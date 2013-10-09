@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.schedule;
+package org.matsim.contrib.dvrp.examples.tsp;
 
-public interface ScheduleListener
+import java.util.List;
+
+import org.matsim.contrib.dvrp.data.network.MatsimVertex;
+import org.matsim.contrib.dvrp.passenger.RequestCreator;
+
+import pl.poznan.put.vrp.dynamic.data.VrpData;
+import pl.poznan.put.vrp.dynamic.data.model.*;
+
+
+public class TSPRequestCreator
+    implements RequestCreator
 {
-    void taskAdded(Task task);
-    
-    /**
-     * As a result of Schedule.nextTask()
-     * @param task
-     */
-    void currentTaskChanged(Schedule schedule);
+    public static final String MODE = "call_salesman";
+
+    private final VrpData vrpData;
+
+
+    public TSPRequestCreator(VrpData vrpData)
+    {
+        this.vrpData = vrpData;
+    }
+
+
+    @Override
+    public Request createRequest(Customer customer, MatsimVertex fromVertex, MatsimVertex toVertex,
+            double startTime)
+    {
+        List<Request> requests = vrpData.getRequests();
+
+        int id = requests.size();
+        int t0 = (int)startTime;
+        int t1 = t0; // no time window
+        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, t0,
+                t1, vrpData.getTime());
+
+        requests.add(request);
+        return request;
+    }
 }

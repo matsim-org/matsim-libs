@@ -31,7 +31,6 @@ public class VehicleImpl
     private final Depot depot;
 
     private final int capacity;
-    private final double cost;
 
     // TW for vehicle
     private final int t0;
@@ -43,14 +42,13 @@ public class VehicleImpl
     private Schedule schedule;
 
 
-    public VehicleImpl(int id, String name, Depot depot, int capacity, double cost, int t0, int t1,
+    public VehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1,
             int timeLimit)
     {
         this.id = id;
         this.name = name;
         this.depot = depot;
         this.capacity = capacity;
-        this.cost = cost;
         this.t0 = t0;
         this.t1 = t1;
         this.timeLimit = timeLimit;
@@ -84,13 +82,6 @@ public class VehicleImpl
     public int getCapacity()
     {
         return capacity;
-    }
-
-
-    @Override
-    public double getCost()
-    {
-        return cost;
     }
 
 

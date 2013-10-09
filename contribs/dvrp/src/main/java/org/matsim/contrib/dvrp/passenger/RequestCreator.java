@@ -17,12 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model;
+package org.matsim.contrib.dvrp.passenger;
 
-public interface Customer
+import org.matsim.contrib.dvrp.data.network.MatsimVertex;
+
+import pl.poznan.put.vrp.dynamic.data.model.*;
+
+
+public interface RequestCreator
 {
-    int getId();
-
-
-    String getName();
+    Request createRequest(Customer customer, MatsimVertex fromVertex,
+            MatsimVertex toVertex, double now);
 }

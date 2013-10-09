@@ -22,17 +22,17 @@ package playground.michalm.taxi;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.data.network.MatsimVertex;
-import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.contrib.dvrp.passenger.RequestCreator;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 
 
 public class TaxiRequestCreator
-    implements PassengerDepartureHandler.RequestCreator
+    implements RequestCreator
 {
     public static final String MODE = "taxi";
+    public static final int DURATION = 120;
 
     private final VrpData vrpData;
 
@@ -44,21 +44,16 @@ public class TaxiRequestCreator
 
 
     @Override
-    public Request createRequest(MobsimAgent agent, MatsimVertex fromVertex, MatsimVertex toVertex,
+    public Request createRequest(Customer customer, MatsimVertex fromVertex, MatsimVertex toVertex,
             double now)
     {
-        List<Customer> customers = vrpData.getCustomers();
         List<Request> requests = vrpData.getRequests();
 
-        // agent -> customerId -> Customer
         int id = requests.size();
-        Customer customer = new PassengerCustomer(id, fromVertex, agent);// TODO
-        int duration = 120; // approx. 120 s for entering the taxi
         int t0 = (int)now;
-        int t1 = t0 + 0; // hardcoded values!
-        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, 1, duration, t0,
-                t1, false);
-        customers.add(customer);
+        int t1 = t0; // no time windows
+        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, t0,
+                t1, (int)now);
         requests.add(request);
 
         return request;

@@ -38,8 +38,6 @@ public class ScheduleImpl
     private ScheduleStatus status;
     private AbstractTask currentTask;
 
-    private List<ScheduleListener> listeners;
-
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public ScheduleImpl(Vehicle vehicle)
@@ -52,8 +50,6 @@ public class ScheduleImpl
 
         status = ScheduleStatus.UNPLANNED;
         currentTask = null;
-
-        listeners = new ArrayList<ScheduleListener>();
     }
 
 
@@ -104,10 +100,6 @@ public class ScheduleImpl
         }
 
         at.notifyAdded();
-
-        for (ScheduleListener l : listeners) {
-            l.taskAdded(task);
-        }
     }
 
 
@@ -266,10 +258,6 @@ public class ScheduleImpl
             currentTask.status = TaskStatus.STARTED;
         }
 
-        for (ScheduleListener l : listeners) {
-            l.currentTaskChanged(this);
-        }
-
         return currentTask;
     }
 
@@ -294,20 +282,6 @@ public class ScheduleImpl
     {
         failIfUnplanned();
         return tasks.get(tasks.size() - 1).endTime;
-    }
-
-
-    @Override
-    public void addScheduleListener(ScheduleListener listener)
-    {
-        listeners.add(listener);
-    }
-
-
-    @Override
-    public void removeScheduleListener(ScheduleListener listener)
-    {
-        listeners.remove(listener);
     }
 
 

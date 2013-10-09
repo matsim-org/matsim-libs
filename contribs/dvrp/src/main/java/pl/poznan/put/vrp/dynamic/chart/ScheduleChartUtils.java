@@ -128,9 +128,6 @@ public class ScheduleChartUtils
                 case DRIVE:
                     return DARK_BLUE;
                 case SERVE:
-                    if ( ((ServeTask)t.vrpTask).getRequest().getFixedVehicle()) {
-                        return Color.ORANGE;
-                    }
                     return DARK_RED;
                 default:
                     throw new IllegalStateException("only 3 task types are supported");

@@ -39,9 +39,6 @@ public interface Vehicle
     int getCapacity();
 
 
-    double getCost();
-
-
     // vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
     int getT0();
 

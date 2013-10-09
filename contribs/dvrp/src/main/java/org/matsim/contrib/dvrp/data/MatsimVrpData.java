@@ -19,8 +19,12 @@
 
 package org.matsim.contrib.dvrp.data;
 
-import org.matsim.api.core.v01.Scenario;
+import java.util.*;
+
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
+import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -30,6 +34,10 @@ public class MatsimVrpData
 {
     private final VrpData vrpData;
     private final Scenario scenario;
+    
+    private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>();
+    private final Map<Id, PassengerCustomer> customersByAgentId = new HashMap<Id, PassengerCustomer>();
+    
 
     private final String coordSystem;
 
@@ -69,5 +77,17 @@ public class MatsimVrpData
     public MatsimVrpGraph getMatsimVrpGraph()
     {
         return (MatsimVrpGraph)vrpData.getVrpGraph();
+    }
+    
+    
+    public Map<Id, MobsimAgent> getAgents()
+    {
+        return agents;
+    }
+    
+    
+    public Map<Id, PassengerCustomer> getCustomersByAgentId()
+    {
+        return customersByAgentId;
     }
 }

@@ -188,20 +188,20 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
 
 
     /*package*/ImmediateRequestTaxiOptimizer createTaxiOptimizer(VrpData data,
-            boolean destinationKnown, boolean minimizePickupTripTime)
+            boolean destinationKnown, boolean minimizePickupTripTime, int pickupDuration)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
                 return new NOSTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
-                        this == NOS_STRAIGHT_LINE);
+                        pickupDuration, this == NOS_STRAIGHT_LINE);
 
             case ONE_TIME_SCHEDULING:
                 return new OTSTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
-                        optimizationPolicy);
+                        pickupDuration, optimizationPolicy);
 
             case RE_SCHEDULING:
                 return new RESTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
-                        optimizationPolicy);
+                        pickupDuration, optimizationPolicy);
 
             default:
                 throw new IllegalStateException();

@@ -55,16 +55,10 @@ public interface Request
     };
 
 
-    // public enum Type
-    // {
-    // P, D, PD, DR;//pickup, delivery, pickup&delivery, dial-a-ride
-    // };
-
     int getId();
 
 
     ReqStatus getStatus();// based on: serveTask.getStatus();
-    // Type getType;
 
 
     Customer getCustomer();
@@ -79,12 +73,6 @@ public interface Request
     int getQuantity();
 
 
-    double getPriority();
-
-
-    int getDuration();
-
-
     int getT0();// earliest start time
 
 
@@ -92,9 +80,6 @@ public interface Request
 
 
     int getSubmissionTime();
-
-
-    boolean getFixedVehicle();
 
 
     ServeTask getServeTask();
@@ -110,10 +95,7 @@ public interface Request
 
 
     /////////////////////////
-    //TODO the following 5 methods need some refactoring in the future
-    void deactivate(int submissionTime);
-
-
+    //TODO the following 3 methods need some refactoring in the future
     void submit();
 
 
@@ -121,25 +103,5 @@ public interface Request
 
 
     void cancel();
-
-
-    void reset();
     /////////////////////////
-
-
-    int getStartTime();
-
-
-    int getEndTime();
-
-    // public int getDuration()
-    // {
-    // return customer.fixedTime + quantity * customer.unitTime;
-    // }
-
-    // public Request()
-    // {
-    // status = Status.RECEIVED;
-    // type = Type.NORMAL;
-    // }
 }

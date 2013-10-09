@@ -41,9 +41,9 @@ public class RESTaxiOptimizer
 
 
     public RESTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            TaxiOptimizationPolicy optimizationPolicy)
+            int pickupDuration, TaxiOptimizationPolicy optimizationPolicy)
     {
-        super(data, destinationKnown, minimizePickupTripTime);
+        super(data, destinationKnown, minimizePickupTripTime, pickupDuration);
         this.data = data;
         this.destinationKnown = destinationKnown;
         this.optimizationPolicy = optimizationPolicy;

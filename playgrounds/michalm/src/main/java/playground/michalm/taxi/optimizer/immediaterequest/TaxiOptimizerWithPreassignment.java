@@ -37,9 +37,10 @@ public class TaxiOptimizerWithPreassignment
     private Vehicle[] reqIdToVehMapping;
 
 
-    public TaxiOptimizerWithPreassignment(VrpData data, final Vehicle[] reqIdToVehMapping)
+    public TaxiOptimizerWithPreassignment(VrpData data, int pickupDuration,
+            final Vehicle[] reqIdToVehMapping)
     {
-        super(data, true, false);
+        super(data, true, false, pickupDuration);
         this.reqIdToVehMapping = reqIdToVehMapping;
     }
 
@@ -66,7 +67,7 @@ public class TaxiOptimizerWithPreassignment
     }
 
 
-    public static TaxiOptimizerWithPreassignment createOptimizer(VrpData data,
+    public static TaxiOptimizerWithPreassignment createOptimizer(VrpData data, int pickupDuration,
             String reqIdToVehIdFile)
     {
         Scanner scanner = null;
@@ -84,6 +85,6 @@ public class TaxiOptimizerWithPreassignment
             reqIdToVehMapping[i] = vehicles.get(scanner.nextInt());
         }
 
-        return new TaxiOptimizerWithPreassignment(data, reqIdToVehMapping);
+        return new TaxiOptimizerWithPreassignment(data, pickupDuration, reqIdToVehMapping);
     }
 }

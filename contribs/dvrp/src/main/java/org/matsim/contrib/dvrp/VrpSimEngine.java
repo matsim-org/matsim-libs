@@ -21,16 +21,16 @@ package org.matsim.contrib.dvrp;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.optimizer.*;
 import org.matsim.contrib.dynagent.DynAgentLogic;
-import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 
@@ -38,9 +38,8 @@ import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 public class VrpSimEngine
     implements MobsimEngine, MobsimBeforeSimStepListener
 {
-    private final VrpData vrpData;
-    protected final MobsimTimer simTimer;
-
+    private final MatsimVrpData data;
+    private final QSim qsim;
     private final VrpOptimizer optimizer;
 
     private final List<DynAgentLogic> agentLogics = new ArrayList<DynAgentLogic>();
@@ -48,12 +47,12 @@ public class VrpSimEngine
     private InternalInterface internalInterface;
 
 
-    public VrpSimEngine(Netsim netsim, MatsimVrpData data, VrpOptimizer optimizer)
+    public VrpSimEngine(QSim qsim, MatsimVrpData data, VrpOptimizer optimizer)
     {
-        this.simTimer = netsim.getSimTimer();
+        this.qsim = qsim;
+        this.data = data;
         this.optimizer = optimizer;
-        this.vrpData = data.getVrpData();
-        netsim.addQueueSimulationListeners(this);
+        qsim.addQueueSimulationListeners(this);
     }
 
 
@@ -74,8 +73,13 @@ public class VrpSimEngine
     public void onPrepareSim()
     {
         // important: in some cases one may need to decrease simTimer.time
-        int time = (int)simTimer.getTimeOfDay();
-        vrpData.setTime(time);
+        int time = (int)qsim.getSimTimer().getTimeOfDay();
+        data.getVrpData().setTime(time);
+
+        Map<Id, MobsimAgent> agents = data.getAgents();
+        for (MobsimAgent mobsimAgent : qsim.getAgents()) {
+            agents.put(mobsimAgent.getId(), mobsimAgent);
+        }
 
         optimizer.init();
         notifyAgentLogics();
@@ -85,7 +89,7 @@ public class VrpSimEngine
     @Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        vrpData.setTime((int)simTimer.getTimeOfDay());
+        data.getVrpData().setTime((int)qsim.getSimTimer().getTimeOfDay());
     }
 
 

@@ -31,10 +31,10 @@ public class VrpAgentVehicle
     private VrpAgentLogic agentLogic;
 
 
-    public VrpAgentVehicle(int id, String name, Depot depot, int capacity, double cost, int t0,
-            int t1, int timeLimit)
+    public VrpAgentVehicle(int id, String name, Depot depot, int capacity, int t0, int t1,
+            int timeLimit)
     {
-        super(id, name, depot, capacity, cost, t0, t1, timeLimit);
+        super(id, name, depot, capacity, t0, t1, timeLimit);
     }
 
 

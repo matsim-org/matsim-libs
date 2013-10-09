@@ -52,7 +52,7 @@ public class PassengerHandlingUtils
         Id currentLinkId = passenger.getCurrentLinkId();
 
         if (currentLinkId != driver.getCurrentLinkId()) {
-            throw new IllegalStateException("Passanger and vehicle on different links!");
+            throw new IllegalStateException("Passenger and vehicle on different links!");
         }
 
         if (vrpSimEngine.getInternalInterface().unregisterAdditionalAgentOnLink(passenger.getId(),

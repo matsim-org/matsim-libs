@@ -113,13 +113,11 @@ public class DepotReader
 
         int capacity = getInt(atts, "id", 1);
 
-        double cost = getDouble(atts, "cost", 0);
-
         int t0 = getInt(atts, "t0", 0);
         int t1 = getInt(atts, "t1", 24 * 60 * 60);
         int tLimit = getInt(atts, "tLimit", t1 - t0);
 
-        vehicles.add(new VrpAgentVehicle(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
+        vehicles.add(new VrpAgentVehicle(id, name, currentDepot, capacity, t0, t1, tLimit));
     }
 
 
@@ -136,21 +134,7 @@ public class DepotReader
     }
 
 
-    private double getDouble(Attributes atts, String qName, double defaultValue)
-    {
-        String val = atts.getValue(qName);
-
-        if (val != null) {
-            return Double.parseDouble(val);
-        }
-        else {
-            return defaultValue;
-        }
-    }
-
-
 	public List<Id> getDepotLinks() {
 		return depotLinks;
 	}
-    
 }

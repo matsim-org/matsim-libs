@@ -30,9 +30,9 @@ public class OTSTaxiOptimizer
 
 
     public OTSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            TaxiOptimizationPolicy optimizationPolicy)
+            int pickupDuration, TaxiOptimizationPolicy optimizationPolicy)
     {
-        super(data, destinationKnown, minimizePickupTripTime);
+        super(data, destinationKnown, minimizePickupTripTime, pickupDuration);
         this.optimizationPolicy = optimizationPolicy;
     }
 

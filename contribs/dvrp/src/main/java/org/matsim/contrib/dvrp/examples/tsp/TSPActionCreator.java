@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,12 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model;
+package org.matsim.contrib.dvrp.examples.tsp;
 
-public interface Customer
+import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dynagent.DynAction;
+
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
+
+
+public class TSPActionCreator
+    implements VrpAgentLogic.ActionCreator
 {
-    int getId();
-
-
-    String getName();
+    @Override
+    public DynAction createAction(Task task, double now)
+    {
+        return new VrpDynLeg((DriveTask)task);
+    }
 }

@@ -133,10 +133,4 @@ public interface Schedule
 
 
     Task nextTask();// sets the next task as the current one, updates this schedule status
-
-
-    void addScheduleListener(ScheduleListener listener);
-
-
-    void removeScheduleListener(ScheduleListener listener);
 }

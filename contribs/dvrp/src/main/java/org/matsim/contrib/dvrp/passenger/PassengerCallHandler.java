@@ -19,29 +19,29 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
 import pl.poznan.put.vrp.dynamic.data.model.Request;
 
 
-public class PassengerDepartureHandler
-    implements DepartureHandler
+public class PassengerCallHandler
+    implements ActivityStartEventHandler
 {
-    private final String mode;
+    private final String type;
     private final RequestCreator requestCreator;
     private final MatsimVrpData data;
     private final VrpSimEngine vrpSimEngine;
 
 
-    public PassengerDepartureHandler(String mode, RequestCreator requestCreator,
+    public PassengerCallHandler(String type, RequestCreator requestCreator,
             VrpSimEngine vrpSimEngine, MatsimVrpData data)
     {
-        this.mode = mode;
+        this.type = type;
         this.requestCreator = requestCreator;
         this.vrpSimEngine = vrpSimEngine;
         this.data = data;
@@ -49,36 +49,30 @@ public class PassengerDepartureHandler
 
 
     @Override
-    public boolean handleDeparture(double now, MobsimAgent agent, Id linkId)
+    public void handleEvent(ActivityStartEvent event)
     {
-        if (agent.getMode().equals(mode)) {
-            vrpSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
-
-            MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
-            MatsimVertex fromVertex = vrpGraph.getVertex(linkId);
-            Id toLinkId = agent.getDestinationLinkId();
-            MatsimVertex toVertex = vrpGraph.getVertex(toLinkId);
-
-            boolean submitted = false;
-
-            //TODO this "submitted?" check works only for up to 1 advanced request per customer
-            for (Request req : data.getVrpData().getRequests()) {
-                if ( ((PassengerCustomer)req.getCustomer()).getPassenger() == agent) {
-                    submitted = true;
-                }
-            }
-
-            if (!submitted) {
-                PassengerCustomer customer = PassengerCustomer.getOrCreatePassengerCustomer(data,
-                        agent);
-                Request request = requestCreator.createRequest(customer, fromVertex, toVertex, now);
-                vrpSimEngine.requestSubmitted(request, now);
-            }
-
-            return true;
+        if (!event.getActType().equals(type)) {
+            return;
         }
-        else {
-            return false;
-        }
+
+        MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
+        MatsimVertex vertex = vrpGraph.getVertex(event.getLinkId());
+
+        MobsimAgent passenger = data.getAgents().get(event.getPersonId());
+
+        double serveTime = passenger.getActivityEndTime();//TODO is this the best idea???
+        //can we get the serveTime in any other way?
+        //what about the destination?
+
+        PassengerCustomer customer = PassengerCustomer
+                .getOrCreatePassengerCustomer(data, passenger);
+        Request request = requestCreator.createRequest(customer, vertex, null, serveTime);
+
+        vrpSimEngine.requestSubmitted(request, event.getTime());
     }
+
+
+    @Override
+    public void reset(int iteration)
+    {}
 }

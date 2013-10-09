@@ -41,32 +41,6 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
  */
 public class RouteChartUtils
 {
-    public static JFreeChart chartVertices(VrpData data)
-    {
-        VertexDataset nData = new VertexDataset();
-        nData.addSeries("Depot", VertexSources.createFromLocalizables(data.getDepots()));
-        nData.addSeries("Customers", VertexSources.createFromLocalizables(data.getCustomers()));
-
-        JFreeChart chart = ChartFactory.createXYLineChart("Vertices", "X", "Y", nData,
-                PlotOrientation.VERTICAL, true, true, false);
-
-        XYPlot plot = (XYPlot)chart.getPlot();
-        plot.setRangeGridlinesVisible(false);
-        plot.setDomainGridlinesVisible(false);
-
-        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
-        yAxis.setAutoRangeIncludesZero(false);
-
-        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
-        renderer.setSeriesShapesVisible(0, true);
-        renderer.setSeriesLinesVisible(0, false);
-        renderer.setSeriesShapesVisible(1, true);
-        renderer.setSeriesLinesVisible(1, false);
-
-        return chart;
-    }
-
-
     public static JFreeChart chartRoutes(VrpData data)
     {
         VertexDataset nData = new VertexDataset();

@@ -39,7 +39,6 @@ public class VrpConfigUtils
 
     public static Config loadConfig(final String filename)
     {
-        @SuppressWarnings("unchecked")
         Config config = ConfigUtils.loadConfig(filename);
 
         updateQSimConfigGroup(config);

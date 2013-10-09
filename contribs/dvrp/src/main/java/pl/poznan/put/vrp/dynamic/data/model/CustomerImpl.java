@@ -19,9 +19,6 @@
 
 package pl.poznan.put.vrp.dynamic.data.model;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-
-
 /**
  * @author michalm
  */
@@ -30,14 +27,12 @@ public class CustomerImpl
 {
     private final int id;
     private final String name;
-    private final Vertex vertex;
 
 
-    public CustomerImpl(int id, String name, Vertex vertex)
+    public CustomerImpl(int id, String name)
     {
         this.id = id;
         this.name = name;
-        this.vertex = vertex;
     }
 
 
@@ -52,13 +47,6 @@ public class CustomerImpl
     public String getName()
     {
         return name;
-    }
-
-
-    @Override
-    public Vertex getVertex()
-    {
-        return vertex;
     }
 
 

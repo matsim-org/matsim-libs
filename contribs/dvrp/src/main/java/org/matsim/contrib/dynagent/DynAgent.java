@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -43,7 +43,7 @@ public class DynAgent
 
     private InternalInterface internalInterface;
 
-    private EventsManager eventsManager;
+    private EventsManager events;
 
     private MobsimAgent.State state;
 
@@ -69,7 +69,7 @@ public class DynAgent
         this.currentLinkId = startLinkId;
         this.agentLogic = agentLogic;
         this.internalInterface = internalInterface;
-        this.eventsManager = internalInterface.getMobsim().getEventsManager();
+        this.events = internalInterface.getMobsim().getEventsManager();
 
         // initial activity
         dynActivity = this.agentLogic.init(this);
@@ -118,7 +118,7 @@ public class DynAgent
     private void computeNextAction(DynAction oldDynAction, double now)
     {
         oldDynAction.endAction(now);
-        
+
         state = null;// !!! this is important
         dynActivity = null;
         dynLeg = null;
@@ -130,7 +130,8 @@ public class DynAgent
             activityEndTime = dynActivity.getEndTime();
             state = MobsimAgent.State.ACTIVITY;
 
-            eventsManager.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
+            events.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, dynActivity
+                    .getActivityType()));
         }
         else {
             dynLeg = (DynLeg)nextDynAction;
@@ -142,7 +143,8 @@ public class DynAgent
     @Override
     public void endActivityAndComputeNextState(double now)
     {
-				eventsManager.processEvent(new ActivityEndEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
+        events.processEvent(new ActivityEndEvent(now, id, currentLinkId, null, dynActivity
+                .getActivityType()));
 
         computeNextAction(dynActivity, now);
     }
@@ -151,7 +153,7 @@ public class DynAgent
     @Override
     public void endLegAndComputeNextState(double now)
     {
-				eventsManager.processEvent(new PersonArrivalEvent(now, id, currentLinkId, TransportMode.car));
+        events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, TransportMode.car));
 
         computeNextAction(dynLeg, now);
     }

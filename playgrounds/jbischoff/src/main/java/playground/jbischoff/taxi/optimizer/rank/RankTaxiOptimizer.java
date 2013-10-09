@@ -49,6 +49,9 @@ import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
  * @author michalm, jbischoff
  */
 public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
+    private static final int PICKUP_DURATION = 120;
+    
+    
 	protected static class VehicleDrive {
 		public static final VehicleDrive NO_VEHICLE_DRIVE_FOUND = new VehicleDrive(
 				null, null, Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -249,7 +252,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 					.addTask(new TaxiDriveTask(best.t1, best.t2, best.arc, req));
 		}
 
-		int t3 = best.t2 + req.getDuration();
+		int t3 = best.t2 + PICKUP_DURATION;
 		bestSched.addTask(new ServeTaskImpl(best.t2, t3, req.getFromVertex(),
 				req));
 
@@ -438,7 +441,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 				// cannot be shortened/lengthen, therefore must be moved
 				// forward/backward
 				task.setBeginTime(t);
-				t += ((ServeTask) task).getRequest().getDuration();
+				t += PICKUP_DURATION;
 				task.setEndTime(t);
 
 				break;

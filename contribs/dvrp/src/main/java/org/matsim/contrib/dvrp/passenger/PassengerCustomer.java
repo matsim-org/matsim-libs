@@ -19,24 +19,25 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.*;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
 public class PassengerCustomer
     implements Customer
 {
-    private int id;
-    private Vertex vertex;
-    private MobsimAgent passenger;
+    private final int id;
+    private final MobsimAgent passenger;
 
 
-    public PassengerCustomer(int id, Vertex vertex, MobsimAgent passenger)
+    public PassengerCustomer(int id, MobsimAgent passenger)
     {
         this.id = id;
-        this.vertex = vertex;
         this.passenger = passenger;
     }
 
@@ -55,21 +56,35 @@ public class PassengerCustomer
     }
 
 
-    @Override
-    public Vertex getVertex()
-    {
-        return vertex;
-    }
-
-
     public MobsimAgent getPassenger()
     {
         return passenger;
     }
-    
-    
+
+
     public static MobsimAgent getPassenger(Request request)
     {
         return ((PassengerCustomer)request.getCustomer()).getPassenger();
+    }
+
+
+    /**
+     * not well established
+     * 
+     * @param vrpData
+     */
+    static PassengerCustomer getOrCreatePassengerCustomer(MatsimVrpData data, MobsimAgent passenger)
+    {
+        Map<Id, PassengerCustomer> customersByAgentId = data.getCustomersByAgentId();
+        PassengerCustomer customer = customersByAgentId.get(passenger.getId());
+
+        if (customer == null) {
+            List<Customer> customers = data.getVrpData().getCustomers();
+            int id = customers.size();
+            customer = new PassengerCustomer(id, passenger);
+            customers.add(customer);
+        }
+
+        return customer;
     }
 }

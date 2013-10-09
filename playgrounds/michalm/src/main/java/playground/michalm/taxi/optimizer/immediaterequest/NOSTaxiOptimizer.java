@@ -35,9 +35,9 @@ public class NOSTaxiOptimizer
 
 
     public NOSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            boolean straightLineDistance)
+            int pickupDuration, boolean straightLineDistance)
     {
-        super(data, destinationKnown, minimizePickupTripTime);
+        super(data, destinationKnown, minimizePickupTripTime, pickupDuration);
         idleVehicleFinder = new IdleVehicleFinder(data, straightLineDistance);
     }
 

@@ -22,7 +22,6 @@ package playground.michalm.taxi.optimizer;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.vrpagent.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;

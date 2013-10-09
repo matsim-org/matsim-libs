@@ -29,19 +29,6 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 public class RequestImpl
     implements Request
 {
-    // TODO ideas for future
-    // perhaps
-    // 1.
-    // introduce fake-Request that represents return to the depot (makes sense if one wants to
-    // change vehicle's depots from day to day, etc.). Any vehicle relocations during the day could
-    // also be performed as a request of a special kind
-    //
-    // 2.
-    // departure: instead of: "arrival-start-finish-departure" use:
-    // "departure-arrival-start-finish"
-    // this improves optVeh->veh mapping
-    // its easier to switch between EarliestArrival/LatestArrival strategies
-
     private final int id;
 
     private final Customer customer;
@@ -50,34 +37,27 @@ public class RequestImpl
     private final Vertex toVertex;
 
     private final int quantity;
-    private final double priority;
 
-    private final int duration;
     private final int t0;// earliest start time
     private final int t1;// latest start time
 
-    private final boolean fixedVehicle;
+    private final int submissionTime;
 
     private ServeTask serveTask = null;
-    private ReqStatus status = ReqStatus.UNPLANNED;// based on: serveTask.getStatus();
-    private int submissionTime = -1;
+    private ReqStatus status = ReqStatus.INACTIVE;// based on: serveTask.getStatus();
 
-
-    // public Type type;
 
     public RequestImpl(int id, Customer customer, Vertex fromVertex, Vertex toVertex, int quantity,
-            double priority, int duration, int t0, int t1, boolean fixedVehicle)
+            int t0, int t1, int submissionTime)
     {
         this.id = id;
         this.customer = customer;
         this.fromVertex = fromVertex;
         this.toVertex = toVertex;
         this.quantity = quantity;
-        this.priority = priority;
-        this.duration = duration;
         this.t0 = t0;
         this.t1 = t1;
-        this.fixedVehicle = fixedVehicle;
+        this.submissionTime = submissionTime;
     }
 
 
@@ -117,20 +97,6 @@ public class RequestImpl
 
 
     @Override
-    public double getPriority()
-    {
-        return priority;
-    }
-
-
-    @Override
-    public int getDuration()
-    {
-        return duration;
-    }
-
-
-    @Override
     public int getT0()
     {
         return t0;
@@ -148,13 +114,6 @@ public class RequestImpl
     public int getSubmissionTime()
     {
         return submissionTime;
-    }
-
-
-    @Override
-    public boolean getFixedVehicle()
-    {
-        return fixedVehicle;
     }
 
 
@@ -186,18 +145,6 @@ public class RequestImpl
 
 
     @Override
-    public void deactivate(int submissionTime)
-    {
-        if (getStatus() != ReqStatus.UNPLANNED) {
-            throw new RuntimeException("Only UNPLANNED request can be deactivated.");
-        }
-
-        status = ReqStatus.INACTIVE;
-        this.submissionTime = submissionTime;
-    }
-
-
-    @Override
     public void submit()
     {
         if (getStatus() != ReqStatus.INACTIVE) {
@@ -211,45 +158,24 @@ public class RequestImpl
     @Override
     public void reject()
     {
-        switch (getStatus()) {
-            case PLANNED:
-                // TODO some code to handle ServeTask????????
-                throw new UnsupportedOperationException("What about ServeTask???");
-
-            case UNPLANNED:
-                status = ReqStatus.REJECTED;
-                return;
-
-            default:
-                throw new RuntimeException("ReqStatus must be UNPLANNED or PLANNED");
+        if (getStatus() != ReqStatus.UNPLANNED) {
+            throw new RuntimeException("ReqStatus must be UNPLANNED;"
+                    + "if scheduled, first remove it from the schedule");
         }
+
+        status = ReqStatus.REJECTED;
     }
 
 
     @Override
     public void cancel()
     {
-        switch (getStatus()) {
-            case PLANNED:
-            case STARTED:
-                // TODO some code to handle ServeTask????????
-                throw new UnsupportedOperationException("What about ServeTask???");
-
-            case UNPLANNED:
-                status = ReqStatus.CANCELLED;
-                return;
-
-            default:
-                throw new RuntimeException("ReqStatus must be UNPLANNED, PLANNED or STARTED");
+        if (getStatus() != ReqStatus.UNPLANNED) {
+            throw new RuntimeException("ReqStatus must be UNPLANNED;"
+                    + "if scheduled, first remove it from the schedule");
         }
-    }
 
-
-    @Override
-    public void reset()
-    {
-        serveTask = null;
-        status = (submissionTime == -1) ? ReqStatus.INACTIVE : ReqStatus.UNPLANNED;
+        status = ReqStatus.CANCELLED;
     }
 
 
@@ -289,34 +215,8 @@ public class RequestImpl
 
 
     @Override
-    public int getStartTime()
-    {
-        return serveTask.getBeginTime();
-    }
-
-
-    @Override
-    public int getEndTime()
-    {
-        return serveTask.getEndTime();
-    }
-
-
-    // public Request()
-    // {
-    // status = Status.RECEIVED;
-    // type = Type.NORMAL;
-    // }
-
-    @Override
     public String toString()
     {
-        // return "Request_" + id;
-
-        // return "Request_" + id + " [A=" + arrivalTime + ", S=(" + t0 + ", " + startTime + ", " +
-        // t1
-        // + "), F=" + finishTime + ", D=" + departureTime + "]";
-
         if (serveTask == null) {
             return "Request_" + id + " [S=(" + t0 + ", ???, " + t1 + "), F=???]";
         }

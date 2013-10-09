@@ -73,14 +73,16 @@ public abstract class ImmediateRequestTaxiOptimizer
     private TaxiDelaySpeedupStats delaySpeedupStats;
     private final boolean destinationKnown;
     private final boolean minimizePickupTripTime;
+    private final int pickupDuration;
 
 
     public ImmediateRequestTaxiOptimizer(VrpData data, boolean destinationKnown,
-            boolean minimizePickupTripTime)
+            boolean minimizePickupTripTime, int pickupDuration)
     {
         super(data);
         this.destinationKnown = destinationKnown;
         this.minimizePickupTripTime = minimizePickupTripTime;
+        this.pickupDuration = pickupDuration;
     }
 
 
@@ -170,10 +172,17 @@ public abstract class ImmediateRequestTaxiOptimizer
                         if (!destinationKnown) {
                             return null;
                         }
+                        
+                    case DRIVE:
+                    default:
+                        throw new IllegalStateException();
                 }
+                
+            case COMPLETED:
+            default:
+                throw new IllegalStateException();
+ 
         }
-
-        throw new IllegalStateException();
     }
 
 
@@ -205,13 +214,12 @@ public abstract class ImmediateRequestTaxiOptimizer
                 default:
                     throw new IllegalStateException();
             }
-
         }
 
         Vertex reqFromVertex = req.getFromVertex();
         bestSched.addTask(new TaxiDriveTask(best.t1, best.t2, best.arc, req));
 
-        int t3 = best.t2 + req.getDuration();
+        int t3 = best.t2 + pickupDuration;
         bestSched.addTask(new ServeTaskImpl(best.t2, t3, reqFromVertex, req));
 
         if (destinationKnown) {
@@ -355,7 +363,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                 case SERVE: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
-                    t += ((ServeTask)task).getRequest().getDuration();
+                    t += pickupDuration;
                     task.setEndTime(t);
 
                     break;
