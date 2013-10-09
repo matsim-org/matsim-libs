@@ -345,7 +345,7 @@ public class ChooseRandomLegModeForSubtourTest {
 			originalPlan.copyFrom(plan);
 			assertTrue(TestsUtil.equals(plan.getPlanElements(), originalPlan.getPlanElements()));
 			testee.run(plan);
-			assertSubTourMutated(plan, originalPlan, expectedMode, true);
+			assertSubTourMutated(plan, originalPlan, expectedMode, false);
 		}
 	}
 	
