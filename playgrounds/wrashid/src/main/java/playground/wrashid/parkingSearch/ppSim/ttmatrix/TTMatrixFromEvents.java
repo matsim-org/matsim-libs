@@ -30,12 +30,16 @@ import org.matsim.core.events.EventsUtils;
 public class TTMatrixFromEvents extends TTMatrix {
 
 	public static void main(String[] args) {
-		String eventsFile="C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.events.xml.gz";
-		String networkFile="C:/data/parkingSearch/psim/berlin/output_network.xml.gz";
-		//String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
-		//String networkFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
-		TTMatrixFromEvents tTMatrixFromEvents=new TTMatrixFromEvents(24*3600,60, eventsFile, networkFile);
-		tTMatrixFromEvents.writeTTMatrixToFile("C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.60secBin.ttMatrix.txt");
+	//	String eventsFile="C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.events.xml.gz";
+//		String eventsFile="C:/data/parkingSearch/psim/output/events.xml";
+//		String networkFile="C:/data/parkingSearch/psim/berlin/output_network.xml.gz";
+		String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
+		//String eventsFile="C:/data/parkingSearch/psim/zurich/output/basic output with 300 sec bins/events.xml.gz";
+		String networkFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
+		TTMatrixFromEvents tTMatrixFromEvents=new TTMatrixFromEvents(24*3600,3600, eventsFile, networkFile);
+//		tTMatrixFromEvents.writeTTMatrixToFile("C:/data/parkingSearch/psim/output/50.60secBin.ttMatrix_fromPSim.txt");
+//		tTMatrixFromEvents.writeTTMatrixToFile("C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.60secBin.ttMatrix.txt");
+		tTMatrixFromEvents.writeTTMatrixToFile("C:/data/parkingSearch/psim/zurich/experiment/zurich eperiment 1/it.50.3600secBin.ttMatrix_fromPSim.txt");
 	}
 	
 	TTMatrixFromEvents(int simulatedTimePeriod,int timeBinSizeInSeconds, String eventsFile, String networkFile) {
@@ -80,12 +84,16 @@ public class TTMatrixFromEvents extends TTMatrix {
 				double[] ds = linkTravelTimes.get(linkId);
 				Link link = network.getLinks().get(linkId);
 				
-				for (int i=0;i<ds.length;i++){
+				// reason for backward iteration is that in this case 
+				// one can look at the value in past (if empty)
+				// this is indeed an improvement for the quality (traffic peaks matching better)
+				for (int i=ds.length-1;i>=0;i--){
 					if (ds[i]==0){
 						if (i>0 && i<ds.length-1){
-							if (ds[i+1]==0){
+							if (ds[i-1]==0){
+								// proability increases that road speed should be close to freespeed
 								double freeSpeedTravelTime=link.getLength() / link.getFreespeed();
-								ds[i]=(ds[i-1]+freeSpeedTravelTime)/2;
+								ds[i]=(ds[i+1]+freeSpeedTravelTime)/2;
 							} else {
 								ds[i]=(ds[i-1]+ds[i+1])/2;;
 							}
