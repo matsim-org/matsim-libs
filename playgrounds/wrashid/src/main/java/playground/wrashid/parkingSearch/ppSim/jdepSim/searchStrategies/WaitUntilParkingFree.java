@@ -17,13 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
+public class WaitUntilParkingFree {
 
-import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
-
-public interface ParkingSearchStrategy {
-
-	public void handleAgentLeg(AgentWithParking aem);
-	public String getName();
 }
 

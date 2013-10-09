@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.population.Person;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
@@ -28,6 +30,21 @@ public class RandomSearch implements ParkingSearchStrategy{
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		aem.processLegInDefaultWay();
+		
+		Person person = aem.getPerson();
+		
+		Random rand=new Random();
+		
+		// TODO: add score only at end of search (store it locally during search)!
+		
+		if (aem.getPlanElementIndex() >1 && aem.getPlanElementIndex() % 2 == 0){
+			AgentWithParking.parkingStrategyManager.updateScore(person.getId(), aem.getPlanElementIndex()-1, 1*rand.nextDouble());
+		}
+	}
+
+	@Override
+	public String getName() {
+		return "RandomSearch";
 	}
 
 

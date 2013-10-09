@@ -30,6 +30,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
 
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.GarageParkingSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.IllegalParking;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 
 public class MainPPSimZurich30km {
@@ -48,41 +53,71 @@ public class MainPPSimZurich30km {
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 		String outputFolder="C:/data/parkingSearch/psim/zurich/output/";
 		
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-
-		EventWriterXML eventsWriter = new EventWriterXML(outputFolder + "events.xml.gz");
-		eventsManager.addHandler(eventsWriter);
-		LegHistogram lh = new LegHistogram(300);
-		eventsManager.addHandler(lh);
-
-		eventsManager.resetHandlers(0);
-		eventsWriter.init(outputFolder + "events.xml.gz");
-
 		Message.ttMatrix = new TTMatrixFromStoredTable("C:/data/parkingSearch/psim/zurich/inputs/it.50.3600secBin.ttMatrix.txt", scenario.getNetwork());
 		
 		//TODO: set strategies initially at random
 		
 		LinkedList<AgentWithParking> agentsMessage=new LinkedList<AgentWithParking>();
+
 		
-		for (Person p:scenario.getPopulation().getPersons().values()){
-			agentsMessage.add(new AgentWithParking(p));
-		}
+		
+		LinkedList<ParkingSearchStrategy> allStrategies=new LinkedList<ParkingSearchStrategy>();
+		allStrategies.add(new RandomSearch());
+		allStrategies.add(new GarageParkingSearch());
+		allStrategies.add(new IllegalParking());
+		
+		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
+		
 		
 		// TODO: load parking infrastructure files from: 
 		//Z:\data\experiments\TRBAug2011\parkings
 		
+		int writeEachNthIteration = 5;
 		
-		for (int iter=0;iter<10;iter++){
+		for (int iter=0;iter<100;iter++){
+			
+			EventsManager eventsManager = EventsUtils.createEventsManager();
+			LegHistogram lh = new LegHistogram(300);
+			EventWriterXML eventsWriter = new EventWriterXML(outputFolder + "events.xml.gz");
+			if (iter % writeEachNthIteration==0){
+			eventsManager.addHandler(eventsWriter);
+			eventsManager.addHandler(lh);
+
+			eventsManager.resetHandlers(0);
+			eventsWriter.init(outputFolder + "events.xml.gz");
+			
+			
+			eventsManager.resetHandlers(0);
+			
+			
+				eventsWriter.init(outputFolder + "it." + iter + ".events.xml.gz");
+			}
+			
+			
+			agentsMessage.clear();
+			for (Person p:scenario.getPopulation().getPersons().values()){
+				agentsMessage.add(new AgentWithParking(p));
+				AgentWithParking.parkingStrategyManager.prepareStrategiesForNewIteration(p, iter);
+			}
+			
+			
 			Mobsim sim = new ParkingPSim(scenario, eventsManager,agentsMessage);
 			sim.run();
 			eventsManager.finishProcessing();
 			
+			if (iter % writeEachNthIteration==0){
 			lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_all.png");
 			lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_car.png",TransportMode.car);
 			lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_pt.png",TransportMode.pt);
 			lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_ride.png",TransportMode.ride);
 			lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_walk.png",TransportMode.walk);
 			eventsWriter.reset(0);
+			}
+			
+			AgentWithParking.parkingStrategyManager.printStrategyStatistics();
+			
+			
+			
 		}
 		
 		

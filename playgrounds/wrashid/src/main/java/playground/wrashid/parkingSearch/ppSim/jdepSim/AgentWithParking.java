@@ -26,13 +26,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 
 public class AgentWithParking extends AgentEventMessage{
 
-	ArrayList<ParkingSearchStrategy> parkingSearchStrategies;
+	public static ParkingStrategyManager parkingStrategyManager;
 	
 	public AgentWithParking(Person person) {
-		this.person = person;
+		this.setPerson(person);
 		this.setPlanElementIndex(0);
 		ActivityImpl ai = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		setMessageArrivalTime(ai.getEndTime());
@@ -44,12 +45,12 @@ public class AgentWithParking extends AgentEventMessage{
 	
 	@Override
 	public void processEvent() {
-		if (person.getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof ActivityImpl){
+		if (getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof ActivityImpl){
 			handleActivityEndEvent();
 		} else {
-			Leg leg=(Leg) person.getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+			Leg leg=(Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 			if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
-				parkingSearchStrategies.get(getPlanElementIndex()).handleAgentLeg(this);
+				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(),planElementIndex).handleAgentLeg(this);
 			} else {
 				handleLeg();
 			}
