@@ -30,12 +30,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name= "writeEventsInterval" value="4" />
-	</module>
-
-	<module name="simulation">
-		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
+		<param name="mobsim" value="JDEQSim" />
 	</module>
 
 	<module name="planCalcScore">
