@@ -32,9 +32,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 import playground.ciarif.retailers.IO.FileRetailerReader;
 import playground.ciarif.retailers.IO.LinksRetailerReader;
@@ -55,7 +55,6 @@ public class RetailersLocationListener
   public static final String CONFIG_MODEL_ITERATION = "modelIteration";
   public static final String CONFIG_ANALYSIS_FREQUENCY = "analysisFrequency";
   public static final String CONFIG_RSW_OUTPUT_FILE = "rswOutputFile";
-  private PlansCalcRoute pcrl = null;
   private final boolean parallel = false;
   private String facilityIdFile = null;
   private Retailers retailers;
@@ -70,7 +69,6 @@ public class RetailersLocationListener
     this.controler = event.getControler();
     FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(this.controler.getConfig().planCalcScore());
     ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getPopulation().getFactory()).getModeRouteFactory();
-    this.pcrl = new PlansCalcRoute(this.controler.getConfig().plansCalcRoute(), this.controler.getNetwork(), timeCostCalc, timeCostCalc, new AStarLandmarksFactory(this.controler.getNetwork(), timeCostCalc), routeFactory);
 
     this.facilityIdFile = this.controler.getConfig().findParam("Retailers", "retailers");
     if (this.facilityIdFile == null) throw new RuntimeException("In config file, param = retailers in module = Retailers not defined!");
@@ -124,12 +122,20 @@ public class RetailersLocationListener
 
     if (event.getIteration() == modelIter)
     {
+      final PersonAlgorithm router =
+    		  new PlanRouter(
+    				  event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter() );
       for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) { r = localIterator.next();
         this.rsw.write(r, event.getIteration(), this.cfc);
         r.runStrategy(this.lrr.getFreeLinks());
         this.lrr.updateFreeLinks();
         Map persons = this.controler.getPopulation().getPersons();
-        new ReRoutePersons().run(r.getMovedFacilities(), this.controler.getNetwork(), persons, this.pcrl, this.controler.getFacilities());
+        new ReRoutePersons().run(
+        		r.getMovedFacilities(),
+        		this.controler.getNetwork(),
+        		persons,
+        		router,
+        		this.controler.getFacilities());
       }
     }
     if ((event.getIteration() != 0) && (event.getIteration() % analysisFrequency == 0) && (event.getIteration() != modelIter) && (event.getIteration() != this.controler.getLastIteration()))

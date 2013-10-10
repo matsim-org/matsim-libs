@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 
 public class ReRoutePersons {
@@ -38,7 +38,12 @@ public class ReRoutePersons {
 	private final static Logger log = Logger.getLogger(ReRoutePersons.class);
 
 
-	public void run (Map<Id,ActivityFacilityImpl> movedFacilities, Network network, Map<Id, PersonImpl> persons,PlansCalcRoute pcrl, ActivityFacilities facilities){
+	public void run (
+			Map<Id,ActivityFacilityImpl> movedFacilities,
+			Network network,
+			Map<Id, PersonImpl> persons,
+			PersonAlgorithm pcrl,
+			ActivityFacilities facilities){
 		log.info("movedFacilities= " + movedFacilities);
 		int counterPlans = 0;
 		int counterPersons = 0;
@@ -54,11 +59,6 @@ public class ReRoutePersons {
 							routeIt = true;
 						}
 					}
-				}
-
-				if (routeIt) {
-					pcrl.run(plan);
-					 counterPlans = counterPlans+1;
 				}
 			}
 			if (routeIt) {

@@ -125,19 +125,19 @@ public final class CarSharingControler extends Controler
 //				super.createRoutingAlgorithm();
 //	}
 
-  private PlanAlgorithm createFtRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes)
-  {
-    log.info("travelcosts = " + travelCosts );
+  //private PlanAlgorithm createFtRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes)
+  //{
+  //  log.info("travelcosts = " + travelCosts );
 
-      return new PlansCalcRouteFT(
-        super.getConfig().plansCalcRoute(), 
-        super.network, 
-        travelCosts, 
-        travelTimes, 
-        super.getLeastCostPathCalculatorFactory(),
-        ((PopulationFactoryImpl) super.population.getFactory()).getModeRouteFactory(),
-        this.plansCalcRouteFtInfo);
-  }
+  //    return new PlansCalcRouteFT(
+  //      super.getConfig().plansCalcRoute(), 
+  //      super.network, 
+  //      travelCosts, 
+  //      travelTimes, 
+  //      super.getLeastCostPathCalculatorFactory(),
+  //      ((PopulationFactoryImpl) super.population.getFactory()).getModeRouteFactory(),
+  //      this.plansCalcRouteFtInfo);
+  //}
 
   public static void main(String[] args)
   {

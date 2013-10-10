@@ -123,17 +123,17 @@ public final class FlexibleTransportControler extends Controler
 //				super.createRoutingAlgorithm();
 //	}
 
-	private PlanAlgorithm createFtRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes)
-  {
-      return new PlansCalcRouteFT(
-        super.getConfig().plansCalcRoute(), 
-        super.network, 
-        travelCosts, 
-        travelTimes, 
-        super.getLeastCostPathCalculatorFactory(),
-        ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
-        this.plansCalcRouteFtInfo);
-  }
+//	private PlanAlgorithm createFtRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes)
+//  {
+//      return new PlansCalcRouteFT(
+//        super.getConfig().plansCalcRoute(), 
+//        super.network, 
+//        travelCosts, 
+//        travelTimes, 
+//        super.getLeastCostPathCalculatorFactory(),
+//        ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
+//        this.plansCalcRouteFtInfo);
+//  }
 
   public static void main(String[] args)
   {

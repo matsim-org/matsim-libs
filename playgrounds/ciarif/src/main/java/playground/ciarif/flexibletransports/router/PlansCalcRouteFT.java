@@ -2,25 +2,16 @@ package playground.ciarif.flexibletransports.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.ciarif.flexibletransports.data.MyTransportMode;
 import playground.ciarif.flexibletransports.network.MyLinkUtils;
 
-public class PlansCalcRouteFT extends PlansCalcRoute
+public class PlansCalcRouteFT 
 {
   private final Network network;
   private final PlansCalcRouteFtInfo plansCalcRouteFtInfo;
@@ -35,78 +26,78 @@ public class PlansCalcRouteFT extends PlansCalcRoute
 		  ModeRouteFactory routeFactory,
 		  PlansCalcRouteFtInfo ptRoutingInfo)
   {
-    super(group, network, costCalculator, timeCalculator, factory, routeFactory);
+    //super(group, network, costCalculator, timeCalculator, factory, routeFactory);
     this.network = network;
     this.plansCalcRouteFtInfo = ptRoutingInfo;
     this.myLinkUtils = new MyLinkUtils(network);
   }
 
-  @Override
-	public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime)
-  {
-    String mode = leg.getMode();
+//  @Override
+//	public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime)
+//  {
+//    String mode = leg.getMode();
+//
+//
+//    double travelTime = 0.0D;
+//
+//    Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
+//    Link toLink = this.network.getLinks().get(toAct.getLinkId());
+//    if (fromLink.equals(toLink))
+//    {
+//      Route route = getRouteFactory().createRoute(mode, fromLink.getId(), toLink.getId());
+//      route.setTravelTime(travelTime);
+//      if (Double.isNaN(route.getDistance())) {
+//        route.setDistance(0.0D);
+//      }
+//      leg.setRoute(route);
+//      leg.setDepartureTime(depTime);
+//      leg.setTravelTime(travelTime);
+//      ((LegImpl)leg).setArrivalTime(depTime + travelTime);
+//    }
+//
+//    /*if (mode.equals(TransportMode.pt))
+//    {
+//      travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
+//    }*/
+//    //else if
+//    if (mode.equals(MyTransportMode.carsharing))
+//    {
+//      travelTime = handleCarSharingLeg(person,(LegImpl) leg, (ActivityImpl)fromAct, (ActivityImpl)toAct, depTime);
+//    }
+//    else {
+//      travelTime = super.handleLeg(person, leg, fromAct, toAct, depTime);
+//    }
+//
+//    return travelTime;
+//  }
 
-
-    double travelTime = 0.0D;
-
-    Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
-    Link toLink = this.network.getLinks().get(toAct.getLinkId());
-    if (fromLink.equals(toLink))
-    {
-      Route route = getRouteFactory().createRoute(mode, fromLink.getId(), toLink.getId());
-      route.setTravelTime(travelTime);
-      if (Double.isNaN(route.getDistance())) {
-        route.setDistance(0.0D);
-      }
-      leg.setRoute(route);
-      leg.setDepartureTime(depTime);
-      leg.setTravelTime(travelTime);
-      ((LegImpl)leg).setArrivalTime(depTime + travelTime);
-    }
-
-    /*if (mode.equals(TransportMode.pt))
-    {
-      travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
-    }*/
-    //else if
-    if (mode.equals(MyTransportMode.carsharing))
-    {
-      travelTime = handleCarSharingLeg(person,(LegImpl) leg, (ActivityImpl)fromAct, (ActivityImpl)toAct, depTime);
-    }
-    else {
-      travelTime = super.handleLeg(person, leg, fromAct, toAct, depTime);
-    }
-
-    return travelTime;
-  }
-
-  private double handleCarSharingLeg(Person person, LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime)
-  {
-    double travelTime = 0.0D;
-
-    CarSharingStation fromStation = this.plansCalcRouteFtInfo.getCarStations().getClosestLocation(fromAct.getCoord());
-    CarSharingStation toStation = this.plansCalcRouteFtInfo.getCarStations().getClosestLocation(toAct.getCoord());
-
-    FtCarSharingRoute newRoute = new FtCarSharingRoute(fromAct.getLinkId(), toAct.getLinkId(), this.plansCalcRouteFtInfo, fromStation, toStation);
-    leg.setRoute(newRoute);
-
-    double timeInVehicle = calcCarTime(person, fromStation, toStation, depTime);
-
-    double walkAccessDistance = newRoute.calcAccessDistance(fromAct);
-    double walkEgressDistance = newRoute.calcAccessDistance(toAct);
-    double walkAccessTime = getAccessEgressTime(walkAccessDistance, this.configGroup);
-    double walkEgressTime = getAccessEgressTime(walkEgressDistance, this.configGroup);
-
-    newRoute.setDistance(walkAccessDistance + walkEgressDistance + newRoute.calcCarDistance(fromAct));
-
-    travelTime = walkAccessTime + walkEgressTime + timeInVehicle;
-
-    leg.setDepartureTime(depTime);
-    leg.setTravelTime(travelTime);
-    leg.setArrivalTime(depTime + travelTime);
-
-    return travelTime;
-  }
+//  private double handleCarSharingLeg(Person person, LegImpl leg, ActivityImpl fromAct, ActivityImpl toAct, double depTime)
+//  {
+//    double travelTime = 0.0D;
+//
+//    CarSharingStation fromStation = this.plansCalcRouteFtInfo.getCarStations().getClosestLocation(fromAct.getCoord());
+//    CarSharingStation toStation = this.plansCalcRouteFtInfo.getCarStations().getClosestLocation(toAct.getCoord());
+//
+//    FtCarSharingRoute newRoute = new FtCarSharingRoute(fromAct.getLinkId(), toAct.getLinkId(), this.plansCalcRouteFtInfo, fromStation, toStation);
+//    leg.setRoute(newRoute);
+//
+//    double timeInVehicle = calcCarTime(person, fromStation, toStation, depTime);
+//
+//    double walkAccessDistance = newRoute.calcAccessDistance(fromAct);
+//    double walkEgressDistance = newRoute.calcAccessDistance(toAct);
+//    double walkAccessTime = getAccessEgressTime(walkAccessDistance, this.configGroup);
+//    double walkEgressTime = getAccessEgressTime(walkEgressDistance, this.configGroup);
+//
+//    newRoute.setDistance(walkAccessDistance + walkEgressDistance + newRoute.calcCarDistance(fromAct));
+//
+//    travelTime = walkAccessTime + walkEgressTime + timeInVehicle;
+//
+//    leg.setDepartureTime(depTime);
+//    leg.setTravelTime(travelTime);
+//    leg.setArrivalTime(depTime + travelTime);
+//
+//    return travelTime;
+//  }
 
   /*public double handleSwissPtLeg(Activity fromAct, Leg leg, Activity toAct, double depTime)
   {
@@ -148,14 +139,14 @@ public class PlansCalcRouteFT extends PlansCalcRoute
 	  return this.plansCalcRouteFtInfo;
   }
 
-  protected double calcCarTime(Person person, CarSharingStation fromStation, CarSharingStation toStation, double carStartTime) {
-	  //LegImpl leg = new LegImpl(MyTransportMode.carsharing);
-	  LegImpl leg = new LegImpl(MyTransportMode.car);
-
-    double travelTime = 0.0D;
-    Activity getCarSharingCar = new ActivityImpl("getCarSharingCar", fromStation.getCoord(), fromStation.getLink().getId());
-    Activity letCarSharingCar = new ActivityImpl("letCarSharingCar", toStation.getCoord(), toStation.getLink().getId());
-    travelTime = super.handleLeg(person, leg, getCarSharingCar, letCarSharingCar, carStartTime);
-    return travelTime;
-  }
+//  protected double calcCarTime(Person person, CarSharingStation fromStation, CarSharingStation toStation, double carStartTime) {
+//	  //LegImpl leg = new LegImpl(MyTransportMode.carsharing);
+//	  LegImpl leg = new LegImpl(MyTransportMode.car);
+//
+//    double travelTime = 0.0D;
+//    Activity getCarSharingCar = new ActivityImpl("getCarSharingCar", fromStation.getCoord(), fromStation.getLink().getId());
+//    Activity letCarSharingCar = new ActivityImpl("letCarSharingCar", toStation.getCoord(), toStation.getLink().getId());
+//    travelTime = super.handleLeg(person, leg, getCarSharingCar, letCarSharingCar, carStartTime);
+//    return travelTime;
+//  }
 }

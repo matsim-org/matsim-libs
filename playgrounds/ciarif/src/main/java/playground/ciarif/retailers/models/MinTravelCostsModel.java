@@ -21,9 +21,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -88,13 +88,13 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
         LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 
-        PlansCalcRoute pcr = new PlansCalcRoute(this.controler.getConfig().plansCalcRoute(), network, travelCost, travelTime, this.controler.getLeastCostPathCalculatorFactory(), routeFactory);
+        //PlansCalcRoute pcr = new PlansCalcRoute(this.controler.getConfig().plansCalcRoute(), network, travelCost, travelTime, this.controler.getLeastCostPathCalculatorFactory(), routeFactory);
 
         LegImpl li = new LegImpl(TransportMode.car);
         li.setDepartureTime(0.0D);
         //log.info("fromLink " + link);
         //log.info("toLink " + (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()));
-        handleCarLeg(li, link, this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()), network, pcr, routeAlgo);
+        handleCarLeg(li, link, this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()), network, routeAlgo);
 
         Plan plan = this.controler.getPopulation().getFactory().createPlan();
         plan.addActivity(null);
@@ -124,7 +124,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
     return function.getScore();
   }
 
-  private double handleCarLeg(Leg leg, Link fromLink, Link toLink, Network network, PlansCalcRoute pcr, LeastCostPathCalculator routeAlgo)
+  private double handleCarLeg(Leg leg, Link fromLink, Link toLink, Network network, LeastCostPathCalculator routeAlgo)
     throws RuntimeException
   {
     NetworkRoute route;
@@ -143,7 +143,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       path = routeAlgo.calcLeastCostPath(startNode, endNode, depTime, null, null);
       if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 
-      route = (NetworkRoute)pcr.getRouteFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+      route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
       route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
       route.setTravelTime((int)path.travelTime);
       route.setTravelCost(path.travelCost);
@@ -152,7 +152,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       travTime = (int)path.travelTime;
     }
     else {
-      route = (NetworkRoute)pcr.getRouteFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+      route = new LinkNetworkRouteImpl( fromLink.getId(), toLink.getId());
       route.setTravelTime(0.0D);
       route.setDistance(0.0D);
       leg.setRoute(route);
