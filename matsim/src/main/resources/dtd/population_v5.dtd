@@ -4,7 +4,7 @@
 <!ATTLIST population
           desc           CDATA   #IMPLIED>
 
-<!ELEMENT person         (desires?,plan*)>
+<!ELEMENT person         (plan*)>
 <!ATTLIST person
           id             CDATA                    #REQUIRED
           sex            (f|m)                    #IMPLIED
