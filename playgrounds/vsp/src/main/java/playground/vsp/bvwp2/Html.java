@@ -78,6 +78,13 @@ class Html {
 		myWrite("</table>\n") ;
 	}
 	
+	void beginDivRightAlign() {
+		myWrite("<div align=\"right\">") ;
+	}
+	void endDiv() {
+		myWrite("</div>") ;
+	}
+	
 	void bvwpTableRow( String str, double n1, double n2, double p1, double p2, double d1, double d2, double u1, double u2 ) {
 		beginTableRow() ;
 		write(str) ; 
@@ -85,6 +92,15 @@ class Html {
 		nextTableEntry() ; write(p1) ; nextTableEntry() ; write(p2) ; 
 		nextTableEntry() ; write(d1) ; nextTableEntry() ; write(d2) ; 
 		nextTableEntry() ; write(u1) ; nextTableEntry() ; write(u2) ; 
+		endTableRow() ;
+	}
+	void bvwpTableRow( String str, double n1, double n2, double p1, double p2, double d1, double d2, double u1, String u2 ) {
+		beginTableRow() ;
+		write(str) ; 
+		nextTableEntry() ; write(n1) ; nextTableEntry() ; write(n2) ; 
+		nextTableEntry() ; write(p1) ; nextTableEntry() ; write(p2) ; 
+		nextTableEntry() ; write(d1) ; nextTableEntry() ; write(d2) ; 
+		nextTableEntry() ; write(u1) ; nextTableEntry() ; this.beginDivRightAlign() ; write(u2) ; this.endDiv() ; 
 		endTableRow() ;
 	}
 	void bvwpTableRow( String str, String n1, String n2, String p1, String p2, String d1, String d2, String u1, String u2, String zz ) {

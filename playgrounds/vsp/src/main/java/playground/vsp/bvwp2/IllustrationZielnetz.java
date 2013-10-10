@@ -28,7 +28,7 @@ public class IllustrationZielnetz {
 		System.out.println(divider);
 		System.out.println(divider);
 		
-		planfall = ScenarioZielnetzBahn.createPlanfallStrassenausbau(nullfall) ;
+//		planfall = ScenarioZielnetzBahn.createPlanfallStrassenausbau(nullfall) ;
 //		runBVWP2003();
 //		runBVWP2010();
 //		runRoH();

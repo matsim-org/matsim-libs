@@ -16,102 +16,167 @@ import static playground.vsp.bvwp2.Key.*;
  */
 
 class ScenarioZielnetzBahn {
-	
-	static final double xx_bahn = 116.5 * 1000. * 1000.  ;
-	static final double pkm_bahn = 32700. * 1000. * 1000. ;
-	static final double distance = pkm_bahn / xx_bahn ;
-	
-	static final double xx_bahn_comm = 36.8 * 1000. * 1000. ;
-
-	static final double verbleibend_bahn =  xx_bahn ;
-	static final double verbleibend_strasse = xx_bahn * 10. ;
-	 static final double verbleibend_bahn_comm = xx_bahn_comm ; 
-	 static final double verbleibend_strasse_comm = xx_bahn_comm * 5. ;
-//	static final double verbleibend_bahn =  0. ;
-//	static final double verbleibend_strasse = 0. ;
-//	static final double verbleibend_bahn_comm = 0. ;
-//	static final double verbleibend_strasse_comm = 0. ;
-	
-	static final double xxi_bahn = 1.2 * 1000. * 1000. ;
-	static final double xxi_bahn_comm = 0.8 * 1000. * 1000. ;
-
-	static final double induziert_bahn = xxi_bahn ;
-	static final double induziert_strasse = xxi_bahn * 10. ;
-	static final double induziert_bahn_comm =  xxi_bahn_comm ;
-	static final double induziert_strasse_comm = xxi_bahn_comm * 5. ;
-//	static final double induziert_bahn = 0. ;
-//	static final double induziert_strasse = 0. ;
-//	static final double induziert_bahn_comm = 0. ;
-//	static final double induziert_strasse_comm = 0. ;
-	
-	static final double xxv_bahn = 6.6 * 1000. * 1000. ;
-	static final double xxv_bahn_comm = 2.5 * 1000. * 1000. ;
-
-	static final double verlagert_bahn_von_strasse =  xxv_bahn ;
-	static final double verlagert_strasse_von_bahn = xxv_bahn / 10. ;
-	static final double verlagert_bahn_von_strasse_comm = xxv_bahn_comm ;
-	static final double verlagert_strasse_von_bahn_comm = xxv_bahn_comm / 5. ;
-//	static final double verlagert_bahn_von_strasse = 0. ;
-//	static final double verlagert_strasse_von_bahn = 0. ;
-//	 static final double verlagert_bahn_von_strasse_comm = 0. ;
-//	 static final double verlagert_strasse_von_bahn_comm = 0. ;
-
-
 
 	static ScenarioForEvalData createNullfall1() {
 		// set up the base case:
 		ScenarioForEvalData nullfall = new ScenarioForEvalData() ;
-	
-		// construct values for one OD relation:
-		Values nullfallForOD = new Values() ;
-		nullfall.setValuesForODRelation(new IdImpl("BC"), nullfallForOD ) ;
-		{
-			System.out.println(" distance: " + distance );
-			{
-				// construct values for the road mode for this OD relation:
-				Mode mode = Mode.ROAD ;
-				{
-					// non-commercial passenger traffic:
-					DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_strasse ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 2.5 ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), (0.1 - 0.02) * distance  ) ; // price minus taxes
-					// this is per demand item!!!
-				}			
-				{
-					// commercial passenger traffic:
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_strasse_comm ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 2.5 ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), (0.1 - 0.02) * distance  ) ; // price minus taxes
-					// this is per demand item!!!
-				}			
 
-			}
+		// induced traffic:
+		{
+			final Values nullfallForInduced = new Values() ;
+			nullfall.setValuesForODRelation(new IdImpl("induziert"), nullfallForInduced ) ;
 			{
-				// construct values for the RAIL mode for this OD relation:
-				Mode mode = Mode.RAIL ;
 				{
-					// non-commercial passenger traffic:
-					DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_bahn ) ; 
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 3. ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
-				}			
+					Mode mode = Mode.RAIL ;
+					{
+						// commercial passenger traffic:
+						DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+						final double distance = 580. ; 
+
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), 5.5 ) ;
+						// (we need both the base case and the measure case here to be able to compute the "half" improvement!!!)
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+					}
+					{
+						// non-commercial passenger traffic:
+						DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+						final double distance = 620. ; 
+
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ;
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), 5.9 ) ;
+						// (we need both the base case and the measure case here to be able to compute the "half" improvement!!!)
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0.  ) ; 
+					}
+				}
 				{
-					// commercial passenger traffic:
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_bahn_comm ) ; 
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 3. ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+					Mode mode = Mode.ROAD ; // we need a fake road!
+					{
+						// commercial passenger traffic:
+						DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+						final double distance = 580. ; 
+
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), 5.5 ) ;
+						// (we need both the base case and the measure case here to be able to compute the "half" improvement!!!)
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+					}
+					{
+						// non-commercial passenger traffic:
+						DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+						final double distance = 620. ; 
+
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ;
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), 5.9 ) ;
+						// (we need both the base case and the measure case here to be able to compute the "half" improvement!!!)
+						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0.  ) ; 
+					}
 				}
 			}
 		}
-		
+
+		// verlagert:
+		{
+			final Values nullfallForSwitched = new Values() ;
+			nullfall.setValuesForODRelation( new IdImpl("verlagert"), nullfallForSwitched ) ;
+			{
+				Mode mode = Mode.RAIL ;
+				{
+					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					final double distance = 315. ;
+
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), 4.0 ) ;
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+				}
+				{
+					DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+					final double distance = 210. ;
+
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), 3.2 ) ;
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+				}
+			}
+			{	
+				Mode mode = Mode.ROAD ;
+				{
+					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					final double distance = 315. ;
+
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 2.5*1000.*1000. ) ; 
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), 3.5 ) ;
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), distance * 0.1 ) ;
+				}
+				{
+					DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+					final double distance = 210. ;
+
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 6.6*1000.*1000. ) ; 
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), 2.7 ) ;
+					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), distance * 0.1 ) ; 
+				}
+			}
+		}
+		{
+			final Values nullfallForOld = new Values() ;
+			nullfall.setValuesForODRelation( new IdImpl("verbleibend"), nullfallForOld ) ;
+			{
+				Mode mode = Mode.RAIL ;
+				{
+					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					final double distance =  374. ;  // 13788. / 36.8 ;
+					final double ttime = distance * 0.15 ;
+
+					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 36.8 * 1000. * 1000.  ) ; 
+					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs), ttime ) ;
+					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+				}
+				{
+					DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+					final double distance = 281. ; // 32700. / 116.5 ;
+					final double ttime = distance * 0.12 ;
+
+					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 116.5 * 1000. * 1000. ) ; 
+					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs), ttime ) ;
+					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+				}
+			}
+			{
+				Mode mode = Mode.ROAD ;
+				{
+					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+					final double distance =  374. ;  // 13788. / 36.8 ;
+					final double ttime = distance * 0.15 ;
+
+					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
+					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs), ttime ) ;
+					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+				}
+				{
+					DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+					final double distance = 281. ; // 32700. / 116.5 ;
+					final double ttime = distance * 0.12 ;
+
+					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
+					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs), ttime ) ;
+					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
+					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+				}
+			}
+		}
+
 		// return the base case:
 		return nullfall;
 	}
@@ -119,60 +184,82 @@ class ScenarioZielnetzBahn {
 	static ScenarioForEvalData createPlanfallBahnausbau(ScenarioForEvalData nullfall) {
 		// The policy case is initialized as a complete copy of the base case:
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
-		
-		// we are now looking at one specific OD relation (for this scenario, there is only one!)
-		Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("BC")) ;
-		Assert.assertNotNull(planfallValuesForOD) ;
-		{
-			// modify the travel times for the rail mode:
-			DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
-			
-			// modify some demand (presumably as a result):
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), verlagert_bahn_von_strasse + induziert_bahn) ;
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -verlagert_bahn_von_strasse ) ;
-			
-		}
-//		{
-//			// modify the travel times for the rail mode:
-//			DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-//			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
-//			
-//			// modify some demand (presumably as a result):
-//			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), verlagert_bahn_von_strasse_comm + induziert_bahn_comm) ;
-//			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -verlagert_bahn_von_strasse_comm ) ;
-//			
-//		}
-		return planfall;
-	}
 
-	static ScenarioForEvalData createPlanfallStrassenausbau(ScenarioForEvalData nullfall) {
-		// The policy case is initialized as a complete copy of the base case:
-		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
-		
-		// we are now looking at one specific OD relation (for this scenario, there is only one!)
-		Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("BC")) ;
-		Assert.assertNotNull(planfallValuesForOD) ;
 		{
-			// modify the travel times for the rail mode:
-			DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
-			
-			// modify some demand (presumably as a result):
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), verlagert_strasse_von_bahn + induziert_strasse) ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), -verlagert_strasse_von_bahn ) ;
-			
+			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("induziert")) ;
+			Assert.assertNotNull(planfallValuesForOD) ;
+			{
+				// modify the travel times for the rail mode:
+				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.75 ) ; 
+				// (we need both the base case and the measure case here to be able to compute the "half" improvement!!!)
+
+				// modify some demand (presumably as a result):
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), 0.8*1000.*1000. ) ;
+
+			}
+			{
+				// modify the travel times for the rail mode:
+				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.58 ) ; 
+				// (we need both the base case and the measure case here to be able to compute the "half" improvement!!!)
+
+				// modify some demand (presumably as a result):
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), 1.2*1000.*1000. ) ;
+
+			}
 		}
 		{
-			// modify the travel times for the rail mode:
-			DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
-			
-			// modify some demand (presumably as a result):
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), verlagert_strasse_von_bahn_comm + induziert_strasse_comm) ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), -verlagert_strasse_von_bahn_comm ) ;
-			
+			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("verlagert")) ;
+			Assert.assertNotNull(planfallValuesForOD) ;
+			{
+				double xx_verlagert = 2.5 * 1000. * 1000. ;
+
+				// modify the travel times for the rail mode:
+				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+				final Key key = makeKey( Mode.RAIL, segm, Attribute.hrs);
+				System.err.flush(); 
+				System.out.println( planfallValuesForOD.get(key).toString() )  ;
+				System.out.flush();
+				planfallValuesForOD.inc( key, -0.68 ) ;
+
+				// modify some demand (presumably as a result):
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), xx_verlagert ) ;
+				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -xx_verlagert ) ;
+
+			}
+			{
+				double xx_verlagert = 6.6 * 1000. *1000. ;
+
+				// modify the travel times for the rail mode:
+				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.50 ) ;
+
+				// modify some demand (presumably as a result):
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), xx_verlagert ) ;
+				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -xx_verlagert ) ;
+
+			}
 		}
+		{
+			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("verbleibend")) ;
+			Assert.assertNotNull(planfallValuesForOD) ;
+			{
+				// modify the travel times for the rail mode:
+				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.18 ) ; 
+
+				// no demand modif ("verbleibend")
+			}
+			{
+				// modify the travel times for the rail mode:
+				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+				planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.13 ) ; 
+
+				// no demand modif ("verbleibend")
+			}
+		}
+
 		return planfall;
 	}
 

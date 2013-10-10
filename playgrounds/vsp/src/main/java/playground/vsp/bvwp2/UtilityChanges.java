@@ -14,7 +14,6 @@ import playground.vsp.bvwp2.MultiDimensionalArray.Mode;
  * @author nagel
  */
 abstract class UtilityChanges {
-	static final String FMT_STRING = "%16s || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %12.1f  mio||\n";
 	UtilityChanges() {
 		System.out.println("Setting utility computation method to " + this.getClass() ) ;
 	}
@@ -31,24 +30,25 @@ abstract class UtilityChanges {
 		// yyyy these two can't be here if html is initialized in user code!
 		html.beginHtml() ;
 		html.beginBody() ;
+		html.beginTable() ;
+
 
 		double utils = 0. ;
 		double utilsUserFromRoH = 0. ;
 		double operatorProfit = 0. ;
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
+			Utils.initializeOutputTables(html);				
+			
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Values planfallForODRelation = planfall.getByODRelation(id) ;
 			for ( DemandSegment segm : DemandSegment.values() ) { // for all types (e.g. PV or GV)
 
 				Mode improvedMode = autodetectImprovingMode( nullfallForODRelation, planfallForODRelation, segm);
-//				System.out.println( "autodetected improved mode: " + improvedMode );
 
 				if ( improvedMode == null ) {
 					continue ; // means that in the demand segment, nothing has changed; goto next demand segment
 				}
 
-				Utils.initializeOutputTables(html);				
-				
 				Attributes econValuesReceiving = economicValues.getAttributes(improvedMode, segm) ;
 				Attributes attributesNullfallReceiving = nullfallForODRelation.getAttributes(improvedMode, segm) ;
 				Attributes attributesPlanfallReceiving = planfallForODRelation.getAttributes(improvedMode, segm) ;
@@ -61,18 +61,32 @@ abstract class UtilityChanges {
 					Attributes attributesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
 					Attributes attributesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
 
-					final double amountNullfall = nullfallForODRelation.get( makeKey(mode, segm, Attribute.XX)) ;
-					final double amountPlanfall = planfallForODRelation.get( makeKey(mode, segm, Attribute.XX)) ;
+					final Key key = makeKey(mode, segm, Attribute.XX);
+					System.out.println( "key: " + key.toString() );
+					System.out.flush(); 
+					final double amountNullfall = nullfallForODRelation.get( key) ;
+					final double amountPlanfall = planfallForODRelation.get( key) ;
 					final double deltaAmounts = amountPlanfall - amountNullfall ;
+
+					System.out.flush();
+					System.err.println(" amountPlanfall: " + amountPlanfall + " amountNullfall: " + amountNullfall );
+					System.err.flush() ;
 
 					if ( amountPlanfall==0. && amountNullfall==0. ) {
 						// (suppress output if this (relation,mode,demand_segment) is never used)
 						continue ;
 					}
 
-					if ( mode==improvedMode ) {
+					System.out.flush();
+					System.err.println(" mode: " + mode + " improvedMode: " + improvedMode );
+					System.err.flush() ;
+
+					if ( mode.equals(improvedMode) ) {
 						// Altnutzer:
 						double amountAltnutzer = amountNullfall ;
+						System.out.flush();
+						System.err.println("writing verbleibend:");
+						System.err.flush() ;
 						Utils.writeSubHeaderVerbleibend(html, id, segm, mode, amountAltnutzer);
 						utils += computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
 					} else {
@@ -104,9 +118,11 @@ abstract class UtilityChanges {
 				final double implUtlInducedPerItem = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
 				final double implUtlInduced = implUtlInducedPerItem * amountInduced ;
 				
-				Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "impl utl ind");
 				
-				Utils.writePartialSum(html, implUtlInduced ); 
+				if ( implUtlInduced != 0. ) {
+					Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "impl utl ind");
+					Utils.writePartialSum(html, implUtlInduced );
+				}
 				
 				utils += implUtlInduced ;
 				
@@ -169,39 +185,18 @@ abstract class UtilityChanges {
 				}
 				if ( deltaAmounts > 0 ) {
 					// wir sind aufnehmend; utl gains should be negative
-					System.out.printf(FMT_STRING,attribute,
-							0., 0., 
-							attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-							attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-							utlChangesPerItem.utl , utlChange/1000./1000.
-							) ;
-					html.bvwpTableRow(attribute.toString(),
-							0., 0., 
-							attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-							attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-							utlChangesPerItem.utl , utlChange) ;
+					Utils.writeAufnehmendRow(html, deltaAmounts, attribute, attributeValuePlanfall, utlChangesPerItem, utlChange);
 				} else {
 					// wir sind abgebend; utl gains should be positive
-					System.out.printf(FMT_STRING, attribute,
-							attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-							0., 0., 
-							-attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-							// (selbst wenn sich das abgebende System ändert, so ist unser Gewinn dennoch basierend auf dem
-							// Nullfall)
-							utlChangesPerItem.utl , utlChange/1000./1000.
-							) ;
-					html.bvwpTableRow(attribute.toString(),
-							attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-							attributeValuePlanfall, 0., 
-							-attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-							// (selbst wenn sich das abgebende System ändert, so ist unser Gewinn dennoch basierend auf dem
-							// Nullfall)
-							utlChangesPerItem.utl , utlChange) ;
+					Utils.writeAbgebendRow(html, deltaAmounts, attribute, attributeValuePlanfall, attributeValueNullfall,
+							utlChangesPerItem, utlChange);
 				}
 
 			}
 		}
-		Utils.writePartialSum(html, utils);
+		if ( utils != 0. ) {
+			Utils.writePartialSum(html, utils);
+		}
 		return utils;
 	}
 
@@ -215,17 +210,23 @@ abstract class UtilityChanges {
 		// probably positive
 		
 		final double implicitUtlOverall = - implicitUtlPerItem * Math.abs(deltaAmounts) ;
-		Utils.writeImplicitUtl(html, implicitUtlPerItem, implicitUtlOverall, "implicit utl frm");
+		if ( implicitUtlOverall != 0. ) {
+			Utils.writeImplicitUtl(html, implicitUtlPerItem, implicitUtlOverall, "implicit utl frm");
+		}
 
 		final double implicitUtlPerItemReceiving = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
 		// probably positive
 		
 		final double implicitUtlOverallReceiving = implicitUtlPerItemReceiving * Math.abs(deltaAmounts) ;
-		Utils.writeImplicitUtl( html, implicitUtlPerItemReceiving, implicitUtlOverallReceiving, "implicit utl to" ) ;
+		if ( implicitUtlOverallReceiving != 0. ) {
+			Utils.writeImplicitUtl( html, implicitUtlPerItemReceiving, implicitUtlOverallReceiving, "implicit utl to" ) ;
+		}
 		
 		double util = implicitUtlOverall + implicitUtlOverallReceiving ;
 		
-		Utils.writePartialSum(html, util);
+		if ( util != 0. ) {
+			Utils.writePartialSum(html, util);
+		}
 
 		return util ;
 	}
@@ -272,33 +273,18 @@ abstract class UtilityChanges {
 					continue ;
 				}
 
-				System.out.printf(FMT_STRING,
-						attribute,
-						quantitiesNullfall.getByEntry(attribute), 
-						quantitiesNullfall.getByEntry(attribute) * amountAltnutzer,
-						quantitiesPlanfall.getByEntry(attribute), 
-						quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
-						deltaQuantities , deltaQuantities * amountAltnutzer ,
-						utlChangePerItem , 
-						utlChange/1000./1000.
-						) ;
-				html.bvwpTableRow(
-						attribute.toString(),
-						quantitiesNullfall.getByEntry(attribute), 
-						quantitiesNullfall.getByEntry(attribute) * amountAltnutzer,
-						quantitiesPlanfall.getByEntry(attribute), 
-						quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
-						deltaQuantities , deltaQuantities * amountAltnutzer ,
-						utlChangePerItem , 
-						utlChange
-						) ;
+				Utils.writeAltnutzerRow(quantitiesNullfall, quantitiesPlanfall, amountAltnutzer, html, attribute, deltaQuantities,
+						utlChangePerItem, utlChange);
 				utils += utlChange ;
 
 			}
 		}
-		Utils.writePartialSum(html, utils);
+		if ( utils != 0. ) {
+			Utils.writePartialSum(html, utils);
+		}
 		return utils;
 	}
+
 	abstract UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, 
 			double quantityNullfall, double quantityPlanfall, double econVal);
 	abstract double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, 

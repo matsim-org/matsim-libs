@@ -20,6 +20,7 @@ package playground.vsp.bvwp2;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.vsp.bvwp2.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp2.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp2.MultiDimensionalArray.Mode;
 
@@ -28,11 +29,17 @@ import playground.vsp.bvwp2.MultiDimensionalArray.Mode;
  *
  */
 class Utils {
+	static final String FMT_STRING = "%16s || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %12.1f  mio||\n";
+
 	private Utils() {} // not to be instantiated
 
 	static void writePartialSum(Html html, double utils) {
 		System.out.printf("--------------------%163.1f mio\n", utils / 1000. / 1000.  ) ;
-		html.bvwpTableRow("Zwischensumme", "", "", "", "", "", "", "", "", Double.toString(((long)(utils/100./1000.))/10.)+" mio" ) ;
+		html.beginTableMulticolumnRow(); 
+		html.beginDivRightAlign();
+		html.write("<strong>" + Double.toString(((long)(utils/100./1000.))/10.)+" mio</strong>" ) ;
+		html.endDiv() ;
+		html.endTableRow(); 
 	}
 
 	static void writeSum(Html html, double utils) {
@@ -44,7 +51,7 @@ class Utils {
 		html.write("Summe") ;
 		html.endTableRow() ;
 	
-		html.bvwpTableRow("Summe", "", "", "", "", "", "", "", "", Double.toString(   ((long)(utils/100./1000.))/10.   ) + " mio" ) ;
+		html.bvwpTableRow("Summe", "", "", "", "", "", "", "", "", "<strong>" + Double.toString(   ((long)(utils/100./1000.))/10.   ) + " mio</strong>" ) ;
 	}
 
 	static void initializeOutputTables(Html html) {
@@ -55,17 +62,16 @@ class Utils {
 				"Attribut Diff", "... mal Menge",
 				"Nutzen Diff", "... mal Menge") ;
 	
-		html.beginTable() ;
 		html.beginTableRow() ;
-		html.write("Attribut") ; html.nextTableEntry() ; 
-		html.write("Attribut Nullfall") ; html.nextTableEntry() ;
-		html.write("... mal Menge") ; html.nextTableEntry() ;
-		html.write("Attribut Planfall") ; html.nextTableEntry() ;
-		html.write("... mal Menge") ; html.nextTableEntry() ;
-		html.write("Attribut Diff") ; html.nextTableEntry() ;
-		html.write("... mal Menge") ; html.nextTableEntry() ;
-		html.write("Nutzen Diff") ; html.nextTableEntry() ;
-		html.write("... mal Menge") ; html.nextTableEntry() ;
+		html.write("<strong>Attribut</strong>") ; html.nextTableEntry() ; 
+		html.write("<strong>Attribut Nullfall</strong>") ; html.nextTableEntry() ;
+		html.write("<strong>... mal Menge</strong>") ; html.nextTableEntry() ;
+		html.write("<strong>Attribut Planfall</strong>") ; html.nextTableEntry() ;
+		html.write("<strong>... mal Menge</strong>") ; html.nextTableEntry() ;
+		html.write("<strong>Attribut Diff</strong>") ; html.nextTableEntry() ;
+		html.write("<strong>... mal Menge</strong>") ; html.nextTableEntry() ;
+		html.write("<strong>Nutzen Diff</strong>") ; html.nextTableEntry() ;
+		html.write("<strong>... mal Menge</strong>") ; html.nextTableEntry() ;
 		html.write(" ");
 		html.endTableRow() ;
 	}
@@ -109,7 +115,7 @@ class Utils {
 	static void writeImplicitUtl(Html html, final double implicitUtlPerItem, final double implicitUtlOverall, final String str) {
 		if ( implicitUtlPerItem != 0.  ) {
 	
-			System.out.printf(UtilityChanges.FMT_STRING,
+			System.out.printf(Utils.FMT_STRING,
 					str,
 					0.,0.,
 					0.,0.,
@@ -120,10 +126,68 @@ class Utils {
 					0.,0.,
 					0.,0.,
 					0.,0.,
-					implicitUtlPerItem, implicitUtlOverall 
+					implicitUtlPerItem, Double.toString(   ((long)(implicitUtlOverall/100./1000.))/10.   ) + " mio" 
 					) ;
 	
 		}
+	}
+
+	static void writeAltnutzerRow(Attributes quantitiesNullfall, Attributes quantitiesPlanfall, double amountAltnutzer, Html html,
+			Attribute attribute, double deltaQuantities, final double utlChangePerItem, final double utlChange) {
+		System.out.printf(Utils.FMT_STRING,
+				attribute,
+				quantitiesNullfall.getByEntry(attribute), 
+				quantitiesNullfall.getByEntry(attribute) * amountAltnutzer,
+				quantitiesPlanfall.getByEntry(attribute), 
+				quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
+				deltaQuantities , deltaQuantities * amountAltnutzer ,
+				utlChangePerItem , 
+				utlChange/1000./1000.
+				) ;
+		html.bvwpTableRow(
+				attribute.toString(),
+				quantitiesNullfall.getByEntry(attribute), 
+				quantitiesNullfall.getByEntry(attribute) * amountAltnutzer,
+				quantitiesPlanfall.getByEntry(attribute), 
+				quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
+				deltaQuantities , deltaQuantities * amountAltnutzer ,
+				utlChangePerItem , 
+				Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" 
+				) ;
+	}
+
+	static void writeAufnehmendRow(Html html, final double deltaAmounts, Attribute attribute, final double attributeValuePlanfall,
+			UtlChangesData utlChangesPerItem, final double utlChange) {
+		System.out.printf(FMT_STRING,attribute,
+				0., 0., 
+				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
+				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
+				utlChangesPerItem.utl , utlChange/1000./1000.
+				) ;
+		html.bvwpTableRow(attribute.toString(),
+				0., 0., 
+				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
+				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
+				utlChangesPerItem.utl , Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" ) ;
+	}
+
+	static void writeAbgebendRow(Html html, final double deltaAmounts, Attribute attribute, final double attributeValuePlanfall,
+			final double attributeValueNullfall, UtlChangesData utlChangesPerItem, final double utlChange) {
+		System.out.printf(FMT_STRING, attribute,
+				attributeValueNullfall, attributeValueNullfall * deltaAmounts,
+				0., 0., 
+				-attributeValueNullfall, attributeValueNullfall * deltaAmounts,
+				// (selbst wenn sich das abgebende System ändert, so ist unser Gewinn dennoch basierend auf dem
+				// Nullfall)
+				utlChangesPerItem.utl , utlChange/1000./1000.
+				) ;
+		html.bvwpTableRow(attribute.toString(),
+				attributeValueNullfall, attributeValueNullfall * deltaAmounts,
+				attributeValuePlanfall, 0., 
+				-attributeValueNullfall, attributeValueNullfall * deltaAmounts,
+				// (selbst wenn sich das abgebende System ändert, so ist unser Gewinn dennoch basierend auf dem
+				// Nullfall)
+				utlChangesPerItem.utl , Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" ) ;
 	}
 
 }
