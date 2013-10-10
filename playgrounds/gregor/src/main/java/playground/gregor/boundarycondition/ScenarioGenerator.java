@@ -96,7 +96,7 @@ public class ScenarioGenerator {
 		s2d.setTimeStepSize(0.04);
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);
 		create2DWorld(s2dsc);
-		//		create2DWorld2(s2dsc);
+		create2DWorldII(s2dsc);
 
 
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.26);
@@ -204,11 +204,11 @@ public class ScenarioGenerator {
 			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l1")));
-			//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l5")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l5")));
@@ -217,11 +217,11 @@ public class ScenarioGenerator {
 
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l1_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2_rev")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l5_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6_rev")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l5_rev")));
@@ -236,6 +236,7 @@ public class ScenarioGenerator {
 
 			NetworkChangeEvent ee1 = fac.createNetworkChangeEvent(time);
 			ee1.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
+			ee1.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
 			//			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
 			//			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6")));
 			if (time < 35*60) {
@@ -246,12 +247,12 @@ public class ScenarioGenerator {
 				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.7*flowCap);
 
 				ee1.setFlowCapacityChange(ccv1);
-			}else if (time < 43*60){
+			}else if (time < 41*60){
 				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.001*flowCap);
 
 				ee1.setFlowCapacityChange(ccv1);
 			} else {
-				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.7*flowCap);
+				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,1*flowCap);
 
 				ee1.setFlowCapacityChange(ccv1);
 			}
@@ -545,7 +546,7 @@ public class ScenarioGenerator {
 
 	}
 
-	private static void create2DWorld2(Sim2DScenario sc2) {
+	private static void create2DWorldII(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
 		env.setId(new IdImpl("env1"));
 
@@ -555,10 +556,16 @@ public class ScenarioGenerator {
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate c0 = new Coordinate(5,8);
 		Coordinate c1 = new Coordinate(5,12);
+		//		Coordinate c1a = new Coordinate(8,2);
+		//		Coordinate c1b = new Coordinate(20,20);
+		//		Coordinate c1c = new Coordinate(32,2);
 		Coordinate c2 = new Coordinate(35,12);
 		Coordinate c3 = new Coordinate(35,8);
+		//		Coordinate c3a = new Coordinate(32,-2);
+		//		Coordinate c3b = new Coordinate(20,-20);
+		//		Coordinate c3c = new Coordinate(8,-2);
 		Coordinate c4 = new Coordinate(5,8);
-		env.setEnvelope(new Envelope(c0,c2));
+		env.setEnvelope(new Envelope(5,35,8,12));
 		try {
 			env.setCRS(CRS.decode("EPSG:3395"));
 		} catch (NoSuchAuthorityCodeException e) {
@@ -566,6 +573,7 @@ public class ScenarioGenerator {
 		} catch (FactoryException e) {
 			e.printStackTrace();
 		}
+		//		Coordinate[] coords = {c0,c1,c1a,c1b,c1c,c2,c3,c3a,c3b,c3c,c4};
 		Coordinate[] coords = {c0,c1,c2,c3,c4};
 		LinearRing lr = geofac.createLinearRing(coords );
 		Polygon p = geofac.createPolygon(lr , null);
@@ -573,24 +581,28 @@ public class ScenarioGenerator {
 
 		NetworkImpl net = NetworkImpl.createNetwork();
 		NetworkFactoryImpl fac = net.getFactory();
-		NodeImpl n0 = fac.createNode(new IdImpl(8), new CoordImpl(5,10));
+		NodeImpl n0 = fac.createNode(new IdImpl(8), new CoordImpl(5,10-.001));
 		NodeImpl n1 = fac.createNode(new IdImpl(9), new CoordImpl(35,10));
 		net.addNode(n0);
 		net.addNode(n1);
-		IdImpl id = new IdImpl("l2d1");
+		IdImpl id = new IdImpl("l5d0");
 		Link l = fac.createLink(id, n0, n1);
+
+		double flow = 4 *SEPC_FLOW;
 		l.setFreespeed(1.34);
-		l.setLength(10);
+		l.setLength(30);
+		l.setCapacity(flow);;
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk2d");modes.add("walk");modes.add("car");
 		l.setAllowedModes(modes);
 		net.addLink(l);
 
-		IdImpl idRev = new IdImpl("l2d1_rev");
+		IdImpl idRev = new IdImpl("l5d0_rev");
 		Link lRev = fac.createLink(idRev, n1, n0);
 		lRev.setFreespeed(1.34);
 		lRev.setLength(30);
 		lRev.setAllowedModes(modes);
+		lRev.setCapacity(flow);
 		net.addLink(lRev);
 
 		net.setCapacityPeriod(1);
@@ -766,13 +778,13 @@ public class ScenarioGenerator {
 		double flow = SEPC_FLOW * 4;
 		Link l0 = fac.createLink(new IdImpl("l4"), n0, n1);
 		Link l1 = fac.createLink(new IdImpl("l5"), n1, n2);
-		Link l1b = fac.createLink(new IdImpl("l5b"), n2, n3);
+//		Link l1b = fac.createLink(new IdImpl("l5b"), n2, n3);
 		Link l2 = fac.createLink(new IdImpl("l6"), n3, n4);
 		Link l3 = fac.createLink(new IdImpl("l7"), n4, n5);
 
 		Link l0Rev = fac.createLink(new IdImpl("l4_rev"), n1, n0);
 		Link l1Rev = fac.createLink(new IdImpl("l5_rev"), n2, n1);
-		Link l1bRev = fac.createLink(new IdImpl("l5b_rev"), n3, n2);
+//		Link l1bRev = fac.createLink(new IdImpl("l5b_rev"), n3, n2);
 		Link l2Rev = fac.createLink(new IdImpl("l6_rev"), n4, n3);
 		Link l3Rev = fac.createLink(new IdImpl("l7_rev"), n5, n4);
 
@@ -782,74 +794,74 @@ public class ScenarioGenerator {
 
 		l0.setLength(14);
 		l1.setLength(14);
-		l1b.setLength(30);
+//		l1b.setLength(30);
 		l2.setLength(14);
 		l3.setLength(14);
 
 		l0Rev.setLength(14);
 		l1Rev.setLength(14);
-		l1bRev.setLength(30);
+//		l1bRev.setLength(30);
 		l2Rev.setLength(14);
 		l3Rev.setLength(14);
 
 		l0.setAllowedModes(modes);
 		l1.setAllowedModes(modes);
-		l1b.setAllowedModes(modes);
+//		l1b.setAllowedModes(modes);
 		l2.setAllowedModes(modes);
 		l3.setAllowedModes(modes);
 
 		l0Rev.setAllowedModes(modes);
 		l1Rev.setAllowedModes(modes);
-		l1bRev.setAllowedModes(modes);
+//		l1bRev.setAllowedModes(modes);
 		l2Rev.setAllowedModes(modes);
 		l3Rev.setAllowedModes(modes);
 
 		l0.setFreespeed(1.34);
 		l1.setFreespeed(1.34);
-		l1b.setFreespeed(1.34);
+//		l1b.setFreespeed(1.34);
 		l2.setFreespeed(1.34);
 		l3.setFreespeed(1.34);
 
 		l0Rev.setFreespeed(1.34);
 		l1Rev.setFreespeed(1.34);
-		l1bRev.setFreespeed(1.34);
+//		l1bRev.setFreespeed(1.34);
 		l2Rev.setFreespeed(1.34);
 		l3Rev.setFreespeed(1.34);
 
 		l0.setCapacity(flow);
 		l1.setCapacity(flow);
-		l1b.setCapacity(flow);
+//		l1b.setCapacity(flow);
 		l2.setCapacity(flow);
 		l3.setCapacity(flow);
 
 		l0Rev.setCapacity(flow);
 		l1Rev.setCapacity(flow);
-		l1bRev.setCapacity(flow);
+//		l1bRev.setCapacity(flow);
 		l2Rev.setCapacity(flow);
 		l3Rev.setCapacity(flow);
 
 		double lanes = 4/0.71;
 		l0.setNumberOfLanes(lanes);
 		l1.setNumberOfLanes(lanes);
-		l1b.setNumberOfLanes(lanes);
+//		l1b.setNumberOfLanes(lanes);
 		l2.setNumberOfLanes(lanes);
 		l3.setNumberOfLanes(lanes);
 
 		l0Rev.setNumberOfLanes(lanes);
 		l1Rev.setNumberOfLanes(lanes);
-		l1bRev.setNumberOfLanes(lanes);
+//		l1bRev.setNumberOfLanes(lanes);
 		l2Rev.setNumberOfLanes(lanes);
 		l3Rev.setNumberOfLanes(lanes);
 
 		net.addLink(l0);
 		net.addLink(l1);
-		net.addLink(l1b);
+//		net.addLink(l1b);
 		net.addLink(l2);
 		net.addLink(l3);
 
 		net.addLink(l0Rev);
 		net.addLink(l1Rev);
-		net.addLink(l1bRev);
+//		net.addLink(l1bRev);
 		net.addLink(l2Rev);
 		net.addLink(l3Rev);
 

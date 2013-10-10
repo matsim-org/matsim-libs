@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.ForceReDrawEvent;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.events.debug.RectEvent;
@@ -356,26 +357,26 @@ public class TransitionArea extends PhysicalSim2DSection implements TransitionAr
 			a.reDrawAgent(time);
 		}
 		
-		for (Segment o : getOpenings()) {
+		for (LineSegment o : getOpenings()) {
 			PhysicalSim2DSection n = getNeighbor(o);
 			for (Sim2DAgent a : n.agents) {
 				a.reDrawAgent(time);
 			} 
 		}
 		this.penv.getEventsManager().processEvent(new ForceReDrawEvent(time));
-		Segment constr0 = new Segment();
+		LineSegment constr0 = new LineSegment();
 		constr0.x0 = this.x1+this.dy/2;
 		constr0.x1 = this.x2+this.dy/2;
 		constr0.y0 = this.y1-this.dx/2;
 		constr0.y1 = this.y2-this.dx/2;
-		Segment constr1 = new Segment();
+		LineSegment constr1 = new LineSegment();
 		constr1.x0 = this.x3-this.dy/2;
 		constr1.x1 = this.x0-this.dy/2;
 		constr1.y0 = this.y3+this.dx/2;
 		constr1.y1 = this.y0+this.dx/2;
 
 		for ( GraphEdge ge : vd) {
-			Segment s = new Segment();
+			LineSegment s = new LineSegment();
 			s.x0 = ge.x1;
 			s.x1 = ge.x2;
 			s.y0 = ge.y1;
@@ -391,7 +392,7 @@ public class TransitionArea extends PhysicalSim2DSection implements TransitionAr
 		Voronoi v2 = new Voronoi(0.001f);
 		LinkedList<GraphEdge> vd2 = (LinkedList<GraphEdge>) v2.generateVoronoi(x, y, this.minX, this.maxX, this.minY, this.maxY);//TODO
 		for ( GraphEdge ge : vd2) {
-			Segment s = new Segment();
+			LineSegment s = new LineSegment();
 			s.x0 = ge.x1;
 			s.x1 = ge.x2;
 			s.y0 = ge.y1;
@@ -403,7 +404,7 @@ public class TransitionArea extends PhysicalSim2DSection implements TransitionAr
 			a.reDrawAgent(time);
 		}
 		
-		for (Segment o : getOpenings()) {
+		for (LineSegment o : getOpenings()) {
 			PhysicalSim2DSection n = getNeighbor(o);
 			for (Sim2DAgent a : n.agents) {
 				a.reDrawAgent(time);

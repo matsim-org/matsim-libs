@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.TwoDTree;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
@@ -50,8 +51,8 @@ public class PhysicalSim2DSection {
 
 	private final Section sec;
 
-	List<Segment> obstacles;
-	Segment [] openings;//TODO why not using a list, is array really faster?? [gl April '13]
+	List<LineSegment> obstacles;
+	LineSegment [] openings;//TODO why not using a list, is array really faster?? [gl April '13]
 
 	//	Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
 
@@ -64,7 +65,7 @@ public class PhysicalSim2DSection {
 
 	protected final PhysicalSim2DEnvironment penv;
 
-	private final Map<Segment,PhysicalSim2DSection> neighbors = new HashMap<Segment,PhysicalSim2DSection>();
+	private final Map<LineSegment,PhysicalSim2DSection> neighbors = new HashMap<LineSegment,PhysicalSim2DSection>();
 
 	protected final TwoDTree<Sim2DAgent> agentTwoDTree;
 
@@ -186,7 +187,7 @@ public class PhysicalSim2DSection {
 			}
 			if (mv) {
 				for (int i = 0; i < this.numOpenings; i++) {
-					Segment opening = this.openings[i];
+					LineSegment opening = this.openings[i];
 					double leftOfOpening = CGAL.isLeftOfLine(newXPosX, newXPosY, opening.x0, opening.y0, opening.x1, opening.y1);
 					if (leftOfOpening >= 0) {
 						double l0 = CGAL.isLeftOfLine(opening.x0, opening.y0,oldX,oldY,newXPosX,newXPosY);
@@ -230,13 +231,13 @@ public class PhysicalSim2DSection {
 		int[] openings = this.sec.getOpenings();
 		int oidx = 0;
 
-		List<Segment> obst = new ArrayList<Segment>();
-		List<Segment> open = new ArrayList<Segment>();
+		List<LineSegment> obst = new ArrayList<LineSegment>();
+		List<LineSegment> open = new ArrayList<LineSegment>();
 
 		for (int i = 0; i < coords.length-1; i++){
 			Coordinate c0 = coords[i];
 			Coordinate c1 = coords[i+1];
-			Segment seg = new Segment();
+			LineSegment seg = new LineSegment();
 			seg.x0 = c0.x;
 			seg.x1 = c1.x;
 			seg.y0 = c0.y;
@@ -258,7 +259,7 @@ public class PhysicalSim2DSection {
 			}
 		}
 		this.obstacles = obst;
-		this.openings = open.toArray(new Segment[0]);
+		this.openings = open.toArray(new LineSegment[0]);
 		this.numOpenings = this.openings.length;
 
 		//		Map<Id, ? extends Link> links = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks();
@@ -307,7 +308,7 @@ public class PhysicalSim2DSection {
 	}
 
 	/*package*/ void connect() {
-		for (Segment opening : this.openings) {
+		for (LineSegment opening : this.openings) {
 			for (Id n : this.sec.getNeighbors()) {
 				PhysicalSim2DSection nPSec = this.penv.psecs.get(n);
 				if (isConnectedViaOpening(opening,nPSec)){
@@ -318,9 +319,9 @@ public class PhysicalSim2DSection {
 		}
 	}
 
-	private boolean isConnectedViaOpening(Segment opening,
+	private boolean isConnectedViaOpening(LineSegment opening,
 			PhysicalSim2DSection nPSec) {
-		for (Segment nOpening : nPSec.getOpenings()) {
+		for (LineSegment nOpening : nPSec.getOpenings()) {
 			if (nOpening.equalInverse(opening)) {
 				return true;
 			}
@@ -357,26 +358,6 @@ public class PhysicalSim2DSection {
 	//	}
 
 
-	public static final class Segment {//TODO move this inner class elsewhere [gl April '13]
-		public double  x0;
-		public double  x1;
-		public double  y0;
-		public double  y1;
-		public double dx;//normalized!!
-		public double dy;//normalized!!
-
-		/*package*/ boolean equalInverse(Segment other) {
-			if (this.x0 == other.x1 && this.x1 == other.x0 && this.y0 == other.y1 && this.y1 == other.y0) {
-				return true;
-			}
-			return false;
-		}
-		
-		@Override
-		public String toString() {
-			return this.x0+":"+this.y0 +"  " +this.x1+":"+this.y1;
-		}
-	}
 
 
 
@@ -393,16 +374,16 @@ public class PhysicalSim2DSection {
 		return this.agentTwoDTree.get(e);
 	}
 
-	public Segment [] getOpenings() {
+	public LineSegment [] getOpenings() {
 		return this.openings;
 
 	}
 
-	public PhysicalSim2DSection getNeighbor(Segment opening) {
+	public PhysicalSim2DSection getNeighbor(LineSegment opening) {
 		return this.neighbors.get(opening);
 	}
 
-	/*package*/ void putNeighbor(Segment finishLine, PhysicalSim2DSection psec) {
+	/*package*/ void putNeighbor(LineSegment finishLine, PhysicalSim2DSection psec) {
 		this.neighbors.put(finishLine, psec);
 	}
 
@@ -410,7 +391,7 @@ public class PhysicalSim2DSection {
 		return this.penv;
 	}
 
-	public List<Segment> getObstacles() {
+	public List<LineSegment> getObstacles() {
 		return this.obstacles;
 	}
 

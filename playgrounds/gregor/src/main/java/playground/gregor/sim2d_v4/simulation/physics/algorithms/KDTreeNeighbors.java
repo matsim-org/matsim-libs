@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -44,7 +44,7 @@ public class KDTreeNeighbors implements Neighbors {
 	private int nrNeighbors = 3;
 
 	List<Sim2DAgent> agentsSec = new ArrayList<Sim2DAgent>();
-	Map<Segment,List<Sim2DAgent>> agentsNeigh = new HashMap<Segment,List<Sim2DAgent>>();
+	Map<LineSegment,List<Sim2DAgent>> agentsNeigh = new HashMap<LineSegment,List<Sim2DAgent>>();
 	private final Sim2DAgent agent;
 
 	private List<Sim2DAgent> cachedNeighbors;
@@ -72,9 +72,9 @@ public class KDTreeNeighbors implements Neighbors {
 
 
 		//agents from neighboring sections
-		Segment[] openings = psec.getOpenings();
+		LineSegment[] openings = psec.getOpenings();
 		for (int i = 0; i < openings.length; i++) {
-			Segment opening = openings[i];
+			LineSegment opening = openings[i];
 			PhysicalSim2DSection qSec = psec.getNeighbor(opening);
 			if (qSec == null) {
 				continue;
@@ -170,9 +170,9 @@ public class KDTreeNeighbors implements Neighbors {
 		}
 
 		//agents from neighboring sections
-		for (Entry<Segment, List<Sim2DAgent>> e : this.agentsNeigh.entrySet()) {
+		for (Entry<LineSegment, List<Sim2DAgent>> e : this.agentsNeigh.entrySet()) {
 			List<Sim2DAgent> agents = e.getValue();
-			Segment opening = e.getKey();
+			LineSegment opening = e.getKey();
 			//agents from neighboring sections need to check visibility
 			for (Sim2DAgent b : agents) {
 				double[] bPos = b.getPos();
@@ -227,7 +227,7 @@ public class KDTreeNeighbors implements Neighbors {
 
 	}
 
-	private boolean visible(double[] aPos, double[] bPos, Segment opening) {
+	private boolean visible(double[] aPos, double[] bPos, LineSegment opening) {
 		double l0 = CGAL.isLeftOfLine( opening.x0, opening.y0,aPos[0], aPos[1],bPos[0], bPos[1]);
 		double l1 = CGAL.isLeftOfLine( opening.x1, opening.y1,aPos[0], aPos[1],bPos[0], bPos[1]);
 		return l0*l1 < 0;

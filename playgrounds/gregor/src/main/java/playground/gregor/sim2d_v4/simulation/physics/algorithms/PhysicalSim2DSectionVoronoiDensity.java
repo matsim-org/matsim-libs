@@ -30,9 +30,9 @@ import java.util.Set;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import be.humphreys.simplevoronoi.GraphEdge;
 import be.humphreys.simplevoronoi.Voronoi;
@@ -46,7 +46,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 	private final Envelope bounds;
 	private final double offsetX;
 	private final double offsetY;
-	private final List<Segment> obstacles = new ArrayList<Segment>();
+	private final List<LineSegment> obstacles = new ArrayList<LineSegment>();
 	private ArrayList<Cell> cells;
 
 	//TODO look for a more efficient way ...
@@ -56,12 +56,12 @@ public class PhysicalSim2DSectionVoronoiDensity {
 	public PhysicalSim2DSectionVoronoiDensity(PhysicalSim2DSection pSec){
 		this.pSec = pSec;
 		this.bounds = new Envelope(pSec.getObstacles().get(0).x0,pSec.getObstacles().get(0).x1,pSec.getObstacles().get(0).y0,pSec.getObstacles().get(0).y1);
-		for (Segment o : pSec.getOpenings()) {
+		for (LineSegment o : pSec.getOpenings()) {
 			this.bounds.expandToInclude(o.x0-2*o.dy, o.y0+2*o.dx);
 			this.bounds.expandToInclude(o.x1-2*o.dy, o.y1+2*o.dx);
 		}
 
-		for (Segment o : pSec.getObstacles()) {
+		for (LineSegment o : pSec.getObstacles()) {
 			this.bounds.expandToInclude(o.x0, o.y0);
 			this.bounds.expandToInclude(o.x1, o.y1);
 		}
@@ -69,8 +69,8 @@ public class PhysicalSim2DSectionVoronoiDensity {
 		this.offsetX = -this.bounds.getMinX();
 		this.offsetY = -this.bounds.getMinY();
 		this.bounds.translate(this.offsetX, this.offsetY);
-		for (Segment o : this.pSec.getObstacles()) {
-			Segment s = new Segment();
+		for (LineSegment o : this.pSec.getObstacles()) {
+			LineSegment s = new LineSegment();
 			s.x0 = o.x0 + this.offsetX;
 			s.x1 = o.x1 + this.offsetX;
 			s.y0 = o.y0 + this.offsetY;
@@ -86,7 +86,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 		}
 		this.agentCellMapping.clear();
 
-		for (Segment o : this.pSec.getOpenings()) {
+		for (LineSegment o : this.pSec.getOpenings()) {
 			PhysicalSim2DSection n = this.pSec.getNeighbor(o);
 			//FIXME repair this!!
 			if (n == null) {
@@ -177,7 +177,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 			
 			
 			//DEBUG
-			Segment seg = new Segment();
+			LineSegment seg = new LineSegment();
 			c1.segments.add(seg);
 			c2.segments.add(seg);
 			seg.x0 = e.x1 - this.offsetX;
@@ -198,7 +198,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 		double dxu = e.x2 - e.x1;
 		double dyu = e.y2 - e.y1;
 		for (int i = 0; i < this.obstacles.size(); i++) {
-			Segment o = this.obstacles.get(i);
+			LineSegment o = this.obstacles.get(i);
 			double lft0 = CGAL.isLeftOfLine(e.x1, e.y1, o.x0, o.y0, o.x1, o.y1);
 			double lft1 = CGAL.isLeftOfLine(e.x2, e.y2, o.x0, o.y0, o.x1, o.y1);
 			if (lft0 * lft1 <= 0) { //in case of convex polygons we've an intersection here; otherwise it is not guaranteed
@@ -254,7 +254,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 			c1.cy += lft*cntr1y;
 			
 			//DEBUG
-			Segment s = new Segment();
+			LineSegment s = new LineSegment();
 			s.x0 = xx - this.offsetX;
 			s.x1 = intersec1.x - this.offsetX;
 			s.y0 = yy - this.offsetY;
@@ -295,7 +295,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 		for (Cell c : cells) {
 
 			
-			for (Segment edge : c.segments) {
+			for (LineSegment edge : c.segments) {
 				em.processEvent(new LineEvent(0, edge, false, 0, 255, 255, 255, 0, .8, .2));
 			}
 //			if (c.area < 1/50. || c.area > 100.) {
@@ -316,7 +316,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 	private void debug(List<GraphEdge> edges) {
 		EventsManager em = this.pSec.getPhysicalEnvironment().getEventsManager();
 		for (GraphEdge e : edges) {
-			Segment seg = new Segment();
+			LineSegment seg = new LineSegment();
 			seg.x0 = e.x1;
 			seg.y0 = e.y1;
 			seg.x1 = e.x2;
@@ -328,22 +328,22 @@ public class PhysicalSim2DSectionVoronoiDensity {
 
 	private void debug() {
 		EventsManager em = this.pSec.getPhysicalEnvironment().getEventsManager();
-		Segment seg0 = new Segment();
+		LineSegment seg0 = new LineSegment();
 		seg0.x0 = this.bounds.getMaxX();
 		seg0.y0 = this.bounds.getMaxY();
 		seg0.x1 = this.bounds.getMinX();
 		seg0.y1 = this.bounds.getMaxY();
-		Segment seg1 = new Segment();
+		LineSegment seg1 = new LineSegment();
 		seg1.x0 = this.bounds.getMinX();
 		seg1.y0 = this.bounds.getMaxY();
 		seg1.x1 = this.bounds.getMinX();
 		seg1.y1 = this.bounds.getMinY();
-		Segment seg2 = new Segment();
+		LineSegment seg2 = new LineSegment();
 		seg2.x0 = this.bounds.getMinX();
 		seg2.y0 = this.bounds.getMinY();
 		seg2.x1 = this.bounds.getMaxX();
 		seg2.y1 = this.bounds.getMinY();
-		Segment seg3 = new Segment();
+		LineSegment seg3 = new LineSegment();
 		seg3.x0 = this.bounds.getMaxX();
 		seg3.y0 = this.bounds.getMinY();
 		seg3.x1 = this.bounds.getMaxX();
@@ -372,7 +372,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 		public double vx;
 		// area of a simple polygon A = 1/2 * sum_{i=0}^{n-1} (x_i*y_{i+1}-x_{i+1}*y_i)
 		public double area;
-		List<Segment> segments = new ArrayList<Segment>();
+		List<LineSegment> segments = new ArrayList<LineSegment>();
 		//centroid of a simple polygon is 	cx = 1/(6*A) * sum_{i=0}^{n-1}(x_i+x_{i+1})*(x_i*y_{i+1} - x_{i+1) * y_i)
 		//									cy = 1/(6*A) * sum_{i=0}^{n-1}(y_i+y_{i+1})*(y_i*x_{i+1} - y_{i+1) * x_i)
 		double cx;

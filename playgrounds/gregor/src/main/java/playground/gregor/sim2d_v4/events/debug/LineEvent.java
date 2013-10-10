@@ -22,14 +22,15 @@ package playground.gregor.sim2d_v4.events.debug;
 
 import org.matsim.api.core.v01.events.Event;
 
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
+
 
 public class LineEvent extends Event {
 
 	private static final String TYPE = "LINE_EVENT";
 	
 	private final boolean isStatic;
-	private final Segment s;
+	private final LineSegment s;
 
 	private final int r,g,b,a,minScale;
 
@@ -37,15 +38,15 @@ public class LineEvent extends Event {
 
 	private final double gap;
 	
-	public LineEvent(double time,Segment s, boolean isStatic) {
+	public LineEvent(double time,LineSegment s, boolean isStatic) {
 		this(time, s, isStatic, 0, 0, 0, 255, 0);
 	}
 	
-	public LineEvent(double time, Segment s, boolean isStatic, int r, int g, int b, int a, int minScale) {
+	public LineEvent(double time, LineSegment s, boolean isStatic, int r, int g, int b, int a, int minScale) {
 
 		this(time, s, isStatic, r, g, b, a, minScale, 0, 0);
 	}
-	public LineEvent(double time, Segment s, boolean isStatic, int r, int g, int b, int a, int minScale, double dash, double gap) {
+	public LineEvent(double time, LineSegment s, boolean isStatic, int r, int g, int b, int a, int minScale, double dash, double gap) {
 		super(time);
 		this.s = s;
 		this.isStatic = isStatic;
@@ -64,7 +65,7 @@ public class LineEvent extends Event {
 		return TYPE;
 	}
 	
-	public Segment getSegment() {
+	public LineSegment getSegment() {
 		return this.s;
 	}
 	

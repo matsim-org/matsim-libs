@@ -29,6 +29,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.ForceReDrawEvent;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
@@ -67,7 +68,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 	//	private final double sqrDMin = .38 * .38;
 
 	private double currrentDMin;
-	private final Segment[] bounds;
+	private final LineSegment[] bounds;
 	//	private final double y4;
 	//	private final double x4;
 
@@ -111,31 +112,31 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 		x3 -= dx*coeff + dy*coeff;
 		y3 -= dy*coeff - dx*coeff;
 
-		Segment s0 = new Segment();
+		LineSegment s0 = new LineSegment();
 		s0.x0 = x0;
 		s0.y0 = y0;
 		s0.x1 = x1;
 		s0.y1 = y1;
 
-		Segment s1 = new Segment();
+		LineSegment s1 = new LineSegment();
 		s1.x0 = x1;
 		s1.y0 = y1;
 		s1.x1 = x2;
 		s1.y1 = y2;
 
-		Segment s2 = new Segment();
+		LineSegment s2 = new LineSegment();
 		s2.x0 = x2;
 		s2.y0 = y2;
 		s2.x1 = x3;
 		s2.y1 = y3;
 
-		Segment s3 = new Segment();
+		LineSegment s3 = new LineSegment();
 		s3.x0 = x3;
 		s3.y0 = y3;
 		s3.x1 = x0;
 		s3.y1 = y0;
 
-		this.bounds = new Segment [] {s0,s1,s2,s3};
+		this.bounds = new LineSegment [] {s0,s1,s2,s3};
 
 
 
@@ -157,7 +158,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 
 
 		//debug
-		for (Segment s : this.bounds) {
+		for (LineSegment s : this.bounds) {
 			this.penv.getEventsManager().processEvent(new LineEvent(0, s, true,255,0,0,255,0));
 		}
 	}
@@ -285,7 +286,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 //					this.penv.getEventsManager().processEvent(new LineEvent(0, dummy2, false,0,255,0,255,0));
 					
 					
-					for (Segment s : this.bounds) {
+					for (LineSegment s : this.bounds) {
 						double dxv = s.x1 - s.x0;
 						double dyv = s.y1 - s.y0;
 						double dxw = ge.x1 - s.x0;
@@ -328,7 +329,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 //					this.penv.getEventsManager().processEvent(new LineEvent(0, dummy2, false,0,255,0,255,0));
 					
 					
-					for (Segment s : this.bounds) {
+					for (LineSegment s : this.bounds) {
 						double dxv = s.x1 - s.x0;
 						double dyv = s.y1 - s.y0;
 						double dxw = ge.x1 - s.x0;
@@ -367,7 +368,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 //					this.penv.getEventsManager().processEvent(new LineEvent(0, dummy2, false,0,255,0,255,0));
 					
 					
-					for (Segment s : this.bounds) {
+					for (LineSegment s : this.bounds) {
 						double dxv = s.x1 - s.x0;
 						double dyv = s.y1 - s.y0;
 						double dxw = ge.x1 - s.x0;
@@ -453,7 +454,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 	}
 
 	private boolean isInside(double x12, double y12) {
-		for ( Segment s : this.bounds) {
+		for ( LineSegment s : this.bounds) {
 			if (CGAL.isLeftOfLine(x12, y12, s.x0,s.y0,s.x1,s.y1) > 0) {
 				return false;
 			}	
@@ -522,7 +523,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 		//		LinkedList<GraphEdge> vd2 = (LinkedList<GraphEdge>) v.generateVoronoi(x, y, this.minX+2, this.maxX-2, this.minY+2, this.maxY-2);//TODO
 		//		this.penv.getEventsManager().processEvent(new RectEvent(0,this.minX+2,this.maxY-2,this.maxX-this.minX-4,this.maxY-this.minY-4,true));
 		for ( GraphEdge ge : vd) {
-			Segment s = new Segment();
+			LineSegment s = new LineSegment();
 			s.x0 = ge.x1;
 			s.x1 = ge.x2;
 			s.y0 = ge.y1;
@@ -549,7 +550,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 			a.reDrawAgent(time);
 		}
 
-		for (Segment o : getOpenings()) {
+		for (LineSegment o : getOpenings()) {
 			PhysicalSim2DSection n = getNeighbor(o);
 			if (n == null) {
 				continue;

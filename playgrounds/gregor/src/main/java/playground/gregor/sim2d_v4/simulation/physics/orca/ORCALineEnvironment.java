@@ -24,8 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
 public class ORCALineEnvironment implements ORCALine {
 	
@@ -38,11 +38,11 @@ public class ORCALineEnvironment implements ORCALine {
 	
 	private static int penetrationCnt = 0;
 
-	public ORCALineEnvironment(ORCAVelocityUpdater orcaAgent, Segment seg, double tau) {
+	public ORCALineEnvironment(ORCAVelocityUpdater orcaAgent, LineSegment seg, double tau) {
 		construct(orcaAgent,seg,tau);
 	}
 
-	private void construct(ORCAVelocityUpdater orcaAgent, Segment seg, double tau) {
+	private void construct(ORCAVelocityUpdater orcaAgent, LineSegment seg, double tau) {
 		
 		
 //		tau = 1f;

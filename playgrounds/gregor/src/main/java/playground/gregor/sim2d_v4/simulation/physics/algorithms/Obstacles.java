@@ -24,16 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 public class Obstacles {
 	
 
 
-	public List<Segment> computeObstacles(Sim2DAgent agent) {
-		List<Segment> ret = new ArrayList<Segment>(100);
+	public List<LineSegment> computeObstacles(Sim2DAgent agent) {
+		List<LineSegment> ret = new ArrayList<LineSegment>(100);
 		
 		PhysicalSim2DSection psec = agent.getPSec();
 		ret.addAll(psec.getObstacles());
@@ -41,9 +41,9 @@ public class Obstacles {
 		double[] aPos = agent.getPos();
 		
 		//agents from neighboring sections
-		Segment[] openings = psec.getOpenings();
+		LineSegment[] openings = psec.getOpenings();
 		for (int i = 0; i < openings.length; i++) {
-			Segment opening = openings[i];
+			LineSegment opening = openings[i];
 			PhysicalSim2DSection qSec = psec.getNeighbor(opening);
 			if (qSec == null) {
 				continue;
@@ -53,7 +53,7 @@ public class Obstacles {
 			if (left >= 0) {
 				continue;
 			}
-			for (Segment obstacle : qSec.getObstacles()) {
+			for (LineSegment obstacle : qSec.getObstacles()) {
 				if (bothEndesVisible(obstacle,opening,aPos)) {
 					ret.add(obstacle);
 //					if (this.debugger != null)
@@ -67,7 +67,7 @@ public class Obstacles {
 		return ret;
 	}
 
-	private boolean bothEndesVisible(Segment obstacle, Segment opening,
+	private boolean bothEndesVisible(LineSegment obstacle, LineSegment opening,
 			double[] aPos) {
 		
 		double left0 = CGAL.isLeftOfLine(aPos[0],aPos[1], opening.x0, opening.y0, opening.x1, opening.y1);

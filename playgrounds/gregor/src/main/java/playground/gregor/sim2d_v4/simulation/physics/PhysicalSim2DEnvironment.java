@@ -32,11 +32,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -234,11 +234,11 @@ public class PhysicalSim2DEnvironment {
 		PhysicalSim2DSection psec = this.psecs.get(id);
 
 		//retrieve opening
-		Segment opening = null;
+		LineSegment opening = null;
 		Coord c = hiResLink.getLink().getFromNode().getCoord();
 		double cx = c.getX();
 		double cy = c.getY();
-		for (Segment op : psec.getOpenings()) {
+		for (LineSegment op : psec.getOpenings()) {
 			if (CGAL.isOnVector(cx, cy, op.x0, op.y0, op.x1, op.y1)){ 
 				double cx1 = hiResLink.getLink().getToNode().getCoord().getX();
 				double cy1 = hiResLink.getLink().getToNode().getCoord().getX();
@@ -259,7 +259,7 @@ public class PhysicalSim2DEnvironment {
 			double length = Math.sqrt(dx*dx+dy*dy);
 			dx /= length;
 			dy /= length;
-			opening = new Segment();
+			opening = new LineSegment();
 			opening.x0 = (cx+x0)/2 + dy*DEP_BOX_WIDTH/2; //should be capacity dependent [GL July '13]
 			opening.y0 = (cy+y0)/2 - dx*DEP_BOX_WIDTH/2;
 			opening.x1 = (cx+x0)/2 - dy*DEP_BOX_WIDTH/2;
@@ -310,13 +310,13 @@ public class PhysicalSim2DEnvironment {
 		this.psecs.put(s.getId(),ta);
 
 
-		Segment o = ta.getOpenings()[1];
+		LineSegment o = ta.getOpenings()[1];
 		ta.putNeighbor(o,psec);
 		psec.putNeighbor(opening, ta);
 		hiResLink.createDepartureBox(ta,spawnX,spawnY);
 
 		//DEBUG
-		for ( Segment bo : ta.getObstacles()) {
+		for ( LineSegment bo : ta.getObstacles()) {
 			this.eventsManager.processEvent(new LineEvent(0,bo,true,0,0,0,255,0));
 		}
 		//		} else {

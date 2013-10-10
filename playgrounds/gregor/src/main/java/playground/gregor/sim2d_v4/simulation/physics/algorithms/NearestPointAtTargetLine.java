@@ -23,7 +23,7 @@ package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 import org.matsim.api.core.v01.Id;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher.LinkInfo;
 
@@ -42,7 +42,7 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 		final double [] pos = this.agent.getPos();
 		Id id = this.agent.getCurrentLinkId();
 		LinkInfo li = this.ls.getLinkInfo(id);
-		Segment fl = li.targetLine;
+		LineSegment fl = li.targetLine;
 		double r = CGAL.vectorCoefOfPerpendicularProjection(pos[0], pos[1], fl.x0, fl.y0, fl.x1, fl.y1);
 
 		double dx, dy;

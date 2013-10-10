@@ -45,14 +45,14 @@ public class BiDirPedsCA {
 	private final double minCellTravelTime = this.L/this.maxSpeed;
 	private final double conflictDelay = 0.5;//0.5+this.minCellTravelTime;
 
-	private static final int CELLS = 200;
+	private static final int CELLS = 500; //(int) (1000/.19);
 
 	private final Cell [] cells = new Cell[CELLS+2];
 	private final Cell [] tmpCells = new Cell[CELLS+2];
 
-	private static final double MAX_TIME = 1000;
+	private static final double MAX_TIME = 10000;
 
-	private static final double WARMUP_TIME = 100;
+	private static final double WARMUP_TIME = 3000;
 
 	private static final boolean VISUALIZE = false;
 
@@ -63,10 +63,10 @@ public class BiDirPedsCA {
 	public void run() {
 
 		int idx1 = 0;
-		for (double rho1 = 0; rho1 <= 1; rho1 += 0.005) {
+		for (double rho1 = 0; rho1 <= 1; rho1 += 0.025) {
 			idx1++;
 			int idx2 = 0;
-			for (double rho2 = 0; rho2 <= 1; rho2 += 0.005) {
+			for (double rho2 = 0; rho2 <= 1; rho2 += 0.025) {
 				idx2++;
 				double rho = rho1+rho2;
 				if (rho > 1) {
@@ -178,8 +178,8 @@ public class BiDirPedsCA {
 					double incr = (nextT - t)*1000;
 					t = nextT;
 
-					StringBuffer buf = new StringBuffer();
-					buf.append('\r');
+//					StringBuffer buf = new StringBuffer();
+//					buf.append('\r');
 
 
 					Ped cand = this.cells[1].ped;
@@ -211,13 +211,16 @@ public class BiDirPedsCA {
 						this.cells[i].lastEnter = this.tmpCells[i].lastEnter;
 						this.cells[i].lastExit = this.tmpCells[i].lastExit;
 						this.cells[i].ped = this.tmpCells[i].ped;
-						this.tmpCells[i] = new Cell();
-						buf.append(this.cells[i]+"|");
+//						this.tmpCells[i] = new Cell();
+						this.tmpCells[i].lastEnter = 0;
+						this.tmpCells[i].lastExit = 0;
+						this.tmpCells[i].ped = null;
+//						buf.append(this.cells[i]+"|");
 					}
 
 
 					if (VISUALIZE) {
-						System.out.print(buf.toString());
+//						System.out.print(buf.toString());
 						//					the next block synchronizes the simulation with the real time
 						long time = System.currentTimeMillis();
 						if (time-this.last < incr) {

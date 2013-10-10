@@ -23,8 +23,8 @@ package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 import org.matsim.api.core.v01.Id;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.math.Math;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher.LinkInfo;
 
@@ -50,7 +50,7 @@ public class PathAndDrivingDirection implements DesiredDirectionCalculator {
 		final double [] ret = {0,0};
 		Id id = this.agent.getCurrentLinkId();
 		LinkInfo li = this.ls.getLinkInfo(id);
-		final Segment link = li.link;
+		final LineSegment link = li.link;
 		
 		
 		double dx = li.dx;

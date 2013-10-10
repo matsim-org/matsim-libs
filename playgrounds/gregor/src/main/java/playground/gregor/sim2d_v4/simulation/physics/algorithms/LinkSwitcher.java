@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
 public class LinkSwitcher {// TODO more meaningful name for this class [gl April '13]
 
@@ -57,7 +57,7 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		final LinkInfo li = getLinkInfo(currentLinkId);
 		final double newXPosX = pos[0] + dx;
 		final double newXPosY = pos[1] + dy;
-		final Segment fl = li.finishLine;
+		final LineSegment fl = li.finishLine;
 		double isLeftOfLine = CGAL.isLeftOfLine(newXPosX, newXPosY, fl.x0, fl.y0, fl.x1, fl.y1);
 		return isLeftOfLine >= 0;
 	}
@@ -76,7 +76,7 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		Link l = this.net.getLinks().get(currentLinkId);
 		Coord from = l.getFromNode().getCoord();
 		Coord to = l.getToNode().getCoord();
-		Segment seg = new Segment();
+		LineSegment seg = new LineSegment();
 		seg.x0 = from.getX();
 		seg.x1 = to.getX();
 		seg.y0 = from.getY();
@@ -96,13 +96,13 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 //		if (pSec == null) {
 //			System.out.println();
 //		}
-		Segment fl = null;
+		LineSegment fl = null;
 		if (pSec != null) {
 			fl = getTouchingSegment(seg, pSec.getOpenings());
 		}
 		
 		
-		Segment targetLine = null;
+		LineSegment targetLine = null;
 		//all polygons are clockwise oriented so we rotate to the right here 
 		//TODO find intersections with pSec!! [gl April '13]
 		if (fl != null) {
@@ -121,7 +121,7 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			double fdy = fl.y1-fl.y0;
 			double w = Math.sqrt(fdx*fdx + fdy*fdy)/2; //TODO repair! (visibility intersection or something ??) [gl April '13] 
 			
-			targetLine = new Segment();
+			targetLine = new LineSegment();
 			targetLine.x0 = seg.x1 - w*li.dy;
 			targetLine.y0 = seg.y1 + w*li.dx;
 			targetLine.x1 = seg.x1 + w*li.dy;
@@ -131,7 +131,7 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 //			//HACK July '13 [gl]
 //			double cap = l.getCapacity();
 			double width = 5;//(cap)/1.3;
-			fl = new Segment();
+			fl = new LineSegment();
 			fl.x0 = seg.x1 - width/2*li.dy;// + rX;
 			fl.y0 = seg.y1 + width/2*li.dx;// + rY;
 			fl.x1 = seg.x1 + width/2*li.dy;// + rY;
@@ -145,9 +145,9 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 	}
 
 
-	private Segment getTouchingSegment(Segment seg, Segment[] openings) {
+	private LineSegment getTouchingSegment(LineSegment seg, LineSegment[] openings) {
 
-		for (Segment opening : openings) {
+		for (LineSegment opening : openings) {
 
 			boolean onSegment = CGAL.isOnVector(seg.x1, seg.y1,opening.x0, opening.y0, opening.x1, opening.y1); // this is a necessary but not sufficient condition since a section is only approx convex. so we need the following test as well
 			if (onSegment) {
@@ -169,9 +169,9 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		public double width;
 		public double dx;
 		public double dy;
-		public Segment link;
-		Segment fromOpening;
-		public Segment finishLine;
-		public Segment targetLine;
+		public LineSegment link;
+		LineSegment fromOpening;
+		public LineSegment finishLine;
+		public LineSegment targetLine;
 	}
 }

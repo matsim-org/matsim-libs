@@ -27,8 +27,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 import playground.gregor.sim2d_v4.simulation.physics.orca.ORCALine;
@@ -80,7 +80,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 
 		List<ORCALine> constr = new ArrayList<ORCALine>();
-		for (Segment seg : this.agent.getPSec().getObstacles()) {
+		for (LineSegment seg : this.agent.getPSec().getObstacles()) {
 			ORCALineEnvironment ol = new ORCALineEnvironment(this, seg, this.tau);
 			constr.add(ol);
 			

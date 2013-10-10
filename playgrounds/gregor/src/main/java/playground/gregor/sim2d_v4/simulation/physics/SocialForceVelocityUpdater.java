@@ -25,8 +25,8 @@ import java.util.List;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
@@ -78,7 +78,7 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 		
 //		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors(time);
 		List<Sim2DAgent> neighbors = this.ncalc.getNeighbors();
-		List<Segment> obstacles = this.ocalc.computeObstacles(this.agent);
+		List<LineSegment> obstacles = this.ocalc.computeObstacles(this.agent);
 
 		double v0 = this.agent.getV0();
 		
@@ -135,7 +135,7 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 		//obstacles
 		double fwx = 0;
 		double fwy = 0;
-		for (Segment s : obstacles) {
+		for (LineSegment s : obstacles) {
 			double r = CGAL.vectorCoefOfPerpendicularProjection(pos[0], pos[1], s.x0, s.y0, s.x1, s.y1);
 			double nx;
 			double ny;
