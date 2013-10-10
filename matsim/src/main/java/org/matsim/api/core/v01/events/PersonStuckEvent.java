@@ -46,7 +46,9 @@ public class PersonStuckEvent extends Event implements HasPersonId {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_LINK, (this.linkId == null ? null : this.linkId.toString()));
+		if (this.linkId == null) {
+			attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		}
 		if (this.legMode != null) {
 			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}

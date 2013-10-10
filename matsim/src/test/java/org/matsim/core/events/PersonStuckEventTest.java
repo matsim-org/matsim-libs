@@ -28,7 +28,7 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author mrieser
  */
-public class AgentStuckEventTest extends MatsimTestCase {
+public class PersonStuckEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final PersonStuckEvent event1 = new PersonStuckEvent(81153.3, new IdImpl("a007"), new IdImpl("link1"), TransportMode.walk);
