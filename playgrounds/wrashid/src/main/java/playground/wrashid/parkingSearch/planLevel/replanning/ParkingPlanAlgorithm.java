@@ -31,11 +31,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.wrashid.lib.GlobalRegistry;
@@ -203,8 +199,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
 		// peform rerouting
 
-		PlansCalcRoute router = getRoutingAlgorithm(controler);
-		router = getRoutingAlgorithm(controler);
+		PlanAlgorithm router = getRoutingAlgorithm(controler);
 		router.run(plan);
 	}
 
@@ -235,15 +230,8 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		return newParkingActivity;
 	}
 
-	private static PlansCalcRoute getRoutingAlgorithm(Controler controler) {
-		TravelTime travelTime = controler.getLinkTravelTimes();
-		TravelDisutility travelCost = controler.getTravelDisutilityFactory().createTravelDisutility(travelTime,
-				controler.getConfig().planCalcScore());
-
-		LeastCostPathCalculatorFactory leastCostFactory = controler.getLeastCostPathCalculatorFactory();
-
-		return new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(), travelCost, travelTime,
-				leastCostFactory, ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
+	private static PlanAlgorithm getRoutingAlgorithm(Controler controler) {
+		return new PlanRouter( controler.getTripRouterFactory().instantiateAndConfigureTripRouter() );
 	}
 
 }

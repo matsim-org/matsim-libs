@@ -116,16 +116,16 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 //				super.createRoutingAlgorithm();
 //	}
 
-	public PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		return new PlansCalcRouteKti(
-					super.getConfig().plansCalcRoute(),
-					super.network,
-					travelCosts,
-					travelTimes,
-					super.getLeastCostPathCalculatorFactory(),
-					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
-					this.plansCalcRouteKtiInfo);
-	}	
+//	public PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+//		return new PlansCalcRouteKti(
+//					super.getConfig().plansCalcRoute(),
+//					super.network,
+//					travelCosts,
+//					travelTimes,
+//					super.getLeastCostPathCalculatorFactory(),
+//					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
+//					this.plansCalcRouteKtiInfo);
+//	}	
 
 	/**
 	 * @param args

@@ -5,13 +5,14 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -102,7 +103,13 @@ public class LoadedNetworkRouter {
 		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(sl.getScenario(), eventsFile);
 		TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
-		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator.getLinkTravelTimes(), ((PopulationFactoryImpl) sl.getScenario().getPopulation().getFactory()).getModeRouteFactory()));
+		plans.addAlgorithm(
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								sl.getScenario() ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												travelCostCalculator,
+												travelTimeCalculator.getLinkTravelTimes() ) ) ) );
 
 		// add algorithm to write out the plans
 		plans.addAlgorithm(plansWriter);

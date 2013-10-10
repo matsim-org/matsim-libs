@@ -37,16 +37,15 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 public class LegModeCheckerTest extends MatsimTestCase {
@@ -101,9 +100,13 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		 */
 		TravelTime travelTimes = new FreeSpeedTravelTime();
 		TravelDisutility travelCosts = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimes, config.planCalcScore());
-		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastDijkstraFactory();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (sc.getPopulation().getFactory())).getModeRouteFactory();
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), sc.getNetwork(), travelCosts, travelTimes, leastCostPathCalculatorFactory, routeFactory);
+		PlanAlgorithm plansCalcRoute =
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								sc ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												travelCosts,
+												travelTimes ) ) );
 
 		/*
 		 * Create LegModeChecker to check and adapt leg modes
