@@ -45,8 +45,8 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  */
 public class StrategyManager implements MatsimManager {
 
-	private final ArrayList<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
-	private final ArrayList<Double> weights = new ArrayList<Double>();
+	private final List<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
+	private final List<Double> weights = new ArrayList<Double>();
 	private final List<PlanStrategy> unmodifiableStrategies = Collections.unmodifiableList(this.strategies);
 	private final List<Double> unmodifiableWeights = Collections.unmodifiableList(this.weights);
 	private double totalWeights = 0.0;
@@ -54,7 +54,7 @@ public class StrategyManager implements MatsimManager {
 
 	private PlanSelector removalPlanSelector = new WorstPlanForRemovalSelector();
 
-	private final TreeMap<Integer, Map<PlanStrategy, Double>> changeRequests =
+	private final Map<Integer, Map<PlanStrategy, Double>> changeRequests =
 			new TreeMap<Integer, Map<PlanStrategy, Double>>();
 
 	/**
