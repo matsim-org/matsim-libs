@@ -45,22 +45,20 @@ import java.util.Properties;
 public class EventsToTravelSummaryTablesGUI extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField schemaNameComponent;
+	private JTextField outputPathComponent;
 	private JTextField transitScheduleFileComponent;
-	private JTextField postgresPropertiesComponent;
 	private JTextField tableSuffixComponent;
 	private JTextField configFileComponent;
 	private JTextField eventsToSQLPropertiesFileComponent;
 	private JTextField networkFileComponent;
 	private JTextField eventsFileComponent;
 	private Properties defaultProperties;
-	private String transitScheduleFile = "examples/pt-tutorial/transitschedule.xml";
-	private String networkFile = "examples/pt-tutorial/multimodalnetwork.xml";
-	private String eventsFile = "output/pt-tutorial/ITERS/it.0/0.events.xml.gz";
-	private String configFile = "examples/pt-tutorial/0.config.xml";
-	private String tableSuffix = "_ezlinksim";
-	private String schemaName = "u_fouriep";
-	private String postgresProperties = "data/matsim2postgres.properties";
+	private String transitScheduleFile = "transitschedule.xml";
+	private String networkFile = "multimodalnetwork.xml";
+	private String eventsFile = "events.xml.gz";
+	private String configFile = "config.xml";
+	private String tableSuffix = "_test";
+	private String outputPath = "./";
 	private EventsToTravelSummaryTablesGUI self = this;
 	private String defaultpath = "";
 
@@ -76,7 +74,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 					frame.loadDefaultProperties(new File(
 							"eventsToSQL.properties"));
 				} catch (Exception e) {
-					e.printStackTrace();
+					System.err.println("No default properties file.");
 				}
 			}
 		});
@@ -88,21 +86,22 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 	public EventsToTravelSummaryTablesGUI() {
 		setTitle("Events to PostgreSQL tables");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 764, 300);
+		setBounds(100, 100, 764, 246);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[] { 144, 509, 0 };
-		gbl_contentPane.rowHeights = new int[] { 20, 20, 20, 20, 20, 20, 23,
-				20, 20, 23, 0 };
+		gbl_contentPane.rowHeights = new int[] { 20, 20, 20, 20, 20, 20, 20,
+				23, 0 };
 		gbl_contentPane.columnWeights = new double[] { 0.0, 1.0,
 				Double.MIN_VALUE };
 		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
-				0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+				0.0, 0.0, 0.0, Double.MIN_VALUE };
 		contentPane.setLayout(gbl_contentPane);
 
-		JLabel lblFillFromProperties = new JLabel("Fill from properties file");
+		JLabel lblFillFromProperties = new JLabel(
+				"Fill this dialog from properties file:");
 		GridBagConstraints gbc_lblFillFromProperties = new GridBagConstraints();
 		gbc_lblFillFromProperties.anchor = GridBagConstraints.WEST;
 		gbc_lblFillFromProperties.insets = new Insets(0, 0, 5, 5);
@@ -116,10 +115,14 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				File defaultPropertiesFile = fileSelect(
 						eventsToSQLPropertiesFileComponent.getText(),
-						"Select properties file");
+						"Select properties file",false);
+				try{
 				eventsToSQLPropertiesFileComponent
 						.setText(defaultPropertiesFile.getPath());
 				loadDefaultProperties(defaultPropertiesFile);
+				}catch(NullPointerException ne){
+					//do nothing
+				}
 			}
 		});
 		eventsToSQLPropertiesFileComponent.setText("eventsToSQL.properties");
@@ -133,28 +136,41 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 				gbc_txtDataeventstosqlproperties);
 		eventsToSQLPropertiesFileComponent.setColumns(10);
 
-		JLabel lblSchemaName = new JLabel(
-				"Schema name for SQL/output path for CSVs");
-		lblSchemaName.setHorizontalAlignment(SwingConstants.LEFT);
-		GridBagConstraints gbc_lblSchemaName = new GridBagConstraints();
-		gbc_lblSchemaName.anchor = GridBagConstraints.WEST;
-		gbc_lblSchemaName.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSchemaName.gridx = 0;
-		gbc_lblSchemaName.gridy = 1;
-		contentPane.add(lblSchemaName, gbc_lblSchemaName);
+		JLabel lbloutputPath = new JLabel("Output path for CSVs");
+		lbloutputPath.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_lbloutputPath = new GridBagConstraints();
+		gbc_lbloutputPath.anchor = GridBagConstraints.WEST;
+		gbc_lbloutputPath.insets = new Insets(0, 0, 5, 5);
+		gbc_lbloutputPath.gridx = 0;
+		gbc_lbloutputPath.gridy = 1;
+		contentPane.add(lbloutputPath, gbc_lbloutputPath);
 
-		schemaNameComponent = new JTextField();
-		schemaNameComponent.setText("m_calibration");
-		GridBagConstraints gbc_schemaName = new GridBagConstraints();
-		gbc_schemaName.anchor = GridBagConstraints.NORTH;
-		gbc_schemaName.fill = GridBagConstraints.HORIZONTAL;
-		gbc_schemaName.insets = new Insets(0, 0, 5, 0);
-		gbc_schemaName.gridx = 1;
-		gbc_schemaName.gridy = 1;
-		contentPane.add(schemaNameComponent, gbc_schemaName);
-		schemaNameComponent.setColumns(10);
+		outputPathComponent = new JTextField();
+		outputPathComponent.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				outputPathComponent.
+				setText(
+					fileSelect(
+							outputPathComponent.getText(),
+							"Select output path",
+							true)
+							.getPath()
+						);
+			}
+		});
+		outputPathComponent.setText("./");
+		GridBagConstraints gbc_outputPath = new GridBagConstraints();
+		gbc_outputPath.anchor = GridBagConstraints.NORTH;
+		gbc_outputPath.fill = GridBagConstraints.HORIZONTAL;
+		gbc_outputPath.insets = new Insets(0, 0, 5, 0);
+		gbc_outputPath.gridx = 1;
+		gbc_outputPath.gridy = 1;
+		contentPane.add(outputPathComponent, gbc_outputPath);
+		outputPathComponent.setColumns(10);
 
-		JLabel lblTransitSchedule = new JLabel("Transit schedule");
+		JLabel lblTransitSchedule = new JLabel(
+				"Transit schedule (empty for none)");
 		lblTransitSchedule.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_lblTransitSchedule = new GridBagConstraints();
 		gbc_lblTransitSchedule.anchor = GridBagConstraints.WEST;
@@ -169,11 +185,11 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				transitScheduleFileComponent.setText(fileSelect(
 						transitScheduleFileComponent.getText(),
-						"select transit schedule file").getPath());
+						"select transit schedule file",false).getPath());
 			}
 		});
 		transitScheduleFileComponent
-				.setText("data/sing2.2/input/transit/transitSchedule.xml.gz");
+				.setText("transitSchedule.xml.gz");
 		GridBagConstraints gbc_transitScheduleFile = new GridBagConstraints();
 		gbc_transitScheduleFile.anchor = GridBagConstraints.NORTH;
 		gbc_transitScheduleFile.fill = GridBagConstraints.HORIZONTAL;
@@ -196,7 +212,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				networkFileComponent.setText(fileSelect(
-						networkFileComponent.getText(), "select network file")
+						networkFileComponent.getText(), "select network file",false)
 						.getPath());
 			}
 		});
@@ -223,7 +239,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				configFileComponent.setText(fileSelect(
-						configFileComponent.getText(), "select config file")
+						configFileComponent.getText(), "select config file",false)
 						.getPath());
 			}
 		});
@@ -237,43 +253,12 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		contentPane.add(configFileComponent, gbc_configFile);
 		configFileComponent.setColumns(10);
 
-		JLabel lblpropertiesForPostgresql = new JLabel(
-				".properties for postgresql (leave empty for CSV)");
-		GridBagConstraints gbc_lblpropertiesForPostgresql = new GridBagConstraints();
-		gbc_lblpropertiesForPostgresql.anchor = GridBagConstraints.WEST;
-		gbc_lblpropertiesForPostgresql.insets = new Insets(0, 0, 5, 5);
-		gbc_lblpropertiesForPostgresql.gridx = 0;
-		gbc_lblpropertiesForPostgresql.gridy = 5;
-		contentPane.add(lblpropertiesForPostgresql,
-				gbc_lblpropertiesForPostgresql);
-
-		postgresPropertiesComponent = new JTextField();
-		postgresPropertiesComponent.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				postgresPropertiesComponent.setText(fileSelect(
-						postgresPropertiesComponent.getText(),
-						"select PostgreSQL connection properties file")
-						.getPath());
-
-			}
-		});
-		postgresPropertiesComponent.setText("data/matsim2postgres.properties");
-		GridBagConstraints gbc_postgresProperties = new GridBagConstraints();
-		gbc_postgresProperties.anchor = GridBagConstraints.NORTH;
-		gbc_postgresProperties.fill = GridBagConstraints.HORIZONTAL;
-		gbc_postgresProperties.insets = new Insets(0, 0, 5, 0);
-		gbc_postgresProperties.gridx = 1;
-		gbc_postgresProperties.gridy = 5;
-		contentPane.add(postgresPropertiesComponent, gbc_postgresProperties);
-		postgresPropertiesComponent.setColumns(10);
-
-		JLabel lblEvents = new JLabel("Events file?");
+		JLabel lblEvents = new JLabel("Events file");
 		GridBagConstraints gbc_lblEvents = new GridBagConstraints();
 		gbc_lblEvents.anchor = GridBagConstraints.WEST;
 		gbc_lblEvents.insets = new Insets(0, 0, 5, 5);
 		gbc_lblEvents.gridx = 0;
-		gbc_lblEvents.gridy = 7;
+		gbc_lblEvents.gridy = 5;
 		contentPane.add(lblEvents, gbc_lblEvents);
 
 		eventsFileComponent = new JTextField();
@@ -281,7 +266,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				eventsFileComponent.setText(fileSelect(
-						eventsFileComponent.getText(), "select events file")
+						eventsFileComponent.getText(), "select events file",false)
 						.getPath());
 			}
 		});
@@ -291,7 +276,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		gbc_eventsFile.fill = GridBagConstraints.HORIZONTAL;
 		gbc_eventsFile.insets = new Insets(0, 0, 5, 0);
 		gbc_eventsFile.gridx = 1;
-		gbc_eventsFile.gridy = 7;
+		gbc_eventsFile.gridy = 5;
 		contentPane.add(eventsFileComponent, gbc_eventsFile);
 		eventsFileComponent.setColumns(10);
 
@@ -300,7 +285,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		gbc_lblTableNameSuffix.anchor = GridBagConstraints.WEST;
 		gbc_lblTableNameSuffix.insets = new Insets(0, 0, 5, 5);
 		gbc_lblTableNameSuffix.gridx = 0;
-		gbc_lblTableNameSuffix.gridy = 8;
+		gbc_lblTableNameSuffix.gridy = 6;
 		contentPane.add(lblTableNameSuffix, gbc_lblTableNameSuffix);
 
 		tableSuffixComponent = new JTextField();
@@ -310,7 +295,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		gbc_tableSuffix.fill = GridBagConstraints.HORIZONTAL;
 		gbc_tableSuffix.insets = new Insets(0, 0, 5, 0);
 		gbc_tableSuffix.gridx = 1;
-		gbc_tableSuffix.gridy = 8;
+		gbc_tableSuffix.gridy = 6;
 		contentPane.add(tableSuffixComponent, gbc_tableSuffix);
 		tableSuffixComponent.setColumns(10);
 
@@ -326,7 +311,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		gbc_btnSaveAsDefault.fill = GridBagConstraints.BOTH;
 		gbc_btnSaveAsDefault.insets = new Insets(0, 0, 0, 5);
 		gbc_btnSaveAsDefault.gridx = 0;
-		gbc_btnSaveAsDefault.gridy = 9;
+		gbc_btnSaveAsDefault.gridy = 7;
 		contentPane.add(btnSaveAsDefault, gbc_btnSaveAsDefault);
 
 		JButton btnStartEventsProcessing = new JButton(
@@ -348,19 +333,17 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		gbc_btnStartEventsProcessing.anchor = GridBagConstraints.NORTH;
 		gbc_btnStartEventsProcessing.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnStartEventsProcessing.gridx = 1;
-		gbc_btnStartEventsProcessing.gridy = 9;
+		gbc_btnStartEventsProcessing.gridy = 7;
 		contentPane.add(btnStartEventsProcessing, gbc_btnStartEventsProcessing);
 	}
 
 	public void saveDefaultProperties() {
 		this.defaultProperties = new Properties();
 
-		this.defaultProperties.setProperty("schemaName",
-				schemaNameComponent.getText());
+		this.defaultProperties.setProperty("outputPath",
+				outputPathComponent.getText());
 		this.defaultProperties.setProperty("transitScheduleFile",
 				transitScheduleFileComponent.getText());
-		this.defaultProperties.setProperty("postgresProperties",
-				postgresPropertiesComponent.getText());
 		this.defaultProperties.setProperty("tableSuffix",
 				tableSuffixComponent.getText());
 		this.defaultProperties.setProperty("configFile",
@@ -375,7 +358,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		} catch (FileNotFoundException e) {
 
 			fileSelect(eventsToSQLPropertiesFileComponent.getText(),
-					"Path not found. Enter proerties filename.");
+					"Path not found. Enter properties filename.",false);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -406,14 +389,13 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		// ,tableSuffixComponent.getText());
 		// }else{
 		if (isTransit) {
-			test = new EventsToTravelSummaryTables(scenario.getTransitSchedule(),
-					scenario.getNetwork(), scenario.getConfig(), tableSuffix,
-					schemaNameComponent.getText());
+			test = new EventsToTravelSummaryTables(
+					scenario.getTransitSchedule(), scenario.getNetwork(),
+					scenario.getConfig());
 
 		} else {
 			test = new EventsToTravelSummaryTables(scenario.getNetwork(),
-					scenario.getConfig(), tableSuffix,
-					schemaNameComponent.getText());
+					scenario.getConfig());
 		}
 		// }
 		eventsManager.addHandler(test);
@@ -421,11 +403,10 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 				.getText());
 
 		try {
-			
-				test.writeSimulationResultsToCSV(schemaNameComponent.getText(),
-						tableSuffixComponent.getText());
 
-	
+			test.writeSimulationResultsToCSV(outputPathComponent.getText(),
+					tableSuffixComponent.getText());
+
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -445,7 +426,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(test.getStuck());
+		System.out.println("Number of stuck vehicles/passengers: "+test.getStuck());
 
 	}
 
@@ -455,8 +436,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			this.defaultProperties.load(new FileInputStream(
 					defaultPropertiesFile));
 			String[] properties = { "transitScheduleFile", "networkFile",
-					"eventsFile", "configFile", "tableSuffix", "schemaName",
-					"postgresProperties" };
+					"eventsFile", "configFile", "tableSuffix", "outputPath" };
 			for (String property : properties) {
 				try {
 					String propertyValue = this.defaultProperties
@@ -486,17 +466,15 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 	}
 
 	private void setComponentValues() {
-		schemaNameComponent.setText(schemaName);
+		outputPathComponent.setText(outputPath);
 		transitScheduleFileComponent.setText(transitScheduleFile);
-		postgresPropertiesComponent.setText(postgresProperties);
 		tableSuffixComponent.setText(tableSuffix);
 		configFileComponent.setText(configFile);
 		networkFileComponent.setText(networkFile);
 		eventsFileComponent.setText(eventsFile);
-		// linkTrafficComponent.setSelected(Boolean.parseBoolean(linkTraffic));
 	}
 
-	public File fileSelect(String path, String title) {
+	public File fileSelect(String path, String title, boolean dirsOnly) {
 		boolean validPath = false;
 		File file = null;
 		try {
@@ -508,10 +486,17 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 
 		}
 		JFileChooser chooser = new JFileChooser(defaultpath);
+		if (dirsOnly)
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.setToolTipText(title);
 		chooser.setDialogTitle(title);
 		chooser.showOpenDialog(new JPanel());
-		defaultpath = chooser.getSelectedFile().getPath();
+		try{
+			defaultpath = chooser.getSelectedFile().getPath();			
+		}catch(NullPointerException ne){
+			//do nothing
+		}
 		return chooser.getSelectedFile();
 	}
+
 }

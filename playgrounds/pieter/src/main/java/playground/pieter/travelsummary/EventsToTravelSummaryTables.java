@@ -1,8 +1,6 @@
 package playground.pieter.travelsummary;
 
-import java.io.File;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -14,57 +12,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.bcel.generic.ISUB;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
-import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-import playground.pieter.singapore.utils.postgresql.*;
-import playground.pieter.travelsummary.travelcomponents.*;
+import playground.pieter.singapore.utils.postgresql.CSVWriter;
+import playground.pieter.singapore.utils.postgresql.PostgresType;
+import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
+import playground.pieter.travelsummary.travelcomponents.Activity;
+import playground.pieter.travelsummary.travelcomponents.Journey;
+import playground.pieter.travelsummary.travelcomponents.Transfer;
+import playground.pieter.travelsummary.travelcomponents.TravelComponent;
+import playground.pieter.travelsummary.travelcomponents.TravellerChain;
+import playground.pieter.travelsummary.travelcomponents.Trip;
+import playground.pieter.travelsummary.travelcomponents.Wait;
+import playground.pieter.travelsummary.travelcomponents.Walk;
 
 /**
  * 
@@ -76,11 +71,12 @@ import playground.pieter.travelsummary.travelcomponents.*;
  *         modes.
  */
 
-public class EventsToTravelSummaryTables implements TransitDriverStartsEventHandler,
-		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-		PersonDepartureEventHandler, PersonArrivalEventHandler,
-		ActivityStartEventHandler, ActivityEndEventHandler,
-		PersonStuckEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
+public class EventsToTravelSummaryTables implements
+		TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
+		PersonLeavesVehicleEventHandler, PersonDepartureEventHandler,
+		PersonArrivalEventHandler, ActivityStartEventHandler,
+		ActivityEndEventHandler, PersonStuckEventHandler,
+		LinkEnterEventHandler, LinkLeaveEventHandler,
 		TeleportationArrivalEventHandler, VehicleArrivesAtFacilityEventHandler {
 
 	// Private classes
@@ -133,33 +129,28 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 	private int stuck = 0;
 	private TransitSchedule transitSchedule;
 	private final double walkSpeed;
-	private String schemaName;
 	private HashSet<Id> transitDriverIds = new HashSet<Id>();
 	private boolean isTransitScenario = false;
-	private HashMap<Id,Id> driverIdFromVehicleId = new HashMap<Id, Id>();
+	private HashMap<Id, Id> driverIdFromVehicleId = new HashMap<Id, Id>();
 
 	public EventsToTravelSummaryTables(TransitSchedule transitSchedule,
-			Network network, Config config, String suffix, String schemaName) {
+			Network network, Config config) {
+		this(network, config);
 		this.transitSchedule = transitSchedule;
 		this.isTransitScenario = true;
-		this.network = network;
-		this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
-		this.schemaName = schemaName;
 	}
-	
-	public EventsToTravelSummaryTables(
-			Network network, Config config, String suffix, String schemaName) {
+
+	public EventsToTravelSummaryTables(Network network, Config config) {
 		this.network = network;
 		this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
-		this.schemaName = schemaName;
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		try {
-			if(isTransitScenario){
+			if (isTransitScenario) {
 				if (transitDriverIds.contains(event.getPersonId()))
-					return;				
+					return;
 			}
 			TravellerChain chain = chains.get(event.getPersonId());
 			locations.put(event.getPersonId(),
@@ -191,9 +182,9 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		try {
-			if(isTransitScenario){
+			if (isTransitScenario) {
 				if (transitDriverIds.contains(event.getPersonId()))
-					return;				
+					return;
 			}
 			TravellerChain chain = chains.get(event.getPersonId());
 			boolean beforeInPT = chain.isInPT();
@@ -228,9 +219,9 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		try {
-			if(isTransitScenario){
+			if (isTransitScenario) {
 				if (transitDriverIds.contains(event.getPersonId()))
-					return;				
+					return;
 			}
 			TravellerChain chain = chains.get(event.getPersonId());
 			if (event.getLegMode().equals("car")) {
@@ -250,7 +241,7 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 				walk.setEndTime(event.getTime());
 				walk.setDistance(walk.getDuration() * walkSpeed);
 			} else if (event.getLegMode().equals("pt")) {
-				if(isTransitScenario){
+				if (isTransitScenario) {
 					Journey journey = chain.getJourneys().getLast();
 					Trip trip = journey.getTrips().getLast();
 					trip.setDest(network.getLinks().get(event.getLinkId())
@@ -259,7 +250,7 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 					journey.setPossibleTransfer(new Transfer());
 					journey.getPossibleTransfer().setStartTime(event.getTime());
 					journey.getPossibleTransfer().setFromTrip(trip);
-				}else{
+				} else {
 					Journey journey = chain.getJourneys().getLast();
 					journey.setEndTime(event.getTime());
 					journey.setDest(network.getLinks().get(event.getLinkId())
@@ -314,7 +305,7 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 				trip.setMode("car");
 				trip.setStartTime(event.getTime());
 			} else if (event.getLegMode().equals("pt")) {
-				if(isTransitScenario){
+				if (isTransitScenario) {
 					// person waits till they enter the vehicle
 					journey = chain.getJourneys().getLast();
 					Wait wait = journey.addWait();
@@ -326,7 +317,7 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 					if (!wait.isAccessWait()) {
 						journey.getPossibleTransfer().getWaits().add(wait);
 					}
-				}else{
+				} else {
 					journey = chain.addJourney();
 					journey.setTeleportJourney(true);
 					journey.setOrig(network.getLinks().get(event.getLinkId())
@@ -382,10 +373,9 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 				Trip trip = journey.addTrip();
 				PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
 				trip.setLine(vehicle.transitLineId);
-				trip.setMode(
-						transitSchedule.getTransitLines()
-								.get(vehicle.transitLineId).getRoutes()
-								.get(vehicle.transitRouteId).getTransportMode());
+				trip.setMode(transitSchedule.getTransitLines()
+						.get(vehicle.transitLineId).getRoutes()
+						.get(vehicle.transitRouteId).getTransportMode());
 				trip.setBoardingStop(vehicle.lastStop);
 				trip.setOrig(journey.getWaits().getLast().getCoord());
 				trip.setRoute(ptVehicles.get(event.getVehicleId()).transitRouteId);
@@ -397,9 +387,11 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 					journey.addTransfer(journey.getPossibleTransfer());
 					journey.setPossibleTransfer(null);
 				}
-			}else{
-				// add the person to the map that keeps track of who drives what vehicle
-				driverIdFromVehicleId.put(event.getVehicleId(), event.getPersonId());
+			} else {
+				// add the person to the map that keeps track of who drives what
+				// vehicle
+				driverIdFromVehicleId.put(event.getVehicleId(),
+						event.getPersonId());
 			}
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
@@ -414,20 +406,19 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 		if (transitDriverIds.contains(event.getPersonId()))
 			return;
 		try {
-				if (ptVehicles.keySet().contains(event.getVehicleId())) {
-					TravellerChain chain = chains.get(event.getPersonId());
-					chain.traveledVehicle = true;
-					PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
-					double stageDistance = vehicle.removePassenger(event
-							.getPersonId());
-					Trip trip = chain.getJourneys().getLast().getTrips()
-							.getLast();
-					trip.setDistance(stageDistance);
-					trip.setAlightingStop(vehicle.lastStop);
-				}else{
-					driverIdFromVehicleId.remove(event.getVehicleId());
-				}
-			
+			if (ptVehicles.keySet().contains(event.getVehicleId())) {
+				TravellerChain chain = chains.get(event.getPersonId());
+				chain.traveledVehicle = true;
+				PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
+				double stageDistance = vehicle.removePassenger(event
+						.getPersonId());
+				Trip trip = chain.getJourneys().getLast().getTrips().getLast();
+				trip.setDistance(stageDistance);
+				trip.setAlightingStop(vehicle.lastStop);
+			} else {
+				driverIdFromVehicleId.remove(event.getVehicleId());
+			}
+
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
 					.getFullStackTrace(e);
@@ -444,8 +435,8 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 				ptVehicle.in = true;
 				ptVehicle.setLinkEnterTime(event.getTime());
 			} else {
-				chains.get(driverIdFromVehicleId.get(event.getVehicleId())).setLinkEnterTime(
-						event.getTime());
+				chains.get(driverIdFromVehicleId.get(event.getVehicleId()))
+						.setLinkEnterTime(event.getTime());
 			}
 
 		} catch (Exception e) {
@@ -468,12 +459,12 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 						.getLength());
 
 			} else {
-				TravellerChain chain = chains.get(driverIdFromVehicleId.get(event.getVehicleId()));
+				TravellerChain chain = chains.get(driverIdFromVehicleId
+						.get(event.getVehicleId()));
 				if (chain.inCar) {
 					Journey journey = chain.getJourneys().getLast();
 					journey.incrementCarDistance(network.getLinks()
 							.get(event.getLinkId()).getLength());
-
 
 				}
 			}
@@ -536,133 +527,49 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 
 	}
 
-	
+	public void writeSimulationResultsToCSV(String path, String suffix)
+			throws InstantiationException, IllegalAccessException,
+			ClassNotFoundException, IOException, SQLException,
+			NoConnectionException {
 
-	public void writeSimulationResultsToCSV(String path,
-			String suffix) throws InstantiationException,
-			IllegalAccessException, ClassNotFoundException, IOException,
-			SQLException, NoConnectionException {
-		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
-		String formattedDate = df.format(new Date());
-		// start with activities
-		String actTableName = "matsim_activities" + suffix;
-		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("activity_id",
-				PostgresType.INT, "primary key"));
-		columns.add(new PostgresqlColumnDefinition("person_id",
-				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("facility_id",
-				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("type", PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("start_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("sample_selector",
-				PostgresType.FLOAT8));
-		CSVWriter activityWriter = new CSVWriter("ACTS",
-				actTableName, path, 100000, columns);
-		activityWriter.addComment(String.format(
-				"MATSim activities from events file %s, created on %s.",
-				eventsFileName, formattedDate));
+		String actTableName = "matsim_activities" + suffix + ".csv";
+		CsvListWriter activityWriter = new CsvListWriter(
+				IOUtils.getBufferedWriter(path + "/" + actTableName),
+				CsvPreference.STANDARD_PREFERENCE);
+		activityWriter.write("activity_id", "person_id", "facility_id", "type",
+				"start_time", "end_time", "sample_selector");
 
-		String journeyTableName =  "matsim_journeys" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("journey_id",
-				PostgresType.INT, "primary key"));
-		columns.add(new PostgresqlColumnDefinition("person_id",
-				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("start_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("distance",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("main_mode",
-				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("from_act", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("to_act", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("in_vehicle_distance",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("in_vehicle_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("access_walk_distance",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("access_walk_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("access_wait_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("first_boarding_stop",
-				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("egress_walk_distance",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("egress_walk_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("last_alighting_stop",
-				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("transfer_walk_distance",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("transfer_walk_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("transfer_wait_time",
-				PostgresType.INT));		
-		columns.add(new PostgresqlColumnDefinition("sample_selector",
-				PostgresType.FLOAT8));
-		CSVWriter journeyWriter = new CSVWriter("JOURNEYS",
-				journeyTableName, path, 50000, columns);
-		journeyWriter.addComment(String.format(
-				"MATSim journeys from events file %s, created on %s.",
-				eventsFileName, formattedDate));
+		String journeyTableName = "matsim_journeys" + suffix + ".csv";
+		CsvListWriter journeyWriter = new CsvListWriter(
+				IOUtils.getBufferedWriter(path + "/" + journeyTableName),
+				CsvPreference.STANDARD_PREFERENCE);
+		journeyWriter.write("journey_id", "person_id", "start_time",
+				"end_time", "distance", "main_mode", "from_act", "to_act",
+				"in_vehicle_distance", "in_vehicle_time",
+				"access_walk-distance", "access_walk_time", "access_wait_time",
+				"first_boarding_stop", "egress_walk_distance",
+				"egress_walk_time", "last_alighting_stop",
+				"transfer_walk_distance", "transfer_walk_time",
+				"transfer_wait_time", "sample_selector");
 
-		String tripTableName ="matsim_trips" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("journey_id",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("start_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("distance",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("mode", PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("line", PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("route", PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("boarding_stop",
-				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("alighting_stop",
-				PostgresType.TEXT));
-		columns.add(new PostgresqlColumnDefinition("sample_selector",
-				PostgresType.FLOAT8));
-		CSVWriter tripWriter = new CSVWriter("TRIPS",
-				tripTableName, path, 100000, columns);
-		tripWriter.addComment(String.format(
-				"MATSim trips (stages) from events file %s, created on %s.",
-				eventsFileName, formattedDate));
+		String tripTableName = "matsim_trips" + suffix + ".csv";
+		CsvListWriter tripWriter = new CsvListWriter(
+				IOUtils.getBufferedWriter(path + "/" + tripTableName),
+				CsvPreference.STANDARD_PREFERENCE);
+		tripWriter.write("trip_id", "journey_id", "start_time", "end_time",
+				"distance", "mode", "line", "route", "boarding_stop",
+				"alighting_stop", "sample_selector");
 
-		String transferTableName = "matsim_transfers" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("transfer_id",
-				PostgresType.INT, "primary key"));
-		columns.add(new PostgresqlColumnDefinition("journey_id",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("start_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("end_time", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("from_trip",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("to_trip", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("walk_distance",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("walk_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("wait_time",
-				PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("sample_selector",
-				PostgresType.FLOAT8));
-		CSVWriter transferWriter = new CSVWriter(
-				"TRANSFERS", transferTableName, path, 100000, columns);
-		transferWriter.addComment(String.format(
-				"MATSim transfers from events file %s, created on %s.",
-				eventsFileName, formattedDate));
+		String transferTableName = "matsim_transfers" + suffix + ".csv";
+		CsvListWriter transferWriter = new CsvListWriter(
+				IOUtils.getBufferedWriter(path + "/" + transferTableName),
+				CsvPreference.STANDARD_PREFERENCE);
+		transferWriter.write("transfer_id", "journey_id", "start_time",
+				"end_time", "from_trip", "to_trip", "walk_distance",
+				"walk_time", "wait_time", "sample_selector");
 
+		//read a static field that increments with every inheriting object constructed
+		Counter counter = new Counter("Output lines written: ");
 		for (Entry<Id, TravellerChain> entry : chains.entrySet()) {
 			String pax_id = entry.getKey().toString();
 			TravellerChain chain = entry.getValue();
@@ -673,10 +580,10 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 							new Integer((int) act.getStartTime()),
 							new Integer((int) act.getEndTime()),
 							new Double(Math.random()) };
-					activityWriter.addLine(args);
+					activityWriter.write(args);
 				} catch (Exception e) {
 					System.out.println("HARK!");
-//					System.err.println(act);
+					// System.err.println(act);
 					;
 				}
 			}
@@ -684,7 +591,8 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 				try {
 
 					Object[] journeyArgs = {
-							new Integer(journey.getElementId()), pax_id,
+							new Integer(journey.getElementId()),
+							pax_id,
 							new Integer((int) journey.getStartTime()),
 							new Integer((int) journey.getEndTime()),
 							new Integer((int) journey.getDistance()),
@@ -706,7 +614,9 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 							new Double(Math.random())
 
 					};
-					journeyWriter.addLine(journeyArgs);
+					journeyWriter.write(journeyArgs);
+					counter.incCounter();
+				
 					if (!(journey.isCarJourney() || journey.isTeleportJourney())) {
 						for (Trip trip : journey.getTrips()) {
 							Object[] tripArgs = {
@@ -719,7 +629,8 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 									trip.getRoute(), trip.getBoardingStop(),
 									trip.getAlightingStop(),
 									new Double(Math.random()) };
-							tripWriter.addLine(tripArgs);
+							tripWriter.write(tripArgs);
+							counter.incCounter();
 						}
 						for (Transfer transfer : journey.getTransfers()) {
 							Object[] transferArgs = {
@@ -731,25 +642,27 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 											.getElementId()),
 									new Integer(transfer.getToTrip()
 											.getElementId()),
-									new Integer((int) transfer.getWalkDistance()),
+									new Integer(
+											(int) transfer.getWalkDistance()),
 									new Integer((int) transfer.getWalkTime()),
 									new Integer((int) transfer.getWaitTime()),
 									new Double(Math.random()) };
-							transferWriter.addLine(transferArgs);
+							transferWriter.write(transferArgs);
+							counter.incCounter();
 						}
-					}else{
+					} else {
 						for (Trip trip : journey.getTrips()) {
 							Object[] tripArgs = {
 									new Integer(trip.getElementId()),
 									new Integer(journey.getElementId()),
 									new Integer((int) trip.getStartTime()),
 									new Integer((int) trip.getEndTime()),
-									journey.isTeleportJourney()? new Integer((int) trip.getDistance()):null,
-									trip.getMode(), null,
-									null, null,
-									null,
+									journey.isTeleportJourney() ? new Integer(
+											(int) trip.getDistance()) : null,
+									trip.getMode(), null, null, null, null,
 									new Double(Math.random()) };
-							tripWriter.addLine(tripArgs);
+							tripWriter.write(tripArgs);
+							counter.incCounter();
 						}
 					}
 				} catch (NullPointerException e) {
@@ -758,11 +671,12 @@ public class EventsToTravelSummaryTables implements TransitDriverStartsEventHand
 			}
 
 		}
-		
-			activityWriter.finish();
-			journeyWriter.finish();
-			tripWriter.finish();
-			transferWriter.finish();
+
+		activityWriter.close();
+		journeyWriter.close();
+		tripWriter.close();
+		transferWriter.close();
+		counter.printCounter();
 	}
 
 	public int getStuck() {
