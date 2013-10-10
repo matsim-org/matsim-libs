@@ -43,6 +43,7 @@ public class StrategyConfigGroup extends Module {
 	private static final String MODULE_PROBABILITY = "ModuleProbability_";
 	private static final String MODULE_DISABLE_AFTER_ITERATION = "ModuleDisableAfterIteration_";
 	private static final String MODULE_EXE_PATH = "ModuleExePath_";
+	private static final String MODULE_SUBPOPULATION = "ModuleSubpopulation_";
 	private static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
 	private static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
 	private static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
@@ -100,6 +101,13 @@ public class StrategyConfigGroup extends Module {
 			}
 			return settings.getExePath();
 		}
+		if (key != null && key.startsWith(MODULE_SUBPOPULATION)) {
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_SUBPOPULATION.length())), false);
+			if (settings == null) {
+				return null;
+			}
+			return settings.getSubpopulation();
+		}
 		if (EXTERNAL_EXE_CONFIG_TEMPLATE.equals(key)) {
 			return getExternalExeConfigTemplate();
 		}
@@ -133,6 +141,9 @@ public class StrategyConfigGroup extends Module {
 		} else if (key != null && key.startsWith(MODULE_EXE_PATH)) {
 			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_EXE_PATH.length())), true);
 			settings.setExePath(value);
+		} else if (key != null && key.startsWith(MODULE_SUBPOPULATION)) {
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_SUBPOPULATION.length())), true);
+			settings.setSubpopulation(value);
 		} else if (EXTERNAL_EXE_CONFIG_TEMPLATE.equals(key)) {
 			setExternalExeConfigTemplate(value);
 		} else if (EXTERNAL_EXE_TMP_FILE_ROOT_DIR.equals(key)) {
@@ -161,6 +172,7 @@ public class StrategyConfigGroup extends Module {
 				map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), Integer.toString(entry.getValue().getDisableAfter()));
 			}
 			this.addParameterToMap(map, MODULE_EXE_PATH + entry.getKey());
+			this.addParameterToMap(map, MODULE_SUBPOPULATION + entry.getKey());
 		}
 		this.addParameterToMap(map, EXTERNAL_EXE_CONFIG_TEMPLATE);
 		this.addParameterToMap(map, EXTERNAL_EXE_TMP_FILE_ROOT_DIR);
@@ -184,6 +196,7 @@ public class StrategyConfigGroup extends Module {
 				map.put(MODULE_PROBABILITY + entry.getKey().toString(), "probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight''");
 				map.put(MODULE_DISABLE_AFTER_ITERATION + entry.getKey().toString(), "iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
 				map.put(MODULE_EXE_PATH + entry.getKey().toString(), "path to external executable (if applicable)" ) ;
+				map.put(MODULE_SUBPOPULATION + entry.getKey().toString(), "subpopulation to which the module applies. \"null\" refers to the default population, that is, the set of persons for which no explicit subpopulation is defined (ie no subpopulation attribute)" ) ;
 			} else {
 				map.put(MODULE + entry.getKey().toString(), Gbl.SEPARATOR ); 
 			}
@@ -287,6 +300,7 @@ public class StrategyConfigGroup extends Module {
 		private String moduleName = null;
 		private int disableAfter = -1;
 		private String exePath = null;
+		private String subpopulation = null;
 
 		public StrategySettings(final Id id) {
 			this.id = id;
@@ -328,6 +342,13 @@ public class StrategyConfigGroup extends Module {
 			return this.id;
 		}
 
+		public void setSubpopulation(final String subpopulation) {
+			this.subpopulation = subpopulation;
+		}
+
+		public String getSubpopulation() {
+			return subpopulation;
+		}
 	}
 
 	public String getPlanSelectorForRemoval() {
