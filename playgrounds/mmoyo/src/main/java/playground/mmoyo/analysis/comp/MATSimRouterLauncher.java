@@ -7,18 +7,18 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.xml.sax.SAXException;
 
 import playground.mmoyo.algorithms.PlanScoreNullifier;
@@ -47,16 +47,22 @@ public class MATSimRouterLauncher {
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
 				scenario.getConfig().vspExperimental());
 
-		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
-				timeCostCalculator, timeCostCalculator, dijkstraFactory, new ModeRouteFactory(), transitConfig, 
-				new TransitRouterImpl(tRConfig, scenario.getTransitSchedule()), scenario.getTransitSchedule());
+		PlanRouter router =
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								scenario ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												timeCostCalculator,
+												timeCostCalculator ) ) );
 	
 		Population population = scenario.getPopulation();
 		
 		//remove scores
 		new PlanScoreNullifier().run(population);
 		
-		router.run(scenario.getPopulation());
+		for ( Person p : scenario.getPopulation().getPersons().values() ) {
+			router.run( p );
+		}
 
 		//fragment
 		//new PlanFragmenter().run(population);

@@ -21,21 +21,25 @@ package playground.mmoyo.randomizerPtRouter;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
@@ -64,20 +68,37 @@ class PopulationRndPtRouter{
 			Population population = scn.getPopulation();
 			
 			//create randomizedPtRouter and PlansCalcTransitRoute
-			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
-			TransitRouter randomizedPtRouter = new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
-			final PlansCalcRouteConfigGroup config = scn.getConfig().plansCalcRoute();
+			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 			final Network network = scn.getNetwork();
 			FreespeedTravelTimeAndDisutility freespeedTravelTimeCost = new FreespeedTravelTimeAndDisutility(scn.getConfig().planCalcScore());
 			final TravelDisutility costCalculator = freespeedTravelTimeCost;
 			final TravelTime timeCalculator = freespeedTravelTimeCost;
-			final LeastCostPathCalculatorFactory factory = new DijkstraFactory();
-			final ModeRouteFactory routeFactory =((PopulationFactoryImpl)population.getFactory()).getModeRouteFactory();
-			final TransitConfigGroup transitConfigGroup = scn.getConfig().transit(); 
-			PlansCalcTransitRoute plansCalcTransitRoute = new PlansCalcTransitRoute(config, network, costCalculator, timeCalculator, factory, routeFactory, transitConfigGroup, randomizedPtRouter, schedule);
+			final TripRouterFactoryBuilderWithDefaults builder =
+				new TripRouterFactoryBuilderWithDefaults();
+			builder.setTransitRouterFactory(
+				new TransitRouterFactory() {
+					@Override
+					public TransitRouter createTransitRouter() {
+						return new TransitRouterImpl(
+							trConfig,
+							new PreparedTransitSchedule(schedule),
+							routerNetwork,
+							ttCalculator,
+							ttCalculator);
+					}
+				});
+			final PlanRouter router =
+				new PlanRouter(
+						builder.build(
+							scn ).instantiateAndConfigureTripRouter(
+								new RoutingContextImpl(
+									costCalculator,
+									timeCalculator ) ) ); 
 			
 			//route population
-			plansCalcTransitRoute.run(population);
+			for ( Person p : population.getPersons().values() ) {
+				router.run( p );
+			}
 		
 			//write agents individual parameters in output directory  ??
 			
