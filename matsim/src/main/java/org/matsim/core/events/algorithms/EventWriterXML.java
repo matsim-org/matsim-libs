@@ -84,18 +84,16 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 
 	@Override
 	public void handleEvent(final Event event) {
-		StringBuilder eventXML = new StringBuilder(180);
-		eventXML.append("\t<event ");
-		Map<String, String> attr = event.getAttributes();
-		for (Map.Entry<String, String> entry : attr.entrySet()) {
-			eventXML.append(entry.getKey());
-			eventXML.append("=\"");
-			eventXML.append(encodeAttributeValue(entry.getValue()));
-			eventXML.append("\" ");
-		}
-		eventXML.append(" />\n");
 		try {
-			this.out.write(eventXML.toString());
+			this.out.append("\t<event ");
+			Map<String, String> attr = event.getAttributes();
+			for (Map.Entry<String, String> entry : attr.entrySet()) {
+				this.out.append(entry.getKey());
+				this.out.append("=\"");
+				this.out.append(encodeAttributeValue(entry.getValue()));
+				this.out.append("\" ");
+			}
+			this.out.append(" />\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -115,10 +113,45 @@ public class EventWriterXML implements EventWriter, BasicEventHandler {
 		if (attributeValue == null) {
 			return null;
 		}
-		if (attributeValue.contains("&") || attributeValue.contains("\"") || attributeValue.contains("<") || attributeValue.contains(">")) {
-			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
+		int len = attributeValue.length();
+		boolean encode = false;
+		for (int pos = 0; pos < len; pos++) {
+			char ch = attributeValue.charAt(pos);
+			if (ch == '<') {
+				encode = true;
+				break;
+			} else if (ch == '>') {
+				encode = true;
+				break;
+			} else if (ch == '\"') {
+				encode = true;
+				break;
+			} else if (ch == '&') {
+				encode = true;
+				break;
+			}
+		}
+		if (encode) {
+			StringBuffer bf = new StringBuffer();
+			for (int pos = 0; pos < len; pos++) {
+				char ch = attributeValue.charAt(pos);
+				if (ch == '<') {
+					bf.append("&lt;");
+				} else if (ch == '>') {
+					bf.append("&gt;");
+				} else if (ch == '\"') {
+					bf.append("&quot;");
+				} else if (ch == '&') {
+					bf.append("&amp;");
+				} else {
+					bf.append(ch);
+				}
+			}
+			
+			return bf.toString();
 		}
 		return attributeValue;
+
 	}
 
 }
