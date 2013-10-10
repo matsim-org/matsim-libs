@@ -694,7 +694,7 @@ public class MultiModalDemo {
 			travelTimes.put(TransportMode.bike, bikeTravelTime);
 			travelTimes.put(TransportMode.walk, walkTravelTime);
 			
-			for (PlanStrategy planStrategy : this.strategyManager.getStrategies()) {
+			for (PlanStrategy planStrategy : this.strategyManager.getStrategiesOfDefaultSubpopulation()) {
 				if (planStrategy instanceof ChooseBestLegModePlanStrategy) {
 					((ChooseBestLegModePlanStrategy) planStrategy).setWaitToLinkCalculator(waitToLinkCalculator);
 					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(travelTimes);

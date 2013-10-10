@@ -70,7 +70,7 @@ public class StrategyManager implements MatsimManager {
 		this.subpopulationName = name;
 	}
 
-	public final void addStrategy(
+	public final void addStrategyForDefaultSubpopulation(
 			final PlanStrategy strategy,
 			final double weight) {
 		addStrategy( strategy , null , weight );
@@ -105,7 +105,7 @@ public class StrategyManager implements MatsimManager {
 		return weights;
 	}
 
-	public final boolean removeStrategy(
+	public final boolean removeStrategyForDefaultSubpopulation(
 			final PlanStrategy strategy) {
 		return removeStrategy( strategy , null );
 	}
@@ -139,7 +139,7 @@ public class StrategyManager implements MatsimManager {
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
-	public final boolean changeWeightOfStrategy(
+	public final boolean changeWeightOfStrategyForDefaultSubpopulation(
 			final PlanStrategy strategy,
 			final double newWeight) {
 		return changeWeightOfStrategy( strategy , null , newWeight );
@@ -347,7 +347,7 @@ public class StrategyManager implements MatsimManager {
 	 * @param strategy
 	 * @param newWeight
 	 */
-	public final void addChangeRequest(
+	public final void addChangeRequestForDefaultSubpopulation(
 			final int iteration,
 			final PlanStrategy strategy,
 			final double newWeight) {
@@ -401,7 +401,7 @@ public class StrategyManager implements MatsimManager {
 		this.removalPlanSelector = planSelector;
 	}
 
-	public final List<PlanStrategy> getStrategies() {
+	public final List<PlanStrategy> getStrategiesOfDefaultSubpopulation() {
 		return getStrategies( null );
 	}
 
@@ -410,9 +410,9 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	/**
-	 * @return the weights of the strategies, in the same order as the strategies returned by {@link #getStrategies()}
+	 * @return the weights of the strategies, in the same order as the strategies returned by {@link #getStrategiesOfDefaultSubpopulation()}
 	 */
-	public final List<Double> getWeights() {
+	public final List<Double> getWeightsOfDefaultSubpopulation() {
 		return getWeights( null );
 	}
 

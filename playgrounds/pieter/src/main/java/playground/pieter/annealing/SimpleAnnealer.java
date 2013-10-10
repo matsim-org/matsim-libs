@@ -135,13 +135,13 @@ public class SimpleAnnealer implements IterationStartsListener,
 	 */
 	public static void anneal(IterationStartsEvent event, double proportion) {
 		StrategyManager stratMan = event.getControler().getStrategyManager();
-		List<PlanStrategy> strategies = stratMan.getStrategies();
+		List<PlanStrategy> strategies = stratMan.getStrategiesOfDefaultSubpopulation();
 		double totalWeights = 0.0;
 		double totalSelectorWeights = 0.0;
 		for (PlanStrategy strategy : strategies) {
 			// first read off the weights of the strategies and classify them
 			String strategyName = strategy.toString().toLowerCase();
-			double weight = stratMan.getWeights().get(
+			double weight = stratMan.getWeightsOfDefaultSubpopulation().get(
 					strategies.indexOf(strategy));
 			if ((strategyName.contains("selector")||strategyName.contains("expbeta"))
 					&& !strategyName.contains("_")
@@ -162,7 +162,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 		for (PlanStrategy strategy : strategies) {
 			// first read off the weights of the strategies and classify them
 			String strategyName = strategy.toString().toLowerCase();
-			double weight = stratMan.getWeights().get(
+			double weight = stratMan.getWeightsOfDefaultSubpopulation().get(
 					strategies.indexOf(strategy));
 			double newWeight = weight;
 			if ((strategyName.contains("selector")||strategyName.contains("expbeta"))
@@ -179,7 +179,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 			// strategy + " weight set from " + weight
 			// + " to " + newWeight);
 			outputToWrite += "\t" + strategy + "\t" + weight + "\t" + newWeight;
-			stratMan.changeWeightOfStrategy(strategy, newWeight);
+			stratMan.changeWeightOfStrategyForDefaultSubpopulation(strategy, newWeight);
 		}
 		Logger.getLogger("ANNEAL").info(outputToWrite);
 

@@ -159,23 +159,23 @@ public class ParkAndRideControlerListener implements StartupListener {
 		
 		StrategyManager manager = this.controler.getStrategyManager() ;
 	
-		manager.addStrategy(strategyAddPR, this.addPRProb);
-		manager.addChangeRequest(this.addPRDisable, strategyAddPR, 0.);
+		manager.addStrategyForDefaultSubpopulation(strategyAddPR, this.addPRProb);
+		manager.addChangeRequestForDefaultSubpopulation(this.addPRDisable, strategyAddPR, 0.);
 		
-		manager.addStrategy(strategyChangeLocation, this.changeLocationProb);
-		manager.addChangeRequest(this.changeLocationDisable, strategyChangeLocation, 0.);
+		manager.addStrategyForDefaultSubpopulation(strategyChangeLocation, this.changeLocationProb);
+		manager.addChangeRequestForDefaultSubpopulation(this.changeLocationDisable, strategyChangeLocation, 0.);
 		
-		manager.addStrategy(strategyTimeAllocation, this.timeAllocationProb);
-		manager.addChangeRequest(this.timeAllocationDisable, strategyTimeAllocation, 0.);
+		manager.addStrategyForDefaultSubpopulation(strategyTimeAllocation, this.timeAllocationProb);
+		manager.addChangeRequestForDefaultSubpopulation(this.timeAllocationDisable, strategyTimeAllocation, 0.);
 		
-		manager.addStrategy(strategyRemovePR, this.removePRProb);
-		manager.addChangeRequest(this.removePRDisable, strategyRemovePR, 0.);
+		manager.addStrategyForDefaultSubpopulation(strategyRemovePR, this.removePRProb);
+		manager.addChangeRequestForDefaultSubpopulation(this.removePRDisable, strategyRemovePR, 0.);
 		
-		manager.addStrategy(strategyAddPRTimeAllocation, this.addPRtimeAllocationProb);
-		manager.addChangeRequest(this.addPRtimeAllocationDisable, strategyAddPRTimeAllocation, 0.);
+		manager.addStrategyForDefaultSubpopulation(strategyAddPRTimeAllocation, this.addPRtimeAllocationProb);
+		manager.addChangeRequestForDefaultSubpopulation(this.addPRtimeAllocationDisable, strategyAddPRTimeAllocation, 0.);
 		
-		manager.addStrategy(strategyReRoute, this.reRouteProb);
-		manager.addChangeRequest(this.reRouteDisable, strategyReRoute, 0.);
+		manager.addStrategyForDefaultSubpopulation(strategyReRoute, this.reRouteProb);
+		manager.addChangeRequestForDefaultSubpopulation(this.reRouteDisable, strategyReRoute, 0.);
 		
 	}
 

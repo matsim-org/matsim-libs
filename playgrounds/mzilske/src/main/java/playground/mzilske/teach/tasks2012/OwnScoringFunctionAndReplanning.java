@@ -136,7 +136,7 @@ public class OwnScoringFunctionAndReplanning {
 			public void notifyStartup(StartupEvent controlerEvent) {
 				PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector()) ;
 				strategy.addStrategyModule(new MyTimeMutator() ) ;
-				controler.getStrategyManager().addStrategy(strategy, 1.0 ) ;
+				controler.getStrategyManager().addStrategyForDefaultSubpopulation(strategy, 1.0 ) ;
 			}
 		}) ;
 		controler.run();

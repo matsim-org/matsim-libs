@@ -112,11 +112,11 @@ public class TTAStrategyManager extends StrategyManager {
 		PlanStrategy planStrategy;
 		
 		planStrategy = new ReRoutePlanStrategyFactory().createPlanStrategy(scenario, eventsManager);
-		this.ttaStrategyManager.addStrategy(planStrategy, 0.1);
+		this.ttaStrategyManager.addStrategyForDefaultSubpopulation(planStrategy, 0.1);
 		this.planStrategies.add(planStrategy);
 
 		planStrategy = new SelectExpBetaPlanStrategyFactory().createPlanStrategy(scenario, eventsManager);
-		this.ttaStrategyManager.addStrategy(planStrategy, 0.9);
+		this.ttaStrategyManager.addStrategyForDefaultSubpopulation(planStrategy, 0.9);
 		this.planStrategies.add(planStrategy);
 	}
 }

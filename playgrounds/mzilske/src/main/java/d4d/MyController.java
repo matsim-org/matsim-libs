@@ -273,9 +273,9 @@ public class MyController extends AbstractController {
 		});
 		
 		
-		strategyManager.addStrategy(strategy1, 0.6) ;
-		strategyManager.addStrategy(strategy2, 0.2) ;		
-		strategyManager.addStrategy(strategy3, 0.2) ;
+		strategyManager.addStrategyForDefaultSubpopulation(strategy1, 0.6) ;
+		strategyManager.addStrategyForDefaultSubpopulation(strategy2, 0.2) ;		
+		strategyManager.addStrategyForDefaultSubpopulation(strategy3, 0.2) ;
 		
 
 		return strategyManager ;

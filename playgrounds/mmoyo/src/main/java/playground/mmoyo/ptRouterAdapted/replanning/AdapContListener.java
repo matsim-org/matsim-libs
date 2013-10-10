@@ -36,7 +36,7 @@ public class AdapContListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		PlanStrategy strategy = new AdapTimeMut_ReRouteStrategy(this.controler);
 		StrategyManager manager = this.controler.getStrategyManager() ;
-		manager.addStrategy(strategy, 1.0 ) ;
+		manager.addStrategyForDefaultSubpopulation(strategy, 1.0 ) ;
 	}
 
 }

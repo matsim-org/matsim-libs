@@ -46,11 +46,11 @@ public class BottleneckControler extends Controler {
 		manager.setMaxPlansPerAgent(5);
 		//
 		PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.planCalcScore()));
-		manager.addStrategy(strategy1, 0.95);
+		manager.addStrategyForDefaultSubpopulation(strategy1, 0.95);
 
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.config));
-		manager.addStrategy(strategy2, 0.05);
+		manager.addStrategyForDefaultSubpopulation(strategy2, 0.05);
 		return manager;
 	}
 

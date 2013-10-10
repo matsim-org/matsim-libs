@@ -38,8 +38,8 @@ public class RandomPlanSelectorControler extends Controler {
 		StrategyManagerConfigLoader.load(this, manager);
 
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		manager.addStrategy(strategy, 0.0);
-		manager.addChangeRequest(601, strategy, 1.0);
+		manager.addStrategyForDefaultSubpopulation(strategy, 0.0);
+		manager.addChangeRequestForDefaultSubpopulation(601, strategy, 1.0);
 
 		return manager;
 	}

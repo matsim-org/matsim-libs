@@ -72,8 +72,8 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 			PlanStrategyImpl expBetaPlanChanger = new PlanStrategyImpl(
 					new ExpBetaPlanChanger(config.planCalcScore()
 							.getBrainExpBeta()));
-			manager.addStrategy(expBetaPlanChanger, 0.0);
-			manager.addChangeRequest(this.strategyChangerIteration,
+			manager.addStrategyForDefaultSubpopulation(expBetaPlanChanger, 0.0);
+			manager.addChangeRequestForDefaultSubpopulation(this.strategyChangerIteration,
 					expBetaPlanChanger, 1.0);
 		}
 

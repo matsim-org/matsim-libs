@@ -39,7 +39,7 @@ public class Main {
 				strategy.addStrategyModule( knRouter ) ;
 				controler.getEvents().addHandler( knRouter ) ;
 				
-				controler.getStrategyManager().addStrategy(strategy, 0.1 ) ;
+				controler.getStrategyManager().addStrategyForDefaultSubpopulation(strategy, 0.1 ) ;
 			}
 		}) ;
 		controler.setOverwriteFiles(true) ;

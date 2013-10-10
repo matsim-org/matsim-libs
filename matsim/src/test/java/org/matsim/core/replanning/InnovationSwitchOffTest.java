@@ -115,19 +115,19 @@ public class InnovationSwitchOffTest {
 				System.out.flush() ;
 				log.warn( " Iteration: " + event.getIteration() ) ;
 				final StrategyManager sm = event.getControler().getStrategyManager(); // move into controler package if access to sm is a problem. kai, jun'13
-				for ( int ii =0 ; ii < sm.getStrategies().size() ; ii++ ) {
-					log.warn("strategy " + sm.getStrategies().get(ii) + " has weight " + sm.getWeights().get(ii) ) ;
-					if ( event.getIteration() == 11 && sm.getStrategies().get(ii).toString().contains( ReRoute.class.getSimpleName()) ) {
-						Assert.assertEquals(0.1, sm.getWeights().get(ii),0.000001 ) ;
+				for ( int ii =0 ; ii < sm.getStrategiesOfDefaultSubpopulation().size() ; ii++ ) {
+					log.warn("strategy " + sm.getStrategiesOfDefaultSubpopulation().get(ii) + " has weight " + sm.getWeightsOfDefaultSubpopulation().get(ii) ) ;
+					if ( event.getIteration() == 11 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains( ReRoute.class.getSimpleName()) ) {
+						Assert.assertEquals(0.1, sm.getWeightsOfDefaultSubpopulation().get(ii),0.000001 ) ;
 					}
-					if ( event.getIteration() == 12 && sm.getStrategies().get(ii).toString().contains( ReRoute.class.getSimpleName()) ) {
-						Assert.assertEquals(0., sm.getWeights().get(ii) ) ;
+					if ( event.getIteration() == 12 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains( ReRoute.class.getSimpleName()) ) {
+						Assert.assertEquals(0., sm.getWeightsOfDefaultSubpopulation().get(ii) ) ;
 					}
-					if ( event.getIteration() == 13 && sm.getStrategies().get(ii).toString().contains( TimeAllocationMutator.class.getSimpleName()) ) {
-						Assert.assertEquals(0.1, sm.getWeights().get(ii),0.000001 ) ;
+					if ( event.getIteration() == 13 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains( TimeAllocationMutator.class.getSimpleName()) ) {
+						Assert.assertEquals(0.1, sm.getWeightsOfDefaultSubpopulation().get(ii),0.000001 ) ;
 					}
-					if ( event.getIteration() == 14 && sm.getStrategies().get(ii).toString().contains( TimeAllocationMutator.class.getSimpleName()) ) {
-						Assert.assertEquals(0.0, sm.getWeights().get(ii) ) ;
+					if ( event.getIteration() == 14 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains( TimeAllocationMutator.class.getSimpleName()) ) {
+						Assert.assertEquals(0.0, sm.getWeightsOfDefaultSubpopulation().get(ii) ) ;
 					}
 				}
 				System.err.flush();

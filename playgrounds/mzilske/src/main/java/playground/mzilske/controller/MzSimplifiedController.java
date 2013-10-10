@@ -171,7 +171,7 @@ public class MzSimplifiedController extends AbstractController {
 		}
 		{
 			PlanStrategy strategy = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
-			strategyManager.addStrategy(strategy, 0.9) ;
+			strategyManager.addStrategyForDefaultSubpopulation(strategy, 0.9) ;
 		}
 		{
 			PlanStrategyImpl strategy = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
@@ -183,7 +183,7 @@ public class MzSimplifiedController extends AbstractController {
 				}
 				
 			}) ;
-			strategyManager.addStrategy(strategy, 0.1) ;
+			strategyManager.addStrategyForDefaultSubpopulation(strategy, 0.1) ;
 		}
 		return strategyManager ;
 	}

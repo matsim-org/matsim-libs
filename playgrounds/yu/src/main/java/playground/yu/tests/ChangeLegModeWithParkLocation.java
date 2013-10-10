@@ -678,24 +678,24 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 			// ChangeExpBeta
 			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
-			manager.addStrategy(strategy1, 0.7);
+			manager.addStrategyForDefaultSubpopulation(strategy1, 0.7);
 
 			// ChangeLegModeWithParkLocation
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
 					config, network));
 			strategy2.addStrategyModule(new ReRoute(getScenario()));
-			manager.addStrategy(strategy2, 0.1);
+			manager.addStrategyForDefaultSubpopulation(strategy2, 0.1);
 
 			// ReRoute
 			PlanStrategyImpl strategy3 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy3.addStrategyModule(new ReRoute(getScenario()));
-			manager.addStrategy(strategy3, 0.1);
+			manager.addStrategyForDefaultSubpopulation(strategy3, 0.1);
 
 			// TimeAllocationMutator
 			PlanStrategyImpl strategy4 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy4.addStrategyModule(new TimeAllocationMutator(config));
-			manager.addStrategy(strategy4, 0.1);
+			manager.addStrategyForDefaultSubpopulation(strategy4, 0.1);
 
 			return manager;
 		}

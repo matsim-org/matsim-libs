@@ -44,7 +44,7 @@ public class SubSetStrategyManager extends StrategyManager {
 
 	/**
 	 * Specifies if the default strategies (strategies registered in this instance, e.g. using
-	 * {@link SubSetStrategyManager#addStrategy(PlanStrategy, double)}) should be used
+	 * {@link SubSetStrategyManager#addStrategyForDefaultSubpopulation(PlanStrategy, double)}) should be used
 	 * for all persons who are not listed in one of the special Id-sets
 	 * ({@link #addSubset(Set, StrategyManager)}. Defaults to <code>true</code>.
 	 *
@@ -58,7 +58,7 @@ public class SubSetStrategyManager extends StrategyManager {
 	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
 		super.beforePopulationRunHook(population, replanningContext);
 		for (StrategyManager mgr : this.managers.values()) {
-			for (PlanStrategy strategy : mgr.getStrategies()) {
+			for (PlanStrategy strategy : mgr.getStrategiesOfDefaultSubpopulation()) {
 				strategy.init(replanningContext);
 			}
 		}
@@ -68,7 +68,7 @@ public class SubSetStrategyManager extends StrategyManager {
 	protected void afterRunHook(Population population) {
 		super.afterRunHook(population);
 		for (StrategyManager mgr : this.managers.values()) {
-			for (PlanStrategy strategy : mgr.getStrategies()) {
+			for (PlanStrategy strategy : mgr.getStrategiesOfDefaultSubpopulation()) {
 				strategy.finish();
 			}
 		}

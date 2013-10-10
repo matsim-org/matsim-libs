@@ -152,7 +152,7 @@ public class KnSimplifiedController extends AbstractController {
 		strategyManager.setPlanSelectorForRemoval( new WorstPlanForRemovalSelector() ) ;
 
 		PlanStrategy strategy1 = new PlanStrategyImpl( new ExpBetaPlanChanger(this.config.planCalcScore().getBrainExpBeta()) ) ;
-		strategyManager.addStrategy(strategy1, 0.9) ;
+		strategyManager.addStrategyForDefaultSubpopulation(strategy1, 0.9) ;
 
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl( new ExpBetaPlanSelector(this.config.planCalcScore())) ;
 		strategy2.addStrategyModule( new AbstractMultithreadedModule(this.scenario.getConfig().global().getNumberOfThreads()) {
@@ -161,7 +161,7 @@ public class KnSimplifiedController extends AbstractController {
 				return createRoutingAlgorithm();
 			}
 		}) ;
-		strategyManager.addStrategy(strategy2, 0.1) ;
+		strategyManager.addStrategyForDefaultSubpopulation(strategy2, 0.1) ;
 
 		return strategyManager ;
 	}

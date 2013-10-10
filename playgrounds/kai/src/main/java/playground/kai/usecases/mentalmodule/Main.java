@@ -36,7 +36,7 @@ public class Main {
 			public void notifyStartup(StartupEvent controlerEvent) {
 				PlanStrategy strategy = new PlanStrategyImpl(new RandomPlanSelector()) ;
 				((PlanStrategyImpl) strategy).addStrategyModule(new MyTimeMutator() ) ;
-				controler.getStrategyManager().addStrategy(strategy, 0.1 ) ;
+				controler.getStrategyManager().addStrategyForDefaultSubpopulation(strategy, 0.1 ) ;
 			}
 		}) ;
 		controler.setOverwriteFiles(true) ;

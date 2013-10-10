@@ -59,7 +59,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TimeAllocationMutator(config));
 		StrategyManager strategyManager = new StrategyManager();
-		strategyManager.addStrategy(strategy, 1.0);
+		strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		new TestControler(config, strategyManager).run();
@@ -96,7 +96,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		StrategyManager strategyManager = new StrategyManager();
 		strategyManager.setMaxPlansPerAgent(5);
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategyManager.addStrategy(strategy, 1.0);
+		strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 		
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		TestControler controler = new TestControler(config, strategyManager);
@@ -108,7 +108,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		StrategyManager strategyManager2 = new StrategyManager();
 		strategyManager2.setMaxPlansPerAgent(5);
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-		strategyManager2.addStrategy(strategy2, 1.0);
+		strategyManager2.addStrategyForDefaultSubpopulation(strategy2, 1.0);
 		
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		TestControler controler2 = new TestControler(config, strategyManager2);
@@ -146,7 +146,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		// setup run1
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager = new StrategyManager();
-		strategyManager.addStrategy(strategy, 1.0);
+		strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		Controler controler = new TestControler(config, strategyManager);
@@ -156,7 +156,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		// setup run2
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager2 = new StrategyManager();
-		strategyManager2.addStrategy(strategy2, 1.0);
+		strategyManager2.addStrategyForDefaultSubpopulation(strategy2, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same
@@ -195,7 +195,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		// setup run1
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager = new StrategyManager();
-		strategyManager.addStrategy(strategy, 1.0);
+		strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		Controler controler = new TestControler(config, strategyManager);
@@ -205,7 +205,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		// setup run2
 		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 		StrategyManager strategyManager2 = new StrategyManager();
-		strategyManager2.addStrategy(strategy2, 1.0);
+		strategyManager2.addStrategyForDefaultSubpopulation(strategy2, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same

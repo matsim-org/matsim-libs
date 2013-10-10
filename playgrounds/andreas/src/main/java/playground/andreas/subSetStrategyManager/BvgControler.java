@@ -94,13 +94,13 @@ public class BvgControler extends Controler {
 			StrategyManager mgr = new StrategyManager();
 
 			PlanStrategy strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.planCalcScore()));
-			mgr.addStrategy(strategy1, 0.9);
+			mgr.addStrategyForDefaultSubpopulation(strategy1, 0.9);
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.config,7200));
 			strategy2.addStrategyModule(new ReRoute(getScenario()));
-			mgr.addStrategy(strategy2, 0.1);
-			mgr.addChangeRequest(90,strategy2,0.0);
+			mgr.addStrategyForDefaultSubpopulation(strategy2, 0.1);
+			mgr.addChangeRequestForDefaultSubpopulation(90,strategy2,0.0);
 
 			manager.addSubset(ids, mgr);
 		}

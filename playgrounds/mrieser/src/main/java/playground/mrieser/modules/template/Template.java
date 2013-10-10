@@ -74,7 +74,7 @@ public class Template implements MatsimModule {
 		// *** ReplanningModule *********************
 
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		c.getStrategyManager().addStrategy(strategy, 0.5);
+		c.getStrategyManager().addStrategyForDefaultSubpopulation(strategy, 0.5);
 		// TODO needs improvement, not directly add to StrategyManager, but offer option to be loaded via config
 		// register PlanStrategy, PlanSelector, StrategyModule?
 

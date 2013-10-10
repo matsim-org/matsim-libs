@@ -73,10 +73,10 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 			if (settings.getDisableAfter() >= 0) {
 				int maxIter = settings.getDisableAfter();
 				if (maxIter <= iteration) {
-					manager.addStrategy(strategy, rate);
+					manager.addStrategyForDefaultSubpopulation(strategy, rate);
 				}
 			} else {
-				manager.addStrategy(strategy, rate);
+				manager.addStrategyForDefaultSubpopulation(strategy, rate);
 			}
 		}
 		manager.run(scenario.getPopulation(), null);

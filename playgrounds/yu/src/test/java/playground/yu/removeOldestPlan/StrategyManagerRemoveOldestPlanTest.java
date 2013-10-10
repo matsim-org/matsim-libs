@@ -63,7 +63,7 @@ public class StrategyManagerRemoveOldestPlanTest extends MatsimTestCase {
 	public void testRemoveOldestPlan() {
 		// init StrategyManager
 		StrategyManager manager = new StrategyManager();
-		manager.addStrategy(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
+		manager.addStrategyForDefaultSubpopulation(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
 		PersonImpl p = new PersonImpl(new IdImpl(1));
@@ -98,7 +98,7 @@ public class StrategyManagerRemoveOldestPlanTest extends MatsimTestCase {
 		}
 		// init StrategyManagerWithRemoveOldestPlan
 		manager = new StrategyManagerWithRemoveOldestPlan();
-		manager.addStrategy(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
+		manager.addStrategyForDefaultSubpopulation(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
 		p = new PersonImpl(new IdImpl(1));
