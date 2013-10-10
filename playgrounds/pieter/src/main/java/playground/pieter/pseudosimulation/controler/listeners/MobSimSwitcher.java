@@ -51,7 +51,7 @@ public class MobSimSwitcher implements ControlerListener,
 	private int startIter;
 	private int endIter;
 	static ArrayList<Integer> qsimIters = new ArrayList<Integer>();
-	private PSimControler controler;
+	private PSimControler psimControler;
 
 	private enum SwitchType {
 		incrementing, doubling
@@ -59,39 +59,41 @@ public class MobSimSwitcher implements ControlerListener,
 
 	private SwitchType switchType = SwitchType.incrementing;
 	Logger log = Logger.getLogger(this.getClass());
+	private Controler matsimControler;
 
-	public MobSimSwitcher(PSimControler c) {
-		this.controler = c;
-		if (c.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
+	public MobSimSwitcher(PSimControler p) {
+		this.psimControler = p;
+		this.matsimControler = p.getMATSimControler();
+		if (matsimControler.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
 			startRate = Math.max(
 					0,
-					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
+					Integer.parseInt(matsimControler.getConfig().getParam("MobSimSwitcher",
 							START_RATE)));
-		if (c.getConfig().getParam("MobSimSwitcher", END_RATE) != null)
+		if (matsimControler.getConfig().getParam("MobSimSwitcher", END_RATE) != null)
 			endRate = Math.max(
 					0,
-					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
+					Integer.parseInt(matsimControler.getConfig().getParam("MobSimSwitcher",
 							END_RATE)));
 		currentRate = startRate;
 
-		startIter = c.getFirstIteration();
-		if (c.getConfig().getParam("MobSimSwitcher", START_ITER) != null)
+		startIter = matsimControler.getFirstIteration();
+		if (matsimControler.getConfig().getParam("MobSimSwitcher", START_ITER) != null)
 			startIter = Math.max(
 					startIter,
-					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
+					Integer.parseInt(matsimControler.getConfig().getParam("MobSimSwitcher",
 							START_ITER)));
-		endIter = c.getLastIteration();
-		if (c.getConfig().getParam("MobSimSwitcher", END_ITER) != null)
+		endIter = matsimControler.getLastIteration();
+		if (matsimControler.getConfig().getParam("MobSimSwitcher", END_ITER) != null)
 			endIter = Math.min(
 					endIter,
-					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
+					Integer.parseInt(matsimControler.getConfig().getParam("MobSimSwitcher",
 							END_ITER)));
-		if (c.getConfig().getParam("MobSimSwitcher", INCREASE_EVERY_N) != null)
+		if (matsimControler.getConfig().getParam("MobSimSwitcher", INCREASE_EVERY_N) != null)
 			increaseEveryNExpensiveIters = Math.max(
 					increaseEveryNExpensiveIters,
-					Integer.parseInt(c.getConfig().getParam("MobSimSwitcher",
+					Integer.parseInt(matsimControler.getConfig().getParam("MobSimSwitcher",
 							INCREASE_EVERY_N)));
-		String rc = c.getConfig().getParam("MobSimSwitcher", SWITCH_TYPE);
+		String rc = matsimControler.getConfig().getParam("MobSimSwitcher", SWITCH_TYPE);
 		if (rc == null) {
 			switchType = SwitchType.incrementing;
 		} else if (rc.equals("doubling")) {
@@ -110,31 +112,31 @@ public class MobSimSwitcher implements ControlerListener,
 
 		if (checkExpensiveIter(event.getIteration())) {
 			log.warn("Running full queue simulation");
-			String mobsim = controler.getConfig().controler().getMobsim();
+			String mobsim = matsimControler.getConfig().controler().getMobsim();
 
 			if (mobsim != null) {
 				if (mobsim.equals("qsim")) {
-					controler.setMobsimFactory(new QSimFactory());
+					matsimControler.setMobsimFactory(new QSimFactory());
 					// controler.setMobsimFactory(new MentalSimFactory(ttcalc));
 				} else if (mobsim.equals("jdeqsim")) {
-					controler.setMobsimFactory(new JDEQSimulationFactory());
+					matsimControler.setMobsimFactory(new JDEQSimulationFactory());
 				} else {
-					controler.setMobsimFactory(new QueueSimulationFactory());
+					matsimControler.setMobsimFactory(new QueueSimulationFactory());
 				}
 			} else {
-				controler.setMobsimFactory(new QueueSimulationFactory());
+				matsimControler.setMobsimFactory(new QueueSimulationFactory());
 			}
 		} else {
 			log.info("Running PSim");
-			controler.setMobsimFactory(new PSimFactory( controler));
-			controler.clearPlansForPseudoSimulation();
+			matsimControler.setMobsimFactory(new PSimFactory( psimControler));
+			psimControler.clearPlansForPseudoSimulation();
 
 		}
 	}
 
 	private boolean checkExpensiveIter(int iteration) {
 
-		if (iteration == controler.getLastIteration()) {
+		if (iteration == matsimControler.getLastIteration()) {
 			MobSimSwitcher.isQSimIteration = true;
 			return isQSimIteration;
 		}

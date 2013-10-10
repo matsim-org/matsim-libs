@@ -117,7 +117,7 @@ public class PSim implements Mobsim {
 		this(sc2, eventsManager);
 		this.controler = c;
 		this.carLinkTravelTimeCalculator = controler.getCarTravelTimeCalculator();
-		if (controler.getConfig().scenario().isUseTransit()) {
+		if (controler.getMATSimControler().getConfig().scenario().isUseTransit()) {
 			transitStopToStopTimeCalculator = controler.getStopStopTimeCalculator();
 			transitWaitTimeCalculator = controler.getWaitTimeCalculator();
 			transitLines = scenario.getTransitSchedule().getTransitLines();
@@ -221,7 +221,7 @@ public class PSim implements Mobsim {
 							travelTime = tnd.time;
 							eventQueue.add(new TeleportationArrivalEvent(prevEndTime + tnd.time, personId, tnd.distance));
 						} else if (prevLeg.getMode().equals(TransportMode.pt)) {
-							if (controler.getConfig().scenario().isUseTransit()) {
+							if (controler.getMATSimControler().getConfig().scenario().isUseTransit()) {
 								ExperimentalTransitRoute route = (ExperimentalTransitRoute) prevLeg.getRoute();
 								Id accessStopId = route.getAccessStopId();
 								Id egressStopId = route.getEgressStopId();

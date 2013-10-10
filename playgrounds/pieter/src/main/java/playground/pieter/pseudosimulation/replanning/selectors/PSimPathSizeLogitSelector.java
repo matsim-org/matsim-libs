@@ -41,9 +41,9 @@ public class PSimPathSizeLogitSelector implements PlanSelector{
 	@Override
 	public Plan selectPlan(Person person) {
 		if (MobSimSwitcher.isQSimIteration)
-			return person.getSelectedPlan();
-		else
 			return delegate.selectPlan(person);
+		else
+			return person.getSelectedPlan();
 	}
 
 }

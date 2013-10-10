@@ -56,7 +56,7 @@ public class AfterScoringSelectedPlanScoreRestoreListener implements
 	private void restoreScores() {
 		HashMap<IdImpl, Double> nSASS = c
 				.getNonSimulatedAgentSelectedPlanScores();
-		Map<Id, ? extends Person> persons = c.getPopulation().getPersons();
+		Map<Id, ? extends Person> persons = c.getMATSimControler().getPopulation().getPersons();
 		// double selectedPlanScoreAvg = 0;
 		// int i = 0;
 		for (IdImpl id : nSASS.keySet()) {

@@ -33,13 +33,13 @@ public class QSimScoreWriter implements IterationEndsListener,
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		if (!MobSimSwitcher.isQSimIteration || event.getIteration()==controler.getLastIteration()) {
+		if (!MobSimSwitcher.isQSimIteration || event.getIteration()==controler.getMATSimControler().getLastIteration()) {
 			return;
 		}
 		ArrayList<Integer> expensiveIters = MobSimSwitcher.getQSimIters();
 		int index = expensiveIters.size();
-		double[][] history = controler.getScoreStats().getHistory();
-		int idx = event.getIteration() - controler.getFirstIteration();
+		double[][] history = controler.getMATSimControler().getScoreStats().getHistory();
+		int idx = event.getIteration() - controler.getMATSimControler().getFirstIteration();
 		try {
 			out.write(event.getIteration() + "\t"
 					+ history[INDEX_EXECUTED][idx] + "\t"
@@ -59,11 +59,11 @@ public class QSimScoreWriter implements IterationEndsListener,
 				"iteration", "score");
 		double[] iterations = new double[index];
 		for (int i = 0; i < index; i++) {
-			iterations[i] = i + controler.getFirstIteration();
+			iterations[i] = i + controler.getMATSimControler().getFirstIteration();
 		}
 		double[] values = new double[index];
 		double[] fullhist = new double[event.getIteration()
-				- controler.getFirstIteration() + 1];
+				- controler.getMATSimControler().getFirstIteration() + 1];
 		int[] series = { INDEX_WORST, INDEX_BEST, INDEX_AVERAGE, INDEX_EXECUTED };
 		String[] seriesNames = { "avg. worst score", "avg. best score",
 				"avg. of plans' average score", "avg. executed score" };
@@ -73,7 +73,7 @@ public class QSimScoreWriter implements IterationEndsListener,
 			int valuecounter = 0;
 			for (int i : expensiveIters) {
 				values[valuecounter++] = fullhist[i
-						- controler.getFirstIteration()];
+						- controler.getMATSimControler().getFirstIteration()];
 			}
 			chart.addSeries(seriesNames[s], iterations, values);
 
@@ -83,7 +83,7 @@ public class QSimScoreWriter implements IterationEndsListener,
 
 
 		chart.addMatsimLogo();
-		chart.saveAsPng(controler.getControlerIO().getOutputPath()
+		chart.saveAsPng(controler.getMATSimControler().getControlerIO().getOutputPath()
 				+ "/qsimstats.png", 1200, 800);
 
 	}
@@ -100,7 +100,7 @@ public class QSimScoreWriter implements IterationEndsListener,
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		String fileName = controler.getControlerIO().getOutputPath()
+		String fileName = controler.getMATSimControler().getControlerIO().getOutputPath()
 				+ "/qsimstats.txt";
 		this.out = IOUtils.getBufferedWriter(fileName);
 

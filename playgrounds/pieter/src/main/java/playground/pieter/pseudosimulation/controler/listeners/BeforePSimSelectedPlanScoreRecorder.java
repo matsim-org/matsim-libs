@@ -44,7 +44,7 @@ public class BeforePSimSelectedPlanScoreRecorder implements
 			return;
 		LinkedHashSet<IdImpl> agentsForMentalSimulation = c
 				.getAgentsForPseudoSimulation();
-		for (Person p : c.getPopulation().getPersons().values()) {
+		for (Person p : c.getMATSimControler().getPopulation().getPersons().values()) {
 			if (!agentsForMentalSimulation.contains((IdImpl) p.getId())) {
 				c.getNonSimulatedAgentSelectedPlanScores().put(
 						(IdImpl) p.getId(), p.getSelectedPlan().getScore());

@@ -10,10 +10,9 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		PSimControler c = new PSimControler(args);
-		c.setOverwriteFiles(true);
-		c.setCreateGraphs(false);
-		c.run();
-		System.exit(0);
+		c.getMATSimControler().setOverwriteFiles(true);
+		c.getMATSimControler().setCreateGraphs(false);
+		c.getMATSimControler().run();
 		
 	}
 

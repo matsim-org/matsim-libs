@@ -33,9 +33,15 @@ import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
  *         It also keeps track of agents for psim, and stores the scores of
  *         agents not being simulated.
  */
-public class PSimControler extends Controler{
+public class PSimControler {
 	
-	
+	private Controler matsimControler;
+	public Controler getMATSimControler() {
+		return matsimControler;
+	}
+
+
+
 	private LinkedHashSet<Plan> plansForPseudoSimulation = new LinkedHashSet<Plan>();
 	private LinkedHashSet<IdImpl> agentsForPseudoSimulation = new LinkedHashSet<IdImpl>();
 	private HashMap<IdImpl,Double> nonSimulatedAgentSelectedPlanScores = new HashMap<IdImpl, Double>(); 
@@ -49,34 +55,35 @@ public class PSimControler extends Controler{
 
 	
 	public PSimControler(String[] args) {
-		super(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
+		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
+		
 		this.psimStrategies = new PSimPlanStrategyRegistrar(this);
 		//substitute qualifying plan strategies with their PSim equivalents
 		this.substituteStrategies();
-		this.addControlerListener(new MobSimSwitcher(this));
-		this.addControlerListener(new QSimScoreWriter(this));
-		this.addControlerListener(new BeforePSimSelectedPlanScoreRecorder(this));
-		this.addControlerListener(new AfterScoringSelectedPlanScoreRestoreListener(this));
-		this.carTravelTimeCalculator = new PSimTravelTimeCalculator(getNetwork(),
-				getConfig().travelTimeCalculator(),70);
-		this.getEvents().addHandler(carTravelTimeCalculator);
-		if (this.getConfig().scenario().isUseTransit()) {
+		matsimControler.addControlerListener(new MobSimSwitcher(this));
+		matsimControler.addControlerListener(new QSimScoreWriter(this));
+		matsimControler.addControlerListener(new BeforePSimSelectedPlanScoreRecorder(this));
+		matsimControler.addControlerListener(new AfterScoringSelectedPlanScoreRestoreListener(this));
+		this.carTravelTimeCalculator = new PSimTravelTimeCalculator(matsimControler.getNetwork(),
+				matsimControler.getConfig().travelTimeCalculator(),70);
+		matsimControler.getEvents().addHandler(carTravelTimeCalculator);
+		if (matsimControler.getConfig().scenario().isUseTransit()) {
 			this.waitTimeCalculator = new PSimWaitTimeCalculator(
-					this.getPopulation(),
-					this.getScenario().getTransitSchedule(),
-					this.getConfig().travelTimeCalculator()
+					matsimControler.getPopulation(),
+					matsimControler.getScenario().getTransitSchedule(),
+					matsimControler.getConfig().travelTimeCalculator()
 							.getTraveltimeBinSize(),
-					(int) (this.getConfig().qsim().getEndTime() - this
+					(int) (matsimControler.getConfig().qsim().getEndTime() - matsimControler
 							.getConfig().qsim().getStartTime()));
-			this.getEvents().addHandler(waitTimeCalculator);
+			matsimControler.getEvents().addHandler(waitTimeCalculator);
 			this.stopStopTimeCalculator = new PSimStopStopTimeCalculator(
-					this.getScenario().getTransitSchedule(),
-					 this
+					matsimControler.getScenario().getTransitSchedule(),
+					matsimControler
 							.getConfig().travelTimeCalculator()
-							.getTraveltimeBinSize(), (int) (this.getConfig()
-							.qsim().getEndTime() - this
+							.getTraveltimeBinSize(), (int) (matsimControler.getConfig()
+							.qsim().getEndTime() - matsimControler
 							.getConfig().qsim().getStartTime()));
-			this.getEvents().addHandler(stopStopTimeCalculator);
+			matsimControler.getEvents().addHandler(stopStopTimeCalculator);
 		}
 	}
 
@@ -89,7 +96,7 @@ public class PSimControler extends Controler{
 //		for(PlanStrategyRegistrar.Selector selector:PlanStrategyRegistrar.Selector.values()){
 //			nonMutatingStrategies.add(selector.toString());
 //		}
-		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
+		for (StrategyConfigGroup.StrategySettings settings : matsimControler.getConfig().strategy().getStrategySettings()) {
 
 			String classname = settings.getModuleName();
 			
@@ -158,53 +165,7 @@ public class PSimControler extends Controler{
 		return carTravelTimeCalculator;
 	}
 
-//	protected void loadControlerListeners() {
-//		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
-//		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
-//		// The core controler listeners are separate, after all.  kai, feb'13
-//		// yy On the other hand, we could write a method clearControlerListeners() and one would have a similar flexibility without
-//		// inheritance.  kai, may'13
-//		// zz vote for clearControlerListeners(). dg, may'13
-//
-//		// optional: LegHistogram
-//		this.addControlerListener(new LegHistogramListener(this.events, this.getCreateGraphs()));
-//	
-//		// optional: score stats
-//		this.scoreStats = new ScoreStats(this.population,
-//				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.getCreateGraphs());
-//		this.addControlerListener(this.getScoreStats());
-//	
-//		// optional: travel distance stats
-//		this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
-//				this.getControlerIO() .getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.this.getCreateGraphs());
-//		this.addControlerListener(this.travelDistanceStats);
-//		this.controlerListenerManager.removeControlerListener(LegHistogramListener.class);
-//	
-//		// load counts, if requested
-//		if (this.config.counts().getCountsFileName() != null) {
-//			CountControlerListener ccl = new CountControlerListener(this.config.counts());
-//			this.addControlerListener(ccl);
-//			this.counts = ccl.getCounts();
-//		}
-//	
-//		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
-//			this.addControlerListener(new LinkStatsControlerListener(this.config.linkStats()));
-//		}
-//	
-//		if (this.config.scenario().isUseTransit()) {
-//			if (this.config.ptCounts().getAlightCountsFileName() != null) {
-//				// only works when all three files are defined! kai, oct'10
-//				addControlerListener(new PtCountControlerListener(this.config));
-//			}
-//		}
-//	
-//	
-//		if ( !this.config.vspExperimental().getActivityDurationInterpretation().equals(ActivityDurationInterpretation.minOfDurationAndEndTime)
-//				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
-//			addControlerListener(new VspPlansCleaner());
-//		}
-//	
-//	}
+
 
 
 }

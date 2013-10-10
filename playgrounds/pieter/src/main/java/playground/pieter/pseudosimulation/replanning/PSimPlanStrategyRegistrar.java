@@ -16,6 +16,8 @@ import org.matsim.core.replanning.modules.SelectRandomStrategyFactory;
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.factories.PSimBestScorePlanStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimChangeExpBetaPlanStrategyFactory;
+import playground.pieter.pseudosimulation.replanning.factories.PSimChangeLegModeStrategyFactory;
+import playground.pieter.pseudosimulation.replanning.factories.PSimChangeSingleLegModeStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimChangeTripModeStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimDoNothingPlanStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimKeepLastSelectedPlanStrategyFactory;
@@ -35,6 +37,9 @@ import org.matsim.core.controler.PlanStrategyRegistrar;
 /**
  * @author fouriep
  *         <P>
+ *         Essentially a lookup used in config translation. Also registers
+ *         extended strategies with the controler.
+ *         <P>
  *         If a mutating strategy is sent for pseudo-simulation, it needs to be
  *         marked as such, and registered with the {@link PSimControler}.
  *         Non-mutating strategies, e.g. selector strategies, should be disabled
@@ -46,7 +51,7 @@ import org.matsim.core.controler.PlanStrategyRegistrar;
  *         end of each strategy. Each factory is registered during controler
  *         construction, and the config entries are changed to refer to their
  *         PSim equivalents in the controler's substituteStrategies() method.
- *         
+ * 
  *         <P>
  *         Each strategy name is taken from the enum in the
  *         {@link PlanStrategyRegistrar} to ensure future consistency
@@ -66,57 +71,53 @@ public class PSimPlanStrategyRegistrar {
 		String strategyName = PlanStrategyRegistrar.Selector.BestScore
 				.toString();
 		compatibleStrategies.add(strategyName);
-		controler.addPlanStrategyFactory(strategyName + "PSim",
+		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimBestScorePlanStrategyFactory());
 		strategyName = PlanStrategyRegistrar.Selector.KeepLastSelected
 				.toString();
 		compatibleStrategies.add(strategyName);
-		controler.addPlanStrategyFactory(strategyName + "PSim",
+		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimKeepLastSelectedPlanStrategyFactory());
 		strategyName = PlanStrategyRegistrar.Selector.SelectExpBeta.toString();
 		compatibleStrategies.add(strategyName);
-		controler.addPlanStrategyFactory(strategyName + "PSim",
+		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimSelectExpBetaPlanStrategyFactory());
 		strategyName = PlanStrategyRegistrar.Selector.ChangeExpBeta.toString();
 		compatibleStrategies.add(strategyName);
-		controler.addPlanStrategyFactory(strategyName + "PSim",
+		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimChangeExpBetaPlanStrategyFactory());
 		strategyName = PlanStrategyRegistrar.Selector.SelectRandom.toString();
 		compatibleStrategies.add(strategyName);
-		controler.addPlanStrategyFactory(strategyName + "PSim",
+		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimSelectRandomStrategyFactory());
 		strategyName = PlanStrategyRegistrar.Selector.SelectPathSizeLogit
 				.toString();
 		compatibleStrategies.add(strategyName);
-		controler.addPlanStrategyFactory(strategyName + "PSim",
+		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimSelectPathSizeLogitStrategyFactory());
 
-		strategyName = PlanStrategyRegistrar.Names.ReRoute
-				.toString();
+		strategyName = PlanStrategyRegistrar.Names.ReRoute.toString();
 		compatibleStrategies.add(strategyName);
-		controler.addPlanStrategyFactory(strategyName + "PSim",
+		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimReRoutePlanStrategyFactory(controler));
 		compatibleStrategies.add("LocationChoice");
-		controler.addPlanStrategyFactory("LocationChoicePSim",
+		controler.getMATSimControler().addPlanStrategyFactory("LocationChoicePSim",
 				new PSimLocationChoicePlanStrategyFactory(controler));
 		compatibleStrategies.add("TimeAllocationMutator");
-		controler.addPlanStrategyFactory("TimeAllocationMutatorPSim",
+		controler.getMATSimControler().addPlanStrategyFactory("TimeAllocationMutatorPSim",
 				new PSimTimeAllocationMutatorPlanStrategyFactory(controler));
 		compatibleStrategies.add("SubtourModeChoice");
-		controler.addPlanStrategyFactory("SubtourModeChoicePSim",
+		controler.getMATSimControler().addPlanStrategyFactory("SubtourModeChoicePSim",
 				new PSimSubtourModeChoiceStrategyFactory(controler));
 		compatibleStrategies.add("DoNothing");
-		controler.addPlanStrategyFactory("DoNothingPSim",
+		controler.getMATSimControler().addPlanStrategyFactory("DoNothingPSim",
 				new PSimDoNothingPlanStrategyFactory(controler));
-		compatibleStrategies.add("TransitTimeAllocationMutator");
-		controler.addPlanStrategyFactory("TransitTimeAllocationMutatorPSim",
-				new PSimTripTimeAllocationMutatorStrategyFactory(controler));
-		compatibleStrategies.add("TransitChangeLegMode");
-		controler.addPlanStrategyFactory("TransitChangeLegModePSim",
-				new PSimChangeTripModeStrategyFactory(controler));
-		compatibleStrategies.add("TransitSubtourModeChoice");
-		controler.addPlanStrategyFactory("TransitSubtourModeChoicePSim",
-				new PSimTripSubtourModeChoiceStrategyFactory(controler));
+		compatibleStrategies.add("ChangeLegMode");
+		controler.getMATSimControler().addPlanStrategyFactory("ChangeLegModePSim",
+				new PSimChangeLegModeStrategyFactory(controler));
+		compatibleStrategies.add("ChangeSingleLegMode");
+		controler.getMATSimControler().addPlanStrategyFactory("ChangeSingleLegModePSim",
+				new PSimChangeSingleLegModeStrategyFactory(controler));
 
 	}
 

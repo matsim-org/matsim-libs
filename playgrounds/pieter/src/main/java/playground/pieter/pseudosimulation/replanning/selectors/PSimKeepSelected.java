@@ -34,8 +34,8 @@ public class PSimKeepSelected extends KeepSelected {
 	@Override
 	public Plan selectPlan(Person person) {
 		if (MobSimSwitcher.isQSimIteration)
-			return person.getSelectedPlan();
-		else
 			return super.selectPlan(person);
+		else
+			return person.getSelectedPlan();
 	}
 }
