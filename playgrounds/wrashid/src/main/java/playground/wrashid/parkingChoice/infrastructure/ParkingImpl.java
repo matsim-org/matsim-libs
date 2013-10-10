@@ -147,5 +147,10 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 		this.parkingType=parkingType;		
 	}
 
+	@Override
+	public int getIntCapacity() {
+		return (int) Math.round(getCapacity());
+	}
+
 	
 }
