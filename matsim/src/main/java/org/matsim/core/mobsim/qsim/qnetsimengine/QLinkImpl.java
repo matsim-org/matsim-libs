@@ -99,18 +99,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	}
-
-	/** 
-	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
-	 * 
-	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final QLaneInternalI road) {
-		super(link2, network) ;
-		this.length = this.getLink().getLength();
-		this.road = road;
-		this.toQueueNode = toNode;
-		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-	}
 	
 	/** 
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
