@@ -20,9 +20,9 @@
 package playground.vsp.pipeline;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -49,13 +49,23 @@ public class PersonPrepareForSimTask implements ScenarioSinkSource {
 
 	@Override
 	public void process(final Scenario scenario) {
-		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), NUMBER_OF_THREADS,
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), travelCosts, travelTimes, routerFactory, routeFactory), scenario.getNetwork());
+				final TripRouterFactoryBuilderWithDefaults builder =
+					new TripRouterFactoryBuilderWithDefaults();
+				builder.setLeastCostPathCalculatorFactory(
+					routerFactory );
+				return new PersonPrepareForSim(
+					new PlanRouter(
+						builder.build(
+							scenario ).instantiateAndConfigureTripRouter(
+								new RoutingContextImpl(
+									travelCosts,
+									travelTimes ) ) ),
+					scenario.getNetwork());
 			}
 		});
 		sink.process(scenario);

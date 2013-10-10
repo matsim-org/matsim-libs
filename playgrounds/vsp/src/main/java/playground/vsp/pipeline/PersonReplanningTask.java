@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -17,7 +16,9 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -89,7 +90,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 			strategy = new PlanStrategyImpl(new KeepSelected());
 		} else if (name.equals("ReRoute")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRoute(network, routeFactory));
+			strategy.addStrategyModule(new ReRoute( scenario ));
 		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			TimeAllocationMutator tam = new TimeAllocationMutator(config);
@@ -105,7 +106,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 		} else if (name.equals("ChangeLegMode")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ChangeLegMode(config));
-			strategy.addStrategyModule(new ReRoute(network, routeFactory));
+			strategy.addStrategyModule(new ReRoute( scenario ));
 		}
 		return strategy;
 	}
@@ -120,18 +121,25 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 
 	private class ReRoute extends AbstractMultithreadedModule {
 	
-		private Network network;
-		private ModeRouteFactory routeFactory;
+		private final Scenario scenario;
 	
-		public ReRoute(Network network, final ModeRouteFactory routeFactory) {
+		public ReRoute(final Scenario scenario) {
 			super(1);
-			this.network = network;
-			this.routeFactory = routeFactory;
+			this.scenario = scenario;
 		}
 	
 		@Override
 		public PlanAlgorithm getPlanAlgoInstance() {
-			return new PlansCalcRoute(config.plansCalcRoute(), network, travelCostCalc.getTravelCostCalculator(), travelTimeCalc.getTravelTimeCalculator(), leastCostPathCalculatorFactory, routeFactory);
+			final TripRouterFactoryBuilderWithDefaults builder =
+					new TripRouterFactoryBuilderWithDefaults();
+			builder.setLeastCostPathCalculatorFactory(
+					leastCostPathCalculatorFactory );
+			return new PlanRouter(
+						builder.build(
+							scenario ).instantiateAndConfigureTripRouter(
+								new RoutingContextImpl(
+									travelCostCalc.getTravelCostCalculator(),
+									travelTimeCalc.getTravelTimeCalculator() ) ) );
 		}
 	
 	}

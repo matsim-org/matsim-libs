@@ -19,13 +19,12 @@
 
 package playground.vsp.pipeline;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -47,11 +46,25 @@ public class RoutePersonTask implements PersonSinkSource {
 		sink.process(person);
 	}
 
-	public RoutePersonTask(Config config, Network network, final ModeRouteFactory routeFactory) {
+	public RoutePersonTask( final Scenario scenario ) {
 		super();
-		TravelTime travelTimes = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, config.travelTimeCalculator()).getLinkTravelTimes();
-		TravelDisutility travelCosts = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimes, config.planCalcScore());
-		personPrepareForSim = new PersonPrepareForSim(new PlansCalcRoute(config.plansCalcRoute(), network, travelCosts, travelTimes, new DijkstraFactory(), routeFactory), network);
+		TravelTime travelTimes =
+			new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
+					scenario.getNetwork(),
+					scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
+		TravelDisutility travelCosts =
+			new TravelCostCalculatorFactoryImpl().createTravelDisutility(
+					travelTimes,
+					scenario.getConfig().planCalcScore());
+		personPrepareForSim =
+			new PersonPrepareForSim(
+					new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+							scenario ).instantiateAndConfigureTripRouter(
+								new RoutingContextImpl(
+									travelCosts,
+									travelTimes ) ) ),
+					scenario.getNetwork());
 	}
 
 	@Override
