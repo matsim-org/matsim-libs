@@ -21,11 +21,10 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.experimental.ReflectiveModule;
 
-public class PlansConfigGroup extends Module {
+public class PlansConfigGroup extends ReflectiveModule {
 
 	public static final String GROUP_NAME = "plans";
 
@@ -47,29 +46,6 @@ public class PlansConfigGroup extends Module {
 	}
 
 	@Override
-	public String getValue(final String key) {
-		if (INPUT_FILE.equals(key)) {
-			return getInputFile();
-		}
-		else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		if (INPUT_FILE.equals(key)) {
-			setInputFile(value);
-		} else if (NETWORK_ROUTE_TYPE.equals(key)) {
-			setNetworkRouteType(value);
-		} else if (INPUT_PERSON_ATTRIBUTES_FILE.equals(key)) {
-			setInputPersonAttributeFile(value);
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(NETWORK_ROUTE_TYPE, "Defines how routes are stored in memory. Currently supported: " + NetworkRouteType.LinkNetworkRoute + ", " + NetworkRouteType.CompressedNetworkRoute + ".");
@@ -77,37 +53,32 @@ public class PlansConfigGroup extends Module {
 		return comments;
 	}
 
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		addParameterToMap(map, INPUT_FILE);
-		map.put(INPUT_PERSON_ATTRIBUTES_FILE, this.inputPersonAttributeFile == null ? "null" : this.inputPersonAttributeFile);
-		map.put(NETWORK_ROUTE_TYPE, this.networkRouteType);
-		return map;
-	}
-
-	/* direct access */
-
+	@StringGetter( INPUT_FILE )
 	public String getInputFile() {
 		return this.inputFile;
 	}
 
+	@StringSetter( INPUT_FILE )
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
 	}
 	
+	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
 	}
 
+	@StringSetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
 		this.inputPersonAttributeFile = inputPersonAttributeFile;
 	}
 
+	@StringGetter( NETWORK_ROUTE_TYPE )
 	public String getNetworkRouteType() {
 		return this.networkRouteType;
 	}
 
+	@StringSetter( NETWORK_ROUTE_TYPE )
 	public void setNetworkRouteType(final String routeType) {
 		this.networkRouteType = routeType;
 	}
