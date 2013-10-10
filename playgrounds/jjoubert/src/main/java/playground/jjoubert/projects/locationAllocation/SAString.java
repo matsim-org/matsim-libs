@@ -792,6 +792,17 @@ public class SAString {
 			this.calculateObjective();
 		}
 		
+		public String toString(){
+			String string = "";
+			/* Add all but the last element. */
+			for(int i=0; i < this.representation.size()-1; i++){
+				string += this.representation.get(i).toString() + ";";
+			}
+			string += this.representation.get(this.representation.size()-1);
+			
+			return string;
+		}
+		
 	}
 	
 	
