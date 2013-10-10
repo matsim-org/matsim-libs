@@ -116,7 +116,7 @@ public class IIDMAssign2Network {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		pop.addAlgorithm(new PersonAssignToNetwork(network, facilities, config, ((PopulationFactoryImpl) pop.getFactory()).getModeRouteFactory()));
+		pop.addAlgorithm(new PersonAssignToNetwork( scenario ) );
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////
