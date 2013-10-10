@@ -26,7 +26,7 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 		nullfall.setValuesForODRelation(new IdImpl("BC"), nullfallForOD ) ;
 		{
 			// construct values for the road mode for this OD relation:
-			Mode mode = Mode.road ;
+			Mode mode = Mode.ROAD ;
 			{
 				// passenger traffic:
 				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
@@ -37,7 +37,7 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 		}
 		{
 			// construct values for the rail mode for this OD relation:
-			Mode mode = Mode.rail ;
+			Mode mode = Mode.RAIL ;
 			{
 				// passenger traffic:
 				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
@@ -64,12 +64,12 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 		{
 			// modify the travel times for the rail mode:
 			DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.rail, segm, Attribute.hrs), -0.1 ) ;
+			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.1 ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			planfallValuesForOD.inc( makeKey( Mode.rail, segm, Attribute.XX), delta ) ;
-			planfallValuesForOD.inc( makeKey( Mode.road, segm, Attribute.XX), -delta ) ;
+			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), delta ) ;
+			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -delta ) ;
 		}
 		return planfall;
 	}

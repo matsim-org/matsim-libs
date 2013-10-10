@@ -31,15 +31,14 @@ import playground.vsp.bvwp2.MultiDimensionalArray.Attribute;
  * @author Ihab
  *
  */
- class UtilityChangesBVWP2003 extends UtilityChanges {
-	
-		
-		@Override
-		UtlChangesData utlChangePerEntry(Attribute attribute,
-				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
+class UtilityChangesBVWP2003 extends UtilityChanges {
+
+
+	@Override
+	UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
-		
+
 		if ( deltaAmount > 0 ) {
 			// wir sind aufnehmend; es zaehlt der Planfall:
 			utlChanges.utl = quantityPlanfall * margUtl ;
@@ -51,9 +50,7 @@ import playground.vsp.bvwp2.MultiDimensionalArray.Attribute;
 	}
 
 	@Override
-	double computeImplicitUtility(Attributes econValues,
-			Attributes quantitiesNullfall,
-			Attributes quantitiesPlanfall) {
+	double computeImplicitUtility(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
 		return 0;
 	}
 

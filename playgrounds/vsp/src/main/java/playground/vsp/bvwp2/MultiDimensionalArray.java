@@ -12,7 +12,7 @@ public class MultiDimensionalArray {
 	 * aber abgesehen davon spricht eigentlich nichts dagegen.  kai,benjamin, sep'12
 	 * </ul>
 	 */
-	enum Attribute { XX, km, hrs, priceUser, costOfProduction, excess_hrs }
+	enum Attribute { XX, km, hrs, priceUser, costOfProduction, access_hrs }
 
 	/**
 	 * Design thoughts:<ul>
@@ -22,7 +22,7 @@ public class MultiDimensionalArray {
 	 */
 	enum DemandSegment { GV, PV_NON_COMMERCIAL, PV_COMMERCIAL }
 
-	enum Mode { road, rail }
+	enum Mode { ROAD, RAIL }
 	
 	public static void main(String[] args) {
 		Values m = new Values() ;
