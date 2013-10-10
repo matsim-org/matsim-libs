@@ -50,8 +50,18 @@ public class PlansConfigGroup extends ReflectiveModule {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
-		comments.put(NETWORK_ROUTE_TYPE, "Defines how routes are stored in memory. Currently supported: " + NetworkRouteType.LinkNetworkRoute + ", " + NetworkRouteType.CompressedNetworkRoute + ".");
-		comments.put(INPUT_PERSON_ATTRIBUTES_FILE, "Path to a file containing person attributes (required file format: ObjectAttributes).");
+		comments.put(
+				NETWORK_ROUTE_TYPE,
+				"Defines how routes are stored in memory. Currently supported: " +
+				NetworkRouteType.LinkNetworkRoute + ", " +
+				NetworkRouteType.CompressedNetworkRoute + ".");
+		comments.put(
+				INPUT_PERSON_ATTRIBUTES_FILE,
+				"Path to a file containing person attributes (required file format: ObjectAttributes).");
+		comments.put(
+				SUBPOPULATION_ATTRIBUTE,
+				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
+				" (as freight, through traffic, etc.). The attribute must be of String type." );
 		return comments;
 	}
 
