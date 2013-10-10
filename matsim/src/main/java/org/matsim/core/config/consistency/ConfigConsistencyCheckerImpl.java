@@ -51,7 +51,6 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		this.checkEventsFormatLanesSignals(config);
 		this.checkTravelTimeCalculationRoutingConfiguration(config);
 		this.checkLaneDefinitionRoutingConfiguration(config);
-		this.checkTransitReplanningConfiguration(config);
 		this.checkPlanCalcScore(config);
 		this.checkMobsimSelection(config);
 	}
@@ -177,17 +176,5 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		   }
 	}
 
-
-	private void checkTransitReplanningConfiguration(final Config config) {
-		if (config.scenario().isUseTransit()) {
-			for (StrategySettings settings : config.strategy().getStrategySettings()) {
-				if ("TimeAllocationMutator".equals(settings.getModuleName())) {
-					log.error("The strategy 'TimeAllocationMutator' should be replaced with 'TransitTimeAllocationMutator' when transit is enabled!");
-				} else if ("ChangeLegMode".equals(settings.getModuleName())) {
-					log.error("The strategy 'ChangeLegMode' should be replaced with 'TransitChangeLegMode' when transit is enabled!");
-				}
-			}
-		}
-	}
 
 }
