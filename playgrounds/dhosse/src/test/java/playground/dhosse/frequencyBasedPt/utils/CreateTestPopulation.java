@@ -12,12 +12,17 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CreateTestPopulation {
 	
-	public static String createTestPopulation(Scenario scenario, Network network, int nPersons, String dir){
+	public static Population createTestPopulation(Network network, int nPersons){
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		PopulationFactory factory = new PopulationFactoryImpl(scenario);
 		Population population = scenario.getPopulation();
@@ -47,9 +52,7 @@ public class CreateTestPopulation {
 			
 		}
 		
-		new PopulationWriter(population, network).write(dir);
-		
-		return dir;
+		return population;
 		
 	}
 

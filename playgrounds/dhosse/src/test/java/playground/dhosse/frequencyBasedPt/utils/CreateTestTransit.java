@@ -16,14 +16,19 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 public class CreateTestTransit {
+	
+	private static int vehicleCounter = 0;
+	private static final String vehicle = "BUS_";
 
-	public static TransitSchedule createTestSchedule(String dir, Network network, int nRoutes){
-		
-		int vehicleCounter = 0;
+	public static TransitSchedule createTestSchedule(Network network, int nRoutes){
 		
 		TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
 		
@@ -67,12 +72,12 @@ public class CreateTestTransit {
 		NetworkRoute route1 = RouteUtils.createNetworkRoute(routeLinkIds, network);
 		
 		//rückrichtung
-		routeLinkIds = new ArrayList<Id>();
-		routeLinkIds.add(new IdImpl(8));
-		routeLinkIds.add(new IdImpl(6));
-		routeLinkIds.add(new IdImpl(4));
-		routeLinkIds.add(new IdImpl(2));
-		NetworkRoute route2 = RouteUtils.createNetworkRoute(routeLinkIds, network);
+//		routeLinkIds = new ArrayList<Id>();
+//		routeLinkIds.add(new IdImpl(8));
+//		routeLinkIds.add(new IdImpl(6));
+//		routeLinkIds.add(new IdImpl(4));
+//		routeLinkIds.add(new IdImpl(2));
+//		NetworkRoute route2 = RouteUtils.createNetworkRoute(routeLinkIds, network);
 		
 		//hinrichtung
 		List<TransitRouteStop> transitRouteStops1 = new ArrayList<TransitRouteStop>();
@@ -90,68 +95,98 @@ public class CreateTestTransit {
 		transitRouteStops1.add(stop_7);
 		
 		//rückrichtung
-		List<TransitRouteStop> transitRouteStops2 = new ArrayList<TransitRouteStop>();
-		TransitRouteStop stop_8 = factory.createTransitRouteStop(stop8, 0., 0.);
-		stop_8.setAwaitDepartureTime(true);
-		transitRouteStops2.add(stop_8);
-		TransitRouteStop stop_6 = factory.createTransitRouteStop(stop6, 10., 15.);
-		stop_6.setAwaitDepartureTime(true);
-		transitRouteStops2.add(stop_6);
-		TransitRouteStop stop_4 = factory.createTransitRouteStop(stop4, 25., 30.);
-		stop_4.setAwaitDepartureTime(true);
-		transitRouteStops2.add(stop_4);
-		TransitRouteStop stop_2 = factory.createTransitRouteStop(stop2, 40., 40.);
-		stop_2.setAwaitDepartureTime(true);
-		transitRouteStops2.add(stop_2);
+//		List<TransitRouteStop> transitRouteStops2 = new ArrayList<TransitRouteStop>();
+//		TransitRouteStop stop_8 = factory.createTransitRouteStop(stop8, 0., 0.);
+//		stop_8.setAwaitDepartureTime(true);
+//		transitRouteStops2.add(stop_8);
+//		TransitRouteStop stop_6 = factory.createTransitRouteStop(stop6, 10., 15.);
+//		stop_6.setAwaitDepartureTime(true);
+//		transitRouteStops2.add(stop_6);
+//		TransitRouteStop stop_4 = factory.createTransitRouteStop(stop4, 25., 30.);
+//		stop_4.setAwaitDepartureTime(true);
+//		transitRouteStops2.add(stop_4);
+//		TransitRouteStop stop_2 = factory.createTransitRouteStop(stop2, 40., 40.);
+//		stop_2.setAwaitDepartureTime(true);
+//		transitRouteStops2.add(stop_2);
 		
 		
 		//hinrichtung
 		for(int i = 0; i < nRoutes; i++){
+			
+			int departureCounter = 0;
 			
 			TransitRoute transitRoute = factory.createTransitRoute(new IdImpl("route_h_"+i), route1, transitRouteStops1, TransportMode.pt);
 			
-			Departure dep1 = factory.createDeparture(new IdImpl("dep_5,5"), 5*3600+30*60);
-			dep1.setVehicleId(new IdImpl(vehicleCounter));
-			Departure dep2 = factory.createDeparture(new IdImpl("dep_6"), 6*3600);
-			dep1.setVehicleId(new IdImpl(vehicleCounter+1));
-			Departure dep3 = factory.createDeparture(new IdImpl("dep_6,5"), 6*3600+30*60);
-			dep1.setVehicleId(new IdImpl(vehicleCounter+2));
+			Departure dep1 = factory.createDeparture(new IdImpl(departureCounter), i*3600);
+			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter));
+//			Departure dep2 = factory.createDeparture(new IdImpl("dep_6"), 6*3600);
+//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter+1));
+//			Departure dep3 = factory.createDeparture(new IdImpl("dep_6,5"), 6*3600+30*60);
+//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter+2));
 			
 			transitRoute.addDeparture(dep1);
-			transitRoute.addDeparture(dep2);
-			transitRoute.addDeparture(dep3);
+//			transitRoute.addDeparture(dep2);
+//			transitRoute.addDeparture(dep3);
 			
-			vehicleCounter += 3;
+			vehicleCounter++;
 			
 			transitLine.addRoute(transitRoute);
 			
 		}
 		
-		//hinrichtung
-		for(int i = 0; i < nRoutes; i++){
-					
-			TransitRoute transitRoute = factory.createTransitRoute(new IdImpl("route_r_"+i), route2, transitRouteStops2, TransportMode.pt);
-					
-			Departure dep1 = factory.createDeparture(new IdImpl("dep_17,5"), 17*3600+30*60);
-			dep1.setVehicleId(new IdImpl(vehicleCounter));
-			Departure dep2 = factory.createDeparture(new IdImpl("dep_18"), 18*3600);
-			dep1.setVehicleId(new IdImpl(vehicleCounter+1));
-			Departure dep3 = factory.createDeparture(new IdImpl("dep_18,5"), 18*3600+30*60);
-			dep1.setVehicleId(new IdImpl(vehicleCounter+2));
-					
-			transitRoute.addDeparture(dep1);
-			transitRoute.addDeparture(dep2);
-			transitRoute.addDeparture(dep3);
-			
-			vehicleCounter += 3;
-			
-			transitLine.addRoute(transitRoute);
-				
-		}
+		schedule.addTransitLine(transitLine);
 		
-		new TransitScheduleWriter(schedule).writeFileV1(dir+"/schedule.xml");
+		//rückrichtung
+//		for(int i = 0; i < nRoutes; i++){
+//					
+//			TransitRoute transitRoute = factory.createTransitRoute(new IdImpl("route_r_"+i), route2, transitRouteStops2, TransportMode.pt);
+//					
+//			Departure dep1 = factory.createDeparture(new IdImpl("dep_17,5"), 17*3600+30*60);
+//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter));
+//			Departure dep2 = factory.createDeparture(new IdImpl("dep_18"), 18*3600);
+//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter+1));
+//			Departure dep3 = factory.createDeparture(new IdImpl("dep_18,5"), 18*3600+30*60);
+//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter+2));
+//					
+//			transitRoute.addDeparture(dep1);
+//			transitRoute.addDeparture(dep2);
+//			transitRoute.addDeparture(dep3);
+//			
+//			vehicleCounter += 3;
+//			
+//			transitLine.addRoute(transitRoute);
+//				
+//		}
 		
 		return schedule;
+		
+	}
+	
+	public static Vehicles createTestTransitVehicles(){
+		
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		
+		VehicleTypeImpl typeBus = new VehicleTypeImpl(new IdImpl("bus"));
+		typeBus.setLength(12.);
+		typeBus.setWidth(2.5);
+		typeBus.setMaximumVelocity(80/3.6);
+		
+		VehicleCapacityImpl capacityBus = new VehicleCapacityImpl();
+		capacityBus.setSeats(33);
+		capacityBus.setStandingRoom(58);
+		
+		typeBus.setCapacity(capacityBus);
+		typeBus.setAccessTime(4.);
+		typeBus.setEgressTime(2.);
+		
+		vehicles.getVehicleTypes().put(typeBus.getId(), typeBus);
+		
+		for(int i = 0; i < vehicleCounter; i++){
+			VehicleImpl bus = new VehicleImpl(new IdImpl(vehicle + i),typeBus);
+			vehicles.getVehicles().put(bus.getId(), bus);
+		}
+		
+		return vehicles;
 		
 	}
 	
