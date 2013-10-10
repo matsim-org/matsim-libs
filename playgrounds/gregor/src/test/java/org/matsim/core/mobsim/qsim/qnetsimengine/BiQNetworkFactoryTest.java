@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,7 +41,6 @@ public class BiQNetworkFactoryTest extends MatsimTestCase{
 	public void testBiQNetworkFactory() {
 		Config c = ConfigUtils.createConfig();
 		
-		c.addQSimConfigGroup(new QSimConfigGroup());
 		Scenario sc = ScenarioUtils.createScenario(c);
 		
 		Network net = sc.getNetwork();
