@@ -19,14 +19,12 @@
 
 package playground.andreas.intersection.dijkstra;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -61,11 +59,12 @@ public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config, wrappedNetwork, costCalculator, timeCalculator, routeFactory);
-		
-		DijkstraLegHandler dijkstraLegHandler = new DijkstraLegHandler(this.originalNetwork, this.wrappedNetwork, costCalculator, timeCalculator);	
-		plansCalcRoute.addLegHandler(TransportMode.car, dijkstraLegHandler);
-		
-		return plansCalcRoute;
+		//PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config, wrappedNetwork, costCalculator, timeCalculator, routeFactory);
+		//
+		//DijkstraLegHandler dijkstraLegHandler = new DijkstraLegHandler(this.originalNetwork, this.wrappedNetwork, costCalculator, timeCalculator);	
+		//plansCalcRoute.addLegHandler(TransportMode.car, dijkstraLegHandler);
+		//
+		//return plansCalcRoute;
+		throw new UnsupportedOperationException( "this cannot be done anymore. It looks like what you need to do is only to input the two lines of this method in your own TripRouterFactory. If you do not know how to do that, contact me. Sorry about that... thibautd, 10 oct 2013" );
 	}
 }

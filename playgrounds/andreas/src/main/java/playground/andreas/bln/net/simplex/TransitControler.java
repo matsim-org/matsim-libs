@@ -49,9 +49,6 @@ import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
-import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -153,14 +150,6 @@ public final class TransitControler extends Controler {
 //				this.createTravelCostCalculator(),
 //				this.getLinkTravelTimes());
 //	}
-
-	public PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		TransitRouterConfig trConfig = new TransitRouterConfig(this.config.planCalcScore(), this.config.plansCalcRoute(), this.config.transitRouter(),
-				this.config.vspExperimental());
-		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-				this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory(), this.transitConfig,
-				new TransitRouterImpl(trConfig, this.scenarioData.getTransitSchedule()), this.scenarioData.getTransitSchedule() );
-	}
 
 	public static class TransitControlerListener implements StartupListener {
 
