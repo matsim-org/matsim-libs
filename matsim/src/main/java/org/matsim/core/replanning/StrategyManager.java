@@ -66,10 +66,15 @@ public class StrategyManager implements MatsimManager {
 	// XXX to what should this be initialized?
 	private String subpopulationName = null;
 
+	/**
+	 * @param name the name of the subpopulation attribute
+	 * in the person's object attributes.
+	 */
 	public void setSubpopulationAttributeName(final String name) {
 		this.subpopulationName = name;
 	}
 
+	@Deprecated
 	public final void addStrategyForDefaultSubpopulation(
 			final PlanStrategy strategy,
 			final double weight) {
@@ -105,15 +110,17 @@ public class StrategyManager implements MatsimManager {
 		return weights;
 	}
 
+	@Deprecated
 	public final boolean removeStrategyForDefaultSubpopulation(
 			final PlanStrategy strategy) {
 		return removeStrategy( strategy , null );
 	}
 
 	/**
-	 * removes the specified strategy from this manager
+	 * removes the specified strategy from this manager for the specified subpopulation
 	 *
 	 * @param strategy the strategy to be removed
+	 * @param subpopulation the subpopulation for which the strategy must be removed
 	 * @return true if the strategy was successfully removed from this manager,
 	 * 		false if the strategy was not part of this manager and could thus not be removed.
 	 */
@@ -131,6 +138,13 @@ public class StrategyManager implements MatsimManager {
 		return false;
 	}
 
+	@Deprecated
+	public final boolean changeWeightOfStrategyForDefaultSubpopulation(
+			final PlanStrategy strategy,
+			final double newWeight) {
+		return changeWeightOfStrategy( strategy , null , newWeight );
+	}
+
 	/**
 	 * changes the weight of the specified strategy
 	 *
@@ -139,12 +153,6 @@ public class StrategyManager implements MatsimManager {
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
-	public final boolean changeWeightOfStrategyForDefaultSubpopulation(
-			final PlanStrategy strategy,
-			final double newWeight) {
-		return changeWeightOfStrategy( strategy , null , newWeight );
-	}
-
 	public final boolean changeWeightOfStrategy(
 			final PlanStrategy strategy,
 			final String subpopulation,
@@ -321,32 +329,11 @@ public class StrategyManager implements MatsimManager {
 		this.maxPlansPerAgent = maxPlansPerAgent;
 	}
 
-	/**
-	 * @return the subpopulationName
-	 */
-	public String getSubpopulationName() {
-		return subpopulationName;
-	}
-
-	/**
-	 * @param subpopulationName the subpopulationName to set
-	 */
-	public void setSubpopulationName(String subpopulationName) {
-		this.subpopulationName = subpopulationName;
-	}
-
 	public final int getMaxPlansPerAgent() {
 		return this.maxPlansPerAgent;
 	}
 
-	/**
-	 * Schedules a {@link #changeStrategy changeStrategy(Strategy, double)} command for a later iteration. The
-	 * change will take place before the strategies are applied.
-	 *
-	 * @param iteration
-	 * @param strategy
-	 * @param newWeight
-	 */
+	@Deprecated
 	public final void addChangeRequestForDefaultSubpopulation(
 			final int iteration,
 			final PlanStrategy strategy,
@@ -354,6 +341,14 @@ public class StrategyManager implements MatsimManager {
 		addChangeRequest( iteration , strategy , null , newWeight );
 	}
 
+	/**
+	 * Schedules a {@link #changeStrategy changeStrategy(Strategy, subpopulation, double)} command for a later iteration. The
+	 * change will take place before the strategies are applied.
+	 *
+	 * @param iteration
+	 * @param strategy
+	 * @param newWeight
+	 */
 	public final void addChangeRequest(
 			final int iteration,
 			final PlanStrategy strategy,
@@ -401,6 +396,7 @@ public class StrategyManager implements MatsimManager {
 		this.removalPlanSelector = planSelector;
 	}
 
+	@Deprecated
 	public final List<PlanStrategy> getStrategiesOfDefaultSubpopulation() {
 		return getStrategies( null );
 	}
@@ -410,12 +406,16 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	/**
-	 * @return the weights of the strategies, in the same order as the strategies returned by {@link #getStrategiesOfDefaultSubpopulation()}
+	 * @return the weights of the strategies for the default subpopulation, in the same order as the strategies returned by {@link #getStrategiesOfDefaultSubpopulation()}
 	 */
+	@Deprecated
 	public final List<Double> getWeightsOfDefaultSubpopulation() {
 		return getWeights( null );
 	}
 
+	/**
+	 * @return the weights of the strategies for the given subpopulation, in the same order as the strategies returned by {@link #getStrategies()}
+	 */
 	public final List<Double> getWeights( final String subpopulation ) {
 		return getStrategyWeights( subpopulation ).unmodifiableWeights;
 	}
