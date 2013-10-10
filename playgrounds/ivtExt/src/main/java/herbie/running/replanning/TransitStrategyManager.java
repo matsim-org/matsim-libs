@@ -72,7 +72,9 @@ public class TransitStrategyManager extends StrategyManager {
 	}
 	
 	@Override
-	public PlanStrategy chooseStrategy(final Person person) {	
+	public PlanStrategy chooseStrategy(
+			final Person person,
+			final String subpopulation) {	
 		
 		/*
 		 * Is it a transit agent?
@@ -82,6 +84,6 @@ public class TransitStrategyManager extends StrategyManager {
 			double rnd = MatsimRandom.getRandom().nextDouble();
 			if (rnd <= reroutingShare) return reroutingStrategy;
 			else return expBetaSelectorStrategy;
-		} else return super.chooseStrategy(person);
+		} else return super.chooseStrategy(person, subpopulation);
 	}
 }

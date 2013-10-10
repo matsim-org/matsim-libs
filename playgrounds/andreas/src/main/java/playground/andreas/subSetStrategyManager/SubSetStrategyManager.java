@@ -75,16 +75,16 @@ public class SubSetStrategyManager extends StrategyManager {
 	}
 
 	@Override
-	public PlanStrategy chooseStrategy(Person person) {
+	public PlanStrategy chooseStrategy(Person person, String subpopulation) {
 		for (Map.Entry<Set<Id>, StrategyManager> e : this.managers.entrySet()) {
 			Set<Id> ids = e.getKey();
 			if (ids.contains(person.getId())) {
 				StrategyManager m = e.getValue();
-				return m.chooseStrategy(person);
+				return m.chooseStrategy(person, subpopulation);
 			}
 		}
 		if (this.allowDefaultFallback) {
-			return super.chooseStrategy(person);
+			return super.chooseStrategy(person, subpopulation);
 		}
 		return null;
 	}
