@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.XY2Links;
 
@@ -51,6 +51,7 @@ public class MyPlanMerger {
 	private String outputFile;
 	private String networkFile;
 	private Scenario sc;
+	private XY2Links xy2Links;
 	
 	/**
 	 * Class to merge one {@link Population} file with another. The first is referred 
@@ -114,10 +115,10 @@ public class MyPlanMerger {
 		mpr.parse(baseFile);
 		nr.parse(networkFile);
 		log.info("Successfully created the base scenario with plans and network.");
-		XY2Links xy = new XY2Links((NetworkImpl) sc.getNetwork());
+		this.xy2Links = new XY2Links((ScenarioImpl) sc);
 		for(Id id : sc.getPopulation().getPersons().keySet()){
 			Person p = sc.getPopulation().getPersons().get(id);
-			xy.run(p.getSelectedPlan());
+			this.xy2Links.run(p.getSelectedPlan());
 		}
 	}
 	
@@ -131,7 +132,6 @@ public class MyPlanMerger {
 	public void mergePlans(){
 		PopulationFactory pf = sc.getPopulation().getFactory();
 		int nextId = Integer.parseInt(addNumber);
-		XY2Links xy = new XY2Links((NetworkImpl) sc.getNetwork());
 
 		Scenario scAdd = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -142,7 +142,7 @@ public class MyPlanMerger {
 		for (Id idToAdd : peopleToAdd.keySet()) {
 			Person p = pf.createPerson(new IdImpl(nextId));
 			Plan plan = peopleToAdd.get(idToAdd).getSelectedPlan();
-			xy.run(plan);
+			this.xy2Links.run(plan);
 			p.addPlan(plan);
 			sc.getPopulation().addPerson(p);
 			nextId++;
