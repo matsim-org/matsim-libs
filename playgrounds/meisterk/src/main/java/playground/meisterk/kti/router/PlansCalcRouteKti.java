@@ -21,24 +21,14 @@
 package playground.meisterk.kti.router;
 
 import java.util.HashSet;
-import java.util.List;
 
-import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import playground.balmermi.world.Layer;
 
 
 /**
@@ -48,7 +38,7 @@ import playground.balmermi.world.Layer;
  * @author meisterk
  *
  */
-public class PlansCalcRouteKti extends PlansCalcRoute {
+public class PlansCalcRouteKti /*extends PlansCalcRoute*/ {
 
 	/**
 	 * Transport modes which are considered in the kti project.
@@ -77,91 +67,91 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 			final LeastCostPathCalculatorFactory factory,
 			final ModeRouteFactory routeFactory,
 			final PlansCalcRouteKtiInfo ptRoutingInfo) {
-		super(group, network, costCalculator, timeCalculator, factory, routeFactory);
+		//super(group, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.network = network;
 		this.plansCalcRouteKtiInfo = ptRoutingInfo;
 	}
 
-	@Override
-	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+//	@Override
+//	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+//
+//		String mode = leg.getMode();
+//
+//		// TODO meisterk: This is a shortcut. Please find a general solution for that. [balmermi]
+////		if (mode == TransportMode.ride) { mode = TransportMode.car; }
+//
+//		if (!KTI_MODES.contains(mode)) {
+//			throw new RuntimeException("cannot handle legmode '" + mode + "'.");
+//		}
+//
+//		double travelTime = 0.0;
+//
+//		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
+//		Link toLink = this.network.getLinks().get(toAct.getLinkId());
+//		if (fromLink.equals(toLink)) {
+//			// create an empty route == staying on place if toLink == endLink
+//			Route route = this.getRouteFactory().createRoute(mode, fromLink.getId(), toLink.getId());
+//			route.setTravelTime(travelTime);
+//			if (Double.isNaN(route.getDistance())) {
+//				route.setDistance(0.0);
+//			}
+//			leg.setRoute(route);
+//			leg.setDepartureTime(depTime);
+//			leg.setTravelTime(travelTime);
+//		} else {
+//			if (mode.equals(TransportMode.pt)) {
+//				travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
+//			} else {
+//				travelTime = super.handleLeg(person, leg, fromAct, toAct, depTime);
+//			}
+//		}
+//
+//		return travelTime;
+//	}
 
-		String mode = leg.getMode();
-
-		// TODO meisterk: This is a shortcut. Please find a general solution for that. [balmermi]
-//		if (mode == TransportMode.ride) { mode = TransportMode.car; }
-
-		if (!KTI_MODES.contains(mode)) {
-			throw new RuntimeException("cannot handle legmode '" + mode + "'.");
-		}
-
-		double travelTime = 0.0;
-
-		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
-		Link toLink = this.network.getLinks().get(toAct.getLinkId());
-		if (fromLink.equals(toLink)) {
-			// create an empty route == staying on place if toLink == endLink
-			Route route = this.getRouteFactory().createRoute(mode, fromLink.getId(), toLink.getId());
-			route.setTravelTime(travelTime);
-			if (Double.isNaN(route.getDistance())) {
-				route.setDistance(0.0);
-			}
-			leg.setRoute(route);
-			leg.setDepartureTime(depTime);
-			leg.setTravelTime(travelTime);
-		} else {
-			if (mode.equals(TransportMode.pt)) {
-				travelTime = handleSwissPtLeg(fromAct, leg, toAct, depTime);
-			} else {
-				travelTime = super.handleLeg(person, leg, fromAct, toAct, depTime);
-			}
-		}
-
-		return travelTime;
-	}
-
-	/**
-	 * Make use of the Swiss National transport model to find more or less realistic travel times.
-	 *
-	 * The travel time of a leg with mode 'pt' (meaning pseudo/public transport)
-	 * is estimated by a municipality-to-municipality travel time matrix, plus walk-speed access to and egress from the next pt stop.
-	 *
-	 * @param fromAct
-	 * @param leg
-	 * @param toAct
-	 * @param depTime
-	 * @return
-	 */
-	public double handleSwissPtLeg(final Activity fromAct, final Leg leg, final Activity toAct, final double depTime) {
-
-		double travelTime = 0.0;
-
-		SwissHaltestelle fromStop = this.plansCalcRouteKtiInfo.getHaltestellen().getClosestLocation(fromAct.getCoord());
-		SwissHaltestelle toStop = this.plansCalcRouteKtiInfo.getHaltestellen().getClosestLocation(toAct.getCoord());
-
-		Layer municipalities = this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality");
-		final List<? extends BasicLocation> froms = municipalities.getNearestLocations(fromStop.getCoord());
-		final List<? extends BasicLocation> tos = municipalities.getNearestLocations(toStop.getCoord());
-		BasicLocation fromMunicipality = froms.get(0);
-		BasicLocation toMunicipality = tos.get(0);
-
-		KtiPtRoute newRoute = new KtiPtRoute(fromAct.getLinkId(), toAct.getLinkId(), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
-		leg.setRoute(newRoute);
-
-//		final double timeInVehicle = newRoute.calcInVehicleTime();
-		final double timeInVehicle = newRoute.getInVehicleTime();
-
-		final double walkAccessEgressDistance = newRoute.calcAccessEgressDistance(fromAct, toAct);
-		final double walkAccessEgressTime = PlansCalcRouteKti.getAccessEgressTime(walkAccessEgressDistance, this.configGroup);
-
-		newRoute.setDistance((walkAccessEgressDistance + newRoute.calcInVehicleDistance()));
-
-		travelTime = walkAccessEgressTime + timeInVehicle;
-
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travelTime);
-
-		return travelTime;
-	}
+//	/**
+//	 * Make use of the Swiss National transport model to find more or less realistic travel times.
+//	 *
+//	 * The travel time of a leg with mode 'pt' (meaning pseudo/public transport)
+//	 * is estimated by a municipality-to-municipality travel time matrix, plus walk-speed access to and egress from the next pt stop.
+//	 *
+//	 * @param fromAct
+//	 * @param leg
+//	 * @param toAct
+//	 * @param depTime
+//	 * @return
+//	 */
+//	public double handleSwissPtLeg(final Activity fromAct, final Leg leg, final Activity toAct, final double depTime) {
+//
+//		double travelTime = 0.0;
+//
+//		SwissHaltestelle fromStop = this.plansCalcRouteKtiInfo.getHaltestellen().getClosestLocation(fromAct.getCoord());
+//		SwissHaltestelle toStop = this.plansCalcRouteKtiInfo.getHaltestellen().getClosestLocation(toAct.getCoord());
+//
+//		Layer municipalities = this.plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality");
+//		final List<? extends BasicLocation> froms = municipalities.getNearestLocations(fromStop.getCoord());
+//		final List<? extends BasicLocation> tos = municipalities.getNearestLocations(toStop.getCoord());
+//		BasicLocation fromMunicipality = froms.get(0);
+//		BasicLocation toMunicipality = tos.get(0);
+//
+//		KtiPtRoute newRoute = new KtiPtRoute(fromAct.getLinkId(), toAct.getLinkId(), plansCalcRouteKtiInfo, fromStop, fromMunicipality, toMunicipality, toStop);
+//		leg.setRoute(newRoute);
+//
+////		final double timeInVehicle = newRoute.calcInVehicleTime();
+//		final double timeInVehicle = newRoute.getInVehicleTime();
+//
+//		final double walkAccessEgressDistance = newRoute.calcAccessEgressDistance(fromAct, toAct);
+//		final double walkAccessEgressTime = PlansCalcRouteKti.getAccessEgressTime(walkAccessEgressDistance, this.configGroup);
+//
+//		newRoute.setDistance((walkAccessEgressDistance + newRoute.calcInVehicleDistance()));
+//
+//		travelTime = walkAccessEgressTime + timeInVehicle;
+//
+//		leg.setDepartureTime(depTime);
+//		leg.setTravelTime(travelTime);
+//
+//		return travelTime;
+//	}
 
 	public static double getAccessEgressTime(final double distance, final PlansCalcRouteConfigGroup group) {
 		return distance / group.getTeleportedModeSpeeds().get(TransportMode.walk);

@@ -25,9 +25,6 @@ import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
@@ -37,7 +34,6 @@ import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
-import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
 import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
@@ -122,16 +118,16 @@ public class KTIControler extends Controler {
 //				super.createRoutingAlgorithm();
 //	}
 
-	public PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		return new PlansCalcRouteKti(
-					super.getConfig().plansCalcRoute(),
-					super.network,
-					travelCosts,
-					travelTimes,
-					super.getLeastCostPathCalculatorFactory(),
-					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
-					this.plansCalcRouteKtiInfo);
-	}
+//	public PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+//		return new PlansCalcRouteKti(
+//					super.getConfig().plansCalcRoute(),
+//					super.network,
+//					travelCosts,
+//					travelTimes,
+//					super.getLeastCostPathCalculatorFactory(),
+//					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
+//					this.plansCalcRouteKtiInfo);
+//	}
 
 	/**
 	 * @param args
