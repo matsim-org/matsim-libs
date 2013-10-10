@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ParallelPopulationReaderMatsimV4.EndProcessingTag;
 import org.matsim.core.population.ParallelPopulationReaderMatsimV4.EndTag;
 import org.matsim.core.population.ParallelPopulationReaderMatsimV4.PersonTag;

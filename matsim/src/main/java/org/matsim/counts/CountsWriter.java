@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {

@@ -25,7 +25,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 

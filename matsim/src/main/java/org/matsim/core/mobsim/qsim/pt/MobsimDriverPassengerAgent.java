@@ -20,8 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 /**

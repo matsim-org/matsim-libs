@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.api.internal.MatsimNetworkObject;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 
 /**

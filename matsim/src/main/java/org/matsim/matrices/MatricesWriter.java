@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class MatricesWriter extends MatsimXmlWriter implements MatsimWriter {

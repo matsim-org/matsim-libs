@@ -20,7 +20,6 @@
 package org.matsim.core.router;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;

@@ -20,6 +20,9 @@
 
 package org.matsim.core.router.priorityqueue;
 
+import org.matsim.core.router.util.ArrayRoutingNetwork;
+import org.matsim.core.router.util.ArrayRoutingNetworkNode;
+
 /**
  * An interface to mark classes that enumerate their objects. Each index
  * should be unique and can e.g. be used to lookup values in an array. This feature

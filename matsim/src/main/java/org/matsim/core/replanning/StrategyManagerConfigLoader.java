@@ -31,7 +31,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyFactoryRegister;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;

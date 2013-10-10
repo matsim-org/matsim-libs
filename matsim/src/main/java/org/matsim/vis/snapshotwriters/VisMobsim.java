@@ -6,7 +6,6 @@ package org.matsim.vis.snapshotwriters;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 /**
