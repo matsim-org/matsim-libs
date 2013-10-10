@@ -87,6 +87,11 @@ public class TransitScheduleSimplifier{
 		
 			Map<Id,TransitRoute> transitRoutes = transitLine.getRoutes();
 			
+			if(transitRoutes.size() < 1){
+				transitLineIterator.remove();
+				continue;
+			}
+			
 			TransitRoute refTransitRoute = null;
 		
 			TransitLine mergedTransitLine = factory.createTransitLine(transitLine.getId());
@@ -136,8 +141,8 @@ public class TransitScheduleSimplifier{
 				//split new id in order to access the original routes
 				String[] listOfRoutes = id.split(UNDERLINE);
 			
-//				NetworkRoute newRoute = refTransitRoute.getRoute();
-				NetworkRoute newRoute = computeNetworkRoute(scenario.getNetwork(), refTransitRoute);
+				NetworkRoute newRoute = refTransitRoute.getRoute();
+//				NetworkRoute newRoute = computeNetworkRoute(scenario.getNetwork(), refTransitRoute);
 			
 				List<TransitRouteStop> newStops = computeNewRouteProfile(factory, refTransitRoute, transitRoutes, listOfRoutes, newRoute, null);
 				compareRouteProfiles(refTransitRoute.getStops(), newStops);
@@ -308,66 +313,66 @@ public class TransitScheduleSimplifier{
 		
 	}
 
-	/**
-	 * 
-	 * This method creates a simplified transit route out of the reference transit route.
-	 * The route of the resulting transit route equals the initial route, except that
-	 * it starts at the first and ends at the last transit route stop (no depot
-	 * tours etc.).
-	 * 
-	 * @param transitRoute the reference transit route
-	 * @return the simplified network route
-	 */
-	private static NetworkRoute computeNetworkRoute(Network network, TransitRoute transitRoute) {
-		
-		List<Id> routeLinkIds = new ArrayList<Id>();
-		
-		double startOffset = Double.MAX_VALUE;
-		double endOffset = Double.MIN_VALUE;
-		
-		TransitRouteStop start = null;
-		TransitRouteStop end = null;
-		
-		for(TransitRouteStop stop : transitRoute.getStops()){
-			if(stop.getArrivalOffset() < startOffset){
-				startOffset = stop.getArrivalOffset();
-				start = stop;
-			}
-			if(stop.getArrivalOffset() > endOffset){
-				endOffset = stop.getArrivalOffset();
-				end = stop;
-			}
-		}
-		
-		Id startLinkId = start.getStopFacility().getLinkId();
-		Id endLinkId = end.getStopFacility().getLinkId();
-		int cnt = 0;
-		
-		routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
-		routeLinkIds.addAll(transitRoute.getRoute().getLinkIds());
-		routeLinkIds.add(transitRoute.getRoute().getEndLinkId());
-		
-		boolean started = false, ended = false;
-		
-		for(int i = 0; i < routeLinkIds.size(); i++){
-			
-			if(routeLinkIds.get(i).equals(startLinkId)){
-				started = true;
-				cnt++;
-			}
-			if(!started||ended)
-				routeLinkIds.remove(i);
-			
-			if(routeLinkIds.get(i).equals(endLinkId)&&cnt > 1){
+//	/**
+//	 * 
+//	 * This method creates a simplified transit route out of the reference transit route.
+//	 * The route of the resulting transit route equals the initial route, except that
+//	 * it starts at the first and ends at the last transit route stop (no depot
+//	 * tours etc.).
+//	 * 
+//	 * @param transitRoute the reference transit route
+//	 * @return the simplified network route
+//	 */
+//	private static NetworkRoute computeNetworkRoute(Network network, TransitRoute transitRoute) {
+//		
+//		List<Id> routeLinkIds = new ArrayList<Id>();
+//		
+//		double startOffset = Double.MAX_VALUE;
+//		double endOffset = Double.MIN_VALUE;
+//		
+//		TransitRouteStop start = null;
+//		TransitRouteStop end = null;
+//		
+//		for(TransitRouteStop stop : transitRoute.getStops()){
+//			if(stop.getArrivalOffset() < startOffset){
+//				startOffset = stop.getArrivalOffset();
+//				start = stop;
+//			}
+//			if(stop.getArrivalOffset() > endOffset){
+//				endOffset = stop.getArrivalOffset();
+//				end = stop;
+//			}
+//		}
+//		
+//		Id startLinkId = start.getStopFacility().getLinkId();
+//		Id endLinkId = end.getStopFacility().getLinkId();
+//		int cnt = 0;
+//		
+//		routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
+//		routeLinkIds.addAll(transitRoute.getRoute().getLinkIds());
+//		routeLinkIds.add(transitRoute.getRoute().getEndLinkId());
+//		
+//		boolean started = false, ended = false;
+//		
+//		for(int i = 0; i < routeLinkIds.size(); i++){
+//			
+//			if(routeLinkIds.get(i).equals(startLinkId)){
+//				started = true;
+//				cnt++;
+//			}
+//			if(!started||ended)
+//				routeLinkIds.remove(i);
+//			
+//			if(routeLinkIds.get(i).equals(endLinkId)&&cnt > 1){
 //				if(startLinkId.equals(endLinkId)){
 //					if(cnt > 1)
 //						ended = true;
 //				}
-				ended = true;
-			}
-			
-		}
-		
+//				ended = true;
+//			}
+//			
+//		}
+//		
 //		for(int i = 0; i < routeLinkIds.size(); i++){
 //		
 //			if(startLinkId.equals(endLinkId)){
@@ -395,10 +400,10 @@ public class TransitScheduleSimplifier{
 ////				System.out.println(routeLinkIds.get(i) + "\t" + started + "\t" + ended);
 //			
 //		}
-		
-		return RouteUtils.createNetworkRoute(routeLinkIds, network);
-		
-	}
+//		
+//		return RouteUtils.createNetworkRoute(routeLinkIds, network);
+//		
+//	}
 	
 	/**
 	 * Creates a list of new network routes. These routes are parts of the initial
