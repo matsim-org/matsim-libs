@@ -3,7 +3,10 @@
  */
 package josmMatsimPlugin;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
+
+import josmMatsimPlugin.ExportDefaults.OsmHighwayDefaults;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -22,6 +25,7 @@ import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
 /**
+ * The task which is executed after confirming the MATSimExportDialog
  * @author nkuehnel
  * 
  */
@@ -68,9 +72,11 @@ public class ExportTask extends PleaseWaitRunnable
 	protected void realRun() throws SAXException, IOException,
 			OsmTransferException, UncheckedIOException
 	{
-
-		Layer layer = Main.main.getActiveLayer();
+		boolean keepPaths = MATSimExportDialog.keepPaths.isSelected();
+		Map<String, OsmHighwayDefaults> defaults = ExportDefaults.defaults;
 		
+		
+		AbstractJosm2Network writer;
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network net = sc.getNetwork();
@@ -78,9 +84,21 @@ public class ExportTask extends PleaseWaitRunnable
 				.getCoordinateTransformation(TransformationFactory.WGS84,
 						targetSystem);
 		
-		JosmMATSimWriter writer = new JosmMATSimWriter(net, ct, true);
-		writer.writeLayer((OsmDataLayer) layer);
-		writer.write(MATSimExportDialog.path.getText()+".xml");
+		Layer layer = Main.main.getActiveLayer();
+		
+		if (layer instanceof OsmDataLayer)
+		{
+			if (layer instanceof NetworkLayer)
+			{
+				writer = new Network2Network(net, ct, keepPaths);
+			}
+			else
+			{
+				writer = new Osm2Network(net, ct, keepPaths, targetSystem, defaults);
+			}
+			writer.writeLayer((OsmDataLayer) layer);
+			writer.write(MATSimExportDialog.path.getText()+".xml");
+		}
 		
 		new NetworkCleaner().run(net);
 		System.out.println("schreibe: "+MATSimExportDialog.path.getText()+".xml"+" von WGS84 nach "+targetSystem);

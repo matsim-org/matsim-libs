@@ -8,13 +8,4 @@
   <groupId>playground</groupId>
   <artifactId>nkuehnel</artifactId>
   <name>nkuehnel</name>
-  <dependencies>
-  	<dependency>
-			<groupId>josm-custom</groupId>
-			<artifactId>josm-custom</artifactId>
-			<version>0.0.1</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/josm-custom.jar</systemPath>
-		</dependency>
-  </dependencies>
 </project>
