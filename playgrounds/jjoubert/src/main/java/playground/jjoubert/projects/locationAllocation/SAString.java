@@ -102,22 +102,48 @@ public class SAString {
 		sas.readDemandWeights(weightsFilename);
 		sas.readFixedSites(fixedSitesFilename);
 		
+		/* Initialise the output list. */
+		List<String> outputList = new ArrayList<String>();
+		
 //		int[] sitesInSolution = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
-		int[] sitesInSolution = {10};
+		int[] sitesInSolution = {50};
 		String prefix;
 		for(int n : sitesInSolution){
-			for(int run = 1; run <= 1; run++){
+			for(int run = 1; run <= 200; run++){
+				LOG.info("====> Number of sites: " + n + "; Run " + run + " <====");
 				/* Execute for full distance matrix. */
-				prefix = n +"_full_" + run + "_";
+				prefix = n +"_full_" + run;
+				String outputString = sas.executeSA(n, outputFolder, prefix);
 				
 				/* Execute for demand point matrix. */
-				prefix = n +"_demand_" + run + "_";
-				sas.executeSA(n, outputFolder, prefix);
+				prefix = n +"_demand_" + run;
+				
+				outputList.add(outputString);
 			}
 		}
 		
-		/* TODO Write out the overall multi-run results. */
-		
+		/* Write out the overall multi-run results. */
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder + "multiRunOutput.csv");
+		try{
+			/* Write header. */
+			bw.write("sites,matrix,run,objective,incumbent");
+			bw.newLine();
+			
+			for(String s : outputList){
+				bw.write(s);
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to BufferedWriter.");
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close BufferedWriter.");
+			}
+		}
 		
 		Header.printFooter();
 	}
@@ -408,16 +434,19 @@ public class SAString {
 	}
 	
 	
-	public void executeSA(int numberOfSites, String outputFolder, String runPrefix){
+	public String executeSA(int numberOfSites, String outputFolder, String runPrefix){
 		List<Solution> solutionList = new ArrayList<SAString.Solution>();
 		List<Solution> incumbentList = new ArrayList<SAString.Solution>();
 		
-		/* Initialise the algorithm. */
+		/* Initialise the algorithm. 
+		 * 
+		 * TODO Perform parameter analysis/tweaking */
 		int iteration = 0;
-		int iterationMax = 50;
+		int iterationMax = 500;
 		double temp = 1000;
 		int tempChangeFrequency = 20;
 		double tempChangeFraction = 0.75;
+		int nonImprovingIterations = 0;
 		
 		/* Get initial solution. */
 		Solution initialSolution = generateInitialSolution(numberOfSites);
@@ -442,11 +471,11 @@ public class SAString {
 				LOG.warn("Cannot make a move...");
 				terminate = true;
 			} else{
-
-
 				/* Test incumbent. */
 				if(newCurrent.getObjective() < incumbent.getObjective()){
 					incumbent = newCurrent;
+				} else{
+					nonImprovingIterations++;
 				}
 				
 				/* Update the solution progress. */
@@ -455,7 +484,7 @@ public class SAString {
 				solutionList.add(currentSolution.copy());
 
 				/* Update temperature, if necessary. */
-				if(iteration % tempChangeFrequency == 0){
+				if(nonImprovingIterations % tempChangeFrequency == 0){
 					temp *= tempChangeFraction;
 				}
 
@@ -467,17 +496,8 @@ public class SAString {
 		}
 		counter.printCounter();
 		
-		/* Report the output. */
-		/*TODO Write out:
-		 * - n: number of sites in solution;
-		 * - m: which matrix (full or demand);
-		 * - r: the run number (should be 1-200)
-		 * - obj: the incumbent objective;
-		 * - incumbent: string of selected sites. */ 
-		
-		
-		
-		String filename = outputFolder + runPrefix + "progress.csv";
+		/* Report the incumbent progress output. */
+		String filename = outputFolder + runPrefix + "_progress.csv";
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try{
 			bw.write("Iter,Current,Incumbent");
@@ -502,6 +522,8 @@ public class SAString {
 			}
 		}
 		
+		/* Update the solution string. */
+		return String.format("%s,%.4f,%s", runPrefix.replaceAll("_", ","), incumbent.objective, incumbent.toString());
 	}
 	
 	
@@ -521,7 +543,7 @@ public class SAString {
 		for(Id nextSite : this.sites){
 			if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString())){
 				/* Consider this possible move. */
-				map.put(new Tuple<Id, Id>(selectedSite, nextSite), this.interSiteDistanceMatrix.getEntry(selectedSite, nextSite).getValue());
+				map.put(new Tuple<Id, Id>(selectedSite, nextSite), this.distanceMatrix.getEntry(selectedSite, nextSite).getValue());
 			}
 		}
 		
@@ -668,6 +690,13 @@ public class SAString {
 	}
 	
 	
+	private String getOutputString(){
+		String string = "";
+		
+		
+		return string;
+	}
+	
 	
 	
 	
@@ -679,8 +708,13 @@ public class SAString {
 		public double objective;
 
 		public Solution(List<Id> representation) {
+			this(representation, 0.0);
+			this.objective = calculateObjective();
+		}
+		
+		public Solution(List<Id> representation, double objective){
 			this.representation = representation;
-			this.calculateObjective();
+			this.objective = objective;
 		}
 		
 		public List<Id> getRepresentation() {
@@ -691,7 +725,7 @@ public class SAString {
 			return this.objective;
 		}
 
-		public void calculateObjective() {
+		public double calculateObjective() {
 			this.allocation = new HashMap<Id, Id>(this.representation.size());
 			double obj = 0.0;
 
@@ -721,48 +755,39 @@ public class SAString {
 			} catch (ExecutionException e) {
 				throw new RuntimeException("Could not retrieve multithreaded result.");
 			}
-			this.objective = obj;
+			return obj;
 		}	
 		
-		private Id getClosestSite(Id id, List<Id> currentSites){
-			Id closest = null;
-			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
-			Comparator<Entry> entryComparator = new Comparator<Entry>() {
-				@Override
-				public int compare(Entry e1, Entry e2) {
-					return new Double(e1.getValue()).compareTo(new Double(e2.getValue()));
-				}
-			};
-			Collections.sort(thisDemandPointSites, entryComparator);
-			boolean foundClosest = false;
-			Iterator<Entry> siteIterator = thisDemandPointSites.iterator();
-			while(!foundClosest && siteIterator.hasNext()){
-				Id thisSite = siteIterator.next().getToLocation();
-				if(currentSites.contains(thisSite)){
-					foundClosest = true;
-					closest = thisSite;
-				}
-			}
-			return closest;
-		}
 
 		/**
-		 * Make an exact copy of the solution.
+		 * Make an exact copy of the solution. The objective is not re-evaluated
+		 * but rather we use, for computational reasons, the current objective.
 		 * @return exact copy of the solution, but (hopefully) with no references
 		 * 		   to the existing solution's elements.
 		 */
 		public Solution copy(){
+			/* Copy the representation. */
 			List<Id> newRepresentation = new ArrayList<Id>(this.representation.size());
 			for(Id id : this.representation){
 				newRepresentation.add(new IdImpl(id.toString()));
 			}
-			Solution ss = new Solution(newRepresentation);
+			
+			/* Copy the objective. */
+			Solution ss = new Solution(newRepresentation, this.getObjective());
+
+			/* Copy the allocation. */
+			Map<Id, Id> newAllocation = new HashMap<Id, Id>();
+			for(Id id : this.allocation.keySet()){
+				newAllocation.put(new IdImpl(id.toString()), new IdImpl(this.allocation.get(id).toString()));
+			}
+			ss.allocation = newAllocation;
+			
 			return ss;
 		}
 		
 		
 		public double evaluateObjectiveFunctionDifference(Id oldId, Id newId){
-			double difference = 0;
+			double difference = 0.0;
 			
 			/* Only consider a move if the new site is not already included in 
 			 * the current solution. Otherwise, just return a zero difference.*/
@@ -789,8 +814,9 @@ public class SAString {
 
 			/* Re-calculate the objective function. The allocation will also be 
 			 * updated. */
-			this.calculateObjective();
+			this.objective = calculateObjective();
 		}
+		
 		
 		public String toString(){
 			String string = "";
