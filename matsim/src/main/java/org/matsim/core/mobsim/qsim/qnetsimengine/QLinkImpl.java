@@ -57,6 +57,11 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	public interface RoadFactory {
 
+		/**
+		 * If this QLinkImpl is passed an instance of this factory upon construction,
+		 * it will call back this factory within the constructor (!) to obtain a road and pass
+		 * itself to the creation method.
+		 */
 		public QLaneInternalI createRoad(QLinkImpl qLinkImpl);
 
 	}
@@ -107,7 +112,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final RoadFactory roadFactory) {
 		super(link2, network) ;
 		this.length = this.getLink().getLength();
-		this.road = roadFactory.createRoad(this);
+		// The next line must must by contract stay within the constructor,
+		// so that the caller can use references to the created roads to wire them together,
+		// if it must.
+		this.road = roadFactory.createRoad(this); 
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	}
