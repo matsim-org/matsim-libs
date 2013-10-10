@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,36 +19,9 @@
 
 package org.matsim.core.facilities;
 
-import java.util.SortedSet;
-
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.internal.MatsimFacilitiesObject;
-
 /**
- * @author dgrether
  * @author mrieser / Senozon AG
  */
-public interface ActivityOption extends MatsimFacilitiesObject {
+public class ActivityOptionImplTest {
 
-	public double getCapacity();
-
-	public void setCapacity(double cap);
-
-	public void addOpeningTime(OpeningTime openingTime);
-
-	public SortedSet<OpeningTime> getOpeningTimes();
-
-	public String getType();
-
-	public ActivityFacility getFacility();
-	
-	/**
-	 * Sets the reference to the facility this activity option belongs to.
-	 * This is done automatically if using {@link ActivityFacility#addActivityOption(ActivityOption)}.
-	 * Make sure that the bidirectional reference is set correctly if you are using this method!
-	 * 
-	 * @param facility
-	 */
-	public void setFacility(final ActivityFacility facility);
-	
 }

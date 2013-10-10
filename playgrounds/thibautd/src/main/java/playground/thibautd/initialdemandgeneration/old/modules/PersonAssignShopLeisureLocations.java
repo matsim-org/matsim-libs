@@ -168,22 +168,24 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	private boolean isCompatible(
 			final ActivityOptionImpl option,
 			final OpeningTime.DayType day) {
-		for ( OpeningTime.DayType openingDay : option.getOpeningTimes().keySet() ) {
-			if ( openingDay.equals( day ) ) return true;
-			switch ( openingDay ) {
-				case wk: return true;
-				case wkday: return day.equals( OpeningTime.DayType.mon ) ||
-							day.equals( OpeningTime.DayType.tue ) ||
-							day.equals( OpeningTime.DayType.wed ) ||
-							day.equals( OpeningTime.DayType.thu ) ||
-							day.equals( OpeningTime.DayType.fri );
-				case wkend: return day.equals( OpeningTime.DayType.sat ) ||
-							day.equals( OpeningTime.DayType.sun );
-				default:
-					break; 
-			}
-		}
-		return false;
+		
+		throw new RuntimeException("DayType is no longer supported.");
+//		for ( OpeningTime.DayType openingDay : option.getOpeningTimes() ) {
+//			if ( openingDay.equals( day ) ) return true;
+//			switch ( openingDay ) {
+//				case wk: return true;
+//				case wkday: return day.equals( OpeningTime.DayType.mon ) ||
+//							day.equals( OpeningTime.DayType.tue ) ||
+//							day.equals( OpeningTime.DayType.wed ) ||
+//							day.equals( OpeningTime.DayType.thu ) ||
+//							day.equals( OpeningTime.DayType.fri );
+//				case wkend: return day.equals( OpeningTime.DayType.sat ) ||
+//							day.equals( OpeningTime.DayType.sun );
+//				default:
+//					break; 
+//			}
+//		}
+//		return false;
 	}
 
 	//////////////////////////////////////////////////////////////////////

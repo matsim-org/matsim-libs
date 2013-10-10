@@ -32,9 +32,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -126,7 +125,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.functions.C
 				}
 			}
 			if (actOpt != null) {
-				openTimes = actOpt.getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
+				openTimes = actOpt.getOpeningTimes();
 			} else {
 				if (!act.getType().equals("tta")) {
 					log.error("Agent wants to perform an activity whose type is not available in the planned facility.");

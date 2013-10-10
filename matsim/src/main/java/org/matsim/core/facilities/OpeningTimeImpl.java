@@ -24,23 +24,29 @@ import org.matsim.core.utils.misc.Time;
 
 public class OpeningTimeImpl implements OpeningTime {
 
-	private DayType day;
+	public static enum TimeRelation { 
+		START_AND_END_BEFORE, 
+		START_AND_END_AFTER, 
+		START_AND_END_WITHIN, 
+		START_BEFORE_END_WITHIN,
+		START_WITHIN_END_AFTER,
+		START_BEFORE_END_AFTER
+	}
+	
 	private double startTime;
 	private double endTime;
 	
 	public OpeningTimeImpl(final double startTime, final double endTime) {
-		this.day = null;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.acceptTimes();
+		this.validateTimes();
 	}
 
 	@Deprecated
 	public OpeningTimeImpl(final DayType day, final double startTime, final double endTime) {
-		this.day = day;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.acceptTimes();
+		this.validateTimes();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -56,17 +62,17 @@ public class OpeningTimeImpl implements OpeningTime {
 		//    the end times decides which comes first
 		// 2. the meaning of the return value. See the ASCII figures for that.
 		if (this.startTime > other.getEndTime()) {         // this:       |-----|
-			return -6;                                    // other: |--|
+			return -6;                                       // other: |--|
 		}
 		else if (this.startTime == other.getEndTime()) {   // this:       |-----|
-			return -5;                                    // other: |----|
+			return -5;                                       // other: |----|
 		}
 		else if (this.startTime > other.getStartTime()) {
 			if (this.endTime > other.getEndTime()) {         // this:       |-----|
-				return -4;                                  // other: |--------|
+				return -4;                                     // other: |--------|
 			}
 			else if (this.endTime == other.getEndTime()) {   // this:       |-----|
-				return -3;                                  // other: |----------|
+				return -3;                                     // other: |----------|
 			}
 			else {                                        // this:       |-----|
 				return -2;                                  // other: |---------------|
@@ -74,17 +80,17 @@ public class OpeningTimeImpl implements OpeningTime {
 		}
 		else if (this.startTime == other.getStartTime()) {
 			if (this.endTime > other.getEndTime()) {         // this:       |-----|
-				return -1;                                  // other:      |---|
+				return -1;                                     // other:      |---|
 			}
 			else if (this.endTime == other.getEndTime()) {   // this:       |-----|
-				return 0;                                   // other:      |-----|
+				return 0;                                      // other:      |-----|
 			}
-			else {                                        // this:       |-----|
-				return 3;                                   // other:      |----------|
+			else {                                           // this:       |-----|
+				return 3;                                      // other:      |----------|
 			}
 		}
 		else if (this.endTime > other.getEndTime()) {      // this:       |-----|
-			return 2;                                     // other:        |-|
+			return 2;                                        // other:        |-|
 		}
 		else if (this.endTime == other.getEndTime()) {     // this:       |-----|
 			return 1;                                     // other:        |---|
@@ -108,7 +114,7 @@ public class OpeningTimeImpl implements OpeningTime {
 	public final boolean equals(final Object o) {
 		if (o instanceof OpeningTimeImpl) {
 			OpeningTimeImpl other = (OpeningTimeImpl)o;
-			if (other.day.equals(this.day) && (other.startTime == this.startTime) && (other.endTime == this.endTime)) {
+			if ((other.startTime == this.startTime) && (other.endTime == this.endTime)) {
 				return true;
 			}
 		}
@@ -118,11 +124,11 @@ public class OpeningTimeImpl implements OpeningTime {
 	@Override
 	public final int hashCode() {
 		/* equals() checks day, startTime and endTime, so we should include those into hashCode as well */
-		return (this.day.hashCode() + Double.valueOf(this.startTime).hashCode()
+		return (Double.valueOf(this.startTime).hashCode()
 				+ Double.valueOf(this.endTime).hashCode());
 	}
 
-	private final void acceptTimes() {
+	private final void validateTimes() {
 		if (this.startTime >= this.endTime) {
 			throw new RuntimeException(this + "[startTime=" + this.startTime + " >= endTime=" + this.endTime + " not allowed]");
 		}
@@ -135,28 +141,18 @@ public class OpeningTimeImpl implements OpeningTime {
 	@Override
 	public final void setStartTime(final double start_time) {
 		this.startTime = start_time;
-		this.acceptTimes();
+		this.validateTimes();
 	}
 
 	@Override
 	public final void setEndTime(final double end_time) {
 		this.endTime = end_time;
-		this.acceptTimes();
+		this.validateTimes();
 	}
 	
-	@Deprecated
-	public void setDay(DayType day) {
-		this.day = day;
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
-
-	@Deprecated
-	public final DayType getDay() {
-		return this.day;
-	}
 
 	@Override
 	public final double getStartTime() {
@@ -174,8 +170,7 @@ public class OpeningTimeImpl implements OpeningTime {
 
 	@Override
 	public final String toString() {
-		return "[day=" + this.day + "]" +
-				"[startTime=" + Time.writeTime(this.startTime) + "]" +
+		return "[startTime=" + Time.writeTime(this.startTime) + "]" +
 				"[endTime=" + Time.writeTime(this.endTime) + "]";
 	}
 

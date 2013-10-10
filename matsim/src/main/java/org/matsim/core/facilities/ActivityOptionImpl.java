@@ -20,74 +20,76 @@
 
 package org.matsim.core.facilities;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.gbl.Gbl;
 
 public class ActivityOptionImpl implements ActivityOption {
 
 	private final String type;
 	private Double capacity = Double.valueOf(Integer.MAX_VALUE);
 	private ActivityFacility facility = null;
-	private Map<DayType, SortedSet<OpeningTime>> opentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
+	private SortedSet<OpeningTime> openingTimes = new TreeSet<OpeningTime>();
 
 	public ActivityOptionImpl(final String type) {
 		this.type = type;
 	}
 
+	public void clearOpeningTimes() {
+		this.openingTimes.clear();
+	}
+	
 	@Override
 	public void addOpeningTime(OpeningTime opentime) {
-		DayType day = ((OpeningTimeImpl) opentime).getDay();
-		if (!this.opentimes.containsKey(day)) {
-			this.opentimes.put(day,new TreeSet<OpeningTime>());
+		if (openingTimes.isEmpty()) {
+			openingTimes.add(opentime);
+			return;
 		}
-		SortedSet<OpeningTime> o_set = this.opentimes.remove(day);
-		if (o_set.isEmpty()) {
-			o_set.add(opentime);
-			this.opentimes.put(day,o_set);
-		}
-		else {
-			TreeSet<OpeningTime> new_o_set = new TreeSet<OpeningTime>();
-			Iterator<OpeningTime> o_it = o_set.iterator();
-			while (o_it.hasNext()) {
-				OpeningTime o = o_it.next();
-				int merge_type = o.compareTo(opentime); // see Opentime for the meaning
-				if ((merge_type == -6) || (merge_type == 6)) {
-					// complete disjoint
-					new_o_set.add(o);
+		TreeSet<OpeningTime> new_o_set = new TreeSet<OpeningTime>();
+		Iterator<OpeningTime> o_it = openingTimes.iterator();
+		while (o_it.hasNext()) {
+			OpeningTime o = o_it.next();
+			int merge_type = o.compareTo(opentime); // see Opentime for the meaning
+			if ((merge_type == -6) || (merge_type == 6)) {
+				// complete disjoint
+				new_o_set.add(o);
+				new_o_set.add(opentime);
+			}
+			else if ((merge_type >= -1) && (merge_type <= 2)) {
+				// opentime is subset of o
+				new_o_set.add(o);
+			}
+			else if ((merge_type == -3) || (merge_type == -2) || (merge_type == 3)) {
+				// o is subset of opentime
+				new_o_set.add(opentime);
+			}
+			else { // union of the two opentimes
+				if ((merge_type == -5) || (merge_type == -4)) {
+					// start_time of opentime and endtime of o
+					opentime.setEndTime(o.getEndTime());
 					new_o_set.add(opentime);
 				}
-				else if ((merge_type >= -1) && (merge_type <= 2)) {
-					// opentime is subset of o
-					new_o_set.add(o);
-				}
-				else if ((merge_type == -3) || (merge_type == -2) || (merge_type == 3)) {
-					// o is subset of opentime
+				else if ((merge_type == 4) || (merge_type == 5)) {
+					// start_time of o and endtime of opentime
+					opentime.setStartTime(o.getStartTime());
 					new_o_set.add(opentime);
 				}
-				else { // union of the two opentimes
-					if ((merge_type == -5) || (merge_type == -4)) {
-						// start_time of opentime and endtime of o
-						opentime.setEndTime(o.getEndTime());
-						new_o_set.add(opentime);
-					}
-					else if ((merge_type == 4) || (merge_type == 5)) {
-						// start_time of o and endtime of opentime
-						opentime.setStartTime(o.getStartTime());
-						new_o_set.add(opentime);
-					}
-					else {
-						throw new RuntimeException("[Something is wrong]");
-					}
+				else {
+					throw new RuntimeException("[Something is wrong]");
 				}
 			}
-			this.opentimes.put(day,new_o_set);
+		}
+		this.openingTimes.clear();
+		this.openingTimes.addAll(new_o_set);
+	}
+	
+	public void setOpeningTimes(Collection<OpeningTime> times) {
+		this.clearOpeningTimes();
+		for (OpeningTime t : times) {
+			this.addOpeningTime(t);
 		}
 	}
 
@@ -97,10 +99,6 @@ public class ActivityOptionImpl implements ActivityOption {
 			throw new NumberFormatException("A capacity of an activity must be >= 0.");
 		}
 		this.capacity = capacity;
-	}
-
-	public void setOpeningTimes(Map<DayType, SortedSet<OpeningTime>> opentimes) {
-		this.opentimes = opentimes;
 	}
 
 	@Override
@@ -121,13 +119,8 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.capacity;
 	}
 
-	public final Map<DayType,SortedSet<OpeningTime>> getOpeningTimes() {
-		return this.opentimes;
-	}
-
-	@Override
-	public final SortedSet<OpeningTime> getOpeningTimes(final DayType day) {
-		return this.opentimes.get(day);
+	public final SortedSet<OpeningTime> getOpeningTimes() {
+		return this.openingTimes;
 	}
 
 	@Override

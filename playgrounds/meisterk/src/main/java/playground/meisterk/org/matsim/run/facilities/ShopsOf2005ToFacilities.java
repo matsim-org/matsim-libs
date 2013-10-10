@@ -70,7 +70,6 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -1521,9 +1520,8 @@ public class ShopsOf2005ToFacilities {
 			if (shopping != null) {
 
 				// open times (variable length)
-				for (Day day : days) {
 
-					Set<OpeningTime> dailyOpentime = shopping.getOpeningTimes(day.getAbbrevEnglish());
+					Set<OpeningTime> dailyOpentime = shopping.getOpeningTimes();
 
 					if (dailyOpentime != null) {
 
@@ -1545,7 +1543,6 @@ public class ShopsOf2005ToFacilities {
 						}
 
 					}
-				}
 
 			}
 			txtLines.add(aShopLine);
@@ -1667,33 +1664,31 @@ public class ShopsOf2005ToFacilities {
 
 				// have to iterate this over opening times
 				int dayCounter = 0;
-				for (Day day : days) {
-					if (facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP) != null) {
-						Set<OpeningTime> dailyOpentimes = facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP).getOpeningTimes(day.getAbbrevEnglish());
-						if (dailyOpentimes != null) {
-							for (OpeningTime opentime : dailyOpentimes) {
+				if (facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP) != null) {
+					Set<OpeningTime> dailyOpentimes = facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP).getOpeningTimes();
+					if (dailyOpentimes != null) {
+						for (OpeningTime opentime : dailyOpentimes) {
 
-								// build up placemark structure
-								aShopOpeningPeriod = factory.createPlacemarkType();
-								aShop.getAbstractFeatureGroup().add(factory.createPlacemark(aShopOpeningPeriod));
-								aShopOpeningPeriod.setStyleUrl(shopStyleNames.get(new Integer(dataSetIndex)));
-								aShopOpeningPeriod.setName(facilityId.split("_", 2)[0]);
-								aShopOpeningPeriod.setDescription(facilityId);
+							// build up placemark structure
+							aShopOpeningPeriod = factory.createPlacemarkType();
+							aShop.getAbstractFeatureGroup().add(factory.createPlacemark(aShopOpeningPeriod));
+							aShopOpeningPeriod.setStyleUrl(shopStyleNames.get(new Integer(dataSetIndex)));
+							aShopOpeningPeriod.setName(facilityId.split("_", 2)[0]);
+							aShopOpeningPeriod.setDescription(facilityId);
 
-								aPointType = factory.createPointType();
-								aShopOpeningPeriod.setAbstractGeometryGroup(factory.createPoint(aPointType));
-								aPointType.getCoordinates().add(northWestWGS84.getX() + "," + northWestWGS84.getY() + ",0.0");
+							aPointType = factory.createPointType();
+							aShopOpeningPeriod.setAbstractGeometryGroup(factory.createPoint(aPointType));
+							aPointType.getCoordinates().add(northWestWGS84.getX() + "," + northWestWGS84.getY() + ",0.0");
 
-								// transform opening times to GE time primitives
-								aTimeSpanType = factory.createTimeSpanType();
-								aShopOpeningPeriod.setAbstractTimePrimitiveGroup(factory.createAbstractTimePrimitiveGroup(aTimeSpanType));
-								aTimeSpanType.setBegin("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getStartTime()) + "+01:00");
-								aTimeSpanType.setEnd("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getEndTime()) + "+01:00");
-							}
+							// transform opening times to GE time primitives
+							aTimeSpanType = factory.createTimeSpanType();
+							aShopOpeningPeriod.setAbstractTimePrimitiveGroup(factory.createAbstractTimePrimitiveGroup(aTimeSpanType));
+							aTimeSpanType.setBegin("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getStartTime()) + "+01:00");
+							aTimeSpanType.setEnd("2008-04-" + Integer.toString(MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getEndTime()) + "+01:00");
 						}
 					}
-					dayCounter++;
 				}
+				dayCounter++;
 
 			}
 

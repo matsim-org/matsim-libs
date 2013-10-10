@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -114,8 +113,8 @@ public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionM
 		OpeningTime startTimeOpeningTime = null;
 		ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
 		double maxFacilityTime= Time.MIDNIGHT;
-		if(facility.getActivityOptions().get(typeOfActivity).getOpeningTimes(DayType.wkday)!=null) {
-			for(OpeningTime openingTime:facility.getActivityOptions().get(typeOfActivity).getOpeningTimes(DayType.wkday))
+		if(facility.getActivityOptions().get(typeOfActivity).getOpeningTimes()!=null) {
+			for(OpeningTime openingTime:facility.getActivityOptions().get(typeOfActivity).getOpeningTimes())
 				if(openingTime.getStartTime()<=startTime && startTime<=openingTime.getEndTime())
 					startTimeOpeningTime = openingTime;
 			if(startTimeOpeningTime!=null)

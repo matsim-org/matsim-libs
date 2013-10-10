@@ -75,15 +75,12 @@ import org.matsim.core.utils.misc.Time;
 				this.startActivity((ActivityOptionImpl) a, this.writer);
 				this.startCapacity((ActivityOptionImpl) a, this.writer);
 				this.endCapacity(this.writer);
-				Iterator<SortedSet<OpeningTime>> o_set_it = ((ActivityOptionImpl) a).getOpeningTimes().values().iterator();
-				while (o_set_it.hasNext()) {
-					SortedSet<OpeningTime> o_set = o_set_it.next();
-					Iterator<OpeningTime> o_it = o_set.iterator();
-					while (o_it.hasNext()) {
-						OpeningTime o = o_it.next();
-						this.startOpentime(o, this.writer);
-						this.endOpentime(this.writer);
-					}
+				SortedSet<OpeningTime> o_set = ((ActivityOptionImpl) a).getOpeningTimes();
+				Iterator<OpeningTime> o_it = o_set.iterator();
+				while (o_it.hasNext()) {
+					OpeningTime o = o_it.next();
+					this.startOpentime(o, this.writer);
+					this.endOpentime(this.writer);
 				}
 				this.endActivity(this.writer);
 			}
@@ -174,7 +171,7 @@ import org.matsim.core.utils.misc.Time;
 
 	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<opentime");
-		out.write(" day=\"" + ((OpeningTimeImpl) opentime).getDay() + "\"");
+		out.write(" day=\"wkday\"");
 		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");
 		out.write(" end_time=\"" + Time.writeTime(opentime.getEndTime()) + "\"");
 		out.write(" />\n");

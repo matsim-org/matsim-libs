@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -45,8 +44,8 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -583,9 +582,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
-				for (Collection<OpeningTime> openingTimes : nearestShopActivityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) activityOption.addOpeningTime(openingTime);
-				}			
+				for (OpeningTime openingTime : nearestShopActivityOption.getOpeningTimes()) activityOption.addOpeningTime(openingTime);
 			}
 			if (shop_retail_get1000sqmCapacity > 0) {
 				ActivityOptionImpl activityOption = (ActivityOptionImpl) ((ActivityFacilityImpl) facility).getActivityOptions().get("shop");
@@ -599,9 +596,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
-				for (Collection<OpeningTime> openingTimes : nearestShopActivityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) activityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : nearestShopActivityOption.getOpeningTimes()) activityOption.addOpeningTime(openingTime);
 			}
 			if (shop_retail_get400sqmCapacity > 0) {
 				ActivityOptionImpl activityOption = (ActivityOptionImpl) ((ActivityFacilityImpl) facility).getActivityOptions().get("shop");
@@ -615,9 +610,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
-				for (Collection<OpeningTime> openingTimes : nearestShopActivityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) activityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : nearestShopActivityOption.getOpeningTimes()) activityOption.addOpeningTime(openingTime);
 			}
 			if (shop_retail_get100sqmCapacity > 0) {
 				ActivityOptionImpl activityOption = (ActivityOptionImpl) ((ActivityFacilityImpl) facility).getActivityOptions().get("shop");
@@ -631,9 +624,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
-				for (Collection<OpeningTime> openingTimes : nearestShopActivityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) activityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : nearestShopActivityOption.getOpeningTimes()) activityOption.addOpeningTime(openingTime);
 			}
 			if (shop_retail_lt100sqmCapacity > 0) {
 				ActivityOptionImpl activityOption = (ActivityOptionImpl) ((ActivityFacilityImpl) facility).getActivityOptions().get("shop");
@@ -647,9 +638,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
-				for (Collection<OpeningTime> openingTimes : nearestShopActivityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) activityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : nearestShopActivityOption.getOpeningTimes()) activityOption.addOpeningTime(openingTime);
 			}
 			if (shop_otherCapacity > 0) {
 				ActivityOptionImpl activityOption = (ActivityOptionImpl) ((ActivityFacilityImpl) facility).getActivityOptions().get("shop");
@@ -663,9 +652,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
-				for (Collection<OpeningTime> openingTimes : nearestShopActivityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) activityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : nearestShopActivityOption.getOpeningTimes()) activityOption.addOpeningTime(openingTime);
 			}
 			if (leisure_gastroCapacity > 0) {
 				ActivityOptionImpl activityOption = (ActivityOptionImpl) ((ActivityFacilityImpl) facility).getActivityOptions().get("leisure");
@@ -676,18 +663,10 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				activityOption.setCapacity(activityOption.getCapacity() + leisure_gastroCapacity);
 				
 //				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("leisure_gastro");
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 9.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 9.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 9.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 9.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 9.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.sat, 9.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.sun, 9.0 * 3600.0, 24.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(9.0 * 3600.0, 24.0 * 3600));
 				activityOption.setCapacity(leisure_gastroCapacity * 1.0);
 				
-				for (Collection<OpeningTime> openingTimes : activityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) work_sector3ActivityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : activityOption.getOpeningTimes()) work_sector3ActivityOption.addOpeningTime(openingTime);
 			}
 			if (leisure_culturalCapacity > 0) {
 				ActivityOptionImpl activityOption = (ActivityOptionImpl) ((ActivityFacilityImpl) facility).getActivityOptions().get("leisure");
@@ -698,18 +677,10 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				activityOption.setCapacity(activityOption.getCapacity() + leisure_culturalCapacity);
 				
 //				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("leisure_cultural");
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 14.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 14.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 14.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 14.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 14.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.sat, 14.0 * 3600.0, 24.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.sun, 14.0 * 3600.0, 24.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(14.0 * 3600.0, 24.0 * 3600));
 				activityOption.setCapacity(leisure_culturalCapacity * 1.0);
 				
-				for (Collection<OpeningTime> openingTimes : activityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) work_sector3ActivityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : activityOption.getOpeningTimes()) work_sector3ActivityOption.addOpeningTime(openingTime);
 			}
 			if (leisure_sportsCapacity > 0) {
 				ActivityOptionImpl activityOption = (ActivityOptionImpl) ((ActivityFacilityImpl) facility).getActivityOptions().get("leisure");
@@ -720,98 +691,47 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				activityOption.setCapacity(activityOption.getCapacity() + leisure_sportsCapacity);
 				
 //				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("leisure_sports");
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 9.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 9.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 9.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 9.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 9.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.sat, 9.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.sun, 9.0 * 3600.0, 18.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(9.0 * 3600.0, 22.0 * 3600));
 				activityOption.setCapacity(leisure_sportsCapacity * 1.0);
 				
-				for (Collection<OpeningTime> openingTimes : activityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) work_sector3ActivityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : activityOption.getOpeningTimes()) work_sector3ActivityOption.addOpeningTime(openingTime);
 			}
 			if (education_primaryCapacity > 0) {
 				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("education_primary");
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 13.5 * 3600.0, 17.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 13.5 * 3600.0, 17.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 13.5 * 3600.0, 17.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 13.5 * 3600.0, 17.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 13.5 * 3600.0, 17.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(8.0 * 3600.0, 12.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(13.5 * 3600.0, 17.0 * 3600));
 				activityOption.setCapacity(education_primaryCapacity * 1.0);
 				
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 8.0 * 3600.0, 17.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 8.0 * 3600.0, 17.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 8.0 * 3600.0, 17.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 8.0 * 3600.0, 17.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600.0, 17.0 * 3600));
+				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(8.0 * 3600.0, 17.0 * 3600));
 			}
 			if (education_secondaryCapacity > 0) {
 				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("education_secondary");
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 8.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 8.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 8.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 8.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600.0, 18.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(8.0 * 3600.0, 18.0 * 3600));
 				activityOption.setCapacity(education_secondaryCapacity * 1.0);
 				
-				for (Collection<OpeningTime> openingTimes : activityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) work_sector3ActivityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : activityOption.getOpeningTimes()) work_sector3ActivityOption.addOpeningTime(openingTime);
 			}
 			if (education_kindergartenCapacity > 0) {
 				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("education_kindergarten");
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 13.5 * 3600.0, 17.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 13.5 * 3600.0, 17.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 13.5 * 3600.0, 17.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 13.5 * 3600.0, 17.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600.0, 12.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 13.5 * 3600.0, 17.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(8.0 * 3600.0, 12.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(13.5 * 3600.0, 17.0 * 3600));
 				activityOption.setCapacity(education_kindergartenCapacity * 1.0);
 				
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 8.0 * 3600.0, 17.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 8.0 * 3600.0, 17.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 8.0 * 3600.0, 17.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 8.0 * 3600.0, 17.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600.0, 17.0 * 3600));
+				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(8.0 * 3600.0, 17.0 * 3600));
 			}
 			if (education_higherCapacity > 0) {
 				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("education_higher");
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 7.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 7.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 7.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 7.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 7.0 * 3600.0, 22.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.sat, 8.0 * 3600.0, 12.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(7.0 * 3600.0, 22.0 * 3600));
 				activityOption.setCapacity(education_higherCapacity * 1.0);
 				
-				for (Collection<OpeningTime> openingTimes : activityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) work_sector3ActivityOption.addOpeningTime(openingTime);
-				}				
+				for (OpeningTime openingTime : activityOption.getOpeningTimes()) work_sector3ActivityOption.addOpeningTime(openingTime);
 			}
 			if (education_otherCapacity > 0) {
 				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("education_other");
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 8.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 8.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 8.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 8.0 * 3600.0, 18.0 * 3600));
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 8.0 * 3600.0, 18.0 * 3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(8.0 * 3600.0, 18.0 * 3600));
 				activityOption.setCapacity(education_otherCapacity * 1.0);
 				
-				for (Collection<OpeningTime> openingTimes : activityOption.getOpeningTimes().values()) {
-					for (OpeningTime openingTime : openingTimes) work_sector3ActivityOption.addOpeningTime(openingTime);
-				}
+				for (OpeningTime openingTime : activityOption.getOpeningTimes()) work_sector3ActivityOption.addOpeningTime(openingTime);
 			}
 			
 			/*
@@ -819,12 +739,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 			 * the opening times, we use 7:00 to 18:00 from Monday to Saturday. 
 			 */
 			if (work_sector3ActivityOption != null && work_sector3ActivityOption.getOpeningTimes().size() == 0) {
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.mon, 7.0 * 3600.0, 18.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.tue, 7.0 * 3600.0, 18.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.wed, 7.0 * 3600.0, 18.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.thu, 7.0 * 3600.0, 18.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.fri, 7.0 * 3600.0, 18.0 * 3600));
-				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(DayType.sat, 7.0 * 3600.0, 18.0 * 3600));
+				work_sector3ActivityOption.addOpeningTime(new OpeningTimeImpl(7.0 * 3600.0, 18.0 * 3600));
 			}
 		}
 

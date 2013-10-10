@@ -63,14 +63,11 @@ public class FacilitiesCombine {
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
 				else { a2.setCapacity(Integer.MAX_VALUE); }
 			}
-			Iterator<SortedSet<OpeningTime>> ts_it = a.getOpeningTimes().values().iterator();
-			while (ts_it.hasNext()) {
-				SortedSet<OpeningTime> ts = ts_it.next();
-				Iterator<OpeningTime> o_it = ts.iterator();
-				while (o_it.hasNext()) {
-					OpeningTime o = o_it.next();
-					f2.getActivityOptions().get(a.getType()).addOpeningTime(o);
-				}
+			SortedSet<OpeningTime> ts = a.getOpeningTimes();
+			Iterator<OpeningTime> o_it = ts.iterator();
+			while (o_it.hasNext()) {
+				OpeningTime o = o_it.next();
+				f2.getActivityOptions().get(a.getType()).addOpeningTime(o);
 			}
 		}
 		if (Integer.parseInt(f2.getId().toString()) > Integer.parseInt(f.getId().toString())) {

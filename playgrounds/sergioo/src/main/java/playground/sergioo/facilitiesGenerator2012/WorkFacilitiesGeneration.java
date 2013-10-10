@@ -201,7 +201,7 @@ public class WorkFacilitiesGeneration {
 						ActivityOptionImpl activityOption = new ActivityOptionImpl(activityOptionArea.getType());
 						activityOption.setFacility(building);
 						activityOption.setCapacity(capacity);
-						activityOption.addOpeningTime(activityOptionArea.getOpeningTimes(DayType.wkday).first());
+						activityOption.addOpeningTime(activityOptionArea.getOpeningTimes().first());
 						building.getActivityOptions().put(activityOption.getType(), activityOption);
 					}
 				}

@@ -17,7 +17,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -274,7 +273,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 	public double decideEndTime(double startTime, double maximumEndTime, String typeOfActivity, Id facilityId) {
 		OpeningTime startTimeOpeningTime = null;
 		ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
-		for(OpeningTime openingTime:facility.getActivityOptions().get(typeOfActivity).getOpeningTimes(DayType.wkday))
+		for(OpeningTime openingTime:facility.getActivityOptions().get(typeOfActivity).getOpeningTimes())
 			if(openingTime.getStartTime()<=startTime && startTime<=openingTime.getEndTime())
 				startTimeOpeningTime = openingTime;
 		return Math.min(startTimeOpeningTime.getEndTime(), maximumEndTime);

@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -268,7 +267,7 @@ public class RelocateActivities {
 			map.put(activity.getType(), map.get(activity.getType()) + 1);
 		} else {
 			ActivityOption activityOption = relocatedFacility.getActivityOptions().get(activityType);
-			Set<OpeningTime> openingTimes = activityOption.getOpeningTimes(DayType.mon);
+			Set<OpeningTime> openingTimes = activityOption.getOpeningTimes();
 			
 			double time = 0.0;
 			for (OpeningTime openingTime : openingTimes) time += openingTime.getEndTime() - openingTime.getStartTime();

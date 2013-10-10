@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -99,13 +98,13 @@ public class ActivityDifferentiator {
 			for (ActivityFacility  af:this.shopFacilities.values()) {
 				ActivityFacilityImpl afi = (ActivityFacilityImpl)af; 
 				Double capacity = afi.getActivityOptions().get("shop").getCapacity();
-				SortedSet<OpeningTime> openingTimesWkday = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.wkday);
-				SortedSet<OpeningTime> openingTimesSat = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.sat);
-				SortedSet<OpeningTime> openingTimesMon = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.mon);
-				SortedSet<OpeningTime> openingTimesTue = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.tue);
-				SortedSet<OpeningTime> openingTimesWed = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.wed);
-				SortedSet<OpeningTime> openingTimesThu = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.thu);
-				SortedSet<OpeningTime> openingTimesFri = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.fri);
+				SortedSet<OpeningTime> openingTimesWkday = afi.getActivityOptions().get("shop").getOpeningTimes();
+//				SortedSet<OpeningTime> openingTimesSat = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.sat);
+//				SortedSet<OpeningTime> openingTimesMon = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.mon);
+//				SortedSet<OpeningTime> openingTimesTue = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.tue);
+//				SortedSet<OpeningTime> openingTimesWed = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.wed);
+//				SortedSet<OpeningTime> openingTimesThu = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.thu);
+//				SortedSet<OpeningTime> openingTimesFri = afi.getActivityOptions().get("shop").getOpeningTimes(DayType.fri);
 				if (this.groceryFacilities.contains(af.getId())) {
 					
 					afi.createActivityOption("shopgrocery");
@@ -118,35 +117,35 @@ public class ActivityDifferentiator {
 					}
 					
 					if  (!(openingTimesWkday==null)) {
-						for (OpeningTime openingTime: openingTimesSat){
-							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
-						}
+//						for (OpeningTime openingTime: openingTimesSat){
+//							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
+//						}
 					}
-					if  (!(openingTimesMon==null)) {
-						for (OpeningTime openingTime: openingTimesMon){
-							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesTue==null)) {
-						for (OpeningTime openingTime: openingTimesTue){
-							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesWed==null)) {
-						for (OpeningTime openingTime: openingTimesWed){
-							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesThu==null)) {
-						for (OpeningTime openingTime: openingTimesThu){
-							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesFri==null)) {
-						for (OpeningTime openingTime: openingTimesFri){
-							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
-						}
-					}
+//					if  (!(openingTimesMon==null)) {
+//						for (OpeningTime openingTime: openingTimesMon){
+//							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesTue==null)) {
+//						for (OpeningTime openingTime: openingTimesTue){
+//							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesWed==null)) {
+//						for (OpeningTime openingTime: openingTimesWed){
+//							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesThu==null)) {
+//						for (OpeningTime openingTime: openingTimesThu){
+//							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesFri==null)) {
+//						for (OpeningTime openingTime: openingTimesFri){
+//							afi.getActivityOptions().get("shopgrocery").addOpeningTime(openingTime);
+//						}
+//					}
 					
 				}
 				else {
@@ -159,36 +158,36 @@ public class ActivityDifferentiator {
 						}
 					}
 					
-					if  (!(openingTimesSat==null)) {
-						for (OpeningTime openingTime: openingTimesSat){
-							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesMon==null)) {
-						for (OpeningTime openingTime: openingTimesMon){
-							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesTue==null)) {
-						for (OpeningTime openingTime: openingTimesTue){
-							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesWed==null)) {
-						for (OpeningTime openingTime: openingTimesWed){
-							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesThu==null)) {
-						for (OpeningTime openingTime: openingTimesThu){
-							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
-						}
-					}
-					if  (!(openingTimesFri==null)) {
-						for (OpeningTime openingTime: openingTimesFri){
-							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
-						}
-					}
+//					if  (!(openingTimesSat==null)) {
+//						for (OpeningTime openingTime: openingTimesSat){
+//							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesMon==null)) {
+//						for (OpeningTime openingTime: openingTimesMon){
+//							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesTue==null)) {
+//						for (OpeningTime openingTime: openingTimesTue){
+//							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesWed==null)) {
+//						for (OpeningTime openingTime: openingTimesWed){
+//							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesThu==null)) {
+//						for (OpeningTime openingTime: openingTimesThu){
+//							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
+//						}
+//					}
+//					if  (!(openingTimesFri==null)) {
+//						for (OpeningTime openingTime: openingTimesFri){
+//							afi.getActivityOptions().get("shopnongrocery").addOpeningTime(openingTime);
+//						}
+//					}
 				}
 				afi.getActivityOptions().remove("shop");
 			}

@@ -31,7 +31,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -43,8 +42,8 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
 
@@ -159,8 +158,8 @@ public class KtiActivityScoring implements ActivityScoring {
 			}
 
 			final Set<OpeningTime> openTimes =
-				actOpt.getOpeningTimes(DEFAULT_DAY) != null ?
-					actOpt.getOpeningTimes(DEFAULT_DAY) :
+				actOpt.getOpeningTimes() != null ?
+					actOpt.getOpeningTimes() :
 					// if there is an activity option but no opening times,
 					// assume always open.
 					DEFAULT_OPENING_TIME;

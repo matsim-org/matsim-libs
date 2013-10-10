@@ -20,7 +20,6 @@
 
 package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreation.fromBZ;
 
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
@@ -176,7 +175,7 @@ public class FacilitiesProductionKTI {
 						// copy opening times
 						ActivityOptionImpl optionNew = (ActivityOptionImpl) f.getActivityOptions().get("sg");
 
-						Map<DayType, SortedSet<OpeningTime>> ot = ((ActivityOptionImpl)f.getActivityOptions().get("s")).getOpeningTimes();
+						SortedSet<OpeningTime> ot = ((ActivityOptionImpl)f.getActivityOptions().get("s")).getOpeningTimes();
 						optionNew.setOpeningTimes(ot);
 					}
 				if (shop.getPrice() > 0) priceCnt++;

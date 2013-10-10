@@ -19,7 +19,6 @@
 
 package playground.anhorni.surprice.preprocess.rwscenario;
 
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
@@ -27,15 +26,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 
 
 public class AdaptFacilities {	
@@ -69,7 +67,7 @@ public class AdaptFacilities {
 			
 			if (actOpt != null) {
 				ActivityOptionImpl aOptWork = ((ActivityFacilityImpl)facility).createActivityOption("work");				
-				Map<DayType,SortedSet<OpeningTime>> ots = actOpt.getOpeningTimes();
+				SortedSet<OpeningTime> ots = actOpt.getOpeningTimes();
 				aOptWork.setOpeningTimes(ots);
 			}
 		}
@@ -77,7 +75,7 @@ public class AdaptFacilities {
 		TreeMap<Id, ActivityFacility> workFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType("work");		
 		for (ActivityFacility facility : workFacilities.values()) {
 			ActivityOptionImpl aOptWork = (ActivityOptionImpl) facility.getActivityOptions().get("work");
-			Map<DayType, SortedSet<OpeningTime>> ots = aOptWork.getOpeningTimes();
+			SortedSet<OpeningTime> ots = aOptWork.getOpeningTimes();
 					
 			ActivityOptionImpl aOptBusiness = ((ActivityFacilityImpl)facility).createActivityOption("business");
 			aOptBusiness.setOpeningTimes(ots);

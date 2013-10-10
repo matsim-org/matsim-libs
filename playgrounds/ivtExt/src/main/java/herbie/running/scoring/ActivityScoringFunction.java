@@ -40,9 +40,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -135,7 +134,7 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 			// assume facility is always open
 			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
 			if (actOpt != null) {
-				openTimes = actOpt.getOpeningTimes(ActivityScoringFunction.DEFAULT_DAY);
+				openTimes = actOpt.getOpeningTimes();
 				if (openTimes == null) {
 					openTimes = ActivityScoringFunction.DEFAULT_OPENING_TIME;
 				}

@@ -19,8 +19,6 @@
 
 package playground.anhorni.utils;
 
-import java.util.Map;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -36,8 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -90,8 +86,7 @@ public class FacilitiesAdderAndModifier {
 	private ActivityOptionImpl replaceActOption(String type, ActivityOptionImpl option, ActivityFacility facility) {
 		ActivityOptionImpl optionNew = new ActivityOptionImpl(type);
 		optionNew.setFacility(facility);
-		Map<DayType, SortedSet<OpeningTime>> ot = option.getOpeningTimes();
-		optionNew.setOpeningTimes(ot);
+		optionNew.setOpeningTimes(option.getOpeningTimes());
 		optionNew.setCapacity(option.getCapacity());
 		return optionNew;
 	}

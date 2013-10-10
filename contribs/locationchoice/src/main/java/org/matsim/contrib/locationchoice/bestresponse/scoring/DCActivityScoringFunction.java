@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
@@ -41,8 +40,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -243,13 +240,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				foundAct = true;
 				// choose appropriate opentime: either wed, wkday or wk
 				// if none is given, use undefined opentimes
-				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wed);
-				if (opentimes == null) {
-					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wkday);
-				}
-				if (opentimes == null) {
-					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wk);
-				}
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes();
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:
 					// if there is only one wed/wkday/wk open time interval, use it

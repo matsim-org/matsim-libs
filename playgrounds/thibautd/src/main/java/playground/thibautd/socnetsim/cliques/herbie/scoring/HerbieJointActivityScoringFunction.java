@@ -124,7 +124,7 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 			// assume facility is always open
 			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
 			if (actOpt != null) {
-				openTimes = actOpt.getOpeningTimes(DEFAULT_DAY);
+				openTimes = actOpt.getOpeningTimes();
 				if (openTimes == null) {
 					openTimes = DEFAULT_OPENING_TIME;
 				}

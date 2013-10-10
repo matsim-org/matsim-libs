@@ -20,9 +20,7 @@
 package playground.anhorni.LEGO.miniscenario.create;
 
 import java.io.File;
-import java.util.Map;
 import java.util.Random;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -42,7 +40,6 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
@@ -197,8 +194,9 @@ public class AdaptZHScenario {
 		ActivityOptionImpl optionNew = new ActivityOptionImpl(type);
 		optionNew.setFacility(facility);
 				
-		Map<DayType, SortedSet<OpeningTime>> ot = (Map<DayType, SortedSet<OpeningTime>>) option.getOpeningTimes();
-		optionNew.setOpeningTimes(ot);				
+		for (OpeningTime ot : option.getOpeningTimes()) {
+			optionNew.addOpeningTime(ot);
+		}
 		optionNew.setCapacity(option.getCapacity());
 		return optionNew;
 	}

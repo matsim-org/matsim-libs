@@ -383,7 +383,7 @@ public class WorkFacilitiesGenerator {
 					dataBaseFacilities.executeStatement("INSERT INTO Activity_options (type,facility_id,capacity) VALUES ('"+option.getType()+"',"+idFacility+","+option.getCapacity()+")");
 				else
 					dataBaseFacilities.executeStatement("UPDATE Activity_options SET capacity=capacity+"+optionResult.getDouble(1)+" WHERE type='"+option.getType()+"' AND facility_id ="+idFacility);
-				for(OpeningTime openingTime:option.getOpeningTimes(DayType.wkday))
+				for(OpeningTime openingTime:option.getOpeningTimes())
 					dataBaseFacilities.executeStatement("INSERT INTO Opening_times (day_type,start_time,end_time,type,facility_id) VALUES ('"+DayType.wkday+"',"+openingTime.getStartTime()+","+openingTime.getEndTime()+",'"+option.getType()+"',"+idFacility+")");
 			}
 		}

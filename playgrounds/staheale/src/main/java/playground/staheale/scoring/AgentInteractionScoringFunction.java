@@ -20,7 +20,6 @@
 
 package playground.staheale.scoring;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -38,8 +37,6 @@ import org.matsim.core.config.Config;
 //import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -302,14 +299,7 @@ public class AgentInteractionScoringFunction extends CharyparNagelActivityScorin
 		if (!act.getType().startsWith("h") && !act.getType().endsWith("a")) {
 			//if (!(facility.getActivityOptions().containsKey("home"))){
 
-			opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wed);
-
-			if (opentimes == null) {
-				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wkday);
-			}
-			if (opentimes == null) {
-				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes(DayType.wk);
-			}
+			opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(act.getType()).getOpeningTimes();
 			if (opentimes != null) {
 				// ignoring lunch breaks with the following procedure:
 				// if there is only one wed/wkday open time interval, use it

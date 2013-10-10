@@ -29,7 +29,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -74,10 +73,7 @@ public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivity
 				// choose appropriate opentime:
 				// either wed or wkday
 				// if none is given, use undefined opentimes
-				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wed);
-				if (opentimes == null) {
-					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wkday);
-				}
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes();
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:
 					// if there is only one wed/wkday open time interval, use it

@@ -23,7 +23,6 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -83,7 +82,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 		double startTime = -1.0;
 		double endTime = -1.0;
 
-		Map<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
+		SortedSet<OpeningTime> closestShopOpentimes = null;
 
 //		 List<? extends BasicLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
 		List<? extends BasicLocation> closestShops = null; // destroyed by refactoring
@@ -97,7 +96,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 		// remove all existing opentimes
 		for (ActivityOption a : activities.values()) {
-			((ActivityOptionImpl) a).setOpeningTimes(new TreeMap<DayType, SortedSet<OpeningTime>>());
+			((ActivityOptionImpl) a).clearOpeningTimes();
 		}
 
 		// if only presence code and work are present
@@ -115,7 +114,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 				} else if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR3)) {
 					// eliminate lunch break
 					for (DayType day : days) {
-						SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes.get(day);
+						SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes;
 						if (dailyOpentime != null) {
 							switch(dailyOpentime.size()) {
 								case 2:

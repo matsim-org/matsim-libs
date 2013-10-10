@@ -128,7 +128,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 		//closest shop
 		
-		TreeMap<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
+		SortedSet<OpeningTime> closestShopOpentimes = null;
 
 	//	log.info("TreeMap defined");
 		
@@ -143,13 +143,14 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 			Double y = facility.getCoord().getY();
 			ActivityFacility closestShop = this.shoppingQuadTree.get(x,y);
 			//log.info("closestShop size: "+ closestShop.getActivityOptions().size());
-			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon)!=null) {closestShopOpentimes.put(DayType.mon, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon));}
-			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.tue)!=null) {closestShopOpentimes.put(DayType.tue, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.tue));}
-			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.wed)!=null) {closestShopOpentimes.put(DayType.wed, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.wed));}
-			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.thu)!=null) {closestShopOpentimes.put(DayType.thu,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.thu));}
-			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.fri)!=null) {closestShopOpentimes.put(DayType.fri, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.fri));}
-			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sat)!=null) {closestShopOpentimes.put(DayType.sat,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sat));}
-			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sun)!=null) {closestShopOpentimes.put(DayType.sun,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sun));}
+			if (closestShop.getActivityOptions().get("shop").getOpeningTimes()!=null) {closestShopOpentimes = closestShop.getActivityOptions().get("shop").getOpeningTimes();}
+//			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon)!=null) {closestShopOpentimes.put(DayType.mon, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.mon));}
+//			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.tue)!=null) {closestShopOpentimes.put(DayType.tue, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.tue));}
+//			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.wed)!=null) {closestShopOpentimes.put(DayType.wed, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.wed));}
+//			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.thu)!=null) {closestShopOpentimes.put(DayType.thu,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.thu));}
+//			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.fri)!=null) {closestShopOpentimes.put(DayType.fri, closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.fri));}
+//			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sat)!=null) {closestShopOpentimes.put(DayType.sat,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sat));}
+//			if (closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sun)!=null) {closestShopOpentimes.put(DayType.sun,closestShop.getActivityOptions().get("shop").getOpeningTimes(DayType.sun));}
 		}
 		
 		//List<MappedLocation> closestShops = this.shopsOf2005.getNearestLocations(facility.getCoord());
@@ -166,7 +167,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 		// remove all existing opentimes
 		for (ActivityOption a : activities.values()) {
-			((ActivityOptionImpl) a).setOpeningTimes(new TreeMap<DayType, SortedSet<OpeningTime>>());
+			((ActivityOptionImpl) a).clearOpeningTimes();
 		}
 	//	log.info("existing opentimes removed");
 
@@ -205,10 +206,10 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 					if (
 							Pattern.matches(FacilitiesProduction.ACT_TYPE_SHOP_RETAIL + ".*", activityType)) {
 						// eliminate lunch break
-						for (DayType day : days) {
-							((ActivityOptionImpl) activities.get(activityType)).setOpeningTimes(closestShopOpentimes);
-							SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes.get(day);
-							if (dailyOpentime != null) {
+							for (OpeningTime ot : closestShopOpentimes) {
+								((ActivityOptionImpl) activities.get(activityType)).addOpeningTime(ot);
+							}
+							SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes;
 								switch(dailyOpentime.size()) {
 									case 2:
 										startTime = Math.min(
@@ -224,11 +225,8 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 										break;
 								}
 								activities.get(FacilitiesProduction.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-										day,
 										startTime,
 										endTime));
-							}
-						}
 						//((ActivityOptionImpl) activities.get(FacilitiesProduction.WORK_SECTOR3)).setOpeningTimes(closestShopOpentimes);
 			//			log.info("opentimes for shop retail defined");
 					} else if (

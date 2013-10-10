@@ -17,7 +17,6 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -164,20 +163,18 @@ public class FacilitiesToSQL {
 				ActivityOptionImpl aoi = (ActivityOptionImpl) ao;
 				String actType =aoi.getType();
 				double capacity = aoi.getCapacity();
-				for(DayType dayType : aoi.getOpeningTimes().keySet()){
-					String day = dayType.toString();
-					aoi.getOpeningTimes();
-					for(OpeningTime ot: aoi.getOpeningTimes(dayType)){
-						double startTime = ot.getStartTime();
-						double endTime = ot.getStartTime();
-						String sqlInserter = "INSERT INTO %s " +
-								"VALUES(\'%s\',%f,%f,\'%s\',\'%s\',%f,\'%s\',%f,%f);";
-						sb.append(String.format(sqlInserter,tableName,id,x,y,description,actType,capacity,day,startTime,endTime));
-					}
-					if (lineCounter % batchSize == 0){
-						dba.executeStatement(sb.toString());
-						sb.delete(0,sb.length());
-					}
+				String day = "";
+				aoi.getOpeningTimes();
+				for(OpeningTime ot: aoi.getOpeningTimes()){
+					double startTime = ot.getStartTime();
+					double endTime = ot.getStartTime();
+					String sqlInserter = "INSERT INTO %s " +
+							"VALUES(\'%s\',%f,%f,\'%s\',\'%s\',%f,\'%s\',%f,%f);";
+					sb.append(String.format(sqlInserter,tableName,id,x,y,description,actType,capacity,day,startTime,endTime));
+				}
+				if (lineCounter % batchSize == 0){
+					dba.executeStatement(sb.toString());
+					sb.delete(0,sb.length());
 				}
 			}
 			if(++counter >= modfactor && counter % modfactor == 0){
@@ -245,27 +242,25 @@ public class FacilitiesToSQL {
 				ActivityOptionImpl aoi = (ActivityOptionImpl) ao;
 				String actType =aoi.getType();
 				double capacity = aoi.getCapacity();
-				for(DayType dayType : aoi.getOpeningTimes().keySet()){
-					String day = dayType.toString();
-					aoi.getOpeningTimes();
-					for(OpeningTime ot: aoi.getOpeningTimes(dayType)){
-						double startTime = ot.getStartTime();
-						double endTime = ot.getStartTime();
-						String sqlInserter = "\"%s\",%f,%f,\"%s\",\"%s\",%f,\"%s\",%f,%f\n";
-						sb.append(String.format(sqlInserter,id,x,y,description,actType,capacity,day,startTime,endTime));
-						lineCounter++;
-					}
-					if (lineCounter % batchSize == 0){
-						try {
-							reader.unread( sb.toString().toCharArray() );
-							reader2.unread( sb2.toString().toCharArray() );
-							cpManager.copyIn("COPY "+tableName+" FROM STDIN WITH CSV", reader );
-							sb.delete(0,sb.length());
-							cpManager.copyIn("COPY "+tableName+"_sh"+" FROM STDIN WITH CSV", reader2 );
-							sb2.delete(0,sb2.length());
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+				String day = "";
+				aoi.getOpeningTimes();
+				for(OpeningTime ot: aoi.getOpeningTimes()){
+					double startTime = ot.getStartTime();
+					double endTime = ot.getStartTime();
+					String sqlInserter = "\"%s\",%f,%f,\"%s\",\"%s\",%f,\"%s\",%f,%f\n";
+					sb.append(String.format(sqlInserter,id,x,y,description,actType,capacity,day,startTime,endTime));
+					lineCounter++;
+				}
+				if (lineCounter % batchSize == 0){
+					try {
+						reader.unread( sb.toString().toCharArray() );
+						reader2.unread( sb2.toString().toCharArray() );
+						cpManager.copyIn("COPY "+tableName+" FROM STDIN WITH CSV", reader );
+						sb.delete(0,sb.length());
+						cpManager.copyIn("COPY "+tableName+"_sh"+" FROM STDIN WITH CSV", reader2 );
+						sb2.delete(0,sb2.length());
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
 				}
 			}
@@ -343,8 +338,8 @@ public class FacilitiesToSQL {
 				ActivityOptionImpl i = (ActivityOptionImpl) ao.next();
 				if(i.getType().equals(actType)){
 					
-					i.getOpeningTimes().get(DayType.wkday).clear();
-					i.getOpeningTimes().get(DayType.wkday).add(new OpeningTimeImpl(DayType.wkday, start, end));
+					i.getOpeningTimes().clear();
+					i.getOpeningTimes().add(new OpeningTimeImpl(start, end));
 				}
 					
 			}

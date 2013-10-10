@@ -27,23 +27,22 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import others.sergioo.util.algebra.MatrixND;
+import others.sergioo.util.algebra.MatrixNDImpl;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import others.sergioo.util.fitting.FittingControl1D;
 import others.sergioo.util.fitting.FittingData;
 import others.sergioo.util.fitting.ProportionFittingControl1D;
 import others.sergioo.util.fitting.TotalFittingControl1D;
-
-import others.sergioo.util.algebra.MatrixND;
-import others.sergioo.util.algebra.MatrixNDImpl;
 
 public class SecondaryFacilitiesGenerator {
 
@@ -316,7 +315,7 @@ public class SecondaryFacilitiesGenerator {
 					dataBaseFacilities.executeStatement("INSERT INTO Activity_options (type,facility_id,capacity) VALUES ('"+option.getType()+"',"+idFacility+","+option.getCapacity()+")");
 				else
 					dataBaseFacilities.executeStatement("UPDATE Activity_options SET capacity=capacity+"+optionResult.getDouble(1)+" WHERE type='"+option.getType()+"' AND facility_id ="+idFacility);
-				for(OpeningTime openingTime:option.getOpeningTimes(DayType.wkday))
+				for(OpeningTime openingTime:option.getOpeningTimes())
 					dataBaseFacilities.executeStatement("INSERT INTO Opening_times (day_type,start_time,end_time,type,facility_id) VALUES ('"+DayType.wkday+"',"+openingTime.getStartTime()+","+openingTime.getEndTime()+",'"+option.getType()+"',"+idFacility+")");
 			}
 		}

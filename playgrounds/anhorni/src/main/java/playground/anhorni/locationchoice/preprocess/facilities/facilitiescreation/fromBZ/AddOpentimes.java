@@ -22,7 +22,6 @@ package playground.anhorni.locationchoice.preprocess.facilities.facilitiescreati
 
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -79,7 +78,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
 		double startTime = -1.0;
 		double endTime = -1.0;
-		Map<DayType, SortedSet<OpeningTime>> closestShopOpentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
+		SortedSet<OpeningTime> closestShopOpentimes = null;
 		ActivityFacilityImpl closestShop = (ActivityFacilityImpl) this.shopQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());		
 		ActivityOptionImpl shopsOf2005ShopAct = (ActivityOptionImpl) closestShop.getActivityOptions().get("shop");
 		if (shopsOf2005ShopAct != null) {
@@ -91,7 +90,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 		// remove all existing opentimes
 		for (ActivityOption a : activities.values()) {
-			((ActivityOptionImpl) a).setOpeningTimes(new TreeMap<DayType, SortedSet<OpeningTime>>());
+			((ActivityOptionImpl) a).clearOpeningTimes();
 		}
 
 		// if only presence code and work are present
@@ -109,7 +108,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 				} else if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR3)) {
 					// eliminate lunch break
 					for (DayType day : days) {
-						SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes.get(day);
+						SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes;
 						if (dailyOpentime != null) {
 							switch(dailyOpentime.size()) {
 								case 2:

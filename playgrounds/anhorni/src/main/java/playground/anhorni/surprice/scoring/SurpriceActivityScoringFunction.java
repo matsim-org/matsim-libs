@@ -22,7 +22,6 @@ package playground.anhorni.surprice.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
-
 //import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,7 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -151,9 +149,9 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 
 				// choose appropriate opentime:
 				// if none is given, use undefined opentimes
-				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(day);
+				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes();
 				if (opentimes == null) {
-					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes(DayType.wkday);
+					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes();
 				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:

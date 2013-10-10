@@ -31,7 +31,6 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -69,7 +68,7 @@ public class AdaptFacilities {
 //		    		fImpl.getActivityOptions().put("shop_retail", new ActivityOptionImpl("shop", fImpl));
 		    		fImpl.addActivityOption(new ActivityOptionImpl("shop"));
 
-					if (a.getOpeningTimes(DayType.mon)!=null) {;}
+					if (a.getOpeningTimes()!=null) {;}
 
 		    	}
 		    	if (f.getActivityOptions().containsKey("shop_service")){
