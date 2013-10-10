@@ -33,12 +33,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 
 /**
@@ -113,7 +115,13 @@ public class EmptyPlans {
 		config.addCoreModules();
 
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork());
-		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory());
+		PlanAlgorithm router =
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								scenario ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												new FakeTravelTimeCost(),
+												new FakeTravelTimeCost() ) ) );
 		//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);
