@@ -47,7 +47,6 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.core.router.old.ModularPlanRouter;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -182,7 +181,7 @@ public class KnSimplifiedController extends AbstractController {
 		return SimplifiedControlerUtils.createPlansScoringDefault( this.scenario, this.events, this.getControlerIO() );
 	}
 
-	private ModularPlanRouter createRoutingAlgorithm() {
+	private PlanAlgorithm createRoutingAlgorithm() {
 		return SimplifiedControlerUtils.createRoutingAlgorithmDefault( this.scenario, this.travelTimeCalculator.getLinkTravelTimes() );
 	}
 

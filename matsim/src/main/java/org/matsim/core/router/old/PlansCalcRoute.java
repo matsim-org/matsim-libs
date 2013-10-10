@@ -66,6 +66,26 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 @Deprecated
 public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	
+	public class ModularPlanRouter {
+
+		public void addLegHandler(String transportMode, LegRouter legHandler) {
+			throw new UnsupportedOperationException();
+			
+		}
+
+		public void routePlan(Person person, Plan plan) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
+		}
+
+		public double handleLeg(Person person, Leg leg, Activity fromAct,
+				Activity toAct, double depTime) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
 	static final Logger log = Logger.getLogger(PlansCalcRoute.class);
 
 	private static final String NO_CONFIGGROUP_SET_WARNING = "No PlansCalcRouteConfigGroup"

@@ -22,13 +22,8 @@
  */
 package playground.kai.run;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -40,20 +35,10 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.old.ModularPlanRouter;
-import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.PseudoTransitLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
@@ -87,45 +72,46 @@ public class SimplifiedControlerUtils {
 	 * </ul>
 	 * May be used as starting point for own variants.
 	 */
-	static ModularPlanRouter createRoutingAlgorithmDefault( Scenario sc, TravelTime travelTime ) {
-		Population population = sc.getPopulation() ;
-		Network network = sc.getNetwork() ;
-		Config config = sc.getConfig() ;
-		
-		// factory to generate routes:
-		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (population.getFactory())).getModeRouteFactory();
+	static PlanAlgorithm createRoutingAlgorithmDefault( Scenario sc, TravelTime travelTime ) {
+		//Population population = sc.getPopulation() ;
+		//Network network = sc.getNetwork() ;
+		//Config config = sc.getConfig() ;
+		//
+		//// factory to generate routes:
+		//final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (population.getFactory())).getModeRouteFactory();
 	
-		// travel disutility (generalized cost)
-		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
-		
-		final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
+		//// travel disutility (generalized cost)
+		//final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
+		//
+		//final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 	
-		// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
-		// times (e.g. for car router, pt router, ...)
-		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
+		//// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
+		//// times (e.g. for car router, pt router, ...)
+		//final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
 	
-		// plug it together
-		final ModularPlanRouter plansCalcRoute = new ModularPlanRouter();
-		
-		Collection<String> networkModes = config.plansCalcRoute().getNetworkModes();
-		for (String mode : networkModes) {
-			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(network, 
-					leastCostPathFactory.createPathCalculator(network, travelDisutility, travelTime), routeFactory));
-		}
-		Map<String, Double> teleportedModeSpeeds = config.plansCalcRoute().getTeleportedModeSpeeds();
-		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
-			plansCalcRoute.addLegHandler(entry.getKey(), new TeleportationLegRouter(routeFactory, entry.getValue(), 
-					config.plansCalcRoute().getBeelineDistanceFactor()));
-		}
-		Map<String, Double> teleportedModeFreespeedFactors = config.plansCalcRoute().getTeleportedModeFreespeedFactors();
-		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
-			plansCalcRoute.addLegHandler(entry.getKey(), 
-					new PseudoTransitLegRouter(network, leastCostPathFactory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc), 
-							entry.getValue(), config.plansCalcRoute().getBeelineDistanceFactor(), routeFactory));
-		}
-		
-		// return it:
-		return plansCalcRoute;
+		//// plug it together
+		//final ModularPlanRouter plansCalcRoute = new ModularPlanRouter();
+		//
+		//Collection<String> networkModes = config.plansCalcRoute().getNetworkModes();
+		//for (String mode : networkModes) {
+		//	plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(network, 
+		//			leastCostPathFactory.createPathCalculator(network, travelDisutility, travelTime), routeFactory));
+		//}
+		//Map<String, Double> teleportedModeSpeeds = config.plansCalcRoute().getTeleportedModeSpeeds();
+		//for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
+		//	plansCalcRoute.addLegHandler(entry.getKey(), new TeleportationLegRouter(routeFactory, entry.getValue(), 
+		//			config.plansCalcRoute().getBeelineDistanceFactor()));
+		//}
+		//Map<String, Double> teleportedModeFreespeedFactors = config.plansCalcRoute().getTeleportedModeFreespeedFactors();
+		//for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
+		//	plansCalcRoute.addLegHandler(entry.getKey(), 
+		//			new PseudoTransitLegRouter(network, leastCostPathFactory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc), 
+		//					entry.getValue(), config.plansCalcRoute().getBeelineDistanceFactor(), routeFactory));
+		//}
+		//
+		//// return it:
+		//return plansCalcRoute;
+		throw new UnsupportedOperationException( "should use TripRouter" );
 	}
 
 	/**

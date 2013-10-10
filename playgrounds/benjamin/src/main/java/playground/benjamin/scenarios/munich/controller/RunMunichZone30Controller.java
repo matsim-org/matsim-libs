@@ -21,10 +21,6 @@
 package playground.benjamin.scenarios.munich.controller;
 
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -50,8 +46,6 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -59,14 +53,11 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.old.ModularPlanRouter;
-import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.PseudoTransitLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -188,38 +179,46 @@ public class RunMunichZone30Controller extends AbstractController {
 	}
 
 
-	private ModularPlanRouter createRoutingAlgorithm() {
-		// factory to generate routes:
-		final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
+	private PlanAlgorithm createRoutingAlgorithm() {
+		//// factory to generate routes:
+		//final ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
 
 		// travel disutility (generalized cost)
 		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(this.travelTime.getLinkTravelTimes(), this.config.planCalcScore());
-		
-		final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
+		//
+		//final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 
-		// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
-		// times (e.g. for car router, pt router, ...)
-		final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
+		//// define the factory for the "computer science" router.  Needs to be a factory because it might be used multiple
+		//// times (e.g. for car router, pt router, ...)
+		//final LeastCostPathCalculatorFactory leastCostPathFactory = new DijkstraFactory();
 
-		// plug it together
-		final ModularPlanRouter plansCalcRoute = new ModularPlanRouter();
-		
-		Collection<String> networkModes = this.config.plansCalcRoute().getNetworkModes();
-		for (String mode : networkModes) {
-			plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(this.network, leastCostPathFactory.createPathCalculator(this.network, travelDisutility, this.travelTime.getLinkTravelTimes()), routeFactory));
-		}
-		Map<String, Double> teleportedModeSpeeds = this.config.plansCalcRoute().getTeleportedModeSpeeds();
-		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
-			plansCalcRoute.addLegHandler(entry.getKey(), new TeleportationLegRouter(routeFactory, entry.getValue(), this.config.plansCalcRoute().getBeelineDistanceFactor()));
-		}
-		Map<String, Double> teleportedModeFreespeedFactors = this.config.plansCalcRoute().getTeleportedModeFreespeedFactors();
-		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
-			plansCalcRoute.addLegHandler(entry.getKey(), new PseudoTransitLegRouter(this.ptRoutingNetwork, leastCostPathFactory.createPathCalculator(this.ptRoutingNetwork, ptTimeCostCalc, ptTimeCostCalc), entry.getValue(), this.config.plansCalcRoute().getBeelineDistanceFactor(), routeFactory));
-		}
-		
-		// return it:
-		return plansCalcRoute;
+		//// plug it together
+		//final ModularPlanRouter plansCalcRoute = new ModularPlanRouter();
+		//
+		//Collection<String> networkModes = this.config.plansCalcRoute().getNetworkModes();
+		//for (String mode : networkModes) {
+		//	plansCalcRoute.addLegHandler(mode, new NetworkLegRouter(this.network, leastCostPathFactory.createPathCalculator(this.network, travelDisutility, this.travelTime.getLinkTravelTimes()), routeFactory));
+		//}
+		//Map<String, Double> teleportedModeSpeeds = this.config.plansCalcRoute().getTeleportedModeSpeeds();
+		//for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
+		//	plansCalcRoute.addLegHandler(entry.getKey(), new TeleportationLegRouter(routeFactory, entry.getValue(), this.config.plansCalcRoute().getBeelineDistanceFactor()));
+		//}
+		//Map<String, Double> teleportedModeFreespeedFactors = this.config.plansCalcRoute().getTeleportedModeFreespeedFactors();
+		//for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
+		//	plansCalcRoute.addLegHandler(entry.getKey(), new PseudoTransitLegRouter(this.ptRoutingNetwork, leastCostPathFactory.createPathCalculator(this.ptRoutingNetwork, ptTimeCostCalc, ptTimeCostCalc), entry.getValue(), this.config.plansCalcRoute().getBeelineDistanceFactor(), routeFactory));
+		//}
+		//
+		//// return it:
+		//return plansCalcRoute;
+		final TripRouterFactory fact =
+			new TripRouterFactoryBuilderWithDefaults().build(
+					scenario );
+		return new PlanRouter(
+				fact.instantiateAndConfigureTripRouter(
+					new RoutingContextImpl(
+						travelDisutility,
+						travelTime.getLinkTravelTimes() ) ) );
 	}
 	
 	@Override
