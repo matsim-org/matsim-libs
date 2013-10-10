@@ -21,15 +21,14 @@
 package org.matsim.core.router;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.AStarEuclideanFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -40,9 +39,9 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 public class RoutingTest extends MatsimTestCase {
@@ -247,36 +246,55 @@ public class RoutingTest extends MatsimTestCase {
 	}
 
 	private void doTest(final RouterProvider provider) {
-		Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
+		final Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
-		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
-		Population population = scenario.getPopulation();
+		final String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		new MatsimPopulationReader(scenario).readFile(inPlansName);
-		long referenceChecksum = CRCChecksum.getCRCFromFile(inPlansName);
+
+		final long referenceChecksum = CRCChecksum.getCRCFromFile(inPlansName);
 		log.info("Reference checksum = " + referenceChecksum + " file: " + inPlansName);
 
-		String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
+		final String outPlansName = getOutputDirectory() + provider.getName() + ".plans.xml.gz";
 
-		calcRoute(provider, network, population, config);
-		new PopulationWriter(population, network).write(outPlansName);
+		calcRoute(provider, scenario);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outPlansName);
 		final long routerChecksum = CRCChecksum.getCRCFromFile(outPlansName);
+
 		log.info("routerChecksum = " + routerChecksum + " file: " + outPlansName);
 		assertEquals("different plans files.", referenceChecksum, routerChecksum);
 	}
 
-	private void calcRoute(final RouterProvider provider, final Network network, final Population population, final Config config) {
+	private void calcRoute(
+			final RouterProvider provider,
+			final Scenario scenario) {
 		log.info("### calcRoute with router " + provider.getName());
 
-		FreespeedTravelTimeAndDisutility calculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		FreespeedTravelTimeAndDisutility calculator =
+			new FreespeedTravelTimeAndDisutility(
+					scenario.getConfig().planCalcScore() );
 
-		PlansCalcRoute router = null;
-		router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, provider.getFactory(network, calculator, calculator), ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory());
-		router.run(population);
+		final TripRouterFactoryBuilderWithDefaults builder =
+			new TripRouterFactoryBuilderWithDefaults();
+		builder.setLeastCostPathCalculatorFactory(
+				provider.getFactory(
+					scenario.getNetwork(),
+					calculator,
+					calculator ) );
+		final TripRouterFactory factory = builder.build( scenario );
+		final TripRouter tripRouter =
+			factory.instantiateAndConfigureTripRouter(
+					new RoutingContextImpl(
+						calculator,
+						calculator ) );
+		final PersonAlgorithm router = new PlanRouter( tripRouter );
+
+		for ( Person p : scenario.getPopulation().getPersons().values() ) {
+			router.run( p );
+		}
 	}
 
 }

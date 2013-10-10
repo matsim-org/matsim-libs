@@ -44,8 +44,12 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -53,8 +57,8 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -153,13 +157,32 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		Leg leg = populationFactory.createLeg(TransportMode.pt);
 		plan.addLeg(leg);
 
-		TransitRouterImplFactory router = new TransitRouterImplFactory(transitSchedule, new TransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
-				scenario.getConfig().vspExperimental()));
+		//TransitRouterImplFactory router = new TransitRouterImplFactory(transitSchedule, new TransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
+		//		scenario.getConfig().vspExperimental()));
 
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, config.travelTimeCalculator());
 		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), config.planCalcScore());
-		PlansCalcTransitRoute plansCalcRoute = new PlansCalcTransitRoute(config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator.getLinkTravelTimes(),
-				new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(), config.transit(), router.createTransitRouter(), transitSchedule);
+		//PlansCalcTransitRoute plansCalcRoute =
+		//	new PlansCalcTransitRoute(
+		//			config.plansCalcRoute(),
+		//			network,
+		//			travelCostCalculator,
+		//			travelTimeCalculator.getLinkTravelTimes(),
+		//			new DijkstraFactory(),
+		//			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
+		//			config.transit(),
+		//			router.createTransitRouter(),
+		//			transitSchedule);
+
+		final TripRouterFactoryBuilderWithDefaults factoryBuilder =
+			new TripRouterFactoryBuilderWithDefaults();
+		final TripRouterFactory factory = factoryBuilder.build( scenario );
+		final TripRouter tripRouter =
+			factory.instantiateAndConfigureTripRouter(
+					new RoutingContextImpl(
+						travelCostCalculator,
+						travelTimeCalculator.getLinkTravelTimes() ) );
+		final PlanAlgorithm plansCalcRoute = new PlanRouter( tripRouter );
 
 
 
