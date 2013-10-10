@@ -136,7 +136,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 					MatsimRandom.getRandom().setSeed((int)(100*x[0])+coords.length);
 					int offset = MatsimRandom.getRandom().nextInt(10)*15;
 //					offset += 96;
-					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
+					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 128, 0);
 
 					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 100);
 				}
@@ -179,7 +179,6 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 
 	@Override
 	public void handleEvent(XYVxVyEventImpl event) {
-		
 		if (event.getTime() > this.time) {
 			update(this.time);
 			this.time = event.getTime();
@@ -187,7 +186,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		
 		this.nrAgents++;
 		
-		this.vis.addLine(event.getX(), event.getY(), event.getX()+event.getVX(), event.getY()+event.getVY(), 0, 0, 0, 255, 50);
+		this.vis.addLine(event.getX(), event.getY(), event.getX()+event.getVX(), event.getY()+event.getVY(), 0, 0, 0, 64, 100);
 		double dx = event.getVY();
 		double dy = -event.getVX();
 		double length = Math.sqrt(dx*dx+dy*dy);
@@ -200,7 +199,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		double y1 = y0 - dx*al -dy*al/4;
 		double x2 = x0 + dy*al +dx*al/4;
 		double y2 = y0 - dx*al +dy*al/4;
-		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, 255, 50, true);
+		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, 64, 100, true);
 		
 		CircleProperty cp = this.circleProperties.get(event.getPersonId());
 		
@@ -247,7 +246,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	}
 
 	private static final class CircleProperty {
-		boolean fill = true;
+		boolean fill = false;
 		float rr;
 		int r,g,b,a, minScale = 0;
 	}
@@ -297,7 +296,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 //		cp.r = nr;
 //		cp.g = nr;
 //		cp.b = nr;
-		cp.a = 255;
+		cp.a = 128;
 		//		cp.fill = false;
 		//		cp.r = 0;
 		//		cp.g = 0;
@@ -316,8 +315,8 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		List<Sim2DAgent> n = event.getNeighbors();
 		Sim2DAgent a = event.getAgent();
 		for (Sim2DAgent neighbor : n) {
-			double x0 = a.getPos()[0];
-			double y0 = a.getPos()[1];
+			double x0 = a.getPos()[0]+a.getVelocity()[0]*0.1;
+			double y0 = a.getPos()[1]+a.getVelocity()[1]*0.1;
 			double x1 = neighbor.getPos()[0];
 			double y1 = neighbor.getPos()[1];
 			double dx = x1 - x0;
@@ -326,7 +325,23 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			dx /= l;
 			dy /= l;
 
-			this.vis.addLine(x0+dx*a.getRadius(), y0+dy*a.getRadius(), x1-dx*neighbor.getRadius(), y1-dy*neighbor.getRadius(), 0, 0, 0, 128, 0);
+			int cc = a.hashCode()%(2*255);
+			int r,g,b;
+			if (cc > 255) {
+				cc -= 255;
+				r = cc;
+				g = 255-cc;
+				b = 0;
+			} else {
+				g = cc;
+				b = 255-cc;
+				r = 0;
+			}
+				
+			
+			
+//			this.vis.addLine(x0+dx*a.getRadius(), y0+dy*a.getRadius(), x1-dx*neighbor.getRadius(), y1-dy*neighbor.getRadius(), r,g,b, 255, 0);
+			this.vis.addLine(x0, y0, x1, y1, r,g,b, 255, 0);
 			double tan = dx/dy;
 			double atan = Math.atan(tan);
 			if (atan >0) {
@@ -346,7 +361,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			int tmp = (int)dist;
 			int tmp2 = (int)((dist-tmp)*100+.5);
 			String fill = tmp2 < 10 ? "0" : "";
-			this.vis.addText((x0+x1)/2+offsetX, (y0+y1)/2+offsetY, tmp+"."+fill+tmp2+" m", 100,(float)atan);
+//			this.vis.addText((x0+x1)/2+offsetX, (y0+y1)/2+offsetY, tmp+"."+fill+tmp2+" m", 100,(float)atan);
 
 
 		}

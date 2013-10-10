@@ -160,7 +160,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		for (int x = 0; x <= this.width; x += 128) {
 			for (int y = 0; y <= this.height+128; y += 128) {
 				PVector d = this.zoomer.getDispToCoord(new PVector(x,y));
-				coords.add(d);
+//				coords.add(d);
 			}
 		}
 		
@@ -355,7 +355,7 @@ public class EventsBasedVisDebugger extends PApplet {
 			fill(c.r,c.g,c.b,c.a);
 //			fill(c.r,c.g,c.b,0);
 		} else {
-			fill(255);
+			fill(255,0);
 		}
 		//		stroke(c.r,c.g,c.b,c.a);
 		stroke(0,0,0,255);;

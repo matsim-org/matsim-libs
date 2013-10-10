@@ -52,22 +52,20 @@ public class VoronoiFNDDrawer implements XYVxVyEventsHandler, VisDebuggerAdditio
 
 	private final QuadTree<XYVxVyEventImpl> quadTree; 
 
-	//linear list --> slow --> should be a QuadTree 
-	private static List<Envelope> envelopes = new ArrayList<Envelope>();
-	static {
-		Envelope e = new Envelope(15,25,-2,2);
-		envelopes.add(e);
-
-	}
 
 	private final LinkPair lp;
 
-	public VoronoiFNDDrawer() {
-		this.quadTree = new QuadTree<XYVxVyEventImpl>(1, -2, 35, 2);
+
+	private final Envelope envelope;
+
+	public VoronoiFNDDrawer(double y) {
+		this.quadTree = new QuadTree<XYVxVyEventImpl>(1, y-2, 35, y+2);
+		Envelope e = new Envelope(15,25,y-2,y+2);
+		this.envelope = e;
 		this.lp = new LinkPair();
 
 		double x = 20;
-		double y = 0;
+		//		double y = 0;
 		double dx = 1;
 		double dy = 0;
 		//		dx /= lp.length;
@@ -94,7 +92,7 @@ public class VoronoiFNDDrawer implements XYVxVyEventsHandler, VisDebuggerAdditio
 			this.time = event.getTime();
 		}
 
-		if (event.getX() <= 1|| event.getX() >= 35 || event.getY() <= -2 || event.getY() >= 2) {
+		if (event.getX() <= 1|| event.getX() >= 35 || event.getY() <= this.envelope.getMinY() || event.getY() >= this.envelope.getMaxY()) {
 			return;
 		}
 		this.quadTree.put(event.getX(), event.getY(), event);
@@ -103,13 +101,12 @@ public class VoronoiFNDDrawer implements XYVxVyEventsHandler, VisDebuggerAdditio
 	}
 
 	private void processFrame() {
-		for (Envelope e : envelopes) {
-			List<XYVxVyEventImpl> events = new ArrayList<XYVxVyEventImpl>();
-			this.quadTree.get(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY(), events);
+		Envelope e = this.envelope;
+		List<XYVxVyEventImpl> events = new ArrayList<XYVxVyEventImpl>();
+		this.quadTree.get(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY(), events);
 
-			if (events.size() > 1) {
-				processEnvelope(events,e);
-			}
+		if (events.size() > 1) {
+			processEnvelope(events,e);
 		}
 
 		synchronized(this.currentCells) {
@@ -131,7 +128,7 @@ public class VoronoiFNDDrawer implements XYVxVyEventsHandler, VisDebuggerAdditio
 			y[i] = events.get(i).getY();
 		}
 
-		
+
 		VoronoiDensity vd = new VoronoiDensity(CGAL.EPSILON, e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 		List<VoronoiCell> cells = vd.computeVoronoiDensity(x, y);
 
@@ -167,23 +164,23 @@ public class VoronoiFNDDrawer implements XYVxVyEventsHandler, VisDebuggerAdditio
 		j /= area;
 		//		System.out.println("rho: " + rho + "  v: " + v + "  j: " + j);
 
-		
-		
+
+
 		synchronized (this.lp.dataPoints) {
 			double roundRho = (int)rho + ((int)(50*rho))/50.;
-			
+
 			DataPoint dp = this.lp.dataPoints.get(roundRho);
 			if (dp == null) {
 				dp = new DataPoint();
 				this.lp.dataPoints.put(roundRho, dp);
 			}
-			
+
 			dp.density = dp.cnt/(dp.cnt+1.) * dp.density + 1./(dp.cnt+1)*rho;
 			dp.speed = dp.cnt/(dp.cnt+1.) * dp.speed + 1./(dp.cnt+1)*v;
 			dp.flow = dp.cnt/(dp.cnt+1.) * dp.flow + 1./(dp.cnt+1)*j;
 			dp.cnt++;
 
-			
+
 		}
 		this.newCells.addAll(cells);
 
@@ -224,26 +221,26 @@ public class VoronoiFNDDrawer implements XYVxVyEventsHandler, VisDebuggerAdditio
 		p.textAlign(PConstants.CENTER);
 		p.strokeWeight(sz);
 
-//		synchronized(this.currentCells) {
-//			for (VoronoiCell c : this.currentCells) {
-//				//				if (c) {
-//				//					continue;
-//				//				}
-//				float x = (float) (c.x + p.offsetX);
-//				float y = -(float) (c.y + p.offsetY);
-//				PVector cv = p.zoomer.getCoordToDisp(new PVector(x, y));
-//				p.text(c.area+"", cv.x, cv.y);
-//
-//			}
-//		}
-//		long start = System.nanoTime();
+		//		synchronized(this.currentCells) {
+		//			for (VoronoiCell c : this.currentCells) {
+		//				//				if (c) {
+		//				//					continue;
+		//				//				}
+		//				float x = (float) (c.x + p.offsetX);
+		//				float y = -(float) (c.y + p.offsetY);
+		//				PVector cv = p.zoomer.getCoordToDisp(new PVector(x, y));
+		//				p.text(c.area+"", cv.x, cv.y);
+		//
+		//			}
+		//		}
+		//		long start = System.nanoTime();
 
 		synchronized (this.lp.dataPoints) {
 			drawSpeedFND(p, this.lp, fs, sz);
 			drawFlowFND(p, this.lp, fs, sz);
 		}
-//		long stop = System.nanoTime();
-//		System.out.println("took: " + ((stop-start)/1000) + "  points:" + this.lp.dataPoints.size());
+		//		long stop = System.nanoTime();
+		//		System.out.println("took: " + ((stop-start)/1000) + "  points:" + this.lp.dataPoints.size());
 	}
 
 
@@ -346,7 +343,7 @@ public class VoronoiFNDDrawer implements XYVxVyEventsHandler, VisDebuggerAdditio
 		double flow;
 		double speed;
 		int discount;
-		
+
 		int cnt = 0;
 	}
 
