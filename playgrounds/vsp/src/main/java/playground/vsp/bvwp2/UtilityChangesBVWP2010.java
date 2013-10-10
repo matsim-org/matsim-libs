@@ -61,7 +61,7 @@ class UtilityChangesBVWP2010 extends UtilityChanges {
 	}
 
 	@Override
-	double computeImplicitUtility(Attributes econValues,
+	double computeImplicitUtilityPerItem(Attributes econValues,
 			Attributes quantitiesNullfall,
 			Attributes quantitiesPlanfall) {
 		return 0 ;

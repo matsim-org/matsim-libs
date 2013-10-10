@@ -14,7 +14,7 @@ import playground.vsp.bvwp2.MultiDimensionalArray.Mode;
  * @author nagel
  */
 abstract class UtilityChanges {
-	private static final String FMT_STRING = "%16s || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %12.1f  mio||\n";
+	static final String FMT_STRING = "%16s || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %12.1f  mio||\n";
 	UtilityChanges() {
 		System.out.println("Setting utility computation method to " + this.getClass() ) ;
 	}
@@ -48,6 +48,10 @@ abstract class UtilityChanges {
 				}
 
 				Utils.initializeOutputTables(html);				
+				
+				Attributes econValuesReceiving = economicValues.getAttributes(improvedMode, segm) ;
+				Attributes attributesNullfallReceiving = nullfallForODRelation.getAttributes(improvedMode, segm) ;
+				Attributes attributesPlanfallReceiving = planfallForODRelation.getAttributes(improvedMode, segm) ;
 
 				for ( Mode mode : Mode.values() ) { // for all modes
 
@@ -57,33 +61,32 @@ abstract class UtilityChanges {
 
 					final double amountNullfall = nullfallForODRelation.get( makeKey(mode, segm, Attribute.XX)) ;
 					final double amountPlanfall = planfallForODRelation.get( makeKey(mode, segm, Attribute.XX)) ;
+					final double deltaAmounts = amountPlanfall - amountNullfall ;
 
 					if ( amountPlanfall==0. && amountNullfall==0. ) {
 						// (suppress output if this (relation,mode,demand_segment) is never used)
 						continue ;
 					}
 
-					final double deltaAmounts = amountPlanfall - amountNullfall ;
-
 					if ( mode==improvedMode ) {
-						// yyyy pull "improved mode" forwards in pgm flow
 						// Altnutzer:
-
 						double amountAltnutzer = amountNullfall ;
-
 						Utils.writeSubHeaderVerbleibend(html, id, segm, mode, amountAltnutzer);
-
 						utils += computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
-					} 
+					}
 
 					Utils.writeSubHeaderWechselnd(html, id, segm, mode, deltaAmounts);
-
+					
 					utils += computeAndPrintGivingOrReceiving(econValues, attributesNullfall, attributesPlanfall, html);
 
-					utils += computeAndPrintImplicitUtl(econValues, attributesNullfall, attributesPlanfall,html);
+					if ( mode != improvedMode ) {
+						// compute implicit uti completely on the side of the giving modes:
+						utils += computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
+								econValues, attributesNullfall, attributesPlanfall, html);
+					}
 
+					// roh etc. stuff (for comparison):
 					utilsUserFromRoH = computeUserBenefit(utilsUserFromRoH, econValues, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
-
 					operatorProfit = computeOperatorProfit(operatorProfit, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
 
 				} // mode				
@@ -182,34 +185,29 @@ abstract class UtilityChanges {
 		return utils;
 	}
 
-	private double computeAndPrintImplicitUtl(Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Html html) {
-		final double deltaAmounts = attributesPlanfall.getByEntry(Attribute.XX) - attributesNullfall.getByEntry(Attribute.XX ) ;  
+	private double computeAndPrintImplicitUtl(Attributes econValuesReceiving, Attributes attributesNullfallReceiving, Attributes attributesPlanfallReceiving, 
+			Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Html html) {
 
-		final double implicitUtl = this.computeImplicitUtility(econValues, attributesNullfall, attributesPlanfall) ;
-		// probably always positive
+		final double deltaAmounts = attributesPlanfall.getByEntry(Attribute.XX) - attributesNullfall.getByEntry(Attribute.XX ) ;
+		// negative, since this is never called for the receiving mode
 
-		final double implicitUtlOverall = implicitUtl * deltaAmounts ; 
-		// negative when we are "abgebend"
+		final double implicitUtlPerItem = this.computeImplicitUtilityPerItem(econValues, attributesNullfall, attributesPlanfall) ;
+		// probably positive
+		
+		final double implicitUtlOverall = - implicitUtlPerItem * Math.abs(deltaAmounts) ;
+		Utils.writeImplicitUtl(html, implicitUtlPerItem, implicitUtlOverall, "implicit utl frm");
 
-		if ( implicitUtl != 0.  ) {
+		final double implicitUtlPerItemReceiving = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
+		// probably positive
+		
+		final double implicitUtlOverallReceiving = implicitUtlPerItemReceiving * Math.abs(deltaAmounts) ;
+		Utils.writeImplicitUtl( html, implicitUtlPerItemReceiving, implicitUtlOverallReceiving, "implicit utl to" ) ;
+		
+		double util = implicitUtlOverall + implicitUtlOverallReceiving ;
+		
+		Utils.writePartialSum(html, util);
 
-			System.out.printf(FMT_STRING,
-					"implicit utl",
-					0.,0.,
-					0.,0.,
-					0.,0.,
-					implicitUtl, implicitUtlOverall/1000./1000.
-					) ;
-			html.bvwpTableRow(					"implicit utl",
-					0.,0.,
-					0.,0.,
-					0.,0.,
-					implicitUtl, implicitUtlOverall 
-					) ;
-			Utils.writePartialSum(html, implicitUtlOverall);
-
-		}
-		return implicitUtlOverall ;
+		return util ;
 	}
 
 	private static Mode autodetectImprovingMode(Values nullfallForODRelation, Values planfallForODRelation, DemandSegment segm) {
@@ -283,6 +281,6 @@ abstract class UtilityChanges {
 	}
 	abstract UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, 
 			double quantityNullfall, double quantityPlanfall, double econVal);
-	abstract double computeImplicitUtility(Attributes econValues, Attributes quantitiesNullfall, 
+	abstract double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, 
 			Attributes quantitiesPlanfall) ;
 }

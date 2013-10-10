@@ -133,16 +133,16 @@ class ScenarioZielnetzBahn {
 			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -verlagert_bahn_von_strasse ) ;
 			
 		}
-		{
-			// modify the travel times for the rail mode:
-			DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
-			
-			// modify some demand (presumably as a result):
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), verlagert_bahn_von_strasse_comm + induziert_bahn_comm) ;
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -verlagert_bahn_von_strasse_comm ) ;
-			
-		}
+//		{
+//			// modify the travel times for the rail mode:
+//			DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
+//			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
+//			
+//			// modify some demand (presumably as a result):
+//			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), verlagert_bahn_von_strasse_comm + induziert_bahn_comm) ;
+//			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -verlagert_bahn_von_strasse_comm ) ;
+//			
+//		}
 		return planfall;
 	}
 

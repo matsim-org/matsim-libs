@@ -105,4 +105,24 @@ class Utils {
 		html.endTableRow() ;
 	}
 
+	static void writeImplicitUtl(Html html, final double implicitUtlPerItem, final double implicitUtlOverall, final String str) {
+		if ( implicitUtlPerItem != 0.  ) {
+	
+			System.out.printf(UtilityChanges.FMT_STRING,
+					str,
+					0.,0.,
+					0.,0.,
+					0.,0.,
+					implicitUtlPerItem, implicitUtlOverall/1000./1000.
+					) ;
+			html.bvwpTableRow(					str,
+					0.,0.,
+					0.,0.,
+					0.,0.,
+					implicitUtlPerItem, implicitUtlOverall 
+					) ;
+	
+		}
+	}
+
 }

@@ -56,7 +56,7 @@ class UtilityChangesBVWP2015 extends UtilityChanges {
 	}
 
 	@Override
-	double computeImplicitUtility(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
+	double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
 		double sum = 0. ;
 		for ( Attribute attribute : Attribute.values() ) {
 			if ( attribute != Attribute.XX && attribute != Attribute.costOfProduction ) {
