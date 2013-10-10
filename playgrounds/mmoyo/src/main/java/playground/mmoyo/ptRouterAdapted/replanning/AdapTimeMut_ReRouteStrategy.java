@@ -17,75 +17,75 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.ptRouterAdapted.replanning;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.pt.replanning.TransitActsRemoverStrategy;
-
-public class AdapTimeMut_ReRouteStrategy implements PlanStrategy {
-	private static final Logger log = Logger.getLogger(AdapTimeMut_ReRouteStrategy.class);
-	PlanStrategyImpl planStrategyDelegate = null ;
-	
-	public AdapTimeMut_ReRouteStrategy(Controler controler) {
-		
-		planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector( ) );
-		log.info("Using Experimental AdapTimeMut_ReRouteStrategy");
-
-		//remove transit acts
-		addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-	
-		//add time allocation mutator
-//		int mutationRange= Integer.parseInt(controler.getConfig().getParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE));
-//		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), mutationRange);
-		
-		Double mutationRange = controler.getConfig().timeAllocationMutator().getMutationRange() ;
-		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator( controler.getConfig(), mutationRange ) ;
-		
-		this.addStrategyModule(timeAllocationMutator);
-
-		//reroute with adapted router
-		addStrategyModule(new AdapPlanStrategyModule(controler));
-		
-		// these modules may, at the same time, be events listeners (so that they can collect information):
-		//controler.getEvents().addHandler( adapPlanStrategyModule ) ;
-
-		// to collect events:
-		//controler.getEvents().addHandler( (EventHandler) this.getPlanSelector() ) ;
-	}
-
-	public void addStrategyModule(PlanStrategyModule module) {
-		planStrategyDelegate.addStrategyModule(module);
-	}
-
-
-	@Override
-	public void finish() {
-		planStrategyDelegate.finish();
-	}
-
-	public int getNumberOfStrategyModules() {
-		return planStrategyDelegate.getNumberOfStrategyModules();
-	}
-
-	@Override
-	public void init(ReplanningContext replanningContext) {
-		planStrategyDelegate.init(replanningContext);
-	}
-
-	@Override
-	public void run(Person person) {
-		planStrategyDelegate.run(person);
-	}
-
-	public String toString() {
-		return planStrategyDelegate.toString();
-	}
-}
+//package playground.mmoyo.ptRouterAdapted.replanning;
+//
+//import org.apache.log4j.Logger;
+//import org.matsim.api.core.v01.population.Person;
+//import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+//import org.matsim.core.controler.Controler;
+//import org.matsim.core.replanning.PlanStrategy;
+//import org.matsim.core.replanning.PlanStrategyImpl;
+//import org.matsim.core.replanning.ReplanningContext;
+//import org.matsim.core.replanning.modules.TimeAllocationMutator;
+//import org.matsim.core.replanning.selectors.RandomPlanSelector;
+//import org.matsim.pt.replanning.TransitActsRemoverStrategy;
+//
+//public class AdapTimeMut_ReRouteStrategy implements PlanStrategy {
+//	private static final Logger log = Logger.getLogger(AdapTimeMut_ReRouteStrategy.class);
+//	PlanStrategyImpl planStrategyDelegate = null ;
+//	
+//	public AdapTimeMut_ReRouteStrategy(Controler controler) {
+//		
+//		planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector( ) );
+//		log.info("Using Experimental AdapTimeMut_ReRouteStrategy");
+//
+//		//remove transit acts
+//		addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
+//	
+//		//add time allocation mutator
+////		int mutationRange= Integer.parseInt(controler.getConfig().getParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE));
+////		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), mutationRange);
+//		
+//		Double mutationRange = controler.getConfig().timeAllocationMutator().getMutationRange() ;
+//		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator( controler.getConfig(), mutationRange ) ;
+//		
+//		this.addStrategyModule(timeAllocationMutator);
+//
+//		//reroute with adapted router
+//		addStrategyModule(new AdapPlanStrategyModule(controler));
+//		
+//		// these modules may, at the same time, be events listeners (so that they can collect information):
+//		//controler.getEvents().addHandler( adapPlanStrategyModule ) ;
+//
+//		// to collect events:
+//		//controler.getEvents().addHandler( (EventHandler) this.getPlanSelector() ) ;
+//	}
+//
+//	public void addStrategyModule(PlanStrategyModule module) {
+//		planStrategyDelegate.addStrategyModule(module);
+//	}
+//
+//
+//	@Override
+//	public void finish() {
+//		planStrategyDelegate.finish();
+//	}
+//
+//	public int getNumberOfStrategyModules() {
+//		return planStrategyDelegate.getNumberOfStrategyModules();
+//	}
+//
+//	@Override
+//	public void init(ReplanningContext replanningContext) {
+//		planStrategyDelegate.init(replanningContext);
+//	}
+//
+//	@Override
+//	public void run(Person person) {
+//		planStrategyDelegate.run(person);
+//	}
+//
+//	public String toString() {
+//		return planStrategyDelegate.toString();
+//	}
+//}

@@ -17,26 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.mmoyo.ptRouterAdapted.replanning;
-
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.StrategyManager;
-
-public class AdapContListener implements StartupListener {
-	private Controler controler ;
-
-	public AdapContListener( Controler ctl ) {
-		this.controler = ctl ;
-	}
-
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		PlanStrategy strategy = new AdapTimeMut_ReRouteStrategy(this.controler);
-		StrategyManager manager = this.controler.getStrategyManager() ;
-		manager.addStrategyForDefaultSubpopulation(strategy, 1.0 ) ;
-	}
-
-}
+//package playground.mmoyo.ptRouterAdapted.replanning;
+//
+//import org.matsim.core.controler.Controler;
+//import org.matsim.core.controler.events.StartupEvent;
+//import org.matsim.core.controler.listener.StartupListener;
+//import org.matsim.core.replanning.PlanStrategy;
+//import org.matsim.core.replanning.StrategyManager;
+//
+//public class AdapContListener implements StartupListener {
+//	private Controler controler ;
+//
+//	public AdapContListener( Controler ctl ) {
+//		this.controler = ctl ;
+//	}
+//
+//	@Override
+//	public void notifyStartup(StartupEvent event) {
+//		PlanStrategy strategy = new AdapTimeMut_ReRouteStrategy(this.controler);
+//		StrategyManager manager = this.controler.getStrategyManager() ;
+//		manager.addStrategyForDefaultSubpopulation(strategy, 1.0 ) ;
+//	}
+//
+//}
