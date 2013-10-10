@@ -22,13 +22,14 @@ package playground.dgrether.utils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 
@@ -48,13 +49,25 @@ public class DgOTFVisUtils {
 	public static void locateAndRoutePopulation(ScenarioImpl scenario){
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links(scenario));
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()));
+		((PopulationImpl)scenario.getPopulation()).addAlgorithm(
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								scenario ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												timeCostCalc,
+												timeCostCalc ) ) ) );
 		((PopulationImpl)scenario.getPopulation()).runAlgorithms();
 	}
 	
 	public static void preparePopulation4Simulation(Scenario scenario) {
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-		PlansCalcRoute router = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
+		PlanAlgorithm router = 
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								scenario ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												timeCostCalc,
+												timeCostCalc ) ) );
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (ScenarioImpl) scenario);
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			pp4s.run(p);

@@ -22,11 +22,11 @@ package playground.dgrether.signalsystems.cottbus.scripts;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.population.algorithms.XY2Links;
 
@@ -49,7 +49,13 @@ public class DgCottbusPreprocessPlans {
 		Scenario scenario = loader.loadScenario();
 		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new XY2Links((NetworkImpl) scenario.getNetwork()));
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()));
+		((PopulationImpl) scenario.getPopulation()).addAlgorithm(
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								scenario ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												timeCostCalc,
+												timeCostCalc ) ) ) );
 		((PopulationImpl) scenario.getPopulation()).runAlgorithms();
 		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		writer.write(popOutFile);

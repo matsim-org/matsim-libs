@@ -36,15 +36,16 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.population.algorithms.PersonPrepareForSim;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -135,7 +136,13 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 		int numberOfSPNFans = numberOfFans - numberOfCbFans;
 		
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(sc.getConfig().planCalcScore());
-		PlansCalcRoute router = new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory());
+		PlanAlgorithm router =
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								sc ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												timeCostCalc,
+												timeCostCalc ) ) );
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (NetworkImpl) sc.getNetwork());
 		
 //		Scenario sc2 = ScenarioUtils.createScenario(sc.getConfig());
