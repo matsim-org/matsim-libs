@@ -99,10 +99,10 @@ public class PhysicalSim2DSection {
 	}
 
 	public void updateAgents(double time) {
-//		this.agentTwoDTree.clear();
+		this.agentTwoDTree.clear();
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
-//		this.agentTwoDTree.buildTwoDTree(this.agents);
+		this.agentTwoDTree.buildTwoDTree(this.agents);
 		this.densityMap.buildDensityMap();
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 //
@@ -125,15 +125,15 @@ public class PhysicalSim2DSection {
 			idx++;
 			
 			double area = cell.area;
-			for (Integer n : cell.neighbors) {
-				area += this.densityMap.getCell(n).area;
-			}
-			area /= (cell.neighbors.size() + 1);
+//			for (Integer n : cell.neighbors) {
+//				area += this.densityMap.getCell(n).area;
+//			}
+//			area /= (cell.neighbors.size() + 1);
+//			area = Math.max(0.19, area);
 			
-			if (area < 10 && area > 0) {
+			if (area <= 5.4 || area >= 0.1) {
 				double rho = 1/area;//+0.1;
-				double freeSpeed = Math.max(0.001, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
-
+				double freeSpeed = Math.max(0.01, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
 				agent.setDesiredSpeed(freeSpeed);
 			} else {
 				agent.setDesiredSpeed(1.34);

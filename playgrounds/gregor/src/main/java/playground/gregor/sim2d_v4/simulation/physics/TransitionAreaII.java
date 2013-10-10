@@ -180,14 +180,14 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 	 */
 	@Override
 	public void updateAgents(double time) {
-//		this.agentTwoDTree.clear();
+		this.agentTwoDTree.clear();
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
 
 		handleTransitionBuffer(time);
 
 
-//		this.agentTwoDTree.buildTwoDTree(this.agents);
+		this.agentTwoDTree.buildTwoDTree(this.agents);
 		this.densityMap.buildDensityMap();
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		
@@ -205,7 +205,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 			}
 			area /= (cell.neighbors.size() + 1);
 			
-			if (area < 10 && area > 0) {
+			if (area < 10 && area > 0.1) {
 				double rho = 1/area;//+0.1;
 				double freeSpeed = Math.max(0.001, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
 

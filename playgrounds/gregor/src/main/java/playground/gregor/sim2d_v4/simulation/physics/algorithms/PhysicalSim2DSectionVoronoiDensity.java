@@ -22,8 +22,10 @@ package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 
@@ -140,12 +142,36 @@ public class PhysicalSim2DSectionVoronoiDensity {
 			contr *= leftOf;
 			c1.area += contr/2;
 			c2.area -= contr/2;
-			double cntr1x = (e.x1+e.x2)*(e.x1*e.y2 - e.x2*e.y1);
-			double cntr1y = (e.y1+e.y2)*(e.x1*e.y2 - e.x2*e.y1);
-			c1.cx += leftOf*cntr1x;
-			c1.cy += leftOf*cntr1y;
-			c2.cx -= leftOf*cntr1x;
-			c2.cy -= leftOf*cntr1y;
+			
+//			c1.contrs++;
+//			c2.contrs++;
+//			if (Math.abs(contr) > 10) {
+//				c1.area = Double.POSITIVE_INFINITY;
+//				c2.area = Double.POSITIVE_INFINITY;
+//			}
+//			System.out.println(Math.abs(contr));
+			
+//			if (!c1.xCoords.remove(e.x1)) {
+//				c1.xCoords.add(e.x1);
+//			}
+//			if (!c1.xCoords.remove(e.x2)) {
+//				c1.xCoords.add(e.x2);
+//			}
+//			if (!c2.xCoords.remove(e.x1)) {
+//				c2.xCoords.add(e.x1);
+//			}
+//			if (!c2.xCoords.remove(e.x2)) {
+//				c2.xCoords.add(e.x2);
+//			}			
+//			
+			
+			//centroid computation
+//			double cntr1x = (e.x1+e.x2)*(e.x1*e.y2 - e.x2*e.y1);
+//			double cntr1y = (e.y1+e.y2)*(e.x1*e.y2 - e.x2*e.y1);
+//			c1.cx += leftOf*cntr1x;
+//			c1.cy += leftOf*cntr1y;
+//			c2.cx -= leftOf*cntr1x;
+//			c2.cy -= leftOf*cntr1y;
 			
 			
 			
@@ -164,7 +190,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 		
 		//		debug();
 		//		debug(edges);
-//		debug(this.cells,true);
+		debug(this.cells,true);
 	}
 
 	//find obstacle (wall) intersections and handle them accordingly
@@ -241,12 +267,20 @@ public class PhysicalSim2DSectionVoronoiDensity {
 	public Cell getCell(int i) {
 		
 		Cell ret = this.cells.get(i);
+		
+//		//centroid computation
 		if (!ret.finalized) {
-//			s.x0 = c.vx-this.offsetX;
-//			s.y0 = c.vy-this.offsetY;
-			ret.cx = ret.cx/(6*ret.area)-this.offsetX;
-			ret.cy = ret.cy/(6*ret.area)-this.offsetY;
-			ret.finalized = true;
+			if (ret.contrs < 3) {
+				ret.area = Double.POSITIVE_INFINITY;
+			}
+//			if (ret.xCoords.size() > 0) {
+//				ret.area = 5.4;
+//			}
+//////			s.x0 = c.vx-this.offsetX;
+//////			s.y0 = c.vy-this.offsetY;
+////			ret.cx = ret.cx/(6*ret.area)-this.offsetX;
+////			ret.cy = ret.cy/(6*ret.area)-this.offsetY;
+//			ret.finalized = true;
 		}
 		return ret;
 		
@@ -260,6 +294,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 		EventsManager em = this.pSec.getPhysicalEnvironment().getEventsManager();
 		for (Cell c : cells) {
 
+			
 			for (Segment edge : c.segments) {
 				em.processEvent(new LineEvent(0, edge, false, 0, 255, 255, 255, 0, .8, .2));
 			}
@@ -323,9 +358,13 @@ public class PhysicalSim2DSectionVoronoiDensity {
 
 	public static final class Cell {
 
+		public int contrs = 0;
+
 		public Sim2DAgent agent;
 
-		private boolean finalized = false;
+		private final boolean finalized = false;
+		
+		private final Set<Double> xCoords = new HashSet<Double>();
 		
 		public Map<Integer,Coordinate> intersectsions = new HashMap<Integer,Coordinate>();
 		public List<Integer> neighbors = new ArrayList<Integer>();

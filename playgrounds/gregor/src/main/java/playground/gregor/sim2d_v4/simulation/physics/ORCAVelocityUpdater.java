@@ -65,9 +65,6 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 	private final double normHeightDenom = 1.72;
 	private final double beta = .9 + MatsimRandom.getRandom().nextGaussian()*.2;
 	
-	
-	private static final boolean voronoiApproach = true;
-
 	public ORCAVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dT = conf.getTimeStepSize();
@@ -87,6 +84,10 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 			ORCALineEnvironment ol = new ORCALineEnvironment(this, seg, this.tau);
 			constr.add(ol);
 			
+			
+//			if (this.agent.getId().equals(new IdImpl("c11045"))) {
+//				System.out.println();
+//			}
 //			if (this.agent.getId().toString().equals("b7975")) {
 //				
 //				double x0 = ol.getPointX()+this.agent.getPos()[0];
@@ -119,8 +120,8 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //		double orthoX = this.agent.getPos()[0]-dir[1];
 //		double orthoY = this.agent.getPos()[1]+dir[0];
 
-		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors(time);
-		for (Tuple<Double, Sim2DAgent> neighbor : neighbors) {
+		List<Sim2DAgent> neighbors = this.ncalc.getNeighbors();
+		for (Sim2DAgent neighbor : neighbors) {
 //			if (this.debugger != null && ( getId().toString().equals("r876"))){//&& neighbor.getSecond().getId().toString().equals("r5")) {
 //				ORCALine ol = new ORCALineAgent(this, neighbor, this.tau,this.debugger);
 //				constr.add(ol);				
@@ -216,7 +217,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //		}
 		
 		
-		this.solver.run(constr, dir, 2, new double []{v[0],v[1]});
+		this.solver.run(constr, dir, vS, new double []{v[0],v[1]});
 		
 		
 

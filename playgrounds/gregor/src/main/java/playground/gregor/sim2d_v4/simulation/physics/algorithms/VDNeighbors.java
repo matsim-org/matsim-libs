@@ -23,14 +23,12 @@ package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.gregor.sim2d_v4.events.debug.NeighborsEvent;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity.Cell;
 
-public class VDNeighbors {
+public class VDNeighbors implements Neighbors{
 
 	private final Sim2DAgent agent;
 
@@ -38,6 +36,7 @@ public class VDNeighbors {
 		this.agent = agent;
 	}
 
+	@Override
 	public List<Sim2DAgent> getNeighbors() {
 		List<Sim2DAgent> ret = new ArrayList<Sim2DAgent>();
 		PhysicalSim2DSection psec = this.agent.getPSec();
@@ -53,10 +52,11 @@ public class VDNeighbors {
 		//		if (this.agent.getId().equals(new IdImpl("b7301"))) {
 		//			
 		//		}
-		if (this.agent.getId().equals(new IdImpl("b6575"))) {
+//		if (this.agent.getId().toString().endsWith("5")){
 			this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new NeighborsEvent(0, this.agent.getId(), ret, this.agent));
-		}
+//		}
 
 		return ret;
 	}
+
 }

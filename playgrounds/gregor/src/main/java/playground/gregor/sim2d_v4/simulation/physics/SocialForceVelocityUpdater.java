@@ -28,8 +28,8 @@ import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.VDNeighbors;
 
 /**
  * Social force model according to: D. Helbing, I. Farkas, T. Vicsek,
@@ -55,14 +55,14 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	private final double CUTOFF_DIST = 20f;
 
 
-	private final VDNeighbors ncalc;
+	private final Neighbors ncalc;
 	private final Obstacles ocalc = new Obstacles();
 	private DesiredDirectionCalculator dd;
 
 	private final double dT;
 	private final Sim2DAgent agent;
 	
-	public SocialForceVelocityUpdater(DesiredDirectionCalculator dd, VDNeighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
+	public SocialForceVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dd = dd;
 		this.agent = agent;

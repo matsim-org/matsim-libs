@@ -20,8 +20,6 @@
 
 package playground.gregor.sim2d_v4.simulation.physics.orca;
 
-import org.matsim.core.utils.collections.Tuple;
-
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
@@ -41,17 +39,17 @@ public class ORCALineAgent implements ORCALine {
 
 
 
-	public ORCALineAgent(ORCAVelocityUpdater orcaAgent, Tuple<Double,Sim2DAgent> neighbor, double tau) {
+	public ORCALineAgent(ORCAVelocityUpdater orcaAgent, Sim2DAgent neighbor, double tau) {
 		construct(orcaAgent,neighbor,tau);
 	}
 
-	private void construct(ORCAVelocityUpdater a, Tuple<Double,Sim2DAgent> neighbor, double tau) {
+	private void construct(ORCAVelocityUpdater a, Sim2DAgent neighbor, double tau) {
 
 
 
 //		final double sqrDist = neighbor.getFirst();
 //		final double sqrDist = 
-		Sim2DAgent b = neighbor.getSecond();
+		Sim2DAgent b = neighbor;
 
 
 		final double[] aPos = a.getPos();
