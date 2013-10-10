@@ -52,6 +52,8 @@ abstract class UtilityChanges {
 				Attributes econValuesReceiving = economicValues.getAttributes(improvedMode, segm) ;
 				Attributes attributesNullfallReceiving = nullfallForODRelation.getAttributes(improvedMode, segm) ;
 				Attributes attributesPlanfallReceiving = planfallForODRelation.getAttributes(improvedMode, segm) ;
+				
+				double sumSent = 0. ;
 
 				for ( Mode mode : Mode.values() ) { // for all modes
 
@@ -73,6 +75,8 @@ abstract class UtilityChanges {
 						double amountAltnutzer = amountNullfall ;
 						Utils.writeSubHeaderVerbleibend(html, id, segm, mode, amountAltnutzer);
 						utils += computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
+					} else {
+						sumSent += Math.abs( deltaAmounts ) ;
 					}
 
 					Utils.writeSubHeaderWechselnd(html, id, segm, mode, deltaAmounts);
@@ -89,7 +93,23 @@ abstract class UtilityChanges {
 					utilsUserFromRoH = computeUserBenefit(utilsUserFromRoH, econValues, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
 					operatorProfit = computeOperatorProfit(operatorProfit, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
 
-				} // mode				
+				} // mode			
+				
+				final double amountNullfallRcv = nullfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
+				final double amountPlanfallRcv = planfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
+				final double deltaAmountsRcv = amountPlanfallRcv - amountNullfallRcv ;
+				final double amountInduced = deltaAmountsRcv - sumSent ;
+				System.out.println( " amount induced: " + amountInduced ) ;
+				
+				final double implUtlInducedPerItem = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
+				final double implUtlInduced = implUtlInducedPerItem * amountInduced ;
+				
+				Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "impl utl ind");
+				
+				Utils.writePartialSum(html, implUtlInduced ); 
+				
+				utils += implUtlInduced ;
+				
 
 			} // demand segment
 		} // relation

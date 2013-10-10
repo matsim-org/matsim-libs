@@ -32,7 +32,7 @@ class Utils {
 
 	static void writePartialSum(Html html, double utils) {
 		System.out.printf("--------------------%163.1f mio\n", utils / 1000. / 1000.  ) ;
-		html.bvwpTableRow("Zwischensumme", "", "", "", "", "", "", "", Double.toString(utils) ) ;
+		html.bvwpTableRow("Zwischensumme", "", "", "", "", "", "", "", "", Double.toString(((long)(utils/100./1000.))/10.)+" mio" ) ;
 	}
 
 	static void writeSum(Html html, double utils) {
@@ -44,7 +44,7 @@ class Utils {
 		html.write("Summe") ;
 		html.endTableRow() ;
 	
-		html.bvwpTableRow("Summe", "", "", "", "", "", "", "", Double.toString(utils) ) ;
+		html.bvwpTableRow("Summe", "", "", "", "", "", "", "", "", Double.toString(   ((long)(utils/100./1000.))/10.   ) + " mio" ) ;
 	}
 
 	static void initializeOutputTables(Html html) {
@@ -65,7 +65,8 @@ class Utils {
 		html.write("Attribut Diff") ; html.nextTableEntry() ;
 		html.write("... mal Menge") ; html.nextTableEntry() ;
 		html.write("Nutzen Diff") ; html.nextTableEntry() ;
-		html.write("... mal Menge") ; 
+		html.write("... mal Menge") ; html.nextTableEntry() ;
+		html.write(" ");
 		html.endTableRow() ;
 	}
 
@@ -89,19 +90,19 @@ class Utils {
 	}
 
 	static void writeSubHeaderWechselnd(Html html, Id id, DemandSegment segm, Mode mode, final double deltaAmounts) {
-		System.out.printf("%16s; %16s; %16s; wechselnder & induzierter Verkehr: %16.1f Personen/Tonnen\n", 
+		System.out.printf("====================%16s; %16s; %16s; wechselnder & induzierter Verkehr: %16.1f Personen/Tonnen ====================\n", 
 				id, mode, segm, deltaAmounts ) ;
 		html.beginTableMulticolumnRow() ;
-		html.write( id + "; " + segm + "; " + mode + "; wechselnder & induzierter Verkehr: " + deltaAmounts + " Personen/Tonnen") ;
+		html.write( "<strong>" + id + "; " + segm + "; " + mode + "; wechselnder & induzierter Verkehr: " + deltaAmounts + " Personen/Tonnen" + "</strong>") ;
 		html.endTableRow();
 	}
 
 	static void writeSubHeaderVerbleibend(Html html, Id id, DemandSegment segm, Mode mode, double amountAltnutzer) {
-		System.out.printf("%16s; %16s; %16s; verbleibender Verkehr: %16.1f Personen/Tonnen\n", 
+		System.out.printf("====================%16s; %16s; %16s;             verbleibender Verkehr: %16.1f Personen/Tonnen ====================\n", 
 				id, mode, segm, amountAltnutzer );
 	
 		html.beginTableMulticolumnRow() ;
-		html.write( id + "; " + segm + "; " + mode + "; verbleibender Verkehr: " + amountAltnutzer + " Personen/Tonnen") ;
+		html.write( "<strong>" + id + "; " + segm + "; " + mode + "; verbleibender Verkehr: " + amountAltnutzer + " Personen/Tonnen" + "</strong>") ;
 		html.endTableRow() ;
 	}
 

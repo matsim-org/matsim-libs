@@ -87,13 +87,14 @@ class Html {
 		nextTableEntry() ; write(u1) ; nextTableEntry() ; write(u2) ; 
 		endTableRow() ;
 	}
-	void bvwpTableRow( String str, String n1, String n2, String p1, String p2, String d1, String d2, String u1, String u2 ) {
+	void bvwpTableRow( String str, String n1, String n2, String p1, String p2, String d1, String d2, String u1, String u2, String zz ) {
 		beginTableRow() ;
 		write(str) ; 
 		nextTableEntry() ; write(n1) ; nextTableEntry() ; write(n2) ; 
 		nextTableEntry() ; write(p1) ; nextTableEntry() ; write(p2) ; 
 		nextTableEntry() ; write(d1) ; nextTableEntry() ; write(d2) ; 
 		nextTableEntry() ; write(u1) ; nextTableEntry() ; write(u2) ; 
+		nextTableEntry() ; write(zz) ;
 		endTableRow() ;
 	}
 
