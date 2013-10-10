@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -45,17 +44,37 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
  */
 public class StrategyManager implements MatsimManager {
 
-	private final List<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
-	private final List<Double> weights = new ArrayList<Double>();
-	private final List<PlanStrategy> unmodifiableStrategies = Collections.unmodifiableList(this.strategies);
-	private final List<Double> unmodifiableWeights = Collections.unmodifiableList(this.weights);
-	private double totalWeights = 0.0;
+	private static class StrategyWeights {
+		private final List<PlanStrategy> strategies = new ArrayList<PlanStrategy>();
+		private final List<PlanStrategy> unmodifiableStrategies =
+			Collections.unmodifiableList( strategies );
+		private final List<Double> weights = new ArrayList<Double>();
+		private final List<Double> unmodifiableWeights =
+			Collections.unmodifiableList( weights );
+		private double totalWeights = 0.0;
+		private final Map<Integer, Map<PlanStrategy, Double>> changeRequests =
+				new TreeMap<Integer, Map<PlanStrategy, Double>>();
+	}
+
+	private Map<String, StrategyWeights> weightsPerSubpopulation =
+		new HashMap<String, StrategyWeights>();
+
 	private int maxPlansPerAgent = 0;
 
 	private PlanSelector removalPlanSelector = new WorstPlanForRemovalSelector();
 
-	private final Map<Integer, Map<PlanStrategy, Double>> changeRequests =
-			new TreeMap<Integer, Map<PlanStrategy, Double>>();
+	// XXX to what should this be initialized?
+	private String subpopulationName = null;
+
+	public void setSubpopulationAttributeName(final String name) {
+		this.subpopulationName = name;
+	}
+
+	public final void addStrategy(
+			final PlanStrategy strategy,
+			final double weight) {
+		addStrategy( strategy , null , weight );
+	}
 
 	/**
 	 * Adds a strategy to this manager with the specified weight. This weight
@@ -65,10 +84,30 @@ public class StrategyManager implements MatsimManager {
 	 * @param strategy
 	 * @param weight
 	 */
-	public final void addStrategy(final PlanStrategy strategy, final double weight) {
-		this.strategies.add(strategy);
-		this.weights.add(Double.valueOf(weight));
-		this.totalWeights += weight;
+	public final void addStrategy(
+			final PlanStrategy strategy,
+			final String subpopulation,
+			final double weight) {
+		final StrategyWeights weights = getStrategyWeights( subpopulation );
+		weights.strategies.add(strategy);
+		weights.weights.add(Double.valueOf(weight));
+		weights.totalWeights += weight;
+	}
+
+	private final StrategyWeights getStrategyWeights(final String subpop) {
+		StrategyWeights weights = weightsPerSubpopulation.get( subpop );
+
+		if ( weights == null ) {
+			weights = new StrategyWeights();
+			weightsPerSubpopulation.put( subpop , weights );
+		}
+
+		return weights;
+	}
+
+	public final boolean removeStrategy(
+			final PlanStrategy strategy) {
+		return removeStrategy( strategy , null );
 	}
 
 	/**
@@ -78,12 +117,15 @@ public class StrategyManager implements MatsimManager {
 	 * @return true if the strategy was successfully removed from this manager,
 	 * 		false if the strategy was not part of this manager and could thus not be removed.
 	 */
-	public final boolean removeStrategy(final PlanStrategy strategy) {
-		int idx = this.strategies.indexOf(strategy);
+	public final boolean removeStrategy(
+			final PlanStrategy strategy,
+			final String subpopulation) {
+		final StrategyWeights weights = getStrategyWeights( subpopulation );
+		int idx = weights.strategies.indexOf(strategy);
 		if (idx != -1) {
-			this.strategies.remove(idx);
-			double weight = this.weights.remove(idx).doubleValue();
-			this.totalWeights -= weight;
+			weights.strategies.remove(idx);
+			double weight = weights.weights.remove(idx).doubleValue();
+			weights.totalWeights -= weight;
 			return true;
 		}
 		return false;
@@ -97,11 +139,21 @@ public class StrategyManager implements MatsimManager {
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
-	public final boolean changeWeightOfStrategy(final PlanStrategy strategy, final double newWeight) {
-		int idx = this.strategies.indexOf(strategy);
+	public final boolean changeWeightOfStrategy(
+			final PlanStrategy strategy,
+			final double newWeight) {
+		return changeWeightOfStrategy( strategy , null , newWeight );
+	}
+
+	public final boolean changeWeightOfStrategy(
+			final PlanStrategy strategy,
+			final String subpopulation,
+			final double newWeight) {
+		final StrategyWeights weights = getStrategyWeights( subpopulation );
+		int idx = weights.strategies.indexOf(strategy);
 		if (idx != -1) {
-			double oldWeight = this.weights.set(idx, Double.valueOf(newWeight)).doubleValue();
-			this.totalWeights += (newWeight - oldWeight);
+			double oldWeight = weights.weights.set(idx, Double.valueOf(newWeight)).doubleValue();
+			weights.totalWeights += (newWeight - oldWeight);
 			return true;
 		}
 		return false;
@@ -140,8 +192,10 @@ public class StrategyManager implements MatsimManager {
 		beforePopulationRunHook( population, replanningContext ) ;
 
 		// initialize all strategies
-		for (PlanStrategy strategy : this.strategies) {
-			strategy.init(replanningContext);
+		for (StrategyWeights weights : weightsPerSubpopulation.values()) {
+			for (PlanStrategy strategy : weights.strategies) {
+				strategy.init(replanningContext);
+			}
 		}
 
 		// then go through the population and ...
@@ -153,7 +207,11 @@ public class StrategyManager implements MatsimManager {
 			}
 
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
-			PlanStrategy strategy = this.chooseStrategy(person);
+			PlanStrategy strategy =
+				this.chooseStrategy(
+						person,
+						(String) population.getPersonAttributes().getAttribute(
+							person.getId().toString(), subpopulationName ) );
 
 			beforeStrategyRunHook( person, strategy ) ;
 
@@ -168,8 +226,10 @@ public class StrategyManager implements MatsimManager {
 		}
 
 		// finally make sure all strategies have finished there work
-		for (PlanStrategy strategy : this.strategies) {
-			strategy.finish();
+		for (StrategyWeights weights : weightsPerSubpopulation.values()) {
+			for (PlanStrategy strategy : weights.strategies) {
+				strategy.finish();
+			}
 		}
 
 		afterRunHook( population ) ;
@@ -214,10 +274,17 @@ public class StrategyManager implements MatsimManager {
 	 * @param iteration
 	 */
 	private final void handleChangeRequests(final int iteration) {
-		Map<PlanStrategy, Double> changes = this.changeRequests.remove(Integer.valueOf(iteration));
-		if (changes != null) {
-			for (java.util.Map.Entry<PlanStrategy, Double> entry : changes.entrySet()) {
-				changeWeightOfStrategy(entry.getKey(), entry.getValue().doubleValue());
+		for ( Map.Entry<String, StrategyWeights> wentry : weightsPerSubpopulation.entrySet() ) {
+			final String subpop = wentry.getKey();
+			final StrategyWeights weights = wentry.getValue();
+			Map<PlanStrategy, Double> changes = weights.changeRequests.remove(Integer.valueOf(iteration));
+			if (changes != null) {
+				for (Map.Entry<PlanStrategy, Double> entry : changes.entrySet()) {
+					changeWeightOfStrategy(
+							entry.getKey(),
+							subpop,
+							entry.getValue().doubleValue());
+				}
 			}
 		}
 	}
@@ -228,14 +295,15 @@ public class StrategyManager implements MatsimManager {
 	 * @param person The person for which the strategy should be chosen
 	 * @return the chosen strategy
 	 */
-	public PlanStrategy chooseStrategy(final Person person) {
-		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
+	public PlanStrategy chooseStrategy(final Person person, final String subpopulation) {
+		final StrategyWeights weights = weightsPerSubpopulation.get( subpopulation );
+		double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;
 
 		double sum = 0.0;
-		for (int i = 0, max = this.weights.size(); i < max; i++) {
-			sum += this.weights.get(i).doubleValue();
+		for (int i = 0, max = weights.weights.size(); i < max; i++) {
+			sum += weights.weights.get(i).doubleValue();
 			if (rnd <= sum) {
-				return this.strategies.get(i);
+				return weights.strategies.get(i);
 			}
 		}
 		return null;
@@ -253,6 +321,20 @@ public class StrategyManager implements MatsimManager {
 		this.maxPlansPerAgent = maxPlansPerAgent;
 	}
 
+	/**
+	 * @return the subpopulationName
+	 */
+	public String getSubpopulationName() {
+		return subpopulationName;
+	}
+
+	/**
+	 * @param subpopulationName the subpopulationName to set
+	 */
+	public void setSubpopulationName(String subpopulationName) {
+		this.subpopulationName = subpopulationName;
+	}
+
 	public final int getMaxPlansPerAgent() {
 		return this.maxPlansPerAgent;
 	}
@@ -265,12 +347,24 @@ public class StrategyManager implements MatsimManager {
 	 * @param strategy
 	 * @param newWeight
 	 */
-	public final void addChangeRequest(final int iteration, final PlanStrategy strategy, final double newWeight) {
+	public final void addChangeRequest(
+			final int iteration,
+			final PlanStrategy strategy,
+			final double newWeight) {
+		addChangeRequest( iteration , strategy , null , newWeight );
+	}
+
+	public final void addChangeRequest(
+			final int iteration,
+			final PlanStrategy strategy,
+			final String subpopulation,
+			final double newWeight) {
+		final StrategyWeights weights = getStrategyWeights( subpopulation );
 		Integer iter = Integer.valueOf(iteration);
-		Map<PlanStrategy, Double> iterationRequests = this.changeRequests.get(iter);
+		Map<PlanStrategy, Double> iterationRequests = weights.changeRequests.get(iter);
 		if (iterationRequests == null) {
 			iterationRequests = new HashMap<PlanStrategy, Double>(3);
-			this.changeRequests.put(iter, iterationRequests);
+			weights.changeRequests.put(iter, iterationRequests);
 		}
 		iterationRequests.put(strategy, Double.valueOf(newWeight));
 	}
@@ -308,14 +402,21 @@ public class StrategyManager implements MatsimManager {
 	}
 
 	public final List<PlanStrategy> getStrategies() {
-		return this.unmodifiableStrategies;
+		return getStrategies( null );
+	}
+
+	public final List<PlanStrategy> getStrategies( final String subpopulation ) {
+		return getStrategyWeights( subpopulation ).unmodifiableStrategies;
 	}
 
 	/**
 	 * @return the weights of the strategies, in the same order as the strategies returned by {@link #getStrategies()}
 	 */
 	public final List<Double> getWeights() {
-		return this.unmodifiableWeights;
+		return getWeights( null );
 	}
 
+	public final List<Double> getWeights( final String subpopulation ) {
+		return getStrategyWeights( subpopulation ).unmodifiableWeights;
+	}
 }

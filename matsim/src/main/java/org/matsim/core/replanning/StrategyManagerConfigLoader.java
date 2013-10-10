@@ -70,6 +70,8 @@ public final class StrategyManagerConfigLoader {
 				* config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration());
 		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
+		manager.setSubpopulationAttributeName(
+				config.plans().getSubpopulationAttributeName() );
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 			double rate = settings.getProbability();
 			if (rate == 0.0) {
@@ -87,7 +89,7 @@ public final class StrategyManagerConfigLoader {
 				throw new RuntimeException("Could not initialize strategy named " + moduleName);
 			}
 
-			manager.addStrategy(strategy, rate);
+			manager.addStrategy(strategy, settings.getSubpopulation() , rate);
 
 			// now check if this modules should be disabled after some iterations
 			int maxIter = settings.getDisableAfter();
@@ -108,11 +110,11 @@ public final class StrategyManagerConfigLoader {
 			// --- end new ---
 			if (maxIter >= 0) {
 				if (maxIter >= config.controler().getFirstIteration()) {
-					manager.addChangeRequest(maxIter + 1, strategy, 0.0);
+					manager.addChangeRequest(maxIter + 1, strategy, settings.getSubpopulation() , 0.0);
 				} else {
 					/* The controler starts at a later iteration than this change request is scheduled for.
 					 * make the change right now.					 */
-					manager.changeWeightOfStrategy(strategy, 0.0);
+					manager.changeWeightOfStrategy(strategy, settings.getSubpopulation() , 0.0);
 				}
 			}
 		}
