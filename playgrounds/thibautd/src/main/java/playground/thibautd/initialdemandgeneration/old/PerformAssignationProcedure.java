@@ -43,7 +43,6 @@ import playground.thibautd.initialdemandgeneration.old.modules.PersonAssignActiv
 import playground.thibautd.initialdemandgeneration.old.modules.PersonAssignAndNormalizeTimes;
 import playground.thibautd.initialdemandgeneration.old.modules.PersonAssignPrimaryActivities;
 import playground.thibautd.initialdemandgeneration.old.modules.PersonAssignShopLeisureLocations;
-import playground.thibautd.initialdemandgeneration.old.modules.PersonAssignToNetwork;
 import playground.thibautd.initialdemandgeneration.old.modules.PersonRemoveUnhandledModes;
 import playground.thibautd.initialdemandgeneration.old.modules.PersonSetLocationsFromKnowledge;
 import playground.thibautd.utils.MoreIOUtils;
@@ -137,9 +136,9 @@ public class PerformAssignationProcedure {
 			// create desires structure (among other things)
 			algos.add( new PersonAssignAndNormalizeTimes() );
 			// finally, make facility / activity link information consistent
-			algos.add( new PersonAssignToNetwork(
-						scen.getNetwork(),
-						facilities) );
+//			algos.add( new PersonAssignToNetwork(
+//						scen.getNetwork(),
+//						facilities) );
 
 			// apply the routine
 			// ---------------------------------------------------------------------
