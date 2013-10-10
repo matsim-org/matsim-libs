@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
@@ -41,6 +43,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -74,11 +77,8 @@ public class ParkingManagerZH {
 		initializeQuadTree(parkings);
 		addParkings(parkings);
 		
-		
-			facilityCapacities = new IntegerValueHashMap<Id>();
 			occupiedParking = new IntegerValueHashMap<Id>();
 			parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
-			
 
 			for (Parking parking:parkings){
 				Id linkId= ((NetworkImpl) network).getNearestLink(parking.getCoord()).getId();
@@ -90,12 +90,8 @@ public class ParkingManagerZH {
 				}
 			}
 			
-			
-			
 			this.initialParkingFacilityOfAgent=new HashMap<Id, Parking>();
 			this.fullPublicParkingFacilities=new HashSet<Parking>();
-			
-			
 			
 			privateParkingFacilityIdMapping=new TwoHashMapsConcatenated<Id, String, Id>();
 			for (Parking parking:parkings){
@@ -179,7 +175,6 @@ public class ParkingManagerZH {
 	protected final HashSet<Parking> fullPublicParkingFacilities;
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
 	//private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
-	private IntegerValueHashMap<Id> facilityCapacities;	
 	private IntegerValueHashMap<Id> occupiedParking;	// number of reserved parkings
 	private final HashMap<String, HashSet<Id>> parkingTypes;
 	private HashMap<Id,Parking> initialParkingFacilityOfAgent;
@@ -222,13 +217,14 @@ public class ParkingManagerZH {
 	}
 	
 	public int getFreeCapacity(Id facilityId) {
-		int freeCapacity = getFacilityCapacities().get(facilityId)-occupiedParking.get(facilityId);
+		
+		int freeCapacity = parkingsHashMap.get(facilityId).getIntCapacity()-occupiedParking.get(facilityId);
 		
 		if (freeCapacity<0){
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 		
-		if (freeCapacity>getFacilityCapacities().get(facilityId)){
+		if (freeCapacity>parkingsHashMap.get(facilityId).getIntCapacity()){
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 		
@@ -287,7 +283,7 @@ public class ParkingManagerZH {
 					continue;
 				}
 				
-				int capacity = getFacilityCapacities().get(id);
+				int capacity = parkingsHashMap.get(id).getIntCapacity();
 				int occupied = occupiedParking.get(id);
 				if ((capacity - occupied) > maxCapacity) facilityId = id;
 			}
@@ -391,13 +387,6 @@ public class ParkingManagerZH {
 		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(),distance);
 	}
 
-	public IntegerValueHashMap<Id> getFacilityCapacities() {
-		return facilityCapacities;
-	}
-	
-	public void setFacilityCapacities(IntegerValueHashMap<Id> facilityCapacities) {
-		this.facilityCapacities=facilityCapacities;
-	}
 	
 	public Collection<Parking> getParkingFacilities(){
 		return nonFullPublicParkingFacilities.values();
@@ -441,6 +430,20 @@ public class ParkingManagerZH {
 				return parkingFacilityId;
 			} else {
 				return null;
+			}
+		}
+
+		public void initFirstParkingOfDay(Population population) {
+			for (Person person:population.getPersons().values()){
+				ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(0);
+				Id freePrivateParkingId = getFreePrivateParking(act.getFacilityId(),act.getType());
+				
+				if (freePrivateParkingId!=null){
+					parkVehicle(freePrivateParkingId);
+				} else {
+					Id closestFreeParkingFacilityId = getClosestFreeParkingFacilityId(act.getLinkId());
+					parkVehicle(closestFreeParkingFacilityId);
+				}
 			}
 		}
 	

@@ -50,17 +50,25 @@ public class ParkingLoader {
 
 		readParkings(parkingsOutsideZHCityScaling, parkingsFile, parkingCollection);
 
+		LinkedList<Parking> parkingWithNonPositveCapacity=new LinkedList<Parking>();
+		for (Parking parking : parkingCollection) {
+			if (parking.getIntCapacity()<=0){
+				parkingWithNonPositveCapacity.add(parking);
+			}
+		}
+		parkingCollection.removeAll(parkingWithNonPositveCapacity);
+		
 		int numberOfStreetParking = 0;
 		int numberOfGarageParking = 0;
 		int numberOfPrivateParking = 0;
 
 		for (Parking parking : parkingCollection) {
 			if (parking.getId().toString().contains("stp")) {
-				numberOfStreetParking += parking.getCapacity();
+				numberOfStreetParking += parking.getIntCapacity();
 			} else if (parking.getId().toString().contains("gp")) {
-				numberOfGarageParking += parking.getCapacity();
+				numberOfGarageParking += parking.getIntCapacity();
 			} else if (parking.getId().toString().contains("private")) {
-				numberOfPrivateParking += parking.getCapacity();
+				numberOfPrivateParking += parking.getIntCapacity();
 			}
 		}
 

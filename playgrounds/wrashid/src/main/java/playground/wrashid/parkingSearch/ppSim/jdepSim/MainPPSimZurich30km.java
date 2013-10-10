@@ -81,6 +81,9 @@ public class MainPPSimZurich30km {
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
 		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork());
 
+		AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
+		
+		
 		// TODO: load parking infrastructure files from:
 		// Z:\data\experiments\TRBAug2011\parkings
 
