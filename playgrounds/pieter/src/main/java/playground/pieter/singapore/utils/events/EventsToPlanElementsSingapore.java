@@ -63,7 +63,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.postgresql.*;
-import playground.pieter.travelsummary.travelcomponents.*;
+import playground.singapore.travelsummary.travelcomponents.*;
 
 /**
  * 

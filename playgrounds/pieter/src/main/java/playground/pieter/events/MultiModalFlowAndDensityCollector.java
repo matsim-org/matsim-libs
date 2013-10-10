@@ -23,36 +23,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-
-import playground.pieter.travelsummary.travelcomponents.Journey;
-import playground.pieter.travelsummary.travelcomponents.TravellerChain;
-import playground.pieter.travelsummary.travelcomponents.Trip;
 
 /**
  * @author fouriep, with liberal dollops of code lifted from wrashid's playground :) 

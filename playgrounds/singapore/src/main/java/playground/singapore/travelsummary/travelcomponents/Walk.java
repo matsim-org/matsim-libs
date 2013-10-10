@@ -1,4 +1,4 @@
-package playground.pieter.travelsummary.travelcomponents;
+package playground.singapore.travelsummary.travelcomponents;
 
 import org.matsim.api.core.v01.Coord;
 

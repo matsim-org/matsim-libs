@@ -1,4 +1,4 @@
-package playground.pieter.travelsummary.travelcomponents;
+package playground.singapore.travelsummary.travelcomponents;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
-import playground.pieter.singapore.utils.events.EventsToPlanElementsSingapore;
 
 public class TravelComponent {
 

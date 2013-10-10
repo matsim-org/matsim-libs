@@ -1,4 +1,4 @@
-package playground.pieter.travelsummary;
+package playground.singapore.travelsummary;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -48,18 +48,14 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import others.sergioo.util.dataBase.NoConnectionException;
-import playground.pieter.singapore.utils.postgresql.CSVWriter;
-import playground.pieter.singapore.utils.postgresql.PostgresType;
-import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
-import playground.pieter.travelsummary.travelcomponents.Activity;
-import playground.pieter.travelsummary.travelcomponents.Journey;
-import playground.pieter.travelsummary.travelcomponents.Transfer;
-import playground.pieter.travelsummary.travelcomponents.TravelComponent;
-import playground.pieter.travelsummary.travelcomponents.TravellerChain;
-import playground.pieter.travelsummary.travelcomponents.Trip;
-import playground.pieter.travelsummary.travelcomponents.Wait;
-import playground.pieter.travelsummary.travelcomponents.Walk;
+import playground.singapore.travelsummary.travelcomponents.Activity;
+import playground.singapore.travelsummary.travelcomponents.Journey;
+import playground.singapore.travelsummary.travelcomponents.Transfer;
+import playground.singapore.travelsummary.travelcomponents.TravelComponent;
+import playground.singapore.travelsummary.travelcomponents.TravellerChain;
+import playground.singapore.travelsummary.travelcomponents.Trip;
+import playground.singapore.travelsummary.travelcomponents.Wait;
+import playground.singapore.travelsummary.travelcomponents.Walk;
 
 /**
  * 
@@ -527,10 +523,7 @@ public class EventsToTravelSummaryTables implements
 
 	}
 
-	public void writeSimulationResultsToCSV(String path, String suffix)
-			throws InstantiationException, IllegalAccessException,
-			ClassNotFoundException, IOException, SQLException,
-			NoConnectionException {
+	public void writeSimulationResultsToCSV(String path, String suffix) throws IOException {
 
 		String actTableName = "matsim_activities" + suffix + ".csv";
 		CsvListWriter activityWriter = new CsvListWriter(

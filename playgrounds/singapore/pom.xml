@@ -23,5 +23,10 @@
   		<artifactId>artemc</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+  		<groupId>net.sf.supercsv</groupId>
+  		<artifactId>super-csv</artifactId>
+  		<version>2.1.0</version>
+  	</dependency>
   </dependencies>
 </project>

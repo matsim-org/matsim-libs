@@ -85,19 +85,19 @@ import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.postgresql.PostgresType;
 import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
 import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
-import playground.pieter.travelsummary.travelcomponents.Activity;
-import playground.pieter.travelsummary.travelcomponents.Journey;
-import playground.pieter.travelsummary.travelcomponents.Transfer;
-import playground.pieter.travelsummary.travelcomponents.TravellerChain;
-import playground.pieter.travelsummary.travelcomponents.Trip;
-import playground.pieter.travelsummary.travelcomponents.Wait;
-import playground.pieter.travelsummary.travelcomponents.Walk;
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
+import playground.singapore.travelsummary.travelcomponents.Activity;
+import playground.singapore.travelsummary.travelcomponents.Journey;
+import playground.singapore.travelsummary.travelcomponents.Transfer;
+import playground.singapore.travelsummary.travelcomponents.TravellerChain;
+import playground.singapore.travelsummary.travelcomponents.Trip;
+import playground.singapore.travelsummary.travelcomponents.Wait;
+import playground.singapore.travelsummary.travelcomponents.Walk;
 
 public class HITSAnalyserPostgresqlSummary {
 

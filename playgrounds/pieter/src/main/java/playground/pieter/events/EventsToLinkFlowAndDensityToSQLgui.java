@@ -1,57 +1,9 @@
 package playground.pieter.events;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
-import javax.swing.JTextField;
-
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.JCheckBox;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
-import others.sergioo.util.dataBase.DataBaseAdmin;
-import others.sergioo.util.dataBase.NoConnectionException;
-import playground.pieter.singapore.utils.postgresql.CSVWriter;
-import playground.pieter.singapore.utils.postgresql.PostgresType;
-import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
-import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
-import playground.pieter.singapore.utils.postgresql.TableWriter;
-import playground.pieter.travelsummary.travelcomponents.Activity;
-import playground.pieter.travelsummary.travelcomponents.Journey;
-import playground.pieter.travelsummary.travelcomponents.Transfer;
-import playground.pieter.travelsummary.travelcomponents.TravellerChain;
-import playground.pieter.travelsummary.travelcomponents.Trip;
-import playground.wrashid.nan.InFlowInfoCollectorWithPt;
-import playground.wrashid.nan.MainDensityAnalysisWithPt;
-import playground.wrashid.nan.NetworkReadExample;
-import playground.wrashid.nan.OutFlowInfoCollectorWithPt;
-
-import java.awt.GridBagLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -67,19 +19,37 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Map.Entry;
 
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
-
-import java.awt.Color;
-
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
-import java.awt.Font;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import playground.pieter.singapore.utils.postgresql.CSVWriter;
+import playground.pieter.singapore.utils.postgresql.PostgresType;
+import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
+import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
+import playground.pieter.singapore.utils.postgresql.TableWriter;
+import playground.wrashid.nan.MainDensityAnalysisWithPt;
+import playground.wrashid.nan.NetworkReadExample;
 
 public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 

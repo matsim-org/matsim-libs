@@ -1,4 +1,4 @@
-package playground.pieter.travelsummary.travelcomponents;
+package playground.singapore.travelsummary.travelcomponents;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;

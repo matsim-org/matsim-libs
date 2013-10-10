@@ -1,4 +1,4 @@
-package playground.pieter.travelsummary;
+package playground.singapore.travelsummary;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -25,8 +25,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
-import others.sergioo.util.dataBase.NoConnectionException;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -115,13 +113,13 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				File defaultPropertiesFile = fileSelect(
 						eventsToSQLPropertiesFileComponent.getText(),
-						"Select properties file",false);
-				try{
-				eventsToSQLPropertiesFileComponent
-						.setText(defaultPropertiesFile.getPath());
-				loadDefaultProperties(defaultPropertiesFile);
-				}catch(NullPointerException ne){
-					//do nothing
+						"Select properties file", false);
+				try {
+					eventsToSQLPropertiesFileComponent
+							.setText(defaultPropertiesFile.getPath());
+					loadDefaultProperties(defaultPropertiesFile);
+				} catch (NullPointerException ne) {
+					// do nothing
 				}
 			}
 		});
@@ -149,14 +147,9 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		outputPathComponent.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				outputPathComponent.
-				setText(
-					fileSelect(
-							outputPathComponent.getText(),
-							"Select output path",
-							true)
-							.getPath()
-						);
+				outputPathComponent.setText(fileSelect(
+						outputPathComponent.getText(), "Select output path",
+						true).getPath());
 			}
 		});
 		outputPathComponent.setText("./");
@@ -185,11 +178,10 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 				transitScheduleFileComponent.setText(fileSelect(
 						transitScheduleFileComponent.getText(),
-						"select transit schedule file",false).getPath());
+						"select transit schedule file", false).getPath());
 			}
 		});
-		transitScheduleFileComponent
-				.setText("transitSchedule.xml.gz");
+		transitScheduleFileComponent.setText("transitSchedule.xml.gz");
 		GridBagConstraints gbc_transitScheduleFile = new GridBagConstraints();
 		gbc_transitScheduleFile.anchor = GridBagConstraints.NORTH;
 		gbc_transitScheduleFile.fill = GridBagConstraints.HORIZONTAL;
@@ -212,8 +204,8 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				networkFileComponent.setText(fileSelect(
-						networkFileComponent.getText(), "select network file",false)
-						.getPath());
+						networkFileComponent.getText(), "select network file",
+						false).getPath());
 			}
 		});
 		networkFileComponent.setText("network.xml");
@@ -239,8 +231,8 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				configFileComponent.setText(fileSelect(
-						configFileComponent.getText(), "select config file",false)
-						.getPath());
+						configFileComponent.getText(), "select config file",
+						false).getPath());
 			}
 		});
 		configFileComponent.setText("config.xml");
@@ -266,8 +258,8 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				eventsFileComponent.setText(fileSelect(
-						eventsFileComponent.getText(), "select events file",false)
-						.getPath());
+						eventsFileComponent.getText(), "select events file",
+						false).getPath());
 			}
 		});
 		eventsFileComponent.setText("events.xml");
@@ -358,7 +350,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		} catch (FileNotFoundException e) {
 
 			fileSelect(eventsToSQLPropertiesFileComponent.getText(),
-					"Path not found. Enter properties filename.",false);
+					"Path not found. Enter properties filename.", false);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -407,26 +399,12 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 			test.writeSimulationResultsToCSV(outputPathComponent.getText(),
 					tableSuffixComponent.getText());
 
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		System.out.println("Number of stuck vehicles/passengers: "+test.getStuck());
+		System.out.println("Number of stuck vehicles/passengers: "
+				+ test.getStuck());
 
 	}
 
@@ -491,10 +469,10 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 		chooser.setToolTipText(title);
 		chooser.setDialogTitle(title);
 		chooser.showOpenDialog(new JPanel());
-		try{
-			defaultpath = chooser.getSelectedFile().getPath();			
-		}catch(NullPointerException ne){
-			//do nothing
+		try {
+			defaultpath = chooser.getSelectedFile().getPath();
+		} catch (NullPointerException ne) {
+			// do nothing
 		}
 		return chooser.getSelectedFile();
 	}
