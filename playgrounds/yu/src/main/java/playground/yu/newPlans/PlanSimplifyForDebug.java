@@ -25,20 +25,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author mrieser
@@ -61,13 +61,13 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	protected Set<String> homeActs = null;
 	protected Set<String> workActs = null;
 	protected Set<String> eduActs = null;
-	protected PlansCalcRoute router = null;
+	protected PlanAlgorithm router = null;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 
-	public PlanSimplifyForDebug(final Network network, final ModeRouteFactory routeFactory) {
+	public PlanSimplifyForDebug(final Scenario scenario) {
 		this.homeActs = new HashSet<String>();
 		// this.homeActs.add("h0.5");
 
@@ -83,7 +83,13 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		// this.eduActs.add("uni");
 
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
-		this.router = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, timeCostCalc, timeCostCalc, new DijkstraFactory(), routeFactory);
+		this.router =
+				new PlanRouter(
+						new TripRouterFactoryBuilderWithDefaults().build(
+								scenario ).instantiateAndConfigureTripRouter(
+										new RoutingContextImpl(
+												timeCostCalc,
+												timeCostCalc ) ) );
 	}
 
 	// ////////////////////////////////////////////////////////////////////
