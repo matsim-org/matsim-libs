@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -40,7 +41,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -48,7 +51,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufInterpolator;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -164,11 +166,21 @@ public class DataPrepare {
 				, this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
 		
-		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
-				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, new ModeRouteFactory(),
-				transitConfig, new TransitRouterImpl(transitRouterConfig, this.scenario.getTransitSchedule() ), this.scenario.getTransitSchedule());
+		if ( scenario.getConfig().scenario().isUseTransit() ) {
+			throw new IllegalStateException( "Routing will not behave as desired" );
+		}
+		PlanRouter router =
+			new PlanRouter(
+					new TripRouterFactoryBuilderWithDefaults().build(
+						scenario ).instantiateAndConfigureTripRouter(
+							new RoutingContextImpl(
+								timeCostCalculator,
+								timeCostCalculator ) ) );
+
 		log.info("start pt-router");
-		router.run(pop);
+		for ( Person p : pop.getPersons().values() ) {
+			router.run( p );
+		}
 		log.info("write routed plans out.");
 		new PopulationWriter(pop, this.scenario.getNetwork()).write(OutRoutedPlanFile);
 	}
