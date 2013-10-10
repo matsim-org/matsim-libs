@@ -32,7 +32,7 @@ public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 	
 	private final Map<Id,BiPedQ> qs = new HashMap<Id,BiPedQ>();
 
-	private final Map<Id,BiPedQLinkImpl> qls = new HashMap<Id,BiPedQLinkImpl>();
+	private final Map<Id,BiPedQueueWithBuffer> qls = new HashMap<Id,BiPedQueueWithBuffer>();
 	
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork network) {
@@ -40,30 +40,33 @@ public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 	}
 
 	@Override
-	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
+	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network,
 			QNode toQueueNode) {
-		double delay = 0.25;
-		BiPedQ q = new BiPedQ(network.simEngine.getMobsim().getSimTimer(),delay);
+		final double delay = 0.25;
+		final BiPedQ q = new BiPedQ(network.simEngine.getMobsim().getSimTimer(),delay);
+		this.qs.put(link.getId(), q);
 		
-		BiPedQLinkImpl ret = new BiPedQLinkImpl(link, network, toQueueNode, q,delay);
+		QLinkImpl ret = new QLinkImpl(link, network, toQueueNode, new QLinkImpl.RoadFactory() {
+			public QLaneInternalI createRoad(QLinkImpl qLinkImpl) {
+				BiPedQueueWithBuffer road = new BiPedQueueWithBuffer(network, qLinkImpl, q, delay);
+				qls.put(link.getId(), road);
+				return road;
+			}
+		});
+		
 		Iterator<? extends Link> it = link.getToNode().getOutLinks().values().iterator();
 		while (it.hasNext()) {
 			Link rev = it.next();
 			if (rev.getToNode().equals(link.getFromNode())) {
 				BiPedQ revQ = this.qs.remove(rev.getId());
-				BiPedQLinkImpl revQl = this.qls.remove(rev.getId());
+				BiPedQueueWithBuffer revQl = this.qls.remove(rev.getId());
 				if (revQ != null) {
 					revQ.setRevQ(q);
 					q.setRevQ(revQ);
-					BiPedQueueWithBuffer road = ret.getRoad();
-					BiPedQueueWithBuffer revRoad = revQl.getRoad();
+					BiPedQueueWithBuffer road = qls.get(link.getId()); // the road we just created above
+					BiPedQueueWithBuffer revRoad = revQl;
 					road.setRevRoad(revRoad);
-					revRoad.setRevRoad(road);
-					
-				} else {
-					this.qs.put(link.getId(), q);
-					this.qls.put(link.getId(), ret);
-					
+					revRoad.setRevRoad(road);	
 				}
 				break;
 			}

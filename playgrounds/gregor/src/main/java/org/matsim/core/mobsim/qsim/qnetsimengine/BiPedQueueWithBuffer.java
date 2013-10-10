@@ -29,9 +29,8 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
@@ -58,7 +57,7 @@ SignalizeableItem {
 	private static final Logger log = Logger.getLogger(BiPedQueueWithBuffer.class);
 	private static final boolean HOLES = true;
 	private static int spaceCapWarningCount;
-	private final QLinkInternalI link;
+	private final AbstractQLink link;
 	private final QNetwork network;
 	private final VehicleQ<QVehicle> vehQueue;
 
@@ -102,7 +101,7 @@ SignalizeableItem {
 	//TODO repair! [GL August '13]
 	private final Map<QVehicle,Double> enterTimes = new HashMap<QVehicle, Double>();
 
-	BiPedQueueWithBuffer(QNetwork network, QLinkInternalI link, final VehicleQ<QVehicle> vehicleQueue, double delay){
+	BiPedQueueWithBuffer(QNetwork network, AbstractQLink link, final VehicleQ<QVehicle> vehicleQueue, double delay){
 		this.delay = delay;
 
 
@@ -410,7 +409,7 @@ SignalizeableItem {
 	public void addFromUpstream(final QVehicle veh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 	
-		((BiPedQLinkImpl)this.link).activateLink();
+		this.link.activateLink();
 		//		linkEnterTimeMap.put(veh, now);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		double vehicleTravelTime = this.link.getLink().getLength() / veh.getMaximumVelocity();

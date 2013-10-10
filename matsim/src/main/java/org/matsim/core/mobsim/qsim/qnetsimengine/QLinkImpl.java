@@ -55,6 +55,12 @@ import org.matsim.vis.snapshotwriters.VisData;
  */
 public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
+	public interface RoadFactory {
+
+		public QLaneInternalI createRoad(QLinkImpl qLinkImpl);
+
+	}
+
 	// static variables (no problem with memory)
 	final static Logger log = Logger.getLogger(QLinkImpl.class);
 //	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
@@ -102,6 +108,18 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		super(link2, network) ;
 		this.length = this.getLink().getLength();
 		this.road = road;
+		this.toQueueNode = toNode;
+		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
+	}
+	
+	/** 
+	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
+	 * 
+	 */
+	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final RoadFactory roadFactory) {
+		super(link2, network) ;
+		this.length = this.getLink().getLength();
+		this.road = roadFactory.createRoad(this);
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	}
