@@ -161,16 +161,16 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 //				super.createRoutingAlgorithm();
 //	}
 
-	private PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		return new PlansCalcRouteKti(
-					super.getConfig().plansCalcRoute(),
-					super.network,
-					travelCosts,
-					travelTimes,
-					super.getLeastCostPathCalculatorFactory(),
-					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
-					this.plansCalcRouteKtiInfo);
-	}
+	//private PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	//	return new PlansCalcRouteKti(
+	//				super.getConfig().plansCalcRoute(),
+	//				super.network,
+	//				travelCosts,
+	//				travelTimes,
+	//				super.getLeastCostPathCalculatorFactory(),
+	//				((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
+	//				this.plansCalcRouteKtiInfo);
+	//}
 	
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
