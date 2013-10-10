@@ -33,42 +33,7 @@ import org.matsim.testcases.utils.LogCounter;
  */
 public class ConfigConsistencyCheckerImplTest {
 
-	@Test
-	public void testCheckTransitReplanningConfiguration() {
-		Config config = new Config();
-		config.addCoreModules();
-		config.scenario().setUseTransit(true);
-		config.setParam("strategy", "ModuleProbability_1", "0.9");
-		config.setParam("strategy", "Module_1", "TimeAllocationMutator");
 
-		LogCounter logger = new LogCounter(Level.ERROR);
-		try {
-			logger.activiate();
-			Assert.assertEquals(0, logger.getErrorCount());
-			new ConfigConsistencyCheckerImpl().checkConsistency(config);
-			Assert.assertEquals(1, logger.getErrorCount());
-			logger.resetCounts();
-
-			config.setParam("strategy", "Module_1", "ChangeLegMode");
-			new ConfigConsistencyCheckerImpl().checkConsistency(config);
-			Assert.assertEquals(1, logger.getErrorCount());
-			logger.resetCounts();
-
-			config.setParam("strategy", "ModuleProbability_2", "0.9");
-			config.setParam("strategy", "Module_2", "TimeAllocationMutator");
-			new ConfigConsistencyCheckerImpl().checkConsistency(config);
-			Assert.assertEquals(2, logger.getErrorCount());
-			logger.resetCounts();
-
-			config.setParam("strategy", "Module_1", "TransitChangeLegMode");
-			config.setParam("strategy", "Module_2", "TransitTimeAllocationMutator");
-			new ConfigConsistencyCheckerImpl().checkConsistency(config);
-			Assert.assertEquals(0, logger.getErrorCount());
-		} finally {
-			// make sure counter is deactivated at the end
-			logger.deactiviate();
-		}
-	}
 
 	@Test
 	public void testCheckPlanCalcScore_DefaultsOk() {
@@ -171,6 +136,7 @@ public class ConfigConsistencyCheckerImplTest {
 			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);
 			Assert.assertEquals(0,1) ; // should never get here
 		} catch ( Exception ee ){
+			
 			System.out.println("expected exception") ;
 		}
 		
