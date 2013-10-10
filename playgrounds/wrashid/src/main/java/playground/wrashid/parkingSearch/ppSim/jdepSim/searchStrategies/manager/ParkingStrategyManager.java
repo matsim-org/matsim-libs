@@ -64,7 +64,7 @@ public class ParkingStrategyManager {
 				LegImpl leg=(LegImpl) pe;
 				
 				if (leg.getMode().equals(TransportMode.car)){
-					Id nextActLinkId=((ActivityImpl) person.getSelectedPlan().getPlanElements().get(i+1)).getLinkId();
+					Id nextActLinkId=((ActivityImpl) person.getSelectedPlan().getPlanElements().get(i+3)).getLinkId();
 				
 					HashMap<Integer, HashMap<Id, EvaluationContainer>> agentHashMap = strategyEvaluations.get(agentId);
 					

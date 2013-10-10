@@ -27,6 +27,20 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
 
 public class RandomSearch implements ParkingSearchStrategy{
+	
+	
+	private double maxDistance;
+
+	// go to final link if no parking there, then try parking at other places.
+	// accept only parking within 300m, choose random links, but if leave 300m area, try
+	// to take direction leading back to destination
+	public RandomSearch (double maxDistance){
+		this.maxDistance = maxDistance;
+		
+	}
+	
+	
+	
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		aem.processLegInDefaultWay();
@@ -34,6 +48,9 @@ public class RandomSearch implements ParkingSearchStrategy{
 		Person person = aem.getPerson();
 		
 		Random rand=new Random();
+		
+		
+		
 		
 		// TODO: add score only at end of search (store it locally during search)!
 		

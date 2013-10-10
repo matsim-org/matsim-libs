@@ -215,7 +215,7 @@ public class AgentEventMessage extends Message {
 				}
 			} else {
 				
-				event = new PersonDepartureEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), leg.getMode());
+				event = new PersonDepartureEvent(getMessageArrivalTime(), personId, curAct.getLinkId(), leg.getMode());
 				eventsManager.processEvent(event);
 				
 				setPlanElementIndex(getPlanElementIndex() + 1);

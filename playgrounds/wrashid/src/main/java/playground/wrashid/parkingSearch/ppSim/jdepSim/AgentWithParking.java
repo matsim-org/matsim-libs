@@ -27,10 +27,12 @@ import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
 
 public class AgentWithParking extends AgentEventMessage{
 
 	public static ParkingStrategyManager parkingStrategyManager;
+	public static ParkingManagerZH parkingManager;
 	
 	public AgentWithParking(Person person) {
 		this.setPerson(person);
