@@ -17,54 +17,54 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scoring.income.old;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.households.PersonHouseholdMapping;
-
-
-/**
- * @author dgrether
- *
- */
-public class IncomePlansCalcRoute extends PlansCalcRoute{
-
-	
-	private BKickIncomeTravelTimeDistanceCostCalculator incomeCostCalculator;
-	private PersonHouseholdMapping hhdb;
-
-	/**
-	 * Uses the speed factors from the config group and the rerouting of the factory 
-	 * @param hhdb 
-	 */
-	public IncomePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
-			final TravelDisutility costCalculator,
-			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory, 
-			final ModeRouteFactory routeFactory, PersonHouseholdMapping hhdb){
-		super(group, network, costCalculator, timeCalculator, factory, routeFactory);
-		this.incomeCostCalculator = (BKickIncomeTravelTimeDistanceCostCalculator)costCalculator;
-		this.hhdb = hhdb;
-	}
-
-	@Override
-	public void run(final Person person) {
-		this.incomeCostCalculator.setIncome(this.hhdb.getHousehold(person.getId()).getIncome());
-		super.run(person);
-	}
-	
-
-	@Override
-	public void run(Plan plan){
-		this.incomeCostCalculator.setIncome(this.hhdb.getHousehold(plan.getPerson().getId()).getIncome());
-		super.run(plan);
-	}
-	
-}
+//package playground.benjamin.scoring.income.old;
+//
+//import org.matsim.api.core.v01.network.Network;
+//import org.matsim.api.core.v01.population.Person;
+//import org.matsim.api.core.v01.population.Plan;
+//import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+//import org.matsim.core.population.routes.ModeRouteFactory;
+//import org.matsim.core.router.old.PlansCalcRoute;
+//import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+//import org.matsim.core.router.util.TravelDisutility;
+//import org.matsim.core.router.util.TravelTime;
+//import org.matsim.households.PersonHouseholdMapping;
+//
+//
+///**
+// * @author dgrether
+// *
+// */
+//public class IncomePlansCalcRoute extends PlansCalcRoute{
+//
+//	
+//	private BKickIncomeTravelTimeDistanceCostCalculator incomeCostCalculator;
+//	private PersonHouseholdMapping hhdb;
+//
+//	/**
+//	 * Uses the speed factors from the config group and the rerouting of the factory 
+//	 * @param hhdb 
+//	 */
+//	public IncomePlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, 
+//			final TravelDisutility costCalculator,
+//			final TravelTime timeCalculator, LeastCostPathCalculatorFactory factory, 
+//			final ModeRouteFactory routeFactory, PersonHouseholdMapping hhdb){
+//		super(group, network, costCalculator, timeCalculator, factory, routeFactory);
+//		this.incomeCostCalculator = (BKickIncomeTravelTimeDistanceCostCalculator)costCalculator;
+//		this.hhdb = hhdb;
+//	}
+//
+//	@Override
+//	public void run(final Person person) {
+//		this.incomeCostCalculator.setIncome(this.hhdb.getHousehold(person.getId()).getIncome());
+//		super.run(person);
+//	}
+//	
+//
+//	@Override
+//	public void run(Plan plan){
+//		this.incomeCostCalculator.setIncome(this.hhdb.getHousehold(plan.getPerson().getId()).getIncome());
+//		super.run(plan);
+//	}
+//	
+//}
