@@ -20,20 +20,9 @@
 package playground.mrieser;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.AStarEuclideanFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -41,8 +30,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 
 public class RouterPerformanceTest {
 
@@ -137,101 +124,102 @@ public class RouterPerformanceTest {
 	}
 
 	private static void doTest(final RouterProvider provider, final Config config, final int limit) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-
-		String inPlansName = config.plans().getInputFile();
-
-		Population population = scenario.getPopulation();
-		new MatsimPopulationReader(scenario).readFile(inPlansName);
-		log.info("### persons: " + population.getPersons().size());
-		log.info("### current limit: " + limit);
-
-		log.info("### calcRoute with router \t" + provider.getName());
-
-		FreespeedTravelTimeAndDisutility calculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-
-		measureMemory("### before creating Router Factory");
-		long start = System.currentTimeMillis();
-		LeastCostPathCalculatorFactory algo = provider.getFactory(network, calculator, calculator);
-		long end = System.currentTimeMillis();
-		log.info("### Creating Router Factory took \t" + (end - start) + "\t ms");
-		measureMemory("### before creating Router 1");
-		start = System.currentTimeMillis();
-		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, algo, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()) {
-			int cnt = 0;
-			@Override
-			public void run(final Person person) {
-				this.cnt++;
-				if (this.cnt > limit) {
-					throw new RuntimeException("Enough's enough");
-				}
-				super.run(person);
-			}
-			@Override
-			public void run(final Plan plan) {
-				this.cnt++;
-				if (this.cnt > limit) {
-					throw new RuntimeException("Enough's enough");
-				}
-				super.run(plan);
-			}
-			@Override
-			public double handleLeg(final Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-				leg.setMode(TransportMode.car); // force car router
-				return super.handleLeg(person, leg, fromAct, toAct, depTime);
-			}
-		};
-		end = System.currentTimeMillis();
-		log.info("### Creating Router 1 took \t" + (end - start) + "\t ms");
-		measureMemory("### before creating Router 2");
-		start = System.currentTimeMillis();
-		PlansCalcRoute router2 = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, algo, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()) {
-			int cnt = 0;
-			@Override
-			public void run(final Person person) {
-				this.cnt++;
-				if (this.cnt > limit) {
-					throw new RuntimeException("Enough's enough");
-				}
-				super.run(person);
-			}
-			@Override
-			public void run(final Plan plan) {
-				this.cnt++;
-				if (this.cnt > limit) {
-					throw new RuntimeException("Enough's enough");
-				}
-				super.run(plan);
-			}
-			@Override
-			public double handleLeg(final Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-				leg.setMode(TransportMode.car); // force car router
-				return super.handleLeg(person, leg, fromAct, toAct, depTime);
-			}
-		};
-		end = System.currentTimeMillis();
-		log.info("### Creating Router 2 took \t" + (end - start) + "\t ms");
-		measureMemory("### before Routing 1");
-		start = System.currentTimeMillis();
-		try {
-			router.run(population);
-		} catch (RuntimeException e) {
-		}
-		long part1 = System.currentTimeMillis() - start;
-		measureMemory("### before Routing 2");
-		start = System.currentTimeMillis();
-		try {
-			router2.run(population);
-		} catch (RuntimeException e) {
-		}
-		end = System.currentTimeMillis();
-		measureMemory("### after Routing");
-		log.info("### Routing took \t" + (part1 + end - start) + "\t ms");
-		System.out.println(router.hashCode()); // just some code to ensure that the router is not gc'ed before the end
-		System.out.println(router2.hashCode());
+		throw new UnsupportedOperationException( "please reimplement without plansCalcRoute" );
+//		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+//
+//		Network network = scenario.getNetwork();
+//		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+//
+//		String inPlansName = config.plans().getInputFile();
+//
+//		Population population = scenario.getPopulation();
+//		new MatsimPopulationReader(scenario).readFile(inPlansName);
+//		log.info("### persons: " + population.getPersons().size());
+//		log.info("### current limit: " + limit);
+//
+//		log.info("### calcRoute with router \t" + provider.getName());
+//
+//		FreespeedTravelTimeAndDisutility calculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+//
+//		measureMemory("### before creating Router Factory");
+//		long start = System.currentTimeMillis();
+//		LeastCostPathCalculatorFactory algo = provider.getFactory(network, calculator, calculator);
+//		long end = System.currentTimeMillis();
+//		log.info("### Creating Router Factory took \t" + (end - start) + "\t ms");
+//		measureMemory("### before creating Router 1");
+//		start = System.currentTimeMillis();
+//		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, algo, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()) {
+//			int cnt = 0;
+//			@Override
+//			public void run(final Person person) {
+//				this.cnt++;
+//				if (this.cnt > limit) {
+//					throw new RuntimeException("Enough's enough");
+//				}
+//				super.run(person);
+//			}
+//			@Override
+//			public void run(final Plan plan) {
+//				this.cnt++;
+//				if (this.cnt > limit) {
+//					throw new RuntimeException("Enough's enough");
+//				}
+//				super.run(plan);
+//			}
+//			@Override
+//			public double handleLeg(final Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+//				leg.setMode(TransportMode.car); // force car router
+//				return super.handleLeg(person, leg, fromAct, toAct, depTime);
+//			}
+//		};
+//		end = System.currentTimeMillis();
+//		log.info("### Creating Router 1 took \t" + (end - start) + "\t ms");
+//		measureMemory("### before creating Router 2");
+//		start = System.currentTimeMillis();
+//		PlansCalcRoute router2 = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, algo, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()) {
+//			int cnt = 0;
+//			@Override
+//			public void run(final Person person) {
+//				this.cnt++;
+//				if (this.cnt > limit) {
+//					throw new RuntimeException("Enough's enough");
+//				}
+//				super.run(person);
+//			}
+//			@Override
+//			public void run(final Plan plan) {
+//				this.cnt++;
+//				if (this.cnt > limit) {
+//					throw new RuntimeException("Enough's enough");
+//				}
+//				super.run(plan);
+//			}
+//			@Override
+//			public double handleLeg(final Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+//				leg.setMode(TransportMode.car); // force car router
+//				return super.handleLeg(person, leg, fromAct, toAct, depTime);
+//			}
+//		};
+//		end = System.currentTimeMillis();
+//		log.info("### Creating Router 2 took \t" + (end - start) + "\t ms");
+//		measureMemory("### before Routing 1");
+//		start = System.currentTimeMillis();
+//		try {
+//			router.run(population);
+//		} catch (RuntimeException e) {
+//		}
+//		long part1 = System.currentTimeMillis() - start;
+//		measureMemory("### before Routing 2");
+//		start = System.currentTimeMillis();
+//		try {
+//			router2.run(population);
+//		} catch (RuntimeException e) {
+//		}
+//		end = System.currentTimeMillis();
+//		measureMemory("### after Routing");
+//		log.info("### Routing took \t" + (part1 + end - start) + "\t ms");
+//		System.out.println(router.hashCode()); // just some code to ensure that the router is not gc'ed before the end
+//		System.out.println(router2.hashCode());
 	}
 
 	private static void measureMemory(final String message) {
