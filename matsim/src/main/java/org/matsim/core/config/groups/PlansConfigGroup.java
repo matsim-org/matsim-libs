@@ -36,10 +36,12 @@ public class PlansConfigGroup extends ReflectiveModule {
 	private static final String INPUT_FILE = "inputPlansFile";
 	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
+	private static final String SUBPOPULATION_ATTRIBUTE = "subpopulationAttributeName";
 
 	private String inputFile = null;
 	private String networkRouteType = NetworkRouteType.LinkNetworkRoute;
 	private String inputPersonAttributeFile = null;
+	private String subpopulationAttributeName = "subpopulation";
 
 	public PlansConfigGroup() {
 		super(GROUP_NAME);
@@ -83,4 +85,13 @@ public class PlansConfigGroup extends ReflectiveModule {
 		this.networkRouteType = routeType;
 	}
 
+	@StringGetter( SUBPOPULATION_ATTRIBUTE )
+	public String getSubpopulationAttributeName() {
+		return subpopulationAttributeName;
+	}
+
+	@StringSetter( SUBPOPULATION_ATTRIBUTE )
+	public void setSubpopulationAttributeName(String subpopulationAttributeName) {
+		this.subpopulationAttributeName = subpopulationAttributeName;
+	}
 }
