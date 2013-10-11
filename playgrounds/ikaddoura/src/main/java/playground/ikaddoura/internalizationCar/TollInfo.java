@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,48 +20,36 @@
 /**
  * 
  */
-
 package playground.ikaddoura.internalizationCar;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
-
+import org.matsim.api.core.v01.Id;
 
 /**
- * @author Ihab
+ * @author ikaddoura
  *
  */
-
-public class InternalizationCarControlerListener implements StartupListener, IterationEndsListener {
-
-	private final ScenarioImpl scenario;
-	private TollHandler tollHandler;
+public class TollInfo {
+	private double time;
+	private double amount;
+	private Id linkId;
 	
-	public InternalizationCarControlerListener(ScenarioImpl scenario, TollHandler tollHandler){
-		this.scenario = scenario;
-		this.tollHandler = tollHandler;
+	public double getTime() {
+		return time;
+	}
+	public void setTime(double time) {
+		this.time = time;
+	}
+	public double getAmount() {
+		return amount;
+	}
+	public void setAmount(double amount) {
+		this.amount = amount;
+	}
+	public Id getLinkId() {
+		return linkId;
+	}
+	public void setLinkId(Id linkId) {
+		this.linkId = linkId;
 	}
 	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		
-		EventsManager eventsManager = event.getControler().getEvents();
-		
-		event.getControler().getEvents().addHandler(new MarginalCongestionHandlerV2(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
-		
-		event.getControler().getEvents().addHandler(tollHandler);
-	}
-
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		tollHandler.setLinkId2timeBin2avgToll();
-	}
-
 }

@@ -47,7 +47,7 @@ public class InternalizationCarControler {
 			log.info("configFile: "+ configFile);
 			
 		} else {
-			configFile = "/Users/Ihab/Desktop/car_internalization_input/config_internalization.xml";
+			configFile = "/Users/Ihab/Desktop/input/config_internalization.xml";
 //			configFile = "/Users/Ihab/Desktop/car_internalization_input/config_noInternalization.xml";
 		}
 		
@@ -58,8 +58,14 @@ public class InternalizationCarControler {
 	private void run() {
 		
 		Controler controler = new Controler(configFile);
+
+		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		
+		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+
 		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new InternalizationCarControlerListener( (ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new InternalizationCarControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler ));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.run();
 		
