@@ -42,7 +42,7 @@ import org.openstreetmap.josm.Main;
 public class MATSimExportDialog extends JPanel
 {
 	private JOptionPane optionPane;
-	private JComboBox<String> coordCombo;
+	private JComboBox coordCombo;
 	static JTextField path;
 	private JButton fileChooser;
 	private JButton defaults;
@@ -71,7 +71,7 @@ public class MATSimExportDialog extends JPanel
 				TransformationFactory.NAD83_UTM17N,
 				TransformationFactory.WGS84_TM };
 		
-		coordCombo = new JComboBox<String>(coordSystems);
+		coordCombo = new JComboBox(coordSystems);
 
 		c.insets = new Insets(4, 4, 4, 4);
 		c.gridwidth = 1;

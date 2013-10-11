@@ -4,7 +4,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.io.File;
 
@@ -31,7 +30,7 @@ public class MATSimImportDialog extends JPanel
 	// the JOptionPane that contains this dialog. required for the closeDialog() method.
     private JOptionPane optionPane;
     private JCheckBox originalData;
-    private JComboBox<String> coordCombo;
+    private JComboBox coordCombo;
     static JTextField path;
     private JButton fileChooser;
     
@@ -42,7 +41,7 @@ public class MATSimImportDialog extends JPanel
         setLayout(new GridBagLayout());
       
         String[] coordSystems = { TransformationFactory.WGS84, TransformationFactory.ATLANTIS, TransformationFactory.CH1903_LV03,TransformationFactory.GK4, TransformationFactory.WGS84_UTM47S, TransformationFactory.WGS84_UTM48N, TransformationFactory.WGS84_UTM35S,TransformationFactory.WGS84_UTM36S,TransformationFactory.WGS84_Albers,TransformationFactory.WGS84_SA_Albers,TransformationFactory.WGS84_UTM33N,TransformationFactory.DHDN_GK4,TransformationFactory.WGS84_UTM29N,TransformationFactory.CH1903_LV03_GT,TransformationFactory.WGS84_SVY21,TransformationFactory.NAD83_UTM17N,TransformationFactory.WGS84_TM};
-        coordCombo = new JComboBox<String>(coordSystems);
+        coordCombo = new JComboBox(coordSystems);
         
         c.gridwidth = 1;
         c.weightx = 1;
