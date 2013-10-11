@@ -55,9 +55,14 @@ public class MainPPSimZurich30km {
 	public static void main(String[] args) {
 		// Todo change these three paths and try run.
 
-		String plansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1000802.xml";
+		//String plansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1000802.xml";
+		 String plansFile =
+		 "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
 		// String plansFile =
-		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
+		//	 "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pct_plans_30km.xml.gz";
+		 
+		// String plansFile =
+		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/10pct_plans_30km.xml.gz";
 		String networkFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz";
 		String facilititiesPath = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_facilities.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
@@ -79,22 +84,22 @@ public class MainPPSimZurich30km {
 		allStrategies.add(new IllegalParking());
 
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
-		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork());
+		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork(), Message.ttMatrix);
 
 		AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
-		
-		
+
 		// TODO: load parking infrastructure files from:
 		// Z:\data\experiments\TRBAug2011\parkings
 
 		int writeEachNthIteration = 5;
+		int skipOutputInIteration = 0;
 
 		for (int iter = 0; iter < 1; iter++) {
 
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			LegHistogram lh = new LegHistogram(300);
 			EventWriterXML eventsWriter = new EventWriterXML(outputFolder + "events.xml.gz");
-			if (iter % writeEachNthIteration == 0) {
+			if (writeOutput(writeEachNthIteration, skipOutputInIteration, iter)) {
 				eventsManager.addHandler(eventsWriter);
 				eventsManager.addHandler(lh);
 
@@ -116,14 +121,14 @@ public class MainPPSimZurich30km {
 			sim.run();
 			eventsManager.finishProcessing();
 
-			if (iter % writeEachNthIteration == 0) {
+			if (writeOutput(writeEachNthIteration, skipOutputInIteration, iter)) {
 				lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_all.png");
 				lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_car.png", TransportMode.car);
 				lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
 				try {
 					lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_ride.png", TransportMode.ride);
 				} catch (Exception e) {
-					
+
 				}
 				lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
 				eventsWriter.reset(0);
@@ -133,6 +138,10 @@ public class MainPPSimZurich30km {
 
 		}
 
+	}
+
+	private static boolean writeOutput(int writeEachNthIteration, int skipOutputInIteration, int iter) {
+		return iter % writeEachNthIteration == 0 && iter != skipOutputInIteration;
 	}
 
 	private static void addParkingActivityAndWalkLegToPlans(Collection<? extends Person> persons) {

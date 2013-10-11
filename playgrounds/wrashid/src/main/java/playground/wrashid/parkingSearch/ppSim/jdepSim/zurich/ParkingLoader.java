@@ -29,6 +29,9 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
+import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
+import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
@@ -114,7 +117,7 @@ public class ParkingLoader {
 		ParkingHerbieControler.readParkings(parkingCalibrationFactor, parkingsFile, parkingCollection);
 	}
 
-	public static ParkingManagerZH getParkingManagerZH(LinkedList<Parking> parkings, Network network) {
+	public static ParkingManagerZH getParkingManagerZH(LinkedList<Parking> parkings, Network network, TTMatrix ttMatrix) {
 		String cityZonesFilePath = "C:/data/parkingSearch/psim/zurich/inputs/parkingZones/zones.csv";
 
 		ParkingCostCalculator parkingCostCalculator = new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), parkings);
@@ -136,17 +139,19 @@ public class ParkingLoader {
 			}
 		}
 		
-		return new ParkingManagerZH(parkingTypes, parkingCostCalculator, parkings, network);
+		return new ParkingManagerZH(parkingTypes, parkingCostCalculator, parkings, network, ttMatrix);
 	}
 
-	public static ParkingManagerZH getParkingManagerZH(Network network) {
+	public static ParkingManagerZH getParkingManagerZH(Network network, TTMatrix ttMatrix) {
 		LinkedList<Parking> parkings = getParkingsForScenario();
-		return getParkingManagerZH(parkings, network);
+		return getParkingManagerZH(parkings, network, ttMatrix);
 	}
 
 	public static void main(String[] args) {
 		Network network = GeneralLib.readNetwork("c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz");
-		getParkingManagerZH(network);
+		TTMatrix ttMatrix = new TTMatrixFromStoredTable("C:/data/parkingSearch/psim/zurich/inputs/it.50.3600secBin.ttMatrix.txt",
+				network);
+		getParkingManagerZH(network, ttMatrix);
 	}
 	
 }

@@ -25,10 +25,20 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -44,10 +54,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.withinday.utils.EditRoutes;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -61,16 +75,41 @@ import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTask;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
+import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 
 public class ParkingManagerZH {
 
+	private static final Logger log = Logger.getLogger(ParkingManagerZH.class);
+	
 	private ParkingCostCalculator parkingCostCalculator;
 	//key: parkingId
 	private HashMap<Id,Parking> parkingsHashMap=new HashMap<Id, Parking>();
 	private Network network;
+	
+	protected QuadTree<Parking> nonFullPublicParkingFacilities;
+	protected final HashSet<Parking> fullPublicParkingFacilities;
+	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
+	//private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
+	private IntegerValueHashMap<Id> occupiedParking;	// number of reserved parkings
+	private final HashMap<String, HashSet<Id>> parkingTypes;
+	// parkingId, linkId
+	private HashMap<Id, Id> parkingIdToLinkIdMapping=new HashMap<Id, Id>();
+	
+	// personId, parkingId
+	private HashMap<Id, Id> agentVehicleIdParkingIdMapping=new HashMap<Id, Id>();
+	
+	private EditRoute editRoute;
 
-	public ParkingManagerZH(HashMap<String, HashSet<Id>> parkingTypes,ParkingCostCalculator parkingCostCalculator, LinkedList<Parking> parkings, Network network) {
+	private TTMatrix ttMatrix;
+	
+	public ParkingManagerZH(HashMap<String, HashSet<Id>> parkingTypes,ParkingCostCalculator parkingCostCalculator, LinkedList<Parking> parkings, Network network, TTMatrix ttMatrix) {
+		this.ttMatrix = ttMatrix;
+		editRoute=new EditRoute(ttMatrix, network);
 		this.parkingCostCalculator = parkingCostCalculator;
 		this.network = network;
 		this.parkingTypes=parkingTypes;
@@ -83,6 +122,8 @@ public class ParkingManagerZH {
 			for (Parking parking:parkings){
 				Id linkId= ((NetworkImpl) network).getNearestLink(parking.getCoord()).getId();
 				assignFacilityToLink(linkId, parking.getId());
+				
+				parkingIdToLinkIdMapping.put(parking.getId(), linkId);
 						
 				Id oppositeDirectionLinkId = getOppositeDirectionLinkId(linkId,network);
 				if (oppositeDirectionLinkId!=null){
@@ -90,7 +131,6 @@ public class ParkingManagerZH {
 				}
 			}
 			
-			this.initialParkingFacilityOfAgent=new HashMap<Id, Parking>();
 			this.fullPublicParkingFacilities=new HashSet<Parking>();
 			
 			privateParkingFacilityIdMapping=new TwoHashMapsConcatenated<Id, String, Id>();
@@ -171,13 +211,7 @@ public class ParkingManagerZH {
 	
 	
 	
-	protected QuadTree<Parking> nonFullPublicParkingFacilities;
-	protected final HashSet<Parking> fullPublicParkingFacilities;
-	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
-	//private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
-	private IntegerValueHashMap<Id> occupiedParking;	// number of reserved parkings
-	private final HashMap<String, HashSet<Id>> parkingTypes;
-	private HashMap<Id,Parking> initialParkingFacilityOfAgent;
+	
 	
 	
 	public void resetParkingFacilityForNewIteration(){
@@ -187,10 +221,6 @@ public class ParkingManagerZH {
 		occupiedParking=new IntegerValueHashMap<Id>();
 	}
 	
-	public void setInitialParkingFacilityOfAgent(HashMap<Id, Parking> initialParkingFacilityOfAgent) {
-		this.initialParkingFacilityOfAgent = initialParkingFacilityOfAgent;
-	}
-
 	private void assignFacilityToLink(Id linkId, Id facilityId) {
 		List<Id> list = parkingFacilitiesOnLinkMapping.get(linkId);
 		if (list == null) {
@@ -231,7 +261,12 @@ public class ParkingManagerZH {
 		return freeCapacity;
 	}
 
-	public void parkVehicle(Id facilityId) {
+	public void parkVehicle(Id agentId, Id parkingId){
+		agentVehicleIdParkingIdMapping.put(agentId, parkingId);
+		parkVehicle(parkingId);
+	}
+	
+	private void parkVehicle(Id facilityId) {
 		occupiedParking.increment(facilityId);
 		
 		if (getFreeCapacity(facilityId)<0){
@@ -249,7 +284,12 @@ public class ParkingManagerZH {
 		fullPublicParkingFacilities.add(parking);
 	}
 
-	public void unParkVehicle(Id facilityId) {
+	public void unParkAgentVehicle(Id agentId){
+		Id parkingId = agentVehicleIdParkingIdMapping.remove(agentId);
+		unParkVehicle(parkingId);
+	}
+	
+	private void unParkVehicle(Id facilityId) {
 		occupiedParking.decrement(facilityId);
 		
 		if (getFreeCapacity(facilityId)==1){
@@ -312,7 +352,7 @@ public class ParkingManagerZH {
 		Parking parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
 		
 		// if parking full or on specified link, try finding other free parkings in the quadtree
-		while (getFreeCapacity(parkingFacility.getId())<=0 || parkingLinkMapping.get(parkingFacility.getId()).equals(linkId)){
+		while (getFreeCapacity(parkingFacility.getId())<=0 || parkingIdToLinkIdMapping.get(parkingFacility.getId()).equals(linkId)){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
 			parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
 		}
@@ -352,16 +392,14 @@ public class ParkingManagerZH {
 		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY()).getId();
 	}
 	
-	// parkingId, linkId
-	// TODO: init this!
-	private HashMap<Id, Id> parkingLinkMapping=new HashMap<Id, Id>();
+
 	
 	public synchronized Id getClosestParkingFacilityNotOnLink(Coord coord, Id linkId) {		
 		LinkedList<Parking> tmpList=new LinkedList<Parking>();
 		Parking parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
 		
 		// if parking full or on specified link, try finding other free parkings in the quadtree
-		while (parkingLinkMapping.get(parkingFacility.getId()).equals(linkId)){
+		while (parkingIdToLinkIdMapping.get(parkingFacility.getId()).equals(linkId)){
 			removeFullParkingFromQuadTree(tmpList, parkingFacility);
 			parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
 		}
@@ -392,9 +430,6 @@ public class ParkingManagerZH {
 		return nonFullPublicParkingFacilities.values();
 	}
 
-	public HashMap<Id, Parking> getInitialParkingFacilityOfAgent() {
-		return initialParkingFacilityOfAgent;
-	}
 
 	public Id getClosestFreeParkingFacilityId(Id linkId) {
 		return getClosestParkingFacility(this.network.getLinks().get(linkId).getCoord());
@@ -434,19 +469,80 @@ public class ParkingManagerZH {
 		}
 
 		public void initFirstParkingOfDay(Population population) {
+			log.info("starting initFirstParkingOfDay");
+			
+			
+			RerouteThread[] rerouteThreads=new RerouteThread[8];
+			
+			CyclicBarrier cyclicBarrier = new CyclicBarrier(rerouteThreads.length+1);
+			for (int i=0;i<rerouteThreads.length;i++){
+				rerouteThreads[i]=new RerouteThread(ttMatrix,network,cyclicBarrier);
+			}
+			
+			
+			int numberOfTasks=0;
 			for (Person person:population.getPersons().values()){
-				ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(0);
-				Id freePrivateParkingId = getFreePrivateParking(act.getFacilityId(),act.getType());
-				
-				if (freePrivateParkingId!=null){
-					parkVehicle(freePrivateParkingId);
-				} else {
-					Id closestFreeParkingFacilityId = getClosestFreeParkingFacilityId(act.getLinkId());
-					parkVehicle(closestFreeParkingFacilityId);
+				for (int i=0;i<person.getSelectedPlan().getPlanElements().size();i++){
+					PlanElement pe=person.getSelectedPlan().getPlanElements().get(i);
+					if (pe instanceof LegImpl){
+						LegImpl leg=(LegImpl) pe;
+						if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+							ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i-3);
+							ActivityImpl prevParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i-1);
+							ActivityImpl nextParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i+1);
+							
+							Id parkingId= getFreePrivateParking(act.getFacilityId(),act.getType());
+							
+							if (parkingId==null){
+								parkingId = getClosestFreeParkingFacilityId(act.getLinkId());
+							}
+							parkVehicle(person.getId(), parkingId);
+						
+							prevParkingAct.setLinkId(getLinkOfParking(parkingId));
+							
+							//leg.setRoute(editRoute.getRoute(act.getEndTime(), prevParkingAct.getLinkId(), nextParkingAct.getLinkId()));
+							//leg.setRoute(editRoute.addInitialPartToRoute(act.getEndTime(), prevParkingAct.getLinkId(), (LinkNetworkRouteImpl) leg.getRoute()));
+						//	 pool.submit(new AddInitialPartToRouteTask(act.getEndTime(), prevParkingAct.getLinkId(), leg,ttMatrix,network));
+							
+							 rerouteThreads[numberOfTasks % rerouteThreads.length].addTask(new RerouteTask(act.getEndTime(), prevParkingAct.getLinkId(), leg));
+								 
+							 numberOfTasks++;
+							 break;
+						}
+					}
 				}
 			}
+			
+			
+			for (int i=0;i<rerouteThreads.length;i++){
+				rerouteThreads[i].start();
+			}
+			
+			try {
+				cyclicBarrier.await();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (BrokenBarrierException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			for (int i=0;i<rerouteThreads.length;i++){
+				for (RerouteTask task:rerouteThreads[i].getTasks()){
+					synchronized (task) {
+						DebugLib.emptyFunctionForSettingBreakPoint();
+					}
+				}
+			}
+			
+			log.info("completed initFirstParkingOfDay");
 		}
 	
+		
+		public Id getLinkOfParking(Id parkingId){
+			return parkingIdToLinkIdMapping.get(parkingId);
+		}
 	
 	
 	
