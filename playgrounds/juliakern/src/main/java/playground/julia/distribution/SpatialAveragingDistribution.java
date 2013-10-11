@@ -50,7 +50,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -196,7 +195,6 @@ public class SpatialAveragingDistribution {
 							Double firstEndTime = firstTimeBin * timeBinSize;
 							Double firstpoll = getExposureFromActivity(time2WeightedEmissions1, pea, firstEndTime);
 							perEx.addExposureIntervall(firstStartTime, firstEndTime, firstpoll, actType);
-							System.out.println("added " + firstStartTime + " + " + firstEndTime + " + " + firstpoll + " + " + actType);
 							
 							// inner time bins
 							for (int i = firstTimeBin + 1; i < lastTimeBin; i++) {
@@ -376,8 +374,6 @@ public class SpatialAveragingDistribution {
 		
 		for(Double endOfTimeInterval : time2EmissionsTotalFilledAndFiltered.keySet()){
 			double[][]weightedEmissions = new double[noOfXbins][noOfYbins];
-			
-			System.out.println("end of time interval " + endOfTimeInterval);
 			
 			for(Id linkId : time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).keySet()){
 				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
