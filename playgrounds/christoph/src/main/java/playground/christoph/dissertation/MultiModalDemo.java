@@ -86,7 +86,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -670,7 +670,7 @@ public class MultiModalDemo {
 		public MultiModalDemoControler(Scenario scenario) {
 			super(scenario);
 			
-			this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
+			this.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
 			this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
 		}
 		

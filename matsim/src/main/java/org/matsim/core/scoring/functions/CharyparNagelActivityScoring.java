@@ -31,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelActivityScoring implements ActivityScoring {
+public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
 
 
 	protected double score;
@@ -253,7 +253,9 @@ public class CharyparNagelActivityScoring implements ActivityScoring {
 					firstLastActOpeningTimesWarning++;
 				}
 			}
-			this.score += calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity); // SCENARIO_DURATION
+			
+			double calcActScore = calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity);
+			this.score += calcActScore; // SCENARIO_DURATION
 		} else {
 			if (this.params.scoreActs) {
 				if (firstLastActWarning <= 10) {
@@ -279,6 +281,27 @@ public class CharyparNagelActivityScoring implements ActivityScoring {
 		assert firstActivity != null;
 		// score first activity
 		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+	}
+
+	@Override
+	public void handleFirstActivity(Activity act) {
+		assert act != null;
+		this.firstActivityEndTime = act.getEndTime();
+		this.firstActivity = act;
+		this.firstAct = false;
+
+	}
+
+	@Override
+	public void handleActivity(Activity act) {
+		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
+	}
+
+	@Override
+	public void handleLastActivity(Activity act) {
+		this.currentActivityStartTime = act.getStartTime();
+		this.handleOvernightActivity(act);
+		this.firstActivity = null;
 	}
 
 }

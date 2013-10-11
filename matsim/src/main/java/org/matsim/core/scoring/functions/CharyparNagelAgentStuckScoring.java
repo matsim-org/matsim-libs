@@ -29,7 +29,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicScoring {
+public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicScoring, org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring {
 
 	protected double score;
 

@@ -66,7 +66,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -260,7 +260,7 @@ public class EvacuationControler extends WithinDayController implements
 		EvacuationConfig.printConfig();
 		
 		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());	
+		this.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());	
 
 		/*
 		 * get number of threads from config file

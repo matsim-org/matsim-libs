@@ -1,0 +1,154 @@
+package org.matsim.core.scoring;
+
+import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.utils.misc.Time;
+
+public class SumScoringFunction implements ScoringFunction {
+
+	public interface BasicScoring {
+		public void finish();
+		public double getScore();
+		public void reset();
+	}
+	
+	public interface ActivityScoring extends BasicScoring {
+		void handleFirstActivity(final Activity act);
+		void handleActivity(final Activity act);
+		void handleLastActivity(final Activity act);
+	}
+
+	public interface LegScoring extends BasicScoring {
+		void handleLeg(final Leg leg);
+	}
+	
+	public interface MoneyScoring extends BasicScoring {
+		void addMoney(final double amount);
+	}
+
+	public interface AgentStuckScoring extends BasicScoring {
+		void agentStuck(final double time);
+	}
+	
+	public interface ArbitraryEventScoring extends BasicScoring {
+		void handleEvent( final Event event ) ;
+	}
+	
+	private static Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
+
+	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
+	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
+	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
+	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
+	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
+	private ArrayList<ArbitraryEventScoring> arbtraryEventScoringFunctions = new ArrayList<ArbitraryEventScoring>() ;
+	
+	@Override
+	public final void handleActivity(Activity activity) {
+		double startTime = activity.getStartTime();
+		double endTime = activity.getEndTime();
+        if (startTime == Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
+        	for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+    			activityScoringFunction.handleFirstActivity(activity);
+    		}
+        } else if (startTime != Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
+        	for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+    			activityScoringFunction.handleActivity(activity);
+    		}
+        } else if (startTime != Time.UNDEFINED_TIME && endTime == Time.UNDEFINED_TIME) {
+        	for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+    			activityScoringFunction.handleLastActivity(activity);
+    		}
+        } else {
+        	throw new RuntimeException("Trying to score an activity without start or end time. Should not happen."); 	
+        }
+    }
+
+	@Override
+    public final void handleLeg(Leg leg) {
+		for (LegScoring legScoringFunction : legScoringFunctions) {
+			legScoringFunction.handleLeg(leg);
+		}
+    }
+	
+	@Override
+	public void addMoney(double amount) {
+		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
+			moneyScoringFunction.addMoney(amount);
+		}
+	}
+
+	@Override
+	public void agentStuck(double time) {
+		for (AgentStuckScoring agentStuckScoringFunction : agentStuckScoringFunctions) {
+			agentStuckScoringFunction.agentStuck(time);
+		}
+	}
+
+	@Override
+	public void handleEvent(Event event) {
+		for ( ArbitraryEventScoring eventScoringFunction : this.arbtraryEventScoringFunctions ) {
+			eventScoringFunction.handleEvent(event) ;
+		}
+	}
+
+	@Override
+	public void finish() {
+		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
+			basicScoringFunction.finish();
+		}
+	}
+
+	/**
+	 * Add the score of all functions.
+	 */
+	@Override
+	public double getScore() {
+		double score = 0.0;
+		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
+            double contribution = basicScoringFunction.getScore();
+			if (log.isTraceEnabled()) {
+				log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
+			}
+            score += contribution;
+		}
+		return score;
+	}
+
+	/**
+	 * add the scoring function the list of functions, it implemented the
+	 * interfaces.
+	 * 
+	 * @param scoringFunction
+	 */
+	public void addScoringFunction(BasicScoring scoringFunction) {
+		basicScoringFunctions.add(scoringFunction);
+
+		if (scoringFunction instanceof ActivityScoring) {
+			activityScoringFunctions.add((ActivityScoring) scoringFunction);
+		}
+
+		if (scoringFunction instanceof AgentStuckScoring) {
+			agentStuckScoringFunctions.add((AgentStuckScoring) scoringFunction);
+		}
+
+		if (scoringFunction instanceof LegScoring) {
+			legScoringFunctions.add((LegScoring) scoringFunction);
+		}
+
+		if (scoringFunction instanceof MoneyScoring) {
+			moneyScoringFunctions.add((MoneyScoring) scoringFunction);
+		}
+		
+		if (scoringFunction instanceof ArbitraryEventScoring ) {
+			this.arbtraryEventScoringFunctions.add((ArbitraryEventScoring) scoringFunction) ;
+		}
+
+	}
+
+
+}

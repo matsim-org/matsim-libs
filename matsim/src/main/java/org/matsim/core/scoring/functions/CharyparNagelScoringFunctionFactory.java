@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 
 /**
  * A factory to create scoring functions as described by D. Charypar and K. Nagel.
@@ -78,11 +78,22 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 			 */
 			this.params = new CharyparNagelScoringParameters(this.config);
 		}
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(this.params));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.params, this.network));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
-		return scoringFunctionAccumulator;
+
+		SumScoringFunction sumScoringFunction = new SumScoringFunction();
+		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(this.params));
+		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(this.params, this.network));
+		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
+		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
+			
+		
+//		ScoringFunctionAccumulator sumScoringFunction = new ScoringFunctionAccumulator();
+//		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(this.params));
+//		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(this.params, this.network));
+//		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
+//		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
+		
+		
+		return sumScoringFunction;
 	}
+	
 }

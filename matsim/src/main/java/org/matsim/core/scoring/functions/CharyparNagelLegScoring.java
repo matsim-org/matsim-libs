@@ -43,7 +43,7 @@ import org.matsim.pt.PtConstants;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScoring {
+public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScoring, org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 
 	protected double score;
 	private double lastTime;
@@ -208,6 +208,12 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 				this.nextStartPtLegIsFirstOfTrip = false ;
 			}
 		}
+	}
+
+	@Override
+	public void handleLeg(Leg leg) {
+		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		this.score += legScore;
 	}
 
 

@@ -29,7 +29,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring {
+public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring {
 
 	private static final double INITIAL_SCORE = 0.0;
 

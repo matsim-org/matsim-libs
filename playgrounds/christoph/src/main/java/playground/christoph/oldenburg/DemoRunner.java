@@ -45,7 +45,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
+import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -98,7 +98,7 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
 		
 		// Use a Scoring Function, that only scores the travel times!
-		controler.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
+		controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
 	}
 	
 	/*
