@@ -105,14 +105,14 @@ public class SAString {
 		/* Initialise the output list. */
 		List<String> outputList = new ArrayList<String>();
 		
-//		int[] sitesInSolution = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
-		int[] sitesInSolution = {50};
+		int[] sitesInSolution = {5, 10, 15, 20, 25, 30, 35, 40, 45};
+//		int[] sitesInSolution = {20};
 		String prefix;
 		for(int n : sitesInSolution){
 			for(int run = 1; run <= 200; run++){
 				LOG.info("====> Number of sites: " + n + "; Run " + run + " <====");
 				/* Execute for full distance matrix. */
-				prefix = n +"_full_" + run;
+				prefix = n +"_full_" + String.format("%03d", run);
 				String outputString = sas.executeSA(n, outputFolder, prefix);
 				
 				/* Execute for demand point matrix. */
