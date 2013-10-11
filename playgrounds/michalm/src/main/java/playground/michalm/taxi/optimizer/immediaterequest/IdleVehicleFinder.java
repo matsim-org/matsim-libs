@@ -24,6 +24,7 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.taxi.optimizer.TaxiUtils;
+import playground.michalm.taxi.schedule.TaxiTask;
 
 
 public class IdleVehicleFinder
@@ -67,14 +68,14 @@ public class IdleVehicleFinder
             return Double.MAX_VALUE;
         }
 
-        Task currentTask = sched.getCurrentTask();
+        TaxiTask currentTask = (TaxiTask)sched.getCurrentTask();
 
-        switch (currentTask.getType()) {
-            case WAIT:
-                departVertex = ((WaitTask)currentTask).getAtVertex();
+        switch (currentTask.getTaxiTaskType()) {
+            case WAIT_STAY:
+                departVertex = ((StayTask)currentTask).getAtVertex();
                 break;
 
-            case DRIVE:// only CRUISE possible
+            case CRUISE_DRIVE:
                 throw new IllegalStateException();// currently, no support for vehicle diversion
 
             default:

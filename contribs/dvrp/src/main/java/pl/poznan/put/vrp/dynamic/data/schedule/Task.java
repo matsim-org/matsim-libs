@@ -23,7 +23,7 @@ public interface Task
 {
     public enum TaskType
     {
-        SERVE, DRIVE, WAIT;
+        STAY, DRIVE;
     }
 
 
@@ -31,10 +31,6 @@ public interface Task
     {
         PLANNED, STARTED, PERFORMED;
     }
-
-
-    public interface TaskInfo
-    {}
 
 
     TaskType getType();
@@ -57,15 +53,9 @@ public interface Task
     int getTaskIdx();
 
 
-    TaskInfo getInfo();
-
-
     // SETTERS:
     void setBeginTime(int beginTime);
 
 
     void setEndTime(int endTime);
-
-
-    void setInfo(TaskInfo info);
 }

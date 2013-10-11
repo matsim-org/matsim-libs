@@ -21,7 +21,7 @@ package playground.jbischoff.taxi.rank;
 
 import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
-import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
+import playground.michalm.taxi.schedule.TaxiCruiseDriveTask;
 /**
  * 
  * 
@@ -29,42 +29,20 @@ import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
  * @author jbischoff
  *
  */
-public class BackToRankTask extends TaxiDriveTask implements DriveTask {
-	 private final TaxiDriveType driveType;
+public class BackToRankTask extends TaxiCruiseDriveTask implements DriveTask {
 
-	
-	private Arc arc;
-	
-	
 	public BackToRankTask(int beginTime, int endTime, Arc arc) {
 		super(beginTime, endTime, arc);
 		
 		//the following is nonsense, as a drive to rank is not a pickup task. 
 		//But it works for the time being as expected
-	
-		driveType = TaxiDriveType.PICKUP;
-		this.arc = arc;	}
+		}
 
-	@Override
-	public TaskType getType() {
-		 return TaskType.DRIVE;
-	}
-	@Override
-	public TaxiDriveType getDriveType()
-	    {
-	        return driveType;
-	    }
-	
-	
-	@Override
-	public Arc getArc() {
-		return arc;
-	}
 
 	   @Override
 	    public String toString()
 	    {
-	        return "DtoRank(@" + arc.getFromVertex().getId() + "->@" + arc.getToVertex().getId() + ")"
+	        return "DtoRank(@" + getArc().getFromVertex().getId() + "->@" + getArc().getToVertex().getId() + ")"
 	                + commonToString();
 	    }
 }

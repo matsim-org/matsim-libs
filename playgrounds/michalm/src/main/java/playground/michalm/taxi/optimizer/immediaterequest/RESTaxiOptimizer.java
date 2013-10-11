@@ -25,11 +25,9 @@ import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.WaitTaskImpl;
 import playground.michalm.taxi.optimizer.TaxiUtils;
-import playground.michalm.taxi.optimizer.schedule.*;
-import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask.TaxiDriveType;
+import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class RESTaxiOptimizer
@@ -57,7 +55,7 @@ public class RESTaxiOptimizer
             return false;
         }
 
-        return optimizationPolicy.shouldOptimize(vehicle.getSchedule().getCurrentTask());
+        return optimizationPolicy.shouldOptimize((TaxiTask)vehicle.getSchedule().getCurrentTask());
     }
 
 
@@ -83,7 +81,7 @@ public class RESTaxiOptimizer
     {
         switch (schedule.getStatus()) {
             case STARTED:
-                Task task = schedule.getCurrentTask();
+                TaxiTask task = (TaxiTask)schedule.getCurrentTask();
 
                 if (Schedules.isLastTask(task)) {
                     return;
@@ -91,36 +89,43 @@ public class RESTaxiOptimizer
 
                 int obligatoryTasks = 0;// remove all planned tasks
 
-                switch (task.getType()) {
-                    case SERVE:
-
-                        if (destinationKnown) {
-                            obligatoryTasks = 1;// keep DELIVERY
-                            break;
-                        }
-                        else {
-                            return;// this is the last task in the schedule
+                switch (task.getTaxiTaskType()) {
+                    case PICKUP_DRIVE:
+                        if (!destinationKnown) {
+                            return;
                         }
 
-                    case DRIVE:
-                        if ( ((TaxiDriveTask)task).getDriveType() == TaxiDriveType.PICKUP) {
-
-                            if (destinationKnown) {
-                                obligatoryTasks = 2;// keep SERVE + DELIVERY
-                            }
-                            else {
-                                return;// this is the last but one task in the schedule
-                            }
-                        }
-
+                        obligatoryTasks = 3;
                         break;
 
-                    case WAIT:
+                    case PICKUP_STAY:
+                        if (!destinationKnown) {
+                            return;
+                        }
+                        obligatoryTasks = 2;
+                        break;
+
+                    case DROPOFF_DRIVE:
+                        obligatoryTasks = 1;
+                        break;
+
+                    case DROPOFF_STAY:
+                        obligatoryTasks = 0;
+                        break;
+
+                    case CRUISE_DRIVE:
+                        obligatoryTasks = 0;
+
+                    case WAIT_STAY:
                         // this WAIT is not the last task, so it seems that it is delayed
                         // and there are some other planned task
                         if (!TaxiUtils.isCurrentTaskDelayed(schedule, data.getTime())) {
                             throw new IllegalStateException();//
                         }
+                }
+
+                if (obligatoryTasks == 0) {
+                    return;
                 }
 
                 removePlannedTasks(schedule, obligatoryTasks);
@@ -130,12 +135,13 @@ public class RESTaxiOptimizer
                 Vertex lastVertex = Schedules.getLastVertexInSchedule(schedule);
 
                 if (scheduleEndTime < tEnd) {
-                    schedule.addTask(new WaitTaskImpl(scheduleEndTime, tEnd, lastVertex));
+                    schedule.addTask(new TaxiWaitStayTask(scheduleEndTime, tEnd, lastVertex));
                 }
                 else {
                     // may happen that the previous task ends after tEnd!!!!!!!!!!
                     // just a hack to comply with the assumptions, i.e. lastTask is WAIT_TASK
-                    schedule.addTask(new WaitTaskImpl(scheduleEndTime, scheduleEndTime, lastVertex));
+                    schedule.addTask(new TaxiWaitStayTask(scheduleEndTime, scheduleEndTime,
+                            lastVertex));
                 }
                 break;
 
@@ -157,10 +163,10 @@ public class RESTaxiOptimizer
         int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + obligatoryTasks;
 
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
-            Task task = tasks.get(i);
+            TaxiTask task = (TaxiTask)tasks.get(i);
 
-            if (task.getType() == TaskType.SERVE) {
-                Request req = ((ServeTask)task).getRequest();
+            if (task.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
+                Request req = ((TaxiPickupStayTask)task).getRequest();
                 unplannedRequestQueue.add(req);
             }
 

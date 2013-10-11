@@ -17,67 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.schedule.impl;
+package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.model.Request;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.schedule.ServeTask;
+import pl.poznan.put.vrp.dynamic.data.schedule.Task;
 
 
-public class ServeTaskImpl
-    extends AbstractTask
-    implements ServeTask
+public interface TaxiTask
+    extends Task
 {
-    private final Vertex atVertex;
-    private final Request request;
-
-
-    public ServeTaskImpl(int beginTime, int endTime, Vertex atVertex, Request request)
+    static enum TaxiTaskType
     {
-        super(beginTime, endTime);
-        this.atVertex = atVertex;
-        this.request = request;
+        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, WAIT_STAY;
     }
 
 
-    @Override
-    protected void notifyAdded()
-    {
-        request.notifyScheduled(this);
-    }
-
-
-    @Override
-    protected void notifyRemoved()
-    {
-        request.notifyUnscheduled();
-    }
-
-
-    @Override
-    public Request getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    public Vertex getAtVertex()
-    {
-        return atVertex;
-    }
-
-
-    @Override
-    public TaskType getType()
-    {
-        return TaskType.SERVE;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "S(R_" + request.getId() + ",@" + atVertex.getId() + ")" + commonToString();
-    }
+    TaxiTaskType getTaxiTaskType();
 }

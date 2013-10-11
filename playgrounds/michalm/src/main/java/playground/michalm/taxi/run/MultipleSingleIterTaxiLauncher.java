@@ -111,8 +111,8 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
                     .evaluateVrp(launcher.data.getVrpData());
 
             taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
-            taxiDeliveryDriveTime.addValue(evaluation.getTaxiDeliveryDriveTime());
-            taxiServiceTime.addValue(evaluation.getTaxiServiceTime());
+            taxiDeliveryDriveTime.addValue(evaluation.getTaxiDropoffDriveTime());
+            taxiServiceTime.addValue(evaluation.getTaxiPickupTime());
             taxiCruiseTime.addValue(evaluation.getTaxiCruiseTime());
             taxiWaitTime.addValue(evaluation.getTaxiWaitTime());
             taxiOverTime.addValue(evaluation.getTaxiOverTime());

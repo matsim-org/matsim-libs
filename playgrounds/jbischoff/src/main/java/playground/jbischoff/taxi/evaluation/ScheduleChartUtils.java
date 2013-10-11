@@ -36,8 +36,9 @@ import pl.poznan.put.util.lang.TimeUtils;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 /**
  * 
  * 
@@ -131,26 +132,29 @@ public class ScheduleChartUtils
 
             ChartTask tt;
             ChartTask ttt;
-            TaskType lastType = TaskType.WAIT;
-            TaskType nextType = null;
+            TaxiTask.TaxiTaskType lastType = TaxiTaskType.WAIT_STAY;
+            TaxiTask.TaxiTaskType nextType = null;
             
             if (column > 0){
             	tt = getTask(row,column-1);
-            	 lastType = tt.vrpTask.getType();
+            	 lastType = ((TaxiTask)tt.vrpTask).getTaxiTaskType();
             	 ttt=getTask(row,column+1);
-            	 if (ttt!=null) nextType = ttt.vrpTask.getType();
+            	 if (ttt!=null) nextType = ((TaxiTask)ttt.vrpTask).getTaxiTaskType();
             }
             
-            switch (t.vrpTask.getType()) {
-                case WAIT:
+            switch (((TaxiTask)t.vrpTask).getTaxiTaskType()) {
+                case WAIT_STAY:
                     return Color.DARK_GRAY;
-                case DRIVE:
+                    
+                case PICKUP_DRIVE:
+                case DROPOFF_DRIVE:
+                case CRUISE_DRIVE:
                 	if (column > 0){
                 		
                 		if (nextType!=null){
-                		if (lastType.equals(TaskType.WAIT)&&nextType.equals(TaskType.WAIT)){
+                		if (lastType.equals(TaxiTaskType.WAIT_STAY)&&nextType.equals(TaxiTaskType.WAIT_STAY)){
                 			return Color.MAGENTA;
-                		}else if (lastType.equals(t.vrpTask.getType())){
+                		}else if (lastType.equals(((TaxiTask)t.vrpTask).getTaxiTaskType())){
                 			return Color.MAGENTA;	
                 		}
                 		
@@ -159,7 +163,8 @@ public class ScheduleChartUtils
                 		
                 	}
                 	else  return DARK_BLUE;
-                case SERVE:
+                case PICKUP_STAY:
+                case DROPOFF_STAY:
 //                    if ( ((ServeTask)t.vrpTask).getRequest().getFixedVehicle()) {
 //                        return Color.ORANGE;
 //                    }
@@ -205,9 +210,9 @@ public class ScheduleChartUtils
             for (Task t : tasks) {
                 String description = t.getType().name();
 
-                if (t.getType() == TaskType.SERVE) {
-                    description += ": " + ((ServeTask)t).getRequest().toString();
-                }
+//                if (t.getType() == TaskType.SERVE) {
+//                    description += ": " + ((ServeTask)t).getRequest().toString();
+//                }
 
                 TimePeriod duration = new SimpleTimePeriod(new Date(t.getBeginTime() * 1000),
                         new Date(t.getEndTime() * 1000));

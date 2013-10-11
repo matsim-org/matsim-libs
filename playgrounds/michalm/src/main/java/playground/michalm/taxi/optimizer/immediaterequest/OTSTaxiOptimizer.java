@@ -21,6 +21,7 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import playground.michalm.taxi.schedule.TaxiTask;
 
 
 public class OTSTaxiOptimizer
@@ -44,7 +45,7 @@ public class OTSTaxiOptimizer
             return false;
         }
 
-        return optimizationPolicy.shouldOptimize(vehicle.getSchedule().getCurrentTask());
+        return optimizationPolicy.shouldOptimize((TaxiTask)vehicle.getSchedule().getCurrentTask());
     }
 
 

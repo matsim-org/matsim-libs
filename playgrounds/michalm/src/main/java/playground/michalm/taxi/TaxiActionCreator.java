@@ -25,7 +25,7 @@ import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
+import playground.michalm.taxi.schedule.*;
 
 
 public class TaxiActionCreator
@@ -43,35 +43,26 @@ public class TaxiActionCreator
     @Override
     public DynAction createAction(Task task, double now)
     {
-        switch (task.getType()) {
-            case DRIVE: // driving both with and without a passenger
-                final TaxiDriveTask tdt = (TaxiDriveTask)task;
+        TaxiTask tt = (TaxiTask)task;
 
-                switch (tdt.getDriveType()) {
-                    case PICKUP:
-                    case CRUISE:
-                        return new VrpDynLeg(tdt);
+        switch (tt.getTaxiTaskType()) {
+            case PICKUP_DRIVE:
+            case DROPOFF_DRIVE:
+            case CRUISE_DRIVE:
+                return new VrpDynLeg((DriveTask)task);
 
-                    case DELIVERY:
-                        return new VrpDynLeg(tdt) {
-                            public void endAction(double now)
-                            {
-                                PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, tdt,
-                                        tdt.getRequest(), now);
-                            }
-                        };
+            case PICKUP_STAY:
+                TaxiPickupStayTask pst = (TaxiPickupStayTask)task;
+                PassengerHandlingUtils.pickUpPassenger(vrpSimEngine, task, pst.getRequest(), now);
+                return new VrpActivity("ServeTask" + pst.getRequest().getId(), pst);
 
-                    default:
-                        throw new IllegalStateException("Not supported enum type");
-                }
+            case DROPOFF_STAY:
+                TaxiDropoffStayTask dst = (TaxiDropoffStayTask)task;
+                PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, dst, dst.getRequest(), now);
+                return new VrpActivity("ServeTask" + dst.getRequest().getId(), dst);
 
-            case SERVE: // pick up a passenger
-                ServeTask st = (ServeTask)task;
-                PassengerHandlingUtils.pickUpPassenger(vrpSimEngine, task, st.getRequest(), now);
-                return new VrpActivity("ServeTask" + st.getRequest().getId(), st);
-
-            case WAIT:
-                return new VrpActivity("WaitTask", (WaitTask)task);
+            case WAIT_STAY:
+                return new VrpActivity("WaitTask", (TaxiWaitStayTask)task);
 
             default:
                 throw new IllegalStateException();

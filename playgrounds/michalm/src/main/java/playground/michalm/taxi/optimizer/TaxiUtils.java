@@ -19,13 +19,11 @@
 
 package playground.michalm.taxi.optimizer;
 
-import java.util.Iterator;
-
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
+import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class TaxiUtils
@@ -38,40 +36,27 @@ public class TaxiUtils
             return false;
         }
 
-        Task currentTask = sched.getCurrentTask();
+        TaxiTask currentTask = (TaxiTask)sched.getCurrentTask();
 
-        switch (currentTask.getType()) {
-            case SERVE:
+        switch (currentTask.getTaxiTaskType()) {
+            case PICKUP_DRIVE://maybe in the future some diversion will be enabled....
+            case PICKUP_STAY:
+            case DROPOFF_DRIVE:
+            case DROPOFF_STAY:
                 return false;
 
-            case DRIVE:
-                TaxiDriveTask tdt = (TaxiDriveTask)currentTask;
+            case CRUISE_DRIVE:
+                // TODO this requires some analysis if a vehicle en route can be immediately
+                // diverted or there is a lag (as in the case of WAIT);
+                // how long is the lag??
+                System.err
+                        .println("Currently CRUISE cannot be interrupted, so the vehicle is considered BUSY...");
+                return false;
 
-                switch (tdt.getDriveType()) {
-                    case PICKUP:
-                    case DELIVERY:
-                        return false;
-
-                    case CRUISE:
-                        // TODO this requires some analysis if a vehicle en route can be immediately
-                        // diverted or there is a lag (as in the case of WAIT);
-                        // how long is the lag??
-                        System.err.println("Currently CRUISE cannot be interrupted, so the vehicle is considered BUSY...");
-                        return false;
-
-                    default:
-                        throw new IllegalStateException();
-                }
-
-            case WAIT:
+            case WAIT_STAY:
                 if (delayedWaitTaskAsNonIdle && isCurrentTaskDelayed(sched, time)) {
                     return false;// assuming that the next task is a non-wait task
                 }
-
-                break;
-
-            default:
-                throw new IllegalStateException();
         }
 
         // idle right now, but:
@@ -86,14 +71,14 @@ public class TaxiUtils
 
     public static boolean isCurrentTaskDelayed(Schedule schedule, int time)
     {
-        Task currentTask = schedule.getCurrentTask();
+        TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
         int delay = time - currentTask.getEndTime();
 
         if (delay < 0) {
             return false;
         }
 
-        if (currentTask.getType() == TaskType.WAIT && delay >= 2) {
+        if (currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY && delay >= 2) {
             // there can be a lag between a change in the schedule (WAIT->OTHER)
             // because activity ends (here, WAIT end) are handled only at the beginning of
             // a simulation step, i.e. ActivityEngine is before QNetsimEngine
@@ -104,48 +89,5 @@ public class TaxiUtils
         }
 
         return true;
-    }
-
-
-    // used for debugging
-    @SuppressWarnings("unused")
-    private static void printScheduledRequests(Vehicle veh)
-    {
-        Schedule sched = veh.getSchedule();
-        ScheduleStatus status = sched.getStatus();
-
-        String currentTaskId;
-
-        switch (status) {
-            case UNPLANNED:
-                currentTaskId = "-/";
-                break;
-
-            case PLANNED:
-                currentTaskId = "0/";
-                break;
-
-            case STARTED:
-                currentTaskId = (sched.getCurrentTask().getTaskIdx() + 1) + "/";
-                break;
-
-            case COMPLETED:
-                currentTaskId = "-/";
-                break;
-
-            default:
-                throw new IllegalStateException("Unsupported state");
-        }
-
-        StringBuilder schedLine = new StringBuilder("Veh: " + veh.getName() + " : " + status + " ["
-                + currentTaskId + sched.getTaskCount() + "]");
-        Iterator<ServeTask> stIter = Schedules.createServeTaskIter(sched);
-
-        while (stIter.hasNext()) {
-            ServeTask st = stIter.next();
-            schedLine.append("-").append(st.getRequest());
-        }
-
-        System.err.println(schedLine.toString());
     }
 }

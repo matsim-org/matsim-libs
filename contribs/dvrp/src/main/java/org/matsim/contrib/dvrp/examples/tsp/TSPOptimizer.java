@@ -53,7 +53,7 @@ public class TSPOptimizer
     @Override
     public void init()
     {
-        schedule.addTask(new WaitTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getDepot()
+        schedule.addTask(new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getDepot()
                 .getVertex()));
     }
 
@@ -61,16 +61,16 @@ public class TSPOptimizer
     @Override
     public void requestSubmitted(Request request)
     {
-        WaitTask lastTask = (WaitTask)Schedules.getLastTask(schedule);// only WAIT
+        StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only waiting
         int currentTime = data.getTime();
 
         switch (lastTask.getStatus()) {
             case PLANNED:
-                schedule.removeLastPlannedTask();// remove WaitTask
+                schedule.removeLastPlannedTask();// remove waiting
                 break;
 
             case STARTED:
-                lastTask.setEndTime(currentTime);// shortening the WAIT task
+                lastTask.setEndTime(currentTime);// shortening waiting
                 break;
 
             case PERFORMED:

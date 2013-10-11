@@ -98,8 +98,6 @@ public class ScheduleImpl
         for (int i = taskIdx + 1; i < tasks.size(); i++) {
             tasks.get(i).taskIdx = i;
         }
-
-        at.notifyAdded();
     }
 
 
@@ -217,7 +215,6 @@ public class ScheduleImpl
     private void removeTaskImpl(int taskIdx)
     {
         AbstractTask task = tasks.remove(taskIdx);
-        task.notifyRemoved();
         task.schedule = null;
         task.status = null;
         task.taskIdx = -1;

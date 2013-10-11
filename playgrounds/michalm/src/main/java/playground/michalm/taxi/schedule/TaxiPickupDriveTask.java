@@ -17,62 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model;
+package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.DriveTaskImpl;
 
 
-/**
- * @author michalm
- */
-public interface Request
+public class TaxiPickupDriveTask
+    extends DriveTaskImpl
+    implements TaxiTask
 {
-    public enum RequestStatus
+    private final Request request;
+
+
+    public TaxiPickupDriveTask(int beginTime, int endTime, Arc arc, Request request)
     {
-        INACTIVE("I"), // invisible to the dispatcher (ARTIFICIAL STATE!)
-        UNPLANNED("U"), // submitted by the CUSTOMER and received by the DISPATCHER
-        PLANNED("P"), // planned - included into one of the routes
-        STARTED("S"), // vehicle starts serving
-        PERFORMED("PE"), //
-        REJECTED("R"), // rejected by the DISPATCHER
-        CANCELLED("C");// canceled by the CUSTOMER
+        super(beginTime, endTime, arc);
+        this.request = request;
 
-        public final String shortName;
-
-
-        private RequestStatus(String shortName)
-        {
-            this.shortName = shortName;
+        if (request.getFromVertex() != arc.getToVertex()) {
+            throw new IllegalArgumentException();
         }
-    };
+    }
 
 
-    int getId();
+    @Override
+    public TaxiTaskType getTaxiTaskType()
+    {
+        return TaxiTaskType.PICKUP_DRIVE;
+    }
 
 
-    RequestStatus getStatus();// based on: serveTask.getStatus();
+    public Request getRequest()
+    {
+        return request;
+    }
 
 
-    Customer getCustomer();
-
-
-    Vertex getFromVertex();
-
-
-    Vertex getToVertex();
-
-
-    int getQuantity();
-
-
-    int getT0();// earliest start time
-
-
-    int getT1();// latest start time
-
-
-    int getSubmissionTime();
-
-
-    void setStatus(RequestStatus status);
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+    }
 }

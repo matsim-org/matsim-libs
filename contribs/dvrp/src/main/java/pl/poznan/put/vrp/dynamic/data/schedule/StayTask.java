@@ -26,5 +26,4 @@ public interface StayTask
     extends Task
 {
     Vertex getAtVertex();
-
 }

@@ -20,7 +20,6 @@
 package pl.poznan.put.vrp.dynamic.data.model;
 
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
 /**
@@ -43,8 +42,7 @@ public class RequestImpl
 
     private final int submissionTime;
 
-    private ServeTask serveTask = null;
-    private ReqStatus status = ReqStatus.INACTIVE;// based on: serveTask.getStatus();
+    private RequestStatus status = RequestStatus.INACTIVE;// based on: serveTask.getStatus();
 
 
     public RequestImpl(int id, Customer customer, Vertex fromVertex, Vertex toVertex, int quantity,
@@ -118,111 +116,21 @@ public class RequestImpl
 
 
     @Override
-    public Schedule getSchedule()
+    public RequestStatus getStatus()
     {
-        return serveTask.getSchedule();
-    }
-
-
-    @Override
-    public ReqStatus getStatus()
-    {
-        if (serveTask != null) {
-            switch (serveTask.getStatus()) {
-                case PLANNED:
-                    return ReqStatus.PLANNED;
-
-                case STARTED:
-                    return ReqStatus.STARTED;
-
-                case PERFORMED:
-                    return ReqStatus.PERFORMED;
-            }
-        }
-
         return status;
     }
 
 
-    @Override
-    public void submit()
+    public void setStatus(RequestStatus status)
     {
-        if (getStatus() != ReqStatus.INACTIVE) {
-            throw new RuntimeException("Request has been already submitted.");
-        }
-
-        status = ReqStatus.UNPLANNED;
-    }
-
-
-    @Override
-    public void reject()
-    {
-        if (getStatus() != ReqStatus.UNPLANNED) {
-            throw new RuntimeException("ReqStatus must be UNPLANNED;"
-                    + "if scheduled, first remove it from the schedule");
-        }
-
-        status = ReqStatus.REJECTED;
-    }
-
-
-    @Override
-    public void cancel()
-    {
-        if (getStatus() != ReqStatus.UNPLANNED) {
-            throw new RuntimeException("ReqStatus must be UNPLANNED;"
-                    + "if scheduled, first remove it from the schedule");
-        }
-
-        status = ReqStatus.CANCELLED;
-    }
-
-
-    @Override
-    public void notifyScheduled(ServeTask serveTask)
-    {
-        if (getStatus() != ReqStatus.UNPLANNED) {
-            throw new RuntimeException("ReqStatus must be UNPLANNED");
-        }
-
-        this.serveTask = serveTask;
-        this.status = null;// getStatus() will determine ReqStatus based on TaskStatus
-    }
-
-
-    @Override
-    public void notifyUnscheduled()
-    {
-        switch (getStatus()) {
-            case PLANNED: // typical
-            case STARTED: // ?? ONLY in case of CANCELLATION !!!
-                this.serveTask = null;
-                this.status = ReqStatus.UNPLANNED;
-                return;
-
-            default:
-                throw new RuntimeException("ReqStatus must be UNPLANNED, PLANNED or STARTED");
-        }
-    }
-
-
-    @Override
-    public ServeTask getServeTask()
-    {
-        return serveTask;
+        this.status = status;
     }
 
 
     @Override
     public String toString()
     {
-        if (serveTask == null) {
-            return "Request_" + id + " [S=(" + t0 + ", ???, " + t1 + "), F=???]";
-        }
-
-        return "Request_" + id + " [S=(" + t0 + ", " + serveTask.getBeginTime() + ", " + t1
-                + "), F=" + serveTask.getEndTime() + "]";
+        return "Request_" + id + " [S=(" + t0 + ", ???, " + t1 + "), F=???]";
     }
-
 }

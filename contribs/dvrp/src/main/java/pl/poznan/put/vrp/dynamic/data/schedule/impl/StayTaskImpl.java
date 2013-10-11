@@ -17,8 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.schedule;
+package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 
-public interface WaitTask
-    extends StayTask
-{}
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
+
+
+public class StayTaskImpl
+    extends AbstractTask
+    implements StayTask
+{
+    private final Vertex atVertex;
+
+
+    public StayTaskImpl(int beginTime, int endTime, Vertex atVertex)
+    {
+        super(beginTime, endTime);
+        this.atVertex = atVertex;
+    }
+
+
+    @Override
+    public Vertex getAtVertex()
+    {
+        return atVertex;
+    }
+
+
+    @Override
+    public TaskType getType()
+    {
+        return TaskType.STAY;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "S(@" + atVertex.getId() + ")" + commonToString();
+    }
+}

@@ -35,7 +35,6 @@ import org.jfree.data.xy.XYDataset;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task;
 
 
@@ -43,8 +42,15 @@ public class ScheduleChartUtils
 {
     public static JFreeChart chartSchedule(VrpData data)
     {
+        return chartSchedule(data, BASIC_DESCRIPTION_CREATOR, BASIC_PAINT_SELECTOR);
+    }
+
+
+    public static JFreeChart chartSchedule(VrpData data, DescriptionCreator descriptionCreator,
+            PaintSelector paintSelector)
+    {
         // data
-        TaskSeriesCollection dataset = createScheduleDataset(data);
+        TaskSeriesCollection dataset = createScheduleDataset(data, descriptionCreator);
         XYTaskDataset xyTaskDataset = new XYTaskDataset(dataset);
 
         // chart
@@ -68,7 +74,7 @@ public class ScheduleChartUtils
         plot.setRangeAxis(new DateAxis("Time", TimeZone.getTimeZone("GMT"), Locale.getDefault()));
 
         // Renderer
-        XYBarRenderer xyBarRenderer = new ChartTaskRenderer(dataset);
+        XYBarRenderer xyBarRenderer = new ChartTaskRenderer(dataset, paintSelector);
         xyBarRenderer.setUseYInterval(true);
         plot.setRenderer(xyBarRenderer);
 
@@ -96,14 +102,14 @@ public class ScheduleChartUtils
         extends XYBarRenderer
     {
         private final TaskSeriesCollection tsc;
-
-        private static final Color DARK_BLUE = new Color(0, 0, 200);
-        private static final Color DARK_RED = new Color(200, 0, 0);
+        private final PaintSelector paintSelector;
 
 
-        public ChartTaskRenderer(final TaskSeriesCollection tsc)
+        public ChartTaskRenderer(final TaskSeriesCollection tsc, PaintSelector paintSelector)
         {
             this.tsc = tsc;
+            this.paintSelector = paintSelector;
+
             setBarPainter(new StandardXYBarPainter());
             setShadowVisible(false);
             setDrawBarOutline(true);
@@ -120,20 +126,7 @@ public class ScheduleChartUtils
         @Override
         public Paint getItemPaint(int row, int column)
         {
-            ChartTask t = getTask(row, column);
-
-            switch (t.vrpTask.getType()) {
-                case WAIT:
-                    return Color.DARK_GRAY;
-                case DRIVE:
-                    return DARK_BLUE;
-                case SERVE:
-                    return DARK_RED;
-                default:
-                    throw new IllegalStateException("only 3 task types are supported");
-                    // return null;
-                    // Color.BLACK;
-            }
+            return paintSelector.select(getTask(row, column).vrpTask);
         }
 
 
@@ -145,7 +138,48 @@ public class ScheduleChartUtils
     }
 
 
-    private static TaskSeriesCollection createScheduleDataset(VrpData data)
+    public static interface PaintSelector
+    {
+        Paint select(Task task);
+    }
+
+
+    private static final Color DARK_BLUE = new Color(0, 0, 200);
+    private static final Color DARK_RED = new Color(200, 0, 0);
+
+    public static final PaintSelector BASIC_PAINT_SELECTOR = new PaintSelector() {
+        public Paint select(Task task)
+        {
+            switch (task.getType()) {
+                case DRIVE:
+                    return DARK_BLUE;
+
+                case STAY:
+                    return DARK_RED;
+
+                default:
+                    throw new IllegalStateException();
+            }
+        }
+    };
+
+
+    public static interface DescriptionCreator
+    {
+        String create(Task task);
+    }
+
+
+    public static final DescriptionCreator BASIC_DESCRIPTION_CREATOR = new DescriptionCreator() {
+        public String create(Task task)
+        {
+            return task.getType().name();
+        }
+    };
+
+
+    private static TaskSeriesCollection createScheduleDataset(VrpData data,
+            DescriptionCreator descriptionCreator)
     {
         TaskSeriesCollection collection = new TaskSeriesCollection();
 
@@ -162,11 +196,7 @@ public class ScheduleChartUtils
             List<Task> tasks = schedule.getTasks();
 
             for (Task t : tasks) {
-                String description = t.getType().name();
-
-                if (t.getType() == TaskType.SERVE) {
-                    description += ": " + ((ServeTask)t).getRequest().toString();
-                }
+                String description = descriptionCreator.create(t);
 
                 TimePeriod duration = new SimpleTimePeriod(new Date(t.getBeginTime() * 1000),
                         new Date(t.getEndTime() * 1000));

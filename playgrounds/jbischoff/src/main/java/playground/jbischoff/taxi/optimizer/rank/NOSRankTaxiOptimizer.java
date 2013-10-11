@@ -23,15 +23,13 @@ import java.util.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.WaitTaskImpl;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.rank.BackToRankTask;
-import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
+import playground.michalm.taxi.schedule.*;
 
 /**
  * 
@@ -82,26 +80,35 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
 	}
 
 	@Override
-	protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle,
-			boolean scheduleUpdated) {
-		Schedule schedule = vehicle.getSchedule();
+    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    {
+        Schedule schedule = vehicle.getSchedule();
 
-		if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-			return false;
-		}
+        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
+            return false;
+        }
 
-		boolean requestsInQueue = !unplannedRequestQueue.isEmpty();
-		boolean vehicleAvailable = schedule.getCurrentTask().getType() == TaskType.WAIT;
+        if (unplannedRequestQueue.isEmpty()) {
+            return false;
+        }
 
-		return vehicleAvailable && requestsInQueue;
-	}
+        TaxiTask tt = (TaxiTask)schedule.getCurrentTask();
+        switch (tt.getTaxiTaskType()) {
+            case WAIT_STAY:
+            case CRUISE_DRIVE:////////????????
+                return true;
+
+            default:
+                return false;
+        }
+    }
 
 	@Override
 	protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule schedule) {
-		ServeTask serveTask = (ServeTask) Schedules.getLastTask(schedule);
+	    TaxiPickupStayTask serveTask = (TaxiPickupStayTask) Schedules.getLastTask(schedule);
 
 		// add DELIVERY after SERVE
-		Request req = ((ServeTask) serveTask).getRequest();
+		Request req = ((TaxiPickupStayTask) serveTask).getRequest();
 		Vertex reqFromVertex = req.getFromVertex();
 		Vertex reqToVertex = req.getToVertex();
 		int t3 = serveTask.getEndTime();
@@ -114,7 +121,7 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
 
 		Arc arc = data.getVrpGraph().getArc(reqFromVertex, reqToVertex);
 		int startIdling = t3 + arc.getTimeOnDeparture(t3);
-		schedule.addTask(new TaxiDriveTask(t3, startIdling, arc, req));
+		schedule.addTask(new TaxiPickupDriveTask(t3, startIdling, arc, req));
 		// addWaitTime at the end (even 0-second WAIT)
 		int tEnd = Math.max(startIdling, Schedules.getActualT1(schedule));
 		int startWaiting = startIdling;
@@ -127,17 +134,17 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
 						+ darc.getTimeOnDeparture(startIdling);
 				schedule.addTask(new BackToRankTask(startIdling, startWaiting,
 						darc));
-				schedule.addTask(new WaitTaskImpl(startWaiting, tEnd, schedule
+				schedule.addTask(new StayTaskImpl(startWaiting, tEnd, schedule
 						.getVehicle().getDepot().getVertex()));
 
 			} else {
-				schedule.addTask(new WaitTaskImpl(startIdling, tEnd,
+				schedule.addTask(new StayTaskImpl(startIdling, tEnd,
 						reqToVertex));
 			}
 		}
 
 		else {
-			schedule.addTask(new WaitTaskImpl(startIdling, tEnd, reqToVertex));
+			schedule.addTask(new StayTaskImpl(startIdling, tEnd, reqToVertex));
 		}
 	}
 

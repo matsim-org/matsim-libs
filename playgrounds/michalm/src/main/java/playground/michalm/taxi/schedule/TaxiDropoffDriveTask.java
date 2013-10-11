@@ -17,43 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.schedule.impl;
+package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.schedule.WaitTask;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.DriveTaskImpl;
 
 
-public class WaitTaskImpl
-    extends AbstractTask
-    implements WaitTask
+public class TaxiDropoffDriveTask
+    extends DriveTaskImpl
+    implements TaxiTask
 {
-    private final Vertex atVertex;
+    private final Request request;
 
 
-    public WaitTaskImpl(int beginTime, int endTime, Vertex atVertex)
+    public TaxiDropoffDriveTask(int beginTime, int endTime, Arc arc, Request request)
     {
-        super(beginTime, endTime);
-        this.atVertex = atVertex;
+        super(beginTime, endTime, arc);
+        this.request = request;
+
+        if (request.getFromVertex() != arc.getFromVertex()
+                && request.getToVertex() != arc.getToVertex()) {
+            throw new IllegalArgumentException();
+        }
     }
 
 
     @Override
-    public Vertex getAtVertex()
+    public TaxiTaskType getTaxiTaskType()
     {
-        return atVertex;
+        return TaxiTaskType.DROPOFF_DRIVE;
+    }
+
+
+    public Request getRequest()
+    {
+        return request;
     }
 
 
     @Override
-    public TaskType getType()
+    protected String commonToString()
     {
-        return TaskType.WAIT;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "W(@" + atVertex.getId() + ")" + commonToString();
+        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
     }
 }

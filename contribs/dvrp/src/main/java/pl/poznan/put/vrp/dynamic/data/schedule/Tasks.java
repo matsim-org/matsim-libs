@@ -29,11 +29,10 @@ public class Tasks
         switch (task.getType()) {
             case DRIVE:
                 return ((DriveTask)task).getArc().getFromVertex();
-            case SERVE:
-            case WAIT:
+            case STAY:
                 return ((StayTask)task).getAtVertex();
             default:
-                throw new IllegalStateException("Only: DRIVE, SERVE or WAIT");
+                throw new IllegalStateException("Only: DRIVE or STAY");
         }
     }
 
@@ -43,11 +42,10 @@ public class Tasks
         switch (task.getType()) {
             case DRIVE:
                 return ((DriveTask)task).getArc().getToVertex();
-            case SERVE:
-            case WAIT:
+            case STAY:
                 return ((StayTask)task).getAtVertex();
             default:
-                throw new IllegalStateException("Only: DRIVE, SERVE or WAIT");
+                throw new IllegalStateException("Only: DRIVE or STAY");
         }
     }
 }

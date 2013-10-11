@@ -17,62 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model;
+package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.DriveTaskImpl;
 
 
-/**
- * @author michalm
- */
-public interface Request
+public class TaxiCruiseDriveTask
+    extends DriveTaskImpl
+    implements TaxiTask
 {
-    public enum RequestStatus
+    public TaxiCruiseDriveTask(int beginTime, int endTime, Arc arc)
     {
-        INACTIVE("I"), // invisible to the dispatcher (ARTIFICIAL STATE!)
-        UNPLANNED("U"), // submitted by the CUSTOMER and received by the DISPATCHER
-        PLANNED("P"), // planned - included into one of the routes
-        STARTED("S"), // vehicle starts serving
-        PERFORMED("PE"), //
-        REJECTED("R"), // rejected by the DISPATCHER
-        CANCELLED("C");// canceled by the CUSTOMER
-
-        public final String shortName;
+        super(beginTime, endTime, arc);
+    }
 
 
-        private RequestStatus(String shortName)
-        {
-            this.shortName = shortName;
-        }
-    };
+    @Override
+    public TaxiTaskType getTaxiTaskType()
+    {
+        return TaxiTaskType.CRUISE_DRIVE;
+    }
 
 
-    int getId();
-
-
-    RequestStatus getStatus();// based on: serveTask.getStatus();
-
-
-    Customer getCustomer();
-
-
-    Vertex getFromVertex();
-
-
-    Vertex getToVertex();
-
-
-    int getQuantity();
-
-
-    int getT0();// earliest start time
-
-
-    int getT1();// latest start time
-
-
-    int getSubmissionTime();
-
-
-    void setStatus(RequestStatus status);
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+    }
 }

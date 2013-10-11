@@ -21,22 +21,30 @@ package pl.poznan.put.vrp.dynamic.data.schedule;
 
 import java.util.*;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 
-import com.google.common.base.*;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 
 
 public class Schedules
 {
-    public static final Predicate<Task> SERVE_TASK_PREDICATE = new TaskTypePredicate(TaskType.SERVE);
+    public static final Predicate<Task> STAY_TASK_PREDICATE = new Predicate<Task>() {
+        public boolean apply(Task input)
+        {
+            return input.getType() == TaskType.STAY;
+        };
+    };
 
-    public static final Predicate<Task> DRIVE_TASK_PREDICATE = new TaskTypePredicate(TaskType.DRIVE);
-
-    public static final Predicate<Task> WAIT_TASK_PREDICATE = new TaskTypePredicate(TaskType.WAIT);
+    public static final Predicate<Task> DRIVE_TASK_PREDICATE = new Predicate<Task>() {
+        public boolean apply(Task input)
+        {
+            return input.getType() == TaskType.DRIVE;
+        };
+    };
 
     public static final Comparator<Task> TASK_SCHEDULE_IDX_COMPARATOR = new Comparator<Task>() {
         @Override
@@ -47,13 +55,6 @@ public class Schedules
             }
 
             return t1.getTaskIdx() - t2.getTaskIdx();
-        }
-    };
-
-    public static final Function<ServeTask, Request> SERVE_TASK_TO_REQUEST = new Function<ServeTask, Request>() {
-        public Request apply(ServeTask input)
-        {
-            return input.getRequest();
         }
     };
 
@@ -82,7 +83,7 @@ public class Schedules
         return tasks.get(tasks.size() - 1);
     }
 
-    
+
     public static boolean isFirstTask(Task task)
     {
         return task.getTaskIdx() == 0;
@@ -121,8 +122,7 @@ public class Schedules
             case DRIVE:
                 return ((DriveTask)task).getArc().getToVertex();
 
-            case SERVE:
-            case WAIT:
+            case STAY:
                 return ((StayTask)task).getAtVertex();
 
             default:
@@ -132,16 +132,9 @@ public class Schedules
 
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Iterator<Request> createRequestIter(Schedule schedule)
+    public static Iterator<StayTask> createStayTaskIter(Schedule schedule)
     {
-        return (Iterator)createTaskFilterIter(schedule, SERVE_TASK_PREDICATE);
-    }
-
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Iterator<ServeTask> createServeTaskIter(Schedule schedule)
-    {
-        return (Iterator)createTaskFilterIter(schedule, SERVE_TASK_PREDICATE);
+        return (Iterator)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
     }
 
 
@@ -152,36 +145,9 @@ public class Schedules
     }
 
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Iterator<DriveTask> createWaitTaskIter(Schedule schedule)
-    {
-        return (Iterator)createTaskFilterIter(schedule, WAIT_TASK_PREDICATE);
-    }
-
-
     public static Iterator<Task> createTaskFilterIter(Schedule schedule,
             Predicate<Task> taskPredicate)
     {
         return Iterators.filter(schedule.getTasks().iterator(), taskPredicate);
-    }
-
-
-    private static class TaskTypePredicate
-        implements Predicate<Task>
-    {
-        private TaskType taskType;
-
-
-        public TaskTypePredicate(TaskType taskType)
-        {
-            this.taskType = taskType;
-        }
-
-
-        @Override
-        public boolean apply(Task input)
-        {
-            return input.getType() == taskType;
-        }
     }
 }

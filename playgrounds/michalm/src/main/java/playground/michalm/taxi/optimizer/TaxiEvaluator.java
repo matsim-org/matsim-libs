@@ -24,7 +24,7 @@ import java.io.PrintWriter;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
+import playground.michalm.taxi.schedule.*;
 
 
 public class TaxiEvaluator
@@ -53,51 +53,41 @@ public class TaxiEvaluator
         }
 
         for (Task t : s.getTasks()) {
-            int time = t.getEndTime() - t.getBeginTime();
+            TaxiTask tt = (TaxiTask)t;
 
-            switch (t.getType()) {
-                case DRIVE:
-                    TaxiDriveTask dt = (TaxiDriveTask)t;
+            int time = tt.getEndTime() - tt.getBeginTime();
 
-                    switch (dt.getDriveType()) {
-                        case DELIVERY:
-                            eval.taxiDeliveryDriveTime += time;
-                            break;
-
-                        case PICKUP:
-                            eval.taxiPickupDriveTime += time;
-                            break;
-
-                        case CRUISE:
-                            eval.taxiCruiseTime += time;
-                            break;
-
-                        default:
-                            throw new IllegalStateException();
-                    }
-
+            switch (tt.getTaxiTaskType()) {
+                case PICKUP_DRIVE:
+                    eval.taxiPickupDriveTime += time;
                     break;
 
-                case SERVE:
-                    Request req = ((ServeTask)t).getRequest();
+                case DROPOFF_DRIVE:
+                    eval.taxiDropoffDriveTime += time;
+                    break;
 
-                    eval.taxiServiceTime += time;
+                case CRUISE_DRIVE:
+                    eval.taxiCruiseTime += time;
+                    break;
 
+                case PICKUP_STAY:
+                    eval.taxiPickupTime += time;
+
+                    Request req = ((TaxiPickupStayTask)tt).getRequest();
                     int waitTime = t.getBeginTime() - req.getT0();
                     eval.passengerWaitTime += waitTime;
 
                     if (eval.maxPassengerWaitTime < waitTime) {
                         eval.maxPassengerWaitTime = waitTime;
                     }
-
                     break;
 
-                case WAIT:
+                case DROPOFF_STAY:
+                    eval.taxiDropoffTime += time;
+                    break;
+
+                case WAIT_STAY:
                     eval.taxiWaitTime += time;
-                    break;
-
-                default:
-                    throw new IllegalStateException();
             }
         }
 
@@ -112,9 +102,10 @@ public class TaxiEvaluator
 
     public static class TaxiEvaluation
     {
-        public static final String HEADER = "PickupT\t" //
-                + "DeliveryT\t"//
-                + "ServiceT\t" //
+        public static final String HEADER = "PickupDriveT\t" //
+                + "DeliveryDriveT\t"//
+                + "PickupT\t" //
+                + "DropoffT\t" //
                 + "CruiseT\t" //
                 + "WaitT\t" //
                 + "OverT\t" //
@@ -122,8 +113,9 @@ public class TaxiEvaluator
                 + "MaxPassengerWaitT";
 
         private int taxiPickupDriveTime;
-        private int taxiDeliveryDriveTime;
-        private int taxiServiceTime;
+        private int taxiDropoffDriveTime;
+        private int taxiPickupTime;
+        private int taxiDropoffTime;
         private int taxiCruiseTime;
         private int taxiWaitTime;
         private int taxiOverTime;
@@ -137,15 +129,21 @@ public class TaxiEvaluator
         }
 
 
-        public int getTaxiDeliveryDriveTime()
+        public int getTaxiDropoffDriveTime()
         {
-            return taxiDeliveryDriveTime;
+            return taxiDropoffDriveTime;
         }
 
 
-        public int getTaxiServiceTime()
+        public int getTaxiPickupTime()
         {
-            return taxiServiceTime;
+            return taxiPickupTime;
+        }
+
+
+        public int getTaxiDropoffTime()
+        {
+            return taxiDropoffTime;
         }
 
 
@@ -182,9 +180,10 @@ public class TaxiEvaluator
         @Override
         public String toString()
         {
-            return new StringBuilder().append(taxiDeliveryDriveTime).append('\t') //
+            return new StringBuilder().append(taxiDropoffDriveTime).append('\t') //
                     .append(taxiPickupDriveTime).append('\t') //
-                    .append(taxiServiceTime).append('\t') //
+                    .append(taxiPickupTime).append('\t') //
+                    .append(taxiDropoffTime).append('\t') //
                     .append(taxiCruiseTime).append('\t') //
                     .append(taxiWaitTime).append('\t') //
                     .append(taxiOverTime).append('\t') //

@@ -17,13 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.schedule;
+package playground.michalm.taxi.schedule;
 
 import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 
 
-public interface ServeTask
-    extends StayTask
+public class TaxiDropoffStayTask
+    extends StayTaskImpl
+    implements TaxiTask
 {
-    Request getRequest();
+    private final Request request;
+
+
+    public TaxiDropoffStayTask(int beginTime, int endTime, Request request)
+    {
+        super(beginTime, endTime, request.getToVertex());
+        this.request = request;
+    }
+
+
+    @Override
+    public TaxiTaskType getTaxiTaskType()
+    {
+        return TaxiTaskType.DROPOFF_STAY;
+    }
+
+
+    public Request getRequest()
+    {
+        return request;
+    }
+
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+    }
 }

@@ -25,7 +25,7 @@ import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
+import playground.michalm.taxi.schedule.TaxiTask;
 
 
 public class NOSTaxiOptimizer
@@ -71,9 +71,18 @@ public class NOSTaxiOptimizer
             return false;
         }
 
-        boolean requestsInQueue = !unplannedRequestQueue.isEmpty();
-        boolean vehicleAvailable = schedule.getCurrentTask().getType() == TaskType.WAIT;
+        if (unplannedRequestQueue.isEmpty()) {
+            return false;
+        }
 
-        return vehicleAvailable && requestsInQueue;
+        TaxiTask tt = (TaxiTask)schedule.getCurrentTask();
+        switch (tt.getTaxiTaskType()) {
+            case WAIT_STAY:
+            case CRUISE_DRIVE:////////????????
+                return true;
+
+            default:
+                return false;
+        }
     }
 }

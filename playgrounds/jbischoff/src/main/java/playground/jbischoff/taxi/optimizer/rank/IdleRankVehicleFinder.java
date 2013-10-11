@@ -19,22 +19,18 @@
 
 package playground.jbischoff.taxi.optimizer.rank;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Request;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
-import pl.poznan.put.vrp.dynamic.data.schedule.WaitTask;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
+import playground.michalm.taxi.optimizer.TaxiUtils;
+import playground.michalm.taxi.schedule.TaxiTask;
 /**
  * 
  * 
@@ -222,14 +218,14 @@ public class IdleRankVehicleFinder
             return Double.MAX_VALUE;
         }
 
-        Task currentTask = sched.getCurrentTask();
+        TaxiTask currentTask = (TaxiTask)sched.getCurrentTask();
 
-        switch (currentTask.getType()) {
-            case WAIT:
-                departVertex = ((WaitTask)currentTask).getAtVertex();
+        switch (currentTask.getTaxiTaskType()) {
+            case WAIT_STAY:
+                departVertex = ((StayTask)currentTask).getAtVertex();
                 break;
 
-            case DRIVE:// only CRUISE possible
+            case CRUISE_DRIVE:// only CRUISE possible
                 throw new IllegalStateException();// currently, no support for vehicle diversion
 
             default:

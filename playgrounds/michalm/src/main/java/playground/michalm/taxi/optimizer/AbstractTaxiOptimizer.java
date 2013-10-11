@@ -25,10 +25,10 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
+import pl.poznan.put.vrp.dynamic.data.model.Request.RequestStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.WaitTaskImpl;
+import playground.michalm.taxi.schedule.TaxiWaitStayTask;
 
 
 /**
@@ -73,7 +73,7 @@ public abstract class AbstractTaxiOptimizer
         // Let's just add a WAIT task to each schedule
         for (Vehicle veh : data.getVehicles()) {
             veh.getSchedule().addTask(
-                    new WaitTaskImpl(veh.getT0(), veh.getT1(), veh.getDepot().getVertex()));
+                    new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getDepot().getVertex()));
         }
     }
 
@@ -135,13 +135,13 @@ public abstract class AbstractTaxiOptimizer
         while (!unplannedRequestQueue.isEmpty()) {
             Request req = unplannedRequestQueue.peek();
 
-            if (req.getStatus() != ReqStatus.UNPLANNED) {
+            if (req.getStatus() != RequestStatus.UNPLANNED) {
                 throw new IllegalStateException();
             }
 
             scheduleRequest(req);// means: try to schedule
 
-            if (req.getStatus() == ReqStatus.UNPLANNED) {
+            if (req.getStatus() == RequestStatus.UNPLANNED) {
                 return;// no taxi available
             }
             else {

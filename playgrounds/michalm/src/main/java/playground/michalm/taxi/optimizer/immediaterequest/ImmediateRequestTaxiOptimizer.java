@@ -30,9 +30,9 @@ import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
+import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 /**
@@ -74,6 +74,7 @@ public abstract class ImmediateRequestTaxiOptimizer
     private final boolean destinationKnown;
     private final boolean minimizePickupTripTime;
     private final int pickupDuration;
+    private final int dropoffDuration = 60;
 
 
     public ImmediateRequestTaxiOptimizer(VrpData data, boolean destinationKnown,
@@ -160,28 +161,27 @@ public abstract class ImmediateRequestTaxiOptimizer
 
             case PLANNED:
             case STARTED:
-                Task lastTask = Schedules.getLastTask(vehicle.getSchedule());
+                TaxiTask lastTask = (TaxiTask)Schedules.getLastTask(vehicle.getSchedule());
 
-                switch (lastTask.getType()) {
-                    case WAIT:
-                        vertex = ((WaitTask)lastTask).getAtVertex();
+                switch (lastTask.getTaxiTaskType()) {
+                    case WAIT_STAY:
+                        vertex = ((StayTask)lastTask).getAtVertex();
                         time = Math.max(lastTask.getBeginTime(), currentTime);
                         return new VertexTimePair(vertex, time);
 
-                    case SERVE:
+                    case PICKUP_STAY:
                         if (!destinationKnown) {
                             return null;
                         }
-                        
-                    case DRIVE:
+
                     default:
                         throw new IllegalStateException();
                 }
-                
+
             case COMPLETED:
             default:
                 throw new IllegalStateException();
- 
+
         }
     }
 
@@ -191,7 +191,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         Schedule bestSched = best.vehicle.getSchedule();
 
         if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
-            WaitTask lastTask = (WaitTask)Schedules.getLastTask(bestSched);// only WAIT
+            TaxiWaitStayTask lastTask = (TaxiWaitStayTask)Schedules.getLastTask(bestSched);// only WAIT
 
             switch (lastTask.getStatus()) {
                 case PLANNED:
@@ -217,10 +217,10 @@ public abstract class ImmediateRequestTaxiOptimizer
         }
 
         Vertex reqFromVertex = req.getFromVertex();
-        bestSched.addTask(new TaxiDriveTask(best.t1, best.t2, best.arc, req));
+        bestSched.addTask(new TaxiPickupDriveTask(best.t1, best.t2, best.arc, req));
 
         int t3 = best.t2 + pickupDuration;
-        bestSched.addTask(new ServeTaskImpl(best.t2, t3, reqFromVertex, req));
+        bestSched.addTask(new TaxiPickupStayTask(best.t2, t3, req));
 
         if (destinationKnown) {
             appendDeliveryAndWaitTasksAfterServeTask(bestSched);
@@ -233,7 +233,7 @@ public abstract class ImmediateRequestTaxiOptimizer
     {
         int time = data.getTime();
         Schedule schedule = vehicle.getSchedule();
-        Task currentTask = schedule.getCurrentTask();
+        TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
 
         int initialEndTime;
 
@@ -258,7 +258,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         }
 
         if (!destinationKnown) {
-            if (currentTask.getType() == TaskType.SERVE) {
+            if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
                 appendDeliveryAndWaitTasksAfterServeTask(schedule);
                 return true;
             }
@@ -275,21 +275,24 @@ public abstract class ImmediateRequestTaxiOptimizer
 
     protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule schedule)
     {
-        ServeTask serveTask = (ServeTask)Schedules.getLastTask(schedule);
+        TaxiPickupStayTask serveTask = (TaxiPickupStayTask)Schedules.getLastTask(schedule);
 
         // add DELIVERY after SERVE
-        Request req = ((ServeTask)serveTask).getRequest();
+        Request req = ((TaxiPickupStayTask)serveTask).getRequest();
         Vertex reqFromVertex = req.getFromVertex();
         Vertex reqToVertex = req.getToVertex();
         int t3 = serveTask.getEndTime();
 
         Arc arc = data.getVrpGraph().getArc(reqFromVertex, reqToVertex);
         int t4 = t3 + arc.getTimeOnDeparture(t3);
-        schedule.addTask(new TaxiDriveTask(t3, t4, arc, req));
+        schedule.addTask(new TaxiDropoffDriveTask(t3, t4, arc, req));
+
+        int t5 = t4 + dropoffDuration;
+        schedule.addTask(new TaxiDropoffStayTask(t4, t5, req));
 
         // addWaitTime at the end (even 0-second WAIT)
-        int tEnd = Math.max(t4, Schedules.getActualT1(schedule));
-        schedule.addTask(new WaitTaskImpl(t4, tEnd, reqToVertex));
+        int tEnd = Math.max(t5, Schedules.getActualT1(schedule));
+        schedule.addTask(new TaxiWaitStayTask(t4, tEnd, reqToVertex));
     }
 
 
@@ -306,10 +309,10 @@ public abstract class ImmediateRequestTaxiOptimizer
         int t = currentTask.getEndTime();
 
         for (int i = startIdx; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
+            TaxiTask task = (TaxiTask)tasks.get(i);
 
-            switch (task.getType()) {
-                case WAIT: {
+            switch (task.getTaxiTaskType()) {
+                case WAIT_STAY: {
                     // wait can be at the end of the schedule
                     //
                     // BUT:
@@ -352,7 +355,9 @@ public abstract class ImmediateRequestTaxiOptimizer
 
                     break;
                 }
-                case DRIVE: {
+
+                case PICKUP_DRIVE:
+                case DROPOFF_DRIVE: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
                     t += ((DriveTask)task).getArc().getTimeOnDeparture(t);
@@ -360,7 +365,8 @@ public abstract class ImmediateRequestTaxiOptimizer
 
                     break;
                 }
-                case SERVE: {
+                case PICKUP_STAY:
+                case DROPOFF_STAY: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
                     t += pickupDuration;
@@ -368,6 +374,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
                     break;
                 }
+
                 default:
                     throw new IllegalStateException();
             }

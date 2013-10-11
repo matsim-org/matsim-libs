@@ -84,15 +84,9 @@ public class VrpSchedulePlan
                     addLeg((MatsimArc)dt.getArc(), dt.getBeginTime(), dt.getEndTime());
                     break;
 
-                case SERVE:
-                    ServeTask st = (ServeTask)t;
-                    addActivity((MatsimVertex)st.getAtVertex(), st.getEndTime(), ""
-                            + st.getRequest().getId());
-                    break;
-
-                case WAIT:
-                    WaitTask wt = (WaitTask)t;
-                    addActivity((MatsimVertex)wt.getAtVertex(), wt.getEndTime(), "W");
+                case STAY:
+                    StayTask wt = (StayTask)t;
+                    addActivity((MatsimVertex)wt.getAtVertex(), wt.getEndTime(), "S");
                     break;
 
                 default:

@@ -19,10 +19,8 @@
 
 package playground.jbischoff.taxi.optimizer.rank;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import org.jfree.util.Log;
 import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -30,12 +28,12 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.rank.BackToRankTask;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
+import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 /**
  * The main assumption: Requests are scheduled at the last request in the
@@ -163,15 +161,15 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 
 		case PLANNED:
 		case STARTED:
-			Task lastTask = Schedules.getLastTask(vehicle.getSchedule());
+			TaxiTask lastTask = (TaxiTask)Schedules.getLastTask(vehicle.getSchedule());
 
-			switch (lastTask.getType()) {
-			case WAIT:
-				vertex = ((WaitTask) lastTask).getAtVertex();
+			switch (lastTask.getTaxiTaskType()) {
+			case WAIT_STAY:
+				vertex = ((StayTask) lastTask).getAtVertex();
 				time = Math.max(lastTask.getBeginTime(), currentTime);
 				return new VertexTimePair(vertex, time);
 
-			case SERVE:
+			case PICKUP_STAY:
 				if (!destinationKnown) {
 					return VertexTimePair.NO_VERTEX_TIME_PAIR_FOUND;
 				}
@@ -199,8 +197,8 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 	private void checkWaitingVehiclesBatteryState() {
 		for (Vehicle veh : data.getVehicles()) {
 			Task last = Schedules.getLastTask(veh.getSchedule());
-			if (last instanceof WaitTask) {
-				WaitTask lastw = (WaitTask) last;
+			if (last instanceof TaxiWaitStayTask) {
+			    TaxiWaitStayTask lastw = (TaxiWaitStayTask) last;
 				if (!lastw.getAtVertex().equals(veh.getDepot().getVertex())) {
 					if (this.depotArrivalDepartureCharger
 							.needsToReturnToRank(new IdImpl(veh.getName()))) {
@@ -218,7 +216,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 
 		if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or
 																// STARTED
-			WaitTask lastTask = (WaitTask) Schedules.getLastTask(bestSched);// only
+		    TaxiWaitStayTask lastTask = (TaxiWaitStayTask) Schedules.getLastTask(bestSched);// only
 																			// WAIT
 
 			switch (lastTask.getStatus()) {
@@ -249,12 +247,11 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 
 		if (best.arc.getFromVertex() != reqFromVertex) {// not a loop
 			bestSched
-					.addTask(new TaxiDriveTask(best.t1, best.t2, best.arc, req));
+					.addTask(new TaxiPickupDriveTask(best.t1, best.t2, best.arc, req));
 		}
 
 		int t3 = best.t2 + PICKUP_DURATION;
-		bestSched.addTask(new ServeTaskImpl(best.t2, t3, req.getFromVertex(),
-				req));
+        bestSched.addTask(new TaxiPickupStayTask(best.t2, t3, req));
 
 		if (destinationKnown) {
 			appendDeliveryAndWaitTasksAfterServeTask(bestSched);
@@ -266,7 +263,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		Schedule sched = veh.getSchedule();
 		int currentTime = data.getTime();
 		int oldendtime;
-		WaitTask lastTask = (WaitTask) Schedules.getLastTask(sched);// only WAIT
+		TaxiWaitStayTask lastTask = (TaxiWaitStayTask) Schedules.getLastTask(sched);// only WAIT
 
 		switch (lastTask.getStatus()) {
 		case PLANNED:
@@ -293,7 +290,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 					+ currentTime;
 
 			sched.addTask(new BackToRankTask(currentTime, arrivalTime, darc));
-			sched.addTask(new WaitTaskImpl(arrivalTime, oldendtime, veh
+			sched.addTask(new StayTaskImpl(arrivalTime, oldendtime, veh
 					.getDepot().getVertex()));
 			// System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:"
 			// +oldendtime);
@@ -305,8 +302,8 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		this.shortTimeIdlers.clear();
 		for (Vehicle veh : data.getVehicles()) {
 			Task last = Schedules.getLastTask(veh.getSchedule());
-			if (last instanceof WaitTask) {
-				WaitTask lastw = (WaitTask) last;
+			if (last instanceof TaxiWaitStayTask) {
+			    TaxiWaitStayTask lastw = (TaxiWaitStayTask) last;
 				if (!lastw.getAtVertex().equals(veh.getDepot().getVertex())) {
 					this.shortTimeIdlers.add(veh.getId());
 				}
@@ -321,7 +318,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		for (Vehicle veh : data.getVehicles()) {
 			if (shortTimeIdlers.contains(veh.getId())) {
 				Task last = Schedules.getLastTask(veh.getSchedule());
-				if (last instanceof WaitTask) {
+				if (last instanceof TaxiWaitStayTask) {
 					scheduleRankReturn(veh);
 				}
 			}
@@ -333,7 +330,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 	protected boolean updateBeforeNextTask(Vehicle vehicle) {
 		int time = data.getTime();
 		Schedule schedule = vehicle.getSchedule();
-		Task currentTask = schedule.getCurrentTask();
+		TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
 
 		int delay = time - currentTask.getEndTime();
 
@@ -347,7 +344,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		}
 
 		if (!destinationKnown) {
-			if (currentTask.getType() == TaskType.SERVE) {
+			if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
 				appendDeliveryAndWaitTasksAfterServeTask(schedule);
 				return true;
 			}
@@ -371,10 +368,10 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		int t = data.getTime();
 
 		for (int i = startIdx; i < tasks.size(); i++) {
-			Task task = tasks.get(i);
+		    TaxiTask task = (TaxiTask)tasks.get(i);
 
-			switch (task.getType()) {
-			case WAIT: {
+			switch (task.getTaxiTaskType()) {
+			case WAIT_STAY: {
 				// wait can be at the end of the schedule
 				//
 				// BUT:
@@ -428,7 +425,8 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 
 				break;
 			}
-			case DRIVE: {
+            case PICKUP_DRIVE:
+            case DROPOFF_DRIVE: {
 				// cannot be shortened/lengthen, therefore must be moved
 				// forward/backward
 				task.setBeginTime(t);
@@ -437,7 +435,8 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 
 				break;
 			}
-			case SERVE: {
+            case PICKUP_STAY:
+            case DROPOFF_STAY: {
 				// cannot be shortened/lengthen, therefore must be moved
 				// forward/backward
 				task.setBeginTime(t);

@@ -35,22 +35,11 @@ public abstract class AbstractTask
     /*package*/TaskStatus status;
     // ==== END: fields managed by ScheduleImpl
 
-    private TaskInfo info;
-
-
     public AbstractTask(int beginTime, int endTime)
     {
         this.beginTime = beginTime;
         this.endTime = endTime;
     }
-
-
-    protected void notifyAdded()
-    {}
-
-
-    protected void notifyRemoved()
-    {}
 
 
     @Override
@@ -89,13 +78,6 @@ public abstract class AbstractTask
 
 
     @Override
-    public final TaskInfo getInfo()
-    {
-        return info;
-    }
-
-
-    @Override
     public void setBeginTime(int beginTime)
     {
         if (status != TaskStatus.PLANNED) { // PERFORMED or STARTED
@@ -117,16 +99,8 @@ public abstract class AbstractTask
     }
 
 
-    @Override
-    public void setInfo(TaskInfo info)
-    {
-        this.info = info;
-    }
-
-
     protected String commonToString()
     {
-        return (info != null ? " " + info.toString() : "")//
-                + " [" + beginTime + " : " + endTime + "]";
+        return " [" + beginTime + " : " + endTime + "]";
     }
 }
