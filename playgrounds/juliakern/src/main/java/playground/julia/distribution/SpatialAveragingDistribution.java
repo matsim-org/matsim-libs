@@ -22,7 +22,6 @@ package playground.julia.distribution;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -50,9 +49,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -136,12 +133,10 @@ public class SpatialAveragingDistribution {
 		processEmissions(emissionFile1);
 		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2WarmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 		Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2ColdEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
-		Map<Double, Map<Id, Double>> time2CountsPerLink1 = this.warmHandler.getTime2linkIdLeaveCount();
 
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal1 = sumUpEmissionsPerTimeInterval(time2WarmEmissionsTotal1, time2ColdEmissionsTotal1);
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled1 = setNonCalculatedEmissions(time2EmissionsTotal1);
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1 = filterEmissionLinks(time2EmissionsTotalFilled1);
-		//Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1 = setNonCalculatedCountsAndFilter(time2CountsPerLink1);
 
 		this.warmHandler.reset(0);
 		this.coldHandler.reset(0);
@@ -152,15 +147,8 @@ public class SpatialAveragingDistribution {
 
 		logger.info("Done calculating weighted emissions");
 		
-		
 		Population pop = scenario.getPopulation();	
-		
 		Map<Id, Double> person2emission = calculatePersonalConcentration(time2WeightedEmissions1,pop);
-
-		
-		for(Id personId: person2emission.keySet()){
-			logger.info("Base case : Person "+personId + " emissions " + person2emission.get(personId));
-		}
 		
 		
 		if(compareToBaseCase){
@@ -183,7 +171,7 @@ public class SpatialAveragingDistribution {
 			
 		}
 		
-		if(createPersonalExposurePlans ){
+		if(createPersonalExposurePlans){
 			List<PersonalExposure> popExposure = new LinkedList<PersonalExposure>();
 			for(Id personId: pop.getPersons().keySet()){
 				PersonalExposure perEx = new PersonalExposure(personId);
@@ -251,6 +239,8 @@ public class SpatialAveragingDistribution {
 			ExposureUtils exut = new ExposureUtils();
 			String outPathForTimeTables = runDirectory1 + "numberofIntervals"+ noOfTimeBins + "outputTimeTables.txt";
 			exut.printTimeTables(popExposure, outPathForTimeTables);
+			
+			logger.info("Done calculating personal time dependent exposure. Results written to " + outPathForTimeTables);
 		}
 		
 		
@@ -320,61 +310,25 @@ public class SpatialAveragingDistribution {
 
 	private Double getExposureFromActivity(
 			Map<Double, double[][]> time2WeightedEmissions, PlanElement pe, Double endOfTimeInterval) {
-		//TODO timebin beachten!!!!
+
 		Activity currentActivity = (Activity)pe;
-		Double duration = currentActivity.getEndTime() - currentActivity.getStartTime();
-		//TODO : besser abfragen ob das home activity ist und endtime =-infty?
-		if(duration <0.0)duration = simulationEndTime-currentActivity.getStartTime();
+
 		if(endOfTimeInterval<timeBinSize)endOfTimeInterval=timeBinSize;
 		if(endOfTimeInterval>simulationEndTime)endOfTimeInterval=simulationEndTime;
+		
 		int xBin= mapXCoordToBin(currentActivity.getCoord().getX());
 		int yBin= mapYCoordToBin(currentActivity.getCoord().getY());
+		
 		// polution: time [sec] * binvalue * factor
 		Double poll;
 		try {
-			poll = duration*time2WeightedEmissions.get(endOfTimeInterval)[xBin][yBin]*pollutionFactorIndoor;
+			poll = time2WeightedEmissions.get(endOfTimeInterval)[xBin][yBin]*pollutionFactorIndoor;
 		} catch (NullPointerException e) {
 			poll =0.0;
 		}
 		return poll;
 	}
 	
-	private void writeRoutput(double[][] results, String outputPathForR) {
-		try {
-			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
-			String valueString = new String();
-			valueString = "\t";
-			
-			//x-coordinates as first row
-			for(int xIndex = 0; xIndex < results.length; xIndex++){
-				valueString += findBinCenterX(xIndex) + "\t";
-			}
-			buffW.write(valueString);
-			buffW.newLine();
-			valueString = new String();
-			
-			for(int yIndex = 0; yIndex < results[0].length; yIndex++){
-				//y-coordinates as first column
-				valueString += findBinCenterY(yIndex) + "\t";
-				//table contents
-				for(int xIndex = 0; xIndex < results.length; xIndex++){ 
-						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-						if(isInMunich(cellCentroid)){
-							valueString += Double.toString(results[xIndex][yIndex]) + "\t"; 
-						} else {
-							valueString += "NA" + "\t";
-						}
-				}
-				buffW.write(valueString);
-				buffW.newLine();
-				valueString = new String();
-			}
-		buffW.close();	
-		} catch (IOException e) {
-			throw new RuntimeException("Failed writing output for R.");
-		}	
-		logger.info("Finished writing output for R to " + outputPathForR);
-	}
 
 	private void writeRoutputForPersons(Map<Id, Double> basecase, Map<Id, Double> comparecase, String outputPathForR) {
 		try {
@@ -447,99 +401,7 @@ public class SpatialAveragingDistribution {
 		return time2weightedEmissions;
 	}
 	
-	private Map<Double, double[][]> fillWeightedDemandValues(Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered) {
-		Map<Double, double[][]> time2weightedDemand = new HashMap<Double, double[][]>();
-		
-		for(Double endOfTimeInterval : time2CountsPerLinkFilledAndFiltered.keySet()){
-			double[][]weightedDemand = new double[noOfXbins][noOfYbins];
-			
-			for(Id linkId : time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).keySet()){
-				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-				double xLink = linkCoord.getX();
-				double yLink = linkCoord.getY();
-				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
-				
-				double count = time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).get(linkId);
-				double vkm = count * linkLength_km;
-				double scaledVkm = this.scalingFactor * vkm;
-				
-				// TODO: maybe calculate the following once and look it up here?
-				for(int xIndex=0; xIndex<noOfXbins; xIndex++){
-					for (int yIndex=0; yIndex<noOfYbins; yIndex++){
-						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-						double weightOfLinkForCell = calculateWeightOfLinkForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-						weightedDemand[xIndex][yIndex] += weightOfLinkForCell * scaledVkm;					
-					}
-				}
-			}
-			time2weightedDemand.put(endOfTimeInterval, weightedDemand);
-		}
-		return time2weightedDemand;
-	}
-
-	private Map<Double, double[][]> calculateSpecificEmissionDifferencesPerBin(
-			Map<Double, double[][]> time2weightedEmissions1,
-			Map<Double, double[][]> time2weightedEmissions2,
-			Map<Double, double[][]> time2weightedDemand1,
-			Map<Double, double[][]> time2weightedDemand2) {
-
-		Map<Double, double[][]> time2specificEmissionDifferences = new HashMap<Double, double[][]>();
-		//  calculate specific emission differences for each x,y-bin
-		for(Double endOfTimeInterval : time2weightedEmissions1.keySet()){
-			// calculate specific emission differences
-			double[][] specificEmissionDifferences = new double[noOfXbins][noOfYbins];
-
-			for(int xIndex=0; xIndex<noOfXbins; xIndex++){
-				for (int yIndex=0; yIndex<noOfYbins; yIndex++){
-					specificEmissionDifferences[xIndex][yIndex]=
-							time2weightedEmissions2.get(endOfTimeInterval)[xIndex][yIndex] / time2weightedDemand2.get(endOfTimeInterval)[xIndex][yIndex]
-									- time2weightedEmissions1.get(endOfTimeInterval)[xIndex][yIndex] / time2weightedDemand1.get(endOfTimeInterval)[xIndex][yIndex];
-				}
-			}
-			time2specificEmissionDifferences.put(endOfTimeInterval, specificEmissionDifferences);
-		}
-		return time2specificEmissionDifferences;
-	}
 	
-	private Map<Double, double[][]> calculateSpecificEmissionsPerBin(
-			Map<Double, double[][]> time2weightedEmissions,
-			Map<Double, double[][]> time2weightedDemand) {
-		
-		Map<Double, double[][]> time2specificEmissions = new HashMap<Double, double[][]>();
-		for( Double endOfTimeInterval : time2weightedEmissions.keySet()){
-			double [][] specificEmissions = new double[noOfXbins][noOfYbins];
-			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-					specificEmissions[xIndex][yIndex] = time2weightedEmissions.get(endOfTimeInterval)[xIndex][yIndex] / time2weightedDemand.get(endOfTimeInterval)[xIndex][yIndex];
-					
-					/* Sum over weighted values for cell does not need to be normalized, since normalization canceles out.
-					 * Result is an average value for cell */
-				}
-			}
-			time2specificEmissions.put(endOfTimeInterval, specificEmissions);
-		}
-		return time2specificEmissions;
-	}
-	
-	private Map<Double, double[][]> calculateAbsoluteDifferencesPerBin(Map<Double, double[][]> time2weightedValues1, Map<Double, double[][]> time2weightedValues2){
-		Map<Double, double[][]> time2absoluteDifferences = new HashMap<Double, double[][]>();
-		final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
-		for(Double endOfTimeInterval : time2weightedValues1.keySet()){
-			double [][] absoluteDifferences = new double[noOfXbins][noOfYbins];
-			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-					absoluteDifferences[xIndex][yIndex] = time2weightedValues2.get(endOfTimeInterval)[xIndex][yIndex] - time2weightedValues1.get(endOfTimeInterval)[xIndex][yIndex];
-					
-					/* Sum over weighted values for cell is normalized to "per sqkm" (dependent on calcluateWeightOfLinkForCell)
-					 * Values NEED to be additive (e.g. vkm, g, counts, ...)
-					 * Make sure coordinate system is metric */
-					absoluteDifferences[xIndex][yIndex] /= area_in_smoothing_circle_sqkm; 
-				}
-			}
-			time2absoluteDifferences.put(endOfTimeInterval, absoluteDifferences);
-		}		
-		return time2absoluteDifferences;
-	}
 
 	private Map<Double, double[][]> scale(Map<Double, double[][]> time2weightedValues){
 		Map<Double, double[][]> time2scaledValues = new HashMap<Double, double[][]>();
@@ -582,27 +444,11 @@ public class SpatialAveragingDistribution {
 		return false;
 	}
 
-	private String convertSeconds2dateTimeFormat(double endOfTimeInterval) {
-		String date = "2012-04-13 ";
-		String time = Time.writeTime(endOfTimeInterval, Time.TIMEFORMAT_HHMM);
-		String dateTimeString = date + time;
-		return dateTimeString;
-	}
-
 	private double calculateWeightOfLinkForCell(double x1, double y1, double x2, double y2) {
 		double distanceSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
 	
-//	private double calculateWeightOfLinkForCell(double x1, double y1, double x2, double y2) {
-//		// check if x and y values are in the same cell:
-//		if ( mapXCoordToBin(x1) == mapXCoordToBin(x2) ) {
-//			if ( mapYCoordToBin(y1) == mapYCoordToBin(y2) ) {
-//				return 1. ;
-//			}
-//		}
-//		return 0. ;
-//	}
 
 	private double findBinCenterY(int yIndex) {
 		double yBinCenter = yMin + ((yIndex + .5) / noOfYbins) * (yMax - yMin);
@@ -738,14 +584,6 @@ public class SpatialAveragingDistribution {
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
 		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
 		return endTime;
-	}
-
-	private static Integer getLastIteration(String configFile) {
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configFile);
-		Integer lastIteration = config.controler().getLastIteration();
-		return lastIteration;
 	}
 
 	public static void main(String[] args) throws IOException{
