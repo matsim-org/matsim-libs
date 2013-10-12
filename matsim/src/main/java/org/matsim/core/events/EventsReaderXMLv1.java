@@ -107,7 +107,9 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		} else if (PersonStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonStuckEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
-			this.events.processEvent(new PersonStuckEvent(time, new IdImpl(atts.getValue(PersonStuckEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(PersonStuckEvent.ATTRIBUTE_LINK)), mode));
+			String linkIdString = atts.getValue(PersonStuckEvent.ATTRIBUTE_LINK);
+			IdImpl linkId = linkIdString == null ? null : new IdImpl(linkIdString); // linkId is optional
+			this.events.processEvent(new PersonStuckEvent(time, new IdImpl(atts.getValue(PersonStuckEvent.ATTRIBUTE_PERSON)), linkId, mode));
 		} else if (PersonMoneyEvent.EVENT_TYPE.equals(eventType) || "agentMoney".equals(eventType)) {
 			this.events.processEvent(new PersonMoneyEvent(time, new IdImpl(atts.getValue(PersonMoneyEvent.ATTRIBUTE_PERSON)), Double.parseDouble(atts.getValue(PersonMoneyEvent.ATTRIBUTE_AMOUNT))));
 		} else if (PersonEntersVehicleEvent.EVENT_TYPE.equals(eventType)) {
