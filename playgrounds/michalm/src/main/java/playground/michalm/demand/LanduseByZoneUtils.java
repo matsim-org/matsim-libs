@@ -58,7 +58,7 @@ public class LanduseByZoneUtils
         }
 
         //TODO check out if geometries overlay one another!!!
-        
+
         return geometriesByZone;
     }
 

@@ -22,14 +22,8 @@ package playground.michalm;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.api.experimental.events.handler.*;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.core.events.handler.EventHandler;
 
 

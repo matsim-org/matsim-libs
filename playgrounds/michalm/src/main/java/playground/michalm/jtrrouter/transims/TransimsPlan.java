@@ -19,7 +19,7 @@
 
 package playground.michalm.jtrrouter.transims;
 
-import java.io.*;
+import java.io.PrintWriter;
 
 import playground.michalm.jtrrouter.*;
 

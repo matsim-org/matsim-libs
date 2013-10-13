@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
 public class VrpSimEngine
@@ -105,9 +106,9 @@ public class VrpSimEngine
     }
 
 
-    public void nextTask(Vehicle vrpVehicle, int time)
+    public void nextTask(Schedule<? extends Task> schedule, int time)
     {
-        optimizer.nextTask(vrpVehicle);
+        optimizer.nextTask(schedule);
         notifyAgentLogics();
     }
 

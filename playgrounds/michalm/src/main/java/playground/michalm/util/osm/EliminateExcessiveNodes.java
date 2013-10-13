@@ -21,7 +21,7 @@ package playground.michalm.util.osm;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.*;
@@ -86,7 +86,7 @@ public class EliminateExcessiveNodes
 
             Link outLink = getOutLink(node);
             Node toNode = outLink.getToNode();
-            
+
             if (fromNode == toNode) {
                 continue;
             }
@@ -101,7 +101,7 @@ public class EliminateExcessiveNodes
             network.removeNode(node.getId());
             network.addLink(newLink);
         }
-        
+
         new NetworkWriter(network).write(outNetworkFile);
     }
 

@@ -35,11 +35,11 @@ public class OTFVisSim
         if (args.length == 1 && args[0].equals("test")) {// for testing
             //dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
             dirName = "d:\\PP-rad\\taxi\\mielec-2-peaks\\";
-            
+
             // mviFileName = "output\\config-verB\\ITERS\\it.10\\10.otfvis.mvi";
             //mviFileName = "output\\config-verB\\ITERS\\it.50\\50.otfvis.mvi";
-            
-            mviFileName = "20.otfvis.mvi"; 
+
+            mviFileName = "20.otfvis.mvi";
         }
         else if (args.length == 2) {
             dirName = args[0];

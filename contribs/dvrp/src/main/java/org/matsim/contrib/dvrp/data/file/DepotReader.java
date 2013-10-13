@@ -42,9 +42,7 @@ public class DepotReader
     private VrpData data;
     private MatsimVrpGraph graph;
 
-    private List<Depot> depots = new ArrayList<Depot>();
     private List<Id> depotLinks = new ArrayList<Id>();
-    private List<Vehicle> vehicles = new ArrayList<Vehicle>();
 
     private Depot currentDepot;
 
@@ -61,9 +59,6 @@ public class DepotReader
     public void readFile(String filename)
     {
         parse(filename);
-
-        data.setDepots(depots);
-        data.setVehicles(vehicles);
     }
 
 
@@ -86,7 +81,7 @@ public class DepotReader
 
     private void startDepot(Attributes atts)
     {
-        int id = depots.size();
+        int id = data.getDepots().size();
 
         String name = atts.getValue("name");
         if (name == null) {
@@ -97,14 +92,14 @@ public class DepotReader
         Vertex vertex = graph.getVertex(linkId);
 
         currentDepot = new DepotImpl(id, name, vertex);
-        depots.add(currentDepot);
+        data.addDepot(currentDepot);
         depotLinks.add(linkId);
     }
 
 
     private void startVehicle(Attributes atts)
     {
-        int id = vehicles.size();
+        int id = data.getVehicles().size();
 
         String name = atts.getValue("name");
         if (name == null) {
@@ -117,7 +112,7 @@ public class DepotReader
         int t1 = getInt(atts, "t1", 24 * 60 * 60);
         int tLimit = getInt(atts, "tLimit", t1 - t0);
 
-        vehicles.add(new VrpAgentVehicle(id, name, currentDepot, capacity, t0, t1, tLimit));
+        data.addVehicle(new VrpAgentVehicle(id, name, currentDepot, capacity, t0, t1, tLimit));
     }
 
 
@@ -134,7 +129,8 @@ public class DepotReader
     }
 
 
-	public List<Id> getDepotLinks() {
-		return depotLinks;
-	}
+    public List<Id> getDepotLinks()
+    {
+        return depotLinks;
+    }
 }

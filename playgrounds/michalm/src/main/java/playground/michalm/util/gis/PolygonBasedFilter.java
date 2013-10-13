@@ -58,16 +58,16 @@ public class PolygonBasedFilter
     }
 
 
-    public static Iterable< ? extends Link> filterLinksInsidePolygon(
-            Iterable< ? extends Link> links, Geometry polygonGeometry, boolean includeBorderLinks)
+    public static Iterable<? extends Link> filterLinksInsidePolygon(Iterable<? extends Link> links,
+            Geometry polygonGeometry, boolean includeBorderLinks)
     {
         return Iterables.filter(links,
                 createLinkInsidePolygonPredicate(polygonGeometry, includeBorderLinks));
     }
 
 
-    public static Iterable< ? extends Link> filterLinksOutsidePolygon(
-            Iterable< ? extends Link> links, Geometry polygonGeometry, boolean includeBorderLinks)
+    public static Iterable<? extends Link> filterLinksOutsidePolygon(
+            Iterable<? extends Link> links, Geometry polygonGeometry, boolean includeBorderLinks)
     {
         return Iterables.filter(links, Predicates.not(createLinkInsidePolygonPredicate(
                 polygonGeometry, !includeBorderLinks)));// includeBorderLinks must be negated
@@ -80,21 +80,21 @@ public class PolygonBasedFilter
         return new Predicate<SimpleFeature>() {
             public boolean apply(SimpleFeature feature)
             {
-                return polygonGeometry.contains((Geometry) feature.getDefaultGeometry());
+                return polygonGeometry.contains((Geometry)feature.getDefaultGeometry());
             }
         };
     }
 
 
-    public static Iterable< ? extends SimpleFeature> filterFeaturesInsidePolygon(
-            Iterable< ? extends SimpleFeature> features, Geometry polygonGeometry)
+    public static Iterable<? extends SimpleFeature> filterFeaturesInsidePolygon(
+            Iterable<? extends SimpleFeature> features, Geometry polygonGeometry)
     {
         return Iterables.filter(features, createFeatureInsidePolygonPredicate(polygonGeometry));
     }
 
 
-    public static Iterable< ? extends SimpleFeature> filterFeaturesOutsidePolygon(
-            Iterable< ? extends SimpleFeature> features, Geometry polygonGeometry)
+    public static Iterable<? extends SimpleFeature> filterFeaturesOutsidePolygon(
+            Iterable<? extends SimpleFeature> features, Geometry polygonGeometry)
     {
         return Iterables.filter(features,
                 Predicates.not(createFeatureInsidePolygonPredicate(polygonGeometry)));
@@ -112,6 +112,6 @@ public class PolygonBasedFilter
         }
 
         SimpleFeature polygon = ftColl.features().next();
-        return (Geometry) polygon.getDefaultGeometry();
+        return (Geometry)polygon.getDefaultGeometry();
     }
 }

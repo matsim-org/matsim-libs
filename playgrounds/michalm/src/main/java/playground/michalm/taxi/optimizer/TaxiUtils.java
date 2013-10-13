@@ -30,7 +30,7 @@ public class TaxiUtils
 {
     public static boolean isIdle(Vehicle vehicle, int time, boolean delayedWaitTaskAsNonIdle)
     {
-        Schedule sched = vehicle.getSchedule();
+        Schedule<?> sched = vehicle.getSchedule();
 
         if (sched.getStatus() != ScheduleStatus.STARTED) {
             return false;
@@ -69,7 +69,7 @@ public class TaxiUtils
     }
 
 
-    public static boolean isCurrentTaskDelayed(Schedule schedule, int time)
+    public static boolean isCurrentTaskDelayed(Schedule<?> schedule, int time)
     {
         TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
         int delay = time - currentTask.getEndTime();

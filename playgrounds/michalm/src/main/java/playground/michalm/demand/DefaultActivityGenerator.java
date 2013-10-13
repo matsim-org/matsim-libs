@@ -96,10 +96,11 @@ public class DefaultActivityGenerator
                 PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().setCrs(crs)
                         .setName("PolygonFeatureType").create();
                 SimpleFeature feature = factory.createPolygon((Polygon)geometry,
-                        Collections.<String, Object> emptyMap(), null);
+                        Collections.<String, Object>emptyMap(), null);
                 Set<SimpleFeature> featureSet = new HashSet<SimpleFeature>();
                 featureSet.add(feature);
-                ShapeFileWriter.writeGeometries(featureSet, "d:\\looped_zoneId_" + zone.getId() + "_actType_" + actType + ".shp");
+                ShapeFileWriter.writeGeometries(featureSet, "d:\\looped_zoneId_" + zone.getId()
+                        + "_actType_" + actType + ".shp");
 
                 System.out.println("Got stuck at zoneId=" + zone.getId() + " actType=" + actType);
             }

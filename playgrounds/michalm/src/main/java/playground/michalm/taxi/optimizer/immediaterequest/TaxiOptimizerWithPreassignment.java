@@ -24,6 +24,8 @@ import java.util.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
+import playground.michalm.taxi.schedule.TaxiTask;
 
 
 /**
@@ -54,14 +56,16 @@ public class TaxiOptimizerWithPreassignment
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated)
     {
         return false;
     }
 
 
     @Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated)
     {
         return false;
     }

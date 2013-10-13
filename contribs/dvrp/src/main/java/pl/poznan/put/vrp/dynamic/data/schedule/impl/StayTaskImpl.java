@@ -20,7 +20,7 @@
 package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.StayTask;
 
 
 public class StayTaskImpl

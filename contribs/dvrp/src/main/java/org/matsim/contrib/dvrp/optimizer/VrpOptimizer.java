@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.optimizer;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
 public interface VrpOptimizer
@@ -37,5 +38,5 @@ public interface VrpOptimizer
 
 
     //return boolean? ("has anything change?" true/false)
-    void nextTask(Vehicle vehicle);
+    void nextTask(Schedule<? extends Task> schedule);
 }

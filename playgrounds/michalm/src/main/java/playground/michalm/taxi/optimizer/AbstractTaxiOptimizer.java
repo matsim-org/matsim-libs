@@ -28,7 +28,7 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.RequestStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import playground.michalm.taxi.schedule.TaxiWaitStayTask;
+import playground.michalm.taxi.schedule.*;
 
 
 /**
@@ -71,9 +71,12 @@ public abstract class AbstractTaxiOptimizer
         // Initial remark!!!
         // We start with 0 requests so there is no need for any pre-optimization.
         // Let's just add a WAIT task to each schedule
-        for (Vehicle veh : data.getVehicles()) {
-            veh.getSchedule().addTask(
-                    new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getDepot().getVertex()));
+
+        for (Vehicle veh : (List<Vehicle>)data.getVehicles()) {
+            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+
+            schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getDepot()
+                    .getVertex()));
         }
     }
 
@@ -87,31 +90,33 @@ public abstract class AbstractTaxiOptimizer
     }
 
 
-    protected abstract boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated);
+    protected abstract boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated);
 
 
-    protected abstract boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated);
+    protected abstract boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated);
 
 
     @Override
-    public void nextTask(Vehicle vehicle)
+    public void nextTask(Schedule<? extends Task> schedule)
     {
-        Schedule schedule = vehicle.getSchedule();
-
+        @SuppressWarnings("unchecked")
+        Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
         boolean scheduleUpdated = false;
 
         // Assumption: there is no delay as long as the schedule has not been started (PLANNED)
         if (schedule.getStatus() == ScheduleStatus.STARTED) {
-            scheduleUpdated = updateBeforeNextTask(vehicle);
+            scheduleUpdated = updateBeforeNextTask(taxiSchedule);
         }
 
-        if (shouldOptimizeBeforeNextTask(vehicle, scheduleUpdated)) {
+        if (shouldOptimizeBeforeNextTask(taxiSchedule, scheduleUpdated)) {
             optimize();
         }
 
         schedule.nextTask();
 
-        if (shouldOptimizeAfterNextTask(vehicle, scheduleUpdated)) {// after nextTask()
+        if (shouldOptimizeAfterNextTask(taxiSchedule, scheduleUpdated)) {// after nextTask()
             optimize();
         }
     }
@@ -124,7 +129,7 @@ public abstract class AbstractTaxiOptimizer
      * @return <code>true</code> if there have been significant changes in the schedule hence the
      *         schedule needs to be re-optimized
      */
-    protected abstract boolean updateBeforeNextTask(Vehicle vehicle);
+    protected abstract boolean updateBeforeNextTask(Schedule<TaxiTask> schedule);
 
 
     /**

@@ -20,7 +20,7 @@
 package playground.michalm.taxi.optimizer.immediaterequest;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
 import playground.michalm.taxi.schedule.TaxiTask;
 
 
@@ -39,18 +39,20 @@ public class OTSTaxiOptimizer
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated)
     {
         if (!scheduleUpdated) {// no changes
             return false;
         }
 
-        return optimizationPolicy.shouldOptimize((TaxiTask)vehicle.getSchedule().getCurrentTask());
+        return optimizationPolicy.shouldOptimize(schedule.getCurrentTask());
     }
 
 
     @Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated)
     {
         return false;
     }

@@ -22,27 +22,36 @@ package playground.jbischoff.taxi.rank;
 import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 import playground.michalm.taxi.schedule.TaxiCruiseDriveTask;
+
+
 /**
- * 
- * 
- * 
  * @author jbischoff
- *
  */
-public class BackToRankTask extends TaxiCruiseDriveTask implements DriveTask {
+public class BackToRankTask
+    extends TaxiCruiseDriveTask
+    implements DriveTask
+{
 
-	public BackToRankTask(int beginTime, int endTime, Arc arc) {
-		super(beginTime, endTime, arc);
-		
-		//the following is nonsense, as a drive to rank is not a pickup task. 
-		//But it works for the time being as expected
-		}
+    public BackToRankTask(int beginTime, int endTime, Arc arc)
+    {
+        super(beginTime, endTime, arc);
+
+        //the following is nonsense, as a drive to rank is not a pickup task. 
+        //But it works for the time being as expected
+    }
 
 
-	   @Override
-	    public String toString()
-	    {
-	        return "DtoRank(@" + getArc().getFromVertex().getId() + "->@" + getArc().getToVertex().getId() + ")"
-	                + commonToString();
-	    }
+    @Override
+    public TaxiTaskType getTaxiTaskType()
+    {
+        return TaxiTaskType.PICKUP_DRIVE;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "DtoRank(@" + getArc().getFromVertex().getId() + "->@"
+                + getArc().getToVertex().getId() + ")" + commonToString();
+    }
 }

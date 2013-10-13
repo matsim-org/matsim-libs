@@ -19,7 +19,7 @@
 
 package pl.poznan.put.vrp.dynamic.data;
 
-import java.util.List;
+import java.util.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
@@ -30,11 +30,10 @@ import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
  */
 public class VrpData
 {
-    private List<Depot> depots;
-    private List<Customer> customers;
-    private List<Vehicle> vehicles;
-
-    private List<Request> requests;
+    private final List<Depot> depots = new ArrayList<Depot>();
+    private final List<Customer> customers = new ArrayList<Customer>();
+    private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
+    private final List<Request> requests = new ArrayList<Request>();
 
     private int time;
 
@@ -93,27 +92,27 @@ public class VrpData
 
     // SETTERS
 
-    public void setDepots(List<Depot> depots)
+    public void addDepot(Depot depot)
     {
-        this.depots = depots;
+        depots.add(depot);
     }
 
 
-    public void setCustomers(List<Customer> customers)
+    public void addCustomer(Customer customer)
     {
-        this.customers = customers;
+        customers.add(customer);
     }
 
 
-    public void setVehicles(List<Vehicle> vehicles)
+    public void addVehicle(Vehicle vehicle)
     {
-        this.vehicles = vehicles;
+        vehicles.add(vehicle);
     }
 
 
-    public void setRequests(List<Request> requests)
+    public void addRequest(Request request)
     {
-        this.requests = requests;
+        requests.add(request);
     }
 
 

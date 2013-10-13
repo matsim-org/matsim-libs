@@ -59,7 +59,7 @@ public class Schedules
     };
 
 
-    public static int getActualT1(Schedule schedule)
+    public static int getActualT1(Schedule<?> schedule)
     {
         Vehicle veh = schedule.getVehicle();
 
@@ -71,15 +71,15 @@ public class Schedules
     }
 
 
-    public static Task getFirstTask(Schedule schedule)
+    public static <T extends Task> T getFirstTask(Schedule<T> schedule)
     {
         return schedule.getTasks().get(0);
     }
 
 
-    public static Task getLastTask(Schedule schedule)
+    public static <T extends Task> T getLastTask(Schedule<T> schedule)
     {
-        List<Task> tasks = schedule.getTasks();
+        List<T> tasks = schedule.getTasks();
         return tasks.get(tasks.size() - 1);
     }
 
@@ -96,9 +96,10 @@ public class Schedules
     }
 
 
-    public static Task getNextTask(Task task)
+    @SuppressWarnings("unchecked")
+    public static <T extends Task> T getNextTask(T task)
     {
-        return task.getSchedule().getTasks().get(task.getTaskIdx() + 1);
+        return ((Schedule<T>)task.getSchedule()).getTasks().get(task.getTaskIdx() + 1);
     }
 
 
@@ -108,9 +109,9 @@ public class Schedules
     }
 
 
-    public static Vertex getLastVertexInSchedule(Schedule schedule)
+    public static <T extends Task> Vertex getLastVertexInSchedule(Schedule<T> schedule)
     {
-        List<Task> tasks = schedule.getTasks();
+        List<T> tasks = schedule.getTasks();
 
         if (tasks.size() == 0) {
             return schedule.getVehicle().getDepot().getVertex();
@@ -131,21 +132,21 @@ public class Schedules
     }
 
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Iterator<StayTask> createStayTaskIter(Schedule schedule)
+    @SuppressWarnings("unchecked")
+    public static <T extends Task> Iterator<StayTask> createStayTaskIter(Schedule<T> schedule)
     {
-        return (Iterator)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
+        return (Iterator<StayTask>)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
     }
 
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static Iterator<DriveTask> createDriveTaskIter(Schedule schedule)
+    @SuppressWarnings("unchecked")
+    public static <T extends Task> Iterator<DriveTask> createDriveTaskIter(Schedule<T> schedule)
     {
-        return (Iterator)createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
+        return (Iterator<DriveTask>)createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
     }
 
 
-    public static Iterator<Task> createTaskFilterIter(Schedule schedule,
+    public static <T extends Task> Iterator<T> createTaskFilterIter(Schedule<T> schedule,
             Predicate<Task> taskPredicate)
     {
         return Iterators.filter(schedule.getTasks().iterator(), taskPredicate);

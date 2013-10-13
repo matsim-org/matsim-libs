@@ -109,7 +109,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         VehicleDrive best = VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
 
         for (Vehicle veh : vehicles) {
-            Schedule schedule = veh.getSchedule();
+            Schedule<?> schedule = veh.getSchedule();
 
             // COMPLETED or STARTED but delayed (time window T1 exceeded)
             if (schedule.getStatus() == ScheduleStatus.COMPLETED
@@ -149,7 +149,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
     protected VertexTimePair calculateDeparture(Vehicle vehicle, int currentTime)
     {
-        Schedule schedule = vehicle.getSchedule();
+        Schedule<?> schedule = vehicle.getSchedule();
         Vertex vertex;
         int time;
 
@@ -188,7 +188,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
     protected void scheduleRequestImpl(VehicleDrive best, Request req)
     {
-        Schedule bestSched = best.vehicle.getSchedule();
+        Schedule<TaxiTask> bestSched = TaxiSchedules.getSchedule(best.vehicle);
 
         if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
             TaxiWaitStayTask lastTask = (TaxiWaitStayTask)Schedules.getLastTask(bestSched);// only WAIT
@@ -216,7 +216,6 @@ public abstract class ImmediateRequestTaxiOptimizer
             }
         }
 
-        Vertex reqFromVertex = req.getFromVertex();
         bestSched.addTask(new TaxiPickupDriveTask(best.t1, best.t2, best.arc, req));
 
         int t3 = best.t2 + pickupDuration;
@@ -229,11 +228,10 @@ public abstract class ImmediateRequestTaxiOptimizer
 
 
     @Override
-    protected boolean updateBeforeNextTask(Vehicle vehicle)
+    protected boolean updateBeforeNextTask(Schedule<TaxiTask> schedule)
     {
         int time = data.getTime();
-        Schedule schedule = vehicle.getSchedule();
-        TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
+        TaxiTask currentTask = schedule.getCurrentTask();
 
         int initialEndTime;
 
@@ -273,7 +271,7 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule schedule)
+    protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule<TaxiTask> schedule)
     {
         TaxiPickupStayTask serveTask = (TaxiPickupStayTask)Schedules.getLastTask(schedule);
 
@@ -300,10 +298,10 @@ public abstract class ImmediateRequestTaxiOptimizer
      * @param schedule
      * @return {@code true} if something has been changed; otherwise {@code false}
      */
-    protected void updatePlannedTasks(Schedule schedule)
+    protected void updatePlannedTasks(Schedule<TaxiTask> schedule)
     {
         Task currentTask = schedule.getCurrentTask();
-        List<Task> tasks = schedule.getTasks();
+        List<TaxiTask> tasks = schedule.getTasks();
 
         int startIdx = currentTask.getTaskIdx() + 1;
         int t = currentTask.getEndTime();
@@ -388,7 +386,8 @@ public abstract class ImmediateRequestTaxiOptimizer
         DriveTask dt = vehicleTracker.getDriveTask();
         dt.setEndTime(vehicleTracker.predictEndTime(data.getTime()));
 
-        Schedule schedule = dt.getSchedule();
+        @SuppressWarnings("unchecked")
+        Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)dt.getSchedule();
         updatePlannedTasks(schedule);
 
         return false;

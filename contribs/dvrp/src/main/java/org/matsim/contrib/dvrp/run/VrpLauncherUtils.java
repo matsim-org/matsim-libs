@@ -49,7 +49,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
@@ -205,8 +204,6 @@ public class VrpLauncherUtils
     {
         VrpData vrpData = new VrpData();
         vrpData.setVrpGraph(graph);
-        vrpData.setCustomers(new ArrayList<Customer>());
-        vrpData.setRequests(new ArrayList<Request>());
         new DepotReader(scenario, vrpData).readFile(depotsFileName);
         return vrpData;
     }
@@ -249,11 +246,11 @@ public class VrpLauncherUtils
         qSim.addAgentSource(new VrpAgentSource(actionCreator, data, vrpSimEngine,
                 onlineVehicleTracker));
     }
-     
-    
-    public static void initDepartureHandler(QSim qSim, MatsimVrpData data, VrpSimEngine vrpSimEngine,
-            RequestCreator requestCreator, String mode)
-    {   
+
+
+    public static void initDepartureHandler(QSim qSim, MatsimVrpData data,
+            VrpSimEngine vrpSimEngine, RequestCreator requestCreator, String mode)
+    {
         qSim.addDepartureHandler(new PassengerDepartureHandler(mode, requestCreator, vrpSimEngine,
                 data));
     }

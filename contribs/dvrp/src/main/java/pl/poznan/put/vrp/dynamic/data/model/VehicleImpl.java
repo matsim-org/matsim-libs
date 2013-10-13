@@ -19,8 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.model;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.ScheduleImpl;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
 
 
 public class VehicleImpl
@@ -39,11 +39,10 @@ public class VehicleImpl
     // max time outside the depot
     private final int timeLimit;
 
-    private Schedule schedule;
+    private Schedule<AbstractTask> schedule;
 
 
-    public VehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1,
-            int timeLimit)
+    public VehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1, int timeLimit)
     {
         this.id = id;
         this.name = name;
@@ -53,7 +52,7 @@ public class VehicleImpl
         this.t1 = t1;
         this.timeLimit = timeLimit;
 
-        schedule = new ScheduleImpl(this);
+        schedule = new ScheduleImpl<AbstractTask>(this);
     }
 
 
@@ -107,7 +106,7 @@ public class VehicleImpl
 
 
     @Override
-    public Schedule getSchedule()
+    public Schedule<? extends Task> getSchedule()
     {
         return schedule;
     }
@@ -116,7 +115,7 @@ public class VehicleImpl
     @Override
     public void resetSchedule()
     {
-        schedule = new ScheduleImpl(this);
+        schedule = new ScheduleImpl<AbstractTask>(this);
     }
 
 

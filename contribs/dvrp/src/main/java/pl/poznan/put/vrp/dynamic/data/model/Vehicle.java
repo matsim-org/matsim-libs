@@ -19,7 +19,7 @@
 
 package pl.poznan.put.vrp.dynamic.data.model;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
 /**
@@ -50,7 +50,7 @@ public interface Vehicle
     int getTimeLimit();
 
 
-    Schedule getSchedule();
+    Schedule<? extends Task> getSchedule();
 
 
     void resetSchedule();

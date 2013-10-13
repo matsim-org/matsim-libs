@@ -34,30 +34,27 @@ public class TaxiEvaluator
         TaxiEvaluation evaluation = new TaxiEvaluation();
 
         for (Vehicle v : data.getVehicles()) {
-            evaluateSchedule(data, v, evaluation);
+            evaluateSchedule(data, TaxiSchedules.getSchedule(v), evaluation);
         }
 
         return evaluation;
     }
 
 
-    private void evaluateSchedule(VrpData data, Vehicle v, TaxiEvaluation eval)
+    private void evaluateSchedule(VrpData data, Schedule<TaxiTask> schedule, TaxiEvaluation eval)
     {
-        Schedule s = v.getSchedule();
-        if (s.getStatus().isUnplanned()) {
+        if (schedule.getStatus().isUnplanned()) {
             return;// do not evaluate - the vehicle is unused
         }
 
-        if (s.getTaskCount() < 1) {
+        if (schedule.getTaskCount() < 1) {
             throw new RuntimeException("count=0 ==> must be unplanned!");
         }
 
-        for (Task t : s.getTasks()) {
-            TaxiTask tt = (TaxiTask)t;
+        for (TaxiTask t : schedule.getTasks()) {
+            int time = t.getEndTime() - t.getBeginTime();
 
-            int time = tt.getEndTime() - tt.getBeginTime();
-
-            switch (tt.getTaxiTaskType()) {
+            switch (t.getTaxiTaskType()) {
                 case PICKUP_DRIVE:
                     eval.taxiPickupDriveTime += time;
                     break;
@@ -73,7 +70,7 @@ public class TaxiEvaluator
                 case PICKUP_STAY:
                     eval.taxiPickupTime += time;
 
-                    Request req = ((TaxiPickupStayTask)tt).getRequest();
+                    Request req = ((TaxiPickupStayTask)t).getRequest();
                     int waitTime = t.getBeginTime() - req.getT0();
                     eval.passengerWaitTime += waitTime;
 
@@ -91,8 +88,8 @@ public class TaxiEvaluator
             }
         }
 
-        int latestValidEndTime = Schedules.getActualT1(s);
-        int actualEndTime = s.getEndTime();
+        int latestValidEndTime = Schedules.getActualT1(schedule);
+        int actualEndTime = schedule.getEndTime();
 
         if (actualEndTime > latestValidEndTime) {
             eval.taxiOverTime += actualEndTime - latestValidEndTime;

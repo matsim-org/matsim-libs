@@ -51,7 +51,7 @@ public class SubNetworkCreator
         List<Link> allLinks = new ArrayList<Link>(network.getLinks().values());
 
         Geometry polygonGeometry = PolygonBasedFilter.readPolygonGeometry(polygonFile);
-        Iterable< ? extends Link> outerLinks = PolygonBasedFilter.filterLinksOutsidePolygon(
+        Iterable<? extends Link> outerLinks = PolygonBasedFilter.filterLinksOutsidePolygon(
                 allLinks, polygonGeometry, true);
 
         for (Link link : outerLinks) {

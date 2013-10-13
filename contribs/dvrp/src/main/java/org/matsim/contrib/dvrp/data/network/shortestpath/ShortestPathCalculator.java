@@ -48,9 +48,9 @@ public class ShortestPathCalculator
         return calculateShortestPath(fromVertex.getLink(), tovVertex.getLink(), departTime);
     }
 
-    
+
     /**
-     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode()) 
+     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
      */
     public ShortestPath calculateShortestPath(Link fromLink, Link toLink, int departureTime)
     {

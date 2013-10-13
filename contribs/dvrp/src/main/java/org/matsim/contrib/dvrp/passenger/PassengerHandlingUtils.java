@@ -21,14 +21,11 @@ package org.matsim.contrib.dvrp.passenger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 import pl.poznan.put.vrp.dynamic.data.model.Request;
@@ -63,7 +60,7 @@ public class PassengerHandlingUtils
 
         EventsManager events = vrpSimEngine.getInternalInterface().getMobsim().getEventsManager();
         events.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), driver
-				.getVehicle().getId()));
+                .getVehicle().getId()));
 
         if (passenger instanceof PassengerAgent) {
             PassengerAgent passengerAgent = (PassengerAgent)passenger;
@@ -100,7 +97,7 @@ public class PassengerHandlingUtils
 
         EventsManager events = vrpSimEngine.getInternalInterface().getMobsim().getEventsManager();
         events.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), driver
-				.getVehicle().getId()));
+                .getVehicle().getId()));
 
         passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
         passenger.endLegAndComputeNextState(now);

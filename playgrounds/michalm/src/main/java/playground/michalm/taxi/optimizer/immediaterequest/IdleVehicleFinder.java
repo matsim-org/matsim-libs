@@ -60,7 +60,7 @@ public class IdleVehicleFinder
 
     private double calculateDistance(Request req, Vehicle veh)
     {
-        Schedule sched = veh.getSchedule();
+        Schedule<?> sched = veh.getSchedule();
         int time = data.getTime();
         Vertex departVertex;
 

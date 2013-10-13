@@ -43,7 +43,7 @@ public class MatsimVrpGraphCreator
         }
 
         // build vertices for all links...
-        
+
         // one can build Arcs with the feature of lazy initialization (even in the case of the fixed
         // size graph)
         MatsimVertexBuilder vertexBuilder = MatsimVertexImpl.createFromLinkIdBuilder(network);

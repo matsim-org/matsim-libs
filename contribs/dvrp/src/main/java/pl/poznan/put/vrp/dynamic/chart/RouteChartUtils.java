@@ -48,7 +48,7 @@ public class RouteChartUtils
 
         List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
-            Schedule schedule = vehicles.get(i).getSchedule();
+            Schedule<?> schedule = vehicles.get(i).getSchedule();
             nData.addSeries(Integer.toString(i), VertexSources.createVertexSource(schedule));
         }
 
@@ -92,7 +92,7 @@ public class RouteChartUtils
 
         List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
-            Schedule schedule = vehicles.get(i).getSchedule();
+            Schedule<?> schedule = vehicles.get(i).getSchedule();
             Map<TaskStatus, VertexSource> vsByStatus = createVertexSourceByStatus(schedule);
             nData.addSeries(i + "-PR", vsByStatus.get(TaskStatus.PERFORMED));
             nData.addSeries(i + "-ST", vsByStatus.get(TaskStatus.STARTED));
@@ -153,7 +153,8 @@ public class RouteChartUtils
     }
 
 
-    private static Map<TaskStatus, VertexSource> createVertexSourceByStatus(Schedule schedule)
+    private static Map<TaskStatus, VertexSource> createVertexSourceByStatus(
+            Schedule<? extends Task> schedule)
     {
         Iterator<DriveTask> taskIter = Schedules.createDriveTaskIter(schedule);
 

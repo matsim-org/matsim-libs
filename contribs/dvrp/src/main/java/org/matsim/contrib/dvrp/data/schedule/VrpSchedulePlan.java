@@ -67,7 +67,7 @@ public class VrpSchedulePlan
     {
         MatsimVertex depotVertex = (MatsimVertex)vehicle.getDepot().getVertex();
 
-        Schedule schedule = vehicle.getSchedule();
+        Schedule<?> schedule = vehicle.getSchedule();
 
         if (schedule.getStatus().isUnplanned()) {// vehicle stays at the depot
             addActivity(depotVertex, -1, "RtU");

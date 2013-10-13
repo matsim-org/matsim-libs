@@ -110,7 +110,7 @@ public class VertexSources
 
 
     // Schedule -> n DriveTasks -> n+1 Vertices
-    public static VertexSource createVertexSource(Schedule schedule)
+    public static VertexSource createVertexSource(Schedule<?> schedule)
     {
         List<DriveTask> tasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
         return VertexSources.createFromDriveTasks(tasks);

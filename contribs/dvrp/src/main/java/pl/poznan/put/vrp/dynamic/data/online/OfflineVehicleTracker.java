@@ -84,8 +84,8 @@ public class OfflineVehicleTracker
     {
         return Math.max(initialEndTime, currentTime);
     }
-    
-    
+
+
     @Override
     public int getInitialEndTime()
     {

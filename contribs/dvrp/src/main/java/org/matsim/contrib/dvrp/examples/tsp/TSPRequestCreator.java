@@ -51,8 +51,8 @@ public class TSPRequestCreator
         int id = requests.size();
         int t0 = (int)startTime;
         int t1 = t0; // no time window
-        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, t0,
-                t1, vrpData.getTime());
+        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, t0, t1,
+                vrpData.getTime());
 
         requests.add(request);
         return request;

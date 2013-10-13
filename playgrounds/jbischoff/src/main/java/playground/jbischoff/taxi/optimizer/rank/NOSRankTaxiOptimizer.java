@@ -26,7 +26,6 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.rank.BackToRankTask;
 import playground.michalm.taxi.schedule.*;
@@ -74,16 +73,14 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
 	}
 
 	@Override
-	protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle,
+	protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
 			boolean scheduleUpdated) {
 		return false;
 	}
 
 	@Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
     {
-        Schedule schedule = vehicle.getSchedule();
-
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             return false;
         }
@@ -104,7 +101,7 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
     }
 
 	@Override
-	protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule schedule) {
+	protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule<TaxiTask> schedule) {
 	    TaxiPickupStayTask serveTask = (TaxiPickupStayTask) Schedules.getLastTask(schedule);
 
 		// add DELIVERY after SERVE
@@ -134,17 +131,17 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
 						+ darc.getTimeOnDeparture(startIdling);
 				schedule.addTask(new BackToRankTask(startIdling, startWaiting,
 						darc));
-				schedule.addTask(new StayTaskImpl(startWaiting, tEnd, schedule
+				schedule.addTask(new TaxiWaitStayTask(startWaiting, tEnd, schedule
 						.getVehicle().getDepot().getVertex()));
 
 			} else {
-				schedule.addTask(new StayTaskImpl(startIdling, tEnd,
+				schedule.addTask(new TaxiWaitStayTask(startIdling, tEnd,
 						reqToVertex));
 			}
 		}
 
 		else {
-			schedule.addTask(new StayTaskImpl(startIdling, tEnd, reqToVertex));
+			schedule.addTask(new TaxiWaitStayTask(startIdling, tEnd, reqToVertex));
 		}
 	}
 

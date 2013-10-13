@@ -196,7 +196,7 @@ public class ScheduleChartUtils
         TaskSeriesCollection collection = new TaskSeriesCollection();
 
         for (Vehicle v : data.getVehicles()) {
-            Schedule schedule = v.getSchedule();
+            Schedule<? extends Task> schedule = v.getSchedule();
 
             final TaskSeries scheduleTaskSeries = new TaskSeries(v.getName());
 
@@ -205,7 +205,7 @@ public class ScheduleChartUtils
                 continue;
             }
 
-            List<Task> tasks = schedule.getTasks();
+            List<? extends Task> tasks = schedule.getTasks();
 
             for (Task t : tasks) {
                 String description = t.getType().name();

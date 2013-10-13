@@ -66,8 +66,7 @@ public class TransimsJTRRouter
             nos[i] = vehCfg.getInt("[@no]");
         }
 
-        flows[node] = new TransimsFlow(node, in, out, next, types, subTypes,
-                nos);
+        flows[node] = new TransimsFlow(node, in, out, next, types, subTypes, nos);
     }
 
 
@@ -77,8 +76,7 @@ public class TransimsJTRRouter
         int type = tFlow.types[subFlow];
         int subType = tFlow.subTypes[subFlow];
 
-        plans.add(new TransimsPlan(id, route, startTime, startTime
-                + TRAVEL_TIME, TRAVEL_TIME));
+        plans.add(new TransimsPlan(id, route, startTime, startTime + TRAVEL_TIME, TRAVEL_TIME));
         vehicles.add(new TransimsVehicle(id, tFlow.inParking, type, subType));
     }
 
@@ -110,8 +108,7 @@ public class TransimsJTRRouter
     private PrintWriter initWriter(String dir, String file)
         throws IOException
     {
-        return new PrintWriter(new BufferedWriter(new FileWriter(dir + "\\"
-                + file)));
+        return new PrintWriter(new BufferedWriter(new FileWriter(dir + "\\" + file)));
     }
 
 

@@ -19,7 +19,7 @@
 
 package playground.michalm.jtrrouter.transims;
 
-import java.io.*;
+import java.io.PrintWriter;
 
 
 /**
@@ -46,7 +46,6 @@ public class TransimsVehicle
 
     public void write(PrintWriter writer)
     {
-        writer.println(hhold + "\t" + hhold + "\t" + location + "\t" + type
-                + "\t" + subType);
+        writer.println(hhold + "\t" + hhold + "\t" + location + "\t" + type + "\t" + subType);
     }
 }

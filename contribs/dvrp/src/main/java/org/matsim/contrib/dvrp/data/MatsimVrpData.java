@@ -34,10 +34,9 @@ public class MatsimVrpData
 {
     private final VrpData vrpData;
     private final Scenario scenario;
-    
+
     private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>();
     private final Map<Id, PassengerCustomer> customersByAgentId = new HashMap<Id, PassengerCustomer>();
-    
 
     private final String coordSystem;
 
@@ -78,14 +77,14 @@ public class MatsimVrpData
     {
         return (MatsimVrpGraph)vrpData.getVrpGraph();
     }
-    
-    
+
+
     public Map<Id, MobsimAgent> getAgents()
     {
         return agents;
     }
-    
-    
+
+
     public Map<Id, PassengerCustomer> getCustomersByAgentId()
     {
         return customersByAgentId;

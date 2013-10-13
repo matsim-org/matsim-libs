@@ -63,7 +63,8 @@ public class Localizables2GIS<T extends Localizable>
     private SimpleFeature getFeature(Vertex vertex)
     {
         try {
-            return this.factory.createPoint(new Coordinate(vertex.getX(), vertex.getY()), new Object[] { vertex.getId(), vertex.getName() }, null);
+            return this.factory.createPoint(new Coordinate(vertex.getX(), vertex.getY()),
+                    new Object[] { vertex.getId(), vertex.getName() }, null);
         }
         catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
@@ -73,12 +74,8 @@ public class Localizables2GIS<T extends Localizable>
 
     private void initFeatureType(final String coordinateSystem)
     {
-    	CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
-    	this.factory = new PointFeatureFactory.Builder().
-    			setCrs(crs).
-    			setName("vrp_node").
-    			addAttribute("ID", Integer.class).
-    			addAttribute("Name", String.class).
-    			create();
+        CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
+        this.factory = new PointFeatureFactory.Builder().setCrs(crs).setName("vrp_node")
+                .addAttribute("ID", Integer.class).addAttribute("Name", String.class).create();
     }
 }

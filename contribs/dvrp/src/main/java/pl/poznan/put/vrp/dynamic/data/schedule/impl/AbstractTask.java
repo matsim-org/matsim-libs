@@ -26,13 +26,15 @@ public abstract class AbstractTask
     implements Task
 {
     // ==== BEGIN: fields managed by ScheduleImpl
-    /*package*/Schedule schedule;
+    /*package*/Schedule<? extends AbstractTask> schedule;
     /*package*/int taskIdx;
 
     /*package*/int beginTime;
     /*package*/int endTime;
 
     /*package*/TaskStatus status;
+
+
     // ==== END: fields managed by ScheduleImpl
 
     public AbstractTask(int beginTime, int endTime)
@@ -57,7 +59,7 @@ public abstract class AbstractTask
 
 
     @Override
-    public final Schedule getSchedule()
+    public final Schedule<? extends AbstractTask> getSchedule()
     {
         return schedule;
     }

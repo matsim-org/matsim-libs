@@ -19,7 +19,7 @@
 
 package pl.poznan.put.vrp.dynamic.data.online;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 
 

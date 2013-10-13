@@ -37,7 +37,7 @@ public class LinkStatsReader
     }
 
 
-    public static List< ? extends LinkStats> readLinkStats(String file)
+    public static List<? extends LinkStats> readLinkStats(String file)
     {
         List<LinkStats> linkStatsList = new ArrayList<LinkStats>();
         Scanner sc = new Scanner(IOUtils.getBufferedReader(file)).useLocale(Locale.ENGLISH);

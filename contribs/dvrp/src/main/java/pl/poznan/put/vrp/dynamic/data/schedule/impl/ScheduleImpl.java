@@ -27,16 +27,16 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 
 
-public class ScheduleImpl
-    implements Schedule
+public class ScheduleImpl<T extends AbstractTask>
+    implements Schedule<T>
 {
     private final Vehicle vehicle;
 
-    private final List<AbstractTask> tasks;
-    private final List<Task> unmodifiableTasks;
+    private final List<T> tasks;
+    private final List<T> unmodifiableTasks;
 
     private ScheduleStatus status;
-    private AbstractTask currentTask;
+    private T currentTask;
 
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -45,7 +45,7 @@ public class ScheduleImpl
         this.vehicle = vehicle;
 
         //TODO what about LinkedList??
-        tasks = new ArrayList<AbstractTask>();
+        tasks = new ArrayList<T>();
         unmodifiableTasks = (List)Collections.unmodifiableList(tasks);
 
         status = ScheduleStatus.UNPLANNED;
@@ -61,7 +61,7 @@ public class ScheduleImpl
 
 
     @Override
-    public List<Task> getTasks()
+    public List<T> getTasks()
     {
         return unmodifiableTasks;
     }
@@ -74,13 +74,13 @@ public class ScheduleImpl
     }
 
 
-    public void addTask(Task task)
+    public void addTask(T task)
     {
         addTask(tasks.size(), task);
     }
 
 
-    public void addTask(int taskIdx, Task task)
+    public void addTask(int taskIdx, T task)
     {
         validateArgsBeforeAddingTask(taskIdx, task);
 
@@ -88,11 +88,10 @@ public class ScheduleImpl
             status = ScheduleStatus.PLANNED;
         }
 
-        AbstractTask at = (AbstractTask)task;
-        tasks.add(taskIdx, at);
-        at.schedule = this;
-        at.taskIdx = taskIdx;
-        at.status = TaskStatus.PLANNED;
+        tasks.add(taskIdx, task);
+        task.schedule = this;
+        task.taskIdx = taskIdx;
+        task.status = TaskStatus.PLANNED;
 
         // update idx of the existing tasks
         for (int i = taskIdx + 1; i < tasks.size(); i++) {
@@ -222,7 +221,7 @@ public class ScheduleImpl
 
 
     @Override
-    public Task getCurrentTask()
+    public T getCurrentTask()
     {
         failIfNotStarted();
         return currentTask;
@@ -230,7 +229,7 @@ public class ScheduleImpl
 
 
     @Override
-    public Task nextTask()
+    public T nextTask()
     {
         failIfUnplanned();
         failIfCompleted();

@@ -118,7 +118,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		VehicleDrive best = VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
 
 		for (Vehicle veh : vehicles) {
-			Schedule schedule = veh.getSchedule();
+			Schedule<?> schedule = veh.getSchedule();
 
 			// COMPLETED or STARTED but delayed (time window T1 exceeded)
 			if (schedule.getStatus() == ScheduleStatus.COMPLETED
@@ -149,7 +149,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 	}
 
 	protected VertexTimePair calculateDeparture(Vehicle vehicle, int currentTime) {
-		Schedule schedule = vehicle.getSchedule();
+		Schedule<?> schedule = vehicle.getSchedule();
 		Vertex vertex;
 		int time;
 
@@ -173,11 +173,16 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 				if (!destinationKnown) {
 					return VertexTimePair.NO_VERTEX_TIME_PAIR_FOUND;
 				}
+				
+			default:
+	            throw new IllegalStateException();
 			}
+			
+		default:
+	        throw new IllegalStateException();
 		}
+    }
 
-		throw new IllegalStateException();
-	}
 
 	public void doSimStep(double time) {
 
@@ -212,7 +217,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 	}
 
 	protected void scheduleRequestImpl(VehicleDrive best, Request req) {
-		Schedule bestSched = best.vehicle.getSchedule();
+		Schedule<TaxiTask> bestSched = TaxiSchedules.getSchedule(best.vehicle);
 
 		if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or
 																// STARTED
@@ -260,7 +265,8 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 
 	protected void scheduleRankReturn(Vehicle veh) {
 
-		Schedule sched = veh.getSchedule();
+		@SuppressWarnings("unchecked")
+        Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
 		int currentTime = data.getTime();
 		int oldendtime;
 		TaxiWaitStayTask lastTask = (TaxiWaitStayTask) Schedules.getLastTask(sched);// only WAIT
@@ -327,10 +333,9 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 	}
 
 	@Override
-	protected boolean updateBeforeNextTask(Vehicle vehicle) {
+	protected boolean updateBeforeNextTask(Schedule<TaxiTask> schedule) {
 		int time = data.getTime();
-		Schedule schedule = vehicle.getSchedule();
-		TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
+		TaxiTask currentTask = schedule.getCurrentTask();
 
 		int delay = time - currentTask.getEndTime();
 
@@ -340,7 +345,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 			}
 
 			currentTask.setEndTime(time);
-			updatePlannedTasks(vehicle);
+			updatePlannedTasks(schedule);
 		}
 
 		if (!destinationKnown) {
@@ -354,21 +359,20 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 	}
 
 	abstract protected void appendDeliveryAndWaitTasksAfterServeTask(
-			Schedule schedule);
+			Schedule<TaxiTask> schedule);
 
 	/**
 	 * @param vehicle
 	 * @return {@code true} if something has been changed; otherwise
 	 *         {@code false}
 	 */
-	protected void updatePlannedTasks(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		List<Task> tasks = schedule.getTasks();
+	protected void updatePlannedTasks(Schedule<TaxiTask> schedule) {
+		List<TaxiTask> tasks = schedule.getTasks();
 		int startIdx = schedule.getCurrentTask().getTaskIdx() + 1;
 		int t = data.getTime();
 
 		for (int i = startIdx; i < tasks.size(); i++) {
-		    TaxiTask task = (TaxiTask)tasks.get(i);
+		    TaxiTask task = tasks.get(i);
 
 			switch (task.getTaxiTaskType()) {
 			case WAIT_STAY: {

@@ -26,6 +26,6 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 
 public interface RequestCreator
 {
-    Request createRequest(Customer customer, MatsimVertex fromVertex,
-            MatsimVertex toVertex, double now);
+    Request createRequest(Customer customer, MatsimVertex fromVertex, MatsimVertex toVertex,
+            double now);
 }

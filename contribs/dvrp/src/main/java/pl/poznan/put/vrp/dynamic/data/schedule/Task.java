@@ -47,7 +47,7 @@ public interface Task
     int getEndTime();
 
 
-    Schedule getSchedule();
+    Schedule<? extends Task> getSchedule();
 
 
     int getTaskIdx();

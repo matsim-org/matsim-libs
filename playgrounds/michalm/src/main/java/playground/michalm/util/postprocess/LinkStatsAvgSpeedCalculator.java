@@ -34,7 +34,7 @@ public class LinkStatsAvgSpeedCalculator
         String linkStatsFile = dir + "40.linkstats-filtered.txt.gz";
         String avgSpeedFile = dir + "40.avg_speed-filtered.txt";
 
-        List< ? extends LinkStats> lsl = LinkStatsReader.readLinkStats(linkStatsFile);
+        List<? extends LinkStats> lsl = LinkStatsReader.readLinkStats(linkStatsFile);
 
         double[] hrsLengthSum = new double[24];
         double[] hrsTTSum = new double[24];

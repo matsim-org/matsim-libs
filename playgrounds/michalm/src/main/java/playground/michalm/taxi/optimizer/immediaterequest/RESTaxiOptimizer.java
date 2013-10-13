@@ -49,18 +49,20 @@ public class RESTaxiOptimizer
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated)
     {
         if (!scheduleUpdated) {// no changes
             return false;
         }
 
-        return optimizationPolicy.shouldOptimize((TaxiTask)vehicle.getSchedule().getCurrentTask());
+        return optimizationPolicy.shouldOptimize(schedule.getCurrentTask());
     }
 
 
     @Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated)
     {
         return false;
     }
@@ -70,14 +72,14 @@ public class RESTaxiOptimizer
     protected void optimize()
     {
         for (Vehicle veh : data.getVehicles()) {
-            removePlannedRequests(veh.getSchedule());
+            removePlannedRequests(TaxiSchedules.getSchedule(veh));
         }
 
         super.optimize();
     }
 
 
-    private void removePlannedRequests(Schedule schedule)
+    private void removePlannedRequests(Schedule<TaxiTask> schedule)
     {
         switch (schedule.getStatus()) {
             case STARTED:
@@ -157,9 +159,9 @@ public class RESTaxiOptimizer
     }
 
 
-    private void removePlannedTasks(Schedule schedule, int obligatoryTasks)
+    private void removePlannedTasks(Schedule<?> schedule, int obligatoryTasks)
     {
-        List<Task> tasks = schedule.getTasks();
+        List<?> tasks = schedule.getTasks();
         int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + obligatoryTasks;
 
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {

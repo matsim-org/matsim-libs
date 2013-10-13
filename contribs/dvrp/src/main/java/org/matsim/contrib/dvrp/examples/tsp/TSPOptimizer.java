@@ -37,14 +37,15 @@ public class TSPOptimizer
 {
     private final VrpData data;
     private final Vehicle vehicle;//we have only one vehicle
-    private final Schedule schedule;
+    private final Schedule<AbstractTask> schedule;
 
 
+    @SuppressWarnings("unchecked")
     public TSPOptimizer(VrpData data)
     {
         this.data = data;
         vehicle = data.getVehicles().get(0);
-        schedule = vehicle.getSchedule();
+        schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
     }
 
 
@@ -93,7 +94,7 @@ public class TSPOptimizer
 
 
     @Override
-    public void nextTask(Vehicle vehicle)
+    public void nextTask(Schedule<? extends Task> schedule)
     {
         schedule.nextTask();
     }

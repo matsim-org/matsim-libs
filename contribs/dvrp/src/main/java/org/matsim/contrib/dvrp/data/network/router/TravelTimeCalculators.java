@@ -21,17 +21,14 @@ package org.matsim.contrib.dvrp.data.network.router;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.*;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.trafficmonitoring.*;
 
 
 public class TravelTimeCalculators
 {
-    public static TravelTime createTravelTimeFromEvents(String eventFileName,
-            Scenario scenario)
+    public static TravelTime createTravelTimeFromEvents(String eventFileName, Scenario scenario)
     {
         TravelTimeCalculator ttimeCalc = new TravelTimeCalculatorFactoryImpl()
                 .createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig()

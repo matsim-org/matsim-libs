@@ -27,8 +27,7 @@ import pl.poznan.put.vrp.dynamic.data.VrpData;
 import playground.jbischoff.taxi.launch.ElectroCabLaunchUtils.TravelCostSource;
 import playground.jbischoff.taxi.launch.ElectroCabLaunchUtils.TravelTimeSource;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
-import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
-import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.optimizer.immediaterequest.TaxiOptimizationPolicy;
 /**
  * 
  * 

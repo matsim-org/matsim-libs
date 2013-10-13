@@ -188,8 +188,6 @@ public class ElectroCabLaunchUtils {
 
 		VrpData vrpData = new VrpData();
 		vrpData.setVrpGraph(graph);
-		vrpData.setCustomers(new ArrayList<Customer>());
-		vrpData.setRequests(new ArrayList<Request>());
 		this.depotReader = new DepotReader(scenario, vrpData);
 		this.depotReader.readFile(depotsFileName);
 

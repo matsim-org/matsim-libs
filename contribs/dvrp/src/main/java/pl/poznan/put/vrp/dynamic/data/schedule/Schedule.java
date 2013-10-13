@@ -24,7 +24,7 @@ import java.util.List;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 
 
-public interface Schedule
+public interface Schedule<T extends Task>
 {
     public enum ScheduleStatus
     {
@@ -97,13 +97,13 @@ public interface Schedule
     Vehicle getVehicle();
 
 
-    List<Task> getTasks();// unmodifiableList
+    List<T> getTasks();// unmodifiableList
 
 
     int getTaskCount();
 
 
-    Task getCurrentTask();
+    T getCurrentTask();
 
 
     ScheduleStatus getStatus();
@@ -117,10 +117,10 @@ public interface Schedule
 
     // schedule modification functionality:
 
-    void addTask(Task task);
+    void addTask(T task);
 
 
-    void addTask(int taskIdx, Task task);
+    void addTask(int taskIdx, T task);
 
 
     void removeAllPlannedTasks();
@@ -132,5 +132,5 @@ public interface Schedule
     void removePlannedTask(int taskIdx);
 
 
-    Task nextTask();// sets the next task as the current one, updates this schedule status
+    T nextTask();// sets the next task as the current one, updates this schedule status
 }

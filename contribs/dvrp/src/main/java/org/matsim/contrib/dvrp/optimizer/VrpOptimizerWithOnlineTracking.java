@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.optimizer;
 
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 
+
 public interface VrpOptimizerWithOnlineTracking
     extends VrpOptimizer
 {

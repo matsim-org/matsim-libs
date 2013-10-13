@@ -22,16 +22,16 @@ package playground.michalm.jtrrouter.matsim;
 import java.io.*;
 import java.util.*;
 
-import org.apache.commons.configuration.*;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.velocity.*;
-import org.apache.velocity.app.*;
-import org.apache.velocity.context.*;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.context.Context;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.core.basic.v01.*;
-import org.matsim.core.config.*;
-import org.matsim.core.network.*;
-import org.matsim.core.scenario.*;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.jtrrouter.*;
 
@@ -91,9 +91,7 @@ public class MATSimJTRRouter
 
     protected void addPlan(int id, int startTime, Route route, int subFlow)
     {
-        plans
-                .add(new MATSimPlan(id, route, startTime, startTime
-                        + TRAVEL_TIME));
+        plans.add(new MATSimPlan(id, route, startTime, startTime + TRAVEL_TIME));
     }
 
 
@@ -102,9 +100,8 @@ public class MATSimJTRRouter
     {
         Properties p = new Properties();
         p.setProperty("resource.loader", "class");
-        p
-                .setProperty("class.resource.loader.class",
-                        "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        p.setProperty("class.resource.loader.class",
+                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 
         Velocity.init(p);
         Context context = new VelocityContext();

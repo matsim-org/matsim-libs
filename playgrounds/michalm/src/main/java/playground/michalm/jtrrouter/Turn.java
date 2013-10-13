@@ -31,7 +31,7 @@ public class Turn
     /*package*/final double[] probs;
 
     // algorithm
-    /*package*/ boolean visited;
+    /*package*/boolean visited;
 
 
     public Turn(int node, int prev, int[] next, double[] probs)

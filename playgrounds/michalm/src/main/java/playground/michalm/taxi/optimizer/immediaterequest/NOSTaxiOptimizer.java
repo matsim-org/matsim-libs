@@ -56,17 +56,17 @@ public class NOSTaxiOptimizer
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated)
     {
         return false;
     }
 
 
     @Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
+            boolean scheduleUpdated)
     {
-        Schedule schedule = vehicle.getSchedule();
-
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             return false;
         }

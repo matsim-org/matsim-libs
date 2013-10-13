@@ -19,7 +19,7 @@
 
 package playground.michalm.jtrrouter.matsim;
 
-import playground.michalm.jtrrouter.*;
+import playground.michalm.jtrrouter.Flow;
 
 
 /**

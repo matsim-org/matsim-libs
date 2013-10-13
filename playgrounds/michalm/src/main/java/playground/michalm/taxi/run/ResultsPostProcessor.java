@@ -195,6 +195,7 @@ public class ResultsPostProcessor
                     value = stats[i].R_NI;
                 }
                 else {
+                    pw.close();
                     throw new RuntimeException();
                 }
 

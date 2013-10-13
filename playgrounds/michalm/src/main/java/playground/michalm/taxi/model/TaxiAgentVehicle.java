@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi;
+package playground.michalm.taxi.model;
 
-import java.util.List;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicle;
 
-import org.matsim.contrib.dvrp.data.network.MatsimVertex;
-import org.matsim.contrib.dvrp.passenger.RequestCreator;
-
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Depot;
 
 
-public class TaxiRequestCreator
-    implements RequestCreator
+public class TaxiAgentVehicle
+    extends VrpAgentVehicle
 {
-    public static final String MODE = "taxi";
-    public static final int DURATION = 120;
-
-    private final VrpData vrpData;
-
-
-    public TaxiRequestCreator(VrpData vrpData)
+    public TaxiAgentVehicle(int id, String name, Depot depot, int capacity, int t0, int t1,
+            int timeLimit)
     {
-        this.vrpData = vrpData;
-    }
-
-
-    @Override
-    public Request createRequest(Customer customer, MatsimVertex fromVertex, MatsimVertex toVertex,
-            double now)
-    {
-        List<Request> requests = vrpData.getRequests();
-
-        int id = requests.size();
-        int t0 = (int)now;
-        int t1 = t0; // no time windows
-        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, t0, t1, (int)now);
-        requests.add(request);
-
-        return request;
+        super(id, name, depot, capacity, t0, t1, timeLimit);
     }
 }
