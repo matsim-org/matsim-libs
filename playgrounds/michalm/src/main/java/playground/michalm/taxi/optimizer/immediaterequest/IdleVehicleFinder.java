@@ -24,7 +24,7 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.taxi.optimizer.TaxiUtils;
-import playground.michalm.taxi.schedule.TaxiTask;
+import playground.michalm.taxi.schedule.*;
 
 
 public class IdleVehicleFinder
@@ -60,15 +60,15 @@ public class IdleVehicleFinder
 
     private double calculateDistance(Request req, Vehicle veh)
     {
-        Schedule<?> sched = veh.getSchedule();
+        Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         int time = data.getTime();
         Vertex departVertex;
 
-        if (!TaxiUtils.isIdle(veh, time, true)) {
+        if (!TaxiUtils.isIdle(sched, time, true)) {
             return Double.MAX_VALUE;
         }
 
-        TaxiTask currentTask = (TaxiTask)sched.getCurrentTask();
+        TaxiTask currentTask = sched.getCurrentTask();
 
         switch (currentTask.getTaxiTaskType()) {
             case WAIT_STAY:

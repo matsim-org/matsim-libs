@@ -19,7 +19,6 @@
 
 package playground.michalm.taxi.optimizer;
 
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.michalm.taxi.schedule.*;
@@ -28,15 +27,14 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class TaxiUtils
 {
-    public static boolean isIdle(Vehicle vehicle, int time, boolean delayedWaitTaskAsNonIdle)
+    public static boolean isIdle(Schedule<TaxiTask> schedule, int time,
+            boolean delayedWaitTaskAsNonIdle)
     {
-        Schedule<?> sched = vehicle.getSchedule();
-
-        if (sched.getStatus() != ScheduleStatus.STARTED) {
+        if (schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
 
-        TaxiTask currentTask = (TaxiTask)sched.getCurrentTask();
+        TaxiTask currentTask = schedule.getCurrentTask();
 
         switch (currentTask.getTaxiTaskType()) {
             case PICKUP_DRIVE://maybe in the future some diversion will be enabled....
@@ -54,14 +52,14 @@ public class TaxiUtils
                 return false;
 
             case WAIT_STAY:
-                if (delayedWaitTaskAsNonIdle && isCurrentTaskDelayed(sched, time)) {
+                if (delayedWaitTaskAsNonIdle && isCurrentTaskDelayed(schedule, time)) {
                     return false;// assuming that the next task is a non-wait task
                 }
         }
 
         // idle right now, but:
         // consider CLOSING (T1) time windows of the vehicle
-        if (time >= Schedules.getActualT1(sched)) {
+        if (time >= Schedules.getActualT1(schedule)) {
             return false;
         }
 
@@ -69,9 +67,9 @@ public class TaxiUtils
     }
 
 
-    public static boolean isCurrentTaskDelayed(Schedule<?> schedule, int time)
+    public static boolean isCurrentTaskDelayed(Schedule<TaxiTask> schedule, int time)
     {
-        TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
+        TaxiTask currentTask = schedule.getCurrentTask();
         int delay = time - currentTask.getEndTime();
 
         if (delay < 0) {

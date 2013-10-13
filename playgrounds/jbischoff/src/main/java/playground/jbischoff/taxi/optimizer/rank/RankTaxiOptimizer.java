@@ -149,7 +149,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 	}
 
 	protected VertexTimePair calculateDeparture(Vehicle vehicle, int currentTime) {
-		Schedule<?> schedule = vehicle.getSchedule();
+		Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
 		Vertex vertex;
 		int time;
 
@@ -161,7 +161,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 
 		case PLANNED:
 		case STARTED:
-			TaxiTask lastTask = (TaxiTask)Schedules.getLastTask(vehicle.getSchedule());
+			TaxiTask lastTask = Schedules.getLastTask(schedule);
 
 			switch (lastTask.getTaxiTaskType()) {
 			case WAIT_STAY:

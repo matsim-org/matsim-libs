@@ -30,7 +30,7 @@ import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.TaxiUtils;
-import playground.michalm.taxi.schedule.TaxiTask;
+import playground.michalm.taxi.schedule.*;
 /**
  * 
  * 
@@ -133,7 +133,7 @@ public class IdleRankVehicleFinder
           Collections.shuffle(data.getVehicles(),rnd);
           
           for (Vehicle veh : data.getVehicles()) {
-        	  if (!TaxiUtils.isIdle(veh, data.getTime(), true)) continue;
+        	  if (!TaxiUtils.isIdle(TaxiSchedules.getSchedule(veh), data.getTime(), true)) continue;
         	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
         	  double soc = this.getVehicleSoc(veh);
         	  if (soc>bestSoc){
@@ -153,7 +153,7 @@ public class IdleRankVehicleFinder
         Collections.shuffle(data.getVehicles(),rnd);
         
         for (Vehicle veh : data.getVehicles()) {
-      	  if (!TaxiUtils.isIdle(veh, data.getTime(), true)) continue;
+      	  if (!TaxiUtils.isIdle(TaxiSchedules.getSchedule(veh), data.getTime(), true)) continue;
       	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
       	  double soc = this.getVehicleSoc(veh);
       	  if (soc>bestSoc){
@@ -210,15 +210,15 @@ public class IdleRankVehicleFinder
 
     private double calculateDistance(Request req, Vehicle veh)
     {
-        Schedule<?> sched = veh.getSchedule();
+        Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         int time = data.getTime();
         Vertex departVertex;
 
-        if (!TaxiUtils.isIdle(veh, time, true)) {
+        if (!TaxiUtils.isIdle(sched, time, true)) {
             return Double.MAX_VALUE;
         }
 
-        TaxiTask currentTask = (TaxiTask)sched.getCurrentTask();
+        TaxiTask currentTask = sched.getCurrentTask();
 
         switch (currentTask.getTaxiTaskType()) {
             case WAIT_STAY:

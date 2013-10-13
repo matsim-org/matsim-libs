@@ -83,7 +83,7 @@ public class RESTaxiOptimizer
     {
         switch (schedule.getStatus()) {
             case STARTED:
-                TaxiTask task = (TaxiTask)schedule.getCurrentTask();
+                TaxiTask task = schedule.getCurrentTask();
 
                 if (Schedules.isLastTask(task)) {
                     return;
@@ -159,13 +159,13 @@ public class RESTaxiOptimizer
     }
 
 
-    private void removePlannedTasks(Schedule<?> schedule, int obligatoryTasks)
+    private void removePlannedTasks(Schedule<TaxiTask> schedule, int obligatoryTasks)
     {
-        List<?> tasks = schedule.getTasks();
+        List<TaxiTask> tasks = schedule.getTasks();
         int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + obligatoryTasks;
 
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
-            TaxiTask task = (TaxiTask)tasks.get(i);
+            TaxiTask task = tasks.get(i);
 
             if (task.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
                 Request req = ((TaxiPickupStayTask)task).getRequest();

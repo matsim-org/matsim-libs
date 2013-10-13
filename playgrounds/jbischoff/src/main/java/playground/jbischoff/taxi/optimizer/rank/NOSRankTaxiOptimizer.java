@@ -89,7 +89,7 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
             return false;
         }
 
-        TaxiTask tt = (TaxiTask)schedule.getCurrentTask();
+        TaxiTask tt = schedule.getCurrentTask();
         switch (tt.getTaxiTaskType()) {
             case WAIT_STAY:
             case CRUISE_DRIVE:////////????????

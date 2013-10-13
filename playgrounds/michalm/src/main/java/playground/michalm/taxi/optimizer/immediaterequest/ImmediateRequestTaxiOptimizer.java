@@ -109,7 +109,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         VehicleDrive best = VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
 
         for (Vehicle veh : vehicles) {
-            Schedule<?> schedule = veh.getSchedule();
+            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
 
             // COMPLETED or STARTED but delayed (time window T1 exceeded)
             if (schedule.getStatus() == ScheduleStatus.COMPLETED
@@ -119,7 +119,7 @@ public abstract class ImmediateRequestTaxiOptimizer
             }
 
             // status = UNPLANNED/PLANNED/STARTED
-            VertexTimePair departure = calculateDeparture(veh, currentTime);
+            VertexTimePair departure = calculateDeparture(schedule, currentTime);
 
             if (departure == null) {
                 continue;
@@ -147,21 +147,21 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    protected VertexTimePair calculateDeparture(Vehicle vehicle, int currentTime)
+    protected VertexTimePair calculateDeparture(Schedule<TaxiTask> schedule, int currentTime)
     {
-        Schedule<?> schedule = vehicle.getSchedule();
         Vertex vertex;
         int time;
 
         switch (schedule.getStatus()) {
             case UNPLANNED:
+                Vehicle vehicle = schedule.getVehicle();
                 vertex = vehicle.getDepot().getVertex();
                 time = Math.max(vehicle.getT0(), currentTime);
                 return new VertexTimePair(vertex, time);
 
             case PLANNED:
             case STARTED:
-                TaxiTask lastTask = (TaxiTask)Schedules.getLastTask(vehicle.getSchedule());
+                TaxiTask lastTask = Schedules.getLastTask(schedule);
 
                 switch (lastTask.getTaxiTaskType()) {
                     case WAIT_STAY:
@@ -307,7 +307,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         int t = currentTask.getEndTime();
 
         for (int i = startIdx; i < tasks.size(); i++) {
-            TaxiTask task = (TaxiTask)tasks.get(i);
+            TaxiTask task = tasks.get(i);
 
             switch (task.getTaxiTaskType()) {
                 case WAIT_STAY: {
