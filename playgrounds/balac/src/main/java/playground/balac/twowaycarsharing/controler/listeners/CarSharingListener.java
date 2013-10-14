@@ -19,8 +19,6 @@
 
 package playground.balac.twowaycarsharing.controler.listeners;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +34,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.api.core.v01.Id;
 
 import playground.balac.twowaycarsharing.IO.CarSharingSummaryWriter;
 import playground.balac.twowaycarsharing.IO.PersonsSummaryWriter;

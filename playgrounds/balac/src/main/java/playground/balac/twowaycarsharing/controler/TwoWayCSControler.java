@@ -28,10 +28,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balac.twowaycarsharing.config.FtConfigGroup;
 import playground.balac.twowaycarsharing.controler.listeners.CarSharingListener;
-import playground.balac.twowaycarsharing.controler.listeners.FtPopulationPreparation;
-import playground.balac.twowaycarsharing.router.CarsharingRouterModelNew;
 import playground.balac.twowaycarsharing.router.FtTravelCostCalculatorFactory;
 import playground.balac.twowaycarsharing.router.PlansCalcRouteFtInfo;
+import playground.balac.twowaycarsharing.router.TwoWayCarsharingRoutingModule;
 import playground.balac.twowaycarsharing.scenario.FtScenarioLoaderImpl;
 import playground.balac.twowaycarsharing.scoring.FtScoringFunctionFactory;
 
@@ -151,7 +150,7 @@ public final class TwoWayCSControler extends Controler
 						// add our module to the instance
 						router.setRoutingModule(
 							"carsharing",
-							new CarsharingRouterModelNew(controler.getConfig().plansCalcRoute(),
+							new TwoWayCarsharingRoutingModule(controler.getConfig().plansCalcRoute(),
 								// use the default routing module for the
 								// carsharing sub-part.
 								

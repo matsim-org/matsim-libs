@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -20,14 +19,10 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+
 
 
 
@@ -67,16 +62,7 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 		int index = -1;
 		int indexEnd  = -1;
 		double time = 0.0;
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl()
-		.createTravelTimeCalculator(controler.getNetwork(), controler.getScenario().getConfig().travelTimeCalculator());
-	   
-	   TravelDisutility travelDisutility = new TravelCostCalculatorFactoryImpl()
-		.createTravelDisutility(travelTimeCalculator
-				.getLinkTravelTimes(), controler.getConfig()
-				.planCalcScore());
-	   Dijkstra carCongestedDijkstra = new Dijkstra(controler.getNetwork(),
-		travelDisutility, travelTimeCalculator.getLinkTravelTimes());
-		
+				
 		for (PlanElement pe:person.getSelectedPlan().getPlanElements()) {
 			
 			LegImpl leg;
@@ -140,26 +126,25 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 		trip.add( firstInteraction );		
 			
 		}
+		List<Id> ids = new ArrayList<Id>();
 		if (start && !end) {
 			double travelTime = 0.0;
+			
 			for(PlanElement pe: carDelegate.calcRoute(fromStation, toFacility, departureTime, person)) {
 		    	
 				if (pe instanceof Leg) {
-					
+					ids = ((NetworkRoute)((Leg) pe).getRoute()).getLinkIds();
 					//((NetworkRoute)((Leg) pe).getRoute()).getLinkIds()
 		    			travelTime += ((Leg) pe).getTravelTime();
+				}
 				}
 				final LegImpl carsharingLeg =
 					(LegImpl) populationFactory.createLeg("onewaycarsharing");
 				carsharingLeg.setTravelTime( travelTime );
 				carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", fromStation.getLinkId(),	toFacility.getLinkId());
-				  List<Id> ids = new ArrayList<Id>();
-				   for (Link l: carCongestedDijkstra.calcLeastCostPath(fromStation.getLink().getToNode(), controler.getNetwork().getLinks().get(toFacility.getLinkId()).getFromNode(), 0, null, null).links) {
-					   ids.add(l.getId());
-					   
-				   }
+				
 				carsharingRoute.setLinkIds(fromStation.getLinkId(),ids, toFacility.getLinkId());
-				carsharingRoute.setTravelTime( carCongestedDijkstra.calcLeastCostPath(fromStation.getLink().getToNode(), controler.getNetwork().getLinks().get(toFacility.getLinkId()).getFromNode(), 0, null, null).travelTime );
+				carsharingRoute.setTravelTime( travelTime);
 				carsharingLeg.setRoute( carsharingRoute );
 				carsharingLeg.setDepartureTime(departureTime + getAccessEgressTime(newRoute.calcAccessDistance(fromFacility.getCoord()), group) );
 				time = travelTime + getAccessEgressTime(newRoute.calcAccessDistance(fromFacility.getCoord()), group);
@@ -167,33 +152,31 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 				trip.add( carsharingLeg );
 		    	
 			}
-		}
+		
 		else if (start && end) {
 			   
 			double travelTime = 0.0;
 			for(PlanElement pe: carDelegate.calcRoute(fromStation, toStation, departureTime, person)) {
 				
 				if (pe instanceof Leg) {
-					travelTime += ((Leg) pe).getTravelTime();
-				}		    	
+					ids = ((NetworkRoute)((Leg) pe).getRoute()).getLinkIds();
+					//((NetworkRoute)((Leg) pe).getRoute()).getLinkIds()
+		    			travelTime += ((Leg) pe).getTravelTime();
+				}
 				    	
 			}			
 			final LegImpl carsharingLeg =
 						(LegImpl) populationFactory.createLeg("onewaycarsharing");
 			carsharingLeg.setTravelTime( travelTime );
 			carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", fromStation.getLinkId(),	toStation.getLinkId());
-			List<Id> ids = new ArrayList<Id>();
-			   for (Link l: carCongestedDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(fromStation.getLinkId()).getToNode(), toStation.getLink().getFromNode(), 0, null, null).links) {
-				   ids.add(l.getId());
-				   
-			   }
+			
 			carsharingRoute.setLinkIds(fromStation.getLinkId(),ids, toStation.getLinkId());
-			carsharingRoute.setTravelTime( carCongestedDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(fromStation.getLinkId()).getToNode(), toStation.getLink().getFromNode(), 0, null, null).travelTime );
+			carsharingRoute.setTravelTime( travelTime );
 			carsharingLeg.setDepartureTime(departureTime + getAccessEgressTime(newRoute.calcAccessDistance(fromFacility.getCoord()), group) );
 			time = travelTime + getAccessEgressTime(newRoute.calcAccessDistance(fromFacility.getCoord()), group);
 			carsharingLeg.setArrivalTime(departureTime + getAccessEgressTime(newRoute.calcAccessDistance(fromFacility.getCoord()), group) + travelTime);
 
-			  carsharingLeg.setRoute( carsharingRoute );
+			carsharingLeg.setRoute( carsharingRoute );
 			trip.add( carsharingLeg );			  
 			   
 		}
@@ -202,8 +185,10 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 			for(PlanElement pe: carDelegate.calcRoute(fromFacility, toStation, departureTime, person)) {
 				    	
 				if (pe instanceof Leg) {
-					travelTime += ((Leg) pe).getTravelTime();
-				}			    	
+					ids = ((NetworkRoute)((Leg) pe).getRoute()).getLinkIds();
+					//((NetworkRoute)((Leg) pe).getRoute()).getLinkIds()
+		    			travelTime += ((Leg) pe).getTravelTime();
+				}		    	
 				    	
 			}
 				
@@ -213,13 +198,8 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 					
 			carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", fromFacility.getLinkId(),	toStation.getLinkId());
 			
-			 List<Id> ids = new ArrayList<Id>();
-			   for (Link l: carCongestedDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(fromFacility.getLinkId()).getToNode(), toStation.getLink().getFromNode(), 0, null, null).links) {
-				   ids.add(l.getId());
-				   
-			   }
-			   carsharingRoute.setLinkIds(fromFacility.getLinkId(),ids, toStation.getLinkId());
-			carsharingRoute.setTravelTime( carCongestedDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(fromFacility.getLinkId()).getToNode(), toStation.getLink().getFromNode(), 0, null, null).travelTime );
+			carsharingRoute.setLinkIds(fromFacility.getLinkId(),ids, toStation.getLinkId());
+			carsharingRoute.setTravelTime( travelTime );
 			carsharingLeg.setDepartureTime(departureTime);
 			time = travelTime;
 			carsharingLeg.setArrivalTime(departureTime + travelTime);
@@ -233,9 +213,11 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 			   double travelTime = 0.0;
 				for(PlanElement pe: carDelegate.calcRoute(fromFacility, toFacility, departureTime, person)) {
 				    	
-				   	if (pe instanceof Leg) {
-				    		travelTime += ((Leg) pe).getTravelTime();
-				   	}
+					if (pe instanceof Leg) {
+						ids = ((NetworkRoute)((Leg) pe).getRoute()).getLinkIds();
+						//((NetworkRoute)((Leg) pe).getRoute()).getLinkIds()
+			    			travelTime += ((Leg) pe).getTravelTime();
+					}
 				    	
 				    	
 				}
@@ -244,14 +226,9 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 					carsharingLeg.setTravelTime( travelTime );
 					carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", fromFacility.getLinkId(),	toFacility.getLinkId());
 										
-					 List<Id> ids = new ArrayList<Id>();
-					   for (Link l: carCongestedDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(fromFacility.getLinkId()).getToNode(), controler.getNetwork().getLinks().get(toFacility.getLinkId()).getFromNode(), 0, null, null).links) {
-						   ids.add(l.getId());
-						   
-					   }
-					   carsharingRoute.setLinkIds(fromStation.getLinkId(),ids, toFacility.getLinkId());
+					carsharingRoute.setLinkIds(fromStation.getLinkId(),ids, toFacility.getLinkId());
 					
-					carsharingRoute.setTravelTime(  carCongestedDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(fromFacility.getLinkId()).getToNode(), controler.getNetwork().getLinks().get(toFacility.getLinkId()).getFromNode(), 0, null, null).travelTime );
+					carsharingRoute.setTravelTime(  travelTime );
 					carsharingLeg.setRoute( carsharingRoute );
 					carsharingLeg.setDepartureTime(departureTime);
 					carsharingLeg.setArrivalTime(departureTime + travelTime);

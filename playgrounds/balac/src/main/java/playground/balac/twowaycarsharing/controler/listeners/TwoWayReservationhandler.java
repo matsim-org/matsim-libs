@@ -7,7 +7,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -29,13 +28,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.balac.twowaycarsharing.router.CarSharingStation;
@@ -187,18 +182,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 		double distance = CoordUtils.calcDistance(activity.getCoord(), station.getCoord());
 		double walkSpeed = (((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
 		double beelineDistanceFactor = ((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getBeelineDistanceFactor();
-		
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl()
-		.createTravelTimeCalculator(controler.getNetwork(), controler.getScenario().getConfig().travelTimeCalculator());
-	   
-	    TravelDisutility travelDisutility = new TravelCostCalculatorFactoryImpl()
-		.createTravelDisutility(travelTimeCalculator
-				.getLinkTravelTimes(), controler.getConfig()
-				.planCalcScore());
-	    Dijkstra carDijkstra = new Dijkstra(controler.getNetwork(),
-		travelDisutility, travelTimeCalculator.getLinkTravelTimes());
-	   
-	   
+	
 		PopulationFactory populationFactory = controler.getScenario().getPopulation().getFactory();
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 		
@@ -221,7 +205,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
  			
  			((ActivityImpl)plan.getPlanElements().get(index + 1)).setLinkId(station.getLinkId());
  			
-	
+ 		List<Id> ids = new ArrayList<Id>();
 		String type = ((Activity)plan.getPlanElements().get(index + 3)).getType();
 		double travelTime = 0.0;
 		if (type == "carsharingInteraction") {
@@ -229,20 +213,15 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 			//CarSharingStation toStation = stationsByLink.get((((Activity)plan.getPlanElements().get(index + 3)).getLinkId()));
 			double departureTime = activity.getEndTime() + distance * beelineDistanceFactor / walkSpeed;
 			
-			for(PlanElement pe1: router.calcRoute("car", station, station, departureTime, plan.getPerson())) 
-		    	
-			   if (pe1 instanceof Leg) {
-		   		
-				   travelTime += ((Leg) pe1).getTravelTime();
-			   }
+			for(PlanElement pe: router.calcRoute("car", station, station, departureTime, plan.getPerson())) 
+				 
+				if (pe instanceof Leg) {
+						ids = ((NetworkRoute)((Leg) pe).getRoute()).getLinkIds();
+			    		travelTime += ((Leg) pe).getTravelTime();
+					}
 				   
 			carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", station.getLinkId(),	station.getLinkId());
-				   
-			List<Id> ids = new ArrayList<Id>();
-			for (Link l: carDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(station.getLinkId()).getToNode(), station.getLink().getFromNode(), 0, null, null).links) {
-			   ids.add(l.getId());
-					   
-			}
+		
 			carsharingRoute.setLinkIds(station.getLinkId(),ids, station.getLinkId());
 				   
 			carsharingRoute.setTravelTime( travelTime );
@@ -283,19 +262,15 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 			
 			double departureTime = activity.getEndTime() + distance * beelineDistanceFactor / walkSpeed;
 			travelTime = 0.0;
-			   for(PlanElement pe1: router.calcRoute("car", station, toFacility, departureTime, plan.getPerson())) 
+			   for(PlanElement pe: router.calcRoute("car", station, toFacility, departureTime, plan.getPerson())) 
 		    	
-				   if (pe1 instanceof Leg) {
-		   		
-					   travelTime += ((Leg) pe1).getTravelTime();
-				   }
+				   if (pe instanceof Leg) {
+						ids = ((NetworkRoute)((Leg) pe).getRoute()).getLinkIds();
+			    		travelTime += ((Leg) pe).getTravelTime();
+					}
 				  
 			   carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", station.getLinkId(),	((Activity)plan.getPlanElements().get(index + 3)).getLinkId());
-			   List<Id> ids = new ArrayList<Id>();
-			   for (Link l: carDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(station.getLinkId()).getToNode(), controler.getNetwork().getLinks().get(toFacility.getLinkId()).getFromNode(), 0, null, null).links) {
-				   ids.add(l.getId());
-					   
-			   }
+			  
 			   carsharingRoute.setLinkIds(station.getLinkId(),ids, toFacility.getLinkId());
 
 			   carsharingRoute.setTravelTime( travelTime );
@@ -321,19 +296,15 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 				ActivityFacilityImpl fromFacility =  (ActivityFacilityImpl) controler.getScenario().getActivityFacilities().getFacilities().get(((Activity)plan.getPlanElements().get(indexEnd - 1)).getFacilityId());
 				fromFacility.setLinkId(((Activity)plan.getPlanElements().get(indexEnd - 1)).getLinkId());
 				travelTime = 0.0;
-			    for(PlanElement pe1: router.calcRoute("car", fromFacility, station, departureTime, plan.getPerson())) 
+			    for(PlanElement pe: router.calcRoute("car", fromFacility, station, departureTime, plan.getPerson())) 
 				    	
-				   if (pe1 instanceof Leg) {
-				   		
-					   travelTime += ((Leg) pe1).getTravelTime();
-				   }
+			    	if (pe instanceof Leg) {
+						ids = ((NetworkRoute)((Leg) pe).getRoute()).getLinkIds();
+			    		travelTime += ((Leg) pe).getTravelTime();
+					}
 						  
 			    carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", fromFacility.getLinkId(),station.getLinkId());
-				ids = new ArrayList<Id>();
-				for (Link l: carDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(fromFacility.getLinkId()).getToNode(), controler.getNetwork().getLinks().get(station.getLinkId()).getFromNode(), 0, null, null).links) {
-					   ids.add(l.getId());
-							   
-				}
+				
 				carsharingRoute.setLinkIds(fromFacility.getLinkId(),ids, station.getLinkId());
 
 				carsharingRoute.setTravelTime( travelTime );

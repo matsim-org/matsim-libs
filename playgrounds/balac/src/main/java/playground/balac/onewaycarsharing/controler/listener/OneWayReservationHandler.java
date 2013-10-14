@@ -1,7 +1,6 @@
 package playground.balac.onewaycarsharing.controler.listener;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -10,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -21,7 +19,6 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -31,13 +28,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.balac.onewaycarsharing.router.CarSharingStation;
@@ -194,17 +187,6 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 		
 		final TripRouterFactoryInternal delegate = controler.getTripRouterFactory();
 		final TripRouter router = delegate.instantiateAndConfigureTripRouter();
-		
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl()
-		.createTravelTimeCalculator(controler.getNetwork(), controler.getScenario().getConfig().travelTimeCalculator());
-	   
-	   TravelDisutility travelDisutility = new TravelCostCalculatorFactoryImpl()
-		.createTravelDisutility(travelTimeCalculator
-				.getLinkTravelTimes(), controler.getConfig()
-				.planCalcScore());
-	   Dijkstra carDijkstra = new Dijkstra(controler.getNetwork(),
-			   travelDisutility, travelTimeCalculator.getLinkTravelTimes());
-	   
 	   
 		PopulationFactory populationFactory = controler.getScenario().getPopulation().getFactory();
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
@@ -229,7 +211,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
  			
  		//get the next activity after the first carsharing leg
 		String typeNextActivity = ((Activity)plan.getPlanElements().get(index + 3)).getType();
-		
+		List<Id> ids = new ArrayList<Id>();
 		if (typeNextActivity == "onewaycarsharingInteraction") {
 					
 			CarSharingStation toStation = stationsByLink.get((((Activity)plan.getPlanElements().get(index + 3)).getLinkId()));
@@ -238,17 +220,12 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 			   for(PlanElement planElement: router.calcRoute("car", station, toStation, departureTime, plan.getPerson())) 
 		    	
 				   if (planElement instanceof Leg) {
-		   		
-					   travelTime += ((Leg) planElement).getTravelTime();
-				   }
+						ids = ((NetworkRoute)((Leg) planElement).getRoute()).getLinkIds();
+			    		travelTime += ((Leg) planElement).getTravelTime();
+					}
 				   
 			   carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", station.getLinkId(),	toStation.getLinkId());
-				   
-			   List<Id> ids = new ArrayList<Id>();
-			   for (Link l: carDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(station.getLinkId()).getToNode(), toStation.getLink().getFromNode(), 0, null, null).links) {
-				   ids.add(l.getId());
-					   
-			   }
+				
 			   carsharingRoute.setLinkIds(station.getLinkId(),ids, toStation.getLinkId());
 			   
 			   carsharingRoute.setTravelTime( travelTime );
@@ -269,16 +246,12 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 			   for(PlanElement planElement: router.calcRoute("car", station, toFacility, departureTime, plan.getPerson())) 
 		    	
 				   if (planElement instanceof Leg) {
-		   		
-					   travelTime += ((Leg) planElement).getTravelTime();
-				   }
+						ids = ((NetworkRoute)((Leg) planElement).getRoute()).getLinkIds();
+			    		travelTime += ((Leg) planElement).getTravelTime();
+					}
 				  
 				   carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", station.getLinkId(),	((Activity)plan.getPlanElements().get(index + 3)).getLinkId());
-				   List<Id> ids = new ArrayList<Id>();
-				   for (Link l: carDijkstra.calcLeastCostPath(controler.getNetwork().getLinks().get(station.getLinkId()).getToNode(), controler.getNetwork().getLinks().get(toFacility.getLinkId()).getFromNode(), 0, null, null).links) {
-					   ids.add(l.getId());
-					   
-				   }
+				  
 				   carsharingRoute.setLinkIds(station.getLinkId(),ids, toFacility.getLinkId());
 
 				   carsharingRoute.setTravelTime( travelTime );
