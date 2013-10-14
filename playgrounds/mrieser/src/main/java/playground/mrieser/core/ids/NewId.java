@@ -95,12 +95,9 @@ public abstract class NewId<T> implements Comparable<NewId<T>> {
 	// default implementation of equals
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		
-		return this.toString().equals(obj.toString());
+		return this == obj;
+		// all other objects have to be different by definition, as long as the cache is correctly implemented
 	}
-	
-	
 	
 	
 	// =====================================================

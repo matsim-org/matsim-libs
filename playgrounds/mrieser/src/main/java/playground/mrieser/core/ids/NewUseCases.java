@@ -64,7 +64,7 @@ public class NewUseCases {
 			System.err.println("linkId1 and personId1 are similar");
 			// this could be prevented by storing the class object passed at creation into the id object, but is it worth it?
 		}
-		if (linkId1.equals((NewId) personId1)) { // does compile, but only with cast
+		if (linkId1.equals(personId1)) { // does compile, but returns the correct answer
 			System.err.println("linkId1 and personId1 are equal");
 		}
 	}
