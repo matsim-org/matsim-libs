@@ -17,8 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network;
+package pl.poznan.put.vrp.dynamic.data.network.impl;
 
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 

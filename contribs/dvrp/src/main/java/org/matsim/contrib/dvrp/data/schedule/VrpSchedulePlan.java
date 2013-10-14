@@ -86,7 +86,7 @@ public class VrpSchedulePlan
 
                 case STAY:
                     StayTask wt = (StayTask)t;
-                    addActivity((MatsimVertex)wt.getAtVertex(), wt.getEndTime(), "S");
+                    addActivity((MatsimVertex)wt.getVertex(), wt.getEndTime(), "S");
                     break;
 
                 default:

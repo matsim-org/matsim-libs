@@ -17,7 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network;
+package pl.poznan.put.vrp.dynamic.data.network.impl;
+
+import pl.poznan.put.vrp.dynamic.data.network.*;
 
 public abstract class AbstractArc
     implements Arc

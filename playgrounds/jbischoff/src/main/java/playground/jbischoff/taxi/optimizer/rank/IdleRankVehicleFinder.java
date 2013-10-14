@@ -222,7 +222,7 @@ public class IdleRankVehicleFinder
 
         switch (currentTask.getTaxiTaskType()) {
             case WAIT_STAY:
-                departVertex = ((StayTask)currentTask).getAtVertex();
+                departVertex = ((StayTask)currentTask).getVertex();
                 break;
 
             case CRUISE_DRIVE:// only CRUISE possible

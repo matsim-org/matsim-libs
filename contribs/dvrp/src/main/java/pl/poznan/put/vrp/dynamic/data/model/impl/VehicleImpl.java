@@ -17,109 +17,112 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network;
+package pl.poznan.put.vrp.dynamic.data.model.impl;
 
-public class VertexImpl
-    implements Vertex
+import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
+
+
+public class VehicleImpl
+    implements Vehicle
 {
-    private static final VertexBuilder BUILDER = new VertexImplBuilder();
-
     private final int id;
     private final String name;
-    private final double x;
-    private final double y;
+    private final Depot depot;
+
+    private final int capacity;
+
+    // TW for vehicle
+    private final int t0;
+    private final int t1;
+
+    // max time outside the depot
+    private final int timeLimit;
+
+    private Schedule<TaskImpl> schedule;
 
 
-    protected VertexImpl(int id, String name, double x, double y)
+    public VehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1, int timeLimit)
     {
         this.id = id;
         this.name = name;
-        this.x = x;
-        this.y = y;
+        this.depot = depot;
+        this.capacity = capacity;
+        this.t0 = t0;
+        this.t1 = t1;
+        this.timeLimit = timeLimit;
+
+        schedule = new ScheduleImpl<TaskImpl>(this);
     }
 
 
     @Override
-    public String toString()
-    {
-        return "Vertex_" + id;
-    }
-
-
     public int getId()
     {
         return id;
     }
 
 
+    @Override
     public String getName()
     {
         return name;
     }
 
 
-    public double getX()
+    @Override
+    public Depot getDepot()
     {
-        return x;
+        return depot;
     }
 
 
-    public double getY()
+    @Override
+    public int getCapacity()
     {
-        return y;
+        return capacity;
     }
 
 
-    public static VertexBuilder getBuilder()
+    @Override
+    public int getT0()
     {
-        return BUILDER;
+        return t0;
     }
 
 
-    private static class VertexImplBuilder
-        implements VertexBuilder
+    @Override
+    public int getT1()
     {
-        private int id = -1;
-
-        private String name;
-        private double x;
-        private double y;
+        return t1;
+    }
 
 
-        @Override
-        public VertexImplBuilder setName(String name)
-        {
-            this.name = name;
-            return this;
-        }
+    @Override
+    public int getTimeLimit()
+    {
+        return timeLimit;
+    }
 
 
-        @Override
-        public VertexImplBuilder setX(double x)
-        {
-            this.x = x;
-            return this;
-        }
+    @Override
+    public Schedule<? extends TaskImpl> getSchedule()
+    {
+        return schedule;
+    }
 
 
-        @Override
-        public VertexImplBuilder setY(double y)
-        {
-            this.y = y;
-            return this;
-        }
+    @Override
+    public void resetSchedule()
+    {
+        schedule = new ScheduleImpl<TaskImpl>(this);
+    }
 
 
-        @Override
-        public Vertex build()
-        {
-            id++;
-
-            if (name == null) {
-                return new VertexImpl(id, Integer.toString(id), x, y);
-            }
-
-            return new VertexImpl(id, name, x, y);
-        }
+    @Override
+    public String toString()
+    {
+        return "Vehicle_" + id;
     }
 }

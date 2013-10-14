@@ -17,34 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network;
+package pl.poznan.put.vrp.dynamic.data.model.impl;
 
-import pl.poznan.put.vrp.dynamic.data.model.Localizable;
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
 
-
-public class VertexTimePair
-    implements Localizable
+/**
+ * @author michalm
+ */
+public class CustomerImpl
+    implements Customer
 {
-    private final Vertex vertex;
-    private final int time;
+    private final int id;
+    private final String name;
 
 
-    public VertexTimePair(Vertex vertex, int time)
+    public CustomerImpl(int id, String name)
     {
-        this.vertex = vertex;
-        this.time = time;
+        this.id = id;
+        this.name = name;
     }
 
 
     @Override
-    public Vertex getVertex()
+    public int getId()
     {
-        return vertex;
+        return id;
     }
 
 
-    public int getTime()
+    @Override
+    public String getName()
     {
-        return time;
+        return name;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "Customer_" + id;
     }
 }

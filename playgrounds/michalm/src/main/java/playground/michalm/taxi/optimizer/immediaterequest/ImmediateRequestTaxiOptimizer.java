@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.impl.VertexTimePair;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
@@ -165,7 +166,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
                 switch (lastTask.getTaxiTaskType()) {
                     case WAIT_STAY:
-                        vertex = ((StayTask)lastTask).getAtVertex();
+                        vertex = ((StayTask)lastTask).getVertex();
                         time = Math.max(lastTask.getBeginTime(), currentTime);
                         return new VertexTimePair(vertex, time);
 

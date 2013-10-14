@@ -165,7 +165,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 
 			switch (lastTask.getTaxiTaskType()) {
 			case WAIT_STAY:
-				vertex = ((StayTask) lastTask).getAtVertex();
+				vertex = ((StayTask) lastTask).getVertex();
 				time = Math.max(lastTask.getBeginTime(), currentTime);
 				return new VertexTimePair(vertex, time);
 
@@ -204,7 +204,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 			Task last = Schedules.getLastTask(veh.getSchedule());
 			if (last instanceof TaxiWaitStayTask) {
 			    TaxiWaitStayTask lastw = (TaxiWaitStayTask) last;
-				if (!lastw.getAtVertex().equals(veh.getDepot().getVertex())) {
+				if (!lastw.getVertex().equals(veh.getDepot().getVertex())) {
 					if (this.depotArrivalDepartureCharger
 							.needsToReturnToRank(new IdImpl(veh.getName()))) {
 						scheduleRankReturn(veh);
@@ -287,7 +287,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 			throw new IllegalStateException();
 		}
 
-		Vertex lastVertex = lastTask.getAtVertex();
+		Vertex lastVertex = lastTask.getVertex();
 
 		if (veh.getDepot().getVertex() != lastVertex) {// not a loop
 			Arc darc = data.getVrpGraph().getArc(lastVertex,
@@ -310,7 +310,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 			Task last = Schedules.getLastTask(veh.getSchedule());
 			if (last instanceof TaxiWaitStayTask) {
 			    TaxiWaitStayTask lastw = (TaxiWaitStayTask) last;
-				if (!lastw.getAtVertex().equals(veh.getDepot().getVertex())) {
+				if (!lastw.getVertex().equals(veh.getDepot().getVertex())) {
 					this.shortTimeIdlers.add(veh.getId());
 				}
 			}

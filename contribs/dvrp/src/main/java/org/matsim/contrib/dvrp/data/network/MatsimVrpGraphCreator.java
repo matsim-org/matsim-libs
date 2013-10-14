@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.impl.FixedSizeVrpGraph;
 
 
 public class MatsimVrpGraphCreator

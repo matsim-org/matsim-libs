@@ -27,26 +27,26 @@ public class StayTaskImpl
     extends TaskImpl
     implements StayTask
 {
-    private final Vertex atVertex;
+    private final Vertex vertex;
 
 
-    public StayTaskImpl(int beginTime, int endTime, Vertex atVertex)
+    public StayTaskImpl(int beginTime, int endTime, Vertex vertex)
     {
         super(TaskType.STAY, beginTime, endTime);
-        this.atVertex = atVertex;
+        this.vertex = vertex;
     }
 
 
     @Override
-    public Vertex getAtVertex()
+    public Vertex getVertex()
     {
-        return atVertex;
+        return vertex;
     }
 
 
     @Override
     public String toString()
     {
-        return "S(@" + atVertex.getId() + ")" + commonToString();
+        return "S(@" + vertex.getId() + ")" + commonToString();
     }
 }

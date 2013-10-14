@@ -20,6 +20,7 @@
 package playground.michalm.taxi.model;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import playground.michalm.taxi.schedule.*;
 

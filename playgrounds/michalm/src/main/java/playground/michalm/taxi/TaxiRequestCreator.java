@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.passenger.RequestCreator;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
 
 
 public class TaxiRequestCreator

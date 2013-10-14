@@ -30,7 +30,7 @@ public class Tasks
             case DRIVE:
                 return ((DriveTask)task).getArc().getFromVertex();
             case STAY:
-                return ((StayTask)task).getAtVertex();
+                return ((StayTask)task).getVertex();
             default:
                 throw new IllegalStateException("Only: DRIVE or STAY");
         }
@@ -43,7 +43,7 @@ public class Tasks
             case DRIVE:
                 return ((DriveTask)task).getArc().getToVertex();
             case STAY:
-                return ((StayTask)task).getAtVertex();
+                return ((StayTask)task).getVertex();
             default:
                 throw new IllegalStateException("Only: DRIVE or STAY");
         }

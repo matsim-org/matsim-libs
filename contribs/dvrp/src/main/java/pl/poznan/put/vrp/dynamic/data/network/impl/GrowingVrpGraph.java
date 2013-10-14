@@ -17,10 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network;
+package pl.poznan.put.vrp.dynamic.data.network.impl;
 
 import java.util.*;
 import java.util.Map.Entry;
+
+import pl.poznan.put.vrp.dynamic.data.network.*;
 
 import com.google.common.collect.Iterators;
 

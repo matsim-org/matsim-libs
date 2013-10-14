@@ -17,10 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network;
+package pl.poznan.put.vrp.dynamic.data.network.impl;
 
 import java.lang.reflect.Array;
 import java.util.*;
+
+import pl.poznan.put.vrp.dynamic.data.network.*;
 
 
 public class FixedSizeVrpGraph

@@ -17,69 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network;
+package pl.poznan.put.vrp.dynamic.data.network.impl;
 
-public class ConstantArc
-    extends AbstractArc
+import pl.poznan.put.vrp.dynamic.data.model.Localizable;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+
+
+public class VertexTimePair
+    implements Localizable
 {
-    private int arcTime;
-    private double arcCost;
+    private final Vertex vertex;
+    private final int time;
 
 
-    public ConstantArc(Vertex fromVertex, Vertex toVertex, int arcTime, double arcCost)
+    public VertexTimePair(Vertex vertex, int time)
     {
-        super(fromVertex, toVertex);
-        this.arcTime = arcTime;
-        this.arcCost = arcCost;
+        this.vertex = vertex;
+        this.time = time;
     }
 
 
     @Override
-    public int getTimeOnDeparture(int departureTime)
+    public Vertex getVertex()
     {
-        return arcTime;
+        return vertex;
     }
 
 
-    @Override
-    public int getTimeOnArrival(int arrivalTime)
+    public int getTime()
     {
-        return arcTime;
-    }
-
-
-    @Override
-    public double getCostOnDeparture(int departureTime)
-    {
-        return arcCost;
-    }
-
-
-    public static class ConstantArcFactory
-        implements ArcFactory
-    {
-        private final int[][] times;
-        private final double[][] costs;
-
-
-        /**
-         * @param times - n x n matrix with (time-independent) arc times
-         * @param costs - n x n matrix with (time-independent) arc costs
-         */
-        public ConstantArcFactory(int[][] times, double[][] costs)
-        {
-            this.times = times;
-            this.costs = costs;
-        }
-
-
-        @Override
-        public Arc createArc(Vertex fromVertex, Vertex toVertex)
-        {
-            int i = fromVertex.getId();
-            int j = toVertex.getId();
-
-            return new ConstantArc(fromVertex, toVertex, times[i][j], costs[i][j]);
-        }
+        return time;
     }
 }

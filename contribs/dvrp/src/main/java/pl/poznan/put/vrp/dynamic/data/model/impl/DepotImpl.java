@@ -17,42 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model;
+package pl.poznan.put.vrp.dynamic.data.model.impl;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
+import pl.poznan.put.vrp.dynamic.data.model.Depot;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
-public class VehicleImpl
-    implements Vehicle
+public class DepotImpl
+    implements Depot
 {
     private final int id;
     private final String name;
-    private final Depot depot;
-
-    private final int capacity;
-
-    // TW for vehicle
-    private final int t0;
-    private final int t1;
-
-    // max time outside the depot
-    private final int timeLimit;
-
-    private Schedule<TaskImpl> schedule;
+    private final Vertex vertex;
 
 
-    public VehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1, int timeLimit)
+    public DepotImpl(int id, String name, Vertex vertex)
     {
         this.id = id;
         this.name = name;
-        this.depot = depot;
-        this.capacity = capacity;
-        this.t0 = t0;
-        this.t1 = t1;
-        this.timeLimit = timeLimit;
-
-        schedule = new ScheduleImpl<TaskImpl>(this);
+        this.vertex = vertex;
     }
 
 
@@ -71,57 +54,15 @@ public class VehicleImpl
 
 
     @Override
-    public Depot getDepot()
+    public Vertex getVertex()
     {
-        return depot;
-    }
-
-
-    @Override
-    public int getCapacity()
-    {
-        return capacity;
-    }
-
-
-    @Override
-    public int getT0()
-    {
-        return t0;
-    }
-
-
-    @Override
-    public int getT1()
-    {
-        return t1;
-    }
-
-
-    @Override
-    public int getTimeLimit()
-    {
-        return timeLimit;
-    }
-
-
-    @Override
-    public Schedule<? extends TaskImpl> getSchedule()
-    {
-        return schedule;
-    }
-
-
-    @Override
-    public void resetSchedule()
-    {
-        schedule = new ScheduleImpl<TaskImpl>(this);
+        return vertex;
     }
 
 
     @Override
     public String toString()
     {
-        return "Vehicle_" + id;
+        return "Depot_" + id;
     }
 }

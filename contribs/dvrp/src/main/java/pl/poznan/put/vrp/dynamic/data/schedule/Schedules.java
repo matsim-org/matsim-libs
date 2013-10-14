@@ -123,7 +123,7 @@ public class Schedules
                 return ((DriveTask)task).getArc().getToVertex();
 
             case STAY:
-                return ((StayTask)task).getAtVertex();
+                return ((StayTask)task).getVertex();
 
             default:
                 throw new IllegalStateException();

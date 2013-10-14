@@ -27,9 +27,9 @@ public class TaxiWaitStayTask
     extends StayTaskImpl
     implements TaxiTask
 {
-    public TaxiWaitStayTask(int beginTime, int endTime, Vertex atVertex)
+    public TaxiWaitStayTask(int beginTime, int endTime, Vertex vertex)
     {
-        super(beginTime, endTime, atVertex);
+        super(beginTime, endTime, vertex);
     }
 
 
