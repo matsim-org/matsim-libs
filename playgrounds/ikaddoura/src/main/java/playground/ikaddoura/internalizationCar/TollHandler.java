@@ -40,7 +40,7 @@ public class TollHandler implements MarginalCongestionEventHandler {
 	private static final Logger log = Logger.getLogger(TollHandler.class);
 	private double timeBinSize = 900.;
 	
-	private List<TollInfo> linkId2tollInfo = new ArrayList<TollInfo>();
+	private List<TollInfo> tollInfos = new ArrayList<TollInfo>();
 	private List<Id> linkIds = new ArrayList<Id>();
 	private Map<Id, Map<Double, Double>> linkId2timeBin2avgToll = new HashMap<Id, Map<Double, Double>>();
 	private double vtts_car;
@@ -52,8 +52,8 @@ public class TollHandler implements MarginalCongestionEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-		log.info("Iteration (" + iteration + ") begins. Clear all informations of the previous iteration (" + (iteration-1) + ").");
-		this.linkId2tollInfo.clear();
+		log.info("-----> Iteration (" + iteration + ") begins. Clear all informations of the previous iteration (" + (iteration-1) + ").");
+		this.tollInfos.clear();
 		this.linkId2timeBin2avgToll.clear();
 		this.linkIds.clear();
 	}
@@ -66,14 +66,14 @@ public class TollHandler implements MarginalCongestionEventHandler {
 		tollInfo.setAmount(amount);
 		tollInfo.setTime(event.getTime());
 		tollInfo.setLinkId(event.getLinkId());
-		this.linkId2tollInfo.add(tollInfo);
+		this.tollInfos.add(tollInfo);
 		
 		if (!linkIds.contains(event.getLinkId())){
 			linkIds.add(event.getLinkId());
 		}
 	}
 
-	public void setLinkId2timeBin2avgToll() {		
+	public void setLinkId2timeBin2avgToll() {
 		for (Id linkId : this.linkIds) {
 			Map<Double, Double> timeBin2avgToll = new HashMap<Double, Double>();
 			
@@ -81,7 +81,7 @@ public class TollHandler implements MarginalCongestionEventHandler {
 				time = time + this.timeBinSize;
 				
 				List<Double> amounts = new ArrayList<Double>();
-				for (TollInfo tollInfo : this.linkId2tollInfo){
+				for (TollInfo tollInfo : this.tollInfos){
 					
 					if (tollInfo.getLinkId().toString().equals(linkId.toString())){
 

@@ -47,8 +47,7 @@ public class InternalizationCarControler {
 			log.info("configFile: "+ configFile);
 			
 		} else {
-			configFile = "/Users/Ihab/Desktop/input/config_internalization.xml";
-//			configFile = "/Users/Ihab/Desktop/car_internalization_input/config_noInternalization.xml";
+			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
 		}
 		
 		InternalizationCarControler main = new InternalizationCarControler();

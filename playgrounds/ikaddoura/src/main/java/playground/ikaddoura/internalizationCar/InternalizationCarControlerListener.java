@@ -63,6 +63,9 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		tollHandler.setLinkId2timeBin2avgToll();
+		
+		// calculate and write social welfare
+
 	}
 
 }
