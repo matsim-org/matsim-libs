@@ -1,134 +1,10 @@
 \NextFile{OtherModules.html}
-\chapter{Other configurable modules}
+\chapter{MATSim input data (``MATSim containers'')}
 
-Modules are loosely defined by their corresponding entry in the config file.
+Sorted alphabetically.
 
-They are also sorted in the same sequence (which is done by the machine, not by content).
-
-Note that individual config options are often explained inside the config section of the log file.
-
-Config file modules that just define files/directories are, as a tendency, not explained here.Note that strategy modules (such as ReRoute, Planomat) are described in a separate section.
-
-Maintainers are mentioned as far as possible, but they are \emph{not} responsible for answering arbitrary service requests.
-
-\vfill\eject
-\section{"JDEQSim".  Status: works for ivt}
-
-\textbf{Maintainer:} Rashid Waraich
-
-\subsubsection{Overview}
-
-JDEQSim (Java Deterministic Event Driven Queue Based Simulation) has the following properties and features:
-\begin{itemize}
-	\item it is based on a discrete event simulation model
-	\item traffic simulation is based on a queue model for streets (FIFO: first in first out)
-	\item deadlock prevention is achieved by squeezing vehicles
-	\item gaps  generated at front of queue propagate backwards with a speed called  'gapTravelSpeed' resulting in a more realistic traffic model
-\end{itemize}
-
-\subsubsection{Usage}
-
-Insert  a new module called 'JDEQSim' into the config XML file. All parameters  are optional and have default values (shown below), never the less it  could be helpful to know their meaning and physical units.
-\begin{lstlisting}{language=XML}
-<module name="JDEQSim">
-    <param name="endTime" value="00:00:00"   />
-    <param name="flowCapacityFactor" value="1.0"   />
-    <param name="storageCapacityFactor" value="1.0"   />
-    <param name="minimumInFlowCapacity" value="1800"   />
-    <param name="carSize" value="7.5"   />
-    <param name="gapTravelSpeed" value="15.0"   />
-    <param name="squeezeTime" value="1800"   />
-</module>
-\end{lstlisting}
-
-The mobsim type now  also needs to be defined in the controler section of the config  file. See comments in config dumps in logfiles.
-
-The  'endTime' defines the time of the last event of the simulation. If it is  set to '00:00:00', no end time is defined and the simulation will stop,  when the last event of the simulation has been processed. The (scaling)  parameters  'flowCapacityFactor' and 'storageCapacityFactor' can  be used as with mobSim and have no unit. The 'minimumInFlowCapacity'  defines for all roads the minimum number of cars, which could enter the  road per hour, for the congestion less case. The 'carSize' parameter  allows to set the size of a car in meters. The 'gapTravelSpeed'  parameter defines the speed of gaps in [m/s]. Finally the 'squeezeTime'  is used for deadlock prevention and defines, how long a car should wait  at maximum for entering the next road before deadlock prevention is  turned on (unit: seconds).
-
-The 'minimumInFlowCapacity' is a  parameter, which was not published in the C++ DEQSim, but only used  interally and was hardcoded to the value 1800 vehicles per hour. This  value was estimated from literature assuming that independently from the  speed limit of a road the minimum interval between two vehicles is 2  seconds (inverse of 1800 vehicles per hour). This factor does not need  to be changed, when the 'flowCapacityFactor' is changed, as the scaling  is automatically done internally. The reason for publishing this factor  is to make it possible for users to adapt this factor, if they want to  use a different minium inflow capacity based on their model estimations.
-
-\subsubsection{Hints}
-\begin{itemize}
-	\item You might consider turning on the module  'parallelEventHandling' when using JDEQSim, as often JDEQSim can make  much better use of this module than QueueSim (as JDEQSim is faster).
-	\item If you are getting lots of breakdowns, consider using smaller squeezeTime (e.g. 10 seconds or lower)
-\end{itemize}
-
-\textbf{Requirements for the Plans XML File
-\\}
-\begin{itemize}
-	\item For each person the 'end\_time' of the first act must be defined ('dur' is ignored).
-	\item For the other acts of a person either 'dur' or 'end\_time' needs to be defined
-	\item If both 'dur' and 'end\_time' are defined, then only the one which occurs earlier is considered
-\end{itemize}
-
-\subsubsection{Details of the Model}
-
-\textbf{Difference between MobSim and JDEQSim}
-\begin{itemize}
-	\item QueueSim  uses a simulation approach called 'fixed-increment time advance'  instead of 'next-event time advance', which makes it much slower than  JDEQSim for high resolution networks.
-	\item JDEQSim allows  squeezing of vehicles to resolve possible deadlocks. Deadlock prevention  in QueueSim is (traditionally) dealt with by removing vehicles from the  network or squeezing.
-	\item JDEQSim models gap travel times more realistically than QueueSim, where this feature is missing.
-\end{itemize}
-
-
-
-
-\subsubsection{Further Reading}
-
-This implementation is based on the micro-simulation described in the following paper:
-
-Charypar, D., K. Nagel and K.W. Axhausen (2007) An event-driven queue-based microsimulation of traffic flow, \emph{Transportation Research Record}, \textbf{2003}, 35-40.Order \href{http://trb.metapress.com/content/j2118065485r4611/?p=4f63e25a261d48d99eeebea19b494e24&amp;pi=0}{here}.
-
-Some  Java specific implementation aspects and performance tests of JDEQSim  and parallelEventHandling are described in the following paper:
-
-Waraich,  R., D. Charypar, M. Balmer and K.W. Axhausen (2009) Performance  improvements for large scale traffic simulation in MATSim, paper  presented at the \emph{9$^th$ Swiss Transport Research Conference}, Ascona, September 2009. Download from \href{http://www.ivt.ethz.ch/vpl/publications/reports/ab565.pdf}{here}.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\vfill\eject
-\section{"controler". Status: indispensable}
-
-\subsubsection{\textbf{Maintenance and Questions}}
-
-Marcel Rieser, Senozon AG (rieser\_at\_senozon.com)
-
-\subsubsection{\textbf{Javadoc}}
-
-\href{http://www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html}{www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html}
-
-
-
-\subsubsection{Config Parameters}
-
-\href{http://www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html#controler_parameters}{www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html\#controler\_parameters}
-
-
-\subsubsection{\textbf{\textbf{In Brief}}}
-
-Central module to run matsim. Specifies, for example, the number of iterations.
-
-
-
-\subsubsection{Notes}
-
-See \href{http://matsim.org/node/398}{here} for some instructions how to use an external executable as mobsim.
-
-\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"counts". Status: works for vsp and ivt}
 
 \subsubsection{\textbf{Maintenance and Questions:}}
@@ -213,43 +89,6 @@ The counts-module offers the following config-parameters:
 \vfill\eject
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% I think this is now fully a contrib.  kai, oct'13
-%%\section{"evacuation"(-ivt). Status: ??}
-
-%%Evacuation code used by IVT; please note that IVT and VSP use different evacuation codes.
-
-%%Maintained by C. Dobler.
-
-%%I (kn) don't know how this works
-
-%%\vfill\eject
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% I think this is now fully a contrib.  kai, oct'13
-%%\section{"evacuation"(-vsp). Status: works if you know what you are doing}
-
-%%(Note that VSP and IVT use different evacuation packages.)
-
-%%\subsubsection{\textbf{Maintenance and Questions}}
-
-%%G. Lämmel, TU Berlin
-
-%%\subsubsection{\textbf{Javadoc}}
-
-%%\href{http://www.matsim.org/javadoc/org/matsim/evacuation/package-summary.html}{http://www.matsim.org/javadoc/org/matsim/evacuation/package-summary.html}
-
-
-%%\subsubsection{\textbf{\textbf{Config Parameters{}}}}
-
-%%\href{http://www.matsim.org/javadoc/org/matsim/evacuation/package-summary.html#evacuation_parameters}{http://www.matsim.org/javadoc/org/matsim/evacuation/package-summary.html\#evacuation\_parameters}
-
-%%\subsubsection{\textbf{\textbf{In Brief}}}
-
-%%I (kn) can't say how this works. There is, at this point, neither documentation nor funding.
-
-%%\vfill\eject
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"facilities". Status: "user" version work in progress}
 
 \textbf{Maintainer:} Andreas Horni
@@ -259,13 +98,8 @@ One may, or may not, use a separate file that contains "facilities" – essentia
 The prototype for this is fairly old. But the final design is  somewhat different, and has not been fully executed. So I (kn) do  not know if this can currently be used as a non-developer.
 
 \vfill\eject
-\section{"global". Status: indispensable}
-
-\textbf{"Maintainer":} Marcel Rieser
-
-"Global" information. Arguably should be merged with "controler" section.
-
-\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"households". Status: probably ready but nowhere used}
 
 \textbf{Maintainer:} Christoph Dobler
@@ -275,6 +109,13 @@ An option to read a households file into matsim.
 I (kn) don't know the exact status.
 
 \vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{"network". Status: ok}
+
+\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"network" (time dependent). Status: works for vsp}
 
 \textbf{Maintenance:} G. Lämmel, VSP
@@ -328,6 +169,188 @@ It  seems that the ``absolute'' version of this module was never tested (and  ma
 
 
 \vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{"vehicles". Status: probably reads the file correctly, but does nothing else}
+
+\textbf{Maintainer:} Michael Zilske (within limits of DFG/MUC project; possibly pt project)
+
+\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Other configurable modules}
+
+% I now think that there should be
+% * matsim containers (population, network, facilities, households, ...)
+% * mobsims
+% * other
+% kai, oct'13
+
+
+
+Modules are loosely defined by their corresponding entry in the config file.
+
+They are also sorted in the same sequence (which is done by the machine, not by content).
+
+Note that individual config options are often explained inside the config section of the log file.
+
+Config file modules that just define files/directories are, as a tendency, not explained here.Note that strategy modules (such as ReRoute, Planomat) are described in a separate section.
+
+Maintainers are mentioned as far as possible, but they are \emph{not} responsible for answering arbitrary service requests.
+
+\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{"global". Status: indispensable}
+
+\textbf{"Maintainer":} Marcel Rieser
+
+"Global" information. Arguably should be merged with "controler" section.
+
+\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{"JDEQSim".  Status: works for ivt}
+
+\textbf{Maintainer:} Rashid Waraich
+
+\subsubsection{Overview}
+
+JDEQSim (Java Deterministic Event Driven Queue Based Simulation) has the following properties and features:
+\begin{itemize}
+	\item it is based on a discrete event simulation model
+	\item traffic simulation is based on a queue model for streets (FIFO: first in first out)
+	\item deadlock prevention is achieved by squeezing vehicles
+	\item gaps  generated at front of queue propagate backwards with a speed called  'gapTravelSpeed' resulting in a more realistic traffic model
+\end{itemize}
+
+\subsubsection{Usage}
+
+Insert  a new module called 'JDEQSim' into the config XML file. All parameters  are optional and have default values (shown below), never the less it  could be helpful to know their meaning and physical units.
+\begin{lstlisting}{language=XML}
+<module name="JDEQSim">
+    <param name="endTime" value="00:00:00"   />
+    <param name="flowCapacityFactor" value="1.0"   />
+    <param name="storageCapacityFactor" value="1.0"   />
+    <param name="minimumInFlowCapacity" value="1800"   />
+    <param name="carSize" value="7.5"   />
+    <param name="gapTravelSpeed" value="15.0"   />
+    <param name="squeezeTime" value="1800"   />
+</module>
+\end{lstlisting}
+
+The mobsim type now  also needs to be defined in the controler section of the config  file. See comments in config dumps in logfiles.
+
+The  'endTime' defines the time of the last event of the simulation. If it is  set to '00:00:00', no end time is defined and the simulation will stop,  when the last event of the simulation has been processed. The (scaling)  parameters  'flowCapacityFactor' and 'storageCapacityFactor' can  be used as with mobSim and have no unit. The 'minimumInFlowCapacity'  defines for all roads the minimum number of cars, which could enter the  road per hour, for the congestion less case. The 'carSize' parameter  allows to set the size of a car in meters. The 'gapTravelSpeed'  parameter defines the speed of gaps in [m/s]. Finally the 'squeezeTime'  is used for deadlock prevention and defines, how long a car should wait  at maximum for entering the next road before deadlock prevention is  turned on (unit: seconds).
+
+The 'minimumInFlowCapacity' is a  parameter, which was not published in the C++ DEQSim, but only used  interally and was hardcoded to the value 1800 vehicles per hour. This  value was estimated from literature assuming that independently from the  speed limit of a road the minimum interval between two vehicles is 2  seconds (inverse of 1800 vehicles per hour). This factor does not need  to be changed, when the 'flowCapacityFactor' is changed, as the scaling  is automatically done internally. The reason for publishing this factor  is to make it possible for users to adapt this factor, if they want to  use a different minium inflow capacity based on their model estimations.
+
+\subsubsection{Hints}
+\begin{itemize}
+	\item You might consider turning on the module  'parallelEventHandling' when using JDEQSim, as often JDEQSim can make  much better use of this module than QueueSim (as JDEQSim is faster).
+	\item If you are getting lots of breakdowns, consider using smaller squeezeTime (e.g. 10 seconds or lower)
+\end{itemize}
+
+\subsubsection{Requirements for the Plans XML File}
+
+\begin{itemize}
+	\item For each person the 'end\_time' of the first act must be defined ('dur' is ignored).
+	\item For the other acts of a person either 'dur' or 'end\_time' needs to be defined
+	\item If both 'dur' and 'end\_time' are defined, then only the one which occurs earlier is considered
+\end{itemize}
+
+\subsubsection{Differences between MobSim and JDEQSim}
+\begin{itemize}
+	\item QueueSim  uses a simulation approach called 'fixed-increment time advance'  instead of 'next-event time advance', which makes it much slower than  JDEQSim for high resolution networks.
+	%%\item JDEQSim allows  squeezing of vehicles to resolve possible deadlocks. Deadlock prevention  in QueueSim is (traditionally) dealt with by removing vehicles from the  network or squeezing.
+%
+% squeezing has been possible in the qsim for many years now. kai, oct'13
+	\item JDEQSim models gap travel times more realistically than QueueSim, where this feature is missing.
+\end{itemize}
+
+
+
+
+\subsubsection{Further Reading}
+
+This implementation is based on the micro-simulation described in the following paper:
+
+Charypar, D., K. Nagel and K.W. Axhausen (2007) An event-driven queue-based microsimulation of traffic flow, \emph{Transportation Research Record}, \textbf{2003}, 35-40.Order \href{http://trb.metapress.com/content/j2118065485r4611/?p=4f63e25a261d48d99eeebea19b494e24&amp;pi=0}{here}.
+
+Some  Java specific implementation aspects and performance tests of JDEQSim  and parallelEventHandling are described in the following paper:
+
+Waraich,  R., D. Charypar, M. Balmer and K.W. Axhausen (2009) Performance  improvements for large scale traffic simulation in MATSim, paper  presented at the \emph{9$^th$ Swiss Transport Research Conference}, Ascona, September 2009. Download from \href{http://www.ivt.ethz.ch/vpl/publications/reports/ab565.pdf}{here}.
+
+\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{"controler". Status: indispensable}
+
+\subsubsection{\textbf{Maintenance and Questions}}
+
+Marcel Rieser, Senozon AG (rieser\_at\_senozon.com)
+
+\subsubsection{\textbf{Javadoc}}
+
+\href{http://www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html}{www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html}
+
+
+
+\subsubsection{Config Parameters}
+
+\href{http://www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html#controler_parameters}{www.matsim.org/javadoc/org/matsim/core/controler/package-summary.html\#controler\_parameters}
+
+
+\subsubsection{\textbf{\textbf{In Brief}}}
+
+Central module to run matsim. Specifies, for example, the number of iterations.
+
+
+
+\subsubsection{Notes}
+
+See \href{http://matsim.org/node/398}{here} for some instructions how to use an external executable as mobsim.
+
+\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% I think this is now fully a contrib.  kai, oct'13
+%%\section{"evacuation"(-ivt). Status: ??}
+
+%%Evacuation code used by IVT; please note that IVT and VSP use different evacuation codes.
+
+%%Maintained by C. Dobler.
+
+%%I (kn) don't know how this works
+
+%%\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% I think this is now fully a contrib.  kai, oct'13
+%%\section{"evacuation"(-vsp). Status: works if you know what you are doing}
+
+%%(Note that VSP and IVT use different evacuation packages.)
+
+%%\subsubsection{\textbf{Maintenance and Questions}}
+
+%%G. Lämmel, TU Berlin
+
+%%\subsubsection{\textbf{Javadoc}}
+
+%%\href{http://www.matsim.org/javadoc/org/matsim/evacuation/package-summary.html}{http://www.matsim.org/javadoc/org/matsim/evacuation/package-summary.html}
+
+
+%%\subsubsection{\textbf{\textbf{Config Parameters{}}}}
+
+%%\href{http://www.matsim.org/javadoc/org/matsim/evacuation/package-summary.html#evacuation_parameters}{http://www.matsim.org/javadoc/org/matsim/evacuation/package-summary.html\#evacuation\_parameters}
+
+%%\subsubsection{\textbf{\textbf{In Brief}}}
+
+%%I (kn) can't say how this works. There is, at this point, neither documentation nor funding.
+
+%%\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"parallelEventHandling". Status: works for ivt and vsp}
 
 \textbf{Maintainer:} Rashid Waraich
@@ -444,27 +467,32 @@ This is, naturally, the same as dividing the 200m\textasciicircum2 of the link b
 The effective lane width might be used by the visualization (unclear if this is the case).
 
 \vfill\eject
-\section{"roadpricing".  Status: works for vsp}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\section{"roadpricing".  Status: works for vsp}
 
-\textbf{Maintainer:} Michael Zilske
+%%\textbf{Maintainer:} Michael Zilske
 
-The roadpricing module provides functionality to simulate different road-pricing scenarios in MATSim.
+%%The roadpricing module provides functionality to simulate different road-pricing scenarios in MATSim.
 
-Documentation can be found at:
-\begin{itemize}
-	\item \href{http://ci.matsim.org:8080/job/MATSim_contrib_M2/org.matsim.contrib$roadpricing/javadoc/?}{http://ci.matsim.org:8080/job/MATSim\_contrib\_M2/org.matsim.contrib\$roadpricing/javadoc/?}
-\end{itemize}
+%%Documentation can be found at:
+%%\begin{itemize}
+%%	\item \href{http://ci.matsim.org:8080/job/MATSim_contrib_M2/org.matsim.contrib$roadpricing/javadoc/?}{http://ci.matsim.org:8080/job/MATSim\_contrib\_M2/org.matsim.contrib\$roadpricing/javadoc/?}
+%%\end{itemize}
 
-Publications using this module:
-\begin{itemize}
-	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2007/07-14/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2007/07-14/}
-	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-01/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-01/}
-	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-08/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-08/}
-	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2010/10-03/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2010/10-03/}
-\end{itemize}
+%%Publications using this module:
+%%\begin{itemize}
+%%	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2007/07-14/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2007/07-14/}
+%%	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-01/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-01/}
+%%	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-08/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2008/08-08/}
+%%	\item \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2010/10-03/}{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2010/10-03/}
+%%\end{itemize}
 
 
-\vfill\eject
+%%\vfill\eject
+
+% roadpricing is no longer core but now a contrib.  kai, oct'13
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"lanes". Status: works}
@@ -628,11 +656,8 @@ M. Rieser, K. Nagel; \textbf{Combined agent-based simulation of private car traf
 "router" and "travelTimeCalculator" are separate in matsim, so that  they can be configured separately. They refer to each other,  though.
 
 \vfill\eject
-\section{"vehicles". Status: probably reads the file correctly, but does nothing else}
-
-\textbf{Maintainer:} Michael Zilske (within limits of DFG/MUC project; possibly pt project)
-
-\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{"vspExperimental". Status: used by VSP}
 
 This  section defines switches that are used at VSP or when collaborating  with VSP. There are experimental and may we withdrawn without  notice.
