@@ -96,10 +96,9 @@ public class Schedules
     }
 
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Task> T getNextTask(T task)
+    public static Task getNextTask(Task task)
     {
-        return ((Schedule<T>)task.getSchedule()).getTasks().get(task.getTaskIdx() + 1);
+        return (task.getSchedule()).getTasks().get(task.getTaskIdx() + 1);
     }
 
 
@@ -133,20 +132,20 @@ public class Schedules
 
 
     @SuppressWarnings("unchecked")
-    public static <T extends Task> Iterator<StayTask> createStayTaskIter(Schedule<T> schedule)
+    public static Iterator<StayTask> createStayTaskIter(Schedule<?> schedule)
     {
         return (Iterator<StayTask>)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
     }
 
 
     @SuppressWarnings("unchecked")
-    public static <T extends Task> Iterator<DriveTask> createDriveTaskIter(Schedule<T> schedule)
+    public static Iterator<DriveTask> createDriveTaskIter(Schedule<?> schedule)
     {
         return (Iterator<DriveTask>)createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
     }
 
 
-    public static <T extends Task> Iterator<T> createTaskFilterIter(Schedule<T> schedule,
+    public static Iterator<? extends Task> createTaskFilterIter(Schedule<?> schedule,
             Predicate<Task> taskPredicate)
     {
         return Iterators.filter(schedule.getTasks().iterator(), taskPredicate);

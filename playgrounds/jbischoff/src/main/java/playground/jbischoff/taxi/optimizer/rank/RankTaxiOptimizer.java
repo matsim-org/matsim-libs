@@ -118,7 +118,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		VehicleDrive best = VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
 
 		for (Vehicle veh : vehicles) {
-			Schedule<?> schedule = veh.getSchedule();
+			Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
 
 			// COMPLETED or STARTED but delayed (time window T1 exceeded)
 			if (schedule.getStatus() == ScheduleStatus.COMPLETED
@@ -128,7 +128,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 			}
 
 			// status = UNPLANNED/PLANNED/STARTED
-			VertexTimePair departure = calculateDeparture(veh, currentTime);
+			VertexTimePair departure = calculateDeparture(schedule, currentTime);
 
 			if (departure == VertexTimePair.NO_VERTEX_TIME_PAIR_FOUND) {
 				continue;
@@ -148,13 +148,13 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		return best;
 	}
 
-	protected VertexTimePair calculateDeparture(Vehicle vehicle, int currentTime) {
-		Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
+	protected VertexTimePair calculateDeparture(Schedule<TaxiTask> schedule, int currentTime) {
 		Vertex vertex;
 		int time;
 
 		switch (schedule.getStatus()) {
 		case UNPLANNED:
+		    Vehicle vehicle = schedule.getVehicle();
 			vertex = vehicle.getDepot().getVertex();
 			time = Math.max(vehicle.getT0(), currentTime);
 			return new VertexTimePair(vertex, time);

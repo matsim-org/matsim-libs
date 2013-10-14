@@ -24,7 +24,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.StayTask;
 
 
 public class StayTaskImpl
-    extends AbstractTask
+    extends TaskImpl
     implements StayTask
 {
     private final Vertex atVertex;
@@ -32,7 +32,7 @@ public class StayTaskImpl
 
     public StayTaskImpl(int beginTime, int endTime, Vertex atVertex)
     {
-        super(beginTime, endTime);
+        super(TaskType.STAY, beginTime, endTime);
         this.atVertex = atVertex;
     }
 
@@ -41,13 +41,6 @@ public class StayTaskImpl
     public Vertex getAtVertex()
     {
         return atVertex;
-    }
-
-
-    @Override
-    public TaskType getType()
-    {
-        return TaskType.STAY;
     }
 
 

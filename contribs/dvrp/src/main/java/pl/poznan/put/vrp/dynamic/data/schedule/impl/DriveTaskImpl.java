@@ -25,7 +25,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 
 
 public class DriveTaskImpl
-    extends AbstractTask
+    extends TaskImpl
     implements DriveTask
 {
     private final Arc arc;
@@ -34,7 +34,7 @@ public class DriveTaskImpl
 
     public DriveTaskImpl(int beginTime, int endTime, Arc arc)
     {
-        super(beginTime, endTime);
+        super(TaskType.DRIVE, beginTime, endTime);
         this.arc = arc;
         vehicleTracker = new OfflineVehicleTracker(this);//by default; can be changed later
     }
@@ -45,13 +45,6 @@ public class DriveTaskImpl
     {
         return arc;
     };
-
-
-    @Override
-    public TaskType getType()
-    {
-        return TaskType.DRIVE;
-    }
 
 
     @Override

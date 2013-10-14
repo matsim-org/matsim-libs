@@ -72,7 +72,7 @@ public abstract class AbstractTaxiOptimizer
         // We start with 0 requests so there is no need for any pre-optimization.
         // Let's just add a WAIT task to each schedule
 
-        for (Vehicle veh : (List<Vehicle>)data.getVehicles()) {
+        for (Vehicle veh : data.getVehicles()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
             schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getDepot()
                     .getVertex()));

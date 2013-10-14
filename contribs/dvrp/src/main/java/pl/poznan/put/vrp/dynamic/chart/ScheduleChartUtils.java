@@ -46,8 +46,8 @@ public class ScheduleChartUtils
     }
 
 
-    public static JFreeChart chartSchedule(VrpData data, DescriptionCreator descriptionCreator,
-            PaintSelector paintSelector)
+    public static <T extends Task> JFreeChart chartSchedule(VrpData data, DescriptionCreator<T> descriptionCreator,
+            PaintSelector<T> paintSelector)
     {
         // data
         TaskSeriesCollection dataset = createScheduleDataset(data, descriptionCreator);
@@ -74,7 +74,7 @@ public class ScheduleChartUtils
         plot.setRangeAxis(new DateAxis("Time", TimeZone.getTimeZone("GMT"), Locale.getDefault()));
 
         // Renderer
-        XYBarRenderer xyBarRenderer = new ChartTaskRenderer(dataset, paintSelector);
+        XYBarRenderer xyBarRenderer = new ChartTaskRenderer<T>(dataset, paintSelector);
         xyBarRenderer.setUseYInterval(true);
         plot.setRenderer(xyBarRenderer);
 
@@ -83,13 +83,13 @@ public class ScheduleChartUtils
 
 
     @SuppressWarnings("serial")
-    private static class ChartTask
+    private static class ChartTask<T extends Task>
         extends org.jfree.data.gantt.Task
     {
-        private Task vrpTask;
+        private T vrpTask;
 
 
-        private ChartTask(String description, TimePeriod duration, Task vrpTask)
+        private ChartTask(String description, TimePeriod duration, T vrpTask)
         {
             super(description, duration);
             this.vrpTask = vrpTask;
@@ -98,14 +98,14 @@ public class ScheduleChartUtils
 
 
     @SuppressWarnings("serial")
-    private static class ChartTaskRenderer
+    private static class ChartTaskRenderer<T extends Task>
         extends XYBarRenderer
     {
         private final TaskSeriesCollection tsc;
-        private final PaintSelector paintSelector;
+        private final PaintSelector<T> paintSelector;
 
 
-        public ChartTaskRenderer(final TaskSeriesCollection tsc, PaintSelector paintSelector)
+        public ChartTaskRenderer(final TaskSeriesCollection tsc, PaintSelector<T> paintSelector)
         {
             this.tsc = tsc;
             this.paintSelector = paintSelector;
@@ -130,24 +130,26 @@ public class ScheduleChartUtils
         }
 
 
-        private ChartTask getTask(int series, int item)
+        private ChartTask<T> getTask(int series, int item)
         {
-            return (ChartTask)tsc.getSeries(series).get(item);
+            @SuppressWarnings("unchecked")
+            ChartTask<T> chartTask = (ChartTask<T>)tsc.getSeries(series).get(item);
+            return chartTask;
         }
 
     }
 
 
-    public static interface PaintSelector
+    public static interface PaintSelector<T extends Task>
     {
-        Paint select(Task task);
+        Paint select(T task);
     }
 
 
     private static final Color DARK_BLUE = new Color(0, 0, 200);
     private static final Color DARK_RED = new Color(200, 0, 0);
 
-    public static final PaintSelector BASIC_PAINT_SELECTOR = new PaintSelector() {
+    public static final PaintSelector<Task> BASIC_PAINT_SELECTOR = new PaintSelector<Task>() {
         public Paint select(Task task)
         {
             switch (task.getType()) {
@@ -164,13 +166,13 @@ public class ScheduleChartUtils
     };
 
 
-    public static interface DescriptionCreator
+    public static interface DescriptionCreator<T extends Task>
     {
-        String create(Task task);
+        String create(T task);
     }
 
 
-    public static final DescriptionCreator BASIC_DESCRIPTION_CREATOR = new DescriptionCreator() {
+    public static final DescriptionCreator<Task> BASIC_DESCRIPTION_CREATOR = new DescriptionCreator<Task>() {
         public String create(Task task)
         {
             return task.getType().name();
@@ -178,13 +180,14 @@ public class ScheduleChartUtils
     };
 
 
-    private static TaskSeriesCollection createScheduleDataset(VrpData data,
-            DescriptionCreator descriptionCreator)
+    private static <T extends Task> TaskSeriesCollection createScheduleDataset(VrpData data,
+            DescriptionCreator<T> descriptionCreator)
     {
         TaskSeriesCollection collection = new TaskSeriesCollection();
 
         for (Vehicle v : data.getVehicles()) {
-            Schedule<?> schedule = v.getSchedule();
+            @SuppressWarnings("unchecked")
+            Schedule<T> schedule = (Schedule<T>)v.getSchedule();
 
             final TaskSeries scheduleTaskSeries = new TaskSeries(v.getName());
 
@@ -193,15 +196,15 @@ public class ScheduleChartUtils
                 continue;
             }
 
-            List<? extends Task> tasks = schedule.getTasks();
+            List<T> tasks = schedule.getTasks();
 
-            for (Task t : tasks) {
+            for (T t : tasks) {
                 String description = descriptionCreator.create(t);
 
                 TimePeriod duration = new SimpleTimePeriod(new Date(t.getBeginTime() * 1000),
                         new Date(t.getEndTime() * 1000));
 
-                scheduleTaskSeries.add(new ChartTask(description, duration, t));
+                scheduleTaskSeries.add(new ChartTask<T>(description, duration, t));
             }
 
             collection.add(scheduleTaskSeries);

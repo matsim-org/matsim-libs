@@ -39,7 +39,7 @@ public class VehicleImpl
     // max time outside the depot
     private final int timeLimit;
 
-    private Schedule<AbstractTask> schedule;
+    private Schedule<TaskImpl> schedule;
 
 
     public VehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1, int timeLimit)
@@ -52,7 +52,7 @@ public class VehicleImpl
         this.t1 = t1;
         this.timeLimit = timeLimit;
 
-        schedule = new ScheduleImpl<AbstractTask>(this);
+        schedule = new ScheduleImpl<TaskImpl>(this);
     }
 
 
@@ -115,7 +115,7 @@ public class VehicleImpl
     @Override
     public void resetSchedule()
     {
-        schedule = new ScheduleImpl<AbstractTask>(this);
+        schedule = new ScheduleImpl<TaskImpl>(this);
     }
 
 
