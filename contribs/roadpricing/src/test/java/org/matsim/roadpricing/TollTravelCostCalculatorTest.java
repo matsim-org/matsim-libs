@@ -20,7 +20,7 @@
 
 package org.matsim.roadpricing;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -80,12 +80,15 @@ public class TollTravelCostCalculatorTest {
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
-		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
+		TravelTime timeCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+		// yy note: this returns a combined TravelTime and TravelDisutility object.  The TravelDisutility object is used in the next three lines to be wrapped, 
+		// and then never again.  Would be nice to be able to get them separately ...  kai, oct'13
+		
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll((TravelDisutility)timeCalc, toll, config); // we use freespeedTravelCosts as base costs
 
-		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
+		AStarLandmarksFactory aStarLandmarksFactory = new AStarLandmarksFactory(network, (TravelDisutility)timeCalc);
 
-		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
+		PreProcessLandmarks commonRouterData = new PreProcessLandmarks((TravelDisutility)timeCalc);
 		commonRouterData.run(network);
 
 		Person person1 = population.getPersons().get(new IdImpl("1"));
@@ -93,7 +96,7 @@ public class TollTravelCostCalculatorTest {
 		routePopulation(
 				scenario,
 				new DijkstraFactory(),
-				timeCostCalc,
+				timeCalc,
 				costCalc );
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
 		// also test it with A*-Landmarks
@@ -101,8 +104,8 @@ public class TollTravelCostCalculatorTest {
 		assertNull(((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute()); // make sure the cleaning worked. we do this only once, then we believe it.
 		routePopulation(
 				scenario,
-				routerFactory,
-				timeCostCalc,
+				aStarLandmarksFactory,
+				timeCalc,
 				costCalc );
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
 
@@ -112,15 +115,15 @@ public class TollTravelCostCalculatorTest {
 		routePopulation(
 				scenario,
 				new DijkstraFactory(),
-				timeCostCalc,
+				timeCalc,
 				costCalc );
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
 		// also test it with A*-Landmarks
 		clearRoutes(population);
 		routePopulation(
 				scenario,
-				routerFactory,
-				timeCostCalc,
+				aStarLandmarksFactory,
+				timeCalc,
 				costCalc );
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
 
@@ -131,15 +134,15 @@ public class TollTravelCostCalculatorTest {
 		routePopulation(
 				scenario,
 				new DijkstraFactory(),
-				timeCostCalc,
+				timeCalc,
 				costCalc );
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
 		// also test it with A*-Landmarks
 		clearRoutes(population);
 		routePopulation(
 				scenario,
-				routerFactory,
-				timeCostCalc,
+				aStarLandmarksFactory,
+				timeCalc,
 				costCalc );
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) ((LegImpl) (person1.getPlans().get(0).getPlanElements().get(1))).getRoute());
 	}
@@ -318,15 +321,17 @@ public class TollTravelCostCalculatorTest {
 			final LeastCostPathCalculatorFactory routerFactory,
 			final TravelTime travelTime,
 			final TravelDisutility travelDisutility ) {
+		assertNotNull(routerFactory);
+
 		final TripRouterFactoryBuilderWithDefaults builder =
-			new TripRouterFactoryBuilderWithDefaults();
+				new TripRouterFactoryBuilderWithDefaults();
 		builder.setLeastCostPathCalculatorFactory( routerFactory );
 		final TripRouterFactory factory = builder.build( scenario );
 		final TripRouter tripRouter =
-			factory.instantiateAndConfigureTripRouter(
-					new RoutingContextImpl(
-						travelDisutility,
-						travelTime ) );
+				factory.instantiateAndConfigureTripRouter(
+						new RoutingContextImpl(
+								travelDisutility,
+								travelTime ) );
 		final PersonAlgorithm router = new PlanRouter( tripRouter );
 
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {

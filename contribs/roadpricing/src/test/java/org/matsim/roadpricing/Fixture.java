@@ -226,7 +226,12 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	protected static void compareRoutes(final String expectedRoute, final NetworkRoute realRoute) {
+		TestCase.assertNotNull(expectedRoute) ;
+		TestCase.assertNotNull(realRoute);
+		TestCase.assertNotNull(realRoute.getLinkIds()) ;
+
 		StringBuilder strBuilder = new StringBuilder();
+		
 		for (Id linkId : realRoute.getLinkIds()) {
 			strBuilder.append(linkId.toString());
 			strBuilder.append(' ');
