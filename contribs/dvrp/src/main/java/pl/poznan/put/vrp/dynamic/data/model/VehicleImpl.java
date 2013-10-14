@@ -106,7 +106,7 @@ public class VehicleImpl
 
 
     @Override
-    public Schedule<? extends Task> getSchedule()
+    public Schedule<? extends TaskImpl> getSchedule()
     {
         return schedule;
     }
