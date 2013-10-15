@@ -52,22 +52,21 @@ public interface Scenario extends IdFactory {
 
 	/**
 	 * Adds the given object to the scenario, such it can be
-	 * retrieved with {@link #getScenarioElement(Class)} using
-	 * it's class or any of its super-classes or implemented
-	 * interfaces as query-key.
+	 * retrieved with {@link #getScenarioElement(String)} using
+	 * the name given here as a key.
 	 *
 	 * @param name the name to which the object should be associated
 	 * @param o the object. <code>null</code> is not allowed.
 	 * 
 	 * @throws {@link NullPointerException} if the object is null
 	 * @throws {@link IllegalStateException} if there is already an object
-	 * associated to this name
+	 * associated to this name.
 	 */
 	public void addScenarioElement(String name, Object o);
 
 	/**
 	 * Removes the object from the scenario, such it can no
-	 * longer be retrieved using {@link #getScenarioElement(Class)}.
+	 * longer be retrieved using {@link #getScenarioElement(String)}.
 	 *
 	 * @param name the name of the element
 	 * @return the object which was associated with this name, or null if there was none
