@@ -119,8 +119,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-		controler.getScenario().addScenarioElement(lcContext);
-		controler.getScenario().addScenarioElement(dcScore);
+		controler.getScenario().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME , lcContext);
+		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
 
 		// add locachoice strategy factory:
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
@@ -187,8 +187,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-		controler.getScenario().addScenarioElement(lcContext);
-		controler.getScenario().addScenarioElement(dcScore);
+		controler.getScenario().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, lcContext);
+		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
 
 		// set locachoice strategy:
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){

@@ -49,6 +49,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
  *
  */
 public class DestinationChoiceBestResponseContext implements MatsimToplevelContainer {	
+	public static final String ELEMENT_NAME = "DestinationChoiceBestResponseContext";
 	private final Scenario scenario;
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;

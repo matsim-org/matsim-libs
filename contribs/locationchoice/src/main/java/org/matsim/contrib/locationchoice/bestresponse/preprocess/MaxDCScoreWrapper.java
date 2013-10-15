@@ -5,6 +5,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class MaxDCScoreWrapper implements MatsimToplevelContainer {
+	public static final String ELEMENT_NAME = "maxDcScoreWrapper";
 
 	private ObjectAttributes personsMaxDCScoreUnscaled; 
 	

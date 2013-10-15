@@ -55,8 +55,8 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		 * Somehow this is ugly. Should be initialized in the constructor. But I do not know, how to initialize the lc scenario elements
 		 * such that they are already available at the time of constructing this object. ah feb'13
 		 */
-		DestinationChoiceBestResponseContext lcContext = scenario.getScenarioElement(DestinationChoiceBestResponseContext.class);
-		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.class);
+		DestinationChoiceBestResponseContext lcContext = (DestinationChoiceBestResponseContext) scenario.getScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME);
+		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
 		if ( !LocationChoiceConfigGroup.Algotype.bestResponse.equals(lcContext.getScenario().getConfig().locationchoice().getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}		

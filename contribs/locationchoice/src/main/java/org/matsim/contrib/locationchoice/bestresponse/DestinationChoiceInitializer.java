@@ -66,8 +66,8 @@ public class DestinationChoiceInitializer implements StartupListener {
 				
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
-		controler.getScenario().addScenarioElement(dcContext);
-		controler.getScenario().addScenarioElement(dcScore);
+		controler.getScenario().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, dcContext);
+		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME, dcScore);
 			
 		log.info("dc initialized");
 	}	
