@@ -217,14 +217,14 @@ public class OTFVis {
 
 		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
 			config.otfVis().setScaleQuadTreeRect(true);
-			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), scenario.getScenarioElement(LaneDefinitions20.class), scenario.getConfig());
+			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);
 		} else if (config.scenario().isUseSignalSystems()) {
 			config.otfVis().setScaleQuadTreeRect(true);
 			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
 			events.addHandler(signalTracker);
-			SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
-			LaneDefinitions20 laneDefs = scenario.getScenarioElement(LaneDefinitions20.class);
+			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+			LaneDefinitions20 laneDefs = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 			SignalSystemsData systemsData = signalsData.getSignalSystemsData();
 			SignalGroupsData groupsData = signalsData.getSignalGroupsData();
 			OTFSignalWriter otfSignalWriter = new OTFSignalWriter(qSim.getVisNetwork(), laneDefs, scenario.getConfig(), systemsData, groupsData , signalTracker);
