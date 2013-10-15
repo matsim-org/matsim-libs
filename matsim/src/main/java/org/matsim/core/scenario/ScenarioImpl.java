@@ -127,9 +127,12 @@ public class ScenarioImpl implements Scenario {
 
 	protected void createLaneDefinitionsContainer() {
 		this.laneDefinitions = new LaneDefinitionsImpl();
-		this.addScenarioElement(
-				LaneDefinitions20.ELEMENT_NAME,
-				new LaneDefinitions20Impl());
+		// thought: this is not the responsibility of the scenario to add 
+		// custom elements (the idea being that those elements are not known.
+		// td, oct 2013
+//		this.addScenarioElement(
+//				LaneDefinitions20.ELEMENT_NAME,
+//				new LaneDefinitions20Impl());
 	}
 
 	protected void createTransit() {
@@ -137,9 +140,9 @@ public class ScenarioImpl implements Scenario {
 	}
 	
 	protected void createSignals(){
-		this.addScenarioElement(
-				SignalsData.ELEMENT_NAME,
-				new SignalsDataImpl(this.config.signalSystems()));
+//		this.addScenarioElement(
+//				SignalsData.ELEMENT_NAME,
+//				new SignalsDataImpl(this.config.signalSystems()));
 	}
 
 	@Override
