@@ -22,8 +22,6 @@ package playground.balac.onewaycarsharing.config;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
-import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
-
 public class OneWayCSConfigGroup extends Module {
 	
 	public static final String GROUP_NAME = "OneWayCS";

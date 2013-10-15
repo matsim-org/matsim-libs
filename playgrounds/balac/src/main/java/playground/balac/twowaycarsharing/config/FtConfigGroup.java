@@ -22,7 +22,6 @@ package playground.balac.twowaycarsharing.config;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Module;
 
-import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
 public class FtConfigGroup extends Module {
 	
