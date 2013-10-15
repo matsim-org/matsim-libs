@@ -30,6 +30,8 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  */
 public interface RoadPricingScheme {
+	/** the name to which schemes should be associated in Scenario */
+	public static final String ELEMENT_NAME = "roadPricingScheme";
 
 	/**
 	 *  The type to be returned by getType() if this is a distance toll,
