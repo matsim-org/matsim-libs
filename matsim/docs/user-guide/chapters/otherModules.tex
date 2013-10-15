@@ -191,11 +191,11 @@ called for in the \verb$controler$ section of the config file.  It is also the m
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{"qsim". Status: works but is not very transparent}
+\section{"qsim". Status: works}
 
 \sout{If you do \textbf{\emph{not}} put a "qsim" section into the config file, the system will use the default "simulation" (look there).}
 
-"qsim"  is what we use for new features such as public transit or  signalsystems. "New features" implies "unstable". Use only  if you have to.
+\sout{"qsim"  is what we use for new features such as public transit or  signalsystems. "New features" implies "unstable". Use only  if you have to.}
 
 Also see \url{http://ci.matsim.org:8080/job/MATSim_M2/javadoc/org/matsim/core/mobsim/qsim/QSim.html}.
  %%\href{http://www.matsim.org/javadoc/org/matsim/ptproject/qsim/package-summary.html}{www.matsim.org/javadoc/org/matsim/ptproject/qsim/package-summary.html}
@@ -241,7 +241,7 @@ in the above example
 \begin{lstlisting}
 = 10 * 50 / 0.4 = 1250 .
 \end{lstlisting}
-This is, naturally, the same as dividing the 200m\textasciicircum2 of the link by the 0.16persons/$m^2$.
+This is, naturally, the same as dividing the $200\,m^2$ of the link by the $0.16\,persons/m^2$.
 
 The effective lane width might be used by the visualization (unclear if this is the case).
 
@@ -250,7 +250,10 @@ The effective lane width might be used by the visualization (unclear if this is 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{"qsim" (parallel version). Status: looks promising}
 
-Responsible: C. Dobler, IVT
+\authorsOfCode{C. Dobler, IVT}
+\maintainers{C. Dobler, IVT}
+\authorsOfDoc{C. Dobler, IVT}
+
 
 Analysis of performance and structure of (non parallel) QueueSim shows:
 \begin{itemize}
@@ -286,8 +289,8 @@ Any number of threads larger than $1$ triggers the use of the parallel version.
 \subsection{"lanes". Status: works}
 
 \authorsOfDoc{Dominik Grether}
-\authorsOfCode{Dominik Grether}
 \maintainers{Dominik Grether}
+\authorsOfCode{Dominik Grether}
 
 Make sure you read
 \\ \url{http://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2012/12-03/} 
@@ -365,7 +368,9 @@ where
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{"signalsystems". Status: works}
 
-\textbf{Maintainer:} Dominik Grether
+\authorsOfCode{Dominik Grether}
+\maintainers{Dominik Grether}
+\authorsOfDoc{Dominik Grether}
 
 The signal systems module provides functionality to simulate traffic  lights with MATSim. It is recommended to use a nightly build that is  younger than 04-19-2011, i.e. revision 15081.
 
@@ -403,6 +408,10 @@ Publications using this module:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{"transit" (public transport).  Status: works}
 
+\authorsOfCode{Marcel Rieser}
+\maintainers{Marcel Rieser}
+\authorsOfDoc{Marcel Rieser}
+
 A  public transport system is simulated and integrated on a fine scale  with both the traffic simulation and the behavior of the artificial  population.
 
 Agents who use transit determine a route to their destination based  on the transit schedule. Transit vehicles are moved on the road network  in accordance with the traffic flow model, i.e. they may get stuck in  congestion and fail to keep their schedule. Agents getting on and off  transit vehicles cause realistic delays.
@@ -418,9 +427,11 @@ M. Rieser, K. Nagel; \textbf{Combined agent-based simulation of private car traf
 \vfill\eject
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{"JDEQSim".  Status: works for ivt}
+\section{"JDEQSim".  Status: works}
 
-\textbf{Maintainer:} Rashid Waraich
+\authorsOfCode{Rashid Waraich}
+\maintainers{Rashid Waraich}
+\authorsOfDoc{Rashid Waraich}
 
 \subsubsection{Overview}
 
@@ -500,7 +511,12 @@ Waraich,  R., D. Charypar, M. Balmer and K.W. Axhausen (2009) Performance  impro
 
 This  was essentially the production of the queue simulation until Nov/2010.  The "qsim" was then forked out for further development. Unfortunately,  this fork was done somewhat too late, so "simulation" is not exactly the  stable version that was used over many years, but something that is  already somewhat modified, and was not used very much after that.  (Please let us know if you have problems.)
 
-Note that you will get a "simulation" section in the log file even if  you have selected a different mobsim (such as qsim or jdqsim).
+\sout{Note that you will get a "simulation" section in the log file even if  you have selected a different mobsim (such as qsim or jdqsim).}
+
+\vfill\eject
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{External mobsim.  Status: unknown}
 
 There used to be an option to start an external mobsim. This still seems to be there but the syntax is a bit awkward:
 \begin{lstlisting}
@@ -515,7 +531,9 @@ There used to be an option to start an external mobsim. This still seems to be t
 
 \end{lstlisting}
 
-I.e. you need to specify that you are \emph{not} using the (queue)Simulation, but then set a parameter inside the (queue)Simulation config block.
+I.e.\ you need to specify that you are \emph{not} using the (queue)Simulation, but then set a parameter inside the (queue)Simulation config block.
+
+I (kn, oct'13) cannot say if this is still working.  
 
 \vfill\eject
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -576,9 +594,11 @@ Central module to run matsim. Specifies, for example, the number of iterations.
 
 
 
-\subsubsection{Notes}
+%%\subsubsection{Notes}
 
-See \href{http://matsim.org/node/398}{here} for some instructions how to use an external executable as mobsim.
+%%See \href{http://matsim.org/node/398}{here} for some instructions how to use an external executable as mobsim.
+
+% the reference is wrong, and there is a separate section on this in the present (latex) manual, which should be sufficient.
 
 \vfill\eject
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
