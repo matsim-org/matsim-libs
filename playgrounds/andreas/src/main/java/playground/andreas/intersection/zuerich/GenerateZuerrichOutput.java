@@ -91,7 +91,7 @@ public class GenerateZuerrichOutput {
 		}
 
 		if (generateSignalSystems){
-			SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			//first generate the signal systems itself 
 			SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 			//read the mappings
