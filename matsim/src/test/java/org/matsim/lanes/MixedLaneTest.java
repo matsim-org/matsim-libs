@@ -56,7 +56,7 @@ public class MixedLaneTest {
 	 */
 	@Test
 	public void testFixture(){
-		LaneDefinitions20 lanes = this.fixture.sc.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitions20 lanes = (LaneDefinitions20) this.fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 		Assert.assertNotNull(lanes);
 		Assert.assertNotNull(lanes.getLanesToLinkAssignments());
 		LanesToLinkAssignment20 lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
@@ -122,7 +122,7 @@ public class MixedLaneTest {
 		fixture.create1PersonFromLink1Population();
 		fixture.sc.getConfig().qsim().setStartTime(3500.0);
 		fixture.sc.getConfig().qsim().setEndTime(7200.0);
-		LaneDefinitions20 lanes = fixture.sc.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitions20 lanes = (LaneDefinitions20) fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.id1);
 		lane1.setCapacityVehiclesPerHour(1800.0);
 		LaneData20 lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
@@ -198,7 +198,7 @@ public class MixedLaneTest {
 	@Test
 	public void testMixedLane2AgentsDrivingCapacityRestriction() {
 		fixture.create2PersonPopulation();
-		LaneDefinitions20 lanes = fixture.sc.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitions20 lanes = (LaneDefinitions20) fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.id1);
 		lane1.setCapacityVehiclesPerHour(1800.0);
 		

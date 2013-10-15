@@ -125,7 +125,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
 		// first in ctors calling each other.  kai, feb'12
 		if (sim.getScenario().getConfig().scenario().isUseLanes()) {
-			if (sim.getScenario().getScenarioElement(LaneDefinitions20.class) == null) {
+			if (sim.getScenario().getScenarioElement(LaneDefinitions20.ELEMENT_NAME) == null) {
 				throw new IllegalStateException(
 						"Lane definitions in v2.0 format have to be set if feature is enabled!");
 			}
@@ -133,7 +133,13 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 			if ( netsimNetworkFactory != null ) {
 				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;
 			}
-			network = new QNetwork(sim.getScenario().getNetwork(), new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getScenarioElement(LaneDefinitions20.class)));
+			network =
+					new QNetwork(
+							sim.getScenario().getNetwork(),
+							new QLanesNetworkFactory(
+									new DefaultQNetworkFactory(),
+									(LaneDefinitions20) sim.getScenario().getScenarioElement(
+											LaneDefinitions20.ELEMENT_NAME)));
 		} else if ( netsimNetworkFactory != null ){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
 		} else {

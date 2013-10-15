@@ -80,7 +80,9 @@ public class DumpDataAtEnd implements ShutdownListener {
 			new HouseholdsWriterV10(((ScenarioImpl) scenarioData).getHouseholds()).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
 		}
 		if (this.scenarioData.getConfig().scenario().isUseLanes()) {
-			new LaneDefinitionsWriter20(scenarioData.getScenarioElement(LaneDefinitions20.class)).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
+			new LaneDefinitionsWriter20(
+					(LaneDefinitions20) scenarioData.getScenarioElement(LaneDefinitions20.ELEMENT_NAME)).write(
+							controlerIO.getOutputFilename(Controler.FILENAME_LANES));
 		}
 		if (!event.isUnexpected() && scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {
 			File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));

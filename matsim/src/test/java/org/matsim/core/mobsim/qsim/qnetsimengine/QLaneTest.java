@@ -70,7 +70,7 @@ public class QLaneTest extends MatsimTestCase {
   
 	private LaneDefinitions20 createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().scenario().setUseLanes(true);
-		LaneDefinitions20 lanes = scenario.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitions20 lanes = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
 		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(id1);
@@ -93,7 +93,7 @@ public class QLaneTest extends MatsimTestCase {
   
 	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
 		scenario.getConfig().scenario().setUseLanes(true);
-		LaneDefinitions20 lanes = scenario.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitions20 lanes = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
 		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(id1);

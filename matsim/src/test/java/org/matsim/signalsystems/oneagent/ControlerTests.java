@@ -77,8 +77,9 @@ public class ControlerTests {
 				Scenario scenario = event.getControler().getScenario();
 				int dropping = 0;
 				int onset = 100;
-				for (SignalSystemControllerData intersectionSignal : scenario
-						.getScenarioElement(SignalsData.class).getSignalControlData()
+				for (SignalSystemControllerData intersectionSignal :
+					((SignalsData) scenario
+						.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalControlData()
 						.getSignalSystemControllerDataBySystemId().values()) {
 					
 					for (SignalPlanData plan : intersectionSignal.getSignalPlanData().values()) {

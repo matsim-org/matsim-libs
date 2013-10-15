@@ -82,7 +82,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(f.scenario);
 		reader.readFile(this.getClassInputDirectory() + TESTXMLV20);
-		checkContent(f.scenario.getScenarioElement(LaneDefinitions20.class));
+		checkContent((LaneDefinitions20) f.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 	}
 	
 	public void testWriter20() {
@@ -97,14 +97,14 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		// write the test file
 		log.debug("write the test file...");
 		MatsimLaneDefinitionsWriter writer = new MatsimLaneDefinitionsWriter();
-		writer.writeFile20(testoutput, f.scenario.getScenarioElement(LaneDefinitions20.class));
+		writer.writeFile20(testoutput, (LaneDefinitions20) f.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 
 		f = new Fixture();
 		log.debug("and read it again");
 		reader = new MatsimLaneDefinitionsReader(
 				f.scenario);
 		reader.readFile(testoutput);
-		checkContent(f.scenario.getScenarioElement(LaneDefinitions20.class));
+		checkContent((LaneDefinitions20) f.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 	}
 	
 

@@ -102,12 +102,12 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		netTurnInfoBuilder.createAndAddTurnInfo(TransportMode.car, allowedInLinkTurnInfoMap, this.network);
 
 		if (sc.getConfig().scenario().isUseLanes()) {
-			LaneDefinitions20 ld =  sc.getScenarioElement(LaneDefinitions20.class);
+			LaneDefinitions20 ld = (LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 			Map<Id, List<TurnInfo>> lanesTurnInfoMap = new LanesTurnInfoBuilder().createTurnInfos(ld);
 			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, lanesTurnInfoMap);
 		}
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
-			SignalSystemsData ssd = sc.getScenarioElement(SignalsData.class).getSignalSystemsData();
+			SignalSystemsData ssd = ((SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData();
 			Map<Id, List<TurnInfo>> signalsTurnInfoMap = new SignalsTurnInfoBuilder()
 					.createSignalsTurnInfos(ssd);
 			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, signalsTurnInfoMap);

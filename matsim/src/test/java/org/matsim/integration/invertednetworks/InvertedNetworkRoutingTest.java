@@ -120,7 +120,7 @@ public class InvertedNetworkRoutingTest {
 		Fixture f = new Fixture(false, false, true);
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().controler().setLastIteration(1);
-		SignalsData signalsData = f.scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) f.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalPlanData signalPlan = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(f.getId(2)).getSignalPlanData().get(f.getId(1));
 		signalPlan.setCycleTime(500);
 		signalPlan.getSignalGroupSettingsDataByGroupId().get(f.getId(2)).setOnset(0);
@@ -268,7 +268,7 @@ public class InvertedNetworkRoutingTest {
 		}
 
 		private void createSignals() {
-			SignalsData signalsData = this.scenario.getScenarioElement(SignalsData.class);
+			SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			SignalSystemsData ssd = signalsData.getSignalSystemsData();
 			SignalSystemsDataFactory f = ssd.getFactory();
 			SignalSystemData system = f.createSignalSystemData(getId(2));
@@ -299,7 +299,7 @@ public class InvertedNetworkRoutingTest {
 		}
 
 		private void createLanes() {
-			LaneDefinitions20 ld = this.scenario.getScenarioElement(LaneDefinitions20.class);
+			LaneDefinitions20 ld = (LaneDefinitions20) this.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 			LaneDefinitionsFactory20 f = ld.getFactory();
 			LanesToLinkAssignment20 l2l = f.createLanesToLinkAssignment(getId(12));
 			ld.addLanesToLinkAssignment(l2l);

@@ -90,7 +90,7 @@ public class Fixture {
 		
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
-		scenario.addScenarioElement(signalsData);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME , signalsData);
 
 		
 		return scenario;

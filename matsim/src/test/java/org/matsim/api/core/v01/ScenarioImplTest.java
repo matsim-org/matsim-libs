@@ -32,87 +32,67 @@ public class ScenarioImplTest {
 	}
 
 	@Test
-	public void testAddGetScenarioElement_simple() {
-		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Assert.assertNull(s.getScenarioElement(A.class));
-		Assert.assertNull(s.getScenarioElement(AImpl.class));
-		A a = new AImpl();
-		s.addScenarioElement(a);
-		Assert.assertEquals(a, s.getScenarioElement(A.class));
-		Assert.assertEquals(a, s.getScenarioElement(AImpl.class));
+	public void testAddAndGetScenarioElement() {
+		final ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		final Object element1 = new Object();
+		final String name1 = "peter_parker";
+		final Object element2 = new Object();
+		final String name2 = "popeye";
+
+		s.addScenarioElement( name1 , element1 );
+		s.addScenarioElement( name2 , element2 );
+		Assert.assertSame(
+				"unexpected scenario element",
+				element1,
+				s.getScenarioElement( name1 ) );
+		// just check that it is got, not removed
+		Assert.assertSame(
+				"unexpected scenario element",
+				element1,
+				s.getScenarioElement( name1 ) );
+
+		Assert.assertSame(
+				"unexpected scenario element",
+				element2,
+				s.getScenarioElement( name2 ) );
+
 	}
 
 	@Test
-	public void testAddGetScenarioElement_complex() {
-		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	public void testCannotAddAnElementToAnExistingName() {
+		final ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		B b = new BImpl();
-		C c = new CImpl();
+		final String name = "bruce_wayne";
 
-		s.addScenarioElement(b);
-		Assert.assertEquals(b, s.getScenarioElement(BImpl.class));
-		Assert.assertEquals(b, s.getScenarioElement(B.class));
-		Assert.assertEquals(b, s.getScenarioElement(AImpl.class));
-		Assert.assertEquals(b, s.getScenarioElement(A.class));
-
-		s.addScenarioElement(c);
-		Assert.assertEquals(c, s.getScenarioElement(CImpl.class));
-		Assert.assertEquals(c, s.getScenarioElement(C.class));
-		Assert.assertEquals(b, s.getScenarioElement(BImpl.class));
-		Assert.assertEquals(c, s.getScenarioElement(B.class));
-		Assert.assertEquals(b, s.getScenarioElement(AImpl.class));
-		Assert.assertEquals(b, s.getScenarioElement(A.class));
+		s.addScenarioElement( name , new Object() );
+		try {
+			s.addScenarioElement( name , new Object() );
+		}
+		catch (IllegalStateException e) {
+			return;
+		}
+		catch (Exception e) {
+			Assert.fail( "wrong exception thrown when trying to add an element for an existing name "+e.getClass().getName() );
+		}
+		Assert.fail( "no exception thrown when trying to add an element for an existing name" );
 	}
 
 	@Test
-	public void testRemoveScenarioElement_simple() {
-		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		A a = new AImpl();
-		s.addScenarioElement(a);
-		Assert.assertEquals(a, s.getScenarioElement(A.class));
-		Assert.assertEquals(a, s.getScenarioElement(AImpl.class));
-		Assert.assertFalse(s.removeScenarioElement(new AImpl()));
-		Assert.assertTrue(s.removeScenarioElement(a));
-		Assert.assertNull(s.getScenarioElement(A.class));
-		Assert.assertNull(s.getScenarioElement(AImpl.class));
-		Assert.assertFalse(s.removeScenarioElement(a));
+	public void testRemoveElement() {
+		final ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		final Object element = new Object();
+		final String name = "clark_kent";
+
+		s.addScenarioElement( name , element );
+		Assert.assertSame(
+				"unexpected removed element",
+				element,
+				s.removeScenarioElement( name ) );
+		Assert.assertNull(
+				"element was not removed",
+				s.getScenarioElement( name ) );
+
 	}
-
-	@Test
-	public void testRemoveScenarioElement_complex() {
-		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		B b = new BImpl();
-		C c = new CImpl();
-
-		s.addScenarioElement(b); // BImpl, B, AImpl, A
-
-		s.addScenarioElement(c); // CImpl, C, B
-
-		Assert.assertTrue(s.removeScenarioElement(c));
-		Assert.assertNull(s.getScenarioElement(CImpl.class));
-		Assert.assertNull(s.getScenarioElement(C.class));
-		Assert.assertNull(s.getScenarioElement(B.class));
-		Assert.assertEquals(b, s.getScenarioElement(BImpl.class));
-		Assert.assertEquals(b, s.getScenarioElement(AImpl.class));
-		Assert.assertEquals(b, s.getScenarioElement(A.class));
-
-		s.addScenarioElement(c);
-
-		Assert.assertTrue(s.removeScenarioElement(b));
-		Assert.assertEquals(c, s.getScenarioElement(CImpl.class));
-		Assert.assertEquals(c, s.getScenarioElement(C.class));
-		Assert.assertEquals(c, s.getScenarioElement(B.class));
-		Assert.assertNull(s.getScenarioElement(BImpl.class));
-		Assert.assertNull(s.getScenarioElement(AImpl.class));
-		Assert.assertNull(s.getScenarioElement(A.class));
-	}
-
-	/*package*/ static interface A { }
-	/*package*/ static class AImpl implements A { }
-	/*package*/ static interface B { }
-	/*package*/ static class BImpl extends AImpl implements B { }
-	/*package*/ static interface C extends B { }
-	/*package*/ static class CImpl implements C { }
-
 }

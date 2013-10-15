@@ -54,7 +54,7 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 	
 	public MatsimLaneDefinitionsReader(Scenario scenario) {
 		this.laneDefinitionsV1 = ((ScenarioImpl)scenario).getLaneDefinitions11();
-		this.laneDefinitions = scenario.getScenarioElement(LaneDefinitions20.class);
+		this.laneDefinitions = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 	}
 
 	/**

@@ -91,7 +91,7 @@ public class QSimTests implements
 		//configure and load standard scenario
 		Fixture fixture = new Fixture();
 		Scenario scenario = fixture.createAndLoadTestScenario(false);
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 	
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.id2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.id2);
@@ -126,7 +126,7 @@ public class QSimTests implements
 		//configure and load standard scenario
 		Fixture fixture = new Fixture();
 		Scenario scenario = fixture.createAndLoadTestScenario(true);
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.id2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.id2);

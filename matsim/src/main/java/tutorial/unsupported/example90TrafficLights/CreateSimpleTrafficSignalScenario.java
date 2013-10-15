@@ -171,7 +171,7 @@ public class CreateSimpleTrafficSignalScenario {
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle("queue");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.createSignalSystemsAndGroups(scenario, signalsData);
 		this.createSignalControl(scenario, signalsData);
 		

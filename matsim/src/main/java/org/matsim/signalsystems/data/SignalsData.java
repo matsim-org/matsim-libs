@@ -31,6 +31,10 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
  *
  */
 public interface SignalsData {
+	/**
+	 * Name under which signals data are added as scenario elements
+	 */
+	public static final String ELEMENT_NAME = "signalsData";
 	
 	public SignalSystemsData getSignalSystemsData();
 	

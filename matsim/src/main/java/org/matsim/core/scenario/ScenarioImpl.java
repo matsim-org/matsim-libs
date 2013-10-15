@@ -21,6 +21,7 @@ package org.matsim.core.scenario;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -43,9 +44,11 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -61,7 +64,7 @@ public class ScenarioImpl implements Scenario {
 
 	private static final String NON_ENABLED_ATTRIBUTE_WARNING = "Trying to retrieve not enabled scenario feature, have you enabled the feature in ScenarioConfigGroup?";
 
-	private final Map<Class<?>, Object> elements = new HashMap<Class<?>, Object>();
+	private final Map<String, Object> elements = new HashMap<String, Object>();
 
 	//mandatory attributes
 	private final Config config;
@@ -124,7 +127,9 @@ public class ScenarioImpl implements Scenario {
 
 	protected void createLaneDefinitionsContainer() {
 		this.laneDefinitions = new LaneDefinitionsImpl();
-		this.addScenarioElement(new LaneDefinitions20Impl());
+		this.addScenarioElement(
+				LaneDefinitions20.ELEMENT_NAME,
+				new LaneDefinitions20Impl());
 	}
 
 	protected void createTransit() {
@@ -132,7 +137,9 @@ public class ScenarioImpl implements Scenario {
 	}
 	
 	protected void createSignals(){
-		this.addScenarioElement(new SignalsDataImpl(this.config.signalSystems()));
+		this.addScenarioElement(
+				SignalsData.ELEMENT_NAME,
+				new SignalsDataImpl(this.config.signalSystems()));
 	}
 
 	@Override
@@ -233,34 +240,24 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public void addScenarioElement(final Object o) {
-		for (Class<?> c : ClassUtils.getAllTypes(o.getClass())) {
-			this.elements.put(c, o);
+	public void addScenarioElement(
+			final String name,
+			final Object o) {
+		if ( o == null ) throw new NullPointerException( name );
+		final Object former = elements.put( name , o );
+		if ( former != null ) {
+			throw new IllegalStateException( former+" is already associated with name "+name+" when adding "+o );
 		}
 	}
 
 	@Override
-	public boolean removeScenarioElement(Object o) {
-		boolean changed = false;
-
-		for (Class<?> c : ClassUtils.getAllTypes(o.getClass())) {
-			if (this.elements.get(c) == o) {
-				this.elements.remove(c);
-				changed = true;
-			}
-		}
-
-		return changed;
+	public Object removeScenarioElement(final String name) {
+		return elements.remove( name );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getScenarioElement(java.lang.Class<? extends T> klass) {
-		final Object maybeScenarioElement = this.elements.get(klass);
-		if (maybeScenarioElement == null) {
-			log.warn("the scenario element " + klass.toString() + " is not defined.  This may crash later ..." ) ;
-		}
-		return (T) maybeScenarioElement;
+	public Object getScenarioElement(final String name) {
+		return elements.get( name );
 	}
 
 }

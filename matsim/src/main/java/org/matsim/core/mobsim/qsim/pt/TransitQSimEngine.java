@@ -121,21 +121,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
 		Scenario scenario = this.qSim.getScenario();
-		TransitSchedule transitSchedule = scenario.getTransitSchedule();
 		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<MobsimAgent>();
-		UmlaufCache umlaufCache = scenario.getScenarioElement(UmlaufCache.class) ;
-		if (umlaufCache != null && umlaufCache.getTransitSchedule() == transitSchedule) { // has someone put a new transitschedule into the scenario?
-			log.info("found pre-existing Umlaeufe in scenario, and the transit schedule is still the same, so using them.");
-		} else {
-			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(scenario.getNetwork(),
-					transitSchedule.getTransitLines().values(),
-					vehicles,
-					scenario.getConfig().planCalcScore());
-			Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
-			umlaufCache = new UmlaufCache(transitSchedule, umlaeufe);
-			scenario.addScenarioElement(umlaufCache); // possibly overwriting the existing one
-		}
+		UmlaufCache umlaufCache = getOrCreateUmlaufCache( scenario );
+
 		for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
@@ -144,6 +133,27 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 			}
 		}
 		return drivers;
+	}
+
+	private UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
+		UmlaufCache umlaufCache = (UmlaufCache) scenario.getScenarioElement( UmlaufCache.ELEMENT_NAME );
+		if (umlaufCache != null &&
+				umlaufCache.getTransitSchedule() == scenario.getTransitSchedule()) { // has someone put a new transitschedule into the scenario?
+			log.info("found pre-existing Umlaeufe in scenario, and the transit schedule is still the same, so using them.");
+			return umlaufCache;
+		}
+
+		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder =
+				new ReconstructingUmlaufBuilder(
+						scenario.getNetwork(),
+						scenario.getTransitSchedule().getTransitLines().values(),
+						((ScenarioImpl) scenario).getVehicles(),
+						scenario.getConfig().planCalcScore());
+		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
+		umlaufCache = new UmlaufCache(scenario.getTransitSchedule(), umlaeufe);
+		scenario.addScenarioElement( UmlaufCache.ELEMENT_NAME , umlaufCache); // possibly overwriting the existing one
+
+		return umlaufCache;
 	}
 
 	private AbstractTransitDriver createAndScheduleVehicleAndDriver(Umlauf umlauf,

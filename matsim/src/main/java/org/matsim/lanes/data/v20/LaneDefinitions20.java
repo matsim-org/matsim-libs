@@ -30,6 +30,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  *
  */
 public interface LaneDefinitions20 extends MatsimToplevelContainer {
+	public static final String ELEMENT_NAME = "laneDefinition20";
 
 	/**
 	 *

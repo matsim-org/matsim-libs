@@ -86,7 +86,7 @@ public class TravelTimeFourWaysTest {
 		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
-		scenario.addScenarioElement(signalsData);
+		scenario.addScenarioElement( SignalsData.ELEMENT_NAME , signalsData);
 		
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();

@@ -22,6 +22,7 @@ package org.matsim.signalsystems;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.lanes.MixedLaneTestFixture;
+import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -49,7 +50,7 @@ public class SignalsMixedLaneTestFixture {
 	
 		//create signalsystems
 		SignalSystemsData signals = new SignalSystemsDataImpl();
-		this.sc.addScenarioElement(signals);
+		this.sc.addScenarioElement( SignalsData.ELEMENT_NAME , signals);
 		SignalSystemsDataFactory signalsFactory = signals.getFactory();
 		SignalSystemData system = signalsFactory.createSignalSystemData(delegate.id1);
 		signals.addSignalSystemData(system);

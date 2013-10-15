@@ -60,7 +60,7 @@ public class DefaultSignalsControllerListener implements SignalsControllerListen
 	}
 	
 	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
-		SignalsData data = sc.getScenarioElement(SignalsData.class);
+		SignalsData data = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
 	}
 

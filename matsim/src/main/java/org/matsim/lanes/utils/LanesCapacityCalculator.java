@@ -70,7 +70,7 @@ public class LanesCapacityCalculator {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 		LanesCapacityCalculator calc = new LanesCapacityCalculator();
-		LaneDefinitions20 lanes = scenario.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitions20 lanes = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 		for (LanesToLinkAssignment20 l2l : lanes.getLanesToLinkAssignments().values()){
 			Link link = network.getLinks().get(l2l.getLinkId());
 			for (LaneData20 lane : l2l.getLanes().values()){

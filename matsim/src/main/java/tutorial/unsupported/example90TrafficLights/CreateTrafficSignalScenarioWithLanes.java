@@ -232,7 +232,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		//convert to 2.0 format and return
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
 		LaneDefinitions20 l2 = conversion.convertTo20(lanes, scenario.getNetwork());
-		scenario.addScenarioElement(l2);
+		scenario.addScenarioElement( LaneDefinitions20.ELEMENT_NAME , l2);
 		return l2;
 	}
 	
@@ -251,7 +251,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		
 		this.createLanes((ScenarioImpl) scenario);
 		
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		this.createGroupsAndSystem2(scenario, signalsData.getSignalSystemsData(), signalsData.getSignalGroupsData());
 		this.createGroupsAndSystem5(scenario, signalsData.getSignalSystemsData(), signalsData.getSignalGroupsData());
@@ -270,7 +270,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		String signalGroupsFile = "output/example90TrafficLights/signal_groups.xml";
 		String signalControlFile = "output/example90TrafficLights/signal_control.xml";
 
-		new MatsimLaneDefinitionsWriter().writeFile20(lanesFile, scenario.getScenarioElement(LaneDefinitions20.class));
+		new MatsimLaneDefinitionsWriter().writeFile20(lanesFile, (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
 		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);

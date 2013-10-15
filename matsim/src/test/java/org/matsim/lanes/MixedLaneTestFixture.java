@@ -128,7 +128,7 @@ public class MixedLaneTestFixture {
 		lanes.addLanesToLinkAssignment(l2l);
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
 		LaneDefinitions20 lanesV2 = conversion.convertTo20(lanes, this.sc.getNetwork());
-		this.sc.addScenarioElement(lanesV2);
+		this.sc.addScenarioElement( LaneDefinitions20.ELEMENT_NAME , lanesV2);
 	}
 	
 	public void create2PersonPopulation(){

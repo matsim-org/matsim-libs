@@ -55,7 +55,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	private Scenario scenario;
 
 	public FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
-		this.signalsData = scenario.getScenarioElement(SignalsData.class);
+		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.scenario = scenario;
 		this.factory = factory;
 		this.events = events;

@@ -56,29 +56,30 @@ public interface Scenario extends IdFactory {
 	 * it's class or any of its super-classes or implemented
 	 * interfaces as query-key.
 	 *
-	 * @param o
+	 * @param name the name to which the object should be associated
+	 * @param o the object. <code>null</code> is not allowed.
+	 * 
+	 * @throws {@link NullPointerException} if the object is null
+	 * @throws {@link IllegalStateException} if there is already an object
+	 * associated to this name
 	 */
-	public void addScenarioElement(Object o);
+	public void addScenarioElement(String name, Object o);
 
 	/**
 	 * Removes the object from the scenario, such it can no
 	 * longer be retrieved using {@link #getScenarioElement(Class)}.
 	 *
-	 * @param o
-	 * @return <code>true</code> if the object was registered
-	 * with the scenario previously, <code>false</code> if not.
+	 * @param name the name of the element
+	 * @return the object which was associated with this name, or null if there was none
 	 */
-	public boolean removeScenarioElement(Object o);
+	public Object removeScenarioElement(String name);
 
 	/**
 	 *
-	 * @param <T>
-	 * @param klass
-	 * @return Returns an object previously registered with
-	 * {@link #addScenarioElement(Object)} that is of type
-	 * <code>klass</code>.
+	 * @param name the name of the element to get
+	 * @return the object associated with that name, or null if none is associated
 	 */
-	public <T> T getScenarioElement(Class<? extends T> klass);
+	public Object getScenarioElement(String name);
 
 	public ActivityFacilities getActivityFacilities();
 

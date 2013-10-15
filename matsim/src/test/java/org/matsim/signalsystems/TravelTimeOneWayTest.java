@@ -112,7 +112,7 @@ public class TravelTimeOneWayTest {
 		Id id2 = new IdImpl(2);
 		Id id100 = new IdImpl(100);
 
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		for (int dropping = 10; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
