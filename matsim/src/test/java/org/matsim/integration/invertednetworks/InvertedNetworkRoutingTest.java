@@ -24,6 +24,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
+import org.matsim.signalsystems.data.SignalsDataImpl;
+
 import junit.framework.Assert;
 
 import org.junit.Rule;
@@ -268,7 +271,8 @@ public class InvertedNetworkRoutingTest {
 		}
 
 		private void createSignals() {
-			SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+			SignalsData signalsData = new SignalsDataImpl( scenario.getConfig().signalSystems() );
+			this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 			SignalSystemsData ssd = signalsData.getSignalSystemsData();
 			SignalSystemsDataFactory f = ssd.getFactory();
 			SignalSystemData system = f.createSignalSystemData(getId(2));
@@ -299,7 +303,8 @@ public class InvertedNetworkRoutingTest {
 		}
 
 		private void createLanes() {
-			LaneDefinitions20 ld = (LaneDefinitions20) this.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+			LaneDefinitions20 ld = new LaneDefinitions20Impl();
+			scenario.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, ld);
 			LaneDefinitionsFactory20 f = ld.getFactory();
 			LanesToLinkAssignment20 l2l = f.createLanesToLinkAssignment(getId(12));
 			ld.addLanesToLinkAssignment(l2l);

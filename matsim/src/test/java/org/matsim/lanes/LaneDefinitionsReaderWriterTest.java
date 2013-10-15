@@ -67,7 +67,8 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		Fixture(){
 			Config config = ConfigUtils.createConfig();
 			config.scenario().setUseLanes(true);
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			// need to LOAD the scenario in order for the lanes container to be created.
+			this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		}
 	}
 	
