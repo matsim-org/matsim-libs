@@ -182,11 +182,11 @@ It  seems that the ``absolute'' version of this module was never tested (and  ma
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Synthetic realities (aka ``mobsims'')}
 
-This chapter in parts deprecated, e.g.:
+This chapter is partially deprecated, e.g.:
 \begin{itemize}
 \item
 ``qsim'' is now the default mobsim; the others need to be specifically
-instantiated.  It is also the most used and therefore probably the most reliable of the three variants.
+called for in the \verb$controler$ section of the config file.  It is also the most used and therefore probably the most reliable of the three variants.
 \end{itemize}
 
 
@@ -197,7 +197,8 @@ instantiated.  It is also the most used and therefore probably the most reliable
 
 "qsim"  is what we use for new features such as public transit or  signalsystems. "New features" implies "unstable". Use only  if you have to.
 
-Also see \href{http://www.matsim.org/javadoc/org/matsim/ptproject/qsim/package-summary.html}{www.matsim.org/javadoc/org/matsim/ptproject/qsim/package-summary.html}
+Also see \url{http://ci.matsim.org:8080/job/MATSim_M2/javadoc/org/matsim/core/mobsim/qsim/QSim.html}.
+ %%\href{http://www.matsim.org/javadoc/org/matsim/ptproject/qsim/package-summary.html}{www.matsim.org/javadoc/org/matsim/ptproject/qsim/package-summary.html}
 
 \subsubsection{Some calibration hints, especially when the main mode is not "car"}
 
@@ -284,9 +285,14 @@ Any number of threads larger than $1$ triggers the use of the parallel version.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{"lanes". Status: works}
 
-\textbf{Maintainer:} Dominik Grether
+\authorsOfDoc{Dominik Grether}
+\authorsOfCode{Dominik Grether}
+\maintainers{Dominik Grether}
 
-Make sure you read \url{http://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2012/12-03/} before you use the lanes module to understand effects on the queue model.
+Make sure you read
+\\ \url{http://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2012/12-03/} 
+\\
+before you use the lanes module to understand effects on the queue model.
 
 \subsubsection{Configuration}
 
