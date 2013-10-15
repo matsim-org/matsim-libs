@@ -41,6 +41,8 @@ public class JointPlans implements MatsimToplevelContainer {
 	private static final Logger log =
 		Logger.getLogger(JointPlans.class);
 
+	public static final String ELEMENT_NAME = "jointPlans";
+
 	private final Map<Plan, JointPlan> planToJointPlan = new ConcurrentHashMap<Plan, JointPlan>();
 
 	private static AtomicInteger instanceCount = new AtomicInteger( 0 );

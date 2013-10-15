@@ -64,7 +64,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 		
 		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
 		if (scenario.getConfig().scenario().isUseLanes()){
-			this.sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitions20.class));
+			this.sensorManager.setLaneDefinitions((LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 		}
 		event.getControler().getEvents().addHandler(sensorManager);
 		
@@ -89,7 +89,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 	}
 	
 	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
-		SignalsData data = sc.getScenarioElement(SignalsData.class);
+		SignalsData data = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
 	}
 	

@@ -62,7 +62,7 @@ public class Sim2DRunner implements IterationStartsListener{
 		c.controler().setWriteEventsInterval(1);
 //		c.controler().setLastIteration(300);
 		Scenario sc = ScenarioUtils.loadScenario(c);
-		sc.addScenarioElement(sim2dsc);
+		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
 		sim2dsc.connect(sc);
 		
 

@@ -25,6 +25,7 @@ import org.matsim.pt.Umlauf;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 class UmlaufCache {
+	public static final String ELEMENT_NAME = "umlaufCache";
 
 	private final TransitSchedule transitSchedule;
 	private final Collection<Umlauf> umlaeufe;

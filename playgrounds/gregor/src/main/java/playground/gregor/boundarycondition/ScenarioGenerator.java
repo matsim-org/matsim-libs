@@ -102,7 +102,7 @@ public class ScenarioGenerator {
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.26);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.71);
 		((NetworkImpl)sc.getNetwork()).setCapacityPeriod(1);
-		sc.addScenarioElement(s2dsc);
+		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, s2dsc);
 
 
 

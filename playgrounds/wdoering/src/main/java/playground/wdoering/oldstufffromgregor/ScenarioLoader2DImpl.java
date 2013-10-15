@@ -50,7 +50,7 @@ public class ScenarioLoader2DImpl  {
 		this.scenarioData = scenario;
 		this.config = scenario.getConfig();
 		this.c = new MyDataContainer();
-		this.scenarioData.addScenarioElement(this.c);
+		this.scenarioData.addScenarioElement(MyDataContainer.ELEMENT_NAME, this.c);
 	}
 
 	public void load2DScenario() {
@@ -75,7 +75,8 @@ public class ScenarioLoader2DImpl  {
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(file);
 
-		this.scenarioData.addScenarioElement(reader);
+		// Uh??? 8-S
+		this.scenarioData.addScenarioElement( ShapeFileReader.class.getName(), reader);
 		generateDenseCoords(reader);
 
 		SegmentsFromGeometries segs = new SegmentsFromGeometries(reader);

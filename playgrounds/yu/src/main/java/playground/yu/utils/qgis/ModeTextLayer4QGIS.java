@@ -97,11 +97,11 @@ public class ModeTextLayer4QGIS extends TextLayer4QGIS {
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(tollFilename);
 
 		ModeTextLayer4QGIS mtl = new ModeTextLayer4QGIS(textFilename,
-				(RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.class));
+				(RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		mtl.run(population);
 		mtl.close();
 

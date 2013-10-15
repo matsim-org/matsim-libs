@@ -83,7 +83,7 @@ public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime
 		double cost = calc.getLinkTravelDisutility(link, time, person, vehicle, dataManager);
 		
 		// Do some stuff here
-		FarePolicies policies = scenario.getScenarioElement(FarePolicies.class);
+		FarePolicies policies = (FarePolicies) scenario.getScenarioElement(FarePolicies.ELEMENT_NAME);
 		
 		if (link instanceof TransitRouterNetworkLink)
 		{
@@ -127,8 +127,8 @@ public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime
 		else
 		{
 			AgentSensitivities as = null;
-			if (scenario.getScenarioElement(AgentSensitivities.class) != null)
-				as = (AgentSensitivities) scenario.getScenarioElement(AgentSensitivities.class);
+			if (scenario.getScenarioElement(AgentSensitivities.ELEMENT_NAME) != null)
+				as = (AgentSensitivities) scenario.getScenarioElement(AgentSensitivities.ELEMENT_NAME);
 			if (as != null)
 			{
 				fac = as.getSensitivity(person.getId());

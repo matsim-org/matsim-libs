@@ -81,18 +81,18 @@ public class PseudoScenario implements Scenario {
 	}
 
 	@Override
-	public void addScenarioElement(final Object o) {
-		this.scenario.addScenarioElement(o);
+	public void addScenarioElement(final String name, final Object o) {
+		this.scenario.addScenarioElement(name, o);
 	}
 
 	@Override
-	public <T> T getScenarioElement(final Class<? extends T> klass) {
-		return this.scenario.getScenarioElement(klass);
+	public Object getScenarioElement(final String name) {
+		return this.scenario.getScenarioElement(name);
 	}
 
 	@Override
-	public boolean removeScenarioElement(final Object o) {
-		return this.scenario.removeScenarioElement(o);
+	public Object removeScenarioElement(final String name) {
+		return this.scenario.removeScenarioElement(name);
 	}
 
 }

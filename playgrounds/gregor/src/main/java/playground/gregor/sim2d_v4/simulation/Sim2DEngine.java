@@ -69,7 +69,7 @@ public class Sim2DEngine implements MobsimEngine {
 		this.scenario = sim.getScenario();
 
 		this.sim = sim;
-		this.sim2dsc = this.scenario.getScenarioElement(Sim2DScenario.class);
+		this.sim2dsc = (Sim2DScenario) this.scenario.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
 		Sim2DConfig sim2dc = this.sim2dsc.getSim2DConfig();
 
 

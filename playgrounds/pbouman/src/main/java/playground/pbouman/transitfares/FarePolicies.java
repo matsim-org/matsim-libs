@@ -8,6 +8,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 public class FarePolicies
 {
+	/** name of the element for adding it as scenario element*/
+	public static final String ELEMENT_NAME = "farePolicies";
 
 	private LinkedList<DiscountInterval> discountIntervals;
 	private LinkedList<PricingPolicy> pricingPolicies;

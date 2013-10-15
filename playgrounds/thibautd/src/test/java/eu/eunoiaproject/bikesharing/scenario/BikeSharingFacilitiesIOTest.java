@@ -48,7 +48,7 @@ public class BikeSharingFacilitiesIOTest {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new BikeSharingFacilitiesReader( scenario ).parse( file );
 
-		final BikeSharingFacilities newFacilities = scenario.getScenarioElement( BikeSharingFacilities.class );
+		final BikeSharingFacilities newFacilities = (BikeSharingFacilities) scenario.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME );
 
 		assertFacilitiesMatch( facilities , newFacilities );
 	}

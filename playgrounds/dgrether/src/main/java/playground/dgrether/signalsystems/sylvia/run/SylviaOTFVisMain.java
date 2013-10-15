@@ -73,7 +73,7 @@ public class SylviaOTFVisMain {
 //		scenario.getConfig().otfVis().setAgentSize(40.0f);
 
 		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
-		sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitions20.class));
+		sensorManager.setLaneDefinitions((LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 		events.addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 

@@ -92,10 +92,10 @@ public class JointScenarioUtils {
 			final JointPlans jps = JointPlansXmlReader.readJointPlans(
 					scenario.getPopulation(),
 					jpConfig.getFileName() );
-			scenario.addScenarioElement( jps );
+			scenario.addScenarioElement( JointPlans.ELEMENT_NAME , jps );
 		}
 		else {
-			scenario.addScenarioElement( new JointPlans() );
+			scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
 		}
 
 		if ( config.plans().getInputPersonAttributeFile() != null ) {

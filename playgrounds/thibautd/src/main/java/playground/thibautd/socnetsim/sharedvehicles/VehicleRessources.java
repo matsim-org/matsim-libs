@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.Id;
  * @author thibautd
  */
 public interface VehicleRessources {
+	public static final String ELEMENT_NAME = "vehicleRessources";
+
 	/**
 	 * gives access to the ids of the vehicles the Person can use
 	 */

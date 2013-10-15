@@ -741,14 +741,14 @@ public class DailyEnRouteTime4Muc extends DailyEnRouteTime implements
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyEnRouteTime4Muc ert = new DailyEnRouteTime4Muc((RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.class));
+		DailyEnRouteTime4Muc ert = new DailyEnRouteTime4Muc((RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		ert.run(population);
 		ert.write(outputFilename);
 

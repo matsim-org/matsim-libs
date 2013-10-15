@@ -66,7 +66,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 				BikeSharingConstants.MODE,
 				new BikeSharingRoutingModule(
 					MatsimRandom.getLocalInstance(),
-					scenario.getScenarioElement( BikeSharingFacilities.class ),
+					(BikeSharingFacilities) scenario.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME ),
 					configGroup.getSearchRadius(),
 					scenario.getConfig().plansCalcRoute()) );
 

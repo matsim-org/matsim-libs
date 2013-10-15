@@ -135,7 +135,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 	/*package*/ CustomizedOSM2Sim2DExtendedMATSimScenario(Scenario sc, OSM osm) {
 		this.sc = sc;
-		this.s2dsc = sc.getScenarioElement(Sim2DScenario.class);
+		this.s2dsc = (Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
 		this.osm = osm;
 	}
 
@@ -426,7 +426,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.26);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.71);
-		sc.addScenarioElement(s2dsc);
+		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, s2dsc);
 
 
 		CustomizedOSM2Sim2DExtendedMATSimScenario osm2sim2d = new CustomizedOSM2Sim2DExtendedMATSimScenario(sc);

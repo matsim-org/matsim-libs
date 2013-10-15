@@ -80,7 +80,7 @@ public class DgSignalizedLinks2Shape {
 	
 	
 	public void getSignalizedLinksAndWrite2Shape(Scenario sc, String shapeFilename){
-		SignalsData sd = sc.getScenarioElement(SignalsData.class);
+		SignalsData sd = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
 		if (sd == null)	return;
 		SignalSystemsData ssd = sd.getSignalSystemsData();
 		Network net = sc.getNetwork();

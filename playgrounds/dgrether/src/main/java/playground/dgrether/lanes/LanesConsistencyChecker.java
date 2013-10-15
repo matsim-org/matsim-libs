@@ -167,7 +167,7 @@ public class LanesConsistencyChecker {
 		MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(scenario);
 	  laneReader.readFile(lanesFile);
 	  
-	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, scenario.getScenarioElement(LaneDefinitions20.class));
+	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 		lcc.setRemoveMalformed(false);
 		lcc.checkConsistency();
 		

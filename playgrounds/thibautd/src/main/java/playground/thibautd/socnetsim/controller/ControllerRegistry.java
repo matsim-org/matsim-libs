@@ -115,7 +115,7 @@ public final class ControllerRegistry {
 	}
 	
 	public JointPlans getJointPlans() {
-		return scenario.getScenarioElement( JointPlans.class );
+		return (JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
 	}
 
 	public EventsManager getEvents() {

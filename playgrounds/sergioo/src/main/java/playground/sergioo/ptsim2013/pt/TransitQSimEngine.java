@@ -130,7 +130,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();
 		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<MobsimAgent>();
-		UmlaufCache umlaufCache = scenario.getScenarioElement(UmlaufCache.class) ;
+		UmlaufCache umlaufCache = (UmlaufCache) scenario.getScenarioElement(UmlaufCache.ELEMENT_NAME) ;
 		if (umlaufCache != null && umlaufCache.getTransitSchedule() == transitSchedule) { // has someone put a new transitschedule into the scenario?
 			log.info("found pre-existing Umlaeufe in scenario, and the transit schedule is still the same, so using them.");
 		} else {
@@ -140,7 +140,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 					scenario.getConfig().planCalcScore());
 			Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 			umlaufCache = new UmlaufCache(transitSchedule, umlaeufe);
-			scenario.addScenarioElement(umlaufCache); // possibly overwriting the existing one
+			scenario.addScenarioElement(UmlaufCache.ELEMENT_NAME, umlaufCache); // possibly overwriting the existing one
 		}
 		for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());

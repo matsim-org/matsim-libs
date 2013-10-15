@@ -276,18 +276,18 @@ public class CreateEvacuationAreaSubScenario {
 		}
 
 		@Override
-		public void addScenarioElement(Object o) {
-			this.scenario.addScenarioElement(o);
+		public void addScenarioElement(String name, Object o) {
+			this.scenario.addScenarioElement( name , o );
 		}
 
 		@Override
-		public boolean removeScenarioElement(Object o) {
-			return this.scenario.removeScenarioElement(o);
+		public Object removeScenarioElement(String name) {
+			return this.scenario.removeScenarioElement(name);
 		}
 
 		@Override
-		public <T> T getScenarioElement(Class<? extends T> klass) {
-			return this.scenario.getScenarioElement(klass);
+		public Object getScenarioElement(String name) {
+			return this.scenario.getScenarioElement(name);
 		}
 	}
 }

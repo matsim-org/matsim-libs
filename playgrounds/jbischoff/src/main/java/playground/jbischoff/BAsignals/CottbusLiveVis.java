@@ -80,7 +80,7 @@ public class CottbusLiveVis {
 			AdaptiveControllHead adaptiveControllHead = new AdaptiveControllHead();
 			CarsOnLaneHandler carsOnLaneHandler = new CarsOnLaneHandler();
 			carsOnLaneHandler.setAdaptiveControllHead(adaptiveControllHead);
-			JbSignalBuilder jbBuilder = new JbSignalBuilder(scenario.getScenarioElement(SignalsData.class), new FromDataBuilder(scenario, events), carsOnLaneHandler, adaptiveControllHead);
+			JbSignalBuilder jbBuilder = new JbSignalBuilder((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME), new FromDataBuilder(scenario, events), carsOnLaneHandler, adaptiveControllHead);
 			SignalEngine engine = new QSimSignalEngine(jbBuilder.createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}

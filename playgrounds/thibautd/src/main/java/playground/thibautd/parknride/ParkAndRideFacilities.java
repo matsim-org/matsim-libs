@@ -33,6 +33,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  * @author thibautd
  */
 public class ParkAndRideFacilities implements MatsimToplevelContainer {
+	public static final String ELEMENT_NAME = "pnrFacilities";
 	private final String name;
 	private final Map<Id, ParkAndRideFacility> facilities =
 		new HashMap<Id, ParkAndRideFacility>();

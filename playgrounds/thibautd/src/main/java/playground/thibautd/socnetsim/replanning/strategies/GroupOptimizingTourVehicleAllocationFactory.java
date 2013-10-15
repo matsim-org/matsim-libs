@@ -49,8 +49,8 @@ public class GroupOptimizingTourVehicleAllocationFactory implements GroupPlanStr
 				new OptimizeVehicleAllocationAtTourLevelModule(
 						registry.getScenario().getConfig().global().getNumberOfThreads(),
 						stageActs,
-						registry.getScenario().getScenarioElement(
-							VehicleRessources.class ),
+						(VehicleRessources) registry.getScenario().getScenarioElement(
+							VehicleRessources.ELEMENT_NAME ),
 						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
 						true));
 

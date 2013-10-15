@@ -76,12 +76,12 @@ public class UglyHerbieMultilegControler extends Controler {
 
 	@Override
 	protected void setUp() {
-		FacilityPenalties facPenalties = getScenario().getScenarioElement(FacilityPenalties.class);
+		FacilityPenalties facPenalties = (FacilityPenalties) getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME);
 
 		if (facPenalties == null) {
 			// I'm pretty sure it's not used anywhere...
 			facPenalties = new FacilityPenalties();
-			getScenario().addScenarioElement( facPenalties );
+			getScenario().addScenarioElement( FacilityPenalties.ELEMENT_NAME , facPenalties );
 		}
 
 		HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =

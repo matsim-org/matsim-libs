@@ -46,7 +46,7 @@ public class SignalControlDataConsistencyChecker implements ConsistencyChecker {
 	private SignalsData signalsData;
 
 	public SignalControlDataConsistencyChecker(Scenario scenario) {
-		this.signalsData = scenario.getScenarioElement(SignalsData.class);
+		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 
 	}
 

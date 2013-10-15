@@ -55,14 +55,14 @@ public class GroupSubtourModeChoiceFactory implements GroupPlanStrategyFactory {
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =
-				registry.getScenario().getScenarioElement(
-					VehicleRessources.class );
+				(VehicleRessources) registry.getScenario().getScenarioElement(
+			VehicleRessources.ELEMENT_NAME );
 		if ( vehicles != null ) {
 			strategy.addStrategyModule(
 				new AllocateVehicleToPlansInGroupPlanModule(
 						registry.getScenario().getConfig().global().getNumberOfThreads(),
-						registry.getScenario().getScenarioElement(
-							VehicleRessources.class ),
+						(VehicleRessources) registry.getScenario().getScenarioElement(
+							VehicleRessources.ELEMENT_NAME ),
 						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
 						true,
 						true));

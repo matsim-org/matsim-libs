@@ -65,7 +65,7 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 		HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
 				super.config,
 				this.herbieConfigGroup,
-				this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(),
+				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
 				this.getFacilities(),
 				this.getNetwork());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);

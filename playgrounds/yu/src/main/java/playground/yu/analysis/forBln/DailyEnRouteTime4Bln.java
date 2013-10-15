@@ -615,7 +615,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
@@ -623,7 +623,7 @@ public class DailyEnRouteTime4Bln extends DailyEnRouteTime implements
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		DailyEnRouteTime4Bln ert = new DailyEnRouteTime4Bln(
-				(RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.class));
+				(RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		ert.run(population);
 		ert.write(outputFilename);
 

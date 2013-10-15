@@ -45,8 +45,8 @@ public class GroupTourVehicleAllocationFactory implements GroupPlanStrategyFacto
 					new AllocateVehicleToSubtourModule(
 						registry.getScenario().getConfig().global().getNumberOfThreads(),
 						TransportMode.car,
-						registry.getScenario().getScenarioElement(
-							VehicleRessources.class ) ) ) );
+						(VehicleRessources) registry.getScenario().getScenarioElement(
+							VehicleRessources.ELEMENT_NAME ) ) ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(

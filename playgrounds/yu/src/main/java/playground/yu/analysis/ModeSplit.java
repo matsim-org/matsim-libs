@@ -182,7 +182,7 @@ public class ModeSplit extends AbstractPersonAlgorithm implements
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 
-		RoadPricingSchemeImpl tollScheme = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class);
+		RoadPricingSchemeImpl tollScheme = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(tollScheme);
 		tollReader.parse(tollFilename);
 

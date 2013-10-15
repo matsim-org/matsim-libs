@@ -37,7 +37,7 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerO
 	
 	public InfoBox(EventBasedVisDebuggerEngine dbg, Scenario sc) {
 		this.dbg = dbg;
-		this.dT = sc.getScenarioElement(Sim2DScenario.class).getSim2DConfig().getTimeStepSize();
+		this.dT = ((Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME)).getSim2DConfig().getTimeStepSize();
 	}
 
 	@Override

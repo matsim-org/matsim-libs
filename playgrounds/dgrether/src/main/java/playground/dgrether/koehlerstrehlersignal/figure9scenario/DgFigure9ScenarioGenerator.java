@@ -91,7 +91,7 @@ public class DgFigure9ScenarioGenerator {
 		ScenarioImpl sc = (ScenarioImpl) scl.loadScenario();
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(sc.getConfig().signalSystems());
 		SignalsData signals = signalsLoader.loadSignalsData();
-		sc.addScenarioElement(signals);
+		sc.addScenarioElement(SignalsData.ELEMENT_NAME, signals);
 		return sc;
 	}
 	
@@ -102,7 +102,7 @@ public class DgFigure9ScenarioGenerator {
 		config.scenario().setUseSignalSystems(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		//network
 		Network net = this.createNetwork(scenario);

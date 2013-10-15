@@ -118,7 +118,7 @@ public class DgCalculateSignalGroupsTest {
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		this.createManySignalsOn3WayCrossing(signalSystems);
 
-		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalSystems, sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class));
+		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalSystems, sc.getNetwork(), (LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 
 		Assert.assertNotNull(signalGroups);
@@ -241,10 +241,10 @@ public class DgCalculateSignalGroupsTest {
 
 		//load the network
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 //		
 		//calculate the signal groups
-		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalsData.getSignalSystemsData(), scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitions20.class));
+		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalsData.getSignalSystemsData(), scenario.getNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 		//test them
 		Assert.assertNotNull(signalGroups);
@@ -382,7 +382,7 @@ public class DgCalculateSignalGroupsTest {
 		lane = fac.createLane(this.getId(2));
 		l2l.addLane(lane);
 		lane.addToLinkId(this.getId(32));
-		sc.addScenarioElement(new LaneDefinitionsV11ToV20Conversion().convertTo20(lanes, sc.getNetwork()));
+		sc.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, new LaneDefinitionsV11ToV20Conversion().convertTo20(lanes, sc.getNetwork()));
 	}
 	
 	/**

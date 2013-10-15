@@ -93,7 +93,7 @@ public final class CarSharingControler extends Controler
     FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
       this.config, 
       this.ftConfigGroup, 
-      this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(), 
+      ((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(), 
       this.getFacilities(), network);
     this.setScoringFunctionFactory(ftScoringFunctionFactory);
 //
@@ -108,7 +108,7 @@ public final class CarSharingControler extends Controler
   {
     super.loadControlerListeners();
 
-    this.addControlerListener(new FacilitiesLoadCalculator(this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties()));
+    this.addControlerListener(new FacilitiesLoadCalculator(((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties()));
     this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
     this.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt", "legTravelTimeDistribution.txt"));
     this.addControlerListener(new LegDistanceDistributionWriter("legDistanceDistribution.txt"));

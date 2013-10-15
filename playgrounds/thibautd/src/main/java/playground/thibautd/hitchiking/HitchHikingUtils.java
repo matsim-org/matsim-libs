@@ -106,13 +106,13 @@ public class HitchHikingUtils {
 					readFile( inFileName ),
 					sc.getNetwork() );
 
-		sc.addScenarioElement( spots );
+		sc.addScenarioElement( HitchHikingSpots.ELEMENT_NAME , spots );
 
 		return sc;
 	}
 
 	public static HitchHikingSpots getSpots(final Scenario sc) {
-		return sc.getScenarioElement( HitchHikingSpots.class );
+		return (HitchHikingSpots) sc.getScenarioElement( HitchHikingSpots.ELEMENT_NAME );
 	}
 
 	public static HitchHikingConfigGroup getConfigGroup(final Config config) {

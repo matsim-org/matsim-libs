@@ -127,7 +127,7 @@ public class RunResultsLoader {
 		Scenario sc = ScenarioUtils.createScenario(c);
 		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(sc);
 		reader.readFile(path);
-		return sc.getScenarioElement(LaneDefinitions20.class);
+		return (LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 	}
 	
 	public SignalsData getSignals() {

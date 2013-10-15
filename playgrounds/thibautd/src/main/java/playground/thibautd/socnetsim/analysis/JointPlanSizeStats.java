@@ -38,7 +38,7 @@ public class JointPlanSizeStats extends AbstractPlanAnalyzerPerGroup {
 			final Scenario scenario,
 			final GroupIdentifier groupIdentifier) {
 		super(graphWriteInterval, controlerIO, scenario, groupIdentifier);
-		this.jointPlans = scenario.getScenarioElement( JointPlans.class );
+		this.jointPlans = (JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
 	}
 
 	@Override

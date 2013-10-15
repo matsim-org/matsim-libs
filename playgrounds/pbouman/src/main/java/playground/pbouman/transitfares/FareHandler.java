@@ -212,7 +212,7 @@ public class FareHandler implements
 		event.getControler().getEvents().addHandler(this);
 		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
 		policies = new FarePolicies(scenario);
-		scenario.addScenarioElement(policies);
+		scenario.addScenarioElement(FarePolicies.ELEMENT_NAME, policies);
 	}
 	
 	@Override
@@ -224,7 +224,7 @@ public class FareHandler implements
 		{
 			double fare = agentTotalFare.get(p);
 			double factor = 1;
-			AgentSensitivities as = scenario.getScenarioElement(AgentSensitivities.class);
+			AgentSensitivities as = (AgentSensitivities) scenario.getScenarioElement(AgentSensitivities.ELEMENT_NAME);
 			if (as != null)
 			{
 				factor = as.getSensitivity(p);

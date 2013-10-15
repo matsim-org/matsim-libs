@@ -72,7 +72,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 
 		Scenario scenario = c.getScenario();
 		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		// this.loadData(signalsConfig, scenario);
 		FromDataBuilder builder = new FromDataBuilder(scenario, c.getEvents());
 		jbBuilder = new JbSignalBuilder(signalsData, builder, this.collh, this.ach);
@@ -169,7 +169,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 			}
 
 	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO) {
-		SignalsData data = sc.getScenarioElement(SignalsData.class);
+		SignalsData data = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
 	}
 

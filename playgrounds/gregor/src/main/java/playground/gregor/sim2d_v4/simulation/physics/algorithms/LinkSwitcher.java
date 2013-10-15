@@ -48,7 +48,7 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 
 	public LinkSwitcher(Scenario sc, PhysicalSim2DEnvironment pEnv) {
 		this.net = sc.getNetwork();
-		Sim2DScenario s2dsc = sc.getScenarioElement(Sim2DScenario.class);
+		Sim2DScenario s2dsc = (Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
 		Sim2DConfig s2dc = s2dsc.getSim2DConfig();
 		this.pEnv = pEnv;
 	}

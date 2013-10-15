@@ -125,8 +125,8 @@ public class CliqueJointTripMutatorFactory implements GroupPlanStrategyFactory {
 		}
 
 		final VehicleRessources vehicles = 
-					registry.getScenario().getScenarioElement(
-						VehicleRessources.class );
+					(VehicleRessources) registry.getScenario().getScenarioElement(
+			VehicleRessources.ELEMENT_NAME );
 
 		if ( vehicles != null ) {
 			strategy.addStrategyModule(

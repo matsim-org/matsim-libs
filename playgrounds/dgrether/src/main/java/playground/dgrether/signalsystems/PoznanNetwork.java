@@ -267,7 +267,7 @@ public class PoznanNetwork
         lanes.addLanesToLinkAssignment(l2l);
 
         // create the traffic signal infrastructure
-        SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+        SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signals = signalsData.getSignalSystemsData();
 
         SignalSystemsDataFactory sf = signals.getFactory();
@@ -459,7 +459,7 @@ public class PoznanNetwork
 
     private static void createSignalControl(Scenario scenario)
     {
-        SignalsData sd = scenario.getScenarioElement(SignalsData.class);
+        SignalsData sd = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalControlData control = sd.getSignalControlData();
         SignalControlDataFactory scf = control.getFactory();
 
@@ -591,7 +591,7 @@ public class PoznanNetwork
                 scenario.getLaneDefinitions11(), scenario.getNetwork());
         LanesConsistencyChecker lcc = new LanesConsistencyChecker(scenario.getNetwork(), lanes20);
         lcc.checkConsistency();
-        SignalSystemsDataConsistencyChecker sscc = new SignalSystemsDataConsistencyChecker(scenario.getNetwork(), lanes20, scenario.getScenarioElement(SignalsData.class));
+        SignalSystemsDataConsistencyChecker sscc = new SignalSystemsDataConsistencyChecker(scenario.getNetwork(), lanes20, (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME));
         sscc.checkConsistency();
 
         SignalGroupsDataConsistencyChecker sgcc = new SignalGroupsDataConsistencyChecker(scenario);
@@ -602,7 +602,7 @@ public class PoznanNetwork
         SignalControlDataConsistencyChecker sccc = new SignalControlDataConsistencyChecker(scenario);
         sccc.checkConsistency();
 
-        createAmbertimes(scenario.getScenarioElement(SignalsData.class));
+        createAmbertimes((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME));
 
         createPopulation(scenario);
 
@@ -625,7 +625,7 @@ public class PoznanNetwork
         String amberTimesFile = baseDir + "amber_times.xml";
         signalsWriter.setAmberTimesOutputFilename(amberTimesFile);
         config.signalSystems().setAmberTimesFile(amberTimesFile);
-        signalsWriter.writeSignalsData(scenario.getScenarioElement(SignalsData.class));
+        signalsWriter.writeSignalsData((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME));
 
         String lanesOutputFile = baseDir + "lanes.xml";
         // String lanesOutputFile = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\lanes.xml";

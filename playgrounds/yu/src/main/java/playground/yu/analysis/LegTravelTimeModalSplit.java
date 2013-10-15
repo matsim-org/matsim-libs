@@ -346,7 +346,7 @@ public class LegTravelTimeModalSplit implements PersonDepartureEventHandler,
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(tollFilename);
 
 		EventsManager events = EventsUtils.createEventsManager();

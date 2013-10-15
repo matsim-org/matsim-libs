@@ -34,6 +34,7 @@ import playground.thibautd.utils.QuadTreeRebuilder;
  * @author thibautd
  */
 public class BikeSharingFacilities implements MatsimToplevelContainer {
+	public static final String ELEMENT_NAME = "bikeSharingFacilities";
 	private final Map<Id, BikeSharingFacility> facilities =
 		new LinkedHashMap<Id, BikeSharingFacility>();
 	private final Map<Id, BikeSharingFacility> unmodifiableFacilities =

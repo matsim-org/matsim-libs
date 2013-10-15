@@ -118,6 +118,7 @@ public class RunCliquesWithModularStrategies {
 
 		if ( config.scenario().isUseHouseholds() && weights.getUseLimitedVehicles() ) {
 			scenario.addScenarioElement(
+							VehicleRessources.ELEMENT_NAME,
 							new HouseholdBasedVehicleRessources(
 								((ScenarioImpl) scenario).getHouseholds() ) );
 		}
@@ -163,11 +164,11 @@ public class RunCliquesWithModularStrategies {
 				@Override
 				public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
 					return 
-						scenario.getScenarioElement( VehicleRessources.class ) != null ?
+						scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
 						new PrepareVehicleAllocationForSimAlgorithm(
 								MatsimRandom.getLocalInstance(),
-								scenario.getScenarioElement( JointPlans.class ),
-								scenario.getScenarioElement( VehicleRessources.class ),
+								(JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME ),
+								(VehicleRessources) scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ),
 								planLinkIdentifier) :
 						new GenericPlanAlgorithm<ReplanningGroup>() {
 							@Override
@@ -197,7 +198,7 @@ public class RunCliquesWithModularStrategies {
 					.withIncompatiblePlansIdentifierFactory(
 							weights.getConsiderVehicleIncompatibilities() &&
 							!weights.getSynchronize().equals( Synchro.none ) &&
-							scenario.getScenarioElement( VehicleRessources.class ) != null ?
+							scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
 								new VehicleBasedIncompatiblePlansIdentifierFactory(
 										SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
 								new EmptyIncompatiblePlansIdentifierFactory() )

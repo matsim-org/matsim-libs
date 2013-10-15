@@ -83,7 +83,7 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				getScenario(),
 				this.ktiConfigGroup,
-				this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(),
+				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
 				this.getFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 

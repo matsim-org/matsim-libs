@@ -54,7 +54,7 @@ public class DgCottbusSignals2PointLayerShape {
 
 	public static void main(String[] args) throws Exception {
 		ScenarioImpl sc = CottbusUtils.loadCottbusScenrio(true);
-		Map<Id, Set<Id>> systemId2NodeIdsMap = DgSignalsUtils.calculateSignalizedNodesPerSystem(sc.getScenarioElement(SignalsData.class).getSignalSystemsData(), sc.getNetwork());
+		Map<Id, Set<Id>> systemId2NodeIdsMap = DgSignalsUtils.calculateSignalizedNodesPerSystem(((SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), sc.getNetwork());
 		String srsId = TransformationFactory.WGS84_UTM33N;
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srsId);
 		SimpleFeatureBuilder builder = createMultiPointSignalSystemFeatureBuilder(networkSrs);

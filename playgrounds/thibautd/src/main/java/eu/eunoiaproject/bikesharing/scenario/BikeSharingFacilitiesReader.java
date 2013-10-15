@@ -80,7 +80,7 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 			final Stack<String> context) {
 		if ( name.equals( "bikeSharingFacilities" ) ) {
 			counter.printCounter();
-			scenario.addScenarioElement( facilities );
+			scenario.addScenarioElement( BikeSharingFacilities.ELEMENT_NAME, facilities );
 		}
 	}
 

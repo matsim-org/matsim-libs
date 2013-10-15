@@ -41,8 +41,8 @@ public class GroupPlanVehicleAllocationFactory implements GroupPlanStrategyFacto
 		strategy.addStrategyModule(
 				new AllocateVehicleToPlansInGroupPlanModule(
 					registry.getScenario().getConfig().global().getNumberOfThreads(),
-					registry.getScenario().getScenarioElement(
-						VehicleRessources.class ),
+					(VehicleRessources) registry.getScenario().getScenarioElement(
+						VehicleRessources.ELEMENT_NAME ),
 					SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
 					false,
 					false));

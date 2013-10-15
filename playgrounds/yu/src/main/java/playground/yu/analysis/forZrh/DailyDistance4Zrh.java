@@ -486,13 +486,13 @@ public class DailyDistance4Zrh extends DailyDistance implements Analysis4Zrh {
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
-		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
+		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		DailyDistance4Zrh dd = new DailyDistance4Zrh((RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.class), network);
+		DailyDistance4Zrh dd = new DailyDistance4Zrh((RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME), network);
 		dd.run(population);
 		dd.write(outputFilename);
 

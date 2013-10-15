@@ -9,7 +9,9 @@ import org.matsim.core.config.Module;
 import org.matsim.core.scenario.ScenarioImpl;
 
 public class AgentSensitivities
-{
+{	
+	/** name of the element for adding it as scenario element*/
+	public static final String ELEMENT_NAME = "agentSensitivities";
 	public static final double DEFAULT_SENSITIVITY = 1;
 
 	public double minimum = 1;

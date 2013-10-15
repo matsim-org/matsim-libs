@@ -57,8 +57,10 @@ public class DgFigure9ToKoehlerStrehler2010ModelConverter {
 
 		M2KS2010NetworkConverter converter = new M2KS2010NetworkConverter(idConverter);
 		log.warn("Check times of demand!");
-		DgKSNetwork net = converter.convertNetworkLanesAndSignals(sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class), 
-				sc.getScenarioElement(SignalsData.class), 0.0, 3600.0);
+		DgKSNetwork net = converter.convertNetworkLanesAndSignals(
+				sc.getNetwork(),
+				(LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), 
+				(SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME), 0.0, 3600.0);
 		
 		M2KS2010SimpleDemandConverter demandConverter = new M2KS2010SimpleDemandConverter();
 		DgCommodities coms = demandConverter.convert(sc, net);

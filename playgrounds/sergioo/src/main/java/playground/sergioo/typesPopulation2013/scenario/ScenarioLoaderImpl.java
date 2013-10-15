@@ -41,6 +41,7 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -267,7 +268,7 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadLanes() {
-		LaneDefinitions20 laneDefinitions = this.scenario.getScenarioElement(LaneDefinitions20.class);
+		LaneDefinitions20 laneDefinitions = (LaneDefinitions20) this.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
@@ -291,7 +292,7 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadSignalSystems() {
-		this.scenario.addScenarioElement(new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
+		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
 	}
 
 }

@@ -192,14 +192,14 @@ public class MZComparisonDataIO implements TabularFileHandler {
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(tollFilename);
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
 		MZComparisonData mzcd = new MZComparisonData(
-				(RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.class));
+				(RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		mzcd.run(population);
 
 		mzcdi.setData2Compare(mzcd);

@@ -76,13 +76,13 @@ public class NetLanesSignalsShrinker {
 	
 	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double boundingBoxOffset) throws IOException{
 		//Some initialization
-		Set<Id> signalizedNodes = this.getSignalizedNodeIds(this.fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), this.fullScenario.getNetwork());
+		Set<Id> signalizedNodes = this.getSignalizedNodeIds(((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), this.fullScenario.getNetwork());
 		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), crs, shapeFileDirectory + "network_full");
 		
 		//create the bounding box
 		this.signalsBoundingBox = new DgSignalsBoundingBox(crs);
 		Envelope boundingBox = signalsBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), 
-				fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), boundingBoxOffset);
+				((SignalsData) fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), boundingBoxOffset);
 		signalsBoundingBox.writeBoundingBox(shapeFileDirectory);
 		
 		//Reduce the network size to the bounding box
@@ -108,12 +108,12 @@ public class NetLanesSignalsShrinker {
 		NetworkLanesSignalsSimplifier nsimply = new NetworkLanesSignalsSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 		nsimply.setSimplifySignalizedNodes(false);
-		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, this.fullScenario.getScenarioElement(LaneDefinitions20.class), this.fullScenario.getScenarioElement(SignalsData.class));
+		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, (LaneDefinitions20) this.fullScenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), (SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME));
 		this.originalToSimplifiedLinkIdMatching = nsimply.getOriginalToSimplifiedLinkIdMatching();
 		
 		this.shrinkedNetwork =  smallNetwork;
-		this.shrinkedLanes = this.fullScenario.getScenarioElement(LaneDefinitions20.class);
-		this.shrinkedSignals = this.fullScenario.getScenarioElement(SignalsData.class);
+		this.shrinkedLanes = (LaneDefinitions20) this.fullScenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		this.shrinkedSignals = (SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		LanesConsistencyChecker lanesConsistency = new LanesConsistencyChecker(smallNetwork, shrinkedLanes);
 		lanesConsistency.checkConsistency();
@@ -126,11 +126,11 @@ public class NetLanesSignalsShrinker {
 		DgNetworkUtils.writeNetwork(smallNetwork, simplifiedNetworkFile);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small_simplified");
 
-		LaneDefinitionsWriter20 lanesWriter = new LaneDefinitionsWriter20(this.fullScenario.getScenarioElement(LaneDefinitions20.class));
+		LaneDefinitionsWriter20 lanesWriter = new LaneDefinitionsWriter20((LaneDefinitions20) this.fullScenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 		lanesWriter.write(outputDirectory + simplifiedLanesFilename);
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter(outputDirectory);
-		signalsWriter.writeSignalsData(this.fullScenario.getScenarioElement(SignalsData.class));
+		signalsWriter.writeSignalsData((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME));
 		
 	}
 		

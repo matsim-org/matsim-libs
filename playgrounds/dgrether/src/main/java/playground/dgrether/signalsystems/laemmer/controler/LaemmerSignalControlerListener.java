@@ -54,7 +54,7 @@ public class LaemmerSignalControlerListener implements SignalsControllerListener
 		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
 		
 		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
-		this.sensorManager.setLaneDefinitions(scenario.getScenarioElement(LaneDefinitions20.class));
+		this.sensorManager.setLaneDefinitions((LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 		event.getControler().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 

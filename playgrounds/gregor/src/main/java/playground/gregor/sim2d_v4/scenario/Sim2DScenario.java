@@ -35,6 +35,9 @@ public class Sim2DScenario {
 	
 	private static final Logger log = Logger.getLogger(Sim2DScenario.class);
 	
+	/** name to use to add this class as a scenario element */
+	public static final String ELEMENT_NAME = "sim2DScenario";
+	
 	private final Map<Id,Sim2DEnvironment> envs = new HashMap<Id,Sim2DEnvironment>();
 	
 	private final Map<Link,Sim2DEnvironment> linkEnvironmentMapping = new HashMap<Link, Sim2DEnvironment>();
@@ -64,7 +67,7 @@ public class Sim2DScenario {
 			return;
 		}
 		log.info("Connecting 2D scenario.");
-		sc.addScenarioElement(this);
+		sc.addScenarioElement( ELEMENT_NAME , this);
 		this.sc = sc;
 		Network scNet = sc.getNetwork();
 		for (Sim2DEnvironment env : this.envs.values()) {

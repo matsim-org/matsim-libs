@@ -139,7 +139,7 @@ public class SingleCrossingScenario {
 	}
 	
 	private void createLaemmerSignalControl(Scenario scenario){
-		SignalsData signals = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signals = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData control = signals.getSignalControlData();
 		SignalControlDataFactory fac = signals.getSignalControlData().getFactory();
 		SignalSystemControllerData controller = fac.createSignalSystemControllerData(systemId);
@@ -150,7 +150,7 @@ public class SingleCrossingScenario {
 	
 	
 	private void createFixedTimeSignalControl(Scenario scenario, double lambdaWestEast){
-		SignalsData signals = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signals = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData control = signals.getSignalControlData();
 		SignalControlDataFactory fac = signals.getSignalControlData().getFactory();
 		SignalSystemControllerData controller = fac.createSignalSystemControllerData(systemId);
@@ -201,7 +201,7 @@ public class SingleCrossingScenario {
 	
 	
 	private void createSignals(Scenario scenario) {
-		SignalsData signals = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signals = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData systems = signals.getSignalSystemsData();
 		SignalSystemData system = systems.getFactory().createSignalSystemData(systemId);
 		systems.addSignalSystemData(system);

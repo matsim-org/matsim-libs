@@ -57,7 +57,7 @@ public class ParkAndRideUtils {
 		ParkAndRideFacilitiesXmlReader reader = new ParkAndRideFacilitiesXmlReader();
 		reader.parse( configGroup.getFacilities() );
 
-		scen.addScenarioElement( reader.getFacilities() );
+		scen.addScenarioElement( ParkAndRideFacilities.ELEMENT_NAME , reader.getFacilities() );
 
 		return scen;
 	}
@@ -84,7 +84,7 @@ public class ParkAndRideUtils {
 	 * @return
 	 */
 	public static ParkAndRideFacilities getParkAndRideFacilities(final Scenario scenario) {
-		return scenario.getScenarioElement( ParkAndRideFacilities.class );
+		return (ParkAndRideFacilities) scenario.getScenarioElement( ParkAndRideFacilities.ELEMENT_NAME );
 	}
 
 	/**

@@ -52,7 +52,7 @@ public class CustomizedOSM2Sim2DTest extends MatsimTestCase{
 
 		Config c0 = ConfigUtils.createConfig();
 		Scenario sc0 = ScenarioUtils.createScenario(c0);
-		sc0.addScenarioElement(s2dsc);
+		sc0.addScenarioElement(Sim2DScenario.ELEMENT_NAME, s2dsc);
 		CustomizedOSM2Sim2DExtendedMATSimScenario osm2sim2d = new CustomizedOSM2Sim2DExtendedMATSimScenario(sc0);
 		osm2sim2d.processOSMFile(inDir + "/sim2d.osm");
 		

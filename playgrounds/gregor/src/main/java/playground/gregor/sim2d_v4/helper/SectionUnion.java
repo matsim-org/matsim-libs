@@ -71,7 +71,7 @@ public class SectionUnion {
 		
 		CustomizedOSM2Sim2DExtendedMATSimScenario envReader = new CustomizedOSM2Sim2DExtendedMATSimScenario(this.sc, osm);
 		envReader.processOSMFile(file);
-		Sim2DScenario s2dsc = this.sc.getScenarioElement(Sim2DScenario.class);
+		Sim2DScenario s2dsc = (Sim2DScenario) this.sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
 		if (s2dsc.getSim2DEnvironments().size() != 1) {
 			throw new RuntimeException("not yet implemented! use osm file with only one sim2d environment!"); //TODO implement it [gl dec 2012]
 		}
@@ -226,7 +226,7 @@ public class SectionUnion {
 		Sim2DConfig s2dc = Sim2DConfigUtils.createConfig();
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2dc);
 		
-		sc.addScenarioElement(s2dsc);
+		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, s2dsc);
 		new SectionUnion(sc).processOSMFile(osmFile);
 		//		CustomizedOSM2Sim2D osm2sim2d = new CustomizedOSM2Sim2D(env);
 		//		osm2sim2d.processOSMFile(osmFile);

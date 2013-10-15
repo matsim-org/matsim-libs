@@ -118,7 +118,7 @@ public class Controller {
 			prediction2 = Double.parseDouble(con.getScenario().getConfig().getParam("telematics", "predictedTravelTimeRoute2"));
 
 			double time = 18.0 * 3600.0;
-			RoadPricingSchemeImpl roadPricingScheme = (RoadPricingSchemeImpl) con.getScenario().getScenarioElement(RoadPricingScheme.class);
+			RoadPricingSchemeImpl roadPricingScheme = (RoadPricingSchemeImpl) con.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 			tollRoute1 = roadPricingScheme.getLinkCostInfo(new IdImpl("2"), time , null).amount;
 			tollRoute2 = roadPricingScheme.getLinkCostInfo(new IdImpl("3"), time, null).amount;
 //			log.error("using prediction1: " + prediction1 + " prediction2: " + prediction2 + " toll1: " + tollRoute1 + " toll2: " + tollRoute2);

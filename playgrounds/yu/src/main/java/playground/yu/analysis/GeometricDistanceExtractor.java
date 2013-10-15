@@ -322,7 +322,7 @@ public class GeometricDistanceExtractor extends AbstractPersonAlgorithm
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class);
+		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 		new RoadPricingReaderXMLv1(scheme).parse(tollFilename);
 
 		GeometricDistanceExtractor lde = new GeometricDistanceExtractor(scheme,

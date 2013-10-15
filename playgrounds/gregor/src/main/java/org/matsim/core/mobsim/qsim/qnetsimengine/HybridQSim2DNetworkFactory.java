@@ -48,7 +48,7 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 	public HybridQSim2DNetworkFactory( Sim2DEngine e, Scenario sc, Sim2DAgentFactory builder) {
 		this.hybridEngine = e;
 		this.agentBuilder = builder;
-		this.s2dsc = sc.getScenarioElement(Sim2DScenario.class);
+		this.s2dsc = (Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME);
 
 	}
 

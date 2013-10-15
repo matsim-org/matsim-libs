@@ -22,6 +22,9 @@ import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.utilities.Header;
 
 class PersonHouseholdMapping {
+	/** name to use to add an instance as a scenario element*/
+	public static final String ELEMENT_NAME = "personHouseholdMapping"; 
+	
 	Map<Id,Id> delegate = new HashMap<Id,Id>() ;
 	// key = personId; value = householdId
 	// Id hhId = personHouseholdMapping.get( personId ) ;
@@ -139,10 +142,10 @@ class GautengControler {
 				phm.insertPersonidHhidPair( personId, hh.getId() ) ;
 			}
 		}
-		sc.addScenarioElement( phm ) ;
+		sc.addScenarioElement( PersonHouseholdMapping.ELEMENT_NAME, phm ) ;
 		
 		// retreive as follows:
-		PersonHouseholdMapping retreivedPhm = sc.getScenarioElement( PersonHouseholdMapping.class ) ;
+		PersonHouseholdMapping retreivedPhm = (PersonHouseholdMapping) sc.getScenarioElement( PersonHouseholdMapping.ELEMENT_NAME ) ;
 	}
 
 

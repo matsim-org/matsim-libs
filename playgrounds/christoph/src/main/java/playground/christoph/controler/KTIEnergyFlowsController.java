@@ -129,7 +129,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				this.scenarioData,
 				this.ktiConfigGroup,
-				this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties(),
+				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
 				this.getFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
@@ -145,7 +145,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		super.loadControlerListeners();
 
 		// the scoring function processes facility loads
-		this.addControlerListener(new FacilitiesLoadCalculator(this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties()));
+		this.addControlerListener(new FacilitiesLoadCalculator(((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
 		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));

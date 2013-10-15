@@ -65,7 +65,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 		event.getControler().getEvents().addHandler(sensorManager);
 		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
-				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitions20.class));
+				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
 				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
 			
 			}
@@ -85,7 +85,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		SignalsData data = event.getControler().getScenario().getScenarioElement(SignalsData.class);
+		SignalsData data = (SignalsData) event.getControler().getScenario().getScenarioElement(SignalsData.ELEMENT_NAME);
 		new SignalsScenarioWriter(event.getControler().getControlerIO()).writeSignalsData(data);
 	}
 

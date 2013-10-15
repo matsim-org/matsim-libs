@@ -43,7 +43,7 @@ public class TransitFares
 		if (useAgentSensitivities)
 		{
 			ScenarioImpl si = (ScenarioImpl) controler.getScenario();
-			si.addScenarioElement(new AgentSensitivities(si));
+			si.addScenarioElement(AgentSensitivities.ELEMENT_NAME, new AgentSensitivities(si));
 		}
 		
 		controler.addControlerListener(new FareHandler(controler.getScenario()));

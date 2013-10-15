@@ -6,6 +6,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class MyDataContainer {
+	public static final String ELEMENT_NAME = "myDataContainer";
 
 	private QuadTree<Coordinate> quad;
 	private QuadTree<float[]> floatSegQuad;

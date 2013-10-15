@@ -33,6 +33,7 @@ import org.matsim.core.utils.collections.QuadTree;
  * @author thibautd
  */
 public class HitchHikingSpots {
+	public static final String ELEMENT_NAME = "histchHikingSpots";
 	private final QuadTree<Link> quadTree;
 
 	public HitchHikingSpots(

@@ -418,10 +418,10 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 
 		scenario.getConfig().scenario().setUseRoadpricing(true);
 		RoadPricingReaderXMLv1 tollReader = new RoadPricingReaderXMLv1(
-				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		tollReader.parse(roadPricingFilename);
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(network,
-				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.class));
+				(RoadPricingSchemeImpl) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 		events.addHandler(clas);
 
 		new MatsimEventsReader(events).readFile(eventsFilename);

@@ -73,7 +73,7 @@ public class SignalSystemToXYData implements BasicEventHandler {
 		config.signalSystems().setSignalSystemFile(inputSignalSystemsFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		new SignalSystemToXYData(scenario.getNetwork(), signalsData).createXYData(inputEventsFile, outputXYFile);
 	}
 	

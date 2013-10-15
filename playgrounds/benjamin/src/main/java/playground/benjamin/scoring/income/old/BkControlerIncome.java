@@ -75,7 +75,7 @@ public class BkControlerIncome extends BkControler {
 	private void installTravelCostCalculatorFactory() {
 		//returns null, if there is no road pricing
 		if (config.scenario().isUseRoadpricing()){
-			RoadPricingScheme roadPricingScheme = this.scenarioData.getScenarioElement(RoadPricingScheme.class);
+			RoadPricingScheme roadPricingScheme = (RoadPricingScheme) this.scenarioData.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 			
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
