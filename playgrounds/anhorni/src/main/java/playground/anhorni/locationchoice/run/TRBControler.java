@@ -52,7 +52,7 @@ public class TRBControler extends Controler {
 	  			new TRBScoringFunctionFactory(this.config.planCalcScore(), this);
 	  		this.setScoringFunctionFactory(trbScoringFunctionFactory);
 
-	  		this.addControlerListener(new FacilitiesLoadCalculator(this.getScenario().getScenarioElement(FacilityPenalties.class).getFacilityPenalties()));
+	  		this.addControlerListener(new FacilitiesLoadCalculator(((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties()));
 	  		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
 	  		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes.txt", false));
 	  		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes_wayThere.txt", true));

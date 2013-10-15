@@ -70,7 +70,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 			throw new RuntimeException(e);
 		}
 		
-		event.getControler().getScenario().addScenarioElement(scheme);
+		event.getControler().getScenario().addScenarioElement(RoadPricingScheme.ELEMENT_NAME, scheme);
 
 		// add the events handler to calculate the tolls paid by agents
 		this.tollCalc = new CalcPaidToll(controler.getNetwork(), this.scheme);
