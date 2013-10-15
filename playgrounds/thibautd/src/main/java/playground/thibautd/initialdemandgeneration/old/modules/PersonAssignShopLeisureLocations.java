@@ -168,6 +168,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	private boolean isCompatible(
 			final ActivityOptionImpl option,
 			final OpeningTime.DayType day) {
+		// avoid warning due to unused params
+		if ( option == option && day == day ) {}
 		
 		throw new RuntimeException("DayType is no longer supported.");
 //		for ( OpeningTime.DayType openingDay : option.getOpeningTimes() ) {
