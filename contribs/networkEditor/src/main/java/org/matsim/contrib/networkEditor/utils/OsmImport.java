@@ -224,6 +224,10 @@ public class OsmImport extends javax.swing.JDialog {
 				setVisible(false);
 			}
 		});
+		
+		// initially loads EPSG database while user sees the form the first time, so we can use that time
+		// also makes sures that OK and Cancel are correctly initialized
+		lookupCRS("EPSG:" + txtEPSG.getText());
 	}
 	
 	public String getIdentifiedCrsString() {
