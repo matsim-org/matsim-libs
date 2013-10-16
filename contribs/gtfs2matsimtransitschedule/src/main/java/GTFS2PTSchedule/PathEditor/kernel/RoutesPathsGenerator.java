@@ -32,8 +32,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -108,7 +108,7 @@ public class RoutesPathsGenerator {
 		if(!tempFolder.exists())
 			if(!tempFolder.mkdir()) {
 				log.error("It was not possible to create the solution temporal folder");
-				throw new IOException();
+				throw new IOException("It was not possible to create the temporary directory " + tempFolder);
 			}
 		BufferedReader reader = null;
 		String line = null;
