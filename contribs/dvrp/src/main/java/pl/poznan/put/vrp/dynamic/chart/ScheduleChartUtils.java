@@ -46,8 +46,8 @@ public class ScheduleChartUtils
     }
 
 
-    public static <T extends Task> JFreeChart chartSchedule(VrpData data, DescriptionCreator<T> descriptionCreator,
-            PaintSelector<T> paintSelector)
+    public static <T extends Task> JFreeChart chartSchedule(VrpData data,
+            DescriptionCreator<T> descriptionCreator, PaintSelector<T> paintSelector)
     {
         // data
         TaskSeriesCollection dataset = createScheduleDataset(data, descriptionCreator);

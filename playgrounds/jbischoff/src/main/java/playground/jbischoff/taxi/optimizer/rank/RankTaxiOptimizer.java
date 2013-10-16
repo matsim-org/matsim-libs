@@ -24,13 +24,14 @@ import java.util.*;
 import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.rank.BackToRankTask;
+import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -105,7 +106,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		this.delaySpeedupStats = delaySpeedupStats;
 	}
 
-	protected void scheduleRequest(Request request) {
+	protected void scheduleRequest(TaxiRequest request) {
 		VehicleDrive bestVehicle = findBestVehicle(request, data.getVehicles());
 
 		if (bestVehicle != VehicleDrive.NO_VEHICLE_DRIVE_FOUND) {
@@ -113,7 +114,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		}
 	}
 
-	protected VehicleDrive findBestVehicle(Request req, List<Vehicle> vehicles) {
+	protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles) {
 		int currentTime = data.getTime();
 		VehicleDrive best = VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
 
@@ -216,7 +217,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 		}
 	}
 
-	protected void scheduleRequestImpl(VehicleDrive best, Request req) {
+	protected void scheduleRequestImpl(VehicleDrive best, TaxiRequest req) {
 		Schedule<TaxiTask> bestSched = TaxiSchedules.getSchedule(best.vehicle);
 
 		if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or

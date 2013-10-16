@@ -23,8 +23,9 @@ import java.io.*;
 import java.util.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
+import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;
 
 
@@ -48,7 +49,7 @@ public class TaxiOptimizerWithPreassignment
 
 
     @Override
-    protected VehicleDrive findBestVehicle(Request req, List<Vehicle> vehicles)
+    protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
     {
         Vehicle veh = reqIdToVehMapping[req.getId()];
         return super.findBestVehicle(req, Arrays.asList(new Vehicle[] { veh }));

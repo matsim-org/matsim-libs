@@ -17,45 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model.impl;
+package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
-/**
- * @author michalm
- */
-public class CustomerImpl
-    implements Customer
+public class SingleRequestTask
+    extends StayTaskImpl
 {
-    private final int id;
-    private final String name;
+    private final Request request;
 
 
-    public CustomerImpl(int id, String name)
+    public SingleRequestTask(int beginTime, int endTime, Vertex vertex, Request request)
     {
-        this.id = id;
-        this.name = name;
+        super(beginTime, endTime, vertex);
+        this.request = request;
     }
 
 
-    @Override
-    public int getId()
+    public Request getRequest()
     {
-        return id;
-    }
-
-
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Customer_" + id;
+        return request;
     }
 }

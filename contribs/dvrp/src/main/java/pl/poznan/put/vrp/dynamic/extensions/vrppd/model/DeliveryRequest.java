@@ -17,45 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model.impl;
+package pl.poznan.put.vrp.dynamic.extensions.vrppd.model;
 
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.DeliveryTask;
 
 
-/**
- * @author michalm
- */
-public class CustomerImpl
-    implements Customer
+public interface DeliveryRequest
+    extends VRPPDRequest
 {
-    private final int id;
-    private final String name;
+    Vertex getToVertex();
 
 
-    public CustomerImpl(int id, String name)
-    {
-        this.id = id;
-        this.name = name;
-    }
-
-
-    @Override
-    public int getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Customer_" + id;
-    }
+    DeliveryTask getDeliveryTask();
 }

@@ -19,9 +19,6 @@
 
 package pl.poznan.put.vrp.dynamic.data.model;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-
-
 /**
  * @author michalm
  */
@@ -54,12 +51,6 @@ public interface Request
 
 
     Customer getCustomer();
-
-
-    Vertex getFromVertex();
-
-
-    Vertex getToVertex();
 
 
     int getQuantity();

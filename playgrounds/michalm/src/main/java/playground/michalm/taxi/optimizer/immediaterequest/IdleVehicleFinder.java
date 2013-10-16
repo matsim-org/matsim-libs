@@ -20,9 +20,10 @@
 package playground.michalm.taxi.optimizer.immediaterequest;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.schedule.*;
 
@@ -40,7 +41,7 @@ public class IdleVehicleFinder
     }
 
 
-    public Vehicle findClosestVehicle(Request req)
+    public Vehicle findClosestVehicle(TaxiRequest req)
     {
         Vehicle bestVeh = null;
         double bestDistance = Double.MAX_VALUE;
@@ -58,7 +59,7 @@ public class IdleVehicleFinder
     }
 
 
-    private double calculateDistance(Request req, Vehicle veh)
+    private double calculateDistance(TaxiRequest req, Vehicle veh)
     {
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         int time = data.getTime();

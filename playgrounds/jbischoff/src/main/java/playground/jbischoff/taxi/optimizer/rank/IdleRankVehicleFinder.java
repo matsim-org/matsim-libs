@@ -25,10 +25,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
+import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.schedule.*;
 /**
@@ -79,7 +80,7 @@ public class IdleRankVehicleFinder
 	}
     
     
-    public Vehicle findClosestVehicle(Request req)
+    public Vehicle findClosestVehicle(TaxiRequest req)
     
     
     {
@@ -96,7 +97,7 @@ public class IdleRankVehicleFinder
     }
       
     
-    private Vehicle findBestChargedVehicle(Request req){
+    private Vehicle findBestChargedVehicle(TaxiRequest req){
        	  Vehicle bestVeh = null;
              double bestDistance = 1e9;
              
@@ -127,7 +128,7 @@ public class IdleRankVehicleFinder
              return bestVeh;
        }
     
-    private Vehicle findHighestChargedIdleVehicle(Request req){
+    private Vehicle findHighestChargedIdleVehicle(TaxiRequest req){
      	  Vehicle bestVeh = null;
      	  double bestSoc=0;
           Collections.shuffle(data.getVehicles(),rnd);
@@ -147,7 +148,7 @@ public class IdleRankVehicleFinder
 
     }
     
-    private Vehicle findHighestChargedIdleVehicleDistanceSort(Request req){
+    private Vehicle findHighestChargedIdleVehicleDistanceSort(TaxiRequest req){
    	  Vehicle bestVeh = null;
    	  double bestSoc=0;
         Collections.shuffle(data.getVehicles(),rnd);
@@ -177,7 +178,7 @@ public class IdleRankVehicleFinder
 
   }
     
-    private Vehicle findClosestFIFOVehicle(Request req){
+    private Vehicle findClosestFIFOVehicle(TaxiRequest req){
         Collections.shuffle(data.getVehicles(),rnd);
     	  Vehicle bestVeh = null;
           double bestDistance = 1e9;
@@ -208,7 +209,7 @@ public class IdleRankVehicleFinder
     }
   
 
-    private double calculateDistance(Request req, Vehicle veh)
+    private double calculateDistance(TaxiRequest req, Vehicle veh)
     {
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         int time = data.getTime();

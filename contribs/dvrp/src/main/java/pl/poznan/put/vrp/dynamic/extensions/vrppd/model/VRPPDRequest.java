@@ -17,45 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model.impl;
+package pl.poznan.put.vrp.dynamic.extensions.vrppd.model;
 
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
 
 
-/**
- * @author michalm
- */
-public class CustomerImpl
-    implements Customer
+public interface VRPPDRequest
+    extends Request
 {
-    private final int id;
-    private final String name;
-
-
-    public CustomerImpl(int id, String name)
+    public enum RequestType
     {
-        this.id = id;
-        this.name = name;
+        PICKUP, DELIVERY, PICKUP_DELIVERY;
     }
 
 
-    @Override
-    public int getId()
-    {
-        return id;
-    }
+    RequestType getRequestType();
 
-
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Customer_" + id;
-    }
 }

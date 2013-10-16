@@ -17,60 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model.impl;
+package pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.impl.AbstractRequest;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.PickupDeliveryRequest;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.*;
 
 
-/**
- * @author michalm
- */
-public class RequestImpl
-    implements Request
+public class PickupDeliveryRequestImpl
+    extends AbstractRequest
+    implements PickupDeliveryRequest
 {
-    private final int id;
-
-    private final Customer customer;
-
     private final Vertex fromVertex;
     private final Vertex toVertex;
 
-    private final int quantity;
-
-    private final int t0;// earliest start time
-    private final int t1;// latest start time
-
-    private final int submissionTime;
-
-    private RequestStatus status = RequestStatus.INACTIVE;// based on: serveTask.getStatus();
+    private PickupTask pickupTask;
+    private DeliveryTask deliveryTask;
 
 
-    public RequestImpl(int id, Customer customer, Vertex fromVertex, Vertex toVertex, int quantity,
-            int t0, int t1, int submissionTime)
+    public PickupDeliveryRequestImpl(int id, Customer customer, int quantity, int t0, int t1,
+            int submissionTime, Vertex fromVertex, Vertex toVertex)
     {
-        this.id = id;
-        this.customer = customer;
+        super(id, customer, quantity, t0, t1, submissionTime);
         this.fromVertex = fromVertex;
         this.toVertex = toVertex;
-        this.quantity = quantity;
-        this.t0 = t0;
-        this.t1 = t1;
-        this.submissionTime = submissionTime;
     }
 
 
     @Override
-    public int getId()
+    public RequestType getRequestType()
     {
-        return id;
-    }
-
-
-    @Override
-    public Customer getCustomer()
-    {
-        return customer;
+        return RequestType.PICKUP_DELIVERY;
     }
 
 
@@ -89,49 +68,28 @@ public class RequestImpl
 
 
     @Override
-    public int getQuantity()
+    public PickupTask getPickupTask()
     {
-        return quantity;
+        return pickupTask;
+    }
+
+
+    public void setPickupTask(PickupTask pickupTask)
+    {
+        this.pickupTask = pickupTask;
     }
 
 
     @Override
-    public int getT0()
+    public DeliveryTask getDeliveryTask()
     {
-        return t0;
+        return deliveryTask;
     }
 
 
-    @Override
-    public int getT1()
+    public void setDeliveryTask(DeliveryTask deliveryTask)
     {
-        return t1;
+        this.deliveryTask = deliveryTask;
     }
 
-
-    @Override
-    public int getSubmissionTime()
-    {
-        return submissionTime;
-    }
-
-
-    @Override
-    public RequestStatus getStatus()
-    {
-        return status;
-    }
-
-
-    public void setStatus(RequestStatus status)
-    {
-        this.status = status;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Request_" + id + " [S=(" + t0 + ", ???, " + t1 + "), F=???]";
-    }
 }

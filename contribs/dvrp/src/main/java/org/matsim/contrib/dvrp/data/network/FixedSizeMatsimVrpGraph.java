@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.network.impl.FixedSizeVrpGraph;
 
 

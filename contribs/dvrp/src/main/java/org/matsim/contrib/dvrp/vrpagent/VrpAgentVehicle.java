@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dynagent.DynAgent;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Depot;
 import pl.poznan.put.vrp.dynamic.data.model.impl.VehicleImpl;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task;
 

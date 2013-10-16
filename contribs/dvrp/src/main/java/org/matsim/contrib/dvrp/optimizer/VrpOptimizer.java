@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 

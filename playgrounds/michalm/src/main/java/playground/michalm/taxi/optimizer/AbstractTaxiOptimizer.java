@@ -28,6 +28,7 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.RequestStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
+import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.*;
 
 
@@ -45,7 +46,7 @@ public abstract class AbstractTaxiOptimizer
     implements VrpOptimizer
 {
     protected final VrpData data;
-    protected Queue<Request> unplannedRequestQueue;
+    protected Queue<TaxiRequest> unplannedRequestQueue;
 
 
     public AbstractTaxiOptimizer(VrpData data)
@@ -53,9 +54,9 @@ public abstract class AbstractTaxiOptimizer
         this.data = data;
         int initialCapacity = data.getVehicles().size();// just proportional to the number of
                                                         // vehicles (for easy scaling)
-        unplannedRequestQueue = new PriorityQueue<Request>(initialCapacity,
-                new Comparator<Request>() {
-                    public int compare(Request r1, Request r2)
+        unplannedRequestQueue = new PriorityQueue<TaxiRequest>(initialCapacity,
+                new Comparator<TaxiRequest>() {
+                    public int compare(TaxiRequest r1, TaxiRequest r2)
                     {
                         return r1.getId() - r2.getId();
                     }
@@ -83,7 +84,7 @@ public abstract class AbstractTaxiOptimizer
     @Override
     public void requestSubmitted(Request request)
     {
-        unplannedRequestQueue.add(request);
+        unplannedRequestQueue.add((TaxiRequest)request);
 
         optimize();
     }
@@ -137,7 +138,7 @@ public abstract class AbstractTaxiOptimizer
     protected void optimize()
     {
         while (!unplannedRequestQueue.isEmpty()) {
-            Request req = unplannedRequestQueue.peek();
+            TaxiRequest req = unplannedRequestQueue.peek();
 
             if (req.getStatus() != RequestStatus.UNPLANNED) {
                 throw new IllegalStateException();
@@ -155,5 +156,5 @@ public abstract class AbstractTaxiOptimizer
     }
 
 
-    protected abstract void scheduleRequest(Request request);
+    protected abstract void scheduleRequest(TaxiRequest request);
 }

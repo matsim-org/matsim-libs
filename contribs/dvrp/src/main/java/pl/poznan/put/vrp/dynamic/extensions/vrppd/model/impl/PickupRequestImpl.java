@@ -17,45 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model.impl;
+package pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl;
 
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.impl.AbstractRequest;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.PickupRequest;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.PickupTask;
 
 
-/**
- * @author michalm
- */
-public class CustomerImpl
-    implements Customer
+public class PickupRequestImpl
+    extends AbstractRequest
+    implements PickupRequest
 {
-    private final int id;
-    private final String name;
+    private final Vertex fromVertex;
+    private PickupTask pickupTask;
 
 
-    public CustomerImpl(int id, String name)
+    public PickupRequestImpl(int id, Customer customer, int quantity, int t0, int t1,
+            int submissionTime, Vertex fromVertex)
     {
-        this.id = id;
-        this.name = name;
+        super(id, customer, quantity, t0, t1, submissionTime);
+        this.fromVertex = fromVertex;
     }
 
 
     @Override
-    public int getId()
+    public RequestType getRequestType()
     {
-        return id;
+        return RequestType.PICKUP;
     }
 
 
     @Override
-    public String getName()
+    public Vertex getFromVertex()
     {
-        return name;
+        return fromVertex;
     }
 
 
     @Override
-    public String toString()
+    public PickupTask getPickupTask()
     {
-        return "Customer_" + id;
+        return pickupTask;
+    }
+
+
+    public void setPickupTask(PickupTask pickupTask)
+    {
+        this.pickupTask = pickupTask;
     }
 }

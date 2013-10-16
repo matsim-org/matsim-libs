@@ -17,19 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.model;
+package pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl;
 
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicle;
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.impl.AbstractRequest;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.DeliveryRequest;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.DeliveryTask;
 
-import pl.poznan.put.vrp.dynamic.data.model.Depot;
 
-
-public class TaxiAgentVehicle
-    extends VrpAgentVehicle
+public class DeliveryRequestImpl
+    extends AbstractRequest
+    implements DeliveryRequest
 {
-    public TaxiAgentVehicle(int id, String name, Depot depot, int capacity, int t0, int t1,
-            int timeLimit)
+    private final Vertex toVertex;
+    private DeliveryTask deliveryTask;
+
+
+    public DeliveryRequestImpl(int id, Customer customer, int quantity, int t0, int t1,
+            int submissionTime, Vertex toVertex)
     {
-        super(id, name, depot, capacity, t0, t1, timeLimit);
+        super(id, customer, quantity, t0, t1, submissionTime);
+        this.toVertex = toVertex;
+    }
+
+
+    @Override
+    public RequestType getRequestType()
+    {
+        return RequestType.DELIVERY;
+    }
+
+
+    @Override
+    public Vertex getToVertex()
+    {
+        return toVertex;
+    }
+
+
+    @Override
+    public DeliveryTask getDeliveryTask()
+    {
+        return deliveryTask;
+    }
+
+
+    public void setDeliveryTask(DeliveryTask deliveryTask)
+    {
+        this.deliveryTask = deliveryTask;
     }
 }

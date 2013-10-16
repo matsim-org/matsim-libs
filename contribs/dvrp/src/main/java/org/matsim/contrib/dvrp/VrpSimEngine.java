@@ -31,7 +31,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 

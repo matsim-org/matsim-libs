@@ -27,6 +27,7 @@ import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.DeliveryRequest;
 
 
 /**
@@ -37,7 +38,7 @@ public class TSPOptimizer
 {
     private final VrpData data;
     private final Vehicle vehicle;//we have only one vehicle
-    private final Schedule<TaskImpl> schedule;
+    private final Schedule<AbstractTask> schedule;
 
 
     @SuppressWarnings("unchecked")
@@ -45,7 +46,7 @@ public class TSPOptimizer
     {
         this.data = data;
         vehicle = data.getVehicles().get(0);
-        schedule = (Schedule<TaskImpl>)vehicle.getSchedule();
+        schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
     }
 
 
@@ -87,7 +88,10 @@ public class TSPOptimizer
             t0 = Schedules.getLastTask(schedule).getEndTime();
         }
 
-        Arc arc = data.getVrpGraph().getArc(request.getFromVertex(), request.getToVertex());
+        //TODO
+        DeliveryRequest req = (DeliveryRequest)request;
+
+        Arc arc = data.getVrpGraph().getArc(req.getToVertex(), null);
         schedule.addTask(new DriveTaskImpl(t0, arc.getTimeOnDeparture(t0), arc));
 
     }

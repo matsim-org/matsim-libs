@@ -27,7 +27,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 
 
-public class ScheduleImpl<T extends TaskImpl>
+public class ScheduleImpl<T extends AbstractTask>
     implements Schedule<T>
 {
     private final Vehicle vehicle;
@@ -173,7 +173,7 @@ public class ScheduleImpl<T extends TaskImpl>
         failIfUnplanned();
         failIfCompleted();
 
-        TaskImpl task = tasks.get(taskIdx);
+        AbstractTask task = tasks.get(taskIdx);
 
         if (task.getStatus() != TaskStatus.PLANNED) {
             throw new IllegalStateException();
@@ -213,7 +213,7 @@ public class ScheduleImpl<T extends TaskImpl>
 
     private void removeTaskImpl(int taskIdx)
     {
-        TaskImpl task = tasks.remove(taskIdx);
+        AbstractTask task = tasks.remove(taskIdx);
         task.schedule = null;
         task.status = null;
         task.taskIdx = -1;

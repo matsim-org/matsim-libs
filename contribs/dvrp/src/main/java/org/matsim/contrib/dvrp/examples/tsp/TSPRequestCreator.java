@@ -26,7 +26,8 @@ import org.matsim.contrib.dvrp.passenger.RequestCreator;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.DeliveryRequest;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl.DeliveryRequestImpl;
 
 
 public class TSPRequestCreator
@@ -44,16 +45,16 @@ public class TSPRequestCreator
 
 
     @Override
-    public Request createRequest(Customer customer, MatsimVertex fromVertex, MatsimVertex toVertex,
-            double startTime)
+    public DeliveryRequest createRequest(Customer customer, MatsimVertex fromVertex,
+            MatsimVertex toVertex, double startTime)
     {
         List<Request> requests = vrpData.getRequests();
 
         int id = requests.size();
         int t0 = (int)startTime;
         int t1 = t0; // no time window
-        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, t0, t1,
-                vrpData.getTime());
+        DeliveryRequest request = new DeliveryRequestImpl(id, customer, 1, t0, t1,
+                vrpData.getTime(), toVertex);
 
         requests.add(request);
         return request;

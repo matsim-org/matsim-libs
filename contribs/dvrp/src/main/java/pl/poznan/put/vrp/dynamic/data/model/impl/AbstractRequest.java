@@ -19,23 +19,38 @@
 
 package pl.poznan.put.vrp.dynamic.data.model.impl;
 
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 
 
 /**
  * @author michalm
  */
-public class CustomerImpl
-    implements Customer
+public abstract class AbstractRequest
+    implements Request
 {
     private final int id;
-    private final String name;
+
+    private final Customer customer;
+
+    private final int quantity;
+
+    private final int t0;// earliest start time
+    private final int t1;// latest start time
+
+    private final int submissionTime;
+
+    private RequestStatus status = RequestStatus.INACTIVE;
 
 
-    public CustomerImpl(int id, String name)
+    public AbstractRequest(int id, Customer customer, int quantity, int t0, int t1,
+            int submissionTime)
     {
         this.id = id;
-        this.name = name;
+        this.customer = customer;
+        this.quantity = quantity;
+        this.t0 = t0;
+        this.t1 = t1;
+        this.submissionTime = submissionTime;
     }
 
 
@@ -47,15 +62,56 @@ public class CustomerImpl
 
 
     @Override
-    public String getName()
+    public Customer getCustomer()
     {
-        return name;
+        return customer;
+    }
+
+
+    @Override
+    public int getQuantity()
+    {
+        return quantity;
+    }
+
+
+    @Override
+    public int getT0()
+    {
+        return t0;
+    }
+
+
+    @Override
+    public int getT1()
+    {
+        return t1;
+    }
+
+
+    @Override
+    public int getSubmissionTime()
+    {
+        return submissionTime;
+    }
+
+
+    @Override
+    public RequestStatus getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus(RequestStatus status)
+    {
+        this.status = status;
     }
 
 
     @Override
     public String toString()
     {
-        return "Customer_" + id;
+        return "Request_" + id + " [S=(" + t0 + ", ???, " + t1 + "), F=???]";
     }
 }

@@ -28,7 +28,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Depot;
 import pl.poznan.put.vrp.dynamic.data.model.impl.DepotImpl;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 

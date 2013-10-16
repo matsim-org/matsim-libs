@@ -22,12 +22,13 @@ package playground.jbischoff.taxi.optimizer.rank;
 import java.util.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.rank.BackToRankTask;
+import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.*;
 
 /**
@@ -60,7 +61,7 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
 	}
 
 	@Override
-	protected VehicleDrive findBestVehicle(Request req, List<Vehicle> vehicles) {
+	protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles) {
 
 		Vehicle veh = idleVehicleFinder.findClosestVehicle(req);
 
@@ -105,7 +106,7 @@ public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
 	    TaxiPickupStayTask serveTask = (TaxiPickupStayTask) Schedules.getLastTask(schedule);
 
 		// add DELIVERY after SERVE
-		Request req = ((TaxiPickupStayTask) serveTask).getRequest();
+		TaxiRequest req = ((TaxiPickupStayTask) serveTask).getRequest();
 		Vertex reqFromVertex = req.getFromVertex();
 		Vertex reqToVertex = req.getToVertex();
 		int t3 = serveTask.getEndTime();

@@ -19,19 +19,19 @@
 
 package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.model.Request;
 import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.DriveTaskImpl;
+import playground.michalm.taxi.model.TaxiRequest;
 
 
 public class TaxiPickupDriveTask
     extends DriveTaskImpl
     implements TaxiTask
 {
-    private final Request request;
+    private final TaxiRequest request;
 
 
-    public TaxiPickupDriveTask(int beginTime, int endTime, Arc arc, Request request)
+    public TaxiPickupDriveTask(int beginTime, int endTime, Arc arc, TaxiRequest request)
     {
         super(beginTime, endTime, arc);
         this.request = request;
@@ -49,7 +49,7 @@ public class TaxiPickupDriveTask
     }
 
 
-    public Request getRequest()
+    public TaxiRequest getRequest()
     {
         return request;
     }

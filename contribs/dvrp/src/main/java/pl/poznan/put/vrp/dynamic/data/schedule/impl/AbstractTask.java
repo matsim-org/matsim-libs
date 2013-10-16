@@ -22,25 +22,22 @@ package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
-public class TaskImpl
+public abstract class AbstractTask
     implements Task
 {
     // ==== BEGIN: fields managed by ScheduleImpl
-    /*package*/Schedule<? extends TaskImpl> schedule;
+    /*package*/Schedule<? extends AbstractTask> schedule;
     /*package*/int taskIdx;
 
     /*package*/TaskStatus status;
     // ==== END: fields managed by ScheduleImpl
 
-    private final TaskType type;
-    
     private int beginTime;
     private int endTime;
 
 
-    public TaskImpl(TaskType type, int beginTime, int endTime)
+    public AbstractTask(int beginTime, int endTime)
     {
-        this.type = type;
         this.beginTime = beginTime;
         this.endTime = endTime;
     }
@@ -61,16 +58,9 @@ public class TaskImpl
 
 
     @Override
-    public final Schedule<? extends TaskImpl> getSchedule()
+    public final Schedule<? extends AbstractTask> getSchedule()
     {
         return schedule;
-    }
-    
-    
-    @Override
-    public TaskType getType()
-    {
-        return type;
     }
 
 

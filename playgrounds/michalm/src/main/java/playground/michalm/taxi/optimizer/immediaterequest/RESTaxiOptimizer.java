@@ -22,9 +22,10 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 import java.util.List;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -168,7 +169,7 @@ public class RESTaxiOptimizer
             TaxiTask task = tasks.get(i);
 
             if (task.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
-                Request req = ((TaxiPickupStayTask)task).getRequest();
+                TaxiRequest req = ((TaxiPickupStayTask)task).getRequest();
                 unplannedRequestQueue.add(req);
             }
 

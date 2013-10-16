@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.passenger.RequestCreator;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
+import playground.michalm.taxi.model.TaxiRequest;
 
 
 public class TaxiRequestCreator
@@ -45,15 +45,14 @@ public class TaxiRequestCreator
 
 
     @Override
-    public Request createRequest(Customer customer, MatsimVertex fromVertex, MatsimVertex toVertex,
-            double now)
+    public TaxiRequest createRequest(Customer customer, MatsimVertex fromVertex,
+            MatsimVertex toVertex, double now)
     {
         List<Request> requests = vrpData.getRequests();
 
         int id = requests.size();
-        int t0 = (int)now;
-        int t1 = t0; // no time windows
-        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, t0, t1, (int)now);
+        TaxiRequest request = new TaxiRequest(id, customer, fromVertex, toVertex, (int)now,
+                (int)now);
         requests.add(request);
 
         return request;

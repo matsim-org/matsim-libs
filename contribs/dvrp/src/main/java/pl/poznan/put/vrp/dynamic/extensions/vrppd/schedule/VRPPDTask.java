@@ -17,45 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model.impl;
+package pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.schedule.StayTask;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.VRPPDRequest;
 
 
-/**
- * @author michalm
- */
-public class CustomerImpl
-    implements Customer
+public interface VRPPDTask
+    extends StayTask
 {
-    private final int id;
-    private final String name;
-
-
-    public CustomerImpl(int id, String name)
+    public enum VRPPDTaskType
     {
-        this.id = id;
-        this.name = name;
-    }
+        PICKUP_STAY, DELIVERY_STAY;
+    };
 
 
-    @Override
-    public int getId()
-    {
-        return id;
-    }
+    VRPPDTaskType getVRPPDTaskType();
 
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Customer_" + id;
-    }
+    VRPPDRequest getRequest();
 }

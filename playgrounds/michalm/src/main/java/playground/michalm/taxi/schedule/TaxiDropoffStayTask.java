@@ -19,18 +19,18 @@
 
 package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.model.Request;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
+import playground.michalm.taxi.model.TaxiRequest;
 
 
 public class TaxiDropoffStayTask
     extends StayTaskImpl
     implements TaxiTask
 {
-    private final Request request;
+    private final TaxiRequest request;
 
 
-    public TaxiDropoffStayTask(int beginTime, int endTime, Request request)
+    public TaxiDropoffStayTask(int beginTime, int endTime, TaxiRequest request)
     {
         super(beginTime, endTime, request.getToVertex());
         this.request = request;
@@ -44,7 +44,7 @@ public class TaxiDropoffStayTask
     }
 
 
-    public Request getRequest()
+    public TaxiRequest getRequest()
     {
         return request;
     }

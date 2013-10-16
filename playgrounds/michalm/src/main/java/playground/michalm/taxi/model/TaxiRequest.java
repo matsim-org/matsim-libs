@@ -19,25 +19,42 @@
 
 package playground.michalm.taxi.model;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.impl.AbstractRequest;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import playground.michalm.taxi.schedule.*;
 
 
 public class TaxiRequest
-    extends RequestImpl
+    extends AbstractRequest
 {
+    private final Vertex fromVertex;
+    private final Vertex toVertex;
+
     private TaxiPickupDriveTask pickupDriveTask;
     private TaxiPickupStayTask pickupStayTask;
     private TaxiDropoffDriveTask dropoffDriveTask;
     private TaxiDropoffStayTask dropoffStayTask;
 
 
-    public TaxiRequest(int id, Customer customer, Vertex fromVertex, Vertex toVertex, int quantity,
-            int t0, int t1, int submissionTime)
+    public TaxiRequest(int id, Customer customer, Vertex fromVertex, Vertex toVertex, int t0,
+            int submissionTime)
     {
-        super(id, customer, fromVertex, toVertex, quantity, t0, t1, submissionTime);
+        super(id, customer, 1, t0, t0, submissionTime);
+        this.fromVertex = fromVertex;
+        this.toVertex = toVertex;
+    }
+
+
+    public Vertex getFromVertex()
+    {
+        return fromVertex;
+    }
+
+
+    public Vertex getToVertex()
+    {
+        return toVertex;
     }
 
 
