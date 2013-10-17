@@ -235,27 +235,27 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 								SelectorUtils.merge(
 									currentAllocation,
 									cachedAlloc ) ) ) ) {
-					assert cachedAlloc.equals(
-							buildPlanString(
-								null,
-								new KnownFeasibleAllocations( 0 ),
-								incompatibleRecords,
-								personsStillToAllocate,
-								allPersons,
-								currentAllocation,
-								allowedIncompatibilityGroups,
-								Double.NEGATIVE_INFINITY).allocation ):
-						"cachedWeight="+cachedAlloc.getWeight()+
-						 " searchWeight="+
-							buildPlanString(
-								null,
-								new KnownFeasibleAllocations( 0 ),
-								incompatibleRecords,
-								personsStillToAllocate,
-								allPersons,
-								currentAllocation,
-								allowedIncompatibilityGroups,
-								Double.NEGATIVE_INFINITY).allocation.getWeight();
+					//assert cachedAlloc.equals(
+					//		buildPlanString(
+					//			null,
+					//			new KnownFeasibleAllocations( 0 ),
+					//			incompatibleRecords,
+					//			personsStillToAllocate,
+					//			allPersons,
+					//			currentAllocation,
+					//			allowedIncompatibilityGroups,
+					//			Double.NEGATIVE_INFINITY).allocation ):
+					//	"cachedWeight="+cachedAlloc.getWeight()+
+					//	 " searchWeight="+
+					//		buildPlanString(
+					//			null,
+					//			new KnownFeasibleAllocations( 0 ),
+					//			incompatibleRecords,
+					//			personsStillToAllocate,
+					//			allPersons,
+					//			currentAllocation,
+					//			allowedIncompatibilityGroups,
+					//			Double.NEGATIVE_INFINITY).allocation.getWeight();
 					return new AllocationRecord( cachedAlloc , false );
 				}
 			}
