@@ -111,6 +111,10 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 		throw new IllegalArgumentException( type );
 	}
 
+	public void addStrategyParameterSet(final StrategyParameterSet set) {
+		addParameterSet( StrategyParameterSet.SET_NAME , set );
+	}
+
 	// XXX not soooo safe, but should be OK (normally, no other type  can be added for the type)
 	@SuppressWarnings("unchecked")
 	public Collection<StrategyParameterSet> getStrategyParameterSets() {
