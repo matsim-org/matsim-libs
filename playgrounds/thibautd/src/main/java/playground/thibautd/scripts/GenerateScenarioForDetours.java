@@ -39,11 +39,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdImpl;
 import org.matsim.households.Households;
@@ -59,11 +58,13 @@ import playground.thibautd.utils.UniqueIdFactory;
  * @author thibautd
  */
 public class GenerateScenarioForDetours {
-	private static final int N_COUPLES_PER_HH = 4;
+	private static final int N_COUPLES_PER_HH = 5;
+	private static final int N_HH_PER_DEST = 50;
 	private static final int N_WORK = 1000;
 	private static final int LENGTH_DETOUR = 100;
 
 	private static final int LINK_CAPACITY = 9999999;
+	private static final double FREESPEED = 70 / 3.6;
 
 	private static final String P_WORK_PREFIX = "worklink-";
 
@@ -166,45 +167,47 @@ public class GenerateScenarioForDetours {
 		final UniqueIdFactory personIdFactory = new UniqueIdFactory( "person-" );
 
 	 	for ( int workPlaceCount = 1; workPlaceCount <= N_WORK; workPlaceCount++ ) {
-			final Household household =
-				households.getFactory().createHousehold(
-						householdIdFactory.createNextId() );
-			((HouseholdsImpl) households).addHousehold( household );
+			for ( int nh = 0; nh < N_HH_PER_DEST; nh++ ) {
+				final Household household =
+					households.getFactory().createHousehold(
+							householdIdFactory.createNextId() );
+				((HouseholdsImpl) households).addHousehold( household );
 
-			final Id passengerWorkLinkId = new IdImpl( P_WORK_PREFIX + workPlaceCount );
+				final Id passengerWorkLinkId = new IdImpl( P_WORK_PREFIX + workPlaceCount );
 
-			final List<Id> members = new ArrayList<Id>();
-			((HouseholdImpl) household).setMemberIds( members );
-			
-			for ( int coupleCount = 0; coupleCount < N_COUPLES_PER_HH; coupleCount++ ) {
-				/* driver scope */ {
-					final Person driver =
-						population.getFactory().createPerson(
-								personIdFactory.createNextId() );
-					((PersonImpl) driver).setCarAvail( "always" );
-					driver.addPlan(
-							createPlan(
-								random,
-								population.getFactory(),
-								"car",
-								driverWorkLinkId ) );
-					population.addPerson( driver );
-					members.add( driver.getId() );
-				}
+				final List<Id> members = new ArrayList<Id>();
+				((HouseholdImpl) household).setMemberIds( members );
+				
+				for ( int coupleCount = 0; coupleCount < N_COUPLES_PER_HH; coupleCount++ ) {
+					/* driver scope */ {
+						final Person driver =
+							population.getFactory().createPerson(
+									personIdFactory.createNextId() );
+						((PersonImpl) driver).setCarAvail( "always" );
+						driver.addPlan(
+								createPlan(
+									random,
+									population.getFactory(),
+									"car",
+									driverWorkLinkId ) );
+						population.addPerson( driver );
+						members.add( driver.getId() );
+					}
 
-				/* passenger scope */ {
-					final Person passenger =
-						population.getFactory().createPerson(
-								personIdFactory.createNextId() );
-					((PersonImpl) passenger).setCarAvail( "never" );
-					passenger.addPlan(
-							createPlan(
-								random,
-								population.getFactory(),
-								"pt",
-								passengerWorkLinkId ) );
-					population.addPerson( passenger );
-					members.add( passenger.getId() );
+					/* passenger scope */ {
+						final Person passenger =
+							population.getFactory().createPerson(
+									personIdFactory.createNextId() );
+						((PersonImpl) passenger).setCarAvail( "never" );
+						passenger.addPlan(
+								createPlan(
+									random,
+									population.getFactory(),
+									"pt",
+									passengerWorkLinkId ) );
+						population.addPerson( passenger );
+						members.add( passenger.getId() );
+					}
 				}
 			}
 		}
@@ -315,6 +318,11 @@ public class GenerateScenarioForDetours {
 
 		for ( Link l : network.getLinks().values() ) {
 			l.setCapacity( LINK_CAPACITY );
+			l.setLength(
+					CoordUtils.calcDistance( 
+						l.getFromNode().getCoord(),
+						l.getToNode().getCoord() ) );
+			l.setFreespeed( FREESPEED );
 		}
 	}
 }
