@@ -59,7 +59,7 @@ import playground.thibautd.utils.UniqueIdFactory;
  */
 public class GenerateScenarioForDetours {
 	private static final int N_COUPLES_PER_HH = 5;
-	private static final int N_HH_PER_DEST = 50;
+	private static final int N_HH_PER_DEST = 10;
 	private static final int N_WORK = 1000;
 	private static final int LENGTH_DETOUR = 100;
 
