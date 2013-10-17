@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -101,6 +102,9 @@ import playground.thibautd.utils.GenericFactory;
  * @author thibautd
  */
 public class RunCliquesWithModularStrategies {
+	private static final Logger log =
+		Logger.getLogger(RunCliquesWithModularStrategies.class);
+
 	private static final boolean DO_STRATEGY_TRACE = false;
 	private static final boolean DO_SELECT_TRACE = false;
 	private static final boolean DO_SCORING_TRACE = false;
@@ -292,19 +296,24 @@ public class RunCliquesWithModularStrategies {
 						controllerRegistry,
 						strategyManager));
 
-
-		final FireMoneyEventsForUtilityOfBeingTogether socialScorer =
-				new FireMoneyEventsForUtilityOfBeingTogether(
-					controllerRegistry.getEvents(),
-					scoringFunctionConf.getActTypeFilterForJointScoring(),
-					scoringFunctionConf.getModeFilterForJointScoring(),
-					getPersonOverlapScorerFactory(
-						scoringFunctionConf,
-						scenario.getPopulation() ),
-					scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
-					toSocialNetwork( cliques ) );
-		controllerRegistry.getEvents().addHandler( socialScorer );
-		controller.addControlerListener( socialScorer );
+		if ( scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() > 0 ) {
+			log.info( "add scorer for being together" );
+			final FireMoneyEventsForUtilityOfBeingTogether socialScorer =
+					new FireMoneyEventsForUtilityOfBeingTogether(
+						controllerRegistry.getEvents(),
+						scoringFunctionConf.getActTypeFilterForJointScoring(),
+						scoringFunctionConf.getModeFilterForJointScoring(),
+						getPersonOverlapScorerFactory(
+							scoringFunctionConf,
+							scenario.getPopulation() ),
+						scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+						toSocialNetwork( cliques ) );
+			controllerRegistry.getEvents().addHandler( socialScorer );
+			controller.addControlerListener( socialScorer );
+		}
+		else {
+			log.info( "do NOT add scorer for being together" );
+		}
 
 		if (produceAnalysis) {
 			RunUtils.loadDefaultAnalysis(
