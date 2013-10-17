@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
@@ -57,6 +58,8 @@ import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -241,9 +244,11 @@ public class ControllerRegistryBuilder {
 	public ScoringFunctionFactory getScoringFunctionFactory() {
 		if ( scoringFunctionFactory == null ) {
 			this.scoringFunctionFactory =
-					new CharyparNagelScoringFunctionFactory(
-						scenario.getConfig().planCalcScore(),
-						scenario.getNetwork());
+					new CharyparNagelWithJointModesScoringFunctionFactory(
+							new StageActivityTypesImpl(
+								JointActingTypes.PICK_UP,
+								JointActingTypes.DROP_OFF ),
+							scenario);
 		}
 		return scoringFunctionFactory;
 	}
