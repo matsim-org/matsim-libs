@@ -95,7 +95,7 @@ public class CreatePopulation {
 
 
 		
-		PopulationFromSightings.preparePopulation(scenario, zones, allSightings);
+		PopulationFromSightings.preparePopulation(scenario, new CellularCoverageLinkToZoneResolver(zones, scenario.getNetwork()), allSightings);
 		
 
 		runStatistics();

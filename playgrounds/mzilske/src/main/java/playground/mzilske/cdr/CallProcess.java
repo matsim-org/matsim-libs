@@ -93,10 +93,6 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		call(event.getTime(), event.getPersonId());
-		Id cellId = zoneTracker.getZoneForPerson(event.getPersonId());
-		if (!cellId.equals(event.getLinkId())) {
-			throw new RuntimeException();
-		}
 	}
 
 	@Override

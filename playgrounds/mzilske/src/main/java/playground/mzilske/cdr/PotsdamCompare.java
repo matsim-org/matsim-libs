@@ -42,19 +42,15 @@ public class PotsdamCompare {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile("input/potsdam/network.xml");
 		final Network network = scenario.getNetwork();
-//		VolumesAnalyzer volumesAnalyzer1 = calculateVolumes(network, "output42/ITERS/it.10/10.events.xml.gz");
-//		VolumesAnalyzer volumesAnalyzer2 = calculateVolumes(network, "output37/ITERS/it.10/10.events.xml.gz");
-//		dumpVolumesCompare(network, volumesAnalyzer1, volumesAnalyzer2);
 
 		new MatsimPopulationReader(scenario).readFile("output-homogeneous-37/ITERS/it.0/0.plans.xml.gz");
 
-
-		
-
 		Map<Id, Id> initialPersonInZone = new HashMap<Id, Id>();
-		// LinkToZoneResolver linkToZoneResolver = new CellularCoverageLinkToZoneResolver(cellularCoverage, network);
 		
-		LinkToZoneResolver linkToZoneResolver = new LinkToZoneResolver() {
+
+		final Zones cellularCoverage = SyntheticCellTowerDistribution.naive(network);
+		
+		LinkToZoneResolver trivialLinkToZoneResolver = new LinkToZoneResolver() {
 
 			@Override
 			public Id resolveLinkToZone(Id linkId) {
@@ -67,13 +63,15 @@ public class PotsdamCompare {
 			
 		};
 		
+		// LinkToZoneResolver linkToZoneResolver = trivialLinkToZoneResolver;
+		LinkToZoneResolver linkToZoneResolver = new CellularCoverageLinkToZoneResolver(cellularCoverage, network);
+		
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Id linkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
 			System.out.println(linkId);
 			initialPersonInZone.put(p.getId(), linkToZoneResolver.resolveLinkToZone(linkId));
 		}
 
-		final Zones cellularCoverage = SyntheticCellTowerDistribution.naive(network);
 		EventsManager events = EventsUtils.createEventsManager();
 		CallProcessTicker ticker = new CallProcessTicker();
 		events.addHandler(ticker);
@@ -97,7 +95,7 @@ public class PotsdamCompare {
 
 		List<Sighting> sightings = callProcess.getSightings();
 
-		VolumesAnalyzer volumesAnalyzer2 = runSimulationFromSightings(linkToZoneResolver, cellularCoverage, sightings);
+		VolumesAnalyzer volumesAnalyzer2 = runSimulationFromSightings(linkToZoneResolver, linkToZoneResolver, sightings);
 		
 
 		dumpVolumesCompareAllDay(network, volumesAnalyzer1, volumesAnalyzer2);
@@ -139,7 +137,7 @@ public class PotsdamCompare {
 		System.out.println(Math.sqrt(squares));
 	}
 
-	public static VolumesAnalyzer runSimulationFromSightings(final LinkToZoneResolver linkToZoneResolver, Zones zones,
+	public static VolumesAnalyzer runSimulationFromSightings(final LinkToZoneResolver linkToZoneResolver, LinkToZoneResolver linkToZoneResolver2,
 			List<Sighting> sightings) throws FileNotFoundException {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
@@ -172,16 +170,13 @@ public class PotsdamCompare {
 
 			}
 			System.out.println(sighting.getCellTowerId().toString());
-//			CellTower cellTower = cellularCoverage.cellTowers.get(sighting.getCellTowerId().toString());
-//			cellTower.nSightings++;
+
 			sightingsOfPerson.add(sighting);
 		}
 
 
-		zones.buildCells();
-
 		PopulationFromSightings.readSampleWithOneRandomPointForEachSightingInNewCell(scenario2, linkToZoneResolver, allSightings);
-		PopulationFromSightings.preparePopulation(scenario2, zones, allSightings);
+		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver2, allSightings);
 
 		Controler controler = new Controler(scenario2);
 		controler.setOverwriteFiles(true);

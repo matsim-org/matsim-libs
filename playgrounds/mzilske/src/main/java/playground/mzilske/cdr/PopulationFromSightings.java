@@ -86,7 +86,7 @@ public class PopulationFromSightings {
 
 	
 	
-	public static void preparePopulation(final ScenarioImpl scenario, final Zones zones, final Map<Id, List<Sighting>> allSightings) {
+	public static void preparePopulation(final ScenarioImpl scenario, final LinkToZoneResolver linkToZoneResolver2, final Map<Id, List<Sighting>> allSightings) {
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new org.matsim.population.algorithms.XY2Links(scenario));
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithmProvider() {
 
@@ -120,11 +120,7 @@ public class PopulationFromSightings {
 						if (planElement instanceof Activity) {
 							Sighting sighting = sightingsForThisAgent.sightings.next();
 							ActivityImpl activity = (ActivityImpl) planElement;
-							activity.setLinkId(null);
-							Geometry cell = zones.getCell(sighting.getCellTowerId());
-							Point p = getRandomPointInFeature(rnd, cell);
-							Coord newCoord = new CoordImpl(p.getX(), p.getY());
-							activity.setCoord(newCoord);
+							activity.setLinkId(linkToZoneResolver2.chooseLinkInZone(sighting.getCellTowerId()));							
 						}
 					}
 				}
