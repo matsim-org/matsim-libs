@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.scoring;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,6 +47,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 
 	private final StageActivityTypes blackList;
 	private final CharyparNagelScoringParameters params;
+	private final Map<String, LegScoringParameters> parametersPerMode = new HashMap<String, LegScoringParameters>();
     private final Scenario scenario;
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -55,6 +59,41 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 		this.params = new CharyparNagelScoringParameters( scenario.getConfig().planCalcScore() );
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
+
+		// standard modes
+		parametersPerMode.put(
+					TransportMode.car,
+					LegScoringParameters.createForCar(
+						params ));
+		parametersPerMode.put(
+					TransportMode.pt,
+					LegScoringParameters.createForPt(
+						params ));
+		parametersPerMode.put(
+					TransportMode.walk,
+					LegScoringParameters.createForWalk(
+						params ));
+		parametersPerMode.put(
+					TransportMode.bike,
+					LegScoringParameters.createForBike(
+						params ));
+		parametersPerMode.put(
+					TransportMode.transit_walk,
+					LegScoringParameters.createForWalk(
+						params ));
+
+		// joint modes
+		parametersPerMode.put(
+					JointActingTypes.DRIVER,
+					LegScoringParameters.createForCar(
+						params ));
+		parametersPerMode.put(
+					JointActingTypes.PASSENGER,
+					new LegScoringParameters(
+						params.constantCar,
+						params.marginalUtilityOfTraveling_s,
+						// passenger doesn't pay gasoline
+						0 ));
 	}
 
 	@Override
@@ -67,54 +106,13 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 					new CharyparNagelActivityScoring(
 						params ) ) );
 
-		// standard modes
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					TransportMode.car,
-					LegScoringParameters.createForCar(
-						params ),
-					scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					TransportMode.pt,
-					LegScoringParameters.createForPt(
-						params ),
-					scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					TransportMode.walk,
-					LegScoringParameters.createForWalk(
-						params ),
-					scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					TransportMode.bike,
-					LegScoringParameters.createForBike(
-						params ),
-					scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					TransportMode.transit_walk,
-					LegScoringParameters.createForWalk(
-						params ),
-					scenario.getNetwork()));
-
-		// joint modes
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					JointActingTypes.DRIVER,
-					LegScoringParameters.createForCar(
-						params ),
-					scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					JointActingTypes.PASSENGER,
-					new LegScoringParameters(
-						params.constantCar,
-						params.marginalUtilityOfTraveling_s,
-						// passenger doesn't pay gasoline
-						0 ),
-					scenario.getNetwork()));
+		for ( Map.Entry<String, LegScoringParameters> entry : parametersPerMode.entrySet() ) {
+			scoringFunctionAccumulator.addScoringFunction(
+					new ElementalCharyparNagelLegScoringFunction(
+						entry.getKey(),
+						entry.getValue(),
+						scenario.getNetwork()));
+		}
 
 		// other standard stuff
 		scoringFunctionAccumulator.addScoringFunction(
