@@ -114,6 +114,16 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		if (this.calculateLinkTravelTimes){
 			this.linkData = new ConcurrentHashMap<Id, DataContainer>((int) (network.getLinks().size() * 1.4));
 
+			/*
+			 * So far, link data objects were stored in a HashMap. This lookup strategy is used
+			 * by a MapBasedDataContainerProvider.
+			 * When ArrayRoutingNetworks are used (as the FastRouter implementations do), the
+			 * getArrayIndex() methods from the RoutingLinks can be used to lookup the link
+			 * data objects in an array. This approach is implemented by the ArrayBasedDataContainerProvider.
+			 * Using a ArrayBasedDataContainerProvider instead of a MapBasedDataContainerProvider
+			 * increases the routing performance by 20-30%.
+			 * cdobler, oct'13
+			 */
 	//		this.dataContainerProvider = new MapBasedDataContainerProvider(linkData, ttDataFactory);
 			this.dataContainerProvider = new ArrayBasedDataContainerProvider(linkData, ttDataFactory, network);
 		} else this.dataContainerProvider = null;
