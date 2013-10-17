@@ -40,7 +40,7 @@ public class TollHandler implements MarginalCongestionEventHandler {
 	private static final Logger log = Logger.getLogger(TollHandler.class);
 	private double timeBinSize = 900.;
 	
-	private List<TollInfo> tollInfos = new ArrayList<TollInfo>();
+	private List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 	private List<Id> linkIds = new ArrayList<Id>();
 	private Map<Id, Map<Double, Double>> linkId2timeBin2avgToll = new HashMap<Id, Map<Double, Double>>();
 	private double vtts_car;
@@ -53,20 +53,15 @@ public class TollHandler implements MarginalCongestionEventHandler {
 	@Override
 	public void reset(int iteration) {
 		log.info("-----> Iteration (" + iteration + ") begins. Clear all informations of the previous iteration (" + (iteration-1) + ").");
-		this.tollInfos.clear();
+		this.congestionEvents.clear();
 		this.linkId2timeBin2avgToll.clear();
 		this.linkIds.clear();
 	}
 
 	@Override
 	public void handleEvent(MarginalCongestionEvent event) {
-				
-		TollInfo tollInfo = new TollInfo();
-		double amount = event.getDelay() / 3600 * this.vtts_car;
-		tollInfo.setAmount(amount);
-		tollInfo.setTime(event.getTime());
-		tollInfo.setLinkId(event.getLinkId());
-		this.tollInfos.add(tollInfo);
+						
+		this.congestionEvents.add(event);
 		
 		if (!linkIds.contains(event.getLinkId())){
 			linkIds.add(event.getLinkId());
@@ -80,30 +75,44 @@ public class TollHandler implements MarginalCongestionEventHandler {
 			for (double time = 0; time < (30 * 3600); ){
 				time = time + this.timeBinSize;
 				
-				List<Double> amounts = new ArrayList<Double>();
-				for (TollInfo tollInfo : this.tollInfos){
-					
-					if (tollInfo.getLinkId().toString().equals(linkId.toString())){
+				Map<Id, List<Double>> personId2amounts = new HashMap<Id, List<Double>>();
 
-						if (tollInfo.getTime() < time && tollInfo.getTime() >= (time - this.timeBinSize)){
-							amounts.add(tollInfo.getAmount());
+				for (MarginalCongestionEvent congestionEvent : this.congestionEvents){
+					
+					if (congestionEvent.getLinkId().toString().equals(linkId.toString())){
+						// congestionEvent on link
+												
+						if (congestionEvent.getTime() < time && congestionEvent.getTime() >= (time - this.timeBinSize)){
+							// congestionEvent in time bin
+							
+							double amount = congestionEvent.getDelay() / 3600 * this.vtts_car;
+							
+							if (personId2amounts.containsKey(congestionEvent.getCausingAgentId())){
+								personId2amounts.get(congestionEvent.getCausingAgentId()).add(amount);
+							} else {
+								List<Double> amounts = new ArrayList<Double>();
+								amounts.add(amount);
+								personId2amounts.put(congestionEvent.getCausingAgentId(), amounts);
+							}
 						}
 					}
 				}
 				
-				double sum = 0;
-				double n = 0;
-				for (Double amount : amounts) {
-					sum = sum + amount;
-					n++;
+				// sum up all amounts for each person (in this time bin on this link)
+				double totalToll = 0;
+				double causingAgents = 0;
+				for (Id personId : personId2amounts.keySet()) {
+					for (Double amount : personId2amounts.get(personId)) {
+						totalToll = totalToll + amount;
+					}
+					causingAgents++;
 				}
-				double avgToll = sum / n;
+				double avgToll = totalToll / causingAgents;
 				timeBin2avgToll.put(time, avgToll);
 			}
 			this.linkId2timeBin2avgToll.put(linkId, timeBin2avgToll);
 		}
-		log.info(this.linkId2timeBin2avgToll.toString());
-		
+		log.info(this.linkId2timeBin2avgToll.toString());	
 	}
 
 	/**
