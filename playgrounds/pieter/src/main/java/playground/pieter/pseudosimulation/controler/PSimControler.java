@@ -16,7 +16,7 @@ import playground.pieter.pseudosimulation.controler.listeners.AfterScoringSelect
 import playground.pieter.pseudosimulation.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosimulation.controler.listeners.QSimScoreWriter;
-import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyRegistrar;
+import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslationAndRegistration;
 import playground.pieter.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
@@ -49,7 +49,7 @@ public class PSimControler {
 	private WaitTimeStuckCalculator waitTimeCalculator;
 	private StopStopTimeCalculator stopStopTimeCalculator;
 	private PSimTravelTimeCalculator carTravelTimeCalculator;
-	private PSimPlanStrategyRegistrar psimStrategies;
+	private PSimPlanStrategyTranslationAndRegistration psimStrategies;
 
 
 
@@ -57,7 +57,7 @@ public class PSimControler {
 	public PSimControler(String[] args) {
 		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		
-		this.psimStrategies = new PSimPlanStrategyRegistrar(this);
+		this.psimStrategies = new PSimPlanStrategyTranslationAndRegistration(this);
 		//substitute qualifying plan strategies with their PSim equivalents
 		this.substituteStrategies();
 		matsimControler.addControlerListener(new MobSimSwitcher(this));

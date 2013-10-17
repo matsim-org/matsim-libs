@@ -63,11 +63,11 @@ import org.matsim.core.controler.PlanStrategyRegistrar;
  * 
  * 
  */
-public class PSimPlanStrategyRegistrar {
+public class PSimPlanStrategyTranslationAndRegistration {
 
 	private ArrayList<String> compatibleStrategies = new ArrayList<String>();
 
-	public PSimPlanStrategyRegistrar(PSimControler controler) {
+	public PSimPlanStrategyTranslationAndRegistration(PSimControler controler) {
 		String strategyName = PlanStrategyRegistrar.Selector.BestScore
 				.toString();
 		compatibleStrategies.add(strategyName);

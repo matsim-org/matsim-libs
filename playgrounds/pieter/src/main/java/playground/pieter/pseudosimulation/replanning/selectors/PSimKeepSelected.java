@@ -24,11 +24,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.KeepSelected;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
-import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyRegistrar;
+import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslationAndRegistration;
 
 /**
  * @author fouriep
- * Plan selector for PSim. See {@link PSimPlanStrategyRegistrar}.
+ * Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}.
  */
 public class PSimKeepSelected extends KeepSelected {
 	@Override

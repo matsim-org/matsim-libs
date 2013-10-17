@@ -25,10 +25,10 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
-import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyRegistrar;
+import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslationAndRegistration;
 
 /**
- * @author fouriep Plan selector for PSim. See {@link PSimPlanStrategyRegistrar}
+ * @author fouriep Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}
  *         .
  */
 public class PSimExpBetaPlanSelector extends ExpBetaPlanSelector {
