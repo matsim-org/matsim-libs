@@ -108,6 +108,8 @@ public class GenerateScenarioForDetours {
 		config.scenario().setUseHouseholds( true );
 		config.households().setInputFile( outputHouseholds );
 
+		config.qsim().setEndTime( 30 * 3600 );
+
 		/* scope of work params */ {
 			final ActivityParams params = new ActivityParams( "work" );
 			params.setTypicalDuration( 9 * 3600 );
