@@ -237,6 +237,15 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * Allow replacing the RouterPriorityQueue.
 	 */
 	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		/*
+		 * The (Wrapped)BinaryMinHeap replaces the PseudoRemovePriorityQueue as default
+		 * PriorityQueue. It offers a decreaseKey method and uses less memory. As a result,
+		 * the routing performance is increased by ~20%.
+		 * 
+		 * When an ArrayRoutingNetwork is used, an BinaryMinHeap can be used which uses
+		 * the getArrayIndex() method of the ArrayRoutingNetworkNodes which further reduces
+		 * the memory consumption and increases the performance by another ~10%.
+		 */
 		return new WrappedBinaryMinHeap<Node>(this.network.getNodes().size());
 	}
 	
@@ -460,10 +469,6 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
 		pendingNodes.decreaseKey(n, getPriority(data));
-//		pendingNodes.remove(n);
-//
-//		data.visit(outLink, cost, time, getIterationId());
-//		pendingNodes.add(n, getPriority(data));
 	}
 
 	/**
