@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.SortedSet;
@@ -47,6 +48,10 @@ public class StageActivityTypesImpl implements StageActivityTypes {
 	 */
 	public StageActivityTypesImpl(final Collection<String> types) {
 		this.types.addAll( types );
+	}
+
+	public StageActivityTypesImpl( final String... types ) {
+		this( Arrays.asList( types ) );
 	}
 
 	@Override
