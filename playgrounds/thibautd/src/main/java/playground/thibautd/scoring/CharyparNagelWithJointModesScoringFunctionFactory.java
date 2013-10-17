@@ -19,18 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.scoring;
 
-import java.util.Collection;
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
@@ -39,8 +31,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.ivt.kticompatibility.KtiActivityScoring;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.scoring.BlackListedActivityScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
