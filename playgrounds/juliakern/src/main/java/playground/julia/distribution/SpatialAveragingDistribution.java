@@ -41,11 +41,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -86,6 +90,8 @@ public class SpatialAveragingDistribution {
 	private final String emissionFile2 = runDirectory1 + "compcase.sample.emission.events.xml";
 	String plansFile1 = runDirectory1+"basecase.sample.plans.xml";
 	String plansFile2 = runDirectory1+"compcase.sample.plans.xml";
+	String eventsFile1 = runDirectory1+"basecase.sample.events.xml";
+	String eventsFile2 = runDirectory1+"compcase.sample.events.xml";
 	
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
@@ -103,16 +109,20 @@ public class SpatialAveragingDistribution {
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 
-	final int noOfTimeBins = 5; // one bin for each hour //TODO 30? sim endtime ist 30...
+	final int noOfTimeBins = 1; // one bin for each hour //TODO 30? sim endtime ist 30...
 	double timeBinSize;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.;
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
-	final boolean compareToBaseCase = false;
+	final boolean compareToBaseCase = true;
 
 	private boolean createPersonalExposurePlans = true;
+
+	private boolean simpleExposureOnLegs = false;
+
+	private String car = "car";
 	
 //	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_g = new HashMap<Double, Map<Id,Map<String,Double>>>();
 //	Map<Double, Map<Id, Double>> time2DemandMapToAnalyze_vkm = new HashMap<Double, Map<Id,Double>>();
@@ -136,7 +146,7 @@ public class SpatialAveragingDistribution {
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal1 = sumUpEmissionsPerTimeInterval(time2WarmEmissionsTotal1, time2ColdEmissionsTotal1);
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled1 = setNonCalculatedEmissions(time2EmissionsTotal1);
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1 = filterEmissionLinks(time2EmissionsTotalFilled1);
-
+		
 		this.warmHandler.reset(0);
 		this.coldHandler.reset(0);
 
@@ -148,7 +158,63 @@ public class SpatialAveragingDistribution {
 		
 		Population pop = scenario.getPopulation();	
 		Map<Id, Double> person2emission = calculatePersonalConcentration(time2WeightedEmissions1,pop);
+		ExposureUtils exut = new ExposureUtils();
 		
+		
+		if(createPersonalExposurePlans){
+			List<PersonalExposure> popExposure = new LinkedList<PersonalExposure>();
+			for(Id personId: pop.getPersons().keySet()){
+				PersonalExposure perEx = new PersonalExposure(personId);
+				popExposure.add(perEx);
+				
+				for(PlanElement pe: pop.getPersons().get(personId).getSelectedPlan().getPlanElements()){
+					if(pe instanceof Activity){
+						handleActivityPlanElement(time2WeightedEmissions1, perEx,pe); // add entry for each activity to personal timetables
+					}
+					if(pe instanceof Leg){
+						Leg pel = (Leg)pe;
+						String actType = pel.getMode();
+						Double poll;
+						if(actType!=car){ // use simple exposure model
+							poll = getExposureFromLeg(time2WeightedEmissions1, pel);
+							perEx.addExposureIntervall(pel.getDepartureTime(), pel.getDepartureTime()+pel.getTravelTime(), poll, actType);
+						}else{ // =car
+							if(simpleExposureOnLegs){
+								poll= getExposureFromLeg(time2WeightedEmissions1, pel);
+								perEx.addExposureIntervall(pel.getDepartureTime(), pel.getDepartureTime()+pel.getTravelTime(), poll, actType);
+							}else{ // exposure for each link 
+								// generated from events - nothing to do here
+							}
+						}	
+					}	
+				}				
+			}
+
+			
+			if(!simpleExposureOnLegs){
+				// add exposure for 'car'
+				
+				EventsManager eventsManager = EventsUtils.createEventsManager();
+				
+				CarIntervalHandler carIntervalHandler = new CarIntervalHandler();
+				eventsManager.addHandler(carIntervalHandler);
+				
+				MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+				matsimEventsReader.readFile(eventsFile1);
+				
+				carIntervalHandler.addIntervalsToTimetables(popExposure, time2EmissionsTotalFilledAndFiltered1, timeBinSize, pollutant2analyze, pollutionFactorOutdoor);
+				
+			}
+			
+
+			logger.info("Calculated time tables of personal exposure.");
+			
+			String outPathForTimeTables = runDirectory1 + "numberofIntervals"+ noOfTimeBins + "outputTimeTables.txt";
+			if(!simpleExposureOnLegs)outPathForTimeTables = runDirectory1 + "numberofIntervals"+ noOfTimeBins + "detailedLegExposure" + "outputTimeTables.txt";
+			exut.printTimeTables(popExposure, outPathForTimeTables);
+			
+			logger.info("Done calculating personal time dependent exposure. Results written to " + outPathForTimeTables);
+		}
 		
 		if(compareToBaseCase){
 			processEmissions(emissionFile2);
@@ -168,80 +234,120 @@ public class SpatialAveragingDistribution {
 			
 			logger.info("Average difference " + calculateAvgDifference(person2emission, person2emission2));
 			
+			if(createPersonalExposurePlans){
+				
+				Scenario scenario2 = loadScenario2(netFile1);
+				this.network = scenario2.getNetwork();
+				Population pop2 = scenario2.getPopulation();
+				//---------
+
+				List<PersonalExposure> popExposure2 = new LinkedList<PersonalExposure>();
+				for(Id personId: pop2.getPersons().keySet()){
+					PersonalExposure perEx = new PersonalExposure(personId);
+					popExposure2.add(perEx);
+					
+					for(PlanElement pe: pop2.getPersons().get(personId).getSelectedPlan().getPlanElements()){
+						if(pe instanceof Activity){
+							handleActivityPlanElement(time2WeightedEmissions1, perEx,pe); // add entry for each activity to personal timetables
+						}
+						if(pe instanceof Leg){
+							Leg pel = (Leg)pe;
+							String actType = pel.getMode();
+							Double poll;
+							if(actType!=car){ // use simple exposure model
+								poll = getExposureFromLeg(time2WeightedEmissions1, pel);
+								perEx.addExposureIntervall(pel.getDepartureTime(), pel.getDepartureTime()+pel.getTravelTime(), poll, actType);
+							}else{ // =car
+								if(simpleExposureOnLegs){
+									poll= getExposureFromLeg(time2WeightedEmissions1, pel);
+									perEx.addExposureIntervall(pel.getDepartureTime(), pel.getDepartureTime()+pel.getTravelTime(), poll, actType);
+								}else{ // exposure for each link 
+									// generated from events - nothing to do here
+								}
+							}	
+						}	
+					}				
+				}
+
+				
+				if(!simpleExposureOnLegs){
+					// add exposure for 'car'
+					
+					EventsManager eventsManager = EventsUtils.createEventsManager();
+					
+					CarIntervalHandler carIntervalHandler = new CarIntervalHandler();
+					eventsManager.addHandler(carIntervalHandler);
+					
+					MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+					matsimEventsReader.readFile(eventsFile1);
+					
+					carIntervalHandler.addIntervalsToTimetables(popExposure2, time2EmissionsTotalFilledAndFiltered1, timeBinSize, pollutant2analyze, pollutionFactorOutdoor);
+					
+				}
+				
+
+				logger.info("Calculated time tables of personal exposure.");
+				
+				String outPathForTimeTables = runDirectory1 + "numberofIntervals"+ noOfTimeBins + "outputTimeTables_compareCase.txt";
+				if(!simpleExposureOnLegs)outPathForTimeTables = runDirectory1 + "numberofIntervals"+ noOfTimeBins + "detailedLegExposure" + "outputTimeTables_compareCase.txt";
+				exut.printTimeTables(popExposure2, outPathForTimeTables);
+				
+				logger.info("Done calculating personal time dependent exposure. Results written to " + outPathForTimeTables);
+			
+				//------------
+				
+			}
 		}
 		
-		if(createPersonalExposurePlans){
-			List<PersonalExposure> popExposure = new LinkedList<PersonalExposure>();
-			for(Id personId: pop.getPersons().keySet()){
-				PersonalExposure perEx = new PersonalExposure(personId);
-				popExposure.add(perEx);
-				for(PlanElement pe: pop.getPersons().get(personId).getSelectedPlan().getPlanElements()){
-					if(pe instanceof Activity){
-						Activity pea = (Activity)pe;
-						String actType = pea.getType();
-						// number of time bins matching activity time
-						int firstTimeBin = (int) Math.ceil(pea.getStartTime()/timeBinSize);
-						if(firstTimeBin==0)firstTimeBin=1;
-						int lastTimeBin;
-						if(pea.getEndTime()>0.0){
-							lastTimeBin = (int) Math.ceil(pea.getEndTime()/timeBinSize);
-						}else{
-							lastTimeBin = (int) Math.ceil(simulationEndTime/timeBinSize);
-						}
-						
-						if (firstTimeBin<lastTimeBin) {
-							//first bin
-							Double firstStartTime = pea.getStartTime();
-							Double firstEndTime = firstTimeBin * timeBinSize;
-							Double firstpoll = getExposureFromActivity(time2WeightedEmissions1, pea, firstEndTime);
-							perEx.addExposureIntervall(firstStartTime, firstEndTime, firstpoll, actType);
-							
-							// inner time bins
-							for (int i = firstTimeBin + 1; i < lastTimeBin; i++) {
-								Double currStartTime = i * timeBinSize;
-								Double currEndTime = (i + 1) * timeBinSize;
-								Double poll = getExposureFromActivity(time2WeightedEmissions1, pe, currEndTime);
-								perEx.addExposureIntervall(currStartTime,currEndTime, poll, actType);
-							}
-							
-							// last bin
-							Double lastStartTime = (lastTimeBin-1) * timeBinSize;
-							Double lastEndTime = pea.getEndTime();
-							if(lastEndTime<0.0)lastEndTime=simulationEndTime;
-							Double lastpoll = getExposureFromActivity(time2WeightedEmissions1, pea, lastTimeBin*timeBinSize);
-							perEx.addExposureIntervall(lastStartTime, lastEndTime, lastpoll, actType);
-							
-						}else{ // activity entirely in one interval
-							
-							Double startTime = pea.getStartTime();
-							Double endTime = pea.getEndTime();
-							if(endTime<0.0)endTime=simulationEndTime;
-							Double poll = getExposureFromActivity(time2WeightedEmissions1, pea, lastTimeBin*timeBinSize);
-							perEx.addExposureIntervall(startTime, endTime, poll, actType);
-						}
-						
-						
-						
-					}
-					if(pe instanceof Leg){
-						Double poll = getExposureFromLeg(time2WeightedEmissions1, pe);
-						Leg pel = (Leg)pe;
-						String actType = pel.getMode();
-						perEx.addExposureIntervall(pel.getDepartureTime(), pel.getDepartureTime()+pel.getTravelTime(), poll, actType);
-					}
-				}
+		
+	}
+
+	private void handleActivityPlanElement(
+			Map<Double, double[][]> time2WeightedEmissions1,
+			PersonalExposure perEx, PlanElement pe) {
+		
+			Activity pea = (Activity)pe;
+			String actType = pea.getType();
+			// number of time bins matching activity time
+			int firstTimeBin = (int) Math.ceil(pea.getStartTime()/timeBinSize);
+			if(firstTimeBin==0)firstTimeBin=1;
+			int lastTimeBin;
+			if(pea.getEndTime()>0.0){
+				lastTimeBin = (int) Math.ceil(pea.getEndTime()/timeBinSize);
+			}else{
+				lastTimeBin = (int) Math.ceil(simulationEndTime/timeBinSize);
 			}
 			
-			logger.info("Calculated time tables of personal exposure.");
-			
-			ExposureUtils exut = new ExposureUtils();
-			String outPathForTimeTables = runDirectory1 + "numberofIntervals"+ noOfTimeBins + "outputTimeTables.txt";
-			exut.printTimeTables(popExposure, outPathForTimeTables);
-			
-			logger.info("Done calculating personal time dependent exposure. Results written to " + outPathForTimeTables);
-		}
-		
-		
+			if (firstTimeBin<lastTimeBin) {
+				//first bin
+				Double firstStartTime = pea.getStartTime();
+				Double firstEndTime = firstTimeBin * timeBinSize;
+				Double firstpoll = getExposureFromActivity(time2WeightedEmissions1, pea, firstEndTime);
+				perEx.addExposureIntervall(firstStartTime, firstEndTime, firstpoll, actType);
+				
+				// inner time bins
+				for (int i = firstTimeBin + 1; i < lastTimeBin; i++) {
+					Double currStartTime = i * timeBinSize;
+					Double currEndTime = (i + 1) * timeBinSize;
+					Double poll = getExposureFromActivity(time2WeightedEmissions1, pe, currEndTime);
+					perEx.addExposureIntervall(currStartTime,currEndTime, poll, actType);
+				}
+				
+				// last bin
+				Double lastStartTime = (lastTimeBin-1) * timeBinSize;
+				Double lastEndTime = pea.getEndTime();
+				if(lastEndTime<0.0)lastEndTime=simulationEndTime;
+				Double lastpoll = getExposureFromActivity(time2WeightedEmissions1, pea, lastTimeBin*timeBinSize);
+				perEx.addExposureIntervall(lastStartTime, lastEndTime, lastpoll, actType);
+				
+			}else{ // activity entirely in one interval
+				
+				Double startTime = pea.getStartTime();
+				Double endTime = pea.getEndTime();
+				if(endTime<0.0)endTime=simulationEndTime;
+				Double poll = getExposureFromActivity(time2WeightedEmissions1, pea, lastTimeBin*timeBinSize);
+				perEx.addExposureIntervall(startTime, endTime, poll, actType);
+			}
 	}
 
 	private Double calculateAvgDifference(Map<Id, Double> person2emission,
@@ -274,7 +380,8 @@ public class SpatialAveragingDistribution {
 					person2emission.put(personId, oldvalue+poll);
 				}
 				if(pe instanceof Leg){
-					Double poll = getExposureFromLeg(time2WeightedEmissions, pe);
+					Leg pel = (Leg)pe;
+					Double poll = getExposureFromLeg(time2WeightedEmissions, pel);
 					Double oldvalue = person2emission.get(personId);
 					person2emission.put(personId, oldvalue+poll);
 					
@@ -287,8 +394,7 @@ public class SpatialAveragingDistribution {
 	}
 
 	private Double getExposureFromLeg(
-			Map<Double, double[][]> time2WeightedEmissions, PlanElement pe) {
-		Leg currentLeg = (Leg)pe;
+			Map<Double, double[][]> time2WeightedEmissions, Leg currentLeg) {
 		Double travelTime = currentLeg.getTravelTime();
 		Double currentTimeBin = Math.ceil(currentLeg.getDepartureTime()/timeBinSize)*timeBinSize;
 		if(currentTimeBin<timeBinSize)currentTimeBin=timeBinSize;
@@ -568,6 +674,14 @@ public class SpatialAveragingDistribution {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(plansFile1);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
+	}
+	
+	private Scenario loadScenario2(String netFile) {
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(netFile);
+		config.plans().setInputFile(plansFile2);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
 	}

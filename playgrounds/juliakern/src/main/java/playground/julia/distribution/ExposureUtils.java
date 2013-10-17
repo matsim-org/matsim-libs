@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 
 public class ExposureUtils {
 
@@ -41,4 +44,6 @@ public class ExposureUtils {
 			System.err.println("Error creating " + outPathForTimeTables + ".");
 		}
 	}
+
+
 }
