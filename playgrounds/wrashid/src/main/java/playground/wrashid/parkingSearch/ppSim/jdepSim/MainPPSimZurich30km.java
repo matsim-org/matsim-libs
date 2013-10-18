@@ -39,6 +39,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.GarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.IllegalParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
@@ -55,19 +56,30 @@ public class MainPPSimZurich30km {
 	public static void main(String[] args) {
 		// Todo change these three paths and try run.
 
-		//String plansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1000802.xml";
+		// String plansFile =
+		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1000802.xml";
+
+		//String plansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1472928.xml";
+
+		// String plansFile =
+		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
+		
+		//String plansFile =
+		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pct_plans_30km.xml.gz";
+
 		 String plansFile =
-		 "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
-		// String plansFile =
-		//	 "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pct_plans_30km.xml.gz";
-		 
-		// String plansFile =
-		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/10pct_plans_30km.xml.gz";
+		 "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/10pct_plans_30km.xml.gz";
 		String networkFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz";
 		String facilititiesPath = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_facilities.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 
 		addParkingActivityAndWalkLegToPlans(scenario.getPopulation().getPersons().values());
+
+		// this is introduced to quickly avoid problems with current implemenation
+		// regarding departure and arrival of car on same link
+		// could be solve/updated in future.
+		replaceShortCarLegsByWalkLegs(scenario);
+		
 
 		String outputFolder = "C:/data/parkingSearch/psim/zurich/output/";
 
@@ -79,13 +91,17 @@ public class MainPPSimZurich30km {
 		LinkedList<AgentWithParking> agentsMessage = new LinkedList<AgentWithParking>();
 
 		LinkedList<ParkingSearchStrategy> allStrategies = new LinkedList<ParkingSearchStrategy>();
-		allStrategies.add(new RandomSearch(300.0));
-		allStrategies.add(new GarageParkingSearch());
-		allStrategies.add(new IllegalParking());
+		allStrategies.add(new RandomSearch(300.0, scenario.getNetwork()));
+		allStrategies.add(new RandomSearch(500.0, scenario.getNetwork()));
+		// allStrategies.add(new GarageParkingSearch());
+		// allStrategies.add(new IllegalParking());
 
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
+		EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork());
 		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork(), Message.ttMatrix);
 
+		// TODO: we need to do that probably also inside loop below at start of
+		// each iteration
 		AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
 
 		// TODO: load parking infrastructure files from:
@@ -138,6 +154,41 @@ public class MainPPSimZurich30km {
 
 		}
 
+	}
+
+	private static void replaceShortCarLegsByWalkLegs(Scenario scenario) {
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			Plan selectedPlan = p.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+			int i = 0;
+			while (i < planElements.size()) {
+				if (planElements.get(i) instanceof LegImpl) {
+					Activity prevAct = (Activity) planElements.get(i - 1);
+					Leg leg = (Leg) planElements.get(i);
+					Activity nextAct = (Activity) planElements.get(i + 1);
+					
+					if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+						
+						if (prevAct.getLinkId().toString().equalsIgnoreCase(nextAct.getLinkId().toString())){
+							double walkDistance = GeneralLib.getDistance(prevAct.getCoord(),nextAct.getCoord());
+						//if (walkDistance<300){
+							// TODO: improve this later (no straight line)
+							double walkSpeed=3.0 / 3.6;
+							double walkDuration=walkDistance / walkSpeed;
+							
+							LegImpl walkLeg = new LegImpl(TransportMode.walk);
+							walkLeg.setTravelTime(walkDuration);
+							planElements.remove(i);
+							planElements.add(i,walkLeg);
+						//}
+						}
+					}
+				}
+				
+				i++;
+			}
+		}
 	}
 
 	private static boolean writeOutput(int writeEachNthIteration, int skipOutputInIteration, int iter) {

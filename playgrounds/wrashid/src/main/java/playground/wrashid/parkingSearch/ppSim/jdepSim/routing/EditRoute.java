@@ -43,6 +43,7 @@ import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 
 public class EditRoute {
 
+	public static EditRoute globalEditRoute;
 	Network network;
 	private LeastCostPathCalculator routingAlgo;
 	

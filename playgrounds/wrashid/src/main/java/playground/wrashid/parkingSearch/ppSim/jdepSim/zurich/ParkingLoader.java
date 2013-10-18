@@ -133,6 +133,10 @@ public class ParkingLoader {
 			if (parking.getId().toString().contains("stp-")) {
 				streetParking.add(parking.getId());
 			}
+			
+			if (parking.getId().toString().contains("publicPOutsideCityZH")) {
+				streetParking.add(parking.getId());
+			}
 
 			if (parking.getId().toString().contains("gp-")) {
 				garageParking.add(parking.getId());

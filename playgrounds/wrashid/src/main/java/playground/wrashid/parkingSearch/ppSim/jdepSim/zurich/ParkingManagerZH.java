@@ -262,6 +262,10 @@ public class ParkingManagerZH {
 	}
 
 	public void parkVehicle(Id agentId, Id parkingId){
+		if (agentId==null || parkingId==null){
+			DebugLib.stopSystemAndReportInconsistency("null adding not allowed");
+		}
+		
 		agentVehicleIdParkingIdMapping.put(agentId, parkingId);
 		parkVehicle(parkingId);
 	}
@@ -286,6 +290,11 @@ public class ParkingManagerZH {
 
 	public void unParkAgentVehicle(Id agentId){
 		Id parkingId = agentVehicleIdParkingIdMapping.remove(agentId);
+		
+		if (parkingId==null){
+			DebugLib.stopSystemAndReportInconsistency("parkingId missing");
+		}
+		
 		unParkVehicle(parkingId);
 	}
 	
@@ -330,7 +339,7 @@ public class ParkingManagerZH {
 			return facilityId;
 		}
 	}
-	
+	/*
 	public Parking getClosestFreeParking(Coord coord) {
 		LinkedList<Parking> tmpList=new LinkedList<Parking>();
 		Parking parking=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
@@ -346,7 +355,7 @@ public class ParkingManagerZH {
 		
 		return  parkingsHashMap.get(parking.getId());
 	}
-	
+	*/
 	public Id getClosestFreeParkingFacilityNotOnLink(Coord coord, Id linkId){
 		LinkedList<Parking> tmpList=new LinkedList<Parking>();
 		Parking parkingFacility=nonFullPublicParkingFacilities.get(coord.getX(), coord.getY());
@@ -490,12 +499,20 @@ public class ParkingManagerZH {
 							ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i-3);
 							ActivityImpl prevParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i-1);
 							ActivityImpl nextParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i+1);
+							ActivityImpl nextNonParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i+3);
+							
+							DebugLib.traceAgent(person.getId());
 							
 							Id parkingId= getFreePrivateParking(act.getFacilityId(),act.getType());
 							
 							if (parkingId==null){
 								parkingId = getClosestFreeParkingFacilityId(act.getLinkId());
 							}
+							
+							if (getLinkOfParking(parkingId).toString().equalsIgnoreCase(nextNonParkingAct.getLinkId().toString())){
+								parkingId = getClosestParkingFacilityNotOnLink(network.getLinks().get(act.getLinkId()).getCoord(), nextNonParkingAct.getLinkId());
+							}
+								
 							parkVehicle(person.getId(), parkingId);
 						
 							prevParkingAct.setLinkId(getLinkOfParking(parkingId));

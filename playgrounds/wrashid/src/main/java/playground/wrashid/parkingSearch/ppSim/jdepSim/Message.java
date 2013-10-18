@@ -11,7 +11,7 @@ public abstract class Message implements Comparable<Message> {
 	int priority;
 	static MessageQueue messageQueue;
 	private Person person;
-	static EventsManager eventsManager;
+	public static EventsManager eventsManager;
 	static TTMatrix ttMatrix;
 	
 	
