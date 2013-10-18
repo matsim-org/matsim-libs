@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -49,9 +50,10 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 
-public class RandomSearch implements ParkingSearchStrategy{
+public class RandomParkingSearch implements ParkingSearchStrategy{
 	
-	
+	protected DoubleValueHashMap<Id> startSearchTime=new DoubleValueHashMap<Id>();
+	protected String parkingType ;
 	private double maxDistance;
 	private Network network;
 	private Random random;
@@ -62,7 +64,7 @@ public class RandomSearch implements ParkingSearchStrategy{
 	// go to final link if no parking there, then try parking at other places.
 	// accept only parking within 300m, choose random links, but if leave 300m area, try
 	// to take direction leading back to destination
-	public RandomSearch (double maxDistance, Network network){
+	public RandomParkingSearch (double maxDistance, Network network){
 		this.maxDistance = maxDistance;
 		this.network = network;
 		this.random = MatsimRandom.getLocalInstance();
@@ -82,6 +84,10 @@ public class RandomSearch implements ParkingSearchStrategy{
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex()+1);
 	
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+			Id personId = aem.getPerson().getId();
+			if (!startSearchTime.containsKey(personId)){
+				startSearchTime.put(personId, aem.getMessageArrivalTime());
+			}
 			
 			List<Id> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
 			LinkNetworkRouteImpl route= (LinkNetworkRouteImpl)leg.getRoute();
@@ -89,23 +95,17 @@ public class RandomSearch implements ParkingSearchStrategy{
 			boolean endOfLegReached = aem.getCurrentLinkIndex()==linkIds.size()-1;
 			
 			if (endOfLegReached){
-				DebugLib.traceAgent(aem.getPerson().getId());
-				Id parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), "streetParking");
+				DebugLib.traceAgent(personId);
+				Id parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), parkingType);
 				ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex()+3);
 				
-				// avoid temporary problem with car leave and next planned parking on same link
-				// TODO: resolve in future implementation
-				boolean invalidLink=false;
-				int nextCarLegIndex = aem.duringCarLeg_getPlanElementIndexOfNextCarLeg();
-				if (nextCarLegIndex!=-1){
-					ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(nextCarLegIndex+3);
-					invalidLink=route.getEndLinkId().toString().equalsIgnoreCase(nextActAfterNextCarLeg.getLinkId().toString());
-				}
+				boolean isInvalidLink=aem.isInvalidLinkForParking();
 				
+				// TODO: include max distance here (maxDistance variable)
 				
-				if (parkingId==null || invalidLink){
-					DebugLib.traceAgent(aem.getPerson().getId(),1);
-					extraSearchPathNeeded.add(aem.getPerson().getId());
+				if (parkingId==null || isInvalidLink){
+					DebugLib.traceAgent(personId,1);
+					extraSearchPathNeeded.add(personId);
 					
 					Random r=new Random();
 					Link link = network.getLinks().get(route.getEndLinkId());
@@ -121,10 +121,10 @@ public class RandomSearch implements ParkingSearchStrategy{
 					aem.processLegInDefaultWay();
 					
 				} else {
-					DebugLib.traceAgent(aem.getPerson().getId(),2);
+					DebugLib.traceAgent(personId,2);
 					
-					if (extraSearchPathNeeded.contains(aem.getPerson().getId())){
-						extraSearchPathNeeded.remove(aem.getPerson().getId());
+					if (extraSearchPathNeeded.contains(personId)){
+						extraSearchPathNeeded.remove(personId);
 						
 						aem.processEndOfLegCarMode_processEvents(leg, nextAct);
 						
@@ -162,13 +162,15 @@ public class RandomSearch implements ParkingSearchStrategy{
 							EditRoute.globalEditRoute.addInitialPartToRoute(nextNonParkingAct.getEndTime(), parkingLink.getId(), nextCarLeg);
 						}
 						
+						startSearchTime.remove(personId);
+						
 						aem.processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(nextAct);
 						
 						
 					} else {
 						aem.processLegInDefaultWay();
 					}
-					AgentWithParking.parkingManager.parkVehicle(aem.getPerson().getId(), parkingId);
+					AgentWithParking.parkingManager.parkVehicle(personId, parkingId);
 				}
 			} else {
 				aem.processLegInDefaultWay();
@@ -209,7 +211,7 @@ public class RandomSearch implements ParkingSearchStrategy{
 
 	@Override
 	public String getName() {
-		return "RandomSearch";
+		return "RandomParkingSearch";
 	}
 	
 	

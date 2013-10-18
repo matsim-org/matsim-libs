@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
@@ -61,6 +63,21 @@ public class AgentWithParking extends AgentEventMessage{
 	
 	public void processLegInDefaultWay(){
 		handleLeg();
+	}
+
+	// avoid temporary problem with car leave and next planned parking on same link
+	// TODO: resolve in future implementation
+	public boolean isInvalidLinkForParking() {
+		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		LinkNetworkRouteImpl route= (LinkNetworkRouteImpl)leg.getRoute();
+		
+		boolean isInvalidLink=false;
+		int nextCarLegIndex = duringCarLeg_getPlanElementIndexOfNextCarLeg();
+		if (nextCarLegIndex!=-1){
+			ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(nextCarLegIndex+3);
+			isInvalidLink=route.getEndLinkId().toString().equalsIgnoreCase(nextActAfterNextCarLeg.getLinkId().toString());
+		}
+		return isInvalidLink;
 	}
 	
 	

@@ -20,30 +20,40 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 
-public class GarageParkingSearch implements ParkingSearchStrategy{
+public class RandomGarageParkingSearch extends RandomParkingSearch{
 	
-	@Override
-	public void handleAgentLeg(AgentWithParking aem) {
-		aem.processLegInDefaultWay();
-		
-		Person person = aem.getPerson();
-		
-		Random rand=new Random();
-		
-		// TODO: add score only at end of search (store it locally during search)!
-		
-		if (aem.getPlanElementIndex() >1 && aem.getPlanElementIndex() % 2 == 0){
-			AgentWithParking.parkingStrategyManager.updateScore(person.getId(), aem.getPlanElementIndex()-1, 2*rand.nextDouble());
-		}
+	
+	
+	public RandomGarageParkingSearch(double maxDistance, Network network) {
+		super(maxDistance, network);
+		this.parkingType="garageParking";
 	}
 
 	@Override
 	public String getName() {
-		return "GarageParkingSearch";
+		return "RandomGarageParkingSearch";
+	}
+
+	@Override
+	public void handleAgentLeg(AgentWithParking aem) {
+		super.handleAgentLeg(aem);
+		Id personId = aem.getPerson().getId();
+		if (startSearchTime.containsKey(personId)){
+			double searchDuration=aem.getMessageArrivalTime()-startSearchTime.get(personId);
+			
+			// allow parking at street if no garage parking found after 5 min
+			if (searchDuration>5*60){
+				this.parkingType="streetParking";
+			}
+			
+		}
 	}
 
 }

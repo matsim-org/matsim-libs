@@ -49,10 +49,11 @@ import org.matsim.population.Desires;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.GarageParkingSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.IllegalParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
@@ -84,7 +85,7 @@ public class MainPPSimZurich30km {
 
 		filterPopulation2_5km(scenario);
 		removeNotSelectedPlans(scenario);
-		multiplyPopulation(scenario,10);
+		multiplyPopulation(scenario,1);
 		
 		
 		addParkingActivityAndWalkLegToPlans(scenario.getPopulation().getPersons().values());
@@ -105,8 +106,8 @@ public class MainPPSimZurich30km {
 		LinkedList<AgentWithParking> agentsMessage = new LinkedList<AgentWithParking>();
 
 		LinkedList<ParkingSearchStrategy> allStrategies = new LinkedList<ParkingSearchStrategy>();
-		allStrategies.add(new RandomSearch(300.0, scenario.getNetwork()));
-		allStrategies.add(new RandomSearch(500.0, scenario.getNetwork()));
+		allStrategies.add(new RandomStreetParkingSearch(300.0, scenario.getNetwork()));
+		allStrategies.add(new RandomGarageParkingSearch(500.0, scenario.getNetwork()));
 		// allStrategies.add(new GarageParkingSearch());
 		// allStrategies.add(new IllegalParking());
 
