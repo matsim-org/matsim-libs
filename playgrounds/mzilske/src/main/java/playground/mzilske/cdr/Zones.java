@@ -47,14 +47,15 @@ public class Zones {
 			coords.put(cellTower, cellTower.coord);
 		}
 		quadTree = new ReadableQuadTree<CellTower>(coords);
+		buildCells();
 	}
 
 	private void voronoiStatistics() {
 		for (CellTower cellTower : cellTowers.values()) {
 			Geometry cell = getCell(cellTower.id);
 			System.out.println(cell.getArea());
-			Coordinate[] nearestPoints = new DistanceOp(gf.createPoint(coordinate(cellTower)), sites).nearestPoints();
-			System.out.println(cellTower.coord + " --- " + nearestPoints[0] + " --- " + nearestPoints[1]);
+//			Coordinate[] nearestPoints = new DistanceOp(gf.createPoint(coordinate(cellTower)), sites).nearestPoints();
+//			System.out.println(cellTower.coord + " --- " + nearestPoints[0] + " --- " + nearestPoints[1]);
 		}
 
 	}

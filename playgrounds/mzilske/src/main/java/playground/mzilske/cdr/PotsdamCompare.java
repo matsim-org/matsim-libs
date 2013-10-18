@@ -127,11 +127,11 @@ public class PotsdamCompare {
 			for (int i = 0; i < volumesForLink1.length; ++i) {
 				int diff = volumesForLink1[i] - volumesForLink2[i];
 				squares += diff * diff;
-				if (diff != 0) {
-					System.out.println(Arrays.toString(volumesForLink1));
-					System.out.println(Arrays.toString(volumesForLink2));
-					System.out.println("=== " + link.getId());
-				}
+//				if (diff != 0) {
+//					System.out.println(Arrays.toString(volumesForLink1));
+//					System.out.println(Arrays.toString(volumesForLink2));
+//					System.out.println("=== " + link.getId());
+//				}
 			}
 		}
 		System.out.println(Math.sqrt(squares));

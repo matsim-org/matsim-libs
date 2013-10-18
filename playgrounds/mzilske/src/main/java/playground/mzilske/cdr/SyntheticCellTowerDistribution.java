@@ -14,7 +14,7 @@ public class SyntheticCellTowerDistribution {
 		double maxX = Double.NEGATIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
-		double GRID_SIZE = 10000.0; // m
+		double GRID_SIZE = 100000.0; // m
 		
 		Map<String, CellTower> cellTowerMap = new HashMap<String, CellTower>();
 		for (Node node : network.getNodes().values()) {
