@@ -21,8 +21,12 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.analysis.LegHistogram;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -30,6 +34,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,7 +43,11 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.population.Desires;
 
+import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.GarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.IllegalParking;
@@ -61,24 +70,29 @@ public class MainPPSimZurich30km {
 
 		//String plansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1472928.xml";
 
-		// String plansFile =
-		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
+		 String plansFile =
+		 "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
 		
 		//String plansFile =
 		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pct_plans_30km.xml.gz";
 
-		 String plansFile =
-		 "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/10pct_plans_30km.xml.gz";
+		// String plansFile =
+		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/10pct_plans_30km.xml.gz";
 		String networkFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz";
 		String facilititiesPath = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_facilities.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 
+		filterPopulation2_5km(scenario);
+		removeNotSelectedPlans(scenario);
+		multiplyPopulation(scenario,10);
+		
+		
 		addParkingActivityAndWalkLegToPlans(scenario.getPopulation().getPersons().values());
 
 		// this is introduced to quickly avoid problems with current implemenation
 		// regarding departure and arrival of car on same link
 		// could be solve/updated in future.
-		replaceShortCarLegsByWalkLegs(scenario);
+		replaceCarLegsStartingAndEndingOnSameRoadByWalkLegs(scenario);
 		
 
 		String outputFolder = "C:/data/parkingSearch/psim/zurich/output/";
@@ -156,7 +170,79 @@ public class MainPPSimZurich30km {
 
 	}
 
-	private static void replaceShortCarLegsByWalkLegs(Scenario scenario) {
+	private static void multiplyPopulation(Scenario scenario, int populationExpansionFactor) {
+		LinkedList<Person> originalAgents = new LinkedList<Person>();
+
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			originalAgents.add(p);
+		}
+
+		for (Person p : originalAgents) {
+			scenario.getPopulation().getPersons().remove(p.getId());
+		}
+		
+		PopulationFactory factory = scenario.getPopulation().getFactory();
+
+		int pCounter = 1;
+
+		for (int i = 0; i < populationExpansionFactor; i++) {
+			for (Person origPerson : originalAgents) {
+				PersonImpl originPersonImpl=(PersonImpl) origPerson;
+				
+				Person newPerson = factory.createPerson(scenario.createId(String.valueOf(pCounter++)));
+				newPerson.addPlan(originPersonImpl.copySelectedPlan());
+				
+				scenario.getPopulation().addPerson(newPerson);
+			}
+		}
+		
+		System.out.println("population after population expansion: " + scenario.getPopulation().getPersons().size());
+	}
+
+	private static void removeNotSelectedPlans(Scenario scenario) {
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			Plan selectedPlan = p.getSelectedPlan();
+			LinkedList<Plan> selectedPlanList = new LinkedList<Plan>();
+			selectedPlanList.add(selectedPlan);
+			p.getPlans().retainAll(selectedPlanList);
+		}
+	}
+
+	private static void filterPopulation2_5km(Scenario scenario) {
+		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
+		LinkedList<Id> personToBeRemoved=new LinkedList<Id>();
+		
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			Plan selectedPlan = p.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+			int i = 0;
+			boolean removeFromPopulatation=true;
+			while (i < planElements.size()) {
+				if (planElements.get(i) instanceof Activity) {
+					Activity act = (Activity) planElements.get(i);
+					
+					if (GeneralLib.getDistance(coordinatesLindenhofZH, act.getCoord())<2500){
+						removeFromPopulatation=false;
+						break;
+					}
+				}
+				i++;
+			}
+			
+			if (removeFromPopulatation){
+				personToBeRemoved.add(p.getId());
+			}
+		}
+		
+		for (Id personId:personToBeRemoved){
+			scenario.getPopulation().getPersons().remove(personId);
+		}
+		
+		System.out.println("population size after fitering: " + scenario.getPopulation().getPersons().size());
+	}
+
+	private static void replaceCarLegsStartingAndEndingOnSameRoadByWalkLegs(Scenario scenario) {
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Plan selectedPlan = p.getSelectedPlan();
 			List<PlanElement> planElements = selectedPlan.getPlanElements();
