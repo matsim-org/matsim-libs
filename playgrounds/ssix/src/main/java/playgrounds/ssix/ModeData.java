@@ -39,17 +39,22 @@ import org.matsim.vehicles.VehicleType;
 public class ModeData {
 	
 	private Id modeId;
-	private VehicleType vehicleType;//TODO Ensure all methods can work without a specific vehicle type (needed for storing global data)
-									//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
-									//		Sofar programmed to contain also global data (ssix, 30.09.13)
+	private VehicleType vehicleType;//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
+									//		So far programmed to contain also global data, i.e. data without a specific vehicleType (ssix, 30.09.13)
 	public int numberOfAgents;
-	
+	private int numberOfDrivingAgents;//dynamic variable counting live agents on the track
+	private double permanentDensity;
+	private double permanentAverageVelocity;
+	private double permanentFlow;
+		
 	private Map<Id,Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
 	private int speedTableSize;
 	private List<Double> speedTable;
 	private Double flowTime;
 	private List<Double> flowTable;
+	private List<Double> lastXFlows;//recording a number of flows to ensure stability
 	private boolean speedStability;
+	private boolean flowStability;
 	
 	public ModeData(){}
 	
@@ -59,17 +64,29 @@ public class ModeData {
 	}
 	
 	public void handle(LinkEnterEvent event){
-		//TODO
 		if (event.getLinkId().equals(FundamentalDiagramsNmodes.studiedMeasuringPointLinkId)){
-			Id personId = event.getPersonId();
+			Id personId = event.getVehicleId();
 			double nowTime = event.getTime();
 			
 			//Updating flow, speed
 			this.updateFlow(nowTime, this.vehicleType.getPcuEquivalents());
-			this.updateSpeed(nowTime, personId);
+			//System.out.println(this.modeId+"' LastXFlows: "+this.lastXFlows);
+			this.updateSpeedTable(nowTime, personId);
+			//System.out.println(this.modeId+"' LastXSpeeds: "+this.speedTable);
 			
-			//Checking for speed stability
-			this.checkSpeedStability();
+			//Checking for stability
+			//Making sure all agents are on the track before testing stability
+			//Also waiting half an hour to let the database build itself.
+			
+			System.out.println(nowTime);
+			if ((this.getNumberOfDrivingAgents() == this.numberOfAgents) && (nowTime > 23400)){//TODO
+				if (!(this.speedStability)){
+					this.checkSpeedStability();
+				}
+				if (!(this.flowStability)){
+					this.checkFlowStability();
+				}
+			}
 		}
 	}
 	
@@ -95,9 +112,18 @@ public class ModeData {
 			}
 			this.flowTime = new Double(nowTime);
 		}
+		updateLastXFlows();
 	}
 	
-	public void updateSpeed(double nowTime, Id personId){
+	private void updateLastXFlows(){
+		Double nowFlow = new Double(this.getActualFlow());
+		for (int i=DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS-2; i>=0; i--){
+			this.lastXFlows.set(i+1, this.lastXFlows.get(i).doubleValue());
+		}
+		this.lastXFlows.set(0, nowFlow);
+	}
+	
+	public void updateSpeedTable(double nowTime, Id personId){
 		if (this.lastSeenOnStudiedLinkEnter.containsKey(personId)){
 			double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
 			double speed = DreieckNmodes.length * 3 / (nowTime-lastSeenTime);//in m/s!!
@@ -110,6 +136,7 @@ public class ModeData {
 		} else {
 			this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
 		}
+		this.numberOfDrivingAgents = this.lastSeenOnStudiedLinkEnter.size();
 	}
 	
 	public void checkSpeedStability(){
@@ -125,15 +152,26 @@ public class ModeData {
 		relativeDeviances /= DreieckNmodes.NUMBER_OF_MODES;//taking dependence on number of modes away
 		if (relativeDeviances < 0.0001){
 			this.speedStability = true;
+			System.out.println("Reaching a certain speed stability in mode: "+modeId);
 		}
 		this.speedStability = false;
 	}
 	
-	public boolean isSpeedStable(){
-		if (speedStability){
-			return true;
+	public void checkFlowStability(){
+		double relativeDeviances = 0.;
+		double averageFlow = 0;
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
+			averageFlow += this.lastXFlows.get(i).doubleValue();
 		}
-		return false;
+		averageFlow /= DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS;
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
+			relativeDeviances += Math.pow( ((this.lastXFlows.get(i).doubleValue() - averageFlow) / averageFlow) , 2);
+		}
+		if (relativeDeviances < 0.001){
+			this.flowStability = true;
+			//System.out.println("Reaching a certain flow stability in mode: "+modeId);
+		}
+		this.flowStability = false;
 	}
 	
 	public void initDynamicVariables() {
@@ -143,24 +181,40 @@ public class ModeData {
 		for (int i=0; i<this.speedTableSize; i++){
 			this.speedTable.add(0.);
 		}
-		
 		this.flowTime = 0.;
 		this.flowTable = new LinkedList<Double>();
 		for (int i=0; i<3600; i++){
 			this.flowTable.add(0.);
 		}
+		this.lastXFlows = new LinkedList<Double>();
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
+			this.lastXFlows.add(0.);
+		}
 		this.speedStability = false;
+		this.flowStability = false;
 		this.lastSeenOnStudiedLinkEnter = new TreeMap<Id,Double>();
+		this.permanentDensity = 0.;
+		this.permanentAverageVelocity =0.;
+		this.permanentFlow = 0.;
+	}
+	
+	public void reset(){
+		this.speedTable.clear();
+		this.flowTableReset();
+		this.lastXFlows.clear();
+		this.speedStability = false;
+		this.flowStability = false;
 	}
 
 	private void decideSpeedTableSize() {
 		//Ensures a significant speed sampling for every mode size
-		if (this.numberOfAgents >= 100) {
+		//Is pretty empirical and can be changed if necessary (ssix, 16.10.13)
+		if (this.numberOfAgents >= 500) {
 			this.speedTableSize = 50;
-		} else if (this.numberOfAgents >= 60) {
-			this.speedTableSize = 30;
-		} else if (this.numberOfAgents >= 20) {
+		} else if (this.numberOfAgents >= 100) {
 			this.speedTableSize = 20;
+		} else if (this.numberOfAgents >= 10) {
+			this.speedTableSize = 10;
 		} else {
 			this.speedTableSize = this.numberOfAgents;
 		}
@@ -179,6 +233,14 @@ public class ModeData {
 		}
 	}
 	
+	public void saveDynamicVariables(){
+		this.permanentDensity = this.numberOfAgents / (DreieckNmodes.length*3) *1000;
+		System.out.println("Calculating permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable);
+		this.permanentAverageVelocity = this.getActualAverageVelocity();
+		System.out.println("Calculating permanent Flow from "+modeId+"'s lastXFlows : "+lastXFlows);
+		this.permanentFlow = this.getActualFlow();
+	}
+	
 	//Getters/Setters
 	public VehicleType getVehicleType(){
 		return this.vehicleType;
@@ -188,7 +250,52 @@ public class ModeData {
 		return this.modeId;
 	}
 	
+	public double getActualAverageVelocity(){
+		double nowSpeed = 0.;
+		for (int i=0; i<this.speedTableSize; i++){
+			nowSpeed += this.speedTable.get(i);
+		}
+		nowSpeed /= this.speedTableSize;
+		return nowSpeed;
+	}
+	
+	public double getActualFlow(){
+		double nowFlow = 0.;
+		for (int i=0; i<3600; i++){
+			nowFlow += this.flowTable.get(i);
+		}
+		return nowFlow;
+	}
+	
+	public boolean isSpeedStable(){
+		return this.speedStability;
+	}
+	
+	public boolean isFlowStable(){
+		return this.flowStability;
+	}
+	
 	public void setnumberOfAgents(int n){
 		this.numberOfAgents = n;
+	}
+
+	public double getPermanentDensity(){
+		return this.permanentDensity;
+	}
+	
+	public double getPermanentAverageVelocity(){
+		return this.permanentAverageVelocity;
+	}
+	
+	public double getPermanentFlow(){
+		return this.permanentFlow;
+	}
+
+	public int getNumberOfDrivingAgents() {
+		return numberOfDrivingAgents;
+	}
+	
+	public Map<Id, Double> getLastSeenOnStudiedLinkEnter() {
+		return lastSeenOnStudiedLinkEnter;
 	}
 }

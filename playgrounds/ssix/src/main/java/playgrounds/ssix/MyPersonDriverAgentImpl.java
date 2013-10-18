@@ -40,6 +40,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -54,8 +55,9 @@ import org.matsim.core.utils.misc.Time;
  * Also saved locally the method calculateDepartureTime that was only package-wide reachable.
  * These three changes are put at the end of this class. 
  */
+ 
 
-public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, PlanAgent {
+public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
 	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
 	// use this class directly.  kai, nov'10
 
@@ -123,9 +125,10 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-		this.simulation.getEventsManager().processEvent(
-				new PersonArrivalEvent(now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
-		if(!this.currentLinkId.equals(this.cachedDestinationLinkId)) {
+		this.simulation.getEventsManager().processEvent(new PersonArrivalEvent(
+						now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
+		if( (!(this.currentLinkId == null && this.cachedDestinationLinkId == null)) 
+				&& !this.currentLinkId.equals(this.cachedDestinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
 			this.state = MobsimAgent.State.ABORT ;
@@ -168,6 +171,14 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 	 */
 	@Override
 	public Id chooseNextLinkId() {
+		
+		// Please, let's try, amidst all checking and caching, to have this method return the same thing
+		// if it is called several times in a row. Otherwise, you get Heisenbugs.
+		// I just fixed a situation where this method would give a warning about a bad route and return null
+		// the first time it is called, and happily return a link id when called the second time.
+		
+		// michaz 2013-08
+		
 		if (this.cachedNextLinkId != null) {
 			return this.cachedNextLinkId;
 		}
@@ -195,19 +206,22 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
 				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLinkId.toString()
 						+ ", is at the end of its route, but has not yet reached its destination link " + this.cachedDestinationLinkId.toString());
-				//  personally, I would throw some kind of abort event here.  kai, aug'10
+				// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
 			}
 			return null; // vehicle is at the end of its route
 		}
 
-		this.cachedNextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex); //save time in later calls, if link is congested
+
+		Id nextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);
 		Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
-		Link nextLink = this.simulation.getScenario().getNetwork().getLinks().get(this.cachedNextLinkId);
+		Link
+ nextLink = this.simulation.getScenario().getNetwork().getLinks().get(nextLinkId);
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
+			this.cachedNextLinkId = nextLinkId; //save time in later calls, if link is congested
 			return this.cachedNextLinkId;
 		}
 		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentLinkIdIndex + " ]");
-		//  personally, I would throw some kind of abort event here.  kai, aug'10
+		// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
 		return null;
 	}
 
@@ -263,9 +277,9 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 	}
 	
 	private void initializeActivity(Activity act) {
-		this.state = MobsimAgent.State.ACTIVITY;
+		this.state = MobsimAgent.State.ACTIVITY ;
 
-		double now = this.getMobsim().getSimTimer().getTimeOfDay();
+		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		this.simulation.getEventsManager().processEvent(
 				new ActivityStartEvent(now, this.getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
 		/* schedule a departure if either duration or endtime is set of the activity.
@@ -283,6 +297,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 	 * on the Results of the Simulation!
 	 */
 	void resetCaches() {
+		
 		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
 		// known best.  kai, oct'10
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
@@ -299,18 +314,21 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 		if (currentPlanElement instanceof Leg) {
 			this.currentLeg  = ((Leg) currentPlanElement);
 			this.cachedRouteLinkIds = null;
-		}
 
-		Route route = currentLeg.getRoute();
-		if (route == null) {
-			log.error("The agent " + this.getId() + " has no route in its leg. Removing the agent from the simulation." );
-			//			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
-			//			this.simulation.getAgentCounter().decLiving();
-			//			this.simulation.getAgentCounter().incLost();
-			this.state = MobsimAgent.State.ABORT ;
-			return;
+			Route route = currentLeg.getRoute();
+			if (route == null) {
+				log.error("The agent " + this.getId() + " has no route in its leg. Removing the agent from the simulation." );
+				//			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
+				//			this.simulation.getAgentCounter().decLiving();
+				//			this.simulation.getAgentCounter().incLost();
+				this.state = MobsimAgent.State.ABORT ;
+				return;
+			}
+			this.cachedDestinationLinkId = route.getEndLinkId();
+		} else {			
+			// If an activity is performed, update its current activity.
+			this.calculateAndSetDepartureTime((Activity) this.getCurrentPlanElement());
 		}
-		this.cachedDestinationLinkId = route.getEndLinkId();
 	}
 
 	/**
@@ -320,12 +338,11 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 	void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		ActivityDurationInterpretation activityDurationInterpretation = this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation();
-		double departure = /*ActivityDurationUtils. is a hidden type, so stored the method locally as a private method*/
-				calculateDepartureTime(act, now, activityDurationInterpretation);
+		double departure = this.calculateDepartureTime(act, now, activityDurationInterpretation);
 
 		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
-				log.error( "last activity has end time < infty; setting it to infty") ;
+				log.error( "last activity of person driver agent id " + this.person.getId() + " has end time < infty; setting it to infty") ;
 				log.error( Gbl.ONLYONCE ) ;
 				finalActHasDpTimeWrnCnt++ ;
 			}
@@ -378,7 +395,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 
 	@Override
 	public final double getActivityEndTime() {
-		//  I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
+		// yyyyyy I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
 		return this.activityEndTime;
 	}
 
@@ -457,7 +474,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 		currentLinkIdIndex = index;
 	}
 	
-	private double calculateDepartureTime(Activity act, double now, ActivityDurationInterpretation activityDurationInterpretation){
+	private double calculateDepartureTime(Activity act, double now, ActivityDurationInterpretation activityDurationInterpretation) {
 		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
 			return Double.POSITIVE_INFINITY ;

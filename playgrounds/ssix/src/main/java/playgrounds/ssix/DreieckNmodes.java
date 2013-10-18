@@ -59,6 +59,7 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -73,6 +74,7 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+//import org.apache.log4j.Logger;
 
 /**
  * @author ssix
@@ -80,7 +82,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 public class DreieckNmodes {
 	
-	//private static Integer[] TEST_DISTRIBUTION = {1,1,2};
+	private static Integer[] TEST_DISTRIBUTION = {8,4,1};
 
 	private static final Logger log = Logger.getLogger(DreieckNmodes.class);
 	
@@ -144,24 +146,30 @@ public class DreieckNmodes {
 
 		@Override
 		public Id chooseNextLinkId() {
-			if (!(goHome)){
-				Id forcedLeftTurnLinkId = new IdImpl((long)(3*DreieckNmodes.subdivisionFactor - 1));
-				if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){
+			if (DreieckNmodes.funfunfun.isPermanent()){ goHome = true; }
+			
+			Id forcedLeftTurnLinkId = new IdImpl((long)(3*DreieckNmodes.subdivisionFactor - 1));
+			Id forcedStraightForwardLinkId = new IdImpl((long)(DreieckNmodes.subdivisionFactor - 1));
+			
+			if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){ // not 3n-1
+				if (!(delegate.getCurrentLinkId().equals(forcedStraightForwardLinkId))){ //not 3n-1 and not n-1
 					return delegate.chooseNextLinkId();
+				} else { // n-1
+					if (!(goHome)){ //n-1 but not goHome
+						return delegate.chooseNextLinkId();
+					} else { //n-1 and goHome
+						Id afterGoingStraightForwardLinkId = new IdImpl((long)(3*DreieckNmodes.subdivisionFactor));
+						delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
+						delegate.setCurrentLinkIdIndex(3*DreieckNmodes.subdivisionFactor);//This does work quite well so far and allows to end simulation.
+						return afterGoingStraightForwardLinkId;
+					}
 				}
+			} else { //3n-1
 				Id afterLeftTurnLinkId = new IdImpl((long)(0));
 				delegate.setCachedNextLinkId(afterLeftTurnLinkId);
 				delegate.setCurrentLinkIdIndex(0);
 				return afterLeftTurnLinkId;
 			}
-			Id forcedStraightForwardLinkId = new IdImpl((long)(DreieckNmodes.subdivisionFactor - 1));
-			if (!(delegate.getCurrentLinkId().equals(forcedStraightForwardLinkId))){
-				return delegate.chooseNextLinkId();
-			}
-			Id afterGoingStraightForwardLinkId = new IdImpl((long)(3*DreieckNmodes.subdivisionFactor));
-			delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
-			delegate.setCurrentLinkIdIndex(3*DreieckNmodes.subdivisionFactor);//This does work quite well so far and allows to end simulation.
-			return afterGoingStraightForwardLinkId;
 		}
 
 		@Override
@@ -203,22 +211,25 @@ public class DreieckNmodes {
 	
 	//CONFIGURATION: static variables used for aggregating configuration options
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public static double length = 444.44;//in m, length of one the triangle sides.
+	public static double length = 333.33;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
+	public static boolean PASSING_ALLOWED = true;
 	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_test.txt";
 	private static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_test.xml";
 	
 	private static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
+	public static int NUMBER_OF_MEMORIZED_FLOWS = 5;
 	public static int NUMBER_OF_MODES = 3;
-	public static String[] NAMES= {"bicycles","bikes","cars"};	//identification of the different modes
-	private static Double[] Probabilities = {1/3., 1/3., 1/3.}; //modal split
-	private static Double[] Pcus = {0.25, 0.25, 1.}; 			//PCUs of the different possible modes
-	private static Double[] Speeds = {4.17, 16.67, 16.67};		//maximum velocities of the vehicle types, in m/s
-	private static Integer[] MaxAgentDistribution = {80,320,320};
-	private static Integer[] Steps = {20,40,40};
+	public static String[] NAMES= {"bicycles","motorbikes","cars"};	//identification of the different modes
+	public static Double[] Probabilities = {1/3., 1/3., 1/3.}; //modal split
+	public static Double[] Pcus = {0.25, 0.25, 1.}; 			//PCUs of the different possible modes
+	public static Double[] Speeds = {4.17, 16.67, 16.67};		//maximum velocities of the vehicle types, in m/s
+	private static Integer[] MaxAgentDistribution = {1,1,1};
+	private static Integer[] Steps = {1,1,1};
 	
 	private PrintStream writer;
 	private Scenario scenario;
+	private static FundamentalDiagramsNmodes funfunfun;
 	private Map<Id, ModeData> modesData;
 	private int networkCapacity;//the capacity all links of the network will have
 		
@@ -234,6 +245,7 @@ public class DreieckNmodes {
 		
 		//Initializing scenario Config file
 		Config config = ConfigUtils.createConfig();
+		//config.addQSimConfigGroup(new QSimConfigGroup());
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
 		config.qsim().setMainModes(Arrays.asList(NAMES));
 		config.qsim().setStuckTime(100*3600.);//allows to overcome maximal density regime
@@ -244,7 +256,8 @@ public class DreieckNmodes {
 		// to me (kn).
 		this.scenario = ScenarioUtils.createScenario(config);
 		
-		//Initializing modeData objects//TODO: should be initialized when instancing FundamentalDiagrams
+		//Initializing modeData objects//TODO: should be initialized when instancing FundamentalDiagrams, no workaround still found
+		//Need to be currently initialized at this point to initialize output and modified QSim
 		this.modesData = new HashMap<Id, ModeData>();
 		for (int i=0; i < NUMBER_OF_MODES; i++){
 			Id modeId = new IdImpl(NAMES[i]);
@@ -260,33 +273,23 @@ public class DreieckNmodes {
 	}
 	
 	public static void main(String[] args) {
-		/*Integer[] testMax = {4,3,2};
-		Integer[] testSteps = {2,1,2};
-		Integer[] testPoint = {0,0,0};
-		BinaryAdditionModule test = new BinaryAdditionModule(Arrays.asList(testMax), Arrays.asList(testSteps), testPoint);
-		int numberOfAdditions = 23;
-		for (int i=0; i<numberOfAdditions; i++){
-			test.add1();
-			Integer[] point = test.getPoint();
-			System.out.println(point[0].intValue()+" "+point[1].intValue()+" "+point[2].intValue());
-		}*/
-		
-		
 		DreieckNmodes dreieck = new DreieckNmodes(NETWORK_CAPACITY);
 		dreieck.fillNetworkData();
 		dreieck.openFile(OUTPUT_DIR);
-		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
-		//dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
+		//dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
+		dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));//TODO: debug this case so that it returns non null values.
 		dreieck.closeFile();
 	}
 	
 	private void parametricRunAccordingToDistribution(List<Integer> maxAgentDistribution, List<Integer> steps){
 		//Check for size
-		if ((maxAgentDistribution.size() != NUMBER_OF_MODES) || (steps.size() != NUMBER_OF_MODES)){ throw new RuntimeException("There should be as many number and/or steps in the two given lists as there are modes in the simulation.");}
+		if ((maxAgentDistribution.size() != NUMBER_OF_MODES) || (steps.size() != NUMBER_OF_MODES)){ throw new RuntimeException("There should be as many maxValues and/or steps in the two given lists as there are modes in the simulation.");}
 		
 		List<List<Integer>> pointsToRun = this.createPointsToRun(maxAgentDistribution, steps);
+		System.out.println(pointsToRun);
 		for ( int i=0; i<pointsToRun.size(); i++){
 			List<Integer> pointToRun = pointsToRun.get(i);
+			System.out.println("Going into run "+pointToRun);
 			this.singleRun(pointToRun);
 		}
 	}
@@ -302,25 +305,34 @@ public class DreieckNmodes {
 		//Actually going through the n-dimensional grid
 		BinaryAdditionModule iterationModule = new BinaryAdditionModule(maxValues, steps, startingPoint);
 		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
-		pointsToRun.add(Arrays.asList(startingPoint));
-		for (int i=0; i<numberOfPoints-1; i++){
-			iterationModule.add1();
-			pointsToRun.add(Arrays.asList(iterationModule.getPoint()));
-			//String point = Arraytostring(iterationModule.getPoint());
-			//System.out.println("Just added point "+point+"to the collection.");
+		for (int i=0; i<numberOfPoints; i++){
+			Integer[] newPoint = new Integer[maxValues.size()];
+			for (int j=0; j<maxValues.size(); j++){
+				newPoint[j] = (iterationModule.getPoint())[j];
+			}
+			pointsToRun.add(Arrays.asList(newPoint));
+			String point = Arraytostring(iterationModule.getPoint());
+			System.out.println("Just added point "+point+"to the collection.");
+			if (i<numberOfPoints-1){
+				iterationModule.add1();
+			}
 		}
+		System.out.println(pointsToRun.size());
 		return pointsToRun;
 	}
 	
 	private void singleRun(List<Integer> pointToRun) {
-		this.createWantedPopulation(pointToRun, 2);
+		this.createWantedPopulation(pointToRun, 2);//ok
 		for (int i=0; i<NAMES.length; i++){
-			this.modesData.get(new IdImpl(NAMES[i])).setnumberOfAgents(pointToRun.get(i).intValue());
+			this.modesData.get(new IdImpl(NAMES[i])).setnumberOfAgents(pointToRun.get(i).intValue());//ok
+			//System.out.println("Setting "+NAMES[i]+"'s numberOfAgents to "+pointToRun.get(i).intValue());
 		}
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		FundamentalDiagramsNmodes fundiN = new FundamentalDiagramsNmodes(this.scenario, this.modesData);
+		this.modesData = fundiN.getModesData();
+		DreieckNmodes.funfunfun = fundiN;
 		events.addHandler(fundiN);
 		events.addHandler(new EventWriterXML(OUTPUT_EVENTS));
 		
@@ -328,8 +340,27 @@ public class DreieckNmodes {
 		
 		qSim.run();
 		
-		//TODO: writer.doSomething
-		
+		//writer.doSomething
+		writer.format("%d\t\t",fundiN.getGlobalData().numberOfAgents);
+		for (int i=0; i < NUMBER_OF_MODES; i++){
+			writer.format("%d\t", this.modesData.get(new IdImpl(NAMES[i])).numberOfAgents);
+		}
+		writer.print("\t");
+		writer.format("%.2f\t", fundiN.getGlobalData().getPermanentDensity());
+		for (int i=0; i < NUMBER_OF_MODES; i++){
+			writer.format("%.2f\t", this.modesData.get(new IdImpl(NAMES[i])).getPermanentDensity());
+		}
+		writer.print("\t");
+		writer.format("%.2f\t", fundiN.getGlobalData().getPermanentFlow());
+		for (int i=0; i < NUMBER_OF_MODES; i++){
+			writer.format("%.2f\t", this.modesData.get(new IdImpl(NAMES[i])).getPermanentFlow());
+		}
+		writer.print("\t");
+		writer.format("%.2f\t", fundiN.getGlobalData().getPermanentAverageVelocity());
+		for (int i=0; i < NUMBER_OF_MODES; i++){
+			writer.format("%.2f\t", this.modesData.get(new IdImpl(NAMES[i])).getPermanentAverageVelocity());
+		}
+		writer.print("\n");
 	}
 
 	private void fillNetworkData(){
@@ -472,20 +503,6 @@ public class DreieckNmodes {
 			//System.out.println("Just added person : "+(i+1)+" to the scenario population.");
 		}
 	}
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
 		//From QSimFactory inspired code
@@ -508,7 +525,11 @@ public class DreieckNmodes {
 
 					@Override
 					public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-						return new QLinkImpl(link, network, toQueueNode, new MZilskePassingVehicleQ());
+						if (PASSING_ALLOWED){
+							return new QLinkImpl(link, network, toQueueNode, new MZilskePassingVehicleQ());
+						} else {
+							return new QLinkImpl(link, network, toQueueNode, new FIFOVehicleQ());
+						}
 					}
 
 					@Override
@@ -621,8 +642,8 @@ public class DreieckNmodes {
 		return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
 	}
 
-	/*
-	private String Arraytostring(Integer[] list){
+	///*
+	private static String Arraytostring(Integer[] list){
 		int n = list.length;
 		String str = "";
 		for (int i=0; i<n; i++){
@@ -630,5 +651,5 @@ public class DreieckNmodes {
 			str += " ";
 		}
 		return str;
-	}*/
+	}//*/
 }

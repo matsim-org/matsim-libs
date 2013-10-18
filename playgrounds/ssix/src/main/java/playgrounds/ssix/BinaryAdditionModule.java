@@ -1,6 +1,5 @@
 package playgrounds.ssix;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BinaryAdditionModule {
