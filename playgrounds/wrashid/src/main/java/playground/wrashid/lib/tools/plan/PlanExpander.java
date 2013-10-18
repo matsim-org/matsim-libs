@@ -20,12 +20,12 @@ public class PlanExpander {
 	 */
 	public static void main(String[] args) {
 		
-		String inputPlansFile = "../../matsim/mysimulations/FundamentalDiagram/input/plans.xml.gz";
-		String inputNetworkFile = "../../matsim/mysimulations/FundamentalDiagram/input/network.xml.gz";
-		String inputFacilitiesFile = "../../matsim/mysimulations/FundamentalDiagram/input/facilities.xml.gz";
-		int populationExpansionFactor = 3;
+		String inputPlansFile = "H:/data/cvs/ivt/studies/switzerland/plans/teleatlas-ivtcheu/census2000v2_dilZh30km_10pct/plans.xml.gz";
+		String inputNetworkFile = "H:/data/cvs/ivt/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
+		String inputFacilitiesFile = "H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
+		int populationExpansionFactor = 2;
 
-		String outputPlansFile = "../../matsim/mysimulations/FundamentalDiagram/input/plans_zurich_30pct.xml.gz";
+		String outputPlansFile = "H:/data/experiments/msimoni/13Aug2013/plans_zurich_20pct.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile,
 				inputNetworkFile,inputFacilitiesFile);
 

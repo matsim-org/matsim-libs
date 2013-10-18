@@ -27,10 +27,16 @@ import org.matsim.core.events.EventsUtils;
 public class PrintEventsOfSingleAgent {
 
 	public static void main(String[] args) {
-		String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun22/output/ITERS/it.50/50.events.xml.gz";
+		//String eventsFile="C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.events.xml.gz";
+		//String eventsFile="C:/data/parkingSearch/psim/output/all/events.xml.gz";
+		
+		//String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
+		String eventsFile="C:/data/parkingSearch/psim/zurich/output/basic output with 300 sec bins/events.xml.gz";
+		
+		
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
-		SingleAgentEventsPrinter singleAgentEventsPrinter = new SingleAgentEventsPrinter(new IdImpl("1470986"));
+		SingleAgentEventsPrinter singleAgentEventsPrinter = new SingleAgentEventsPrinter(new IdImpl("65802"));
 		
 		events.addHandler(singleAgentEventsPrinter);
 		

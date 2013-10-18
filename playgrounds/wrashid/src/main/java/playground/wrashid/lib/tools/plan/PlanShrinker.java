@@ -8,13 +8,15 @@ import org.matsim.core.population.PopulationWriter;
 public class PlanShrinker {
 
 	public static void main(final String[] args) {
-		String inputPlansFile="C:/data/parkingSearch/zurich/input/10pct_plans_ktiClean.xml.gz";
-		String inputNetworkFile="H:/data/cvs/ivt/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
-		String inputFacilities="H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
-		double populationFraction=0.01;
+		
+		String inputPlansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/10pct_plans_30km.xml.gz";
+		String inputNetworkFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz";
+		String inputFacilities = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_facilities.xml.gz";
+		
+		double populationFraction=0.1;
 		// e.g. 0.1 means 10% of input population
 		
-		String outputPlansFile="C:/data/parkingSearch/zurich/input/1pml_plans_ktiClean.xml.gz";		
+		String outputPlansFile="c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pct_plans_30km.xml.gz";		
 		
 		// NOTE: if no facilities file is available for the scenario, just specify any valid facilities file
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
