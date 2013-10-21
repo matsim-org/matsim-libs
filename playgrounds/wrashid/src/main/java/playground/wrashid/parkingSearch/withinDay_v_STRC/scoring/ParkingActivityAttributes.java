@@ -55,6 +55,10 @@ public class ParkingActivityAttributes {
 		this.toParkWalkDuration = toParkWalkDuration;
 	}
 	
+	public ParkingActivityAttributes(){
+		
+	}
+	
 	public double getToActWalkDurationInSeconds() {
 		return toActWalkDuration;
 	}
