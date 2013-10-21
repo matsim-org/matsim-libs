@@ -39,6 +39,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import playground.telaviv.config.TelAvivConfig;
+
 public class TTAAgentSource implements AgentSource {
 	
 	private final static Logger log = Logger.getLogger(TTAAgentSource.class);
@@ -53,38 +55,61 @@ public class TTAAgentSource implements AgentSource {
 	
 	public TTAAgentSource(Population population, AgentFactory agentFactory, QSim qsim) {
 		
-		log.info("total population size:\t" + population.getPersons().size());
-		FilterPopulation filterPopulation;
+		Population defaultPopulation = new FilteredPopulation();
+		Population carPopulation = new FilteredPopulation();
+		Population truckPopulation = new FilteredPopulation();
+		Population commercialPopulation = new FilteredPopulation();
+		
+		ObjectAttributes attributes = population.getPersonAttributes();
+		for (Person person : population.getPersons().values()) {
+			Object attribute = attributes.getAttribute(person.getId().toString(), TelAvivConfig.externalTripType);
+			if (attribute == null) defaultPopulation.addPerson(person);
+			else {
+				String externalTripType = (String) attribute;
+				if (externalTripType.equals(TelAvivConfig.externalTripTypeCar)) {
+					carPopulation.addPerson(person);
+				} else if (externalTripType.equals(TelAvivConfig.externalTripTypeTruck)) {
+					truckPopulation.addPerson(person);
+				} else if (externalTripType.equals(TelAvivConfig.externalTripTypeCommercial)) {
+					commercialPopulation.addPerson(person);
+				} else {
+					throw new RuntimeException("Unknown value for attribute " + TelAvivConfig.externalTripType + 
+							" was found: " + externalTripType + ". Aborting!");
+				}
+			}
+		}
 
-		filterPopulation = new FilterPopulation(population, "tta", false);
-		this.defaultPopulationAgentSource = new PopulationAgentSource(filterPopulation, agentFactory, qsim);
-		log.info("default population size:\t" + filterPopulation.getPersons().size());
+		this.defaultPopulationAgentSource = new PopulationAgentSource(defaultPopulation, agentFactory, qsim);
+		this.carPopulationAgentSource = new PopulationAgentSource(carPopulation, agentFactory, qsim);
+		this.truckPopulationAgentSource = new PopulationAgentSource(truckPopulation, agentFactory, qsim);
+		this.commercialPopulationAgentSource = new PopulationAgentSource(commercialPopulation, agentFactory, qsim);
 		
-		filterPopulation = new FilterPopulation(population, "car", true);
-		this.carPopulationAgentSource = new PopulationAgentSource(filterPopulation, agentFactory, qsim);
-		log.info("external car population size:\t" + filterPopulation.getPersons().size());
-		
-		filterPopulation = new FilterPopulation(population, "truck", true);
-		this.truckPopulationAgentSource = new PopulationAgentSource(filterPopulation, agentFactory, qsim);
-		log.info("external truck population size:\t" + filterPopulation.getPersons().size());
-		
-		filterPopulation = new FilterPopulation(population, "commercial", true);
-		this.commercialPopulationAgentSource = new PopulationAgentSource(filterPopulation, agentFactory, qsim);
-		log.info("external commercial population size:\t" + filterPopulation.getPersons().size());
+		log.info("total population size:\t" + population.getPersons().size());
+		log.info("default population size:\t" + defaultPopulation.getPersons().size());
+		log.info("external car population size:\t" + carPopulation.getPersons().size());
+		log.info("external truck population size:\t" + truckPopulation.getPersons().size());
+		log.info("external commercial population size:\t" + commercialPopulation.getPersons().size());
 		
 		Map<String, VehicleType> modeVehicleTypes;
 		
 		modeVehicleTypes = new HashMap<String, VehicleType>();
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(new IdImpl("car"));
+		car.setPcuEquivalents(TelAvivConfig.carPcuEquivalents);
+		car.setMaximumVelocity(TelAvivConfig.carMaximumVelocity);
+		modeVehicleTypes.put(TransportMode.car, car);
+		this.truckPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
+		
+		modeVehicleTypes = new HashMap<String, VehicleType>();
 		VehicleType truck = VehicleUtils.getFactory().createVehicleType(new IdImpl("truck"));
-		truck.setPcuEquivalents(3.5);
-		truck.setMaximumVelocity(25.0);
+		truck.setPcuEquivalents(TelAvivConfig.truckPcuEquivalents);
+		truck.setMaximumVelocity(TelAvivConfig.truckMaximumVelocity);
 		modeVehicleTypes.put(TransportMode.car, truck);
 		this.truckPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
 		
 		modeVehicleTypes = new HashMap<String, VehicleType>();
 		VehicleType commercial = VehicleUtils.getFactory().createVehicleType(new IdImpl("commercial"));
-		commercial.setPcuEquivalents(1.0);
-		commercial.setMaximumVelocity(30.0);
+		commercial.setPcuEquivalents(TelAvivConfig.commercialPcuEquivalents);
+		commercial.setMaximumVelocity(TelAvivConfig.commercialMaximumVelocity);
 		modeVehicleTypes.put(TransportMode.car, commercial);
 		this.commercialPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
 	}
@@ -98,22 +123,10 @@ public class TTAAgentSource implements AgentSource {
 		this.commercialPopulationAgentSource.insertAgentsIntoMobsim();
 	}
 	
-	private static class FilterPopulation implements Population {
+	private static class FilteredPopulation implements Population {
 
-		private final Map<Id, Person> persons;
+		Map<Id, Person> persons = new LinkedHashMap<Id, Person>();
 		
-		public FilterPopulation(Population population, String filterString, boolean include) {
-			
-			this.persons = new LinkedHashMap<Id, Person>();
-			
-			for (Person p : population.getPersons().values()) {
-				boolean contains = p.getId().toString().contains(filterString);
-				
-				if (contains && include) persons.put(p.getId(), p);
-				else if (!contains && !include) persons.put(p.getId(), p);
-			}
-		}
-
 		@Override
 		public PopulationFactory getFactory() {
 			return null;
@@ -125,16 +138,17 @@ public class TTAAgentSource implements AgentSource {
 		}
 
 		@Override
-		public void setName(String name) {			
+		public void setName(String name) {
 		}
 
 		@Override
 		public Map<Id, ? extends Person> getPersons() {
-			return persons;
+			return this.persons;
 		}
 
 		@Override
 		public void addPerson(Person p) {
+			this.persons.put(p.getId(), p);
 		}
 
 		@Override
@@ -143,5 +157,4 @@ public class TTAAgentSource implements AgentSource {
 		}
 		
 	}
-
 }

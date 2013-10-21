@@ -29,23 +29,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.Desires;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.telaviv.config.TelAvivConfig;
 
@@ -57,28 +54,27 @@ public class Emme2ExternalTripsCreator {
 	private String facilitiesFile = TelAvivConfig.basePath + "/facilities/facilities.xml";
 //	private String externalTripsFile = TelAvivConfig.basePath + "/population/external_trips.csv";
 	
-//	private String type = "car";
-//	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/car_ext_AM.csv";
-//	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/car_ext_OP.csv";
-//	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/car_ext_PM.csv";
+	private String type = TelAvivConfig.externalTripTypeCar;
+	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/car_ext_AM.csv";
+	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/car_ext_OP.csv";
+	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/car_ext_PM.csv";
 
-//	private String type = "truck";
+//	private String type = TelAvivConfig.externalTripTypeTruck;
 //	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/truck_AM.csv";
 //	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/truck_OP.csv";
 //	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/truck_PM.csv";
 	
-	private String type = "commercial";
-	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/commercial_AM.csv";
-	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/commercial_OP.csv";
-	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/commercial_PM.csv";
+//	private String type = TelAvivConfig.externalTripTypeCommercial;
+//	private String externalAMTripsFile = TelAvivConfig.basePath + "/population/commercial_AM.csv";
+//	private String externalOPTripsFile = TelAvivConfig.basePath + "/population/commercial_OP.csv";
+//	private String externalPMTripsFile = TelAvivConfig.basePath + "/population/commercial_PM.csv";
 	
-	private String outFile = TelAvivConfig.basePath + "/population/external_plans_" + type + "_10.xml.gz";
+	private String outPlansFile = TelAvivConfig.basePath + "/population/external_plans_" + type + "_10.xml.gz";
+	private String outAttributesFile = TelAvivConfig.basePath + "/population/external_plans_attributes_" + type + "_10.xml.gz";
 	
 	private Scenario scenario;
 //	private ZoneMapping zoneMapping;
 	private Random random = new Random(123456);
-	private Network network;
-	private ActivityFacilities activityFacilities; 
 	
 	/*
 	 * We got Trips per Hour in the input file.
@@ -102,19 +98,24 @@ public class Emme2ExternalTripsCreator {
 	private double scaleFactor = 0.1; 
 	
 	public static void main(String[] args) {
-		new Emme2ExternalTripsCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		new Emme2ExternalTripsCreator();
 	}
 	
-	public Emme2ExternalTripsCreator(Scenario scenario) {		
-		this.scenario = scenario;
+	public Emme2ExternalTripsCreator() {
 		
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-		network = scenario.getNetwork();
-		log.info("Loading Network ... done");
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(networkFile);
+		config.facilities().setInputFile(facilitiesFile);
 		
-		new MatsimFacilitiesReader((ScenarioImpl)scenario).readFile(facilitiesFile);
-		activityFacilities = ((ScenarioImpl)scenario).getActivityFacilities();
-		log.info("Loading Facilities ... done");
+		this.scenario = ScenarioUtils.loadScenario(config);
+		
+//		new MatsimNetworkReader(scenario).readFile(networkFile);
+//		network = scenario.getNetwork();
+//		log.info("Loading Network ... done");
+//		
+//		new MatsimFacilitiesReader((ScenarioImpl)scenario).readFile(facilitiesFile);
+//		activityFacilities = ((ScenarioImpl)scenario).getActivityFacilities();
+//		log.info("Loading Facilities ... done");
 		
 		Counter counter = new Counter("Created people from external population #: ");
 		
@@ -133,7 +134,8 @@ public class Emme2ExternalTripsCreator {
 		counter.printCounter();
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scaleFactor).write(outFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scaleFactor).write(outPlansFile);
+		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(this.outAttributesFile);
 		log.info("done.");
 	}
 	
@@ -165,6 +167,10 @@ public class Emme2ExternalTripsCreator {
 				createAndAddInitialPlan(person, externalTrip, departureTimeCalculator);
 				
 				scenario.getPopulation().addPerson(person);
+				scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), 
+						TelAvivConfig.subPopulationConfigName, TelAvivConfig.externalAgent);
+				scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), 
+						TelAvivConfig.externalTripType, this.type);
 				
 				counter.incCounter();
 			}
@@ -254,7 +260,7 @@ public class Emme2ExternalTripsCreator {
 	 * is used to weight the probability.
 	 */
 	private Id selectLinkByStartNode(Id nodeId) {		
-		Node startNode = network.getNodes().get(nodeId);
+		Node startNode = scenario.getNetwork().getNodes().get(nodeId);
 		List<Id> linkIds = new ArrayList<Id>();
 		
 		for (Link link : startNode.getOutLinks().values()) linkIds.add(link.getId());
@@ -266,14 +272,14 @@ public class Emme2ExternalTripsCreator {
 		
 		double totalLength = 0;
 		for (Id id : linkIds) {
-			Link link = network.getLinks().get(id);
+			Link link = scenario.getNetwork().getLinks().get(id);
 			totalLength = totalLength + link.getLength();
 		}
 		
 		double[] probabilities = new double[linkIds.size()];
 		double sumProbability = 0.0;
 		for (int i = 0; i < linkIds.size(); i++) {
-			Link link = network.getLinks().get(linkIds.get(i));
+			Link link = scenario.getNetwork().getLinks().get(linkIds.get(i));
 			double probability = link.getLength() / totalLength;
 			probabilities[i] = sumProbability + probability;
 			sumProbability = probabilities[i];
@@ -295,7 +301,7 @@ public class Emme2ExternalTripsCreator {
 	 * We get the Id of a Link that is connected to an external Node.
 	 */
 	private ActivityFacility getActivityFacilityByLinkId(Id id) {	
-		return activityFacilities.getFacilities().get(id);
+		return scenario.getActivityFacilities().getFacilities().get(id);
 	}
 
 	private static interface DepartureTimeCalculator {

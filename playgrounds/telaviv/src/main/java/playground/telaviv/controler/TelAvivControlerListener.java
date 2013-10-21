@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TelAvivControler.java
+ * TelAvivControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,41 +20,26 @@
 
 package playground.telaviv.controler;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-import org.matsim.roadpricing.RoadPricing;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 
-import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
+public class TelAvivControlerListener implements StartupListener {
 
-public final class TelAvivControler {
+	@Override
+	public void notifyStartup(StartupEvent event) {
 		
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: TelAvivControler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new Controler(args);
-			
-			// add road pricing contrib
-			controler.addControlerListener(new RoadPricing());
-			
-			// use an adapted MobsimFactory
-			controler.setMobsimFactory(new TTAQSimFactory());
-			
-			controler.addControlerListener(new TelAvivControlerListener());
-			
-			/*
-			 * We use a Scoring Function that get the Facility Opening Times from
-			 * the Facilities instead of the Config File.
-			 */
-			controler.setScoringFunctionFactory(
-					new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario())
-					) ;
-
-			controler.run();
-		}
-		System.exit(0);
+		Controler controler = event.getControler();
+		Scenario scenario = controler.getScenario();
+		Config config = controler.getConfig();
+		
+		// connect facilities to links
+		new WorldConnectLocations(config).connectFacilitiesWithLinks(scenario.getActivityFacilities(), 
+				(NetworkImpl) scenario.getNetwork());
 	}
 
 }
