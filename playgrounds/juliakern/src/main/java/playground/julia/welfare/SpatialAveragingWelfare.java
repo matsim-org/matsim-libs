@@ -47,7 +47,8 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.vsp.analysis.modules.userBenefits.*;
+import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
+import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -75,8 +76,6 @@ public class SpatialAveragingWelfare {
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
 	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
-//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
 	private final String plansFile1 = runDirectory1 + "output_plans.xml.gz";
 	private final String plansFile2 = runDirectory2 + "output_plans.xml.gz";
 	
@@ -113,12 +112,11 @@ public class SpatialAveragingWelfare {
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 	final boolean compareToBaseCase = true;
 
-	private double[][] weights = new double[noOfXbins][noOfYbins];
+	private final double[][] weights = new double[noOfXbins][noOfYbins];
 
-	private double epsilon = Math.pow(10., -5.);
+	private final double epsilon = Math.pow(10., -5.);
 
 	private void run() throws IOException{
-		
 		//initialize scenario, set outpath, read plans file
 		this.simulationEndTime = getEndTime(configFile1);
 		Scenario scenario = loadScenario(netFile1);
@@ -138,7 +136,7 @@ public class SpatialAveragingWelfare {
 		logger.info("Starting user benefits calculation.");
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
 		ubc.calculateUtility_money(pop);
-		logger.info("There were " + ubc.getNoValidPlanCnt() + " unvalid plans.");
+		logger.info("There were " + ubc.getNoValidPlanCnt() + " invalid plans.");
 		
 		Map<Id, Double> personId2Utility = ubc.getPersonId2Utility();
 		logger.info("Finished user benefits calculation for " + runNumber1 + ".");
@@ -171,7 +169,7 @@ public class SpatialAveragingWelfare {
 			logger.info("Starting user benefits calculation.");
 			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM);
 			ubc2.calculateUtility_money(pop2);
-			logger.info("There were " + ubc2.getNoValidPlanCnt() + " unvalid plans.");
+			logger.info("There were " + ubc2.getNoValidPlanCnt() + " invalid plans.");
 			
 			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2Utility();
 			logger.info("Finished user benefits calculation for " + runNumber2 +".");
@@ -200,9 +198,6 @@ public class SpatialAveragingWelfare {
 			writeRoutput(weightsDifferences, outPath3); // should be zero
 			writeRoutput(average, outPath4);
 		}
-		
-
-
 	}
 	
 	private double[][] calculateDifferences(double[][] weightsBaseCase,
@@ -288,7 +283,7 @@ public class SpatialAveragingWelfare {
 				weights[xIndex][yIndex]=.0;
 			}
 		}
-		int count =1;
+		int count = 1;
 		for(Id personId : personId2Utility.keySet()){ 
 			
 				if(count%1000==0)logger.info("count = " + count);
@@ -305,10 +300,8 @@ public class SpatialAveragingWelfare {
 							weightedBenefits, personId2Utility.get(personId),
 							homeCoord);
 				}
-				
 				count++;
 		}
-		
 		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
 				weightedBenefits[xIndex][yIndex]=weightedBenefits[xIndex][yIndex]*scalingFactor/area_in_smoothing_circle_sqkm;
@@ -317,7 +310,6 @@ public class SpatialAveragingWelfare {
 		}
 		return weightedBenefits;
 	}
-
 	
 	private double[][] calculatePersonalInfluencePerBin(
 			double[][] weightedBenefits, Double value, Coord homeCoord) {
