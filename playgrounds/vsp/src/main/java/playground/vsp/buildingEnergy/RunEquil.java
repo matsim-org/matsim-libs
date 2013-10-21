@@ -1,4 +1,4 @@
-package playground.mzilske.energy;
+package playground.vsp.buildingEnergy;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;

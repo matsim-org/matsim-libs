@@ -1,4 +1,4 @@
-package playground.mzilske.energy;
+package playground.vsp.buildingEnergy;
 
 import java.util.HashMap;
 import java.util.Map;
