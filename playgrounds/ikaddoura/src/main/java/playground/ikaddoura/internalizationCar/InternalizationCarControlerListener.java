@@ -24,6 +24,7 @@
 
 package playground.ikaddoura.internalizationCar;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -40,6 +41,7 @@ import org.matsim.core.scenario.ScenarioImpl;
  */
 
 public class InternalizationCarControlerListener implements StartupListener, IterationEndsListener {
+	private static final Logger log = Logger.getLogger(InternalizationCarControlerListener.class);
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
@@ -62,6 +64,7 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		log.info(" -------------- Set average tolls for each link Id and 15 min time bin.");
 		tollHandler.setLinkId2timeBin2avgToll();
 		
 		// calculate and write social welfare

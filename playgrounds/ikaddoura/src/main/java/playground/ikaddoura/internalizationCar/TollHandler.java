@@ -30,18 +30,25 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author ikaddoura
  *
  */
-public class TollHandler implements MarginalCongestionEventHandler {
+public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEventHandler {
 	private static final Logger log = Logger.getLogger(TollHandler.class);
 	private double timeBinSize = 900.;
 	
+	private Map<Id, Map<Double, Double>> linkId2timeBin2tollSum = new HashMap<Id, Map<Double, Double>>();
+	private Map<Id, Map<Double, Integer>> linkId2timeBin2leavingAgents = new HashMap<Id, Map<Double, Integer>>();
+	
 	private List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-	private List<Id> linkIds = new ArrayList<Id>();
+	private List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
+
 	private Map<Id, Map<Double, Double>> linkId2timeBin2avgToll = new HashMap<Id, Map<Double, Double>>();
 	private double vtts_car;
 	
@@ -52,67 +59,151 @@ public class TollHandler implements MarginalCongestionEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-		log.info("-----> Iteration (" + iteration + ") begins. Clear all informations of the previous iteration (" + (iteration-1) + ").");
+		linkId2timeBin2tollSum.clear();
+		linkId2timeBin2leavingAgents.clear();
 		this.congestionEvents.clear();
 		this.linkId2timeBin2avgToll.clear();
-		this.linkIds.clear();
 	}
 
 	@Override
 	public void handleEvent(MarginalCongestionEvent event) {
-						
 		this.congestionEvents.add(event);
-		
-		if (!linkIds.contains(event.getLinkId())){
-			linkIds.add(event.getLinkId());
-		}
+	}
+	
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		this.linkLeaveEvents.add(event);
 	}
 
 	public void setLinkId2timeBin2avgToll() {
-		for (Id linkId : this.linkIds) {
-			Map<Double, Double> timeBin2avgToll = new HashMap<Double, Double>();
+		
+		if (!this.linkId2timeBin2tollSum.isEmpty()) {
+			throw new RuntimeException("Map linkId2timeBin2tollSum should be empty!");
+		} else {
+			setlinkId2timeBin2tollSum();
+		}
+		
+		if (!this.linkId2timeBin2leavingAgents.isEmpty()) {
+			throw new RuntimeException("Map linkId2timeBin2leavingAgents should be empty!");
+		} else {
+			setlinkId2timeBin2leavingAgents();
+		}
+		
+		if (!this.linkId2timeBin2avgToll.isEmpty()) {
+			throw new RuntimeException("Map linkId2timeBin2avgToll should be empty!");
+		} else {
 			
-			for (double time = 0; time < (30 * 3600); ){
-				time = time + this.timeBinSize;
-				
-				Map<Id, List<Double>> personId2amounts = new HashMap<Id, List<Double>>();
+			for (Id linkId : this.linkId2timeBin2tollSum.keySet()) {
+				log.info("calculate average toll for link " + linkId);
+				Map<Double, Double> timeBin2tollSum = this.linkId2timeBin2tollSum.get(linkId);
+				Map<Double, Double> timeBin2avgToll = new HashMap<Double, Double>();
 
-				for (MarginalCongestionEvent congestionEvent : this.congestionEvents){
+				for (Double timeBin : timeBin2tollSum.keySet()){
+					double avgToll = 0.0;
+					double tollSum = timeBin2tollSum.get(timeBin);
+					if (tollSum == 0.) {
+						// avg toll is zero for this time bin on that link
+					} else {
+						double leavingAgents = this.linkId2timeBin2leavingAgents.get(linkId).get(timeBin);
+						avgToll = tollSum / leavingAgents;
+						log.info("linkId: " + linkId + " // timeBin: " + Time.writeTime(timeBin, Time.TIMEFORMAT_HHMMSS) + " // toll sum: " + tollSum + " // leaving agents: " + leavingAgents + " // avg toll: " + avgToll);
+					}
+					timeBin2avgToll.put(timeBin, avgToll);
+				}
+			}
+		}
+	}
+
+	private void setlinkId2timeBin2leavingAgents() {
+		for (LinkLeaveEvent event : this.linkLeaveEvents){
+			
+			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())){
+				// auf dem link wurden Mautgebühren gezahlt
+				Map<Double, Integer> timeBin2leavingAgents = new HashMap<Double, Integer>();
+
+				if (this.linkId2timeBin2leavingAgents.containsKey(event.getLinkId())) {
+					// link already in map
+					timeBin2leavingAgents = this.linkId2timeBin2leavingAgents.get(event.getLinkId());
 					
-					if (congestionEvent.getLinkId().toString().equals(linkId.toString())){
-						// congestionEvent on link
-												
-						if (congestionEvent.getTime() < time && congestionEvent.getTime() >= (time - this.timeBinSize)){
-							// congestionEvent in time bin
-							
-							double amount = congestionEvent.getDelay() / 3600 * this.vtts_car;
-							
-							if (personId2amounts.containsKey(congestionEvent.getCausingAgentId())){
-								personId2amounts.get(congestionEvent.getCausingAgentId()).add(amount);
-							} else {
-								List<Double> amounts = new ArrayList<Double>();
-								amounts.add(amount);
-								personId2amounts.put(congestionEvent.getCausingAgentId(), amounts);
-							}
+					// for this link: search for the right time bin
+					for (double time = 0; time < (30 * 3600);) {
+						time = time + this.timeBinSize;
+
+						if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
+							// link leave event in time bin
+
+							// update leaving agents on this link and in this time bin
+							int leavingAgentsSoFar = timeBin2leavingAgents.get(time);
+							int leavingAgents = leavingAgentsSoFar + 1;
+							timeBin2leavingAgents.put(time, leavingAgents);
+						}
+					}
+
+				} else {
+					// link not yet in map
+
+					// for this link: search for the right time bin
+					for (double time = 0; time < (30 * 3600);) {
+						time = time + this.timeBinSize;
+
+						if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
+							// link leave event in time bin
+							timeBin2leavingAgents.put(time, 1);
 						}
 					}
 				}
 				
-				// sum up all amounts for each person (in this time bin on this link)
-				double totalToll = 0;
-				double causingAgents = 0;
-				for (Id personId : personId2amounts.keySet()) {
-					for (Double amount : personId2amounts.get(personId)) {
-						totalToll = totalToll + amount;
-					}
-					causingAgents++;
-				}
-				double avgToll = totalToll / causingAgents;
-				timeBin2avgToll.put(time, avgToll);
+				this.linkId2timeBin2leavingAgents.put(event.getLinkId(), timeBin2leavingAgents);	
+			
+			} else {
+				// no tolls paid on that link. Skip that link.
+		
 			}
-			this.linkId2timeBin2avgToll.put(linkId, timeBin2avgToll);
 		}
-		log.info(this.linkId2timeBin2avgToll.toString());	
+		
+	}
+
+	private void setlinkId2timeBin2tollSum() {
+
+		for (MarginalCongestionEvent event : this.congestionEvents) {
+			Map<Double, Double> timeBin2tollSum = new HashMap<Double, Double>();
+
+			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())) {
+				// link already in map
+				timeBin2tollSum = this.linkId2timeBin2tollSum.get(event.getLinkId());
+
+				// for this link: search for the right time bin
+				for (double time = 0; time < (30 * 3600);) {
+					time = time + this.timeBinSize;
+					
+					if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
+						// congestion event in time bin
+						// update toll sum of this link and time bin
+						
+						double sum = timeBin2tollSum.get(time);
+						double amount = event.getDelay() / 3600.0 * this.vtts_car;
+						double sumNew = sum + amount;
+						timeBin2tollSum.put(time, sumNew);
+					}
+				}
+
+			} else {
+				// link not yet in map
+				
+				// for this link: search for the right time bin
+				for (double time = 0; time < (30 * 3600);) {
+					time = time + this.timeBinSize;
+
+					if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
+						// congestion event in time bin
+						double amount = event.getDelay() / 3600.0 * this.vtts_car;
+						timeBin2tollSum.put(time, amount);
+					}
+				}
+			}
+			
+			this.linkId2timeBin2tollSum.put(event.getLinkId(), timeBin2tollSum);
+		}
 	}
 
 	/**
