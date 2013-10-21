@@ -195,7 +195,7 @@ public class AgentEventMessage extends Message {
 		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(nextLegIndex);
 
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
-			AgentWithParking.parkingManager.unParkAgentVehicle(getPerson().getId());
+		//	AgentWithParking.parkingManager.unParkAgentVehicle(getPerson().getId());
 			
 			event = new PersonDepartureEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), leg.getMode());
 			eventsManager.processEvent(event);
@@ -313,6 +313,24 @@ public class AgentEventMessage extends Message {
 
 		return -1;
 
+	}
+	
+	public int duringAct_getPlanElementIndexOfPreviousCarLeg() {
+		Plan selectedPlan = getPerson().getSelectedPlan();
+		List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+		int i = planElementIndex;
+		while (i > 0) {
+			if (planElements.get(i) instanceof LegImpl) {
+				Leg leg = (Leg) planElements.get(i);
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					return i;
+				}
+			}
+			i--;
+		}
+
+		return -1;
 	}
 
 }

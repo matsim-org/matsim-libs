@@ -23,6 +23,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -46,7 +47,7 @@ public class RandomGarageParkingSearch extends RandomParkingSearch{
 		super.handleAgentLeg(aem);
 		Id personId = aem.getPerson().getId();
 		if (startSearchTime.containsKey(personId)){
-			double searchDuration=aem.getMessageArrivalTime()-startSearchTime.get(personId);
+			double searchDuration=GeneralLib.getIntervalDuration(startSearchTime.get(personId),aem.getMessageArrivalTime());
 			
 			// allow parking at street if no garage parking found after 5 min
 			if (searchDuration>5*60){

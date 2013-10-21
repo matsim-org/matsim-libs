@@ -92,11 +92,11 @@ public class ParkingManagerZH {
 	private Network network;
 	
 	protected QuadTree<Parking> nonFullPublicParkingFacilities;
-	protected final HashSet<Parking> fullPublicParkingFacilities;
-	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
+	protected HashSet<Parking> fullPublicParkingFacilities;
+	private Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
 	//private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
 	private IntegerValueHashMap<Id> occupiedParking;	// number of reserved parkings
-	private final HashMap<String, HashSet<Id>> parkingTypes;
+	private HashMap<String, HashSet<Id>> parkingTypes;
 	// parkingId, linkId
 	private HashMap<Id, Id> parkingIdToLinkIdMapping=new HashMap<Id, Id>();
 	
@@ -106,26 +106,37 @@ public class ParkingManagerZH {
 	private EditRoute editRoute;
 
 	private TTMatrix ttMatrix;
+
+	private LinkedList<Parking> parkings;
 	
 	public ParkingManagerZH(HashMap<String, HashSet<Id>> parkingTypes,ParkingCostCalculator parkingCostCalculator, LinkedList<Parking> parkings, Network network, TTMatrix ttMatrix) {
+		this.setParkings(parkings);
+		this.network = network;
 		this.ttMatrix = ttMatrix;
 		editRoute=new EditRoute(ttMatrix, network);
-		this.parkingCostCalculator = parkingCostCalculator;
+		this.setParkingCostCalculator(parkingCostCalculator);
 		this.network = network;
 		this.parkingTypes=parkingTypes;
-		initializeQuadTree(parkings);
-		addParkings(parkings);
+		
+		
+		reset();
+			
+	}
+
+	public void reset() {
+		initializeQuadTree(this.getParkings());
+		addParkings(this.getParkings());
 		
 			occupiedParking = new IntegerValueHashMap<Id>();
 			parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
 
-			for (Parking parking:parkings){
-				Id linkId= ((NetworkImpl) network).getNearestLink(parking.getCoord()).getId();
+			for (Parking parking:this.getParkings()){
+				Id linkId= ((NetworkImpl) this.network).getNearestLink(parking.getCoord()).getId();
 				assignFacilityToLink(linkId, parking.getId());
 				
 				parkingIdToLinkIdMapping.put(parking.getId(), linkId);
 						
-				Id oppositeDirectionLinkId = getOppositeDirectionLinkId(linkId,network);
+				Id oppositeDirectionLinkId = getOppositeDirectionLinkId(linkId,this.network);
 				if (oppositeDirectionLinkId!=null){
 					assignFacilityToLink(oppositeDirectionLinkId, parking.getId());
 				}
@@ -134,7 +145,7 @@ public class ParkingManagerZH {
 			this.fullPublicParkingFacilities=new HashSet<Parking>();
 			
 			privateParkingFacilityIdMapping=new TwoHashMapsConcatenated<Id, String, Id>();
-			for (Parking parking:parkings){
+			for (Parking parking:this.getParkings()){
 				if (parking.getId().toString().contains("pp")){
 					PrivateParking privateParking=(PrivateParking) parking;
 					nonFullPublicParkingFacilities.remove(parking.getCoord().getX(), parking.getCoord().getY(), parking);
@@ -142,7 +153,6 @@ public class ParkingManagerZH {
 					privateParkingFacilityIdMapping.put(privateParking.getActInfo().getFacilityId(), privateParking.getActInfo().getActType(), parking.getId());
 				}
 			}
-			
 	}
 
 	public HashMap<Id, Parking> getParkingsHashMap() {
@@ -296,6 +306,16 @@ public class ParkingManagerZH {
 		}
 		
 		unParkVehicle(parkingId);
+	}
+	
+	public Id getCurrentParkingId(Id agentId){
+		Id parkingId = agentVehicleIdParkingIdMapping.get(agentId);
+		
+		if (parkingId==null){
+			DebugLib.stopSystemAndReportInconsistency("parkingId missing");
+		}
+		
+		return parkingId;
 	}
 	
 	private void unParkVehicle(Id facilityId) {
@@ -501,7 +521,7 @@ public class ParkingManagerZH {
 							ActivityImpl nextParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i+1);
 							ActivityImpl nextNonParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i+3);
 							
-							DebugLib.traceAgent(person.getId());
+							DebugLib.traceAgent(person.getId(),19);
 							
 							Id parkingId= getFreePrivateParking(act.getFacilityId(),act.getType());
 							
@@ -512,6 +532,13 @@ public class ParkingManagerZH {
 							if (getLinkOfParking(parkingId).toString().equalsIgnoreCase(nextNonParkingAct.getLinkId().toString())){
 								parkingId = getClosestParkingFacilityNotOnLink(network.getLinks().get(act.getLinkId()).getCoord(), nextNonParkingAct.getLinkId());
 							}
+							
+							if (getLinkOfParking(parkingId).toString().equalsIgnoreCase(nextNonParkingAct.getLinkId().toString())){
+								DebugLib.stopSystemAndReportInconsistency();
+							}
+							
+							// TODO!!!!!!!!!!!!!!!!!!!
+							// add check here, if on same link or not!!!
 								
 							parkVehicle(person.getId(), parkingId);
 						
@@ -560,7 +587,19 @@ public class ParkingManagerZH {
 		public Id getLinkOfParking(Id parkingId){
 			return parkingIdToLinkIdMapping.get(parkingId);
 		}
-	
+
+		public LinkedList<Parking> getParkings() {
+			return parkings;
+		}
+
+		public void setParkings(LinkedList<Parking> parkings) {
+			this.parkings = parkings;
+		}
+
+		public void setParkingCostCalculator(ParkingCostCalculator parkingCostCalculator) {
+			this.parkingCostCalculator = parkingCostCalculator;
+		}
+
 	
 	
 	

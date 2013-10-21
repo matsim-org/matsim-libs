@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioImpl;
 
-public class HouseHoldIncome {
+public class HouseHoldIncomeZH {
 
 	public static HashMap<Id, Double> getHouseHoldIncomeCantonZH(ScenarioImpl scenario) {
 		HashMap<Id, Double> houseHoldIncome=new HashMap<Id, Double>();

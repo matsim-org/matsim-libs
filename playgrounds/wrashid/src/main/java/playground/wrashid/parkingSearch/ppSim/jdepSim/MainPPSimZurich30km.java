@@ -44,6 +44,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.Desires;
 
@@ -55,8 +56,14 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSe
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.HouseHoldIncomeZH;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
+import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
+import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
 
 public class MainPPSimZurich30km {
 
@@ -114,10 +121,14 @@ public class MainPPSimZurich30km {
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
 		EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork());
 		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork(), Message.ttMatrix);
-
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas((ScenarioImpl) scenario, HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((ScenarioImpl) scenario));
+		
+		ParkingCostCalculatorZH parkingCostCalculatorZH = (ParkingCostCalculatorZH) AgentWithParking.parkingManager.getParkingCostCalculator();
+		ZHScenarioGlobal.parkingScoreEvaluator=new ParkingScoreEvaluator(parkingCostCalculatorZH , parkingPersonalBetas);
+		
 		// TODO: we need to do that probably also inside loop below at start of
 		// each iteration
-		AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
+		
 
 		// TODO: load parking infrastructure files from:
 		// Z:\data\experiments\TRBAug2011\parkings
@@ -125,7 +136,7 @@ public class MainPPSimZurich30km {
 		int writeEachNthIteration = 5;
 		int skipOutputInIteration = 0;
 
-		for (int iter = 0; iter < 1; iter++) {
+		for (int iter = 0; iter < 20; iter++) {
 
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			LegHistogram lh = new LegHistogram(300);
@@ -147,7 +158,8 @@ public class MainPPSimZurich30km {
 				agentsMessage.add(new AgentWithParking(p));
 				AgentWithParking.parkingStrategyManager.prepareStrategiesForNewIteration(p, iter);
 			}
-
+			AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
+			
 			Mobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
 			sim.run();
 			eventsManager.finishProcessing();
@@ -166,7 +178,8 @@ public class MainPPSimZurich30km {
 			}
 
 			AgentWithParking.parkingStrategyManager.printStrategyStatistics();
-
+			AgentWithParking.parkingManager.reset();
+			setParkingLinkIdToClosestActivity(scenario.getPopulation().getPersons().values());
 		}
 
 	}
@@ -329,6 +342,31 @@ public class MainPPSimZurich30km {
 			}
 
 			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+	}
+	
+	private static void setParkingLinkIdToClosestActivity(Collection<? extends Person> persons) {
+		for (Person p : persons) {
+			Plan selectedPlan = p.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+			int i = 0;
+			while (i < planElements.size()) {
+				if (planElements.get(i) instanceof LegImpl) {
+					ActivityImpl prevAct = (ActivityImpl) planElements.get(i - 1);
+					Leg leg = (Leg) planElements.get(i);
+					ActivityImpl nextAct = (ActivityImpl) planElements.get(i + 1);
+
+					if (leg.getMode().equalsIgnoreCase(TransportMode.walk) && prevAct.getType().equalsIgnoreCase("parking")) {
+						prevAct.setLinkId(nextAct.getLinkId());
+					}
+
+					if (leg.getMode().equalsIgnoreCase(TransportMode.walk) && nextAct.getType().equalsIgnoreCase("parking")) {
+						nextAct.setLinkId(prevAct.getLinkId());
+					}
+				}
+				i++;
+			}
 		}
 	}
 

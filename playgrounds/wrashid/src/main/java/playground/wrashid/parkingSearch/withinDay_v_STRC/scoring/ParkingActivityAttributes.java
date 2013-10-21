@@ -21,6 +21,40 @@ package playground.wrashid.parkingSearch.withinDay_v_STRC.scoring;
 import org.matsim.api.core.v01.Id;
 
 public class ParkingActivityAttributes {
+	public double getToActWalkDuration() {
+		return toActWalkDuration;
+	}
+	public void setToActWalkDuration(double toActWalkDuration) {
+		this.toActWalkDuration = toActWalkDuration;
+	}
+	public double getToParkWalkDuration() {
+		return toParkWalkDuration;
+	}
+	public void setToParkWalkDuration(double toParkWalkDuration) {
+		this.toParkWalkDuration = toParkWalkDuration;
+	}
+	public double getParkingSearchDuration() {
+		return parkingSearchDuration;
+	}
+	public void setParkingSearchDuration(double parkingSearchDuration) {
+		this.parkingSearchDuration = parkingSearchDuration;
+	}
+	public void setPersonId(Id personId) {
+		this.personId = personId;
+	}
+	public void setFacilityId(Id facilityId) {
+		this.facilityId = facilityId;
+	}
+	public void setParkingArrivalTime(double parkingArrivalTime) {
+		this.parkingArrivalTime = parkingArrivalTime;
+	}
+	public void setParkingDuration(double parkingDuration) {
+		this.parkingDuration = parkingDuration;
+	}
+	public void setActivityDuration(double activityDuration) {
+		this.activityDuration = activityDuration;
+	}
+
 	private double toActWalkDuration;
 	private double toParkWalkDuration;
 	public Id getPersonId() {
@@ -55,8 +89,8 @@ public class ParkingActivityAttributes {
 		this.toParkWalkDuration = toParkWalkDuration;
 	}
 	
-	public ParkingActivityAttributes(){
-		
+	public ParkingActivityAttributes(Id personId){
+		this.personId = personId;
 	}
 	
 	public double getToActWalkDurationInSeconds() {

@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
@@ -33,18 +34,6 @@ public class EvaluationContainer {
 	private static final Logger log = Logger.getLogger(EvaluationContainer.class);
 	
 	LinkedList<StrategyEvaluation> evaluations;
-	
-	// this is super important, because if a parking container is not used in an iteration
-	// it should be flushed/ reset.
-	private int lastIterationContainerUsed=-1;
-
-	public int getLastIterationContainerUsed() {
-		return lastIterationContainerUsed;
-	}
-
-	public void setLastIterationContainerUsed(int lastIterationContainerUsed) {
-		this.lastIterationContainerUsed = lastIterationContainerUsed;
-	}
 	
 	public EvaluationContainer(LinkedList<ParkingSearchStrategy> allStrategies){
 		evaluations=new LinkedList<StrategyEvaluation>();
@@ -71,7 +60,18 @@ public class EvaluationContainer {
 		}
 		evaluations.remove(best);
 		evaluations.addFirst(best);
+		
+		if (best.score<0){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
 	}
+	
+	//TODO: add random selection from non selected
+	
+	//TODO: add logit model
+	
+	// for this to work, will need to set initial score to finit negative number initially.
+	
 	
 	public void selectLongestNonExecutedStrategyForExecution(){
 		StrategyEvaluation last=evaluations.getLast();

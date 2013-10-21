@@ -42,129 +42,86 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingS
 public class ParkingStrategyManager {
 
 	private static final Logger log = Logger.getLogger(ParkingStrategyManager.class);
-	
-	double executionProbabilityOfBestStrategy=0.9;
+
+	double executionProbabilityOfBestStrategy = 0.9;
 	WithinDayAgentUtils withinDayAgentUtils = new WithinDayAgentUtils();
 	LinkedList<ParkingSearchStrategy> allStrategies;
-	HashMap<Id, HashMap<Integer,HashMap<Id,EvaluationContainer>>> strategyEvaluations=new HashMap<Id, HashMap<Integer,HashMap<Id,EvaluationContainer>>>();
-	// personId, legIndex, linkId
-	
-	public ParkingStrategyManager(LinkedList<ParkingSearchStrategy> allStrategies){
+	HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations = new HashMap<Id, HashMap<Integer, EvaluationContainer>>();
+
+	// personId, legIndex
+
+	public ParkingStrategyManager(LinkedList<ParkingSearchStrategy> allStrategies) {
 		this.allStrategies = allStrategies;
 	}
-	
-	// this needs to be invoked at the starting of an iteration (does not assume plan adaption with parking act/walk leg)
-	public void prepareStrategiesForNewIteration(Person person, int currentIterationNumber){
+
+	// this needs to be invoked at the starting of an iteration (does not assume
+	// plan adaption with parking act/walk leg)
+	public void prepareStrategiesForNewIteration(Person person, int currentIterationNumber) {
 		Random random = MatsimRandom.getLocalInstance();
 		Id agentId = person.getSelectedPlan().getPerson().getId();
-		for (int i=0;i<person.getSelectedPlan().getPlanElements().size();i++){
-			PlanElement pe=person.getSelectedPlan().getPlanElements().get(i);
-						
-			if (pe instanceof LegImpl){
-				LegImpl leg=(LegImpl) pe;
-				
-				if (leg.getMode().equals(TransportMode.car)){
-					Id nextActLinkId=((ActivityImpl) person.getSelectedPlan().getPlanElements().get(i+3)).getLinkId();
-				
-					HashMap<Integer, HashMap<Id, EvaluationContainer>> agentHashMap = strategyEvaluations.get(agentId);
-					
-					if (agentHashMap==null){
-						strategyEvaluations.put(agentId, new HashMap<Integer, HashMap<Id,EvaluationContainer>>());
+		for (int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++) {
+			PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
+
+			if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
+
+				if (leg.getMode().equals(TransportMode.car)) {
+					HashMap<Integer, EvaluationContainer> agentHashMap = strategyEvaluations.get(agentId);
+
+					if (agentHashMap == null) {
+						strategyEvaluations.put(agentId, new HashMap<Integer, EvaluationContainer>());
 						agentHashMap = strategyEvaluations.get(agentId);
 					}
-					
-					HashMap<Id, EvaluationContainer> legIndexHashMap = agentHashMap.get(i);
-					
-					if (legIndexHashMap==null){
-						agentHashMap.put(i, new HashMap<Id,EvaluationContainer>());
-						legIndexHashMap = agentHashMap.get(i);
+
+					EvaluationContainer evaluationContainer = agentHashMap.get(i);
+
+					if (evaluationContainer == null) {
+						agentHashMap.put(i, new EvaluationContainer(allStrategies));
+						evaluationContainer = agentHashMap.get(i);
 					}
-					
-					if (legIndexHashMap.size()==0){
-						// initialize 
-						legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(person,i,currentIterationNumber));
-					} else if (legIndexHashMap.size()==1){
-						Id linkIdInHM=null;
-						for (Id linkId:legIndexHashMap.keySet()){
-							linkIdInHM=linkId;
-						}
-						
-						if (linkIdInHM==nextActLinkId){
-							// continue with evaluation of strategy
-							EvaluationContainer evaluationContainer = legIndexHashMap.get(nextActLinkId);
-							if (evaluationContainer.getLastIterationContainerUsed()+1==currentIterationNumber){
-								// continue with strategy optimization
-								evaluationContainer.setLastIterationContainerUsed(currentIterationNumber);
-								
-								if (random.nextDouble()<executionProbabilityOfBestStrategy){
-									evaluationContainer.selectBestStrategyForExecution();
-								} else {
-									evaluationContainer.selectLongestNonExecutedStrategyForExecution();
-								}
-							}else {
-								// the activity location changed -> reset
-								legIndexHashMap.clear();
-								legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(person,i,currentIterationNumber));
-							}
-						} else {
-							// the activity location changed -> reset
-							legIndexHashMap.clear();
-							legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(person,i,currentIterationNumber));
-						}
+
+					if (random.nextDouble() < executionProbabilityOfBestStrategy) {
+						evaluationContainer.selectBestStrategyForExecution();
 					} else {
-						DebugLib.stopSystemAndReportInconsistency("something went really wrong...");
+						evaluationContainer.selectLongestNonExecutedStrategyForExecution();
 					}
+
 				}
 			}
 		}
-		
-		
-		
 	}
 
-	public void updateScore(Id personId, int legIndex, double score){
-		HashMap<Id, EvaluationContainer> legIndexHashMap = strategyEvaluations.get(personId).get(legIndex);
-		Id linkIdInHM=null;
-		for (Id linkId:legIndexHashMap.keySet()){
-			linkIdInHM=linkId;
+	public void updateScore(Id personId, int legIndex, double score) {
+		EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
+		if (evaluationContainer==null){
+			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
-		legIndexHashMap.get(linkIdInHM).updateScoreOfSelectedStrategy(score);
-	}
-	
-	
-	
-	private EvaluationContainer createEvaulationContainerForAgentAtLeg(Person person, int legIndex, int iterationNumber) {
-		EvaluationContainer evaluationContainer=new EvaluationContainer(allStrategies);
-		evaluationContainer.setLastIterationContainerUsed(iterationNumber);
-		return evaluationContainer;
+		
+		evaluationContainer.updateScoreOfSelectedStrategy(score);
 	}
 
-	public void printStrategyStatistics(){
-		IntegerValueHashMap<String> numberOfTimesStrategySelected=new IntegerValueHashMap<String>();
+
+	public void printStrategyStatistics() {
+		IntegerValueHashMap<String> numberOfTimesStrategySelected = new IntegerValueHashMap<String>();
 		log.info(" --- start strategy stats ---");
-		
-		for (Id personId:strategyEvaluations.keySet()){
-			for (Integer legIndex:strategyEvaluations.get(personId).keySet()){
-				for (Id linkId:strategyEvaluations.get(personId).get(legIndex).keySet()){
-					EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex).get(linkId);
-					
-					//log.info("legIndex: " + legIndex);
-					//evaluationContainer.printAllScores();
-					
-					numberOfTimesStrategySelected.increment(evaluationContainer.getCurrentSelectedStrategy().strategy.getName());
-				}
+
+		for (Id personId : strategyEvaluations.keySet()) {
+			for (Integer legIndex : strategyEvaluations.get(personId).keySet()) {
+				EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
+				numberOfTimesStrategySelected.increment(evaluationContainer.getCurrentSelectedStrategy().strategy.getName());
 			}
 		}
-		
-		
+
 		numberOfTimesStrategySelected.addToLog();
 		log.info(" --- end strategy stats ---");
 	}
 
 	public ParkingSearchStrategy getParkingStrategyForCurrentLeg(Person person, int currentPlanElementIndex) {
-		Id nextActLinkId=((ActivityImpl) person.getSelectedPlan().getPlanElements().get(currentPlanElementIndex+1)).getLinkId();
-		return strategyEvaluations.get(person.getId()).get(currentPlanElementIndex).get(nextActLinkId).getCurrentSelectedStrategy().strategy;		
+		if (strategyEvaluations.get(person.getId()).get(currentPlanElementIndex)==null){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
+		return strategyEvaluations.get(person.getId()).get(currentPlanElementIndex).getCurrentSelectedStrategy().strategy;
 	}
-	
-}
 
+}

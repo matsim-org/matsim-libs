@@ -19,10 +19,14 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -50,6 +54,20 @@ public class AgentWithParking extends AgentEventMessage{
 	@Override
 	public void processEvent() {
 		if (getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof ActivityImpl){
+			Activity act=(Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+			Leg nextLeg=(Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 1);
+			
+			if (act.getType().equalsIgnoreCase("parking") && nextLeg.getMode().equals(TransportMode.car)){
+				
+				// (don't do this for first parking)
+				if (getPlanElementIndex()>getIndexOfFirstCarLegOfDay()){
+					parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(),duringAct_getPlanElementIndexOfPreviousCarLeg()).handleParkingDepartureActivity(this);
+				}
+			
+				AgentWithParking.parkingManager.unParkAgentVehicle(getPerson().getId());
+			}
+			
+			
 			handleActivityEndEvent();
 		} else {
 			Leg leg=(Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
@@ -61,6 +79,24 @@ public class AgentWithParking extends AgentEventMessage{
 		}
 	}
 	
+	private int getIndexOfFirstCarLegOfDay() {
+		Plan selectedPlan = getPerson().getSelectedPlan();
+		List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+		int i = 0;
+		while (i < planElements.size()) {
+			if (planElements.get(i) instanceof LegImpl) {
+				Leg leg = (Leg) planElements.get(i);
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					return i;
+				}
+			}
+			i++;
+		}
+
+		return -1;
+	}
+
 	public void processLegInDefaultWay(){
 		handleLeg();
 	}
@@ -78,6 +114,10 @@ public class AgentWithParking extends AgentEventMessage{
 			isInvalidLink=route.getEndLinkId().toString().equalsIgnoreCase(nextActAfterNextCarLeg.getLinkId().toString());
 		}
 		return isInvalidLink;
+	}
+
+	public ActivityImpl getCurrentActivity() {
+		return (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 	}
 	
 	

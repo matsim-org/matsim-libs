@@ -16,16 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
+package playground.wrashid.parkingSearch.ppSim.jdepSim.zurich;
 
-import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
+import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
-public interface ParkingSearchStrategy {
+public class ZHScenarioGlobal {
 
-	public void handleAgentLeg(AgentWithParking aem);
-	public String getName();
+	public static ParkingScoreEvaluator parkingScoreEvaluator;
 	
-	public void handleParkingDepartureActivity(AgentWithParking agentWithParking);
 }
 

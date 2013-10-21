@@ -46,5 +46,12 @@ public class IllegalParking implements ParkingSearchStrategy{
 		return "IllegalParking";
 	}
 
+	@Override
+	public void handleParkingDepartureActivity(AgentWithParking aem) {
+		
+		
+	}
+
+
 }
 
