@@ -22,23 +22,14 @@ package playground.thibautd.socnetsim.replanning;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelSelectorFactory;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
-import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
-import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
-import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
-import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
+import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumOfMinimumLossSelectorFactory;
+import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumOfMinimumsSelectorFactory;
+import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumSelectorFactory;
+import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumWeightedSumSelectorFactory;
+import playground.thibautd.socnetsim.replanning.selectors.factories.ParetoMinSelectorFactory;
+import playground.thibautd.socnetsim.replanning.selectors.factories.WhoIsTheBossMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CliqueJointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinLossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinSelectExpBetaFactory;
@@ -52,7 +43,6 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupTimeAllocationMu
 import playground.thibautd.socnetsim.replanning.strategies.GroupTourVehicleAllocationFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
-import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup;
 
 /**
  * @author thibautd
@@ -88,112 +78,25 @@ public class GroupPlanStrategyFactoryRegistry {
 		// ---------------------------------------------------------------------
 		addSelectorFactory(
 				"MinimumWeightedSum",
-				new GroupLevelSelectorFactory() {
-					@Override
-					public GroupLevelPlanSelector createSelector(
-							final ControllerRegistry controllerRegistry) {
-						final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
-								controllerRegistry.getScenario().getConfig().getModule(
-									GroupReplanningConfigGroup.GROUP_NAME );
-						return new HighestWeightSelector(
-								true ,
-								controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-								new WeightedWeight(
-									new InverseScoreWeight(),
-									weights.getWeightAttributeName(),
-									controllerRegistry.getScenario().getPopulation().getPersonAttributes()  ));
-					}
-				});
+				new MinimumWeightedSumSelectorFactory());
 		addSelectorFactory(
 				"MinimumSum",
-				new GroupLevelSelectorFactory() {
-					@Override
-					public GroupLevelPlanSelector createSelector(
-							final ControllerRegistry controllerRegistry) {
-						return new LowestScoreSumSelectorForRemoval(
-								controllerRegistry.getIncompatiblePlansIdentifierFactory());
-					}
-				});
+				new MinimumSumSelectorFactory());
 		addSelectorFactory(
 				"MinimumOfSumOfMinimumsOfJointPlan",
-				new GroupLevelSelectorFactory() {
-					@Override
-					public GroupLevelPlanSelector createSelector(
-							final ControllerRegistry controllerRegistry) {
-						final WeightCalculator baseWeight =
-							new LowestScoreOfJointPlanWeight(
-									controllerRegistry.getJointPlans());
-						return new HighestWeightSelector(
-								true ,
-								controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-								new WeightCalculator() {
-									@Override
-									public double getWeight(
-											final Plan indivPlan,
-											final ReplanningGroup replanningGroup) {
-										return -baseWeight.getWeight( indivPlan , replanningGroup );
-									}
-								});
-					}
-				});
+				new MinimumSumOfMinimumsSelectorFactory());
 		addSelectorFactory(
 				"MinimumOfSumOfMinimumIndividualLossOfJointPlan",
-				new GroupLevelSelectorFactory() {
-					@Override
-					public GroupLevelPlanSelector createSelector(
-							final ControllerRegistry controllerRegistry) {
-						final WeightCalculator baseWeight =
-							new LowestScoreOfJointPlanWeight(
-									new LossWeight(),
-									controllerRegistry.getJointPlans());
-						return new HighestWeightSelector(
-								true ,
-								controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-								new WeightCalculator() {
-									@Override
-									public double getWeight(
-											final Plan indivPlan,
-											final ReplanningGroup replanningGroup) {
-										return -baseWeight.getWeight( indivPlan , replanningGroup );
-									}
-								});
-					}
-				});
+				new MinimumSumOfMinimumLossSelectorFactory());
 		addSelectorFactory(
 				"WhoIsTheBoss",
-				new GroupLevelSelectorFactory() {
-					@Override
-					public GroupLevelPlanSelector createSelector(
-							final ControllerRegistry controllerRegistry) {
-						return new WhoIsTheBossSelector(
-								true ,
-								MatsimRandom.getLocalInstance(),
-								controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-								new InverseScoreWeight() );
-					}
-				});
+				new WhoIsTheBossMinSelectorFactory());
 		addSelectorFactory(
 				"Pareto",
-				new GroupLevelSelectorFactory() {
-					@Override
-					public GroupLevelPlanSelector createSelector(
-							final ControllerRegistry controllerRegistry) {
-						return new HighestWeightSelector(
-								true ,
-								controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-								new ParetoWeight(
-									new InverseScoreWeight() ) );
-					}
-				});
+				new ParetoMinSelectorFactory());
 		addSelectorFactory(
 				"Coalition",
-				new GroupLevelSelectorFactory() {
-					@Override
-					public GroupLevelPlanSelector createSelector(
-							final ControllerRegistry registry) {
-						return new CoalitionSelector( new InverseScoreWeight() );
-					}
-				});
+				new CoalitionMinSelectorFactory());
 
 	}
 
