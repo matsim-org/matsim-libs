@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -44,10 +45,12 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.Desires;
 
+import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
@@ -76,12 +79,12 @@ public class MainPPSimZurich30km {
 		// String plansFile =
 		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1000802.xml";
 
-		//String plansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1472928.xml";
+		// String plansFile =
+		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1472928.xml";
 
-		 String plansFile =
-		 "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
-		
-		//String plansFile =
+		String plansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
+
+		// String plansFile =
 		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pct_plans_30km.xml.gz";
 
 		// String plansFile =
@@ -92,41 +95,40 @@ public class MainPPSimZurich30km {
 
 		filterPopulation2_5km(scenario);
 		removeNotSelectedPlans(scenario);
-		multiplyPopulation(scenario,1);
-		
-		
+		multiplyPopulation(scenario, 1);
+
+
 		addParkingActivityAndWalkLegToPlans(scenario.getPopulation().getPersons().values());
 
-		// this is introduced to quickly avoid problems with current implemenation
+		// this is introduced to quickly avoid problems with current
+		// implemenation
 		// regarding departure and arrival of car on same link
 		// could be solve/updated in future.
 		replaceCarLegsStartingAndEndingOnSameRoadByWalkLegs(scenario);
-		
+
+		ZHScenarioGlobal.initialRoutes= getInitialRoutes(scenario);
 
 		Message.ttMatrix = new TTMatrixFromStoredTable("C:/data/parkingSearch/psim/zurich/inputs/it.50.3600secBin.ttMatrix.txt",
 				scenario.getNetwork());
 
-		// TODO: set strategies initially at random
-
-		LinkedList<AgentWithParking> agentsMessage = new LinkedList<AgentWithParking>();
-
 		LinkedList<ParkingSearchStrategy> allStrategies = new LinkedList<ParkingSearchStrategy>();
 		allStrategies.add(new RandomStreetParkingSearch(300.0, scenario.getNetwork()));
 		allStrategies.add(new RandomGarageParkingSearch(500.0, scenario.getNetwork()));
-		// allStrategies.add(new GarageParkingSearch());
-		// allStrategies.add(new IllegalParking());
-
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
+
+		LinkedList<AgentWithParking> agentsMessage = new LinkedList<AgentWithParking>();
+
 		EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork());
 		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork(), Message.ttMatrix);
-		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas((ScenarioImpl) scenario, HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((ScenarioImpl) scenario));
-		
-		ParkingCostCalculatorZH parkingCostCalculatorZH = (ParkingCostCalculatorZH) AgentWithParking.parkingManager.getParkingCostCalculator();
-		ZHScenarioGlobal.parkingScoreEvaluator=new ParkingScoreEvaluator(parkingCostCalculatorZH , parkingPersonalBetas);
-		
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas((ScenarioImpl) scenario,
+				HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((ScenarioImpl) scenario));
+
+		ParkingCostCalculatorZH parkingCostCalculatorZH = (ParkingCostCalculatorZH) AgentWithParking.parkingManager
+				.getParkingCostCalculator();
+		ZHScenarioGlobal.parkingScoreEvaluator = new ParkingScoreEvaluator(parkingCostCalculatorZH, parkingPersonalBetas);
+
 		// TODO: we need to do that probably also inside loop below at start of
 		// each iteration
-		
 
 		// TODO: load parking infrastructure files from:
 		// Z:\data\experiments\TRBAug2011\parkings
@@ -135,7 +137,8 @@ public class MainPPSimZurich30km {
 		int skipOutputInIteration = ZHScenarioGlobal.skipOutputInIteration;
 
 		for (int iter = 0; iter < ZHScenarioGlobal.numberOfIterations; iter++) {
-			ZHScenarioGlobal.iteration=iter;
+			System.out.println("iteration-" + iter + " starts");
+			ZHScenarioGlobal.iteration = iter;
 
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			LegHistogram lh = new LegHistogram(300);
@@ -157,11 +160,9 @@ public class MainPPSimZurich30km {
 				agentsMessage.add(new AgentWithParking(p));
 				AgentWithParking.parkingStrategyManager.prepareStrategiesForNewIteration(p, iter);
 			}
-			AgentWithParking.parkingManager.printNumberOfOccupiedParking("start");
 			AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
-			AgentWithParking.parkingManager.printNumberOfOccupiedParking("init");
 			ZHScenarioGlobal.reset();
-			
+
 			Mobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
 			sim.run();
 			eventsManager.finishProcessing();
@@ -178,15 +179,68 @@ public class MainPPSimZurich30km {
 				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
 				eventsWriter.reset(0);
 			}
-			
-			AgentWithParking.parkingManager.printNumberOfOccupiedParking("after");
+
+			ZHScenarioGlobal.produceOutputStats();
 
 			AgentWithParking.parkingStrategyManager.printStrategyStatistics();
 			AgentWithParking.parkingStrategyManager.writeStatisticsToFile();
+			AgentWithParking.parkingStrategyManager.reset();
 			AgentWithParking.parkingManager.reset();
+			resetRoutes(scenario);
 			setParkingLinkIdToClosestActivity(scenario.getPopulation().getPersons().values());
+			System.out.println("iteration-" + iter + " ended");
 		}
 
+	}
+
+	private static void resetRoutes(Scenario scenario) {
+		TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes=ZHScenarioGlobal.initialRoutes;
+		
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			Plan selectedPlan = p.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+			int i = 0;
+			while (i < planElements.size()) {
+				if (planElements.get(i) instanceof LegImpl) {
+					Leg leg = (Leg) planElements.get(i);
+
+					if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+						leg.setRoute(initialRoutes.get(p.getId(), i).clone());
+					}
+
+					
+				}
+				i++;
+			}
+		}
+	}
+
+	// personId, legIndex, route
+	private static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> getInitialRoutes(Scenario scenario) {
+		TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> result=new TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl>();
+		
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			Plan selectedPlan = p.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+			int i = 0;
+			while (i < planElements.size()) {
+				if (planElements.get(i) instanceof LegImpl) {
+					Leg leg = (Leg) planElements.get(i);
+
+					if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+						LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
+						result.put(p.getId(), i, route.clone());
+					}
+
+					
+				}
+				i++;
+			}
+		}
+		
+		return result;
 	}
 
 	private static void multiplyPopulation(Scenario scenario, int populationExpansionFactor) {
@@ -199,24 +253,24 @@ public class MainPPSimZurich30km {
 		for (Person p : originalAgents) {
 			scenario.getPopulation().getPersons().remove(p.getId());
 		}
-		
+
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 
 		int pCounter = 1;
 
 		for (int i = 0; i < populationExpansionFactor; i++) {
 			for (Person origPerson : originalAgents) {
-				PersonImpl originPersonImpl=(PersonImpl) origPerson;
-				
+				PersonImpl originPersonImpl = (PersonImpl) origPerson;
+
 				PersonImpl newPerson = (PersonImpl) factory.createPerson(scenario.createId(String.valueOf(pCounter++)));
-				newPerson.setAge(((PersonImpl)origPerson).getAge());
-				newPerson.setSex(((PersonImpl)origPerson).getSex());
+				newPerson.setAge(((PersonImpl) origPerson).getAge());
+				newPerson.setSex(((PersonImpl) origPerson).getSex());
 				newPerson.addPlan(originPersonImpl.copySelectedPlan());
-				
+
 				scenario.getPopulation().addPerson(newPerson);
 			}
 		}
-		
+
 		System.out.println("population after population expansion: " + scenario.getPopulation().getPersons().size());
 	}
 
@@ -231,35 +285,35 @@ public class MainPPSimZurich30km {
 
 	private static void filterPopulation2_5km(Scenario scenario) {
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
-		LinkedList<Id> personToBeRemoved=new LinkedList<Id>();
-		
+		LinkedList<Id> personToBeRemoved = new LinkedList<Id>();
+
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Plan selectedPlan = p.getSelectedPlan();
 			List<PlanElement> planElements = selectedPlan.getPlanElements();
 
 			int i = 0;
-			boolean removeFromPopulatation=true;
+			boolean removeFromPopulatation = true;
 			while (i < planElements.size()) {
 				if (planElements.get(i) instanceof Activity) {
 					Activity act = (Activity) planElements.get(i);
-					
-					if (GeneralLib.getDistance(coordinatesLindenhofZH, act.getCoord())<2500){
-						removeFromPopulatation=false;
+
+					if (GeneralLib.getDistance(coordinatesLindenhofZH, act.getCoord()) < 2500) {
+						removeFromPopulatation = false;
 						break;
 					}
 				}
 				i++;
 			}
-			
-			if (removeFromPopulatation){
+
+			if (removeFromPopulatation) {
 				personToBeRemoved.add(p.getId());
 			}
 		}
-		
-		for (Id personId:personToBeRemoved){
+
+		for (Id personId : personToBeRemoved) {
 			scenario.getPopulation().getPersons().remove(personId);
 		}
-		
+
 		System.out.println("population size after fitering: " + scenario.getPopulation().getPersons().size());
 	}
 
@@ -274,25 +328,25 @@ public class MainPPSimZurich30km {
 					Activity prevAct = (Activity) planElements.get(i - 1);
 					Leg leg = (Leg) planElements.get(i);
 					Activity nextAct = (Activity) planElements.get(i + 1);
-					
-					if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
-						
-						if (prevAct.getLinkId().toString().equalsIgnoreCase(nextAct.getLinkId().toString())){
-							double walkDistance = GeneralLib.getDistance(prevAct.getCoord(),nextAct.getCoord());
-						//if (walkDistance<300){
+
+					if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+
+						if (prevAct.getLinkId().toString().equalsIgnoreCase(nextAct.getLinkId().toString())) {
+							double walkDistance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
+							// if (walkDistance<300){
 							// TODO: improve this later (no straight line)
-							double walkSpeed=3.0 / 3.6;
-							double walkDuration=walkDistance / walkSpeed;
-							
+							double walkSpeed = 3.0 / 3.6;
+							double walkDuration = walkDistance / walkSpeed;
+
 							LegImpl walkLeg = new LegImpl(TransportMode.walk);
 							walkLeg.setTravelTime(walkDuration);
 							planElements.remove(i);
-							planElements.add(i,walkLeg);
-						//}
+							planElements.add(i, walkLeg);
+							// }
 						}
 					}
 				}
-				
+
 				i++;
 			}
 		}
@@ -351,7 +405,7 @@ public class MainPPSimZurich30km {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
 	}
-	
+
 	private static void setParkingLinkIdToClosestActivity(Collection<? extends Person> persons) {
 		for (Person p : persons) {
 			Plan selectedPlan = p.getSelectedPlan();

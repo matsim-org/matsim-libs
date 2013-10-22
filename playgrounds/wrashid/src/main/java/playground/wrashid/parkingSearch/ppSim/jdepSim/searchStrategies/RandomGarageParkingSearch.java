@@ -51,7 +51,7 @@ public class RandomGarageParkingSearch extends RandomParkingSearch{
 			
 			// allow parking at street if no garage parking found after 5 min
 			if (searchDuration>5*60){
-				this.parkingType="streetParking";
+				useSpecifiedParkingType.put(personId, "streetParking");
 			}
 			
 		}

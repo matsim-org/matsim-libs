@@ -40,9 +40,9 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingInfrastructure
 public class ParkingLoader {
 
 	static double parkingsOutsideZHCityScaling = 1.0;
-	static double streetParkingCalibrationFactor = 1.0;
-	static double garageParkingCalibrationFactor = 1.0;
-	static double privateParkingCalibrationFactorZHCity = 1.0;
+	static double streetParkingCalibrationFactor = 0.1;
+	static double garageParkingCalibrationFactor = 0.1;
+	static double privateParkingCalibrationFactorZHCity = 0.01;
 	static double populationScalingFactor = 1.0;
 
 	public static LinkedList<Parking> getParkingsForScenario() {

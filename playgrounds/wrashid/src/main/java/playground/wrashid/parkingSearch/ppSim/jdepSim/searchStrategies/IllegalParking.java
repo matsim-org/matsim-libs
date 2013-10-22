@@ -52,6 +52,12 @@ public class IllegalParking implements ParkingSearchStrategy{
 		
 	}
 
+	@Override
+	public void resetForNewIteration() {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }
 

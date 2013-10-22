@@ -131,4 +131,11 @@ public class ParkingStrategyManager {
 		ZHScenarioGlobal.strategyScoreStats.writeDataToFile();
 	}
 
+	public void reset() {
+		for (ParkingSearchStrategy pss:allStrategies){
+			pss.resetForNewIteration();
+		}
+		
+	}
+
 }

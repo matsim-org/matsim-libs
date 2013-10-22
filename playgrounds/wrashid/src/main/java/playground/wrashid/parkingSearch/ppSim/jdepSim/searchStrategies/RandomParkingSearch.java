@@ -56,9 +56,9 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivity
 
 public class RandomParkingSearch implements ParkingSearchStrategy {
 
-	protected DoubleValueHashMap<Id> startSearchTime = new DoubleValueHashMap<Id>();
-	private HashMap<Id, ParkingActivityAttributes> parkingActAttributes=new HashMap<Id, ParkingActivityAttributes>();
-	
+	protected DoubleValueHashMap<Id> startSearchTime ;
+	private HashMap<Id, ParkingActivityAttributes> parkingActAttributes;
+	protected HashMap<Id, String> useSpecifiedParkingType;
 	
 	
 	
@@ -78,6 +78,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		this.maxDistance = maxDistance;
 		this.network = network;
 		this.random = MatsimRandom.getLocalInstance();
+		resetForNewIteration();
 	}
 
 	public HashSet<Id> extraSearchPathNeeded = new HashSet<Id>();
@@ -103,7 +104,14 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 			if (endOfLegReached) {
 				DebugLib.traceAgent(personId);
-				Id parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), parkingType);
+				
+				String filterParkingType=parkingType;
+				
+				if (useSpecifiedParkingType.containsKey(personId)){
+					filterParkingType=useSpecifiedParkingType.get(personId);
+				}
+				
+				Id parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), filterParkingType);
 				ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 						.get(aem.getPlanElementIndex() + 3);
 
@@ -253,7 +261,15 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	private void logParkingSearchDuration(AgentWithParking aem){
 		Id personId = aem.getPerson().getId();
 		double searchDuration=GeneralLib.getIntervalDuration(startSearchTime.get(personId),aem.getMessageArrivalTime());
+		
+		if (searchDuration==86400){
+			searchDuration=0;
+		}else {
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		getParkingAttributesForScoring(aem).setParkingSearchDuration(searchDuration);
+		startSearchTime.remove(personId);
 	}
 
 	/*
@@ -297,6 +313,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
 		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(aem.getPlanElementIndex(), parkingScore, AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()) , parkingAttributesForScoring));
 		parkingActAttributes.remove(personId);
+
 	}
 	
 	
@@ -325,6 +342,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
 		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore, AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), legIndex) , parkingAttributesForScoring));
 		parkingActAttributes.remove(personId);
+		
 	}
 	
 	// TODO: log parkingAttributesForScoring + score + leg index
@@ -336,6 +354,13 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			parkingActAttributes.put(personId, new ParkingActivityAttributes(personId));
 		}
 		return parkingActAttributes.get(personId);
+	}
+
+	@Override
+	public void resetForNewIteration() {
+		startSearchTime = new DoubleValueHashMap<Id>();
+		parkingActAttributes=new HashMap<Id, ParkingActivityAttributes>();
+		useSpecifiedParkingType=new HashMap<Id, String>();
 	}
 
 	/*

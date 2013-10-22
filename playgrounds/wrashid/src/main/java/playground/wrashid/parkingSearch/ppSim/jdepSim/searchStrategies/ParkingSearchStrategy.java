@@ -27,5 +27,6 @@ public interface ParkingSearchStrategy {
 	public String getName();
 	
 	public void handleParkingDepartureActivity(AgentWithParking agentWithParking);
+	public void resetForNewIteration();
 }
 
