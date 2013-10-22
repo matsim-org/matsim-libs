@@ -134,6 +134,7 @@ public class GenerateScenarioForDetours {
 
 			set.setStrategyName( "SelectExpBeta" );
 			set.setWeight( 0.6 );
+			set.setIsInnovative( false );
 		}
 
 		/* scope of mode choice */ {
