@@ -48,6 +48,7 @@ import org.matsim.core.utils.misc.Time;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
+@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 public class ScoringFunctionAccumulator implements ScoringFunction {
 	
 	public interface BasicScoring {
