@@ -78,7 +78,7 @@ public final class GroupStrategyRegistry {
 	}
 
 	public GroupLevelSelectorFactory getSelectorForRemovalFactory() {
-		if ( this.selectorForRemovalFactory != null ) {
+		if ( this.selectorForRemovalFactory == null ) {
 			throw new IllegalStateException( "no removal selector factory defined" );
 		}
 		return this.selectorForRemovalFactory;
