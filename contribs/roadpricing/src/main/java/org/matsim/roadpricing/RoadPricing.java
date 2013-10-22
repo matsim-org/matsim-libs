@@ -22,6 +22,7 @@ package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -36,7 +37,17 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
- * Integrates the RoadPricing functionality into the MATSim Controler.
+ * Integrates the RoadPricing functionality into the MATSim Controler.  Does the following:
+ * <p/>
+ * Initialization:<ul>
+ * <li> Reads the road pricing scheme and adds it as a scenario element.
+ * <li> Adds the CalcPaidToll events listener (to calculate the toll per agent).
+ * <li> Adds the toll to the TravelDisutility for the router (by wrapping the pre-existing Travel Disutility object).
+ * </ul>
+ * After mobsim:<ul>
+ * <li> Send toll as money events to agents.
+ * </ul>
+ * Will also generate and output some statistics ...
  *
  * @author mrieser
  */
@@ -58,7 +69,8 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 		// read the road pricing scheme from file
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
 		try {
-			rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
+			RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) controler.getConfig().getModule(RoadPricingConfigGroup.GROUP_NAME) ;
+			rpReader.parse(rpConfig.getTollLinksFile());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -78,9 +90,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 
 			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 				@Override
-				public TravelDisutility createTravelDisutility(
-						TravelTime timeCalculator,
-						PlanCalcScoreConfigGroup cnScoringGroup) {
+				public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
 					return new TravelDisutilityIncludingToll(previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), 
 							RoadPricing.this.scheme, controler.getConfig() );
 				}
