@@ -56,7 +56,7 @@ public class HouseholdBasedVehicleRessources implements VehicleRessources {
 		if ( hhId == null ) throw new RuntimeException( "no household known for "+person );
 
 		final Household hh = households.getHouseholds().get( hhId );
-		if ( hh == null ) throw new RuntimeException( "household "+hh+" vanished!" );
+		if ( hh == null ) throw new RuntimeException( "household "+hhId+" vanished!" );
 		if ( !hh.getMemberIds().contains( person ) ) throw new RuntimeException( "household "+hhId+" does not contain "+person );
 
 		return new HashSet<Id>( hh.getVehicleIds() );
