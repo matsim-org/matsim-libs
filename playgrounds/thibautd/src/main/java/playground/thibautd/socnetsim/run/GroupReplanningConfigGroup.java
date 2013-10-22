@@ -84,16 +84,7 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	private boolean useLimitedVehicles = true;
 	private String locationChoiceActivityType = "leisure";
 	private String weightAttribute = null;
-
-	public static enum GroupScoringType {
-		sum,
-		weightedSum,
-		min,
-		minLoss,
-		whoIsTheBoss,
-		pareto;
-	}
-	private GroupScoringType groupScoringType = GroupScoringType.sum;
+	private String selectorForRemoval = "MinimumSum";
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -204,6 +195,16 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 		this.locationChoiceActivityType = locationChoiceActivityType;
 	}
 
+	@StringGetter( "selectorForRemoval" )
+	public String getSelectorForRemoval() {
+		return this.selectorForRemoval;
+	}
+
+	@StringSetter( "selectorForRemoval" )
+	public void setSelectorForRemoval(final String selectorForRemoval) {
+		this.selectorForRemoval = selectorForRemoval;
+	}
+
 	@StringGetter( "weightAttributeName" )
 	public String getWeightAttributeName() {
 		return this.weightAttribute;
@@ -212,20 +213,6 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	@StringSetter( "weightAttributeName" )
 	public void setWeightAttributeName(String weightAttribute) {
 		this.weightAttribute = weightAttribute;
-	}
-
-	@StringGetter( "groupScoringType" )
-	public GroupScoringType getGroupScoringType() {
-		return this.groupScoringType;
-	}
-
-	@StringSetter( "groupScoringType" )
-	private void setgetGroupScoringType(final String groupScoringType) {
-		this.setgetGroupScoringType( GroupScoringType.valueOf( groupScoringType ) );
-	}
-
-	public void setgetGroupScoringType(final GroupScoringType groupScoringType) {
-		this.groupScoringType = groupScoringType;
 	}
 }
 

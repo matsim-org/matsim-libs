@@ -77,16 +77,7 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
-import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
-import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
-import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
@@ -281,9 +272,8 @@ public class RunCliquesWithModularStrategies {
 		// create strategy manager
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
-					getSelectorForRemoval(
-						weights,
-						controllerRegistry),
+					strategyRegistry.getSelectorForRemovalFactory().createSelector(
+						controllerRegistry ),
 					strategyRegistry,
 					config.strategy().getMaxAgentPlanMemorySize());
 
@@ -334,71 +324,6 @@ public class RunCliquesWithModularStrategies {
 
 		// dump non flat config
 		new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
-	}
-
-	private static GroupLevelPlanSelector getSelectorForRemoval(
-			final GroupReplanningConfigGroup weights,
-			final ControllerRegistry controllerRegistry) {
-		switch ( weights.getGroupScoringType() ) {
-			case weightedSum:
-				return new HighestWeightSelector(
-						true ,
-						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-						new WeightedWeight(
-							new InverseScoreWeight(),
-							weights.getWeightAttributeName(),
-							controllerRegistry.getScenario().getPopulation().getPersonAttributes()  ));
-			case sum:
-				return new LowestScoreSumSelectorForRemoval(
-						controllerRegistry.getIncompatiblePlansIdentifierFactory());
-			case min:
-				{ // scope to avoid errors with baseWeight in next case.
-				final WeightCalculator baseWeight =
-					new LowestScoreOfJointPlanWeight(
-							controllerRegistry.getJointPlans());
-				return new HighestWeightSelector(
-						true ,
-						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-						new WeightCalculator() {
-							@Override
-							public double getWeight(
-									final Plan indivPlan,
-									final ReplanningGroup replanningGroup) {
-								return -baseWeight.getWeight( indivPlan , replanningGroup );
-							}
-						});
-				}
-			case minLoss:
-				final WeightCalculator baseWeight =
-					new LowestScoreOfJointPlanWeight(
-							new LossWeight(),
-							controllerRegistry.getJointPlans());
-				return new HighestWeightSelector(
-						true ,
-						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-						new WeightCalculator() {
-							@Override
-							public double getWeight(
-									final Plan indivPlan,
-									final ReplanningGroup replanningGroup) {
-								return -baseWeight.getWeight( indivPlan , replanningGroup );
-							}
-						});
-			case whoIsTheBoss:
-				return new WhoIsTheBossSelector(
-						true ,
-						MatsimRandom.getLocalInstance(),
-						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-						new InverseScoreWeight() );
-			case pareto:
-				return new HighestWeightSelector(
-						true ,
-						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-						new ParetoWeight(
-							new InverseScoreWeight() ) );
-			default:
-				throw new RuntimeException( "unkown: "+weights.getGroupScoringType() );
-		}
 	}
 
 	private static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(

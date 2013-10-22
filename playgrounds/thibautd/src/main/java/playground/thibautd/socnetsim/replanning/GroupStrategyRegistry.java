@@ -24,11 +24,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelSelectorFactory;
+
 /**
  * @author thibautd
  */
 public final class GroupStrategyRegistry {
 	private static final Logger log = Logger.getLogger( GroupStrategyRegistry.class );
+
+	private GroupLevelSelectorFactory selectorForRemovalFactory = null;
 	private final List<GroupPlanStrategy> strategies = new ArrayList<GroupPlanStrategy>();
 	private final List<Double> weights = new ArrayList<Double>();
 	private final List<Integer> lastIters = new ArrayList<Integer>();
@@ -71,6 +75,21 @@ public final class GroupStrategyRegistry {
 			}
 		}
 		return sum;
+	}
+
+	public GroupLevelSelectorFactory getSelectorForRemovalFactory() {
+		if ( this.selectorForRemovalFactory != null ) {
+			throw new IllegalStateException( "no removal selector factory defined" );
+		}
+		return this.selectorForRemovalFactory;
+	}
+
+	public void setSelectorForRemovalFactory(
+			final GroupLevelSelectorFactory selectorForRemovalFactory) {
+		if ( this.selectorForRemovalFactory != null ) {
+			throw new IllegalStateException( "already removal selector "+this.selectorForRemovalFactory );
+		}
+		this.selectorForRemovalFactory = selectorForRemovalFactory;
 	}
 }
 
