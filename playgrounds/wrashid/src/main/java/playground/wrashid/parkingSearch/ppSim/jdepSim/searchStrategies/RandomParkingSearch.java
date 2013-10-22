@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -49,6 +50,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
@@ -197,6 +199,10 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					
 					AgentWithParking.parkingManager.parkVehicle(personId, parkingId);
 					
+					if (aem.getPlanElementIndex()==aem.getPlanElementIndexOfLastCarLeg()){
+						handleLastParkingScore(aem);
+					}
+					
 					aem.processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(nextAct);
 				}
 			} else {
@@ -250,6 +256,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		getParkingAttributesForScoring(aem).setParkingSearchDuration(searchDuration);
 	}
 
+	/*
 	public void handleParkingScoring(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
 		double searchDuration=GeneralLib.getIntervalDuration(startSearchTime.get(personId),aem.getMessageArrivalTime());
@@ -267,18 +274,42 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), 0);
 		}
 		*/
+	/*
 		startSearchTime.remove(personId);
 	}
-
+*/
+	
+	public void handleLastParkingScore(AgentWithParking aem){
+		Id personId = aem.getPerson().getId();
+		ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
+		Id currentParkingId = AgentWithParking.parkingManager.getCurrentParkingId(aem.getPerson().getId());
+		
+		Activity act = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getIndexOfFirstCarLegOfDay()-3);
+		
+		parkingAttributesForScoring.setFacilityId(currentParkingId);
+		parkingAttributesForScoring.setParkingDuration(GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(), act.getEndTime()));
+		
+		// just an approximation - TODO: update later
+		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
+		
+		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
+		
+		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
+		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(aem.getPlanElementIndex(), parkingScore, AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()) , parkingAttributesForScoring));
+		parkingActAttributes.remove(personId);
+	}
+	
+	
 	@Override
 	public void handleParkingDepartureActivity(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
 		ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
 		//handleParkingScoring(aem);	
 		
 		ActivityImpl currentActivity = aem.getCurrentActivity();
 		
-		int nextLegIndex = aem.getPlanElementIndex() + 1;
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(nextLegIndex);
+		//int nextLegIndex = aem.getPlanElementIndex() + 1;
+		//Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(nextLegIndex);
 
 		Id currentParkingId = AgentWithParking.parkingManager.getCurrentParkingId(aem.getPerson().getId());
 		
@@ -288,7 +319,12 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
 		
-		ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
+		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
+		
+		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
+		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
+		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore, AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), legIndex) , parkingAttributesForScoring));
+		parkingActAttributes.remove(personId);
 	}
 	
 	// TODO: log parkingAttributesForScoring + score + leg index

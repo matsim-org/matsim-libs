@@ -79,23 +79,7 @@ public class AgentWithParking extends AgentEventMessage{
 		}
 	}
 	
-	private int getIndexOfFirstCarLegOfDay() {
-		Plan selectedPlan = getPerson().getSelectedPlan();
-		List<PlanElement> planElements = selectedPlan.getPlanElements();
-
-		int i = 0;
-		while (i < planElements.size()) {
-			if (planElements.get(i) instanceof LegImpl) {
-				Leg leg = (Leg) planElements.get(i);
-				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
-					return i;
-				}
-			}
-			i++;
-		}
-
-		return -1;
-	}
+	
 
 	public void processLegInDefaultWay(){
 		handleLeg();

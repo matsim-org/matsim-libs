@@ -103,8 +103,6 @@ public class MainPPSimZurich30km {
 		replaceCarLegsStartingAndEndingOnSameRoadByWalkLegs(scenario);
 		
 
-		String outputFolder = "C:/data/parkingSearch/psim/zurich/output/";
-
 		Message.ttMatrix = new TTMatrixFromStoredTable("C:/data/parkingSearch/psim/zurich/inputs/it.50.3600secBin.ttMatrix.txt",
 				scenario.getNetwork());
 
@@ -133,24 +131,25 @@ public class MainPPSimZurich30km {
 		// TODO: load parking infrastructure files from:
 		// Z:\data\experiments\TRBAug2011\parkings
 
-		int writeEachNthIteration = 5;
-		int skipOutputInIteration = 0;
+		int writeEachNthIteration = ZHScenarioGlobal.writeEachNthIteration;
+		int skipOutputInIteration = ZHScenarioGlobal.skipOutputInIteration;
 
-		for (int iter = 0; iter < 20; iter++) {
+		for (int iter = 0; iter < ZHScenarioGlobal.numberOfIterations; iter++) {
+			ZHScenarioGlobal.iteration=iter;
 
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			LegHistogram lh = new LegHistogram(300);
-			EventWriterXML eventsWriter = new EventWriterXML(outputFolder + "events.xml.gz");
+			EventWriterXML eventsWriter = new EventWriterXML(ZHScenarioGlobal.outputFolder + "events.xml.gz");
 			if (writeOutput(writeEachNthIteration, skipOutputInIteration, iter)) {
 				eventsManager.addHandler(eventsWriter);
 				eventsManager.addHandler(lh);
 
 				eventsManager.resetHandlers(0);
-				eventsWriter.init(outputFolder + "events.xml.gz");
+				eventsWriter.init(ZHScenarioGlobal.outputFolder + "events.xml.gz");
 
 				eventsManager.resetHandlers(0);
 
-				eventsWriter.init(outputFolder + "it." + iter + ".events.xml");
+				eventsWriter.init(ZHScenarioGlobal.outputFolder + "it." + iter + ".events.xml");
 			}
 
 			agentsMessage.clear();
@@ -158,26 +157,32 @@ public class MainPPSimZurich30km {
 				agentsMessage.add(new AgentWithParking(p));
 				AgentWithParking.parkingStrategyManager.prepareStrategiesForNewIteration(p, iter);
 			}
+			AgentWithParking.parkingManager.printNumberOfOccupiedParking("start");
 			AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
+			AgentWithParking.parkingManager.printNumberOfOccupiedParking("init");
+			ZHScenarioGlobal.reset();
 			
 			Mobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
 			sim.run();
 			eventsManager.finishProcessing();
 
 			if (writeOutput(writeEachNthIteration, skipOutputInIteration, iter)) {
-				lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_all.png");
-				lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_car.png", TransportMode.car);
-				lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
+				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_all.png");
+				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_car.png", TransportMode.car);
+				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
 				try {
-					lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_ride.png", TransportMode.ride);
+					lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_ride.png", TransportMode.ride);
 				} catch (Exception e) {
 
 				}
-				lh.writeGraphic(outputFolder + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
+				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
 				eventsWriter.reset(0);
 			}
+			
+			AgentWithParking.parkingManager.printNumberOfOccupiedParking("after");
 
 			AgentWithParking.parkingStrategyManager.printStrategyStatistics();
+			AgentWithParking.parkingStrategyManager.writeStatisticsToFile();
 			AgentWithParking.parkingManager.reset();
 			setParkingLinkIdToClosestActivity(scenario.getPopulation().getPersons().values());
 		}
@@ -203,7 +208,9 @@ public class MainPPSimZurich30km {
 			for (Person origPerson : originalAgents) {
 				PersonImpl originPersonImpl=(PersonImpl) origPerson;
 				
-				Person newPerson = factory.createPerson(scenario.createId(String.valueOf(pCounter++)));
+				PersonImpl newPerson = (PersonImpl) factory.createPerson(scenario.createId(String.valueOf(pCounter++)));
+				newPerson.setAge(((PersonImpl)origPerson).getAge());
+				newPerson.setSex(((PersonImpl)origPerson).getSex());
 				newPerson.addPlan(originPersonImpl.copySelectedPlan());
 				
 				scenario.getPopulation().addPerson(newPerson);

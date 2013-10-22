@@ -332,5 +332,40 @@ public class AgentEventMessage extends Message {
 
 		return -1;
 	}
+	
+	public int getPlanElementIndexOfLastCarLeg() {
+		Plan selectedPlan = getPerson().getSelectedPlan();
+		List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+		int i =  planElements.size()-1;
+		while (i > 0) {
+			if (planElements.get(i) instanceof LegImpl) {
+				Leg leg = (Leg) planElements.get(i);
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					return i;
+				}
+			}
+			i--;
+		}
+
+		return -1;
+	}
+	public int getIndexOfFirstCarLegOfDay() {
+		Plan selectedPlan = getPerson().getSelectedPlan();
+		List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+		int i = 0;
+		while (i < planElements.size()) {
+			if (planElements.get(i) instanceof LegImpl) {
+				Leg leg = (Leg) planElements.get(i);
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					return i;
+				}
+			}
+			i++;
+		}
+
+		return -1;
+	}
 
 }

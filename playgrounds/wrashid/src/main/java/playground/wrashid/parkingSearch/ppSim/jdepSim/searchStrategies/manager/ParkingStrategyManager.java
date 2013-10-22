@@ -37,6 +37,8 @@ import org.matsim.core.population.LegImpl;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyScoreStats;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 
 public class ParkingStrategyManager {
@@ -122,6 +124,11 @@ public class ParkingStrategyManager {
 		}
 		
 		return strategyEvaluations.get(person.getId()).get(currentPlanElementIndex).getCurrentSelectedStrategy().strategy;
+	}
+
+	public void writeStatisticsToFile() {
+		ZHScenarioGlobal.strategyScoreStats.addIterationData(strategyEvaluations);
+		ZHScenarioGlobal.strategyScoreStats.writeDataToFile();
 	}
 
 }

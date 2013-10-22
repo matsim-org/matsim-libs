@@ -88,7 +88,7 @@ public class ParkingManagerZH {
 	
 	private ParkingCostCalculator parkingCostCalculator;
 	//key: parkingId
-	private HashMap<Id,Parking> parkingsHashMap=new HashMap<Id, Parking>();
+	private HashMap<Id,Parking> parkingsHashMap;
 	private Network network;
 	
 	protected QuadTree<Parking> nonFullPublicParkingFacilities;
@@ -98,22 +98,23 @@ public class ParkingManagerZH {
 	private IntegerValueHashMap<Id> occupiedParking;	// number of reserved parkings
 	private HashMap<String, HashSet<Id>> parkingTypes;
 	// parkingId, linkId
-	private HashMap<Id, Id> parkingIdToLinkIdMapping=new HashMap<Id, Id>();
+	private HashMap<Id, Id> parkingIdToLinkIdMapping;
 	
 	// personId, parkingId
-	private HashMap<Id, Id> agentVehicleIdParkingIdMapping=new HashMap<Id, Id>();
+	private HashMap<Id, Id> agentVehicleIdParkingIdMapping;
 	
-	private EditRoute editRoute;
-
 	private TTMatrix ttMatrix;
 
 	private LinkedList<Parking> parkings;
+	// activity facility Id, activityType, parking facility id
+	private TwoHashMapsConcatenated<Id, String, Id> privateParkingFacilityIdMapping;
+
+	
 	
 	public ParkingManagerZH(HashMap<String, HashSet<Id>> parkingTypes,ParkingCostCalculator parkingCostCalculator, LinkedList<Parking> parkings, Network network, TTMatrix ttMatrix) {
 		this.setParkings(parkings);
 		this.network = network;
 		this.ttMatrix = ttMatrix;
-		editRoute=new EditRoute(ttMatrix, network);
 		this.setParkingCostCalculator(parkingCostCalculator);
 		this.network = network;
 		this.parkingTypes=parkingTypes;
@@ -124,6 +125,10 @@ public class ParkingManagerZH {
 	}
 
 	public void reset() {
+		agentVehicleIdParkingIdMapping=new HashMap<Id, Id>();
+		 parkingIdToLinkIdMapping=new HashMap<Id, Id>();
+		 parkingsHashMap=new HashMap<Id, Parking>();
+		
 		initializeQuadTree(this.getParkings());
 		addParkings(this.getParkings());
 		
@@ -223,13 +228,6 @@ public class ParkingManagerZH {
 	
 	
 	
-	
-	public void resetParkingFacilityForNewIteration(){
-		for (Parking parking:fullPublicParkingFacilities){
-			nonFullPublicParkingFacilities.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
-		}
-		occupiedParking=new IntegerValueHashMap<Id>();
-	}
 	
 	private void assignFacilityToLink(Id linkId, Id facilityId) {
 		List<Id> list = parkingFacilitiesOnLinkMapping.get(linkId);
@@ -478,10 +476,7 @@ public class ParkingManagerZH {
 	
 	
 	
-	// activity facility Id, activityType, parking facility id
-		private TwoHashMapsConcatenated<Id, String, Id> privateParkingFacilityIdMapping;
-
-			
+	
 		
 		public Id getFreePrivateParking(Id actFacilityId, String actType){
 			Id parkingFacilityId = privateParkingFacilityIdMapping.get(actFacilityId, actType);
@@ -600,7 +595,14 @@ public class ParkingManagerZH {
 			this.parkingCostCalculator = parkingCostCalculator;
 		}
 
-	
+		public void printNumberOfOccupiedParking(String comment){
+			int sum=0;
+			for (Id parkingId:occupiedParking.getKeySet()){
+				sum+=occupiedParking.get(parkingId);
+			}
+			
+			System.out.println("number of occupied parking: " + sum + " (" + comment + ")");
+		}
 	
 	
 	

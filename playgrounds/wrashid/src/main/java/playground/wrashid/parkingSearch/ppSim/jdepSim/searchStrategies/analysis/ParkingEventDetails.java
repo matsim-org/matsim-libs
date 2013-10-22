@@ -16,29 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.wrashid.parkingSearch.ppSim.jdepSim.zurich;
+package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis;
 
-import java.util.LinkedList;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
+import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyScoreStats;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
-import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
+public class ParkingEventDetails {
 
-public class ZHScenarioGlobal {
-
-	public static ParkingScoreEvaluator parkingScoreEvaluator;
-	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run3/";;
-	public static StrategyScoreStats strategyScoreStats=new StrategyScoreStats();
-	public static int iteration=0;
-	public static int numberOfIterations=1000;
-	public static int writeEachNthIteration = 1000;
-	public static int skipOutputInIteration = 0;
-	public static LinkedList<ParkingEventDetails> parkingEventDetails ;
-	
-	
-	public static void reset(){
-		parkingEventDetails=new LinkedList<ParkingEventDetails>();
+	public ParkingEventDetails(int legIndex, double score, ParkingSearchStrategy parkingStrategy,
+			ParkingActivityAttributes parkingActivityAttributes) {
+		super();
+		this.legIndex = legIndex;
+		this.score = score;
+		this.parkingStrategy = parkingStrategy;
+		this.parkingActivityAttributes = parkingActivityAttributes;
 	}
+	public int legIndex;
+	public double score;
+	public ParkingSearchStrategy parkingStrategy;
+	public ParkingActivityAttributes parkingActivityAttributes;
 }
 

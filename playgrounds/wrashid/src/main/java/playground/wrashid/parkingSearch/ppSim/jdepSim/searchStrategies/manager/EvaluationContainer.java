@@ -80,6 +80,10 @@ public class EvaluationContainer {
 	}
 	
 	public void updateScoreOfSelectedStrategy(double score){
+		if (score<-100000000){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		evaluations.get(0).score=score;
 	}
 	
@@ -87,6 +91,42 @@ public class EvaluationContainer {
 		for (StrategyEvaluation strategyEvaluation:evaluations){
 			log.info(strategyEvaluation.strategy.getName() + "-> score: " + strategyEvaluation.score);
 		}
+	}
+	
+	public double getSelectedStrategyScore(){
+		return getCurrentSelectedStrategy().score;
+	}
+	
+	public double getBestStrategyScore(){
+		double bestScore=Double.NEGATIVE_INFINITY;
+		for (StrategyEvaluation se:evaluations){
+			if (se.score>Double.NEGATIVE_INFINITY && bestScore<se.score){
+				bestScore=se.score;
+			}
+		}
+		return bestScore;
+	}
+	
+	public double getWorstStrategyScore(){
+		double worstScore=Double.POSITIVE_INFINITY;
+		for (StrategyEvaluation se:evaluations){
+			if (se.score>Double.NEGATIVE_INFINITY && worstScore>se.score){
+				worstScore=se.score;
+			}
+		}
+		return worstScore;
+	}
+	
+	public double getAverageStrategyScore(){
+		double average=0;
+		int sampleSize=0;
+		for (StrategyEvaluation se:evaluations){
+			if (se.score>Double.NEGATIVE_INFINITY){
+				average+=se.score;
+				sampleSize++;
+			}
+		}
+		return average/sampleSize;
 	}
 
 }
