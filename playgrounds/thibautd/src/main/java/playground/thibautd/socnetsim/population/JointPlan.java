@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
@@ -80,26 +79,12 @@ public class JointPlan {
 	 * JointPlan specific methods
 	 * =========================================================================
 	 */
-	public Plan getIndividualPlan(final Person person) {
-		return this.getIndividualPlan(person.getId());
-	}
-
 	public Plan getIndividualPlan(final Id id) {
 		return this.individualPlans.get(id);
 	}
 
 	public Map<Id,Plan> getIndividualPlans() {
 		return this.individualPlans;
-	}
-
-	/**
-	 * Sets the individual scores to null.
-	 * Used in the replanning.
-	 */
-	public void resetScores() {
-		for (Plan plan : this.individualPlans.values()) {
-			plan.setScore(null);
-		}
 	}
 
 	public List<Activity> getLastActivities() {
