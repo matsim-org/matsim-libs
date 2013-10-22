@@ -34,6 +34,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.ScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
 import playground.thibautd.utils.MapUtils;
 
@@ -45,6 +46,10 @@ import playground.thibautd.utils.MapUtils;
  */
 public class CoalitionSelector implements GroupLevelPlanSelector {
 	private final WeightCalculator weight;
+
+	public CoalitionSelector() {
+		this( new ScoreWeight() );
+	}
 
 	public CoalitionSelector(final WeightCalculator weight) {
 		this.weight = weight;
