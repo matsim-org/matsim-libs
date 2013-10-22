@@ -62,6 +62,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 		final Map<Id, PointingAgent> agents = new LinkedHashMap<Id, PointingAgent>();
 		final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan = new HashMap<JointPlan, Collection<PlanRecord>>();
 
+		// create agents
 		for ( Person person : group.getPersons() ) {
 			final PointingAgent agent =
 				new PointingAgent(
@@ -98,6 +99,11 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			final Map<Id, PointingAgent> agents,
 			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan,
 			final GroupPlans groupPlans) {
+		// Agents all point their prefered feasible plan, feasible meaning that
+		// no co-traveler was already alocated a plan.
+		// If all participants of a joint plan point it, it is selected, as they
+		// represent a blocking coalition for other allocations of the remaining
+		// plans.
 		for ( Map.Entry<Id, PointingAgent> entry : agents.entrySet() ) {
 			final PointingAgent agent = entry.getValue();
 
