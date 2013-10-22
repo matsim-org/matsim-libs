@@ -31,6 +31,7 @@ import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumWeigh
 import playground.thibautd.socnetsim.replanning.selectors.factories.ParetoMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.factories.WhoIsTheBossMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CliqueJointTripMutatorFactory;
+import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinLossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupOptimizingTourVehicleAllocationFactory;
@@ -73,6 +74,7 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory( "MinSelectExpBeta" , new GroupMinSelectExpBetaFactory() );
 		addFactory( "MinLossSelectExpBeta" , new GroupMinLossSelectExpBetaFactory() );
 		addFactory( "ParetoSelectExpBeta" , new ParetoExpBetaFactory() );
+		addFactory( "CoalitionSelectExpBeta" , new CoalitionExpBetaFactory() );
 
 		// default selectors
 		// ---------------------------------------------------------------------
