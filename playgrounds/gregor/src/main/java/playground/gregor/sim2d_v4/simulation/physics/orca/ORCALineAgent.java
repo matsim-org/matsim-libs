@@ -208,9 +208,9 @@ public class ORCALineAgent implements ORCALine {
 		this.setPointX(vxA + this.getDirectionX()/2f);
 		this.setPointY(vyA + this.getDirectionY()/2f);
 		double n = norm(this);
-		if (n == 0) {
-			System.out.println("");
-		}
+//		if (n == 0) {
+//			System.out.println("");
+//		}
 		multiply(this, this.sign/n);
 		double tmp = this.getDirectionX();
 		this.setDirectionX(this.getDirectionY());

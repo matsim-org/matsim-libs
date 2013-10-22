@@ -358,7 +358,7 @@ public class EventsBasedVisDebugger extends PApplet {
 			fill(255,0);
 		}
 		//		stroke(c.r,c.g,c.b,c.a);
-		stroke(0,0,0,255);;
+		stroke(0,0,0,128);;
 		ellipseMode(RADIUS);
 		ellipse(c.x,c.y,c.rr,c.rr);
 	}

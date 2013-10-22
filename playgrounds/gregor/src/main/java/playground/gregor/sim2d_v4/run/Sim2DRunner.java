@@ -29,7 +29,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -62,12 +61,12 @@ public class Sim2DRunner implements IterationStartsListener{
 		c.controler().setWriteEventsInterval(1);
 //		c.controler().setLastIteration(300);
 		Scenario sc = ScenarioUtils.loadScenario(c);
-		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
+//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
 		sim2dsc.connect(sc);
 		
 
 //		c.qsim().setEndTime(30*3600);
-		c.qsim().setEndTime(1*60);
+		c.qsim().setEndTime(5*60);
 
 
 		//offsets needed to convert to doubles later in program
@@ -120,13 +119,13 @@ public class Sim2DRunner implements IterationStartsListener{
 			VoronoiFNDDrawer vFND = new VoronoiFNDDrawer(0);
 			VoronoiFNDDrawer vFND1 = new VoronoiFNDDrawer(10);
 			dbg.addAdditionalDrawer(iBox);
-			dbg.addAdditionalDrawer(new Branding());
+//			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 			QSimInfoBoxDrawer qDbg2 = new QSimInfoBoxDrawer(sc);
 			dbg.addAdditionalDrawer(qDbg);
 			dbg.addAdditionalDrawer(qDbg2);
-			dbg.addAdditionalDrawer(vFND);
-			dbg.addAdditionalDrawer(vFND1);
+//			dbg.addAdditionalDrawer(vFND);
+//			dbg.addAdditionalDrawer(vFND1);
 //			dbg.addAdditionalDrawer(fnd);;
 //			dbg.addAdditionalDrawer(iCasion);
 //			dbg.addAdditionalDrawer(new GregorsOffice());
@@ -134,8 +133,8 @@ public class Sim2DRunner implements IterationStartsListener{
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
 			controller.getEvents().addHandler(qDbg2);
-			controller.getEvents().addHandler(vFND);
-			controller.getEvents().addHandler(vFND1);
+//			controller.getEvents().addHandler(vFND);
+//			controller.getEvents().addHandler(vFND1);
 //			controller.getEvents().addHandler(fnd);
 //			controller.getEvents().addHandler(iCasion);
 //			controller.getEvents().addHandler(v);

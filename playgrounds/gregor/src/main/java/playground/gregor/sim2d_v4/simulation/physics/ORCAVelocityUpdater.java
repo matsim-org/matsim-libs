@@ -31,6 +31,7 @@ import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.SpaceDependentSpeed;
 import playground.gregor.sim2d_v4.simulation.physics.orca.ORCALine;
 import playground.gregor.sim2d_v4.simulation.physics.orca.ORCALineAgent;
 import playground.gregor.sim2d_v4.simulation.physics.orca.ORCALineEnvironment;
@@ -64,13 +65,17 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 	private final double alpha = 1.57 + MatsimRandom.getRandom().nextGaussian()*.15;
 	private final double normHeightDenom = 1.72;
 	private final double beta = .9 + MatsimRandom.getRandom().nextGaussian()*.2;
+
+
+	private final SpaceDependentSpeed ps;
 	
-	public ORCAVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
+	public ORCAVelocityUpdater(SpaceDependentSpeed ps, DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dT = conf.getTimeStepSize();
 		this.maxDelta =5 * this.dT;
 		this.dd = dd;
 		this.agent = agent;
+		this.ps = ps;
 	}
 
 
@@ -197,6 +202,13 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //			freeSpeed = v0;
 //		}
 //		System.out.println(v0);
+		double area = this.ps.computePersonalSpace(this.agent,neighbors);
+		if (area < 10 && area > 0.0001) {
+			double rho = Math.min(4, 1/area);
+			
+			freeSpeed = 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4)));
+		}
+		
 		double vS = freeSpeed;
 //		double vS = v0;             
 //		vS = v0;
@@ -217,7 +229,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //		}
 		
 		
-		this.solver.run(constr, dir, vS, new double []{v[0],v[1]});
+		this.solver.run(constr, dir, v0, new double []{v[0],v[1]});
 		
 		
 

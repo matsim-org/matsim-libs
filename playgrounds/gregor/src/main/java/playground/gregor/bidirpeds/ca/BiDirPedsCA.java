@@ -20,10 +20,12 @@
 
 package playground.gregor.bidirpeds.ca;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 
@@ -33,40 +35,51 @@ import java.util.Random;
 public class BiDirPedsCA {
 
 
-	private  long last = 0;
+	private final  long last = 0;
 
 	private final Random r = new Random();
 
-	private final double maxSpeed = 1.34;
+	private final double maxSpeed = 1.5;
 	private final double L = .19;
-	private final double z = .5; 
+	private final double w = .51;
+	private final double z = this.w/this.L; 
 
 
 	private final double minCellTravelTime = this.L/this.maxSpeed;
-	private final double conflictDelay = 0.5;//0.5+this.minCellTravelTime;
+	private final double conflictDelay = 0.53;//0.5+this.minCellTravelTime;
 
-	private static final int CELLS = 500; //(int) (1000/.19);
+	private static final int CELLS = 30; //(int) (1000/.19);
 
 	private final Cell [] cells = new Cell[CELLS+2];
 	private final Cell [] tmpCells = new Cell[CELLS+2];
 
-	private static final double MAX_TIME = 10000;
+	private final BiDirPedsCAVis vis;
 
-	private static final double WARMUP_TIME = 3000;
+	private BufferedWriter bf;
 
-	private static final boolean VISUALIZE = false;
+	private String fileName;
+
+
+	private static final double WARMUP_TIME = 200;
+	private static final double MAX_TIME = WARMUP_TIME+500;
+
+	private static final boolean VISUALIZE = true;
+
+	private static final boolean SAVE_DAT = false;
 
 	public BiDirPedsCA() {
+
+		this.vis = new BiDirPedsCAVis(CELLS);
 
 	}
 
 	public void run() {
 
 		int idx1 = 0;
-		for (double rho1 = 0; rho1 <= 1; rho1 += 0.025) {
+		for (double rho1 = 0.075; rho1 <= 1; rho1 += 0.025) {
 			idx1++;
 			int idx2 = 0;
-			for (double rho2 = 0; rho2 <= 1; rho2 += 0.025) {
+			for (double rho2 = 0.75; rho2 <= 1; rho2 += 0.025) {
 				idx2++;
 				double rho = rho1+rho2;
 				if (rho > 1) {
@@ -77,28 +90,20 @@ public class BiDirPedsCA {
 				double rrho2 = (rho2)/this.L;
 
 
-
-
 				//initialization
 				for (int i = 0; i < CELLS+2; i++) {
 					this.cells[i] = new Cell();
 					this.tmpCells[i] = new Cell();
 				}
 
-
-
-
-
-
 				//demand
 				ArrayList<Integer> idxs = new ArrayList<Integer>();
-				for (int i = 0; i < CELLS+2; i++) {
+				for (int i = 1; i < CELLS; i++) {
 					idxs.add(i);
 				}
 				Collections.shuffle(idxs);
 
 				int numPeds = 0;
-
 
 				double threshold = (CELLS*rho) * rho1/(rho1+rho2);
 				for (int i = 1 ; i <= CELLS*rho; i ++) {
@@ -108,54 +113,23 @@ public class BiDirPedsCA {
 					numPeds++;
 					//			}
 				}
-//				System.out.println(threshold + " " + numPeds);
-
-				//				for (int i = CELLS-1 ; i < CELLS+1; i++) {
-				//					//			this.cells[i].ped = new Ped(i,-1);
-				//				}
-
+				
+				if (SAVE_DAT) {
+					this.fileName = "/Users/laemmel/tmp/ca/biDir/spaceTime_"+rrho1+"_"+rrho2;
+					try {
+						this.bf = new BufferedWriter(new FileWriter(new File(this.fileName)));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					try {
+						new GnuplotScript(this.fileName, this.cells, numPeds,CELLS);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 
 				double t = 0;
-
-
-				Map<Ped,Double> pedMap = new HashMap<Ped,Double>();
-
-
-				int m = 0;
-				int mLR = 0;
-				int mRL = 0;
-				double msaTT = 0;
-				double msaTTLR = 0;
-				double msaTTRL = 0;
 				while (t < MAX_TIME) {
-
-
-
-//					if (VISUALIZE) {
-//						StringBuffer strBuff = new StringBuffer();
-//						strBuff.append(t);
-//						strBuff.append(' ');
-//						ArrayList<Integer> peds = new ArrayList<Integer>();
-//						for (int i = 0; i < numPeds; i++) {
-//							peds.add(0);
-//						}
-//
-//						for (int i = 1; i <= CELLS; i++ ) {
-//							Ped ped = this.cells[i].ped;
-//							if (ped != null) {
-//								peds.set(Integer.parseInt(ped.id), i);
-//							}
-//						}
-//						for (int i : peds) {
-//							strBuff.append(i+" ");
-//						}
-//						strBuff.append("\n");
-//						try {
-//							bw.append(strBuff);
-//						} catch (IOException e1) {
-//							e1.printStackTrace();
-//						}
-//					}
 
 					double nextT = this.minCellTravelTime+t;//latest next update
 
@@ -167,7 +141,6 @@ public class BiDirPedsCA {
 					this.cells[CELLS+1].lastExit = this.cells[1].lastExit;
 					this.cells[CELLS+1].ped = this.cells[1].ped;
 
-
 					//update dynamics
 					for (int i = 1; i <= CELLS; i++) {
 						double earliestUpdate = updateCell(i,t);
@@ -178,85 +151,106 @@ public class BiDirPedsCA {
 					double incr = (nextT - t)*1000;
 					t = nextT;
 
-//					StringBuffer buf = new StringBuffer();
-//					buf.append('\r');
-
-
 					Ped cand = this.cells[1].ped;
-					if (t > WARMUP_TIME && cand != null && (this.tmpCells[1].ped == null||this.tmpCells[1].ped != cand)) {
-						Double lastRound = pedMap.get(cand);
-						if (lastRound != null) {
-							double tt = t-lastRound;
-							double tmp0 = m/(m+1.) * msaTT;
-							double tmp1 = 1./(m+1.)*tt;
-							msaTT = tmp0 + tmp1; 
-							m++;
-							if (cand.dir == 1) {
-								double tmp0LR = mLR/(mLR+1.) * msaTTLR;
-								double tmp1LR = 1./(mLR+1.)*tt;
-								msaTTLR = tmp0LR + tmp1LR; 
-								mLR++;
-							} else {
-								double tmp0RL = mRL/(mRL+1.) * msaTTRL;
-								double tmp1RL = 1./(mRL+1.)*tt;
-								msaTTRL = tmp0RL + tmp1RL; 
-								mRL++;
-							}							
-							//					System.out.println(msaTT);
-						}
-						pedMap.put(cand, t);
+					if (cand != null && (this.tmpCells[1].ped == null || this.tmpCells[1].ped != cand)) {
+						cand.it++;
 					}
 
 					for (int i = 1; i <= CELLS; i++) {
 						this.cells[i].lastEnter = this.tmpCells[i].lastEnter;
 						this.cells[i].lastExit = this.tmpCells[i].lastExit;
 						this.cells[i].ped = this.tmpCells[i].ped;
-//						this.tmpCells[i] = new Cell();
+						//						this.tmpCells[i] = new Cell();
 						this.tmpCells[i].lastEnter = 0;
 						this.tmpCells[i].lastExit = 0;
 						this.tmpCells[i].ped = null;
-//						buf.append(this.cells[i]+"|");
+						//						buf.append(this.cells[i]+"|");
 					}
-
-
 					if (VISUALIZE) {
-//						System.out.print(buf.toString());
-						//					the next block synchronizes the simulation with the real time
-						long time = System.currentTimeMillis();
-						if (time-this.last < incr) {
-							try {
-								long diff = (time-this.last);
-								long sleep = (long) (incr-diff);
-								Thread.sleep(sleep/10);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}				
+						this.vis.setCells(this.cells,t);
+					}
+
+					if (SAVE_DAT) {
+						int [] spaceDat = new int[numPeds];
+						for (int i = 1; i <= CELLS; i++) {
+							Ped ped = this.cells[i].ped;
+							if (ped != null ) {
+								if (i == CELLS) {
+									spaceDat[ped.nr] = -1;
+								} else {
+									spaceDat[ped.nr] = i;
+								}
+							}
 						}
-						this.last = System.currentTimeMillis();
+						StringBuffer bf = new StringBuffer();
+						
+							bf.append(t);
+						
+						//					bf.append(' ');
+						for (int i : spaceDat) {
+							bf.append(' ');
+							bf.append(i+"");
+						}
+						bf.append("\n");
+						String str = bf.toString();
+						try {
+							this.bf.append(str);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					//					System.out.println(str);
+				}
+				int lrPeds = 0;
+				int rlPeds = 0;
+				double RLFlow = 0;
+				double LRFlow = 0;
+				double RLSpeed = 0;
+				double LRSpeed = 0;
+				double overallFlow = 0;
+				double overallSpeed = 0;
+				double timeInt = MAX_TIME - WARMUP_TIME;
+				for (int i = 1; i <= CELLS; i++) {
+					Ped ped = this.cells[i].ped;
+					if (ped == null) {
+						continue;
+					}
+					int tr = ped.traveled;
+					double v = tr/timeInt * this.L;
+					if (ped.dir == 1) {
+						lrPeds++;
+						LRFlow += v*rrho1;
+						LRSpeed += v;
+						overallFlow += v*rrho1;
+						overallSpeed += v;
+					} else {
+						rlPeds++;
+						RLFlow += v*rrho2;
+						RLSpeed += v;
+						overallFlow += v*rrho2;
+						overallSpeed += v;						
 					}
 
 				}
-				//				try {
-				//					bw.close();
-				//				} catch (IOException e) {
-				//					e.printStackTrace();
-				//				}
-				double v = this.L/(msaTT/CELLS);
+				RLSpeed /= rlPeds;
+				RLFlow /= rlPeds;
+				LRSpeed /= lrPeds;
+				LRFlow /= lrPeds;
+				overallFlow += RLFlow+LRFlow;
+				overallSpeed /= (rlPeds+lrPeds);
 
-				double vRL = this.L/(msaTTRL/CELLS);
-				double vLR = this.L/(msaTTLR/CELLS);
-				if (msaTTRL == 0) {
-					vRL = 0;
+				System.out.println(rrho + "," + rrho1 + " " + rrho2 +  " " + overallSpeed + " " + overallFlow + " " + LRSpeed + " " + LRFlow + " " + RLSpeed + " " + RLFlow + " " + idx1 + " " + idx2);
+				if (SAVE_DAT) {
+					try {
+						this.bf.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-				if (msaTTLR == 0) {
-					vLR = 0;
+				if (VISUALIZE){// || SAVE_DAT) {
+					System.exit(0);
 				}
 				
-				double RLFlow = rrho2*vRL;
-				double LRFlow = rrho1*vLR;
-				double totalFlow = RLFlow + LRFlow;
-				System.out.println(rrho + "," + rrho1 + " " + rrho2 +  " " + v + " " + totalFlow + " " + vLR + " " + rrho1*vLR + " " + vRL + " " + rrho2*vRL + " " + idx1 + " " + idx2);
-
 			}
 		}
 	}
@@ -267,8 +261,6 @@ public class BiDirPedsCA {
 
 		Cell curr = this.cells[i];
 		if (curr.ped == null) {
-			//			this.tmpCells[i].ped = curr.ped;
-			//			this.tmpCells[i].lastEnter = curr.lastEnter;
 			this.tmpCells[i].lastExit = curr.lastExit;
 			return Double.POSITIVE_INFINITY;
 		}
@@ -305,6 +297,9 @@ public class BiDirPedsCA {
 		Cell nextTmp = this.tmpCells[idx];
 		//min time gap not reached
 		if (next.lastExit + this.z > time) {
+			//			if (next.lastExit > 0) {
+			//				System.out.println();
+			//			}
 			this.tmpCells[i].ped = curr.ped;
 			this.tmpCells[i].lastEnter = curr.lastEnter;
 			this.tmpCells[i].lastExit = curr.lastExit;
@@ -330,6 +325,10 @@ public class BiDirPedsCA {
 				return time + this.z;
 			}
 		}
+
+		if (time >= WARMUP_TIME) {
+			ped.traveled ++;
+		}
 		nextTmp.lastEnter = time;
 		nextTmp.ped = ped;
 		Cell currTmp = this.tmpCells[i];
@@ -342,7 +341,7 @@ public class BiDirPedsCA {
 		new BiDirPedsCA().run();
 	}
 
-	private static class Cell {
+	/*package*/ static class Cell {
 		double lastExit = 0;
 		double lastEnter = 0;
 		Ped ped = null;
@@ -353,10 +352,13 @@ public class BiDirPedsCA {
 		}
 	}
 
-	private static class Ped {
-		private final String id;
-
+	static class Ped {
+		public int traveled = 0;
+		final String id;
+		final int nr;
+		public int it = 0;
 		public Ped(int i, int j) {
+			this.nr = i;
 			if (i <10) {
 				this.id = "0"+i;
 			} else {

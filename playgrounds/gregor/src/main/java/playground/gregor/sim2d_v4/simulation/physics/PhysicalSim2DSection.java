@@ -37,8 +37,6 @@ import playground.gregor.sim2d_v4.cgal.TwoDTree;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity.Cell;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -66,16 +64,16 @@ public class PhysicalSim2DSection {
 	protected final PhysicalSim2DEnvironment penv;
 
 	private final Map<LineSegment,PhysicalSim2DSection> neighbors = new HashMap<LineSegment,PhysicalSim2DSection>();
-
+	private final Map<PhysicalSim2DSection,LineSegment> neighborsInvMapping = new HashMap<PhysicalSim2DSection, LineSegment>();
+	
+	
 	protected final TwoDTree<Sim2DAgent> agentTwoDTree;
 
 	//	private final Map<Segment,Id> openingLinkIdMapping = new HashMap<Segment,Id>();
 
 	private int numOpenings;
 
-
-	protected final PhysicalSim2DSectionVoronoiDensity densityMap;
-
+	
 
 	//	private VisDebugger debugger;
 
@@ -87,7 +85,38 @@ public class PhysicalSim2DSection {
 		Envelope e = this.sec.getPolygon().getEnvelopeInternal();
 		this.agentTwoDTree = new TwoDTree<Sim2DAgent>(new Envelope(e.getMinX(),e.getMaxX(),e.getMinY(),e.getMaxY()));
 		init();
-		this.densityMap = new PhysicalSim2DSectionVoronoiDensity(this);
+		
+		List<LineSegment> vdBounds = new ArrayList<LineSegment>(this.obstacles);
+//		vdBounds.addAll(openings);
+		for ( LineSegment o : this.openings){
+			vdBounds.add(o);
+			
+//			LineSegment l0 = new LineSegment();
+//			l0.x0 = o.x0;
+//			l0.y0 = o.y0;
+//			l0.x1 = o.x0-VoronoiDiagramCells.SPATIAL_BUFFER*o.dy;
+//			l0.y1 = o.y0+VoronoiDiagramCells.SPATIAL_BUFFER*o.dx;
+//			l0.dx = -o.dy;
+//			l0.dy = o.dx;
+//			vdBounds.add(l0);
+//			LineSegment l1 = new LineSegment();
+//			l1.x0 = o.x0-VoronoiDiagramCells.SPATIAL_BUFFER*o.dy;
+//			l1.y0 = o.y0+VoronoiDiagramCells.SPATIAL_BUFFER*o.dx;
+//			l1.x1 = o.x1-VoronoiDiagramCells.SPATIAL_BUFFER*o.dy;
+//			l1.y1 = o.y1+VoronoiDiagramCells.SPATIAL_BUFFER*o.dx;
+//			l1.dx = o.dx;
+//			l1.dy = o.dy;
+//			vdBounds.add(l1);
+//			LineSegment l2 = new LineSegment();
+//			l2.x0 = o.x1-VoronoiDiagramCells.SPATIAL_BUFFER*o.dy;
+//			l2.y0 = o.y1+VoronoiDiagramCells.SPATIAL_BUFFER*o.dx;
+//			l2.x1 = o.x1;
+//			l2.y1 = o.y1;
+//			l2.dx = o.dy;
+//			l2.dy = -o.dx;
+//			vdBounds.add(l2);
+		}
+//		this.vd = new VoronoiDiagramCells<Sim2DAgent>(vdBounds);
 	}
 
 	public int getNumberOfAllAgents() {
@@ -103,42 +132,30 @@ public class PhysicalSim2DSection {
 		this.agentTwoDTree.clear();
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
-		this.agentTwoDTree.buildTwoDTree(this.agents);
-		this.densityMap.buildDensityMap();
+//		this.agentTwoDTree.buildTwoDTree(this.agents);
 		Iterator<Sim2DAgent> it = this.agents.iterator();
-//
-//		if (this.agents.size() > 0) {
-//			double [] x = new double[this.agents.size()];
-//			double [] y = new double[this.agents.size()];
-//			for (int i = 0; i < this.agents.size(); i++){
-//				x[i] = this.agents.get(i).getPos()[0];
-//				y[i] = this.agents.get(i).getPos()[1];
-//			}
-//			VoronoiDensity vd = new VoronoiDensity(0.01, -5, -4, 45, 4);
-//			this.cells = vd.computeVoronoiDensityFast(x, y);
-//		}
 		int idx = 0;
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
 
 			//proof of concept! needs to be revised and implemented at a different location [GL August '13]
-			Cell cell = this.densityMap.getCell(idx);
-			idx++;
+//			Cell cell = this.densityMap.getCell(idx);
+//			idx++;
 			
-			double area = cell.area;
+//			double area = cell.area;
 //			for (Integer n : cell.neighbors) {
 //				area += this.densityMap.getCell(n).area;
 //			}
 //			area /= (cell.neighbors.size() + 1);
 //			area = Math.max(0.19, area);
 			
-			if (area <= 5.4 || area >= 0.1) {
-				double rho = 1/area;//+0.1;
-				double freeSpeed = Math.max(0.01, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
-				agent.setDesiredSpeed(freeSpeed);
-			} else {
-				agent.setDesiredSpeed(1.34);
-			}
+//			if (area <= 5.4 || area >= 0.1) {
+//				double rho = 1/area;//+0.1;
+//				double freeSpeed = Math.max(0.01, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
+//				agent.setDesiredSpeed(freeSpeed);
+//			} else {
+//				agent.setDesiredSpeed(1.34);
+//			}
 //			agent.setVoronoiCell(cell);  
 
 
@@ -313,6 +330,7 @@ public class PhysicalSim2DSection {
 				PhysicalSim2DSection nPSec = this.penv.psecs.get(n);
 				if (isConnectedViaOpening(opening,nPSec)){
 					this.neighbors.put(opening, nPSec);
+					this.neighborsInvMapping.put(nPSec,opening);
 					break;
 				}
 			}
@@ -382,6 +400,10 @@ public class PhysicalSim2DSection {
 	public PhysicalSim2DSection getNeighbor(LineSegment opening) {
 		return this.neighbors.get(opening);
 	}
+	
+	public LineSegment getConnectingOpening(PhysicalSim2DSection neighbor) {
+		return this.neighborsInvMapping.get(neighbor);
+	}
 
 	/*package*/ void putNeighbor(LineSegment finishLine, PhysicalSim2DSection psec) {
 		this.neighbors.put(finishLine, psec);
@@ -399,8 +421,8 @@ public class PhysicalSim2DSection {
 		return this.sim2dsc;
 	}
 
-	public PhysicalSim2DSectionVoronoiDensity getVD() {
-		return this.densityMap;
-	}
+//	public PhysicalSim2DSectionVoronoiDensity getVD() {
+//		return this.densityMap;
+//	}
 
 }

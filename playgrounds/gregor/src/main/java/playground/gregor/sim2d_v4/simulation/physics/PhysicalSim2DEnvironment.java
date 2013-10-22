@@ -20,19 +20,21 @@
 
 package playground.gregor.sim2d_v4.simulation.physics;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
+import playground.gregor.sim2d_v4.cgal.VoronoiDiagramCells;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
@@ -76,11 +78,14 @@ public class PhysicalSim2DEnvironment {
 
 	private final EventsManager eventsManager;
 
+	private final VoronoiDiagramCells<Sim2DAgent> vd;
+
 
 	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
 		this.env = env;
 		this.sim2dsc = sim2dsc;
 		this.eventsManager = eventsManager;
+		this.vd = new VoronoiDiagramCells<Sim2DAgent>(env.getEnvelope());
 		init();
 	}
 
@@ -114,6 +119,13 @@ public class PhysicalSim2DEnvironment {
 	}
 
 	public void doSimStep(double time) {
+		//TODO this can be done more efficient, one just has to do some bookkeeping when agents enter/leave sim2d
+		List<Sim2DAgent> allAgents = new ArrayList<Sim2DAgent>();
+		for (PhysicalSim2DSection psec : this.psecs.values()) {
+			allAgents.addAll(psec.getAgents());
+		}
+		this.vd.update(allAgents);
+		
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
 			psec.updateAgents(time);
 		}
@@ -121,111 +133,7 @@ public class PhysicalSim2DEnvironment {
 			psec.moveAgents(time);
 		}
 
-		//		//DEBUG
-		//		for (Sim2DQTransitionLink e : this.lowResLinks.values()) {
-		//			e.debug();
-		//		}
-
 	}
-
-	public void createAndAddPhysicalTransitionSection(
-			Sim2DQTransitionLink lowResLink, Section sec, Link pred) {
-		//		Id id = sec.getId();
-		//		PhysicalSim2DSection psec = this.psecs.get(id);
-		//
-		//		//find the corresponding opening
-		//		Segment o = null;
-		//		//1. try to find touching element
-		//		double x0 = lowResLink.getLink().getFromNode().getCoord().getX();
-		//		double y0 = lowResLink.getLink().getFromNode().getCoord().getY();
-		//		double x1 = lowResLink.getLink().getToNode().getCoord().getX();
-		//		double y1 = lowResLink.getLink().getToNode().getCoord().getY();
-		//		for ( Segment po : psec.getOpenings()) {
-		//			boolean touches = CGAL.isOnVector(x0, y0, po.x0, po.y0, po.x1, po.y1);
-		//			if (touches) {
-		//				double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x1,y1);
-		//				double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x1,y1);
-		//				if (left2*left3 < 0) {
-		//					o = po;
-		//					break;
-		//				}
-		//			}
-		//		}
-		//		if (o == null) {
-		//			//2. not found! check for lowResLink opening intersection
-		//			for ( Segment po : psec.getOpenings()) {
-		//				double left0 = CGAL.isLeftOfLine(x0, y0, po.x0, po.y0, po.x1, po.y1);
-		//				double left1 = CGAL.isLeftOfLine(x1, y1, po.x0, po.y0, po.x1, po.y1);
-		//				if (left0*left1 < 0) {
-		//					double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x1,y1);
-		//					double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x1,y1);
-		//					if (left2*left3 < 0) {
-		//						o = po;
-		//						break;
-		//					}
-		//				}
-		//			}
-		//			if (o == null) {
-		//				//3. still not found! last chance, pred intersects opening
-		//				double x2 = pred.getFromNode().getCoord().getX();
-		//				double y2 = pred.getFromNode().getCoord().getY();
-		//				for ( Segment po : psec.getOpenings()) {
-		//					double left0 = CGAL.isLeftOfLine(x0, y0, po.x0, po.y0, po.x1, po.y1);
-		//					double left1 = CGAL.isLeftOfLine(x2, y2, po.x0, po.y0, po.x1, po.y1);
-		//					if (left0*left1 < 0) {
-		//						double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x2,y2);
-		//						double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x2,y2);
-		//						if (left2*left3 < 0) {
-		//							o = po;
-		//							break;
-		//						}
-		//					}
-		//				}
-		//
-		//			}
-		//
-		//		} // if o is still null then something is wrong! not checked here
-		//
-		//		Segment o1 = new Segment();
-		//		o1.dx = -o.dy;
-		//		o1.dy = o.dx;
-		//		o1.x0 = o.x0;
-		//		o1.y0 = o.y0;
-		//		o1.x1 = o1.x0 + ARRIVAL_AREA_LENGTH * o1.dx;
-		//		o1.y1 = o1.y0 + ARRIVAL_AREA_LENGTH * o1.dy;
-		//		//		psec.getObstacles().add(o1);
-		//
-		//
-		//		Segment o2 = new Segment();
-		//		o2.dx = o.dy;
-		//		o2.dy = -o.dx;
-		//		o2.x0 = o.x1 - ARRIVAL_AREA_LENGTH * o2.dx;
-		//		o2.y0 = o.y1 - ARRIVAL_AREA_LENGTH * o2.dy;
-		//		o2.x1 = o.x1;
-		//		o2.y1 = o.y1;
-		//		//		psec.getObstacles().add(o2);
-		//
-		//		Segment o3 = new Segment();
-		//		double l = lowResLink.getLink().getLength();
-		//		o3.dx = o.dx;
-		//		o3.dy = o.dy;
-		//		o3.x0 = o.x0 + l*-o.dy;
-		//		o3.y0 = o.y0 + l*o.dx;
-		//		o3.x1 = o.x1 + l*-o.dy;
-		//		o3.y1 = o.y1 + l*o.dx;
-		//		if (l < ARRIVAL_AREA_LENGTH) {
-		//			log.warn("2D/Q transition link:" + lowResLink.getLink().getId() + " is shorter than arrival area length. This might have negative side effects on the flow!");
-		//		}
-		//		//		psec.getObstacles().add(o3);
-		//		lowResLink.setEndOfQueueLine(o3);
-
-
-		//		//DEBUG
-		//		this.eventsManager.processEvent(new LineEvent(0, o1, true));
-		//		this.eventsManager.processEvent(new LineEvent(0, o2, true));
-		//		this.eventsManager.processEvent(new LineEvent(0, o3, true));
-	}
-
 
 	public void createAndAddPhysicalTransitionSection(
 			QSim2DTransitionLink hiResLink) {

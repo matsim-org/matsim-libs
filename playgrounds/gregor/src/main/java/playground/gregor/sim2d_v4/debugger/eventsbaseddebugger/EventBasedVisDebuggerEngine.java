@@ -65,6 +65,9 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	private final EventsBasedVisDebugger vis;
 
 	private final Map<Id,CircleProperty> circleProperties = new HashMap<Id,CircleProperty>();
+	private final CircleProperty defaultCp = new CircleProperty();
+	
+	
 	private final Scenario sc;
 
 	private long lastUpdate = -1;
@@ -91,6 +94,10 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	}
 
 	private void init() {
+		
+		this.defaultCp.a = 255;
+		this.defaultCp.minScale = 0;
+		this.defaultCp.rr = .19f;
 
 		//Links
 		LineProperty lp = new LineProperty();
@@ -202,6 +209,9 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, 64, 100, true);
 		
 		CircleProperty cp = this.circleProperties.get(event.getPersonId());
+		if (cp == null) {
+			cp = this.defaultCp;
+		}
 		
 		this.vis.addCircle(event.getX(),event.getY(),cp.rr,cp.r,cp.g,cp.b,cp.a,cp.minScale,cp.fill);
 		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 200);
@@ -246,7 +256,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	}
 
 	private static final class CircleProperty {
-		boolean fill = false;
+		boolean fill = true;
 		float rr;
 		int r,g,b,a, minScale = 0;
 	}
@@ -261,12 +271,17 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		CircleProperty cp = new CircleProperty();
 		cp.rr = (float) a.getRadius();
 		int nr = a.getId().toString().hashCode()%100;
-		if (a.getId().toString().contains("d") || a.getId().toString().contains("e")) {
+		if (a.getId().toString().contains("b")){
 			cp.r = 255;
 			cp.g = 255-nr;
 			cp.b = 0;
 			cp.a = 255;
-		} else {
+		} else if (a.getId().toString().contains("e")) { 
+			cp.r = nr-nr;
+			cp.g = 0;
+			cp.b = 255;
+			cp.a = 255;
+		}else {
 			cp.r = 0;
 			cp.g = 255;
 			cp.b = 255-nr;
@@ -296,7 +311,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 //		cp.r = nr;
 //		cp.g = nr;
 //		cp.b = nr;
-		cp.a = 128;
+//		cp.a = 128;
 		//		cp.fill = false;
 		//		cp.r = 0;
 		//		cp.g = 0;

@@ -98,7 +98,7 @@ public class Sim2DEnvironment implements Identifiable{
 	
 	/*package*/ void addLinkSectionMapping(Link link, Section sec) {
 		Section tmp = this.linkSectionMapping.put(link, sec);
-		if (tmp != null) {
+		if (tmp != null) {//TODO this is not long a requirement, so fix it!! [GL Oct '13]
 			throw new RuntimeException("link: " + link.getId() + " already mapped to section: " + tmp.getId() + "! Links can only be mapped to one section, will not map link to section: " + sec.getId());
 		}
 	}

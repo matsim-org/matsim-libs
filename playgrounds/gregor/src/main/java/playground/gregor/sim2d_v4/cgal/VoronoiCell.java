@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VoronoiDiagram.java
+ * VoronoiCell.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,10 +20,61 @@
 
 package playground.gregor.sim2d_v4.cgal;
 
-public class VoronoiDiagram {
+import java.util.ArrayList;
+import java.util.List;
+
+import be.humphreys.simplevoronoi.GraphEdge;
+
+public class VoronoiCell {
+
+	/*package*/ double area = 0;
+	private final int idx;
+	private final VoronoiCenter c;
+	private final List<VoronoiCenter> neighbors = new ArrayList<VoronoiCenter>();
+	private final List<GraphEdge> edges = new ArrayList<GraphEdge>();
+
 	
-	public VoronoiDiagram() {
+	public VoronoiCell(VoronoiCenter c, int idx) {
+		this.c = c;
+		this.idx = idx;
+	}
+
+	
+	public int getIdx() {
+		return this.idx;
+	}
+	
+	public double getPointX() {
+		return this.c.getXLocation();
+	}
+	public double getPointY() {
+		return this.c.getYLocation();
+	}
+	
+	public double getArea() {
+		return this.area;
+	}
+	
+	public void addNeighbor(VoronoiCenter n) {
+		this.neighbors.add(n);
+	}
+	
+	public List<VoronoiCenter> getNeighbors() {
+		return this.neighbors;
+	}
+	
+	public VoronoiCenter getVoronoiCenter(){
+		return this.c;
+	}
+
+
+	public void addGraphEdge(GraphEdge ed) {
+		this.edges .add(ed);
 		
 	}
 
+
+	public List<GraphEdge> getGraphEdges() {
+		return this.edges;
+	}
 }

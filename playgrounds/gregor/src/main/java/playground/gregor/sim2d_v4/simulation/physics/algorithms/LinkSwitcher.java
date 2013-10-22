@@ -119,7 +119,7 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			
 			double fdx = fl.x1-fl.x0;
 			double fdy = fl.y1-fl.y0;
-			double w = Math.sqrt(fdx*fdx + fdy*fdy)/2; //TODO repair! (visibility intersection or something ??) [gl April '13] 
+			double w = Math.sqrt(fdx*fdx + fdy*fdy)/4; //TODO repair! (visibility intersection or something ??) [gl April '13] 
 			
 			targetLine = new LineSegment();
 			targetLine.x0 = seg.x1 - w*li.dy;

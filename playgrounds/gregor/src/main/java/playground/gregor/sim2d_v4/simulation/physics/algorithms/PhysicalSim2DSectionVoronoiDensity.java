@@ -190,7 +190,7 @@ public class PhysicalSim2DSectionVoronoiDensity {
 		
 		//		debug();
 		//		debug(edges);
-		debug(this.cells,true);
+//		debug(this.cells,true);
 	}
 
 	//find obstacle (wall) intersections and handle them accordingly

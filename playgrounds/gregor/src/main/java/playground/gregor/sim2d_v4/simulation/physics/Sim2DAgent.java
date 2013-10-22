@@ -29,13 +29,13 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
-import playground.gregor.sim2d_v4.cgal.TwoDObject;
+import playground.gregor.sim2d_v4.cgal.VoronoiCell;
+import playground.gregor.sim2d_v4.cgal.VoronoiCenter;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity.Cell;
 
 
-public class Sim2DAgent implements TwoDObject {
+public class Sim2DAgent implements VoronoiCenter {
 	
 	//testing only
 	@Deprecated
@@ -76,7 +76,7 @@ public class Sim2DAgent implements TwoDObject {
 
 	/*package*/ int ttl; //workaround - think about this [gl August '13]
 
-	private Cell voronoiCell;
+	private VoronoiCell voronoiCell;
 	
 	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.pos[0] = spawnX;
@@ -246,12 +246,14 @@ public class Sim2DAgent implements TwoDObject {
 		return Math.sqrt(this.v[0]*this.v[0]+this.v[1]*this.v[1]);
 	}
 
-	public void setVoronoiCell(Cell cell) {
-		this.voronoiCell = cell;
-		
-	}
-	
-	public Cell getVoronoiCell() {
+	@Override
+	public VoronoiCell getVoronoiCell() {
 		return this.voronoiCell;
+	}
+
+	@Override
+	public void setVoronoiCell(VoronoiCell voronoiCell) {
+		this.voronoiCell = voronoiCell;
+		
 	}
 }
