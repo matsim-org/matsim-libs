@@ -41,7 +41,7 @@ import org.xml.sax.Attributes;
 public class NonFlatConfigReader extends MatsimXmlParser {
 	private final Config config;
 
-	private Deque<Module> moduleStack = new ArrayDeque<Module>();
+	private final Deque<Module> moduleStack = new ArrayDeque<Module>();
 
 	public NonFlatConfigReader(
 			final Config config) {

@@ -44,7 +44,7 @@ public class SampleCliques {
 	private static final String CLIQUE_START_LINE = "\t<"+CliquesSchemaNames.CLIQUE+" "+CliquesSchemaNames.CLIQUE_ID+"=\"";
 	private static final String MEMBER_START_LINE ="\t\t<"+CliquesSchemaNames.MEMBER+" "+CliquesSchemaNames.MEMBER_ID+"=\"";
 	private static final String END_CLIQUE = "\t</"+CliquesSchemaNames.CLIQUE+">";
-	private static double maxCliqueSize = 10;
+	private final static double maxCliqueSize = 10;
 
 	public static void main(final String[] args) {
 		final double rate = Double.parseDouble( args[ 0 ] );

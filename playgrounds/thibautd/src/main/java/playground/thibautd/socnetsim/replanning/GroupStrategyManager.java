@@ -50,7 +50,7 @@ public class GroupStrategyManager {
 	private static final Logger log =
 		Logger.getLogger(GroupStrategyManager.class);
 
-	private GroupStrategyRegistry registry;
+	private final GroupStrategyRegistry registry;
 
 	private final GroupLevelPlanSelector selectorForRemoval;
 	private final int maxPlanPerAgent;

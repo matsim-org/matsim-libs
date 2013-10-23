@@ -40,7 +40,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 	private final Map<String, AcceptabilityCondition> conditions = new HashMap<String, AcceptabilityCondition>();
 	//private List<AcceptabilityCondition> conditions =
 	//	new ArrayList<AcceptabilityCondition>();
-	private Map<Id, JoinableTrips.TripRecord> trips =
+	private final Map<Id, JoinableTrips.TripRecord> trips =
 		new HashMap<Id, JoinableTrips.TripRecord>();
 
 	private List<JoinableTrips.JoinableTrip> currentJoinableTrips = null;
@@ -139,7 +139,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 }
 
 class IdPool {
-	private static Map<String, Id> map = new HashMap<String, Id>();
+	private final static Map<String, Id> map = new HashMap<String, Id>();
 
 	public static Id getId(final String string) {
 		Id id = map.get(string);

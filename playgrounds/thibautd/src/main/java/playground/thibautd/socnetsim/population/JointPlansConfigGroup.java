@@ -25,7 +25,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  * @author thibautd
  */
 public class JointPlansConfigGroup extends ReflectiveModule {
-	public static String GROUP_NAME = "jointPlans";
+	public final static String GROUP_NAME = "jointPlans";
 
 	public JointPlansConfigGroup() {
 		super( GROUP_NAME );

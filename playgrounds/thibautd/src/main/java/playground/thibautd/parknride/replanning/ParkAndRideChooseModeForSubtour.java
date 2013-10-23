@@ -76,7 +76,7 @@ public class ParkAndRideChooseModeForSubtour implements PlanAlgorithm {
 	private final FacilityChanger changer;
 	private final boolean anchorAtFacilities = false;
 
-	private PermissibleModesCalculator permissibleModesCalculator;
+	private final PermissibleModesCalculator permissibleModesCalculator;
 	
 	/**
 	 * @param includer

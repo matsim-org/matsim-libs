@@ -39,10 +39,10 @@ import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 public class StdDevBoxPlot {
 	
 	private JFreeChart chart_;
-	private TreeMap<Integer, Vector<Double>> values = new TreeMap<Integer, Vector<Double>>();
-	private String chartTitle = "";
-	private String xlabel = "";
-	private String ylabel = "";
+	private final TreeMap<Integer, Vector<Double>> values = new TreeMap<Integer, Vector<Double>>();
+	private final String chartTitle;
+	private final String xlabel;
+	private final String ylabel;
 
 	public StdDevBoxPlot(final String chartTitle, String xlabel, String ylabel) {
 		this.chartTitle = chartTitle;

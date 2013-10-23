@@ -41,12 +41,12 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
  * @author thibautd
  */
 public class CountTripsPerMode {
-	private static String PLAN = "plan";
-	private static String SEL = "selected";
-	private static String ACT = "act";
-	private static String ACTTYPE = "type";
-	private static String MODE = "mode";
-	private static String LEG = "leg";
+	private final static String PLAN = "plan";
+	private final static String SEL = "selected";
+	private final static String ACT = "act";
+	private final static String ACTTYPE = "type";
+	private final static String MODE = "mode";
+	private final static String LEG = "leg";
 
 	public static void main(final String[] args) {
 		String plansFile = args[ 0 ];

@@ -72,7 +72,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	 * when coords of start and end are identical, the initial raidus to search
 	 * activities in.
 	 */
-	private static double DEFAULT_RADIUS = 1000;
+	private final static double DEFAULT_RADIUS = 1000;
 	private final ActivityFacilities facilities;
 
 	private QuadTree<ActivityOption> shopActQuadTree = null;

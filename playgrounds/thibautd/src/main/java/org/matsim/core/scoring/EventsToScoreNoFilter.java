@@ -47,16 +47,16 @@ public class EventsToScoreNoFilter implements BasicEventHandler {
 	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	// XXX added here to keep modifications minimal, but should be in ScoringFunctionsForPopulation
 	private final Map<Id, ScoringFunction> functionsMap = new HashMap<Id, ScoringFunction>();
-	private Scenario scenario;
-	private ScoringFunctionFactory scoringFunctionFactory;
-	private double learningRate;
+	private final Scenario scenario;
+	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final double learningRate;
 	private boolean finished = false;
 	
 	private int iteration = -1 ;
 
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
-	private Integer scoreMSAstartsAtIteration;
+	private final Integer scoreMSAstartsAtIteration;
 	
 
 	/**

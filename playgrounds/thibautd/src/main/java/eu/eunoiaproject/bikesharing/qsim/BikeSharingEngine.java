@@ -254,7 +254,7 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 }
 
 class ArrivalQueue {
-	private Queue<Tuple<Double, MobsimAgent>> teleportationList =
+	private final Queue<Tuple<Double, MobsimAgent>> teleportationList =
 		new PriorityQueue<Tuple<Double, MobsimAgent>>(
 				30,
 				new TeleportationArrivalTimeComparator());

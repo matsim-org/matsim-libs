@@ -33,7 +33,7 @@ import org.matsim.core.basic.v01.IdImpl;
  * @author thibautd
  */
 public class ExtractHousholdInfo {
-	private Map<Id, List<Id>> cliques;
+	private final Map<Id, List<Id>> cliques;
 	private static final String FIRST_LINE = "hh_id\tz_id\tf_id\thhtpw\thhtpz\tp_w_list\tp_z_list";
 	private static final String SPLIT_EXPR = "\t";
 	private static final String LIST_SPLIT_EXPR = ";";
@@ -57,7 +57,7 @@ public class ExtractHousholdInfo {
 			//bis.close();
 			//fis.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException( e );
 		}
 	}
 

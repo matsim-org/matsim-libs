@@ -20,7 +20,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class NetworkMapper {
 	
 	private List<CountStation> countStations = new Vector<CountStation>();
-	private boolean removeZeroVolumes = false;
+	private final boolean removeZeroVolumes;
 	private final static Logger log = Logger.getLogger(NetworkMapper.class);
 	
 	public NetworkMapper(boolean removeZeroVolumes) {

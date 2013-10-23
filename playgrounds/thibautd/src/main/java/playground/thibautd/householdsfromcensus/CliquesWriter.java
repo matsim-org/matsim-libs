@@ -37,8 +37,8 @@ public class CliquesWriter extends MatsimXmlWriter {
 		Logger.getLogger(CliquesWriter.class);
 
 
-	private Map<Id, List<Id>> cliques;
-	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+	private final Map<Id, List<Id>> cliques;
+	private final List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	private int count = 0;
 	private int nextLog = 1;
 

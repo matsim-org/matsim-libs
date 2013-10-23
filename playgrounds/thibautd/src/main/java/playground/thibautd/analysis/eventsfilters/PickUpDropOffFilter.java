@@ -53,7 +53,7 @@ public class PickUpDropOffFilter {
 	private static final String ARRIVAL = "passenger_arrival";
 
 	private boolean useTimes;
-	private List<Event> events = new ArrayList<Event>();
+	private final List<Event> events = new ArrayList<Event>();
 
 	private EventWriterXML writer = null;
 

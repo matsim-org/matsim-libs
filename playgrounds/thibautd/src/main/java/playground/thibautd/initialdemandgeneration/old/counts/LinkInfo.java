@@ -12,13 +12,13 @@ import java.util.Vector;
  */
 public class LinkInfo {
 		
-	private TreeMap<String, String> ids = new TreeMap<String, String>();
-	private TreeMap<Integer, List<Double>> yearCountVals = new TreeMap<Integer, List<Double>>();
+	private final TreeMap<String, String> ids = new TreeMap<String, String>();
+	private final TreeMap<Integer, List<Double>> yearCountVals = new TreeMap<Integer, List<Double>>();
 	
-	private TreeMap<Integer, List<Double>> dailyCountVals = new TreeMap<Integer, List<Double>>();
+	private final TreeMap<Integer, List<Double>> dailyCountVals = new TreeMap<Integer, List<Double>>();
 	private TreeMap<Integer, Double> simVals =  new TreeMap<Integer, Double>();
 	
-	private boolean removeZeroVolumes = false;
+	private final boolean removeZeroVolumes;
 	
 	private Aggregator aggregator = new Aggregator();
 	

@@ -41,7 +41,7 @@ import playground.thibautd.utils.RoutingUtils;
  * @author thibautd
  */
 public class ParkAndRideUtils {
-	public static String PNR_TRIP_FLAG = "pnr";
+	public final static String PNR_TRIP_FLAG = "pnr";
 	private ParkAndRideUtils() {}
 
 	/**

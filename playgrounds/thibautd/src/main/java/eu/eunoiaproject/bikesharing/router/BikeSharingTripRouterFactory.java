@@ -40,8 +40,8 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
  */
 public class BikeSharingTripRouterFactory implements TripRouterFactory {
 
-	private TripRouterFactory delegate;
-	private Scenario scenario;
+	private final TripRouterFactory delegate;
+	private final Scenario scenario;
 
 	public BikeSharingTripRouterFactory(
 			final TripRouterFactory delegate,

@@ -45,7 +45,7 @@ public class JointPlans implements MatsimToplevelContainer {
 
 	private final Map<Plan, JointPlan> planToJointPlan = new ConcurrentHashMap<Plan, JointPlan>();
 
-	private static AtomicInteger instanceCount = new AtomicInteger( 0 );
+	private final static AtomicInteger instanceCount = new AtomicInteger( 0 );
 	private final JointPlanFactory factory = new JointPlanFactory();
 	
 	public JointPlans() {

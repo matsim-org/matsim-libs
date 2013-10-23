@@ -60,9 +60,9 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
-	private Config config;
-	private CharyparNagelScoringParameters params;
-	private Plan plan;
+	private final Config config;
+	private final CharyparNagelScoringParameters params;
+	private final Plan plan;
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();

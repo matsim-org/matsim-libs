@@ -61,7 +61,7 @@ public abstract class AbstractEventsFilter {
 	abstract protected boolean acceptEvent(final EventWrapper event);
 
 	public static class EventWrapper {
-		public Event event;
+		public final Event event;
 		private EventWrapper(final Event event) {
 			this.event = event;
 		}

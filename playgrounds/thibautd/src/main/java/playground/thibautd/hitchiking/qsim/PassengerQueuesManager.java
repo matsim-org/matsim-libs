@@ -42,7 +42,7 @@ import playground.thibautd.hitchiking.qsim.events.PassengerStartsWaitingEvent;
  */
 public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
 	private final PassengerQueuesPerLink queues = new PassengerQueuesPerLink();
-	private EventsManager events;
+	private final EventsManager events;
 	private InternalInterface internalInterface = null;
 
 	public PassengerQueuesManager(final EventsManager events) {

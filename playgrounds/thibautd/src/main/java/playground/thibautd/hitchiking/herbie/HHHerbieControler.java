@@ -112,7 +112,7 @@ public class HHHerbieControler extends HitchHikingControler {
 	}
 	
 	
-	private double reroutingShare = 0.05;
+	private final double reroutingShare = 0.05;
 	 /**
 	  * Create and return a TransitStrategyManager which filters transit agents
 	  * during the replanning phase. They either keep their selected plan or

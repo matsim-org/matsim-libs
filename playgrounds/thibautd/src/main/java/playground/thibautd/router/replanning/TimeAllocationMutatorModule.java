@@ -38,7 +38,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 	private final StageActivityTypes blackList;
 
 	private final double mutationRange;
-	private boolean useActivityDurations = true;
+	private final boolean useActivityDurations;
 
 	/**
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in

@@ -35,10 +35,11 @@ public class JointPlansDumping implements BeforeMobsimListener {
 	private static final Logger log =
 		Logger.getLogger(JointPlansDumping.class);
 
-	private Scenario sc;
-	private JointPlans jointPlans;
-	private int writePlansInterval, firstIteration ;
-	private OutputDirectoryHierarchy controlerIO;
+	private final Scenario sc;
+	private final JointPlans jointPlans;
+	private final int writePlansInterval;
+	private final int firstIteration ;
+	private final OutputDirectoryHierarchy controlerIO;
 
 	public JointPlansDumping(
 			final Scenario sc,

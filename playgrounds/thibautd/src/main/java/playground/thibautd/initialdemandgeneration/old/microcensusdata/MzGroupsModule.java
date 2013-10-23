@@ -37,7 +37,7 @@ public class MzGroupsModule extends Module {
 
 	public static final String NAME = "MzGroups";
 
-	private boolean isModifiable = true;
+	private final boolean isModifiable = true;
 
 	// field names
 	public static final String AGE_THRESHOLD_REGEXP = "ageThreshold.*";
@@ -54,7 +54,7 @@ public class MzGroupsModule extends Module {
 	private final AgeThresholds thresholds = new AgeThresholds();
 
 	// "group container" related fields
-	private Map<GroupId, MzGroup> groups = new HashMap<GroupId, MzGroup>();
+	private final Map<GroupId, MzGroup> groups = new HashMap<GroupId, MzGroup>();
 
 	// /////////////////////////////////////////////////////////////////////////
 	// construction

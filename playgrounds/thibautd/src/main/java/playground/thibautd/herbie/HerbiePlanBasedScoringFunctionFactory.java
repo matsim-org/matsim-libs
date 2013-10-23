@@ -47,8 +47,8 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 	private final HerbieConfigGroup ktiConfigGroup;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
-	private Network network;
-	private CharyparNagelScoringParameters params;
+	private final Network network;
+	private final CharyparNagelScoringParameters params;
 	
 	public HerbiePlanBasedScoringFunctionFactory(
 			final Config config, 

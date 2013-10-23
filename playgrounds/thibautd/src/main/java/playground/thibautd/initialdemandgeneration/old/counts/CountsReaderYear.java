@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 public class CountsReaderYear {
 	
 	private final static Logger log = Logger.getLogger(CountsReaderYear.class);
-	TreeMap<String, Vector<RawCount>> rawCounts = new TreeMap<String, Vector<RawCount>>();
+	final TreeMap<String, Vector<RawCount>> rawCounts = new TreeMap<String, Vector<RawCount>>();
 	
 	public void read(final String datasetsfile) {
 		List<String> paths = new Vector<String>();

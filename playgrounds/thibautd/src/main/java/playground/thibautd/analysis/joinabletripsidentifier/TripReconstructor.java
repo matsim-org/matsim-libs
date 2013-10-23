@@ -217,7 +217,7 @@ class TripData {
 
 	private final Id agentId;
 	private final int tripCount;
-	private ActivityEndEvent origin = null;
+	private final ActivityEndEvent origin;
 	private PersonDepartureEvent departure = null;
 	private PersonArrivalEvent arrival = null;
 	private ActivityStartEvent destination = null;
