@@ -59,39 +59,44 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 	public GroupPlans selectPlans(
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
-		final Map<Id, PointingAgent> agents = new LinkedHashMap<Id, PointingAgent>();
-		final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan = new HashMap<JointPlan, Collection<PlanRecord>>();
+		try {
+			final Map<Id, PointingAgent> agents = new LinkedHashMap<Id, PointingAgent>();
+			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan = new HashMap<JointPlan, Collection<PlanRecord>>();
 
-		// create agents
-		for ( Person person : group.getPersons() ) {
-			final PointingAgent agent =
-				new PointingAgent(
-						person,
-						group,
-						weight);
-			agents.put( person.getId() , agent );
+			// create agents
+			for ( Person person : group.getPersons() ) {
+				final PointingAgent agent =
+					new PointingAgent(
+							person,
+							group,
+							weight);
+				agents.put( person.getId() , agent );
 
-			for ( PlanRecord r : agent.getRecords() ) {
-				final JointPlan jp = jointPlans.getJointPlan( r.getPlan() );
-				if ( jp != null ) {
-					MapUtils.getCollection(
-							jp,
-							recordsPerJointPlan ).add( r );
+				for ( PlanRecord r : agent.getRecords() ) {
+					final JointPlan jp = jointPlans.getJointPlan( r.getPlan() );
+					if ( jp != null ) {
+						MapUtils.getCollection(
+								jp,
+								recordsPerJointPlan ).add( r );
+					}
 				}
 			}
-		}
 
-		// iterate
-		final GroupPlans groupPlans = new GroupPlans();
-		while ( !agents.isEmpty() ) {
-			doIteration(
-					jointPlans,
-					agents,
-					recordsPerJointPlan,
-					groupPlans );
-		}
+			// iterate
+			final GroupPlans groupPlans = new GroupPlans();
+			while ( !agents.isEmpty() ) {
+				doIteration(
+						jointPlans,
+						agents,
+						recordsPerJointPlan,
+						groupPlans );
+			}
 
-		return groupPlans;
+			return groupPlans;
+		}
+		catch ( Exception e ) {
+			throw new RuntimeException( "exception with group "+group , e );
+		}
 	}
 
 	private static void doIteration(
@@ -127,6 +132,8 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 				return;
 			}
 		}
+
+		throw new RuntimeException();
 	}
 
 	private static void markJointPlansAsInfeasible(
