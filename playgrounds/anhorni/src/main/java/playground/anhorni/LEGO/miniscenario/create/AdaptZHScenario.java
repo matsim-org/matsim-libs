@@ -41,6 +41,7 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -71,7 +72,13 @@ public class AdaptZHScenario {
 	}
 
 	public void run(String configFile) {			
-		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario()).getConfig();
+//		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario()).getConfig();
+
+		// the following is not an equivalent translation, but I don't think that scenario was needed at all:
+		Config config = ConfigUtils.loadConfig(configFile);
+		MatsimRandom.reset(config.global().getRandomSeed());
+		// (probably not needed, but was in originally called code. kai, oct'13)
+
 		this.init(config.getModule("plans").getValue("inputPlansFile"), 
 				config.getModule("network").getValue("inputNetworkFile"), 
 				config.getModule("facilities").getValue("inputFacilitiesFile"));

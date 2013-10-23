@@ -30,8 +30,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.LinkImpl;
@@ -44,6 +47,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -342,13 +346,24 @@ public class MyControler1 extends Controler {
 
 	public static void main(final String[] args) {
 
-		ScenarioLoaderImpl sl;
-		if ( args.length==0 ) {
-			sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("./examples/itsumo-sesam-scenario/config.xml");
-		} else {
-			sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
+//		ScenarioLoaderImpl sl;
+//		if ( args.length==0 ) {
+//			sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("./examples/itsumo-sesam-scenario/config.xml");
+//		} else {
+//			sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
+//		}
+//		final Scenario scenario = sl.getScenario();
+
+		// the following should be equivalent, but is not an automatic refactoring. kai, oct'13
+		String str = "./examples/itsumo-sesam-scenario/config.xml" ;
+		if ( args.length!=0 ) {
+			str = args[0] ;
 		}
-		final Scenario scenario = sl.getScenario();
+		final Config config = ConfigUtils.loadConfig(str);
+		final Scenario scenario = ScenarioUtils.createScenario(config) ;
+		MatsimRandom.reset(config.global().getRandomSeed());
+		// (probably not needed, but was in original called code. kai, oct'13)
+
 
 		loadNetwork(scenario);
 		loadPopulation(scenario);
