@@ -32,8 +32,11 @@ public class RandomGarageParkingSearch extends RandomParkingSearch{
 	
 	
 	
-	public RandomGarageParkingSearch(double maxDistance, Network network) {
+	private int delayBeforeSwitchToStreetParkingSearch;
+
+	public RandomGarageParkingSearch(double maxDistance, Network network,int delayBeforeSwitchToStreetParkingSearch) {
 		super(maxDistance, network);
+		this.delayBeforeSwitchToStreetParkingSearch = delayBeforeSwitchToStreetParkingSearch;
 		this.parkingType="garageParking";
 	}
 
@@ -50,7 +53,8 @@ public class RandomGarageParkingSearch extends RandomParkingSearch{
 			double searchDuration=GeneralLib.getIntervalDuration(startSearchTime.get(personId),aem.getMessageArrivalTime());
 			
 			// allow parking at street if no garage parking found after 5 min
-			if (searchDuration>5*60){
+			delayBeforeSwitchToStreetParkingSearch = 30*60;
+			if (searchDuration>delayBeforeSwitchToStreetParkingSearch){
 				useSpecifiedParkingType.put(personId, "streetParking");
 			}
 			

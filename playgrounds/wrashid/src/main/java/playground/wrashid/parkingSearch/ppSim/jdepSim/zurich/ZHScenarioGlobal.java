@@ -38,7 +38,7 @@ import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas
 public class ZHScenarioGlobal {
 
 	public static ParkingScoreEvaluator parkingScoreEvaluator;
-	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run5/";;
+	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run7/";;
 	public static StrategyStats strategyScoreStats = new StrategyStats();
 	public static int iteration = 0;
 	public static int numberOfIterations = 1000;
@@ -48,6 +48,7 @@ public class ZHScenarioGlobal {
 	public static int populationExpensionFactor=1;
 	public static int numberOfRoutingThreadsAtBeginning=7;
 	public static int numberOfRoutingThreadsDuringSim=10;
+	public static boolean turnParallelRoutingOnDuringSim=true;
 	
 	// personId, legIndex, route
 	public static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes;
@@ -72,6 +73,7 @@ public class ZHScenarioGlobal {
 		printGeneralParkingStats();
 		printFilteredParkingStatsParkingType("stp");
 		printFilteredParkingStatsParkingType("gp");
+		printFilteredParkingStatsParkingType("private");
 		printFilteredParkingStatsParkingType(RandomStreetParkingSearch.class);
 		printFilteredParkingStatsParkingType(RandomGarageParkingSearch.class);
 	}

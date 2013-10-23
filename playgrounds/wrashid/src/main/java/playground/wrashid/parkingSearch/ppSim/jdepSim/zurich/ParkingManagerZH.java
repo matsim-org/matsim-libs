@@ -151,7 +151,7 @@ public class ParkingManagerZH {
 			
 			privateParkingFacilityIdMapping=new TwoHashMapsConcatenated<Id, String, Id>();
 			for (Parking parking:this.getParkings()){
-				if (parking.getId().toString().contains("pp")){
+				if (parking.getId().toString().contains("private")){
 					PrivateParking privateParking=(PrivateParking) parking;
 					nonFullPublicParkingFacilities.remove(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 				

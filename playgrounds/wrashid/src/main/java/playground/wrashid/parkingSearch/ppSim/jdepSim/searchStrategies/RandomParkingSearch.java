@@ -58,13 +58,10 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivity
 
 public class RandomParkingSearch implements ParkingSearchStrategy {
 
-	protected DoubleValueHashMap<Id> startSearchTime ;
+	protected DoubleValueHashMap<Id> startSearchTime;
 	private HashMap<Id, ParkingActivityAttributes> parkingActAttributes;
 	protected HashMap<Id, String> useSpecifiedParkingType;
-	
-	
-	
-	
+
 	protected String parkingType;
 	private double maxDistance;
 	private Network network;
@@ -98,7 +95,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 			Id personId = aem.getPerson().getId();
-			
+
 			List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 
@@ -106,28 +103,37 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 			if (endOfLegReached) {
 				DebugLib.traceAgent(personId);
-				
-				String filterParkingType=parkingType;
-				
-				if (useSpecifiedParkingType.containsKey(personId)){
-					filterParkingType=useSpecifiedParkingType.get(personId);
+
+				String filterParkingType = parkingType;
+
+				if (useSpecifiedParkingType.containsKey(personId)) {
+					filterParkingType = useSpecifiedParkingType.get(personId);
 				}
 				
-				Id parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), filterParkingType);
 				ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 						.get(aem.getPlanElementIndex() + 3);
+				
+				Id parkingId= AgentWithParking.parkingManager.getFreePrivateParking(nextNonParkingAct.getFacilityId(),nextNonParkingAct.getType());
+				
+				// actually would need to drive to private parking, but this is skipped here
+				//|| !AgentWithParking.parkingManager.getLinkOfParking(parkingId).toString().equalsIgnoreCase(route.getEndLinkId().toString())
+				if (parkingId==null ){
+					parkingId = AgentWithParking.parkingManager
+							.getFreeParkingFacilityOnLink(route.getEndLinkId(), filterParkingType);
+				}
+				
 
 				boolean isInvalidLink = aem.isInvalidLinkForParking();
 
 				// TODO: include max distance here (maxDistance variable)
-				
+
 				if (!startSearchTime.containsKey(personId)) {
 					startSearchTime.put(personId, aem.getMessageArrivalTime());
 				}
 
 				if (parkingId == null || isInvalidLink) {
 					DebugLib.traceAgent(personId, 1);
-				//	extraSearchPathNeeded.add(personId);
+					// extraSearchPathNeeded.add(personId);
 
 					Random r = new Random();
 					Link link = network.getLinks().get(route.getEndLinkId());
@@ -145,77 +151,78 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 				} else {
 					DebugLib.traceAgent(personId, 2);
 
-				//	if (extraSearchPathNeeded.contains(personId)) {
-				//		extraSearchPathNeeded.remove(personId);
+					// if (extraSearchPathNeeded.contains(personId)) {
+					// extraSearchPathNeeded.remove(personId);
 
-						aem.processEndOfLegCarMode_processEvents(leg, nextAct);
+					aem.processEndOfLegCarMode_processEvents(leg, nextAct);
 
-						setDurationOfParkingActivity(aem, nextAct);
+					setDurationOfParkingActivity(aem, nextAct);
 
-						ActivityImpl currentParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-								.get(aem.getPlanElementIndex() + 1);
-						Leg nextWalkLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements()
-								.get(aem.getPlanElementIndex() + 2);
-						Link parkingLink = network.getLinks().get(route.getEndLinkId());
+					ActivityImpl currentParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+							.get(aem.getPlanElementIndex() + 1);
+					Leg nextWalkLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 2);
+					Link parkingLink = network.getLinks().get(route.getEndLinkId());
 
-						currentParkingAct.setLinkId(parkingLink.getId());
+					currentParkingAct.setLinkId(parkingLink.getId());
 
-						double walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), nextNonParkingAct.getCoord());
-						// TODO: improve this later (no straight line)
-						double walkDuration = walkDistance / walkSpeed;
-						nextWalkLeg.setTravelTime(walkDuration);
-						getParkingAttributesForScoring(aem).setToActWalkDuration(walkDuration);
-						getParkingAttributesForScoring(aem).setToParkWalkDuration(walkDuration);
-						
-						// TODO: update this later, this is an approximation
-						getParkingAttributesForScoring(aem).setParkingArrivalTime(aem.getMessageArrivalTime());
+					double walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), nextNonParkingAct.getCoord());
+					// TODO: improve this later (no straight line)
+					double walkDuration = walkDistance / walkSpeed;
+					nextWalkLeg.setTravelTime(walkDuration);
+					getParkingAttributesForScoring(aem).setToActWalkDuration(walkDuration);
+					getParkingAttributesForScoring(aem).setToParkWalkDuration(walkDuration);
 
-						// check, if more car legs, only in that case adapt that
-						// leg (TODO:)
+					// TODO: update this later, this is an approximation
+					getParkingAttributesForScoring(aem).setParkingArrivalTime(aem.getMessageArrivalTime());
 
-						// if car departs again during day, adapt the departure
-						// walking and routes
+					// check, if more car legs, only in that case adapt that
+					// leg (TODO:)
 
-						int indexOfNextCarLeg = aem.duringCarLeg_getPlanElementIndexOfNextCarLeg();
+					// if car departs again during day, adapt the departure
+					// walking and routes
 
-						
-						// TODO: avoid routing if parking link Id and activity linkId remained the same
-						if (indexOfNextCarLeg != -1) {
-							ActivityImpl lastActBeforeNextCarLeg = (ActivityImpl) aem.getPerson().getSelectedPlan()
-									.getPlanElements().get(indexOfNextCarLeg - 3);
-							Leg nextwalkLegToParking = (Leg) aem.getPerson().getSelectedPlan().getPlanElements()
-									.get(indexOfNextCarLeg - 2);
-							ActivityImpl nextParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-									.get(indexOfNextCarLeg - 1);
-							Leg nextCarLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg);
+					int indexOfNextCarLeg = aem.duringCarLeg_getPlanElementIndexOfNextCarLeg();
 
-							walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), lastActBeforeNextCarLeg.getCoord());
-							walkDuration = walkDistance / walkSpeed;
-							nextwalkLegToParking.setTravelTime(walkDuration);
+					// TODO: avoid routing if parking link Id and activity
+					// linkId remained the same
+					if (indexOfNextCarLeg != -1) {
+						ActivityImpl lastActBeforeNextCarLeg = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+								.get(indexOfNextCarLeg - 3);
+						Leg nextwalkLegToParking = (Leg) aem.getPerson().getSelectedPlan().getPlanElements()
+								.get(indexOfNextCarLeg - 2);
+						ActivityImpl nextParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+								.get(indexOfNextCarLeg - 1);
+						Leg nextCarLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg);
 
-							nextParkingAct.setLinkId(parkingLink.getId());
+						walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), lastActBeforeNextCarLeg.getCoord());
+						walkDuration = walkDistance / walkSpeed;
+						nextwalkLegToParking.setTravelTime(walkDuration);
 
-							//EditRoute.globalEditRoute.addInitialPartToRoute(nextNonParkingAct.getEndTime(), parkingLink.getId(),
-							//		nextCarLeg);
-							
-							aem.rerouteTask = new RerouteTaskDuringSim(nextNonParkingAct.getEndTime(), parkingLink.getId(),nextCarLeg);
+						nextParkingAct.setLinkId(parkingLink.getId());
+
+						if (ZHScenarioGlobal.turnParallelRoutingOnDuringSim) {
+							aem.rerouteTask = new RerouteTaskDuringSim(nextNonParkingAct.getEndTime(), parkingLink.getId(),
+									nextCarLeg);
 							RerouteThreadDuringSim.addTask(aem.rerouteTask);
+						} else {
+							EditRoute.globalEditRoute.addInitialPartToRoute(nextNonParkingAct.getEndTime(), parkingLink.getId(),
+									nextCarLeg);
 						}
 
-						
+					}
 
-				//	} else {
-				//		aem.processLegInDefaultWay();
-				//	}
-					
-					logParkingSearchDuration(aem);	
-					
+					// } else {
+					// aem.processLegInDefaultWay();
+					// }
+
+					logParkingSearchDuration(aem);
+
 					AgentWithParking.parkingManager.parkVehicle(personId, parkingId);
-					
-					if (aem.getPlanElementIndex()==aem.getPlanElementIndexOfLastCarLeg()){
+
+					if (aem.getPlanElementIndex() == aem.getPlanElementIndexOfLastCarLeg()) {
 						handleLastParkingScore(aem);
 					}
-					
+
 					aem.processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(nextAct);
 				}
 			} else {
@@ -262,100 +269,103 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	public String getName() {
 		return "RandomParkingSearch";
 	}
-	
-	private void logParkingSearchDuration(AgentWithParking aem){
+
+	private void logParkingSearchDuration(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
-		double searchDuration=GeneralLib.getIntervalDuration(startSearchTime.get(personId),aem.getMessageArrivalTime());
-		
-		if (searchDuration==86400){
-			searchDuration=0;
-		}else {
+		double searchDuration = GeneralLib.getIntervalDuration(startSearchTime.get(personId), aem.getMessageArrivalTime());
+
+		if (searchDuration == 86400) {
+			searchDuration = 0;
+		} else {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
-		
+
 		getParkingAttributesForScoring(aem).setParkingSearchDuration(searchDuration);
 		startSearchTime.remove(personId);
 	}
 
 	/*
-	public void handleParkingScoring(AgentWithParking aem) {
-		Id personId = aem.getPerson().getId();
-		double searchDuration=GeneralLib.getIntervalDuration(startSearchTime.get(personId),aem.getMessageArrivalTime());
-		if (aem.getPlanElementIndex() > 1 && aem.getPlanElementIndex() % 2 == 1) {
-			if (startSearchTime.containsKey(personId)){
-				AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), searchDuration);
-			} else {
-				AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), searchDuration);
-			}
-		}
-		/*
-		if (this instanceof RandomGarageParkingSearch){
-			AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), 1000);
-		} else {
-			AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), 0);
-		}
-		*/
+	 * public void handleParkingScoring(AgentWithParking aem) { Id personId =
+	 * aem.getPerson().getId(); double
+	 * searchDuration=GeneralLib.getIntervalDuration
+	 * (startSearchTime.get(personId),aem.getMessageArrivalTime()); if
+	 * (aem.getPlanElementIndex() > 1 && aem.getPlanElementIndex() % 2 == 1) {
+	 * if (startSearchTime.containsKey(personId)){
+	 * AgentWithParking.parkingStrategyManager.updateScore(personId,
+	 * aem.getPlanElementIndex(), searchDuration); } else {
+	 * AgentWithParking.parkingStrategyManager.updateScore(personId,
+	 * aem.getPlanElementIndex(), searchDuration); } } /* if (this instanceof
+	 * RandomGarageParkingSearch){
+	 * AgentWithParking.parkingStrategyManager.updateScore(personId,
+	 * aem.getPlanElementIndex(), 1000); } else {
+	 * AgentWithParking.parkingStrategyManager.updateScore(personId,
+	 * aem.getPlanElementIndex(), 0); }
+	 */
 	/*
-		startSearchTime.remove(personId);
-	}
-*/
-	
-	public void handleLastParkingScore(AgentWithParking aem){
+	 * startSearchTime.remove(personId); }
+	 */
+
+	public void handleLastParkingScore(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
 		ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
 		Id currentParkingId = AgentWithParking.parkingManager.getCurrentParkingId(aem.getPerson().getId());
-		
-		Activity act = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getIndexOfFirstCarLegOfDay()-3);
-		
+
+		Activity act = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getIndexOfFirstCarLegOfDay() - 3);
+
 		parkingAttributesForScoring.setFacilityId(currentParkingId);
-		parkingAttributesForScoring.setParkingDuration(GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(), act.getEndTime()));
-		
+		parkingAttributesForScoring
+				.setParkingDuration(GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(), act.getEndTime()));
+
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
-		
+
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
-		
+
 		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
-		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(aem.getPlanElementIndex(), parkingScore, AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()) , parkingAttributesForScoring));
+		ZHScenarioGlobal.parkingEventDetails
+				.add(new ParkingEventDetails(aem.getPlanElementIndex(), parkingScore, AgentWithParking.parkingStrategyManager
+						.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()), parkingAttributesForScoring));
 		parkingActAttributes.remove(personId);
 
 	}
-	
-	
+
 	@Override
 	public void handleParkingDepartureActivity(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
 		ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
-		//handleParkingScoring(aem);	
-		
+		// handleParkingScoring(aem);
+
 		ActivityImpl currentActivity = aem.getCurrentActivity();
-		
-		//int nextLegIndex = aem.getPlanElementIndex() + 1;
-		//Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(nextLegIndex);
+
+		// int nextLegIndex = aem.getPlanElementIndex() + 1;
+		// Leg leg = (LegImpl)
+		// aem.getPerson().getSelectedPlan().getPlanElements().get(nextLegIndex);
 
 		Id currentParkingId = AgentWithParking.parkingManager.getCurrentParkingId(aem.getPerson().getId());
-		
+
 		parkingAttributesForScoring.setFacilityId(currentParkingId);
-		parkingAttributesForScoring.setParkingDuration(GeneralLib.getIntervalDuration(parkingAttributesForScoring.getParkingArrivalTime(), aem.getMessageArrivalTime()));
-		
+		parkingAttributesForScoring.setParkingDuration(GeneralLib.getIntervalDuration(
+				parkingAttributesForScoring.getParkingArrivalTime(), aem.getMessageArrivalTime()));
+
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
-		
+
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
-		
+
 		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
 		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
-		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore, AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), legIndex) , parkingAttributesForScoring));
+		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore,
+				AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), legIndex),
+				parkingAttributesForScoring));
 		parkingActAttributes.remove(personId);
-		
+
 	}
-	
+
 	// TODO: log parkingAttributesForScoring + score + leg index
-	
-	
-	private ParkingActivityAttributes getParkingAttributesForScoring(AgentWithParking aem){
+
+	private ParkingActivityAttributes getParkingAttributesForScoring(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
-		if (!parkingActAttributes.containsKey(personId)){
+		if (!parkingActAttributes.containsKey(personId)) {
 			parkingActAttributes.put(personId, new ParkingActivityAttributes(personId));
 		}
 		return parkingActAttributes.get(personId);
@@ -364,8 +374,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	@Override
 	public void resetForNewIteration() {
 		startSearchTime = new DoubleValueHashMap<Id>();
-		parkingActAttributes=new HashMap<Id, ParkingActivityAttributes>();
-		useSpecifiedParkingType=new HashMap<Id, String>();
+		parkingActAttributes = new HashMap<Id, ParkingActivityAttributes>();
+		useSpecifiedParkingType = new HashMap<Id, String>();
 	}
 
 	/*

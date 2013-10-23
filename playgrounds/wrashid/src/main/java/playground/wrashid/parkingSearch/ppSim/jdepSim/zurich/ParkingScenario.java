@@ -21,7 +21,11 @@ public class ParkingScenario {
 
 	
 	public static void scenario1pml(){
-		scenario1pct();
+		ParkingLoader.parkingsOutsideZHCityScaling = 1.0;
+		ParkingLoader.streetParkingCalibrationFactor = 0.1;
+		ParkingLoader.garageParkingCalibrationFactor = 0.11;
+		ParkingLoader.privateParkingCalibrationFactorZHCity = 0.1;
+		ParkingLoader.populationScalingFactor = 0.01;
 		ZHScenarioGlobal.plansFile= "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
 	}
 	
