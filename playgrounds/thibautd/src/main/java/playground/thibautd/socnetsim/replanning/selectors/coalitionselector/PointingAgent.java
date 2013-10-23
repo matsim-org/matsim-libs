@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.replanning.selectors.coalitionselector;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
@@ -38,6 +39,8 @@ final class PointingAgent {
 				return -Double.compare( o1.getWeight() , o2.getWeight() );
 			}
 		};
+
+	private final Id id;
 	private final PlanRecord[] records;
 	private int pointer = 0;
 
@@ -45,6 +48,7 @@ final class PointingAgent {
 			final Person person,
 			final ReplanningGroup group,
 			final WeightCalculator weight) {
+		this.id = person.getId();
 		this.records = new PlanRecord[ person.getPlans().size() ];
 
 		int c=0;
@@ -65,7 +69,14 @@ final class PointingAgent {
 	}
 
 	public Plan getPointedPlan() {
-		while ( !records[ pointer ].isFeasible() ) pointer++;
+		try {
+			while ( !records[ pointer ].isFeasible() ) pointer++;
+		}
+		catch ( ArrayIndexOutOfBoundsException e ) {
+			throw new RuntimeException(
+					"no more feasible plans for agent "+id,
+					e );
+		}
 		return records[ pointer ].getPlan();
 	}
 }
