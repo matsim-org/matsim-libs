@@ -21,13 +21,10 @@ package playground.thibautd.socnetsim.replanning.strategies;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 
-import playground.thibautd.socnetsim.cliques.replanning.modules.jointtimemodechooser.JointTimeModeChooserAlgorithm;
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
@@ -43,11 +40,6 @@ import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleTo
  * @author thibautd
  */
 public class CliqueJointTripMutatorFactory implements GroupPlanStrategyFactory {
-	private final boolean optimize;
-
-	public  CliqueJointTripMutatorFactory(final boolean optimize) {
-		this.optimize = optimize;
-	}
 
 	@Override
 	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
@@ -83,46 +75,10 @@ public class CliqueJointTripMutatorFactory implements GroupPlanStrategyFactory {
 					registry.getPlanRoutingAlgorithmFactory(),
 					registry.getTripRouterFactory() ) );
 
-		if (optimize) {
-			final DepartureDelayAverageCalculator delay =
-				new DepartureDelayAverageCalculator(
-					registry.getScenario().getNetwork(),
-					registry.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-
-			// split immediately after insertion/removal,
-			// to make optimisation easier.
-			strategy.addStrategyModule(
-					GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-						config,
-						registry.getJointPlans().getFactory(),
-						// XXX use the default, to allow stupid simulations
-						// without joint plans. This is rather ugly.
-						new DefaultPlanLinkIdentifier() ) );
-
-			strategy.addStrategyModule(
-					new JointPlanBasedGroupStrategyModule(
-						new AbstractMultithreadedGenericStrategyModule<JointPlan>(
-								registry.getScenario().getConfig().global() ) {
-							@Override
-							public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
-								return new JointTimeModeChooserAlgorithm(
-									MatsimRandom.getLocalInstance(),
-									null,
-									delay,
-									registry.getScenario(),
-									registry.getScoringFunctionFactory(),
-									registry.getTravelTime().getLinkTravelTimes(),
-									registry.getLeastCostPathCalculatorFactory(),
-									registry.getTripRouterFactory() );
-							}
-						}));
-		}
-		else {
-			strategy.addStrategyModule(
-					GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-						config,
-						registry.getTripRouterFactory()) );
-		}
+		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+					config,
+					registry.getTripRouterFactory()) );
 
 		final VehicleRessources vehicles = 
 					(VehicleRessources) registry.getScenario().getScenarioElement(

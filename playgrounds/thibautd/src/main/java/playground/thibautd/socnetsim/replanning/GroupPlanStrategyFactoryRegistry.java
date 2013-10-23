@@ -57,8 +57,7 @@ public class GroupPlanStrategyFactoryRegistry {
 		// ---------------------------------------------------------------------
 		addFactory( "ReRoute" , new GroupReRouteFactory() );
 		addFactory( "TimeAllocationMutator" , new GroupTimeAllocationMutatorFactory( 1 ) );
-		addFactory( "OptimizingCliqueJointTripMutator" , new CliqueJointTripMutatorFactory( true ) );
-		addFactory( "CliqueJointTripMutator" , new CliqueJointTripMutatorFactory( false ) );
+		addFactory( "CliqueJointTripMutator" , new CliqueJointTripMutatorFactory( ) );
 		addFactory( "SubtourModeChoice" , new GroupSubtourModeChoiceFactory() );
 		addFactory( "TourVehicleAllocation" , new GroupTourVehicleAllocationFactory() );
 		addFactory( "PlanVehicleAllocation" , new GroupPlanVehicleAllocationFactory() );
