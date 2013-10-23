@@ -57,8 +57,13 @@ public class RandomGarageParkingSearch extends RandomParkingSearch{
 			if (searchDuration>delayBeforeSwitchToStreetParkingSearch){
 				useSpecifiedParkingType.put(personId, "streetParking");
 			}
-			
 		}
+	}
+	
+	@Override
+	public void handleParkingDepartureActivity(AgentWithParking aem) {
+		super.handleParkingDepartureActivity(aem);
+		useSpecifiedParkingType.remove(aem.getPerson().getId());
 	}
 
 }

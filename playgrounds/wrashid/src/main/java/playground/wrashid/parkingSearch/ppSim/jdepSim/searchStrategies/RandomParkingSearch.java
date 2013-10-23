@@ -68,6 +68,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	private Random random;
 	private final double parkingDuration = 60 * 2;
 	private final double walkSpeed = 3.0 / 3.6; // [m/s]
+	protected double scoreInterrupationValue=0;;
 
 	// go to final link if no parking there, then try parking at other places.
 	// accept only parking within 300m, choose random links, but if leave 300m
@@ -313,20 +314,25 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		Activity act = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getIndexOfFirstCarLegOfDay() - 3);
 
 		parkingAttributesForScoring.setFacilityId(currentParkingId);
-		parkingAttributesForScoring
-				.setParkingDuration(GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(), act.getEndTime()));
-
+		
+		double parkingDuration = GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(), act.getEndTime());
+		if (aem.getMessageArrivalTime()==act.getEndTime()){
+			parkingDuration=0;
+		}
+		parkingAttributesForScoring.setParkingDuration(parkingDuration);
+		
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
 
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
-
+		parkingScore+=scoreInterrupationValue;
+		
 		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
 		ZHScenarioGlobal.parkingEventDetails
 				.add(new ParkingEventDetails(aem.getPlanElementIndex(), parkingScore, AgentWithParking.parkingStrategyManager
 						.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()), parkingAttributesForScoring));
 		parkingActAttributes.remove(personId);
-
+		scoreInterrupationValue=0;
 	}
 
 	@Override
@@ -344,26 +350,31 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		Id currentParkingId = AgentWithParking.parkingManager.getCurrentParkingId(aem.getPerson().getId());
 
 		parkingAttributesForScoring.setFacilityId(currentParkingId);
-		parkingAttributesForScoring.setParkingDuration(GeneralLib.getIntervalDuration(
-				parkingAttributesForScoring.getParkingArrivalTime(), aem.getMessageArrivalTime()));
+		
+		double parkingDuration = GeneralLib.getIntervalDuration(parkingAttributesForScoring.getParkingArrivalTime(), aem.getMessageArrivalTime());
+		if (parkingAttributesForScoring.getParkingArrivalTime()==aem.getMessageArrivalTime()){
+			parkingDuration=0;
+		}
+		parkingAttributesForScoring.setParkingDuration(parkingDuration);
 
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
 
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
-
+		parkingScore+=scoreInterrupationValue;
+		
 		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
 		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
 		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore,
 				AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), legIndex),
 				parkingAttributesForScoring));
 		parkingActAttributes.remove(personId);
-
+		scoreInterrupationValue=0;
 	}
 
 	// TODO: log parkingAttributesForScoring + score + leg index
 
-	private ParkingActivityAttributes getParkingAttributesForScoring(AgentWithParking aem) {
+	protected ParkingActivityAttributes getParkingAttributesForScoring(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
 		if (!parkingActAttributes.containsKey(personId)) {
 			parkingActAttributes.put(personId, new ParkingActivityAttributes(personId));

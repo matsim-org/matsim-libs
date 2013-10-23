@@ -22,11 +22,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.basic.v01.IdImpl;
 
+import playground.wrashid.parkingChoice.infrastructure.PublicParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
@@ -126,8 +130,10 @@ public class ParkingLoader {
 
 		HashSet<Id> streetParking = new HashSet<Id>();
 		HashSet<Id> garageParking = new HashSet<Id>();
+		HashSet<Id> illegalParking = new HashSet<Id>();
 		parkingTypes.put("streetParking", streetParking);
 		parkingTypes.put("garageParking", garageParking);
+		parkingTypes.put("illeagalParking", illegalParking);
 
 		for (Parking parking : parkings) {
 			if (parking.getId().toString().contains("stp-")) {
@@ -141,6 +147,10 @@ public class ParkingLoader {
 			if (parking.getId().toString().contains("gp-")) {
 				garageParking.add(parking.getId());
 			}
+			
+			if (parking.getId().toString().contains("illegal-")) {
+				illegalParking.add(parking.getId());
+			}
 		}
 		
 		return new ParkingManagerZH(parkingTypes, parkingCostCalculator, parkings, network, ttMatrix);
@@ -148,7 +158,24 @@ public class ParkingLoader {
 
 	public static ParkingManagerZH getParkingManagerZH(Network network, TTMatrix ttMatrix) {
 		LinkedList<Parking> parkings = getParkingsForScenario();
+		addIllegalParking(network,parkings);
+		
 		return getParkingManagerZH(parkings, network, ttMatrix);
+	}
+
+	private static void addIllegalParking(Network network, LinkedList<Parking> parkings) {
+		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
+		int i=0;
+		for (Link link:network.getLinks().values()){
+			if (GeneralLib.getDistance(coordinatesLindenhofZH, link.getCoord()) < 7000) {
+				PublicParking parking = new PublicParking(link.getCoord());
+				parking.setMaxCapacity(1.0);
+				parking.setParkingId(new IdImpl("illegal-" + i));
+				parking.setType("public");
+				parkings.add(parking);
+				i++;
+			}
+		}
 	}
 
 	public static void main(String[] args) {
