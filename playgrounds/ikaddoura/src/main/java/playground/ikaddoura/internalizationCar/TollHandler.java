@@ -77,6 +77,13 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 	}
 
 	public void setLinkId2timeBin2avgToll() {
+		if (!this.congestionEvents.isEmpty()) {
+			throw new RuntimeException("List congestionEvents should be empty!");
+		}
+		
+		if (!this.linkLeaveEvents.isEmpty()) {
+			throw new RuntimeException("List linkLeaveEvents should be empty!");
+		}
 		
 		if (!this.linkId2timeBin2tollSum.isEmpty()) {
 			throw new RuntimeException("Map linkId2timeBin2tollSum should be empty!");
@@ -133,11 +140,15 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 
 						if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
 							// link leave event in time bin
-
-							// update leaving agents on this link and in this time bin
-							int leavingAgentsSoFar = timeBin2leavingAgents.get(time);
-							int leavingAgents = leavingAgentsSoFar + 1;
-							timeBin2leavingAgents.put(time, leavingAgents);
+							
+							if(timeBin2leavingAgents.get(time) != null){
+								// update leaving agents on this link and in this time bin
+								int leavingAgentsSoFar = timeBin2leavingAgents.get(time);
+								int leavingAgents = leavingAgentsSoFar + 1;
+								timeBin2leavingAgents.put(time, leavingAgents);
+							}else{
+								timeBin2leavingAgents.put(time, 1);
+							}
 						}
 					}
 
@@ -182,10 +193,15 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 						// congestion event in time bin
 						// update toll sum of this link and time bin
 						
-						double sum = timeBin2tollSum.get(time);
-						double amount = event.getDelay() / 3600.0 * this.vtts_car;
-						double sumNew = sum + amount;
-						timeBin2tollSum.put(time, sumNew);
+						if(timeBin2tollSum.get(time) != null){
+							double sum = timeBin2tollSum.get(time);
+							double amount = event.getDelay() / 3600.0 * this.vtts_car;
+							double sumNew = sum + amount;
+							timeBin2tollSum.put(time, sumNew);
+						}else{
+							double amount = event.getDelay() / 3600.0 * this.vtts_car;
+							timeBin2tollSum.put(time, amount);
+						}	
 					}
 				}
 
