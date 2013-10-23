@@ -63,6 +63,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.Par
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.HouseHoldIncomeZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingScenario;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
@@ -82,7 +83,17 @@ public class MainPPSimZurich30km {
 		// String plansFile =
 		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1472928.xml";
 
-		String plansFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pml_plans_30km.xml.gz";
+		
+		//		ParkingScenario.scenario1pml();
+		//	ParkingScenario.scenario1pct();
+			ParkingScenario.scenario10pct();
+		//	ParkingScenario.scenario100pct();
+		
+		
+		
+		
+		
+		String plansFile = ZHScenarioGlobal.plansFile;
 
 		// String plansFile =
 		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pct_plans_30km.xml.gz";
@@ -93,9 +104,12 @@ public class MainPPSimZurich30km {
 		String facilititiesPath = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_facilities.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 
+	
+		
+		
 		filterPopulation2_5km(scenario);
 		removeNotSelectedPlans(scenario);
-		multiplyPopulation(scenario, 1);
+		multiplyPopulation(scenario, ZHScenarioGlobal.populationExpensionFactor);
 
 
 		addParkingActivityAndWalkLegToPlans(scenario.getPopulation().getPersons().values());

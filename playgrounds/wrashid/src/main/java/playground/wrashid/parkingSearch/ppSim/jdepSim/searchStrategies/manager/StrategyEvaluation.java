@@ -26,8 +26,8 @@ public class StrategyEvaluation {
 		super();
 		this.strategy = strategy;
 	}
-	ParkingSearchStrategy strategy;
-	double score=Double.NEGATIVE_INFINITY;
+	public ParkingSearchStrategy strategy;
+	public double score=Double.NEGATIVE_INFINITY;
 	
 
 }

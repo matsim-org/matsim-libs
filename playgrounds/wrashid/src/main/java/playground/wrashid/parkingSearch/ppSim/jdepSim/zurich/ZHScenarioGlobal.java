@@ -27,23 +27,25 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyScoreStats;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyStats;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class ZHScenarioGlobal {
 
 	public static ParkingScoreEvaluator parkingScoreEvaluator;
-	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run3/";;
-	public static StrategyScoreStats strategyScoreStats = new StrategyScoreStats();
+	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run5/";;
+	public static StrategyStats strategyScoreStats = new StrategyStats();
 	public static int iteration = 0;
 	public static int numberOfIterations = 1000;
 	public static int writeEachNthIteration = 1000;
 	public static int skipOutputInIteration = 0;
 	public static LinkedList<ParkingEventDetails> parkingEventDetails;
+	public static int populationExpensionFactor=1;
 	
 	// personId, legIndex, route
 	public static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes;
+	public static String plansFile;
 
 	public static void reset() {
 		parkingEventDetails = new LinkedList<ParkingEventDetails>();

@@ -23,32 +23,67 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 
+import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.EvaluationContainer;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
-public class StrategyScoreStats {
+public class StrategyStats {
 
 	private ArrayList<Double> averageBestList;
 	private ArrayList<Double> averageExecutedList;
 	private ArrayList<Double> averageWorstList;
 	private ArrayList<Double> averageAverageList;
 	
-	public StrategyScoreStats(){
+	private HashMap<ParkingSearchStrategy, ArrayList<Double>> strategyShares;
+	
+	public StrategyStats(){
 		averageBestList = new ArrayList();
 		averageExecutedList = new ArrayList();
 		averageWorstList = new ArrayList();
 		averageAverageList = new ArrayList();
+		strategyShares=new HashMap<ParkingSearchStrategy, ArrayList<Double>>();
 	}
 	
 	
 	public void addIterationData(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
+		updateScores(strategyEvaluations);
+		updateStrategyShares(strategyEvaluations);
+	}
+
+
+	private void updateStrategyShares(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
+		IntegerValueHashMap<ParkingSearchStrategy> strategyCount=new IntegerValueHashMap<ParkingSearchStrategy>();
+		
+		int sampleSize=0;
+		for (Id personId : strategyEvaluations.keySet()) {
+			for (Integer legIndex : strategyEvaluations.get(personId).keySet()) {
+				EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
+				strategyCount.increment(evaluationContainer.getCurrentSelectedStrategy().strategy);
+				sampleSize++;
+			}
+		}
+		
+		for (ParkingSearchStrategy pss: strategyCount.getKeySet()){
+			if (!strategyShares.containsKey(pss)){
+				strategyShares.put(pss, new ArrayList<Double>());
+			}
+			
+			strategyShares.get(pss).add(100.0*strategyCount.get(pss)/sampleSize);
+		}
+	}
+
+
+	private void updateScores(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
 		double averageBest=0;
 		double averageExecuted=0;
 		double averageWorst=0;
 		double averageAverage=0;
 		
+		int sampleSize=0;
 		for (Id personId : strategyEvaluations.keySet()) {
 			for (Integer legIndex : strategyEvaluations.get(personId).keySet()) {
 				EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
@@ -56,10 +91,11 @@ public class StrategyScoreStats {
 				averageExecuted+=evaluationContainer.getSelectedStrategyScore();
 				averageWorst+=evaluationContainer.getWorstStrategyScore();
 				averageAverage+=evaluationContainer.getAverageStrategyScore();
+				sampleSize++;
 			}
 		}
 		
-		int numberOfPeople = strategyEvaluations.keySet().size();
+		int numberOfPeople = sampleSize;
 		averageBestList.add(averageBest/numberOfPeople);
 		averageExecutedList.add(averageExecuted/numberOfPeople);
 		averageWorstList.add(averageWorst/numberOfPeople);
@@ -67,7 +103,7 @@ public class StrategyScoreStats {
 	}
 
 
-	public void writeDataToFile() {
+	public void writeStrategyScoresToFile() {
 		String xLabel = "Iteration";
 		String yLabel = "score";
 		String title="Parking Strategy Score";
@@ -92,7 +128,35 @@ public class StrategyScoreStats {
 		}
 
 		GeneralLib.writeGraphic(ZHScenarioGlobal.outputFolder + "parkingStrategyScores.png", matrix, title, xLabel, yLabel, seriesLabels, xValues);
+	}
+	
+	public void writeStrategySharesToFile() {
+		String xLabel = "Iteration";
+		String yLabel = "share [%]";
+		String title="Parking Strategy Shares";
+		int numberOfXValues = averageBestList.size();
+		int numberOfFunctions = strategyShares.size();
+		double[] xValues=new double[numberOfXValues];
+		String[] seriesLabels=new String[numberOfFunctions];
 		
+		int j=0;
+		for (ParkingSearchStrategy pss: strategyShares.keySet()){
+			seriesLabels[j]=pss.getName();
+			j++;
+		}
+		
+		double[][] matrix=new double[numberOfXValues][numberOfFunctions];
+		
+		for (int i=0;i<numberOfXValues;i++){
+			j=0;
+			for (ParkingSearchStrategy pss: strategyShares.keySet()){
+				matrix[i][j]=strategyShares.get(pss).get(i);
+				j++;
+			}
+			xValues[i]=i;
+		}
+
+		GeneralLib.writeGraphic(ZHScenarioGlobal.outputFolder + "parkingStrategyShares.png", matrix, title, xLabel, yLabel, seriesLabels, xValues);
 	}
 }
 
