@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 import d4d.Sighting;
 
-public class PotsdamCompare {
+public class CompareMain {
 
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
@@ -64,6 +64,7 @@ public class PotsdamCompare {
 		};
 		
 		// LinkToZoneResolver linkToZoneResolver = trivialLinkToZoneResolver;
+		
 		LinkToZoneResolver linkToZoneResolver = new CellularCoverageLinkToZoneResolver(cellularCoverage, network);
 		
 		for (Person p : scenario.getPopulation().getPersons().values()) {
