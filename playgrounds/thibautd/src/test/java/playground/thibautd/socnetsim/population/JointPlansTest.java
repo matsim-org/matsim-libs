@@ -30,8 +30,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
-
 /**
  * @author thibautd
  */
@@ -84,8 +82,7 @@ public class JointPlansTest {
 		// this must result in a exception at removal
 		JointPlan wrongInstance = 
 			new JointPlan(
-					jp1,
-					new HomogeneousScoreAggregator());
+					jp1 );
 
 		boolean gotException = false;
 		try {

@@ -28,9 +28,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.population.PlanImpl;
 
-import playground.thibautd.socnetsim.scoring.HomogeneousScoreAggregator;
-import playground.thibautd.socnetsim.scoring.ScoresAggregator;
-
 /**
  * <b>Static</b> factory to create joint plans.
  * The fact that it is static allows to track which joint plan is associated
@@ -45,15 +42,6 @@ public class JointPlanFactory implements MatsimFactory {
 	}
 
 	/**
-	 * equivalent to JointPlan(clique, plans, addAtIndividualLevel, true)
-	 */
-	public JointPlan createJointPlan(
-			final Map<Id, ? extends Plan> plans,
-			final boolean addAtIndividualLevel) {
-		return createJointPlan( plans, addAtIndividualLevel, new HomogeneousScoreAggregator());
-	}
-
-	/**
 	 * Creates a joint plan from individual plans.
 	 * Two individual trips to be shared must have their Pick-Up activity type set
 	 * to 'pu_i', where i is an integer which identifies the joint trip.
@@ -64,9 +52,8 @@ public class JointPlanFactory implements MatsimFactory {
 	 */
 	public JointPlan createJointPlan(
 			final Map<Id, ? extends Plan> plans,
-			final boolean addAtIndividualLevel,
-			final ScoresAggregator aggregator) {
-		JointPlan jointPlan = new JointPlan( plans, aggregator );
+			final boolean addAtIndividualLevel) {
+		JointPlan jointPlan = new JointPlan( plans );
 
 		if (addAtIndividualLevel) {
 			for (Plan plan : plans.values()) {
@@ -93,8 +80,7 @@ public class JointPlanFactory implements MatsimFactory {
 			final boolean addAtIndividualLevel) {
 		return createJointPlan(
 				cloneIndividualPlans( toCopy ),
-				addAtIndividualLevel,
-				toCopy.getScoresAggregator());
+				addAtIndividualLevel );
 	}
 
 	private static Map<Id, Plan> cloneIndividualPlans(final JointPlan plan) {

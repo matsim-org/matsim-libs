@@ -29,8 +29,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
-import playground.thibautd.socnetsim.scoring.ScoresAggregator;
-
 /**
  * class for handling synchronized plans.
  * @author thibautd
@@ -38,13 +36,8 @@ import playground.thibautd.socnetsim.scoring.ScoresAggregator;
 public class JointPlan {
 	private final Map<Id,Plan> individualPlans = new LinkedHashMap<Id,Plan>();
 
-	private ScoresAggregator aggregator;
-
-	JointPlan(
-			final Map<Id, ? extends Plan> plans,
-			final ScoresAggregator aggregator) {
+	JointPlan( final Map<Id, ? extends Plan> plans ) {
 		this.individualPlans.putAll( plans );
-		this.aggregator = aggregator;
 	}
 
 	/*
@@ -65,13 +58,6 @@ public class JointPlan {
 		if (nsel == tot) return true;
 
 		throw new IllegalStateException( "various selection status in "+individualPlans );
-	}
-
-	/**
-	 * Returns the global score as defined by the score aggregator
-	 */
-	public Double getScore() {
-		return this.aggregator.getJointScore( individualPlans.values() );
 	}
 
 	/*
@@ -107,9 +93,5 @@ public class JointPlan {
 	public String toString() {
 		return getClass().getSimpleName()+": plans="+getIndividualPlans();
 			//", isSelected="+this.isSelected();
-	}
-
-	public ScoresAggregator getScoresAggregator() {
-		return this.aggregator;
 	}
 }

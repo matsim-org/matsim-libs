@@ -137,9 +137,13 @@ public class JointTimeModeChooserFitness implements FitnessFunction<JointPlan> {
 			individualPlan.setScore( score );
 		}
 
-		return plan.getScore() +
-			(accumulatedNegativeDuration * negativeDurationPenalty) -
-			(jointTimes.getCumulatedUnsynchronisedTime() * unsynchronizedPenalty);
+		throw new RuntimeException( "JointPlan.getScore() does not exist anymore "+
+				// this makes the message confusing, but avoids errors for unused fields
+				((accumulatedNegativeDuration * negativeDurationPenalty) -
+				(jointTimes.getCumulatedUnsynchronisedTime() * unsynchronizedPenalty)));
+//		return  plan.getScore() +
+//			(accumulatedNegativeDuration * negativeDurationPenalty) -
+//			(jointTimes.getCumulatedUnsynchronisedTime() * unsynchronizedPenalty);
 	}
 
 	private static class JointTimes {
