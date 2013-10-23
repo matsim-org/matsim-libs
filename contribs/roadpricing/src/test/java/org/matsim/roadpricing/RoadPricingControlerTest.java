@@ -22,6 +22,7 @@ package org.matsim.roadpricing;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -57,7 +58,11 @@ public class RoadPricingControlerTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 		config.scenario().setUseRoadpricing(true);
-		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
+		
+//		config.roadpricing().setTollLinksFile(getInputDirectory() + "distanceToll.xml");
+		RoadPricingConfigGroup rpConfig = (RoadPricingConfigGroup) config.getModule(RoadPricingConfigGroup.GROUP_NAME) ;
+		rpConfig.setTollLinksFile(getInputDirectory() + "distanceToll.xml") ;
+		
 		Controler controler = new Controler(config);
 		controler.addControlerListener(new RoadPricing());
 		controler.setCreateGraphs(false);
