@@ -48,9 +48,9 @@ import org.matsim.testcases.utils.EventsLogger;
  * @author dgrether
  *
  */
-public class ControlerTests {
+public class ControlerTest {
 	
-	private static final Logger log = Logger.getLogger(ControlerTests.class);
+	private static final Logger log = Logger.getLogger(ControlerTest.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
