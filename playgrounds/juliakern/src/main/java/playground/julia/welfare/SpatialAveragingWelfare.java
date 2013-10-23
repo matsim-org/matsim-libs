@@ -23,7 +23,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -56,7 +55,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.util.Assert;
 
 /**
- * @author benjamin, julia
+ * @author julia, benjamin
  *
  */
 public class SpatialAveragingWelfare {
@@ -65,10 +64,10 @@ public class SpatialAveragingWelfare {
 	final double scalingFactor = 100.;
 	private final static String runNumber1 = "baseCase";
 	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-	private final static String runNumber2 = "zone30";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-//	private final static String runNumber2 = "pricing";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+//	private final static String runNumber2 = "zone30";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+	private final static String runNumber2 = "pricing";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 //
@@ -92,10 +91,8 @@ public class SpatialAveragingWelfare {
 //	private final String plansFile1 = runDirectory1 + runNumber1 + ".output_plans.xml";
 //	private final String plansFile2 = runDirectory2 + runNumber2 + ".output_plans.xml.gz";
 
-	Network network;
 	Collection<SimpleFeature> featuresInMunich;
-	double simulationEndTime;
-	String outPathStub = runDirectory1 + "analysis/welfare/";
+	Network network;
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static double xMin = 4452550.25;
@@ -103,135 +100,106 @@ public class SpatialAveragingWelfare {
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 	
-	final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
-
-	final int noOfTimeBins = 1;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
-	final double smoothingRadius_m = 500.;
+	final double smoothingRadius_m = 1000.;
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
+	final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
 	final boolean compareToBaseCase = true;
 
-	private final double[][] weights = new double[noOfXbins][noOfYbins];
-
-	private final double epsilon = Math.pow(10., -5.);
+	String outPathStub = runDirectory1 + "analysis/spatialAveraging/welfare/";
 
 	private void run() throws IOException{
-		//initialize scenario, set outpath, read plans file
-		this.simulationEndTime = getEndTime(configFile1);
+		this.featuresInMunich = ShapeFileReader.getAllFeatures(munichShapeFile);
+
 		Scenario scenario = loadScenario(netFile1);
 		this.network = scenario.getNetwork();		
-		this.featuresInMunich = ShapeFileReader.getAllFeatures(munichShapeFile);
-		Config config = scenario.getConfig();
-		
-		String outPath = outPathStub + runNumber1 + "_Routput_" + "UserBenefits.txt";
-		
 		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
 		mpr.readFile(plansFile1);
-		logger.info("Finished reading the plans file " + plansFile1);
-		
-		// create population and calculate user benefit for base case
-		Population pop = scenario.getPopulation();
 		
 		logger.info("Starting user benefits calculation.");
+		Config config = scenario.getConfig();
+		Population pop = scenario.getPopulation();
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
 		ubc.calculateUtility_money(pop);
-		logger.info("There were " + ubc.getNoValidPlanCnt() + " invalid plans.");
-		
-		Map<Id, Double> personId2Utility = ubc.getPersonId2Utility();
+		Map<Id, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
+		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 		logger.info("Finished user benefits calculation for " + runNumber1 + ".");
 		
-		double [][] userBenefits = fillUserBenefits(personId2Utility, pop);
-		logger.info("Finished averaging for " + runNumber1 + ".");
-		double [][] average = calculateAverage(userBenefits, weights);
+		double [][] weightsBaseCase = calculateWeights(personId2Utility, pop);
+		double [][] normalizedWeightsBaseCase = normalizeArray(weightsBaseCase);
 		
-		// write results to text files
-		writeRoutput(userBenefits, outPath + ".txt");
-		writeRoutput(weights, outPathStub+"BaseCase_Routput_"+"UserBenefitWeights.txt");
-		writeRoutput(average, outPathStub+"BaseCase_Routput_"+"AverageUserBenefits.txt");
+		double [][] userBenefitsBaseCase = fillUserBenefits(personId2Utility, pop);
+		double [][] normalizedUserBenefitsBaseCase = normalizeArray(userBenefitsBaseCase);
+		
+		double [][] averageUserBenefitsBaseCase = calculateAverage(normalizedUserBenefitsBaseCase, normalizedWeightsBaseCase);
+		
+		writeRoutput(normalizedUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefits.txt");
+		writeRoutput(averageUserBenefitsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefitsAverage.txt");
+//		writeRoutput(normalizedWeightsBaseCase, outPathStub + runNumber1 + "." + lastIteration1 + ".Routput." + "NormalizedWeightsBaseCase.txt");
 		
 		// 
 		if(compareToBaseCase){
-			// make a copy of old weights
-			double [][] weightsBaseCase = new double[noOfXbins][noOfYbins];
-			copyWeights(weightsBaseCase);
-			
-			// initialize scenario for comparison case
 			Scenario scenario2 = loadScenario(netFile1);
-			Config config2 = scenario2.getConfig();
 			MatsimPopulationReader mpr2 = new MatsimPopulationReader(scenario2);
 			mpr2.readFile(plansFile2);
-			logger.info("Finished reading the plans file " + plansFile2);
-			
-			// create population and calculate user benefit for comparison case
-			Population pop2 = scenario2.getPopulation();
 			
 			logger.info("Starting user benefits calculation.");
+			Config config2 = scenario2.getConfig();
+			Population pop2 = scenario2.getPopulation();
 			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM);
 			ubc2.calculateUtility_money(pop2);
-			logger.info("There were " + ubc2.getNoValidPlanCnt() + " invalid plans.");
-			
-			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2Utility();
+			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
+			logger.info("There were " + ubc2.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 			logger.info("Finished user benefits calculation for " + runNumber2 +".");
 			
-			// calculate differences base case <-> comparison case
-			Map<Id, Double> absoluteDifferences = new HashMap<Id, Double>();
-			for(Id id: personId2Utility.keySet()){
-				if (personId2Utility2.containsKey(id)) {
-					absoluteDifferences.put
-					(id, personId2Utility2.get(id)- personId2Utility.get(id));
-				}
-				else{
-					logger.warn("Person " + id.toString() +" does not appear in the second scenario.");
-				}
-			}
-			double [][] userBenefitDifferences = fillUserBenefits(absoluteDifferences, pop);			
-			average = calculateAverage(userBenefitDifferences, weights);
-			// should be zero
-			double [][] weightsDifferences = calculateDifferences(weightsBaseCase, weights);
+			double [][] weightsPolicyCase = calculateWeights(personId2Utility2, pop2);
+			double [][] normalizedWeightsPolicyCase = normalizeArray(weightsPolicyCase);
 			
-			// set output paths and write results to text files
-			String outPath2 = outPathStub + runNumber2 + "_Routput_" + "UserBenefitsDifferences.txt";
-			String outPath3 = outPathStub + runNumber2 +  "_Routput_" + "UserBenefitsCountsDifferences.txt";
-			String outPath4 = outPathStub + runNumber2 + "_Routput_" + "UserBenefitsAverageDifferences.txt";
-			writeRoutput(userBenefitDifferences, outPath2);
-			writeRoutput(weightsDifferences, outPath3); // should be zero
-			writeRoutput(average, outPath4);
+			double [][] userBenefitsPolicyCase = fillUserBenefits(personId2Utility2, pop2);
+			double [][] normalizedUserBenefitsPolicyCase = normalizeArray(userBenefitsPolicyCase);
+			
+			double [][] averageUserBenefitsPolicyCase = calculateAverage(normalizedUserBenefitsPolicyCase, normalizedWeightsPolicyCase);
+			
+			// calculate differences base case <-> policy case
+			double [][] normalizedUserBenefitDifferences = calculateDifferences(normalizedUserBenefitsPolicyCase, normalizedUserBenefitsBaseCase);
+			double [][] normalizedAverageUserBenefitDifferences = calculateDifferences(averageUserBenefitsPolicyCase, averageUserBenefitsBaseCase);
+//			double [][] normalizedWeightsDifferences = calculateDifferences(normalizedWeightsPolicyCase, normalizedWeightsBaseCase);
+			
+			writeRoutput(normalizedUserBenefitDifferences, outPathStub + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefitsDifferences.txt");
+			writeRoutput(normalizedAverageUserBenefitDifferences, outPathStub + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".Routput." + "UserBenefitsAverageDifferences.txt");
+//			writeRoutput(normalizedWeightsDifferences, outPathStub + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".Routput_" + "WeightsDifferences.txt"); // should be zero
 		}
 	}
 	
-	private double[][] calculateDifferences(double[][] weightsBaseCase,
-			double[][] weights2) {
-		
+	private double[][] normalizeArray(double[][] array) {
+		double [][] normalizedArray = new double[noOfXbins][noOfYbins];
+		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
+				normalizedArray[xIndex][yIndex] = array[xIndex][yIndex] / area_in_smoothing_circle_sqkm;
+			}
+		}
+		return normalizedArray;
+	}
+
+	private double[][] calculateDifferences(double[][] normalizedArrayPolicyCase, double[][] normalizedArrayBaseCase) {
 		double [][] diff = new double[noOfXbins][noOfYbins];
 		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-				diff[xIndex][yIndex]= weights2[xIndex][yIndex]-weightsBaseCase[xIndex][yIndex];
-				if(diff[xIndex][yIndex]>epsilon  || diff[xIndex][yIndex]<-epsilon){
-					logger.warn("weights should not be different but are for zell (" + xIndex
-							+ "," + yIndex + ")." );
-				}
+				diff[xIndex][yIndex]= normalizedArrayPolicyCase[xIndex][yIndex] - normalizedArrayBaseCase[xIndex][yIndex];
 			}
 		}
 		return diff;
 	}
 
-	private void copyWeights(double[][] weightsBaseCase) {
-		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-				weightsBaseCase[xIndex][yIndex] = new Double(weights[xIndex][yIndex]);
-			}
-		}
-		
-	}
-
-	private double[][] calculateAverage(double[][] userBenefits,
-			double[][] weights2) {
+	private double[][] calculateAverage(double[][] userBenefits, double[][] weights) {
 		double[][] average = new double [noOfXbins][noOfYbins];
 		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-				if(weights2[xIndex][yIndex]>0){
-					average[xIndex][yIndex]= userBenefits[xIndex][yIndex]/weights2[xIndex][yIndex];
+				if(weights[xIndex][yIndex] > 0){
+					average[xIndex][yIndex]= userBenefits[xIndex][yIndex] / weights[xIndex][yIndex];
+				} else {
+					throw new RuntimeException("Weights for " + xIndex + "," + yIndex + "is undefined. Aborting ...");
 				}
 			}
 		}
@@ -243,7 +211,7 @@ public class SpatialAveragingWelfare {
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
 			String valueString = new String();
 			valueString = "\t";
-			
+
 			//x-coordinates as first row
 			for(int xIndex = 0; xIndex < results.length; xIndex++){
 				valueString += findBinCenterX(xIndex) + "\t";
@@ -251,85 +219,100 @@ public class SpatialAveragingWelfare {
 			buffW.write(valueString);
 			buffW.newLine();
 			valueString = new String();
-			
+
 			for(int yIndex = 0; yIndex < results[0].length; yIndex++){
 				//y-coordinates as first column
 				valueString += findBinCenterY(yIndex) + "\t";
 				//table contents
 				for(int xIndex = 0; xIndex < results.length; xIndex++){ 
-						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-						if(isInMunich(cellCentroid)){
-							valueString += Double.toString(results[xIndex][yIndex]) + "\t"; 
-						} else {
-							valueString += "NA" + "\t";
-						}
+					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+					if(isInMunich(cellCentroid)){
+						valueString += Double.toString(results[xIndex][yIndex]) + "\t"; 
+					} else {
+						valueString += "NA" + "\t";
+					}
 				}
 				buffW.write(valueString);
 				buffW.newLine();
 				valueString = new String();
 			}
-		buffW.close();	
+			buffW.close();	
 		} catch (IOException e) {
-			throw new RuntimeException("Failed writing output for R.");
+			throw new RuntimeException("Failed writing output for R. Reason: " + e);
 		}	
 		logger.info("Finished writing output for R to " + outputPathForR);
 	}
 
-	private double [][] fillUserBenefits(Map<Id, Double> personId2Utility, Population pop){
-		double[][] weightedBenefits = new double [noOfXbins][noOfYbins];
-		for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){
-			for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
-				weightedBenefits[xIndex][yIndex]=0.0;
-				weights[xIndex][yIndex]=.0;
-			}
-		}
-		int count = 1;
+	private double [][] calculateWeights(Map<Id, Double> personId2Utility, Population pop){
+		double[][] weights = new double[noOfXbins][noOfYbins];
+
 		for(Id personId : personId2Utility.keySet()){ 
-			
-				if(count%1000==0)logger.info("count = " + count);
-				Person person = pop.getPersons().get(personId);
-				Plan plan = person.getSelectedPlan();
-				Coord homeCoord = new CoordImpl(.0, .0);
-				for (PlanElement planElement : plan.getPlanElements()) {
-						Activity activity = (Activity) planElement;
-						homeCoord = activity.getCoord();
-						if(homeCoord!=null)	break;
-				}
-				if ((homeCoord!=null) && (isInResearchArea(homeCoord))) {
-					weightedBenefits = calculatePersonalInfluencePerBin(
-							weightedBenefits, personId2Utility.get(personId),
-							homeCoord);
-				}
-				count++;
-		}
-		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-				weightedBenefits[xIndex][yIndex]=weightedBenefits[xIndex][yIndex]*scalingFactor/area_in_smoothing_circle_sqkm;
-				weights[xIndex][yIndex]= weights[xIndex][yIndex]*scalingFactor/area_in_smoothing_circle_sqkm;
-			}
-		}
-		return weightedBenefits;
-	}
-	
-	private double[][] calculatePersonalInfluencePerBin(
-			double[][] weightedBenefits, Double value, Coord homeCoord) {
-		
-			for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
-					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-					double weightForCurrentBin = calculateWeightOfLinkForCell(homeCoord.getX(), homeCoord.getY(), cellCentroid.getX(), cellCentroid.getY());
-					if (value != null) {
-						weightedBenefits[xIndex][yIndex] += weightForCurrentBin * value;
-						weights[xIndex][yIndex]+= weightForCurrentBin;
-					}else{
-						logger.warn("current value is null");
+			Person person = pop.getPersons().get(personId);
+			Coord homeCoord = findHomeCoord(person);
+			if (isInResearchArea(homeCoord)){
+				double personCount = 1.0;
+				double scaledPersonCount = this.scalingFactor * personCount;
+				for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){
+					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+						double weightOfPersonForCell = calculateWeightOfPersonForCell(homeCoord.getX(), homeCoord.getY(), cellCentroid.getX(), cellCentroid.getY());
+						weights[xIndex][yIndex] += weightOfPersonForCell * scaledPersonCount;
 					}
-					
 				}
 			}
-		return weightedBenefits;
+		}
+		return weights;
 	}
 	
+	private double [][] fillUserBenefits(Map<Id, Double> personId2Utility, Population pop){
+		double[][] scaledWeightedBenefits = new double [noOfXbins][noOfYbins];
+
+		for(Id personId : personId2Utility.keySet()){ 
+			Person person = pop.getPersons().get(personId);
+			Coord homeCoord = findHomeCoord(person);
+			if (isInResearchArea(homeCoord)){
+				double benefitOfPerson = personId2Utility.get(personId);
+				double scaledBenefitOfPerson = this.scalingFactor * benefitOfPerson;
+
+				for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){
+					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+						double weightOfPersonForCell = calculateWeightOfPersonForCell(homeCoord.getX(), homeCoord.getY(), cellCentroid.getX(), cellCentroid.getY());
+						scaledWeightedBenefits[xIndex][yIndex] += weightOfPersonForCell * scaledBenefitOfPerson;
+					}
+				}
+			} else {
+				// do nothing...
+			}
+		}
+		return scaledWeightedBenefits;
+	}
+	
+	private Coord findHomeCoord(Person person) {
+		Plan plan = person.getSelectedPlan();
+		Coord homeCoord = null;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if(pe instanceof Activity){
+				Activity act =  ((Activity) pe);
+				if(act.getType().equals("home")){
+					homeCoord = act.getCoord();
+					break;
+				} else if(act.getType().equals("pvHome")){
+					homeCoord = act.getCoord();
+					break;
+				} else if(act.getType().equals("gvHome")){
+					homeCoord = act.getCoord();
+					break;
+				}
+			}
+		}
+		if(homeCoord == null){
+			throw new RuntimeException("Person " + person.getId() + " has no homeCoord. Aborting...");
+		} else {
+			return homeCoord;
+		}
+	}
+
 	private boolean isInMunich(Coord cellCentroid) {
 		boolean isInMunichShape = false;
 		GeometryFactory factory = new GeometryFactory();
@@ -355,7 +338,7 @@ public class SpatialAveragingWelfare {
 		return false;
 	}
 
-	private double calculateWeightOfLinkForCell(double x1, double y1, double x2, double y2) {
+	private double calculateWeightOfPersonForCell(double x1, double y1, double x2, double y2) {
 		double distanceSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
@@ -396,16 +379,6 @@ public class SpatialAveragingWelfare {
 		config.network().setInputFile(netFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
-	}
-
-	private Double getEndTime(String configfile) {
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configfile);
-		Double endTime = config.qsim().getEndTime();
-		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
-		return endTime;
 	}
 
 	private static Integer getLastIteration(String configFile) {
