@@ -79,19 +79,15 @@ public class Fixture {
 		conf.qsim().setStuckTime(1000);
 		conf.qsim().setStartTime(0.0);
 		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
-		this.setSignalSystemConfigValues(signalsConfig, testUtils);
-		Scenario scenario = ScenarioUtils.loadScenario(conf);
 		
 		if (useIntergreens) {
 			signalsConfig.setIntergreenTimesFile(testUtils.getClassInputDirectory() + "testIntergreenTimes_v1.0.xml");
 			signalsConfig.setUseIntergreenTimes(true);
 			signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.EXCEPTION_ON_INTERGREEN_VIOLATION);
 		}			
-		
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
-		SignalsData signalsData = signalsLoader.loadSignalsData();
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME , signalsData);
 
+		this.setSignalSystemConfigValues(signalsConfig, testUtils);
+		Scenario scenario = ScenarioUtils.loadScenario(conf);
 		
 		return scenario;
 	}
