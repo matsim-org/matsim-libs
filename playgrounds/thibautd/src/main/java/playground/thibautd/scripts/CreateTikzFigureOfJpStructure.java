@@ -20,6 +20,7 @@
 package playground.thibautd.scripts;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ import playground.thibautd.socnetsim.utils.JointStructureTikzCreator;
 public class CreateTikzFigureOfJpStructure {
 	private static final Logger log =
 		Logger.getLogger(CreateTikzFigureOfJpStructure.class);
+
+	private static final boolean SHOW_PREFERENCE = true;
 
 	public static void main(final String[] args) {
 		final String plansFile = args[ 0 ];
@@ -71,6 +74,8 @@ public class CreateTikzFigureOfJpStructure {
 			private int count = 0;
 			private int selected = -1;
 			private final Map<Integer, String> vehicles = new LinkedHashMap<Integer, String>();
+			private final List<ScoredIndex> scores = new ArrayList<ScoredIndex>();
+
 			@Override
 			public void startTag(
 					final String name,
@@ -81,11 +86,18 @@ public class CreateTikzFigureOfJpStructure {
 					count = 0;
 					selected = -1;
 					vehicles.clear();
+					scores.clear();
 				}
 				if ( name.equals( "plan" ) ) {
 					if ( atts.getValue( "selected" ).equals( "yes" ) ) {
 						assert selected < 0;
 						selected = count;
+					}
+					if ( SHOW_PREFERENCE ) {
+						scores.add(
+								new ScoredIndex(
+									count,
+									Double.parseDouble( atts.getValue( "score" ) ) ) );
 					}
 					count++;
 				}
@@ -113,9 +125,37 @@ public class CreateTikzFigureOfJpStructure {
 						final String vehicle = e.getValue();
 						tikzCreator.setPlanProperty( id , plan , vehicle );
 					}
+
+					if ( SHOW_PREFERENCE ) {
+						Collections.sort( scores );
+
+						for ( int i = 0; i < scores.size(); i++ ) {
+							tikzCreator.setPlanProperty(
+									id,
+									scores.get( i ).index,
+									"rank-"+i );
+						}
+					}
 				}
 			}
 		}.parse( plansFile );
+	}
+
+	private static class ScoredIndex implements Comparable<ScoredIndex> {
+		public final int index;
+		public final double score;
+
+		public ScoredIndex(
+				final int index,
+				final double score) {
+			this.index = index;
+			this.score = score;
+		}
+
+		@Override
+		public int compareTo(final ScoredIndex o) {
+			return Double.compare( score , o.score );
+		}
 	}
 
 	private static void parsePlanLinkInfo(
