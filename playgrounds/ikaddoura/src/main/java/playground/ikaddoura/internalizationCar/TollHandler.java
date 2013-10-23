@@ -63,6 +63,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 		linkId2timeBin2leavingAgents.clear();
 		this.congestionEvents.clear();
 		this.linkId2timeBin2avgToll.clear();
+		this.linkLeaveEvents.clear();
 	}
 
 	@Override
@@ -110,6 +111,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 					}
 					timeBin2avgToll.put(timeBin, avgToll);
 				}
+				linkId2timeBin2avgToll.put(linkId , timeBin2avgToll);
 			}
 		}
 	}
