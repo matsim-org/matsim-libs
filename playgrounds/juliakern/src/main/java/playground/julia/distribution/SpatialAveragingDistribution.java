@@ -385,56 +385,56 @@ public class SpatialAveragingDistribution {
 			Id personId = ema.getPersonId();
 			Double startTime = ema.getStartTime();
 			Double endTime = ema.getEndTime();
-			int xBin = ema.getXbin();
-			int yBin = ema.getYbin();
+//			int xBin = ema.getXbin();
+//			int yBin = ema.getYbin();
+//			
+//			// number of time bins matching activity time
+//			int firstTimeBin = (int) Math.ceil(startTime/timeBinSize);
+//			if(firstTimeBin==0)firstTimeBin=1;
+//			int lastTimeBin;
+//			if(ema.getEndTime()>0.0){
+//					lastTimeBin = (int) Math.ceil(endTime/timeBinSize);
+//			}else{
+//					lastTimeBin = (int) Math.ceil(simulationEndTime/timeBinSize);
+//			}
+//
+//			
+//			if (firstTimeBin<lastTimeBin) {
+//				//first bin
+//				Double firstStartTime = startTime;
+//				Double firstEndTime = firstTimeBin * timeBinSize;
+//				Double firstpoll = reut.getExposureInCell(xBin, yBin, firstTimeBin);
+//				ExposureEvent eevent = new ExposureEvent(personId, firstStartTime, firstEndTime, firstpoll, actType);
+//				exposure.add(eevent);
+//				
+//				// inner time bins
+//				for (int i = firstTimeBin + 1; i < lastTimeBin; i++) {
+//					Double currStartTime = i * timeBinSize;
+//					Double currEndTime = (i + 1) * timeBinSize;
+//			 		Double poll = reut.getExposureInCell(xBin, yBin, i);
+//					ExposureEvent exEvent = new ExposureEvent(personId, currStartTime, currEndTime, poll, actType);
+//					exposure.add(exEvent);
+//				}
+//				
+//				// last bin
+//				Double lastStartTime = (lastTimeBin-1) * timeBinSize;
+//				Double lastEndTime = endTime;
+//				if(lastEndTime<0.0)lastEndTime=simulationEndTime;
+//				Double lastpoll = reut.getExposureInCell(xBin, yBin, lastTimeBin);
+//				perEx.addExposureIntervall(lastStartTime, lastEndTime, lastpoll, actType);
+//				
+//			}else{ // activity entirely in one interval
+//				
+//				Double startTime = pea.getStartTime();
+//				Double endTime = pea.getEndTime();
+//				if(endTime<0.0)endTime=simulationEndTime;
+//				Double poll = getExposureFromActivity(time2WeightedEmissions1, pea, lastTimeBin*timeBinSize);
+//				perEx.addExposureIntervall(startTime, endTime, poll, actType);
+//			}
+//			 
 			
-			// number of time bins matching activity time
-			int firstTimeBin = (int) Math.ceil(startTime/timeBinSize);
-			if(firstTimeBin==0)firstTimeBin=1;
-			int lastTimeBin;
-			if(ema.getEndTime()>0.0){
-					lastTimeBin = (int) Math.ceil(endTime/timeBinSize);
-			}else{
-					lastTimeBin = (int) Math.ceil(simulationEndTime/timeBinSize);
-			}
-
-			
-			if (firstTimeBin<lastTimeBin) {
-				//first bin
-				Double firstStartTime = startTime;
-				Double firstEndTime = firstTimeBin * timeBinSize;
-				Double firstpoll = reut.getExposureInCell(xBin, yBin, firstTimeBin);
-				ExposureEvent eevent = new ExposureEvent(personId, firstStartTime, firstEndTime, firstpoll, actType);
-				exposure.add(eevent);
-				
-				// inner time bins
-				for (int i = firstTimeBin + 1; i < lastTimeBin; i++) {
-					Double currStartTime = i * timeBinSize;
-					Double currEndTime = (i + 1) * timeBinSize;
-					Double poll = reut.getExposureInCell(xBin, yBin, i);
-					ExposureEvent exEvent = new ExposureEvent(personId, currStartTime, currEndTime, poll, actType);
-					exposure.add(exEvent);
-				}
-				
-				// last bin
-				Double lastStartTime = (lastTimeBin-1) * timeBinSize;
-				Double lastEndTime = endTime;
-				if(lastEndTime<0.0)lastEndTime=simulationEndTime;
-				Double lastpoll = reut.getExposureInCell(xBin, yBin, lastTimeBin);
-				perEx.addExposureIntervall(lastStartTime, lastEndTime, lastpoll, actType);
-				
-			}else{ // activity entirely in one interval
-				
-				Double startTime = pea.getStartTime();
-				Double endTime = pea.getEndTime();
-				if(endTime<0.0)endTime=simulationEndTime;
-				Double poll = getExposureFromActivity(time2WeightedEmissions1, pea, lastTimeBin*timeBinSize);
-				perEx.addExposureIntervall(startTime, endTime, poll, actType);
-			}
-			 
-			
-			Double personalExposure = reut.getExposureInCell(xBin, yBin, timeBin);
-			ExposureEvent eevent = new ExposureEvent(personId, ema.getStartTime(), ema.getEndTime(), personalExposure, ema.getActivityType());
+//			Double personalExposure = reut.getExposureInCell(xBin, yBin, timeBin);
+//			ExposureEvent eevent = new ExposureEvent(personId, ema.getStartTime(), ema.getEndTime(), personalExposure, ema.getActivityType());
 		}
 		
 	}
