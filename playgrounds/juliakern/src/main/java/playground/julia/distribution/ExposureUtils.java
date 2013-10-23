@@ -3,6 +3,7 @@ package playground.julia.distribution;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,37 @@ public class ExposureUtils {
 			System.err.println("Error creating " + outPathForTimeTables + ".");
 		}
 	}
+
+
+	
+	public void printPersonalExposureTimeTables(ArrayList<ExposureEvent> exposure,
+			String outPathForTimeTables) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void printPersonalResponibility(ArrayList<ResponsibilityEvent> responsibility,
+			String outPathForTimeTables) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	public void printExposureInformation(ArrayList<ExposureEvent> exposure,
+			String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	public void printResponsibilityInformation(
+			ArrayList<ResponsibilityEvent> responsibility, String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 
 }

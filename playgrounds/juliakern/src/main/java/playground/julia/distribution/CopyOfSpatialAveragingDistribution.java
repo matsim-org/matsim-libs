@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -75,8 +74,8 @@ import com.vividsolutions.jts.util.Assert;
  * @author benjamin, julia
  *
  */
-public class SpatialAveragingDistribution {
-	private static final Logger logger = Logger.getLogger(SpatialAveragingDistribution.class);
+public class CopyOfSpatialAveragingDistribution {
+	private static final Logger logger = Logger.getLogger(CopyOfSpatialAveragingDistribution.class);
 	
 	final double scalingFactor = 100;
 	private final static String runDirectory1 = "input/sample/";
@@ -89,11 +88,11 @@ public class SpatialAveragingDistribution {
 	//private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
 	//private final static Integer lastIteration2 = getLastIteration(configFile2);
 	private final String emissionFile1 = runDirectory1 + "basecase.sample.emission.events.xml";
-	//private final String emissionFile2 = runDirectory1 + "compcase.sample.emission.events.xml";
+	private final String emissionFile2 = runDirectory1 + "compcase.sample.emission.events.xml";
 	String plansFile1 = runDirectory1+"basecase.sample.plans.xml";
-	//String plansFile2 = runDirectory1+"compcase.sample.plans.xml";
+	String plansFile2 = runDirectory1+"compcase.sample.plans.xml";
 	String eventsFile1 = runDirectory1+"basecase.sample.events.xml";
-	//String eventsFile2 = runDirectory1+"compcase.sample.events.xml";
+	String eventsFile2 = runDirectory1+"compcase.sample.events.xml";
 	
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
@@ -102,7 +101,7 @@ public class SpatialAveragingDistribution {
 	EmissionsPerLinkColdEventHandler coldHandler;
 	SortedSet<String> listOfPollutants;
 	double simulationEndTime;
-	String outPathStub = "output/sample";
+	String outPathStub;
 	double pollutionFactorOutdoor, pollutionFactorIndoor;
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
@@ -118,10 +117,11 @@ public class SpatialAveragingDistribution {
 	final double smoothingRadius_m = 500.;
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
+	final boolean compareToBaseCase = true;
 
-	private boolean printPersonalInformation = false;
+	private boolean createPersonalExposurePlans = true;
 
-	private boolean storeEvents = false;
+	private String car = "car";
 
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile1);
@@ -152,60 +152,11 @@ public class SpatialAveragingDistribution {
 
 		logger.info("Done calculating weighted emissions");
 		
-		/*
-		 * four lists to store information on activities, car trips and emissions
-		 * activities: time interval, person id, location - from events
-		 * car trips: time interval, person id, link id - from events
-		 * emission per bin: time bin, area bin, responsible person id - from emission events
-		 * emission per link: time bin, link id, responsible person id - from emission events 
-		 * 
-		 */
 		
-		ArrayList<EmActivity> activities = new ArrayList<EmActivity>();
-		ArrayList<EmCarTrip> carTrips= new ArrayList<EmCarTrip>();
 		
-		Map<Double, ArrayList<EmPerBin>> emissionPerBin = new HashMap<Double, ArrayList<EmPerBin>>();
-		Map<Double, ArrayList<EmPerLink>> emissionPerLink = new HashMap<Double, ArrayList<EmPerLink>>();
 		
-		generateActivitiesAndTrips(eventsFile1, activities, carTrips);
-		generateEmissions(emissionFile1, emissionPerBin, emissionPerLink);
 		
-		/*
-		 * two lists to store information on exposure and responsibility 
-		 * responsibility: responsible person id, emission value x time - from  (car trips and emission per link), (activities and emission per bin)
-		 * exposure: person id, emission value x time - from  (car trips and emission per link), (activities and emission per bin)
-		 * 
-		 * TODO later: write emission per bin/link into xml... handle as responsibility events
-		 * TODO later: write emission per bin/link into xml... handle as exposure events
-		 */
-		
-		ArrayList<ResponsibilityEvent> responsibility = new ArrayList<ResponsibilityEvent>();
-		ArrayList<ExposureEvent> exposure = new ArrayList<ExposureEvent>();
-		
-		calculateResponsibilityAndExposureBinwise(activities, emissionPerBin, responsibility, exposure);
-		calculateResponsibilityAndExposureLinkwise(carTrips, emissionPerLink, responsibility, exposure);
-		
-		/*
-		 * analysis
-		 * exposure analysis: sum, average, welfare, personal time table
-		 * responsibility analysis: sum, average, welfare
-		 *  TODO
-		 */
-		
-		//TODO mit case-namen versehen?
-		ExposureUtils exut = new ExposureUtils();
-		if(printPersonalInformation){
-			exut.printPersonalExposureTimeTables(exposure, outPathStub+"personalExposure.txt");
-			exut.printPersonalResponibility(responsibility, outPathStub + "personalExposure.txt");
-		}
-		exut.printExposureInformation(exposure, outPathStub+"exposure.txt");
-		exut.printResponsibilityInformation(responsibility, outPathStub+"responsibility.txt");
-		
-		if(storeEvents){
-			//TODO write events file for respons. and exposure
-		}
-		
-/*		//-----------------
+		//-----------------
 		Population pop = scenario.getPopulation();	
 		Map<Id, Double> person2emission = calculatePersonalConcentration(time2WeightedEmissions1,pop);
 		ExposureUtils exut = new ExposureUtils();
@@ -326,153 +277,15 @@ public class SpatialAveragingDistribution {
 			
 
 				
-			}*/
-		}
-		
-		
-	
-
-	private void calculateResponsibilityAndExposureLinkwise(
-			ArrayList<EmCarTrip> carTrips,
-			Map<Double, ArrayList<EmPerLink>> emissionPerLink,
-			ArrayList<ResponsibilityEvent> responsibility,
-			ArrayList<ExposureEvent> exposure) {
-		
-		responsibility.clear();
-		exposure.clear();
-		
-		ResponsibilityUtils reut = new ResponsibilityUtils();
-		
-		// for each car trip
-		// calculate exposure
-		// calculate responsibility
-		
-		for(EmCarTrip ect: carTrips){
-			Id linkId = ect.getLinkId();
-			Double duration = ect.getDuration();
-			
-			// exposure
-			// TODO Benjamin fragen: Annahme: fahrzeit auf links ist so kurz, dass sie nicht in mehrere time bins fallen
-			Double endOfTimeInterval = Math.ceil(ect.getStartTime()/ timeBinSize)* timeBinSize;
-			Id exposedPersonId = ect.getPersonId();
-			Double personalExposure = reut.getExposureOnLink(linkId, endOfTimeInterval)* duration * pollutionFactorOutdoor;
-			
-			ExposureEvent eevent = new ExposureEvent(exposedPersonId, ect.getStartTime(), ect.getEndTime(), personalExposure, "car");
-			exposure.add(eevent);
-			
-			// responsibility
-			ArrayList<ResponsibilityEvent> revents = reut.getResponsibilityOnLink(linkId, endOfTimeInterval, duration);
-			responsibility.addAll(revents);
-		}
-		
-	}
-
-	private void calculateResponsibilityAndExposureBinwise(
-			ArrayList<EmActivity> activities,
-			Map<Double, ArrayList<EmPerBin>> emissionPerBin,
-			ArrayList<ResponsibilityEvent> responsibility,
-			ArrayList<ExposureEvent> exposure) {
-		// for each activity
-		// calculate exposure
-		// calculate responsibility
-		
-		ResponsibilityUtils reut = new ResponsibilityUtils();
-		
-		// TODO responsibilities!!!!!
-		
-		for(EmActivity ema: activities){
-			
-			Id personId = ema.getPersonId();
-			Double startTime = ema.getStartTime();
-			Double endTime = ema.getEndTime();
-			int xBin = ema.getXbin();
-			int yBin = ema.getYbin();
-			
-			// number of time bins matching activity time
-			int firstTimeBin = (int) Math.ceil(startTime/timeBinSize);
-			if(firstTimeBin==0)firstTimeBin=1;
-			int lastTimeBin;
-			if(ema.getEndTime()>0.0){
-					lastTimeBin = (int) Math.ceil(endTime/timeBinSize);
-			}else{
-					lastTimeBin = (int) Math.ceil(simulationEndTime/timeBinSize);
 			}
-
-			
-			if (firstTimeBin<lastTimeBin) {
-				//first bin
-				Double firstStartTime = startTime;
-				Double firstEndTime = firstTimeBin * timeBinSize;
-				Double firstpoll = reut.getExposureInCell(xBin, yBin, firstTimeBin);
-				ExposureEvent eevent = new ExposureEvent(personId, firstStartTime, firstEndTime, firstpoll, actType);
-				exposure.add(eevent);
-				
-				// inner time bins
-				for (int i = firstTimeBin + 1; i < lastTimeBin; i++) {
-					Double currStartTime = i * timeBinSize;
-					Double currEndTime = (i + 1) * timeBinSize;
-					Double poll = reut.getExposureInCell(xBin, yBin, i);
-					ExposureEvent exEvent = new ExposureEvent(personId, currStartTime, currEndTime, poll, actType);
-					exposure.add(exEvent);
-				}
-				
-				// last bin
-				Double lastStartTime = (lastTimeBin-1) * timeBinSize;
-				Double lastEndTime = endTime;
-				if(lastEndTime<0.0)lastEndTime=simulationEndTime;
-				Double lastpoll = reut.getExposureInCell(xBin, yBin, lastTimeBin);
-				perEx.addExposureIntervall(lastStartTime, lastEndTime, lastpoll, actType);
-				
-			}else{ // activity entirely in one interval
-				
-				Double startTime = pea.getStartTime();
-				Double endTime = pea.getEndTime();
-				if(endTime<0.0)endTime=simulationEndTime;
-				Double poll = getExposureFromActivity(time2WeightedEmissions1, pea, lastTimeBin*timeBinSize);
-				perEx.addExposureIntervall(startTime, endTime, poll, actType);
-			}
-			 
-			
-			Double personalExposure = reut.getExposureInCell(xBin, yBin, timeBin);
-			ExposureEvent eevent = new ExposureEvent(personId, ema.getStartTime(), ema.getEndTime(), personalExposure, ema.getActivityType());
 		}
 		
-	}
-
-	private void generateEmissions(String emissionFile,
-			Map<Double, ArrayList<EmPerBin>> emissionPerBin,
-			Map<Double, ArrayList<EmPerLink>> emissionPerLink) {
-		
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		
-		GeneratedEmissionsHandler generatedEmissionsHandler = new GeneratedEmissionsHandler();
-		eventsManager.addHandler(generatedEmissionsHandler);
-		
-		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-		matsimEventsReader.readFile(emissionFile);
-				
-		generatedEmissionsHandler.addEmissionsPerCell(emissionPerBin);
-		generatedEmissionsHandler.addEmissionsPerLink(emissionPerLink);
-		
-		eventsManager.removeHandler(generatedEmissionsHandler);
 		
 	}
 
-	private void generateActivitiesAndTrips(String eventsFile,
+	private void generateActivitiesAndTrips(String eventsFile12,
 			ArrayList<EmActivity> activities, ArrayList<EmCarTrip> carTrips) {
-		// from eventsfile -> car trips, activities: store
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		
-		IntervalHandler intervalHandler = new IntervalHandler();
-		eventsManager.addHandler(intervalHandler);
-		
-		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-		matsimEventsReader.readFile(eventsFile);
-				
-		intervalHandler.addActivitiesToTimetables(activities);
-		intervalHandler.addCarTripsToTimetables(carTrips);
-		
-		eventsManager.removeHandler(intervalHandler);
+		// TODO Auto-generated method stub
 		
 	}
 
@@ -682,6 +495,8 @@ public class SpatialAveragingDistribution {
 		return time2weightedEmissions;
 	}
 	
+	
+
 	private Map<Double, double[][]> scale(Map<Double, double[][]> time2weightedValues){
 		Map<Double, double[][]> time2scaledValues = new HashMap<Double, double[][]>();
 		
@@ -727,6 +542,7 @@ public class SpatialAveragingDistribution {
 		double distanceSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
+	
 
 	private double findBinCenterY(int yIndex) {
 		double yBinCenter = yMin + ((yIndex + .5) / noOfYbins) * (yMax - yMin);
@@ -854,6 +670,14 @@ public class SpatialAveragingDistribution {
 		return scenario;
 	}
 	
+	private Scenario loadScenario2(String netFile) {
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(netFile);
+		config.plans().setInputFile(plansFile2);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return scenario;
+	}
+
 	private Double getEndTime(String configfile) {
 		Config config = ConfigUtils.createConfig();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
@@ -865,6 +689,6 @@ public class SpatialAveragingDistribution {
 	}
 
 	public static void main(String[] args) throws IOException{
-		new SpatialAveragingDistribution().run();
+		new CopyOfSpatialAveragingDistribution().run();
 	}
 }
