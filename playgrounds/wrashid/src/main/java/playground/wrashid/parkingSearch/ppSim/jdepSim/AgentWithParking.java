@@ -31,6 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
@@ -39,6 +40,7 @@ public class AgentWithParking extends AgentEventMessage{
 
 	public static ParkingStrategyManager parkingStrategyManager;
 	public static ParkingManagerZH parkingManager;
+	public RerouteTaskDuringSim rerouteTask=null;
 	
 	public AgentWithParking(Person person) {
 		this.setPerson(person);
@@ -71,6 +73,13 @@ public class AgentWithParking extends AgentEventMessage{
 			handleActivityEndEvent();
 		} else {
 			Leg leg=(Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+
+			if (rerouteTask!=null){
+				if (rerouteTask.getLeg()==leg){
+					rerouteTask.waitUntilDone();
+				}
+			}
+			
 			if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
 				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(),planElementIndex).handleAgentLeg(this);
 			} else {

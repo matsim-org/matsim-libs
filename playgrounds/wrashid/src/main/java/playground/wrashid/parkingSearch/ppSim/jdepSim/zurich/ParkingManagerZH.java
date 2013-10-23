@@ -496,7 +496,7 @@ public class ParkingManagerZH {
 			log.info("starting initFirstParkingOfDay");
 			
 			
-			RerouteThread[] rerouteThreads=new RerouteThread[8];
+			RerouteThread[] rerouteThreads=new RerouteThread[ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning];
 			
 			CyclicBarrier cyclicBarrier = new CyclicBarrier(rerouteThreads.length+1);
 			for (int i=0;i<rerouteThreads.length;i++){

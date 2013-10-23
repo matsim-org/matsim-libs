@@ -21,14 +21,18 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.zurich;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyStats;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
+import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class ZHScenarioGlobal {
@@ -42,11 +46,24 @@ public class ZHScenarioGlobal {
 	public static int skipOutputInIteration = 0;
 	public static LinkedList<ParkingEventDetails> parkingEventDetails;
 	public static int populationExpensionFactor=1;
+	public static int numberOfRoutingThreadsAtBeginning=7;
+	public static int numberOfRoutingThreadsDuringSim=10;
 	
 	// personId, legIndex, route
 	public static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes;
 	public static String plansFile;
+	public static RerouteThreadDuringSim[] rerouteThreadsDuringSim;
 
+	
+	public static void init(TTMatrix ttMatrix, Network network){
+		rerouteThreadsDuringSim=new RerouteThreadDuringSim[numberOfRoutingThreadsDuringSim];
+		
+		for (int i=0;i<numberOfRoutingThreadsDuringSim;i++){
+			rerouteThreadsDuringSim[i]=new RerouteThreadDuringSim(ttMatrix,network);
+			rerouteThreadsDuringSim[i].start();
+		}
+	}
+	
 	public static void reset() {
 		parkingEventDetails = new LinkedList<ParkingEventDetails>();
 	}

@@ -84,9 +84,9 @@ public class MainPPSimZurich30km {
 		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1472928.xml";
 
 		
-		//		ParkingScenario.scenario1pml();
+			ParkingScenario.scenario1pml();
 		//	ParkingScenario.scenario1pct();
-			ParkingScenario.scenario10pct();
+		//	ParkingScenario.scenario10pct();
 		//	ParkingScenario.scenario100pct();
 		
 		
@@ -140,7 +140,9 @@ public class MainPPSimZurich30km {
 		ParkingCostCalculatorZH parkingCostCalculatorZH = (ParkingCostCalculatorZH) AgentWithParking.parkingManager
 				.getParkingCostCalculator();
 		ZHScenarioGlobal.parkingScoreEvaluator = new ParkingScoreEvaluator(parkingCostCalculatorZH, parkingPersonalBetas);
-
+		ZHScenarioGlobal.init(Message.ttMatrix, scenario.getNetwork());
+		
+		
 		// TODO: we need to do that probably also inside loop below at start of
 		// each iteration
 
