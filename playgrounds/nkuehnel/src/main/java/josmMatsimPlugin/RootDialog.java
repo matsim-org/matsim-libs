@@ -16,8 +16,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.event.DatasetEventManager;
 import org.openstreetmap.josm.gui.layer.Layer;
 
 /**
@@ -25,16 +30,15 @@ import org.openstreetmap.josm.gui.layer.Layer;
  * @author nkuehnel
  * 
  */
-public class MATSimDialog extends JPanel
+public class RootDialog extends JPanel
 {
 
-	// the JOptionPane that contains this dialog. required for the closeDialog()
-	// method.
 	private JButton importButton;
 	private JButton exportButton;
 	private JButton newNetButton;
+	private JButton mergeNetButton;
 
-	public MATSimDialog(final JDialog dlgSuper)
+	public RootDialog(final JDialog dlgSuper)
 	{
 		GridBagConstraints c = new GridBagConstraints();
 
@@ -51,7 +55,7 @@ public class MATSimDialog extends JPanel
 		importButton = new JButton("Import network");
 
 		c.gridwidth = 1;
-		c.gridx = 0;
+		c.gridx = 1;
 		c.gridy = 1;
 		c.weightx = 1.5;
 		add(importButton, c);
@@ -61,7 +65,7 @@ public class MATSimDialog extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				dlgSuper.dispose();
-				MATSimImportDialog dialog = new MATSimImportDialog();
+				ImportDialog dialog = new ImportDialog();
 		        JOptionPane pane = new JOptionPane(dialog, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
 		        dialog.setOptionPane(pane);
 		        JDialog dlg = pane.createDialog(Main.parent, tr("Import"));
@@ -78,14 +82,13 @@ public class MATSimDialog extends JPanel
 		        	}
 		        }
 		        dlg.dispose();
-		       
 			}
 		});
 
 		exportButton = new JButton("Export network");
 		
 		c.gridwidth = 1;
-		c.gridx = 1;
+		c.gridx = 2;
 		c.gridy = 1;
 		c.weightx = 1.5;
 		add(exportButton, c);
@@ -95,8 +98,8 @@ public class MATSimDialog extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				dlgSuper.dispose();
-				ExportDefaults.initialize();
-				MATSimExportDialog dialog = new MATSimExportDialog();
+				Defaults.initializeExportDefaults();
+				ExportDialog dialog = new ExportDialog();
 		        JOptionPane pane = new JOptionPane(dialog, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
 		        dialog.setOptionPane(pane);
 		        JDialog dlg = pane.createDialog(Main.parent, tr("Export"));
@@ -112,14 +115,13 @@ public class MATSimDialog extends JPanel
 		        	}
 		        }
 		        dlg.dispose();
-		        
 			}
 		});
 		
 		newNetButton = new JButton("new network layer");
 		
 		c.gridwidth = 1;
-		c.gridx = 2;
+		c.gridx = 0;
 		c.gridy = 1;
 		c.weightx = 1.5;
 		add(newNetButton, c);
@@ -130,10 +132,52 @@ public class MATSimDialog extends JPanel
 			{
 				dlgSuper.dispose();
 				DataSet dataSet = new DataSet();
-				Layer layer = new NetworkLayer(dataSet, "new Layer", new File("new Layer"));
+				Config config = ConfigUtils.createConfig();
+				Scenario scenario = ScenarioUtils.createScenario(config);
+				Layer layer = new NetworkLayer(dataSet, "new Layer", new File("new Layer"), scenario.getNetwork(), "WGS84");
 				Main.main.addLayer(layer);
+				NetworkListener listener = new NetworkListener();
+				DatasetEventManager.getInstance().addDatasetListener(listener, DatasetEventManager.FireMode.IN_EDT);
+			}
+		});
+		
+		mergeNetButton = new JButton("merge networks");
+		
+		c.gridwidth = 1;
+		c.gridx = 3;
+		c.gridy = 1;
+		c.weightx = 1.5;
+		add(mergeNetButton, c);
+		
+		mergeNetButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				dlgSuper.dispose();
+				Defaults.initializeExportDefaults();
+				MergeDialog dialog = new MergeDialog();
+		        JOptionPane pane = new JOptionPane(dialog, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+		        dialog.setOptionPane(pane);
+		        JDialog dlg = pane.createDialog(Main.parent, tr("Merge"));
+		        dlg.setAlwaysOnTop(true);
+		        dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		        dlg.setVisible(true);
+		        if(pane.getValue()!=null)
+		        {
+		        	if(((Integer)pane.getValue()) == JOptionPane.OK_OPTION)
+		        	{
+//		        		ExportTask task = new ExportTask();
+//		        		Main.worker.execute(task);
+		        	}
+		        }
+		        dlg.dispose();
+				
 		        
 			}
 		});
 	}
 }
+
+
+
+

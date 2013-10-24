@@ -6,12 +6,18 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import josmMatsimPlugin.ExportDefaults.OsmHighwayDefaults;
+import javax.swing.JOptionPane;
 
+import josmMatsimPlugin.Defaults.OsmHighwayDefaults;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -33,7 +39,6 @@ import org.xml.sax.SAXException;
 public class ExportTask extends PleaseWaitRunnable
 {
 	static Properties matsimConvertProperties = new Properties();
-	static String targetSystem="WGS84";
 	public ExportTask()
 	{
 		super("matsimexport");
@@ -59,8 +64,7 @@ public class ExportTask extends PleaseWaitRunnable
 	@Override
 	protected void finish()
 	{
-		// TODO Auto-generated method stub
-
+		JOptionPane.showMessageDialog(Main.main.parent, "Export finished.");
 	}
 
 	/*
@@ -72,17 +76,13 @@ public class ExportTask extends PleaseWaitRunnable
 	protected void realRun() throws SAXException, IOException,
 			OsmTransferException, UncheckedIOException
 	{
-		boolean keepPaths = MATSimExportDialog.keepPaths.isSelected();
-		Map<String, OsmHighwayDefaults> defaults = ExportDefaults.defaults;
 		
-		
-		AbstractJosm2Network writer;
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
-						targetSystem);
+						Defaults.targetSystem);
 		
 		Layer layer = Main.main.getActiveLayer();
 		
@@ -90,18 +90,37 @@ public class ExportTask extends PleaseWaitRunnable
 		{
 			if (layer instanceof NetworkLayer)
 			{
-				writer = new Network2Network(net, ct, keepPaths);
+				net = ((NetworkLayer) layer).getMatsimNetwork();
+				if(!(((NetworkLayer) layer).getCoordSystem().equals(Defaults.targetSystem)))
+				{
+					for(Node node: ((NetworkImpl)net).getNodes().values())
+					{
+						Coord temp=ct.transform(node.getCoord());
+						node.getCoord().setXY(temp.getX(), temp.getY());
+					}
+				}
 			}
 			else
 			{
-				writer = new Osm2Network(net, ct, keepPaths, targetSystem, defaults);
+				Converter converter = new Converter(((OsmDataLayer) layer).data, net, Defaults.defaults, Defaults.keepPaths);
+				converter.convert();
+				if (!(Defaults.targetSystem.equals("WGS84")))
+				{
+					for(Node node: ((NetworkImpl)net).getNodes().values())
+					{
+						Coord temp=ct.transform(node.getCoord());
+						node.getCoord().setXY(temp.getX(), temp.getY());
+					}
+				}
 			}
-			writer.writeLayer((OsmDataLayer) layer);
-			writer.write(MATSimExportDialog.path.getText()+".xml");
+			
+			if(Defaults.cleanNet==true)
+			{	
+				new NetworkCleaner().run(net);
+			}
+			new NetworkWriter(net).write(Defaults.exportPath+".xml");
 		}
-		
-		new NetworkCleaner().run(net);
-		System.out.println("schreibe: "+MATSimExportDialog.path.getText()+".xml"+" von WGS84 nach "+targetSystem);
+		System.out.println("schreibe: "+Defaults.exportPath+".xml"+" von WGS84 nach "+Defaults.targetSystem);
 	}
 
 }

@@ -8,11 +8,11 @@ import javax.swing.JPanel;
  * @author nkuehnel
  * 
  */
-public class MATSimFilterDialog extends JPanel
+public class FilterDialog extends JPanel
 {
 	private JOptionPane optionPane;
 
-	public MATSimFilterDialog()
+	public FilterDialog()
 	{
 		
 	}

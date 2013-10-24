@@ -23,12 +23,13 @@ import javax.swing.JTextField;
  * @author nkuehnel
  * 
  */
-public class MATSimDefaultsDialog extends JPanel
+public class OsmExportDefaultsDialog extends JPanel
 {
 
 	private JOptionPane optionPane;
 	private Map<String, JComponent> input = new HashMap<String, JComponent>();
 	private GridBagConstraints c = new GridBagConstraints();
+	static JCheckBox keepPaths = new JCheckBox("keep paths");
 	
 	static String[] types =
 		{ "motorway", "motorway_link", "trunk", "trunk_link", "primary",
@@ -38,7 +39,7 @@ public class MATSimDefaultsDialog extends JPanel
 	static String[] attributes =
 		{ "hierarchy", "lanes", "freespeed", "freespeedfactor", "laneCapacity"};
 	
-	public MATSimDefaultsDialog()
+	public OsmExportDefaultsDialog()
 	{
 		setLayout(new GridBagLayout());
 		c.insets = new Insets(4, 4, 4, 4);
@@ -66,31 +67,31 @@ public class MATSimDefaultsDialog extends JPanel
 				switch(j)
 				{
 				case 0: 
-					JTextField tF_hierarchy = new JTextField(Integer.toString(ExportDefaults.defaults.get(types[i]).hierarchy));
+					JTextField tF_hierarchy = new JTextField(Integer.toString(Defaults.defaults.get(types[i]).hierarchy));
 					add(tF_hierarchy, c);
 					input.put(i+"_"+j, tF_hierarchy);
 					System.out.println(types[i]+"_"+attributes[j]);
 					break;
 				case 1: 
-					JTextField tF_lanes = new JTextField(Double.toString(ExportDefaults.defaults.get(types[i]).lanes));
+					JTextField tF_lanes = new JTextField(Double.toString(Defaults.defaults.get(types[i]).lanes));
 					add(tF_lanes, c);
 					input.put(i+"_"+j, tF_lanes);
 					System.out.println(types[i]+"_"+attributes[j]);
 					break;
 				case 2:
-					JTextField tF_freespeed = new JTextField(Double.toString(ExportDefaults.defaults.get(types[i]).freespeed));
+					JTextField tF_freespeed = new JTextField(Double.toString(Defaults.defaults.get(types[i]).freespeed));
 					add(tF_freespeed, c); 
 					input.put(i+"_"+j, tF_freespeed);
 					System.out.println(types[i]+"_"+attributes[j]);
 					break;
 				case 3: 
-					JTextField tF_freespeedFactor = new JTextField(Double.toString(ExportDefaults.defaults.get(types[i]).freespeedFactor));
+					JTextField tF_freespeedFactor = new JTextField(Double.toString(Defaults.defaults.get(types[i]).freespeedFactor));
 					add(tF_freespeedFactor, c); 
 					input.put(i+"_"+j, tF_freespeedFactor);
 					System.out.println(types[i]+"_"+attributes[j]);
 					break;
 				case 4: 
-					JTextField tF_laneCapacity = new JTextField(Double.toString(ExportDefaults.defaults.get(types[i]).laneCapacity));
+					JTextField tF_laneCapacity = new JTextField(Double.toString(Defaults.defaults.get(types[i]).laneCapacity));
 					add(tF_laneCapacity, c); 
 					input.put(i+"_"+j, tF_laneCapacity);
 					System.out.println(types[i]+"_"+attributes[j]);
@@ -99,7 +100,7 @@ public class MATSimDefaultsDialog extends JPanel
 			}
 			c.gridx=(attributes.length+1);
 			JCheckBox oneway = new JCheckBox("oneway");
-			oneway.setSelected(ExportDefaults.defaults.get(types[i]).oneway);
+			oneway.setSelected(Defaults.defaults.get(types[i]).oneway);
 			add(oneway, c);
 			input.put(i+"_"+attributes.length, oneway);
 		}
@@ -120,11 +121,18 @@ public class MATSimDefaultsDialog extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				ExportDefaults.initialize();
+				Defaults.initializeExportDefaults();
 				reset();
 				
 			}
 		});
+		
+		keepPaths.setSelected(false);
+		c.gridwidth = 1;
+		c.gridx = 4;
+		c.gridy = (types.length+1);
+		c.weightx = 1.;
+		add(keepPaths, c);
 	}
 	
 	public Map<String, JComponent> getInput(){
@@ -140,19 +148,20 @@ public class MATSimDefaultsDialog extends JPanel
 				switch(j)
 				{
 					case 0:
-						((JTextField)input.get(i+"_"+j)).setText(Integer.toString(ExportDefaults.defaults.get(types[i]).hierarchy)); break;
+						((JTextField)input.get(i+"_"+j)).setText(Integer.toString(Defaults.defaults.get(types[i]).hierarchy)); break;
 					case 1:
-						((JTextField)input.get(i+"_"+j)).setText(Double.toString(ExportDefaults.defaults.get(types[i]).lanes)); break;
+						((JTextField)input.get(i+"_"+j)).setText(Double.toString(Defaults.defaults.get(types[i]).lanes)); break;
 					case 2:
-						((JTextField)input.get(i+"_"+j)).setText(Double.toString(ExportDefaults.defaults.get(types[i]).freespeed)); break;
+						((JTextField)input.get(i+"_"+j)).setText(Double.toString(Defaults.defaults.get(types[i]).freespeed)); break;
 					case 3:
-						((JTextField)input.get(i+"_"+j)).setText(Double.toString(ExportDefaults.defaults.get(types[i]).freespeedFactor)); break;
+						((JTextField)input.get(i+"_"+j)).setText(Double.toString(Defaults.defaults.get(types[i]).freespeedFactor)); break;
 					case 4:
-						((JTextField)input.get(i+"_"+j)).setText(Double.toString(ExportDefaults.defaults.get(types[i]).laneCapacity)); break;
+						((JTextField)input.get(i+"_"+j)).setText(Double.toString(Defaults.defaults.get(types[i]).laneCapacity)); break;
 				}
 			}
-			((JCheckBox)input.get(i+"_"+attributes.length)).setSelected(ExportDefaults.defaults.get(types[i]).oneway);
+			((JCheckBox)input.get(i+"_"+attributes.length)).setSelected(Defaults.defaults.get(types[i]).oneway);
 		}
+		keepPaths.setSelected(false);
 		
 	}
 	

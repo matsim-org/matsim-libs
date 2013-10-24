@@ -35,7 +35,7 @@ public class MATSimAction extends JosmAction
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		dlg = new JDialog();
-		MATSimDialog dialog = new MATSimDialog(dlg);
+		RootDialog dialog = new RootDialog(dlg);
        
         dlg.setTitle("MATSim");
         dlg.add(dialog);

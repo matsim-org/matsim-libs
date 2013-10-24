@@ -20,7 +20,6 @@ public class MATSimPlugin extends Plugin{
         Action = new MATSimAction();
         Main.main.menu.toolsMenu.add(Action);
         System.out.println(getPluginDir());
-        
     }
     
     /**
