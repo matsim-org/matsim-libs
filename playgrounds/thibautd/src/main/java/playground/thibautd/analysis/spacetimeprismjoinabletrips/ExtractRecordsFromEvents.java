@@ -96,7 +96,7 @@ public class ExtractRecordsFromEvents {
 	private static void mkdirs(final String outPrefix) {
 		String dirs = outPrefix.substring( 0 , outPrefix.lastIndexOf( "/" )+1 );
 		File f = new File( dirs );
-		if (!f.exists()) f.mkdirs();
+		if (!f.exists() && !f.mkdirs()) throw new UncheckedIOException( "could not create dirs for "+dirs );
 
 		Logger root = Logger.getRootLogger();
 		root.setLevel( LOG_LEVEL );

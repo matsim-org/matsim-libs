@@ -56,8 +56,8 @@ public class MoreIOUtils {
 				outputDir += "/";
 			}
 			File outputDirFile = new File(outputDir);
-			if (!outputDirFile.exists()) {
-				outputDirFile.mkdirs();
+			if (!outputDirFile.exists() && !outputDirFile.mkdirs()) {
+				throw new UncheckedIOException( "could not create directory "+outputDir );
 			}
 
 			// init logFile
