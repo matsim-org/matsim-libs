@@ -45,7 +45,7 @@ final class PersonRecord {
 							final PlanRecord o1,
 							final PlanRecord o2) {
 						// sort in DECREASING order
-						return -Double.compare( o1.individualPlanWeight , o2.individualPlanWeight );
+						return Double.compare( o2.individualPlanWeight , o1.individualPlanWeight );
 					}
 				});
 		this.prunedPlans = new ArrayList<PlanRecord>( plans );

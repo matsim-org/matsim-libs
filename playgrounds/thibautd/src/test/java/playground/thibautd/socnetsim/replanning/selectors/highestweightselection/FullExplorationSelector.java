@@ -175,7 +175,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 								final PlanRecord o1,
 								final PlanRecord o2) {
 							// sort in DECREASING order
-							return -Double.compare( o1.avgJointPlanWeight , o2.avgJointPlanWeight );
+							return Double.compare( o2.avgJointPlanWeight , o1.avgJointPlanWeight );
 						}
 					});
 		}

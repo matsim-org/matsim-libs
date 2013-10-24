@@ -293,9 +293,9 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 							final PlanRecord o1,
 							final PlanRecord o2) {
 						// sort in DECREASING order
-						return -Double.compare(
-							o1.cachedMaximumWeight,
-							o2.cachedMaximumWeight );
+						return Double.compare(
+							o2.cachedMaximumWeight,
+							o1.cachedMaximumWeight );
 					}
 				});
 

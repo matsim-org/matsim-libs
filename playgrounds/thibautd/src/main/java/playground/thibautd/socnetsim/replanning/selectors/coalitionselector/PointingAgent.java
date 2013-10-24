@@ -36,7 +36,7 @@ final class PointingAgent {
 			public int compare(
 					final PlanRecord o1,
 					final PlanRecord o2) {
-				return -Double.compare( o1.getWeight() , o2.getWeight() );
+				return Double.compare( o2.getWeight() , o1.getWeight() );
 			}
 		};
 
