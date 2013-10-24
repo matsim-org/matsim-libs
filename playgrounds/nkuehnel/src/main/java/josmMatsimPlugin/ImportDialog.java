@@ -40,7 +40,7 @@ public class ImportDialog extends JPanel
 
 		//--------------displayed elements---------------------------------
 		
-		final JComboBox coordCombo = new JComboBox<String>(Defaults.coordSystems);
+		final JComboBox coordCombo = new JComboBox(Defaults.coordSystems);
 		final JLabel coordSystemLabel = new JLabel(tr("original coord system:"));
 		final JLabel openLabel =new JLabel(tr("Open:"));
 		final JTextField path = new JTextField(Defaults.importPath);
