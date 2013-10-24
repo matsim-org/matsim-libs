@@ -10,6 +10,10 @@ public abstract class Message implements Comparable<Message> {
 	private double messageArrivalTime;
 	int priority;
 	static MessageQueue messageQueue;
+	public static MessageQueue getMessageQueue() {
+		return messageQueue;
+	}
+
 	private Person person;
 	public static EventsManager eventsManager;
 	static TTMatrix ttMatrix;
@@ -38,7 +42,7 @@ public abstract class Message implements Comparable<Message> {
 		return messageArrivalTime;
 	}
 
-	protected void setMessageArrivalTime(double messageArrivalTime) {
+	public void setMessageArrivalTime(double messageArrivalTime) {
 		this.messageArrivalTime = messageArrivalTime;
 	}
 

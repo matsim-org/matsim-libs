@@ -27,7 +27,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadDuringSim;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkOption;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndLawEnforcement;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
@@ -39,7 +39,7 @@ import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas
 public class ZHScenarioGlobal {
 
 	public static ParkingScoreEvaluator parkingScoreEvaluator;
-	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run9/";;
+	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run11/";;
 	public static StrategyStats strategyScoreStats = new StrategyStats();
 	public static int iteration = 0;
 	public static int numberOfIterations = 1000;
@@ -78,7 +78,7 @@ public class ZHScenarioGlobal {
 		printFilteredParkingStatsParkingType("illegal");
 		printFilteredParkingStatsParkingType(RandomStreetParkingSearch.class);
 		printFilteredParkingStatsParkingType(RandomGarageParkingSearch.class);
-		printFilteredParkingStatsParkingType(RandomStreetParkingWithIllegalParkOption.class);
+		printFilteredParkingStatsParkingType(RandomStreetParkingWithIllegalParkingAndLawEnforcement.class);
 	}
 	
 	private static void printFilteredParkingStatsParkingType(Class c) {

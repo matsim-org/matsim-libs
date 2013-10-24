@@ -19,32 +19,35 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
 import java.util.List;
-import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
-public class RandomStreetParkingWithIllegalParkOption extends RandomParkingSearch {
+// wait on first link if needed, afterwards random search.
+public class RandomStreetParkingSearchWithWaiting extends RandomParkingSearch {
 
-	public RandomStreetParkingWithIllegalParkOption(double maxDistance, Network network) {
+	private double maxWaitingTime;
+	private double availabilityCheckIntervall;
+
+	public RandomStreetParkingSearchWithWaiting(double maxDistance, Network network, double maxWaitingTime,
+			double availabilityCheckIntervall) {
 		super(maxDistance, network);
-		this.parkingType = "illegalParking";
+		this.maxWaitingTime = maxWaitingTime;
+		this.availabilityCheckIntervall = availabilityCheckIntervall;
+		this.parkingType = "streetParking";
 	}
 
 	@Override
 	public String getName() {
-		return "RandomStreet+IllegalParking";
+		return "RandomStreetSearch+WithWaiting";
 	}
 
 	@Override
@@ -59,6 +62,10 @@ public class RandomStreetParkingWithIllegalParkOption extends RandomParkingSearc
 
 		if (endOfLegReached) {
 
+			if (!startSearchTime.containsKey(personId)) {
+				startSearchTime.put(personId, aem.getMessageArrivalTime());
+			}
+
 			ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
 
@@ -69,47 +76,21 @@ public class RandomStreetParkingWithIllegalParkOption extends RandomParkingSearc
 				parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), "streetParking");
 			}
 
-			if (parkingId != null) {
-				useSpecifiedParkingType.put(personId, "streetParking");
+			double waitingTime = GeneralLib.getIntervalDuration(startSearchTime.get(personId), aem.getMessageArrivalTime());
+			if (startSearchTime.get(personId)==aem.getMessageArrivalTime()){
+				waitingTime=0;
+			}
+			
+			if (parkingId != null || waitingTime > maxWaitingTime) {
+				super.handleAgentLeg(aem);
 			} else {
-				useSpecifiedParkingType.put(personId, "illegalParking");
+				aem.setMessageArrivalTime(aem.getMessageArrivalTime() + availabilityCheckIntervall);
+				AgentEventMessage.getMessageQueue().schedule(aem);
 			}
+		}else {
+			super.handleAgentLeg(aem);
 		}
 
-		super.handleAgentLeg(aem);
-	}
-
-	@Override
-	public void handleParkingDepartureActivity(AgentWithParking aem) {
-		addIllegalParkingScore(aem);
-
-		super.handleParkingDepartureActivity(aem);
-		useSpecifiedParkingType.remove(aem.getPerson().getId());
-	}
-
-	private void addIllegalParkingScore(AgentWithParking aem) {
-		if (ZHScenarioGlobal.iteration > 100) {
-			ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
-			
-			double parkingDuration = GeneralLib.getIntervalDuration(parkingAttributesForScoring.getParkingArrivalTime(), aem.getMessageArrivalTime());
-			if (parkingAttributesForScoring.getParkingArrivalTime()==aem.getMessageArrivalTime()){
-				parkingDuration=0;
-			}
-			
-			if (Double.isInfinite(parkingDuration) || Double.isNaN(parkingDuration)){
-				DebugLib.emptyFunctionForSettingBreakPoint();
-			}
-			
-			double disutilityPerSecond=-400.0/(24*60*60);
-			scoreInterrupationValue = disutilityPerSecond*parkingDuration;
-		}
-	}
-
-	@Override
-	public void handleLastParkingScore(AgentWithParking aem) {
-		addIllegalParkingScore(aem);
-
-		super.handleLastParkingScore(aem);
 	}
 
 }

@@ -54,10 +54,12 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkOption;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndLawEnforcement;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndNoLawEnforcement;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.HouseHoldIncomeZH;
@@ -128,7 +130,10 @@ public class MainPPSimZurich30km {
 		LinkedList<ParkingSearchStrategy> allStrategies = new LinkedList<ParkingSearchStrategy>();
 		allStrategies.add(new RandomStreetParkingSearch(300.0, scenario.getNetwork()));
 		allStrategies.add(new RandomGarageParkingSearch(500.0, scenario.getNetwork(),5*60));
-		allStrategies.add(new RandomStreetParkingWithIllegalParkOption(500.0, scenario.getNetwork()));
+		allStrategies.add(new RandomStreetParkingWithIllegalParkingAndLawEnforcement(500.0, scenario.getNetwork()));
+		allStrategies.add(new RandomStreetParkingWithIllegalParkingAndNoLawEnforcement(500.0, scenario.getNetwork()));
+		allStrategies.add(new RandomStreetParkingSearchWithWaiting(500.0, scenario.getNetwork(),5*60,30));
+		
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
 
 		LinkedList<AgentWithParking> agentsMessage = new LinkedList<AgentWithParking>();
