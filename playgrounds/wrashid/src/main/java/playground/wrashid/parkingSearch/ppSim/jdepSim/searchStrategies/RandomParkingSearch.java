@@ -136,15 +136,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					DebugLib.traceAgent(personId, 1);
 					// extraSearchPathNeeded.add(personId);
 
-					Random r = new Random();
-					Link link = network.getLinks().get(route.getEndLinkId());
-
-					Link nextLink = randomNextLink(link);
-					ArrayList<Id> newRoute = new ArrayList<Id>();
-					newRoute.addAll(route.getLinkIds());
-					newRoute.add(link.getId());
-					route.setLinkIds(route.getStartLinkId(), newRoute, nextLink.getId());
-					route.setEndLinkId(nextLink.getId());
+					addRandomLinkToRoute(route);
 
 					// this will just continue the search of the agent
 					aem.processLegInDefaultWay();
@@ -253,6 +245,18 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		// first).
 	}
 
+	public void addRandomLinkToRoute(LinkNetworkRouteImpl route) {
+		Random r = new Random();
+		Link link = network.getLinks().get(route.getEndLinkId());
+
+		Link nextLink = randomNextLink(link);
+		ArrayList<Id> newRoute = new ArrayList<Id>();
+		newRoute.addAll(route.getLinkIds());
+		newRoute.add(link.getId());
+		route.setLinkIds(route.getStartLinkId(), newRoute, nextLink.getId());
+		route.setEndLinkId(nextLink.getId());
+	}
+
 	private void setDurationOfParkingActivity(AgentWithParking aem, ActivityImpl nextAct) {
 		if (nextAct.getType().equalsIgnoreCase("parking")) {
 			nextAct.setEndTime(aem.getMessageArrivalTime() + parkingDuration);
@@ -273,13 +277,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 	private void logParkingSearchDuration(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
-		double searchDuration = GeneralLib.getIntervalDuration(startSearchTime.get(personId), aem.getMessageArrivalTime());
-
-		if (searchDuration == 86400) {
-			searchDuration = 0;
-		} else {
-			DebugLib.emptyFunctionForSettingBreakPoint();
-		}
+		double searchDuration=getSearchTime(aem);
 
 		getParkingAttributesForScoring(aem).setParkingSearchDuration(searchDuration);
 		startSearchTime.remove(personId);
@@ -305,6 +303,16 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	/*
 	 * startSearchTime.remove(personId); }
 	 */
+
+	public double getSearchTime(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
+		double searchDuration = GeneralLib.getIntervalDuration(startSearchTime.get(personId), aem.getMessageArrivalTime());
+
+		if (searchDuration == 86400) {
+			searchDuration = 0;
+		} 
+		return searchDuration;
+	}
 
 	public void handleLastParkingScore(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();

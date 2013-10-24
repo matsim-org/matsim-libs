@@ -53,6 +53,7 @@ import org.matsim.population.Desires;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.PrivateParkingWithWaitAndRandomSearchAsBackup;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndLawEnforcement;
@@ -130,9 +131,10 @@ public class MainPPSimZurich30km {
 		LinkedList<ParkingSearchStrategy> allStrategies = new LinkedList<ParkingSearchStrategy>();
 		allStrategies.add(new RandomStreetParkingSearch(300.0, scenario.getNetwork()));
 		allStrategies.add(new RandomGarageParkingSearch(500.0, scenario.getNetwork(),5*60));
-		allStrategies.add(new RandomStreetParkingWithIllegalParkingAndLawEnforcement(500.0, scenario.getNetwork()));
+		//allStrategies.add(new RandomStreetParkingWithIllegalParkingAndLawEnforcement(500.0, scenario.getNetwork()));
 		allStrategies.add(new RandomStreetParkingWithIllegalParkingAndNoLawEnforcement(500.0, scenario.getNetwork()));
 		allStrategies.add(new RandomStreetParkingSearchWithWaiting(500.0, scenario.getNetwork(),5*60,30));
+		allStrategies.add(new PrivateParkingWithWaitAndRandomSearchAsBackup(500.0, scenario.getNetwork(),5*60));
 		
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
 

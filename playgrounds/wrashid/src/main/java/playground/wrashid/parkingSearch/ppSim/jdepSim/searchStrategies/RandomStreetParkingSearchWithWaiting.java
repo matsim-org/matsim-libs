@@ -75,11 +75,8 @@ public class RandomStreetParkingSearchWithWaiting extends RandomParkingSearch {
 			if (parkingId == null) {
 				parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), "streetParking");
 			}
-
-			double waitingTime = GeneralLib.getIntervalDuration(startSearchTime.get(personId), aem.getMessageArrivalTime());
-			if (startSearchTime.get(personId)==aem.getMessageArrivalTime()){
-				waitingTime=0;
-			}
+			
+			double waitingTime = getSearchTime(aem);
 			
 			if (parkingId != null || waitingTime > maxWaitingTime) {
 				super.handleAgentLeg(aem);

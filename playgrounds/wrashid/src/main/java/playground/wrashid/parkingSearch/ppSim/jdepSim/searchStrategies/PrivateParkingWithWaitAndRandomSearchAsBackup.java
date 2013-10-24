@@ -18,50 +18,69 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
-import java.util.Random;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 
-public class RandomGarageParkingSearch extends RandomParkingSearch{
+// only accept private parking, thereafter wait (penalty), thereafter normal street parking search
+public class PrivateParkingWithWaitAndRandomSearchAsBackup extends RandomParkingSearch{
 	
 	
-	
-	private int delayBeforeSwitchToStreetParkingSearch;
+	private double delayBeforeSwitchToStreetParkingSearch;
 
-	public RandomGarageParkingSearch(double maxDistance, Network network,int delayBeforeSwitchToStreetParkingSearch) {
+	public PrivateParkingWithWaitAndRandomSearchAsBackup(double maxDistance, Network network, double delayBeforeSwitchToStreetParkingSearch) {
 		super(maxDistance, network);
 		this.delayBeforeSwitchToStreetParkingSearch = delayBeforeSwitchToStreetParkingSearch;
-		this.parkingType="garageParking";
+		this.parkingType="streetParking";
 	}
 
 	@Override
 	public String getName() {
-		return "RandomGarageParkingSearch";
-	}
-
-	@Override
-	public void handleAgentLeg(AgentWithParking aem) {
-		super.handleAgentLeg(aem);
-		Id personId = aem.getPerson().getId();
-		if (startSearchTime.containsKey(personId)){
-			double searchDuration=getSearchTime(aem);
-			
-			if (searchDuration>delayBeforeSwitchToStreetParkingSearch){
-				useSpecifiedParkingType.put(personId, "streetParking");
-			}
-		}
+		return "PrivateParkingSearch";
 	}
 	
 	@Override
-	public void handleParkingDepartureActivity(AgentWithParking aem) {
-		super.handleParkingDepartureActivity(aem);
-		useSpecifiedParkingType.remove(aem.getPerson().getId());
+	public void handleAgentLeg(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+
+		boolean endOfLegReached = aem.getCurrentLinkIndex() == linkIds.size() - 1;
+
+		if (endOfLegReached) {
+
+			if (!startSearchTime.containsKey(personId)) {
+				startSearchTime.put(personId, aem.getMessageArrivalTime());
+			}
+
+			ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+					.get(aem.getPlanElementIndex() + 3);
+
+			Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextNonParkingAct.getFacilityId(),
+					nextNonParkingAct.getType());
+
+			double waitingTime = getSearchTime(aem);
+			
+			if (parkingId != null || waitingTime >= delayBeforeSwitchToStreetParkingSearch) {
+				super.handleAgentLeg(aem);
+			} else {
+				aem.setMessageArrivalTime(aem.getMessageArrivalTime() + delayBeforeSwitchToStreetParkingSearch);
+				AgentEventMessage.getMessageQueue().schedule(aem);
+			}
+		}else {
+			super.handleAgentLeg(aem);
+		}
+
 	}
 
 }

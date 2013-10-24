@@ -39,7 +39,7 @@ import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas
 public class ZHScenarioGlobal {
 
 	public static ParkingScoreEvaluator parkingScoreEvaluator;
-	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run11/";;
+	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run12/";;
 	public static StrategyStats strategyScoreStats = new StrategyStats();
 	public static int iteration = 0;
 	public static int numberOfIterations = 1000;

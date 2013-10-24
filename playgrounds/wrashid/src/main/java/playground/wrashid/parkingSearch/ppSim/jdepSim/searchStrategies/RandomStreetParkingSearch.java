@@ -38,10 +38,5 @@ public class RandomStreetParkingSearch extends RandomParkingSearch{
 		return "RandomStreetParkingSearch";
 	}
 
-	@Override
-	public void handleAgentLeg(AgentWithParking aem) {
-		super.handleAgentLeg(aem);
-	}
-
 }
 
