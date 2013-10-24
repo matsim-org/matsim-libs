@@ -57,7 +57,7 @@ final class KnownFeasibleAllocations {
 	// /////////////////////////////////////////////////////////////////////////
 	public void addFeasibleAllocation(final GroupPlans plans) {
 		cache.add( plans );
-		if ( cache.size() > capacity ) cache.poll();
+		if ( cache.size() > capacity ) cache.remove();
 		assert cache.size() <= capacity;
 	}
 

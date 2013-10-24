@@ -267,10 +267,10 @@ class ArrivalQueue {
 		final Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 
 		while ( !teleportationList.isEmpty() ) {
-			final Tuple<Double, MobsimAgent> entry = teleportationList.peek();
+			final Tuple<Double, MobsimAgent> entry = teleportationList.element();
 			if (entry.getFirst().doubleValue() > arrivalTime ) return agents;
 
-			teleportationList.poll();
+			teleportationList.remove();
 			agents.add( entry.getSecond() );
 		}
 
