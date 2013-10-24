@@ -89,6 +89,7 @@ public class AcceptabilityCondition {
 
 	@Override
 	public boolean equals(final Object other) {
+		if ( other == null ) return false;
 		AcceptabilityCondition condition = null;
 
 		try {

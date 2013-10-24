@@ -38,6 +38,7 @@ class Label implements Comparable<Label> {
 
 	@Override
 	public boolean equals(final Object o) {
+		if ( o == null ) return false;
 		return toString().equals(o.toString());
 	}
 }

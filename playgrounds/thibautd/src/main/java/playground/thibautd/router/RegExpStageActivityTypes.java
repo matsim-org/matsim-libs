@@ -56,6 +56,7 @@ public class RegExpStageActivityTypes implements StageActivityTypes {
 
 	@Override
 	public boolean equals(final Object other) {
+		if ( other == null ) return false;
 		if (other.getClass().equals( this.getClass() )) {
 			return typesRegExps.equals( ((RegExpStageActivityTypes) other).typesRegExps );
 		}
