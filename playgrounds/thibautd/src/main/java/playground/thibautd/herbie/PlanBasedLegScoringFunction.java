@@ -67,11 +67,6 @@ public class PlanBasedLegScoringFunction implements BasicScoring, LegScoring {
 	}
 
 	@Override
-	public int hashCode() {
-		return delegate.hashCode();
-	}
-
-	@Override
 	public void reset() {
 		delegate.reset();
 		planIterator = plan.getPlanElements().iterator();
