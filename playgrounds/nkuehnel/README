@@ -13,3 +13,7 @@ How to install the josmMatsimPlugin:
 7) after startup click on settings and navigate to the plugins tab. the josmMatsimPlugin should be on the list of available plugins (if not, check step 5)
 8) activate the plugin and restart JOSM. once restarted there should be an entry in the tools tab called "MATSim Export" which allows you to export a MATSim-compatible network out of the current shown data.
 	
+	
+**Update: 	under Windows you can just run the "buildAndDeploy.bat" script to automatically build the jar which will be copied to the correct folder 
+			(you can then skip steps 2-5)
+			
