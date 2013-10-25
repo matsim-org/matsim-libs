@@ -28,11 +28,13 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadDuringSim;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndLawEnforcement;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyStats;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
@@ -43,13 +45,13 @@ public class ZHScenarioGlobal {
 	public static String outputFolder = null;
 	public static StrategyStats strategyScoreStats = new StrategyStats();
 	public static int iteration = 0;
-	public static int numberOfIterations = 1000;
-	public static int writeEventsEachNthIteration = 1000;
-	public static int skipOutputInIteration = 0;
+	public static int numberOfIterations = -1;
+	public static int writeEventsEachNthIteration = -1;
+	public static int skipOutputInIteration = -1;
 	public static LinkedList<ParkingEventDetails> parkingEventDetails;
-	public static int populationExpensionFactor=1;
-	public static int numberOfRoutingThreadsAtBeginning=7;
-	public static int numberOfRoutingThreadsDuringSim=10;
+	public static int populationExpensionFactor=-1;
+	public static int numberOfRoutingThreadsAtBeginning=-1;
+	public static int numberOfRoutingThreadsDuringSim=-1;
 	public static boolean turnParallelRoutingOnDuringSim=true;
 	public static Config config;
 	public static int parkingStrategyScenarioId=-1;
@@ -79,9 +81,10 @@ public class ZHScenarioGlobal {
 		printFilteredParkingStatsParkingType("gp");
 		printFilteredParkingStatsParkingType("private");
 		printFilteredParkingStatsParkingType("illegal");
-		printFilteredParkingStatsParkingType(RandomStreetParkingSearch.class);
-		printFilteredParkingStatsParkingType(RandomGarageParkingSearch.class);
-		printFilteredParkingStatsParkingType(RandomStreetParkingWithIllegalParkingAndLawEnforcement.class);
+		
+		for (ParkingSearchStrategy strategy:ParkingStrategyManager.allStrategies){
+			printFilteredParkingStatsParkingType(strategy.getClass());
+		}
 	}
 	
 	private static void printFilteredParkingStatsParkingType(Class c) {

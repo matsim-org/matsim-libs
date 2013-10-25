@@ -176,6 +176,7 @@ public class ParkingLoader {
 				i++;
 			}
 		}
+		System.out.println("number of illegal parking added: " + i/1000.0 + "k");
 	}
 
 	public static void main(String[] args) {
