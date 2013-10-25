@@ -80,8 +80,8 @@ public class Main {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
-				ScoringFunction sf = ControlerUtils.createDefaultScoringFunctionFactory(sc)
-						.createNewScoringFunction(plan) ;
+				final ScoringFunctionFactory factory = ControlerUtils.createDefaultScoringFunctionFactory(sc);
+				ScoringFunction sf = factory.createNewScoringFunction(plan) ;
 
 				// person-specific utl of money:
 				Person person = plan.getPerson() ;
@@ -98,8 +98,8 @@ public class Main {
 			controler.setTravelDisutilityFactory(new TravelDisutilityFactory() {
 				@Override
 				public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-					final TravelDisutility previousTravelDisutility = ControlerUtils.createDefaultTravelDisutilityFactory()
-							.createTravelDisutility(timeCalculator, cnScoringGroup);
+					final TravelDisutilityFactory factory = ControlerUtils.createDefaultTravelDisutilityFactory();
+					final TravelDisutility previousTravelDisutility = factory.createTravelDisutility(timeCalculator, cnScoringGroup);
 					
 					// at this point, the previous travel disutility calculator factory may or may not know something about person-specific
 					// marginal utl of money.  --??
