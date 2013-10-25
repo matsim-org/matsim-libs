@@ -84,7 +84,7 @@ public class ParkingScoreEvaluator {
 		return getParkingCostScore(personId, parkingCost);
 	}
 
-	private double getParkingCostScore(Id personId, Double parkingCost) {
+	public double getParkingCostScore(Id personId, Double parkingCost) {
 		if (parkingCost == null) {
 			DebugLib.stopSystemAndReportInconsistency("probably the facilityId set is not that of a parking, resp. no mapping found");
 		}

@@ -61,6 +61,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSe
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndNoLawEnforcement;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy7;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.HouseHoldIncomeZH;
@@ -132,9 +133,10 @@ public class MainPPSimZurich30km {
 		allStrategies.add(new RandomStreetParkingSearch(300.0, scenario.getNetwork()));
 		allStrategies.add(new RandomGarageParkingSearch(500.0, scenario.getNetwork(),5*60));
 		//allStrategies.add(new RandomStreetParkingWithIllegalParkingAndLawEnforcement(500.0, scenario.getNetwork()));
-		allStrategies.add(new RandomStreetParkingWithIllegalParkingAndNoLawEnforcement(500.0, scenario.getNetwork()));
+		//allStrategies.add(new RandomStreetParkingWithIllegalParkingAndNoLawEnforcement(500.0, scenario.getNetwork()));
 		allStrategies.add(new RandomStreetParkingSearchWithWaiting(500.0, scenario.getNetwork(),5*60,30));
-		allStrategies.add(new PrivateParkingWithWaitAndRandomSearchAsBackup(500.0, scenario.getNetwork(),5*60));
+		//allStrategies.add(new PrivateParkingWithWaitAndRandomSearchAsBackup(500.0, scenario.getNetwork(),5*60));
+		allStrategies.add(new AxPo1989_Strategy7(500.0, scenario.getNetwork(),1000));
 		
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
 
