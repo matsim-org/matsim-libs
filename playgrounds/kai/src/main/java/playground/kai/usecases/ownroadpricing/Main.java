@@ -72,6 +72,10 @@ public class Main {
 
 		final Controler controler = new Controler(sc) ;
 		
+		// add the events handler to calculate the tolls paid by agents
+		final CalcPaidToll tollCalc = new CalcPaidToll(sc.getNetwork(), scheme);
+		controler.getEvents().addHandler(tollCalc);
+
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
@@ -83,29 +87,28 @@ public class Main {
 
 				// person-specific utl of money:
 				Person person = plan.getPerson() ;
-				double marginalUtilityOfMoney = 1. ;
+				double marginalUtilityOfMoney = params.marginalUtilityOfMoney ;
 				sum.addScoringFunction(new CharyparNagelMoneyScoring(marginalUtilityOfMoney)) ;
 
 				return sum ;
 			}
 		});
 		
-		// add the events handler to calculate the tolls paid by agents
-		final CalcPaidToll tollCalc = new CalcPaidToll(sc.getNetwork(), scheme);
-		controler.getEvents().addHandler(tollCalc);
-
 		// replace the travelCostCalculator with a toll-dependent one if required
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType()) 
 				|| RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType())) {
-			final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
+			final TravelDisutilityFactory prevTravelDisutlCalcFactory = controler.getTravelDisutilityFactory();
 			// area-toll requires a regular TravelCost, no toll-specific one.
 
 			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 				@Override
 				public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-					return new TravelDisutilityIncludingToll(
-							previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), 
-							scheme, controler.getConfig() );
+					final TravelDisutility previousTravelDisutility = prevTravelDisutlCalcFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
+					
+					// at this point, the previous travel disutility calculator factory may or may not know something about person-specific
+					// marginal utl of money.  --??
+					
+					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, controler.getConfig() );
 				}
 			};
 			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
