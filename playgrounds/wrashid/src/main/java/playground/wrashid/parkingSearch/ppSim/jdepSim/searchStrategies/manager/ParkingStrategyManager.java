@@ -47,7 +47,7 @@ public class ParkingStrategyManager {
 
 	double executionProbabilityOfBestStrategy = 0.9;
 	WithinDayAgentUtils withinDayAgentUtils = new WithinDayAgentUtils();
-	LinkedList<ParkingSearchStrategy> allStrategies;
+	public static LinkedList<ParkingSearchStrategy> allStrategies;
 	HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations = new HashMap<Id, HashMap<Integer, EvaluationContainer>>();
 
 	// personId, legIndex
@@ -128,8 +128,10 @@ public class ParkingStrategyManager {
 
 	public void writeStatisticsToFile() {
 		ZHScenarioGlobal.strategyScoreStats.addIterationData(strategyEvaluations);
+		ZHScenarioGlobal.strategyScoreStats.updateStrategySharesWithoutPP();
 		ZHScenarioGlobal.strategyScoreStats.writeStrategyScoresToFile();
-		ZHScenarioGlobal.strategyScoreStats.writeStrategySharesToFile();
+		ZHScenarioGlobal.strategyScoreStats.writeAllStrategySharesToFile();
+		ZHScenarioGlobal.strategyScoreStats.writeNonPPStrategySharesToFile();
 	}
 
 	public void reset() {

@@ -19,7 +19,10 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -29,6 +32,7 @@ import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.EvaluationContainer;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class StrategyStats {
@@ -38,43 +42,67 @@ public class StrategyStats {
 	private ArrayList<Double> averageWorstList;
 	private ArrayList<Double> averageAverageList;
 	
-	private HashMap<ParkingSearchStrategy, ArrayList<Double>> strategyShares;
+	private HashMap<ParkingSearchStrategy, ArrayList<Double>> strategySharesAll;
+	private HashMap<ParkingSearchStrategy, ArrayList<Double>> strategySharesWithoutPrivateParking;
 	
 	public StrategyStats(){
 		averageBestList = new ArrayList();
 		averageExecutedList = new ArrayList();
 		averageWorstList = new ArrayList();
 		averageAverageList = new ArrayList();
-		strategyShares=new HashMap<ParkingSearchStrategy, ArrayList<Double>>();
+		strategySharesAll=new HashMap<ParkingSearchStrategy, ArrayList<Double>>();
+		strategySharesWithoutPrivateParking=new HashMap<ParkingSearchStrategy, ArrayList<Double>>();
 	}
 	
 	
 	public void addIterationData(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
 		updateScores(strategyEvaluations);
-		updateStrategyShares(strategyEvaluations);
+		updateStrategySharesAll(strategyEvaluations);
 	}
 
 
-	private void updateStrategyShares(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
-		IntegerValueHashMap<ParkingSearchStrategy> strategyCount=new IntegerValueHashMap<ParkingSearchStrategy>();
+	private void updateStrategySharesAll(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
+		IntegerValueHashMap<ParkingSearchStrategy> strategyCountAll=new IntegerValueHashMap<ParkingSearchStrategy>();
 		
-		int sampleSize=0;
+		int sampleSizeAll=0;
 		for (Id personId : strategyEvaluations.keySet()) {
 			for (Integer legIndex : strategyEvaluations.get(personId).keySet()) {
 				EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
-				strategyCount.increment(evaluationContainer.getCurrentSelectedStrategy().strategy);
+				strategyCountAll.increment(evaluationContainer.getCurrentSelectedStrategy().strategy);
+				sampleSizeAll++;
+			}
+		}
+		
+		for (ParkingSearchStrategy pss: strategyCountAll.getKeySet()){
+			if (!strategySharesAll.containsKey(pss)){
+				strategySharesAll.put(pss, new ArrayList<Double>());
+			}
+			
+			strategySharesAll.get(pss).add(100.0*strategyCountAll.get(pss)/sampleSizeAll);
+		}
+	}
+	
+	public void updateStrategySharesWithoutPP() {
+		IntegerValueHashMap<ParkingSearchStrategy> strategyCount=new IntegerValueHashMap<ParkingSearchStrategy>();
+		
+		int sampleSize=0;
+		
+		for (ParkingEventDetails ped:ZHScenarioGlobal.parkingEventDetails){
+			if (!ped.parkingActivityAttributes.getFacilityId().toString().contains("private")){
+				strategyCount.increment(ped.parkingStrategy);
 				sampleSize++;
 			}
 		}
 		
 		for (ParkingSearchStrategy pss: strategyCount.getKeySet()){
-			if (!strategyShares.containsKey(pss)){
-				strategyShares.put(pss, new ArrayList<Double>());
+			if (!strategySharesWithoutPrivateParking.containsKey(pss)){
+				strategySharesWithoutPrivateParking.put(pss, new ArrayList<Double>());
 			}
 			
-			strategyShares.get(pss).add(100.0*strategyCount.get(pss)/sampleSize);
+			strategySharesWithoutPrivateParking.get(pss).add(100.0*strategyCount.get(pss)/sampleSize);
 		}
 	}
+	
 
 
 	private void updateScores(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
@@ -130,17 +158,24 @@ public class StrategyStats {
 		GeneralLib.writeGraphic(ZHScenarioGlobal.outputFolder + "parkingStrategyScores.png", matrix, title, xLabel, yLabel, seriesLabels, xValues);
 	}
 	
-	public void writeStrategySharesToFile() {
+	public void writeAllStrategySharesToFile() {
+		writeStrategySharesToFile(strategySharesAll,"parkingStrategyShares.png","Parking Strategy Shares");
+	}
+	
+	public void writeNonPPStrategySharesToFile() {
+		writeStrategySharesToFile(strategySharesWithoutPrivateParking,"parkingStrategyShares_WithoutPrivateParking.png","Parking Strategy Shares (without PrivateParking)");
+	}
+	
+	public void writeStrategySharesToFile(HashMap<ParkingSearchStrategy, ArrayList<Double>> shares,String outputFileName, String title) {
 		String xLabel = "Iteration";
 		String yLabel = "share [%]";
-		String title="Parking Strategy Shares";
 		int numberOfXValues = averageBestList.size();
-		int numberOfFunctions = strategyShares.size();
+		int numberOfFunctions = shares.size();
 		double[] xValues=new double[numberOfXValues];
 		String[] seriesLabels=new String[numberOfFunctions];
 		
 		int j=0;
-		for (ParkingSearchStrategy pss: strategyShares.keySet()){
+		for (ParkingSearchStrategy pss: ParkingStrategyManager.allStrategies){
 			seriesLabels[j]=pss.getName();
 			j++;
 		}
@@ -149,14 +184,14 @@ public class StrategyStats {
 		
 		for (int i=0;i<numberOfXValues;i++){
 			j=0;
-			for (ParkingSearchStrategy pss: strategyShares.keySet()){
-				matrix[i][j]=strategyShares.get(pss).get(i);
+			for (ParkingSearchStrategy pss: ParkingStrategyManager.allStrategies){
+				matrix[i][j]=shares.get(pss).get(i);
 				j++;
 			}
 			xValues[i]=i;
 		}
 
-		GeneralLib.writeGraphic(ZHScenarioGlobal.outputFolder + "parkingStrategyShares.png", matrix, title, xLabel, yLabel, seriesLabels, xValues);
+		GeneralLib.writeGraphic(ZHScenarioGlobal.outputFolder + outputFileName, matrix, title, xLabel, yLabel, seriesLabels, xValues);
 	}
 }
 
