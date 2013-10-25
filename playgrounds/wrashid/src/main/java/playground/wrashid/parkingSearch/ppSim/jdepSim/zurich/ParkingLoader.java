@@ -122,8 +122,8 @@ public class ParkingLoader {
 	}
 
 	public static ParkingManagerZH getParkingManagerZH(LinkedList<Parking> parkings, Network network, TTMatrix ttMatrix) {
-		String cityZonesFilePath = "C:/data/parkingSearch/psim/zurich/inputs/parkingZones/zones.csv";
-
+		String cityZonesFilePath = ZHScenarioGlobal.loadStringParam("ParkingLoader.parkingZones");
+		
 		ParkingCostCalculator parkingCostCalculator = new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), parkings);
 
 		HashMap<String, HashSet<Id>> parkingTypes = new HashMap<String, HashSet<Id>>();
