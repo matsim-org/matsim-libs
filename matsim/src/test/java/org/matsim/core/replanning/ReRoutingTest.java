@@ -119,22 +119,26 @@ public class ReRoutingTest extends MatsimTestCase {
 		long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
 		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
 		long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName);
-		
-		if ( revisedCheckSum != originalCheckSum ) {
 
-			List<String> original = fileToLines(originalFileName);
-			List<String> revised  = fileToLines(revisedFileName);
-
-			Patch patch = DiffUtils.diff(original, revised);
-
-			for (Delta delta: patch.getDeltas()) {
-				System.out.flush() ;
-				System.err.println(delta.getOriginal());
-				System.err.println(delta.getRevised());
-				System.err.flush() ;
-			}
-
-		}
+		// commenting out the following; when there are many differences, this takes forever.  kai, oct'24
+//		if ( revisedCheckSum != originalCheckSum ) {
+//			System.out.flush() ;
+//			log.warn("checksums are not the same; making explicit comparison. When the difference is large, this may take forever ...") ;
+//			System.err.flush() ;
+//
+//			List<String> original = fileToLines(originalFileName);
+//			List<String> revised  = fileToLines(revisedFileName);
+//
+//			Patch patch = DiffUtils.diff(original, revised);
+//
+//			for (Delta delta: patch.getDeltas()) {
+//				System.out.flush() ;
+//				System.err.println(delta.getOriginal());
+//				System.err.println(delta.getRevised());
+//				System.err.flush() ;
+//			}
+//
+//		}
 		assertEquals("different plans files", originalCheckSum, revisedCheckSum);
 	}
 	
