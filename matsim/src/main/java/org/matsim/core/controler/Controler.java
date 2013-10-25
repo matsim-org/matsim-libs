@@ -327,10 +327,9 @@ public class Controler extends AbstractController {
 
 	/**
 	 * Loads a default set of {@link org.matsim.core.controler.listener
-	 * ControlerListener} to provide basic functionality. <b>Note:</b> Be very
-	 * careful if you overwrite this method! The order how the listeners are
-	 * added is very important. Check the comments in the source file before
-	 * overwriting this method!
+	 * ControlerListener} to provide basic functionality. 
+	 * <p/>
+	 * Method is final now.  If you think that you need to over-write this method, start from AbstractController instead.
 	 */
 	@Override
 	protected final void loadCoreListeners() {
