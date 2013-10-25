@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -79,39 +80,33 @@ public class Main {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
-				SumScoringFunction sum = new SumScoringFunction() ;
-				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()) ;
-				sum.addScoringFunction(new CharyparNagelLegScoring(params, sc.getNetwork() ) ) ;
-				sum.addScoringFunction(new CharyparNagelActivityScoring(params));
-				sum.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+				ScoringFunction sf = ControlerUtils.createDefaultScoringFunctionFactory(sc)
+						.createNewScoringFunction(plan) ;
 
 				// person-specific utl of money:
 				Person person = plan.getPerson() ;
-				double marginalUtilityOfMoney = params.marginalUtilityOfMoney ;
-				sum.addScoringFunction(new CharyparNagelMoneyScoring(marginalUtilityOfMoney)) ;
-
-				return sum ;
+				double marginalUtilityOfMoney = 1. ;
+				
+				return sf ;
 			}
 		});
 		
 		// replace the travelCostCalculator with a toll-dependent one if required
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType()) 
 				|| RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType())) {
-			final TravelDisutilityFactory prevTravelDisutlCalcFactory = controler.getTravelDisutilityFactory();
 			// area-toll requires a regular TravelCost, no toll-specific one.
-
-			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
+			controler.setTravelDisutilityFactory(new TravelDisutilityFactory() {
 				@Override
 				public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-					final TravelDisutility previousTravelDisutility = prevTravelDisutlCalcFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
+					final TravelDisutility previousTravelDisutility = ControlerUtils.createDefaultTravelDisutilityFactory()
+							.createTravelDisutility(timeCalculator, cnScoringGroup);
 					
 					// at this point, the previous travel disutility calculator factory may or may not know something about person-specific
 					// marginal utl of money.  --??
 					
 					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, controler.getConfig() );
 				}
-			};
-			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
+			});
 		}
 		
 		controler.addControlerListener( new AfterMobsimListener(){
