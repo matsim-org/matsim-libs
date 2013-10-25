@@ -87,8 +87,10 @@ public class MainPPSimZurich30km {
 		String plansFile = ZHScenarioGlobal.loadStringParam("plansFile");
 		String networkFile = ZHScenarioGlobal.loadStringParam("networkFile");
 		String facilititiesPath = ZHScenarioGlobal.loadStringParam("facilitiesFile");
-		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
-
+		//Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
+		Scenario scenario=GeneralLib.readScenario(plansFile, networkFile);
+		
+		
 		filterPopulation2_5km(scenario);
 		removeNotSelectedPlans(scenario);
 		multiplyPopulation(scenario, ZHScenarioGlobal.populationExpensionFactor);
