@@ -39,6 +39,8 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -67,7 +69,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.Par
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.HouseHoldIncomeZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingScenario;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingStrategyScenarios;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
@@ -79,42 +81,17 @@ public class MainPPSimZurich30km {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// Todo change these three paths and try run.
+		ZHScenarioGlobal.config = ConfigUtils.loadConfig(args[0]);
+		ZHScenarioGlobal.loadConfigParamters();
 
-		// String plansFile =
-		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1000802.xml";
-
-		// String plansFile =
-		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/singleAgentPlan_1472928.xml";
-
-		
-			ParkingScenario.scenario1pml();
-		//	ParkingScenario.scenario1pct();
-		//	ParkingScenario.scenario10pct();
-		//	ParkingScenario.scenario100pct();
-		
-		
-		
-		
-		
-		String plansFile = ZHScenarioGlobal.plansFile;
-
-		// String plansFile =
-		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/1pct_plans_30km.xml.gz";
-
-		// String plansFile =
-		// "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/10pct_plans_30km.xml.gz";
-		String networkFile = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_network.xml.gz";
-		String facilititiesPath = "c:/data/parkingSearch/psim/zurich/inputs/ktiRun24/output_facilities.xml.gz";
+		String plansFile = ZHScenarioGlobal.loadStringParam("plansFile");
+		String networkFile = ZHScenarioGlobal.loadStringParam("networkFile");
+		String facilititiesPath = ZHScenarioGlobal.loadStringParam("facilitiesFile");
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 
-	
-		
-		
 		filterPopulation2_5km(scenario);
 		removeNotSelectedPlans(scenario);
 		multiplyPopulation(scenario, ZHScenarioGlobal.populationExpensionFactor);
-
 
 		addParkingActivityAndWalkLegToPlans(scenario.getPopulation().getPersons().values());
 
@@ -124,20 +101,13 @@ public class MainPPSimZurich30km {
 		// could be solve/updated in future.
 		replaceCarLegsStartingAndEndingOnSameRoadByWalkLegs(scenario);
 
-		ZHScenarioGlobal.initialRoutes= getInitialRoutes(scenario);
+		ZHScenarioGlobal.initialRoutes = getInitialRoutes(scenario);
 
-		Message.ttMatrix = new TTMatrixFromStoredTable("C:/data/parkingSearch/psim/zurich/inputs/it.50.3600secBin.ttMatrix.txt",
+		Message.ttMatrix = new TTMatrixFromStoredTable(ZHScenarioGlobal.loadStringParam("ttMatrixFile"),
 				scenario.getNetwork());
 
-		LinkedList<ParkingSearchStrategy> allStrategies = new LinkedList<ParkingSearchStrategy>();
-		allStrategies.add(new RandomStreetParkingSearch(300.0, scenario.getNetwork()));
-		allStrategies.add(new RandomGarageParkingSearch(500.0, scenario.getNetwork(),5*60));
-		//allStrategies.add(new RandomStreetParkingWithIllegalParkingAndLawEnforcement(500.0, scenario.getNetwork()));
-		//allStrategies.add(new RandomStreetParkingWithIllegalParkingAndNoLawEnforcement(500.0, scenario.getNetwork()));
-		allStrategies.add(new RandomStreetParkingSearchWithWaiting(500.0, scenario.getNetwork(),5*60,30));
-		//allStrategies.add(new PrivateParkingWithWaitAndRandomSearchAsBackup(500.0, scenario.getNetwork(),5*60));
-		allStrategies.add(new AxPo1989_Strategy7(500.0, scenario.getNetwork(),1000));
-		
+		LinkedList<ParkingSearchStrategy> allStrategies = ParkingStrategyScenarios.getScenarioStrategies(scenario);
+				
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
 
 		LinkedList<AgentWithParking> agentsMessage = new LinkedList<AgentWithParking>();
@@ -151,15 +121,14 @@ public class MainPPSimZurich30km {
 				.getParkingCostCalculator();
 		ZHScenarioGlobal.parkingScoreEvaluator = new ParkingScoreEvaluator(parkingCostCalculatorZH, parkingPersonalBetas);
 		ZHScenarioGlobal.init(Message.ttMatrix, scenario.getNetwork());
-		
-		
+
 		// TODO: we need to do that probably also inside loop below at start of
 		// each iteration
 
 		// TODO: load parking infrastructure files from:
 		// Z:\data\experiments\TRBAug2011\parkings
 
-		int writeEachNthIteration = ZHScenarioGlobal.writeEachNthIteration;
+		int writeEachNthIteration = ZHScenarioGlobal.writeEventsEachNthIteration;
 		int skipOutputInIteration = ZHScenarioGlobal.skipOutputInIteration;
 
 		for (int iter = 0; iter < ZHScenarioGlobal.numberOfIterations; iter++) {
@@ -220,8 +189,8 @@ public class MainPPSimZurich30km {
 	}
 
 	private static void resetRoutes(Scenario scenario) {
-		TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes=ZHScenarioGlobal.initialRoutes;
-		
+		TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes = ZHScenarioGlobal.initialRoutes;
+
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Plan selectedPlan = p.getSelectedPlan();
 			List<PlanElement> planElements = selectedPlan.getPlanElements();
@@ -235,7 +204,6 @@ public class MainPPSimZurich30km {
 						leg.setRoute(initialRoutes.get(p.getId(), i).clone());
 					}
 
-					
 				}
 				i++;
 			}
@@ -244,8 +212,8 @@ public class MainPPSimZurich30km {
 
 	// personId, legIndex, route
 	private static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> getInitialRoutes(Scenario scenario) {
-		TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> result=new TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl>();
-		
+		TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> result = new TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl>();
+
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Plan selectedPlan = p.getSelectedPlan();
 			List<PlanElement> planElements = selectedPlan.getPlanElements();
@@ -260,12 +228,11 @@ public class MainPPSimZurich30km {
 						result.put(p.getId(), i, route.clone());
 					}
 
-					
 				}
 				i++;
 			}
 		}
-		
+
 		return result;
 	}
 

@@ -22,6 +22,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -39,17 +40,19 @@ import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas
 public class ZHScenarioGlobal {
 
 	public static ParkingScoreEvaluator parkingScoreEvaluator;
-	public static final String outputFolder = "C:/data/parkingSearch/psim/zurich/output/run13/";;
+	public static String outputFolder = null;
 	public static StrategyStats strategyScoreStats = new StrategyStats();
 	public static int iteration = 0;
 	public static int numberOfIterations = 1000;
-	public static int writeEachNthIteration = 1000;
+	public static int writeEventsEachNthIteration = 1000;
 	public static int skipOutputInIteration = 0;
 	public static LinkedList<ParkingEventDetails> parkingEventDetails;
 	public static int populationExpensionFactor=1;
 	public static int numberOfRoutingThreadsAtBeginning=7;
 	public static int numberOfRoutingThreadsDuringSim=10;
 	public static boolean turnParallelRoutingOnDuringSim=true;
+	public static Config config;
+	public static int parkingStrategyScenarioId=-1;
 	
 	// personId, legIndex, route
 	public static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes;
@@ -148,5 +151,36 @@ public class ZHScenarioGlobal {
 		System.out.println("averageWalkDuration: " + averageWalkDuration / numberOfParkingOperations);
 		System.out.println("numberOfParkingOperations: " + numberOfParkingOperations);
 		System.out.println("========================");
+	}
+
+	public static void loadConfigParamters() {
+		ZHScenarioGlobal.outputFolder=loadStringParam("outputFolder");
+		
+		ParkingLoader.parkingsOutsideZHCityScaling = loadDoubleParam("ParkingLoader.parkingsOutsideZHCityScaling");
+		ParkingLoader.streetParkingCalibrationFactor = loadDoubleParam("ParkingLoader.streetParkingCalibrationFactor");
+		ParkingLoader.garageParkingCalibrationFactor = loadDoubleParam("ParkingLoader.garageParkingCalibrationFactor");
+		ParkingLoader.privateParkingCalibrationFactorZHCity = loadDoubleParam("ParkingLoader.privateParkingCalibrationFactorZHCity");
+		ParkingLoader.populationScalingFactor = loadDoubleParam("ParkingLoader.populationScalingFactor");
+		
+		ZHScenarioGlobal.parkingStrategyScenarioId = loadIntParam("ZHScenarioGlobal.parkingStrategyScenarioId");
+		ZHScenarioGlobal.numberOfIterations = loadIntParam("ZHScenarioGlobal.numberOfIterations");
+		ZHScenarioGlobal.writeEventsEachNthIteration = loadIntParam("ZHScenarioGlobal.writeEventsEachNthIteration");
+		ZHScenarioGlobal.skipOutputInIteration = loadIntParam("ZHScenarioGlobal.skipOutputInIteration");
+		ZHScenarioGlobal.populationExpensionFactor = loadIntParam("ZHScenarioGlobal.populationExpensionFactor");
+		ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning = loadIntParam("ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning");
+		ZHScenarioGlobal.numberOfRoutingThreadsDuringSim = loadIntParam("ZHScenarioGlobal.numberOfRoutingThreadsDuringSim");
+	
+	}
+	
+	public static double loadDoubleParam(String paramName){
+		return Double.parseDouble(config.getParam("parkingSearch", paramName));
+	}
+	
+	public static int loadIntParam(String paramName){
+		return Integer.parseInt(config.getParam("parkingSearch", paramName));
+	}
+	
+	public static String loadStringParam(String paramName){
+		return config.getParam("parkingSearch", paramName);
 	}
 }
