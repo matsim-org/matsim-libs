@@ -71,7 +71,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -80,7 +79,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -168,7 +166,8 @@ public class Controler extends AbstractController {
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory;
 
-	private TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+	private TravelDisutilityFactory travelCostCalculatorFactory = ControlerUtils.createDefaultTravelDisutilityFactory();
+
 	private MobsimFactory thisMobsimFactory = null;
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
@@ -350,7 +349,7 @@ public class Controler extends AbstractController {
 
 
 		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore(), this.getNetwork());
+			this.scoringFunctionFactory = ControlerUtils.createDefaultScoringFunctionFactory(this.scenarioData) ;
 		}
 
 		// the default handling of plans
