@@ -4,6 +4,8 @@
 % makes listings look much nicer, and also 
 % makes keywords in listings boldface (as they should be)
 
+\usepackage{user-guide} % custom style
+
 \makeatletter
 \@ifpackageloaded{tex4ht}{%
 	% packages/options only used for generating html
@@ -25,13 +27,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[dvipsnames,svgnames]{xcolor}
 
+\usepackage{soul}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{User's Guide}
 \usepackage[utf8]{inputenc}
-%  base href="http://www.matsim.org/" 
 
 \usepackage{tabularx}
 
@@ -46,15 +47,6 @@
 % I am, however, somewhat militant about ttfamily font. 
 % kai, jul'13
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[sf]{titlesec}
-\titleformat*{\chapter}{\color{blue}\huge\sf}
-\titleformat*{\section}{\color{blue}\LARGE\sf}
-\titleformat*{\subsection}{\color{blue}\Large\sf}
-\titleformat*{\subsubsection}{\color{blue}\large\sf}
-\titleformat*{\paragraph}{\color{blue}\sf}
-\titleformat*{\subparagraph}{\color{blue}\sf}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% \usepackage{a4wide}
@@ -89,6 +81,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\myemph}[1]{\textcolor{red}{\emph{#1}}}
 
+\newcommand{\todo}[1]{\hl{\emph{TODO #1}}}
+
 \newcommand{\authorsOfDoc}[1]{\vspace{-1em}\centerline{\hfill Author(s) of this document: #1}\bigskip}
 \newcommand{\authorsOfCode}[1]{\vspace{-1em}\centerline{\hfill Main author(s) of the code: #1}\bigskip}
 \newcommand{\maintainers}[1]{\vspace{-1em}\centerline{\hfill Maintainer(s): #1}\bigskip}
@@ -108,29 +102,26 @@
 \NextFile{index.html}
 \tolerance10000
 
-\title{\textcolor{blue}{\sf MATSim User Guide}}
+\title{MATSim User Guide}
 
 \author{%
-\begin{minipage}{0.9\hsize}
-\begin{center}
-Marcel Rieser, % first
+Marcel~Rieser, % first
 %
 % everybody in between alphabetic???
-Christoph Dobler,
-Thibaut Dubernet,
-Dominik Grether,
-Andreas Horni, 
-Gregor Lämmel,
-Rashid Waraich,
-Michael Zilske,
+Christoph~Dobler,
+Thibaut~Dubernet,
+Dominik~Grether,
+Andreas~Horni, 
+Gregor~Lämmel,
+Rashid~Waraich,
+Michael~Zilske,
 %
-Kay W.\ Axhausen, % second-last
-Kai Nagel % last
-\end{center}
-\end{minipage}
+Kay~W.~Axhausen, % second-last
+Kai~Nagel % last
 }
 
-\maketitle
+\include{chapters/titlepage}
+% \maketitle
 
 \vfill\eject
 
@@ -138,17 +129,19 @@ Kai Nagel % last
 
 The material found in this document was originally maintained as a collection of web pages.  Those were eventually automatically converted to latex, and incrementally cleaned up since then.  
 
-As a result, leftovers from those web pages can still be found in the document, including lots of links to web pages which could be replaced by internal links in the document, and links to web pages where the material should be inlided into the document.
-
-
-\vfill\eject
-
-\tableofcontents
+As a result, leftovers from those web pages can still be found in the document, including lots of links to web pages which could be replaced by internal links in the document, and links to web pages where the material should be inlined into the document.
+\\
+\hrule
 
 Originally generated 2013-06-12T12:13:34+02:00
 \\from matsim.org/docs/userguide
 \\but changed since then.
 
+
+
+\vfill\eject
+
+\tableofcontents
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
