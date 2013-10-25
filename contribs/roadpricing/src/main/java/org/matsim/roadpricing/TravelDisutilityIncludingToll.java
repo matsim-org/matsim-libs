@@ -38,10 +38,15 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelDisutility normalTravelDisutility;
-	private double marginalUtilityOfMoney;
+	private final double marginalUtilityOfMoney;
 	private static int utlOfMoneyWrnCnt = 0 ;
 
 	public TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config) {
+		this( normalTravelDisutility, scheme, config.planCalcScore().getMarginalUtilityOfMoney() ) ;
+	}
+	public TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, 
+			double marginalUtilityOfMoney ) {
+
 		this.scheme = scheme;
 		this.normalTravelDisutility = normalTravelDisutility;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
@@ -57,7 +62,7 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		} else {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
 		}
-		this.marginalUtilityOfMoney = config.planCalcScore().getMarginalUtilityOfMoney() ;
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney ;
 		if ( utlOfMoneyWrnCnt < 1 && this.marginalUtilityOfMoney != 1. ) {
 			utlOfMoneyWrnCnt ++ ;
 			Logger.getLogger(this.getClass()).warn("There are no test cases for marginalUtilityOfMoney != 1.  Please write one " +
