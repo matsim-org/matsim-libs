@@ -50,7 +50,7 @@ public class ParkingLoader {
 	public static double populationScalingFactor = 1.0;
 
 	public static LinkedList<Parking> getParkingsForScenario() {
-		String parkingDataBase = "C:/data/parkingSearch/psim/zurich/inputs/parkingFlat/";
+		String parkingDataBase = ZHScenarioGlobal.loadStringParam("ParkingLoader.parkingDataBase");
 
 		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity(parkingDataBase);
 		String parkingsFile = parkingDataBase + "publicParkingsOutsideZHCity.xml";
