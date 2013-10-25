@@ -218,7 +218,7 @@ public class DreieckNmodes {
 	private static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_test.xml";
 	
 	private static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
-	public static int NUMBER_OF_MEMORIZED_FLOWS = 5;
+	public static int NUMBER_OF_MEMORIZED_FLOWS = 10;
 	public static int NUMBER_OF_MODES = 3;
 	public static String[] NAMES= {"bicycles","motorbikes","cars"};	//identification of the different modes
 	public static Double[] Probabilities = {1/3., 1/3., 1/3.}; //modal split
@@ -277,7 +277,7 @@ public class DreieckNmodes {
 		dreieck.fillNetworkData();
 		dreieck.openFile(OUTPUT_DIR);
 		//dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
-		dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));//TODO: debug this case so that it returns non null values.
+		dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
 		dreieck.closeFile();
 	}
 	
@@ -620,7 +620,7 @@ public class DreieckNmodes {
 		*/
 		///*Method 2: With the expected frequency, the maximal departure time is computed and people are randomly departing within this huge time chunk.
 		long TimeChunkSize = numberOfPeople * sekundenFrequenz;
-		double endTime = 6 * 3600 + r.nextDouble() * TimeChunkSize; 
+		double endTime = /*6 * 3600 + */r.nextDouble() * /*TimeChunkSize*/900; 
 		//*/
 		//NB:Method 2 is significantly better for the quality of fundamental diagrams;
 		activity.setEndTime(endTime);

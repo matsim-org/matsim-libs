@@ -70,16 +70,14 @@ public class ModeData {
 			
 			//Updating flow, speed
 			this.updateFlow(nowTime, this.vehicleType.getPcuEquivalents());
-			//System.out.println(this.modeId+"' LastXFlows: "+this.lastXFlows);
 			this.updateSpeedTable(nowTime, personId);
-			//System.out.println(this.modeId+"' LastXSpeeds: "+this.speedTable);
 			
 			//Checking for stability
 			//Making sure all agents are on the track before testing stability
 			//Also waiting half an hour to let the database build itself.
 			
-			System.out.println(nowTime);
-			if ((this.getNumberOfDrivingAgents() == this.numberOfAgents) && (nowTime > 23400)){//TODO
+			//System.out.println(nowTime);
+			if ((this.getNumberOfDrivingAgents() == this.numberOfAgents) && (nowTime > 1800)){//TODO empirical factor
 				if (!(this.speedStability)){
 					this.checkSpeedStability();
 				}
@@ -153,8 +151,9 @@ public class ModeData {
 		if (relativeDeviances < 0.0001){
 			this.speedStability = true;
 			System.out.println("Reaching a certain speed stability in mode: "+modeId);
+		} else {
+			this.speedStability = false;
 		}
-		this.speedStability = false;
 	}
 	
 	public void checkFlowStability(){
@@ -167,11 +166,12 @@ public class ModeData {
 		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
 			relativeDeviances += Math.pow( ((this.lastXFlows.get(i).doubleValue() - averageFlow) / averageFlow) , 2);
 		}
-		if (relativeDeviances < 0.001){
+		if (relativeDeviances < 0.0001){//TODO Here a VERY empirical factor
 			this.flowStability = true;
-			//System.out.println("Reaching a certain flow stability in mode: "+modeId);
+			System.out.println("Reaching a certain flow stability in mode: "+modeId);
+		} else {
+			this.flowStability = false;
 		}
-		this.flowStability = false;
 	}
 	
 	public void initDynamicVariables() {
@@ -235,10 +235,10 @@ public class ModeData {
 	
 	public void saveDynamicVariables(){
 		this.permanentDensity = this.numberOfAgents / (DreieckNmodes.length*3) *1000;
-		System.out.println("Calculating permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable);
 		this.permanentAverageVelocity = this.getActualAverageVelocity();
-		System.out.println("Calculating permanent Flow from "+modeId+"'s lastXFlows : "+lastXFlows);
+		System.out.println("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
 		this.permanentFlow = this.getActualFlow();
+		System.out.println("Calculated permanent Flow from "+modeId+"'s lastXFlows : "+lastXFlows+"\nResult is :"+this.permanentFlow);	
 	}
 	
 	//Getters/Setters
@@ -297,5 +297,9 @@ public class ModeData {
 	
 	public Map<Id, Double> getLastSeenOnStudiedLinkEnter() {
 		return lastSeenOnStudiedLinkEnter;
+	}
+
+	public List<Double> getSpeedTable() {
+		return this.speedTable;
 	}
 }

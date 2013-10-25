@@ -20,7 +20,6 @@
 
 package playgrounds.ssix;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -29,10 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author ssix
@@ -55,9 +50,9 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 	
 	
 	private boolean permanentRegime;
-	private double permanentDensity;
-	private double permanentAverageVelocity;
-	private double permanentFlow;
+	//private double permanentDensity;
+	//private double permanentAverageVelocity;
+	//private double permanentFlow;
 	
 	public FundamentalDiagramsNmodes(Scenario sc, Map<Id, ModeData> modesData){
 		this.scenario =  sc;
@@ -80,7 +75,7 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 		this.permanentRegime = false;
 	}
 
-	@Override
+
 	public void handleEvent(LinkEnterEvent event) {
 		if (!(permanentRegime)){
 			Id personId = event.getVehicleId();
@@ -93,42 +88,53 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 			
 			//Aggregated data update
 			double nowTime = event.getTime();
-			if (event.getLinkId().equals(studiedMeasuringPointLinkId)){	
+			if (event.getLinkId().equals(studiedMeasuringPointLinkId)){				
 				//Updating global data
 				this.globalData.updateFlow(nowTime, pcu_person);
 				this.globalData.updateSpeedTable(nowTime, personId);
 				//Waiting for all agents to be on the track before studying stability
-				if ((this.globalData.getNumberOfDrivingAgents() == this.globalData.numberOfAgents) && (nowTime>23400)){	//TODO parametrize this correctly
-					if (!(this.globalData.isSpeedStable())){
+				if ((this.globalData.getNumberOfDrivingAgents() == this.globalData.numberOfAgents) && (nowTime>1800)){	//TODO parametrize this correctly
+					/*//Taking speed check out, as it is not reliable on the global speed table
+					 *  Maybe making a list of moving averages could be smart, 
+					 *  but there is no reliable converging process even in that case. (ssix, 25.10.13)
+					 * if (!(this.globalData.isSpeedStable())){
 						this.globalData.checkSpeedStability(); 
-					}
+						System.out.println("Checking speed stability in global data for: "+this.globalData.getSpeedTable());
+					}*/
 					if (!(this.globalData.isFlowStable())){
 						this.globalData.checkFlowStability();
 					}
 			
-					//Checking global stability
-					boolean everythingStable = true;
+					//Checking modes stability
+					boolean modesStable = true;
 					for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
-						if (  !  ((this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isSpeedStable())) && 
-								 ((this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isFlowStable())) ){
-							everythingStable = false;
-							System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is not stable yet.");
+						if (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isSpeedStable()) {
+							//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is speed stable, checking for flow...");
+							if ( ! (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isFlowStable()) ){
+								//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is not flow stable yet.");
+								modesStable = false;
+								break;
+							} else {
+								//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is also flow Stable!");
+							}
+						} else {
+							//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is still not speed stable.");
+							break;
 						}
 					}
-					if (everythingStable){
-						log.info("Global permanent regime attained");
-						System.out.println("Global permanent regime attained");
-						//TODO: write end variables or trust stability and do a simple write(getSpeed/Flow) in Dreieck?
-						this.permanentDensity = this.globalData.numberOfAgents / DreieckNmodes.length * 3;
-						this.permanentAverageVelocity = this.globalData.getActualAverageVelocity();
-						this.permanentFlow = this.globalData.getActualFlow();
-						//memorizing modal variables:
-						for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
-							this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).saveDynamicVariables();
+					if (modesStable){
+						//Checking global stability
+						if ( /*this.globalData.isSpeedStable() &&*/ this.globalData.isFlowStable() ){
+							//log.info("Global permanent regime attained");
+							System.out.println("Global permanent regime attained");
+							this.globalData.saveDynamicVariables();
+							for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+								this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).saveDynamicVariables();
+							}
+							this.permanentRegime = true;
+							//How to: end simulation immediately? => solved by granting the mobsim agents access to permanentRegime
+							//and making them exit the simulation as soon as permanentRegime is true.
 						}
-						this.permanentRegime = true;
-						//How to: end simulation immediately? => solved by granting the mobsim agents access to permanentRegime
-						//and making them exit the simulation as soon as permanentRegime is true.
 					}
 				}
 			}
@@ -141,18 +147,6 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 	
 	public ModeData getGlobalData(){
 		return this.globalData;
-	}
-	
-	public double getPermanentDensity(){
-		return this.permanentDensity;
-	}
-	
-	public double getPermanentAverageVelocity(){
-		return this.permanentAverageVelocity;
-	}
-	
-	public double getPermanentFlow(){
-		return this.permanentFlow;
 	}
 
 	public Map<Id, ModeData> getModesData() {
