@@ -42,7 +42,7 @@ public class ControlerUtils {
 		return new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()) ;
 	}
 
-	static TravelDisutilityFactory createDefaultTravelDisutilityFactory() {
+	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory() {
 		return new TravelCostCalculatorFactoryImpl();
 	}
 
