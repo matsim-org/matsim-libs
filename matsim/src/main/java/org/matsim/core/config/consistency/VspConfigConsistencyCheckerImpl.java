@@ -49,6 +49,12 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		boolean problem = false ; // ini
 
+		if ( config.planCalcScore().getMonetaryDistanceCostRateCar() > 0 ) {
+			problem = true ;
+			System.out.flush() ;
+			log.error("found monetary distance cost rate car > 0.  You probably want a value < 0 here.  " +
+					"This is a bug and may be changed eventually.  kai, jun'11") ;
+		}
 		if ( config.planCalcScore().getMonetaryDistanceCostRatePt() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
