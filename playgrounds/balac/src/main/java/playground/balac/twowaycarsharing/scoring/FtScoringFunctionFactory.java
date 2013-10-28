@@ -1,31 +1,21 @@
 package playground.balac.twowaycarsharing.scoring;
 
-import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityScoringFunction;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityWOFacilitiesScoringFunction;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
+
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.balac.twowaycarsharing.config.FtConfigGroup;
-import playground.meisterk.kti.scoring.ActivityScoringFunction;
 
 public class FtScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory
 {
@@ -53,7 +43,7 @@ public class FtScoringFunctionFactory extends org.matsim.core.scoring.functions.
 	
   public ScoringFunction createNewScoringFunction(Plan plan) {
 	  
-	  ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+	  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
     
 	  scoringFunctionAccumulator.addScoringFunction(
       new LegScoringFunction((PlanImpl)plan, 
