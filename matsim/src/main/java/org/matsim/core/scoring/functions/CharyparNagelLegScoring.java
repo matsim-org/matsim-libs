@@ -76,6 +76,7 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	}
 
 	@Override
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public void startLeg(final double time, final Leg leg) {
 		assert leg != null;
 		this.lastTime = time;
@@ -83,13 +84,10 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	}
 
 	@Override
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public void endLeg(final double time) {
-		handleLeg(this.currentLeg, time);
+		this.score += calcLegScore(this.lastTime, time, this.currentLeg);
 		this.lastTime = time;
-	}
-
-	private void handleLeg(Leg leg, final double time) {
-		this.score += calcLegScore(this.lastTime, time, leg);
 	}
 
 	@Override

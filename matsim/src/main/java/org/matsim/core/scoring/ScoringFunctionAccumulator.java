@@ -51,30 +51,36 @@ import org.matsim.core.utils.misc.Time;
 @Deprecated // preferably use SumScoringFunction.  kai, oct'13
 public class ScoringFunctionAccumulator implements ScoringFunction {
 	
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface BasicScoring {
 		public void finish();
 		public double getScore();
 		public void reset();
 	}
 	
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface ActivityScoring extends BasicScoring {
 		void startActivity(final double time, final Activity act);
 		void endActivity(final double time, final Activity act);
 	}
 
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface LegScoring extends BasicScoring {
 		void startLeg(final double time, final Leg leg);
 		void endLeg(final double time);
 	}
 	
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface MoneyScoring extends BasicScoring {
 		void addMoney(final double amount);
 	}
 
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface AgentStuckScoring extends BasicScoring {
 		void agentStuck(final double time);
 	}
 	
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface ArbitraryEventScoring extends BasicScoring {
 		void handleEvent( final Event event ) ;
 	}
