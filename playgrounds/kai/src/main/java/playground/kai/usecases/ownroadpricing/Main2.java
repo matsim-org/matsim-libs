@@ -18,8 +18,14 @@
  * *********************************************************************** */
 package playground.kai.usecases.ownroadpricing;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -32,20 +38,22 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.CalcPaidToll;
+import org.matsim.roadpricing.MarginalUtilityOfMoneyLookup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.TravelDisutilityIncludingToll;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
  *
  */
-public class Main {
-	
-	public static enum Constants { marginalUtilityOfMoney } ; // would need to go to a global place
+public class Main2 {
 
 	public static void main(String[] args) {
 
@@ -64,10 +72,17 @@ public class Main {
 		}
 		sc.addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
 
+		final Map<Person,Double> map = new HashMap<Person,Double>() ;
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
-			double mum = 1. ; // (somehow calculate marginal utility of money)
-			person.getCustomAttributes().put(Constants.marginalUtilityOfMoney.toString(),  mum ) ;
+			double mum = 1. ;
+			map.put(person, mum) ;
 		}
+		MarginalUtilityOfMoneyLookup muml = new MarginalUtilityOfMoneyLookup() {
+			@Override
+			public double getMarginalUtilityOfMoney(Person person) {
+				return map.get(person) ;
+			}
+		} ;
 
 		// ---
 
@@ -84,18 +99,28 @@ public class Main {
 			}
 		});
 
-		// the scoring function pulls searches by itself if the custom attribute is there, and uses it if yes
-		
-		// set the travel disutility calculation
+		// set the scoring function.  this is one scoring function per agent
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
+			@Override
+			public ScoringFunction createNewScoringFunction(final Plan plan) {
+				final ScoringFunctionFactory factory = ControlerUtils.createDefaultScoringFunctionFactory(sc);
+				//					factory.setMarginalUtilityOfMoney( muml ) ;
+				ScoringFunction sf = factory.createNewScoringFunction(plan) ;
+				return sf ;
+			}
+		});
+
+		// set the travel disutility calculation.  let us pretend that this is one "general" function since this is considered as a service
 		if (!RoadPricingScheme.TOLL_TYPE_AREA.equals(scheme.getType())) { 
 			// (area-toll requires a regular TravelCost, no toll-specific one.)
 			controler.setTravelDisutilityFactory(new TravelDisutilityFactory() {
 				@Override
 				public TravelDisutility createTravelDisutility(final TravelTime timeCalculator, final PlanCalcScoreConfigGroup cnScoringGroup) {
 					final TravelDisutilityFactory factory = ControlerUtils.createDefaultTravelDisutilityFactory();
+//					factory.setMarginalUtilityOfMoneyLookup(... ) ;
 					final TravelDisutility previousTravelDisutility = factory.createTravelDisutility(timeCalculator, cnScoringGroup);
-					// TravelDisutilityIncludingToll searches by itself if the custom attribute is there, and uses it if yes 
-					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, config );
+					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, 1. );
+//					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, muml );
 				}
 			}) ;
 		}

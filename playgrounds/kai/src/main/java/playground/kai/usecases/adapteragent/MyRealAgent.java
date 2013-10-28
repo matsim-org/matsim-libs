@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.adapteragent;
+package playground.kai.usecases.adapteragent;
 
 import org.matsim.api.core.v01.Id;
 
