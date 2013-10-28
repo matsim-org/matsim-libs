@@ -51,9 +51,9 @@ public class Main {
 
 		final Config config = ConfigUtils.loadConfig(args[0]) ;
 
-		final Scenario sc = ScenarioUtils.loadScenario(config) ;
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
-		// add road pricing scheme to agents:
+		// add road pricing scheme to scenario:
 		final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl() ;
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
@@ -62,19 +62,19 @@ public class Main {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		sc.addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
+		scenario.addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
 
-		for ( Person person : sc.getPopulation().getPersons().values() ) {
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			double mum = 1. ; // (somehow calculate marginal utility of money)
 			person.getCustomAttributes().put(Constants.marginalUtilityOfMoney.toString(),  mum ) ;
 		}
 
 		// ---
 
-		final Controler controler = new Controler(sc) ;
+		final Controler controler = new Controler(scenario) ;
 
 		// add the events handler to calculate the tolls paid by agents
-		final CalcPaidToll tollCalc = new CalcPaidToll(sc.getNetwork(), scheme);
+		final CalcPaidToll tollCalc = new CalcPaidToll(scenario.getNetwork(), scheme);
 		controler.getEvents().addHandler(tollCalc);
 		controler.addControlerListener( new AfterMobsimListener(){
 			@Override
@@ -92,7 +92,7 @@ public class Main {
 			controler.setTravelDisutilityFactory(new TravelDisutilityFactory() {
 				@Override
 				public TravelDisutility createTravelDisutility(final TravelTime timeCalculator, final PlanCalcScoreConfigGroup cnScoringGroup) {
-					final TravelDisutilityFactory factory = ControlerUtils.createDefaultTravelDisutilityFactory();
+					final TravelDisutilityFactory factory = ControlerUtils.createDefaultTravelDisutilityFactory(scenario);
 					final TravelDisutility previousTravelDisutility = factory.createTravelDisutility(timeCalculator, cnScoringGroup);
 					// TravelDisutilityIncludingToll searches by itself if the custom attribute is there, and uses it if yes 
 					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, config );

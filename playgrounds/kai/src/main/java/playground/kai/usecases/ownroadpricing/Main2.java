@@ -21,9 +21,7 @@ package playground.kai.usecases.ownroadpricing;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -47,7 +45,6 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.TravelDisutilityIncludingToll;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
@@ -59,9 +56,9 @@ public class Main2 {
 
 		final Config config = ConfigUtils.loadConfig(args[0]) ;
 
-		final Scenario sc = ScenarioUtils.loadScenario(config) ;
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
-		// add road pricing scheme to agents:
+		// add road pricing scheme to scenario:
 		final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl() ;
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
@@ -70,10 +67,10 @@ public class Main2 {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		sc.addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
+		scenario.addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
 
 		final Map<Person,Double> map = new HashMap<Person,Double>() ;
-		for ( Person person : sc.getPopulation().getPersons().values() ) {
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			double mum = 1. ;
 			map.put(person, mum) ;
 		}
@@ -86,10 +83,10 @@ public class Main2 {
 
 		// ---
 
-		final Controler controler = new Controler(sc) ;
+		final Controler controler = new Controler(scenario) ;
 
 		// add the events handler to calculate the tolls paid by agents
-		final CalcPaidToll tollCalc = new CalcPaidToll(sc.getNetwork(), scheme);
+		final CalcPaidToll tollCalc = new CalcPaidToll(scenario.getNetwork(), scheme);
 		controler.getEvents().addHandler(tollCalc);
 		controler.addControlerListener( new AfterMobsimListener(){
 			@Override
@@ -103,7 +100,7 @@ public class Main2 {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override
 			public ScoringFunction createNewScoringFunction(final Plan plan) {
-				final ScoringFunctionFactory factory = ControlerUtils.createDefaultScoringFunctionFactory(sc);
+				final ScoringFunctionFactory factory = ControlerUtils.createDefaultScoringFunctionFactory(scenario);
 				//					factory.setMarginalUtilityOfMoney( muml ) ;
 				ScoringFunction sf = factory.createNewScoringFunction(plan) ;
 				return sf ;
@@ -116,7 +113,7 @@ public class Main2 {
 			controler.setTravelDisutilityFactory(new TravelDisutilityFactory() {
 				@Override
 				public TravelDisutility createTravelDisutility(final TravelTime timeCalculator, final PlanCalcScoreConfigGroup cnScoringGroup) {
-					final TravelDisutilityFactory factory = ControlerUtils.createDefaultTravelDisutilityFactory();
+					final TravelDisutilityFactory factory = ControlerUtils.createDefaultTravelDisutilityFactory(scenario);
 //					factory.setMarginalUtilityOfMoneyLookup(... ) ;
 					final TravelDisutility previousTravelDisutility = factory.createTravelDisutility(timeCalculator, cnScoringGroup);
 					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, 1. );

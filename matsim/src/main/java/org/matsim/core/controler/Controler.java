@@ -128,7 +128,7 @@ public class Controler extends AbstractController {
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	protected final Config config;
-	protected ScenarioImpl scenarioData = null;
+	protected final ScenarioImpl scenarioData ;
 
 	protected final EventsManager events;
 
@@ -166,7 +166,7 @@ public class Controler extends AbstractController {
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory;
 
-	private TravelDisutilityFactory travelCostCalculatorFactory = ControlerUtils.createDefaultTravelDisutilityFactory();
+	private TravelDisutilityFactory travelCostCalculatorFactory ; 
 
 	private MobsimFactory thisMobsimFactory = null;
 
@@ -248,16 +248,21 @@ public class Controler extends AbstractController {
 		}
 		this.network = this.scenarioData.getNetwork();
 		this.population = this.scenarioData.getPopulation();
+		
 		MobsimRegistrar mobsimRegistrar = new MobsimRegistrar();
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
+		
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		this.planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
+		
 		this.events = EventsUtils.createEventsManager(this.config);
 
 		// yy is it really so practical to do this in this way?  People might (re)set this factory between constructor and run()--???  kai, may'13
 		this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+		
+		this.travelCostCalculatorFactory = ControlerUtils.createDefaultTravelDisutilityFactory(scenarioData);
 
 		this.config.parallelEventHandling().makeLocked();
 	}
