@@ -51,76 +51,25 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 
+import playground.kai.conceptual.autosensingmargutls.RouterUtils.MarginalUtilitiesContainer;
+
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
  *
  * @author nagel
  */
-public class AutoSensingTimeDistanceDisutility implements TravelDisutility {
+public class PersonIndividualTimeDistanceDisutility implements TravelDisutility {
 
 	protected final TravelTime timeCalculator;
 
-	private final Map<Person,Double> margCstOfTimeLookup = new HashMap<Person,Double>() ;
-	private final Map<Person,Double> margCstOfDistanceLookup = new HashMap<Person,Double>() ;
-	private final Map<Person,Double> margUtlOfMoneyLookup = new HashMap<Person,Double>() ;
-
+	private MarginalUtilitiesContainer muc ;
+	
 	private double marginalCostOfTimeMin = 0. ;
 	private double marginalCostOfDistanceMin = 0. ;
 
-	public AutoSensingTimeDistanceDisutility(final Scenario scenario, final TravelTime timeCalculator) {
+	public PersonIndividualTimeDistanceDisutility(final TravelTime timeCalculator, MarginalUtilitiesContainer muc) {
 		this.timeCalculator = timeCalculator;
 
-		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-
-		// yy might be a bit far "inside", i.e. the following computation should probably be done outside this class and then passed in. kai, oct'13
-		EventsToScore e2s = new EventsToScore(scenario, ControlerUtils.createDefaultScoringFunctionFactory(scenario) ) ;
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			List<Double> scores = new ArrayList<Double>() ;
-			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0) ;
-			// (need this because we need a valid activity type)
-
-			scores.add(e2s.getScoringFunctionForAgent( person.getId() ).getScore()) ;
-			for ( int ii=0 ; ii<=1 ; ii++ ) {
-				e2s.handleEvent( new ActivityStartEvent(20.0*3600., person.getId(), null, null, firstAct.getType() ) ) ;
-				e2s.handleEvent( new ActivityEndEvent((32.0+ii)*3600., person.getId(), null, null, firstAct.getType() ) ) ;
-				e2s.handleEvent( new PersonDepartureEvent((32.0+ii)*3600., person.getId(), null, TransportMode.car ) );
-				e2s.handleEvent( new PersonArrivalEvent(33.0*3600., person.getId(), null, TransportMode.car ) );
-				scores.add( e2s.getScoringFunctionForAgent( person.getId() ).getScore() ) ;
-			}
-			System.out.println( " VTTS: " + ( (scores.get(2) - scores.get(1)) - (scores.get(1)-scores.get(0)) ) ) ;
-			
-			e2s.handleEvent( new PersonMoneyEvent( 33.*3600., person.getId(), 1. ) ) ;
-			scores.add( e2s.getScoringFunctionForAgent( person.getId() ).getScore() ) ;
-			
-			System.out.println( "mum: " + ( scores.get(3)-scores.get(2) )  );
-
-
-			//			for ( int ii=0 ; ii<=1 ; ii++ ) {
-			//
-			//				Leg testLeg = pf.createLeg(TransportMode.car) ;
-			//				testLeg.setDepartureTime(7.*3600);
-			//				testLeg.setTravelTime(3600. * ii);
-			//
-			//				sf.handleLeg( testLeg );
-			//				
-			//				Activity testAct = pf.createActivityFromCoord(firstAct.getType(), new CoordImpl(0.,0.) ) ;
-			//				testAct.setStartTime( testLeg.getDepartureTime() + testLeg.getTravelTime() );
-			//				double typicalDuration = 3600. ;
-			//				testAct.setEndTime( testLeg.getDepartureTime() + typicalDuration ) ;
-			//
-			//				sf.handleActivity( testAct );
-			//				
-			//				double score = sf.getScore();
-			//				scores.add( score ) ;
-			//				
-			//				sf.addMoney(1.);
-			//				
-			//				System.out.println( " margUtlOfMon: " + ( sf.getScore() - score ) );
-			//				
-			//			}
-			//			System.out.println( " effMargDisutlOfTrav: " + ( scores.get(1) - scores.get(0) ) );
-
-		}
 
 	}
 
@@ -129,8 +78,8 @@ public class AutoSensingTimeDistanceDisutility implements TravelDisutility {
 	{
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
-		double marginalCostOfTime = this.margCstOfTimeLookup.get(person) ;
-		double marginalCostOfDistance = this.margCstOfDistanceLookup.get(person) ;
+		double marginalCostOfTime = muc.margCstOfTimeLookup.get(person) ;
+		double marginalCostOfDistance = muc.margCstOfDistanceLookup.get(person) ;
 		return marginalCostOfTime * travelTime + marginalCostOfDistance * link.getLength();
 	}
 
@@ -162,7 +111,8 @@ public class AutoSensingTimeDistanceDisutility implements TravelDisutility {
 		plan.addActivity(act); 
 
 		TravelTime tt = new FreeSpeedTravelTime() ;
-		TravelDisutility td = new AutoSensingTimeDistanceDisutility(scenario, tt ) ;
+		MarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContrainer(scenario) ;
+		TravelDisutility td = new PersonIndividualTimeDistanceDisutility(tt, muc ) ;
 	}
 
 }
