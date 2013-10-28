@@ -35,9 +35,8 @@ public class FtScoringFunctionFactory extends org.matsim.core.scoring.functions.
   private final ActivityFacilities facilities;
 
   	private final Controler controler;
-	private DestinationChoiceBestResponseContext lcContext;
   
-  public FtScoringFunctionFactory(Config config, Controler controler,FtConfigGroup ftConfigGroup, ActivityFacilities facilities, Network network, DestinationChoiceBestResponseContext lcContext)
+  public FtScoringFunctionFactory(Config config, Controler controler,FtConfigGroup ftConfigGroup, ActivityFacilities facilities, Network network)
   {
     super(config.planCalcScore(), network);
     this.network = network;
@@ -45,7 +44,6 @@ public class FtScoringFunctionFactory extends org.matsim.core.scoring.functions.
     this.ftConfigGroup = ftConfigGroup;
     this.facilities = facilities;
     this.controler = controler;
-    this.lcContext = lcContext;
   }
   
   private boolean usingConfigParamsForScoring = true ;

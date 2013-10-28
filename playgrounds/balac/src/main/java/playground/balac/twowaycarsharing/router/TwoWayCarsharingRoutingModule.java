@@ -31,7 +31,7 @@ import org.matsim.core.router.StageActivityTypesImpl;
 
 public class TwoWayCarsharingRoutingModule implements RoutingModule {
 
-	
+	private final double epsilon = 0.000000001;
 	private final RoutingModule carDelegate;
 	private final PopulationFactory populationFactory;
 	private final ModeRouteFactory modeRouteFactory;
@@ -66,14 +66,14 @@ public class TwoWayCarsharingRoutingModule implements RoutingModule {
 		for (PlanElement pe:person.getSelectedPlan().getPlanElements()) {
 			LegImpl leg;
 			if (pe instanceof Activity)  {
-				if ((((Activity) pe).getFacilityId() == fromFacility.getId()) &&((Activity) pe).getEndTime() == departureTime) {
+				if ((((Activity) pe).getFacilityId() == fromFacility.getId()) && Math.abs(((Activity) pe).getEndTime() -  departureTime) < epsilon) {
 					//get the index of the start activity
 					//and check if the current trip is the start of carsharing
 					index = person.getSelectedPlan().getPlanElements().indexOf((Activity)pe);
 					
 					if (index != 0) {
 						leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(index - 1);
-						if (leg.getMode() != "carsharing" && leg.getMode() != "carsharingwalk") 
+						if (!leg.getMode().equals( "carsharing" ) && !leg.getMode().equals( "carsharingwalk" )) 
 							start = true;
 					}
 					else
@@ -90,7 +90,7 @@ public class TwoWayCarsharingRoutingModule implements RoutingModule {
 						else {
 							leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(indexEnd + 1);
 						
-							if (leg.getMode() != "carsharing" && leg.getMode() != "carsharingwalk") 
+							if (!leg.getMode().equals( "carsharing" ) && !leg.getMode().equals( "carsharingwalk" )) 
 								end = true;
 						}
 				

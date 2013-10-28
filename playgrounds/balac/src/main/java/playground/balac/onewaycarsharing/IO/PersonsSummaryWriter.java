@@ -3,13 +3,10 @@ package playground.balac.onewaycarsharing.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
-import org.apache.log4j.Logger;
 import org.matsim.core.population.PersonImpl;
 
 public class PersonsSummaryWriter
 {
-  private static final Logger log = Logger.getLogger(CarSharingSummaryWriter.class);
   private FileWriter fw = null;
   private BufferedWriter out = null;
 
@@ -24,7 +21,7 @@ public class PersonsSummaryWriter
       this.out.flush();
     } catch (IOException e) {
       e.printStackTrace();
-      System.exit(-1);
+     
     }
     System.out.println("    done.");
   }
@@ -38,7 +35,7 @@ public class PersonsSummaryWriter
       this.fw.close();
     } catch (IOException e) {
       e.printStackTrace();
-      System.exit(-1);
+     
     }
   }
 

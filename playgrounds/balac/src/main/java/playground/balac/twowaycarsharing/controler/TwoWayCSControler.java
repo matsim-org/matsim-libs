@@ -1,6 +1,5 @@
 package playground.balac.twowaycarsharing.controler;
 
-
 /**
  * @author balacm
  */
@@ -12,8 +11,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -35,7 +32,6 @@ import playground.balac.twowaycarsharing.scenario.FtScenarioLoaderImpl;
 import playground.balac.twowaycarsharing.scoring.FtScoringFunctionFactory;
 
 
-
 public final class TwoWayCSControler extends Controler
 {
   protected static final String SVN_INFO_FILE_NAME = "svninfo.txt";
@@ -45,7 +41,6 @@ public final class TwoWayCSControler extends Controler
   protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
   private FtConfigGroup ftConfigGroup;
   private final PlansCalcRouteFtInfo plansCalcRouteFtInfo ;
-  private DestinationChoiceBestResponseContext dcContext;
   private static final Logger log = Logger.getLogger(TwoWayCSControler.class);
 
   public TwoWayCSControler(Scenario scenario, PlansCalcRouteFtInfo plansCalcRouteFtInfo) {
@@ -94,7 +89,7 @@ public final class TwoWayCSControler extends Controler
 		 FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
 			      this.config, this, 
 			      this.ftConfigGroup, 
-			      this.getFacilities(), network, this.dcContext);
+			      this.getFacilities(), network);
 			    this.setScoringFunctionFactory(ftScoringFunctionFactory); 	
 			
 	}
@@ -133,7 +128,6 @@ public final class TwoWayCSControler extends Controler
     	
       final TwoWayCSControler controler = new TwoWayCSControler(sc, plansCalcRouteFtInfo);
       
-      PopulationFactory pf = controler.getScenario().getPopulation().getFactory();
       //we need to set a tripRouterFactory for carsharing trips
       controler.setTripRouterFactory(
 				new TripRouterFactory() {

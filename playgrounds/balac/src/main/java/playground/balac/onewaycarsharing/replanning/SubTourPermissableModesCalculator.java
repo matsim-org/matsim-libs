@@ -20,7 +20,7 @@ public class SubTourPermissableModesCalculator implements PermissibleModesCalcul
 		modes.add("bike");
 		modes.add("walk");
 		modes.add("pt");
-		if (p.getLicense() == "yes" && p.getCarAvail() != "never") 
+		if (p.getLicense().equals( "yes" ) && !p.getCarAvail().equals( "never" )) 
 			modes.add("car");
 		//if (p.getTravelcards() != null)
 		//	if (p.getLicense() == "yes" && p.getTravelcards().contains("ch-HT-mobility"))

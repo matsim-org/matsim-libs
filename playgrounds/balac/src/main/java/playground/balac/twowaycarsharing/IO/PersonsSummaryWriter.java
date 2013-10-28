@@ -24,7 +24,7 @@ public class PersonsSummaryWriter
       this.out.flush();
     } catch (IOException e) {
       e.printStackTrace();
-      System.exit(-1);
+
     }
     System.out.println("    done.");
   }
@@ -38,7 +38,7 @@ public class PersonsSummaryWriter
       this.fw.close();
     } catch (IOException e) {
       e.printStackTrace();
-      System.exit(-1);
+
     }
   }
 

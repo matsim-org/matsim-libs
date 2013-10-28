@@ -6,7 +6,6 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
@@ -20,7 +19,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class ChooseRandomTripMode implements PlanAlgorithm {
 	
 	private final String[] possibleModes;
-	private boolean ignoreCarAvailability = true;
+	//private boolean ignoreCarAvailability = true;
 
 	private final Random rng;
 	
@@ -43,7 +42,7 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 		int rndIdx = this.rng.nextInt(cnt);
 		
 		for(Leg l:t.get(rndIdx).getLegsOnly()) 
-			if (l.getMode() == "car" || l.getMode() == "bike")
+			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ))
 				return;
 		
 		if (p.hasLicense() && p.getTravelcards() != null && p.getTravelcards().contains("ch-HT-mobility"))

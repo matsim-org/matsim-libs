@@ -68,7 +68,6 @@ public class CarSharingListener implements StartupListener, IterationEndsListene
   public void notifyIterationEnds(IterationEndsEvent event)
   {
 	   // log.info("Number of rerouted legs is: " + tripCounter.getNumberOfReroutedLegs());
-	    Plan plan1 = event.getControler().getPopulation().getPersons().get(new IdImpl("1001451")).getSelectedPlan();
     this.controler = event.getControler();
     if (event.getIteration() != this.controler.getLastIteration())
       return;

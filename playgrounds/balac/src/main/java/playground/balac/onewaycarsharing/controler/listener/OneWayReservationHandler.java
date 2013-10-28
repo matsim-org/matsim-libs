@@ -53,7 +53,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 	private HashMap<Id, CarSharingStation> stations = new HashMap<Id, CarSharingStation>();
 	private HashMap<Id, CarSharingStation> stationsByLink = new HashMap<Id, CarSharingStation>();
 	private HashMap<Id, Integer> reserved = new HashMap<Id, Integer>();
-	private CarSharingStations CarSharingStations;
+	private CarSharingStations carSharingStations;
 	private ArrayList<Id> personsId = new ArrayList<Id>();
 	private PlansCalcRouteFtInfo plansCalcRouteFtInfo;
 	private Controler controler;
@@ -61,7 +61,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 	
 	OneWayReservationHandler(PlansCalcRouteFtInfo plansCalcRouteFtInfo, Controler controler) {
 		this.plansCalcRouteFtInfo = plansCalcRouteFtInfo;
-		this.CarSharingStations = plansCalcRouteFtInfo.getCarStations();
+		this.carSharingStations = plansCalcRouteFtInfo.getCarStations();
 		this.controler = controler;
 	}
 	  @Override
@@ -89,7 +89,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 	public void handleEvent(ActivityStartEvent event) {
 		// TODO Auto-generated method stub
 		
-		  if (event.getActType() == "onewaycarsharingInteraction" && map.get(event.getPersonId()) != "onewaycarsharing") {
+		  if (event.getActType().equals("onewaycarsharingInteraction") && !map.get(event.getPersonId()).equals( "onewaycarsharing" )) {
 			  if (reserved.get(event.getLinkId()) != null)
 				  reserved.put(event.getLinkId(), reserved.get(event.getLinkId()) - 1);
 			  
@@ -98,7 +98,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 			  stations.put(event.getLinkId(), newCarsStation);
 			  
 		  }
-		  else if (event.getActType() == "onewaycarsharingInteraction" && map.get(event.getPersonId()) == "onewaycarsharing") {			  
+		  else if (event.getActType().equals("onewaycarsharingInteraction") && map.get(event.getPersonId()).equals( "onewaycarsharing" )) {			  
 				  
 				  int x = stations.get(event.getLinkId()).getCars() + 1;
 				  CarSharingStation newCarsStation = new CarSharingStation(stations.get(event.getLinkId()).getId(), stations.get(event.getLinkId()).getCoord(), stations.get(event.getLinkId()).getLink(), x);
@@ -118,7 +118,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		// TODO Auto-generated method stub
-		if (event.getActType() != "onewaycarsharingInteraction" && map.get(event.getPersonId()) != "onewaycarsharing") {
+		if (!event.getActType().equals("onewaycarsharingInteraction") && map.get(event.getPersonId()).equals( "onewaycarsharing" )) {
 			
 			//we need to check if the next activity is going to be carsharinginteraction
 		
@@ -130,7 +130,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 				if (pe instanceof Activity) {
 					if (((Activity) pe).getEndTime() == event.getTime()) {
 					
-						if ( ( (Leg)(plan.getPlanElements().get(plan.getPlanElements().indexOf(pe) + 1) )).getMode() == "onewaycarsharingwalk" ) {
+						if ( ( (Leg)(plan.getPlanElements().get(plan.getPlanElements().indexOf(pe) + 1) )).getMode().equals( "onewaycarsharingwalk" )) {
 							carsharingwalkIndex  = plan.getPlanElements().indexOf(pe) + 1;  //index of the carsharingwalk leg
 							nextCS = true;			
 							fromPlanElement = pe;
@@ -148,7 +148,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 				//reserve it, reroute the next carsharing leg if necessary 
 				//continue with the simulation
 				
-				Vector<CarSharingStation> closest = CarSharingStations.getClosestStations(controler.getNetwork().getLinks().get(event.getLinkId()).getCoord(), 20, 50000);
+				Vector<CarSharingStation> closest = carSharingStations.getClosestStations(controler.getNetwork().getLinks().get(event.getLinkId()).getCoord(), 20, 50000);
 				boolean first = true;
 				for (CarSharingStation css: closest) {
 					
@@ -212,7 +212,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
  		//get the next activity after the first carsharing leg
 		String typeNextActivity = ((Activity)plan.getPlanElements().get(index + 3)).getType();
 		List<Id> ids = new ArrayList<Id>();
-		if (typeNextActivity == "onewaycarsharingInteraction") {
+		if (typeNextActivity.equals( "onewaycarsharingInteraction" )) {
 					
 			CarSharingStation toStation = stationsByLink.get((((Activity)plan.getPlanElements().get(index + 3)).getLinkId()));
 			double departureTime = activity.getEndTime() + distance * beelineDistanceFactor/ walkSpeed;

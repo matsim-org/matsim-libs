@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -21,7 +20,6 @@ import playground.balac.onewaycarsharing.data.MyTransportMode;
 public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions.CharyparNagelLegScoring{
 
 	private final OneWayCSConfigGroup ftConfigGroup;
-	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	private PlanImpl plan;
 	private Network network;
 	
@@ -37,7 +35,8 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 		this.plan = plan;
 		this.network = network;
 		this.ftConfigGroup = ftConfigGroup;
-		this.plansCalcRouteConfigGroup = config.plansCalcRoute();
+		currentLeg = null;
+		//this.plansCalcRouteConfigGroup = config.plansCalcRoute();
 	}
 	@Override
 	public void reset() {
@@ -47,13 +46,13 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 		cs_end = 0.0;
 		cs = false;
 		departureTime = 0.0;
+		currentLeg = null;
 	}
 	
 	@Override
 	public void finish() {		
 		
-		score += totalTime * (-10.0D/3600);   //price for renting a carsharing car
-		
+		score += totalTime * (-6.0D/3600);   //price for renting a carsharing car		
 		
 		//score -= 2;    
 	}	
@@ -71,7 +70,7 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 	public void endLeg(double time) {
 		//check to see if the currentLeg is the start or the end of the carsharing trip
 		
-		if (currentLeg.getMode() == "onewaycarsharingwalk") {
+		if (currentLeg.getMode().equals( "onewaycarsharingwalk" )) {
 			if (!cs) {
 				cs_start = time;
 				cs = true;

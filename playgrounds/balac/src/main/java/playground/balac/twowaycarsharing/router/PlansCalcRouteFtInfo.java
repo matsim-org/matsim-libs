@@ -37,7 +37,6 @@ public class PlansCalcRouteFtInfo
       log.error("The FT module is missing.");
     }
 
-    ScenarioImpl localScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     //this.localWorld = localScenario.getWorld();
      //new MatsimWorldReader(localScenario, this.localWorld).parse(this.ftConfigGroup.getWorldInputFilename());
 

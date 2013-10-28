@@ -48,10 +48,6 @@ public class FtCarSharingRoute extends GenericRouteImpl
     return routeDescription;
   }
 
-  public void setRouteDescription(Id startLinkId, String routeDescription, Id endLinkId)
-  {
-    super.setRouteDescription(startLinkId, routeDescription, endLinkId);
-  }
 
   public double calcCarDistance(Coord coord)
   {

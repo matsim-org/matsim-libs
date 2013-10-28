@@ -3,41 +3,34 @@ package playground.balac.onewaycarsharing.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 
 import playground.balac.onewaycarsharing.router.CarSharingStation;
-import playground.balac.onewaycarsharing.router.PlansCalcRouteFtInfo;
 
 
 
 public class CarSharingSummaryWriter
 {
-  private static final Logger log = Logger.getLogger(CarSharingSummaryWriter.class);
   private FileWriter fw = null;
   private BufferedWriter out = null;
-  private Person person;
-  private PlansCalcRouteFtInfo plansCalcRouteFtInfo;
 
   public CarSharingSummaryWriter(String outfile)
   {
-    try
-    {
-      this.fw = new FileWriter(outfile);
+   
+      try {
+		this.fw = new FileWriter(outfile);
+	
       System.out.println(outfile);
       this.out = new BufferedWriter(this.fw);
       this.out.write("Pers_Id\tLicense\tCar_availability\tStart_x\tstart_y\tfromStation_x\tfromStation_y\ttoStation_x\ttoStation_y\tEnd_x\tEnd_y\tDep_Time\tArr_Time\tAct_Type_B\tAct_Type_A\n");
       this.out.flush();
-    } catch (IOException e) {
-      e.printStackTrace();
-      System.exit(-1);
-    }
+      } catch (IOException e) {
+  		// TODO Auto-generated catch block
+  		e.printStackTrace();
+  	}
     System.out.println("    done.");
   }
 
@@ -50,7 +43,7 @@ public class CarSharingSummaryWriter
       this.fw.close();
     } catch (IOException e) {
       e.printStackTrace();
-      System.exit(-1);
+     
     }
   }
 

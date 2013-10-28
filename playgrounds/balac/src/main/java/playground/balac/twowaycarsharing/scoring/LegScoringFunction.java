@@ -56,21 +56,25 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 	@Override
 	public void finish() {
 		
-			score += (totalTime) * (-8.0D/3600);
+			score += (totalTime) * (-2.5D/3600);   //fee for renting the car per hour    
+			if (totalTime > 0 && totalTime < 1800) {  //this is used to rpevent agents from renting a car for less than 0.5h
+				
+				score -= 50;
+			}
 		
 	}
 	@Override
 	public void startLeg(double time, Leg leg) {
 		// TODO Auto-generated method stub
 		
-		if (leg.getMode() != "carsharing") {
+		if (!leg.getMode().equals( "carsharing" )) {
 			currentLeg = leg;
 			super.startLeg(time, leg);
 			return;
 		}
 		currentLeg = leg;
 		super.startLeg(time, leg);
-		if (leg.getMode() == "carsharing" && carsharing == false) {
+		if (leg.getMode().equals( "carsharing" ) && carsharing == false) {
 			
 			cs_start = time;
 			cs_end = 0.0;
@@ -81,9 +85,9 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 	@Override
 	public void endLeg(double time) {
 		// TODO Auto-generated method stub	
-			if (currentLeg.getMode() != "carsharing" ) {
+			if (!currentLeg.getMode().equals( "carsharing" )) {
 				
-				if (currentLeg.getMode() == "carsharingwalk" && carsharing) {
+				if (currentLeg.getMode().equals( "carsharingwalk" ) && carsharing) {
 					if (cs_end - cs_start > 0)
 						totalTime += (cs_end - cs_start);
 					carsharing = false;

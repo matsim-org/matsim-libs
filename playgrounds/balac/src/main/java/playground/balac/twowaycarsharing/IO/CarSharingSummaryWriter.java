@@ -35,7 +35,7 @@ public class CarSharingSummaryWriter
       this.out.flush();
     } catch (IOException e) {
       e.printStackTrace();
-      System.exit(-1);
+
     }
     System.out.println("    done.");
   }
@@ -49,7 +49,7 @@ public class CarSharingSummaryWriter
       this.fw.close();
     } catch (IOException e) {
       e.printStackTrace();
-      System.exit(-1);
+
     }
   }
 

@@ -33,23 +33,23 @@ public class CalculateCarSharingLegs {
 			
 			for (PlanElement pe:p.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Leg) {
-					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode()=="car")) {
+					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode() == "car")) {
 						countC++;
 						count++;
 					}
-					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode()=="carsharing")) {
+					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode() == "carsharing")) {
 						countCS++;
 						count++;
 					}
-					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode()=="bike")) {
+					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode() == "bike")) {
 						countB++;
 						count++;
 					}
-					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode()=="walk")) {
+					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode() == "walk")) {
 						countW++;
 						count++;
 					}
-					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode()=="pt")) {
+					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode() == "pt")) {
 						countPT++;
 						count++;
 					}

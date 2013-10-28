@@ -43,8 +43,8 @@ public class StationStatistics {
 			Leg previousLeg = null;
 			for(PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					if (((Activity) pe).getType() == "carsharingInteraction") {
-						if (previousLeg.getMode() == "carsharing") {
+					if (((Activity) pe).getType().equals( "carsharingInteraction" )) {
+						if (previousLeg.getMode().equals( "carsharing" )) {
 							
 							if (returned.get(((Activity) pe).getLinkId()) == null) {
 								returned.put(((Activity) pe).getLinkId(), 1);

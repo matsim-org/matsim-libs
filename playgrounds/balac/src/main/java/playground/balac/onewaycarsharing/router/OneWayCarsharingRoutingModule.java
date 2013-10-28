@@ -23,16 +23,13 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 
-
-
-
 /**
  * @author balacm
  */
 
 public class OneWayCarsharingRoutingModule implements RoutingModule {
 
-	
+	private final double epsilon = 0.000000001;
 	private final RoutingModule carDelegate;
 	private final PopulationFactory populationFactory;
 	private final ModeRouteFactory modeRouteFactory;
@@ -67,13 +64,13 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 			
 			LegImpl leg;
 			if (pe instanceof Activity)  {
-				if ((((Activity) pe).getFacilityId() == fromFacility.getId()) &&((Activity) pe).getEndTime() == departureTime) {
+				if ((((Activity) pe).getFacilityId() == fromFacility.getId()) && Math.abs(((Activity) pe).getEndTime() -  departureTime) < epsilon) {
 					
 					index = person.getSelectedPlan().getPlanElements().indexOf((Activity)pe);
 					
 					if (index != 0) {
 						leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(index - 1);
-						if (leg.getMode() != "onewaycarsharing" && leg.getMode() != "onewaycarsharingwalk") 
+						if (!leg.getMode().equals( "onewaycarsharing" ) && !leg.getMode().equals( "onewaycarsharingwalk" )) 
 							start = true;
 					}
 					else
@@ -89,7 +86,7 @@ public class OneWayCarsharingRoutingModule implements RoutingModule {
 						else {
 							leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(indexEnd + 1);	
 						
-							if (leg.getMode() != "onewaycarsharing" && leg.getMode() != "onewaycarsharingwalk") 
+							if (!leg.getMode().equals( "onewaycarsharing" ) && !leg.getMode().equals( "onewaycarsharingwalk" )) 
 								end = true;
 						}				
 				}				
