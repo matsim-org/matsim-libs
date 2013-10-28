@@ -46,6 +46,11 @@ public interface TravelDisutility {
 	 * @return The disutility to travel over the link <code>link</code>, departing at time <code>time</code>.
 	 */
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle);
+	// There was some thought of replacing the "link" argument (resulting in a link travel time lookup) by a "linkTtime" argument (since
+	// the link travel time is known in the router anyways. 
+	// I have at least one argument why this will not carry through in an easy way: We also need the link argument for toll, and other
+	// people may want to look up other link attributes and include them into their router, such as slope or road type.
+	// kai, oct'13
 	
 	/**
 	 * @param the link for which the minimal travel disutility over all time slots is calculated
