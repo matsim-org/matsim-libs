@@ -47,7 +47,7 @@ public class PurposeSplitCarsharing {
 					
 					if (a.getType().startsWith("work")) {
 						
-						if (((Leg) pe).getMode() == "carsharingwalk")
+						if (((Leg) pe).getMode().equals("carsharingwalk"))
 							number++;
 						//startWork = true;
 					}
@@ -56,7 +56,7 @@ public class PurposeSplitCarsharing {
 								
 				if (pe instanceof Leg) {
 					
-					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode()=="carsharing")) {
+					if ((((Leg) pe).getTravelTime() > 0.0) && (((Leg) pe).getMode().equals("carsharing"))) {
 						cs = true;
 						
 					}

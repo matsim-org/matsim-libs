@@ -36,7 +36,7 @@ public class ToursPerPurpose {
 			for (PlanElement pe:p.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Leg) {
 					
-					if ((((Leg) pe).getMode() == "carsharing") || (((Leg) pe).getMode() == "carsharingwalk")) {
+					if ((((Leg) pe).getMode().equals("carsharing")) || (((Leg) pe).getMode().equals( "carsharingwalk"))) {
 						carsh = true;
 					}
 					else

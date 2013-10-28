@@ -33,7 +33,7 @@ public class CarsharingStationDistance {
 			for (PlanElement pe:p.getSelectedPlan().getPlanElements()) {
 					
 				if (pe instanceof Activity) 
-					if (((Activity) pe).getType() == "carsharingInteraction" && leg.getMode() == "carsharingwalk") {
+					if (((Activity) pe).getType().equals( "carsharingInteraction" ) && leg.getMode().equals( "carsharingwalk" )) {
 						if (CoordUtils.calcDistance(scenario.getActivityFacilities().getFacilities().get(a.getFacilityId()).getCoord(), scenario.getNetwork().getLinks().get(((Activity) pe).getLinkId()).getCoord()) < 2000) {
 							bla[(int)CoordUtils.calcDistance(scenario.getActivityFacilities().getFacilities().get(a.getFacilityId()).getCoord(), scenario.getNetwork().getLinks().get(((Activity) pe).getLinkId()).getCoord())/100]++;
 							count++;

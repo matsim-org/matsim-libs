@@ -118,7 +118,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		// TODO Auto-generated method stub
-		if (!event.getActType().equals("onewaycarsharingInteraction") && map.get(event.getPersonId()).equals( "onewaycarsharing" )) {
+		if (!(map.containsKey(event.getPersonId())) ||  (!event.getActType().equals("onewaycarsharingInteraction") && !map.get(event.getPersonId()).equals( "onewaycarsharing" ))) {
 			
 			//we need to check if the next activity is going to be carsharinginteraction
 		

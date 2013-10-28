@@ -39,7 +39,7 @@ public class CarsharingRentalTimes {
 				
 					if (cs) {
 					
-						if (((Activity) pe).getType() != "carsharinginteraction")
+						if (!((Activity) pe).getType().equals( "carsharinginteraction" ))
 							time += ((Activity) pe).getMaximumDuration();
 					}
 				}
@@ -47,12 +47,12 @@ public class CarsharingRentalTimes {
 				
 						if (!cs) { 
 						
-							if (((Leg) pe).getMode() == "carsharingwalk")	
+							if (((Leg) pe).getMode().equals( "carsharingwalk" ))	
 								cs = true;	
 						}
 						else {
 						
-							if (((Leg) pe).getMode() == "carsharingwalk") {
+							if (((Leg) pe).getMode().equals( "carsharingwalk" )) {
 							
 								cs = false;
 								if ( time > 0.0) {
@@ -63,7 +63,7 @@ public class CarsharingRentalTimes {
 								}
 							
 							}
-							else if (((Leg) pe).getMode() == "carsharing")
+							else if (((Leg) pe).getMode().equals( "carsharing" ))
 								time += ((Leg) pe).getTravelTime();
 						}				
 				}			
