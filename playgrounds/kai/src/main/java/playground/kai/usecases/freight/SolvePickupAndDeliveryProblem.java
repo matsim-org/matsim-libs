@@ -29,8 +29,6 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.router.TimeAndSpaceTourRouter;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelTime;
 
 import util.Solutions;
 import algorithms.SchrimpfFactory;
@@ -47,27 +45,14 @@ import basics.VehicleRoutingProblemSolution;
  */
 public class SolvePickupAndDeliveryProblem implements CarrierReplanningStrategyModule{
 
+	@SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(SolvePickupAndDeliveryProblem.class);
-	
-	private LeastCostPathCalculator router;
 	
 	private Network network;
 	
-	private TravelTime travelTime;
-	
-	/**
-	 * Constructs the module with a leastCostPathRouter, network and travelTime.
-	 * 
-	 * @param router
-	 * @param network
-	 * @param travelTime
-	 * @see LeastCostPathCalculator, Network, TravelTime
-	 */
-	public SolvePickupAndDeliveryProblem(LeastCostPathCalculator router, Network network, TravelTime travelTime) {
+	public SolvePickupAndDeliveryProblem(Network network) {
 		super();
-		this.router = router;
 		this.network = network;
-		this.travelTime = travelTime;
 	}
 
 	/**
