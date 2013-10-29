@@ -73,6 +73,7 @@ final class KnFreight {
 			@Override
 			public ScoringFunction createScoringFunction(Carrier carrier) {
 				SumScoringFunction sum = new SumScoringFunction() ;
+				// yyyyyy I am almost sure that we better use separate scoring functions for carriers. kai, oct'13
 				final LegScoring legScoringFunction = new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), 
 						scenario.getNetwork() );
 				sum.addScoringFunction(legScoringFunction ) ;

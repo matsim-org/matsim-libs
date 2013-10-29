@@ -87,17 +87,21 @@ public class SolvePickupAndDeliveryProblem implements CarrierReplanningStrategyM
 		
 		Carrier carrier = carrierPlan.getCarrier() ;
 
+		// build, out of matsim data structures, a jsprit problem:
 		Builder builder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network) ;
 		VehicleRoutingProblem problem = builder.build() ;
 		
+		// define an algorithm to solve the jsprit problem:
 		VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 		
-		Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
+		// get multiple jsprit solutions from the algorithm, and get the best one of those:
+		VehicleRoutingProblemSolution solution = Solutions.getBest(algorithm.searchSolutions());
 		
-		VehicleRoutingProblemSolution solution = Solutions.getBest(solutions);
-		
+		// convert the jsprit solutions back into the matsim data structure
 		CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;
 
+		// copy the new CarrierPlan into the already existing pointer which was the original function call argument
+		// (this is more messy than it should be because of the way it is programmed on the matsim side) 
 		carrierPlan.getScheduledTours().clear() ;
 		for ( ScheduledTour tour : newPlan.getScheduledTours() ) {
 			carrierPlan.getScheduledTours().add(tour) ;
