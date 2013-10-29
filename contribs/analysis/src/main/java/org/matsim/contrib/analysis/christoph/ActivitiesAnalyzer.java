@@ -23,6 +23,7 @@ package org.matsim.contrib.analysis.christoph;
 import java.awt.Font;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.jfree.chart.axis.NumberAxis;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
@@ -68,6 +70,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	private double endTime = 30*3600;
 	
 	private String activitiesFileName = defaultActivitiesFileName;
+	private final Set<Id> observedAgents;
 	private boolean createGraphs;
 	private final Map<String, LinkedList<ActivityData>> activityCountData = new TreeMap<String, LinkedList<ActivityData>>();
 	private final LinkedList<ActivityData> overallCount = new LinkedList<ActivityData>();
@@ -81,13 +84,17 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	public ActivitiesAnalyzer() {
 		
 		this.autoConfig = true;
-		
 		this.createGraphs = true;
+		this.observedAgents = null;
 		
 		reset(0);
 	}
 	
 	public ActivitiesAnalyzer(String activitiesFileName, Set<String> activityTypes, boolean createGraphs) {
+		this(activitiesFileName, activityTypes, null, createGraphs);
+	}
+	
+	public ActivitiesAnalyzer(String activitiesFileName, Set<String> activityTypes, Set<Id> observedAgents, boolean createGraphs) {
 		
 		this.autoConfig = false;
 		
@@ -98,6 +105,11 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 		for (String activityType : activityTypes) {
 			this.activityCountData.put(activityType, new LinkedList<ActivityData>());
 		}
+		
+		if (observedAgents != null) {
+			// make a copy to prevent people changing the set over the iterations
+			this.observedAgents = new HashSet<Id>(observedAgents);			
+		} else this.observedAgents = null;
 		
 		reset(0);
 	}
@@ -112,6 +124,9 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		
+		if (observedAgents != null && !observedAgents.contains(event.getPersonId())) return;
+		
 		LinkedList<ActivityData> list = this.activityCountData.get(event.getActType());
 		
 		// ignore not observed activity types
@@ -124,6 +139,9 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		
+		if (observedAgents != null && !observedAgents.contains(event.getPersonId())) return;
+		
 		LinkedList<ActivityData> list = this.activityCountData.get(event.getActType());
 
 		// ignore not observed activity types
@@ -181,6 +199,9 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 		ActivityData overallActivityData = this.overallCount.getLast();
 				
 		for (Person person : event.getControler().getPopulation().getPersons().values()) {
+			
+			if (this.observedAgents != null && !this.observedAgents.contains(person.getId())) continue;
+			
 			Plan plan = person.getSelectedPlan();
 			Activity firstActivity = (Activity) plan.getPlanElements().get(0);
 			LinkedList<ActivityData> list = activityCountData.get(firstActivity.getType());

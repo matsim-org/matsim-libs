@@ -23,6 +23,7 @@ package org.matsim.contrib.analysis.christoph;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -65,6 +65,7 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 	private final boolean autoConfig;
 	
 	private final Set<String> sortedModes = new TreeSet<String>();
+	private final Set<Id> observedAgents;
 	private final Map<Id, Double> departureTimes = new HashMap<Id, Double>();
 	private final Map<String, List<Double>> legTravelTimes = new HashMap<String, List<Double>>();
 	
@@ -97,15 +98,25 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 		this.sortedModes.add(TransportMode.pt);
 		this.sortedModes.add(TransportMode.ride);
 		this.sortedModes.add(TransportMode.walk);
+		
+		this.observedAgents = null;
 	}
 	
 	public TripsAnalyzer(String tripsFileName, String durationsFileName, Set<String> modes, boolean createGraphs) {
+		this(tripsFileName, durationsFileName, modes, null, createGraphs);
+	}
+	
+	public TripsAnalyzer(String tripsFileName, String durationsFileName, Set<String> modes, Set<Id> observedAgents, boolean createGraphs) {
 
 		this.autoConfig = false;
 		
 		this.tripsFileName = tripsFileName;
 		this.durationsFileName = durationsFileName;
 		this.createGraphs = createGraphs;
+		if (observedAgents != null) {
+			// make a copy to prevent people changing the set over the iterations
+			this.observedAgents = new HashSet<Id>(observedAgents);			
+		} else this.observedAgents = null;
 	}
 	
 	public void setCreateGraphs(boolean createGraphs) {
@@ -126,6 +137,8 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		
+		if (observedAgents != null && !observedAgents.contains(event.getPersonId())) return;
+		
 		Double departureTime = departureTimes.remove(event.getPersonId());
 		if (departureTime == null) throw new RuntimeException("No departure time for agent " + event.getPersonId() + " was found!");
 		
@@ -137,6 +150,7 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
+		if (observedAgents != null && !observedAgents.contains(event.getPersonId())) return;
 		departureTimes.put(event.getPersonId(), event.getTime());
 	}
 
