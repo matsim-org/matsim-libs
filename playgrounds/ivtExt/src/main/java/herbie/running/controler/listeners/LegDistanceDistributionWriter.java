@@ -44,23 +44,35 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 		1000000, Double.MAX_VALUE};
 
 	private final String filename;
+	private final Population subPopulation;
 
 	private Network network;
 	
 	private final static Logger log = Logger.getLogger(LegDistanceDistributionWriter.class);
 
 	public LegDistanceDistributionWriter(String filename, Network network) {
+		this(filename, network, null);
+	}
+
+	/**
+	 * One can use this constructor to analyze only a subset of the entire population.
+	 */
+	public LegDistanceDistributionWriter(String filename, Network network, Population subPopulation) {
 		super();
 		this.network = network;
 		this.filename = filename;
+		this.subPopulation = subPopulation;
 	}
-
+	
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
 		if (event.getIteration() % 10 == 0) {
 
-			Controler c = event.getControler();
-			Population pop = c.getPopulation();
+			Population pop;
+			if (this.subPopulation == null) {
+				Controler c = event.getControler();
+				pop = c.getPopulation();				
+			} else pop = this.subPopulation;
 			
 			PrintStream out = null;
 			try {

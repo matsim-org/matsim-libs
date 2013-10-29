@@ -29,6 +29,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -58,8 +60,9 @@ public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimL
 		Double.MAX_VALUE,
 	};
 
-	final private String averagesSummaryFilename;
-	final private String travelTimeDistributionFilename;
+	private final String averagesSummaryFilename;
+	private final String travelTimeDistributionFilename;
+	private final Population subPopulation;
 
 	private PrintStream iterationSummaryOut;
 	private CalcLegTimesKTI calcLegTimesKTI;
@@ -69,11 +72,20 @@ public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimL
 	private final static Logger log = Logger.getLogger(CalcLegTimesHerbieListener.class);
 
 	public CalcLegTimesHerbieListener(String averagesSummaryFilename, String travelTimeDistributionFilename) {
+		this(averagesSummaryFilename, travelTimeDistributionFilename, null);
+	}
+
+	/**
+	 * One can use this constructor to analyze only a subset of the entire population.
+	 */
+	public CalcLegTimesHerbieListener(String averagesSummaryFilename, String travelTimeDistributionFilename,
+			Population subPopulation) {
 		super();
 		this.averagesSummaryFilename = averagesSummaryFilename;
 		this.travelTimeDistributionFilename = travelTimeDistributionFilename;
+		this.subPopulation = subPopulation;
 	}
-
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
@@ -88,7 +100,13 @@ public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimL
 			e.printStackTrace();
 		}
 
-		this.calcLegTimesKTI = new CalcLegTimesKTI(event.getControler().getPopulation(), iterationSummaryOut);
+		Population pop;
+		if (this.subPopulation == null) {
+			Controler c = event.getControler();
+			pop = c.getPopulation();				
+		} else pop = this.subPopulation;
+		
+		this.calcLegTimesKTI = new CalcLegTimesKTI(pop, iterationSummaryOut);
 		event.getControler().getEvents().addHandler(this.calcLegTimesKTI);
 
 	}
