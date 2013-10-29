@@ -33,7 +33,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 
 import analyzer.act2mode.Act2ModeWithPlanCoordAnalysis;
-import analyzer.beeline2PtDistanceAnalysis.Beeline2PtDistanceAnalysis;
+import playground.vsp.analysis.modules.ptCircuityAnalyzer.*;
 
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
 import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingCountAnalyzer;
@@ -153,20 +153,6 @@ public class RunAnalyzer {
 		reader.readFile(eventFile);
 		analysis.postProcessData();
 		analysis.writeResults(outputDirectory + "Act2ModeWithPlanCoord/");
-	}
-	
-	private static void rBeeline2PtDistanceAnalysis(){
-		Beeline2PtDistanceAnalysis analysis = new Beeline2PtDistanceAnalysis((ScenarioImpl) scenario);
-		analysis.preProcessData();
-		EventsManager events = EventsUtils.createEventsManager();
-		List<EventHandler> handler = analysis.getEventHandler();
-		for(EventHandler eh : handler){
-			events.addHandler(eh);
-		}
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(eventFile);
-		analysis.postProcessData();
-		analysis.writeResults(outputDirectory + "Beeline2PtDistanceAnalysis/");
 	}
 	
 	private static void rBvgAna(){
@@ -292,6 +278,22 @@ public class RunAnalyzer {
 		pta.preProcessData();
 		pta.postProcessData();
 		pta.writeResults(outputDirectory + "PtAccessibility/");
+	}
+	
+	private static void rPtCircuityAnalysis(){
+		ScenarioImpl sc = (ScenarioImpl) scenario;
+		Vehicles vehicles = sc.getVehicles();
+		PtCircuityAnalyzer analysis = new PtCircuityAnalyzer(scenario, vehicles);
+		analysis.preProcessData();
+		EventsManager events = EventsUtils.createEventsManager();
+		List<EventHandler> handler = analysis.getEventHandler();
+		for(EventHandler eh : handler){
+			events.addHandler(eh);
+		}
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(eventFile);
+		analysis.postProcessData();
+		analysis.writeResults(outputDirectory + "Beeline2PtDistanceAnalysis/");
 	}
 	
 	private static void rPtDriverPrefix(){
