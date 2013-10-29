@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 package analyzer.act2mode;
-
+/*
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -57,7 +57,10 @@ import playground.vsp.analysis.modules.act2mode.ActivityToMode;
  * adjustment to use Plan Coordinates by gleich
  *
  */
-public class Act2ModeWithPlanCoordAnalysisHandler implements 
+public class Act2ModeWithPlanCoordAnalysisHandler
+{}
+/*
+implements 
 											ActivityEndEventHandler, AgentDepartureEventHandler,
 											AgentArrivalEventHandler, ActivityStartEventHandler,
 											TransitDriverStartsEventHandler{
@@ -96,7 +99,7 @@ public class Act2ModeWithPlanCoordAnalysisHandler implements
 			for(PlanElement planElement: person.getSelectedPlan().getPlanElements()) {
 				if(planElement instanceof Activity) {
 					Activity currentActivity = (Activity) planElement;
-					/* Exclude "pt interaction" pseudo-activities */
+					// Exclude "pt interaction" pseudo-activities
 					if(!currentActivity.getType().equalsIgnoreCase("pt interaction")) {
 						actCoords.get(person.getId()).add(currentActivity.getCoord());
 					}
@@ -199,3 +202,4 @@ public class Act2ModeWithPlanCoordAnalysisHandler implements
 	
 }
 
+*/

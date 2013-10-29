@@ -132,7 +132,7 @@ public class RunAnalyzer {
 		analysis.postProcessData();
 		analysis.writeResults(outputDirectory + "Act2Mode/");
 	}
-	
+/* ---	
 	private static void rAct2ModeWithPlanCoord() {
 		//test without facilities, although stated to be necessary in ActivityToModeAnalysis
 		Set<Id> personsOfInterest = new TreeSet<Id>();
@@ -140,7 +140,8 @@ public class RunAnalyzer {
 		personsOfInterest.add(new IdImpl(20));
 		personsOfInterest.add(new IdImpl(200));
 		personsOfInterest.add(new IdImpl(500));*/
-		for(Id id: scenario.getPopulation().getPersons().keySet()){
+/* ---	
+	for(Id id: scenario.getPopulation().getPersons().keySet()){
 			personsOfInterest.add(id);
 		}
 		Act2ModeWithPlanCoordAnalysis analysis = new Act2ModeWithPlanCoordAnalysis(scenario, personsOfInterest, 30*60, "DHDN_GK4");
@@ -154,7 +155,7 @@ public class RunAnalyzer {
 		analysis.postProcessData();
 		analysis.writeResults(outputDirectory + "Act2ModeWithPlanCoord/");
 	}
-	
+--- */	
 	private static void rBvgAna(){
 		VehDelayAtStopHistogramAnalyzer cda = new VehDelayAtStopHistogramAnalyzer(100);
 		cda.init((ScenarioImpl) scenario);

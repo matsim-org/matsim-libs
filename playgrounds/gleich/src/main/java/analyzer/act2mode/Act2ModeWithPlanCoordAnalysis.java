@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 package analyzer.act2mode;
-
+/* ---
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,7 +48,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * adjustment to use Plan Coordinates by gleich
  *
  */
-public class Act2ModeWithPlanCoordAnalysis extends AbstractAnalyisModule {
+public class Act2ModeWithPlanCoordAnalysis {}
+/* ---
+extends AbstractAnalyisModule {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
@@ -67,6 +69,7 @@ public class Act2ModeWithPlanCoordAnalysis extends AbstractAnalyisModule {
 	 * @param personsOfInterest, might be null, than all persons are processed
 	 * @param slotSize, timeSlotSize in seconds
 	 */
+/* ---
 	public Act2ModeWithPlanCoordAnalysis(Scenario sc, Set<Id> personsOfInterest, int slotSize, String targetCoordinateSystem) {
 		super(Act2ModeWithPlanCoordAnalysis.class.getSimpleName());
 		this.scenario = sc;
@@ -116,6 +119,8 @@ public class Act2ModeWithPlanCoordAnalysis extends AbstractAnalyisModule {
 	 * @param departureSlotFeatures2
 	 * @param featureType 
 	 */
+
+/* ---
 	private void createFeatureAndAdd(ActivityToMode atm, 
 			HashMap<Integer, Set<SimpleFeature>> slotFeatures, PointFeatureFactory factory) {
 		Integer slice = (int) (atm.getTime() / this.slotSize);
@@ -142,4 +147,4 @@ public class Act2ModeWithPlanCoordAnalysis extends AbstractAnalyisModule {
 		}
 	}
 }
-
+---*/ 
