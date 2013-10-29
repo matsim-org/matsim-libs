@@ -25,7 +25,6 @@ import org.matsim.contrib.freight.controler.CarrierController;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -33,14 +32,12 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	
 	Controler controler;
 	
-	CarrierController carrierControler;
-
 	private String planFile;
 	
+	@Override
 	public void setUp() throws Exception{
 		super.setUp();
 		String NETWORK_FILENAME = getInputDirectory() + "network.xml";
-		String PLANS_FILENAME = getInputDirectory() + "plans100.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		
