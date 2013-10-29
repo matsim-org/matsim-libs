@@ -65,13 +65,9 @@ final class KnFreight {
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
-		Carriers carriers = new Carriers() ;
-//		{
-//			Id id = scenario.createId("testCarrier") ;
-//			Carrier carrier = CarrierImpl.newInstance(id) ; 
-//			carriers.getCarriers().put(id, carrier) ;
-//		}
-		new CarrierPlanXmlReaderV2(carriers).read("/Users/nagel/shared-svn/projects/2000W-City/data/inputs/equil/carrierPlansEquils.xml") ;
+		final String carriersPlansFileName = "/Users/nagel/shared-svn/projects/2000W-City/data/inputs/equil/carrierPlansEquils.xml";
+//		Carriers carriers = new Carriers() ;
+//		new CarrierPlanXmlReaderV2(carriers).read(carriersPlansFileName) ;
  
 		CarrierScoringFunctionFactory scoringFunctionFactory = new CarrierScoringFunctionFactory() {
 			@Override
@@ -111,7 +107,7 @@ final class KnFreight {
 			}
 		} ;
 
-		CarrierController listener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
+		CarrierController listener = new CarrierController(carriersPlansFileName, strategyManagerFactory, scoringFunctionFactory ) ;
 		listener.setEnableWithinDayActivityReScheduling(false);
 
 

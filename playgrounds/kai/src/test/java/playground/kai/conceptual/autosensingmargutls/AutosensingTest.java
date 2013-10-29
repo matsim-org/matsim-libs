@@ -48,7 +48,7 @@ import static org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperi
  * @author nagel
  *
  */
-public class Main {
+public class AutosensingTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
     
