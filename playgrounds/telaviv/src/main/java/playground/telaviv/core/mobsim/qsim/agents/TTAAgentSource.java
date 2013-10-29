@@ -21,15 +21,12 @@
 package playground.telaviv.core.mobsim.qsim.agents;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -121,40 +118,5 @@ public class TTAAgentSource implements AgentSource {
 		this.carPopulationAgentSource.insertAgentsIntoMobsim();
 		this.truckPopulationAgentSource.insertAgentsIntoMobsim();
 		this.commercialPopulationAgentSource.insertAgentsIntoMobsim();
-	}
-	
-	private static class FilteredPopulation implements Population {
-
-		Map<Id, Person> persons = new LinkedHashMap<Id, Person>();
-		
-		@Override
-		public PopulationFactory getFactory() {
-			return null;
-		}
-
-		@Override
-		public String getName() {
-			return null;
-		}
-
-		@Override
-		public void setName(String name) {
-		}
-
-		@Override
-		public Map<Id, ? extends Person> getPersons() {
-			return this.persons;
-		}
-
-		@Override
-		public void addPerson(Person p) {
-			this.persons.put(p.getId(), p);
-		}
-
-		@Override
-		public ObjectAttributes getPersonAttributes() {
-			return null;
-		}
-		
 	}
 }
