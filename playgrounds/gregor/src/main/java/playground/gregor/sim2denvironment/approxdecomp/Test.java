@@ -71,10 +71,12 @@ public class Test {
 //		String network = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml";
 //		String output = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/sim2dEnv_0.gml.gz";
 
-		String dir = "/Users/laemmel/devel/gct/floorpl/";
-		String p = dir + "floorplan_p.shp";
-		String network = dir + "raw_network2d_floorplan.xml";
-		String output = dir + "s2d_environment.gml.gz";
+		String baseName = "42nd_north_west_p_c";
+		String dir = "/Users/laemmel/devel/gct2/floorpl/";
+		String p = dir + baseName +".shp";
+//		String network = dir + "raw_42nd_north_east_p_c.xml";
+		String network = "/Users/laemmel/devel/gct/input/network.xml.gz";
+		String output = dir + "s2d_environment_raw_"+ baseName + ".gml.gz";
 		
 		GeometryFactory geofac = new GeometryFactory();
 
@@ -193,7 +195,7 @@ public class Test {
 			env.createAndAddSection(new IdImpl("sec" + dec.hashCode()), dec.p, os , n, 0);
 		}
 
-		env.setId(new IdImpl("env1"));
+		env.setId(new IdImpl(baseName));
 		new Sim2DEnvironmentWriter02(env).write(output);
 
 		System.out.println(decomposed.size() + " == 105?");
@@ -209,7 +211,7 @@ public class Test {
 		conf.setTimeStepSize(0.1);
 		conf.addSim2DEnvironmentPath(output);
 		conf.addSim2DEnvNetworkMapping(output, network);
-		new Sim2DConfigWriter01(conf).write(dir + "sim2dConfig.xml");
+		new Sim2DConfigWriter01(conf).write(dir + "sim2dConfig" +baseName+".xml");
 		
 		
 		

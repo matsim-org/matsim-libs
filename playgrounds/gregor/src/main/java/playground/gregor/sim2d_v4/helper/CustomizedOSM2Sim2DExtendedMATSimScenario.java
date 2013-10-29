@@ -414,9 +414,9 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		//		String inputDir = "/Users/laemmel/devel/gr90_sim2d_v4/input";
 		//		String outputDir = "/Users/laemmel/devel/gr90_sim2d_v4/output";
 
-		String osmFile = "/Users/laemmel/devel/gct/osm/map.osm";
-		String inputDir = "/Users/laemmel/devel/gct/input";
-		String outputDir = "/Users/laemmel/devel/gct/output";
+		String osmFile = "/Users/laemmel/devel/gct2/env_gen_stage2/map.osm";
+		String inputDir = "/Users/laemmel/devel/gct2/input";
+		String outputDir = "/Users/laemmel/devel/gct2/output";
 
 		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);

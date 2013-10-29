@@ -219,10 +219,6 @@ public class KDTreeNeighbors implements Neighbors {
 		}
 		this.cachedNeighbors = ret;
 		
-//		if (this.agent.getId().toString().endsWith("5")) {
-//			this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new NeighborsEvent(0, this.agent.getId(), ret, this.agent));
-//		}
-		
 		return ret;
 
 	}

@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class Polygonizer {
 	
 	public static void main(String args[]) {
-		String input = "/Users/laemmel/devel/gct/floorpl/floorplan.shp";
+		String input = "/Users/laemmel/devel/gct2/floorpl/42nd_north_east.shp";
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(input);
 		Geometry res = null;
@@ -50,7 +50,7 @@ public class Polygonizer {
 		GisDebugger.setCRSString("EPSG:3395");
 		GisDebugger.addGeometry(e2);
 		
-		GisDebugger.dump("/Users/laemmel/devel/gct/floorpl/floorplan_p.shp");
+		GisDebugger.dump("/Users/laemmel/devel/gct2/floorpl/42nd_north_east_p.shp");
 		
 		System.out.println(res);
 		

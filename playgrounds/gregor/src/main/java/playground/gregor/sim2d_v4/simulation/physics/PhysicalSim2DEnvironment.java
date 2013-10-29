@@ -22,8 +22,14 @@ package playground.gregor.sim2d_v4.simulation.physics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -37,6 +43,7 @@ import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.VoronoiDiagramCells;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
@@ -63,33 +70,49 @@ public class PhysicalSim2DEnvironment {
 	private final Sim2DScenario sim2dsc;
 
 
-	//	//DEBUG
-	//	public static boolean DEBUG = false;
-	//	public static  VisDebugger visDebugger;
-	//	static {
-	//		if (DEBUG) {
-	//			visDebugger = new VisDebugger();
-	//		} else {
-	//			visDebugger = null;
-	//		}
-	//	}
-
 	private Map<Id, Sim2DQTransitionLink> lowResLinks;
 
 	private final EventsManager eventsManager;
 
-	private final VoronoiDiagramCells<Sim2DAgent> vd;
+	//EXPERIMENTAL [GL Oct'13]
+	private VoronoiDiagramCells<Sim2DAgent> vd;
+	
 
+	
+//	//EXPERIMENTAL multi threading stuff
+//	private final Poison poison = new Poison();
+//	private final int numOfThreads = 3; 
+//	private final CyclicBarrier kdSync = new CyclicBarrier(this.numOfThreads);
+//	private final CyclicBarrier cb = new CyclicBarrier(this.numOfThreads+1);
+//	private final List<PhysicalSim2DSectionUpdaterThread> threads = new ArrayList<PhysicalSim2DEnvironment.PhysicalSim2DSectionUpdaterThread>();
+	
+	private void awaitKDTreeSync() {
+//		try {
+//			this.kdSync.await();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		} catch (BrokenBarrierException e) {
+//			e.printStackTrace();
+//		}
+	}
 
 	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
 		this.env = env;
 		this.sim2dsc = sim2dsc;
 		this.eventsManager = eventsManager;
-		this.vd = new VoronoiDiagramCells<Sim2DAgent>(env.getEnvelope());
+		if (Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
+			this.vd = new VoronoiDiagramCells<Sim2DAgent>(env.getEnvelope());
+		}
 		init();
 	}
 
 	private void init() {
+//		for (int i = 0; i < this.numOfThreads; i++) {
+//			PhysicalSim2DSectionUpdaterThread pt = new PhysicalSim2DSectionUpdaterThread(this.cb);
+//			this.threads.add(pt);
+//			new Thread(pt,this.env.getId().toString() + " PhysicalSim2DSectionUpdaterThread." + i).start();
+//		}
+		
 		for (Section sec : this.env.getSections().values()) {
 			PhysicalSim2DSection psec = createAndAddPhysicalSection(sec);
 			for (Id id : sec.getRelatedLinkIds()) {
@@ -108,27 +131,55 @@ public class PhysicalSim2DEnvironment {
 		return psec;
 	}
 
-	private PhysicalSim2DSection createAndAddDepartureBox(Section sec) {
-		PhysicalSim2DSection psec = new PhysicalSim2DSection(sec,this.sim2dsc,this);
-		this.psecs.put(sec.getId(),psec);
-		return psec;
-	}
-
 	public PhysicalSim2DSection getPhysicalSim2DSectionAssociatedWithLinkId(Id id) {
 		return this.linkIdPsecsMapping.get(id);
 	}
 
 	public void doSimStep(double time) {
-		//TODO this can be done more efficient, one just has to do some bookkeeping when agents enter/leave sim2d
-		List<Sim2DAgent> allAgents = new ArrayList<Sim2DAgent>();
-		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			allAgents.addAll(psec.getAgents());
+		//EXPERIMENTAL [GL Oct'13]
+		if (Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
+			//TODO this can be done more efficient, one just has to do some bookkeeping when agents enter/leave sim2d
+			List<Sim2DAgent> allAgents = new ArrayList<Sim2DAgent>();
+			for (PhysicalSim2DSection psec : this.psecs.values()) {
+				allAgents.addAll(psec.getAgents());
+			}
+			this.vd.update(allAgents);
 		}
-		this.vd.update(allAgents);
 		
+		
+		//single threaded
+		for (PhysicalSim2DSection psec : this.psecs.values()) {
+			psec.prepare();
+		}
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
 			psec.updateAgents(time);
 		}
+		
+//		//multi threaded
+//		this.cb.reset();
+//		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
+//			pt.setTime(time);
+//		}
+//		int idx = 0;
+//		for (PhysicalSim2DSection psec : this.psecs.values()) {
+//			int tidx = idx % (this.numOfThreads);
+//			PhysicalSim2DSectionUpdaterThread pt = this.threads.get(tidx);
+//			pt.offer(psec);
+//			idx++;
+//		}
+//		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
+//			pt.offer(this.poison);
+//		}
+//		try {
+//			this.cb.await();
+//			
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		} catch (BrokenBarrierException e) {
+//			e.printStackTrace();
+//		}
+		
+		
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
 			psec.moveAgents(time);
 		}
@@ -257,6 +308,71 @@ public class PhysicalSim2DEnvironment {
 		return this.eventsManager;
 	}
 
+	private class PhysicalSim2DSectionUpdaterThread implements Runnable {
+	
+		private final CyclicBarrier barrier;
+		private final BlockingQueue<PhysicalSim2DSection> queue = new LinkedBlockingQueue<PhysicalSim2DSection>();
+		private double time;
 
+		public PhysicalSim2DSectionUpdaterThread(CyclicBarrier barrier) {
+			this.barrier = barrier;
+		}
+		
+		@Override
+		public void run() {
+			PhysicalSim2DSection sec = null;
+			Queue<PhysicalSim2DSection> secs = new LinkedList<PhysicalSim2DSection>();
+			while (true) {
+				try {
+					sec = this.queue.take();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if (sec instanceof Poison) {
+					PhysicalSim2DEnvironment.this.awaitKDTreeSync();
+					while (secs.peek() != null) {
+						secs.poll().updateAgents(this.time);
+					}
+					try {
+						this.barrier.await();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (BrokenBarrierException e) {
+						e.printStackTrace();
+					}
+				} else {
+					sec.prepare();
+					secs.add(sec);
+				}
+			}
+			
+		}
+		
+		private void setTime(double time) {
+			this.time = time;
+		}
+		
+		public void offer(PhysicalSim2DSection sec) {
+//			this.queue.a
+//			this.queue.offer(sec);
+			try {
+				this.queue.put(sec);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+//			System.out.println(this.hashCode() + "    " + this.queue.size());
+		}
+		
+		
+		
+	}
 
+	private static class Poison extends PhysicalSim2DSection {
+
+//		public Poison(Section sec, Sim2DScenario sim2dsc,
+//				PhysicalSim2DEnvironment penv) {
+//			super(sec, sim2dsc, penv);
+//		}
+		
+	}
 }

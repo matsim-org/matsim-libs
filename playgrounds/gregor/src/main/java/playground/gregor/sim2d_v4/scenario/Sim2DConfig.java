@@ -33,6 +33,9 @@ public class Sim2DConfig {
 //	private double offsetX;
 //	private double offsetY;
 	
+	//EXPERIMENTAL [GL Oct'13]
+	public final static boolean EXPERIMENTAL_VD_APPROACH = false;
+	
 	private double timeStepSize = 0.1;
 	private int eventsInterval = 0;
 	

@@ -28,6 +28,7 @@ import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.VelocityUpdater;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.KDTreeNeighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.NearestPointAtTargetLine;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.PerceivedPersonalSpaceApproach;
@@ -48,21 +49,17 @@ public class ORCAAgentFactory implements Sim2DAgentFactory {
 		LinkSwitcher ls = new LinkSwitcher(this.sc, pEnv);
 		Sim2DAgent agent = new Sim2DAgent(this.sc,veh, spawnX, spawnY, ls, pEnv);
 
-		VDNeighbors nn = new VDNeighbors(agent);
-		VelocityUpdater vu = new ORCAVelocityUpdater(new PerceivedPersonalSpaceApproach(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
-		agent.setVelocityUpdater(vu);
+		if (Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
+			VDNeighbors nn = new VDNeighbors(agent);
+			VelocityUpdater vu = new ORCAVelocityUpdater(new PerceivedPersonalSpaceApproach(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
+			agent.setVelocityUpdater(vu);
+		} else {
+			KDTreeNeighbors nn = new KDTreeNeighbors(agent, this.config);
+			nn.setRangeAndMaxNrOfNeighbors(8, 5);			
+			VelocityUpdater vu = new ORCAVelocityUpdater(new PerceivedPersonalSpaceApproach(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
+			agent.setVelocityUpdater(vu);
+		}
 		
-//		if (!agent.getId().toString().startsWith("b")) {
-//			VDNeighbors nn = new VDNeighbors(agent);
-//			VelocityUpdater vu = new ORCAVelocityUpdater(new PerceivedPersonalSpaceApproach(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
-//			agent.setVelocityUpdater(vu);
-//		} else {
-//
-//			KDTreeNeighbors nn = new KDTreeNeighbors(agent, this.config);
-//			nn.setRangeAndMaxNrOfNeighbors(8, 5);			
-//			VelocityUpdater vu = new ORCAVelocityUpdater(new PerceivedPersonalSpaceApproach(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
-//			agent.setVelocityUpdater(vu);
-//		}
 		return agent;
 	}
 

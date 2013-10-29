@@ -73,7 +73,7 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	 * @see playground.gregor.sim2d_v4.simulation.physics.VelocityUpdater#updateVelocity()
 	 */
 	@Override
-	public void updateVelocity(double time) {
+	public void updateVelocity() {
 
 		
 //		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors(time);

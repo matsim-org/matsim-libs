@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * implementation of 2-dimensional kd-tree (== 2d-tree)
  * similar to de Berg et al (2000), Computational Geometry: Algorithms and Applications. Springer
  * The main differences are:
- * 	1. for small data sets (<128) data is stored in a list, since for small data sets a linear search is usually faster
+ * 	1. for small data sets (<100) data is stored in a list, since for small data sets a linear search is usually faster
  * 	2. the tree has a max depth to avoid stack overflow exceptions. If the max depth has been reached for a region all 
  * data subsequently inserted into this region is stored in a list. Thus, the algorithm retrieves data by linear search for those regions.  
  * @author laemmel
@@ -61,15 +61,16 @@ public class TwoDTree<T extends TwoDObject> {
 //		this.root.cache = new ArrayList<T>(10000);
 		this.root.left = null;
 		this.root.right = null;
-//		this.root.maxDepth = 0;
+		this.root.maxDepth = 0;
 		for (T val : values) {
 			insert(val);
 		}
-//		this.root.maxDepth = 128;
-//		if (values.size() > 128) {
-//			this.root.split();
-//		}
+		this.root.maxDepth = 128;
+		if (values.size() > TwoDNode.cacheSize) {
+			this.root.split();
+		}
 	}
+	
 
 	public List<T> get(Envelope e) {
 		return this.root.get(e);

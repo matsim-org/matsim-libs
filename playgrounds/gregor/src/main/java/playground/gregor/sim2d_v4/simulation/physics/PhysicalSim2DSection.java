@@ -36,6 +36,7 @@ import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.TwoDTree;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -52,8 +53,6 @@ public class PhysicalSim2DSection {
 	List<LineSegment> obstacles;
 	LineSegment [] openings;//TODO why not using a list, is array really faster?? [gl April '13]
 
-	//	Map<Id,LinkInfo> linkInfos = new HashMap<Id,LinkInfo>();
-
 	private final Sim2DScenario sim2dsc;
 
 	protected final List<Sim2DAgent> inBuffer = new LinkedList<Sim2DAgent>();
@@ -65,17 +64,21 @@ public class PhysicalSim2DSection {
 
 	private final Map<LineSegment,PhysicalSim2DSection> neighbors = new HashMap<LineSegment,PhysicalSim2DSection>();
 	private final Map<PhysicalSim2DSection,LineSegment> neighborsInvMapping = new HashMap<PhysicalSim2DSection, LineSegment>();
-	
-	
-	protected final TwoDTree<Sim2DAgent> agentTwoDTree;
 
-	//	private final Map<Segment,Id> openingLinkIdMapping = new HashMap<Segment,Id>();
+
+	protected final TwoDTree<Sim2DAgent> agentTwoDTree;
 
 	private int numOpenings;
 
-	
 
-	//	private VisDebugger debugger;
+
+	public PhysicalSim2DSection() {
+		this.sec = null;
+		this.sim2dsc = null;
+		this.timeStepSize = Double.NaN;
+		this.penv = null;
+		this.agentTwoDTree = null;
+	}
 
 	public PhysicalSim2DSection(Section sec, Sim2DScenario sim2dsc, PhysicalSim2DEnvironment penv) {
 		this.sec = sec;
@@ -85,38 +88,6 @@ public class PhysicalSim2DSection {
 		Envelope e = this.sec.getPolygon().getEnvelopeInternal();
 		this.agentTwoDTree = new TwoDTree<Sim2DAgent>(new Envelope(e.getMinX(),e.getMaxX(),e.getMinY(),e.getMaxY()));
 		init();
-		
-		List<LineSegment> vdBounds = new ArrayList<LineSegment>(this.obstacles);
-//		vdBounds.addAll(openings);
-		for ( LineSegment o : this.openings){
-			vdBounds.add(o);
-			
-//			LineSegment l0 = new LineSegment();
-//			l0.x0 = o.x0;
-//			l0.y0 = o.y0;
-//			l0.x1 = o.x0-VoronoiDiagramCells.SPATIAL_BUFFER*o.dy;
-//			l0.y1 = o.y0+VoronoiDiagramCells.SPATIAL_BUFFER*o.dx;
-//			l0.dx = -o.dy;
-//			l0.dy = o.dx;
-//			vdBounds.add(l0);
-//			LineSegment l1 = new LineSegment();
-//			l1.x0 = o.x0-VoronoiDiagramCells.SPATIAL_BUFFER*o.dy;
-//			l1.y0 = o.y0+VoronoiDiagramCells.SPATIAL_BUFFER*o.dx;
-//			l1.x1 = o.x1-VoronoiDiagramCells.SPATIAL_BUFFER*o.dy;
-//			l1.y1 = o.y1+VoronoiDiagramCells.SPATIAL_BUFFER*o.dx;
-//			l1.dx = o.dx;
-//			l1.dy = o.dy;
-//			vdBounds.add(l1);
-//			LineSegment l2 = new LineSegment();
-//			l2.x0 = o.x1-VoronoiDiagramCells.SPATIAL_BUFFER*o.dy;
-//			l2.y0 = o.y1+VoronoiDiagramCells.SPATIAL_BUFFER*o.dx;
-//			l2.x1 = o.x1;
-//			l2.y1 = o.y1;
-//			l2.dx = o.dy;
-//			l2.dy = -o.dx;
-//			vdBounds.add(l2);
-		}
-//		this.vd = new VoronoiDiagramCells<Sim2DAgent>(vdBounds);
 	}
 
 	public int getNumberOfAllAgents() {
@@ -128,37 +99,19 @@ public class PhysicalSim2DSection {
 		agent.setPSec(this);
 	}
 
-	public void updateAgents(double time) {
+	public void prepare() {
 		this.agentTwoDTree.clear();
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
-//		this.agentTwoDTree.buildTwoDTree(this.agents);
+		if (!Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
+			this.agentTwoDTree.buildTwoDTree(this.agents);
+		}		
+	}
+	
+	public void updateAgents(double time) {
 		Iterator<Sim2DAgent> it = this.agents.iterator();
-		int idx = 0;
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
-
-			//proof of concept! needs to be revised and implemented at a different location [GL August '13]
-//			Cell cell = this.densityMap.getCell(idx);
-//			idx++;
-			
-//			double area = cell.area;
-//			for (Integer n : cell.neighbors) {
-//				area += this.densityMap.getCell(n).area;
-//			}
-//			area /= (cell.neighbors.size() + 1);
-//			area = Math.max(0.19, area);
-			
-//			if (area <= 5.4 || area >= 0.1) {
-//				double rho = 1/area;//+0.1;
-//				double freeSpeed = Math.max(0.01, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
-//				agent.setDesiredSpeed(freeSpeed);
-//			} else {
-//				agent.setDesiredSpeed(1.34);
-//			}
-//			agent.setVoronoiCell(cell);  
-
-
 			updateAgent(agent, time);
 		}
 	}
@@ -229,16 +182,10 @@ public class PhysicalSim2DSection {
 		}
 	}
 
-	//	private Id getLinkId(Segment opening) {
-	//		return this.openingLinkIdMapping.get(opening);
-	//	}
-
 	protected void updateAgent(Sim2DAgent agent, double time) {
 		//		agent.calcNeighbors(this);
 		//		agent.setObstacles(this.obstacles);
-		agent.updateVelocity(time);
-		//		this.agents.r
-		//		List<Sim2DAgent> neighbors = calculateNeighbors(agent);
+		agent.updateVelocity();
 
 	}
 
@@ -278,50 +225,6 @@ public class PhysicalSim2DSection {
 		this.obstacles = obst;
 		this.openings = open.toArray(new LineSegment[0]);
 		this.numOpenings = this.openings.length;
-
-		//		Map<Id, ? extends Link> links = this.getSim2dsc().getMATSimScenario().getNetwork().getLinks();
-		//		for (Id id : this.sec.getRelatedLinkIds()) {
-		//			Link l = links.get(id);
-		//			LinkInfo li = new LinkInfo();
-		//			this.linkInfos.put(id, li);
-		//
-		//			Coord from = l.getFromNode().getCoord();
-		//			Coord to = l.getToNode().getCoord();
-		//			Segment seg = new Segment();
-		//			seg.x0 = from.getX()-this.offsetX;
-		//			seg.x1 = to.getX()-this.offsetX;
-		//			seg.y0 = from.getY()-this.offsetY;
-		//			seg.y1 = to.getY()-this.offsetY;
-		//
-		//			double dx = seg.x1-seg.x0;
-		//			double dy = seg.y1-seg.y0;
-		//			double length = Math.sqrt(dx*dx+dy*dy);
-		//			dx /= length;
-		//			dy /= length;
-		//
-		//			li.link = seg;
-		//			li.dx = dx;
-		//			li.dy = dy;
-		//			Segment fromOpening = getTouchingSegment(seg.x0,seg.y0, seg.x1,seg.y1,this.openings);
-		//			Segment toOpening = getTouchingSegment(seg.x1,seg.y1, seg.x0,seg.y0,this.openings);
-		//			li.fromOpening = fromOpening;
-		//			if (toOpening != null) {
-		//				li.finishLine = toOpening;
-		//				li.width = Math.sqrt((toOpening.x0-toOpening.x1)*(toOpening.x0-toOpening.x1)+(toOpening.y0-toOpening.y1)*(toOpening.y0-toOpening.y1)); 
-		//				this.openingLinkIdMapping .put(toOpening,id);
-		//			} else {
-		//				Segment finishLine = new Segment();
-		//				finishLine.x0 = seg.x1;
-		//				finishLine.y0 = seg.y1;
-		//
-		//				//all polygons are clockwise oriented so we rotate to the right here 
-		//				finishLine.x1 = finishLine.x0 + li.dy;
-		//				finishLine.y1 = finishLine.y0 - li.dx;
-		//				li.finishLine = finishLine;
-		//				li.width = 10; //TODO section width [gl Jan'13]
-		//			}
-		//		}
-
 	}
 
 	/*package*/ void connect() {
@@ -347,38 +250,6 @@ public class PhysicalSim2DSection {
 		return false;
 	}
 
-	//	//
-	//	public LinkInfo getLinkInfo(Id id) {
-	//		return this.linkInfos.get(id);
-	//	}
-	//
-	//	/*package*/ void putLinkInfo(Id id, LinkInfo li) {
-	//		this.linkInfos.put(id, li);
-	//	}
-
-	//	private Segment getTouchingSegment(double x0, double y0, double x1, double y1, Segment[] openings) {
-	//
-	//		for (Segment opening : openings) {
-	//
-	//			boolean onSegment = CGAL.isOnVector(x0, y0,opening.x0, opening.y0, opening.x1, opening.y1); // this is a necessary but not sufficient condition since a section is only approx convex. so we need the following test as well
-	//			if (onSegment) {
-	//				double isLeft0  = CGAL.isLeftOfLine(opening.x0, opening.y0,x0, y0, x1, y1);
-	//				double isLeft1  = CGAL.isLeftOfLine(opening.x1, opening.y1,x0, y0, x1, y1);
-	//				if (isLeft0 * isLeft1 >= 0){ // coordinate is on a vector given by the segment opening but not on the segment itself. This case is unlikely to occur! 
-	//					onSegment = false;
-	//				}
-	//				if (onSegment) {
-	//					return opening;
-	//				}
-	//			}
-	//		}
-	//		return null;
-	//	}
-
-
-
-
-
 	public Id getId() {
 		return this.sec.getId();
 	}
@@ -400,7 +271,7 @@ public class PhysicalSim2DSection {
 	public PhysicalSim2DSection getNeighbor(LineSegment opening) {
 		return this.neighbors.get(opening);
 	}
-	
+
 	public LineSegment getConnectingOpening(PhysicalSim2DSection neighbor) {
 		return this.neighborsInvMapping.get(neighbor);
 	}
@@ -421,8 +292,5 @@ public class PhysicalSim2DSection {
 		return this.sim2dsc;
 	}
 
-//	public PhysicalSim2DSectionVoronoiDensity getVD() {
-//		return this.densityMap;
-//	}
 
 }

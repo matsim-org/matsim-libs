@@ -33,6 +33,7 @@ import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.debug.ForceReDrawEvent;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import be.humphreys.simplevoronoi.GraphEdge;
 import be.humphreys.simplevoronoi.Voronoi;
@@ -174,20 +175,24 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 	}
 
 
+	@Override
+	public void prepare() {
+		this.agentTwoDTree.clear();
+		this.agents.addAll(this.inBuffer);
+		this.inBuffer.clear();
+
+		handleTransitionBuffer();
+		if (!Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
+			this.agentTwoDTree.buildTwoDTree(this.agents);
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection#updateAgents(double)
 	 */
 	@Override
 	public void updateAgents(double time) {
-		this.agentTwoDTree.clear();
-		this.agents.addAll(this.inBuffer);
-		this.inBuffer.clear();
-
-		handleTransitionBuffer(time);
-
-
-		this.agentTwoDTree.buildTwoDTree(this.agents);
+		
 //		this.densityMap.buildDensityMap();
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		
@@ -220,14 +225,14 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 
 
 
-	private void handleTransitionBuffer(double time) {
+	private void handleTransitionBuffer() {
 		Iterator<Sim2DAgent> it = this.transitionBuffer.iterator();
 		//		debug(time);
 		while (it.hasNext()) {
 			this.currrentDMin = Double.POSITIVE_INFINITY;
 			Sim2DAgent a = it.next();
 			if (this.agents.size() < 2) {
-				a.updateVelocity(time);
+				a.updateVelocity();
 				this.agents.add(a);//HACK
 				it.remove();
 				continue;
@@ -428,7 +433,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 					}
 					ds /= 3;
 //					a.setDesiredSpeed(ds);
-					a.updateVelocity(time);
+					a.updateVelocity();
 //					double v0 = a.getV0();
 					double[] vv = a.getVelocity();
 					double mag = Math.sqrt(vv[0]*vv[0]+vv[1]*vv[1]);

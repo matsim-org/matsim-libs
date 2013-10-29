@@ -34,7 +34,7 @@ import playground.gregor.sim2d_v4.cgal.VoronoiCenter;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 
-
+						//EXPERIMENTAL [GL Oct'13]
 public class Sim2DAgent implements VoronoiCenter {
 	
 	//testing only
@@ -72,7 +72,7 @@ public class Sim2DAgent implements VoronoiCenter {
 
 	private VelocityUpdater vu;
 
-	private boolean emitPosEvents = true;
+	private boolean emitPosEvents = false;
 
 	/*package*/ int ttl; //workaround - think about this [gl August '13]
 
@@ -97,8 +97,8 @@ public class Sim2DAgent implements VoronoiCenter {
 		return this.veh;
 	}
 
-	public void updateVelocity(double time) {
-		this.vu.updateVelocity(time);
+	public void updateVelocity() {
+		this.vu.updateVelocity();
 	}
 
 
@@ -246,6 +246,7 @@ public class Sim2DAgent implements VoronoiCenter {
 		return Math.sqrt(this.v[0]*this.v[0]+this.v[1]*this.v[1]);
 	}
 
+	//EXPERIMENTAL 
 	@Override
 	public VoronoiCell getVoronoiCell() {
 		return this.voronoiCell;

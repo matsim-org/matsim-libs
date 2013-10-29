@@ -52,7 +52,7 @@ public class PerceivedPersonalSpaceApproach implements SpaceDependentSpeed {
 		List<GraphEdge> closed = new ArrayList<GraphEdge>();
 		for (GraphEdge ed : vc.getGraphEdges()) {
 
-			intersection(ed,obs,open,closed);
+//			intersection(ed,obs,open,closed);
 			double contr = ed.x1*ed.y2 - ed.x2*ed.y1;
 			double leftOf = CGAL.isLeftOfLine(ed.x2, ed.y2, x, y, ed.x1, ed.y1) < 0 ? -1 : 1;
 			contr *= leftOf;

@@ -32,6 +32,7 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 	private final Sim2DAgent agent;
 	private final LinkSwitcher ls;
 
+	
 	public NearestPointAtTargetLine(Sim2DAgent agent, LinkSwitcher ls) {
 		this.agent = agent;
 		this.ls = ls;

@@ -80,7 +80,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 
 	@Override
-	public void updateVelocity(double time) {
+	public void updateVelocity() {
 		
 
 
@@ -202,12 +202,12 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //			freeSpeed = v0;
 //		}
 //		System.out.println(v0);
-		double area = this.ps.computePersonalSpace(this.agent,neighbors);
-		if (area < 10 && area > 0.0001) {
-			double rho = Math.min(4, 1/area);
-			
-			freeSpeed = 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4)));
-		}
+//		double area = this.ps.computePersonalSpace(this.agent,neighbors);
+//		if (area < 10 && area > 0.0001) {
+//			double rho = Math.min(4, 1/area);
+//			
+//			freeSpeed = 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4)));
+//		}
 		
 		double vS = freeSpeed;
 //		double vS = v0;             

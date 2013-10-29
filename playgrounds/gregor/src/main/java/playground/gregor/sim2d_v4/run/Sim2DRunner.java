@@ -45,8 +45,6 @@ public class Sim2DRunner implements IterationStartsListener{
 
 	private Controler controller;
 	private QSimDensityDrawer qSimDrawer;
-	private HybridQ2DMobsimFactory factory;
-	private EventBasedVisDebuggerEngine test;
 
 	public static void main(String [] args) {
 		if (args.length != 3) {
