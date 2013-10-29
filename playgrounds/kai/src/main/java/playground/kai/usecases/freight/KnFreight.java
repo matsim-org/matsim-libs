@@ -104,8 +104,7 @@ final class KnFreight {
 				}
 				{
 					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-					CarrierReplanningStrategyModule module = new SolvePickupAndDeliveryProblem(router, scenario.getNetwork(), 
-							travelTimes) ;
+					CarrierReplanningStrategyModule module = new SolvePickupAndDeliveryProblem(scenario.getNetwork()) ;
 					strategy.addModule(module) ;
 					manager.addStrategy(strategy,0.1) ;
 				}
