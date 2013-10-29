@@ -128,6 +128,7 @@
 		<module>vsptelematics</module>
 		<module>vsp</module>
 		<module>ssix</module>
+		<module>qvanheerden</module>
 	</modules>
 	<repositories>
 		<repository>
