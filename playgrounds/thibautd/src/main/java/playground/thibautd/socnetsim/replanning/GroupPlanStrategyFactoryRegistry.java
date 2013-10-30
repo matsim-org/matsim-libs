@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import playground.thibautd.socnetsim.replanning.removers.CoalitionMinSelectorFactory;
+import playground.thibautd.socnetsim.replanning.removers.LexicographicRemoverFactory;
 import playground.thibautd.socnetsim.replanning.removers.MinimumSumOfMinimumLossSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.MinimumSumOfMinimumsSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.MinimumSumSelectorFactory;
@@ -74,7 +75,7 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory( "ParetoSelectExpBeta" , new ParetoExpBetaFactory() );
 		addFactory( "CoalitionSelectExpBeta" , new CoalitionExpBetaFactory() );
 
-		// default selectors
+		// default removers
 		// ---------------------------------------------------------------------
 		addRemoverFactory(
 				"MinimumWeightedSum",
@@ -97,6 +98,9 @@ public class GroupPlanStrategyFactoryRegistry {
 		addRemoverFactory(
 				"Coalition",
 				new CoalitionMinSelectorFactory());
+		addRemoverFactory(
+				"LexicographicPerComposition",
+				new LexicographicRemoverFactory());
 
 	}
 
