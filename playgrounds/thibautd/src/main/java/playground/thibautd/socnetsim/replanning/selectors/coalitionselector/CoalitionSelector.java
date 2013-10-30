@@ -133,7 +133,8 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			}
 		}
 
-		throw new RuntimeException();
+		markLeastPointedJointPlanAsInfeasible(
+				recordsPerJointPlan );
 	}
 
 	private static void markJointPlansAsInfeasible(
@@ -153,6 +154,33 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 		}
 
 		agents.remove( id );
+	}
+
+	private static void markLeastPointedJointPlanAsInfeasible(
+			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan) {
+		int minPoint = Integer.MAX_VALUE;
+		Map.Entry<JointPlan , Collection<PlanRecord>> toMark = null;
+		for ( Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {
+			final JointPlan jointPlan = entry.getKey();
+			final Collection<PlanRecord> records = entry.getValue();
+
+			int nPoint = 0;
+			for ( PlanRecord r : records ) {
+				if ( jointPlan.getIndividualPlan( r.getPlan().getPerson().getId() ) == r.getPlan() ) nPoint++;
+			}
+
+			if ( nPoint > 1 && nPoint < minPoint ) {
+				minPoint = nPoint;
+				toMark = entry;
+			}
+		}
+
+		if ( toMark == null ) {
+			throw new RuntimeException( "could not find least pointed joint plan in "+recordsPerJointPlan );
+		}
+
+		for ( PlanRecord r : toMark.getValue() ) r.setInfeasible();
+		recordsPerJointPlan.remove( toMark.getKey() );
 	}
 
 	private static boolean areAllPlansPointed(
