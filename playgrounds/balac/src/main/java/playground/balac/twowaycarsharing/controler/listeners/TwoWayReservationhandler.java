@@ -52,6 +52,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 	private HashMap<Id, CarSharingStation> stations = new HashMap<Id, CarSharingStation>();
 	private HashMap<Id, CarSharingStation> stationsByLink = new HashMap<Id, CarSharingStation>();
 	private HashMap<Id, Integer> reserved = new HashMap<Id, Integer>();
+	private HashMap<Id, Integer> activitiesCount = new HashMap<Id, Integer>();
 	private CarSharingStations carSharingStations;
 	private ArrayList<Id> personsId = new ArrayList<Id>();
 	private PlansCalcRouteFtInfo plansCalcRouteFtInfo;
@@ -80,6 +81,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 			  
 		  }
 		  reserved = new HashMap<Id, Integer>();
+		  activitiesCount = new HashMap<Id, Integer>();
 		  counter = 0;
 	  }	
 
@@ -103,7 +105,13 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 				  stations.put(event.getLinkId(), newCarsStation);
 				  
 			  }		  
-		  
+		  if ( activitiesCount.containsKey(event.getPersonId())) {
+			  
+			  activitiesCount.put(event.getPersonId(), activitiesCount.get(event.getPersonId()) + 1);
+		  }
+		  else {
+			  activitiesCount.put(event.getPersonId(), 1);
+		  }  
 	}	
 	public int getNumberOfReroutedLegs() {
 		return counter;
@@ -116,31 +124,25 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		// TODO Auto-generated method stub
-		if (!(map.containsKey(event.getPersonId())) || (!event.getActType().equals( "carsharingInteraction" ) && !map.get(event.getPersonId()).equals( "carsharing" ))) {
+		
+		
+		if (!(map.containsKey(event.getPersonId())) ||  (!event.getActType().equals("onewaycarsharingInteraction") && !map.get(event.getPersonId()).equals( "onewaycarsharing" ))) {
 			
 			//we need to check if the next activity is going to be carsharinginteraction
 		
-			int index = 0;
+			int carsharingwalkIndex = 0;
 			Plan plan = controler.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
-			boolean nextCS = false;
-			PlanElement fromPlanElement = null;
-			for (PlanElement pe: plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					if (((Activity) pe).getEndTime() == event.getTime()) {
-					
-						if ( ( (Leg)(plan.getPlanElements().get(plan.getPlanElements().indexOf(pe) + 1) )).getMode().equals( "carsharingwalk" ) ) {
-							index  = plan.getPlanElements().indexOf(pe) + 1;  //index of the carsharingwalk leg
-							nextCS = true;			
-							fromPlanElement = pe;
-							break;
-						}
-					}
+			boolean nextCS = false;   //indicator if the next leg is carsharingwalk leg			
+			if (activitiesCount.get(event.getPersonId()) == null) { //if this event is the end of the first activity in the plan
+				
+				if (((Leg)plan.getPlanElements().get(1)).getMode().equals("onewaycarsharingwalk")) {
+					carsharingwalkIndex  = 1;  //index of the carsharingwalk leg
+					nextCS = true;
 					
 				}
 				
 			}
-			
-			if (nextCS) {
+			else if (nextCS) {
 				
 				//find the closest station that has an available car
 				//reserve it, reroute the next carsharing leg if necessary 
@@ -152,7 +154,13 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 					
 					if ((reserved.get(css.getLinkId()) != null && stations.get(css.getLinkId()).getCars() - reserved.get(css.getLinkId()).intValue() > 0) || (reserved.get(css.getLinkId()) == null && stations.get(css.getLinkId()).getCars()  > 0)) {
 						
-							reRoute(plan.getPerson().getId(), (Activity)fromPlanElement, css, plan, index);
+						if (activitiesCount.get(event.getPersonId()) == null) 
+							reRoute( (Activity)plan.getPlanElements().get(0), css, plan, carsharingwalkIndex);
+							
+						
+						else 
+							reRoute( (Activity)plan.getPlanElements().get((2 * activitiesCount.get(event.getPersonId()) - 2)), css, plan, carsharingwalkIndex);
+						
 							if (!first) {
 								log.info("reRouting a person to a station different than the closest one");
 								counter++;
@@ -173,7 +181,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 		
 	}
 	
-	public void reRoute(Id personId, Activity activity, CarSharingStation station, Plan plan, int index) {
+	public void reRoute(Activity activity, CarSharingStation station, Plan plan, int index) {
 		Route carsharingWalkRoute;
 		LinkNetworkRouteImpl carsharingRoute;		
 		
@@ -289,8 +297,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 					}
 						
 				}				
-				if (indexEnd == -1) 
-					System.out.println("");
+				
 					//changing the end of the carsharing route, since we changed the starting station
 				departureTime = ((Activity)plan.getPlanElements().get(indexEnd - 1)).getEndTime();
 				ActivityFacilityImpl fromFacility =  (ActivityFacilityImpl) controler.getScenario().getActivityFacilities().getFacilities().get(((Activity)plan.getPlanElements().get(indexEnd - 1)).getFacilityId());

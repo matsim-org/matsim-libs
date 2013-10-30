@@ -53,6 +53,7 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 	private HashMap<Id, CarSharingStation> stations = new HashMap<Id, CarSharingStation>();
 	private HashMap<Id, CarSharingStation> stationsByLink = new HashMap<Id, CarSharingStation>();
 	private HashMap<Id, Integer> reserved = new HashMap<Id, Integer>();
+	private HashMap<Id, Integer> activitiesCount = new HashMap<Id, Integer>();
 	private CarSharingStations carSharingStations;
 	private ArrayList<Id> personsId = new ArrayList<Id>();
 	private PlansCalcRouteFtInfo plansCalcRouteFtInfo;
@@ -82,13 +83,14 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 			  
 		  }
 		  reserved = new HashMap<Id, Integer>();
+		  activitiesCount = new HashMap<Id, Integer>();
 		  reRoutedLegs = 0;
 	  }	
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		// TODO Auto-generated method stub
-		
+			
 		  if (event.getActType().equals("onewaycarsharingInteraction") && !map.get(event.getPersonId()).equals( "onewaycarsharing" )) {
 			  if (reserved.get(event.getLinkId()) != null)
 				  reserved.put(event.getLinkId(), reserved.get(event.getLinkId()) - 1);
@@ -104,7 +106,14 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 				  CarSharingStation newCarsStation = new CarSharingStation(stations.get(event.getLinkId()).getId(), stations.get(event.getLinkId()).getCoord(), stations.get(event.getLinkId()).getLink(), x);
 				  stations.put(event.getLinkId(), newCarsStation);
 				  
-			  }		  
+			  }
+		  if ( activitiesCount.containsKey(event.getPersonId())) {
+			  
+			  activitiesCount.put(event.getPersonId(), activitiesCount.get(event.getPersonId()) + 1);
+		  }
+		  else {
+			  activitiesCount.put(event.getPersonId(), 2);   //counting the home activity at the beginning of the plan
+		  }
 		  
 	}	
 	public int getNumberOfReroutedLegs() {
@@ -118,30 +127,28 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		// TODO Auto-generated method stub
+		
+		
 		if (!(map.containsKey(event.getPersonId())) ||  (!event.getActType().equals("onewaycarsharingInteraction") && !map.get(event.getPersonId()).equals( "onewaycarsharing" ))) {
 			
 			//we need to check if the next activity is going to be carsharinginteraction
 		
 			int carsharingwalkIndex = 0;
 			Plan plan = controler.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
-			boolean nextCS = false;   //indicator if the next leg is carsharingwalk leg
-			PlanElement fromPlanElement = null;
-			for (PlanElement pe: plan.getPlanElements()) {
-				if (pe instanceof Activity) {
-					if (((Activity) pe).getEndTime() == event.getTime()) {
-					
-						if ( ( (Leg)(plan.getPlanElements().get(plan.getPlanElements().indexOf(pe) + 1) )).getMode().equals( "onewaycarsharingwalk" )) {
-							carsharingwalkIndex  = plan.getPlanElements().indexOf(pe) + 1;  //index of the carsharingwalk leg
-							nextCS = true;			
-							fromPlanElement = pe;
-							break;
-						}
-					}
+			boolean nextCS = false;   //indicator if the next leg is carsharingwalk leg			
+			if (activitiesCount.get(event.getPersonId()) == null) {
+				
+				if (((Leg)plan.getPlanElements().get(1)).getMode().equals("onewaycarsharingwalk")) {
+					carsharingwalkIndex  = 1;  //index of the carsharingwalk leg
+					nextCS = true;
 					
 				}
 				
 			}
-			
+			else if ( ( (Leg)(plan.getPlanElements().get((2 * activitiesCount.get(event.getPersonId()) - 1)))).getMode().equals( "onewaycarsharingwalk" )) {
+				carsharingwalkIndex  = 2 * activitiesCount.get(event.getPersonId()) - 1;  //index of the carsharingwalk leg
+				nextCS = true;
+			}
 			if (nextCS) {
 				
 				//find the closest station that has an available car
@@ -153,8 +160,12 @@ public class OneWayReservationHandler implements  PersonArrivalEventHandler, Act
 				for (CarSharingStation css: closest) {
 					
 					if ((reserved.get(css.getLinkId()) != null && stations.get(css.getLinkId()).getCars() - reserved.get(css.getLinkId()).intValue() > 0) || (reserved.get(css.getLinkId()) == null && stations.get(css.getLinkId()).getCars()  > 0)) {
-						
-							reRoute( (Activity)fromPlanElement, css, plan, carsharingwalkIndex);
+							if (activitiesCount.get(event.getPersonId()) == null) 
+								reRoute( (Activity)plan.getPlanElements().get(0), css, plan, carsharingwalkIndex);
+								
+							
+							else 
+								reRoute( (Activity)plan.getPlanElements().get((2 * activitiesCount.get(event.getPersonId()) - 2)), css, plan, carsharingwalkIndex);
 							if (!first) {
 								log.info("reRouting a person to a station different than the closest one");
 								reRoutedLegs++;
