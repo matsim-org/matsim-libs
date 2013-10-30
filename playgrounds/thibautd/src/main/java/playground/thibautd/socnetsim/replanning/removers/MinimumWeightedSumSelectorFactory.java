@@ -17,17 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.thibautd.socnetsim.replanning.selectors.factories;
+package playground.thibautd.socnetsim.replanning.removers;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
-import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
+import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup;
 
-public class CoalitionMinSelectorFactory extends AbstractDumbRemoverFactory {
+public class MinimumWeightedSumSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry registry) {
-		return new CoalitionSelector( new InverseScoreWeight() );
+			final ControllerRegistry controllerRegistry) {
+		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
+				controllerRegistry.getScenario().getConfig().getModule(
+					GroupReplanningConfigGroup.GROUP_NAME );
+		return new HighestWeightSelector(
+				true ,
+				controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+				new WeightedWeight(
+					new InverseScoreWeight(),
+					weights.getWeightAttributeName(),
+					controllerRegistry.getScenario().getPopulation().getPersonAttributes()  ));
 	}
 }

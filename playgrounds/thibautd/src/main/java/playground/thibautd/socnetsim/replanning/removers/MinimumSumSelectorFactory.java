@@ -17,23 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.thibautd.socnetsim.replanning.selectors.factories;
-
-import org.matsim.core.gbl.MatsimRandom;
+package playground.thibautd.socnetsim.replanning.removers;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
-import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
+import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 
-public class WhoIsTheBossMinSelectorFactory extends AbstractDumbRemoverFactory {
+public class MinimumSumSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry controllerRegistry) {
-		return new WhoIsTheBossSelector(
-				true ,
-				MatsimRandom.getLocalInstance(),
-				controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-				new InverseScoreWeight() );
+		return new LowestScoreSumSelectorForRemoval(
+				controllerRegistry.getIncompatiblePlansIdentifierFactory());
 	}
 }

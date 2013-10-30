@@ -17,25 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.thibautd.socnetsim.replanning.selectors.factories;
+package playground.thibautd.socnetsim.replanning.removers;
 
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 
-public class MinimumSumOfMinimumLossSelectorFactory extends AbstractDumbRemoverFactory {
+public class MinimumSumOfMinimumsSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry controllerRegistry) {
 		final WeightCalculator baseWeight =
 			new LowestScoreOfJointPlanWeight(
-					new LossWeight(),
 					controllerRegistry.getJointPlans());
 		return new HighestWeightSelector(
 				true ,

@@ -17,28 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.thibautd.socnetsim.replanning.selectors.factories;
+package playground.thibautd.socnetsim.replanning.removers;
+
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
-import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 
-public class MinimumWeightedSumSelectorFactory extends AbstractDumbRemoverFactory {
+public class WhoIsTheBossMinSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry controllerRegistry) {
-		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
-				controllerRegistry.getScenario().getConfig().getModule(
-					GroupReplanningConfigGroup.GROUP_NAME );
-		return new HighestWeightSelector(
+		return new WhoIsTheBossSelector(
 				true ,
+				MatsimRandom.getLocalInstance(),
 				controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-				new WeightedWeight(
-					new InverseScoreWeight(),
-					weights.getWeightAttributeName(),
-					controllerRegistry.getScenario().getPopulation().getPersonAttributes()  ));
+				new InverseScoreWeight() );
 	}
 }

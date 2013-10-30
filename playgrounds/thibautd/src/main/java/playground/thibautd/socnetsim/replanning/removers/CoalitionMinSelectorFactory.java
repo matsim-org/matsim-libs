@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractDumbRemoverFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,26 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors.factories;
+
+package playground.thibautd.socnetsim.replanning.removers;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.DumbExtraPlanRemover;
-import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
-import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
+import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
 
-/**
- * @author thibautd
- */
-abstract class AbstractDumbRemoverFactory implements ExtraPlanRemoverFactory {
-
+public class CoalitionMinSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
-	public ExtraPlanRemover createRemover(final ControllerRegistry registry) {
-		return new DumbExtraPlanRemover(
-				createSelector( registry ),
-				registry.getScenario().getConfig().strategy().getMaxAgentPlanMemorySize() );
+	public GroupLevelPlanSelector createSelector(
+			final ControllerRegistry registry) {
+		return new CoalitionSelector( new InverseScoreWeight() );
 	}
-
-	protected abstract GroupLevelPlanSelector createSelector(final ControllerRegistry registry);
 }
-

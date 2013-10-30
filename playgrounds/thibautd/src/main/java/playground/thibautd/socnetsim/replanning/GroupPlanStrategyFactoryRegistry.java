@@ -22,14 +22,13 @@ package playground.thibautd.socnetsim.replanning;
 import java.util.HashMap;
 import java.util.Map;
 
-
-import playground.thibautd.socnetsim.replanning.selectors.factories.CoalitionMinSelectorFactory;
-import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumOfMinimumLossSelectorFactory;
-import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumOfMinimumsSelectorFactory;
-import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumSelectorFactory;
-import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumWeightedSumSelectorFactory;
-import playground.thibautd.socnetsim.replanning.selectors.factories.ParetoMinSelectorFactory;
-import playground.thibautd.socnetsim.replanning.selectors.factories.WhoIsTheBossMinSelectorFactory;
+import playground.thibautd.socnetsim.replanning.removers.CoalitionMinSelectorFactory;
+import playground.thibautd.socnetsim.replanning.removers.MinimumSumOfMinimumLossSelectorFactory;
+import playground.thibautd.socnetsim.replanning.removers.MinimumSumOfMinimumsSelectorFactory;
+import playground.thibautd.socnetsim.replanning.removers.MinimumSumSelectorFactory;
+import playground.thibautd.socnetsim.replanning.removers.MinimumWeightedSumSelectorFactory;
+import playground.thibautd.socnetsim.replanning.removers.ParetoMinSelectorFactory;
+import playground.thibautd.socnetsim.replanning.removers.WhoIsTheBossMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CliqueJointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinLossSelectExpBetaFactory;

@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * AbstractDumbRemoverFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,23 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.thibautd.socnetsim.replanning.selectors.factories;
+package playground.thibautd.socnetsim.replanning.removers;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.replanning.DumbExtraPlanRemover;
+import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
+import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
-import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 
-public class ParetoMinSelectorFactory extends AbstractDumbRemoverFactory {
+/**
+ * @author thibautd
+ */
+abstract class AbstractDumbRemoverFactory implements ExtraPlanRemoverFactory {
+
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry controllerRegistry) {
-		return new HighestWeightSelector(
-				true ,
-				controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-				new ParetoWeight(
-					new InverseScoreWeight() ) );
+	public ExtraPlanRemover createRemover(final ControllerRegistry registry) {
+		return new DumbExtraPlanRemover(
+				createSelector( registry ),
+				registry.getScenario().getConfig().strategy().getMaxAgentPlanMemorySize() );
 	}
+
+	protected abstract GroupLevelPlanSelector createSelector(final ControllerRegistry registry);
 }
+
