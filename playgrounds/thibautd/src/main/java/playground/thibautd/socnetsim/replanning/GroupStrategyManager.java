@@ -35,7 +35,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 /**
  * Implements the group-level replanning logic.
@@ -52,14 +51,11 @@ public class GroupStrategyManager {
 	private final Random random;
 
 	public GroupStrategyManager(
-			final GroupLevelPlanSelector selectorForRemoval,
 			final GroupStrategyRegistry registry,
-			final int maxPlanPerAgent) {
+			final ExtraPlanRemover remover) {
 		this.registry = registry;
 		this.random = MatsimRandom.getLocalInstance();
-		this.remover = new DumbExtraPlanRemover(
-				selectorForRemoval,
-				maxPlanPerAgent );
+		this.remover = remover;
 	}
 
 	public final void run(
