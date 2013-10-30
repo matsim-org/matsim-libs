@@ -112,11 +112,12 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 		
 		this.tripsFileName = tripsFileName;
 		this.durationsFileName = durationsFileName;
-		this.createGraphs = createGraphs;
+		this.sortedModes.addAll(modes);
 		if (observedAgents != null) {
 			// make a copy to prevent people changing the set over the iterations
 			this.observedAgents = new HashSet<Id>(observedAgents);			
 		} else this.observedAgents = null;
+		this.createGraphs = createGraphs;
 	}
 	
 	public void setCreateGraphs(boolean createGraphs) {
