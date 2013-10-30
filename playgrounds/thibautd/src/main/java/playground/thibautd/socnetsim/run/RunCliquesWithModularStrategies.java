@@ -308,7 +308,6 @@ public class RunCliquesWithModularStrategies {
 			RunUtils.loadDefaultAnalysis(
 					weights.getGraphWriteInterval(),
 					cliques,
-					strategyManager,
 					controller );
 		}
 

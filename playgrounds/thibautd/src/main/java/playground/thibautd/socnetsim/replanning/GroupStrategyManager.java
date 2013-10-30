@@ -21,7 +21,6 @@ package playground.thibautd.socnetsim.replanning;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +29,11 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
@@ -52,22 +48,18 @@ public class GroupStrategyManager {
 
 	private final GroupStrategyRegistry registry;
 
-	private final GroupLevelPlanSelector selectorForRemoval;
-	private final int maxPlanPerAgent;
+	private final ExtraPlanRemover remover;
 	private final Random random;
-	private RemovedPlanListener removalListener = new RemovedPlanListener() {
-		@Override
-		public void notifyPlanRemovedForAgent(Plan plan, Person person) {}
-	};
 
 	public GroupStrategyManager(
 			final GroupLevelPlanSelector selectorForRemoval,
 			final GroupStrategyRegistry registry,
 			final int maxPlanPerAgent) {
-		this.selectorForRemoval = selectorForRemoval;
 		this.registry = registry;
-		this.maxPlanPerAgent = maxPlanPerAgent;
 		this.random = MatsimRandom.getLocalInstance();
+		this.remover = new DumbExtraPlanRemover(
+				selectorForRemoval,
+				maxPlanPerAgent );
 	}
 
 	public final void run(
@@ -80,7 +72,7 @@ public class GroupStrategyManager {
 		final Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
 			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
 		for (ReplanningGroup g : groups) {
-			removeExtraPlans(
+			remover.removePlansInGroup(
 					jointPlans,
 					g );
 
@@ -108,94 +100,6 @@ public class GroupStrategyManager {
 		}
 	}
 
-	private final void removeExtraPlans(
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		int c = 0;
-		while ( removeOneExtraPlan( jointPlans , group ) ) c++;
-		if (c > 0) {
-			// in the clique setting, it is impossible.
-			// replace by a warning (or nothing) when there is a setting
-			// in which this makes sense.
-			throw new RuntimeException( (c+1)+" removal iterations were performed for group "+group );
-		}
-	}
-
-	private final boolean removeOneExtraPlan(
-			final JointPlans jointPlans,
-			final ReplanningGroup group) {
-		if (log.isTraceEnabled()) log.trace( "removing plans for group "+group );
-		if (maxPlanPerAgent <= 0) return false;
-
-		GroupPlans toRemove = null;
-		boolean stillSomethingToRemove = false;
-		final List<Person> personsToHandle = new ArrayList<Person>( group.getPersons() );
-		while ( !personsToHandle.isEmpty() ) {
-			final Person person = personsToHandle.remove( 0 );
-			if (person.getPlans().size() <= maxPlanPerAgent) continue;
-			if (log.isTraceEnabled()) log.trace( "Too many plans for person "+person );
-
-			if (toRemove == null) {
-				toRemove = selectorForRemoval.selectPlans( jointPlans , group );
-				if (log.isTraceEnabled()) log.trace( "plans to remove will be taken from "+toRemove );
-				if ( toRemove == null ) {
-					throw new RuntimeException(
-							"The selector for removal returned no plan "
-							+"for group "+group );
-				}
-			}
-
-			for (Plan plan : toRemove( jointPlans , person , toRemove )) {
-				final Person personToHandle = plan.getPerson();
-				if (log.isTraceEnabled()) log.trace( "removing plan "+plan+" for person "+personToHandle );
-				removalListener.notifyPlanRemovedForAgent( plan , personToHandle );
-
-				if ( personToHandle != person ) {
-					final boolean removed = personsToHandle.remove( personToHandle );
-					if ( !removed ) throw new RuntimeException( "person "+personToHandle+" is not part of the persons to handle!" );
-				}
-
-				final boolean removed = personToHandle.getPlans().remove( plan );
-				if ( !removed ) throw new RuntimeException( "could not remove plan "+plan+" of person "+personToHandle );
-
-				final JointPlan jpToRemove = jointPlans.getJointPlan( plan );
-				if ( jpToRemove != null ) jointPlans.removeJointPlan( jpToRemove );
-			}
-
-			if (!stillSomethingToRemove && person.getPlans().size() > maxPlanPerAgent) {
-				stillSomethingToRemove = true;
-			}
-		}
-
-		if (stillSomethingToRemove && log.isTraceEnabled()) {
-			log.trace( "still something to remove for group "+group );
-		}
-
-		return stillSomethingToRemove;
-	}
-
-	private static final Collection<Plan> toRemove(
-			final JointPlans jointPlans,
-			final Person person,
-			final GroupPlans toRemove) {
-		for (Plan plan : person.getPlans()) {
-			JointPlan jp = jointPlans.getJointPlan( plan );
-
-			if (jp != null && toRemove.getJointPlans().contains( jp )) {
-				return jp.getIndividualPlans().values();
-			}
-
-			if (jp == null && toRemove.getIndividualPlans().contains( plan )) {
-				return Collections.singleton( plan );
-			}
-		}
-		throw new IllegalArgumentException();
-	}
-
-	public void setRemovedPlanListener(final RemovedPlanListener l) {
-		this.removalListener = l;
-	}
-
 	private static void logAlloc(
 			final ReplanningGroup g,
 			final GroupPlanStrategy strategy) {
@@ -205,10 +109,6 @@ public class GroupStrategyManager {
 		for (Person p : g.getPersons()) ids.add( p.getId() );
 
 		log.trace( "group "+ids+" gets strategy "+strategy );
-	}
-
-	public static interface RemovedPlanListener {
-		public void notifyPlanRemovedForAgent(Plan plan, Person person);
 	}
 }
 

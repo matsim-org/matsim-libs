@@ -53,9 +53,7 @@ import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
-import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
-import playground.thibautd.socnetsim.replanning.RankOfRemovedPlanListener;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
@@ -110,7 +108,6 @@ public class RunUtils {
 	public static void loadDefaultAnalysis(
 			final int graphWriteInterval,
 			final FixedGroupsIdentifier cliques,
-			final GroupStrategyManager strategyManager,
 			final ImmutableJointController controller) {
 		controller.addControlerListener(
 				new LegHistogramListenerWithoutControler(
@@ -154,13 +151,6 @@ public class RunUtils {
 					controller.getRegistry().getScenario(),
 					new JointMainModeIdentifier( new MainModeIdentifierImpl() ),
 					actTypesForAnalysis));
-
-		final RankOfRemovedPlanListener removalListener =
-			new RankOfRemovedPlanListener(
-					controller.getControlerIO().getOutputFilename(
-						"removedPlansRank.dat" ) );
-		controller.addControlerListener( removalListener );
-		strategyManager.setRemovedPlanListener( removalListener );
 	}
 
 	public static void addConsistencyCheckingListeners(final ImmutableJointController controller) {
