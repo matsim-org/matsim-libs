@@ -82,6 +82,7 @@ public class Visualiser {
 		mobsimFactory.setWithinDayActivityReScheduling(true);
 		
 		EventsManager events = EventsUtils.createEventsManager();
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
 		Mobsim mobsim = mobsimFactory.createMobsim(scenario, events);
 		
 		if(live){
