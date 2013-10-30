@@ -111,7 +111,7 @@ public class UserGroupUtils {
 		for(UserGroup userGroup : UserGroup.values()){
 			Population userGroupPop = personFilter.getPopulation(scenario.getPopulation(), userGroup);
 			double userWelfareOfGroup = ubc.calculateUtility_money(userGroupPop);
-			int personWithNoValidPlanCnt = ubc.getNoValidPlanCnt();
+			int personWithNoValidPlanCnt = ubc.getPersonsWithoutValidPlanCnt();
 			logger.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0'') in group " + userGroup + " : " + personWithNoValidPlanCnt);
 			userGroup2Logsum.put(userGroup, userWelfareOfGroup);
 		}

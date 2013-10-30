@@ -117,14 +117,12 @@ public class SpatialAveragingWelfare {
 		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
 		mpr.readFile(plansFile1);
 		
-		logger.info("Starting user benefits calculation.");
 		Config config = scenario.getConfig();
 		Population pop = scenario.getPopulation();
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
 		ubc.calculateUtility_money(pop);
 		Map<Id, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
-		logger.info("There were " + ubc.getNoValidPlanCnt() + " persons without any valid plan.");
-		logger.info("Finished user benefits calculation for " + runNumber1 + ".");
+		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 		
 		double [][] weightsBaseCase = calculateWeights(personId2Utility, pop);
 		double [][] normalizedWeightsBaseCase = normalizeArray(weightsBaseCase);
@@ -144,14 +142,12 @@ public class SpatialAveragingWelfare {
 			MatsimPopulationReader mpr2 = new MatsimPopulationReader(scenario2);
 			mpr2.readFile(plansFile2);
 			
-			logger.info("Starting user benefits calculation.");
 			Config config2 = scenario2.getConfig();
 			Population pop2 = scenario2.getPopulation();
 			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM);
 			ubc2.calculateUtility_money(pop2);
 			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
-			logger.info("There were " + ubc2.getNoValidPlanCnt() + " persons without any valid plan.");
-			logger.info("Finished user benefits calculation for " + runNumber2 +".");
+			logger.info("There were " + ubc2.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 			
 			double [][] weightsPolicyCase = calculateWeights(personId2Utility2, pop2);
 			double [][] normalizedWeightsPolicyCase = normalizeArray(weightsPolicyCase);
@@ -251,6 +247,7 @@ public class SpatialAveragingWelfare {
 			Coord homeCoord = findHomeCoord(person);
 			if (isInResearchArea(homeCoord)){
 				double personCount = 1.0;
+				// one person stands for this.scalingFactor persons
 				double scaledPersonCount = this.scalingFactor * personCount;
 				for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){
 					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
@@ -272,6 +269,7 @@ public class SpatialAveragingWelfare {
 			Coord homeCoord = findHomeCoord(person);
 			if (isInResearchArea(homeCoord)){
 				double benefitOfPerson = personId2Utility.get(personId);
+				// one person stands for this.scalingFactor persons; thus, that person earns the sum of these person's benefits (additivity required!)
 				double scaledBenefitOfPerson = this.scalingFactor * benefitOfPerson;
 
 				for(int xIndex = 0 ; xIndex < noOfXbins; xIndex++){

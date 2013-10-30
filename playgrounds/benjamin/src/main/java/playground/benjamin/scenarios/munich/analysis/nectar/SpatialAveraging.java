@@ -118,14 +118,11 @@ public class SpatialAveraging {
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.;
+	final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean compareToBaseCase = true;
 	
-//	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_g = new HashMap<Double, Map<Id,Map<String,Double>>>();
-//	Map<Double, Map<Id, Double>> time2DemandMapToAnalyze_vkm = new HashMap<Double, Map<Id,Double>>();
-
-
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile1);
 		this.listOfPollutants = emissionUtils.getListOfPollutants();
@@ -148,14 +145,23 @@ public class SpatialAveraging {
 
 		
 		Map<Double, double[][]> time2WeightedEmissions1 = fillWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered1);
+		Map<Double, double[][]> time2NormalizedWeightedEmissions1 = normalizeAllArrays(time2WeightedEmissions1);
+				
 		Map<Double, double[][]> time2WeightedDemand1 = fillWeightedDemandValues(time2CountsPerLinkFilledAndFiltered1);
-		Map<Double, double[][]> time2SpecificEmissions = calculateSpecificEmissionsPerBin(time2WeightedEmissions1, time2WeightedDemand1);
+		Map<Double, double[][]> time2NormalizedWeightedDemand1 = normalizeAllArrays(time2WeightedDemand1);
+		
+		/* Sum over weighted values for cell does not need to be normalized, since normalization canceles out.
+		 * Result is an average value for cell 
+		 * TODO: check if results look similar...*/
+		Map<Double, double[][]> time2SpecificEmissions1 = calculateSpecificEmissionsPerBin(time2WeightedEmissions1, time2WeightedDemand1);
+//		Map<Double, double[][]> time2SpecificEmissions1 = calculateSpecificEmissionsPerBin(time2NormalizedWeightedEmissions1, time2NormalizedWeightedDemand1);
+		
 
 		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 		for(double endOfTimeInterval: time2WeightedEmissions1.keySet()){
-			writeRoutput(time2WeightedEmissions1.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
-			writeRoutput(time2WeightedDemand1.get(endOfTimeInterval), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
-			writeRoutput(time2SpecificEmissions.get(endOfTimeInterval), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
+			writeRoutput(time2NormalizedWeightedEmissions1.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
+			writeRoutput(time2NormalizedWeightedDemand1.get(endOfTimeInterval), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
+			writeRoutput(time2SpecificEmissions1.get(endOfTimeInterval), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
 			
 //			writeGISoutput(time2WeightedEmissions1, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp");
 //			writeGISoutput(time2WeightedDemand1, outPathStub + ".GISoutput.Demand.vkm.movie.shp");
@@ -174,11 +180,23 @@ public class SpatialAveraging {
 			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered2 = setNonCalculatedCountsAndFilter(time2CountsPerLink2);
 
 			Map<Double, double[][]> time2WeightedEmissions2 = fillWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered2);
+			Map<Double, double[][]> time2NormalizedWeightedEmissions2 = normalizeAllArrays(time2WeightedEmissions2);
+			
 			Map<Double, double[][]> time2WeightedDemand2 = fillWeightedDemandValues(time2CountsPerLinkFilledAndFiltered2);
-
-			Map<Double, double[][]> time2AbsoluteEmissionDifferences = calculateAbsoluteDifferencesPerBin(time2WeightedEmissions1, time2WeightedEmissions2);
-			Map<Double, double[][]> time2AbsoluteDemandDifferences = calculateAbsoluteDifferencesPerBin(time2WeightedDemand1, time2WeightedDemand2);
-			Map<Double, double[][]> time2SpecificEmissionDifferences = calculateSpecificEmissionDifferencesPerBin(time2WeightedEmissions1, time2WeightedEmissions2, time2WeightedDemand1, time2WeightedDemand2);
+			Map<Double, double[][]> time2NormalizedWeightedDemand2 = normalizeAllArrays(time2WeightedDemand2);
+			
+			/* Sum over weighted values for cell does not need to be normalized, since normalization canceles out.
+			 * Result is an average value for cell 
+			 * TODO: check if results look similar...*/
+			Map<Double, double[][]> time2SpecificEmissions2 = calculateSpecificEmissionsPerBin(time2WeightedEmissions2, time2WeightedDemand2);
+//			Map<Double, double[][]> time2SpecificEmissions2 = calculateSpecificEmissionsPerBin(time2NormalizedWeightedEmissions2, time2NormalizedWeightedDemand2);
+			
+			/* Sum over weighted values for cell is normalized to "per sqkm" (dependent on calcluateWeightOfLinkForCell)
+			 * Values NEED to be additive (e.g. vkm, g, counts, or AVERAGE g/vkm!)
+			 * Make sure coordinate system is metric */
+			Map<Double, double[][]> time2AbsoluteEmissionDifferences = calculateAbsoluteDifferencesPerBin(time2NormalizedWeightedEmissions1, time2NormalizedWeightedEmissions2);
+			Map<Double, double[][]> time2AbsoluteDemandDifferences = calculateAbsoluteDifferencesPerBin(time2NormalizedWeightedDemand1, time2NormalizedWeightedDemand2);
+			Map<Double, double[][]> time2SpecificEmissionDifferences = calculateAbsoluteDifferencesPerBin(time2SpecificEmissions1, time2SpecificEmissions2);
 
 			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
 			for(double endOfTimeInterval : time2AbsoluteDemandDifferences.keySet()){
@@ -317,30 +335,6 @@ public class SpatialAveraging {
 		return time2weightedDemand;
 	}
 
-	private Map<Double, double[][]> calculateSpecificEmissionDifferencesPerBin(
-			Map<Double, double[][]> time2weightedEmissions1,
-			Map<Double, double[][]> time2weightedEmissions2,
-			Map<Double, double[][]> time2weightedDemand1,
-			Map<Double, double[][]> time2weightedDemand2) {
-
-		Map<Double, double[][]> time2specificEmissionDifferences = new HashMap<Double, double[][]>();
-		//  calculate specific emission differences for each x,y-bin
-		for(Double endOfTimeInterval : time2weightedEmissions1.keySet()){
-			// calculate specific emission differences
-			double[][] specificEmissionDifferences = new double[noOfXbins][noOfYbins];
-
-			for(int xIndex=0; xIndex<noOfXbins; xIndex++){
-				for (int yIndex=0; yIndex<noOfYbins; yIndex++){
-					specificEmissionDifferences[xIndex][yIndex]=
-							time2weightedEmissions2.get(endOfTimeInterval)[xIndex][yIndex] / time2weightedDemand2.get(endOfTimeInterval)[xIndex][yIndex]
-									- time2weightedEmissions1.get(endOfTimeInterval)[xIndex][yIndex] / time2weightedDemand1.get(endOfTimeInterval)[xIndex][yIndex];
-				}
-			}
-			time2specificEmissionDifferences.put(endOfTimeInterval, specificEmissionDifferences);
-		}
-		return time2specificEmissionDifferences;
-	}
-	
 	private Map<Double, double[][]> calculateSpecificEmissionsPerBin(
 			Map<Double, double[][]> time2weightedEmissions,
 			Map<Double, double[][]> time2weightedDemand) {
@@ -351,9 +345,6 @@ public class SpatialAveraging {
 			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
 					specificEmissions[xIndex][yIndex] = time2weightedEmissions.get(endOfTimeInterval)[xIndex][yIndex] / time2weightedDemand.get(endOfTimeInterval)[xIndex][yIndex];
-					
-					/* Sum over weighted values for cell does not need to be normalized, since normalization canceles out.
-					 * Result is an average value for cell */
 				}
 			}
 			time2specificEmissions.put(endOfTimeInterval, specificEmissions);
@@ -361,19 +352,16 @@ public class SpatialAveraging {
 		return time2specificEmissions;
 	}
 	
-	private Map<Double, double[][]> calculateAbsoluteDifferencesPerBin(Map<Double, double[][]> time2weightedValues1, Map<Double, double[][]> time2weightedValues2){
+	private Map<Double, double[][]> calculateAbsoluteDifferencesPerBin(
+			Map<Double, double[][]> time2weightedValues1,
+			Map<Double, double[][]> time2weightedValues2){
+		
 		Map<Double, double[][]> time2absoluteDifferences = new HashMap<Double, double[][]>();
-		final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
 		for(Double endOfTimeInterval : time2weightedValues1.keySet()){
 			double [][] absoluteDifferences = new double[noOfXbins][noOfYbins];
 			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
 					absoluteDifferences[xIndex][yIndex] = time2weightedValues2.get(endOfTimeInterval)[xIndex][yIndex] - time2weightedValues1.get(endOfTimeInterval)[xIndex][yIndex];
-					
-					/* Sum over weighted values for cell is normalized to "per sqkm" (dependent on calcluateWeightOfLinkForCell)
-					 * Values NEED to be additive (e.g. vkm, g, counts, ...)
-					 * Make sure coordinate system is metric */
-					absoluteDifferences[xIndex][yIndex] /= area_in_smoothing_circle_sqkm; 
 				}
 			}
 			time2absoluteDifferences.put(endOfTimeInterval, absoluteDifferences);
@@ -381,20 +369,24 @@ public class SpatialAveraging {
 		return time2absoluteDifferences;
 	}
 
-	private Map<Double, double[][]> scale(Map<Double, double[][]> time2weightedValues){
-		Map<Double, double[][]> time2scaledValues = new HashMap<Double, double[][]>();
-		
-		for(Double endOfTimeInterval : time2weightedValues.keySet()){
-			double [][] unscaledValues = time2weightedValues.get(endOfTimeInterval);
-			double [][] scaledValues = new double[noOfXbins][noOfYbins];
-			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-					scaledValues[xIndex][yIndex] = this.scalingFactor * unscaledValues[xIndex][yIndex];
-				}
+	private Map<Double, double[][]> normalizeAllArrays(
+			Map<Double, double[][]> time2Array) {
+		Map<Double, double[][]> time2NormalizedArray = new HashMap<Double, double[][]>();
+			for(Double endOfTimeInterval : time2Array.keySet()){
+				double[][] normalizedArray = normalizeArray(time2Array.get(endOfTimeInterval));
+				time2NormalizedArray.put(endOfTimeInterval, normalizedArray);
 			}
-			time2scaledValues.put(endOfTimeInterval, scaledValues);
+		return time2NormalizedArray;
+	}
+
+	private double[][] normalizeArray(double[][] array) {
+		double [][] normalizedArray = new double[noOfXbins][noOfYbins];
+		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
+				normalizedArray[xIndex][yIndex] = array[xIndex][yIndex] / this.area_in_smoothing_circle_sqkm;
+			}
 		}
-		return time2scaledValues;
+		return normalizedArray;
 	}
 	
 	private boolean isInMunich(Coord cellCentroid) {

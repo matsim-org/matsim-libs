@@ -77,7 +77,7 @@ public class MultiAnalyzerWriter {
 				Population userGroupPop = personFilter.getPopulation(pop, userGroup);
 
 				double userWelfareOfGroup = userBenefitsCalculator.calculateUtility_money(userGroupPop);
-				int personWithNoValidPlanCnt = userBenefitsCalculator.getNoValidPlanCnt();
+				int personWithNoValidPlanCnt = userBenefitsCalculator.getPersonsWithoutValidPlanCnt();
 				logger.warn(runName + ": users with no valid plan (all scores ``== null'' or ``<= 0.0'') in group " + userGroup + " : " + personWithNoValidPlanCnt);
 				
 				double tollRevenueOfGroup = 0.0;

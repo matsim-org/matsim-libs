@@ -43,7 +43,7 @@ public class UserBenefitsCalculator {
 	private final WelfareMeasure welfareMeasure;
 	private int nullScore = 0;
 	private int minusScore = 0;
-	private int noValidPlanScore = 0;
+	private int personsWithoutValidPlanScore = 0;
 	private final int maxWarnCnt = 3;
 	private final Map<Id, Double> personId2Utility = new HashMap<Id, Double>();
 	private final Map<Id, Double> personId2MonetizedUtility = new HashMap<Id, Double>();
@@ -59,32 +59,36 @@ public class UserBenefitsCalculator {
 	public void reset() {
 		nullScore = 0;
 		minusScore = 0;
-		noValidPlanScore = 0;
+		personsWithoutValidPlanScore = 0;
 	}
 
 	public double calculateUtility_utils(Population pop){
-		double utility_utils = 0.0;
-		
+		double sumOfUtility_utils = 0.0;
+		logger.info("Starting user benefits calculation...");
+		logger.info("Benefits will be computed in units of UTILITY.");
+		logger.info("The welfare measure is " + this.welfareMeasure + ".");
 		for(Person person : pop.getPersons().values()){
 			double utilityOfPerson_utils = calculateUtilityOfPerson_utils(person);
 			this.personId2Utility.put(person.getId(), utilityOfPerson_utils);
-			utility_utils += utilityOfPerson_utils;
+			sumOfUtility_utils = utilityOfPerson_utils;
 		}
-		return utility_utils;
-		
+		logger.info("Finished user benefits calculation...");
+		return sumOfUtility_utils;
 	}
 	
 	public double calculateUtility_money(Population pop) {
-		double utility_money = 0.0;
-
+		double sumOfUtility_money = 0.0;
+		logger.info("Starting user benefits calculation...");
+		logger.info("Benefits will be computed in units of MONEY.");
+		logger.info("The welfare measure is " + this.welfareMeasure + ".");
 		for(Person person : pop.getPersons().values()){
 			double utilityOfPerson_utils = calculateUtilityOfPerson_utils(person);
 			this.personId2Utility.put(person.getId(), utilityOfPerson_utils);
 			double utilityOfPerson_money = convertToMoney(utilityOfPerson_utils);
 			this.personId2MonetizedUtility.put(person.getId(), utilityOfPerson_money);
-			utility_money += utilityOfPerson_money;
 		}
-		return utility_money;
+		logger.info("Finished user benefits calculation...");
+		return sumOfUtility_money;
 	}
 
 	public double calculateUtilityOfPerson_utils(Person person) {
@@ -108,11 +112,11 @@ public class UserBenefitsCalculator {
 				}
 			}
 			if(sumOfExpScore == 0.0){
-				noValidPlanScore++;
-				if(noValidPlanScore <= maxWarnCnt) {
+				personsWithoutValidPlanScore++;
+				if(personsWithoutValidPlanScore <= maxWarnCnt) {
 					logger.warn("Person " + person.getId() + " has no valid plans. " +
 							"This person's utility is set to " + utilityOfPerson_utils);
-					if(noValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+					if(personsWithoutValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
 			} else{
 				/* Benjamins version: */
@@ -127,11 +131,11 @@ public class UserBenefitsCalculator {
 			if(shouldBeConsidered){
 				utilityOfPerson_utils = selectedPlan.getScore();
 			} else {
-				noValidPlanScore++;
-				if(noValidPlanScore <= maxWarnCnt) {
+				personsWithoutValidPlanScore++;
+				if(personsWithoutValidPlanScore <= maxWarnCnt) {
 					logger.warn("Person " + person.getId() + " has no valid selected plan. " +
 							"This person's utility is set to " + utilityOfPerson_utils);
-					if(noValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+					if(personsWithoutValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
 			}
 		}
@@ -172,8 +176,8 @@ public class UserBenefitsCalculator {
 		return bestScore ;
 	}
 
-	public int getNoValidPlanCnt() {
-		return noValidPlanScore;
+	public int getPersonsWithoutValidPlanCnt() {
+		return personsWithoutValidPlanScore;
 	}
 	
 	public Map<Id, Double> getPersonId2Utility() {

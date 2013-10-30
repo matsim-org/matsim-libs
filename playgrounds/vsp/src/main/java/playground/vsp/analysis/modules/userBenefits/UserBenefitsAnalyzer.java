@@ -75,7 +75,7 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 	@Override
 	public void preProcessData() {
 		this.allUsersLogSum = this.userWelfareCalculator.calculateUtility_money(this.scenario.getPopulation());
-		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getNoValidPlanCnt();
+		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getPersonsWithoutValidPlanCnt();
 		log.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + personWithNoValidPlanCnt);
 		this.personId2Logsum = this.userWelfareCalculator.getPersonId2MonetizedUtility();
 	}
