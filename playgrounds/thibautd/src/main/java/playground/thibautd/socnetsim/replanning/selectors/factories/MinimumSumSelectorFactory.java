@@ -21,11 +21,9 @@ package playground.thibautd.socnetsim.replanning.selectors.factories;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 
-public class MinimumSumSelectorFactory implements
-		GroupLevelSelectorFactory {
+public class MinimumSumSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry controllerRegistry) {

@@ -19,34 +19,15 @@
 
 package playground.thibautd.socnetsim.replanning.selectors.factories;
 
-import org.matsim.api.core.v01.population.Plan;
-
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
-import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
+import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
 
-public class MinimumSumOfMinimumLossSelectorFactory extends AbstractDumbRemoverFactory {
+public class CoalitionMinSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry controllerRegistry) {
-		final WeightCalculator baseWeight =
-			new LowestScoreOfJointPlanWeight(
-					new LossWeight(),
-					controllerRegistry.getJointPlans());
-		return new HighestWeightSelector(
-				true ,
-				controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-				new WeightCalculator() {
-					@Override
-					public double getWeight(
-							final Plan indivPlan,
-							final ReplanningGroup replanningGroup) {
-						return -baseWeight.getWeight( indivPlan , replanningGroup );
-					}
-				});
+			final ControllerRegistry registry) {
+		return new CoalitionSelector( new InverseScoreWeight() );
 	}
 }

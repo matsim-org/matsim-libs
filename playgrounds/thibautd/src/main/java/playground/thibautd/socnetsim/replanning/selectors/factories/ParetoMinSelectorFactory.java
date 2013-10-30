@@ -21,13 +21,11 @@ package playground.thibautd.socnetsim.replanning.selectors.factories;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 
-public class ParetoMinSelectorFactory implements
-		GroupLevelSelectorFactory {
+public class ParetoMinSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry controllerRegistry) {

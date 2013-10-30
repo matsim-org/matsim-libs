@@ -21,14 +21,12 @@ package playground.thibautd.socnetsim.replanning.selectors.factories;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup;
 
-public class MinimumWeightedSumSelectorFactory implements
-		GroupLevelSelectorFactory {
+public class MinimumWeightedSumSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry controllerRegistry) {

@@ -23,12 +23,10 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 
-public class WhoIsTheBossMinSelectorFactory implements
-		GroupLevelSelectorFactory {
+public class WhoIsTheBossMinSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
 	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry controllerRegistry) {

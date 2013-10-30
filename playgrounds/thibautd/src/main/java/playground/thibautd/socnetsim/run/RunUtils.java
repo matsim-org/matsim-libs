@@ -89,8 +89,8 @@ public class RunUtils {
 
 		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
 
-		strategyRegistry.setSelectorForRemovalFactory(
-				factories.getSelectorFactory(
+		strategyRegistry.setExtraPlanRemoverFactory(
+				factories.getRemoverFactory(
 					weights.getSelectorForRemoval() ) );
 
 		for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {

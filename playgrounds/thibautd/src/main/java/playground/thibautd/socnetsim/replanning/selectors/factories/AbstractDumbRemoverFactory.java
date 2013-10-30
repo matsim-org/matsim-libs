@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupLevelSelectorFactory.java
+ * AbstractDumbRemoverFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,14 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.selectors;
+package playground.thibautd.socnetsim.replanning.selectors.factories;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.replanning.DumbExtraPlanRemover;
+import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
+import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 /**
  * @author thibautd
  */
-public interface GroupLevelSelectorFactory {
-	public GroupLevelPlanSelector createSelector( final ControllerRegistry registry );
+abstract class AbstractDumbRemoverFactory implements ExtraPlanRemoverFactory {
+
+	@Override
+	public ExtraPlanRemover createRemover(final ControllerRegistry registry) {
+		return new DumbExtraPlanRemover(
+				createSelector( registry ),
+				registry.getScenario().getConfig().strategy().getMaxAgentPlanMemorySize() );
+	}
+
+	protected abstract GroupLevelPlanSelector createSelector(final ControllerRegistry registry);
 }
 

@@ -66,7 +66,6 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
-import playground.thibautd.socnetsim.replanning.DumbExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
@@ -274,10 +273,8 @@ public class RunCliquesWithModularStrategies {
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
 					strategyRegistry,
-					new DumbExtraPlanRemover(
-						strategyRegistry.getSelectorForRemovalFactory().createSelector(
-							controllerRegistry ),
-						config.strategy().getMaxAgentPlanMemorySize()) );
+					strategyRegistry.getExtraPlanRemoverFactory().createRemover(
+						controllerRegistry ) );
 
 		// create controler
 		final ImmutableJointController controller =

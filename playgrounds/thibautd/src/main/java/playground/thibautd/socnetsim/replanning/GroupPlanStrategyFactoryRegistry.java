@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelSelectorFactory;
+import playground.thibautd.socnetsim.replanning.selectors.factories.CoalitionMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumOfMinimumLossSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumOfMinimumsSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.factories.MinimumSumSelectorFactory;
@@ -50,7 +50,7 @@ import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
  */
 public class GroupPlanStrategyFactoryRegistry {
 	private final Map<String, GroupPlanStrategyFactory> factories = new HashMap<String, GroupPlanStrategyFactory>();
-	private final Map<String, GroupLevelSelectorFactory> selectors = new HashMap<String, GroupLevelSelectorFactory>();
+	private final Map<String, ExtraPlanRemoverFactory> selectors = new HashMap<String, ExtraPlanRemoverFactory>();
 
 	public GroupPlanStrategyFactoryRegistry() {
 		// default factories
@@ -77,25 +77,25 @@ public class GroupPlanStrategyFactoryRegistry {
 
 		// default selectors
 		// ---------------------------------------------------------------------
-		addSelectorFactory(
+		addRemoverFactory(
 				"MinimumWeightedSum",
 				new MinimumWeightedSumSelectorFactory());
-		addSelectorFactory(
+		addRemoverFactory(
 				"MinimumSum",
 				new MinimumSumSelectorFactory());
-		addSelectorFactory(
+		addRemoverFactory(
 				"MinimumOfSumOfMinimumsOfJointPlan",
 				new MinimumSumOfMinimumsSelectorFactory());
-		addSelectorFactory(
+		addRemoverFactory(
 				"MinimumOfSumOfMinimumIndividualLossOfJointPlan",
 				new MinimumSumOfMinimumLossSelectorFactory());
-		addSelectorFactory(
+		addRemoverFactory(
 				"WhoIsTheBoss",
 				new WhoIsTheBossMinSelectorFactory());
-		addSelectorFactory(
+		addRemoverFactory(
 				"Pareto",
 				new ParetoMinSelectorFactory());
-		addSelectorFactory(
+		addRemoverFactory(
 				"Coalition",
 				new CoalitionMinSelectorFactory());
 
@@ -122,24 +122,24 @@ public class GroupPlanStrategyFactoryRegistry {
 		}
 	}
 
-	public GroupLevelSelectorFactory getSelectorFactory( final String name ) {
-		final GroupLevelSelectorFactory f = selectors.get( name );
+	public ExtraPlanRemoverFactory getRemoverFactory( final String name ) {
+		final ExtraPlanRemoverFactory f = selectors.get( name );
 
 		if ( f == null ) {
-			throw new IllegalArgumentException( "selector "+name+
+			throw new IllegalArgumentException( "remover factory "+name+
 					" is not known. Known names are "+selectors.keySet() );
 		}
 
 		return f;
 	}
 
-	public void addSelectorFactory(
+	public void addRemoverFactory(
 			final String name,
-			final GroupLevelSelectorFactory f) {
-		final GroupLevelSelectorFactory old = selectors.put( name , f );
+			final ExtraPlanRemoverFactory f) {
+		final ExtraPlanRemoverFactory old = selectors.put( name , f );
 
 		if ( old != null ) {
-			throw new IllegalArgumentException( "selector "+name+" already known. Replacing selector is unsafe. Consider using another name for "+f );
+			throw new IllegalArgumentException( "removerFactory "+name+" already known. Replacing selector is unsafe. Consider using another name for "+f );
 		}
 	}
 }
