@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.replanning.removers;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.DumbExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
