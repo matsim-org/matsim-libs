@@ -78,7 +78,7 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		double linkExpectedToll = this.tollHandler.getAvgToll(link, time);
 		log.info("-----------> Expected toll on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedToll);
 
-		double linkExpectedTollDisutility = this.marginalUtlOfMoney * linkExpectedToll;
+		double linkExpectedTollDisutility = -1 * this.marginalUtlOfMoney * linkExpectedToll;
 	
 		return linkExpectedTollDisutility;
 	}
