@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LimitedPerCompositionExtraPlanRemover.java
+ * LexicograpicPerCompositionExtraPlanRemover.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -48,10 +48,10 @@ import playground.thibautd.utils.MapUtils;
  * The first, second, etc is defined on the set of *all* plans of an agent.
  * @author thibautd
  */
-public class ParetoForCompositionExtraPlanRemover implements ExtraPlanRemover {
+public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRemover {
 	private final int maxPlansPerComposition;
 
-	public ParetoForCompositionExtraPlanRemover(
+	public LexicographicForCompositionExtraPlanRemover(
 			final int maxPlansPerComposition) {
 		this.maxPlansPerComposition = maxPlansPerComposition;
 	}
