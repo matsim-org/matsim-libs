@@ -159,11 +159,10 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 			String capDemandString = atts.getValue("capacityDemand");
 			if(capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
 			String startString = atts.getValue("earliestStart");
-			double start = 0.0;
-			if(startString != null) start = parseTimeToDouble(startString);
+			double start = parseTimeToDouble(startString);
 			double end = Double.MAX_VALUE;
 			String endString = atts.getValue("latestEnd");
-			if(endString != null) end = parseTimeToDouble(endString);
+			end = parseTimeToDouble(endString);
 			serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
 			String serviceTimeString = atts.getValue("serviceDuration");
 			if(serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));

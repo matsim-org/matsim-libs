@@ -120,7 +120,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	            genericRoute.setDistance(0.0);
 	            currentLeg.setRoute(genericRoute);
 	        }
-//	        logger.info(driverId + " arrives, time " + Time.writeTime(event.getTime()));
 	        scoringFunction.handleLeg(currentLeg);
 	    }
 		
@@ -129,11 +128,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	        leg.setDepartureTime(event.getTime());
 	        currentLeg = leg;
 	        currentRoute = new ArrayList<Id>();
-//	        logger.info(driverId + " departs, time " + Time.writeTime(event.getTime()));
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
-//			logger.info(driverId + " enters link " + event.getLinkId() + " at time " + Time.writeTime(event.getTime()));
 			currentRoute.add(event.getLinkId());
 		}
 
@@ -143,7 +140,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				firstActivity.setFacilityId(event.getFacilityId());
 				currentActivity = firstActivity;
 			}
-//			logger.info(driverId + " ends " + currentActivity.getType() + " time " + Time.writeTime(event.getTime()));
 			currentActivity.setEndTime(event.getTime());
 			scoringFunction.handleActivity(currentActivity);
 			activityFinished(event.getActType(), event.getTime()); 
@@ -157,7 +153,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			 ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId()); 
 			 activity.setFacilityId(event.getFacilityId());
 			 activity.setStartTime(event.getTime());
-//			 logger.info(driverId + " starts " + activity.getType() + " time " + Time.writeTime(event.getTime()));
 			 if(event.getActType().equals(FreightConstants.END)){
 				 activity.setEndTime(Time.UNDEFINED_TIME);
 				 scoringFunction.handleActivity(activity);

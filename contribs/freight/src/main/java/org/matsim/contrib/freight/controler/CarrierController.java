@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanReader;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
@@ -84,7 +83,7 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 	
 	private Carriers carriers;
 	
-//	private CarrierConfig carrierConfig;
+	
 
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
@@ -183,8 +182,8 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
-		new CarrierPlanWriter(carriers.getCarriers().values()).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+//		String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
+//		new CarrierPlanWriter(carriers.getCarriers().values()).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 	}
 
 	@Override

@@ -63,7 +63,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	public void testMobsimWithCarrierRunsWithoutException() {
 		try{
 			CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
-			carrierControler.setEnableWithinDayActivityReScheduling(true);
+//			carrierControler.setEnableWithinDayActivityReScheduling(true);
 			controler.addControlerListener(carrierControler);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -77,7 +77,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	public void testScoringInMeters(){
 		try{
 			CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
-			carrierControler.setEnableWithinDayActivityReScheduling(true);
+//			carrierControler.setEnableWithinDayActivityReScheduling(true);
 			controler.addControlerListener(carrierControler);
 			controler.setOverwriteFiles(true);
 			controler.run();
@@ -97,7 +97,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	public void testScoringInSeconds(){
 //		try{
 		CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
-		carrierControler.setEnableWithinDayActivityReScheduling(true);
+//		carrierControler.setEnableWithinDayActivityReScheduling(true);
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);
 		controler.run();	
@@ -108,7 +108,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 		assertEquals(-8040.0,carrier1.getSelectedPlan().getScore());
 
 		Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
-		assertEquals(-3062.0,carrier2.getSelectedPlan().getScore());
+		assertEquals(-3062.0,carrier2.getSelectedPlan().getScore(),50.0);
 
 //		}
 //		catch(Exception e){

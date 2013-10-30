@@ -29,8 +29,6 @@ public class Visualiser {
 
 	private Scenario scenario;
 
-	private boolean live = true;
-	
 	public Visualiser(Config config, Scenario scenario){
 		this.config = config;
 		this.scenario = scenario;
@@ -84,14 +82,10 @@ public class Visualiser {
 		EventsManager events = EventsUtils.createEventsManager();
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
 		Mobsim mobsim = mobsimFactory.createMobsim(scenario, events);
-		
-		if(live){
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, (QSim) mobsim);
-			OTFClientLive.run(config, server);
-		}
-		else{
-//			OTFVis.
-		}
+
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, (QSim) mobsim);
+		OTFClientLive.run(config, server);
+
 		mobsim.run();
 	}
 	

@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 
-class FreightActivity implements Activity{
+public class FreightActivity implements Activity{
 
 	private Activity act;
 	
