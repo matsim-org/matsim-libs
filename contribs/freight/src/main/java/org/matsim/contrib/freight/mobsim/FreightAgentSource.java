@@ -66,7 +66,6 @@ class FreightAgentSource implements AgentSource {
 	public void insertAgentsIntoMobsim() {
 		for (MobSimVehicleRoute vRoute : vehicleRoutes) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPlan().getPerson());
-			qsim.insertAgentIntoMobsim(agent);
 			Vehicle vehicle = null;
 			if(vRoute.getVehicle() == null){
 				vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType());
@@ -78,6 +77,7 @@ class FreightAgentSource implements AgentSource {
 			}
 			else vehicle = vRoute.getVehicle();
 			qsim.createAndParkVehicleOnLink(vehicle, agent.getCurrentLinkId());
+			qsim.insertAgentIntoMobsim(agent);
 			mobSimAgents.add(agent);
 		}
 	}
