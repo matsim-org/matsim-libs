@@ -137,7 +137,7 @@ public class SubtourModeChoiceConfigGroup extends Module {
 		return this.chainBasedModes;
 	}
 
-	private void setConsiderCarAvailability(final boolean value) {
+	public void setConsiderCarAvailability(final boolean value) {
 		this.considerCarAvailability = value;
 	}
 
