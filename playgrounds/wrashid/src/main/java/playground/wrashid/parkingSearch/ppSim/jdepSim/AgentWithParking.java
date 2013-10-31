@@ -21,6 +21,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -32,9 +33,11 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingMemory;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class AgentWithParking extends AgentEventMessage{
 
@@ -81,7 +84,9 @@ public class AgentWithParking extends AgentEventMessage{
 			}
 			
 			if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+				performSiutationUpdatesForParkingMemory();
 				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(),planElementIndex).handleAgentLeg(this);
+				
 			} else {
 				handleLeg();
 			}
@@ -89,6 +94,15 @@ public class AgentWithParking extends AgentEventMessage{
 	}
 	
 	
+
+	private void performSiutationUpdatesForParkingMemory() {
+		Activity nextActivity=(Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()+3);
+		
+		Id closestFreeGarageParking = parkingManager.getClosestFreeGarageParking(nextActivity.getCoord());
+		
+		ParkingMemory parkingMemory = ParkingMemory.getParkingMemory(getPerson().getId(), getPlanElementIndex());
+		parkingMemory.closestFreeGarageParkingAtTimeOfArrival=closestFreeGarageParking;
+	}
 
 	public void processLegInDefaultWay(){
 		handleLeg();

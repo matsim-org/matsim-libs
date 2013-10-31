@@ -86,6 +86,25 @@ public class EditRoute {
 	
 	
 	
+	public LinkNetworkRouteImpl addLastPartToRoute(double time, Leg leg, Id newTargetLinkId){
+		LinkNetworkRouteImpl firstPartOfRoute=(LinkNetworkRouteImpl) leg.getRoute();
+		Node middleNode = network.getLinks().get(firstPartOfRoute.getEndLinkId()).getToNode();
+		Path calcLeastCostPath = routingAlgo.calcLeastCostPath(middleNode, network.getLinks().get(newTargetLinkId).getFromNode(), time, null, null);
+		
+		List<Id> linkIds=new LinkedList<Id>();
+		for (Id linkId:firstPartOfRoute.getLinkIds()){
+			linkIds.add(linkId);
+		}
+		
+		List<Link> links=calcLeastCostPath.links;
+		
+		for (Link link:links){
+			linkIds.add(link.getId());
+		}
+		
+		return  new LinkNetworkRouteImpl(firstPartOfRoute.getStartLinkId(), linkIds, newTargetLinkId);
+	}
+	
 	
 	
 	

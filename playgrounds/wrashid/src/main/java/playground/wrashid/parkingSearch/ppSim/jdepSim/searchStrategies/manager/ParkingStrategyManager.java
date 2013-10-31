@@ -45,15 +45,13 @@ public class ParkingStrategyManager {
 
 	private static final Logger log = Logger.getLogger(ParkingStrategyManager.class);
 
-	double executionProbabilityOfBestStrategy = 0.9;
-	WithinDayAgentUtils withinDayAgentUtils = new WithinDayAgentUtils();
 	public static LinkedList<ParkingSearchStrategy> allStrategies;
-	HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations = new HashMap<Id, HashMap<Integer, EvaluationContainer>>();
+	private HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations = new HashMap<Id, HashMap<Integer, EvaluationContainer>>();
 
 	// personId, legIndex
 
 	public ParkingStrategyManager(LinkedList<ParkingSearchStrategy> allStrategies) {
-		this.allStrategies = allStrategies;
+		ParkingStrategyManager.allStrategies = allStrategies;
 	}
 
 	// this needs to be invoked at the starting of an iteration (does not assume
@@ -68,11 +66,11 @@ public class ParkingStrategyManager {
 				LegImpl leg = (LegImpl) pe;
 
 				if (leg.getMode().equals(TransportMode.car)) {
-					HashMap<Integer, EvaluationContainer> agentHashMap = strategyEvaluations.get(agentId);
+					HashMap<Integer, EvaluationContainer> agentHashMap = getStrategyEvaluations().get(agentId);
 
 					if (agentHashMap == null) {
-						strategyEvaluations.put(agentId, new HashMap<Integer, EvaluationContainer>());
-						agentHashMap = strategyEvaluations.get(agentId);
+						getStrategyEvaluations().put(agentId, new HashMap<Integer, EvaluationContainer>());
+						agentHashMap = getStrategyEvaluations().get(agentId);
 					}
 
 					EvaluationContainer evaluationContainer = agentHashMap.get(i);
@@ -120,7 +118,7 @@ public class ParkingStrategyManager {
 	}
 
 	public void updateScore(Id personId, int legIndex, double score) {
-		EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
+		EvaluationContainer evaluationContainer = getStrategyEvaluations().get(personId).get(legIndex);
 		if (evaluationContainer == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
@@ -132,9 +130,9 @@ public class ParkingStrategyManager {
 		IntegerValueHashMap<String> numberOfTimesStrategySelected = new IntegerValueHashMap<String>();
 		log.info(" --- start strategy stats ---");
 
-		for (Id personId : strategyEvaluations.keySet()) {
-			for (Integer legIndex : strategyEvaluations.get(personId).keySet()) {
-				EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
+		for (Id personId : getStrategyEvaluations().keySet()) {
+			for (Integer legIndex : getStrategyEvaluations().get(personId).keySet()) {
+				EvaluationContainer evaluationContainer = getStrategyEvaluations().get(personId).get(legIndex);
 				numberOfTimesStrategySelected.increment(evaluationContainer.getCurrentSelectedStrategy().strategy.getName());
 			}
 		}
@@ -144,20 +142,20 @@ public class ParkingStrategyManager {
 	}
 
 	public ParkingSearchStrategy getParkingStrategyForCurrentLeg(Person person, int currentPlanElementIndex) {
-		if (strategyEvaluations.get(person.getId()).get(currentPlanElementIndex) == null) {
+		if (getStrategyEvaluations().get(person.getId()).get(currentPlanElementIndex) == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
 
-		return strategyEvaluations.get(person.getId()).get(currentPlanElementIndex).getCurrentSelectedStrategy().strategy;
+		return getStrategyEvaluations().get(person.getId()).get(currentPlanElementIndex).getCurrentSelectedStrategy().strategy;
 	}
 
 	public void writeStatisticsToFile() {
-		ZHScenarioGlobal.strategyScoreStats.addIterationData(strategyEvaluations);
+		ZHScenarioGlobal.strategyScoreStats.addIterationData(getStrategyEvaluations());
 		ZHScenarioGlobal.strategyScoreStats.updateStrategySharesWithoutPP();
 		ZHScenarioGlobal.strategyScoreStats.writeStrategyScoresToFile();
 		ZHScenarioGlobal.strategyScoreStats.writeAllStrategySharesToFile();
 		ZHScenarioGlobal.strategyScoreStats.writeNonPPStrategySharesToFile();
-		ZHScenarioGlobal.strategyScoreStats.writeToTextFile(strategyEvaluations);
+		ZHScenarioGlobal.strategyScoreStats.writeToTextFile(getStrategyEvaluations());
 	}
 
 	public void reset() {
@@ -165,6 +163,14 @@ public class ParkingStrategyManager {
 			pss.resetForNewIteration();
 		}
 
+	}
+
+	public HashMap<Id, HashMap<Integer, EvaluationContainer>> getStrategyEvaluations() {
+		return strategyEvaluations;
+	}
+
+	public void setStrategyEvaluations(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
+		this.strategyEvaluations = strategyEvaluations;
 	}
 
 }

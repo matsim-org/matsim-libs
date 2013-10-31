@@ -55,6 +55,7 @@ import org.matsim.population.Desires;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingMemory;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.PrivateParkingWithWaitAndRandomSearchAsBackup;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
@@ -87,8 +88,8 @@ public class MainPPSimZurich30km {
 		String plansFile = ZHScenarioGlobal.loadStringParam("plansFile");
 		String networkFile = ZHScenarioGlobal.loadStringParam("networkFile");
 		String facilititiesPath = ZHScenarioGlobal.loadStringParam("facilitiesFile");
-		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
-		
+		ZHScenarioGlobal.scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
+		Scenario scenario=ZHScenarioGlobal.scenario;
 		
 		filterPopulation2_5km(scenario);
 		removeNotSelectedPlans(scenario);
@@ -158,6 +159,8 @@ public class MainPPSimZurich30km {
 			}
 			AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
 			ZHScenarioGlobal.reset();
+			ParkingMemory.prepareForNextIteration();
+			ParkingMemory.resetMemory();
 
 			Mobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
 			sim.run();

@@ -530,28 +530,31 @@ public class ParkingManagerZH {
 			}
 		}
 
-		if (ZHScenarioGlobal.iteration==0){
+		if (ZHScenarioGlobal.iteration == 0) {
 			logInitialOccupancyToTxtFile();
 		}
 
 		log.info("completed initFirstParkingOfDay");
 	}
-	
-	
-	private Id getClosestAcceptableFreeParkingDuringInitialization(Id linkId){
-			Coord coord=this.network.getLinks().get(linkId).getCoord();
-			
-			double distance=100;
-			while (true){
-				Collection<Parking> collection = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(), distance);
-				
-				for (Parking p:collection){
-					if (!p.getId().toString().contains("illegal")){
-						return p.getId();
-					}
+
+	private Id getClosestAcceptableFreeParkingDuringInitialization(Id linkId) {
+		Coord coord = this.network.getLinks().get(linkId).getCoord();
+
+		double distance = 100;
+		while (true) {
+			Collection<Parking> collection = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(), distance);
+
+			for (Parking p : collection) {
+				if (!p.getId().toString().contains("illegal")) {
+					return p.getId();
 				}
-				distance*=2;
 			}
+			if (distance < 1000) {
+				distance += 100;
+			} else {
+				distance *= 2;
+			}
+		}
 	}
 
 	private void logInitialOccupancyToTxtFile() {
@@ -589,6 +592,26 @@ public class ParkingManagerZH {
 		}
 
 		System.out.println("number of occupied parking: " + sum + " (" + comment + ")");
+	}
+
+	public Id getClosestFreeGarageParking(Coord coord) {
+		
+		double distance = 100;
+		while (true) {
+			Collection<Parking> collection = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(), distance);
+
+			for (Parking p : collection) {
+				if (p.getId().toString().contains("gp")) {
+					return p.getId();
+				}
+			}
+			if (distance < 1000) {
+				distance += 100;
+			} else {
+				distance *= 2;
+			}
+
+		}
 	}
 
 }

@@ -26,6 +26,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSe
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy3;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy7;
 
 public class ParkingStrategyScenarios {
@@ -47,6 +48,9 @@ public class ParkingStrategyScenarios {
 			// PrivateParkingWithWaitAndRandomSearchAsBackup(500.0,
 			// scenario.getNetwork(),5*60));
 			allStrategies.add(new AxPo1989_Strategy7(-1, scenario.getNetwork(), ZHScenarioGlobal.loadDoubleParam("parkingStrategyScenarioId.1.expectedIllegalParkingFeeForWholeDay")));
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId==2){
+				allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork()));
+				allStrategies.add(new AxPo1989_Strategy3(-1, scenario.getNetwork()));
 		}
 		
 		return allStrategies;

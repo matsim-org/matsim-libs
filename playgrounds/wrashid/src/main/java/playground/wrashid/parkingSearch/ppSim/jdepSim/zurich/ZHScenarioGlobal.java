@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.Config;
@@ -64,6 +65,7 @@ public class ZHScenarioGlobal {
 	public static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes;
 	public static String plansFile;
 	public static RerouteThreadDuringSim[] rerouteThreadsDuringSim;
+	public static Scenario scenario;
 
 	public static String getItersFolderPath(){
 		return outputFolder + "ITERS/";
