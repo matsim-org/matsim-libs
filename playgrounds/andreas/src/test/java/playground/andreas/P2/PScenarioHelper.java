@@ -22,6 +22,7 @@ package playground.andreas.P2;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -226,8 +227,11 @@ public class PScenarioHelper {
 		
 		Set<String> modes = new TreeSet<String>();
 		modes.add(TransportMode.car);
+		Random rnd = new Random(4713) ;
 		for (Link link : network.getLinks().values()) {
-			link.setLength(1200.0);
+			link.setLength(1200.0 + rnd.nextDouble() );
+			// (adding small random noise to the link length so that there is no arbitrariness any more for routers.  kai, oct'13)
+			
 			link.setCapacity(2000.0);
 			link.setFreespeed(7.0);
 			link.setAllowedModes(modes);
