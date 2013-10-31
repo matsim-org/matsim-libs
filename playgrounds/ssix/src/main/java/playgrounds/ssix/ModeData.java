@@ -166,6 +166,7 @@ public class ModeData {
 		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
 			relativeDeviances += Math.pow( ((this.lastXFlows.get(i).doubleValue() - averageFlow) / averageFlow) , 2);
 		}
+		relativeDeviances /= DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS;//Taking away dependence on list size.
 		if (relativeDeviances < 0.0001){//TODO Here a VERY empirical factor
 			this.flowStability = true;
 			System.out.println("Reaching a certain flow stability in mode: "+modeId);

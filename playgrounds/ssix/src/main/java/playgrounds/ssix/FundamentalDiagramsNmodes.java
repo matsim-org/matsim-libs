@@ -116,9 +116,11 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 								break;
 							} else {
 								//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is also flow Stable!");
+								continue;
 							}
 						} else {
 							//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is still not speed stable.");
+							modesStable = false;
 							break;
 						}
 					}

@@ -317,7 +317,7 @@ public class DreieckNmodes {
 				iterationModule.add1();
 			}
 		}
-		System.out.println(pointsToRun.size());
+		//System.out.println(pointsToRun.size());
 		return pointsToRun;
 	}
 	
