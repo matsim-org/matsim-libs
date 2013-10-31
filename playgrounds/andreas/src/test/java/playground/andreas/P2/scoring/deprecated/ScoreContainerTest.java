@@ -56,20 +56,28 @@ public class ScoreContainerTest {
 		sC.addPassenger();
 		sC.handleLinkTravelled(link1);
 		
-		Assert.assertEquals("revenue with one incomplete trip served", -37.12, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("revenue with one incomplete trip served", -37.12, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue with one incomplete trip served", -37.120007030806455, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		// (disturbing the link lengths (see PScenarioHelper) also changes this value a bit. kai, oct'13)
 		Assert.assertEquals("revenue per pax with zero trips served", Double.NaN, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
 		sC.addPassenger();
 		sC.handleLinkTravelled(link2);
-		Assert.assertEquals("revenue with two incomplete trips served", -34.11, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("revenue with two incomplete trips served", -34.11, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue with two incomplete trips served", -34.11000703080646, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		// (same)
 		Assert.assertEquals("revenue per pax with zero trips served", Double.NaN, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
 		sC.removePassenger();
 		sC.removePassenger();
-		Assert.assertEquals("revenue with two trips served", -34.11, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("revenue per pax with two trips served", -17.055, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("revenue with two trips served", -34.11, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue with two trips served", -34.11000703080646, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		// (same)
+//		Assert.assertEquals("revenue per pax with two trips served", -17.055, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue per pax with two trips served", -17.05500351540323, sC.getTotalRevenuePerPassenger(), MatsimTestUtils.EPSILON);
+		// (same)
 		Assert.assertEquals("trips served", 2, sC.getTripsServed(), MatsimTestUtils.EPSILON);		
 	}
 }

@@ -65,22 +65,31 @@ public class ScorePlansHandlerTest {
 		
 		handler.handleEvent(new LinkEnterEvent(0.0, driverId, new IdImpl("1112"), vehicleId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
-		Assert.assertEquals("revenue with zero trips served", -40.36, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("revenue with zero trips served", -40.36, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue with zero trips served", -40.36002109241936, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		// (disturbing the link lengths (see PScenarioHelper) also changes this value a bit. kai, oct'13)
+
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
 		handler.handleEvent(new PersonEntersVehicleEvent(0.0, personId, vehicleId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
-		Assert.assertEquals("revenue with zero trips served", -40.36, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("revenue with zero trips served", -40.36, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue with zero trips served", -40.36002109241936, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+//		(same)
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
 		handler.handleEvent(new LinkEnterEvent(0.0, driverId, new IdImpl("1211"), vehicleId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
-		Assert.assertEquals("revenue with zero trips served", -40.72, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("revenue with zero trips served", -40.72, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue with zero trips served", -40.720185138621424, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		// (same)
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
 		handler.handleEvent(new PersonLeavesVehicleEvent(0.0, personId, vehicleId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
-		Assert.assertEquals("revenue with zero trips served", -40.72, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("revenue with zero trips served", -40.72, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("revenue with zero trips served", -40.720185138621424, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
+		// (same)
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
 		handler.reset(10);
