@@ -20,6 +20,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausen
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 
@@ -45,30 +46,36 @@ public class AxPo1989_Strategy7 extends RandomStreetParkingWithIllegalParkingAnd
 
 	@Override
 	public void handleParkingDepartureActivity(AgentWithParking aem) {
-		addIllegalParkingScore(aem);
+		ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
+
+		addIllegalParkingScore(aem, parkingAttributesForScoring.getParkingArrivalTime(), aem.getMessageArrivalTime());
 
 		super.handleParkingDepartureActivity(aem);
 		useSpecifiedParkingType.remove(aem.getPerson().getId());
 	}
 
-	private void addIllegalParkingScore(AgentWithParking aem) {
+	private void addIllegalParkingScore(AgentWithParking aem, double parkingArrivalTime, double parkingDepartureTime) {
 		Id personId = aem.getPerson().getId();
 
-		ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
-
-		double parkingDuration = GeneralLib.getIntervalDuration(parkingAttributesForScoring.getParkingArrivalTime(),
-				aem.getMessageArrivalTime());
-		if (parkingAttributesForScoring.getParkingArrivalTime() == aem.getMessageArrivalTime()) {
+		double parkingDuration = GeneralLib.getIntervalDuration(parkingArrivalTime, parkingDepartureTime);
+		if (parkingArrivalTime == parkingDepartureTime) {
 			parkingDuration = 0;
 		}
 
 		double expectedAmountToBePayed = expectedIllegalParkingFeeForWholeDay / (24 * 60 * 60) * parkingDuration;
 		scoreInterrupationValue = ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, expectedAmountToBePayed);
+
+		if (scoreInterrupationValue == 0) {
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
 	}
 
 	@Override
 	public void handleLastParkingScore(AgentWithParking aem) {
-		addIllegalParkingScore(aem);
+		Activity firstAct = (Activity) aem.getPerson().getSelectedPlan().getPlanElements()
+				.get(aem.getIndexOfFirstCarLegOfDay() - 3);
+
+		addIllegalParkingScore(aem, aem.getMessageArrivalTime(), firstAct.getEndTime());
 
 		super.handleLastParkingScore(aem);
 	}

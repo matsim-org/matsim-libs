@@ -35,13 +35,13 @@ public class EvaluationContainer {
 
 	private static final Logger log = Logger.getLogger(EvaluationContainer.class);
 	
-	LinkedList<StrategyEvaluation> evaluations;
+	private LinkedList<StrategyEvaluation> evaluations;
 
 	private Random random;
 	
 	public EvaluationContainer(LinkedList<ParkingSearchStrategy> allStrategies){
 		random = MatsimRandom.getLocalInstance();
-		evaluations=new LinkedList<StrategyEvaluation>();
+		setEvaluations(new LinkedList<StrategyEvaluation>());
 		createAndStorePermutation(allStrategies);
 	}
 	
@@ -50,23 +50,23 @@ public class EvaluationContainer {
 	
 		while (strategies.size()!=0){
 			int randomIndex = random.nextInt(strategies.size());
-			evaluations.add(new StrategyEvaluation(strategies.remove(randomIndex)));
+			getEvaluations().add(new StrategyEvaluation(strategies.remove(randomIndex)));
 		}
 	}
 	
 	public StrategyEvaluation getCurrentSelectedStrategy(){
-		return evaluations.getFirst();
+		return getEvaluations().getFirst();
 	}
 	
 	public void selectBestStrategyForExecution(){
 		StrategyEvaluation best=null;
-		for (StrategyEvaluation se:evaluations){
+		for (StrategyEvaluation se:getEvaluations()){
 			if (best==null || se.score>best.score){
 				best=se;
 			}
 		}
-		evaluations.remove(best);
-		evaluations.addFirst(best);
+		getEvaluations().remove(best);
+		getEvaluations().addFirst(best);
 		
 		if (best.score<0){
 			DebugLib.emptyFunctionForSettingBreakPoint();
@@ -75,13 +75,13 @@ public class EvaluationContainer {
 	
 	public void selectNextStrategyAccordingToMNL(){
 		double exponentialSum=0;
-		double[] selectionProbabilities=new double[evaluations.size()];
-		for (int i=0;i<evaluations.size();i++){
-			exponentialSum+=Math.exp(evaluations.get(i).score);
+		double[] selectionProbabilities=new double[getEvaluations().size()];
+		for (int i=0;i<getEvaluations().size();i++){
+			exponentialSum+=Math.exp(getEvaluations().get(i).score);
 		}
 		
-		for (int i=0;i<evaluations.size();i++){
-			selectionProbabilities[i]=Math.exp( evaluations.get(i).score)/exponentialSum;
+		for (int i=0;i<getEvaluations().size();i++){
+			selectionProbabilities[i]=Math.exp( getEvaluations().get(i).score)/exponentialSum;
 		}
 		
 		double r=random.nextDouble();
@@ -93,7 +93,7 @@ public class EvaluationContainer {
 			index++;
 		}
 		
-		evaluations.addFirst(evaluations.remove(index));
+		getEvaluations().addFirst(getEvaluations().remove(index));
 	}
 	
 	public void selectStrategyAccordingToFixedProbabilityForBestStrategy(){
@@ -105,28 +105,28 @@ public class EvaluationContainer {
 	}
 	
 	public void trimStrategySet(int maxNumberOfStrategies){
-		while (evaluations.size()>maxNumberOfStrategies){
+		while (getEvaluations().size()>maxNumberOfStrategies){
 			dropWostStrategy();
 		}
 	}
 	
 	public void dropWostStrategy(){
-		StrategyEvaluation worstStrategy=evaluations.getFirst();
-		for (StrategyEvaluation se:evaluations){
+		StrategyEvaluation worstStrategy=getEvaluations().getFirst();
+		for (StrategyEvaluation se:getEvaluations()){
 			if (worstStrategy.score>se.score){
 				worstStrategy=se;
 			}
 		}
-		evaluations.remove(worstStrategy);
+		getEvaluations().remove(worstStrategy);
 	}
 	
 	public int getNumberOfStrategies(){
-		return evaluations.size();
+		return getEvaluations().size();
 	}
 	
 	
 	public boolean allStrategiesHaveBeenExecutedOnce(){
-		for (StrategyEvaluation se:evaluations){
+		for (StrategyEvaluation se:getEvaluations()){
 			if (Double.isInfinite(se.score)){
 				return false;
 			}
@@ -137,20 +137,20 @@ public class EvaluationContainer {
 	// precondition: such a strategy exists (allStrategiesHaveBeenExecutedOnce=> true)
 	public void selectStrategyNotExecutedTillNow(){
 		StrategyEvaluation strategyToExecuteNext=null;
-		for (StrategyEvaluation se:evaluations){
+		for (StrategyEvaluation se:getEvaluations()){
 			if (Double.isInfinite(se.score)){
 				strategyToExecuteNext=se;
 				break;
 			}
 		}
-		evaluations.remove(strategyToExecuteNext);
-		evaluations.addFirst(strategyToExecuteNext);
+		getEvaluations().remove(strategyToExecuteNext);
+		getEvaluations().addFirst(strategyToExecuteNext);
 	}
 	
 	public void selectLongestNonExecutedStrategyForExecution(){
-		StrategyEvaluation last=evaluations.getLast();
-		evaluations.remove(last);
-		evaluations.addFirst(last);
+		StrategyEvaluation last=getEvaluations().getLast();
+		getEvaluations().remove(last);
+		getEvaluations().addFirst(last);
 	}
 	
 	public void updateScoreOfSelectedStrategy(double score){
@@ -158,11 +158,11 @@ public class EvaluationContainer {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
 		
-		evaluations.get(0).score=score;
+		getEvaluations().get(0).score=score;
 	}
 	
 	public void printAllScores(){
-		for (StrategyEvaluation strategyEvaluation:evaluations){
+		for (StrategyEvaluation strategyEvaluation:getEvaluations()){
 			log.info(strategyEvaluation.strategy.getName() + "-> score: " + strategyEvaluation.score);
 		}
 	}
@@ -173,7 +173,7 @@ public class EvaluationContainer {
 	
 	public double getBestStrategyScore(){
 		double bestScore=Double.NEGATIVE_INFINITY;
-		for (StrategyEvaluation se:evaluations){
+		for (StrategyEvaluation se:getEvaluations()){
 			if (se.score>Double.NEGATIVE_INFINITY && bestScore<se.score){
 				bestScore=se.score;
 			}
@@ -183,7 +183,7 @@ public class EvaluationContainer {
 	
 	public double getWorstStrategyScore(){
 		double worstScore=Double.POSITIVE_INFINITY;
-		for (StrategyEvaluation se:evaluations){
+		for (StrategyEvaluation se:getEvaluations()){
 			if (se.score>Double.NEGATIVE_INFINITY && worstScore>se.score){
 				worstScore=se.score;
 			}
@@ -194,13 +194,21 @@ public class EvaluationContainer {
 	public double getAverageStrategyScore(){
 		double average=0;
 		int sampleSize=0;
-		for (StrategyEvaluation se:evaluations){
+		for (StrategyEvaluation se:getEvaluations()){
 			if (se.score>Double.NEGATIVE_INFINITY){
 				average+=se.score;
 				sampleSize++;
 			}
 		}
 		return average/sampleSize;
+	}
+
+	public LinkedList<StrategyEvaluation> getEvaluations() {
+		return evaluations;
+	}
+
+	public void setEvaluations(LinkedList<StrategyEvaluation> evaluations) {
+		this.evaluations = evaluations;
 	}
 
 }

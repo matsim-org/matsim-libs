@@ -339,6 +339,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal")) {
 			parkingScore += scoreInterrupationValue;
+			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
 		}
 
 		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
@@ -380,6 +381,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal")) {
 			parkingScore += scoreInterrupationValue;
+			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
 		}
 
 		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
