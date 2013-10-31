@@ -22,8 +22,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.event.DatasetEventManager;
-import org.openstreetmap.josm.gui.layer.Layer;
 
 /**
  * the main MATSim-dialog
@@ -134,10 +132,9 @@ public class RootDialog extends JPanel
 				DataSet dataSet = new DataSet();
 				Config config = ConfigUtils.createConfig();
 				Scenario scenario = ScenarioUtils.createScenario(config);
-				Layer layer = new NetworkLayer(dataSet, "new Layer", new File("new Layer"), scenario.getNetwork(), "WGS84");
+				NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", new File("new Layer"), scenario.getNetwork(), "WGS84");
+				dataSet.addDataSetListener(new NetworkListener(layer, scenario.getNetwork(), "WGS84"));
 				Main.main.addLayer(layer);
-				NetworkListener listener = new NetworkListener();
-				DatasetEventManager.getInstance().addDatasetListener(listener, DatasetEventManager.FireMode.IN_EDT);
 			}
 		});
 		

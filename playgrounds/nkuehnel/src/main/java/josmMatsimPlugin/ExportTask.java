@@ -113,11 +113,6 @@ public class ExportTask extends PleaseWaitRunnable
 					}
 				}
 			}
-			
-			if(Defaults.cleanNet==true)
-			{	
-				new NetworkCleaner().run(net);
-			}
 			new NetworkWriter(net).write(Defaults.exportPath+".xml");
 		}
 		System.out.println("schreibe: "+Defaults.exportPath+".xml"+" von WGS84 nach "+Defaults.targetSystem);

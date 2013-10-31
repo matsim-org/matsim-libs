@@ -2,7 +2,6 @@ package josmMatsimPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import javax.swing.JOptionPane;
 
@@ -13,7 +12,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -24,7 +22,6 @@ import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.data.osm.event.DatasetEventManager;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
@@ -64,8 +61,6 @@ public class ImportTask extends PleaseWaitRunnable
 	{
 		Main.main.addLayer(layer);
 		Main.map.mapView.setActiveLayer(layer);
-		NetworkListener listener = new NetworkListener();
-		DatasetEventManager.getInstance().addDatasetListener(listener, DatasetEventManager.FireMode.IN_EDT);
 		JOptionPane.showMessageDialog(Main.main.parent, "Import finished.");
 	}
 
@@ -89,14 +84,7 @@ public class ImportTask extends PleaseWaitRunnable
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(Defaults.importPath);
 		
-		
-		layer = new NetworkLayer(dataSet, Defaults.importPath, new File(Defaults.importPath), scenario.getNetwork(), Defaults.originSystem);
-		
-		NetworkImpl net = (NetworkImpl) layer.getMatsimNetwork();
-		Map<String, Node> nodes = layer.getNodes();
-		Map<String, Link> links = layer.getLinks();
-		
-		for (Node node: net.getNodes().values())
+		for (Node node: scenario.getNetwork().getNodes().values())
 		{
 			Coord tmpCoor= node.getCoord();
 			LatLon coor;
@@ -113,10 +101,9 @@ public class ImportTask extends PleaseWaitRunnable
 			org.openstreetmap.josm.data.osm.Node nodeOsm = new org.openstreetmap.josm.data.osm.Node(coor);
 			nodeOsm.setOsmId(Long.parseLong(node.getId().toString()), 1);
 			dataSet.addPrimitive(nodeOsm);
-			nodes.put(node.getId().toString(), node);
 		}
 		
-		for (Link link: net.getLinks().values())
+		for (Link link: scenario.getNetwork().getLinks().values())
 		{
 			Way way = new Way(Long.parseLong(link.getId().toString()), 1);
 			
@@ -130,14 +117,14 @@ public class ImportTask extends PleaseWaitRunnable
 			way.put("freespeed", String.valueOf(link.getFreespeed()));
 			way.put("capacity", String.valueOf(link.getCapacity()));
 			way.put("length", String.valueOf(link.getLength()));
-			way.put("number of lanes", String.valueOf(link.getNumberOfLanes()));
-			way.put("allowed modes", String.valueOf(link.getAllowedModes()));
+			way.put("permlanes", String.valueOf(link.getNumberOfLanes()));
+			way.put("modes", String.valueOf(link.getAllowedModes()));
 			
 			dataSet.addPrimitive(way);
-			links.put(link.getId().toString(),link);
 		}
-		
-		
+
+		layer = new NetworkLayer(dataSet, Defaults.importPath, new File(Defaults.importPath), scenario.getNetwork(), Defaults.originSystem);
+		dataSet.addDataSetListener(new NetworkListener(layer, scenario.getNetwork(), Defaults.originSystem));
 	}
 
 	
