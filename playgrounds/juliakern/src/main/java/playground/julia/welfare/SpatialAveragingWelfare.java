@@ -122,7 +122,7 @@ public class SpatialAveragingWelfare {
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
 		ubc.calculateUtility_money(pop);
 		Map<Id, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
-		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
+		logger.info("There were " + ubc.getNoValidPlanCnt() + " persons without any valid plan.");
 		
 		double [][] weightsBaseCase = calculateWeights(personId2Utility, pop);
 		double [][] normalizedWeightsBaseCase = normalizeArray(weightsBaseCase);
@@ -147,7 +147,7 @@ public class SpatialAveragingWelfare {
 			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM);
 			ubc2.calculateUtility_money(pop2);
 			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
-			logger.info("There were " + ubc2.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
+			logger.info("There were " + ubc2.getNoValidPlanCnt() + " persons without any valid plan.");
 			
 			double [][] weightsPolicyCase = calculateWeights(personId2Utility2, pop2);
 			double [][] normalizedWeightsPolicyCase = normalizeArray(weightsPolicyCase);
