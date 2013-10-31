@@ -42,7 +42,7 @@ public class ModeData {
 	private VehicleType vehicleType;//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
 									//		So far programmed to contain also global data, i.e. data without a specific vehicleType (ssix, 30.09.13)
 	public int numberOfAgents;
-	private int numberOfDrivingAgents;//dynamic variable counting live agents on the track
+	//private int numberOfDrivingAgents;//dynamic variable counting live agents on the track
 	private double permanentDensity;
 	private double permanentAverageVelocity;
 	private double permanentFlow;
@@ -134,7 +134,7 @@ public class ModeData {
 		} else {
 			this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
 		}
-		this.numberOfDrivingAgents = this.lastSeenOnStudiedLinkEnter.size();
+		//this.numberOfDrivingAgents = this.lastSeenOnStudiedLinkEnter.size();
 	}
 	
 	public void checkSpeedStability(){
@@ -148,7 +148,7 @@ public class ModeData {
 			relativeDeviances += Math.pow( ((this.speedTable.get(i).doubleValue() - averageSpeed) / averageSpeed) , 2);
 		}
 		relativeDeviances /= DreieckNmodes.NUMBER_OF_MODES;//taking dependence on number of modes away
-		if (relativeDeviances < 0.0001){
+		if (relativeDeviances < 0.0005){
 			this.speedStability = true;
 			System.out.println("Reaching a certain speed stability in mode: "+modeId);
 		} else {
@@ -157,6 +157,7 @@ public class ModeData {
 	}
 	
 	public void checkFlowStability(){
+		/*//Method 1: Relative Deviances
 		double relativeDeviances = 0.;
 		double averageFlow = 0;
 		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
@@ -167,12 +168,21 @@ public class ModeData {
 			relativeDeviances += Math.pow( ((this.lastXFlows.get(i).doubleValue() - averageFlow) / averageFlow) , 2);
 		}
 		relativeDeviances /= DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS;//Taking away dependence on list size.
-		if (relativeDeviances < 0.0001){//TODO Here a VERY empirical factor
+		if (relativeDeviances < 0.000001){//TODO Here a VERY empirical factor
+			this.flowStability = true;
+			System.out.println("Reaching a certain flow stability in mode: "+modeId);
+		} else {
+			this.flowStability = false;
+		}*/
+		//Method 2: absolute deviances
+		double absoluteDeviances = this.lastXFlows.get(this.lastXFlows.size()-1) - this.lastXFlows.get(0);
+		if (Math.abs(absoluteDeviances) < 2){
 			this.flowStability = true;
 			System.out.println("Reaching a certain flow stability in mode: "+modeId);
 		} else {
 			this.flowStability = false;
 		}
+		
 	}
 	
 	public void initDynamicVariables() {
@@ -216,8 +226,10 @@ public class ModeData {
 			this.speedTableSize = 20;
 		} else if (this.numberOfAgents >= 10) {
 			this.speedTableSize = 10;
-		} else {
+		} else if (this.numberOfAgents >  0) {
 			this.speedTableSize = this.numberOfAgents;
+		} else { //case no agents in mode
+			this.speedTableSize = 1;
 		}
 	}
 	
@@ -293,7 +305,7 @@ public class ModeData {
 	}
 
 	public int getNumberOfDrivingAgents() {
-		return numberOfDrivingAgents;
+		return this.lastSeenOnStudiedLinkEnter.size();
 	}
 	
 	public Map<Id, Double> getLastSeenOnStudiedLinkEnter() {

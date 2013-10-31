@@ -74,7 +74,7 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-//import org.apache.log4j.Logger;
+
 
 /**
  * @author ssix
@@ -82,7 +82,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 public class DreieckNmodes {
 	
-	private static Integer[] TEST_DISTRIBUTION = {8,4,1};
+	//private static Integer[] TEST_DISTRIBUTION = {8,4,1};
 
 	private static final Logger log = Logger.getLogger(DreieckNmodes.class);
 	
@@ -224,8 +224,8 @@ public class DreieckNmodes {
 	public static Double[] Probabilities = {1/3., 1/3., 1/3.}; //modal split
 	public static Double[] Pcus = {0.25, 0.25, 1.}; 			//PCUs of the different possible modes
 	public static Double[] Speeds = {4.17, 16.67, 16.67};		//maximum velocities of the vehicle types, in m/s
-	private static Integer[] MaxAgentDistribution = {1,1,1};
-	private static Integer[] Steps = {1,1,1};
+	private static Integer[] MaxAgentDistribution = {320,320,80};
+	private static Integer[] Steps = {40,40,10};
 	
 	private PrintStream writer;
 	private Scenario scenario;
@@ -276,8 +276,8 @@ public class DreieckNmodes {
 		DreieckNmodes dreieck = new DreieckNmodes(NETWORK_CAPACITY);
 		dreieck.fillNetworkData();
 		dreieck.openFile(OUTPUT_DIR);
-		//dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
-		dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
+		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
+		//dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
 		dreieck.closeFile();
 	}
 	
@@ -322,10 +322,9 @@ public class DreieckNmodes {
 	}
 	
 	private void singleRun(List<Integer> pointToRun) {
-		this.createWantedPopulation(pointToRun, 2);//ok
+		this.createWantedPopulation(pointToRun, 2);
 		for (int i=0; i<NAMES.length; i++){
-			this.modesData.get(new IdImpl(NAMES[i])).setnumberOfAgents(pointToRun.get(i).intValue());//ok
-			//System.out.println("Setting "+NAMES[i]+"'s numberOfAgents to "+pointToRun.get(i).intValue());
+			this.modesData.get(new IdImpl(NAMES[i])).setnumberOfAgents(pointToRun.get(i).intValue());
 		}
 		
 		EventsManager events = EventsUtils.createEventsManager();

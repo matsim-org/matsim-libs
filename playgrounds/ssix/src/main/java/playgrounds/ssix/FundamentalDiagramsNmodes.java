@@ -108,20 +108,25 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 					//Checking modes stability
 					boolean modesStable = true;
 					for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
-						if (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isSpeedStable()) {
-							//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is speed stable, checking for flow...");
-							if ( ! (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isFlowStable()) ){
-								//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is not flow stable yet.");
+						if (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).numberOfAgents != 0){
+							if (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isSpeedStable()) {
+								//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is speed stable, checking for flow...");
+								if ( ! (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isFlowStable()) ){
+									//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is not flow stable yet.");
+									modesStable = false;
+									break;
+								} else {
+									//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is also flow Stable!");
+									continue;
+								}
+							} else {
+								//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is still not speed stable.");
 								modesStable = false;
 								break;
-							} else {
-								//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is also flow Stable!");
-								continue;
 							}
 						} else {
-							//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is still not speed stable.");
-							modesStable = false;
-							break;
+							//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is empty thus declared permanent.");
+							continue;
 						}
 					}
 					if (modesStable){
