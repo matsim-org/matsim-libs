@@ -63,7 +63,7 @@ public class GenerateScenarioForDetours {
 	private static final int N_WORK = 1000;
 	private static final int LENGTH_DETOUR = 100;
 
-	private static final int LINK_CAPACITY = 9999999;
+	private static final int LINK_CAPACITY = Integer.MAX_VALUE;
 	private static final double FREESPEED = 70 / 3.6;
 
 	private static final String P_WORK_PREFIX = "worklink-";
