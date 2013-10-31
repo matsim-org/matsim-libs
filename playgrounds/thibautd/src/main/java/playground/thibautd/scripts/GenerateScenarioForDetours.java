@@ -60,8 +60,8 @@ import playground.thibautd.utils.UniqueIdFactory;
 public class GenerateScenarioForDetours {
 	private static final int N_COUPLES_PER_HH = 5;
 	private static final int N_HH_PER_DEST = 5;
-	private static final int N_WORK = 1000;
-	private static final int LENGTH_DETOUR = 100;
+	private static final int N_WORK = 500;
+	private static final int LENGTH_DETOUR = 10;
 
 	private static final int LINK_CAPACITY = Integer.MAX_VALUE;
 	private static final double FREESPEED = 70 / 3.6;
@@ -286,6 +286,12 @@ public class GenerateScenarioForDetours {
 					driverWorkLinkId,
 					workOriginNode,
 					workDestinationNode ) );
+
+		network.addLink(
+				network.getFactory().createLink(
+					linkIdFactory.createNextId(),
+					homeDestinationNode,
+					workOriginNode ) );
 
 		network.addLink(
 				network.getFactory().createLink(
