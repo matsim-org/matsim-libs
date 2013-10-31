@@ -21,6 +21,7 @@ package playground.benjamin.scenarios.munich.analysis.nectar;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,7 +32,7 @@ import playground.vsp.emissions.types.WarmPollutant;
 import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
- * @author benjamin, julia
+ * @author benjamin
  *
  */
 public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandler{
@@ -55,89 +56,57 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		this.time2warmEmissionsTotal.clear();
 		logger.info("Resetting warm emission aggregation to " + this.time2warmEmissionsTotal);
 		this.time2linkIdLeaveCount.clear();
-		logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
+		logger.info("Resetting linkLeve counter to " + this.time2linkIdLeaveCount);
 	}
 
+	
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Double time = event.getTime();
+		Double time = event.getTime(); // wenn time = 0.0 ist, wird das Event nicht registriert
 		Id linkId = event.getLinkId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
-		int numberOfInterval = (int)Math.ceil(time/timeBinSize);
-		if(numberOfInterval==0) numberOfInterval=1; //only happens if time = 0.0
-		double endOfTimeInterval = numberOfInterval * timeBinSize;
+		double endOfTimeInterval = 0.0;
 
-		Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();
-		Map<Id, Double> countTotal = new HashMap<Id, Double>();
+		for(int i = 0; i < this.noOfTimeBins; i++){
+			if(time > i * this.timeBinSize && time <= (i + 1) * this.timeBinSize){
+				endOfTimeInterval = (i + 1) * this.timeBinSize;
+				Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();;
+				Map<Id, Double> countTotal = new HashMap<Id, Double>();
+				
+				if(this.time2warmEmissionsTotal.get(endOfTimeInterval) != null){
+					warmEmissionsTotal = this.time2warmEmissionsTotal.get(endOfTimeInterval);
+					countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
 
-		if (endOfTimeInterval < this.noOfTimeBins * this.timeBinSize+1) {
-			
-			// make sure all fields are initilized / set values to zero
-			// get previous emissions of this time interval
-			if(this.time2warmEmissionsTotal != null && this.time2warmEmissionsTotal.containsKey(endOfTimeInterval)){
-				warmEmissionsTotal.putAll(this.time2warmEmissionsTotal.get(endOfTimeInterval));
-			}else{ // no emissions at this time so far - initialize as zero
-				Map<WarmPollutant, Double> map = new HashMap<WarmPollutant, Double>();
-				for(WarmPollutant wp: WarmPollutant.values()){
-					map.put(wp, 0.0);
+					if(warmEmissionsTotal.get(linkId) != null){
+						Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
+						for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
+							WarmPollutant pollutant = entry.getKey();
+							Double eventValue = entry.getValue();
+
+							Double previousValue = warmEmissionsSoFar.get(pollutant);
+							Double newValue = previousValue + eventValue;
+							
+							/*Is there a bug here?
+							See playground.fhuelsmann.emission.analysisForConcentration.EmissionsPerLinkWarmEventHandler.java*/
+							// TODO einzelne werte koennten null sein
+							warmEmissionsSoFar.put(pollutant, newValue);
+						}
+						warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
+						double countsSoFar = countTotal.get(linkId);
+						double newValue = countsSoFar + 1.;
+						countTotal.put(linkId, newValue);
+					} else {
+						warmEmissionsTotal.put(linkId, warmEmissionsOfEvent);
+						countTotal.put(linkId, 1.);
+					}
+				} else {
+					warmEmissionsTotal.put(linkId, warmEmissionsOfEvent);
+					countTotal.put(linkId, 1.);
 				}
-				warmEmissionsTotal.put(linkId, map);
+				this.time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
+				this.time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
 			}
-			
-			// get previous counts or set them to zero 
-			if(this.time2linkIdLeaveCount != null && this.time2linkIdLeaveCount.containsKey(endOfTimeInterval)){
-				countTotal.putAll(this.time2linkIdLeaveCount.get(endOfTimeInterval));	
-			}else{ // no counts so far - initialize as zero
-				countTotal.put(linkId, 0.0);
-			}
-			
-			// this event
-			if(warmEmissionsOfEvent == null){
-				warmEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
-				for(WarmPollutant wp : WarmPollutant.values()){
-					warmEmissionsOfEvent.put(wp, 0.0);
-				}
-			}
-			// check whether all pollutants exist
-			for(WarmPollutant wp: WarmPollutant.values()){
-				if(warmEmissionsOfEvent.containsKey(wp)==false){
-					warmEmissionsOfEvent.put(wp, 0.0);
-				}
-			}
-			
-			// check whether an old entry for this link exists - if not create on with zero as values
-			if(warmEmissionsTotal.containsKey(linkId)==false){
-				Map<WarmPollutant, Double> map = new HashMap<WarmPollutant, Double>();
-				for(WarmPollutant wp : WarmPollutant.values()){
-					map.put(wp, 0.0);
-				}
-				warmEmissionsTotal.put(linkId, map);
-			}
-			
-			Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
-			// make sure an entry for each pollutant exists
-			for(WarmPollutant wp : WarmPollutant.values()){ 
-				if(warmEmissionsSoFar.get(wp)==null){
-					warmEmissionsSoFar.put(wp, 0.0);
-				}
-			}
-						
-			// sum up emission values
-			for(WarmPollutant wp : WarmPollutant.values()){
-				warmEmissionsSoFar.put(wp, warmEmissionsSoFar.get(wp)+warmEmissionsOfEvent.get(wp)); //this is ok without check... values set to zero above if they didnt exist before
-			}
-			warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
-			
-			// make sure an entry for the counts exists
-			if (countTotal.get(linkId)==null){
-				countTotal.put(linkId, 0.0);
-			}
-			countTotal.put(linkId, countTotal.get(linkId)+1);
-		
-			this.time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
-			this.time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
 		}
-		// do nothing if time of event is later than the simulation end
 	}
 
 	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {

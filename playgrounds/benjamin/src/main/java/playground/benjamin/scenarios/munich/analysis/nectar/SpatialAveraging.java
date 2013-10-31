@@ -70,10 +70,10 @@ public class SpatialAveraging {
 //	final double scalingFactor = 100.;
 //	private final static String runNumber1 = "baseCase";
 //	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-////	private final static String runNumber2 = "zone30";
-////	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-//	private final static String runNumber2 = "pricing";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+//	private final static String runNumber2 = "zone30";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+////	private final static String runNumber2 = "pricing";
+////	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 //	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 //	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 //
@@ -143,7 +143,6 @@ public class SpatialAveraging {
 		this.warmHandler.reset(0);
 		this.coldHandler.reset(0);
 
-		
 		Map<Double, double[][]> time2WeightedEmissions1 = fillWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered1);
 		Map<Double, double[][]> time2NormalizedWeightedEmissions1 = normalizeAllArrays(time2WeightedEmissions1);
 				
