@@ -48,6 +48,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -71,10 +73,10 @@ public class GenerateScenarioForDetours {
 	private static final int N_COUPLES_PER_HH = 5;
 	private static final int N_HH_PER_DEST = 5;
 	private static final int N_WORK = 500;
-	private static final int LENGTH_DETOUR = 10;
+	private static final int LENGTH_DETOUR = 100;
 
 	private static final int LINK_CAPACITY = Integer.MAX_VALUE;
-	private static final double FREESPEED = 70 / 3.6;
+	private static final double FREESPEED = 50 / 3.6;
 
 	private static final String P_WORK_PREFIX = "worklink-";
 
@@ -112,6 +114,7 @@ public class GenerateScenarioForDetours {
 			final String outputNetwork,
 			final String outputPopulation,
 			final String outputHouseholds) {
+		config.subtourModeChoice().setConsiderCarAvailability( true );
 
 		config.network().setInputFile( outputNetwork );
 		config.plans().setInputFile( outputPopulation );
@@ -177,6 +180,7 @@ public class GenerateScenarioForDetours {
 
 		// cleanup: kick out all unused config groups
 		final Collection<String> usedModules = new HashSet<String>();
+		usedModules.add( SubtourModeChoiceConfigGroup.GROUP_NAME );
 		usedModules.add( NetworkConfigGroup.GROUP_NAME );
 		usedModules.add( PlansConfigGroup.GROUP_NAME );
 		usedModules.add( ScenarioConfigGroup.GROUP_NAME );
@@ -283,6 +287,8 @@ public class GenerateScenarioForDetours {
 	}
 
 	private static void createNetwork(final Network network) {
+		((NetworkImpl) network).setCapacityPeriod( 1 );
+
 		final UniqueIdFactory nodeIdFactory = new UniqueIdFactory( "node-" );
 		final UniqueIdFactory linkIdFactory = new UniqueIdFactory( "link-" );
 
