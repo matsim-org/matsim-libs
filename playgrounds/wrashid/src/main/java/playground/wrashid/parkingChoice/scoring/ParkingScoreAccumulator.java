@@ -16,6 +16,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
@@ -29,6 +30,9 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
+
+import org.apache.log4j.Logger;
+
 
 public class ParkingScoreAccumulator implements AfterMobsimListener {
 
@@ -52,6 +56,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		this.parkingManager = parkingManager;
 	}
 
+	private static int wrnCnt = 0 ;
+	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		HashMap<Id, Double> sumOfParkingWalkDistances = new HashMap<Id, Double>();
@@ -63,7 +69,15 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 			ScoringFunction scoringFunction = controler.getPlansScoring().getScoringFunctionForAgent(personId);
 
-			if (scoringFunction instanceof ScoringFunctionAccumulator) {
+			if ( !(scoringFunction instanceof ScoringFunctionAccumulator)  ) {
+				if ( wrnCnt < 10 ) {
+					wrnCnt++ ;
+					Logger.getLogger(this.getClass()).warn("scoring function is not instances of ScoringFunctionAccumulator; bookkeeping will fail ...");
+					if ( wrnCnt==10 ) {
+						Logger.getLogger(this.getClass()).warn( Gbl.FUTURE_SUPPRESSED );
+					}
+				} 
+			} else {
 
 				ScoringFunctionAccumulator scoringFuncAccumulator = (ScoringFunctionAccumulator) scoringFunction;
 
@@ -77,6 +91,8 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 				double disutilityOfWalking = 0;
 				double sumOfWalkingTimes = parkingScoreCollector.getSumOfWalkingTimes(personId);
+				System.err.println(" walkingTimes: " + sumOfWalkingTimes );
+
 				double sumOfParkingDurations = parkingScoreCollector.getSumOfParkingDurations(personId);
 				sumOfParkingWalkDistances.put(personId, sumOfWalkingTimes
 						* event.getControler().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk));
@@ -190,6 +206,9 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 	}
 
 	private void updateAverageValue(HashMap<Id, Double> sumOfParkingWalkDistances) {
+		if ( sumOfParkingWalkDistances.isEmpty() ) {
+			Logger.getLogger(this.getClass()).warn("sumOfParkingWalkDistances is empty; averaging will produce NaN") ;
+		}
 		double[] values = Collections.convertDoubleCollectionToArray(sumOfParkingWalkDistances.values());
 		averageWalkingDistance = new Mean().evaluate(values);
 	}
