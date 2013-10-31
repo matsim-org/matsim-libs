@@ -3,10 +3,22 @@ package playground.julia.distribution;
 import org.matsim.api.core.v01.Id;
 
 public class ExposureEvent {
+	
+	// ! exposure value = time x concentration
+	Id personId; 
+	Double startTime; 
+	Double endTime;
+	Double personalExposureValue; 
+	String activitytype;
+	
 
-	public ExposureEvent(Id personId, double startTime, Object endTime,
-			Double personalExposure, String string) {
-		// TODO Auto-generated constructor stub
+	public ExposureEvent(Id personId, double startTime, double endTime,
+			Double personalExposureValue, String activitytype) {
+		this.personId = personId;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.personalExposureValue = personalExposureValue;
+		this.activitytype = activitytype;
 	}
 
 }

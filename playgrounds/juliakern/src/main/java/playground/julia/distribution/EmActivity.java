@@ -3,37 +3,42 @@ package playground.julia.distribution;
 import org.matsim.api.core.v01.Id;
 
 public class EmActivity {
-	Double startOfTimeInterval;
-	Double endOfTimeInterval;
+	Double startOfActivity;
+	Double endOfActivity;
 	Id personId;
 	int xBin;
 	int yBin;
+	String activityType;
 
-	public EmActivity(Double startOfTimeInterval,	Double endOfTimeInterval, Id personId, int xBin, int yBin){
-		this.startOfTimeInterval=startOfTimeInterval;
-		this.endOfTimeInterval=endOfTimeInterval;
+	public EmActivity(Double startOfActivity,	Double endOfActivity, Id personId, int xBin, int yBin, String activityType){
+		this.startOfActivity=startOfActivity;
+		this.endOfActivity=endOfActivity;
 		this.personId=personId;
 		this.xBin=xBin;
 		this.yBin=yBin;
+		this.activityType = activityType;
 	}
 
 	public Id getPersonId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.personId;
 	}
 
 	public double getStartTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.startOfActivity;
 	}
 
 	public Double getEndTime() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.endOfActivity;
 	}
 
 	public String getActivityType() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.activityType;
+	}
+
+	public int getXBin() {
+		return this.xBin;
+	}
+	public int getYBin() {
+		return this.yBin;
 	}
 }
