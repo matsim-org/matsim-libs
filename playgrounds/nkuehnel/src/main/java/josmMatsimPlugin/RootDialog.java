@@ -8,6 +8,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -17,11 +19,13 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.DataSet;
+import org.openstreetmap.josm.data.osm.Way;
 
 /**
  * the main MATSim-dialog
@@ -133,7 +137,7 @@ public class RootDialog extends JPanel
 				Config config = ConfigUtils.createConfig();
 				Scenario scenario = ScenarioUtils.createScenario(config);
 				NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", new File("new Layer"), scenario.getNetwork(), "WGS84");
-				dataSet.addDataSetListener(new NetworkListener(layer, scenario.getNetwork(), "WGS84"));
+				dataSet.addDataSetListener(new NetworkListener(layer, scenario.getNetwork(), new HashMap<Way, List<Link>>(), "WGS84"));
 				Main.main.addLayer(layer);
 			}
 		});

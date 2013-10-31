@@ -2,6 +2,9 @@ package josmMatsimPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -61,7 +64,6 @@ public class ImportTask extends PleaseWaitRunnable
 	{
 		Main.main.addLayer(layer);
 		Main.map.mapView.setActiveLayer(layer);
-		JOptionPane.showMessageDialog(Main.main.parent, "Import finished.");
 	}
 
 	
@@ -83,7 +85,7 @@ public class ImportTask extends PleaseWaitRunnable
 		Config config= ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(Defaults.importPath);
-		
+		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 		for (Node node: scenario.getNetwork().getNodes().values())
 		{
 			Coord tmpCoor= node.getCoord();
@@ -121,10 +123,11 @@ public class ImportTask extends PleaseWaitRunnable
 			way.put("modes", String.valueOf(link.getAllowedModes()));
 			
 			dataSet.addPrimitive(way);
+			way2Links.put(way, Collections.singletonList(link));
 		}
 
 		layer = new NetworkLayer(dataSet, Defaults.importPath, new File(Defaults.importPath), scenario.getNetwork(), Defaults.originSystem);
-		dataSet.addDataSetListener(new NetworkListener(layer, scenario.getNetwork(), Defaults.originSystem));
+		dataSet.addDataSetListener(new NetworkListener(layer, scenario.getNetwork(), way2Links, Defaults.originSystem));
 	}
 
 	

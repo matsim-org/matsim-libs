@@ -86,7 +86,7 @@ public class ImportDialog extends JPanel
 				File file = new File(System.getProperty("user.home")
 						+ "/josm_matsim_export");
 				chooser.setSelectedFile(file);
-				int result = chooser.showOpenDialog(null);
+				int result = chooser.showOpenDialog(ImportDialog.this);
 				if (result == JFileChooser.APPROVE_OPTION
 						&& chooser.getSelectedFile().getAbsolutePath() != null)
 				{

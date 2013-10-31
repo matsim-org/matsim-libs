@@ -33,14 +33,15 @@ public class NetworkListener implements DataSetListener
 	private CoordinateTransformation ct;
 	private String originSystem;
 	private NetworkLayer layer;
+	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 
 
-	public NetworkListener(NetworkLayer layer, Network network, String originSystem) {
+	public NetworkListener(NetworkLayer layer, Network network, Map<Way, List<Link>> way2Links, String originSystem) {
 		this.layer = layer;
 		this.network = network;
 		this.originSystem = originSystem;
 		this.ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, originSystem);
-		
+		this.way2Links = way2Links;
 	}
 
 	@Override
@@ -59,25 +60,25 @@ public class NetworkListener implements DataSetListener
 		Coord temp= ct.transform(new CoordImpl(moved.getNode().getCoor().lon(), moved.getNode().getCoor().lat()));
 		network.getNodes().get(id).getCoord().setXY(temp.getX(), temp.getY());
 
-//		for (Link link: network.getLinks().values())
-//		{
-//			if(link.getFromNode().getId().equals(id) || 
-//					link.getToNode().getId().equals(id))
-//			{
-//				if (originSystem.equals("WGS84"))
-//					link.setLength(Defaults.calculateWGS84Length(link.getToNode().getCoord(), link.getFromNode().getCoord()));
-//				else
-//					link.setLength(CoordUtils.calcDistance(link.getToNode().getCoord(), link.getFromNode().getCoord()));
-//				OsmPrimitiveType type = OsmPrimitiveType.WAY;
-//				Way way =(Way) moved.getDataset().getPrimitiveById(Long.parseLong(link.getId().toString()), type);
-//				for(Entry<String, String> entry:way.getKeys().entrySet())
-//				{
-//					if (entry.getKey().equals("length"))
-//						way.put("length", (String.valueOf(link.getLength())));
-//					System.out.println("laenge angepasst");
-//				}
-//			}
-//		}
+		//		for (Link link: network.getLinks().values())
+		//		{
+		//			if(link.getFromNode().getId().equals(id) || 
+		//					link.getToNode().getId().equals(id))
+		//			{
+		//				if (originSystem.equals("WGS84"))
+		//					link.setLength(Defaults.calculateWGS84Length(link.getToNode().getCoord(), link.getFromNode().getCoord()));
+		//				else
+		//					link.setLength(CoordUtils.calcDistance(link.getToNode().getCoord(), link.getFromNode().getCoord()));
+		//				OsmPrimitiveType type = OsmPrimitiveType.WAY;
+		//				Way way =(Way) moved.getDataset().getPrimitiveById(Long.parseLong(link.getId().toString()), type);
+		//				for(Entry<String, String> entry:way.getKeys().entrySet())
+		//				{
+		//					if (entry.getKey().equals("length"))
+		//						way.put("length", (String.valueOf(link.getLength())));
+		//					System.out.println("laenge angepasst");
+		//				}
+		//			}
+		//		}
 
 
 	}
@@ -92,23 +93,28 @@ public class NetworkListener implements DataSetListener
 	@Override
 	public void primitivesAdded(PrimitivesAddedEvent added)
 	{
-	//	added.getDataset().clearSelection();
-
+		//	added.getDataset().clearSelection();
+		System.out.println(added.wasIncomplete());
 		for (OsmPrimitive primitive: added.getPrimitives()) {
 			if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				org.openstreetmap.josm.data.osm.Node node = (org.openstreetmap.josm.data.osm.Node) primitive;
 				Coord coord = new CoordImpl(node.getCoor().lon(), node.getCoor().lat());
 				IdImpl id = new IdImpl(primitive.getUniqueId());
-				System.out.println(id);
-				Node nodeTemp = network.getFactory().createNode(id, coord);
-				network.addNode(nodeTemp);
-				System.out.println("node hinzugefuegt!"+nodeTemp.getId());
+				if (! network.getNodes().containsKey(id)) {
+					System.out.println(id);
+					System.out.println(primitive.isDeleted() + " " + primitive.isUndeleted());
+					Node nodeTemp = network.getFactory().createNode(id, coord);
+					network.addNode(nodeTemp);
+					System.out.println("node hinzugefuegt!"+nodeTemp.getId());
+				}
 
 			} else if (primitive instanceof Way) {
 				Way way = (Way) primitive;
-				List<Link> links = way2Links(way);
-				for (Link link : links) {
-					network.addLink(link);
+				if (! way2Links.containsKey(way)) {
+					List<Link> links = enterWay2Links(way);
+					for (Link link : links) {
+						network.addLink(link);
+					}
 				}
 			}
 
@@ -181,11 +187,17 @@ public class NetworkListener implements DataSetListener
 		}
 	}
 
-	private List<Link> way2Links(Way way) {
-		return way2Links(way, way.getKeys());
+	private List<Link> enterWay2Links(Way way) {
+		List<Link> links = computeWay2Links(way);
+		List<Link> previous = way2Links.put(way, links);
+		if (previous != null) {
+			throw new RuntimeException("Shouldn't happen.");
+		}
+		return links;
 	}
-	
-	private List<Link> way2Links(Way way, Map<String, String> keys) {
+
+	public List<Link> computeWay2Links(Way way) {
+		Map<String, String> keys = way.getKeys();
 		if (way.getNodesCount() != 2) return Collections.emptyList();
 		if (!keys.containsKey("capacity")) return Collections.emptyList();
 		if (!keys.containsKey("freespeed")) return Collections.emptyList();
@@ -206,6 +218,7 @@ public class NetworkListener implements DataSetListener
 	@Override
 	public void primitivesRemoved(PrimitivesRemovedEvent primitivesRemoved)
 	{
+		System.out.println(primitivesRemoved.wasComplete());
 		for (OsmPrimitive primitive: primitivesRemoved.getPrimitives()) {
 			if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				String id = String.valueOf(primitive.getUniqueId());
@@ -213,7 +226,7 @@ public class NetworkListener implements DataSetListener
 				System.out.println("node removed!");
 				network.removeNode(node.getId());
 			} else if (primitive instanceof Way) {
-				List<Link> links = way2Links((Way) primitive);
+				List<Link> links = way2Links.remove(((Way) primitive));
 				for (Link link : links) {
 					network.removeLink(link.getId());
 					System.out.println("link removed!");
@@ -223,7 +236,7 @@ public class NetworkListener implements DataSetListener
 		System.out.println("have links: "+network.getLinks().size());
 	}
 
-	
+
 
 	@Override
 	public void relationMembersChanged(RelationMembersChangedEvent arg0)
@@ -237,8 +250,8 @@ public class NetworkListener implements DataSetListener
 		for (OsmPrimitive primitive: changed.getPrimitives()) {
 			if (primitive instanceof Way) {
 				Way way = (Way) primitive;
-				List<Link> oldLinks = way2Links(way, changed.getOriginalKeys());
-				List<Link> newLinks = way2Links(way);
+				List<Link> oldLinks = way2Links.remove(way);
+				List<Link> newLinks = enterWay2Links(way);
 				for (Link link : oldLinks) {
 					System.out.println("remove because tag changed.");
 					network.removeLink(link.getId());
@@ -248,7 +261,6 @@ public class NetworkListener implements DataSetListener
 					network.addLink(link);
 				}
 			}
-			
 		}
 
 		System.out.println("have links: "+network.getLinks().size());
@@ -256,7 +268,7 @@ public class NetworkListener implements DataSetListener
 
 	@Override
 	public void wayNodesChanged(WayNodesChangedEvent changed) {
-				System.out.println("waychange");
+		System.out.println("waychange " + changed.getChangedWay().getUniqueId());
 		//		layer.data.clearSelection();
 		//		layer.data.beginUpdate();
 		//		
