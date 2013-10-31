@@ -23,7 +23,7 @@ public class SOTRMultiNodeDijkstra {
 	
 	private final SOTRTimeCalculator timeCalc;
 	private final SOTRDisutilityCalculator costCalc;
-	private final playground.toronto.sotr.routernetwork2.RoutingNetwork.RoutingNetworkDelegate network;
+	private final RoutingNetworkDelegate network;
 	
 	public SOTRMultiNodeDijkstra(final SOTRTimeCalculator timeFunc, final SOTRDisutilityCalculator costCalc, final RoutingNetworkDelegate network){
 		this.timeCalc = timeFunc;

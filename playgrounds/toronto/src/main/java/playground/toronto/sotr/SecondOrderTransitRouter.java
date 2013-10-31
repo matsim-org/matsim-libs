@@ -21,13 +21,25 @@ import playground.toronto.sotr.routernetwork2.AbstractRoutingNode;
 
 public class SecondOrderTransitRouter implements TransitRouter {
 
-	private /*final*/ RoutingNetworkDelegate network;
-	private /*final*/ SOTRMultiNodeDijkstra pathingAlgorithm;
-	private /*final*/ SOTRTimeCalculator timeCalc;
-	private /*final*/ SOTRDisutilityCalculator costCalc;
+	private final RoutingNetworkDelegate network;
+	private final SOTRMultiNodeDijkstra pathingAlgorithm;
+	//private final SOTRTimeCalculator timeCalc;
+	//private final SOTRDisutilityCalculator costCalc;
 	
-	private /*final*/ double searchRadius;
-	private /*final*/ double extensionRadius;
+	private final double searchRadius;
+	private final double extensionRadius;
+	
+	public SecondOrderTransitRouter(final RoutingNetworkDelegate network, final SOTRTimeCalculator timeCalc,
+			final SOTRDisutilityCalculator costCalc, final double searchRadius, final double extensionRadius) {
+		this.network = network;
+		//this.timeCalc = timeCalc;
+		//this.costCalc = costCalc;
+		
+		this.searchRadius = searchRadius;
+		this.extensionRadius = extensionRadius;
+		
+		this.pathingAlgorithm = new SOTRMultiNodeDijkstra(timeCalc, costCalc, network);
+	}
 	
 	@Override
 	public List<Leg> calcRoute(Coord fromCoord, Coord toCoord,
@@ -46,7 +58,7 @@ public class SecondOrderTransitRouter implements TransitRouter {
 		//Convert the path to a list of legs
 		for (AbstractRoutingLink link : path.getMiddleLinks()){
 			
-			
+			//link.getFromNode().getStopFacility(null, null);
 			
 			
 			//For in-vehicle episodes
