@@ -20,6 +20,9 @@
 package playground.thibautd.scripts;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -37,7 +40,14 @@ import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.HouseholdsConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -102,6 +112,7 @@ public class GenerateScenarioForDetours {
 			final String outputNetwork,
 			final String outputPopulation,
 			final String outputHouseholds) {
+
 		config.network().setInputFile( outputNetwork );
 		config.plans().setInputFile( outputPopulation );
 
@@ -109,6 +120,8 @@ public class GenerateScenarioForDetours {
 		config.households().setInputFile( outputHouseholds );
 
 		config.qsim().setEndTime( 30 * 3600 );
+
+		config.controler().setLastIteration( 300 );
 
 		/* scope of work params */ {
 			final ActivityParams params = new ActivityParams( "work" );
@@ -127,6 +140,7 @@ public class GenerateScenarioForDetours {
 		config.addModule( strategies );
 
 		strategies.setUseLimitedVehicles( false );
+		strategies.setDisableInnovationAfterIteration( 200 );
 
 		/* scope of select exp beta */ {
 			final StrategyParameterSet set = new StrategyParameterSet();
@@ -159,6 +173,23 @@ public class GenerateScenarioForDetours {
 
 			set.setStrategyName( "ReRoute" );
 			set.setWeight( 0.1 );
+		}
+
+		// cleanup: kick out all unused config groups
+		final Collection<String> usedModules = new HashSet<String>();
+		usedModules.add( NetworkConfigGroup.GROUP_NAME );
+		usedModules.add( PlansConfigGroup.GROUP_NAME );
+		usedModules.add( ScenarioConfigGroup.GROUP_NAME );
+		usedModules.add( HouseholdsConfigGroup.GROUP_NAME );
+		usedModules.add( QSimConfigGroup.GROUP_NAME );
+		usedModules.add( ControlerConfigGroup.GROUP_NAME );
+		usedModules.add( PlanCalcScoreConfigGroup.GROUP_NAME );
+		usedModules.add( GroupReplanningConfigGroup.GROUP_NAME );
+
+		final Iterator<String> nameIterator = config.getModules().keySet().iterator();
+		while ( nameIterator.hasNext() ) {
+			final String name = nameIterator.next();
+			if ( !usedModules.contains( name ) ) nameIterator.remove();
 		}
 	}
 
