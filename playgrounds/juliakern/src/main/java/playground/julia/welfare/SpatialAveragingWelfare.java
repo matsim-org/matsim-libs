@@ -64,10 +64,10 @@ public class SpatialAveragingWelfare {
 	final double scalingFactor = 100.;
 	private final static String runNumber1 = "baseCase";
 	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-//	private final static String runNumber2 = "zone30";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-	private final static String runNumber2 = "pricing";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+	private final static String runNumber2 = "zone30";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+//	private final static String runNumber2 = "pricing";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 //
@@ -122,7 +122,7 @@ public class SpatialAveragingWelfare {
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
 		ubc.calculateUtility_money(pop);
 		Map<Id, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
-		logger.info("There were " + ubc.getNoValidPlanCnt() + " persons without any valid plan.");
+		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 		
 		double [][] weightsBaseCase = calculateWeights(personId2Utility, pop);
 		double [][] normalizedWeightsBaseCase = normalizeArray(weightsBaseCase);
@@ -147,7 +147,7 @@ public class SpatialAveragingWelfare {
 			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM);
 			ubc2.calculateUtility_money(pop2);
 			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
-			logger.info("There were " + ubc2.getNoValidPlanCnt() + " persons without any valid plan.");
+			logger.info("There were " + ubc2.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 			
 			double [][] weightsPolicyCase = calculateWeights(personId2Utility2, pop2);
 			double [][] normalizedWeightsPolicyCase = normalizeArray(weightsPolicyCase);
