@@ -3,41 +3,32 @@ package playground.julia.distribution;
 import org.matsim.api.core.v01.Id;
 
 public class EmCarTrip {
-	Double startOfTimeInterval;
-	Double endOfTimeInterval;
+	Double startTime;
+	Double endTime;
 	Id personId;
 	Id linkId;
 	
 	public EmCarTrip(Double startOfTimeInterval, Double endOfTimeInterval, 	Id personId, Id linkId){
-		this.startOfTimeInterval=startOfTimeInterval;
-		this.endOfTimeInterval=endOfTimeInterval;
+		this.startTime=startOfTimeInterval;
+		this.endTime=endOfTimeInterval;
 		this.personId=personId;
 		this.linkId=linkId;
 	}
 
-	public Double getDuration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public double getStartTime() {
-		// TODO Auto-generated method stub
-		return 0;
+	public Double getStartTime() {
+		return this.startTime;
 	}
 
 	public Id getLinkId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.linkId;
 	}
 
 	public Id getPersonId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.personId;
 	}
 
-	public Object getEndTime() {
-		// TODO Auto-generated method stub
-		return null;
+	public Double getEndTime() {
+		return this.endTime;
 	}
 
 }

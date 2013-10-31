@@ -21,4 +21,16 @@ public class ExposureEvent {
 		this.activitytype = activitytype;
 	}
 
+
+	public Id getPersonId() {
+		// TODO Auto-generated method stub
+		return this.personId;
+	}
+
+
+	public String getAverageExposure() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

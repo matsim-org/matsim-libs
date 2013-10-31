@@ -17,22 +17,18 @@ public class EmPerBin {
 	}
 
 	public Integer getXbin() {
-		// TODO Auto-generated method stub
 		return this.xBin;
 	}
 	
 	public Integer getYbin() {
-		// TODO Auto-generated method stub
 		return this.yBin;
 	}
 
 	public Id getPersonId() {
-		// TODO Auto-generated method stub
 		return this.personId;
 	}
 
 	public Double getConcentration() {
-		// TODO Auto-generated method stub
 		return this.value;
 	}
 

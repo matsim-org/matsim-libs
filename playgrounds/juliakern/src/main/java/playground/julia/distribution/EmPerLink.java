@@ -14,4 +14,16 @@ public class EmPerLink {
 		this.value = value;
 	}
 
+	public Id getLinkId() {
+		return this.linkId;
+	}
+
+	public Id getPersonId() {
+		return this.personId;
+	}
+
+	public Double getConcentration() {
+		return this.value;
+	}
+
 }

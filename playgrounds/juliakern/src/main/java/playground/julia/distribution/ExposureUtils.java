@@ -50,7 +50,7 @@ public class ExposureUtils {
 	
 	public void printPersonalExposureTimeTables(ArrayList<ExposureEvent> exposure,
 			String outPathForTimeTables) {
-		// TODO Auto-generated method stub
+//TODO
 		
 	}
 

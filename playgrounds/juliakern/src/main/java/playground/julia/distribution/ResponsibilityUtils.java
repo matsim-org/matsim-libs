@@ -13,8 +13,51 @@ public class ResponsibilityUtils {
 			Map<Double, ArrayList<EmPerLink>> emissionPerLink,
 			ArrayList<ExposureEvent> exposure,
 			ArrayList<ResponsibilityEvent> responsibility, double timeBinSize, double simulationEndTime) {
-		// TODO Auto-generated method stub
 		
+		  		for(EmCarTrip ect: carTrips){
+				Id linkId = ect.getLinkId();
+				Double startTime = ect.getStartTime();
+				Double endTime = ect.getEndTime();
+				Id exposedPersonId = ect.getPersonId();
+				
+				// TODO Benjamin fragen: Annahme: fahrzeit auf links ist so kurz, dass sie nicht in mehrere time bins fallen
+				Double endOfTimeInterval = Math.ceil(ect.getStartTime()/ timeBinSize)* timeBinSize;
+				
+				// all responsibility events for this activity
+				ArrayList<ResponsibilityEvent> currentREvents = new ArrayList<ResponsibilityEvent>();
+				currentREvents.addAll(generateResponsibilityEventsForLink(emissionPerLink.get(endOfTimeInterval), linkId, startTime, endTime));
+				
+				
+				// calculate exposure
+				Double exposureValue =0.0;
+				
+				for(ResponsibilityEvent re: currentREvents){
+					exposureValue+=re.getExposureValue();
+				}
+				
+				String actType = "car on link " + ect.getLinkId().toString();
+				ExposureEvent exposureEvent = new ExposureEvent(exposedPersonId, startTime, endTime, exposureValue, actType);
+				exposure.add(exposureEvent);
+				
+				responsibility.addAll(currentREvents);
+			}
+		
+	}
+
+	private ArrayList<ResponsibilityEvent> generateResponsibilityEventsForLink(
+			ArrayList<EmPerLink> emissionPerLinkOfCurrentTimeBin, Id linkId, Double startTime,
+			Double endTime) {
+		
+		ArrayList<ResponsibilityEvent> rEvents = new ArrayList<ResponsibilityEvent>();
+		
+		for(EmPerLink epl: emissionPerLinkOfCurrentTimeBin){
+			if(epl.getLinkId().equals(linkId)){
+				String location = "link " + linkId.toString();
+				ResponsibilityEvent ree = new ResponsibilityEvent(epl.getPersonId(), startTime, endTime, epl.getConcentration(), location);
+				rEvents.add(ree);
+			}
+		}
+		return rEvents;
 	}
 
 	public void addExposureAndResponsibilityBinwise(
@@ -53,20 +96,20 @@ public class ResponsibilityUtils {
 				//first bin
 				Double firstStartTime = startTime;
 				Double firstEndTime = firstTimeBin * timeBinSize;
-				currentREvents.addAll(generateResponsibilityEvents(emissionPerBin.get(firstTimeBin*timeBinSize), firstTimeBin, xBin, yBin, firstStartTime, firstEndTime));
+				currentREvents.addAll(generateResponsibilityEventsForCell(emissionPerBin.get(firstTimeBin*timeBinSize), firstTimeBin, xBin, yBin, firstStartTime, firstEndTime));
 				// inner time bins
 				for (int i = firstTimeBin + 1; i < lastTimeBin; i++) {
 					Double currentStartTime = (i-1)*timeBinSize; // TODO check!
 					Double currentEndTime = i*timeBinSize;
-					currentREvents.addAll(generateResponsibilityEvents(emissionPerBin.get(i*timeBinSize), i, xBin, yBin, currentStartTime, currentEndTime));
+					currentREvents.addAll(generateResponsibilityEventsForCell(emissionPerBin.get(i*timeBinSize), i, xBin, yBin, currentStartTime, currentEndTime));
 				}
 				// last bin
 				Double lastStartTime = (lastTimeBin-1)*timeBinSize;
 				Double lastEndTime = endTime;
-				currentREvents.addAll(generateResponsibilityEvents(emissionPerBin.get(lastTimeBin*timeBinSize), lastTimeBin, xBin, yBin, lastStartTime, lastEndTime));
+				currentREvents.addAll(generateResponsibilityEventsForCell(emissionPerBin.get(lastTimeBin*timeBinSize), lastTimeBin, xBin, yBin, lastStartTime, lastEndTime));
 				
 			}else{ // activity entirely in one interval
-				currentREvents.addAll(generateResponsibilityEvents(emissionPerBin.get(firstTimeBin*timeBinSize), firstTimeBin, xBin, yBin, startTime, endTime));
+				currentREvents.addAll(generateResponsibilityEventsForCell(emissionPerBin.get(firstTimeBin*timeBinSize), firstTimeBin, xBin, yBin, startTime, endTime));
 			}
 			
 			// calculate exposure
@@ -87,7 +130,7 @@ public class ResponsibilityUtils {
 		
 	}
 
-	private ArrayList<ResponsibilityEvent> generateResponsibilityEvents(
+	private ArrayList<ResponsibilityEvent> generateResponsibilityEventsForCell(
 			ArrayList<EmPerBin> emissionPerBinOfCurrentTimeBin, int firstTimeBin,
 			int xBin, int yBin, Double startTime, Double endTime) {
 		
@@ -103,41 +146,8 @@ public class ResponsibilityUtils {
 		return rEvents;
 	}
 
-	/*
-	 * 		for(EmCarTrip ect: carTrips){
-			Id linkId = ect.getLinkId();
-			Double duration = ect.getDuration();
-			
-			// exposure
-			// TODO Benjamin fragen: Annahme: fahrzeit auf links ist so kurz, dass sie nicht in mehrere time bins fallen
-			Double endOfTimeInterval = Math.ceil(ect.getStartTime()/ timeBinSize)* timeBinSize;
-			Id exposedPersonId = ect.getPersonId();
-			Double personalExposure = reut.getExposureOnLink(linkId, endOfTimeInterval)* duration * pollutionFactorOutdoor;
-			
-			ExposureEvent eevent = new ExposureEvent(exposedPersonId, ect.getStartTime(), ect.getEndTime(), personalExposure, "car");
-			exposure.add(eevent);
-			
-			// responsibility
-			ArrayList<ResponsibilityEvent> revents = reut.getResponsibilityOnLink(linkId, endOfTimeInterval, duration);
-			responsibility.addAll(revents);
-		}
-	 */
+
 	
-	
-//	public Double getExposureOnLink(Id linkId, Double endOfTimeInterval) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	public ArrayList<ResponsibilityEvent> getResponsibilityOnLink(Id linkId,
-//			Double endOfTimeInterval, Double duration) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	public Double getExposureInCell(int xBin, int yBin, int firstTimeBin) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+
 
 }
