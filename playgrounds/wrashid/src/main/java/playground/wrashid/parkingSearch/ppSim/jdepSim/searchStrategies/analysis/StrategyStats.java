@@ -73,9 +73,13 @@ public class StrategyStats {
 			}
 		}
 		
-		for (ParkingSearchStrategy pss: strategyCountAll.getKeySet()){
+		for (ParkingSearchStrategy pss: ParkingStrategyManager.allStrategies){
 			if (!strategySharesAll.containsKey(pss)){
 				strategySharesAll.put(pss, new ArrayList<Double>());
+			}
+			
+			if (!strategyCountAll.containsKey(pss)){
+				strategyCountAll.set(pss, 0);
 			}
 			
 			strategySharesAll.get(pss).add(100.0*strategyCountAll.get(pss)/sampleSizeAll);
@@ -94,9 +98,13 @@ public class StrategyStats {
 			}
 		}
 		
-		for (ParkingSearchStrategy pss: strategyCount.getKeySet()){
+		for (ParkingSearchStrategy pss: ParkingStrategyManager.allStrategies){
 			if (!strategySharesWithoutPrivateParking.containsKey(pss)){
 				strategySharesWithoutPrivateParking.put(pss, new ArrayList<Double>());
+			}
+			
+			if (!strategyCount.containsKey(pss)){
+				strategyCount.set(pss, 0);
 			}
 			
 			strategySharesWithoutPrivateParking.get(pss).add(100.0*strategyCount.get(pss)/sampleSize);

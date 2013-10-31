@@ -179,6 +179,10 @@ public class ZHScenarioGlobal {
 		return Double.parseDouble(config.getParam("parkingSearch", paramName));
 	}
 	
+	public static boolean loadBooleanParam(String paramName){
+		return Boolean.parseBoolean(config.getParam("parkingSearch", paramName));
+	}
+	
 	public static int loadIntParam(String paramName){
 		return Integer.parseInt(config.getParam("parkingSearch", paramName));
 	}

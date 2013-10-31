@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -26,6 +27,7 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 
@@ -34,17 +36,22 @@ public class EvaluationContainer {
 	private static final Logger log = Logger.getLogger(EvaluationContainer.class);
 	
 	LinkedList<StrategyEvaluation> evaluations;
+
+	private Random random;
 	
 	public EvaluationContainer(LinkedList<ParkingSearchStrategy> allStrategies){
+		random = MatsimRandom.getLocalInstance();
 		evaluations=new LinkedList<StrategyEvaluation>();
-		
-		for (ParkingSearchStrategy fullStrat:allStrategies){
-			evaluations.add(new StrategyEvaluation(fullStrat));
+		createAndStorePermutation(allStrategies);
+	}
+	
+	public void createAndStorePermutation(LinkedList<ParkingSearchStrategy> allStrategies){
+		ArrayList<ParkingSearchStrategy> strategies=new ArrayList<ParkingSearchStrategy>(allStrategies);
+	
+		while (strategies.size()!=0){
+			int randomIndex = random.nextInt(strategies.size());
+			evaluations.add(new StrategyEvaluation(strategies.remove(randomIndex)));
 		}
-		
-		Random rand = MatsimRandom.getLocalInstance();
-		StrategyEvaluation randomSelectedEvaluationStrategy = evaluations.remove(rand.nextInt(evaluations.size()));
-		evaluations.addFirst(randomSelectedEvaluationStrategy);
 	}
 	
 	public StrategyEvaluation getCurrentSelectedStrategy(){
@@ -66,12 +73,79 @@ public class EvaluationContainer {
 		}
 	}
 	
-	//TODO: add random selection from non selected
+	public void selectNextStrategyAccordingToMNL(){
+		double exponentialSum=0;
+		double[] selectionProbabilities=new double[evaluations.size()];
+		for (int i=0;i<evaluations.size();i++){
+			exponentialSum+=Math.exp(evaluations.get(i).score);
+		}
+		
+		for (int i=0;i<evaluations.size();i++){
+			selectionProbabilities[i]=Math.exp( evaluations.get(i).score)/exponentialSum;
+		}
+		
+		double r=random.nextDouble();
+		int index=0;
+		double sum=0;
+		
+		while (sum+selectionProbabilities[index]<r){
+			sum+=selectionProbabilities[index];
+			index++;
+		}
+		
+		evaluations.addFirst(evaluations.remove(index));
+	}
 	
-	//TODO: add logit model
+	public void selectStrategyAccordingToFixedProbabilityForBestStrategy(){
+		if (random.nextDouble() < ZHScenarioGlobal.loadDoubleParam("convergance.fixedPropbabilityBestStrategy.probabilityBestStrategy")) {
+			selectBestStrategyForExecution();
+		} else {
+			selectLongestNonExecutedStrategyForExecution();
+		}
+	}
 	
-	// for this to work, will need to set initial score to finit negative number initially.
+	public void trimStrategySet(int maxNumberOfStrategies){
+		while (evaluations.size()>maxNumberOfStrategies){
+			dropWostStrategy();
+		}
+	}
 	
+	public void dropWostStrategy(){
+		StrategyEvaluation worstStrategy=evaluations.getFirst();
+		for (StrategyEvaluation se:evaluations){
+			if (worstStrategy.score>se.score){
+				worstStrategy=se;
+			}
+		}
+		evaluations.remove(worstStrategy);
+	}
+	
+	public int getNumberOfStrategies(){
+		return evaluations.size();
+	}
+	
+	
+	public boolean allStrategiesHaveBeenExecutedOnce(){
+		for (StrategyEvaluation se:evaluations){
+			if (Double.isInfinite(se.score)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	// precondition: such a strategy exists (allStrategiesHaveBeenExecutedOnce=> true)
+	public void selectStrategyNotExecutedTillNow(){
+		StrategyEvaluation strategyToExecuteNext=null;
+		for (StrategyEvaluation se:evaluations){
+			if (Double.isInfinite(se.score)){
+				strategyToExecuteNext=se;
+				break;
+			}
+		}
+		evaluations.remove(strategyToExecuteNext);
+		evaluations.addFirst(strategyToExecuteNext);
+	}
 	
 	public void selectLongestNonExecutedStrategyForExecution(){
 		StrategyEvaluation last=evaluations.getLast();

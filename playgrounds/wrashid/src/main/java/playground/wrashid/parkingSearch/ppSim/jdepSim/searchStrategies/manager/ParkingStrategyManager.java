@@ -82,12 +82,38 @@ public class ParkingStrategyManager {
 						evaluationContainer = agentHashMap.get(i);
 					}
 
-					if (random.nextDouble() < executionProbabilityOfBestStrategy) {
-						evaluationContainer.selectBestStrategyForExecution();
+					if (ZHScenarioGlobal.loadBooleanParam("convergance.evaluateAllStrategiesOnceAtBeginning")
+							&& !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
+						evaluationContainer.selectStrategyNotExecutedTillNow();
 					} else {
-						evaluationContainer.selectLongestNonExecutedStrategyForExecution();
+						if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
+								.loadIntParam("convergance.fixedPropbabilityBestStrategy.stopStrategyAtIteration")) {
+							evaluationContainer.selectStrategyAccordingToFixedProbabilityForBestStrategy();
+						} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
+								.loadIntParam("convergance.MNL.startStrategyAtIteration")) {
+							evaluationContainer.selectNextStrategyAccordingToMNL();
+						} else {
+							DebugLib.stopSystemAndReportInconsistency();
+						}
 					}
-
+					
+					if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropAllOnce")){
+						if (ZHScenarioGlobal.loadIntParam("convergance.dropAllOnce.atIteration")==ZHScenarioGlobal.iteration){
+							evaluationContainer.trimStrategySet(ZHScenarioGlobal.loadIntParam("convergance.dropStrategy.minNumberOfStrategies"));
+						}
+					} else if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropOneByOne")){
+						if (evaluationContainer.getNumberOfStrategies()>ZHScenarioGlobal.loadIntParam("convergance.dropStrategy.minNumberOfStrategies")){
+							int startDrop = ZHScenarioGlobal.loadIntParam("convergance.dropOneByOne.startDroppingAtIteration");
+							if (startDrop==ZHScenarioGlobal.iteration){
+								evaluationContainer.dropWostStrategy();
+							} else if (startDrop<ZHScenarioGlobal.iteration){
+								int dropEachNthIter = ZHScenarioGlobal.loadIntParam("convergance.dropOneByOne.dropEachNthIteration");
+								if ((ZHScenarioGlobal.iteration-startDrop) % dropEachNthIter==0){
+									evaluationContainer.dropWostStrategy();
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -95,13 +121,12 @@ public class ParkingStrategyManager {
 
 	public void updateScore(Id personId, int legIndex, double score) {
 		EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
-		if (evaluationContainer==null){
+		if (evaluationContainer == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
-		
+
 		evaluationContainer.updateScoreOfSelectedStrategy(score);
 	}
-
 
 	public void printStrategyStatistics() {
 		IntegerValueHashMap<String> numberOfTimesStrategySelected = new IntegerValueHashMap<String>();
@@ -119,10 +144,10 @@ public class ParkingStrategyManager {
 	}
 
 	public ParkingSearchStrategy getParkingStrategyForCurrentLeg(Person person, int currentPlanElementIndex) {
-		if (strategyEvaluations.get(person.getId()).get(currentPlanElementIndex)==null){
+		if (strategyEvaluations.get(person.getId()).get(currentPlanElementIndex) == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
-		
+
 		return strategyEvaluations.get(person.getId()).get(currentPlanElementIndex).getCurrentSelectedStrategy().strategy;
 	}
 
@@ -135,10 +160,10 @@ public class ParkingStrategyManager {
 	}
 
 	public void reset() {
-		for (ParkingSearchStrategy pss:allStrategies){
+		for (ParkingSearchStrategy pss : allStrategies) {
 			pss.resetForNewIteration();
 		}
-		
+
 	}
 
 }
