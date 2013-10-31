@@ -5,15 +5,15 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.toronto.sotr.config.SOTRConfig;
 import playground.toronto.sotr.routernetwork2.RoutingInVehicleLink;
-import playground.toronto.sotr.routernetwork2.RoutingLink;
+import playground.toronto.sotr.routernetwork2.AbstractRoutingLink;
 import playground.toronto.sotr.routernetwork2.RoutingWalkLink;
 
-public class TestCalc implements SOTRDisutilityCalculator2, SOTRTimeCalculator2 {
+public class TestCalc implements SOTRDisutilityCalculator, SOTRTimeCalculator {
 
 	private SOTRConfig config;
 	
 	@Override
-	public double getLinkTravelTime(RoutingLink link, double now,
+	public double getLinkTravelTime(AbstractRoutingLink link, double now,
 			Person person, Vehicle vehicle) {
 		
 		if (link instanceof RoutingWalkLink){
@@ -27,7 +27,7 @@ public class TestCalc implements SOTRDisutilityCalculator2, SOTRTimeCalculator2 
 	}
 	
 	@Override
-	public double getTurnTravelTime(RoutingLink fromLink, RoutingLink toLink,
+	public double getTurnTravelTime(AbstractRoutingLink fromLink, AbstractRoutingLink toLink,
 			double now, Person person, Vehicle vehicle) {
 		// TODO Auto-generated method stub
 		
@@ -57,7 +57,7 @@ public class TestCalc implements SOTRDisutilityCalculator2, SOTRTimeCalculator2 
 	}
 
 	@Override
-	public double getLinkTravelDisutility(RoutingLink link, double now,
+	public double getLinkTravelDisutility(AbstractRoutingLink link, double now,
 			Person person, Vehicle vehicle) {
 		
 		if (link instanceof RoutingWalkLink){
@@ -81,8 +81,8 @@ public class TestCalc implements SOTRDisutilityCalculator2, SOTRTimeCalculator2 
 	}
 
 	@Override
-	public double getTurnTravelDisutility(RoutingLink fromLink,
-			RoutingLink toLink, double time, Person person, Vehicle vehicle) {
+	public double getTurnTravelDisutility(AbstractRoutingLink fromLink,
+			AbstractRoutingLink toLink, double time, Person person, Vehicle vehicle) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

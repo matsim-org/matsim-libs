@@ -23,14 +23,18 @@ import playground.toronto.sotr.routernetwork2.RoutingWalkLink.WalkType;
  */
 public class RoutingNetwork {
 	
-	private ArrayList<RoutingNode> nodes;
-	private ArrayList<RoutingLink> links;
+	private ArrayList<AbstractRoutingNode> nodes;
+	private ArrayList<AbstractRoutingLink> links;
 	
-	public RoutingNode createNode(Coord coord){
-		RoutingNode node = new RoutingNode(coord);
-		this.nodes.add(node);
-		return node;
+	public RoutingNetwork(){
+		this.nodes = new ArrayList<AbstractRoutingNode>();
+		this.links = new ArrayList<AbstractRoutingLink>();
 	}
+	
+	public void addNode(AbstractRoutingNode node){
+		this.nodes.add(node);
+	}
+	
 	
 	/**
 	 * Creates and adds a new {@link RoutingWalkLink} to the network, of type
@@ -39,8 +43,23 @@ public class RoutingNetwork {
 	 * @param toNode
 	 * @return
 	 */
-	public RoutingWalkLink createWalkLink(RoutingNode fromNode, RoutingNode toNode){
+	public RoutingWalkLink createWalkLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode){
 		RoutingWalkLink link = new RoutingWalkLink(fromNode, toNode, WalkType.TRANSFER);
+		this.links.add(link);
+		fromNode.outgoingLinks.add(link);
+		return link;
+	}
+	
+	/**
+	 * Creates and adds a new {@link RoutingWalkLink} to the network, of type
+	 * <code>TRANSFER</code>. Other walk types are created during the routing procedure.
+	 * @param fromNode
+	 * @param toNode
+	 * @param length
+	 * @return
+	 */
+	public RoutingWalkLink createWalkLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode, double length){
+		RoutingWalkLink link = new RoutingWalkLink(fromNode, toNode, length, WalkType.TRANSFER);
 		this.links.add(link);
 		fromNode.outgoingLinks.add(link);
 		return link;
@@ -53,27 +72,31 @@ public class RoutingNetwork {
 	 * @param data
 	 * @return
 	 */
-	public RoutingInVehicleLink createInVehicleLink(RoutingNode fromNode, RoutingNode toNode, InVehicleLinkData data){
+	public RoutingInVehicleLink createInVehicleLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode, InVehicleLinkData data){
 		RoutingInVehicleLink link = new RoutingInVehicleLink(fromNode, toNode, data);
 		this.links.add(link);
 		fromNode.outgoingLinks.add(link);
 		return link;
 	}
 	
-	public void createTurnRestriction(RoutingLink fromLink, RoutingLink toLink){
+	public void createTurnRestriction(AbstractRoutingLink fromLink, AbstractRoutingLink toLink){
 		if (fromLink.toNode != toLink.fromNode)
 			throw new IllegalArgumentException("Cannot create turn restriction: links must be connected.");
 		
 		fromLink.prohibitedOutgoingTurns.add(toLink);
 	}
 	
+	/**
+	 * Creates a deep copy {@link RoutingNetworkDelegate} of this network.
+	 * @return
+	 */
 	public RoutingNetworkDelegate createDelegate(){
 		
 		double minX = Double.POSITIVE_INFINITY, minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
 		
-		for (RoutingNode n : nodes){
-			Coord c = n.coord;
+		for (AbstractRoutingNode n : nodes){
+			Coord c = n.getCoord();
 			
 			if (c.getX() < minX) minX = c.getX();
 			if (c.getY() < minY) minY = c.getY();
@@ -83,44 +106,46 @@ public class RoutingNetwork {
 		
 		RoutingNetworkDelegate delegate = new RoutingNetworkDelegate(minX, minY, maxX, maxY, links.size());
 		
-		HashMap<RoutingNode, RoutingNode> nodeProxyMap = new HashMap<RoutingNode, RoutingNode>();
-		HashMap<RoutingLink, RoutingLink> linkProxyMap = new HashMap<RoutingLink, RoutingLink>();
+		HashMap<AbstractRoutingNode, AbstractRoutingNode> nodeProxyMap = new HashMap<AbstractRoutingNode, AbstractRoutingNode>();
+		HashMap<AbstractRoutingLink, AbstractRoutingLink> linkProxyMap = new HashMap<AbstractRoutingLink, AbstractRoutingLink>();
 		
 		//Copy the nodes
-		for (RoutingNode node : nodes){
-			RoutingNode copy = new RoutingNode(node.coord);
+		for (AbstractRoutingNode node : nodes){
+			AbstractRoutingNode copy = new AbstractRoutingNode.RoutingNodeCopy(node);
 			
-			delegate.quadTree.put(node.coord.getX(), node.coord.getY(), copy);
+			delegate.quadTree.put(copy.getCoord().getX(), copy.getCoord().getY(), copy);
 			nodeProxyMap.put(node, copy);
 		}
 		
 		//Copy the links
-		int currentIndex = 1;
-		for (RoutingLink link : links){
-			RoutingNode fromNode = nodeProxyMap.get(link.fromNode);
-			RoutingNode toNode = nodeProxyMap.get(link.toNode);
+		int currentIndex = 0;
+		for (AbstractRoutingLink link : links){
+			AbstractRoutingNode fromNode = nodeProxyMap.get(link.fromNode);
+			AbstractRoutingNode toNode = nodeProxyMap.get(link.toNode);
 			
-			RoutingLink copy= null;		
+			AbstractRoutingLink copy= null;		
 			
 			if (link instanceof RoutingWalkLink){
 				copy = new RoutingWalkLink(fromNode, toNode, ((RoutingWalkLink) link).getLength(), WalkType.TRANSFER);
+				copy.isCopy = true;
 			} else if (link instanceof RoutingInVehicleLink){
 				RoutingInVehicleLink wrapped = (RoutingInVehicleLink) link;
 				copy = new RoutingInVehicleLink(fromNode, toNode, wrapped.data);
 			}
 			
 			fromNode.outgoingLinks.add(copy);
-			copy.index = currentIndex++;
+			copy.index = currentIndex;
+			delegate.links[currentIndex++] = copy;
 			linkProxyMap.put(link, copy);
 		}
 		
 		//Copy turn restrictions
-		for (Entry<RoutingLink, RoutingLink> entry : linkProxyMap.entrySet()){
-			RoutingLink link = entry.getKey();
-			RoutingLink copy = entry.getValue();
+		for (Entry<AbstractRoutingLink, AbstractRoutingLink> entry : linkProxyMap.entrySet()){
+			AbstractRoutingLink link = entry.getKey();
+			AbstractRoutingLink copy = entry.getValue();
 			
-			for (RoutingLink restrictedTurn : link.prohibitedOutgoingTurns){
-				RoutingLink turnCopy = linkProxyMap.get(restrictedTurn);
+			for (AbstractRoutingLink restrictedTurn : link.prohibitedOutgoingTurns){
+				AbstractRoutingLink turnCopy = linkProxyMap.get(restrictedTurn);
 				copy.prohibitedOutgoingTurns.add(turnCopy);
 			}
 		}
@@ -139,20 +164,20 @@ public class RoutingNetwork {
 	 */
 	public static class RoutingNetworkDelegate{
 		
-		private final QuadTree<RoutingNode> quadTree;
-		private final RoutingLink[] links;
+		private final QuadTree<AbstractRoutingNode> quadTree;
+		private final AbstractRoutingLink[] links;
 		
-		private RoutingNode ORIGIN_NODE = null;
-		private RoutingLink[] accessLinks = null;
-		private RoutingLink DESTINATION_LINK = null;
-		private RoutingLink[] egressLinks = null;
+		private AbstractRoutingNode ORIGIN_NODE = null;
+		private AbstractRoutingLink[] accessLinks = null;
+		private AbstractRoutingLink DESTINATION_LINK = null;
+		private AbstractRoutingLink[] egressLinks = null;
 		
 		private RoutingNetworkDelegate(double minX, double minY, double maxX, double maxY, int numberOfLinks){
-			quadTree = new QuadTree<RoutingNode>(minX, minY, maxX, maxY);
-			this.links = new RoutingLink[numberOfLinks];
+			quadTree = new QuadTree<AbstractRoutingNode>(minX, minY, maxX, maxY);
+			this.links = new AbstractRoutingLink[numberOfLinks];
 		}
 		
-		public Collection<RoutingNode> getNearestNodes(Coord coord, double radius){
+		public Collection<AbstractRoutingNode> getNearestNodes(Coord coord, double radius){
 			return this.quadTree.get(coord.getX(), coord.getY(), radius);
 		}
 		
@@ -160,15 +185,15 @@ public class RoutingNetwork {
 		 * Iterates through the links in the network, including the access and egress links.
 		 * @return
 		 */
-		public Iterable<RoutingLink> iterLinks(){
+		public Iterable<AbstractRoutingLink> iterLinks(){
 			if (accessLinks == null || egressLinks == null)
 				throw new NullPointerException("Tried to get links on an unprepared network. Use prepareForRouting first.");
 			
-			return new Iterable<RoutingLink>() {
+			return new Iterable<AbstractRoutingLink>() {
 				
 				@Override
-				public Iterator<RoutingLink> iterator() {
-					return new Iterator<RoutingLink>() {
+				public Iterator<AbstractRoutingLink> iterator() {
+					return new Iterator<AbstractRoutingLink>() {
 						
 						int currentIndex = 0;
 						
@@ -176,13 +201,13 @@ public class RoutingNetwork {
 						public void remove() { throw new UnsupportedOperationException(); }
 						
 						@Override
-						public RoutingLink next() {							
+						public AbstractRoutingLink next() {							
 							if (currentIndex < accessLinks.length)
 								return accessLinks[currentIndex++];
 							else if (currentIndex < (accessLinks.length + links.length))
 								return links[currentIndex++ - accessLinks.length];
 							else if (currentIndex < (accessLinks.length + links.length + egressLinks.length))
-								return egressLinks[currentIndex++ - accessLinks.length - egressLinks.length];
+								return egressLinks[currentIndex++ - accessLinks.length - links.length];
 							else throw new NoSuchElementException();
 						}
 						
@@ -196,43 +221,48 @@ public class RoutingNetwork {
 		}
 		
 		/**
-		 * Prepares the network for a routing request. 
+		 * Prepares the network for a routing request. Creates ACCESS and EGRESS
+		 * instances of {@link RoutingWalkLink} connected to the origin and
+		 * destination. Also clears the delegate of stored pending cost data.
 		 * 
 		 * @param ORIGIN Origin coordinate.
 		 * @param accessNodes Collection of access nodes.
 		 * @param DESTINATIION Destination coordinate.
 		 * @param egressNodes Collection of egress nodes.
 		 */
-		public void prepareForRouting(Coord ORIGIN, Collection<RoutingNode> accessNodes,
-				Coord DESTINATIION, Collection<RoutingNode> egressNodes){
+		public void prepareForRouting(Coord ORIGIN, Collection<AbstractRoutingNode> accessNodes,
+				Coord DESTINATIION, Collection<AbstractRoutingNode> egressNodes){
 			
 			clearEgressLinks(); //Dereference previous request's egress links
 			reset(); //Reset the network links' pending costs & times.
 			
 			int nextIndex = links.length; //For the HasIndex interface
 			
-			ORIGIN_NODE = new RoutingNode(ORIGIN);
-			accessLinks = new RoutingLink[accessNodes.size()];
+			ORIGIN_NODE = new RoutingNoStopNode(ORIGIN);
+			accessLinks = new AbstractRoutingLink[accessNodes.size()];
 			int i = 0;
-			for(RoutingNode accessNode : accessNodes){
+			for(AbstractRoutingNode accessNode : accessNodes){
 				RoutingWalkLink link = new RoutingWalkLink(ORIGIN_NODE, accessNode, WalkType.ACCESS);
+				link.isCopy = true;
 				ORIGIN_NODE.outgoingLinks.add(link);
 				link.index = nextIndex++;
 				accessLinks[i++] = link;
 			}
 			
-			RoutingNode destination1 = new RoutingNode(DESTINATIION);
-			RoutingNode destination2 = new RoutingNode(DESTINATIION);
+			AbstractRoutingNode destination1 = new RoutingNoStopNode(DESTINATIION);
+			AbstractRoutingNode destination2 = new RoutingNoStopNode(DESTINATIION);
 			DESTINATION_LINK = new DestinationLink(destination1, destination2);
-			egressLinks = new RoutingLink[egressNodes.size()];
+			egressLinks = new AbstractRoutingLink[egressNodes.size()];
 			i = 0;
-			for (RoutingNode egressNode : egressNodes){
+			for (AbstractRoutingNode egressNode : egressNodes){
 				RoutingWalkLink link = new RoutingWalkLink(egressNode, destination1, WalkType.EGRESS);
 				egressNode.outgoingLinks.add(link);
 				link.toNode.outgoingLinks.add(DESTINATION_LINK);
 				link.index = nextIndex++;
+				link.isCopy = true;
 				egressLinks[i++] = link;
 			}
+			DESTINATION_LINK.index = nextIndex;
 		}
 		
 		private void clearEgressLinks(){
@@ -240,23 +270,23 @@ public class RoutingNetwork {
 			//routing request should get cleaned by the GC next time it checks since they're not longer being used.
 			if (egressLinks == null) return;
 			
-			for (RoutingLink link : egressLinks){
+			for (AbstractRoutingLink link : egressLinks){
 				link.fromNode.outgoingLinks.remove(link);
 			}
 		}
 		
 		private void reset(){
-			for(RoutingLink link : links){
+			for(AbstractRoutingLink link : links){
 				link.reset();
 			}
 		}
 		
-		public RoutingNode getOriginNode(){
+		public AbstractRoutingNode getOriginNode(){
 			if (this.ORIGIN_NODE == null) throw new NullPointerException("Use prepareForRouting first.");
 			return this.ORIGIN_NODE;
 		}
 		
-		public RoutingLink getDestinationLink(){
+		public AbstractRoutingLink getDestinationLink(){
 			if (this.ORIGIN_NODE == null) throw new NullPointerException("Use prepareForRouting first.");
 			return this.DESTINATION_LINK;
 		}
@@ -266,9 +296,9 @@ public class RoutingNetwork {
 		}
 	}
 	
-	private static class DestinationLink extends RoutingLink{
+	private static class DestinationLink extends AbstractRoutingLink{
 
-		public DestinationLink(RoutingNode fromNode, RoutingNode toNode) {
+		public DestinationLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode) {
 			super(fromNode, toNode);
 		}
 		

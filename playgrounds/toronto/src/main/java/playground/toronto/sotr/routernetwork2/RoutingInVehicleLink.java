@@ -10,11 +10,11 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  * @author pkucirek
  *
  */
-public class RoutingInVehicleLink extends RoutingLink {
+public class RoutingInVehicleLink extends AbstractRoutingLink {
 	
 	protected final InVehicleLinkData data;
 	
-	public RoutingInVehicleLink(RoutingNode fromNode, RoutingNode toNode, InVehicleLinkData data){
+	public RoutingInVehicleLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode, InVehicleLinkData data){
 		super(fromNode, toNode);
 		this.data = data;
 	}
@@ -25,7 +25,7 @@ public class RoutingInVehicleLink extends RoutingLink {
 		//TODO: Figure out when to use the default departures. Clearly, if a transit vehicle didn't make it, this
 		// should be used, but how to test when this occurs?
 		
-		Double e = this.data.getDepartures().ceiling(now);
+		Double e = this.data.getTravelTimes().ceilingKey(now);
 		return (e == null) ? Double.POSITIVE_INFINITY : e; //Return infinity if no departures found past a given hour.
 	}
 	

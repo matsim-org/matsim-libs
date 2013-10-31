@@ -2,18 +2,17 @@ package playground.toronto.sotr.routernetwork2;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import org.matsim.core.router.priorityqueue.HasIndex;
 
-public abstract class RoutingLink implements HasIndex {
+public abstract class AbstractRoutingLink implements HasIndex {
 	
-	protected RoutingNode fromNode;
-	protected RoutingNode toNode;
+	AbstractRoutingNode fromNode;
+	AbstractRoutingNode toNode;
 	
-	protected HashSet<RoutingLink> prohibitedOutgoingTurns;
-	
-	protected int index;
+	HashSet<AbstractRoutingLink> prohibitedOutgoingTurns;
+	boolean isCopy = false;
+	int index;
 	
 	/**
 	 * The pending cost to the tail of this link
@@ -25,16 +24,16 @@ public abstract class RoutingLink implements HasIndex {
 	 */
 	public double pendingTime;
 	
-	public RoutingLink previousLink;
+	public AbstractRoutingLink previousLink;
 	
-	public RoutingNode getFromNode(){ return this.fromNode;}
-	public RoutingNode getToNode(){ return this.toNode;}
+	public AbstractRoutingNode getFromNode(){ return this.fromNode;}
+	public AbstractRoutingNode getToNode(){ return this.toNode;}
 	
-	public RoutingLink(RoutingNode fromNode, RoutingNode toNode){
+	public AbstractRoutingLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode){
 		this.fromNode = fromNode;
 		this.toNode = toNode;
 		
-		this.prohibitedOutgoingTurns = new HashSet<RoutingLink>();
+		this.prohibitedOutgoingTurns = new HashSet<AbstractRoutingLink>();
 		this.index = -1; //This only gets set a meaningful value if it's created by the RoutingNetworkDelegate
 		
 		reset();
@@ -58,51 +57,49 @@ public abstract class RoutingLink implements HasIndex {
 	 * @return
 	 */
 
-	public Iterable<RoutingLink> getOutgoingTurns(final boolean allowUTurns){
+	public Iterable<AbstractRoutingLink> getOutgoingTurns(final boolean allowUTurns){
 		
-		final Iterator<RoutingLink> base = this.toNode.outgoingLinks.iterator();
+		final Iterator<AbstractRoutingLink> base = this.toNode.outgoingLinks.iterator();
 		
-		return new Iterable<RoutingLink>() {
+		return new Iterable<AbstractRoutingLink>() {
 			@Override
-			public Iterator<RoutingLink> iterator() {
-				return new Iterator<RoutingLink>() {	
+			public Iterator<AbstractRoutingLink> iterator() {
+				return new Iterator<AbstractRoutingLink>() {	
 					
-					boolean _hasNext = true;
+					//boolean _hasNext = true;
+					AbstractRoutingLink nextLink = null;
 					
 					@Override
 					public void remove() { throw new UnsupportedOperationException(); }
 					
 					@Override
-					public RoutingLink next() {
-						if (base.hasNext()){
-							RoutingLink nextLink = base.next();
-							
-							while (prohibitedOutgoingTurns.contains(nextLink)){
-								if (base.hasNext()){nextLink = base.next();}
-								else{ 
-									_hasNext = false;
-									throw new NoSuchElementException();
-								}
-							}
-							
-							if (allowUTurns) return nextLink; //If u-turns are permitted, no need to skip u-turned links
-							
-							while (nextLink.getToNode() == fromNode){
-								if (base.hasNext()){nextLink = base.next();}
-								else{
-									_hasNext = false;
-									throw new NoSuchElementException();
-								}
-							}
-							return nextLink;
-						}
-						_hasNext = false;
-						throw new NoSuchElementException();
+					public AbstractRoutingLink next() {
+						return nextLink;
 					}
 					
 					@Override
 					public boolean hasNext() {
-						return _hasNext;
+						if (base.hasNext()){
+							nextLink = base.next();
+							
+							//Cycle until we get a non-prohibited turn.
+							while (prohibitedOutgoingTurns.contains(nextLink)){
+								if (base.hasNext()){nextLink = base.next();}
+								else{ return false; }
+							}
+							
+							if (allowUTurns) return true; //If u-turns are permitted, no need to skip u-turned links
+							
+							//Cycle until we get a non-u-turn
+							while (nextLink.getToNode() == fromNode){
+								if (base.hasNext()){nextLink = base.next();}
+								else{
+									return false;
+								}
+							}
+							return true;
+						}
+						return false;
 					}
 				};
 			}

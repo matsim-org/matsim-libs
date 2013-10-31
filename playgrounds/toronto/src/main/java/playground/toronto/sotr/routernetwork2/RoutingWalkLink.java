@@ -9,7 +9,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author pkucirek
  *
  */
-public class RoutingWalkLink extends RoutingLink {
+public class RoutingWalkLink extends AbstractRoutingLink {
 	
 	/**
 	 * Enumeration of walk link types for convenience in cost calculators.
@@ -31,16 +31,16 @@ public class RoutingWalkLink extends RoutingLink {
 	private double length;
 	private WalkType type;
 	
-	public RoutingWalkLink(RoutingNode fromNode, RoutingNode toNode, double length, WalkType type){
+	public RoutingWalkLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode, double length, WalkType type){
 		super(fromNode, toNode);
 		this.type = type;
 		this.length = length;
 	}
 	
-	public RoutingWalkLink(RoutingNode fromNode, RoutingNode toNode, WalkType type){
+	public RoutingWalkLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode, WalkType type){
 		super(fromNode, toNode);
 		this.type = type;
-		this.length = CoordUtils.calcDistance(this.fromNode.coord, this.toNode.coord);
+		this.length = CoordUtils.calcDistance(this.fromNode.getCoord(), this.toNode.getCoord());
 	}
 	
 	public double getLength() { return this.length; }

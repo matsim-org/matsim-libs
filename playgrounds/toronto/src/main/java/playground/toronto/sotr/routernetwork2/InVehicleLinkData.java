@@ -1,7 +1,6 @@
 package playground.toronto.sotr.routernetwork2;
 
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
@@ -13,32 +12,41 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  * @author pkucirek
  *
  */
-public class InVehicleLinkData {
+public final class InVehicleLinkData {
 	
-	private final StopGroupFacility fromStop;
-	private final StopGroupFacility toStop;
 	private final TransitRoute route;
-	private final TreeSet<Double> departures;
-	private final TreeMap<Double, Double> travelTimes;
+	private final ConcurrentSkipListMap<Double, Double> travelTimes;
 	private final double defaultTravelTime; //Scheduled travel time. Should never change for the life of this object.
 	
-	public InVehicleLinkData(final TransitRoute route, final StopGroupFacility fromStop, final StopGroupFacility toStop,
-			final double defaultTravelTime){
+	public InVehicleLinkData(final TransitRoute route, final double defaultTravelTime){
 		this.route = route;
-		this.fromStop = fromStop;
-		this.toStop = toStop;
 		
-		this.departures = new TreeSet<Double>();
-		this.travelTimes = new TreeMap<Double, Double>();
+		this.travelTimes = new ConcurrentSkipListMap<Double, Double>();
 		this.defaultTravelTime = defaultTravelTime;
 	}
 	
-	public StopGroupFacility getFromStop(){ return this.fromStop;}
-	public StopGroupFacility getToStop() { return this.toStop;}
-	public TransitRoute getRoute() { return this.route; }
-	public TreeSet<Double> getDepartures() { return this.departures; }
-	public TreeMap<Double, Double> getTravelTimes() {return this.travelTimes; }
-	public double getDefaultTravelTime() { return this.defaultTravelTime; }
+	//Package internal
+	TransitRoute getRoute() { return this.route; }
+	ConcurrentSkipListMap<Double, Double> getTravelTimes() {return this.travelTimes; }
+	double getDefaultTravelTime() { return this.defaultTravelTime; }
 	
+	/**
+	 * Adds just a departure from this link's tail node.
+	 * @param departureTime The absolute time of the departure.
+	 */
+	public void addDeparture(double departureTime){
+		this.travelTimes.put(departureTime, Double.NaN);
+	}
+	
+	/**
+	 * Adds a
+	 * @param departureTime
+	 * @param arrivalTime
+	 */
+	public void addDeparture(double departureTime, double arrivalTime){
+		//this.departures.add(departureTime);
+		double delta = arrivalTime - departureTime;
+		this.travelTimes.put(departureTime, delta);
+	}
 }
  
