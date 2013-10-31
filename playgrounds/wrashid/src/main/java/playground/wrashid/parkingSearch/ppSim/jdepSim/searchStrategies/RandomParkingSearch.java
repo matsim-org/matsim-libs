@@ -331,7 +331,9 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
-
+		parkingAttributesForScoring.setParkingCost(ZHScenarioGlobal.parkingScoreEvaluator.getParkingCost(parkingAttributesForScoring));
+		
+		
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		parkingScore+=scoreInterrupationValue;
 		
@@ -367,7 +369,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
-
+		parkingAttributesForScoring.setParkingCost(ZHScenarioGlobal.parkingScoreEvaluator.getParkingCost(parkingAttributesForScoring));
+		
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		parkingScore+=scoreInterrupationValue;
 		

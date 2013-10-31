@@ -18,14 +18,18 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.zurich;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
+import playground.wrashid.parkingChoice.scoring.ParkingInfo;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
@@ -61,6 +65,9 @@ public class ZHScenarioGlobal {
 	public static String plansFile;
 	public static RerouteThreadDuringSim[] rerouteThreadsDuringSim;
 
+	public static String getItersFolderPath(){
+		return outputFolder + "ITERS/";
+	}
 	
 	public static void init(TTMatrix ttMatrix, Network network){
 		rerouteThreadsDuringSim=new RerouteThreadDuringSim[numberOfRoutingThreadsDuringSim];
@@ -85,8 +92,22 @@ public class ZHScenarioGlobal {
 		for (ParkingSearchStrategy strategy:ParkingStrategyManager.allStrategies){
 			printFilteredParkingStatsParkingType(strategy.getClass());
 		}
+		
+		writeAllParkingEventsToFile();
 	}
 	
+	private static void writeAllParkingEventsToFile() {
+		ArrayList<String> list=new ArrayList<String>();
+		
+		list.add(ParkingEventDetails.getTabSeparatedTitleString());
+		
+		for (ParkingEventDetails ped:parkingEventDetails){
+				list.add(ped.getTabSeparatedLogString());
+		}
+		
+		GeneralLib.writeList(list, getItersFolderPath() + iteration + ".parkingEvents.txt");
+	}
+
 	private static void printFilteredParkingStatsParkingType(Class c) {
 		double averageParkingDuration = 0;
 		double averageSearchDuration = 0;
@@ -156,7 +177,17 @@ public class ZHScenarioGlobal {
 		System.out.println("========================");
 	}
 
-	public static void loadConfigParamters() {
+	public static void init() {
+		
+		loadConfigParamters();
+		File file=new File(outputFolder);
+		file.mkdir();
+		
+		file=new File(getItersFolderPath());
+		file.mkdir();
+	}
+	
+	private static void loadConfigParamters() {
 		ZHScenarioGlobal.outputFolder=loadStringParam("outputFolder");
 		
 		ParkingLoader.parkingsOutsideZHCityScaling = loadDoubleParam("ParkingLoader.parkingsOutsideZHCityScaling");
@@ -172,7 +203,6 @@ public class ZHScenarioGlobal {
 		ZHScenarioGlobal.populationExpensionFactor = loadIntParam("ZHScenarioGlobal.populationExpensionFactor");
 		ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning = loadIntParam("ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning");
 		ZHScenarioGlobal.numberOfRoutingThreadsDuringSim = loadIntParam("ZHScenarioGlobal.numberOfRoutingThreadsDuringSim");
-	
 	}
 	
 	public static double loadDoubleParam(String paramName){

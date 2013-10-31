@@ -35,5 +35,37 @@ public class ParkingEventDetails {
 	public double score;
 	public ParkingSearchStrategy parkingStrategy;
 	public ParkingActivityAttributes parkingActivityAttributes;
+	
+	public String getTabSeparatedLogString(){
+		StringBuffer sb=null;
+		
+		sb=new StringBuffer();
+		
+		sb.append(parkingActivityAttributes.getPersonId());
+		sb.append("\t");
+		sb.append(parkingActivityAttributes.getParkingArrivalTime());
+		sb.append("\t");
+		sb.append(parkingActivityAttributes.getParkingDuration());
+		sb.append("\t");
+		sb.append(parkingActivityAttributes.getParkingSearchDuration());
+		sb.append("\t");
+		sb.append(parkingActivityAttributes.getToActWalkDuration());
+		sb.append("\t");
+		sb.append(parkingActivityAttributes.getFacilityId());
+		sb.append("\t");
+		sb.append(parkingActivityAttributes.getParkingCost());
+		sb.append("\t");
+		sb.append(legIndex);
+		sb.append("\t");
+		sb.append(score);
+		sb.append("\t");
+		sb.append(parkingStrategy.getName());
+		
+		return sb.toString();
+	}
+	
+	public static String getTabSeparatedTitleString(){
+		return "personId\tparkingArrivalTime\tparkingDuration\tparkingSearchDuration\twalkDuration\tFacilityId\tparkingCost\tlegIndex\tscore\tparkingStrategy";
+	}
 }
 

@@ -82,7 +82,7 @@ public class MainPPSimZurich30km {
 	 */
 	public static void main(String[] args) {
 		ZHScenarioGlobal.config = ConfigUtils.loadConfig(args[0]);
-		ZHScenarioGlobal.loadConfigParamters();
+		ZHScenarioGlobal.init();
 
 		String plansFile = ZHScenarioGlobal.loadStringParam("plansFile");
 		String networkFile = ZHScenarioGlobal.loadStringParam("networkFile");

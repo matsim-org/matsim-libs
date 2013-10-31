@@ -105,11 +105,19 @@ public class ParkingActivityAttributes {
 		return toActWalkDuration + toParkWalkDuration;
 	}
 	
+	public double getParkingCost() {
+		return parkingCost;
+	}
+	public void setParkingCost(double parkingCost) {
+		this.parkingCost = parkingCost;
+	}
+
 	private Id personId;
 	private Id facilityId;
 	private double parkingArrivalTime;
 	private double parkingDuration;
 	private double activityDuration;
 	private double parkingSearchDuration;
+	private double parkingCost;
 }
 
