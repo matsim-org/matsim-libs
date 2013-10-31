@@ -204,16 +204,15 @@ public class StrategyStats {
 
 	public void writeToTextFile(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
 		ArrayList<String> list = new ArrayList<String>();
-		list.add("personId\tstrategyName\tscore");
+		list.add("personId\tlegIndex\tstrategyName\tscore");
 
 		for (Id personId : strategyEvaluations.keySet()) {
 			for (Integer legIndex : strategyEvaluations.get(personId).keySet()) {
 				EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
 
 				for (StrategyEvaluation se : evaluationContainer.getEvaluations()) {
-					list.add(personId.toString() + "\t" + se.strategy.getName() + "\t" + se.score);
+					list.add(personId.toString() + "\t" + legIndex + "\t" + se.strategy.getName() + "\t" + se.score);
 				}
-
 			}
 		}
 
