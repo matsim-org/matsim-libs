@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierController;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
@@ -55,20 +56,9 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  */
 final class KNFreight3 {
 
-	public static void main(String[] args) {
-		final Config config = ConfigUtils.createConfig() ;
+	public static void run( final Scenario scenario, final Carriers carriers ) {
+		final Config config = scenario.getConfig() ;
 		
-		config.network().setInputFile("/Users/nagel/shared-svn/projects/2000W-City/data/inputs/equil/network.xml");
-		
-		config.controler().setOutputDirectory("/Users/nagel/freight-kairuns/output/");
-		config.controler().setLastIteration(1);
-
-		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
-
-		final String carriersPlansFileName = "/Users/nagel/shared-svn/projects/2000W-City/data/inputs/equil/carrierPlansEquils.xml";
-//		Carriers carriers = new Carriers() ;
-//		new CarrierPlanXmlReaderV2(carriers).read(carriersPlansFileName) ;
- 
 		CarrierScoringFunctionFactory scoringFunctionFactory = new CarrierScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createScoringFunction(Carrier carrier) {
@@ -102,12 +92,12 @@ final class KNFreight3 {
 					strategy.addModule(module);
 					manager.addStrategy(strategy, 0.1);
 				}
-				{
-					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-					CarrierReplanningStrategyModule module = new SolvePickupAndDeliveryProblem(scenario.getNetwork()) ;
-					strategy.addModule(module) ;
-					manager.addStrategy(strategy,0.1) ;
-				}
+//				{
+//					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
+//					CarrierReplanningStrategyModule module = new SolvePickupAndDeliveryProblem(scenario.getNetwork()) ;
+//					strategy.addModule(module) ;
+//					manager.addStrategy(strategy,0.1) ;
+//				}
 				{
 					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
 					manager.addStrategy( strategy, 0.9 ) ;
@@ -116,7 +106,8 @@ final class KNFreight3 {
 			}
 		} ;
 
-		CarrierController listener = new CarrierController(carriersPlansFileName, strategyManagerFactory, scoringFunctionFactory ) ;
+//		CarrierController listener = new CarrierController(carriersPlansFileName, strategyManagerFactory, scoringFunctionFactory ) ;
+		CarrierController listener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
 		listener.setEnableWithinDayActivityReScheduling(false);
 
 

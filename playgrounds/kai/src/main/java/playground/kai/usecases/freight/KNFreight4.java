@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.kai.usecases.freight;
 
+import org.apache.commons.configuration.XMLConfiguration;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -32,6 +33,7 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.utils.Visualiser;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -40,6 +42,7 @@ import algorithms.SchrimpfFactory;
 import basics.VehicleRoutingAlgorithm;
 import basics.VehicleRoutingProblem;
 import basics.VehicleRoutingProblemSolution;
+import basics.io.AlgorithmConfig;
 
 /**
  * @author nagel
@@ -48,16 +51,28 @@ import basics.VehicleRoutingProblemSolution;
 public class KNFreight4 {
 
 	static final String MATSIM_SA = "/Users/Nagel/southafrica/MATSim-SA/" ;
+	
 	static final String QVANHEERDEN_FREIGHT=MATSIM_SA+"/sandbox/qvanheerden/input/freight/" ;
-	static final String NETFILENAME=QVANHEERDEN_FREIGHT+"/fromWiki/network.xml" ;
-	static final String CARRIERS = QVANHEERDEN_FREIGHT+"/fromWiki/carrier.xml" ;
-	static final String VEHTYPES = QVANHEERDEN_FREIGHT+"/fromWiki/vehicleTypes.xml" ;
-	static final String ALGORITHM = QVANHEERDEN_FREIGHT+"/fromWiki/algorithm.xml" ;
+	
+//	static final String NETFILENAME=QVANHEERDEN_FREIGHT+"/scenarioFromWiki/network.xml" ;
+//	static final String CARRIERS = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/carrier.xml" ;
+//	static final String VEHTYPES = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/vehicleTypes.xml" ;
+//	static final String ALGORITHM = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/algorithm.xml" ;
+	
+	static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_FullV7.xml.gz"  ;
+	static final String CARRIERS = QVANHEERDEN_FREIGHT + "myGridSim/carrier.xml" ;
+	static final String VEHTYPES = QVANHEERDEN_FREIGHT + "myGridSim/vehicleTypes.xml" ;
+	static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
+//	static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
+
 
 	public static void main(String[] args) {
 		
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig() ;
+
+		config.controler().setOutputDirectory("/Users/nagel/freight-kairuns/output/");
+		config.controler().setLastIteration(10); 
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(NETFILENAME);
 		
@@ -91,11 +106,14 @@ public class KNFreight4 {
 			carrier.setSelectedPlan(newPlan) ;
 			
 		}
-		new CarrierPlanXmlWriterV2(carriers).write("/Users/nagel/freight-kairuns/output/plannedCarrier.xml") ;
+		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "plannedCarrier.xml") ;
 		
-		new Visualiser( config, scenario).visualizeLive(carriers) ;
-		
+//		new Visualiser( config, scenario).visualizeLive(carriers) ;
+
 //		new Visualiser(config,scenario).makeMVI(carriers,"yourFolder/carrierMVI.mvi",1);
+		
+		KNFreight3.run(scenario, carriers);
+		
 	}
 
 }
