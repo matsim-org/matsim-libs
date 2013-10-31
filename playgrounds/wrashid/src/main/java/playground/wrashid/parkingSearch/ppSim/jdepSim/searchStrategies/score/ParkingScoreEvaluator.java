@@ -60,6 +60,12 @@ public class ParkingScoreEvaluator {
 		double searchTimeScore = getSearchTimeScore(personId, activityDuration, parkingSearchDurationInMinutes);
 		parkingScore += searchTimeScore;
 		
+		//DebugLib.traceAgent(parkingActAttributes.getPersonId());
+		
+		if (parkingScore<-700){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		return parkingScore;
 	}
 	

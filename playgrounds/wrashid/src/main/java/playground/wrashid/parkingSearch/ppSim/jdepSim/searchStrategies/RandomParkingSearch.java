@@ -68,7 +68,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	private Random random;
 	private final double parkingDuration = 60 * 2;
 	private final double walkSpeed = 3.0 / 3.6; // [m/s]
-	protected double scoreInterrupationValue=0;;
+	protected double scoreInterrupationValue = 0;;
 
 	// go to final link if no parking there, then try parking at other places.
 	// accept only parking within 300m, choose random links, but if leave 300m
@@ -103,26 +103,28 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			boolean endOfLegReached = aem.getCurrentLinkIndex() == linkIds.size() - 1;
 
 			if (endOfLegReached) {
-				DebugLib.traceAgent(personId);
+				// DebugLib.traceAgent(personId);
 
 				String filterParkingType = parkingType;
 
 				if (useSpecifiedParkingType.containsKey(personId)) {
 					filterParkingType = useSpecifiedParkingType.get(personId);
 				}
-				
+
 				ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 						.get(aem.getPlanElementIndex() + 3);
-				
-				Id parkingId= AgentWithParking.parkingManager.getFreePrivateParking(nextNonParkingAct.getFacilityId(),nextNonParkingAct.getType());
-				
-				// actually would need to drive to private parking, but this is skipped here
-				//|| !AgentWithParking.parkingManager.getLinkOfParking(parkingId).toString().equalsIgnoreCase(route.getEndLinkId().toString())
-				if (parkingId==null ){
-					parkingId = AgentWithParking.parkingManager
-							.getFreeParkingFacilityOnLink(route.getEndLinkId(), filterParkingType);
+
+				Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextNonParkingAct.getFacilityId(),
+						nextNonParkingAct.getType());
+
+				// actually would need to drive to private parking, but this is
+				// skipped here
+				// ||
+				// !AgentWithParking.parkingManager.getLinkOfParking(parkingId).toString().equalsIgnoreCase(route.getEndLinkId().toString())
+				if (parkingId == null) {
+					parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(),
+							filterParkingType);
 				}
-				
 
 				boolean isInvalidLink = aem.isInvalidLinkForParking();
 
@@ -277,7 +279,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 	private void logParkingSearchDuration(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
-		double searchDuration=getSearchTime(aem);
+		double searchDuration = getSearchTime(aem);
 
 		getParkingAttributesForScoring(aem).setParkingSearchDuration(searchDuration);
 		startSearchTime.remove(personId);
@@ -310,7 +312,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		if (searchDuration == 86400) {
 			searchDuration = 0;
-		} 
+		}
 		return searchDuration;
 	}
 
@@ -322,27 +324,29 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		Activity act = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getIndexOfFirstCarLegOfDay() - 3);
 
 		parkingAttributesForScoring.setFacilityId(currentParkingId);
-		
+
 		double parkingDuration = GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(), act.getEndTime());
-		if (aem.getMessageArrivalTime()==act.getEndTime()){
-			parkingDuration=0;
+		if (aem.getMessageArrivalTime() == act.getEndTime()) {
+			parkingDuration = 0;
 		}
 		parkingAttributesForScoring.setParkingDuration(parkingDuration);
-		
+
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
-		parkingAttributesForScoring.setParkingCost(ZHScenarioGlobal.parkingScoreEvaluator.getParkingCost(parkingAttributesForScoring));
-		
-		
+		parkingAttributesForScoring.setParkingCost(ZHScenarioGlobal.parkingScoreEvaluator
+				.getParkingCost(parkingAttributesForScoring));
+
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
-		parkingScore+=scoreInterrupationValue;
-		
+		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal")) {
+			parkingScore += scoreInterrupationValue;
+		}
+
 		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
 		ZHScenarioGlobal.parkingEventDetails
 				.add(new ParkingEventDetails(aem.getPlanElementIndex(), parkingScore, AgentWithParking.parkingStrategyManager
 						.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()), parkingAttributesForScoring));
 		parkingActAttributes.remove(personId);
-		scoreInterrupationValue=0;
+		scoreInterrupationValue = 0;
 	}
 
 	@Override
@@ -360,27 +364,31 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		Id currentParkingId = AgentWithParking.parkingManager.getCurrentParkingId(aem.getPerson().getId());
 
 		parkingAttributesForScoring.setFacilityId(currentParkingId);
-		
-		double parkingDuration = GeneralLib.getIntervalDuration(parkingAttributesForScoring.getParkingArrivalTime(), aem.getMessageArrivalTime());
-		if (parkingAttributesForScoring.getParkingArrivalTime()==aem.getMessageArrivalTime()){
-			parkingDuration=0;
+
+		double parkingDuration = GeneralLib.getIntervalDuration(parkingAttributesForScoring.getParkingArrivalTime(),
+				aem.getMessageArrivalTime());
+		if (parkingAttributesForScoring.getParkingArrivalTime() == aem.getMessageArrivalTime()) {
+			parkingDuration = 0;
 		}
 		parkingAttributesForScoring.setParkingDuration(parkingDuration);
 
 		// just an approximation - TODO: update later
 		parkingAttributesForScoring.setActivityDuration(parkingAttributesForScoring.getParkingDuration());
-		parkingAttributesForScoring.setParkingCost(ZHScenarioGlobal.parkingScoreEvaluator.getParkingCost(parkingAttributesForScoring));
-		
+		parkingAttributesForScoring.setParkingCost(ZHScenarioGlobal.parkingScoreEvaluator
+				.getParkingCost(parkingAttributesForScoring));
+
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
-		parkingScore+=scoreInterrupationValue;
-		
+		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal")) {
+			parkingScore += scoreInterrupationValue;
+		}
+
 		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
 		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
 		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore,
 				AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), legIndex),
 				parkingAttributesForScoring));
 		parkingActAttributes.remove(personId);
-		scoreInterrupationValue=0;
+		scoreInterrupationValue = 0;
 	}
 
 	// TODO: log parkingAttributesForScoring + score + leg index
