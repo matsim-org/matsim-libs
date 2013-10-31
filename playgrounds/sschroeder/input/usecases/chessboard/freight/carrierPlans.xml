@@ -125,7 +125,7 @@
 					</leg>
 					<act type="service" serviceId="45" end_time="06:32:46"/>
 					<leg dep_time="06:32:46" transp_time="00:15:33">
-						<route>j(5,4) j(5,5) j(5,6) j(5,7) i(5,7)R i(4,7)R</route>
+						<route>i(5,3)R i(4,3)R j(3,4) j(3,5) j(3,6) j(3,7)</route>
 					</leg>
 					<act type="service" serviceId="15" end_time="06:53:19"/>
 					<leg dep_time="06:53:19" transp_time="00:04:26">
@@ -160,7 +160,7 @@
 				<tour vehicleId="carrier_19_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:22:13">
-						<route>i(1,0) i(2,0) i(3,0) i(4,0) i(5,0) i(6,0) i(7,0) j(7,1) i(7,1)R</route>
+						<route>i(1,0) j(1,1) j(1,2) i(2,2) i(3,2) i(4,2) i(5,2) i(6,2) j(6,2)R</route>
 					</leg>
 					<act type="service" serviceId="11" end_time="06:27:13"/>
 					<leg dep_time="06:27:13" transp_time="00:11:06">
@@ -172,11 +172,11 @@
 					</leg>
 					<act type="service" serviceId="10" end_time="06:57:13"/>
 					<leg dep_time="06:57:13" transp_time="00:11:06">
-						<route>j(8,5)R i(9,4) j(9,5) j(9,6)</route>
+						<route>i(8,5)R j(7,6) i(8,6) i(9,6)</route>
 					</leg>
 					<act type="service" serviceId="44" end_time="07:13:19"/>
 					<leg dep_time="07:13:19" transp_time="00:13:19">
-						<route>j(9,8) j(9,9) i(9,9)R i(8,9)R i(7,9)R</route>
+						<route>i(9,7)R i(8,7)R j(7,8) j(7,9) i(7,9)R</route>
 					</leg>
 					<act type="service" serviceId="9" end_time="07:31:39"/>
 					<leg dep_time="07:31:39" transp_time="00:02:13">
@@ -200,14 +200,14 @@
 					</leg>
 					<act type="service" serviceId="43" end_time="08:16:39"/>
 					<leg dep_time="08:16:39" transp_time="00:19:59">
-						<route>j(2,7)R j(2,6)R j(2,5)R j(2,4)R j(2,3)R j(2,2)R i(2,1)R i(1,1)R</route>
+						<route>i(2,7)R i(1,7)R j(0,7)R j(0,6)R j(0,5)R j(0,4)R j(0,3)R j(0,2)R</route>
 					</leg>
 					<act type="end"/>
 				</tour>
 				<tour vehicleId="carrier_19_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:22:13">
-						<route>i(1,0) i(2,0) i(3,0) i(4,0) i(5,0) i(6,0) i(7,0) j(7,1) j(7,2)</route>
+						<route>i(1,0) j(1,1) j(1,2) i(2,2) i(3,2) i(4,2) i(5,2) i(6,2) i(7,2)</route>
 					</leg>
 					<act type="service" serviceId="38" end_time="06:27:13"/>
 					<leg dep_time="06:27:13" transp_time="00:04:26">
@@ -455,7 +455,7 @@
 					</leg>
 					<act type="service" serviceId="7" end_time="07:29:59"/>
 					<leg dep_time="07:29:59" transp_time="00:13:19">
-						<route>i(8,6) i(9,6) j(9,7) j(9,8) j(9,9)</route>
+						<route>j(7,7) j(7,8) i(8,8) i(9,8) j(9,9)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -521,7 +521,7 @@
 					</leg>
 					<act type="service" serviceId="22" end_time="06:39:26"/>
 					<leg dep_time="06:39:26" transp_time="00:15:33">
-						<route>i(7,0) i(8,0) i(9,0) j(9,1) j(9,2) j(9,3)</route>
+						<route>i(7,0) j(7,1) j(7,2) i(8,2) i(9,2) j(9,3)</route>
 					</leg>
 					<act type="service" serviceId="13" end_time="06:59:59"/>
 					<leg dep_time="06:59:59" transp_time="00:11:06">
@@ -556,7 +556,7 @@
 				<tour vehicleId="carrier_17_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:19:59">
-						<route>i(8,9)R i(7,9)R j(6,9)R j(6,8)R j(6,7)R j(6,6)R i(6,5)R i(5,5)R</route>
+						<route>i(8,9)R i(7,9)R i(6,9)R i(5,9)R j(4,9)R j(4,8)R j(4,7)R j(4,6)R</route>
 					</leg>
 					<act type="service" serviceId="49" end_time="06:24:59"/>
 					<leg dep_time="06:24:59" transp_time="00:06:39">
@@ -572,7 +572,7 @@
 					</leg>
 					<act type="service" serviceId="45" end_time="06:55:33"/>
 					<leg dep_time="06:55:33" transp_time="00:13:19">
-						<route>i(2,2) i(3,2) i(4,2) j(4,2)R i(4,1)R</route>
+						<route>i(2,2) j(2,2)R j(2,1)R i(3,0) j(3,1)</route>
 					</leg>
 					<act type="service" serviceId="20" end_time="07:13:53"/>
 					<leg dep_time="07:13:53" transp_time="00:02:13">
@@ -596,7 +596,7 @@
 					</leg>
 					<act type="service" serviceId="24" end_time="08:01:06"/>
 					<leg dep_time="08:01:06" transp_time="00:17:46">
-						<route>i(6,6) i(7,6) j(7,7) j(7,8) i(8,8) i(9,8) j(9,9)</route>
+						<route>j(5,7) j(5,8) i(6,8) i(7,8) i(8,8) i(9,8) j(9,9)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -670,7 +670,7 @@
 				<tour vehicleId="carrier_35_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:13:19">
-						<route>i(1,8) i(2,8) j(2,8)R j(2,7)R i(3,6)</route>
+						<route>j(0,8)R j(0,7)R i(1,6) i(2,6) i(3,6)</route>
 					</leg>
 					<act type="service" serviceId="20" end_time="06:18:19"/>
 					<leg dep_time="06:18:19" transp_time="00:00:00">
@@ -717,7 +717,7 @@
 				<tour vehicleId="carrier_35_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:19:59">
-						<route>j(0,8)R j(0,7)R j(0,6)R j(0,5)R i(1,4) i(2,4) j(2,4)R j(2,3)R</route>
+						<route>j(0,8)R j(0,7)R j(0,6)R j(0,5)R j(0,4)R j(0,3)R i(1,2) i(2,2)</route>
 					</leg>
 					<act type="service" serviceId="21" end_time="06:24:59"/>
 					<leg dep_time="06:24:59" transp_time="00:08:53">
@@ -1008,7 +1008,7 @@
 					</leg>
 					<act type="service" serviceId="42" end_time="07:31:39"/>
 					<leg dep_time="07:31:39" transp_time="00:11:06">
-						<route>i(5,6) i(6,6) j(6,6)R j(6,5)R</route>
+						<route>j(4,6)R j(4,5)R i(5,4) i(6,4)</route>
 					</leg>
 					<act type="service" serviceId="20" end_time="07:47:46"/>
 					<leg dep_time="07:47:46" transp_time="00:13:19">
@@ -1090,7 +1090,7 @@
 					</leg>
 					<act type="service" serviceId="49" end_time="07:03:19"/>
 					<leg dep_time="07:03:19" transp_time="00:19:59">
-						<route>j(1,8) i(2,8) j(2,8)R j(2,7)R i(3,6) i(4,6) j(4,6)R j(4,5)R</route>
+						<route>i(1,7)R j(0,7)R j(0,6)R j(0,5)R i(1,4) i(2,4) i(3,4) i(4,4)</route>
 					</leg>
 					<act type="service" serviceId="1" end_time="07:28:19"/>
 					<leg dep_time="07:28:19" transp_time="00:00:00">
@@ -1200,7 +1200,7 @@
 					</leg>
 					<act type="service" serviceId="3" end_time="08:05:33"/>
 					<leg dep_time="08:05:33" transp_time="00:13:19">
-						<route>j(6,3)R i(7,2) i(8,2) j(8,2)R j(8,1)R</route>
+						<route>j(6,3)R j(6,2)R j(6,1)R i(7,0) i(8,0)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -1282,7 +1282,7 @@
 					</leg>
 					<act type="service" serviceId="2" end_time="06:45:33"/>
 					<leg dep_time="06:45:33" transp_time="00:15:33">
-						<route>i(1,9)R j(0,9)R i(1,8) i(2,8) j(2,8)R j(2,7)R</route>
+						<route>i(1,9)R j(0,9)R j(0,8)R j(0,7)R i(1,6) i(2,6)</route>
 					</leg>
 					<act type="service" serviceId="15" end_time="07:06:06"/>
 					<leg dep_time="07:06:06" transp_time="00:00:00">
@@ -1321,7 +1321,7 @@
 				<tour vehicleId="carrier_36_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:13:19">
-						<route>i(9,9)R j(8,9)R j(8,8)R i(8,7)R i(7,7)R</route>
+						<route>i(9,9)R i(8,9)R i(7,9)R j(6,9)R j(6,8)R</route>
 					</leg>
 					<act type="service" serviceId="35" end_time="06:18:19"/>
 					<leg dep_time="06:18:19" transp_time="00:04:26">
@@ -1415,7 +1415,7 @@
 				<tour vehicleId="carrier_36_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:22:13">
-						<route>i(9,9)R j(8,9)R j(8,8)R j(8,7)R j(8,6)R i(8,5)R i(7,5)R j(6,5)R j(6,4)R</route>
+						<route>i(9,9)R i(8,9)R i(7,9)R j(6,9)R j(6,8)R j(6,7)R j(6,6)R j(6,5)R j(6,4)R</route>
 					</leg>
 					<act type="service" serviceId="42" end_time="06:27:13"/>
 					<leg dep_time="06:27:13" transp_time="00:02:13">
@@ -1462,7 +1462,7 @@
 				<tour vehicleId="carrier_36_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:13:19">
-						<route>i(9,9)R j(8,9)R j(8,8)R i(8,7)R i(7,7)R</route>
+						<route>i(9,9)R i(8,9)R i(7,9)R j(6,9)R j(6,8)R</route>
 					</leg>
 					<act type="service" serviceId="50" end_time="06:18:19"/>
 					<leg dep_time="06:18:19" transp_time="00:02:13">
@@ -1616,7 +1616,7 @@
 					</leg>
 					<act type="service" serviceId="31" end_time="07:45:33"/>
 					<leg dep_time="07:45:33" transp_time="00:15:33">
-						<route>i(8,6) i(9,6) j(9,7) j(9,8) j(9,9) i(9,9)R</route>
+						<route>j(7,7) j(7,8) i(8,8) i(9,8) j(9,9) i(9,9)R</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -1659,7 +1659,7 @@
 					</leg>
 					<act type="service" serviceId="21" end_time="07:29:26"/>
 					<leg dep_time="07:29:26" transp_time="00:24:26">
-						<route>i(5,4) i(6,4) i(7,4) j(7,5) j(7,6) j(7,7) j(7,8) i(8,8) i(9,8) j(9,9)</route>
+						<route>i(5,4) j(5,5) j(5,6) j(5,7) j(5,8) i(6,8) i(7,8) i(8,8) i(9,8) j(9,9)</route>
 					</leg>
 					<act type="service" serviceId="24" end_time="07:58:53"/>
 					<leg dep_time="07:58:53" transp_time="00:02:13">
@@ -1788,11 +1788,11 @@
 					</leg>
 					<act type="service" serviceId="26" end_time="07:01:06"/>
 					<leg dep_time="07:01:06" transp_time="00:22:13">
-						<route>i(5,5)R i(4,5)R i(3,5)R j(2,5)R j(2,4)R j(2,3)R j(2,2)R i(2,1)R j(1,2)</route>
+						<route>i(5,5)R i(4,5)R i(3,5)R i(2,5)R i(1,5)R j(0,5)R j(0,4)R j(0,3)R i(1,2)</route>
 					</leg>
 					<act type="service" serviceId="25" end_time="07:28:19"/>
 					<leg dep_time="07:28:19" transp_time="00:11:06">
-						<route>i(3,2) i(4,2) j(4,2)R j(4,1)R</route>
+						<route>j(2,2)R j(2,1)R i(3,0) i(4,0)</route>
 					</leg>
 					<act type="service" serviceId="50" end_time="07:44:26"/>
 					<leg dep_time="07:44:26" transp_time="00:08:53">
@@ -1804,7 +1804,7 @@
 					</leg>
 					<act type="service" serviceId="30" end_time="08:03:19"/>
 					<leg dep_time="08:03:19" transp_time="00:33:19">
-						<route>i(6,1)R j(5,2) j(5,3) j(5,4) j(5,5) j(5,6) i(6,6) i(7,6) i(8,6) i(9,6) j(9,7) j(9,8) j(9,9) i(9,9)R</route>
+						<route>i(6,1)R j(5,2) j(5,3) j(5,4) j(5,5) j(5,6) j(5,7) j(5,8) i(6,8) i(7,8) i(8,8) i(9,8) j(9,9) i(9,9)R</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -1925,7 +1925,7 @@
 				<tour vehicleId="carrier_33_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:13:19">
-						<route>j(0,7)R i(1,6) i(2,6) j(2,6)R i(2,5)R</route>
+						<route>j(0,7)R j(0,6)R j(0,5)R i(1,4) j(1,5)</route>
 					</leg>
 					<act type="service" serviceId="1" end_time="06:18:19"/>
 					<leg dep_time="06:18:19" transp_time="00:06:39">
@@ -2023,7 +2023,7 @@
 					</leg>
 					<act type="service" serviceId="41" end_time="06:13:53"/>
 					<leg dep_time="06:13:53" transp_time="00:15:33">
-						<route>i(4,6) i(5,6) i(6,6) j(6,6)R j(6,5)R i(7,4)</route>
+						<route>i(4,6) j(4,6)R j(4,5)R i(5,4) i(6,4) i(7,4)</route>
 					</leg>
 					<act type="service" serviceId="16" end_time="06:34:26"/>
 					<leg dep_time="06:34:26" transp_time="00:02:13">
@@ -2106,7 +2106,7 @@
 					</leg>
 					<act type="service" serviceId="28" end_time="08:14:26"/>
 					<leg dep_time="08:14:26" transp_time="00:22:13">
-						<route>i(6,7)R i(5,7)R i(4,7)R j(3,8) j(3,9) i(3,9)R i(2,9)R i(1,9)R j(0,9)R</route>
+						<route>i(6,7)R i(5,7)R i(4,7)R i(3,7)R i(2,7)R j(1,8) j(1,9) i(1,9)R j(0,9)R</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -2220,7 +2220,7 @@
 					</leg>
 					<act type="service" serviceId="5" end_time="07:41:06"/>
 					<leg dep_time="07:41:06" transp_time="00:19:59">
-						<route>j(4,5)R i(5,4) i(6,4) j(6,4)R j(6,3)R j(6,2)R j(6,1)R i(7,0)</route>
+						<route>j(4,5)R j(4,4)R j(4,3)R j(4,2)R j(4,1)R i(5,0) i(6,0) i(7,0)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -2345,7 +2345,7 @@
 					</leg>
 					<act type="service" serviceId="3" end_time="07:07:46"/>
 					<leg dep_time="07:07:46" transp_time="00:11:06">
-						<route>i(4,2) i(5,2) j(5,3) j(5,4)</route>
+						<route>j(3,3) j(3,4) i(4,4) i(5,4)</route>
 					</leg>
 					<act type="service" serviceId="1" end_time="07:23:53"/>
 					<leg dep_time="07:23:53" transp_time="00:02:13">
@@ -2368,7 +2368,7 @@
 				<tour vehicleId="carrier_16_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:22:13">
-						<route>i(9,0) j(9,1) i(9,1)R i(8,1)R j(7,2) j(7,3) i(7,3)R i(6,3)R i(5,3)R</route>
+						<route>i(9,0) j(9,1) i(9,1)R i(8,1)R i(7,1)R i(6,1)R j(5,2) j(5,3) i(5,3)R</route>
 					</leg>
 					<act type="service" serviceId="34" end_time="06:27:13"/>
 					<leg dep_time="06:27:13" transp_time="00:04:26">
@@ -2392,7 +2392,7 @@
 					</leg>
 					<act type="service" serviceId="17" end_time="07:21:06"/>
 					<leg dep_time="07:21:06" transp_time="00:15:33">
-						<route>j(6,7)R i(7,6) j(7,7) j(7,8) i(8,8) j(8,8)R</route>
+						<route>i(6,7)R j(5,8) i(6,8) i(7,8) i(8,8) j(8,8)R</route>
 					</leg>
 					<act type="service" serviceId="27" end_time="07:41:39"/>
 					<leg dep_time="07:41:39" transp_time="00:02:13">
@@ -2537,7 +2537,7 @@
 					</leg>
 					<act type="service" serviceId="41" end_time="06:25:33"/>
 					<leg dep_time="06:25:33" transp_time="00:15:33">
-						<route>j(6,6)R i(6,5)R j(5,6) j(5,7) i(5,7)R j(4,7)R</route>
+						<route>j(6,6)R i(6,5)R i(5,5)R i(4,5)R j(3,6) i(4,6)</route>
 					</leg>
 					<act type="service" serviceId="7" end_time="06:46:06"/>
 					<leg dep_time="06:46:06" transp_time="00:06:39">
@@ -2616,7 +2616,7 @@
 					</leg>
 					<act type="service" serviceId="8" end_time="08:07:46"/>
 					<leg dep_time="08:07:46" transp_time="00:19:59">
-						<route>i(7,2) i(8,2) i(9,2) j(9,3) j(9,4) j(9,5) j(9,6) j(9,7)</route>
+						<route>i(7,2) j(7,3) j(7,4) j(7,5) j(7,6) i(8,6) i(9,6) j(9,7)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -2843,7 +2843,7 @@
 					</leg>
 					<act type="service" serviceId="47" end_time="06:43:53"/>
 					<leg dep_time="06:43:53" transp_time="00:13:19">
-						<route>i(1,2) i(2,2) i(3,2) j(3,3) j(3,4)</route>
+						<route>i(1,2) j(1,3) j(1,4) i(2,4) i(3,4)</route>
 					</leg>
 					<act type="service" serviceId="18" end_time="07:02:13"/>
 					<leg dep_time="07:02:13" transp_time="00:00:00">
@@ -3012,7 +3012,7 @@
 					</leg>
 					<act type="service" serviceId="32" end_time="07:36:39"/>
 					<leg dep_time="07:36:39" transp_time="00:15:33">
-						<route>i(5,6) i(6,6) i(7,6) j(7,7) j(7,8) j(7,9)</route>
+						<route>i(5,6) j(5,7) j(5,8) i(6,8) i(7,8) j(7,9)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -3110,7 +3110,7 @@
 					</leg>
 					<act type="service" serviceId="7" end_time="06:58:53"/>
 					<leg dep_time="06:58:53" transp_time="00:19:59">
-						<route>j(3,6) i(4,6) j(4,6)R j(4,5)R i(5,4) i(6,4) i(7,4) j(7,5)</route>
+						<route>i(3,5)R j(2,5)R i(3,4) i(4,4) i(5,4) i(6,4) i(7,4) j(7,5)</route>
 					</leg>
 					<act type="service" serviceId="44" end_time="07:23:53"/>
 					<leg dep_time="07:23:53" transp_time="00:00:00">
@@ -3173,7 +3173,7 @@
 					</leg>
 					<act type="service" serviceId="21" end_time="08:05:33"/>
 					<leg dep_time="08:05:33" transp_time="00:22:13">
-						<route>i(4,6) i(5,6) i(6,6) j(6,6)R j(6,5)R j(6,4)R j(6,3)R j(6,2)R j(6,1)R</route>
+						<route>i(4,6) j(4,6)R j(4,5)R j(4,4)R j(4,3)R j(4,2)R j(4,1)R i(5,0) i(6,0)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -3227,7 +3227,7 @@
 				<tour vehicleId="carrier_14_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:17:46">
-						<route>j(7,1) j(7,2) j(7,3) j(7,4) j(7,5) i(7,5)R i(6,5)R</route>
+						<route>j(7,1) i(7,1)R i(6,1)R j(5,2) j(5,3) j(5,4) j(5,5)</route>
 					</leg>
 					<act type="service" serviceId="12" end_time="06:22:46"/>
 					<leg dep_time="06:22:46" transp_time="00:02:13">
@@ -3263,7 +3263,7 @@
 					</leg>
 					<act type="service" serviceId="38" end_time="07:29:26"/>
 					<leg dep_time="07:29:26" transp_time="00:17:46">
-						<route>j(0,5)R i(1,4) i(2,4) i(3,4) i(4,4) j(4,4)R j(4,3)R</route>
+						<route>j(0,5)R j(0,4)R j(0,3)R i(1,2) i(2,2) i(3,2) i(4,2)</route>
 					</leg>
 					<act type="service" serviceId="29" end_time="07:52:13"/>
 					<leg dep_time="07:52:13" transp_time="00:08:53">
@@ -3412,7 +3412,7 @@
 					</leg>
 					<act type="service" serviceId="20" end_time="07:14:26"/>
 					<leg dep_time="07:14:26" transp_time="00:15:33">
-						<route>j(5,2) i(6,2) i(7,2) i(8,2) j(8,2)R j(8,1)R</route>
+						<route>i(5,1)R j(4,1)R i(5,0) i(6,0) i(7,0) i(8,0)</route>
 					</leg>
 					<act type="service" serviceId="32" end_time="07:34:59"/>
 					<leg dep_time="07:34:59" transp_time="00:11:06">
@@ -3777,14 +3777,14 @@
 					</leg>
 					<act type="service" serviceId="37" end_time="07:38:53"/>
 					<leg dep_time="07:38:53" transp_time="00:22:13">
-						<route>j(8,4)R i(8,3)R i(7,3)R j(6,3)R j(6,2)R i(6,1)R i(5,1)R j(4,1)R i(5,0)</route>
+						<route>j(8,4)R i(8,3)R i(7,3)R i(6,3)R i(5,3)R j(4,3)R j(4,2)R j(4,1)R i(5,0)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
 				<tour vehicleId="carrier_12_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:15:33">
-						<route>i(7,0) i(8,0) i(9,0) j(9,1) j(9,2) j(9,3)</route>
+						<route>i(7,0) j(7,1) j(7,2) i(8,2) i(9,2) j(9,3)</route>
 					</leg>
 					<act type="service" serviceId="47" end_time="06:20:33"/>
 					<leg dep_time="06:20:33" transp_time="00:11:06">
@@ -4086,7 +4086,7 @@
 				<tour vehicleId="carrier_21_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:22:13">
-						<route>j(0,1)R i(1,0) i(2,0) i(3,0) j(3,1) j(3,2) j(3,3) j(3,4) i(4,4)</route>
+						<route>j(0,1)R i(1,0) j(1,1) j(1,2) j(1,3) j(1,4) i(2,4) i(3,4) i(4,4)</route>
 					</leg>
 					<act type="service" serviceId="21" end_time="06:27:13"/>
 					<leg dep_time="06:27:13" transp_time="00:02:13">
@@ -4110,7 +4110,7 @@
 					</leg>
 					<act type="service" serviceId="7" end_time="07:12:13"/>
 					<leg dep_time="07:12:13" transp_time="00:11:06">
-						<route>i(7,4) i(8,4) j(8,4)R i(8,3)R</route>
+						<route>j(6,4)R j(6,3)R i(7,2) j(7,3)</route>
 					</leg>
 					<act type="service" serviceId="31" end_time="07:28:19"/>
 					<leg dep_time="07:28:19" transp_time="00:00:00">
@@ -4173,7 +4173,7 @@
 					</leg>
 					<act type="service" serviceId="45" end_time="08:05:33"/>
 					<leg dep_time="08:05:33" transp_time="00:22:13">
-						<route>i(2,8) j(2,8)R j(2,7)R j(2,6)R i(2,5)R i(1,5)R j(0,5)R j(0,4)R j(0,3)R</route>
+						<route>j(1,9) i(1,9)R j(0,9)R j(0,8)R j(0,7)R j(0,6)R j(0,5)R j(0,4)R j(0,3)R</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -4381,7 +4381,7 @@
 					</leg>
 					<act type="service" serviceId="17" end_time="07:52:13"/>
 					<leg dep_time="07:52:13" transp_time="00:17:46">
-						<route>i(7,4) i(8,4) j(8,4)R j(8,3)R j(8,2)R j(8,1)R i(9,0)</route>
+						<route>j(6,4)R j(6,3)R j(6,2)R j(6,1)R i(7,0) i(8,0) i(9,0)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -4475,7 +4475,7 @@
 					</leg>
 					<act type="service" serviceId="6" end_time="07:29:59"/>
 					<leg dep_time="07:29:59" transp_time="00:13:19">
-						<route>j(7,2) i(8,2) j(8,2)R j(8,1)R i(9,0)</route>
+						<route>i(7,1)R j(6,1)R i(7,0) i(8,0) i(9,0)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -4679,11 +4679,11 @@
 					</leg>
 					<act type="service" serviceId="42" end_time="07:40:33"/>
 					<leg dep_time="07:40:33" transp_time="00:11:06">
-						<route>j(5,8) i(6,8) j(6,8)R j(6,7)R</route>
+						<route>i(5,7)R j(4,7)R i(5,6) i(6,6)</route>
 					</leg>
 					<act type="service" serviceId="6" end_time="07:56:39"/>
 					<leg dep_time="07:56:39" transp_time="00:22:13">
-						<route>j(6,5)R i(7,4) i(8,4) j(8,4)R j(8,3)R j(8,2)R j(8,1)R i(9,0) j(9,1)</route>
+						<route>j(6,5)R j(6,4)R j(6,3)R j(6,2)R j(6,1)R i(7,0) i(8,0) i(9,0) j(9,1)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -4730,14 +4730,14 @@
 					</leg>
 					<act type="service" serviceId="18" end_time="07:43:19"/>
 					<leg dep_time="07:43:19" transp_time="00:17:46">
-						<route>j(6,3)R i(7,2) i(8,2) j(8,2)R j(8,1)R i(9,0) j(9,1)</route>
+						<route>j(6,3)R j(6,2)R j(6,1)R i(7,0) i(8,0) i(9,0) j(9,1)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
 				<tour vehicleId="carrier_22_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:24:26">
-						<route>j(9,3) i(9,3)R i(8,3)R i(7,3)R j(6,3)R j(6,2)R i(6,1)R i(5,1)R j(4,1)R i(5,0)</route>
+						<route>j(9,3) i(9,3)R i(8,3)R i(7,3)R i(6,3)R i(5,3)R j(4,3)R j(4,2)R j(4,1)R i(5,0)</route>
 					</leg>
 					<act type="service" serviceId="16" end_time="06:29:26"/>
 					<leg dep_time="06:29:26" transp_time="00:08:53">
@@ -4992,7 +4992,7 @@
 				<tour vehicleId="carrier_23_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:15:33">
-						<route>i(1,2) i(2,2) i(3,2) j(3,3) j(3,4) j(3,5)</route>
+						<route>i(1,2) j(1,3) j(1,4) i(2,4) i(3,4) j(3,5)</route>
 					</leg>
 					<act type="service" serviceId="26" end_time="06:20:33"/>
 					<leg dep_time="06:20:33" transp_time="00:02:13">
@@ -5106,7 +5106,7 @@
 					</leg>
 					<act type="service" serviceId="40" end_time="07:09:26"/>
 					<leg dep_time="07:09:26" transp_time="00:22:13">
-						<route>j(8,6)R j(8,5)R j(8,4)R j(8,3)R j(8,2)R i(8,1)R i(7,1)R j(6,1)R i(7,0)</route>
+						<route>j(8,6)R i(8,5)R i(7,5)R j(6,5)R j(6,4)R j(6,3)R j(6,2)R j(6,1)R i(7,0)</route>
 					</leg>
 					<act type="service" serviceId="39" end_time="07:36:39"/>
 					<leg dep_time="07:36:39" transp_time="00:02:13">
@@ -5334,7 +5334,7 @@
 					</leg>
 					<act type="service" serviceId="6" end_time="07:43:19"/>
 					<leg dep_time="07:43:19" transp_time="00:17:46">
-						<route>i(5,0) i(6,0) i(7,0) i(8,0) i(9,0) j(9,1) j(9,2)</route>
+						<route>i(5,0) j(5,1) j(5,2) i(6,2) i(7,2) i(8,2) i(9,2)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -5381,7 +5381,7 @@
 					</leg>
 					<act type="service" serviceId="48" end_time="07:34:26"/>
 					<leg dep_time="07:34:26" transp_time="00:26:39">
-						<route>i(5,8) i(6,8) j(6,8)R j(6,7)R j(6,6)R j(6,5)R i(7,4) i(8,4) j(8,4)R j(8,3)R i(9,2)</route>
+						<route>j(4,8)R j(4,7)R j(4,6)R j(4,5)R j(4,4)R j(4,3)R i(5,2) i(6,2) i(7,2) i(8,2) i(9,2)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -5514,7 +5514,7 @@
 					</leg>
 					<act type="service" serviceId="36" end_time="06:32:46"/>
 					<leg dep_time="06:32:46" transp_time="00:15:33">
-						<route>i(6,4) i(7,4) i(8,4) i(9,4) j(9,5) i(9,5)R</route>
+						<route>j(5,5) j(5,6) i(6,6) i(7,6) i(8,6) j(8,6)R</route>
 					</leg>
 					<act type="service" serviceId="12" end_time="06:53:19"/>
 					<leg dep_time="06:53:19" transp_time="00:11:06">
@@ -5604,11 +5604,11 @@
 					</leg>
 					<act type="service" serviceId="16" end_time="06:27:46"/>
 					<leg dep_time="06:27:46" transp_time="00:11:06">
-						<route>i(6,0) i(7,0) j(7,1) j(7,2)</route>
+						<route>j(5,1) j(5,2) i(6,2) i(7,2)</route>
 					</leg>
 					<act type="service" serviceId="29" end_time="06:43:53"/>
 					<leg dep_time="06:43:53" transp_time="00:15:33">
-						<route>j(7,4) i(8,4) i(9,4) j(9,5) j(9,6) j(9,7)</route>
+						<route>j(7,4) j(7,5) j(7,6) i(8,6) i(9,6) j(9,7)</route>
 					</leg>
 					<act type="service" serviceId="2" end_time="07:04:26"/>
 					<leg dep_time="07:04:26" transp_time="00:08:53">
@@ -5647,7 +5647,7 @@
 					</leg>
 					<act type="service" serviceId="10" end_time="06:18:19"/>
 					<leg dep_time="06:18:19" transp_time="00:11:06">
-						<route>i(6,2) i(7,2) j(7,3) i(7,3)R</route>
+						<route>j(5,3) j(5,4) i(6,4) j(6,4)R</route>
 					</leg>
 					<act type="service" serviceId="20" end_time="06:34:26"/>
 					<leg dep_time="06:34:26" transp_time="00:02:13">
@@ -5690,7 +5690,7 @@
 				<tour vehicleId="carrier_25_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:15:33">
-						<route>j(0,3)R i(1,2) i(2,2) i(3,2) j(3,3) j(3,4)</route>
+						<route>j(0,3)R i(1,2) j(1,3) j(1,4) i(2,4) i(3,4)</route>
 					</leg>
 					<act type="service" serviceId="3" end_time="06:20:33"/>
 					<leg dep_time="06:20:33" transp_time="00:02:13">
@@ -5730,7 +5730,7 @@
 					</leg>
 					<act type="service" serviceId="42" end_time="07:41:06"/>
 					<leg dep_time="07:41:06" transp_time="00:19:59">
-						<route>i(5,7)R i(4,7)R i(3,7)R j(2,7)R j(2,6)R i(2,5)R i(1,5)R j(0,5)R</route>
+						<route>i(5,7)R i(4,7)R i(3,7)R i(2,7)R i(1,7)R j(0,7)R j(0,6)R j(0,5)R</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -5938,7 +5938,7 @@
 					</leg>
 					<act type="service" serviceId="2" end_time="07:56:39"/>
 					<leg dep_time="07:56:39" transp_time="00:22:13">
-						<route>i(4,4) i(5,4) i(6,4) i(7,4) i(8,4) j(8,4)R j(8,3)R i(9,2) j(9,3)</route>
+						<route>i(4,4) j(4,4)R j(4,3)R i(5,2) i(6,2) i(7,2) i(8,2) i(9,2) j(9,3)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -6208,7 +6208,7 @@
 					</leg>
 					<act type="service" serviceId="19" end_time="06:27:46"/>
 					<leg dep_time="06:27:46" transp_time="00:13:19">
-						<route>i(7,6) i(8,6) i(9,6) j(9,7) i(9,7)R</route>
+						<route>i(7,6) j(7,7) j(7,8) i(8,8) j(8,8)R</route>
 					</leg>
 					<act type="service" serviceId="22" end_time="06:46:06"/>
 					<leg dep_time="06:46:06" transp_time="00:08:53">
@@ -6298,7 +6298,7 @@
 					</leg>
 					<act type="service" serviceId="43" end_time="06:05:00"/>
 					<leg dep_time="06:05:00" transp_time="00:11:06">
-						<route>i(1,4) i(2,4) j(2,4)R j(2,3)R</route>
+						<route>j(0,4)R j(0,3)R i(1,2) i(2,2)</route>
 					</leg>
 					<act type="service" serviceId="28" end_time="06:21:06"/>
 					<leg dep_time="06:21:06" transp_time="00:02:13">
@@ -6432,7 +6432,7 @@
 					</leg>
 					<act type="service" serviceId="2" end_time="06:58:53"/>
 					<leg dep_time="06:58:53" transp_time="00:28:53">
-						<route>i(6,6) j(6,6)R j(6,5)R j(6,4)R i(6,3)R i(5,3)R j(4,3)R j(4,2)R i(4,1)R i(3,1)R j(2,1)R i(3,0)</route>
+						<route>j(5,7) i(5,7)R i(4,7)R i(3,7)R j(2,7)R j(2,6)R j(2,5)R j(2,4)R j(2,3)R j(2,2)R j(2,1)R i(3,0)</route>
 					</leg>
 					<act type="service" serviceId="7" end_time="07:32:46"/>
 					<leg dep_time="07:32:46" transp_time="00:04:26">
@@ -6502,7 +6502,7 @@
 				<tour vehicleId="carrier_28_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:19:59">
-						<route>i(9,5)R i(8,5)R i(7,5)R j(6,5)R j(6,4)R i(6,3)R i(5,3)R i(4,3)R</route>
+						<route>i(9,5)R i(8,5)R i(7,5)R i(6,5)R i(5,5)R j(4,5)R j(4,4)R i(4,3)R</route>
 					</leg>
 					<act type="service" serviceId="13" end_time="06:24:59"/>
 					<leg dep_time="06:24:59" transp_time="00:02:13">
@@ -6628,7 +6628,7 @@
 					</leg>
 					<act type="service" serviceId="6" end_time="07:48:53"/>
 					<leg dep_time="07:48:53" transp_time="00:13:19">
-						<route>i(4,6) i(5,6) i(6,6) j(6,6)R j(6,5)R</route>
+						<route>i(4,6) j(4,6)R j(4,5)R i(5,4) i(6,4)</route>
 					</leg>
 					<act type="service" serviceId="3" end_time="08:07:13"/>
 					<leg dep_time="08:07:13" transp_time="00:06:39">
@@ -6910,7 +6910,7 @@
 					</leg>
 					<act type="service" serviceId="44" end_time="06:34:59"/>
 					<leg dep_time="06:34:59" transp_time="00:15:33">
-						<route>i(7,6) i(8,6) i(9,6) j(9,7) j(9,8) j(9,9)</route>
+						<route>i(7,6) j(7,7) j(7,8) i(8,8) i(9,8) j(9,9)</route>
 					</leg>
 					<act type="service" serviceId="15" end_time="06:55:33"/>
 					<leg dep_time="06:55:33" transp_time="00:06:39">
@@ -7420,7 +7420,7 @@
 					</leg>
 					<act type="service" serviceId="5" end_time="06:48:19"/>
 					<leg dep_time="06:48:19" transp_time="00:11:06">
-						<route>j(9,8) j(9,9) i(9,9)R j(8,9)R</route>
+						<route>i(9,7)R i(8,7)R j(7,8) i(8,8)</route>
 					</leg>
 					<act type="service" serviceId="9" end_time="07:04:26"/>
 					<leg dep_time="07:04:26" transp_time="00:11:06">
@@ -7448,7 +7448,7 @@
 					</leg>
 					<act type="service" serviceId="20" end_time="08:03:19"/>
 					<leg dep_time="08:03:19" transp_time="00:24:26">
-						<route>i(5,5)R i(4,5)R i(3,5)R j(2,5)R j(2,4)R j(2,3)R j(2,2)R i(2,1)R i(1,1)R j(0,1)R</route>
+						<route>i(5,5)R i(4,5)R i(3,5)R i(2,5)R i(1,5)R j(0,5)R j(0,4)R j(0,3)R j(0,2)R j(0,1)R</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -7502,7 +7502,7 @@
 				<tour vehicleId="carrier_2_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:11:06">
-						<route>i(2,0) i(3,0) j(3,1) j(3,2)</route>
+						<route>j(1,1) j(1,2) i(2,2) i(3,2)</route>
 					</leg>
 					<act type="service" serviceId="31" end_time="06:16:06"/>
 					<leg dep_time="06:16:06" transp_time="00:08:53">
@@ -7616,7 +7616,7 @@
 				<tour vehicleId="carrier_1_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:22:13">
-						<route>j(0,9)R i(1,8) i(2,8) i(3,8) i(4,8) j(4,8)R j(4,7)R j(4,6)R j(4,5)R</route>
+						<route>j(0,9)R j(0,8)R j(0,7)R j(0,6)R j(0,5)R i(1,4) i(2,4) i(3,4) i(4,4)</route>
 					</leg>
 					<act type="service" serviceId="36" end_time="06:27:13"/>
 					<leg dep_time="06:27:13" transp_time="00:00:00">
@@ -7663,7 +7663,7 @@
 				<tour vehicleId="carrier_1_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:13:19">
-						<route>j(0,9)R i(1,8) i(2,8) j(2,8)R j(2,7)R</route>
+						<route>j(0,9)R j(0,8)R j(0,7)R i(1,6) i(2,6)</route>
 					</leg>
 					<act type="service" serviceId="35" end_time="06:18:19"/>
 					<leg dep_time="06:18:19" transp_time="00:00:00">
@@ -7710,7 +7710,7 @@
 				<tour vehicleId="carrier_1_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:13:19">
-						<route>j(0,9)R i(1,8) i(2,8) j(2,8)R j(2,7)R</route>
+						<route>j(0,9)R j(0,8)R j(0,7)R i(1,6) i(2,6)</route>
 					</leg>
 					<act type="service" serviceId="20" end_time="06:18:19"/>
 					<leg dep_time="06:18:19" transp_time="00:04:26">
@@ -7812,7 +7812,7 @@
 					</leg>
 					<act type="service" serviceId="31" end_time="06:21:06"/>
 					<leg dep_time="06:21:06" transp_time="00:11:06">
-						<route>i(1,4) i(2,4) j(2,4)R j(2,3)R</route>
+						<route>j(0,4)R j(0,3)R i(1,2) i(2,2)</route>
 					</leg>
 					<act type="service" serviceId="6" end_time="06:37:13"/>
 					<leg dep_time="06:37:13" transp_time="00:15:33">
@@ -7969,7 +7969,7 @@
 					</leg>
 					<act type="service" serviceId="13" end_time="06:11:39"/>
 					<leg dep_time="06:11:39" transp_time="00:19:59">
-						<route>j(7,2) i(8,2) i(9,2) j(9,3) j(9,4) j(9,5) j(9,6) j(9,7)</route>
+						<route>j(7,2) j(7,3) j(7,4) j(7,5) j(7,6) i(8,6) i(9,6) j(9,7)</route>
 					</leg>
 					<act type="service" serviceId="3" end_time="06:36:39"/>
 					<leg dep_time="06:36:39" transp_time="00:08:53">
@@ -8106,7 +8106,7 @@
 				<tour vehicleId="carrier_10_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:17:46">
-						<route>i(6,0) i(7,0) j(7,1) j(7,2) j(7,3) j(7,4) j(7,5)</route>
+						<route>j(5,1) j(5,2) j(5,3) j(5,4) i(6,4) i(7,4) j(7,5)</route>
 					</leg>
 					<act type="service" serviceId="4" end_time="06:22:46"/>
 					<leg dep_time="06:22:46" transp_time="00:00:00">
@@ -8307,7 +8307,7 @@
 					</leg>
 					<act type="service" serviceId="30" end_time="07:27:46"/>
 					<leg dep_time="07:27:46" transp_time="00:15:33">
-						<route>i(4,6) i(5,6) j(5,7) j(5,8) j(5,9) i(5,9)R</route>
+						<route>j(3,7) j(3,8) i(4,8) i(5,8) j(5,9) i(5,9)R</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -8330,7 +8330,7 @@
 					</leg>
 					<act type="service" serviceId="16" end_time="06:55:33"/>
 					<leg dep_time="06:55:33" transp_time="00:24:26">
-						<route>i(3,2) i(4,2) i(5,2) i(6,2) i(7,2) i(8,2) j(8,2)R j(8,1)R i(9,0) j(9,1)</route>
+						<route>j(2,2)R j(2,1)R i(3,0) i(4,0) i(5,0) i(6,0) i(7,0) i(8,0) i(9,0) j(9,1)</route>
 					</leg>
 					<act type="service" serviceId="20" end_time="07:24:59"/>
 					<leg dep_time="07:24:59" transp_time="00:06:39">
@@ -8385,7 +8385,7 @@
 					</leg>
 					<act type="service" serviceId="29" end_time="07:16:39"/>
 					<leg dep_time="07:16:39" transp_time="00:13:19">
-						<route>j(4,3)R i(5,2) j(5,3) j(5,4) i(6,4)</route>
+						<route>i(4,3)R j(3,4) i(4,4) i(5,4) i(6,4)</route>
 					</leg>
 					<act type="service" serviceId="1" end_time="07:34:59"/>
 					<leg dep_time="07:34:59" transp_time="00:04:26">
@@ -8420,7 +8420,7 @@
 					</leg>
 					<act type="service" serviceId="7" end_time="06:28:19"/>
 					<leg dep_time="06:28:19" transp_time="00:11:06">
-						<route>j(3,8) i(4,8) j(4,8)R j(4,7)R</route>
+						<route>i(3,7)R j(2,7)R i(3,6) i(4,6)</route>
 					</leg>
 					<act type="service" serviceId="21" end_time="06:44:26"/>
 					<leg dep_time="06:44:26" transp_time="00:04:26">
@@ -8562,7 +8562,7 @@
 					</leg>
 					<act type="service" serviceId="46" end_time="07:34:26"/>
 					<leg dep_time="07:34:26" transp_time="00:17:46">
-						<route>i(6,6) i(7,6) i(8,6) j(8,6)R j(8,5)R i(9,4) j(9,5)</route>
+						<route>i(6,6) j(6,6)R j(6,5)R i(7,4) i(8,4) i(9,4) j(9,5)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -8609,7 +8609,7 @@
 					</leg>
 					<act type="service" serviceId="12" end_time="07:29:59"/>
 					<leg dep_time="07:29:59" transp_time="00:13:19">
-						<route>i(8,2) i(9,2) j(9,3) j(9,4) j(9,5)</route>
+						<route>j(7,3) j(7,4) i(8,4) i(9,4) j(9,5)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -8958,7 +8958,7 @@
 					</leg>
 					<act type="service" serviceId="30" end_time="07:41:06"/>
 					<leg dep_time="07:41:06" transp_time="00:19:59">
-						<route>j(0,6)R j(0,5)R j(0,4)R j(0,3)R i(1,2) i(2,2) j(2,2)R j(2,1)R</route>
+						<route>j(0,6)R j(0,5)R j(0,4)R j(0,3)R j(0,2)R j(0,1)R i(1,0) i(2,0)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -8969,7 +8969,7 @@
 					</leg>
 					<act type="service" serviceId="43" end_time="06:18:19"/>
 					<leg dep_time="06:18:19" transp_time="00:13:19">
-						<route>i(4,6) i(5,6) j(5,7) j(5,8) j(5,9)</route>
+						<route>j(3,7) j(3,8) i(4,8) i(5,8) j(5,9)</route>
 					</leg>
 					<act type="service" serviceId="4" end_time="06:36:39"/>
 					<leg dep_time="06:36:39" transp_time="00:11:06">
@@ -9189,7 +9189,7 @@
 					</leg>
 					<act type="service" serviceId="28" end_time="06:53:19"/>
 					<leg dep_time="06:53:19" transp_time="00:13:19">
-						<route>j(3,2) i(4,2) i(5,2) j(5,3) j(5,4)</route>
+						<route>j(3,2) j(3,3) j(3,4) i(4,4) i(5,4)</route>
 					</leg>
 					<act type="service" serviceId="11" end_time="07:11:39"/>
 					<leg dep_time="07:11:39" transp_time="00:02:13">
@@ -9464,7 +9464,7 @@
 					</leg>
 					<act type="service" serviceId="25" end_time="07:56:06"/>
 					<leg dep_time="07:56:06" transp_time="00:15:33">
-						<route>j(7,2) i(8,2) i(9,2) j(9,3) j(9,4) j(9,5)</route>
+						<route>j(7,2) j(7,3) j(7,4) i(8,4) i(9,4) j(9,5)</route>
 					</leg>
 					<act type="service" serviceId="43" end_time="08:16:39"/>
 					<leg dep_time="08:16:39" transp_time="00:02:13">
@@ -9495,7 +9495,7 @@
 					</leg>
 					<act type="service" serviceId="9" end_time="06:56:06"/>
 					<leg dep_time="06:56:06" transp_time="00:11:06">
-						<route>i(7,4) i(8,4) j(8,4)R i(8,3)R</route>
+						<route>j(6,4)R j(6,3)R i(7,2) j(7,3)</route>
 					</leg>
 					<act type="service" serviceId="37" end_time="07:12:13"/>
 					<leg dep_time="07:12:13" transp_time="00:00:00">
@@ -9558,7 +9558,7 @@
 					</leg>
 					<act type="service" serviceId="45" end_time="07:16:06"/>
 					<leg dep_time="07:16:06" transp_time="00:15:33">
-						<route>j(3,8) i(4,8) j(4,8)R j(4,7)R i(5,6) i(6,6)</route>
+						<route>i(3,7)R j(2,7)R i(3,6) i(4,6) i(5,6) i(6,6)</route>
 					</leg>
 					<act type="service" serviceId="12" end_time="07:36:39"/>
 					<leg dep_time="07:36:39" transp_time="00:06:39">
@@ -9609,7 +9609,7 @@
 					</leg>
 					<act type="service" serviceId="14" end_time="07:38:53"/>
 					<leg dep_time="07:38:53" transp_time="00:13:19">
-						<route>i(7,4) i(8,4) i(9,4) j(9,5) j(9,6)</route>
+						<route>i(7,4) j(7,5) j(7,6) i(8,6) i(9,6)</route>
 					</leg>
 					<act type="end"/>
 				</tour>
@@ -9883,7 +9883,7 @@
 					</leg>
 					<act type="service" serviceId="49" end_time="06:37:13"/>
 					<leg dep_time="06:37:13" transp_time="00:11:06">
-						<route>j(5,8) i(6,8) j(6,8)R j(6,7)R</route>
+						<route>i(5,7)R j(4,7)R i(5,6) i(6,6)</route>
 					</leg>
 					<act type="service" serviceId="18" end_time="06:53:19"/>
 					<leg dep_time="06:53:19" transp_time="00:00:00">
@@ -9918,7 +9918,7 @@
 				<tour vehicleId="carrier_4_heavyVehicle">
 					<act type="start" end_time="06:00:00"/>
 					<leg dep_time="06:00:00" transp_time="00:15:33">
-						<route>i(3,0) i(4,0) i(5,0) j(5,1) j(5,2) j(5,3)</route>
+						<route>i(3,0) j(3,1) j(3,2) i(4,2) i(5,2) j(5,3)</route>
 					</leg>
 					<act type="service" serviceId="17" end_time="06:20:33"/>
 					<leg dep_time="06:20:33" transp_time="00:04:26">
@@ -9926,7 +9926,7 @@
 					</leg>
 					<act type="service" serviceId="37" end_time="06:29:59"/>
 					<leg dep_time="06:29:59" transp_time="00:11:06">
-						<route>i(6,6) i(7,6) j(7,7) j(7,8)</route>
+						<route>j(5,7) j(5,8) i(6,8) i(7,8)</route>
 					</leg>
 					<act type="service" serviceId="4" end_time="06:46:06"/>
 					<leg dep_time="06:46:06" transp_time="00:06:39">
@@ -10036,7 +10036,7 @@
 					</leg>
 					<act type="service" serviceId="36" end_time="06:09:26"/>
 					<leg dep_time="06:09:26" transp_time="00:19:59">
-						<route>i(1,4) i(2,4) j(2,4)R j(2,3)R i(3,2) i(4,2) i(5,2) i(6,2)</route>
+						<route>j(0,4)R j(0,3)R i(1,2) i(2,2) i(3,2) i(4,2) i(5,2) i(6,2)</route>
 					</leg>
 					<act type="service" serviceId="29" end_time="06:34:26"/>
 					<leg dep_time="06:34:26" transp_time="00:02:13">
@@ -10044,7 +10044,7 @@
 					</leg>
 					<act type="service" serviceId="38" end_time="06:41:39"/>
 					<leg dep_time="06:41:39" transp_time="00:13:19">
-						<route>j(5,2) i(6,2) j(6,2)R j(6,1)R i(7,0)</route>
+						<route>i(5,1)R j(4,1)R i(5,0) i(6,0) i(7,0)</route>
 					</leg>
 					<act type="service" serviceId="2" end_time="06:59:59"/>
 					<leg dep_time="06:59:59" transp_time="00:06:39">
@@ -10095,7 +10095,7 @@
 					</leg>
 					<act type="service" serviceId="23" end_time="06:57:46"/>
 					<leg dep_time="06:57:46" transp_time="00:11:06">
-						<route>i(8,4) i(9,4) j(9,5) j(9,6)</route>
+						<route>j(7,5) j(7,6) i(8,6) i(9,6)</route>
 					</leg>
 					<act type="service" serviceId="19" end_time="07:13:53"/>
 					<leg dep_time="07:13:53" transp_time="00:06:39">
@@ -10201,7 +10201,7 @@
 					</leg>
 					<act type="service" serviceId="32" end_time="07:10:33"/>
 					<leg dep_time="07:10:33" transp_time="00:22:13">
-						<route>j(7,4) j(7,5) j(7,6) j(7,7) j(7,8) j(7,9) i(7,9)R i(6,9)R i(5,9)R</route>
+						<route>i(7,3)R i(6,3)R j(5,4) j(5,5) j(5,6) j(5,7) j(5,8) j(5,9) i(5,9)R</route>
 					</leg>
 					<act type="service" serviceId="16" end_time="07:37:46"/>
 					<leg dep_time="07:37:46" transp_time="00:02:13">
@@ -10530,7 +10530,7 @@
 					</leg>
 					<act type="service" serviceId="25" end_time="06:27:46"/>
 					<leg dep_time="06:27:46" transp_time="00:17:46">
-						<route>i(6,3)R i(5,3)R j(4,3)R j(4,2)R i(4,1)R i(3,1)R j(2,1)R</route>
+						<route>i(6,3)R i(5,3)R i(4,3)R i(3,3)R j(2,3)R j(2,2)R j(2,1)R</route>
 					</leg>
 					<act type="service" serviceId="19" end_time="06:50:33"/>
 					<leg dep_time="06:50:33" transp_time="00:08:53">
@@ -10797,7 +10797,7 @@
 					</leg>
 					<act type="service" serviceId="40" end_time="06:47:13"/>
 					<leg dep_time="06:47:13" transp_time="00:15:33">
-						<route>i(7,4) i(8,4) j(8,4)R j(8,3)R i(9,2) j(9,3)</route>
+						<route>j(6,4)R j(6,3)R i(7,2) i(8,2) i(9,2) j(9,3)</route>
 					</leg>
 					<act type="service" serviceId="16" end_time="07:07:46"/>
 					<leg dep_time="07:07:46" transp_time="00:06:39">
@@ -10817,7 +10817,7 @@
 					</leg>
 					<act type="service" serviceId="18" end_time="08:09:59"/>
 					<leg dep_time="08:09:59" transp_time="00:26:39">
-						<route>i(1,7)R j(0,7)R j(0,6)R j(0,5)R i(1,4) i(2,4) j(2,4)R j(2,3)R j(2,2)R j(2,1)R i(3,0)</route>
+						<route>i(1,7)R j(0,7)R j(0,6)R j(0,5)R j(0,4)R j(0,3)R j(0,2)R j(0,1)R i(1,0) i(2,0) i(3,0)</route>
 					</leg>
 					<act type="end"/>
 				</tour>

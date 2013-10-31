@@ -29,6 +29,8 @@ public class PassengerScenarioCreator {
 	
 	static int agentCounter = 1;
 	
+	static int nuOfAgentsPerHomeLink = 1;
+	
 	public static void main(String[] args) {
 		
 		Config config = new Config();
@@ -62,7 +64,7 @@ public class PassengerScenarioCreator {
 			for(Person p : personsR) population.addPerson(p);
 		}
 		
-		new PopulationWriter(population, scenario.getNetwork()).write("input/usecases/chessboard/passenger/passengerPlans.xml");
+		new PopulationWriter(population, scenario.getNetwork()).write("input/usecases/chessboard/passenger/passengerPlansV2.xml");
 	}
 
 	private static List<Person> createPersons(IdImpl homeId, IdImpl workId,Scenario scenario) {
@@ -70,7 +72,7 @@ public class PassengerScenarioCreator {
 				new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0), new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0));
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		List<Person> persons = new ArrayList<Person>();
-		for(int agent=0;agent<9;agent++){
+		for(int agent=0;agent<nuOfAgentsPerHomeLink;agent++){
 			
 			Person person = popFactory.createPerson(new IdImpl(agentCounter));
 			agentCounter++;

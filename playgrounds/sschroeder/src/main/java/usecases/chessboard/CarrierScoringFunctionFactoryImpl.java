@@ -45,7 +45,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 		
 		private double timeParameter = 0.008; 
 		
-		private double missedTimeWindowPenalty = 1.0;
+		private double missedTimeWindowPenalty = 0.008;
 		
 		public DriversActivityScoring() {
 			super();

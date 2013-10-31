@@ -22,6 +22,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import util.Solutions;
 
 import algorithms.VehicleRoutingAlgorithms;
+import analysis.AlgorithmSearchProgressChartListener;
 import basics.VehicleRoutingAlgorithm;
 import basics.VehicleRoutingProblem;
 import basics.VehicleRoutingProblemSolution;
@@ -42,6 +43,7 @@ public class InitialCarrierPlanCreator {
 		VehicleRoutingProblem vrp = vrpBuilder.build();
 		
 		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "input/usecases/chessboard/vrpalgo/initialPlanAlgorithm.xml");
+		vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrier.getId()+".png"));
 		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 		
 		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.getBest(solutions));
@@ -54,7 +56,7 @@ public class InitialCarrierPlanCreator {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("input/diss/network/grid9x9.xml");
+		new MatsimNetworkReader(scenario).readFile("input/usecases/chessboard/network/grid9x9.xml");
 		
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/carrierPlansWithoutRoutes.xml");

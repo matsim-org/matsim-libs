@@ -20,7 +20,7 @@ public class VisualizeCarrierPlans {
 		new MatsimNetworkReader(scenario).readFile("input/usecases/chessboard/network/grid9x9.xml");
 		
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/carrierPlans.xml");
+		new CarrierPlanXmlReaderV2(carriers).read("output/ITERS/it.25/25.carrierPlans.xml");
 		
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes.xml");

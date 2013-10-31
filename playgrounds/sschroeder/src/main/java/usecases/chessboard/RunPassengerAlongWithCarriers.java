@@ -47,7 +47,7 @@ public class RunPassengerAlongWithCarriers {
 		new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes.xml");
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		
-		CarrierPlanStrategyManagerFactory strategyManagerFactory = createStrategyManagerFactory();
+		CarrierPlanStrategyManagerFactory strategyManagerFactory = createStrategyManagerFactory(types);
 		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(carriers,controler.getNetwork());
 		
 		CarrierController carrierController = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory);
@@ -118,10 +118,19 @@ public class RunPassengerAlongWithCarriers {
 	}
 
 
-	private static CarrierPlanStrategyManagerFactory createStrategyManagerFactory() {
-		final CarrierReplanningStrategyManager strategyManager = new CarrierReplanningStrategyManager();
-		
-		return null;
+	private static CarrierPlanStrategyManagerFactory createStrategyManagerFactory(final CarrierVehicleTypes types) {
+		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
+			
+			@Override
+			public CarrierReplanningStrategyManager createStrategyManager(Controler controler) {
+				final CarrierReplanningStrategyManager strategyManager = new CarrierReplanningStrategyManager();
+				strategyManager.addStrategy(new SelectBestPlanStrategyFactory().createStrategy(), 0.95);
+//				strategyManager.addStrategy(new KeepPlanSelectedStrategyFactory().createStrategy(), 0.8);
+				strategyManager.addStrategy(new SelectBestPlanAndOptimizeItsVehicleRouteFactory(controler.getNetwork(), types, controler.getLinkTravelTimes()).createStrategy(), 0.05);
+				return strategyManager;
+			}
+		};
+		return stratManFactory;
 	}
 
 	}
