@@ -21,20 +21,29 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskAddLastPartToRoute;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadPool;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy3;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.EvaluationContainer;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.StrategyEvaluation;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class ParkingMemory {
+
+	private static final Logger log = Logger.getLogger(ParkingMemory.class);
 
 	private static TwoHashMapsConcatenated<Id, Integer, ParkingMemory> parkingMemories = new TwoHashMapsConcatenated<Id, Integer, ParkingMemory>();
 
@@ -51,6 +60,10 @@ public class ParkingMemory {
 	}
 
 	public static void prepareForNextIteration() {
+		log.info("starting prep parking memory");
+		RerouteThreadPool rtPool = new RerouteThreadPool(ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning, Message.ttMatrix,
+				ZHScenarioGlobal.scenario.getNetwork());
+
 		HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations = AgentWithParking.parkingStrategyManager
 				.getStrategyEvaluations();
 
@@ -59,6 +72,7 @@ public class ParkingMemory {
 				EvaluationContainer evaluationContainer = strategyEvaluations.get(personId).get(legIndex);
 
 				for (StrategyEvaluation se : evaluationContainer.getEvaluations()) {
+
 					if (se.strategy.getClass() == AxPo1989_Strategy3.class) {
 						ParkingMemory parkingMemory = getParkingMemory(personId, legIndex);
 
@@ -69,15 +83,43 @@ public class ParkingMemory {
 
 							ActivityImpl previousAct = (ActivityImpl) planElements.get(legIndex - 3);
 
-							EditRoute.globalEditRoute.addLastPartToRoute(previousAct.getEndTime(), leg,
-									AgentWithParking.parkingManager
-											.getLinkOfParking(parkingMemory.closestFreeGarageParkingAtTimeOfArrival));
+							int nextCarLegIndex = getNextCarLegIndex(planElements, legIndex);
 
+							if (nextCarLegIndex != -1) {
+								ActivityImpl actAfterNextCarLeg = (ActivityImpl) planElements.get(nextCarLegIndex + 3);
+
+								Id linkOfParking = AgentWithParking.parkingManager
+										.getLinkOfParking(parkingMemory.closestFreeGarageParkingAtTimeOfArrival);
+
+								if (!linkOfParking.toString().equalsIgnoreCase(actAfterNextCarLeg.getLinkId().toString())) {
+									rtPool.addTask(new RerouteTaskAddLastPartToRoute(previousAct.getEndTime(), leg, linkOfParking));
+								}
+							}
 						}
 					}
+
 				}
 			}
 		}
+
+		rtPool.start();
+
+		log.info("end prep parking memory");
+	}
+
+	private static int getNextCarLegIndex(List<PlanElement> planElements, Integer currentCarLegIndex) {
+		int i = currentCarLegIndex + 1;
+		while (i < planElements.size()) {
+			if (planElements.get(i) instanceof Leg) {
+				Leg leg = (Leg) planElements.get(i);
+
+				if (leg.getMode().endsWith(TransportMode.car)) {
+					return i;
+				}
+			}
+			i++;
+		}
+		return -1;
 	}
 
 	public Id closestFreeGarageParkingAtTimeOfArrival;

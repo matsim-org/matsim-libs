@@ -76,9 +76,12 @@ import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTask;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskAddInitialPartToRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadPool;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.EvaluationContainer;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.StrategyEvaluation;
@@ -95,6 +98,8 @@ public class ParkingManagerZH {
 	private Network network;
 
 	protected QuadTree<Parking> nonFullPublicParkingFacilities;
+	protected QuadTree<Parking> garageParkings;
+	
 	protected HashSet<Parking> fullPublicParkingFacilities;
 	private Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId,
 																// List<FacilityId>>
@@ -123,8 +128,27 @@ public class ParkingManagerZH {
 		this.network = network;
 		this.parkingTypes = parkingTypes;
 
+		initializeGarageParkings(parkings);
+		
 		reset();
 
+	}
+
+	private void initializeGarageParkings(LinkedList<Parking> parking) {
+		EnclosingRectangle rect = new EnclosingRectangle();
+
+		for (Parking p : parking) {
+			if (p.getId().toString().contains("gp")){
+				rect.registerCoord(p.getCoord());
+			}
+		}
+		garageParkings = (new QuadTreeInitializer<Parking>()).getQuadTree(rect);
+		
+		for (Parking p : parking) {
+			if (p.getId().toString().contains("gp")){
+				garageParkings.put(p.getCoord().getX(), p.getCoord().getY(), p);
+			}
+		}
 	}
 
 	public void reset() {
@@ -160,6 +184,10 @@ public class ParkingManagerZH {
 
 				privateParkingFacilityIdMapping.put(privateParking.getActInfo().getFacilityId(), privateParking.getActInfo()
 						.getActType(), parking.getId());
+			}
+			
+			if (parking.getId().toString().contains("illegal")) {
+				nonFullPublicParkingFacilities.remove(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 			}
 		}
 	}
@@ -445,14 +473,14 @@ public class ParkingManagerZH {
 	public void initFirstParkingOfDay(Population population) {
 		log.info("starting initFirstParkingOfDay");
 
-		RerouteThread[] rerouteThreads = new RerouteThread[ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning];
+//		RerouteThread[] rerouteThreads = new RerouteThread[ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning];
+//
+//		CyclicBarrier cyclicBarrier = new CyclicBarrier(rerouteThreads.length + 1);
+//		for (int i = 0; i < rerouteThreads.length; i++) {
+//			rerouteThreads[i] = new RerouteThread(ttMatrix, network, cyclicBarrier);
+//		}
+		RerouteThreadPool rtPool=new RerouteThreadPool(ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning, ttMatrix, network);
 
-		CyclicBarrier cyclicBarrier = new CyclicBarrier(rerouteThreads.length + 1);
-		for (int i = 0; i < rerouteThreads.length; i++) {
-			rerouteThreads[i] = new RerouteThread(ttMatrix, network, cyclicBarrier);
-		}
-
-		int numberOfTasks = 0;
 		for (Person person : population.getPersons().values()) {
 			for (int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++) {
 				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
@@ -469,7 +497,8 @@ public class ParkingManagerZH {
 						Id parkingId = getFreePrivateParking(act.getFacilityId(), act.getType());
 
 						if (parkingId == null) {
-							parkingId = getClosestAcceptableFreeParkingDuringInitialization(act.getLinkId());
+							parkingId= getClosestFreeParkingFacilityId(act.getLinkId());
+							//parkingId = getClosestAcceptableFreeParkingDuringInitialization(act.getLinkId());
 						}
 
 						if (getLinkOfParking(parkingId).toString().equalsIgnoreCase(nextNonParkingAct.getLinkId().toString())) {
@@ -498,37 +527,17 @@ public class ParkingManagerZH {
 						// AddInitialPartToRouteTask(act.getEndTime(),
 						// prevParkingAct.getLinkId(), leg,ttMatrix,network));
 
-						rerouteThreads[numberOfTasks % rerouteThreads.length].addTask(new RerouteTask(act.getEndTime(),
+						rtPool.addTask(new RerouteTaskAddInitialPartToRoute(act.getEndTime(),
 								prevParkingAct.getLinkId(), leg));
+						//rerouteThreads[numberOfTasks % rerouteThreads.length].addTask();
 
-						numberOfTasks++;
 						break;
 					}
 				}
 			}
 		}
 
-		for (int i = 0; i < rerouteThreads.length; i++) {
-			rerouteThreads[i].start();
-		}
-
-		try {
-			cyclicBarrier.await();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		for (int i = 0; i < rerouteThreads.length; i++) {
-			for (RerouteTask task : rerouteThreads[i].getTasks()) {
-				synchronized (task) {
-					DebugLib.emptyFunctionForSettingBreakPoint();
-				}
-			}
-		}
+		rtPool.start();
 
 		if (ZHScenarioGlobal.iteration == 0) {
 			logInitialOccupancyToTxtFile();
@@ -594,23 +603,29 @@ public class ParkingManagerZH {
 		System.out.println("number of occupied parking: " + sum + " (" + comment + ")");
 	}
 
+	// only ensures giving back free parking if dest in city
+	// else gives just closest parking (not considering, if free or not)
 	public Id getClosestFreeGarageParking(Coord coord) {
+		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
 		
+		if (GeneralLib.getDistance(coordinatesLindenhofZH,coord)<8000){
 		double distance = 100;
 		while (true) {
-			Collection<Parking> collection = nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(), distance);
+			Collection<Parking> collection = garageParkings.get(coord.getX(), coord.getY(), distance);
 
 			for (Parking p : collection) {
-				if (p.getId().toString().contains("gp")) {
+				if (p.getIntCapacity()-occupiedParking.get(p.getId())>0) {
 					return p.getId();
 				}
 			}
+			
 			if (distance < 1000) {
 				distance += 100;
 			} else {
 				distance *= 2;
 			}
-
+		}} else {
+			return garageParkings.get(coord.getX(), coord.getY()).getId();
 		}
 	}
 

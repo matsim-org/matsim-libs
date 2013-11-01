@@ -39,86 +39,88 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.P
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
-public class AgentWithParking extends AgentEventMessage{
+public class AgentWithParking extends AgentEventMessage {
 
 	public static ParkingStrategyManager parkingStrategyManager;
 	public static ParkingManagerZH parkingManager;
-	public RerouteTaskDuringSim rerouteTask=null;
-	
+	public RerouteTaskDuringSim rerouteTask = null;
+
 	public AgentWithParking(Person person) {
 		this.setPerson(person);
 		this.setPlanElementIndex(0);
 		ActivityImpl ai = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		setMessageArrivalTime(ai.getEndTime());
 	}
-	
-	public void scheduleMessage(){
+
+	public void scheduleMessage() {
 		messageQueue.schedule(this);
 	}
-	
+
 	@Override
 	public void processEvent() {
-		if (getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof ActivityImpl){
-			Activity act=(Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
-			Leg nextLeg=(Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 1);
-			
-			if (act.getType().equalsIgnoreCase("parking") && nextLeg.getMode().equals(TransportMode.car)){
-				
+		if (getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()) instanceof ActivityImpl) {
+			Activity act = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+			Leg nextLeg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 1);
+
+			if (act.getType().equalsIgnoreCase("parking") && nextLeg.getMode().equals(TransportMode.car)) {
+
 				// (don't do this for first parking)
-				if (getPlanElementIndex()>getIndexOfFirstCarLegOfDay()){
-					parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(),duringAct_getPlanElementIndexOfPreviousCarLeg()).handleParkingDepartureActivity(this);
+				if (getPlanElementIndex() > getIndexOfFirstCarLegOfDay()) {
+					parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(),
+							duringAct_getPlanElementIndexOfPreviousCarLeg()).handleParkingDepartureActivity(this);
 				}
-			
+
 				AgentWithParking.parkingManager.unParkAgentVehicle(getPerson().getId());
 			}
-			
-			
+
 			handleActivityEndEvent();
 		} else {
-			Leg leg=(Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+			Leg leg = (Leg) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 
-			if (rerouteTask!=null){
-				if (rerouteTask.getLeg()==leg){
+			if (rerouteTask != null) {
+				if (rerouteTask.getLeg() == leg) {
 					rerouteTask.waitUntilDone();
 				}
 			}
-			
-			if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+
+			if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 				performSiutationUpdatesForParkingMemory();
-				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(),planElementIndex).handleAgentLeg(this);
-				
+				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).handleAgentLeg(this);
+
 			} else {
 				handleLeg();
 			}
 		}
 	}
-	
-	
 
 	private void performSiutationUpdatesForParkingMemory() {
-		Activity nextActivity=(Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()+3);
-		
-		Id closestFreeGarageParking = parkingManager.getClosestFreeGarageParking(nextActivity.getCoord());
-		
 		ParkingMemory parkingMemory = ParkingMemory.getParkingMemory(getPerson().getId(), getPlanElementIndex());
-		parkingMemory.closestFreeGarageParkingAtTimeOfArrival=closestFreeGarageParking;
+		if (parkingMemory.closestFreeGarageParkingAtTimeOfArrival == null) {
+			Activity nextActivity = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 3);
+
+			Id closestFreeGarageParking = parkingManager.getClosestFreeGarageParking(nextActivity.getCoord());
+
+			parkingMemory.closestFreeGarageParkingAtTimeOfArrival = closestFreeGarageParking;
+		}
 	}
 
-	public void processLegInDefaultWay(){
+	public void processLegInDefaultWay() {
 		handleLeg();
 	}
 
-	// avoid temporary problem with car leave and next planned parking on same link
+	// avoid temporary problem with car leave and next planned parking on same
+	// link
 	// TODO: resolve in future implementation
 	public boolean isInvalidLinkForParking() {
 		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
-		LinkNetworkRouteImpl route= (LinkNetworkRouteImpl)leg.getRoute();
-		
-		boolean isInvalidLink=false;
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
+
+		boolean isInvalidLink = false;
 		int nextCarLegIndex = duringCarLeg_getPlanElementIndexOfNextCarLeg();
-		if (nextCarLegIndex!=-1){
-			ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(nextCarLegIndex+3);
-			isInvalidLink=route.getEndLinkId().toString().equalsIgnoreCase(nextActAfterNextCarLeg.getLinkId().toString());
+		if (nextCarLegIndex != -1) {
+			ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements()
+					.get(nextCarLegIndex + 3);
+			isInvalidLink = route.getEndLinkId().toString().equalsIgnoreCase(nextActAfterNextCarLeg.getLinkId().toString());
 		}
 		return isInvalidLink;
 	}
@@ -126,11 +128,5 @@ public class AgentWithParking extends AgentEventMessage{
 	public ActivityImpl getCurrentActivity() {
 		return (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 	}
-	
-	
-	
-
-
 
 }
-
