@@ -105,7 +105,7 @@ public class ParkingLoader {
 
 		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
 
-		String streetParkingsFile = parkingDataBase + "streetParkings.xml";
+		String streetParkingsFile = parkingDataBase + "streetParkings_teleAtlast_ivtch.xml";
 		readParkings(streetParkingCalibrationFactor, streetParkingsFile, parkingCollection);
 
 		String garageParkingsFile = parkingDataBase + "garageParkings.xml";

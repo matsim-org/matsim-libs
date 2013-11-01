@@ -28,6 +28,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStr
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy3;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy7;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.ParkAgent;
 
 public class ParkingStrategyScenarios {
 
@@ -51,7 +52,10 @@ public class ParkingStrategyScenarios {
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId==2){
 				allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork()));
 				allStrategies.add(new AxPo1989_Strategy3(-1, scenario.getNetwork()));
-		}
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId==3){
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork()));
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork()));
+	}
 		
 		return allStrategies;
 	}

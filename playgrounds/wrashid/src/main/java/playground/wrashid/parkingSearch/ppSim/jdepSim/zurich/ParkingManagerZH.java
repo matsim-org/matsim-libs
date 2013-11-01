@@ -159,7 +159,7 @@ public class ParkingManagerZH {
 		initializeQuadTree(this.getParkings());
 		addParkings(this.getParkings());
 
-		occupiedParking = new IntegerValueHashMap<Id>();
+		setOccupiedParking(new IntegerValueHashMap<Id>());
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
 
 		for (Parking parking : this.getParkings()) {
@@ -251,7 +251,7 @@ public class ParkingManagerZH {
 
 	public int getFreeCapacity(Id facilityId) {
 
-		int freeCapacity = parkingsHashMap.get(facilityId).getIntCapacity() - occupiedParking.get(facilityId);
+		int freeCapacity = parkingsHashMap.get(facilityId).getIntCapacity() - getOccupiedParking().get(facilityId);
 
 		if (freeCapacity < 0) {
 			DebugLib.stopSystemAndReportInconsistency();
@@ -274,7 +274,7 @@ public class ParkingManagerZH {
 	}
 
 	private void parkVehicle(Id facilityId) {
-		occupiedParking.increment(facilityId);
+		getOccupiedParking().increment(facilityId);
 
 		if (getFreeCapacity(facilityId) < 0) {
 			DebugLib.stopSystemAndReportInconsistency();
@@ -312,7 +312,7 @@ public class ParkingManagerZH {
 	}
 
 	private void unParkVehicle(Id facilityId) {
-		occupiedParking.decrement(facilityId);
+		getOccupiedParking().decrement(facilityId);
 
 		if (getFreeCapacity(facilityId) == 1) {
 			markFacilityAsNonFull(facilityId);
@@ -326,7 +326,11 @@ public class ParkingManagerZH {
 	}
 
 	public List<Id> getParkingsOnLink(Id linkId) {
-		return parkingFacilitiesOnLinkMapping.get(linkId);
+		if (parkingFacilitiesOnLinkMapping.containsKey(linkId)){
+			return parkingFacilitiesOnLinkMapping.get(linkId);
+		} else {
+			return new LinkedList<Id>();
+		}
 	}
 
 	public Id getFreeParkingFacilityOnLink(Id linkId, String parkingType) {
@@ -347,7 +351,7 @@ public class ParkingManagerZH {
 				}
 
 				int capacity = parkingsHashMap.get(id).getIntCapacity();
-				int occupied = occupiedParking.get(id);
+				int occupied = getOccupiedParking().get(id);
 				if ((capacity - occupied) > maxCapacity)
 					facilityId = id;
 			}
@@ -570,8 +574,8 @@ public class ParkingManagerZH {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("parkingFacilityId\toccupancy");
 
-		for (Id facilityId : occupiedParking.getKeySet()) {
-			list.add(facilityId.toString() + "\t" + occupiedParking.get(facilityId));
+		for (Id facilityId : getOccupiedParking().getKeySet()) {
+			list.add(facilityId.toString() + "\t" + getOccupiedParking().get(facilityId));
 		}
 
 		GeneralLib.writeList(list, ZHScenarioGlobal.getItersFolderPath() + ZHScenarioGlobal.iteration
@@ -596,8 +600,8 @@ public class ParkingManagerZH {
 
 	public void printNumberOfOccupiedParking(String comment) {
 		int sum = 0;
-		for (Id parkingId : occupiedParking.getKeySet()) {
-			sum += occupiedParking.get(parkingId);
+		for (Id parkingId : getOccupiedParking().getKeySet()) {
+			sum += getOccupiedParking().get(parkingId);
 		}
 
 		System.out.println("number of occupied parking: " + sum + " (" + comment + ")");
@@ -614,7 +618,7 @@ public class ParkingManagerZH {
 			Collection<Parking> collection = garageParkings.get(coord.getX(), coord.getY(), distance);
 
 			for (Parking p : collection) {
-				if (p.getIntCapacity()-occupiedParking.get(p.getId())>0) {
+				if (p.getIntCapacity()-getOccupiedParking().get(p.getId())>0) {
 					return p.getId();
 				}
 			}
@@ -627,6 +631,14 @@ public class ParkingManagerZH {
 		}} else {
 			return garageParkings.get(coord.getX(), coord.getY()).getId();
 		}
+	}
+
+	public IntegerValueHashMap<Id> getOccupiedParking() {
+		return occupiedParking;
+	}
+
+	public void setOccupiedParking(IntegerValueHashMap<Id> occupiedParking) {
+		this.occupiedParking = occupiedParking;
 	}
 
 }

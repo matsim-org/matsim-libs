@@ -18,28 +18,244 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndNoLawEnforcement;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
+// TODO: start considering search time, when agent passes destination link for first time!
+
+// triggerSeachTimeStart(personId,aem.getMessageArrivalTime());
+
 public class AxPo1989_Strategy3 extends RandomParkingSearch {
+
+	DoubleValueHashMap<Id> garageParkingScore;
+
+	public void resetForNewIteration() {
+		super.resetForNewIteration();
+
+		garageParkingScore = new DoubleValueHashMap<Id>();
+	}
 
 	public AxPo1989_Strategy3(double maxDistance, Network network) {
 		super(maxDistance, network);
-		this.parkingType="streetParking";
+		this.parkingType = "streetParking";
+		resetForNewIteration();
 	}
 
 	@Override
 	public String getName() {
 		return "AxPo1989_Strategy3";
 	}
+
+	@Override
+	public void handleAgentLeg(AgentWithParking aem) {
+		triggerSearchTimerIfNeeded(aem);
+		
+		if (!endOfLegReached(aem)) {
+			if (!hasStreetParkingWithBetterScoreThanGPThanTakeIt(aem)) {
+				continueDriving(aem);
+			}
+		} else {
+			if (!hasFreeGPParkingThenTakeIt(aem)) {
+				findClosestFreeGarageAndDriveThere(aem);
+			}
+		}
+	}
+
+	private void triggerSearchTimerIfNeeded(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
 	
+		if (!startSearchTime.containsKey(personId)){
+			ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+					.get(aem.getPlanElementIndex() + 3);
+			if (GeneralLib.equals(getCurrentLinkId(aem),nextNonParkingAct.getLinkId())){
+				startSearchTime.put(personId, aem.getMessageArrivalTime());
+			}
+		}
+	}
+
+	private boolean hasStreetParkingWithBetterScoreThanGPThanTakeIt(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
+		double scoreGP = getScoreOfClosestGPAtCurrentEndOfRoute(aem);
+
+		
+		double searchTime=0;
+		if (startSearchTime.containsKey(personId)){
+			searchTime=getSearchTime(aem);
+		}
+		
+		Link nextLinkId = getNextLink(aem);
+		
+		Id freeParkingFacilityOnLink = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(nextLinkId.getId(), "streetParking");
+		boolean isInvalidLink = aem.isInvalidLinkForParking();
+		
+		if (!isInvalidLink && freeParkingFacilityOnLink!=null){
+			ParkingActivityAttributes paa = getParkingAttributesForParking(aem, nextLinkId, freeParkingFacilityOnLink, searchTime);
+			double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(paa);
+			
+			if (parkingScore>scoreGP){
+				throughAwayRestOfRoute(aem);
+				parkVehicle(aem, freeParkingFacilityOnLink);
+			}
+		}
+		
+		return false;
+	}
+	
+	private double getScoreOfClosestGPAtCurrentEndOfRoute(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
+		if (!garageParkingScore.containsKey(personId)) {
+
+			Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+			Id endLinkId = leg.getRoute().getEndLinkId();
+			
+			Link parkingLink = network.getLinks().get(endLinkId);
+			Id closestFreeGarageParkingId = AgentWithParking.parkingManager.getClosestFreeGarageParking(parkingLink.getCoord());
+
+			
+
+			ParkingActivityAttributes paa = getParkingAttributesForParking(aem, parkingLink, closestFreeGarageParkingId,getTravelTimeFromActivityToGP(aem));
+
+			double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(paa);
+			garageParkingScore.put(personId, parkingScore);
+		}
+
+		return garageParkingScore.get(personId);
+	}
+	
+	
+
+	public ParkingActivityAttributes getParkingAttributesForParking(AgentWithParking aem, Link parkingLink, Id closestFreeGarageParkingId, double searchDuration) {
+		ParkingActivityAttributes paa = new ParkingActivityAttributes(aem.getPerson().getId());
+		paa.setFacilityId(closestFreeGarageParkingId);
+		
+		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+				.get(aem.getPlanElementIndex() + 3);
+		
+
+		double walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), nextNonParkingAct.getCoord());
+		double walkDuration = walkDistance / walkSpeed;
+		paa.setToActWalkDuration(walkDuration);
+		paa.setToParkWalkDuration(walkDuration);
+
+		paa.setParkingArrivalTime(aem.getMessageArrivalTime());
+
+		double activityDuration = getActivityDuration(aem);
+		paa.setActivityDuration(activityDuration);
+		paa.setParkingDuration(activityDuration);
+		paa.setParkingSearchDuration(searchDuration);
+		return paa;
+	}
+
+	public double getActivityDuration(AgentWithParking aem) {
+		double activityDuration;
+		ActivityImpl act;
+
+		int indexOfNextCarLeg = aem.duringCarLeg_getPlanElementIndexOfNextCarLeg();
+		if (indexOfNextCarLeg != -1) {
+			act = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg - 3);
+		} else {
+			act = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(0);
+		}
+		activityDuration = GeneralLib.getIntervalDuration(aem.getMessageArrivalTime(), act.getEndTime());
+
+		if (activityDuration >= 24 * 60 * 60) {
+			activityDuration = 0;
+		}
+
+		return activityDuration;
+	}
+
+	private double getTravelTimeFromActivityToGP(AgentWithParking aem) {
+		Id nextActLinkId = ((ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 3))
+				.getLinkId();
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+
+		double travelTime = 0;
+		boolean routeStarted = false;
+		for (Id linkId : linkIds) {
+			if (linkId.toString().equalsIgnoreCase(nextActLinkId.toString())) {
+				routeStarted = true;
+			}
+
+			if (routeStarted) {
+				travelTime += Message.ttMatrix.getTravelTime(aem.getMessageArrivalTime(), linkId);
+			}
+		}
+
+		return travelTime;
+	}
+
+	private boolean hasFreeGPParkingThenTakeIt(AgentWithParking aem) {
+		boolean isInvalidLink = aem.isInvalidLinkForParking();
+		if (!isInvalidLink) {
+			//System.out.println(AgentWithParking.parkingManager);
+			//System.out.println(getCurrentLinkId(aem));
+			//System.out.println(AgentWithParking.parkingManager.getParkingsOnLink(getCurrentLinkId(aem)));
+			for (Id parkingId : AgentWithParking.parkingManager.getParkingsOnLink(getCurrentLinkId(aem))) {
+				Parking parking = AgentWithParking.parkingManager.getParkingsHashMap().get(parkingId);
+				int freeCapacity = AgentWithParking.parkingManager.getFreeCapacity(parkingId);
+
+				if (freeCapacity > 0 && parking.getId().toString().contains("gp")) {
+					parkVehicle(aem, getCurrentLinkId(aem));
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	
+	
+
+	private void continueDriving(AgentWithParking aem) {
+		super.handleAgentLeg(aem);
+	}
+
+	// TODO: push method to AgentWithParking class
+	private Coord getCurrentLinkCoordinate(AgentWithParking aem) {
+		Id currentLinkId = getCurrentLinkId(aem);
+		return network.getLinks().get(currentLinkId).getCoord();
+	}
+
+	private void findClosestFreeGarageAndDriveThere(AgentWithParking aem) {
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		Id closestFreeGarageParking = AgentWithParking.parkingManager.getClosestFreeGarageParking(getCurrentLinkCoordinate(aem));
+		Id linkOfParking = AgentWithParking.parkingManager.getLinkOfParking(closestFreeGarageParking);
+		EditRoute.globalEditRoute.addLastPartToRoute(aem.getMessageArrivalTime(), leg, linkOfParking);
+		super.handleAgentLeg(aem);
+	}
+
+	
+	@Override
+	public void handleParkingDepartureActivity(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
+		super.handleParkingDepartureActivity(aem);
+		garageParkingScore.remove(personId);
+	}
 }

@@ -21,6 +21,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -59,15 +60,15 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivity
 public class RandomParkingSearch implements ParkingSearchStrategy {
 
 	protected DoubleValueHashMap<Id> startSearchTime;
-	private HashMap<Id, ParkingActivityAttributes> parkingActAttributes;
+	protected HashMap<Id, ParkingActivityAttributes> parkingActAttributes;
 	protected HashMap<Id, String> useSpecifiedParkingType;
 
 	protected String parkingType;
 	private double maxDistance;
-	private Network network;
-	private Random random;
+	protected Network network;
+	protected Random random;
 	private final double parkingDuration = 60 * 2;
-	private final double walkSpeed = 3.0 / 3.6; // [m/s]
+	protected final double walkSpeed = 3.0 / 3.6; // [m/s]
 	protected double scoreInterrupationValue = 0;;
 
 	// go to final link if no parking there, then try parking at other places.
@@ -86,11 +87,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 
-		Event event = null;
-
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
-		ActivityImpl prevAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-				.get(aem.getPlanElementIndex() - 1);
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 1);
 
@@ -98,41 +95,22 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			Id personId = aem.getPerson().getId();
 
 			List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
-			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 
+			LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 			boolean endOfLegReached = aem.getCurrentLinkIndex() == linkIds.size() - 1;
 
 			if (endOfLegReached) {
 				// DebugLib.traceAgent(personId);
 
-				String filterParkingType = parkingType;
+				String filterParkingType = getParkingFilterType(personId);
 
-				if (useSpecifiedParkingType.containsKey(personId)) {
-					filterParkingType = useSpecifiedParkingType.get(personId);
-				}
-
-				ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-						.get(aem.getPlanElementIndex() + 3);
-
-				Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextNonParkingAct.getFacilityId(),
-						nextNonParkingAct.getType());
-
-				// actually would need to drive to private parking, but this is
-				// skipped here
-				// ||
-				// !AgentWithParking.parkingManager.getLinkOfParking(parkingId).toString().equalsIgnoreCase(route.getEndLinkId().toString())
-				if (parkingId == null) {
-					parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(),
-							filterParkingType);
-				}
+				Id parkingId = getParkingLinkId(aem, filterParkingType);
 
 				boolean isInvalidLink = aem.isInvalidLinkForParking();
 
 				// TODO: include max distance here (maxDistance variable)
 
-				if (!startSearchTime.containsKey(personId)) {
-					startSearchTime.put(personId, aem.getMessageArrivalTime());
-				}
+				triggerSeachTimeStart(personId,aem.getMessageArrivalTime());
 
 				if (parkingId == null || isInvalidLink) {
 					DebugLib.traceAgent(personId, 1);
@@ -144,81 +122,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					aem.processLegInDefaultWay();
 
 				} else {
-					DebugLib.traceAgent(personId, 2);
-
-					// if (extraSearchPathNeeded.contains(personId)) {
-					// extraSearchPathNeeded.remove(personId);
-
-					aem.processEndOfLegCarMode_processEvents(leg, nextAct);
-
-					setDurationOfParkingActivity(aem, nextAct);
-
-					ActivityImpl currentParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-							.get(aem.getPlanElementIndex() + 1);
-					Leg nextWalkLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 2);
-					Link parkingLink = network.getLinks().get(route.getEndLinkId());
-
-					currentParkingAct.setLinkId(parkingLink.getId());
-
-					double walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), nextNonParkingAct.getCoord());
-					// TODO: improve this later (no straight line)
-					double walkDuration = walkDistance / walkSpeed;
-					nextWalkLeg.setTravelTime(walkDuration);
-					getParkingAttributesForScoring(aem).setToActWalkDuration(walkDuration);
-					getParkingAttributesForScoring(aem).setToParkWalkDuration(walkDuration);
-
-					// TODO: update this later, this is an approximation
-					getParkingAttributesForScoring(aem).setParkingArrivalTime(aem.getMessageArrivalTime());
-
-					// check, if more car legs, only in that case adapt that
-					// leg (TODO:)
-
-					// if car departs again during day, adapt the departure
-					// walking and routes
-
-					int indexOfNextCarLeg = aem.duringCarLeg_getPlanElementIndexOfNextCarLeg();
-
-					// TODO: avoid routing if parking link Id and activity
-					// linkId remained the same
-					if (indexOfNextCarLeg != -1) {
-						ActivityImpl lastActBeforeNextCarLeg = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-								.get(indexOfNextCarLeg - 3);
-						Leg nextwalkLegToParking = (Leg) aem.getPerson().getSelectedPlan().getPlanElements()
-								.get(indexOfNextCarLeg - 2);
-						ActivityImpl nextParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-								.get(indexOfNextCarLeg - 1);
-						Leg nextCarLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg);
-
-						walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), lastActBeforeNextCarLeg.getCoord());
-						walkDuration = walkDistance / walkSpeed;
-						nextwalkLegToParking.setTravelTime(walkDuration);
-
-						nextParkingAct.setLinkId(parkingLink.getId());
-
-						if (ZHScenarioGlobal.turnParallelRoutingOnDuringSim) {
-							aem.rerouteTask = new RerouteTaskDuringSim(nextNonParkingAct.getEndTime(), parkingLink.getId(),
-									nextCarLeg);
-							RerouteThreadDuringSim.addTask(aem.rerouteTask);
-						} else {
-							EditRoute.globalEditRoute.addInitialPartToRoute(nextNonParkingAct.getEndTime(), parkingLink.getId(),
-									nextCarLeg);
-						}
-
-					}
-
-					// } else {
-					// aem.processLegInDefaultWay();
-					// }
-
-					logParkingSearchDuration(aem);
-
-					AgentWithParking.parkingManager.parkVehicle(personId, parkingId);
-
-					if (aem.getPlanElementIndex() == aem.getPlanElementIndexOfLastCarLeg()) {
-						handleLastParkingScore(aem);
-					}
-
-					aem.processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(nextAct);
+					parkVehicle(aem, parkingId);
 				}
 			} else {
 				aem.processLegInDefaultWay();
@@ -245,6 +149,122 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		// only consider arrival distance at the moment for scoring (both in
 		// future - but for this plans have to be pre-processed and cleaned
 		// first).
+	}
+
+	public String getParkingFilterType(Id personId) {
+		String filterParkingType = parkingType;
+
+		if (useSpecifiedParkingType.containsKey(personId)) {
+			filterParkingType = useSpecifiedParkingType.get(personId);
+		}
+		return filterParkingType;
+	}
+
+	public Id getParkingLinkId(AgentWithParking aem, String filterParkingType) {
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
+		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+				.get(aem.getPlanElementIndex() + 3);
+
+		Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextNonParkingAct.getFacilityId(),
+				nextNonParkingAct.getType());
+
+		// actually would need to drive to private parking, but this is
+		// skipped here
+		// ||
+		// !AgentWithParking.parkingManager.getLinkOfParking(parkingId).toString().equalsIgnoreCase(route.getEndLinkId().toString())
+		if (parkingId == null) {
+			parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(),
+					filterParkingType);
+		}
+		return parkingId;
+	}
+
+	public void triggerSeachTimeStart(Id personId, double time) {
+		if (!startSearchTime.containsKey(personId)) {
+			startSearchTime.put(personId, time);
+		}
+	}
+
+	protected void parkVehicle(AgentWithParking aem, 
+			Id parkingId) {
+		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+				.get(aem.getPlanElementIndex() + 3);
+		Id personId=aem.getPerson().getId();
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
+		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+				.get(aem.getPlanElementIndex() + 1);
+		
+		
+		aem.processEndOfLegCarMode_processEvents(leg, nextAct);
+
+		setDurationOfParkingActivity(aem, nextAct);
+
+		Leg nextWalkLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 2);
+		Link parkingLink = network.getLinks().get(route.getEndLinkId());
+
+		nextAct.setLinkId(parkingLink.getId());
+
+		double walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), nextNonParkingAct.getCoord());
+		// TODO: improve this later (no straight line)
+		double walkDuration = walkDistance / walkSpeed;
+		nextWalkLeg.setTravelTime(walkDuration);
+		getParkingAttributesForScoring(aem).setToActWalkDuration(walkDuration);
+		getParkingAttributesForScoring(aem).setToParkWalkDuration(walkDuration);
+
+		// TODO: update this later, this is an approximation
+		getParkingAttributesForScoring(aem).setParkingArrivalTime(aem.getMessageArrivalTime());
+
+		// check, if more car legs, only in that case adapt that
+		// leg (TODO:)
+
+		// if car departs again during day, adapt the departure
+		// walking and routes
+
+		int indexOfNextCarLeg = aem.duringCarLeg_getPlanElementIndexOfNextCarLeg();
+
+		// TODO: avoid routing if parking link Id and activity
+		// linkId remained the same
+		if (indexOfNextCarLeg != -1) {
+			ActivityImpl lastActBeforeNextCarLeg = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+					.get(indexOfNextCarLeg - 3);
+			Leg nextwalkLegToParking = (Leg) aem.getPerson().getSelectedPlan().getPlanElements()
+					.get(indexOfNextCarLeg - 2);
+			ActivityImpl nextParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+					.get(indexOfNextCarLeg - 1);
+			Leg nextCarLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg);
+
+			walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), lastActBeforeNextCarLeg.getCoord());
+			walkDuration = walkDistance / walkSpeed;
+			nextwalkLegToParking.setTravelTime(walkDuration);
+
+			nextParkingAct.setLinkId(parkingLink.getId());
+
+			if (ZHScenarioGlobal.turnParallelRoutingOnDuringSim) {
+				aem.rerouteTask = new RerouteTaskDuringSim(nextNonParkingAct.getEndTime(), parkingLink.getId(),
+						nextCarLeg);
+				RerouteThreadDuringSim.addTask(aem.rerouteTask);
+			} else {
+				EditRoute.globalEditRoute.addInitialPartToRoute(nextNonParkingAct.getEndTime(), parkingLink.getId(),
+						nextCarLeg);
+			}
+
+		}
+
+		// } else {
+		// aem.processLegInDefaultWay();
+		// }
+
+		logParkingSearchDuration(aem);
+
+		AgentWithParking.parkingManager.parkVehicle(personId, parkingId);
+
+		if (aem.getPlanElementIndex() == aem.getPlanElementIndexOfLastCarLeg()) {
+			handleLastParkingScore(aem);
+		}
+
+		aem.processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(nextAct);
 	}
 
 	public void addRandomLinkToRoute(LinkNetworkRouteImpl route) {
@@ -349,6 +369,24 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		parkingActAttributes.remove(personId);
 		scoreInterrupationValue = 0;
 	}
+	
+	public Link getNextLink(AgentWithParking aem){
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		Id nextLinkId;
+		if (!endOfLegReached(aem)){
+			nextLinkId = linkIds.get(aem.getCurrentLinkIndex()+1);
+		} else {
+			nextLinkId = ((LinkNetworkRouteImpl) leg.getRoute()).getEndLinkId();
+		}
+		return network.getLinks().get(nextLinkId);
+	}
+	
+	protected boolean endOfLegReached(AgentWithParking aem) {
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		return aem.getCurrentLinkIndex() == linkIds.size() - 1;
+	}
 
 	@Override
 	public void handleParkingDepartureActivity(AgentWithParking aem) {
@@ -452,4 +490,34 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	 * }
 	 */
 
+	
+	protected Link getCurrentLink(AgentWithParking aem) {
+		Id currentLinkId = getCurrentLinkId(aem);
+		return network.getLinks().get(currentLinkId);
+	}
+	
+
+	// TODO: push method to AgentWithParking class
+	protected Id getCurrentLinkId(AgentWithParking aem) {
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		
+		if (aem.getCurrentLinkIndex()==-1){
+			return ((LinkNetworkRouteImpl) leg.getRoute()).getStartLinkId();
+		} else {
+			return linkIds.get(aem.getCurrentLinkIndex());
+		}
+	}
+	
+	protected void throughAwayRestOfRoute(AgentWithParking aem) {
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+		LinkNetworkRouteImpl route= ((LinkNetworkRouteImpl) leg.getRoute());
+		
+		List<Id> linkIds=new LinkedList<Id>();
+		for (int i=0;i<=aem.getCurrentLinkIndex();i++){
+			linkIds.add(route.getLinkIds().get(i));
+		}
+		
+		leg.setRoute(new LinkNetworkRouteImpl(route.getStartLinkId(), linkIds, getNextLink(aem).getId()));
+	}
 }
