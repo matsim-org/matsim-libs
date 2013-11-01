@@ -27,19 +27,25 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
+import org.matsim.contrib.analysis.christoph.DistanceDistribution;
+import org.matsim.contrib.analysis.christoph.DistanceDistribution.DistributionClass;
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.telaviv.config.TelAvivConfig;
@@ -47,6 +53,8 @@ import playground.telaviv.core.mobsim.qsim.agents.FilteredPopulation;
 
 public class TelAvivControlerListener implements StartupListener {
 
+	private final static Logger log = Logger.getLogger(TelAvivControlerListener.class);
+	
 	protected static final String CALC_LEG_TIMES_FILE_NAME = "calcLegTimes.txt";
 	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "multimodalLegDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
@@ -76,6 +84,9 @@ public class TelAvivControlerListener implements StartupListener {
 			}
 		}
 		
+		log.info("Total population size:\t" + scenario.getPopulation().getPersons().size());
+		log.info("observed population size:\t" + observedPopulation.getPersons().size());
+		
 		CalcLegTimesHerbieListener calcLegTimes = new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, 
 				LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME, observedPopulation);
 		calcLegTimes.notifyStartup(event);
@@ -94,8 +105,8 @@ public class TelAvivControlerListener implements StartupListener {
 		controler.addControlerListener(activitiesAnalyzer);
 		controler.getEvents().addHandler(activitiesAnalyzer);
 
-		String tripsFileName = TripsAnalyzer.defaultTripsFileName;
-		String durationsFileName = TripsAnalyzer.defaultDurationsFileName;
+		String tripsFileName = controler.getControlerIO().getOutputFilename(TripsAnalyzer.defaultTripsFileName);
+		String durationsFileName = controler.getControlerIO().getOutputFilename(TripsAnalyzer.defaultDurationsFileName);
 		Set<String> modes = new TreeSet<String>();
 		modes.add(TransportMode.bike);
 		modes.add(TransportMode.car);
@@ -106,6 +117,99 @@ public class TelAvivControlerListener implements StartupListener {
 		tripsAnalyzer.notifyStartup(event);
 		controler.addControlerListener(tripsAnalyzer);
 		controler.getEvents().addHandler(tripsAnalyzer);
+		
+		DistanceDistribution distanceDistribution;
+		DistributionClass distributionClass;
+		
+		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), observedPopulation, 
+				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
+		controler.addControlerListener(distanceDistribution);
+		distributionClass = distanceDistribution.createAndAddDistributionClass("observed_population-home-work");
+		distanceDistribution.addActivityCombination(distributionClass, "home", "work");
+		distanceDistribution.addActivityCombination(distributionClass, "work", "home");
+		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 100.0, 0);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 100.0, 200.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 200.0, 500.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, 200000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 200000.0, 500000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 500000.0, Double.MAX_VALUE, 10);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0438);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.1006);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.00);
+		
+		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), observedPopulation, 
+				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
+		controler.addControlerListener(distanceDistribution);
+		distributionClass = distanceDistribution.createAndAddDistributionClass("observed_population-overall");
+		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 100.0, 0);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 100.0, 200.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 200.0, 500.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, 200000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 200000.0, 500000.0, 10);
+//		distanceDistribution.createAndAddDistanceBin(distributionClass, 500000.0, Double.MAX_VALUE, 10);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0438);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.1006);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.00);
+		
+		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), scenario.getPopulation(), 
+				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
+		controler.addControlerListener(distanceDistribution);
+		distributionClass = distanceDistribution.createAndAddDistributionClass("total_population-home-work");
+		distanceDistribution.addActivityCombination(distributionClass, "home", "work");
+		distanceDistribution.addActivityCombination(distributionClass, "work", "home");
+		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0438);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.1006);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.00);
+
+		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), scenario.getPopulation(), 
+				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
+		controler.addControlerListener(distanceDistribution);
+		distributionClass = distanceDistribution.createAndAddDistributionClass("total_population-overall");
+		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0438);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.1006);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.00);
 	}
 
 }
