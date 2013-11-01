@@ -161,6 +161,24 @@ public class StrategyStats {
 
 		GeneralLib.writeGraphic(ZHScenarioGlobal.outputFolder + "parkingStrategyScores.png", matrix, title, xLabel, yLabel,
 				seriesLabels, xValues);
+		
+		
+		writeToTextFile(seriesLabels, matrix, "parkingStrategyScores.txt");
+	}
+
+	public void writeToTextFile(String[] seriesLabels, double[][] matrix, String fileName) {
+		String headerLine="";
+		
+		for (int i=0;i<seriesLabels.length;i++){
+			headerLine+=seriesLabels[i];
+			
+			if (i!=seriesLabels.length-1){
+				headerLine+="\t";
+			}
+		}
+		
+		
+		GeneralLib.writeMatrix(matrix, ZHScenarioGlobal.outputFolder + fileName, headerLine);
 	}
 
 	public void writeAllStrategySharesToFile() {
@@ -200,6 +218,8 @@ public class StrategyStats {
 
 		GeneralLib.writeGraphic(ZHScenarioGlobal.outputFolder + outputFileName, matrix, title, xLabel, yLabel, seriesLabels,
 				xValues);
+		
+		writeToTextFile(seriesLabels, matrix, outputFileName.split("\\.")[0] + ".txt");
 	}
 
 	public void writeToTextFile(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
