@@ -214,18 +214,18 @@ public class DreieckNmodes {
 	public static double length = 333.33;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
 	public static boolean PASSING_ALLOWED = true;
-	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_test.txt";
-	private static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_test.xml";
+	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_test_4.txt";
+	private static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_test_4.xml";
 	
 	private static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
 	public static int NUMBER_OF_MEMORIZED_FLOWS = 10;
-	public static int NUMBER_OF_MODES = 3;
-	public static String[] NAMES= {"bicycles","motorbikes","cars"};	//identification of the different modes
-	public static Double[] Probabilities = {1/3., 1/3., 1/3.}; //modal split
-	public static Double[] Pcus = {0.25, 0.25, 1.}; 			//PCUs of the different possible modes
-	public static Double[] Speeds = {4.17, 16.67, 16.67};		//maximum velocities of the vehicle types, in m/s
-	private static Integer[] MaxAgentDistribution = {600,600,150};
-	private static Integer[] Steps = {100,100,30};
+	public static int NUMBER_OF_MODES = 4;
+	public static String[] NAMES= {"bicycles","motorbikes","cars", "trucks"};	//identification of the different modes
+	public static Double[] Probabilities = {1/4., 1/4., 1/4., 1/4.}; //modal split
+	public static Double[] Pcus = {0.25, 0.25, 1., 3.}; 			//PCUs of the different possible modes
+	public static Double[] Speeds = {4.17, 16.67, 16.67, 10.};		//maximum velocities of the vehicle types, in m/s
+	private static Integer[] MaxAgentDistribution = {600,600,150,50};
+	private static Integer[] Steps = {100,100,30,10};
 	
 	private PrintStream writer;
 	private Scenario scenario;
