@@ -82,6 +82,7 @@ public abstract class BuildingEnergyRunnerMain {
 		String configFilename = args[0];
 		String agents2exclude = args[1];
 		log.info("configfile: " + configFilename);
+		log.info("pIds 2 remove: " + agents2exclude);
 
 		// initialize
 		Config c = ConfigUtils.loadConfig(configFilename);
@@ -105,13 +106,15 @@ public abstract class BuildingEnergyRunnerMain {
 		}else if(!new File(agents2exclude).exists()){
 			throw new NullPointerException(agents2exclude + " does not exist.");
 		}
-//		String population = c.plans().getInputFile();
-//		c.plans().setInputFile(null);
+		log.warn("removing agents");
 		Scenario sc = ScenarioUtils.loadScenario(c);
-		
+		int removed = 0;
 		for(Id id : getAgents2Exclude(agents2exclude)){
-			sc.getPopulation().getPersons().remove(id);
+			if(sc.getPopulation().getPersons().remove(id) != null){
+				removed++;
+			}
 		}
+		log.warn("removed " + removed + " agents.");
 		return sc;
 	}
 
