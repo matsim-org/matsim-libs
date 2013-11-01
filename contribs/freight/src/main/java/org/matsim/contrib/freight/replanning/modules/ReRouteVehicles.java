@@ -36,6 +36,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class ReRouteVehicles implements CarrierReplanningStrategyModule{
 
+	@SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(ReRouteVehicles.class);
 	
 	private LeastCostPathCalculator router;
