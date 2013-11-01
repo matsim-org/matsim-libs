@@ -52,7 +52,9 @@ public class ModeData {
 	private List<Double> speedTable;
 	private Double flowTime;
 	private List<Double> flowTable;
+	private List<Double> flowTable900;
 	private List<Double> lastXFlows;//recording a number of flows to ensure stability
+	private List<Double> lastXFlows900;
 	private boolean speedStability;
 	private boolean flowStability;
 	
@@ -69,7 +71,8 @@ public class ModeData {
 			double nowTime = event.getTime();
 			
 			//Updating flow, speed
-			this.updateFlow(nowTime, this.vehicleType.getPcuEquivalents());
+			//this.updateFlow(nowTime, this.vehicleType.getPcuEquivalents());
+			this.updateFlow900(nowTime, this.vehicleType.getPcuEquivalents());
 			this.updateSpeedTable(nowTime, personId);
 			
 			//Checking for stability
@@ -82,14 +85,14 @@ public class ModeData {
 					this.checkSpeedStability();
 				}
 				if (!(this.flowStability)){
-					this.checkFlowStability();
+					this.checkFlowStability900();
 				}
 			}
 		}
 	}
 	
 	//Utility methods
-	public void updateFlow(double nowTime, double pcu_person) {
+	/*public void updateFlow(double nowTime, double pcu_person) {
 		if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
 			Double nowFlow = this.flowTable.get(0);
 			this.flowTable.set(0, nowFlow.doubleValue()+pcu_person);
@@ -111,14 +114,46 @@ public class ModeData {
 			this.flowTime = new Double(nowTime);
 		}
 		updateLastXFlows();
+	}*/
+	
+	public void updateFlow900(double nowTime, double pcu_person){
+		if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
+			Double nowFlow = this.flowTable900.get(0);
+			this.flowTable900.set(0, nowFlow.doubleValue()+pcu_person);
+		} else {//Need to offset the current data in order to update
+			int timeDifference = (int) (nowTime-this.flowTime.doubleValue());
+			if (timeDifference<900){
+				for (int i=899-timeDifference; i>=0; i--){
+					this.flowTable900.set(i+timeDifference, this.flowTable900.get(i).doubleValue());
+				}
+				if (timeDifference > 1){
+					for (int i = 1; i<timeDifference; i++){
+						this.flowTable900.set(i, 0.);
+					}
+				}
+				this.flowTable900.set(0, pcu_person);
+			} else {
+				flowTableReset();
+			}
+			this.flowTime = new Double(nowTime);
+		}
+		updateLastXFlows900();
 	}
 	
-	private void updateLastXFlows(){
+	/*private void updateLastXFlows(){
 		Double nowFlow = new Double(this.getActualFlow());
 		for (int i=DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS-2; i>=0; i--){
 			this.lastXFlows.set(i+1, this.lastXFlows.get(i).doubleValue());
 		}
 		this.lastXFlows.set(0, nowFlow);
+	}*/
+	
+	private void updateLastXFlows900(){
+		Double nowFlow = new Double(this.getActualFlow900());
+		for (int i=DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS-2; i>=0; i--){
+			this.lastXFlows900.set(i+1, this.lastXFlows900.get(i).doubleValue());
+		}
+		this.lastXFlows900.set(0, nowFlow);
 	}
 	
 	public void updateSpeedTable(double nowTime, Id personId){
@@ -156,8 +191,8 @@ public class ModeData {
 		}
 	}
 	
-	public void checkFlowStability(){
-		/*//Method 1: Relative Deviances
+	/*public void checkFlowStability(){
+		///*Method 1: Relative Deviances
 		double relativeDeviances = 0.;
 		double averageFlow = 0;
 		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
@@ -173,10 +208,23 @@ public class ModeData {
 			System.out.println("Reaching a certain flow stability in mode: "+modeId);
 		} else {
 			this.flowStability = false;
-		}*/
+		}//*//*
 		//Method 2: absolute deviances
 		double absoluteDeviances = this.lastXFlows.get(this.lastXFlows.size()-1) - this.lastXFlows.get(0);
 		if (Math.abs(absoluteDeviances) < 2){
+			this.flowStability = true;
+			System.out.println("Reaching a certain flow stability in mode: "+modeId);
+		} else {
+			this.flowStability = false;
+		}
+		
+	}*/
+	
+	public void checkFlowStability900(){
+		//Method 2: absolute deviances
+		//System.out.println("lastXflows for "+this.modeId+" = "+this.lastXFlows900);
+		double absoluteDeviances = this.lastXFlows900.get(this.lastXFlows900.size()-1) - this.lastXFlows900.get(0);
+		if (Math.abs(absoluteDeviances) < 1){
 			this.flowStability = true;
 			System.out.println("Reaching a certain flow stability in mode: "+modeId);
 		} else {
@@ -193,13 +241,22 @@ public class ModeData {
 			this.speedTable.add(0.);
 		}
 		this.flowTime = 0.;
+		/*
 		this.flowTable = new LinkedList<Double>();
 		for (int i=0; i<3600; i++){
 			this.flowTable.add(0.);
+		}*/
+		this.flowTable900 = new LinkedList<Double>();
+		for (int i=0; i<900; i++){
+			this.flowTable900.add(0.);
 		}
-		this.lastXFlows = new LinkedList<Double>();
+		/*this.lastXFlows = new LinkedList<Double>();
 		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
 			this.lastXFlows.add(0.);
+		}*/
+		this.lastXFlows900 = new LinkedList<Double>();
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS; i++){
+			this.lastXFlows900.add(0.);
 		}
 		this.speedStability = false;
 		this.flowStability = false;
@@ -250,8 +307,9 @@ public class ModeData {
 		this.permanentDensity = this.numberOfAgents / (DreieckNmodes.length*3) *1000;
 		this.permanentAverageVelocity = this.getActualAverageVelocity();
 		System.out.println("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
-		this.permanentFlow = this.getActualFlow();
-		System.out.println("Calculated permanent Flow from "+modeId+"'s lastXFlows : "+lastXFlows+"\nResult is :"+this.permanentFlow);	
+		//this.permanentFlow = this.getActualFlow();
+		this.permanentFlow = this.getActualFlow900();
+		System.out.println("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);	
 	}
 	
 	//Getters/Setters
@@ -272,12 +330,20 @@ public class ModeData {
 		return nowSpeed;
 	}
 	
-	public double getActualFlow(){
+	/*public double getActualFlow(){
 		double nowFlow = 0.;
 		for (int i=0; i<3600; i++){
 			nowFlow += this.flowTable.get(i);
 		}
 		return nowFlow;
+	}*/
+	
+	public double getActualFlow900(){
+		double nowFlow = 0.;
+		for (int i=0; i<900; i++){
+			nowFlow += this.flowTable900.get(i);
+		}
+		return nowFlow*4;
 	}
 	
 	public boolean isSpeedStable(){

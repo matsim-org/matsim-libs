@@ -82,7 +82,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 public class DreieckNmodes {
 	
-	//private static Integer[] TEST_DISTRIBUTION = {8,4,1};
+	private static Integer[] TEST_DISTRIBUTION = {0,0,140};
 
 	private static final Logger log = Logger.getLogger(DreieckNmodes.class);
 	
@@ -224,8 +224,8 @@ public class DreieckNmodes {
 	public static Double[] Probabilities = {1/3., 1/3., 1/3.}; //modal split
 	public static Double[] Pcus = {0.25, 0.25, 1.}; 			//PCUs of the different possible modes
 	public static Double[] Speeds = {4.17, 16.67, 16.67};		//maximum velocities of the vehicle types, in m/s
-	private static Integer[] MaxAgentDistribution = {320,320,80};
-	private static Integer[] Steps = {40,40,10};
+	private static Integer[] MaxAgentDistribution = {600,600,150};
+	private static Integer[] Steps = {100,100,30};
 	
 	private PrintStream writer;
 	private Scenario scenario;

@@ -90,7 +90,8 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 			double nowTime = event.getTime();
 			if (event.getLinkId().equals(studiedMeasuringPointLinkId)){				
 				//Updating global data
-				this.globalData.updateFlow(nowTime, pcu_person);
+				//this.globalData.updateFlow(nowTime, pcu_person);
+				this.globalData.updateFlow900(nowTime, pcu_person);
 				this.globalData.updateSpeedTable(nowTime, personId);
 				//Waiting for all agents to be on the track before studying stability
 				if ((this.globalData.getNumberOfDrivingAgents() == this.globalData.numberOfAgents) && (nowTime>1800)){	//TODO parametrize this correctly
@@ -102,7 +103,7 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 						System.out.println("Checking speed stability in global data for: "+this.globalData.getSpeedTable());
 					}*/
 					if (!(this.globalData.isFlowStable())){
-						this.globalData.checkFlowStability();
+						this.globalData.checkFlowStability900();
 					}
 			
 					//Checking modes stability
