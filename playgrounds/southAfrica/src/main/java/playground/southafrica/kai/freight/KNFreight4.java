@@ -36,6 +36,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import org.apache.log4j.Logger;
+
+
 import util.Solutions;
 import basics.VehicleRoutingAlgorithm;
 import basics.VehicleRoutingProblem;
@@ -124,13 +127,14 @@ public class KNFreight4 {
 			carrier.setSelectedPlan(newPlan) ;
 
 		}
+
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "plannedCarrier.xml") ;
 
-		new Visualiser( config, scenario).visualizeLive(carriers) ;
+//		new Visualiser( config, scenario).visualizeLive(carriers) ;
 
 		//		new Visualiser(config,scenario).makeMVI(carriers,"yourFolder/carrierMVI.mvi",1);
 
-//		KNFreight3.run(scenario, carriers);
+		KNFreight3.run(scenario, carriers);
 
 	}
 
