@@ -54,6 +54,7 @@ import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -1001,6 +1002,10 @@ public class GeneralLib {
 		}
 
 		GeneralLib.writeList(list, fileName);
+	}
+	
+	public static boolean equals(Id id1,Id id2){
+		return id1.toString().equalsIgnoreCase(id2.toString());
 	}
 
 }
