@@ -19,7 +19,6 @@
 package playground.kai.usecases.freight;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -31,15 +30,10 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.contrib.freight.utils.Visualiser;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEvent.ChangeType;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import util.Solutions;
@@ -62,7 +56,8 @@ public class KNFreight4 {
 	//	static final String VEHTYPES = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/vehicleTypes.xml" ;
 	//	static final String ALGORITHM = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/algorithm.xml" ;
 
-	static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_FullV7.xml.gz"  ;
+	static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_CleanV7.xml.gz"  ;
+//	static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_FullV7.xml.gz"  ;
 	static final String CARRIERS = QVANHEERDEN_FREIGHT + "myGridSim/carrier.xml" ;
 	static final String VEHTYPES = QVANHEERDEN_FREIGHT + "myGridSim/vehicleTypes.xml" ;
 	static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
@@ -131,11 +126,11 @@ public class KNFreight4 {
 		}
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "plannedCarrier.xml") ;
 
-		//		new Visualiser( config, scenario).visualizeLive(carriers) ;
+		new Visualiser( config, scenario).visualizeLive(carriers) ;
 
 		//		new Visualiser(config,scenario).makeMVI(carriers,"yourFolder/carrierMVI.mvi",1);
 
-		KNFreight3.run(scenario, carriers);
+//		KNFreight3.run(scenario, carriers);
 
 	}
 
