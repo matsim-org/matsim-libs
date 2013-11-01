@@ -36,7 +36,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.kai.usecases.freight.SolvePickupAndDeliveryProblem;
+import playground.southafrica.kai.freight.SolvePickupAndDeliveryProblem;
 import playground.southafrica.utilities.Header;
 import util.Solutions;
 import basics.VehicleRoutingAlgorithm;
