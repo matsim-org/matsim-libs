@@ -91,7 +91,7 @@ public class StrategyStats {
 		int sampleSize = 0;
 
 		for (ParkingEventDetails ped : ZHScenarioGlobal.parkingEventDetails) {
-			if (!ped.parkingActivityAttributes.getFacilityId().toString().contains("private")) {
+			if (ped.parkingActivityAttributes.getFacilityId().toString().contains("gp") || ped.parkingActivityAttributes.getFacilityId().toString().contains("stp")) {
 				strategyCount.increment(ped.parkingStrategy);
 				sampleSize++;
 			}

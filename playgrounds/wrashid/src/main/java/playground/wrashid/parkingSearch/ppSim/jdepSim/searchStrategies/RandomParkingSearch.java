@@ -360,10 +360,9 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		if (tollAreaEntered.contains(personId)){
 			scoreInterrupationValue +=ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
-			parkingScore += scoreInterrupationValue;
 		}
 		
-		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal")) {
+		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal") || tollAreaEntered.contains(personId)) {
 			parkingScore += scoreInterrupationValue;
 			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
 		}
@@ -424,10 +423,9 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		if (tollAreaEntered.contains(personId)){
 			scoreInterrupationValue +=ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
-			parkingScore += scoreInterrupationValue;
 		}
 		
-		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal")) {
+		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal") || tollAreaEntered.contains(personId)) {
 			parkingScore += scoreInterrupationValue;
 			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
 		}

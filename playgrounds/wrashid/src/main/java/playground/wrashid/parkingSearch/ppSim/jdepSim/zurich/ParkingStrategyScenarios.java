@@ -108,9 +108,20 @@ public class ParkingStrategyScenarios {
 			
 			
 			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-1000A", 1000));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-1000B", 1000));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-1000C", 1000));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-1000D", 1000));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-1000E", 1000));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-1000F", 1000));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-1000G", 1000));
 
 			
-			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-1500A", 1500));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500A", 500));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500B", 500));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500C", 500));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500D", 500));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500E", 500));
+			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500F", 500));
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 5) {
 			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch1"));
 			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch2"));
