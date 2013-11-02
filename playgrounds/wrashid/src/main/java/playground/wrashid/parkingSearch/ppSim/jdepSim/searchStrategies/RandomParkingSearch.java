@@ -358,14 +358,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 				.getParkingCost(parkingAttributesForScoring));
 
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
-		if (tollAreaEntered.contains(personId)){
-			scoreInterrupationValue +=ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
-		}
-		
-		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal") || tollAreaEntered.contains(personId)) {
-			parkingScore += scoreInterrupationValue;
-			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
-		}
+		parkingScore = handleCostScore(personId, parkingAttributesForScoring, parkingScore);
 
 		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
 		ZHScenarioGlobal.parkingEventDetails
@@ -374,22 +367,24 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		resetVariables(personId);
 	}
 
-	public Link getNextLink(AgentWithParking aem) {
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
-		Id nextLinkId;
-		if (!endOfLegReached(aem)) {
-			nextLinkId = linkIds.get(aem.getCurrentLinkIndex() + 1);
-		} else {
-			nextLinkId = ((LinkNetworkRouteImpl) leg.getRoute()).getEndLinkId();
+	public double handleCostScore(Id personId, ParkingActivityAttributes parkingAttributesForScoring, double parkingScore) {
+		if (tollAreaEntered.contains(personId) && !parkingAttributesForScoring.getFacilityId().toString().contains("privateParkings")){
+			scoreInterrupationValue +=ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
 		}
-		return network.getLinks().get(nextLinkId);
+		
+		if ((parkingAttributesForScoring.getFacilityId().toString().contains("illegal") || tollAreaEntered.contains(personId)) && ! parkingAttributesForScoring.getFacilityId().toString().contains("privateParkings")) {
+			parkingScore += scoreInterrupationValue;
+			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
+		}
+		return parkingScore;
+	}
+
+	public Link getNextLink(AgentWithParking aem) {
+		return aem.getNextLink();
 	}
 
 	protected boolean endOfLegReached(AgentWithParking aem) {
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
-		return aem.getCurrentLinkIndex() == linkIds.size() - 1;
+		return aem.endOfLegReached();
 	}
 
 	@Override
@@ -421,14 +416,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 				.getParkingCost(parkingAttributesForScoring));
 
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
-		if (tollAreaEntered.contains(personId)){
-			scoreInterrupationValue +=ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
-		}
-		
-		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal") || tollAreaEntered.contains(personId)) {
-			parkingScore += scoreInterrupationValue;
-			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
-		}
+		parkingScore = handleCostScore(personId, parkingAttributesForScoring, parkingScore);
 		
 		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
 		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
@@ -526,6 +514,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 	@Override
 	public void tollAreaEntered(AgentWithParking aem) {
-		tollAreaEntered.add(aem.getPerson().getId());		
+		if (!tollAreaEntered.contains(aem.getPerson().getId())){
+			tollAreaEntered.add(aem.getPerson().getId());		
+		}
 	}
 }

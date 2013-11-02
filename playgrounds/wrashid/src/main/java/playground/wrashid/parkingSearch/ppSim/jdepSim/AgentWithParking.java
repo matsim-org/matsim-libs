@@ -104,8 +104,9 @@ public class AgentWithParking extends AgentEventMessage {
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
 		
 		Link currentLink = getCurrentLink();
+		Link nextLink=getNextLink();
 		
-		if (GeneralLib.getDistance(currentLink.getCoord(), coordinatesLindenhofZH)<ZHScenarioGlobal.loadDoubleParam("radiusTolledArea")){
+		if (GeneralLib.getDistance(currentLink.getCoord(), coordinatesLindenhofZH)>ZHScenarioGlobal.loadDoubleParam("radiusTolledArea") && GeneralLib.getDistance(nextLink.getCoord(), coordinatesLindenhofZH)<ZHScenarioGlobal.loadDoubleParam("radiusTolledArea")){
 			parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).tollAreaEntered(this);
 		}
 	}
@@ -174,5 +175,23 @@ public class AgentWithParking extends AgentEventMessage {
 		} else {
 			return linkIds.get(getCurrentLinkIndex());
 		}
+	}
+	
+	public Link getNextLink() {
+		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		Id nextLinkId;
+		if (!endOfLegReached()) {
+			nextLinkId = linkIds.get(getCurrentLinkIndex() + 1);
+		} else {
+			nextLinkId = ((LinkNetworkRouteImpl) leg.getRoute()).getEndLinkId();
+		}
+		return ZHScenarioGlobal.scenario.getNetwork().getLinks().get(nextLinkId);
+	}
+	
+	public boolean endOfLegReached() {
+		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		return getCurrentLinkIndex() == linkIds.size() - 1;
 	}
 }
