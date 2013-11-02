@@ -77,13 +77,6 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 	}
 
 	public void setLinkId2timeBin2avgToll() {
-		if (!this.congestionEvents.isEmpty()) {
-			throw new RuntimeException("List congestionEvents should be empty!");
-		}
-		
-		if (!this.linkLeaveEvents.isEmpty()) {
-			throw new RuntimeException("List linkLeaveEvents should be empty!");
-		}
 		
 		if (!this.linkId2timeBin2tollSum.isEmpty()) {
 			throw new RuntimeException("Map linkId2timeBin2tollSum should be empty!");
