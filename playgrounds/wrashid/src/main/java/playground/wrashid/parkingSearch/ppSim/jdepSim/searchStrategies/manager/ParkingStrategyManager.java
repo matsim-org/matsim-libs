@@ -88,8 +88,11 @@ public class ParkingStrategyManager {
 								.loadIntParam("convergance.fixedPropbabilityBestStrategy.stopStrategyAtIteration")) {
 							evaluationContainer.selectStrategyAccordingToFixedProbabilityForBestStrategy();
 						} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
-								.loadIntParam("convergance.MNL.startStrategyAtIteration")) {
-							evaluationContainer.selectNextStrategyAccordingToMNL();
+								.loadIntParam("convergance.MNLExpScore.startStrategyAtIteration")) {
+							evaluationContainer.selectNextStrategyAccordingToMNLExp();
+						}else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
+								.loadIntParam("convergance.MNLScore.startStrategyAtIteration")) {
+							evaluationContainer.selectNextStrategyAccordingToProbability();
 						} else {
 							DebugLib.stopSystemAndReportInconsistency();
 						}

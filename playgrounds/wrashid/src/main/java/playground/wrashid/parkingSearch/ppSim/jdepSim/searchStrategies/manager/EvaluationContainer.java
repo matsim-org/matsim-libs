@@ -73,7 +73,7 @@ public class EvaluationContainer {
 		}
 	}
 	
-	public void selectNextStrategyAccordingToMNL(){
+	public void selectNextStrategyAccordingToMNLExp(){
 		double exponentialSum=0;
 		double[] selectionProbabilities=new double[getEvaluations().size()];
 		for (int i=0;i<getEvaluations().size();i++){
@@ -82,6 +82,29 @@ public class EvaluationContainer {
 		
 		for (int i=0;i<getEvaluations().size();i++){
 			selectionProbabilities[i]=Math.exp( getEvaluations().get(i).score)/exponentialSum;
+		}
+		
+		double r=random.nextDouble();
+		int index=0;
+		double sum=0;
+		
+		while (sum+selectionProbabilities[index]<r){
+			sum+=selectionProbabilities[index];
+			index++;
+		}
+		
+		getEvaluations().addFirst(getEvaluations().remove(index));
+	}
+	
+	public void selectNextStrategyAccordingToProbability(){
+		double exponentialSum=0;
+		double[] selectionProbabilities=new double[getEvaluations().size()];
+		for (int i=0;i<getEvaluations().size();i++){
+			exponentialSum+=Math.abs(getEvaluations().get(i).score);
+		}
+		
+		for (int i=0;i<getEvaluations().size();i++){
+			selectionProbabilities[i]=Math.abs( getEvaluations().get(i).score)/exponentialSum;
 		}
 		
 		double r=random.nextDouble();
