@@ -36,7 +36,7 @@ public class TimeAllocationMutator implements CarrierReplanningStrategyModule {
 	public void handlePlan(CarrierPlan carrierPlan) {
 		Collection<ScheduledTour> newTours = new ArrayList<ScheduledTour>() ;
 		for ( ScheduledTour tour : carrierPlan.getScheduledTours() ) {
-			double departureTime = tour.getDeparture() + ( MatsimRandom.getRandom().nextDouble() - 0.5 ) * 7200. ;
+			double departureTime = tour.getDeparture() + ( MatsimRandom.getRandom().nextDouble() - 0.5 ) * 3600. * 3. ;
 			if ( departureTime < 0. ) {
 				departureTime = 0. ;
 			}

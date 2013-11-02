@@ -35,9 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import org.apache.log4j.Logger;
-
 
 import util.Solutions;
 import basics.VehicleRoutingAlgorithm;
@@ -49,29 +47,35 @@ import basics.VehicleRoutingProblemSolution;
  *
  */
 public class KNFreight4 {
+	@SuppressWarnings("unused")
+	private static final Logger log = Logger.getLogger(KNFreight4.class) ;
 
-	static final String MATSIM_SA = "/Users/Nagel/southafrica/MATSim-SA/" ;
+	private static final String MATSIM_SA = "/Users/Nagel/southafrica/MATSim-SA/" ;
 
-	static final String QVANHEERDEN_FREIGHT=MATSIM_SA+"/sandbox/qvanheerden/input/freight/" ;
+	private static final String QVANHEERDEN_FREIGHT=MATSIM_SA+"/sandbox/qvanheerden/input/freight/" ;
 
-	//	static final String NETFILENAME=QVANHEERDEN_FREIGHT+"/scenarioFromWiki/network.xml" ;
-	//	static final String CARRIERS = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/carrier.xml" ;
-	//	static final String VEHTYPES = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/vehicleTypes.xml" ;
-	//	static final String ALGORITHM = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/algorithm.xml" ;
+	//	private static final String NETFILENAME=QVANHEERDEN_FREIGHT+"/scenarioFromWiki/network.xml" ;
+	//	private static final String CARRIERS = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/carrier.xml" ;
+	//	private static final String VEHTYPES = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/vehicleTypes.xml" ;
+	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/algorithm.xml" ;
 
-	static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_CleanV7.xml.gz"  ;
-//	static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_FullV7.xml.gz"  ;
-	static final String CARRIERS = QVANHEERDEN_FREIGHT + "myGridSim/carrier.xml" ;
-	static final String VEHTYPES = QVANHEERDEN_FREIGHT + "myGridSim/vehicleTypes.xml" ;
-	static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
-	//	static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
+	private static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_CleanV7.xml.gz"  ;
+//	private static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_FullV7.xml.gz"  ;
+	private static final String CARRIERS = QVANHEERDEN_FREIGHT + "myGridSim/carrier.xml" ;
+	private static final String VEHTYPES = QVANHEERDEN_FREIGHT + "myGridSim/vehicleTypes.xml" ;
+	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
+	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
 
 
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.createConfig() ;
 
-		config.controler().setOutputDirectory("/Users/nagel/freight-kairuns/output/");
+		if ( args != null ) {
+			config.controler().setOutputDirectory( args[0] );
+		} else {
+			config.controler().setOutputDirectory("/Users/nagel/freight-kairuns/output/");
+		}
 		config.controler().setLastIteration(10); 
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -108,9 +112,8 @@ public class KNFreight4 {
 
 		for ( Carrier carrier : carriers.getCarriers().values() ) {
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder( carrier, scenario.getNetwork() ) ;
-			NetworkBasedTransportCosts netBasedCosts =
-					NetworkBasedTransportCosts.Builder.newInstance( scenario.getNetwork()
-							, vehicleTypes.getVehicleTypes().values() ).build() ;
+			NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance( 
+					scenario.getNetwork(), vehicleTypes.getVehicleTypes().values() ).build() ;
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem problem = vrpBuilder.build() ;
 
