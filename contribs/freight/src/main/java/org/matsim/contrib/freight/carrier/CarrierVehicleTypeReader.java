@@ -50,6 +50,13 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	 * 
 	 * @param xml-filename containing vehicleTypes
 	 */
+	/* This is somewhat problematic for me (JWJoubert, Nov '13). The MatsimXmlParser
+	 * has a parse method, yet when calling it, it results in an XML error. Maybe 
+	 * it would be better to 
+	 * a) use a dtd file, and
+	 * b) rather use the infrastructure provided by the MatsimXmlParser, and 
+	 *    override it if required.
+	 */
 	public void read(String filename){
 		logger.info("read vehicle types");
 		this.setValidating(false);
