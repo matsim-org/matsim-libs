@@ -54,6 +54,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
@@ -69,17 +70,22 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	protected Random random;
 	private final double parkingDuration = 60 * 2;
 	protected final double walkSpeed = 3.0 / 3.6; // [m/s]
-	protected double scoreInterrupationValue = 0;;
+	protected double scoreInterrupationValue = 0;
+	private String name;;
 
 	// go to final link if no parking there, then try parking at other places.
 	// accept only parking within 300m, choose random links, but if leave 300m
 	// area, try
 	// to take direction leading back to destination
-	public RandomParkingSearch(double maxDistance, Network network) {
+	public RandomParkingSearch(double maxDistance, Network network, String name) {
 		this.maxDistance = maxDistance;
 		this.network = network;
-		this.random = MatsimRandom.getLocalInstance();
+		this.name = name;
 		resetForNewIteration();
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 	public HashSet<Id> extraSearchPathNeeded = new HashSet<Id>();
@@ -116,8 +122,9 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					DebugLib.traceAgent(personId, 1);
 					// extraSearchPathNeeded.add(personId);
 
+					random=RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
 					addRandomLinkToRoute(route);
-
+					
 					// this will just continue the search of the agent
 					aem.processLegInDefaultWay();
 
@@ -272,6 +279,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		Link link = network.getLinks().get(route.getEndLinkId());
 
 		Link nextLink = randomNextLink(link);
+		
 		ArrayList<Id> newRoute = new ArrayList<Id>();
 		newRoute.addAll(route.getLinkIds());
 		newRoute.add(link.getId());
@@ -290,11 +298,6 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		int i = random.nextInt(links.size());
 		return links.get(i);
-	}
-
-	@Override
-	public String getName() {
-		return "RandomParkingSearch";
 	}
 
 	private void logParkingSearchDuration(AgentWithParking aem) {

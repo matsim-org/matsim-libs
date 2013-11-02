@@ -32,32 +32,44 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.Pa
 
 public class ParkingStrategyScenarios {
 
-	public static LinkedList<ParkingSearchStrategy> getScenarioStrategies(Scenario scenario){
+	public static LinkedList<ParkingSearchStrategy> getScenarioStrategies(Scenario scenario) {
 		LinkedList<ParkingSearchStrategy> allStrategies = new LinkedList<ParkingSearchStrategy>();
 
-		if (ZHScenarioGlobal.parkingStrategyScenarioId==1){
-			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork()));
-			allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), ZHScenarioGlobal.loadIntParam("parkingStrategyScenarioId.1.delayBeforeSwitchToStreetParkingSearch")));
+		if (ZHScenarioGlobal.parkingStrategyScenarioId == 1) {
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch"));
+			allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), ZHScenarioGlobal
+					.loadIntParam("parkingStrategyScenarioId.1.delayBeforeSwitchToStreetParkingSearch"),
+					"RandomGarageParkingSearch"));
 			// allStrategies.add(new
 			// RandomStreetParkingWithIllegalParkingAndLawEnforcement(500.0,
 			// scenario.getNetwork()));
 			// allStrategies.add(new
 			// RandomStreetParkingWithIllegalParkingAndNoLawEnforcement(500.0,
 			// scenario.getNetwork()));
-			allStrategies.add(new RandomStreetParkingSearchWithWaiting(-1, scenario.getNetwork(), ZHScenarioGlobal.loadDoubleParam("parkingStrategyScenarioId.1.maxWaitingTime"), ZHScenarioGlobal.loadDoubleParam("parkingStrategyScenarioId.1.availabilityCheckIntervall")));
+			allStrategies.add(new RandomStreetParkingSearchWithWaiting(-1, scenario.getNetwork(), ZHScenarioGlobal
+					.loadDoubleParam("parkingStrategyScenarioId.1.maxWaitingTime"), ZHScenarioGlobal
+					.loadDoubleParam("parkingStrategyScenarioId.1.availabilityCheckIntervall"),
+					"RandomStreetParkingSearchWithWaiting"));
 			// allStrategies.add(new
 			// PrivateParkingWithWaitAndRandomSearchAsBackup(500.0,
 			// scenario.getNetwork(),5*60));
-			allStrategies.add(new AxPo1989_Strategy7(-1, scenario.getNetwork(), ZHScenarioGlobal.loadDoubleParam("parkingStrategyScenarioId.1.expectedIllegalParkingFeeForWholeDay")));
-		} else if (ZHScenarioGlobal.parkingStrategyScenarioId==2){
-				allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork()));
-				allStrategies.add(new AxPo1989_Strategy3(-1, scenario.getNetwork()));
-		} else if (ZHScenarioGlobal.parkingStrategyScenarioId==3){
-			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork()));
-			allStrategies.add(new ParkAgent(-1, scenario.getNetwork()));
-	}
-		
+			allStrategies.add(new AxPo1989_Strategy7(-1, scenario.getNetwork(), ZHScenarioGlobal
+					.loadDoubleParam("parkingStrategyScenarioId.1.expectedIllegalParkingFeeForWholeDay"), "AxPo1989_Strategy7"));
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 2) {
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch"));
+			allStrategies.add(new AxPo1989_Strategy3(-1, scenario.getNetwork(), "AxPo1989_Strategy3"));
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 3) {
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch"));
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent"));
+		}else if (ZHScenarioGlobal.parkingStrategyScenarioId == 4) {
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch1"));
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch2"));
+		}else if (ZHScenarioGlobal.parkingStrategyScenarioId == 5) {
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch1"));
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch2"));
+			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch3"));
+		}
+
 		return allStrategies;
 	}
 }
-

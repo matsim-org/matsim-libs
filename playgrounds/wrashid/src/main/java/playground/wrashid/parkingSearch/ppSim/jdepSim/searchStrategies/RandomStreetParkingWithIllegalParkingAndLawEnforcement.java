@@ -37,14 +37,9 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivity
 
 public class RandomStreetParkingWithIllegalParkingAndLawEnforcement extends RandomStreetParkingWithIllegalParkingAndNoLawEnforcement {
 
-	public RandomStreetParkingWithIllegalParkingAndLawEnforcement(double maxDistance, Network network) {
-		super(maxDistance, network);
+	public RandomStreetParkingWithIllegalParkingAndLawEnforcement(double maxDistance, Network network, String name) {
+		super(maxDistance, network,name);
 		this.parkingType = "illegalParking";
-	}
-
-	@Override
-	public String getName() {
-		return "RandomStreet+IllegalParking+law enforcement";
 	}
 
 	@Override

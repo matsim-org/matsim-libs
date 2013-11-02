@@ -66,6 +66,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStr
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndNoLawEnforcement;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy7;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.HouseHoldIncomeZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
@@ -161,6 +162,7 @@ public class MainPPSimZurich30km {
 			ZHScenarioGlobal.reset();
 			ParkingMemory.prepareForNextIteration();
 			ParkingMemory.resetMemory();
+			RandomNumbers.reset();
 
 			Mobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
 			sim.run();

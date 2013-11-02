@@ -33,15 +33,10 @@ public class AxPo1989_Strategy7 extends RandomStreetParkingWithIllegalParkingAnd
 
 	private double expectedIllegalParkingFeeForWholeDay;
 
-	public AxPo1989_Strategy7(double maxDistance, Network network, double expectedIllegalParkingFeeForWholeDay) {
-		super(maxDistance, network);
+	public AxPo1989_Strategy7(double maxDistance, Network network, double expectedIllegalParkingFeeForWholeDay, String name) {
+		super(maxDistance, network, name);
 		this.expectedIllegalParkingFeeForWholeDay = expectedIllegalParkingFeeForWholeDay;
 		this.parkingType = "illegalParking";
-	}
-
-	@Override
-	public String getName() {
-		return "AxPo1989_Strategy7";
 	}
 
 	@Override

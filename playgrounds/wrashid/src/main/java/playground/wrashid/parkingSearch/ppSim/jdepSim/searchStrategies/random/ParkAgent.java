@@ -36,19 +36,14 @@ public class ParkAgent extends RandomParkingSearch {
 
 	HashMap<Id, ParkAgentAttributes> attributes;
 
-	public ParkAgent(double maxDistance, Network network) {
-		super(maxDistance, network);
+	public ParkAgent(double maxDistance, Network network, String name) {
+		super(maxDistance, network, name);
 		this.parkingType = "streetParking";
 	}
 	
 	public void resetForNewIteration() {
 		super.resetForNewIteration();
 		attributes = new HashMap<Id, ParkAgent.ParkAgentAttributes>();
-	}
-
-	@Override
-	public String getName() {
-		return "ParkAgent";
 	}
 
 	@Override

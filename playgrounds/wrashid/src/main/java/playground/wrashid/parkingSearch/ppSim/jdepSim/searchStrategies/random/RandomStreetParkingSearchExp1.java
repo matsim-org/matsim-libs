@@ -35,17 +35,11 @@ public class RandomStreetParkingSearchExp1 extends RandomParkingSearch{
 	double searchCircleDistance=100;
 	double slope=1.0;
 	
-	public RandomStreetParkingSearchExp1(double maxDistance, Network network) {
-		super(maxDistance, network);
+	public RandomStreetParkingSearchExp1(double maxDistance, Network network, String name) {
+		super(maxDistance, network, name);
 		this.parkingType="streetParking";
 	}
 
-	@Override
-	public String getName() {
-		return "RandomStreetParkingSearch";
-	}
-	
-	
 	public double getMaxDistance(double searchTime){
 		return searchCircleDistance+slope*searchTime;
 	}

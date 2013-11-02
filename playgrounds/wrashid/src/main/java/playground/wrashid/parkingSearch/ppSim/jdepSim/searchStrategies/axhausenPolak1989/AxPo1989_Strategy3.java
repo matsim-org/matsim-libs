@@ -58,15 +58,10 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 		garageParkingScore = new DoubleValueHashMap<Id>();
 	}
 
-	public AxPo1989_Strategy3(double maxDistance, Network network) {
-		super(maxDistance, network);
+	public AxPo1989_Strategy3(double maxDistance, Network network, String name) {
+		super(maxDistance, network, name);
 		this.parkingType = "streetParking";
 		resetForNewIteration();
-	}
-
-	@Override
-	public String getName() {
-		return "AxPo1989_Strategy3";
 	}
 
 	@Override

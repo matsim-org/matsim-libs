@@ -37,17 +37,12 @@ public class PrivateParkingWithWaitAndRandomSearchAsBackup extends RandomParking
 	
 	private double delayBeforeSwitchToStreetParkingSearch;
 
-	public PrivateParkingWithWaitAndRandomSearchAsBackup(double maxDistance, Network network, double delayBeforeSwitchToStreetParkingSearch) {
-		super(maxDistance, network);
+	public PrivateParkingWithWaitAndRandomSearchAsBackup(double maxDistance, Network network, double delayBeforeSwitchToStreetParkingSearch, String name) {
+		super(maxDistance, network,name);
 		this.delayBeforeSwitchToStreetParkingSearch = delayBeforeSwitchToStreetParkingSearch;
 		this.parkingType="streetParking";
 	}
 
-	@Override
-	public String getName() {
-		return "PrivateParkingSearch";
-	}
-	
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();

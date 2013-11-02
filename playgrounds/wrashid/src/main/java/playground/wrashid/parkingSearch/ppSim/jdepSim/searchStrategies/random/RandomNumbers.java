@@ -16,48 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
+package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random;
 
+import java.util.HashMap;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 
-import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
+import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
-public class RandomGarageParkingSearch extends RandomParkingSearch{
-	
-	
-	
-	private int delayBeforeSwitchToStreetParkingSearch;
+public class RandomNumbers {
 
-	public RandomGarageParkingSearch(double maxDistance, Network network,int delayBeforeSwitchToStreetParkingSearch, String name) {
-		super(maxDistance, network,name);
-		this.delayBeforeSwitchToStreetParkingSearch = delayBeforeSwitchToStreetParkingSearch;
-		this.parkingType="garageParking";
-	}
+	static TwoHashMapsConcatenated<Id, Integer, Random> randomNumbers;
 
-	@Override
-	public void handleAgentLeg(AgentWithParking aem) {
-		super.handleAgentLeg(aem);
-		Id personId = aem.getPerson().getId();
-		if (startSearchTime.containsKey(personId)){
-			double searchDuration=getSearchTime(aem);
-			
-			if (searchDuration>delayBeforeSwitchToStreetParkingSearch){
-				useSpecifiedParkingType.put(personId, "streetParking");
-			}
+	public static Random getRandomNumber(Id personId,Integer legIndex,String strategyName){
+		if (randomNumbers.get(personId, legIndex)==null){
+			randomNumbers.put(personId, legIndex, new Random(strategyName.toString().hashCode()));
 		}
+		return randomNumbers.get(personId, legIndex);
 	}
 	
-	@Override
-	public void handleParkingDepartureActivity(AgentWithParking aem) {
-		super.handleParkingDepartureActivity(aem);
-		useSpecifiedParkingType.remove(aem.getPerson().getId());
+	public static void reset(){
+		randomNumbers=new TwoHashMapsConcatenated<Id, Integer, Random>();
 	}
-
+	
 }
 

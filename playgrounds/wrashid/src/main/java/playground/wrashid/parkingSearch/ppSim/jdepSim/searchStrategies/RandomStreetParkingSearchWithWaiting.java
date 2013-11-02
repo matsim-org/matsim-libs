@@ -38,16 +38,11 @@ public class RandomStreetParkingSearchWithWaiting extends RandomParkingSearch {
 	private double availabilityCheckIntervall;
 
 	public RandomStreetParkingSearchWithWaiting(double maxDistance, Network network, double maxWaitingTime,
-			double availabilityCheckIntervall) {
-		super(maxDistance, network);
+			double availabilityCheckIntervall, String name) {
+		super(maxDistance, network,name);
 		this.maxWaitingTime = maxWaitingTime;
 		this.availabilityCheckIntervall = availabilityCheckIntervall;
 		this.parkingType = "streetParking";
-	}
-
-	@Override
-	public String getName() {
-		return "RandomStreetSearch+WithWaiting";
 	}
 
 	@Override

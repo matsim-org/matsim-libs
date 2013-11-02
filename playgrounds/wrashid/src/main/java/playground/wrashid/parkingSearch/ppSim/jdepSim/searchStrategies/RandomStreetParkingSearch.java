@@ -28,15 +28,12 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 public class RandomStreetParkingSearch extends RandomParkingSearch{
 	
 	
-	public RandomStreetParkingSearch(double maxDistance, Network network) {
-		super(maxDistance, network);
+	public RandomStreetParkingSearch(double maxDistance, Network network, String name) {
+		super(maxDistance, network,name);
 		this.parkingType="streetParking";
 	}
 
-	@Override
-	public String getName() {
-		return "RandomStreetParkingSearch";
-	}
+	
 
 }
 
