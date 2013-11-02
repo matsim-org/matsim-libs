@@ -60,7 +60,7 @@ public class RandomStreetParkingWithIllegalParkingAndLawEnforcement extends Rand
 			}
 			
 			double disutilityPerSecond=-400.0/(24*60*60);
-			scoreInterrupationValue = disutilityPerSecond*parkingDuration;
+			scoreInterrupationValue += disutilityPerSecond*parkingDuration;
 		//}
 	}
 

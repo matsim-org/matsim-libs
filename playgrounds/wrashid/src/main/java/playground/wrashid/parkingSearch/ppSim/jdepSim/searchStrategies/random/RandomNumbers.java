@@ -24,19 +24,29 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class RandomNumbers {
 
 	static TwoHashMapsConcatenated<Id, Integer, Random> randomNumbers;
+	static double startTime=-1;
 
 	public static Random getRandomNumber(Id personId,Integer legIndex,String strategyName){
 		if (randomNumbers.get(personId, legIndex)==null){
-			randomNumbers.put(personId, legIndex, new Random(strategyName.toString().hashCode()));
+			int seed=strategyName.toString().hashCode();
+			if (startTime!=-1){
+				seed+=startTime;
+			}
+			
+			randomNumbers.put(personId, legIndex, new Random(seed));
 		}
 		return randomNumbers.get(personId, legIndex);
 	}
 	
 	public static void reset(){
+		if (ZHScenarioGlobal.loadBooleanParam("RandomNumbers.useStartTimeForRandomSeedInitialization")){
+			startTime=System.currentTimeMillis();
+		}
 		randomNumbers=new TwoHashMapsConcatenated<Id, Integer, Random>();
 	}
 	

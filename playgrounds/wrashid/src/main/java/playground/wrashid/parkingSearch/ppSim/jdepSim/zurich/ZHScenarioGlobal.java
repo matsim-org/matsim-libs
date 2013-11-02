@@ -92,7 +92,7 @@ public class ZHScenarioGlobal {
 		printFilteredParkingStatsParkingType("illegal");
 		
 		for (ParkingSearchStrategy strategy:ParkingStrategyManager.allStrategies){
-			printFilteredParkingStatsParkingType(strategy.getClass());
+			printParkingStraregyStats(strategy.getName());
 		}
 		
 		writeAllParkingEventsToFile();
@@ -110,16 +110,16 @@ public class ZHScenarioGlobal {
 		GeneralLib.writeList(list, getItersFolderPath() + iteration + ".parkingEvents.txt");
 	}
 
-	private static void printFilteredParkingStatsParkingType(Class c) {
+	private static void printParkingStraregyStats(String parkingStrategyName) {
 		double averageParkingDuration = 0;
 		double averageSearchDuration = 0;
 		double averageWalkDuration = 0;
 
-		System.out.println("stats for parking strategy: " + c.getName());
+		System.out.println("stats for parking strategy: " + parkingStrategyName);
 
 		int numberOfParkingOperations = 0;
 		for (ParkingEventDetails ped : parkingEventDetails) {
-			if (ped.parkingStrategy.getClass().isAssignableFrom(c)) {
+			if (ped.parkingStrategy.getName().equalsIgnoreCase(parkingStrategyName)) {
 				averageParkingDuration += ped.parkingActivityAttributes.getParkingDuration();
 				averageSearchDuration += ped.parkingActivityAttributes.getParkingSearchDuration();
 				averageWalkDuration += ped.parkingActivityAttributes.getToActWalkDuration();

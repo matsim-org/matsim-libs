@@ -92,7 +92,7 @@ public class MainPPSimZurich30km {
 		ZHScenarioGlobal.scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 		Scenario scenario=ZHScenarioGlobal.scenario;
 		
-		filterPopulation2_5km(scenario);
+		filterPopulationWithinScenarioRadius(scenario);
 		removeNotSelectedPlans(scenario);
 		multiplyPopulation(scenario, ZHScenarioGlobal.populationExpensionFactor);
 
@@ -282,7 +282,7 @@ public class MainPPSimZurich30km {
 		}
 	}
 
-	private static void filterPopulation2_5km(Scenario scenario) {
+	private static void filterPopulationWithinScenarioRadius(Scenario scenario) {
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
 		LinkedList<Id> personToBeRemoved = new LinkedList<Id>();
 
@@ -296,7 +296,7 @@ public class MainPPSimZurich30km {
 				if (planElements.get(i) instanceof Activity) {
 					Activity act = (Activity) planElements.get(i);
 
-					if (GeneralLib.getDistance(coordinatesLindenhofZH, act.getCoord()) < 2500) {
+					if (GeneralLib.getDistance(coordinatesLindenhofZH, act.getCoord()) < ZHScenarioGlobal.loadDoubleParam("scenarioRadiusInMeters")) {
 						removeFromPopulatation = false;
 						break;
 					}

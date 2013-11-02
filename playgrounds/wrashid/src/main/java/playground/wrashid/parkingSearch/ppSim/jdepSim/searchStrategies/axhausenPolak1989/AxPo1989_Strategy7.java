@@ -58,7 +58,7 @@ public class AxPo1989_Strategy7 extends RandomStreetParkingWithIllegalParkingAnd
 		}
 
 		double expectedAmountToBePayed = expectedIllegalParkingFeeForWholeDay / (24 * 60 * 60) * parkingDuration;
-		scoreInterrupationValue = ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, expectedAmountToBePayed);
+		scoreInterrupationValue += ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, expectedAmountToBePayed);
 
 		if (scoreInterrupationValue == 0) {
 			DebugLib.emptyFunctionForSettingBreakPoint();

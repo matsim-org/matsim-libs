@@ -63,6 +63,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	protected DoubleValueHashMap<Id> startSearchTime;
 	protected HashMap<Id, ParkingActivityAttributes> parkingActAttributes;
 	protected HashMap<Id, String> useSpecifiedParkingType;
+	protected HashSet<Id> tollAreaEntered;
 
 	protected String parkingType;
 	private double maxDistance;
@@ -83,7 +84,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		this.name = name;
 		resetForNewIteration();
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -116,15 +117,15 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 				// TODO: include max distance here (maxDistance variable)
 
-				triggerSeachTimeStart(personId,aem.getMessageArrivalTime());
+				triggerSeachTimeStart(personId, aem.getMessageArrivalTime());
 
 				if (parkingId == null || isInvalidLink) {
 					DebugLib.traceAgent(personId, 1);
 					// extraSearchPathNeeded.add(personId);
 
-					random=RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
+					random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
 					addRandomLinkToRoute(route);
-					
+
 					// this will just continue the search of the agent
 					aem.processLegInDefaultWay();
 
@@ -181,8 +182,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		// ||
 		// !AgentWithParking.parkingManager.getLinkOfParking(parkingId).toString().equalsIgnoreCase(route.getEndLinkId().toString())
 		if (parkingId == null) {
-			parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(),
-					filterParkingType);
+			parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), filterParkingType);
 		}
 		return parkingId;
 	}
@@ -193,17 +193,15 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		}
 	}
 
-	protected void parkVehicle(AgentWithParking aem, 
-			Id parkingId) {
+	protected void parkVehicle(AgentWithParking aem, Id parkingId) {
 		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
-		Id personId=aem.getPerson().getId();
+		Id personId = aem.getPerson().getId();
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 1);
-		
-		
+
 		aem.processEndOfLegCarMode_processEvents(leg, nextAct);
 
 		setDurationOfParkingActivity(aem, nextAct);
@@ -236,8 +234,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		if (indexOfNextCarLeg != -1) {
 			ActivityImpl lastActBeforeNextCarLeg = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(indexOfNextCarLeg - 3);
-			Leg nextwalkLegToParking = (Leg) aem.getPerson().getSelectedPlan().getPlanElements()
-					.get(indexOfNextCarLeg - 2);
+			Leg nextwalkLegToParking = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg - 2);
 			ActivityImpl nextParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(indexOfNextCarLeg - 1);
 			Leg nextCarLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(indexOfNextCarLeg);
@@ -248,13 +245,14 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 			nextParkingAct.setLinkId(parkingLink.getId());
 
-			if (ZHScenarioGlobal.turnParallelRoutingOnDuringSim) {
-				aem.rerouteTask = new RerouteTaskDuringSim(nextNonParkingAct.getEndTime(), parkingLink.getId(),
-						nextCarLeg);
-				RerouteThreadDuringSim.addTask(aem.rerouteTask);
-			} else {
-				EditRoute.globalEditRoute.addInitialPartToRoute(nextNonParkingAct.getEndTime(), parkingLink.getId(),
-						nextCarLeg);
+			if (ZHScenarioGlobal.loadBooleanParam("RandomParkingSearch.performReroutingDuringSimulation")) {
+				if (ZHScenarioGlobal.turnParallelRoutingOnDuringSim) {
+					aem.rerouteTask = new RerouteTaskDuringSim(nextNonParkingAct.getEndTime(), parkingLink.getId(), nextCarLeg);
+					RerouteThreadDuringSim.addTask(aem.rerouteTask);
+				} else {
+					EditRoute.globalEditRoute
+							.addInitialPartToRoute(nextNonParkingAct.getEndTime(), parkingLink.getId(), nextCarLeg);
+				}
 			}
 
 		}
@@ -279,7 +277,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		Link link = network.getLinks().get(route.getEndLinkId());
 
 		Link nextLink = randomNextLink(link);
-		
+
 		ArrayList<Id> newRoute = new ArrayList<Id>();
 		newRoute.addAll(route.getLinkIds());
 		newRoute.add(link.getId());
@@ -360,6 +358,11 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 				.getParkingCost(parkingAttributesForScoring));
 
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
+		if (tollAreaEntered.contains(personId)){
+			scoreInterrupationValue +=ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
+			parkingScore += scoreInterrupationValue;
+		}
+		
 		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal")) {
 			parkingScore += scoreInterrupationValue;
 			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
@@ -369,22 +372,21 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		ZHScenarioGlobal.parkingEventDetails
 				.add(new ParkingEventDetails(aem.getPlanElementIndex(), parkingScore, AgentWithParking.parkingStrategyManager
 						.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()), parkingAttributesForScoring));
-		parkingActAttributes.remove(personId);
-		scoreInterrupationValue = 0;
+		resetVariables(personId);
 	}
-	
-	public Link getNextLink(AgentWithParking aem){
+
+	public Link getNextLink(AgentWithParking aem) {
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
 		Id nextLinkId;
-		if (!endOfLegReached(aem)){
-			nextLinkId = linkIds.get(aem.getCurrentLinkIndex()+1);
+		if (!endOfLegReached(aem)) {
+			nextLinkId = linkIds.get(aem.getCurrentLinkIndex() + 1);
 		} else {
 			nextLinkId = ((LinkNetworkRouteImpl) leg.getRoute()).getEndLinkId();
 		}
 		return network.getLinks().get(nextLinkId);
 	}
-	
+
 	protected boolean endOfLegReached(AgentWithParking aem) {
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
@@ -420,18 +422,28 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 				.getParkingCost(parkingAttributesForScoring));
 
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
+		if (tollAreaEntered.contains(personId)){
+			scoreInterrupationValue +=ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
+			parkingScore += scoreInterrupationValue;
+		}
+		
 		if (parkingAttributesForScoring.getFacilityId().toString().contains("illegal")) {
 			parkingScore += scoreInterrupationValue;
 			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
 		}
-
+		
 		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
 		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
 		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore,
 				AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), legIndex),
 				parkingAttributesForScoring));
+		resetVariables(personId);
+	}
+
+	public void resetVariables(Id personId) {
 		parkingActAttributes.remove(personId);
 		scoreInterrupationValue = 0;
+		tollAreaEntered.remove(personId);
 	}
 
 	// TODO: log parkingAttributesForScoring + score + leg index
@@ -449,6 +461,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		startSearchTime = new DoubleValueHashMap<Id>();
 		parkingActAttributes = new HashMap<Id, ParkingActivityAttributes>();
 		useSpecifiedParkingType = new HashMap<Id, String>();
+		tollAreaEntered=new HashSet<Id>();
 	}
 
 	/*
@@ -493,34 +506,28 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	 * }
 	 */
 
-	
 	protected Link getCurrentLink(AgentWithParking aem) {
-		Id currentLinkId = getCurrentLinkId(aem);
-		return network.getLinks().get(currentLinkId);
+		return aem.getCurrentLink();
 	}
-	
 
-	// TODO: push method to AgentWithParking class
 	protected Id getCurrentLinkId(AgentWithParking aem) {
-		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
-		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
-		
-		if (aem.getCurrentLinkIndex()==-1){
-			return ((LinkNetworkRouteImpl) leg.getRoute()).getStartLinkId();
-		} else {
-			return linkIds.get(aem.getCurrentLinkIndex());
-		}
+		return aem.getCurrentLinkId();
 	}
-	
+
 	protected void throughAwayRestOfRoute(AgentWithParking aem) {
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
-		LinkNetworkRouteImpl route= ((LinkNetworkRouteImpl) leg.getRoute());
-		
-		List<Id> linkIds=new LinkedList<Id>();
-		for (int i=0;i<=aem.getCurrentLinkIndex();i++){
+		LinkNetworkRouteImpl route = ((LinkNetworkRouteImpl) leg.getRoute());
+
+		List<Id> linkIds = new LinkedList<Id>();
+		for (int i = 0; i <= aem.getCurrentLinkIndex(); i++) {
 			linkIds.add(route.getLinkIds().get(i));
 		}
-		
+
 		leg.setRoute(new LinkNetworkRouteImpl(route.getStartLinkId(), linkIds, getNextLink(aem).getId()));
+	}
+
+	@Override
+	public void tollAreaEntered(AgentWithParking aem) {
+		tollAreaEntered.add(aem.getPerson().getId());		
 	}
 }

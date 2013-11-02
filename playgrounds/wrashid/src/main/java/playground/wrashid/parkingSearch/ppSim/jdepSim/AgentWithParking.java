@@ -21,8 +21,10 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -33,6 +35,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingMemory;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
@@ -86,11 +89,24 @@ public class AgentWithParking extends AgentEventMessage {
 
 			if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 				performSiutationUpdatesForParkingMemory();
+				
+				logIfTolledAreaEntered();
+				
 				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).handleAgentLeg(this);
 
 			} else {
 				handleLeg();
 			}
+		}
+	}
+
+	private void logIfTolledAreaEntered() {
+		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
+		
+		Link currentLink = getCurrentLink();
+		
+		if (GeneralLib.getDistance(currentLink.getCoord(), coordinatesLindenhofZH)<ZHScenarioGlobal.loadDoubleParam("radiusTolledArea")){
+			parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).tollAreaEntered(this);
 		}
 	}
 
@@ -144,4 +160,19 @@ public class AgentWithParking extends AgentEventMessage {
 		return (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 	}
 
+	public Link getCurrentLink() {
+		Id currentLinkId = getCurrentLinkId();
+		return ZHScenarioGlobal.scenario.getNetwork().getLinks().get(currentLinkId);
+	}
+
+	public Id getCurrentLinkId() {
+		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+
+		if (getCurrentLinkIndex() == -1) {
+			return ((LinkNetworkRouteImpl) leg.getRoute()).getStartLinkId();
+		} else {
+			return linkIds.get(getCurrentLinkIndex());
+		}
+	}
 }
