@@ -104,7 +104,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 		Link nextLinkId = getNextLink(aem);
 		
 		Id freeParkingFacilityOnLink = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(nextLinkId.getId(), "streetParking");
-		boolean isInvalidLink = aem.isInvalidLinkForParking();
+		boolean isInvalidLink = aem.isLastLinkOfRouteInvalidLinkForParking();
 		
 		if (!isInvalidLink && freeParkingFacilityOnLink!=null){
 			ParkingActivityAttributes paa = getParkingAttributesForParking(aem, nextLinkId, freeParkingFacilityOnLink, searchTime);
@@ -206,7 +206,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 	}
 
 	private boolean hasFreeGPParkingThenTakeIt(AgentWithParking aem) {
-		boolean isInvalidLink = aem.isInvalidLinkForParking();
+		boolean isInvalidLink = aem.isLastLinkOfRouteInvalidLinkForParking();
 		if (!isInvalidLink) {
 			//System.out.println(AgentWithParking.parkingManager);
 			//System.out.println(getCurrentLinkId(aem));

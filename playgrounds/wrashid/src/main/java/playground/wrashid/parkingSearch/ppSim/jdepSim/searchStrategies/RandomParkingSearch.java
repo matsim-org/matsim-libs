@@ -112,7 +112,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 				Id parkingId = getParkingLinkId(aem, filterParkingType);
 
-				boolean isInvalidLink = aem.isInvalidLinkForParking();
+				boolean isInvalidLink = aem.isLastLinkOfRouteInvalidLinkForParking();
 
 				// TODO: include max distance here (maxDistance variable)
 

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -94,6 +95,7 @@ public class AgentWithParking extends AgentEventMessage {
 	}
 
 	private void performSiutationUpdatesForParkingMemory() {
+		/*
 		ParkingMemory parkingMemory = ParkingMemory.getParkingMemory(getPerson().getId(), getPlanElementIndex());
 		if (parkingMemory.closestFreeGarageParkingAtTimeOfArrival == null) {
 			Activity nextActivity = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 3);
@@ -102,6 +104,7 @@ public class AgentWithParking extends AgentEventMessage {
 
 			parkingMemory.closestFreeGarageParkingAtTimeOfArrival = closestFreeGarageParking;
 		}
+		*/
 	}
 
 	public void processLegInDefaultWay() {
@@ -111,7 +114,7 @@ public class AgentWithParking extends AgentEventMessage {
 	// avoid temporary problem with car leave and next planned parking on same
 	// link
 	// TODO: resolve in future implementation
-	public boolean isInvalidLinkForParking() {
+	public boolean isLastLinkOfRouteInvalidLinkForParking() {
 		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 
@@ -124,6 +127,18 @@ public class AgentWithParking extends AgentEventMessage {
 		}
 		return isInvalidLink;
 	}
+	
+	public boolean isInvalidLinkForParking(Id linkId) {
+		boolean isInvalidLink = false;
+		int nextCarLegIndex = duringCarLeg_getPlanElementIndexOfNextCarLeg();
+		if (nextCarLegIndex != -1) {
+			ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements()
+					.get(nextCarLegIndex + 3);
+			isInvalidLink = GeneralLib.equals(linkId, nextActAfterNextCarLeg.getLinkId());
+		}
+		return isInvalidLink;
+	}
+	
 
 	public ActivityImpl getCurrentActivity() {
 		return (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());

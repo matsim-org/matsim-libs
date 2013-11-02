@@ -19,12 +19,18 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
@@ -33,6 +39,10 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomPar
 public class ParkAgent extends RandomParkingSearch {
 
 	double startStrategyAtDistanceFromDestination = 500;
+	double startParkingDecision = 250;
+	int xxxx = 2;
+	double maxDistanceAcceptableForWalk=400;
+	double maxSeachDuration=10*60;
 
 	HashMap<Id, ParkAgentAttributes> attributes;
 
@@ -40,7 +50,7 @@ public class ParkAgent extends RandomParkingSearch {
 		super(maxDistance, network, name);
 		this.parkingType = "streetParking";
 	}
-	
+
 	public void resetForNewIteration() {
 		super.resetForNewIteration();
 		attributes = new HashMap<Id, ParkAgent.ParkAgentAttributes>();
@@ -51,41 +61,162 @@ public class ParkAgent extends RandomParkingSearch {
 		Id personId = aem.getPerson().getId();
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
-		
-		if (!attributes.containsKey(personId) && GeneralLib.getDistance(getCurrentLink(aem).getCoord(), network.getLinks().get(nextAct.getLinkId()).getCoord())<startStrategyAtDistanceFromDestination){
+
+		if (!attributes.containsKey(personId)
+				&& GeneralLib.getDistance(getNextLink(aem).getCoord(), network.getLinks().get(nextAct.getLinkId()).getCoord()) < startStrategyAtDistanceFromDestination) {
 			Id parkingLinkId = getParkingLinkId(aem, getParkingFilterType(personId));
 			ParkAgentAttributes parkingAttr = new ParkAgentAttributes();
-			if (parkingLinkId==null || !parkingLinkId.toString().contains("privateParkings")){
-				parkingAttr.takePrivateParking=false;
+			if (parkingLinkId == null || !parkingLinkId.toString().contains("privateParkings")) {
+				parkingAttr.takePrivateParking = false;
 			} else {
-				parkingAttr.takePrivateParking=true;
+				parkingAttr.takePrivateParking = true;
 			}
 			
-			attributes.put(personId, parkingAttr);
-			super.handleAgentLeg(aem);
-		}else if (attributes.containsKey(personId)) {
-			ParkAgentAttributes parkingAttr = attributes.get(personId);
 			
-			if (parkingAttr.takePrivateParking){
+
+			attributes.put(personId, parkingAttr);
+			initParkingCapacitiesTillReachingDestination(aem);
+			super.handleAgentLeg(aem);
+		} else if (attributes.containsKey(personId)) {
+			ParkAgentAttributes parkingAttr = attributes.get(personId);
+
+			if (parkingAttr.takePrivateParking) {
 				super.handleAgentLeg(aem);
 			} else {
-				Id freeParkingFacilityOnLink = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(getNextLink(aem).getId(), "streetParking");
-				boolean isInvalidLink = aem.isInvalidLinkForParking();
-				
-				if (!isInvalidLink && freeParkingFacilityOnLink!=null && random.nextDouble()<0.1){
-					throughAwayRestOfRoute(aem);
-					parkVehicle(aem, freeParkingFacilityOnLink);
+				Link nextLink = getNextLink(aem);
+				Id freeParkingFacilityOnLink = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(nextLink.getId(),
+						"streetParking");
+				boolean isInvalidLink = aem.isInvalidLinkForParking(nextLink.getId());
+
+				if (endOfLegReached(aem)) {
+					triggerSeachTimeStart(personId,aem.getMessageArrivalTime());
+					Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+					
+					String filterParkingType = getParkingFilterType(personId);
+					Id parkingId = getParkingLinkId(aem, filterParkingType);
+					LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
+					
+					if (parkingAttr.timeWhenDestinationReached==-1){
+						parkingAttr.timeWhenDestinationReached=aem.getMessageArrivalTime();
+					}
+
+					double searchTimeDurationAfterReachingTarget = getSearchTimeDurationAfterReachingTarget(aem);
+					double acceptableParkingDistance=getAcceptableParkingDistance(searchTimeDurationAfterReachingTarget);
+					
+					
+					if (parkingId == null || isInvalidLink || GeneralLib.getDistance(nextAct.getCoord(), nextLink.getCoord()) > acceptableParkingDistance) {
+
+						random=RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
+						addRandomLinkToRoute(route);
+						
+						aem.processLegInDefaultWay();
+					} else {
+						parkVehicle(aem, parkingId);
+					}
 				} else {
-					super.handleAgentLeg(aem);
+
+					Id streetParkingOnLink = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(nextLink.getId(),
+							"streetParking");
+
+					if (streetParkingOnLink != null) {
+
+						parkingAttr.totalCapacity += AgentWithParking.parkingManager.getParkingsHashMap().get(streetParkingOnLink)
+								.getIntCapacity();
+						parkingAttr.totalUnOccupied += AgentWithParking.parkingManager.getFreeCapacity(streetParkingOnLink);
+						parkingAttr.capacitiesOfAllParkingTillDestination-=parkingAttr.totalCapacity;
+					}
+
+					if (GeneralLib.getDistance(nextAct.getCoord(), nextLink.getCoord()) < startParkingDecision && parkingAttr.totalCapacity>0) {
+						double F_exp = parkingAttr.totalUnOccupied / parkingAttr.totalCapacity
+								* parkingAttr.capacitiesOfAllParkingTillDestination;
+						
+						
+						if (!isInvalidLink && freeParkingFacilityOnLink != null && F_exp>xxxx) {
+							throughAwayRestOfRoute(aem);
+							parkVehicle(aem, freeParkingFacilityOnLink);
+						} else {
+							super.handleAgentLeg(aem);
+						}
+					} else {
+						super.handleAgentLeg(aem);
+					}
 				}
 			}
-		}else {
+		} else {
 			super.handleAgentLeg(aem);
+		}
+	}
+
+	private double getAcceptableParkingDistance(double searchTimeDurationAfterReachingTarget) {
+		double maxDistanceAcceptableForWalk=400;
+		double maxSeachDuration=10*60;
+		
+		if (searchTimeDurationAfterReachingTarget>maxSeachDuration){
+			return Double.MAX_VALUE;
+		} else {
+			if (100+30*searchTimeDurationAfterReachingTarget/60<maxDistanceAcceptableForWalk){
+				return 100+30*searchTimeDurationAfterReachingTarget/60;
+			} else {
+				return maxDistanceAcceptableForWalk;
+			}
+		}
+		
+		
+		
+	}
+
+	private double getSearchTimeDurationAfterReachingTarget(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
+		ParkAgentAttributes parkingAttr = attributes.get(personId);
+		
+		if (parkingAttr.timeWhenDestinationReached==aem.getMessageArrivalTime()){
+			return 0;
+		} else {
+			return GeneralLib.getIntervalDuration(parkingAttr.timeWhenDestinationReached, aem.getMessageArrivalTime());
+		}
+	}
+
+	private void initParkingCapacitiesTillReachingDestination(AgentWithParking aem) {
+		Id personId = aem.getPerson().getId();
+		ParkAgentAttributes parkingAttr = attributes.get(personId);
+
+		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
+
+		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		Link nextLink = getNextLink(aem);
+
+		boolean countCapacity = false;
+		for (Id linkId : linkIds) {
+			if (GeneralLib.equals(linkId, nextLink.getId())) {
+				countCapacity = true;
+			}
+
+			if (countCapacity) {
+				Id streetParkingOnLink = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(linkId, "streetParking");
+
+				if (streetParkingOnLink != null) {
+					parkingAttr.capacitiesOfAllParkingTillDestination += AgentWithParking.parkingManager.getParkingsHashMap()
+							.get(streetParkingOnLink).getIntCapacity();
+				}
+			}
+		}
+
+		if (countCapacity) {
+			Id streetParkingOnLink = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(((LinkNetworkRouteImpl) leg.getRoute()).getEndLinkId(), "streetParking");
+
+			if (streetParkingOnLink != null) {
+				parkingAttr.capacitiesOfAllParkingTillDestination += AgentWithParking.parkingManager.getParkingsHashMap()
+						.get(streetParkingOnLink).getIntCapacity();
+			}
 		}
 	}
 
 	private static class ParkAgentAttributes {
 		boolean takePrivateParking = true;
+		int totalCapacity = 0;
+		int totalUnOccupied = 0;
+		int capacitiesOfAllParkingTillDestination = 0;
+		double timeWhenDestinationReached=-1;
 	}
 
 }
