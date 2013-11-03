@@ -35,13 +35,14 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDuration
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanTimesAdapter {
@@ -51,26 +52,25 @@ public class PlanTimesAdapter {
 	// 0: complete routing
 	// 1: local routing
 	// 2: no routing (distance-based approximation)
-	private ApproximationLevel approximationLevel = ApproximationLevel.COMPLETE_ROUTING ; 
-	private final LeastCostPathCalculator leastCostPathCalculatorForward ;
-	private final LeastCostPathCalculator leastCostPathCalculatorBackward ;
+	private ApproximationLevel approximationLevel = ApproximationLevel.COMPLETE_ROUTING; 
+	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
+	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final Network network;
 	private final Config config;
 	private final TripRouter router;
 	private Scenario scenario;
 	
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
 		
-	/* package */ PlanTimesAdapter(ApproximationLevel approximationLevel, LeastCostPathCalculator leastCostPathCalculatorForward, 
-			LeastCostPathCalculator leastCostPathCalculatorBackward, TripRouter router, Scenario scenario) {
+	/* package */ PlanTimesAdapter(ApproximationLevel approximationLevel, MultiNodeDijkstra forwardMultiNodeDijkstra, 
+			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, Scenario scenario) {
 		this.approximationLevel = approximationLevel;
-		this.leastCostPathCalculatorForward = leastCostPathCalculatorForward;
-		this.leastCostPathCalculatorBackward = leastCostPathCalculatorBackward;
-		this.network = scenario.getNetwork() ;
+		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
+		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
+		this.network = scenario.getNetwork();
 		this.router = router;
-		this.config = scenario.getConfig() ;
-		this.scenario = scenario ;
+		this.config = scenario.getConfig();
+		this.scenario = scenario;
 	}
 	
 	/* package */ void scorePlan(Plan plan, int actlegIndex, ScoringFunction scoringFunction) {	
@@ -274,7 +274,8 @@ public class PlanTimesAdapter {
 				Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
 				Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
 				
-				Path p = this.leastCostPathCalculatorForward.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime(), plan.getPerson(), null);
+//				Path p = this.leastCostPathCalculatorForward.calcLeastCostPath(fromNode, toNode, previousActivity.getEndTime(), plan.getPerson(), null);
+				Path p = this.forwardMultiNodeDijkstra.constructPath(fromNode, toNode, previousActivity.getEndTime());
 				legTravelTime = p.travelTime;	
 			}
 			else if (planElementIndex == (actlegIndex + 2)) {
@@ -283,8 +284,12 @@ public class PlanTimesAdapter {
 				
 				Node fromNode = network.getLinks().get(((ActivityImpl)pe).getLinkId()).getToNode();
 				Node toNode = network.getLinks().get(actToMove.getLinkId()).getToNode();
-																		
-				Path p = this.leastCostPathCalculatorBackward.calcLeastCostPath(fromNode, toNode, -1.0, plan.getPerson(), null);
+				
+				/*
+				 * Use activity.getStartTime() as time for the routing. Does this make sense?
+				 */
+//				Path p = this.leastCostPathCalculatorBackward.calcLeastCostPath(fromNode, toNode, -1.0, plan.getPerson(), null);
+				Path p = this.backwardMultiNodeDijkstra.constructPath(fromNode, toNode, ((Activity) pe).getStartTime());
 				legTravelTime = p.travelTime;
 				//log.info("	Backward travel time: " + legTravelTime / 60.0);
 			}
@@ -299,7 +304,7 @@ public class PlanTimesAdapter {
 	private double getTravelTimeApproximation(PlanImpl plan, ActivityImpl pe) {	
 		Activity actPre = plan.getPreviousActivity(plan.getPreviousLeg(pe));
 		String mode = plan.getPreviousLeg(pe).getMode();
-		double distance = config.plansCalcRoute().getBeelineDistanceFactor() * ((CoordImpl)actPre.getCoord()).calcDistance(pe.getCoord());
+		double distance = config.plansCalcRoute().getBeelineDistanceFactor() * CoordUtils.calcDistance(actPre.getCoord(), pe.getCoord());
 		
 		// TODO: as soon as plansCalcRoute provides defaults for all modes use them 
 		// I do not want users having to set dc parameters in other config modules!

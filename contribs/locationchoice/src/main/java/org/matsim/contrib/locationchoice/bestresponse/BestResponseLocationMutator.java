@@ -42,8 +42,11 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.core.router.MultiNodeDijkstra;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -53,8 +56,11 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final ScaleEpsilon scaleEpsilon;
 	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
-	private ReplanningContext replanningContext;
-	private DestinationChoiceBestResponseContext lcContext;
+	private final DestinationChoiceBestResponseContext lcContext;
+	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
+	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
+	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final int iteration;
 
 	/*
 	 * This is not nice! We hide the object of the super-super class since
@@ -67,23 +73,27 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceBestResponseContext lcContext,
-			DestinationSampler sampler,
-			ReplanningContext replanningContext) {
+			DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
+			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
+			int iteration) {
 		// TODO: first null argument should be quad_trees...
-		super(lcContext.getScenario(), replanningContext.getTripRouter(), null, facilities_of_type, null);
+		super(lcContext.getScenario(), tripRouter, null, facilities_of_type, null);
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;
-		this.replanningContext = replanningContext ;
 		this.lcContext = lcContext;
+		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
+		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
+		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.iteration = iteration;
 		
 		this.quadTreesOfType = quad_trees;
 	}
 
 	@Override
-	public final void run(final Plan plan){
+	public final void run(final Plan plan) {
 		// if person is not in the analysis population
 		if (Integer.parseInt(plan.getPerson().getId().toString()) > 
 		Integer.parseInt(super.scenario.getConfig().locationchoice().getIdExclusion())) return;
@@ -124,7 +134,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 
 		
 		ScoringFunctionAccumulator scoringFunction = 
-			(ScoringFunctionAccumulator) this.replanningContext.getScoringFunctionFactory().createNewScoringFunction(plan); 
+			(ScoringFunctionAccumulator) this.scoringFunctionFactory.createNewScoringFunction(plan); 
 		// (scoringFunction inserted into getWeightedRandomChoice as well as into evaluateAndAdaptPlans.  Presumably, could as well
 		// insert factory (which is already in the replanning context), but this would need to be checked.  kai, jan'13
 		
@@ -160,7 +170,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// yy why? kai, feb'13
 
 					final Id choice = cs.getWeightedRandomChoice(
-							actlegIndex, this.facilities, scoringFunction, plan, replanningContext, this.lcContext.getPersonsKValuesArray()[personIndex]);
+							actlegIndex, this.facilities, scoringFunction, plan, this.getTripRouter(), this.lcContext.getPersonsKValuesArray()[personIndex],
+							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
 
 					this.setLocation(actToMove, choice);	
 					
@@ -248,7 +259,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		planTmp.copyFrom(plan);			
 		scoringFunction.reset();
 
-		cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, replanningContext.getTripRouter(), 
+		cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, this.getTripRouter(), 
 				ApproximationLevel.COMPLETE_ROUTING);	
 		double score = scoringFunction.getScore();
 		scoringFunction.reset();

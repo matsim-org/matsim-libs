@@ -69,7 +69,6 @@ public class RecursiveLocationMutator extends LocationMutator {
 		this.router = router;
 	}
 
-
 	@Override
 	public void run(final Plan plan){
 		List<SubChain> subChains = this.calcActChains(plan);
@@ -77,6 +76,10 @@ public class RecursiveLocationMutator extends LocationMutator {
 		super.resetRoutes(plan);
 	}
 
+	protected TripRouter getTripRouter() {
+		return this.router;
+	}
+	
 	public int getNumberOfUnsuccessfull() {
 		return this.unsuccessfullLC;
 	}
@@ -117,7 +120,6 @@ public class RecursiveLocationMutator extends LocationMutator {
 			}
 		}
 	}
-
 
 	protected int handleSubChain(Person person, SubChain subChain, double speed, int trialNr){
 		if (trialNr > this.maxRecursions) {
@@ -160,7 +162,6 @@ public class RecursiveLocationMutator extends LocationMutator {
 		}
 		return 0;
 	}
-
 
 	protected boolean modifyLocation(ActivityImpl act, Coord startCoord, Coord endCoord, double radius, int trialNr) {
 

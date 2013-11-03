@@ -22,31 +22,30 @@ package org.matsim.contrib.locationchoice.bestresponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.core.router.ImaginaryNode;
+import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 
 public class ChoiceSet {
@@ -77,9 +76,9 @@ public class ChoiceSet {
 		
 	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario) {
 		this.approximationLevel = approximationLevel;
-		this.network = scenario.getNetwork() ;
-		this.config = scenario.getConfig() ;
-		this.scenario = scenario ;
+		this.network = scenario.getNetwork();
+		this.config = scenario.getConfig();
+		this.scenario = scenario;
 		
 //		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
 //		if ( wrnCnt < 1 ) {
@@ -96,9 +95,9 @@ public class ChoiceSet {
 		this.numberOfAlternatives = Integer.parseInt(config.locationchoice().getProbChoiceSetSize());
 	}
 	
-	public void addDestination(Id id) {
-		this.destinations.add(id);
-		this.notYetVisited.add(id);
+	public void addDestination(Id facilityId) {
+		this.destinations.add(facilityId);
+		this.notYetVisited.add(facilityId);
 	}
 	
 	public boolean hasUnvisited() {
@@ -128,16 +127,19 @@ public class ChoiceSet {
 	}
 	
 	public Id getWeightedRandomChoice(int actlegIndex, ActivityFacilities facilities,
-			ScoringFunctionAccumulator scoringFunction, Plan plan, ReplanningContext replanningContext, double pKVal) {
+			ScoringFunctionAccumulator scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
+			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra,
+			int interation) {
 				
-		TreeMap<Double, Id> map = this.createReducedChoiceSetWithScores(actlegIndex, facilities, scoringFunction, plan, replanningContext);
+		TreeMap<Double, Id> map = this.createReducedChoiceSetWithScores(actlegIndex, facilities, scoringFunction, plan, 
+				tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra);
 				
 		/*  the same seed for every agent????? kai, jan'13
 		 * 
 		 * corrected, thx.
 		 * Probably this error was not dramatic as the cs is different for every agent anyway.
 		 */
-		Random random = new Random((long) (Long.MAX_VALUE / replanningContext.getIteration() * pKVal));
+		Random random = new Random((long) (Long.MAX_VALUE / interation * pKVal));
 		
 		//	a couple of random draws to come to the "chaotic" region:
 		for (int i = 0; i < 10; i++) {
@@ -192,34 +194,68 @@ public class ChoiceSet {
 	}
 	
 	private TreeMap<Double,Id> createReducedChoiceSetWithScores(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
-			Plan plan, ReplanningContext replanningContext) {
-		TravelTime travelTime = replanningContext.getTravelTime() ; 
-		TravelDisutility travelCost = replanningContext.getTravelDisutility() ;
-		TripRouter router = replanningContext.getTripRouter() ;
+			Plan plan, TripRouter router, MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra) {
 		
+		// currently handled activity which should be re-located
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
+		Node fromNode;
+		
+		/*
+		 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where
+		 * potential activities are located. Is this correct??
+		 * Otherwise, an ImaginaryNode for each routing direction has to be created.
+		 * cdobler, oct'13 
+		 */
+		List<InitialNode> destinationNodes = new ArrayList<InitialNode>();
+		for (Id destinationId : this.destinations) {
+			ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get(destinationId);
+			Id linkId = destinationFacility.getLinkId();
+			Link destinationLink;
+			if (linkId != null) {
+				destinationLink = this.network.getLinks().get(linkId);				
+			} else destinationLink = ((NetworkImpl) this.network).getNearestLink(destinationFacility.getCoord());
+			
+			Node toNode = destinationLink.getToNode();
+			InitialNode initialToNode = new InitialNode(toNode, 0.0, 0.0);
+			destinationNodes.add(initialToNode);
+		}
+		ImaginaryNode destinationNode = forwardMultiNodeDijkstra.createImaginaryNode(destinationNodes);
 		
 		// ---
 		
-		ForwardDijkstraMultipleDestinations leastCostPathCalculatorForward = new ForwardDijkstraMultipleDestinations(network, travelCost, travelTime);
-				
 		Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
-		Node fromNode = network.getLinks().get(previousActivity.getLinkId()).getToNode();
-		leastCostPathCalculatorForward.calcLeastCostTree(fromNode, previousActivity.getEndTime());
+		fromNode = this.network.getLinks().get(previousActivity.getLinkId()).getToNode();
+		
+		forwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null);			
+
+//		ForwardDijkstraMultipleDestinations leastCostPathCalculatorForward = new ForwardDijkstraMultipleDestinations(network, travelCost, travelTime);
+//		leastCostPathCalculatorForward.calcLeastCostTree(fromNode, previousActivity.getEndTime());
 		
 		// ---
 		
-		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
 		Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
 		fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
 
-		leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime());
-		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
-		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
-
-		leastCostPathCalculatorBackward.calcLeastCostTree(fromNode, -1.0);
-		// "-1.0" is ignored.  It is not clear to me why we first set the (approximated) start time separately, and then ignore the startTime.
-		// (The Dijkstra algo does not care if the start time is approximated or exact.)  kai, jan'13
+		/*
+		 * The original code below uses the relocated activities end time as start time. Does this make sense?
+		 * Probably yes, since the trip to the next destination is short??
+		 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
+		 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
+		 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
+		 * where used there (leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime())).
+		 * 
+		 * cdobler oct'13
+		 */
+		backwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, act.getEndTime(), plan.getPerson(), null);
+		
+//		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
+//		leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime());
+//		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
+//		// at which this is anchored.  (Clearly too early, but probably not that bad as an approximation.)
+//
+//		leastCostPathCalculatorBackward.calcLeastCostTree(fromNode, -1.0);
+//		// "-1.0" is ignored.  It is not clear to me why we first set the (approximated) start time separately, and then ignore the startTime.
+//		// (The Dijkstra algo does not care if the start time is approximated or exact.)  kai, jan'13
 		
 		// ---
 		
@@ -233,6 +269,11 @@ public class ChoiceSet {
 		double largestValue = Double.NEGATIVE_INFINITY; 
 		Id facilityIdWithLargestScore = act.getFacilityId();
 		
+		/*
+		 * TODO: 
+		 * Can this be merged with the for loop above? So far, facilities are looked up twice.
+		 * cdobler, oct'13
+		 */
 		for (Id destinationId : this.destinations) {
 			// tentatively set 
 			((ActivityImpl)act).setFacilityId(destinationId);
@@ -243,7 +284,7 @@ public class ChoiceSet {
 			PlanImpl planTmp = new PlanImpl();
 			planTmp.copyFrom(plan);
 			this.adaptAndScoreTimes((PlanImpl)plan,  actlegIndex,  planTmp, scoringFunction,
-					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, router, this.approximationLevel);
+					forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, router, this.approximationLevel);
 			
 			// not needed anymore
 			// yyyy why not?  kai, jan'13
@@ -257,7 +298,7 @@ public class ChoiceSet {
 				facilityIdWithLargestScore = destinationId;
 			}
 			list.add(new ScoredAlternative(score, destinationId));
-		}	
+		}
 		TreeMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list);
 		if (mapCorrected.size() > 0) {
 			return mapCorrected;
@@ -321,9 +362,9 @@ public class ChoiceSet {
 	}
 			
 	void adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionAccumulator scoringFunction, 
-			LeastCostPathCalculator leastCostPathCalculatorForward, LeastCostPathCalculator leastCostPathCalculatorBackward, TripRouter router, 
-			ApproximationLevel approximationLevelTmp  ) {
-		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp , leastCostPathCalculatorForward, leastCostPathCalculatorBackward, 
+			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, 
+			ApproximationLevel approximationLevelTmp) {
+		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, 
 				router, this.scenario);
 		adapter.adaptTimesAndScorePlan(plan, actlegIndex, planTmp, scoringFunction);
 	}

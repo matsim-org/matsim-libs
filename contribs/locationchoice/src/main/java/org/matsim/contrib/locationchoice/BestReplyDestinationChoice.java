@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -43,9 +43,17 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.core.router.MultiNodeDijkstra;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.priorityqueue.HasIndex;
+import org.matsim.core.router.util.BackwardsFastMultiNodeDijkstraFactory;
+import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -57,6 +65,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 
 	private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
+	
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
 	protected TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>>();
@@ -64,6 +73,9 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private final Scenario scenario;
 	private DestinationChoiceBestResponseContext lcContext;
 	private HashSet<String> flexibleTypes;
+	private LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
+	private LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
+	
 	public static double useScaleEpsilonFromConfig = -99.0;
 
 	public BestReplyDestinationChoice(DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
@@ -71,11 +83,13 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		if ( !LocationChoiceConfigGroup.Algotype.bestResponse.equals(lcContext.getScenario().getConfig().locationchoice().getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
-		this.lcContext = lcContext ;
-		this.scenario = lcContext.getScenario() ;
+		this.lcContext = lcContext;
+		this.scenario = lcContext.getScenario();
 		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
-		initLocal();
+		this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
+		this.backwardMultiNodeDijsktaFactory = new BackwardsFastMultiNodeDijkstraFactory(true);
 		
+		initLocal();
 	}
 
 	private void initLocal() {
@@ -140,12 +154,30 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {
 		
+		ReplanningContext replanningContext = this.getReplanningContext();
 		
+		MultiNodeDijkstra forwardMultiNodeDijkstra = (MultiNodeDijkstra) this.forwardMultiNodeDijsktaFactory.createPathCalculator(this.scenario.getNetwork(), 
+				replanningContext.getTravelDisutility(), this.getReplanningContext().getTravelTime());
+
+		BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra = (BackwardFastMultiNodeDijkstra) this.backwardMultiNodeDijsktaFactory.createPathCalculator(
+				this.scenario.getNetwork(), replanningContext.getTravelDisutility(), this.getReplanningContext().getTravelTime());
 		
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
+		/*
+		 * Previously, the ReplanningContext was handed over to the BestResponseLocationMutator.
+		 * There, a huge amount of TripRouter object where created. As a result, FastRouter instances
+		 * had to be initialized over and over again. Now a single TripRouter object is re-used.
+		 * 
+		 * Is there a reason for the old implementation style?
+		 * cdobler, oct'13 
+		 */
+		TripRouter tripRouter = replanningContext.getTripRouter();
+		ScoringFunctionFactory scoringFunctionFactory = replanningContext.getScoringFunctionFactory();
+		int iteration = replanningContext.getIteration();
+		
 		this.planAlgoInstances.add(new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-				this.lcContext, this.sampler, this.getReplanningContext()));
+				this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration));
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 	

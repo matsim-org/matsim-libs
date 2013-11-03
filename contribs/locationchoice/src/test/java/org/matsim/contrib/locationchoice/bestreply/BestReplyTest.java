@@ -24,7 +24,7 @@ public class BestReplyTest extends MatsimTestCase {
 		super.setUp();
 		this.init();
 	}
-		
+	
 	public void testSampler() {
 		DestinationSampler sampler = new DestinationSampler(
 				context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(), scenario.getConfig().locationchoice());
