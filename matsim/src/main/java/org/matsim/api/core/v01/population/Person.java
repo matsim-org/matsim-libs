@@ -30,7 +30,10 @@ import org.matsim.utils.customize.Customizable;
  */
 public interface Person extends Identifiable, Customizable{
 
-	public List<? extends Plan> getPlans();
+//	public List<? extends Plan> getPlans();
+	public List<Plan> getPlans();
+	// ("? extends Plan" is necessary when classes that implement persons want to use something that extends Plan.  This is not the
+	// case so far.  Could be changed if it becomes the case. kai, nov'13)
 
 	public void setId(final Id id);
 	/**

@@ -83,7 +83,7 @@ public class TtDgKoehlerStrehler2010Router {
 		}
 
 		@Override
-		public List<? extends Plan> getPlans() {
+		public List<Plan> getPlans() {
 			return null;
 		}
 
