@@ -27,7 +27,6 @@ package playground.ikaddoura;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
@@ -47,8 +46,7 @@ public class IKControler {
 			log.info("configFile: "+ configFile);
 			
 		} else {
-//			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-			configFile = "/Users/Ihab/Desktop/cottbus_input/config.xml";
+			configFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/cottbus/input/config.xml";
 		}
 		
 		IKControler main = new IKControler();
