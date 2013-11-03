@@ -70,7 +70,7 @@ public class BKickLegScoring extends CharyparNagelLegScoring {
 				throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 			}
 
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist
+			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * dist
 					* betaIncomeCar / this.incomePerTrip + betaIncomeCar * Math.log(this.incomePerTrip);
 		}
 		else if (TransportMode.pt.equals(leg.getMode())) {
@@ -79,7 +79,7 @@ public class BKickLegScoring extends CharyparNagelLegScoring {
 				if (Double.isNaN(dist)){
 					throw new IllegalStateException("Route distance is NaN for person: " + this.plan.getPerson().getId());
 				}
-				tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m
+				tmpScore += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m
 						* dist * betaIncomePt / this.incomePerTrip + betaIncomePt * Math.log(this.incomePerTrip);
 			}
 			else {

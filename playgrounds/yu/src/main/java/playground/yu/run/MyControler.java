@@ -108,7 +108,7 @@ public final class MyControler extends Controler {
 			double dist = 0.0; // distance in meters
 
 			if (TransportMode.car.equals(leg.getMode())) {
-				if (params.marginalUtilityOfDistanceCar_m != 0.0) {
+				if (params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 					Route route = leg.getRoute();
 					dist = route.getDistance();
 					if (Double.isNaN(dist)) {
@@ -134,37 +134,37 @@ public final class MyControler extends Controler {
 						distanceWrnCnt++;
 					}
 				}
-				tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-						+ params.marginalUtilityOfDistanceCar_m * dist;
-				tmpScore += params.constantCar;
+				tmpScore += travelTime * params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s
+						+ params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * dist;
+				tmpScore += params.modeParams.get(TransportMode.car).constant;
 			} else if (TransportMode.pt.equals(leg.getMode())) {
-				if (params.marginalUtilityOfDistancePt_m != 0.0) {
+				if (params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m != 0.0) {
 					dist = leg.getRoute().getDistance();
 				}
-				tmpScore += travelTime * params.marginalUtilityOfTravelingPT_s
-						+ params.marginalUtilityOfDistancePt_m * dist;
-				tmpScore += params.constantPt;
+				tmpScore += travelTime * params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s
+						+ params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * dist;
+				tmpScore += params.modeParams.get(TransportMode.pt).constant;
 			} else if (TransportMode.walk.equals(leg.getMode())
 					|| TransportMode.transit_walk.equals(leg.getMode())) {
-				if (params.marginalUtilityOfDistanceWalk_m != 0.0) {
+				if (params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0) {
 					dist = leg.getRoute().getDistance();
 				}
 				tmpScore += travelTime
-						* params.marginalUtilityOfTravelingWalk_s
-						+ params.marginalUtilityOfDistanceWalk_m * dist;
-				tmpScore += params.constantWalk;
+						* params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s
+						+ params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m * dist;
+				tmpScore += params.modeParams.get(TransportMode.walk).constant;
 			} else if (TransportMode.bike.equals(leg.getMode())) {
 				tmpScore += travelTime
-						* params.marginalUtilityOfTravelingBike_s;
-				tmpScore += params.constantBike;
+						* params.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s;
+				tmpScore += params.modeParams.get(TransportMode.bike).constant;
 			} else {
-				if (params.marginalUtilityOfDistanceCar_m != 0.0) {
+				if (params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 					dist = leg.getRoute().getDistance();
 				}
 				// use the same values as for "car"
-				tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-						+ params.marginalUtilityOfDistanceCar_m * dist;
-				tmpScore += params.constantCar;
+				tmpScore += travelTime * params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s
+						+ params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * dist;
+				tmpScore += params.modeParams.get(TransportMode.car).constant;
 			}
 
 			return tmpScore;

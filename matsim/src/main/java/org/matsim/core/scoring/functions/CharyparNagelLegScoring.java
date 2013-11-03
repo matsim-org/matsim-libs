@@ -33,6 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -105,62 +106,36 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
-		if (TransportMode.car.equals(leg.getMode())) {
-			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = getDistance(route);
+		Mode modeParams = this.params.modeParams.get(leg.getMode());
+		if (modeParams == null) {
+			if (leg.getMode().equals(TransportMode.transit_walk)) {
+				modeParams = this.params.modeParams.get(TransportMode.walk);
+			} else {
+				modeParams = this.params.modeParams.get(TransportMode.other);
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
-			tmpScore += this.params.constantCar ;
-			// (yyyy once we have multiple car legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
-		} else if (TransportMode.pt.equals(leg.getMode())) {
-			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistancePt_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = getDistance(route);
-				if ( Double.isNaN(dist) ) {
-					if ( ccc<10 ) {
-						ccc++ ;
-						Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: router does not " +
-								"write distance into plan.  Needs to be fixed or these plans will die out.") ;
-						if ( ccc==10 ) {
-							Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
-						}
-					}
+		}
+		double dist = 0.0; // distance in meters
+		if ( Double.isNaN(dist) ) {
+			if ( ccc<10 ) {
+				ccc++ ;
+				Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: router does not " +
+						"write distance into plan.  Needs to be fixed or these plans will die out.") ;
+				if ( ccc==10 ) {
+					Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
 				}
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m * dist;
-			
-			// (yy NOTE: pt wait is not separately scored!! --> should be done!  kai, nov'12)
-			// see below, but might be nicer to do it here.  kai, may'13, but added earlier than that
-
-			tmpScore += this.params.constantPt ;
-			// (yy NOTE: the pt constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
-			// see below, but might be nicer to do it here.  kai, dec'12
-
-		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
-			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = getDistance(route);
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * dist;
-			tmpScore += this.params.constantWalk ;
-		} else if (TransportMode.bike.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
-			tmpScore += this.params.constantBike ;
-			// (yyyy once we have multiple bike legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
-		} else {
-			double dist = 0.0; // distance in meters
-			if (this.params.marginalUtilityOfDistanceOther_m != 0.0) {
-				Route route = leg.getRoute();
-				dist = getDistance(route);
-			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingOther_s + this.params.marginalUtilityOfDistanceOther_m * dist;
-			tmpScore += this.params.constantOther ;
-			// (yyyy once we have multiple "other" legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
 		}
+		if (modeParams.marginalUtilityOfDistance_m != 0.0
+				|| modeParams.monetaryDistanceCostRate != 0.0) {
+			Route route = leg.getRoute();
+			dist = getDistance(route);
+		}
+		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
+		tmpScore += modeParams.marginalUtilityOfDistance_m * dist;
+		tmpScore += modeParams.monetaryDistanceCostRate * this.params.marginalUtilityOfMoney * dist;
+		tmpScore += modeParams.constant;
+		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
+		// (yy NOTE: the constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
 		return tmpScore;
 	}
 
@@ -192,14 +167,14 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 			}
 			this.nextEnterVehicleIsFirstOfTrip = false ;
 			// add score of waiting, _minus_ score of travelling (since it is added in the legscoring above):
-			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.marginalUtilityOfTravelingPT_s) ;
+			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s) ;
 		}
 
 		if ( event instanceof PersonDepartureEvent ) {
 			this.currentLegIsPtLeg = TransportMode.pt.equals( ((PersonDepartureEvent)event).getLegMode() );
 			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
-					this.score -= params.constantPt ;
+					this.score -= params.modeParams.get(TransportMode.pt).constant ;
 					// (yyyy deducting this again, since is it wrongly added above.  should be consolidated; this is so the code
 					// modification is minimally invasive.  kai, dec'12)
 				}

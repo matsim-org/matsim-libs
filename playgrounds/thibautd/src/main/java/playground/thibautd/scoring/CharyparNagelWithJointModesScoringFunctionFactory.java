@@ -90,8 +90,8 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 		parametersPerMode.put(
 					JointActingTypes.PASSENGER,
 					new LegScoringParameters(
-						params.constantCar,
-						params.marginalUtilityOfTraveling_s,
+						params.modeParams.get(TransportMode.car).constant,
+						params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s,
 						// passenger doesn't pay gasoline
 						0 ));
 	}

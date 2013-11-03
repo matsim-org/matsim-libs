@@ -102,14 +102,14 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 		final Collection<String> travelCards = ((PersonImpl) plan.getPerson()).getTravelcards();
 		final double utilityOfDistancePt =
 			travelCards == null || travelCards.isEmpty() ?
-				params.marginalUtilityOfDistancePt_m :
-				params.marginalUtilityOfDistancePt_m * ktiConfig.getTravelCardRatio();
+				params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m :
+				params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * ktiConfig.getTravelCardRatio();
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
 					TransportMode.pt,
 					new LegScoringParameters(
-						params.constantPt,
-						params.marginalUtilityOfTravelingPT_s,
+						params.modeParams.get(TransportMode.pt).constant,
+						params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s,
 						utilityOfDistancePt),
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(

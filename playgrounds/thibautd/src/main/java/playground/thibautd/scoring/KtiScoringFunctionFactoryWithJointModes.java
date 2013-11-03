@@ -20,6 +20,7 @@
 package playground.thibautd.scoring;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -93,16 +94,16 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 				new ElementalCharyparNagelLegScoringFunction(
 					JointActingTypes.DRIVER,
 					new LegScoringParameters(
-						params.constantCar,
-						params.marginalUtilityOfTraveling_s + additionalMarginalUtilOfBeingDriver_s,
-						params.marginalUtilityOfDistanceCar_m ),
+						params.modeParams.get(TransportMode.car).constant,
+						params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s + additionalMarginalUtilOfBeingDriver_s,
+						params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m ),
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
 					JointActingTypes.PASSENGER,
 					new LegScoringParameters(
-						params.constantCar,
-						params.marginalUtilityOfTraveling_s,
+						params.modeParams.get(TransportMode.car).constant,
+						params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s,
 						// passenger doesn't pay gasoline
 						0 ),
 					scenario.getNetwork()));

@@ -100,21 +100,21 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 		{
 			tmpScore += this.ftConfigGroup.getConstCar();
 			
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0D) {
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0D) {
 				Route r = leg.getRoute();
 				if (r instanceof NetworkRoute) {
 					dist =  RouteUtils.calcDistance((NetworkRoute) r, network);
 				} else {
 					dist = r.getDistance();
 				}
-				tmpScore += this.params.marginalUtilityOfDistanceCar_m * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
+				tmpScore += this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
+			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
 		}
 		else if (MyTransportMode.onewaycarsharing.equals(leg.getMode()))
 		{	
 			
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0D)
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0D)
 			{
 				Route r = leg.getRoute();
 				if (r instanceof NetworkRoute) {
@@ -122,10 +122,10 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 				} else {
 					dist = r.getDistance();
 				}
-				tmpScore += 1.2 * this.params.marginalUtilityOfDistanceCar_m * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
+				tmpScore += 1.2 * this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * this.ftConfigGroup.getDistanceCostCar() / 1000.0D * dist;
 			}
 			travelTime = arrivalTime - departureTime;
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
+			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
 		}
 		else if (MyTransportMode.onewaycarsharingwalk.equals(leg.getMode())) {
 			
@@ -168,7 +168,7 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 		}
 		else if (TransportMode.walk.equals(leg.getMode()))
 		{
-			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0D) {
+			if (this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0D) {
 				Route r = leg.getRoute();
 				if (r instanceof NetworkRoute) {
 					dist =  RouteUtils.calcDistance((NetworkRoute) r, network);
@@ -201,7 +201,7 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 		}
 		else
 		{
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0D) {
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0D) {
 				Route r = leg.getRoute();
 				if (r instanceof NetworkRoute) {
 					dist =  RouteUtils.calcDistance((NetworkRoute) r, network);
@@ -210,7 +210,7 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 				}
 			}
 
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
+			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * dist;
 		}
 
 		return tmpScore;
@@ -232,7 +232,7 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 	{
 		double score = 0.0D;
 
-		score += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * distance;
+		score += travelTime * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m * distance;
 
 		return score;
 	}
@@ -250,8 +250,8 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 		else {
 			throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
 		}
-		score += this.params.marginalUtilityOfDistancePt_m * distanceCost / 1000.0D * distance;
-		score += travelTime * this.params.marginalUtilityOfTravelingPT_s;
+		score += this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * distanceCost / 1000.0D * distance;
+		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
 		score += score += this.ftConfigGroup.getConstPt();
 
 		return score;

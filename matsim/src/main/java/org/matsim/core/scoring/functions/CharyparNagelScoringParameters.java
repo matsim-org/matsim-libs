@@ -22,115 +22,97 @@ package org.matsim.core.scoring.functions;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.pt.PtConstants;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
-	public final Map<String, ActivityUtilityParameters> utilParams ;
+	
+	public static class Mode {
+		private Mode(
+				double marginalUtilityOfTraveling_s,
+				double marginalUtilityOfDistance_m,
+				double monetaryDistanceCostRate,
+				double constant) {
+			this.marginalUtilityOfTraveling_s = marginalUtilityOfTraveling_s;
+			this.marginalUtilityOfDistance_m = marginalUtilityOfDistance_m;
+			this.monetaryDistanceCostRate = monetaryDistanceCostRate;
+			this.constant = constant;
+		}
+		public final double marginalUtilityOfTraveling_s;
+		public final double marginalUtilityOfDistance_m;
+		public final double monetaryDistanceCostRate;
+		public final double constant;
+	}
+	
+	public final Map<String, ActivityUtilityParameters> utilParams;
+	public final Map<String, Mode> modeParams;
 	public final double marginalUtilityOfWaiting_s;
 	public final double marginalUtilityOfLateArrival_s;
 	public final double marginalUtilityOfEarlyDeparture_s;
-	public final double marginalUtilityOfTraveling_s;
-	public final double marginalUtilityOfTravelingPT_s; // public transport
 	public final double marginalUtilityOfWaitingPt_s;
-	public final double marginalUtilityOfTravelingBike_s;
-	public final double marginalUtilityOfTravelingWalk_s;
-	public final double marginalUtilityOfTravelingOther_s;
 	public final double marginalUtilityOfPerforming_s;
-	
-	public final double constantCar ;
-	public final double constantWalk ;
-	public final double constantBike ;
-	public final double constantPt ;
-	public final double constantOther ;
-	
 	public final double utilityOfLineSwitch ;
-
-	@Deprecated
-	public final double marginalUtilityOfDistanceCar_m;
-	@Deprecated
-	public final double marginalUtilityOfDistancePt_m;
-	@Deprecated
-	public final double marginalUtilityOfDistanceOther_m;
-
-	public final double marginalUtilityOfDistanceWalk_m;
-
-	public final double monetaryDistanceCostRateCar;
-	public final double monetaryDistanceCostRatePt;
-	public final double monetaryDistanceCostRateWalk;
-	
 	public final double marginalUtilityOfMoney;
-
 	public final double abortedPlanScore;
-
-	/** True if at least one of marginal utilities for performing, waiting, being late or leaving early is not equal to 0. */
 	public final boolean scoreActs;
 
 	public CharyparNagelScoringParameters(final PlanCalcScoreConfigGroup config) {
 		marginalUtilityOfWaiting_s = config.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
 		marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
 		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
-		marginalUtilityOfTraveling_s = config.getTraveling_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingPT_s = config.getTravelingPt_utils_hr() / 3600.0;
 		marginalUtilityOfWaitingPt_s = config.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 ;
-		marginalUtilityOfTravelingBike_s = config.getTravelingBike_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingWalk_s = config.getTravelingWalk_utils_hr() / 3600.0;
-		marginalUtilityOfTravelingOther_s = config.getTravelingOther_utils_hr() / 3600.0;
 		marginalUtilityOfPerforming_s = config.getPerforming_utils_hr() / 3600.0;
-		
-		constantCar = config.getConstantCar() ;
-		constantBike = config.getConstantBike() ;
-		constantWalk = config.getConstantWalk() ;
-		constantPt = config.getConstantPt() ;
-		constantOther = config.getConstantOther() ;
-		
 		utilityOfLineSwitch = config.getUtilityOfLineSwitch() ;
-
-		
-
-		monetaryDistanceCostRateCar = config.getModes().get("car").getMonetaryDistanceCostRate();
-		monetaryDistanceCostRatePt = config.getModes().get("pt").getMonetaryDistanceCostRate();
-		monetaryDistanceCostRateWalk = config.getModes().get("walk").getMonetaryDistanceCostRate();
-		
 		marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
-		
-		marginalUtilityOfDistanceCar_m = monetaryDistanceCostRateCar * marginalUtilityOfMoney;
-		marginalUtilityOfDistancePt_m = monetaryDistanceCostRatePt * marginalUtilityOfMoney;
-
-		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
-		marginalUtilityOfDistanceOther_m = config.getMarginalUtlOfDistanceOther();
-
-		abortedPlanScore = Math.min(
-				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
-				Math.min(marginalUtilityOfTraveling_s-marginalUtilityOfPerforming_s, marginalUtilityOfWaiting_s-marginalUtilityOfPerforming_s)
-				) * 3600.0 * 24.0; // SCENARIO_DURATION
-		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
-		// This rather complicated definition has to do with the fact that exp(some_large_number) relatively quickly becomes Inf.
-		// In consequence, the abortedPlanScore needs to be more strongly negative than anything else, but not much more.  
-		// kai, feb'12
-
 		scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
 				marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
 
 		SortedMap<String,ActivityUtilityParameters> tmpUtlParams = new TreeMap<String, ActivityUtilityParameters>() ;
 		for (ActivityParams params : config.getActivityParams()) {
-			
 			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory(params) ;
-			
 			// the following was introduced in nov'12.  Also see setupTransitSimulation in Controler.  kai, nov'12
 			if (params.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				factory.setScoreAtAll(false) ;
 			}
 			tmpUtlParams.put(params.getType(), factory.create() ) ;
-
 		}
 		utilParams = Collections.unmodifiableMap(tmpUtlParams );
-
+		
+		SortedMap<String, Mode> tmpModeParams = new TreeMap<String, Mode>() ;
+		Map<String, ModeParams> modes = config.getModes();
+		double worstMarginalUtilityOfTraveling_s = 0.0;
+		for (Entry<String, ModeParams> mode : modes.entrySet()) {
+			String modeName = mode.getKey();
+			ModeParams modeParams = mode.getValue();
+			double marginalUtilityOfTraveling_s = modeParams.getTraveling() / 3600.0;
+			worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
+			double marginalUtilityOfDistance_m = modeParams.getDistance();
+			double monetaryDistanceCostRate = modeParams.getMonetaryDistanceCostRate();
+			double constant = modeParams.getConstant();
+			Mode newModeParams = new Mode(
+					marginalUtilityOfTraveling_s,
+					marginalUtilityOfDistance_m,
+					monetaryDistanceCostRate,
+					constant);
+			tmpModeParams.put(modeName, newModeParams);
+		}
+		modeParams = Collections.unmodifiableMap(tmpModeParams);
+		
+		abortedPlanScore = Math.min(
+				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
+				Math.min(worstMarginalUtilityOfTraveling_s-marginalUtilityOfPerforming_s, marginalUtilityOfWaiting_s-marginalUtilityOfPerforming_s)
+				) * 3600.0 * 24.0; // SCENARIO_DURATION
+		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
+		// This rather complicated definition has to do with the fact that exp(some_large_number) relatively quickly becomes Inf.
+		// In consequence, the abortedPlanScore needs to be more strongly negative than anything else, but not much more.  
+		// kai, feb'12
 	}
 
 }

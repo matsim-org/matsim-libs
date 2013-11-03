@@ -69,7 +69,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 		
 		if (TransportMode.car.equals(leg.getMode()) || JointActingTypes.DRIVER.equals( leg.getMode() ) ) {
 			double dist = 0.0;
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
 				try {
 					dist = DistanceCalculations.getLegDistance(route, network);
@@ -117,7 +117,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 		else if (TransportMode.transit_walk.equals(leg.getMode())){
 			
 			double distance = 0.0;
-			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0) {
 				distance = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
 					* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			}
@@ -138,7 +138,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 		}
 		else {
 			double dist = 0.0;
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				dist = DistanceCalculations.getLegDistance(leg.getRoute(), network);				
 			}
 			tmpScore += travelScoring.getAlternativeModeScore(dist, travelTime);

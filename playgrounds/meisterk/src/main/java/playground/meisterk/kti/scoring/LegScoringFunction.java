@@ -110,7 +110,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 			tmpScore += this.ktiConfigGroup.getConstCar();
 
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
 				/*
 				 * route.getDistance() is deprecated and might return null.
@@ -119,9 +119,9 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 				 * cdobler, Jan'12
 				 */
 				dist = getDistance(route);
-				tmpScore += this.params.marginalUtilityOfDistanceCar_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
+				tmpScore += this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
+			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 			/*
@@ -185,7 +185,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 		} else if (TransportMode.walk.equals(leg.getMode())) {
 
-			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += this.getWalkScore(dist, travelTime);
@@ -198,11 +198,11 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 		} else {
 
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
+			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * dist;
 
 		}
 		
@@ -215,7 +215,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 		double score = 0.0;
 
-		score += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * distance;
+		score += travelTime * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m * distance;
 
 		return score;
 
@@ -234,8 +234,8 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		} else {
 			throw new RuntimeException("Person " + this.plan.getPerson().getId() + " has an invalid travelcard. This should never happen.");
 		}
-		score += this.params.marginalUtilityOfDistancePt_m * distanceCost / 1000d * distance;
-		score += travelTime * this.params.marginalUtilityOfTravelingPT_s;
+		score += this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * distanceCost / 1000d * distance;
+		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
 
 		return score;
 

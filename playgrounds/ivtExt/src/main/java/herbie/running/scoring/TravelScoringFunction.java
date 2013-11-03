@@ -22,6 +22,7 @@ package herbie.running.scoring;
 
 import herbie.running.config.HerbieConfigGroup;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 
@@ -64,14 +65,14 @@ public class TravelScoringFunction {
 		
 		double timeThreashold = 20.0 * 60.0; // sec
 		
-		bikeScore += this.params.constantBike;
+		bikeScore += this.params.modeParams.get(TransportMode.bike).constant;
 		
 		if(travelTime <= timeThreashold) {
-			bikeScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
+			bikeScore += travelTime * this.params.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s;
 		}
 		else{
-			bikeScore += travelTime * this.params.marginalUtilityOfTravelingBike_s + 
-				3 * (travelTime - timeThreashold) * this.params.marginalUtilityOfTravelingBike_s;
+			bikeScore += travelTime * this.params.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s + 
+				3 * (travelTime - timeThreashold) * this.params.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s;
 		}
 		
 		bikeScore += distance * this.herbieConfigGroup.getMarginalDistanceCostRateBike() * this.params.marginalUtilityOfMoney;
@@ -83,13 +84,13 @@ public class TravelScoringFunction {
 		
 		double carScore = 0.0;
 		
-		carScore += this.params.constantCar;
+		carScore += this.params.modeParams.get(TransportMode.car).constant;
 		
-		carScore += travelTime * this.params.marginalUtilityOfTraveling_s;
+		carScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
 			
 //			carScore += this.params.marginalUtilityOfDistanceCar_m * this.params.monetaryDistanceCostRateCar/1000d * dist;
 			
-		carScore += this.params.marginalUtilityOfDistanceCar_m * distance;
+		carScore += this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * distance;
 		
 		return carScore;
 	}
@@ -112,20 +113,20 @@ public class TravelScoringFunction {
 //		}
 		
 		
-		walkScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s;
+		walkScore += travelTime * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s;
 		
 		if(travelTime > timeThreshold1) 
 		{
-			walkScore += 40d * (travelTime - timeThreshold1) * this.params.marginalUtilityOfTravelingWalk_s;
+			walkScore += 40d * (travelTime - timeThreshold1) * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s;
 		}
 		if (travelTime > timeThreshold2) 
 		{
-			walkScore += 0.3 * (travelTime - timeThreshold2) * this.params.marginalUtilityOfTravelingWalk_s;
+			walkScore += 0.3 * (travelTime - timeThreshold2) * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s;
 		}
 		
 //		walkScore += Math.pow(travelTime, 2) * this.params.marginalUtilityOfTravelingWalk_s;
 		
-		walkScore += this.params.marginalUtilityOfDistanceWalk_m * distance;
+		walkScore += this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m * distance;
 		
 		return walkScore;
 	}
@@ -140,13 +141,13 @@ public class TravelScoringFunction {
 		
 		double ptScore = 0.0;
 		
-		ptScore += this.params.constantPt;
+		ptScore += this.params.modeParams.get(TransportMode.pt).constant;
 		
-		double marPt = this.params.marginalUtilityOfTravelingPT_s;
+		double marPt = this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
 		
-		ptScore += travelTime * this.params.marginalUtilityOfTravelingPT_s;
+		ptScore += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
 		
-		ptScore += this.params.marginalUtilityOfDistancePt_m * distanceCost * distance;
+		ptScore += this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m * distanceCost * distance;
 		
 		return ptScore;
 	}

@@ -91,7 +91,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		
 		if (TransportMode.car.equals(leg.getMode())) {
 			double dist = 0.0;
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
 				dist = DistanceCalculations.getLegDistance(route, network);
 				
@@ -139,7 +139,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		}else if (TransportMode.transit_walk.equals(leg.getMode())){
 			
 			double distance = 0.0;
-			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0) {
 				distance = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
 					* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			}
@@ -154,7 +154,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		} else {
 			
 			double dist = 0.0;
-			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				dist = DistanceCalculations.getLegDistance(leg.getRoute(), network);				
 //				carScore += this.params.marginalUtilityOfDistanceCar_m * this.params.monetaryDistanceCostRateCar/1000d * dist;
 			}

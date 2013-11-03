@@ -138,17 +138,17 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 //			}
 			Route route = leg.getRoute();
 			double dist = getDistance(route);
-			double monetaryCostsCar = dist * this.params.monetaryDistanceCostRateCar;
+			double monetaryCostsCar = dist * this.params.modeParams.get(TransportMode.car).monetaryDistanceCostRate;
 			tmpScore += monetaryCostsCar * this.params.marginalUtilityOfMoney;
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
-			tmpScore += this.params.constantCar ;
+			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
+			tmpScore += this.params.modeParams.get(TransportMode.car).constant ;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 
-			tmpScore += this.params.constantPt;
+			tmpScore += this.params.modeParams.get(TransportMode.pt).constant;
 
 		} else if (TransportMode.transit_walk.equals(leg.getMode())) {
-			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
+			if (this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0) {
 				throw new RuntimeException("Marginal utility of distance walk is deprecated and should not be used. Aborting...");
 			}
 			

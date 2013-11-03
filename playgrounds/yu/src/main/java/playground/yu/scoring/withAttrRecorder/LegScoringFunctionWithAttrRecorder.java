@@ -67,7 +67,7 @@ public class LegScoringFunctionWithAttrRecorder extends CharyparNagelLegScoring 
 		double dist = 0.0; // distance in meters
 
 		if (TransportMode.car.equals(leg.getMode())) {
-			if (params.monetaryDistanceCostRateCar != 0.0) {
+			if (params.modeParams.get(TransportMode.car).monetaryDistanceCostRate != 0.0) {
 				Route route = leg.getRoute();
 				// dist = route.getDistance();
 				dist = RouteUtils.calcDistance((NetworkRoute) route, network);
@@ -92,23 +92,23 @@ public class LegScoringFunctionWithAttrRecorder extends CharyparNagelLegScoring 
 			}
 			// distanceCar attr
 			distanceAttrCar += params.marginalUtilityOfMoney * dist;
-			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-					+ params.monetaryDistanceCostRateCar * dist
-					+ params.constantCar;
+			tmpScore += travelTime * params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s
+					+ params.modeParams.get(TransportMode.car).monetaryDistanceCostRate * dist
+					+ params.modeParams.get(TransportMode.car).constant;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
 			// constantCar attr
 			carLegNo++;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-			if (params.monetaryDistanceCostRatePt != 0.0) {
+			if (params.modeParams.get(TransportMode.pt).monetaryDistanceCostRate != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			// distancePt attr
 			distanceAttrPt += params.marginalUtilityOfMoney * dist;
-			tmpScore += travelTime * params.marginalUtilityOfTravelingPT_s
-					+ params.monetaryDistanceCostRatePt * dist
-					+ params.constantPt;
+			tmpScore += travelTime * params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s
+					+ params.modeParams.get(TransportMode.pt).monetaryDistanceCostRate * dist
+					+ params.modeParams.get(TransportMode.pt).constant;
 			// travelingPt attr
 			travTimeAttrPt += travelTime / 3600d;
 			// constantPt attr
@@ -116,12 +116,12 @@ public class LegScoringFunctionWithAttrRecorder extends CharyparNagelLegScoring 
 
 		} else if (TransportMode.walk.equals(leg.getMode())
 				|| TransportMode.transit_walk.equals(leg.getMode())) {
-			if (params.marginalUtilityOfDistanceWalk_m != 0.0) {
+			if (params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
-			tmpScore += travelTime * params.marginalUtilityOfTravelingWalk_s
-					+ params.marginalUtilityOfDistanceWalk_m * dist
-					+ params.constantWalk;
+			tmpScore += travelTime * params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s
+					+ params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m * dist
+					+ params.modeParams.get(TransportMode.walk).constant;
 			// travelingWalk attr
 			travTimeAttrWalk += travelTime / 3600d;
 			// constantWalk attr
@@ -132,16 +132,16 @@ public class LegScoringFunctionWithAttrRecorder extends CharyparNagelLegScoring 
 			// tmpScore += travelTime * params.marginalUtilityOfTravelingBike_s;
 			// tmpScore += params.constantBike;
 		} else {// other mode?
-			if (params.monetaryDistanceCostRateCar != 0.0) {
+			if (params.modeParams.get(TransportMode.car).monetaryDistanceCostRate != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			// distanceCar attr
 			distanceAttrCar += params.marginalUtilityOfMoney * dist;
 
 			// use the same values as for "car"
-			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-					+ params.monetaryDistanceCostRateCar * dist
-					+ params.constantCar;
+			tmpScore += travelTime * params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s
+					+ params.modeParams.get(TransportMode.car).monetaryDistanceCostRate * dist
+					+ params.modeParams.get(TransportMode.car).constant;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
 			// constantCar attr

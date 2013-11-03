@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
@@ -109,15 +110,15 @@ public class PlanCalcScoreConfigGroup extends Module {
 	
 	{
 		ModeParams car = new ModeParams();
-		modes.put("car", car);
+		modes.put(TransportMode.car, car);
 		ModeParams pt = new ModeParams();
-		modes.put("pt", pt);
+		modes.put(TransportMode.pt, pt);
 		ModeParams walk = new ModeParams();
-		modes.put("walk", walk);
+		modes.put(TransportMode.walk, walk);
 		ModeParams bike = new ModeParams();
-		modes.put("bike", bike);
+		modes.put(TransportMode.bike, bike);
 		ModeParams other = new ModeParams();
-		modes.put("other", other);
+		modes.put(TransportMode.other, other);
 	}
 
 	private double waiting = -0.0;
@@ -458,31 +459,31 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	public double getTraveling_utils_hr() {
-		return this.modes.get("car").getTraveling();
+		return this.modes.get(TransportMode.car).getTraveling();
 	}
 	public void setTraveling_utils_hr(final double traveling) {
-		this.modes.get("car").setTraveling(traveling);
+		this.modes.get(TransportMode.car).setTraveling(traveling);
 	}
 
 	public double getTravelingPt_utils_hr() {
-		return this.modes.get("pt").getTraveling();
+		return this.modes.get(TransportMode.pt).getTraveling();
 	}
 	public void setTravelingPt_utils_hr(final double travelingPt) {
-		this.modes.get("pt").setTraveling(travelingPt);
+		this.modes.get(TransportMode.pt).setTraveling(travelingPt);
 	}
 
 	public double getTravelingBike_utils_hr() {
-		return this.modes.get("bike").getTraveling();
+		return this.modes.get(TransportMode.bike).getTraveling();
 	}
 	public void setTravelingBike_utils_hr(final double travelingBike) {
-		this.modes.get("bike").setTraveling(travelingBike);
+		this.modes.get(TransportMode.bike).setTraveling(travelingBike);
 	}
 
 	public double getTravelingWalk_utils_hr() {
-		return this.modes.get("walk").getTraveling();
+		return this.modes.get(TransportMode.walk).getTraveling();
 	}
 	public void setTravelingWalk_utils_hr(final double travelingWalk) {
-		this.modes.get("walk").setTraveling(travelingWalk);
+		this.modes.get(TransportMode.walk).setTraveling(travelingWalk);
 	}
 	/**
 	 * @return the marginal utility of distance for mode walk per meter
@@ -490,7 +491,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
 	 */
 	public double getMarginalUtlOfDistanceWalk() {
-		return this.modes.get("walk").getDistance();
+		return this.modes.get(TransportMode.walk).getDistance();
 	}
 	/**
 	 * @param marginalUtlOfDistanceWalk the marginal utility of distance for mode walk per meter
@@ -498,7 +499,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
 	 */
 	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
-		this.modes.get("walk").setDistance(marginalUtlOfDistanceWalk);
+		this.modes.get(TransportMode.walk).setDistance(marginalUtlOfDistanceWalk);
 	}
 
 	/**
@@ -506,7 +507,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
-		this.modes.get("pt").setDistance(marginalUtlOfDistancePt);
+		this.modes.get(TransportMode.pt).setDistance(marginalUtlOfDistancePt);
 	}
 
 	/**
@@ -514,7 +515,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	 */
 	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
-		this.modes.get("car").setDistance(marginalUtlOfDistanceCar);
+		this.modes.get(TransportMode.car).setDistance(marginalUtlOfDistanceCar);
 	}
 
 	public double getMarginalUtlOfWaiting_utils_hr() {
@@ -526,7 +527,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	
 	public double getMarginalUtlOfWaitingPt_utils_hr() {
 		if ( this.waitingPt==null ) {
-			return this.modes.get("pt").getTraveling();
+			return this.modes.get(TransportMode.pt).getTraveling();
 		} else {
 			return this.waitingPt ;
 		}
@@ -646,8 +647,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 		private double traveling = -6.0;
 		private double distance = 0.0;
-		private double constant = 0.0;
 		private double monetaryDistanceCostRate = 0.0;
+		private double constant = 0.0;
 
 		public void setTraveling(double traveling) {
 			this.traveling = traveling;
@@ -692,19 +693,19 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	public double getMonetaryDistanceCostRateCar() {
-		return this.modes.get("car").getMonetaryDistanceCostRate();
+		return this.modes.get(TransportMode.car).getMonetaryDistanceCostRate();
 	}
 
 	public void setMonetaryDistanceCostRateCar(double monetaryDistanceCostRateCar) {
-		this.modes.get("car").setMonetaryDistanceCostRate(monetaryDistanceCostRateCar);
+		this.modes.get(TransportMode.car).setMonetaryDistanceCostRate(monetaryDistanceCostRateCar);
 	}
 
 	public double getMonetaryDistanceCostRatePt() {
-		return this.modes.get("pt").getMonetaryDistanceCostRate();
+		return this.modes.get(TransportMode.pt).getMonetaryDistanceCostRate();
 	}
 
 	public void setMonetaryDistanceCostRatePt(double monetaryDistanceCostRatePt) {
-		this.modes.get("pt").setMonetaryDistanceCostRate(monetaryDistanceCostRatePt);
+		this.modes.get(TransportMode.pt).setMonetaryDistanceCostRate(monetaryDistanceCostRatePt);
 	}
 
 	public Double getUtilityOfLineSwitch() {
@@ -716,59 +717,59 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	public double getConstantCar() {
-		return modes.get("car").getConstant();
+		return modes.get(TransportMode.car).getConstant();
 	}
 
 	public void setConstantCar(double constantCar) {
-		modes.get("car").setConstant(constantCar);
+		modes.get(TransportMode.car).setConstant(constantCar);
 	}
 
 	public double getConstantWalk() {
-		return modes.get("walk").getConstant();
+		return modes.get(TransportMode.walk).getConstant();
 	}
 
 	public void setConstantWalk(double constantWalk) {
-		modes.get("walk").setConstant(constantWalk);
+		modes.get(TransportMode.walk).setConstant(constantWalk);
 	}
 
 	public double getConstantPt() {
-		return modes.get("pt").getConstant();
+		return modes.get(TransportMode.pt).getConstant();
 	}
 
 	public void setConstantPt(double constantPt) {
-		modes.get("pt").setConstant(constantPt);
+		modes.get(TransportMode.pt).setConstant(constantPt);
 	}
 
 	public double getConstantBike() {
-		return modes.get("bike").getConstant();
+		return modes.get(TransportMode.bike).getConstant();
 	}
 
 	public void setConstantBike(double constantBike) {
-		modes.get("bike").setConstant(constantBike);
+		modes.get(TransportMode.bike).setConstant(constantBike);
 	}
 
 	public double getTravelingOther_utils_hr() {
-		return modes.get("other").getTraveling();
+		return modes.get(TransportMode.other).getTraveling();
 	}
 
 	public double getConstantOther() {
-		return modes.get("other").getConstant();
+		return modes.get(TransportMode.other).getConstant();
 	}
 
 	public double getMarginalUtlOfDistanceOther() {
-		return modes.get("other").getDistance();
+		return modes.get(TransportMode.other).getDistance();
 	}
 
 	public void setMarginalUtlOfDistanceOther(double marginalUtlOfDistanceOther) {
-		this.modes.get("other").setDistance(marginalUtlOfDistanceOther);
+		this.modes.get(TransportMode.other).setDistance(marginalUtlOfDistanceOther);
 	}
 
 	public void setConstantOther(double constantOther) {
-		modes.get("other").setConstant(constantOther);
+		modes.get(TransportMode.other).setConstant(constantOther);
 	}
 
 	public void setTravelingOther_utils_hr(double travelingOtherUtilsHr) {
-		this.modes.get("other").setTraveling(travelingOtherUtilsHr);
+		this.modes.get(TransportMode.other).setTraveling(travelingOtherUtilsHr);
 	}
 
 	public boolean isWriteExperiencedPlans() {

@@ -25,6 +25,7 @@ package playground.yu.scoring.withAttrRecorder;
 
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -189,7 +190,7 @@ public class ScoringFunctionAccumulatorWithAttrRecorder extends
 				double betaStuck = Math.min(Math.min(
 						params.marginalUtilityOfLateArrival_s,
 						params.marginalUtilityOfEarlyDeparture_s), Math.min(
-						params.marginalUtilityOfTraveling_s,
+						params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s,
 						params.marginalUtilityOfWaiting_s));
 
 				stuckAttr = betaStuck != 0d ? fracScore / (betaStuck * 3600d)

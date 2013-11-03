@@ -130,7 +130,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 
 		if (TransportMode.car.equals(leg.getMode())) {
 
-			if (this.charyparNagelParameters.monetaryDistanceCostRateCar != 0.0) {
+			if (this.charyparNagelParameters.modeParams.get(TransportMode.car).monetaryDistanceCostRate != 0.0) {
 
 				dist = leg.getRoute().getDistance(); // Should be RouteUtils.calcDistance(route, network)
 				dist += this.network.getLinks().get(leg.getRoute().getEndLinkId()).getLength();
@@ -156,27 +156,27 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			}
 
 			// add travel time related part
-			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTraveling_s;
+			tmpScore += travelTime * this.charyparNagelParameters.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
 
 			// add distance related part
-			tmpScore += dist * this.charyparNagelParameters.monetaryDistanceCostRateCar * this.charyparNagelParameters.marginalUtilityOfMoney;
+			tmpScore += dist * this.charyparNagelParameters.modeParams.get(TransportMode.car).monetaryDistanceCostRate * this.charyparNagelParameters.marginalUtilityOfMoney;
 
 			// add offset for using car mode
 			tmpScore += this.bvgParameters.offsetCar * this.bvgParameters.betaOffsetCar * this.charyparNagelParameters.marginalUtilityOfMoney;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 
-			if (this.charyparNagelParameters.monetaryDistanceCostRatePt != 0.0) {
+			if (this.charyparNagelParameters.modeParams.get(TransportMode.pt).monetaryDistanceCostRate != 0.0) {
 				// Should be ok, since pt legs are handled in a different way
 				dist = leg.getRoute().getDistance();
 			}
 
 			// add travel time related part
-			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTravelingPT_s;
+			tmpScore += travelTime * this.charyparNagelParameters.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
 
 			// add distance related part, as of jan 2011 transit_walk and pt distance is not set
 			if(!Double.isNaN(dist)){
-				tmpScore += dist * this.charyparNagelParameters.monetaryDistanceCostRatePt * this.charyparNagelParameters.marginalUtilityOfMoney;
+				tmpScore += dist * this.charyparNagelParameters.modeParams.get(TransportMode.pt).monetaryDistanceCostRate * this.charyparNagelParameters.marginalUtilityOfMoney;
 			}
 
 			// add offset for using pt mode
@@ -190,7 +190,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			}
 
 			// add travel time related part
-			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTraveling_s;
+			tmpScore += travelTime * this.charyparNagelParameters.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;
 
 			// add distance related part
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateRide * this.charyparNagelParameters.marginalUtilityOfMoney;
@@ -206,7 +206,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			}
 
 			// add travel time related part
-			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTravelingBike_s;
+			tmpScore += travelTime * this.charyparNagelParameters.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s;
 
 			// add distance related part
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateBike * this.charyparNagelParameters.marginalUtilityOfMoney;
@@ -222,7 +222,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			}
 
 			// add travel time related part
-			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTravelingWalk_s;
+			tmpScore += travelTime * this.charyparNagelParameters.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s;
 
 			// add distance related part
 			tmpScore += dist * this.bvgParameters.monetaryDistanceCostRateWalk * this.charyparNagelParameters.marginalUtilityOfMoney;
@@ -238,7 +238,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 			}
 
 			// add travel time related part
-			tmpScore += travelTime * this.charyparNagelParameters.marginalUtilityOfTravelingWalk_s;
+			tmpScore += travelTime * this.charyparNagelParameters.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s;
 
 			// add distance related part, as of jan 2011 transit_walk and pt distance is not set
 			if(!Double.isNaN(dist)){
