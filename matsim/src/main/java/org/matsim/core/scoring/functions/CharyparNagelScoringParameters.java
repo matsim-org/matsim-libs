@@ -62,6 +62,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 
 	public final double monetaryDistanceCostRateCar;
 	public final double monetaryDistanceCostRatePt;
+	public final double monetaryDistanceCostRateWalk;
+	
 	public final double marginalUtilityOfMoney;
 
 	public final double abortedPlanScore;
@@ -89,15 +91,19 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		
 		utilityOfLineSwitch = config.getUtilityOfLineSwitch() ;
 
-		marginalUtilityOfDistanceCar_m = config.getMonetaryDistanceCostRateCar() * config.getMarginalUtilityOfMoney() ;
-		marginalUtilityOfDistancePt_m = config.getMonetaryDistanceCostRatePt() * config.getMarginalUtilityOfMoney() ;
+		
+
+		monetaryDistanceCostRateCar = config.getModes().get("car").getMonetaryDistanceCostRate();
+		monetaryDistanceCostRatePt = config.getModes().get("pt").getMonetaryDistanceCostRate();
+		monetaryDistanceCostRateWalk = config.getModes().get("walk").getMonetaryDistanceCostRate();
+		
+		marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
+		
+		marginalUtilityOfDistanceCar_m = monetaryDistanceCostRateCar * marginalUtilityOfMoney;
+		marginalUtilityOfDistancePt_m = monetaryDistanceCostRatePt * marginalUtilityOfMoney;
 
 		marginalUtilityOfDistanceWalk_m = config.getMarginalUtlOfDistanceWalk();
 		marginalUtilityOfDistanceOther_m = config.getMarginalUtlOfDistanceOther();
-
-		monetaryDistanceCostRateCar = config.getMonetaryDistanceCostRateCar() ;
-		monetaryDistanceCostRatePt = config.getMonetaryDistanceCostRatePt();
-		marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
 
 		abortedPlanScore = Math.min(
 				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
