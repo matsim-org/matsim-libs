@@ -26,8 +26,8 @@ import org.matsim.core.events.MatsimEventsReader;
 
 public class ExtCostMain {
 	
-	private String eventsFile = "/Users/Ihab/Desktop/events_MCP_18_9min.xml";
-	private String outputFolder = "/Users/Ihab/Desktop/ptTripAnalysis_events_MCP_18_9min";
+	private String eventsFile = "/Users/Ihab/Desktop/events_0.725_3min.xml.gz";
+	private String outputFolder = "/Users/Ihab/Desktop/constFare_3min_0.725";
 	
 	public static void main(String[] args) {
 		ExtCostMain anaMain = new ExtCostMain();
@@ -52,12 +52,12 @@ public class ExtCostMain {
 		System.out.println("Writing output files...");
 
 		PtTripInfoWriter writer = new PtTripInfoWriter(handler1, outputFolder);
-//		writer.writeResults1();
+		writer.writeResults1();
 		writer.writeAvgFares1();
-//		writer.writeAvgFares2();
-//		writer.writeAvgFares3();
+		writer.writeAvgFares2();
+		writer.writeAvgFares3();
 		writer.writeAvgFares4();
-//		writer.writeAvgFares5();
+		writer.writeAvgFares5();
 		
 		System.out.println("Writing output files... Done.");
 

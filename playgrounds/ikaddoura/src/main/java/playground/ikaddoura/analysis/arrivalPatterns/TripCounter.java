@@ -43,9 +43,11 @@ import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHan
  */
 public class TripCounter implements AgentWaitingForPtEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler {
 	
-	private Map<Id, Double> startWaitingForPt = new HashMap<Id, Double>();
+	private Map<Id, Double> personId2startWaitingForPt = new HashMap<Id, Double>();
 	private Map<Double, Integer> waitingTimeAllocation = new TreeMap<Double, Integer>();
 	private List<Double> differenceList = new ArrayList<Double>();
+	private Map<Id, Double> personId2WaitingTime = new HashMap<Id, Double>();
+
 	private List<Id> worker = new ArrayList<Id>();
 	private int counterTotal = 0;
 	private double waitingTimeTotalSum = 0.0;
@@ -84,7 +86,7 @@ public class TripCounter implements AgentWaitingForPtEventHandler, PersonEntersV
 	@Override
 	public void handleEvent(AgentWaitingForPtEvent event) {
 		
-		this.startWaitingForPt.put(event.getPersonId(), event.getTime());
+		this.personId2startWaitingForPt.put(event.getPersonId(), event.getTime());
 		counterTotal++;
 		
 		if (event.getPersonId().toString().contains("Work")){
@@ -114,10 +116,12 @@ public class TripCounter implements AgentWaitingForPtEventHandler, PersonEntersV
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		
-		if (startWaitingForPt.containsKey(event.getPersonId())){
-			waitingTimeTmp = event.getTime() - startWaitingForPt.get(event.getPersonId());
+		if (personId2startWaitingForPt.containsKey(event.getPersonId())){
+			waitingTimeTmp = event.getTime() - personId2startWaitingForPt.get(event.getPersonId());
 			waitingTimeTotalSum = waitingTimeTotalSum + waitingTimeTmp;
 			differenceList.add(waitingTimeTmp);
+			personId2WaitingTime.put(event.getPersonId(), waitingTimeTmp);
+			
 			java.util.Collections.sort(differenceList);
 			
 			if (waitingTimeAllocation.get(waitingTimeTmp) == null) {
@@ -173,13 +177,31 @@ public class TripCounter implements AgentWaitingForPtEventHandler, PersonEntersV
 		File folder = new File(outputFolder);
 		folder.mkdirs();
 		
-		try {//raw data difference List
-			BufferedWriter br  = new BufferedWriter(new FileWriter(new File(outputFolder+"rawDataDifferenceList.csv")));
+//		try {//raw data difference List
+//			BufferedWriter br  = new BufferedWriter(new FileWriter(new File(outputFolder+"rawDataDifferenceList.csv")));
+//			
+//			br.write("waiting time");
+//			
+//			for(int x = 0; x < differenceList.size(); x++){
+//			br.write("\n"+ differenceList.get(x));
+//			}
+//			
+//			br.close();
+//			
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		
+		try {
+			BufferedWriter br  = new BufferedWriter(new FileWriter(new File(outputFolder+"personId2startWaitingForPt.csv")));
 			
-			br.write("waiting time");
-			
-			for(int x = 0; x < differenceList.size(); x++){
-			br.write("\n"+ differenceList.get(x));
+			br.write("person Id;start waiting time");
+			br.newLine();
+			for (Id id : this.personId2startWaitingForPt.keySet()){
+				br.write(id+";"+this.personId2startWaitingForPt.get(id));
+				br.newLine();
 			}
 			
 			br.close();
@@ -191,12 +213,13 @@ public class TripCounter implements AgentWaitingForPtEventHandler, PersonEntersV
 		}
 		
 		try {
-			BufferedWriter br  = new BufferedWriter(new FileWriter(new File(outputFolder+"waitingTime_Frequency.csv")));
+			BufferedWriter br  = new BufferedWriter(new FileWriter(new File(outputFolder+"personId2waitingTime.csv")));
 			
-			br.write("Waiting time; frequency");
-			
-			for(double key : waitingTimeAllocation.keySet()){
-			br.write("\n"+key+"; "+ waitingTimeAllocation.get(key));
+			br.write("person Id;start waiting time");
+			br.newLine();
+			for (Id id : this.personId2WaitingTime.keySet()){
+				br.write(id + ";" + this.personId2WaitingTime.get(id));
+				br.newLine();
 			}
 			
 			br.close();
@@ -207,85 +230,102 @@ public class TripCounter implements AgentWaitingForPtEventHandler, PersonEntersV
 			e.printStackTrace();
 		}
 		
-		System.out.println();
-		System.out.println();
-		System.out.println("### Beginn Auswertung ###");
-		System.out.println();
-		
-		waitingTimeTotalAvg = waitingTimeTotalSum/counterTotal;
-		
-		minValue = differenceList.get(0);
-		System.out.println("Der minimale Wert der Wartezeit beträgt: "+minValue+" Sekunden.");
-		maxValue = differenceList.get(differenceList.size()-1);
-		System.out.println("Der maximale Wert der Wartezeit beträgt: "+maxValue+" Sekunden.");
-		
-		median = differenceList.get((differenceList.size()-1)/2);
-		System.out.println("Der Median der Wartezeit in Sekunden: " + median);
-		lowerQuartile = differenceList.get((differenceList.size()-1)*1/4);
-		System.out.println("Das untere Quartil der Wartezeit in Sekunden: " + lowerQuartile);
-		upperQuartile = differenceList.get((differenceList.size()-1)*3/4);
-		System.out.println("Das obere Quartil der Wartezeit in Sekunden: " + upperQuartile);
-		
-		System.out.println("Durchschnittliche Wartezeit in Sekunden: " + waitingTimeTotalAvg);
-		
-		System.out.println();
-		
-		for(int i = 0 ; i<20 ; i++){
-			waitingTimePerHourAvg[i] = waitingTimePerHour[i]/waitingCounterPerHour[i];
-		}
-		
-		waitingTimetAvgWork = waitingTimeWork/waitingCounterWork;
-		waitingTimeAvgOther = waitingTimeOther/waitingCounterOther;
-		
-		for(int i = 0 ; i<20 ; i++){
-			System.out.println("Durchschnittliche Wartezeit zwischen "+(i+4)+" und "+(i+5)+" Uhr: " + waitingTimePerHourAvg[i]+", Anzahl Fahrten: "+ waitingCounterPerHour[i]);
-		}
-
-		System.out.println("Durchschnittliche Wartezeit 'Work': " + waitingTimetAvgWork);
-		System.out.println("Durchschnittliche Wartezeit 'Other': " + waitingTimeAvgOther);
-		System.out.println();
-		
-		int numberColumns;
-
-		numberColumns = 10;
-
-//		int widthColumns = 30;
-//		numberColumns = (int) maxValue/widthColumns;
-				
-		Map<String, Integer> frequencyColumns = new HashMap<String, Integer>();
-		int tmpNumberPerColumn = 0;
-		
-		//Spaltenweise darstellen:Balkendarstellung
-		for(int d=0;d<numberColumns;d++){
-			for(int p=0; p<differenceList.size(); p++ ) {
-				if ((differenceList.get(p)>=(d*((maxValue-minValue+1)/numberColumns))) && (differenceList.get(p)<((d+1)*((maxValue-minValue+1)/numberColumns)))){
-					if(frequencyColumns.get((int) (d*((maxValue-minValue+1)/numberColumns)+0.5001)+" bis "+(((int) ((d+1)*((maxValue-minValue+1)/numberColumns)-0.0001)))) == null){
-					frequencyColumns.put((int) (d* ((maxValue-minValue+1)/numberColumns)+0.5001)+" bis "+(((int) ((d+1)*((maxValue-minValue+1)/numberColumns)-0.0001))), 1);
-					} else {
-						tmpNumberPerColumn = frequencyColumns.get((int) (d*((maxValue-minValue+1)/numberColumns)+0.5001)+" bis "+(((int) ((d+1)*((maxValue-minValue+1)/numberColumns)-0.0001))));
-						frequencyColumns.put((int) (d*((maxValue-minValue+1)/numberColumns)+0.5001)+" bis "+(((int) ((d+1)*((maxValue-minValue+1)/numberColumns)-0.0001))), tmpNumberPerColumn + 1);
-					}
-				}
-		
-			}
-		}
-		
-		try { //Column Diagram
-			BufferedWriter br  = new BufferedWriter(new FileWriter(new File(outputFolder+"columns.csv")));
-			
-			br.write("Waiting time; frequency");
-			
-			for(String key : frequencyColumns.keySet()){
-			br.write("\n"+key+"; "+ frequencyColumns.get(key));
-			}
-			
-			br.close();
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			BufferedWriter br  = new BufferedWriter(new FileWriter(new File(outputFolder+"waitingTime_Frequency.csv")));
+//			
+//			br.write("Waiting time; frequency");
+//			
+//			for(double key : waitingTimeAllocation.keySet()){
+//			br.write("\n"+key+"; "+ waitingTimeAllocation.get(key));
+//			}
+//			
+//			br.close();
+//			
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		System.out.println();
+//		System.out.println();
+//		System.out.println("### Beginn Auswertung ###");
+//		System.out.println();
+//		
+//		waitingTimeTotalAvg = waitingTimeTotalSum/counterTotal;
+//		
+//		minValue = differenceList.get(0);
+//		System.out.println("Der minimale Wert der Wartezeit beträgt: "+minValue+" Sekunden.");
+//		maxValue = differenceList.get(differenceList.size()-1);
+//		System.out.println("Der maximale Wert der Wartezeit beträgt: "+maxValue+" Sekunden.");
+//		
+//		median = differenceList.get((differenceList.size()-1)/2);
+//		System.out.println("Der Median der Wartezeit in Sekunden: " + median);
+//		lowerQuartile = differenceList.get((differenceList.size()-1)*1/4);
+//		System.out.println("Das untere Quartil der Wartezeit in Sekunden: " + lowerQuartile);
+//		upperQuartile = differenceList.get((differenceList.size()-1)*3/4);
+//		System.out.println("Das obere Quartil der Wartezeit in Sekunden: " + upperQuartile);
+//		
+//		System.out.println("Durchschnittliche Wartezeit in Sekunden: " + waitingTimeTotalAvg);
+//		
+//		System.out.println();
+//		
+//		for(int i = 0 ; i<20 ; i++){
+//			waitingTimePerHourAvg[i] = waitingTimePerHour[i]/waitingCounterPerHour[i];
+//		}
+//		
+//		waitingTimetAvgWork = waitingTimeWork/waitingCounterWork;
+//		waitingTimeAvgOther = waitingTimeOther/waitingCounterOther;
+//		
+//		for(int i = 0 ; i<20 ; i++){
+//			System.out.println("Durchschnittliche Wartezeit zwischen "+(i+4)+" und "+(i+5)+" Uhr: " + waitingTimePerHourAvg[i]+", Anzahl Fahrten: "+ waitingCounterPerHour[i]);
+//		}
+//
+//		System.out.println("Durchschnittliche Wartezeit 'Work': " + waitingTimetAvgWork);
+//		System.out.println("Durchschnittliche Wartezeit 'Other': " + waitingTimeAvgOther);
+//		System.out.println();
+//		
+//		int numberColumns;
+//
+//		numberColumns = 10;
+//
+////		int widthColumns = 30;
+////		numberColumns = (int) maxValue/widthColumns;
+//				
+//		Map<String, Integer> frequencyColumns = new HashMap<String, Integer>();
+//		int tmpNumberPerColumn = 0;
+//		
+//		//Spaltenweise darstellen:Balkendarstellung
+//		for(int d=0;d<numberColumns;d++){
+//			for(int p=0; p<differenceList.size(); p++ ) {
+//				if ((differenceList.get(p)>=(d*((maxValue-minValue+1)/numberColumns))) && (differenceList.get(p)<((d+1)*((maxValue-minValue+1)/numberColumns)))){
+//					if(frequencyColumns.get((int) (d*((maxValue-minValue+1)/numberColumns)+0.5001)+" bis "+(((int) ((d+1)*((maxValue-minValue+1)/numberColumns)-0.0001)))) == null){
+//					frequencyColumns.put((int) (d* ((maxValue-minValue+1)/numberColumns)+0.5001)+" bis "+(((int) ((d+1)*((maxValue-minValue+1)/numberColumns)-0.0001))), 1);
+//					} else {
+//						tmpNumberPerColumn = frequencyColumns.get((int) (d*((maxValue-minValue+1)/numberColumns)+0.5001)+" bis "+(((int) ((d+1)*((maxValue-minValue+1)/numberColumns)-0.0001))));
+//						frequencyColumns.put((int) (d*((maxValue-minValue+1)/numberColumns)+0.5001)+" bis "+(((int) ((d+1)*((maxValue-minValue+1)/numberColumns)-0.0001))), tmpNumberPerColumn + 1);
+//					}
+//				}
+//		
+//			}
+//		}
+//		
+//		try { //Column Diagram
+//			BufferedWriter br  = new BufferedWriter(new FileWriter(new File(outputFolder+"columns.csv")));
+//			
+//			br.write("Waiting time; frequency");
+//			
+//			for(String key : frequencyColumns.keySet()){
+//			br.write("\n"+key+"; "+ frequencyColumns.get(key));
+//			}
+//			
+//			br.close();
+//			
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		
 		
 	}

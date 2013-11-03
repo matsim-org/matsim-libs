@@ -30,13 +30,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 
 
-public class IKAnalysisMain {
+public class IKAnalysisMain1 {
 
 	static String configFile = "path";
 	static String eventsFile = "path";
 				
 	public static void main(String[] args) {
-		IKAnalysisMain anaMain = new IKAnalysisMain();
+		IKAnalysisMain1 anaMain = new IKAnalysisMain1();
 		anaMain.run();
 	}
 

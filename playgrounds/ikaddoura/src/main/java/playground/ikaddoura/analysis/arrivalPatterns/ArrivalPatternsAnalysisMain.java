@@ -31,8 +31,8 @@ public class ArrivalPatternsAnalysisMain {
 	
 	public static void main(String[] args) {
 		
-		String inputEventsFile = "/Users/Ihab/Desktop/300.events_180sec.xml";
-		String outputFolder = "/Users/Ihab/Desktop/arrivalPatternsAnalysis_180/";
+		String inputEventsFile = "/Users/ihab/Desktop/ils4/virginia/output/d_2_100/ITERS/it.200/d_2_100.200.events.xml.gz";
+		String outputFolder = "/Users/Ihab/Desktop/analysis/d_2_100.200/";
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		
