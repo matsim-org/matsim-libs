@@ -40,7 +40,7 @@ import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.GeneralPlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -130,7 +130,7 @@ public final class StrategyManagerPopsConfigLoader {
 			if ( name != null ) {
 				// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
 				// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
-				GeneralPlanSelector<Plan> planSelector = null ;
+				GenericPlanSelector<Plan> planSelector = null ;
 				if ( name.equals("WorstPlanSelector") ) { 
 					planSelector = new WorstPlanForRemovalSelector() ; 
 				} else if ( name.equals("SelectRandom") ) {

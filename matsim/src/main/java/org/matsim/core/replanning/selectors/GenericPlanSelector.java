@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  * @author nagel
  *
  */
-public interface GeneralPlanSelector<T extends BasicPlan> {
+public interface GenericPlanSelector<T extends BasicPlan> {
 	
 	T selectPlan( HasPlansAndId<T> member ) ; 
 

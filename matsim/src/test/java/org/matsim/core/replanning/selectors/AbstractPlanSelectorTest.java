@@ -49,7 +49,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 */
 	public void testUndefinedScore() {
 		PersonImpl person;
-		GeneralPlanSelector<Plan> selector = getPlanSelector();
+		GenericPlanSelector<Plan> selector = getPlanSelector();
 		PlanImpl plan;
 
 		// test 1: exactly one plan, with undefined score
@@ -100,7 +100,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testNegativeScore() {
-		GeneralPlanSelector<Plan> selector = getPlanSelector();
+		GenericPlanSelector<Plan> selector = getPlanSelector();
 		PlanImpl plan;
 		// test with only one plan...
 		PersonImpl person = new PersonImpl(new IdImpl(1));
@@ -138,7 +138,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * This test only ensures that a plan is returned and no Exception occurred when selecting a plan.
 	 */
 	public void testZeroScore() {
-		GeneralPlanSelector<Plan> selector = getPlanSelector();
+		GenericPlanSelector<Plan> selector = getPlanSelector();
 		PlanImpl plan;
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		plan = person.createAndAddPlan(false);
@@ -149,6 +149,6 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	/**
 	 * @return A new instance of a specific implementation of {@link PlanSelector} for testing.
 	 */
-	protected abstract GeneralPlanSelector<Plan> getPlanSelector();
+	protected abstract GenericPlanSelector<Plan> getPlanSelector();
 	
 }

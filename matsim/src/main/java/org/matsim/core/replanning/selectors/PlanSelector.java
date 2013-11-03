@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
  *
  * @author mrieser
  */
-public interface PlanSelector extends GeneralPlanSelector<Plan>{
+public interface PlanSelector extends GenericPlanSelector<Plan>{
 
 //	/**
 //	 * Select and return a plan of a person.

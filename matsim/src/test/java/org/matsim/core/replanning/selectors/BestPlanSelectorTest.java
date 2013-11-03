@@ -32,7 +32,7 @@ import org.matsim.core.population.PersonImpl;
 public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
-	protected GeneralPlanSelector<Plan> getPlanSelector() {
+	protected GenericPlanSelector<Plan> getPlanSelector() {
 		return new BestPlanSelector();
 	}
 
@@ -56,7 +56,7 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 		plan = person.createAndAddPlan(false);
 		plan.setScore(-20.0);
 
-		GeneralPlanSelector<Plan> selector = new BestPlanSelector<Plan>();
+		GenericPlanSelector<Plan> selector = new BestPlanSelector<Plan>();
 
 		plan = selector.selectPlan(person);
 		assertEquals(40.0, plan.getScore().doubleValue(), 0.0);

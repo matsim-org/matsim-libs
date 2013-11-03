@@ -11,7 +11,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.replanning.selectors.CarrierPlanSelector;
-import org.matsim.core.replanning.selectors.GeneralPlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 
 /**
  * A strategy to modify a selected plan.
@@ -25,7 +25,7 @@ public class CarrierReplanningStrategy {
 
 	private List<CarrierReplanningStrategyModule> strategyModules = new ArrayList<CarrierReplanningStrategyModule>();
 
-	private GeneralPlanSelector<CarrierPlan> carrierPlanSelector;
+	private GenericPlanSelector<CarrierPlan> carrierPlanSelector;
 	
 	/**
 	 * Constructs the strategy with a plan selector.
@@ -33,7 +33,7 @@ public class CarrierReplanningStrategy {
 	 * @param carrierPlanSelector
 	 * @see CarrierPlanSelector
 	 */
-	public CarrierReplanningStrategy(GeneralPlanSelector<CarrierPlan> carrierPlanSelector) {
+	public CarrierReplanningStrategy(GenericPlanSelector<CarrierPlan> carrierPlanSelector) {
 		super();
 		this.carrierPlanSelector = carrierPlanSelector;
 	}
