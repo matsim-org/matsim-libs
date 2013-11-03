@@ -20,7 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 
 /**
@@ -34,7 +34,7 @@ public class KeepSelected implements PlanSelector {
 	 * returns the already selected plan for this person
 	 */
 	@Override
-	public Plan selectPlan(Person person) {
+	public Plan selectPlan(HasPlansAndId<Plan> person) {
 		return person.getSelectedPlan();
 	}
 

@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -271,7 +272,7 @@ public class StrategyManagerTest {
 		assertTrue("plan should not have been removed.", p.getPlans().contains(plans[2]));
 
 		// change plan selector for removal and run again
-		manager.setPlanSelectorForRemoval(new BestPlanSelector());
+		manager.setPlanSelectorForRemoval(new BestPlanSelector<Plan>());
 		manager.setMaxPlansPerAgent(plans.length - 4);
 		manager.run(pop, null);
 
@@ -433,7 +434,7 @@ public class StrategyManagerTest {
 		public TestPlanSelector() {
 		}
 		@Override
-		public PlanImpl selectPlan(final Person person) {
+		public PlanImpl selectPlan(final HasPlansAndId<Plan> person) {
 			throw new UnsupportedOperationException();
 		}
 

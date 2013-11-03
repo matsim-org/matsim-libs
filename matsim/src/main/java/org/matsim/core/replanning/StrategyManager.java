@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.replanning.selectors.GeneralPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -61,7 +62,7 @@ public class StrategyManager implements MatsimManager {
 
 	private int maxPlansPerAgent = 0;
 
-	private PlanSelector removalPlanSelector = new WorstPlanForRemovalSelector();
+	private GeneralPlanSelector<Plan> removalPlanSelector = new WorstPlanForRemovalSelector();
 
 	// XXX to what should this be initialized?
 	private String subpopulationName = null;
@@ -391,7 +392,7 @@ public class StrategyManager implements MatsimManager {
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final PlanSelector planSelector) {
+	public final void setPlanSelectorForRemoval(final GeneralPlanSelector<Plan> planSelector) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector = planSelector;
 	}

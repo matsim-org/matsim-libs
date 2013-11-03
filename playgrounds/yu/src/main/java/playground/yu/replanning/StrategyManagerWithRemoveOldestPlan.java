@@ -26,6 +26,7 @@ package playground.yu.replanning;
 import java.util.HashMap;
 import java.util.List;
 
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -44,7 +45,7 @@ public class StrategyManagerWithRemoveOldestPlan extends StrategyManager {
 	public static class OldestPlanForRemovalSelector implements PlanSelector {
 
 		@Override
-		public Plan selectPlan(Person person) {
+		public Plan selectPlan(HasPlansAndId<Plan> person) {
 			HashMap<String, Integer> typeCounts = new HashMap<String, Integer>();
 
 			List<? extends Plan> plans = person.getPlans();

@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.freight.replanning.selectors;
 
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.core.gbl.MatsimRandom;
@@ -29,7 +30,7 @@ import org.matsim.core.gbl.MatsimRandom;
 public class SelectRandomPlan implements CarrierPlanSelector {
 
 	@Override
-	public CarrierPlan selectPlan(Carrier carrier) {
+	public CarrierPlan selectPlan(HasPlansAndId<CarrierPlan> carrier) {
 		int idx = MatsimRandom.getRandom().nextInt( carrier.getPlans().size() ) ;
 		int cnt = 0 ;
 		for ( CarrierPlan plan : carrier.getPlans() ) {

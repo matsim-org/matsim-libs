@@ -2,6 +2,7 @@ package playground.mmoyo.taste_variations;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -9,6 +10,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
+
 import playground.mmoyo.utils.DataLoader;
 
 /** selects the plan with a predefined distribution according to plan index*/
@@ -23,7 +25,7 @@ public class DistribSelector implements PlanSelector{
 	}
 	
 	@Override
-	public Plan selectPlan(final Person person) {
+	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 		double random= MatsimRandom.getRandom().nextDouble();
 		int selIndex=1;
 		

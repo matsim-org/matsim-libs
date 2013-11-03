@@ -21,6 +21,7 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
@@ -47,7 +48,7 @@ public class ExpBetaPlanChanger implements PlanSelector {
 	 * Need to think through if this goes to Nash Equilibrium or to SUE !!!
 	 */
 	@Override
-	public Plan selectPlan(final Person person) {
+	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 		// current plan and random plan:
 		Plan currentPlan = person.getSelectedPlan();
 		Plan otherPlan = ((PersonImpl) person).getRandomPlan();

@@ -1,8 +1,10 @@
 package org.matsim.contrib.freight.carrier;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 
 /**
  * A carrier.
@@ -10,7 +12,7 @@ import org.matsim.api.core.v01.Id;
  * @author sschroeder
  *
  */
-public interface Carrier {
+public interface Carrier extends HasPlansAndId<CarrierPlan> {
 	
 	public static int PLAN_MEMORY = 5;
 
@@ -19,6 +21,7 @@ public interface Carrier {
 	 * 
 	 * @return id
 	 */
+	@Override
 	public abstract Id getId();
 
 	/**
@@ -26,7 +29,8 @@ public interface Carrier {
 	 * 
 	 * @return collection of {@link CarrierPlan}
 	 */
-	public abstract Collection<CarrierPlan> getPlans();
+	@Override
+	public abstract List<CarrierPlan> getPlans();
 
 	/**
 	 * Gets a collection of carrierShipments
@@ -47,6 +51,7 @@ public interface Carrier {
 	 * 
 	 * @return {@link CarrierPlan}
 	 */
+	@Override
 	public abstract CarrierPlan getSelectedPlan();
 
 	/**

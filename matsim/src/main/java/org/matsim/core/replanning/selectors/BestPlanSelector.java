@@ -20,26 +20,26 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.BasicPlan;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 
 /**
  * Selects the plan with the best score from the existing plans of the person.
  *
  * @author mrieser
  */
-public class BestPlanSelector implements PlanSelector {
+public class BestPlanSelector<T extends BasicPlan> implements GeneralPlanSelector<T> {
 
 	/**
 	 * selects the plan with the highest score from the person
 	 */
 	@Override
-	public Plan selectPlan(final Person person) {
+	public T selectPlan(final HasPlansAndId<T> person) {
 
 		double maxScore = Double.NEGATIVE_INFINITY;
-		Plan bestPlan = null;
+		T bestPlan = null;
 
-		for (Plan plan : person.getPlans()) {
+		for (T plan : person.getPlans()) {
 			Double score = plan.getScore();
 			if ((score != null) && (score.doubleValue() > maxScore) && !score.isNaN() ) {
 				maxScore = plan.getScore().doubleValue();

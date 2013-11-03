@@ -22,6 +22,7 @@ package org.matsim.contrib.cadyts.general;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
@@ -46,7 +47,7 @@ public class CadytsPlanChanger<T> implements PlanSelector {
 	}
 	
 	@Override
-	public Plan selectPlan(final Person person) {
+	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 		final Plan currentPlan = person.getSelectedPlan();
 		if (person.getPlans().size() <= 1 || currentPlan.getScore() == null) {
 			return currentPlan;

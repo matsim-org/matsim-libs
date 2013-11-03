@@ -19,7 +19,7 @@
 
 package playground.pieter.pseudosimulation.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 
@@ -30,10 +30,10 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
  * @author fouriep
  * Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}.
  */
-public class PSimBestPlanSelector extends BestPlanSelector {
+public class PSimBestPlanSelector extends BestPlanSelector<Plan> {
 
 	@Override
-	public Plan selectPlan(Person person) {
+	public Plan selectPlan(HasPlansAndId<Plan> person) {
 		if (MobSimSwitcher.isQSimIteration)
 			return super.selectPlan(person);
 		else

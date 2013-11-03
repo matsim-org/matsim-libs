@@ -20,7 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 
@@ -37,7 +37,7 @@ public class RandomPlanSelector implements PlanSelector {
 	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
 	 */
 	@Override
-	public Plan selectPlan(final Person person) {
+	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 		return ((PersonImpl) person).getRandomPlan();
 	}
 }

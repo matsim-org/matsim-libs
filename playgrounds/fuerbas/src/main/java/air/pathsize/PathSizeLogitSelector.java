@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -71,7 +72,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 	}
 	
 	@Override
-	public Plan selectPlan(final Person person) {
+	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 		double maxScore = checkPlansScoreAndGetMaxScore(person);
 		List<PSLPlanData> planDatasets = createPlanIdList(person.getPlans());
 		Map<String, List<PSLPlanData>> plansByMainMode = sortPlansByMainMode(planDatasets);
@@ -169,7 +170,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 		return l;
 	}
 
-	private double checkPlansScoreAndGetMaxScore(final Person person) {
+	private double checkPlansScoreAndGetMaxScore(final HasPlansAndId<Plan> person) {
 		double maxScore = Double.NEGATIVE_INFINITY;
 		for (Plan plan : person.getPlans()){
 			if (plan.getScore() == null || 

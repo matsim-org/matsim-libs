@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.freight.replanning.selectors;
 
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.core.gbl.MatsimRandom;
@@ -32,7 +33,7 @@ public class MetropolisLogit implements CarrierPlanSelector {
 	private double alpha = 0.01 ;
 
 	@Override
-	public CarrierPlan selectPlan(Carrier carrier) {
+	public CarrierPlan selectPlan(HasPlansAndId<CarrierPlan> carrier) {
 			CarrierPlan selectedPlan = carrier.getSelectedPlan() ;
 			CarrierPlan alternativePlan = new SelectBestPlan().selectPlan(carrier) ;
 			double proba = 0. ;

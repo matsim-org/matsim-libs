@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -52,7 +53,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 * @return Returns a random plan from the person, random but according to its weight.
 	 */
 	@Override
-	public Plan selectPlan(final Person person) {
+	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 
 		// get the weights of all plans
 		Map<Plan, Double> weights = this.calcWeights(person);
@@ -106,7 +107,7 @@ public class ExpBetaPlanSelector implements PlanSelector {
 	 * @param person
 	 * @return a map containing the weights of all plans
 	 */
-	Map<Plan, Double> calcWeights(final Person person) {
+	Map<Plan, Double> calcWeights(final HasPlansAndId<Plan> person) {
 
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;

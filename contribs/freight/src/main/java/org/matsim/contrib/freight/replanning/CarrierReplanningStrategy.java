@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.replanning.selectors.CarrierPlanSelector;
+import org.matsim.core.replanning.selectors.GeneralPlanSelector;
 
 /**
  * A strategy to modify a selected plan.
@@ -23,7 +25,7 @@ public class CarrierReplanningStrategy {
 
 	private List<CarrierReplanningStrategyModule> strategyModules = new ArrayList<CarrierReplanningStrategyModule>();
 
-	private CarrierPlanSelector carrierPlanSelector;
+	private GeneralPlanSelector<CarrierPlan> carrierPlanSelector;
 	
 	/**
 	 * Constructs the strategy with a plan selector.
@@ -31,7 +33,7 @@ public class CarrierReplanningStrategy {
 	 * @param carrierPlanSelector
 	 * @see CarrierPlanSelector
 	 */
-	public CarrierReplanningStrategy(CarrierPlanSelector carrierPlanSelector) {
+	public CarrierReplanningStrategy(GeneralPlanSelector<CarrierPlan> carrierPlanSelector) {
 		super();
 		this.carrierPlanSelector = carrierPlanSelector;
 	}

@@ -25,6 +25,7 @@ package playground.southafrica.kai.freight;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -39,6 +40,7 @@ import org.matsim.contrib.freight.replanning.selectors.SelectRandomPlan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -126,7 +128,7 @@ final class KNFreight3 {
 //					manager.addStrategy(strategy,0.1) ;
 //				}
 				{
-					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
+					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new BestPlanSelector<CarrierPlan>() ) ;
 					strategy.addModule( new TimeAllocationMutator() ) ;
 					manager.addStrategy(strategy, 1.0 );
 				}

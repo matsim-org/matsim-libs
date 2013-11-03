@@ -1,5 +1,6 @@
 package org.matsim.contrib.freight.replanning.selectors;
 
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 
@@ -11,7 +12,7 @@ public class SelectBestPlan implements CarrierPlanSelector {
 	 * <p>If there is an unscored plan, it is returned.
 	 */
 	@Override
-	public CarrierPlan selectPlan(Carrier carrier) {
+	public CarrierPlan selectPlan(HasPlansAndId<CarrierPlan> carrier) {
 		CarrierPlan best = null;
 		for (CarrierPlan p : carrier.getPlans()) {
 			if(p.getScore() == null){

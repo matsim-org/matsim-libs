@@ -23,7 +23,7 @@
  */
 package playground.yu.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -51,7 +51,7 @@ public class ExpBetaPlanSelector_Probs extends ExpBetaPlanSelector {
 	 * .selectPlan(Person person)}, with output, that reforms choice probability
 	 * (weights)
 	 */
-	public Plan selectPlan(final Person person) {
+	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 
 		// Build the weights of all plans
 		// - first find the max. score of all plans of this person

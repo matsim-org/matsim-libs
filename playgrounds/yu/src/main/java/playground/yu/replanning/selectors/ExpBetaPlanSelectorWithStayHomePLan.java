@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -69,7 +70,7 @@ public class ExpBetaPlanSelectorWithStayHomePLan implements PlanSelector {
 		}
 	}
 
-	private Double getDummyStayHomePlanScore4ChoiceProb(Person person) {
+	private Double getDummyStayHomePlanScore4ChoiceProb(HasPlansAndId<Plan>  person) {
 		/*
 		 * calculate stay Home Plan score, in order to realize the choice
 		 * probability "1-f", U_stayHome = 1/betaBrain * ln[(1-f)/f *
@@ -108,7 +109,7 @@ public class ExpBetaPlanSelectorWithStayHomePLan implements PlanSelector {
 	 *         its weight.
 	 */
 	@Override
-	public Plan selectPlan(final Person person) {
+	public Plan selectPlan(final HasPlansAndId<Plan> person) {
 		// preferentially choose NULL or NaN -score Plan
 		for (Plan plan : person.getPlans()) {
 			Double score = plan.getScore();
@@ -176,7 +177,7 @@ public class ExpBetaPlanSelectorWithStayHomePLan implements PlanSelector {
 	 * @param person
 	 * @return a map containing the weights of all plans
 	 */
-	Map<Plan, Double> calcWeights(final Person person) {
+	Map<Plan, Double> calcWeights(final HasPlansAndId<Plan>  person) {
 		stayHomeScore = getDummyStayHomePlanScore4ChoiceProb(person);
 		// - first find the max. score of all plans of this person
 		double maxScore = Double.NEGATIVE_INFINITY;

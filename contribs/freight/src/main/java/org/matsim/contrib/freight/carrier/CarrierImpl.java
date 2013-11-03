@@ -2,6 +2,7 @@ package org.matsim.contrib.freight.carrier;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
@@ -20,7 +21,7 @@ public class CarrierImpl implements Carrier {
 	
 	private final Id id;
 
-	private final Collection<CarrierPlan> plans;
+	private final List<CarrierPlan> plans;
 
 	private final Collection<CarrierShipment> shipments; 
 
@@ -65,7 +66,7 @@ public class CarrierImpl implements Carrier {
 	 * @see playground.mzilske.freight.Carrier#getPlans()
 	 */
 	@Override
-	public Collection<CarrierPlan> getPlans() {
+	public List<CarrierPlan> getPlans() {
 		return plans;
 	}
 
@@ -126,6 +127,12 @@ public class CarrierImpl implements Carrier {
 
 	public Collection<CarrierService> getServices(){
 		return services;
+	}
+
+	@Override
+	public boolean addPlan(CarrierPlan p) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

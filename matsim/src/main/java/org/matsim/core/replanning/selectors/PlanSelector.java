@@ -20,7 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 
 /**
@@ -28,18 +28,18 @@ import org.matsim.api.core.v01.population.Plan;
  *
  * @author mrieser
  */
-public interface PlanSelector {
+public interface PlanSelector extends GeneralPlanSelector<Plan>{
 
-	/**
-	 * Select and return a plan of a person.
-	 * Note that is is <b>NOT</b> the responsibility of this method to set the 
-	 * plan status as "selected". It is the responsability of the caller code,
-	 * which may decide to select, copy, remove, modify, or do whatever with the
-	 * returned plan.
-	 *
-	 * @param person
-	 * @return selected plan, or null if the person has no plans.
-	 */
-	public Plan selectPlan(Person person);
+//	/**
+//	 * Select and return a plan of a person.
+//	 * Note that is is <b>NOT</b> the responsibility of this method to set the 
+//	 * plan status as "selected". It is the responsability of the caller code,
+//	 * which may decide to select, copy, remove, modify, or do whatever with the
+//	 * returned plan.
+//	 *
+//	 * @param person
+//	 * @return selected plan, or null if the person has no plans.
+//	 */
+//	public Plan selectPlan(HasPlansAndId<Plan> person);
 
 }

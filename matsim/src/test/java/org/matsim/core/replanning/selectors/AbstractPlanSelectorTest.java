@@ -20,6 +20,8 @@
 
 package org.matsim.core.replanning.selectors;
 
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -47,7 +49,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 */
 	public void testUndefinedScore() {
 		PersonImpl person;
-		PlanSelector selector = getPlanSelector();
+		GeneralPlanSelector<Plan> selector = getPlanSelector();
 		PlanImpl plan;
 
 		// test 1: exactly one plan, with undefined score
@@ -82,7 +84,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	/**
 	 * Test how a plan selector reacts when a person has no plans at all. The correct behavior would be
 	 * to just return null, as stated in
-	 * {@link PlanSelector#selectPlan(org.matsim.core.population.PersonImpl) PlanSelector.selectPlan(Person)}
+	 * {@link PlanSelector#selectPlan(HasPlansAndId) PlanSelector.selectPlan(Person)}
 	 *
 	 * @author mrieser
 	 */
@@ -98,7 +100,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testNegativeScore() {
-		PlanSelector selector = getPlanSelector();
+		GeneralPlanSelector<Plan> selector = getPlanSelector();
 		PlanImpl plan;
 		// test with only one plan...
 		PersonImpl person = new PersonImpl(new IdImpl(1));
@@ -136,7 +138,7 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	 * This test only ensures that a plan is returned and no Exception occurred when selecting a plan.
 	 */
 	public void testZeroScore() {
-		PlanSelector selector = getPlanSelector();
+		GeneralPlanSelector<Plan> selector = getPlanSelector();
 		PlanImpl plan;
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		plan = person.createAndAddPlan(false);
@@ -147,6 +149,6 @@ public abstract class AbstractPlanSelectorTest extends MatsimTestCase {
 	/**
 	 * @return A new instance of a specific implementation of {@link PlanSelector} for testing.
 	 */
-	protected abstract PlanSelector getPlanSelector();
+	protected abstract GeneralPlanSelector<Plan> getPlanSelector();
 	
 }

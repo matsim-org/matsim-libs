@@ -19,7 +19,7 @@
 
 package playground.pieter.pseudosimulation.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
@@ -37,7 +37,7 @@ public class PSimExpBetaPlanChanger extends ExpBetaPlanChanger {
 	}
 
 	@Override
-	public Plan selectPlan(Person person) {
+	public Plan selectPlan(HasPlansAndId<Plan> person) {
 		if (MobSimSwitcher.isQSimIteration)
 			return super.selectPlan(person);
 		else

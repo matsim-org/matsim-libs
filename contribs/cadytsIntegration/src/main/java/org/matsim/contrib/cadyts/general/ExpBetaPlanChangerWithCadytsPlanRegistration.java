@@ -3,6 +3,7 @@
  */
 package org.matsim.contrib.cadyts.general;
 
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -24,7 +25,7 @@ public final class ExpBetaPlanChangerWithCadytsPlanRegistration<T> implements Pl
 	
 
 	@Override
-	public Plan selectPlan(Person person) {
+	public Plan selectPlan(HasPlansAndId<Plan> person) {
 		Plan selectedPlan = delegate.selectPlan(person) ;
 		cadyts.demand.Plan<T> cadytsPlan = cContext.getPlansTranslator().getPlanSteps( selectedPlan ) ;
 		cContext.getCalibrator().addToDemand(cadytsPlan) ;

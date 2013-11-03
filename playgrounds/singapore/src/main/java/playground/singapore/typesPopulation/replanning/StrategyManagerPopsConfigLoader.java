@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -39,6 +40,7 @@ import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.GeneralPlanSelector;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -130,7 +132,7 @@ public final class StrategyManagerPopsConfigLoader {
 			if ( name != null ) {
 				// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
 				// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
-				PlanSelector planSelector = null ;
+				GeneralPlanSelector<Plan> planSelector = null ;
 				if ( name.equals("WorstPlanSelector") ) { 
 					planSelector = new WorstPlanForRemovalSelector() ; 
 				} else if ( name.equals("SelectRandom") ) {
@@ -143,7 +145,7 @@ public final class StrategyManagerPopsConfigLoader {
 					// yyyy this will select _good_ plans for removal--?
 					// yyyy might just use -beta as parameter??
 				} else if ( name.equals("BestPlanSelector") ) {
-					planSelector = new BestPlanSelector() ;
+					planSelector = new BestPlanSelector<Plan>() ;
 					// yyyy this will select _good_ plans for removal--?
 				} else if ( name.equals("PathSizeLogitSelector") ) {
 					planSelector = new PathSizeLogitSelector(config.planCalcScore().getPathSizeLogitBeta(), -config.planCalcScore().getBrainExpBeta(), 

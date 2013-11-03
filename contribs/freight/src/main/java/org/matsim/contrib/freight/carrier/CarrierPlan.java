@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import java.util.Collection;
+import org.matsim.api.core.v01.population.BasicPlan;
 
 /**
  * 
@@ -9,7 +10,7 @@ import java.util.Collection;
  * @author mzilske, sschroeder
  * 
  */
-public class CarrierPlan {
+public class CarrierPlan implements BasicPlan {
 
 	private final Carrier carrier;
 	
@@ -26,10 +27,12 @@ public class CarrierPlan {
 		return carrier;
 	}
 
+	@Override
 	public Double getScore() {
 		return score;
 	}
 
+	@Override
 	public void setScore(Double score) {
 		this.score = score;
 	}

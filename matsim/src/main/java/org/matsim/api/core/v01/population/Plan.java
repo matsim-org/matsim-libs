@@ -33,19 +33,15 @@ import org.matsim.utils.customize.Customizable;
  * The only thing which is not "expected" in the same sense is the score.
  *
  */
-public interface Plan extends MatsimPopulationObject, Customizable {
+public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan {
+	
+	public abstract boolean isSelected();
 
 	public List<PlanElement> getPlanElements();
 
 	public void addLeg(final Leg leg);
 
 	public void addActivity(final Activity act);
-
-	public boolean isSelected();
-
-	public void setScore(Double score);
-
-	public Double getScore();
 
 	public Person getPerson();
 	/**
