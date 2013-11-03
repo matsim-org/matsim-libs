@@ -70,13 +70,14 @@ public class KNFreight4 {
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.createConfig() ;
-
-		if ( args != null ) {
-			config.controler().setOutputDirectory( args[0] );
-		} else {
+		
+		if ((args == null) || (args.length == 0)) {
 			config.controler().setOutputDirectory("/Users/nagel/freight-kairuns/output/");
+		} else {
+			System.out.println( "args[0]:" + args[0] );
+			config.controler().setOutputDirectory( args[0] );
 		}
-		config.controler().setLastIteration(10); 
+		config.controler().setLastIteration(3000); 
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(NETFILENAME);

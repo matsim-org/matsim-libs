@@ -12,7 +12,7 @@ import org.matsim.core.gbl.MatsimRandom;
  * 
  *
  */
-public class CarrierReplanningStrategyManager {
+public class CarrierReplanningStrategyManager implements CarrierReplanningStrategyManagerI {
 
 	private List<CarrierReplanningStrategy> strategies = new ArrayList<CarrierReplanningStrategy>();
 
@@ -28,6 +28,7 @@ public class CarrierReplanningStrategyManager {
 	 * @param weight
 	 * @throws IllegalStateException if weightSum > 1.0 or weightSum < 0.0
 	 */
+	@Override
 	public void addStrategy(CarrierReplanningStrategy strategy, double weight) {
 		strategies.add(strategy);
 		weights.add(weight);
@@ -41,7 +42,8 @@ public class CarrierReplanningStrategyManager {
 	 * @return CarrierReplanningStrategy
 	 * @throws IllegalStateException if sum of weights != 1.0 or if no strategy found.
 	 */
-	public CarrierReplanningStrategy nextStrategy() {
+	@Override
+	public CarrierReplanningStrategy nextStrategy(int iteration) {
 		if(weightSum != 1.0) throw new IllegalStateException("sum of strategy weights has to be 1.0");
 		double randValue = MatsimRandom.getRandom().nextDouble();
 		double sumOfWeights = 0.0;

@@ -40,6 +40,7 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
+import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -168,14 +169,14 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 		if(carrierPlanStrategyManagerFactory == null){
 			return;
 		}
-		CarrierReplanningStrategyManager strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager(event.getControler());
+		CarrierReplanningStrategyManagerI strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager(event.getControler());
 
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			if (carrier.getSelectedPlan() == null) {
 				logger.warn("carrier cannot replan since no selected plan is available");
 				continue;
 			}
-			strategyManager.nextStrategy().run(carrier);
+			strategyManager.nextStrategy(event.getIteration()).run(carrier);
 		}
 
 	}

@@ -31,12 +31,11 @@ import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierController;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
+import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
+import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerKai;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
-import org.matsim.contrib.freight.replanning.selectors.MetropolisLogit;
 import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
-import org.matsim.contrib.freight.replanning.selectors.SelectRandomPlan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
@@ -47,7 +46,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
-import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -109,18 +107,19 @@ final class KNFreight3 {
 
 		CarrierPlanStrategyManagerFactory strategyManagerFactory  = new CarrierPlanStrategyManagerFactory() {
 			@Override
-			public CarrierReplanningStrategyManager createStrategyManager(Controler controler) {
+			public CarrierReplanningStrategyManagerI createStrategyManager(Controler controler) {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
 				TravelDisutility travelCosts = ControlerUtils.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 						travelTimes , config.planCalcScore() );
 				LeastCostPathCalculator router = ctrl.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
 						travelCosts, travelTimes) ;
-				CarrierReplanningStrategyManager manager = new CarrierReplanningStrategyManager() ;
-//				{
-//					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-//					strategy.addModule(new ReRouteVehicles(router, scenario.getNetwork(), travelTimes));
-//					manager.addStrategy(strategy, 0.3);
-//				}
+				CarrierReplanningStrategyManagerKai manager = new CarrierReplanningStrategyManagerKai() ;
+				{
+					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
+					strategy.addModule(new ReRouteVehicles(router, scenario.getNetwork(), travelTimes));
+					manager.addStrategy(strategy, 0.3);
+					manager.addChangeRequest((int)(0.8*config.controler().getLastIteration()), strategy, 0.0);
+				}
 //				{
 //					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
 //					CarrierReplanningStrategyModule module = new SolvePickupAndDeliveryProblem(scenario.getNetwork()) ;
@@ -130,12 +129,13 @@ final class KNFreight3 {
 				{
 					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new BestPlanSelector<CarrierPlan>() ) ;
 					strategy.addModule( new TimeAllocationMutator() ) ;
-					manager.addStrategy(strategy, 1.0 );
+					manager.addStrategy(strategy, 0.9);
+					manager.addChangeRequest((int)(0.8*config.controler().getLastIteration()), strategy, 0.0);
 				}
-//				{
-//					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-//					manager.addStrategy( strategy, 0.4 ) ;
-//				}
+				{
+					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
+					manager.addStrategy( strategy, 0.01 ) ;
+				}
 				return manager ;
 			}
 		} ;
