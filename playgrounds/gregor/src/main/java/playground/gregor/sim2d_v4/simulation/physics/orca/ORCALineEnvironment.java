@@ -101,8 +101,8 @@ public class ORCALineEnvironment implements ORCALine {
 			this.directionY = xn;
 			double dist = CGAL.signDistPointLine(posX, posY, seg.x0, seg.y0, seg.dx, seg.dy)-.19; 
 			if (dist < 0) {
-				this.pointX += (dist-0.1) * this.directionY;
-				this.pointY += -(dist-0.1) * this.directionX;
+				this.pointX += -(dist-0.1) * this.directionY;
+				this.pointY += +(dist-0.1) * this.directionX;
 				
 				if (penetrationCnt < 10) {
 					log.warn("Agent: " + orcaAgent + " is penetrating all wall. This is a bug! As a workaround ORCALine has been moved inward! Needs to be fixed! [GL August '13]");
