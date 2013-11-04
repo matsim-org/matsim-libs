@@ -50,12 +50,20 @@ public class ParkAgent extends RandomParkingSearch {
 	int F2;
 	double maxDistanceAcceptableForWalk;
 	double maxSeachDuration;
+	double increaseAcceptableDistanceInMetersPerMinute;
 
 	HashMap<Id, ParkAgentAttributes> attributes;
 
 	public ParkAgent(double maxDistance, Network network, String name, double startStrategyAtDistanceFromDestination,
-			double startParkingDecision, int F1, int F2, double maxDistanceAcceptableForWalk, double maxSeachDuration) {
+			double startParkingDecision, int F1, int F2, double maxDistanceAcceptableForWalk, double maxSeachDuration,double increaseAcceptableDistancePerMinute) {
 		super(maxDistance, network, name);
+		this.startStrategyAtDistanceFromDestination = startStrategyAtDistanceFromDestination;
+		this.startParkingDecision = startParkingDecision;
+		this.F1 = F1;
+		this.F2 = F2;
+		this.maxDistanceAcceptableForWalk = maxDistanceAcceptableForWalk;
+		this.maxSeachDuration = maxSeachDuration;
+		increaseAcceptableDistanceInMetersPerMinute = increaseAcceptableDistancePerMinute;
 		this.parkingType = "streetParking";
 	}
 
@@ -67,6 +75,24 @@ public class ParkAgent extends RandomParkingSearch {
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
+		if (startSearchTime.containsKey(personId)){
+			double searchDuration=getSearchTime(aem);
+			
+			if (searchDuration>maxSeachDuration){
+				useSpecifiedParkingType.put(personId, "garageParking");
+			}
+			
+			if (searchDuration>2*maxSeachDuration){
+				useSpecifiedParkingType.put(personId, "streetParking");
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
 		random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
@@ -171,14 +197,12 @@ public class ParkAgent extends RandomParkingSearch {
 	}
 
 	private double getAcceptableParkingDistance(double searchTimeDurationAfterReachingTarget) {
-		double maxDistanceAcceptableForWalk = 400;
-		double maxSeachDuration = 10 * 60;
-
 		if (searchTimeDurationAfterReachingTarget > maxSeachDuration) {
 			return Double.MAX_VALUE;
 		} else {
-			if (100 + 30 * searchTimeDurationAfterReachingTarget / 60 < maxDistanceAcceptableForWalk) {
-				return 100 + 30 * searchTimeDurationAfterReachingTarget / 60;
+			
+			if (100 + increaseAcceptableDistanceInMetersPerMinute * searchTimeDurationAfterReachingTarget / 60 < maxDistanceAcceptableForWalk) {
+				return 100 + increaseAcceptableDistanceInMetersPerMinute * searchTimeDurationAfterReachingTarget / 60;
 			} else {
 				return maxDistanceAcceptableForWalk;
 			}
@@ -239,6 +263,12 @@ public class ParkAgent extends RandomParkingSearch {
 		int totalUnOccupied = 0;
 		int capacitiesOfAllParkingTillDestination = 0;
 		double timeWhenDestinationReached = -1;
+	}
+	
+	@Override
+	public void handleParkingDepartureActivity(AgentWithParking aem) {
+		super.handleParkingDepartureActivity(aem);
+		useSpecifiedParkingType.remove(aem.getPerson().getId());
 	}
 
 }
