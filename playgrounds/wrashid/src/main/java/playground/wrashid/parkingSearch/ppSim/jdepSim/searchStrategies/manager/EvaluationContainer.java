@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
@@ -34,198 +35,202 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingS
 public class EvaluationContainer {
 
 	private static final Logger log = Logger.getLogger(EvaluationContainer.class);
-	
+
 	private LinkedList<StrategyEvaluation> evaluations;
 
 	private Random random;
-	
-	public EvaluationContainer(LinkedList<ParkingSearchStrategy> allStrategies){
+
+	public EvaluationContainer(LinkedList<ParkingSearchStrategy> allStrategies) {
 		random = MatsimRandom.getLocalInstance();
 		setEvaluations(new LinkedList<StrategyEvaluation>());
 		createAndStorePermutation(allStrategies);
 	}
-	
-	public void createAndStorePermutation(LinkedList<ParkingSearchStrategy> allStrategies){
-		ArrayList<ParkingSearchStrategy> strategies=new ArrayList<ParkingSearchStrategy>(allStrategies);
-	
-		while (strategies.size()!=0){
+
+	public void createAndStorePermutation(LinkedList<ParkingSearchStrategy> allStrategies) {
+		ArrayList<ParkingSearchStrategy> strategies = new ArrayList<ParkingSearchStrategy>(allStrategies);
+
+		while (strategies.size() != 0) {
 			int randomIndex = random.nextInt(strategies.size());
 			getEvaluations().add(new StrategyEvaluation(strategies.remove(randomIndex)));
 		}
 	}
-	
-	public StrategyEvaluation getCurrentSelectedStrategy(){
+
+	public StrategyEvaluation getCurrentSelectedStrategy() {
 		return getEvaluations().getFirst();
 	}
-	
-	public void selectBestStrategyForExecution(){
-		StrategyEvaluation best=null;
-		for (StrategyEvaluation se:getEvaluations()){
-			if (best==null || se.score>best.score){
-				best=se;
+
+	public void selectBestStrategyForExecution() {
+		StrategyEvaluation best = null;
+		for (StrategyEvaluation se : getEvaluations()) {
+			if (best == null || se.score > best.score) {
+				best = se;
 			}
 		}
 		getEvaluations().remove(best);
 		getEvaluations().addFirst(best);
-		
-		if (best.score<0){
+
+		if (best.score < 0) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
 	}
-	
-	
-	public void selectNextStrategyAccordingToMNLExp(){
-		double exponentialSum=0;
-		double maxScore=getBestStrategyScore();
-		double[] selectionProbabilities=new double[getEvaluations().size()];
-		for (int i=0;i<getEvaluations().size();i++){
-			exponentialSum+=Math.exp(getEvaluations().get(i).score - maxScore);
+
+	public void selectNextStrategyAccordingToMNLExp() {
+		double exponentialSum = 0;
+		double maxScore = getBestStrategyScore();
+		double[] selectionProbabilities = new double[getEvaluations().size()];
+		for (int i = 0; i < getEvaluations().size(); i++) {
+			exponentialSum += Math.exp(getEvaluations().get(i).score - maxScore);
 		}
-		
-		for (int i=0;i<getEvaluations().size();i++){
-			selectionProbabilities[i]=Math.exp( getEvaluations().get(i).score - maxScore)/exponentialSum;
+
+		for (int i = 0; i < getEvaluations().size(); i++) {
+			selectionProbabilities[i] = Math.exp(getEvaluations().get(i).score - maxScore) / exponentialSum;
 		}
-		
-		double r=random.nextDouble();
-		int index=0;
-		double sum=0;
-		
-		while (sum+selectionProbabilities[index]<r){
-			sum+=selectionProbabilities[index];
+
+		double r = random.nextDouble();
+		int index = 0;
+		double sum = 0;
+
+		while (sum + selectionProbabilities[index] < r) {
+			sum += selectionProbabilities[index];
 			index++;
 		}
-		
+
 		getEvaluations().addFirst(getEvaluations().remove(index));
 	}
-	
-	public void selectNextStrategyAccordingToProbability(){
-		double exponentialSum=0;
-		double[] selectionProbabilities=new double[getEvaluations().size()];
-		for (int i=0;i<getEvaluations().size();i++){
-			exponentialSum+=Math.abs(getEvaluations().get(i).score);
+
+	public void selectNextStrategyAccordingToProbability() {
+		double exponentialSum = 0;
+		double[] selectionProbabilities = new double[getEvaluations().size()];
+		for (int i = 0; i < getEvaluations().size(); i++) {
+			exponentialSum += Math.abs(getEvaluations().get(i).score);
 		}
-		
-		for (int i=0;i<getEvaluations().size();i++){
-			selectionProbabilities[i]=Math.abs( getEvaluations().get(i).score)/exponentialSum;
+
+		for (int i = 0; i < getEvaluations().size(); i++) {
+			selectionProbabilities[i] = Math.abs(getEvaluations().get(i).score) / exponentialSum;
 		}
-		
-		double r=random.nextDouble();
-		int index=0;
-		double sum=0;
-		
-		while (sum+selectionProbabilities[index]<r){
-			sum+=selectionProbabilities[index];
+
+		double r = random.nextDouble();
+		int index = 0;
+		double sum = 0;
+
+		while (sum + selectionProbabilities[index] < r) {
+			sum += selectionProbabilities[index];
 			index++;
 		}
-		
+
 		getEvaluations().addFirst(getEvaluations().remove(index));
 	}
-	
-	public void selectStrategyAccordingToFixedProbabilityForBestStrategy(){
-		if (random.nextDouble() < ZHScenarioGlobal.loadDoubleParam("convergance.fixedPropbabilityBestStrategy.probabilityBestStrategy")) {
+
+	public void selectStrategyAccordingToFixedProbabilityForBestStrategy() {
+		if (random.nextDouble() < ZHScenarioGlobal
+				.loadDoubleParam("convergance.fixedPropbabilityBestStrategy.probabilityBestStrategy")) {
 			selectBestStrategyForExecution();
 		} else {
 			selectLongestNonExecutedStrategyForExecution();
 		}
 	}
-	
-	public void trimStrategySet(int maxNumberOfStrategies){
-		while (getEvaluations().size()>maxNumberOfStrategies){
+
+	public void trimStrategySet(int maxNumberOfStrategies) {
+		while (getEvaluations().size() > maxNumberOfStrategies) {
 			dropWostStrategy();
 		}
 	}
+
+	public void dropWostStrategy() {
+		getEvaluations().remove(getWorstStrategy(getEvaluations()));
+	}
 	
-	public void dropWostStrategy(){
-		StrategyEvaluation worstStrategy=getEvaluations().getFirst();
-		for (StrategyEvaluation se:getEvaluations()){
-			if (worstStrategy.score>se.score){
-				worstStrategy=se;
+	private static StrategyEvaluation getWorstStrategy(LinkedList<StrategyEvaluation> linkedList){
+		StrategyEvaluation worstStrategy = linkedList.getFirst();
+		for (StrategyEvaluation se : linkedList) {
+			if (worstStrategy.score > se.score) {
+				worstStrategy = se;
 			}
 		}
-		getEvaluations().remove(worstStrategy);
+		return worstStrategy;
 	}
-	
-	public int getNumberOfStrategies(){
+
+	public int getNumberOfStrategies() {
 		return getEvaluations().size();
 	}
-	
-	
-	public boolean allStrategiesHaveBeenExecutedOnce(){
-		for (StrategyEvaluation se:getEvaluations()){
-			if (Double.isInfinite(se.score)){
+
+	public boolean allStrategiesHaveBeenExecutedOnce() {
+		for (StrategyEvaluation se : getEvaluations()) {
+			if (Double.isInfinite(se.score)) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	// precondition: such a strategy exists (allStrategiesHaveBeenExecutedOnce=> true)
-	public void selectStrategyNotExecutedTillNow(){
-		StrategyEvaluation strategyToExecuteNext=null;
-		for (StrategyEvaluation se:getEvaluations()){
-			if (Double.isInfinite(se.score)){
-				strategyToExecuteNext=se;
+
+	// precondition: such a strategy exists (allStrategiesHaveBeenExecutedOnce=>
+	// true)
+	public void selectStrategyNotExecutedTillNow() {
+		StrategyEvaluation strategyToExecuteNext = null;
+		for (StrategyEvaluation se : getEvaluations()) {
+			if (Double.isInfinite(se.score)) {
+				strategyToExecuteNext = se;
 				break;
 			}
 		}
 		getEvaluations().remove(strategyToExecuteNext);
 		getEvaluations().addFirst(strategyToExecuteNext);
 	}
-	
-	public void selectLongestNonExecutedStrategyForExecution(){
-		StrategyEvaluation last=getEvaluations().getLast();
+
+	public void selectLongestNonExecutedStrategyForExecution() {
+		StrategyEvaluation last = getEvaluations().getLast();
 		getEvaluations().remove(last);
 		getEvaluations().addFirst(last);
 	}
-	
-	public void updateScoreOfSelectedStrategy(double score){
-		if (score<-100000000){
+
+	public void updateScoreOfSelectedStrategy(double score) {
+		if (score < -100000000) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
-		
-		getEvaluations().get(0).score=score;
+
+		getEvaluations().get(0).score = score;
 	}
-	
-	public void printAllScores(){
-		for (StrategyEvaluation strategyEvaluation:getEvaluations()){
+
+	public void printAllScores() {
+		for (StrategyEvaluation strategyEvaluation : getEvaluations()) {
 			log.info(strategyEvaluation.strategy.getName() + "-> score: " + strategyEvaluation.score);
 		}
 	}
-	
-	public double getSelectedStrategyScore(){
+
+	public double getSelectedStrategyScore() {
 		return getCurrentSelectedStrategy().score;
 	}
-	
-	public double getBestStrategyScore(){
-		double bestScore=Double.NEGATIVE_INFINITY;
-		for (StrategyEvaluation se:getEvaluations()){
-			if (se.score>Double.NEGATIVE_INFINITY && bestScore<se.score){
-				bestScore=se.score;
+
+	public double getBestStrategyScore() {
+		double bestScore = Double.NEGATIVE_INFINITY;
+		for (StrategyEvaluation se : getEvaluations()) {
+			if (se.score > Double.NEGATIVE_INFINITY && bestScore < se.score) {
+				bestScore = se.score;
 			}
 		}
 		return bestScore;
 	}
-	
-	public double getWorstStrategyScore(){
-		double worstScore=Double.POSITIVE_INFINITY;
-		for (StrategyEvaluation se:getEvaluations()){
-			if (se.score>Double.NEGATIVE_INFINITY && worstScore>se.score){
-				worstScore=se.score;
+
+	public double getWorstStrategyScore() {
+		double worstScore = Double.POSITIVE_INFINITY;
+		for (StrategyEvaluation se : getEvaluations()) {
+			if (se.score > Double.NEGATIVE_INFINITY && worstScore > se.score) {
+				worstScore = se.score;
 			}
 		}
 		return worstScore;
 	}
-	
-	public double getAverageStrategyScore(){
-		double average=0;
-		int sampleSize=0;
-		for (StrategyEvaluation se:getEvaluations()){
-			if (se.score>Double.NEGATIVE_INFINITY){
-				average+=se.score;
+
+	public double getAverageStrategyScore() {
+		double average = 0;
+		int sampleSize = 0;
+		for (StrategyEvaluation se : getEvaluations()) {
+			if (se.score > Double.NEGATIVE_INFINITY) {
+				average += se.score;
 				sampleSize++;
 			}
 		}
-		return average/sampleSize;
+		return average / sampleSize;
 	}
 
 	public LinkedList<StrategyEvaluation> getEvaluations() {
@@ -236,5 +241,28 @@ public class EvaluationContainer {
 		this.evaluations = evaluations;
 	}
 
-}
+	public void dropWostGroupStrategiesWithoutEliminatingGroup() {
+		LinkedListValueHashMap<String, StrategyEvaluation> evals = new LinkedListValueHashMap<String, StrategyEvaluation>();
+		for (StrategyEvaluation se : getEvaluations()) {
+			evals.put(se.strategy.getGroupName(), se);
+		}
+		for (String groupName : evals.getKeySet()) {
+			LinkedList<StrategyEvaluation> linkedList = evals.get(groupName);
+			if (linkedList.size() > 1) {
+				StrategyEvaluation worstStrategy = getWorstStrategy(linkedList);
+				removeEvaluation(worstStrategy);
+			}
+		}
 
+	}
+
+	public void removeEvaluation(StrategyEvaluation se) {
+		evaluations.remove(se);
+	}
+
+	public void selectRandomStrategy() {
+		int randomIndex = random.nextInt(evaluations.size());
+		evaluations.addFirst(evaluations.remove(randomIndex));
+	}
+
+}

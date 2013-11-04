@@ -207,6 +207,10 @@ public class ZHScenarioGlobal {
 		ZHScenarioGlobal.numberOfRoutingThreadsDuringSim = loadIntParam("ZHScenarioGlobal.numberOfRoutingThreadsDuringSim");
 	}
 	
+	public static boolean paramterExists(String paramName){
+		return config.findParam("parkingSearch", paramName)!=null;
+	}
+	
 	public static double loadDoubleParam(String paramName){
 		return Double.parseDouble(config.getParam("parkingSearch", paramName));
 	}

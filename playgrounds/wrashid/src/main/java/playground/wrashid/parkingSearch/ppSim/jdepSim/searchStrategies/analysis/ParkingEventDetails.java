@@ -60,6 +60,8 @@ public class ParkingEventDetails {
 		sb.append(score);
 		sb.append("\t");
 		sb.append(parkingStrategy.getName());
+		sb.append("\t");
+		sb.append(parkingStrategy.getGroupName());
 		
 		return sb.toString();
 	}

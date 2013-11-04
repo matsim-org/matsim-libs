@@ -79,12 +79,22 @@ public class ParkingStrategyManager {
 						agentHashMap.put(i, new EvaluationContainer(allStrategies));
 						evaluationContainer = agentHashMap.get(i);
 					}
+					
+					
+					handleDropWorseGroupStrategies(evaluationContainer);
+					
 
 					if (ZHScenarioGlobal.loadBooleanParam("convergance.evaluateAllStrategiesOnceAtBeginning")
 							&& !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
 						evaluationContainer.selectStrategyNotExecutedTillNow();
 					} else {
+						/*
 						if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
+								.loadIntParam("convergance.executeRandomStrategy.stopStrategyAtIteration")) {
+							evaluationContainer.selectRandomStrategy();
+						} else
+					*/		
+					if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
 								.loadIntParam("convergance.fixedPropbabilityBestStrategy.stopStrategyAtIteration")) {
 							evaluationContainer.selectStrategyAccordingToFixedProbabilityForBestStrategy();
 						} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
@@ -114,6 +124,23 @@ public class ParkingStrategyManager {
 								}
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+
+	private void handleDropWorseGroupStrategies(EvaluationContainer evaluationContainer) {
+		
+		for (int i=0;i<10;i++){
+			if (ZHScenarioGlobal.paramterExists("convergance.dropWorseGroupStrategies-" + i + "-AtIteration")){
+				int dropAtIteration = ZHScenarioGlobal.loadIntParam("convergance.dropWorseGroupStrategies-" + i + "-AtIteration");
+			
+				if (ZHScenarioGlobal.iteration==dropAtIteration){
+					int numberOfStrategiesToDrop = ZHScenarioGlobal.loadIntParam("convergance.dropWorseGroupStrategies-" + i + "-NumberOfStrategies");
+				
+					for (int j=0;j<numberOfStrategiesToDrop;j++){
+						evaluationContainer.dropWostGroupStrategiesWithoutEliminatingGroup();
 					}
 				}
 			}
