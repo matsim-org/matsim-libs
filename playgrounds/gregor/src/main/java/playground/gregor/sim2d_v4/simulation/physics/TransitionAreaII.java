@@ -181,7 +181,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
 
-		handleTransitionBuffer();
+		
 		if (!Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
 			this.agentTwoDTree.buildTwoDTree(this.agents);
 		}
@@ -192,7 +192,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 	 */
 	@Override
 	public void updateAgents(double time) {
-		
+		handleTransitionBuffer();
 //		this.densityMap.buildDensityMap();
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		
