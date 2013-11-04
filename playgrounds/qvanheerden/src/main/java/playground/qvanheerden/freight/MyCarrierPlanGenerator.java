@@ -66,22 +66,22 @@ public class MyCarrierPlanGenerator {
 		Header.printHeader(MyCarrierPlanGenerator.class.toString(), args);
 		
 		/* Input */
-		//String networkFile = "d://workspace_2/sandbox-qvanheerden/input/freight/network/NMBM_Network_CleanV7.xml";
-		Double depotLong = Double.parseDouble(args[0]);
-		Double depotLat = Double.parseDouble(args[1]);
-		String demandInputFile = args[2];
-		initialPlanAlgorithm = args[3];
+		String networkFile = args[0];
+		Double depotLong = Double.parseDouble(args[1]);
+		Double depotLat = Double.parseDouble(args[2]);
+		String demandInputFile = args[3];
+		initialPlanAlgorithm = args[4];
 		
 		/* Output */
 		String vehicleTypeOutputFile = "./output/freight/vehicleTypes.xml";
 		String carrierPlanOutputFile = "./output/freight/carrier.xml";
 		
 		/* Read network */
-//		Config config = ConfigUtils.createConfig();
-//		config.addCoreModules();
-//		scenario = ScenarioUtils.createScenario(config);
-//		new MatsimNetworkReader(scenario).readFile(networkFile);
-//		network = scenario.getNetwork();
+		Config config = ConfigUtils.createConfig();
+		config.addCoreModules();
+		scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
+		network = scenario.getNetwork();
 		
 		/* Set coordinate and linkId of depot */
 		depotCoord = new CoordImpl(depotLong, depotLat);
