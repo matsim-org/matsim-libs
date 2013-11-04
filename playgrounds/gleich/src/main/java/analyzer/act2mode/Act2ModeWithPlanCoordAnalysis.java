@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 package analyzer.act2mode;
-/* ---
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +28,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
@@ -37,7 +36,6 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.act2mode.ActivityToMode;
-import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -48,9 +46,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * adjustment to use Plan Coordinates by gleich
  *
  */
-public class Act2ModeWithPlanCoordAnalysis {}
-/* ---
-extends AbstractAnalyisModule {
+public class Act2ModeWithPlanCoordAnalysis extends AbstractAnalyisModule {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
@@ -61,7 +57,6 @@ extends AbstractAnalyisModule {
 	private HashMap<Integer, Set<SimpleFeature>> arrivalSlotFeatures;
 	private int slotSize;
 	private final String targetCoordinateSystem;
-	private ActivityToModeAnalysis delegate;
 
 	/**
 	 * a class to create shapefiles per timeSlot for activities mapped to the first mainmode after/before the activity
@@ -69,7 +64,7 @@ extends AbstractAnalyisModule {
 	 * @param personsOfInterest, might be null, than all persons are processed
 	 * @param slotSize, timeSlotSize in seconds
 	 */
-/* ---
+
 	public Act2ModeWithPlanCoordAnalysis(Scenario sc, Set<Id> personsOfInterest, int slotSize, String targetCoordinateSystem) {
 		super(Act2ModeWithPlanCoordAnalysis.class.getSimpleName());
 		this.scenario = sc;
@@ -120,7 +115,7 @@ extends AbstractAnalyisModule {
 	 * @param featureType 
 	 */
 
-/* ---
+
 	private void createFeatureAndAdd(ActivityToMode atm, 
 			HashMap<Integer, Set<SimpleFeature>> slotFeatures, PointFeatureFactory factory) {
 		Integer slice = (int) (atm.getTime() / this.slotSize);
@@ -147,4 +142,4 @@ extends AbstractAnalyisModule {
 		}
 	}
 }
----*/ 
+
