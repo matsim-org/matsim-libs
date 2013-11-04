@@ -26,7 +26,7 @@ public class LinkOccupancyStatisticsPrinter implements LinkEnterEventHandler {
 		LinkOccupancyStatisticsPrinter statistics=new LinkOccupancyStatisticsPrinter();
 		
 		eventsManagerImpl.addHandler(statistics);
-		String eventsFilename="C:/data/My Dropbox/Temp/run27/150.events.txt.gz";
+		String eventsFilename="";
 		new MatsimEventsReader(eventsManagerImpl).readFile(eventsFilename);
 		
 		statistics.printStatistics();
