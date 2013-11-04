@@ -57,6 +57,6 @@ public class MoneyEventHandler implements PersonMoneyEventHandler{
 	
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub	
+		this.id2amount.clear();
 	}
 }
