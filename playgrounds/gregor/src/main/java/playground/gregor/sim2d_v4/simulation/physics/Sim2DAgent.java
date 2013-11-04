@@ -72,17 +72,20 @@ public class Sim2DAgent implements VoronoiCenter {
 
 	private VelocityUpdater vu;
 
-	private boolean emitPosEvents = false;
+	private boolean emitPosEvents = true;
 
 	/*package*/ int ttl; //workaround - think about this [gl August '13]
 
 	private VoronoiCell voronoiCell;
+
+	private final Id id;
 	
 	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
 		this.driver = veh.getDriver();
+		this.id = this.driver.getId();
 		this.sc = sc;
 		this.ls = ls;
 		this.pEnv = pEnv;
@@ -120,15 +123,15 @@ public class Sim2DAgent implements VoronoiCenter {
 					loResLink.addFromUpstream(veh);
 					this.hasLeft2DSim = true;
 					this.ttl = 1000;
-					this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, getId(), this.getCurrentLinkId(), this.veh.getId()));
+					this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, this.id, this.getCurrentLinkId(), this.veh.getId()));
 					this.notifyMoveOverNode(nextLinkId);
 				} else {
 					return false;
 				}
 			} else {
-				this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, getId(), this.getCurrentLinkId(), this.veh.getId()));
+				this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, this.id, this.getCurrentLinkId(), this.veh.getId()));
 				this.notifyMoveOverNode(nextLinkId);
-				this.pEnv.getEventsManager().processEvent(new LinkEnterEvent(time, getId(), nextLinkId, this.veh.getId()));
+				this.pEnv.getEventsManager().processEvent(new LinkEnterEvent(time, this.id, nextLinkId, this.veh.getId()));
 			}
 		}
 		
@@ -136,7 +139,7 @@ public class Sim2DAgent implements VoronoiCenter {
 		this.pos[0] += dx;
 		this.pos[1] += dy;
 		if (this.emitPosEvents) {
-			XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
+			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time);
 			this.pEnv.getEventsManager().processEvent(e);
 		}
 		return true;
@@ -146,7 +149,7 @@ public class Sim2DAgent implements VoronoiCenter {
 		this.pos[0] += dx;
 		this.pos[1] += dy;
 		if (this.emitPosEvents) {
-			XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
+			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time);
 			this.pEnv.getEventsManager().processEvent(e);
 		}
 	}
@@ -169,7 +172,7 @@ public class Sim2DAgent implements VoronoiCenter {
 	}
 
 	public Id getId() {
-		return this.driver.getId();
+		return this.id;
 	}
 
 	public void notifyMoveOverNode(Id nextLinkId) {
@@ -214,7 +217,8 @@ public class Sim2DAgent implements VoronoiCenter {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Sim2DAgent) {
-			return getId().equals(((Sim2DAgent) obj).getId());
+//			return getId().equals(((Sim2DAgent) obj).getId());
+			return this == obj;
 		}
 		return false;
 	}
@@ -238,7 +242,7 @@ public class Sim2DAgent implements VoronoiCenter {
 	
 	//DEBUG
 	void reDrawAgent(double time){
-		XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
+		XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time);
 		this.pEnv.getEventsManager().processEvent(e);
 	}
 
