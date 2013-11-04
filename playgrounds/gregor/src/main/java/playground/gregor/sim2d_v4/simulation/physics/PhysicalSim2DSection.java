@@ -107,11 +107,15 @@ public class PhysicalSim2DSection {
 			this.agentTwoDTree.buildTwoDTree(this.agents);
 		}		
 	}
-	
+
 	public void updateAgents(double time) {
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 		while (it.hasNext()) {
+			
 			Sim2DAgent agent = it.next();
+//			if (agent.getId().toString().equals("13818")) {
+//				System.out.println("got you");
+//			}
 			updateAgent(agent, time);
 		}
 	}
@@ -160,9 +164,10 @@ public class PhysicalSim2DSection {
 					LineSegment opening = this.openings[i];
 					double leftOfOpening = CGAL.isLeftOfLine(newXPosX, newXPosY, opening.x0, opening.y0, opening.x1, opening.y1);
 					if (leftOfOpening >= 0) {
-						double l0 = CGAL.isLeftOfLine(opening.x0, opening.y0,oldX,oldY,newXPosX,newXPosY);
-						double l1 = CGAL.isLeftOfLine(opening.x1, opening.y1,oldX,oldY,newXPosX,newXPosY);
-						if (l0*l1 < - CGAL.EPSILON) {
+						double l1 = CGAL.isLeftOfLine(oldX, oldY, opening.x0, opening.y0, opening.x1, opening.y1);
+						double l2 = CGAL.isLeftOfLine(opening.x0, opening.y0,oldX,oldY,newXPosX,newXPosY);
+						double l3 = CGAL.isLeftOfLine(opening.x1, opening.y1,oldX,oldY,newXPosX,newXPosY);
+						if (l2*l3 < 0 && leftOfOpening*l1 < 0) {
 							PhysicalSim2DSection nextSection = this.neighbors.get(opening);
 							if (nextSection == null) {//agent was pushed out of the sim2d environment
 								if  (agent.hasLeft2DSim()) {
@@ -292,5 +297,9 @@ public class PhysicalSim2DSection {
 		return this.sim2dsc;
 	}
 
+	@Override
+	public String toString() {
+		return "id:" + this.sec.getId() + " agents in section:" + this.agents.size();
+	}
 
 }
