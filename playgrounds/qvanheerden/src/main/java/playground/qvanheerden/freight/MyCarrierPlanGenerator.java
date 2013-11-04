@@ -2,6 +2,7 @@ package playground.qvanheerden.freight;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -11,6 +12,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
@@ -19,6 +21,9 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -28,8 +33,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
+import algorithms.VehicleRoutingAlgorithms;
+import basics.VehicleRoutingAlgorithm;
+import basics.VehicleRoutingProblem;
+import basics.VehicleRoutingProblemSolution;
+
 import playground.southafrica.utilities.Header;
 import util.Coordinate;
+import util.Solutions;
 
 public class MyCarrierPlanGenerator {
 	private final static Logger log = Logger.getLogger(MyCarrierPlanGenerator.class);
@@ -39,6 +50,8 @@ public class MyCarrierPlanGenerator {
 	public CarrierVehicleTypes carrierVehicleTypes;
 	public static Carrier carrier;
 	public static Network network;
+	public static Scenario scenario;
+	public static String initialPlanAlgorithm;
 	/**
 	 * Trying to create carrier plans from the freight contrib [Oct 2013]
 	 * 
@@ -53,21 +66,22 @@ public class MyCarrierPlanGenerator {
 		Header.printHeader(MyCarrierPlanGenerator.class.toString(), args);
 		
 		/* Input */
-		String networkFile = args[0];
-		Double depotLong = Double.parseDouble(args[1]);
-		Double depotLat = Double.parseDouble(args[2]);
-		String demandInputFile = args[3];
+		//String networkFile = "d://workspace_2/sandbox-qvanheerden/input/freight/network/NMBM_Network_CleanV7.xml";
+		Double depotLong = Double.parseDouble(args[0]);
+		Double depotLat = Double.parseDouble(args[1]);
+		String demandInputFile = args[2];
+		initialPlanAlgorithm = args[3];
 		
 		/* Output */
 		String vehicleTypeOutputFile = "./output/freight/vehicleTypes.xml";
 		String carrierPlanOutputFile = "./output/freight/carrier.xml";
 		
 		/* Read network */
-		Config config = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(config);
-		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
-		mnr.readFile(networkFile);
-		network = sc.getNetwork();
+//		Config config = ConfigUtils.createConfig();
+//		config.addCoreModules();
+//		scenario = ScenarioUtils.createScenario(config);
+//		new MatsimNetworkReader(scenario).readFile(networkFile);
+//		network = scenario.getNetwork();
 		
 		/* Set coordinate and linkId of depot */
 		depotCoord = new CoordImpl(depotLong, depotLat);
@@ -86,6 +100,7 @@ public class MyCarrierPlanGenerator {
 		 * -for now these will be services until we figure out how to use shipments
 		 */
 		mcpg.parseDemand(demandInputFile);
+		mcpg.createInitialPlans();
 		
 		Carriers carriers = new Carriers();
 		carriers.addCarrier(carrier);
@@ -94,6 +109,22 @@ public class MyCarrierPlanGenerator {
 		
 		Header.printFooter();
 
+	}
+	
+	public void createInitialPlans(){
+		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
+		NetworkBasedTransportCosts.Builder costsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, carrier.getCarrierCapabilities().getVehicleTypes());
+		NetworkBasedTransportCosts costs = costsBuilder.build();
+		vrpBuilder.setRoutingCost(costs);
+		VehicleRoutingProblem vrp = vrpBuilder.build();
+		
+		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, initialPlanAlgorithm);
+		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
+		
+		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.getBest(solutions));
+		NetworkRouter.routePlan(plan, costs);
+		carrier.setSelectedPlan(plan);
+		log.info("Initial plans created...");
 	}
 	
 	/**
