@@ -146,11 +146,11 @@ public class MainPPSimZurich30km {
 				eventsManager.addHandler(lh);
 
 				eventsManager.resetHandlers(0);
-				eventsWriter.init(ZHScenarioGlobal.outputFolder + "events.xml.gz");
+				eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "events.xml.gz");
 
 				eventsManager.resetHandlers(0);
 
-				eventsWriter.init(ZHScenarioGlobal.outputFolder + "it." + iter + ".events.xml");
+				eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".events.xml");
 			}
 
 			agentsMessage.clear();
@@ -169,15 +169,15 @@ public class MainPPSimZurich30km {
 			eventsManager.finishProcessing();
 
 			if (writeOutput(writeEachNthIteration, skipOutputInIteration, iter)) {
-				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_all.png");
-				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_car.png", TransportMode.car);
-				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
+				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_all.png");
+				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_car.png", TransportMode.car);
+				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
 				try {
-					lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_ride.png", TransportMode.ride);
+					lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_ride.png", TransportMode.ride);
 				} catch (Exception e) {
 
 				}
-				lh.writeGraphic(ZHScenarioGlobal.outputFolder + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
+				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
 				eventsWriter.reset(0);
 			}
 
@@ -352,6 +352,14 @@ public class MainPPSimZurich30km {
 	}
 
 	private static boolean writeOutput(int writeEachNthIteration, int skipOutputInIteration, int iter) {
+		if (iter==ZHScenarioGlobal.loadIntParam("ZHScenarioGlobal.writeOutputAtIteration-1")){
+			return true;
+		}
+		
+		if (iter==ZHScenarioGlobal.loadIntParam("ZHScenarioGlobal.writeOutputAtIteration-2")){
+			return true;
+		}
+		
 		return iter % writeEachNthIteration == 0 && iter != skipOutputInIteration;
 	}
 
