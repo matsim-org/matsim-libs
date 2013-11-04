@@ -69,9 +69,10 @@ public class ParkingStrategyScenarios {
 			int F2 = 3;
 			double maxDistanceAcceptableForWalk = 400;
 			double maxSeachDuration = 10 * 60;
+			double increaseAcceptableDistanceInMetersPerMinute=30;
 
 			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent", startStrategyAtDistanceFromDestination,
-					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration));
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 4) {
 			int delayBeforeSwitchToStreetParkingSearch = ZHScenarioGlobal
 					.loadIntParam("parkingStrategyScenarioId.4.delayBeforeSwitchToStreetParkingSearch");
@@ -136,17 +137,70 @@ public class ParkingStrategyScenarios {
 			int F2 = 3;
 			double maxDistanceAcceptableForWalk = 400;
 			double maxSeachDuration = 10 * 60;
+			double increaseAcceptableDistanceInMetersPerMinute=30;
 
 			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent1", startStrategyAtDistanceFromDestination,
-					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration));
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
 			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent2", startStrategyAtDistanceFromDestination,
-					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration));
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
 			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent3", startStrategyAtDistanceFromDestination,
-					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration));
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
 			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent4", startStrategyAtDistanceFromDestination,
-					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration));
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
 			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent5", startStrategyAtDistanceFromDestination,
-					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration));
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 7) {
+			double startStrategyAtDistanceFromDestination = 250;
+			double startParkingDecision = 100;
+			int F1 = 1;
+			int F2 = 3;
+			double maxDistanceAcceptableForWalk = 400;
+			double maxSeachDuration = 10 * 60;
+			double increaseAcceptableDistanceInMetersPerMinute=30;
+			
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent1", startStrategyAtDistanceFromDestination,
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 8) {
+			double startStrategyAtDistanceFromDestination = 250;
+			double startParkingDecision = 100;
+			int F1 = 1;
+			int F2 = 3;
+			double maxDistanceAcceptableForWalk = 400;
+			double maxSeachDuration = 10 * 60;
+			double increaseAcceptableDistanceInMetersPerMinute=30;
+			
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent1", startStrategyAtDistanceFromDestination,
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
+		
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent2", startStrategyAtDistanceFromDestination,
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
+			
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent3", startStrategyAtDistanceFromDestination,
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
+			
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent4", startStrategyAtDistanceFromDestination,
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
+			
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent5", startStrategyAtDistanceFromDestination,
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
+			
+			allStrategies.add(new ParkAgent(-1, scenario.getNetwork(), "ParkAgent6", startStrategyAtDistanceFromDestination,
+					startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,increaseAcceptableDistanceInMetersPerMinute));
+			
+			
+			allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), 10*60,
+					"RandomGarageParkingSearch1"));
+			allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), 10*60,
+					"RandomGarageParkingSearch2"));
+			allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), 10*60,
+					"RandomGarageParkingSearch3"));
+			allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), 10*60,
+					"RandomGarageParkingSearch4"));
+			allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), 10*60,
+					"RandomGarageParkingSearch5"));
+			allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), 10*60,
+					"RandomGarageParkingSearch6"));
+		
 		}
 		
 		
