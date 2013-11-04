@@ -79,21 +79,21 @@ public class PhysicalSim2DEnvironment {
 	
 
 	
-//	//EXPERIMENTAL multi threading stuff
-//	private final Poison poison = new Poison();
-//	private final int numOfThreads = 3; 
-//	private final CyclicBarrier kdSync = new CyclicBarrier(this.numOfThreads);
-//	private final CyclicBarrier cb = new CyclicBarrier(this.numOfThreads+1);
-//	private final List<PhysicalSim2DSectionUpdaterThread> threads = new ArrayList<PhysicalSim2DEnvironment.PhysicalSim2DSectionUpdaterThread>();
+	//EXPERIMENTAL multi threading stuff
+	private final Poison poison = new Poison();
+	private final int numOfThreads = 3; 
+	private final CyclicBarrier kdSync = new CyclicBarrier(this.numOfThreads);
+	private final CyclicBarrier cb = new CyclicBarrier(this.numOfThreads+1);
+	private final List<PhysicalSim2DSectionUpdaterThread> threads = new ArrayList<PhysicalSim2DEnvironment.PhysicalSim2DSectionUpdaterThread>();
 	
 	private void awaitKDTreeSync() {
-//		try {
-//			this.kdSync.await();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		} catch (BrokenBarrierException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			this.kdSync.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
@@ -107,11 +107,11 @@ public class PhysicalSim2DEnvironment {
 	}
 
 	private void init() {
-//		for (int i = 0; i < this.numOfThreads; i++) {
-//			PhysicalSim2DSectionUpdaterThread pt = new PhysicalSim2DSectionUpdaterThread(this.cb);
-//			this.threads.add(pt);
-//			new Thread(pt,this.env.getId().toString() + " PhysicalSim2DSectionUpdaterThread." + i).start();
-//		}
+		for (int i = 0; i < this.numOfThreads; i++) {
+			PhysicalSim2DSectionUpdaterThread pt = new PhysicalSim2DSectionUpdaterThread(this.cb);
+			this.threads.add(pt);
+			new Thread(pt,this.env.getId().toString() + " PhysicalSim2DSectionUpdaterThread." + i).start();
+		}
 		
 		for (Section sec : this.env.getSections().values()) {
 			PhysicalSim2DSection psec = createAndAddPhysicalSection(sec);
@@ -147,37 +147,37 @@ public class PhysicalSim2DEnvironment {
 		}
 		
 		
-		//single threaded
-		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			psec.prepare();
-		}
-		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			psec.updateAgents(time);
-		}
-		
-//		//multi threaded
-//		this.cb.reset();
-//		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
-//			pt.setTime(time);
-//		}
-//		int idx = 0;
+//		//single threaded
 //		for (PhysicalSim2DSection psec : this.psecs.values()) {
-//			int tidx = idx % (this.numOfThreads);
-//			PhysicalSim2DSectionUpdaterThread pt = this.threads.get(tidx);
-//			pt.offer(psec);
-//			idx++;
+//			psec.prepare();
 //		}
-//		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
-//			pt.offer(this.poison);
+//		for (PhysicalSim2DSection psec : this.psecs.values()) {
+//			psec.updateAgents(time);
 //		}
-//		try {
-//			this.cb.await();
-//			
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		} catch (BrokenBarrierException e) {
-//			e.printStackTrace();
-//		}
+		
+		//multi threaded
+		this.cb.reset();
+		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
+			pt.setTime(time);
+		}
+		int idx = 0;
+		for (PhysicalSim2DSection psec : this.psecs.values()) {
+			int tidx = idx % (this.numOfThreads);
+			PhysicalSim2DSectionUpdaterThread pt = this.threads.get(tidx);
+			pt.offer(psec);
+			idx++;
+		}
+		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
+			pt.offer(this.poison);
+		}
+		try {
+			this.cb.await();
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		}
 		
 		
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
