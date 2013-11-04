@@ -21,6 +21,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -45,6 +46,7 @@ public class StrategyStats {
 
 	private HashMap<ParkingSearchStrategy, ArrayList<Double>> strategySharesAll;
 	private HashMap<ParkingSearchStrategy, ArrayList<Double>> strategySharesWithoutPrivateParking;
+	private HashMap<String, ArrayList<Double>> strategySharesGroupsWithoutPrivateParking;
 
 	public StrategyStats() {
 		averageBestList = new ArrayList();
@@ -53,6 +55,7 @@ public class StrategyStats {
 		averageAverageList = new ArrayList();
 		strategySharesAll = new HashMap<ParkingSearchStrategy, ArrayList<Double>>();
 		strategySharesWithoutPrivateParking = new HashMap<ParkingSearchStrategy, ArrayList<Double>>();
+		strategySharesGroupsWithoutPrivateParking=new HashMap<String, ArrayList<Double>>();
 	}
 
 	public void addIterationData(HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations) {
@@ -237,5 +240,77 @@ public class StrategyStats {
 		}
 
 		GeneralLib.writeList(list, ZHScenarioGlobal.getItersFolderPath() + ZHScenarioGlobal.iteration + ".strategyScores.txt");
+	}
+
+	public void updateStrategyGroupsSharesWithoutPP() {
+		IntegerValueHashMap<String> groupCount = new IntegerValueHashMap<String>();
+
+		int sampleSize = 0;
+
+		for (ParkingEventDetails ped : ZHScenarioGlobal.parkingEventDetails) {
+			if (ped.parkingActivityAttributes.getFacilityId().toString().contains("gp") || ped.parkingActivityAttributes.getFacilityId().toString().contains("stp")) {
+				groupCount.increment(ped.parkingStrategy.getGroupName());
+				sampleSize++;
+			}
+		}
+
+		for (ParkingSearchStrategy pss : ParkingStrategyManager.allStrategies) {
+			if (!strategySharesGroupsWithoutPrivateParking.containsKey(pss.getGroupName())) {
+				strategySharesGroupsWithoutPrivateParking.put(pss.getGroupName(), new ArrayList<Double>());
+			}
+
+			if (!groupCount.containsKey(pss.getGroupName())) {
+				groupCount.set(pss.getGroupName(), 0);
+			}
+
+			strategySharesGroupsWithoutPrivateParking.get(pss.getGroupName()).add(100.0 * groupCount.get(pss.getGroupName()) / sampleSize);
+		}
+		
+	}
+
+	public void writeNonPPGroupSharesToFile() {
+		writeGroupSharesToFile(strategySharesGroupsWithoutPrivateParking, "parkingGroupShares_WithoutPrivateParking.png",
+				"Parking Strategy Group Shares (without PrivateParking)");
+	}
+	
+	public void writeGroupSharesToFile(HashMap<String, ArrayList<Double>> shares, String outputFileName,
+			String title) {
+		String xLabel = "Iteration";
+		String yLabel = "share [%]";
+		int numberOfXValues = averageBestList.size();
+		int numberOfFunctions = shares.size();
+		double[] xValues = new double[numberOfXValues];
+		String[] seriesLabels = new String[numberOfFunctions];
+
+		LinkedList<String> groups=new LinkedList();
+		for (ParkingSearchStrategy pss : ParkingStrategyManager.allStrategies) {
+			if (!groups.contains(pss.getGroupName())){
+				groups.add(pss.getGroupName());
+			}
+		}
+		
+		
+		int j = 0;
+		for (String groupName : groups) {
+			seriesLabels[j] = groupName;
+			j++;
+		}
+
+		double[][] matrix = new double[numberOfXValues][numberOfFunctions];
+
+		for (int i = 0; i < numberOfXValues; i++) {
+			j = 0;
+			for (String groupName : groups) {
+				matrix[i][j] = shares.get(groupName).get(i);
+				j++;
+			}
+			
+			xValues[i] = i;
+		}
+
+		GeneralLib.writeGraphic(ZHScenarioGlobal.outputFolder + outputFileName, matrix, title, xLabel, yLabel, seriesLabels,
+				xValues);
+		
+		writeToTextFile(seriesLabels, matrix, outputFileName.split("\\.")[0] + ".txt");
 	}
 }

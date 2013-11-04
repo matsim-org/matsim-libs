@@ -155,9 +155,11 @@ public class ParkingStrategyManager {
 	public void writeStatisticsToFile() {
 		ZHScenarioGlobal.strategyScoreStats.addIterationData(getStrategyEvaluations());
 		ZHScenarioGlobal.strategyScoreStats.updateStrategySharesWithoutPP();
+		ZHScenarioGlobal.strategyScoreStats.updateStrategyGroupsSharesWithoutPP();
 		ZHScenarioGlobal.strategyScoreStats.writeStrategyScoresToFile();
 		ZHScenarioGlobal.strategyScoreStats.writeAllStrategySharesToFile();
 		ZHScenarioGlobal.strategyScoreStats.writeNonPPStrategySharesToFile();
+		ZHScenarioGlobal.strategyScoreStats.writeNonPPGroupSharesToFile();
 		ZHScenarioGlobal.strategyScoreStats.writeToTextFile(getStrategyEvaluations());
 	}
 

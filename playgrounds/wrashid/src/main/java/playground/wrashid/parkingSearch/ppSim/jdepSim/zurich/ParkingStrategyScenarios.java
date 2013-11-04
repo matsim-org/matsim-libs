@@ -79,15 +79,18 @@ public class ParkingStrategyScenarios {
 			int randomSteetParkingSearchCount = ZHScenarioGlobal
 					.loadIntParam("parkingStrategyScenarioId.4.numberOfRandomSteetParkingSearch");
 			for (int i = 0; i < randomSteetParkingSearchCount; i++) {
-				allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch-AD-" + i));
+				RandomStreetParkingSearch strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch-AD-" + i);
+				strategy.setGroupName("randomStreetParkingSearch");
+				allStrategies.add(strategy);
 			}
 
 			int randomGarageParkingSearchCount = ZHScenarioGlobal
 					.loadIntParam("parkingStrategyScenarioId.4.numberOfRandomGarageParkingSearch");
 			for (int i = 0; i < randomGarageParkingSearchCount; i++) {
-
-				allStrategies.add(new RandomGarageParkingSearch(-1, scenario.getNetwork(), delayBeforeSwitchToStreetParkingSearch,
-						"RandomGarageParkingSearch-AD-" + i));
+				RandomGarageParkingSearch strategy = new RandomGarageParkingSearch(-1, scenario.getNetwork(), delayBeforeSwitchToStreetParkingSearch,
+						"RandomGarageParkingSearch-AD-" + i);
+				strategy.setGroupName("randomGarageParkingSearch");
+				allStrategies.add(strategy);
 			}
 
 			// allStrategies.add(new RandomGarageParkingSearchBRD(-1,
@@ -96,7 +99,7 @@ public class ParkingStrategyScenarios {
 			// scenario.getNetwork(), "RandomStreetParkingSearchBRD-1A", 100));
 			// allStrategies.add(new RandomStreetParkingSearchBRD(-1,
 			// scenario.getNetwork(), "RandomStreetParkingSearchBRD-1B", 100));
-			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-2A", 200));
+		//	allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-2A", 200));
 			// allStrategies.add(new RandomStreetParkingSearchBRD(-1,
 			// scenario.getNetwork(), "RandomStreetParkingSearchBRD-2B", 200));
 			// allStrategies.add(new RandomStreetParkingSearchBRD(-1,
@@ -104,7 +107,7 @@ public class ParkingStrategyScenarios {
 			// allStrategies.add(new RandomStreetParkingSearchBRD(-1,
 			// scenario.getNetwork(), "RandomStreetParkingSearchBRD-3B", 300));
 
-			allStrategies.add(new RandomGarageParkingSearchBRD(-1, scenario.getNetwork(), "RandomGarageParkingSearchBRD-2A", 200.0,
+		/*	allStrategies.add(new RandomGarageParkingSearchBRD(-1, scenario.getNetwork(), "RandomGarageParkingSearchBRD-2A", 200.0,
 					delayBeforeSwitchToStreetParkingSearch));
 			
 			
@@ -123,6 +126,7 @@ public class ParkingStrategyScenarios {
 			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500D", 500));
 			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500E", 500));
 			allStrategies.add(new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "RandomStreetParkingSearchBRD-500F", 500));
+		*/
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 5) {
 			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch1"));
 			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch2"));

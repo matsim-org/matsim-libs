@@ -72,7 +72,10 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	private final double parkingDuration = 60 * 2;
 	protected final double walkSpeed = 3.0 / 3.6; // [m/s]
 	protected double scoreInterrupationValue = 0;
-	private String name;;
+	private String name;
+	public HashSet<Id> extraSearchPathNeeded = new HashSet<Id>();
+	private String groupName;
+	
 
 	// go to final link if no parking there, then try parking at other places.
 	// accept only parking within 300m, choose random links, but if leave 300m
@@ -89,7 +92,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		return name;
 	}
 
-	public HashSet<Id> extraSearchPathNeeded = new HashSet<Id>();
+	
 
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
@@ -518,4 +521,14 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			tollAreaEntered.add(aem.getPerson().getId());		
 		}
 	}
+
+	@Override
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+	
 }
