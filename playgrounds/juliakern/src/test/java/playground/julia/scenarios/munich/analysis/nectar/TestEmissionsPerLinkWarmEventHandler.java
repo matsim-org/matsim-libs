@@ -129,20 +129,15 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		Assert.assertNull(handler.getTime2linkIdLeaveCount().get(expectedEndOfTimeInterval).get(new IdImpl("unused link")));
 		
 		// initialize event 2,3,4 and handle them
-		System.out.println(warmEmissions.get(WarmPollutant.CO));
 		// event 2: time = 0.0 -> interval end should be 6.6666...
 		// event belongs to the same time interval as event 1! 
 		// and has the same emissions as event 1
 		WarmEmissionEvent event2 = new WarmEmissionEventImpl(simulationStartTime, linkId, vehicleId, warmEmissions);
 		handler.handleEvent(event2);
-		System.out.println(warmEmissions.get(WarmPollutant.CO));
 		// event 3: time = 200.0 -> interval should be 200.0 since this is the end of the simulation
 		// has the same emissions as event 1
 		WarmEmissionEvent event3 = new WarmEmissionEventImpl(simulationEndTime, linkId, vehicleId, warmEmissions);
 		handler.handleEvent(event3);
-		
-		System.out.println(warmEmissions.get(WarmPollutant.CO));
-		System.out.println(handler.getWarmEmissionsPerLinkAndTimeInterval().get(simulationEndTime).get(linkId).get(WarmPollutant.CO));
 		
 		// event 4: time = 200.0/30*3.8=25.3333... -> interval should be 26.6666...
 		double timeOfEvent4 = simulationEndTime/noOfTimeBins*3.8;
