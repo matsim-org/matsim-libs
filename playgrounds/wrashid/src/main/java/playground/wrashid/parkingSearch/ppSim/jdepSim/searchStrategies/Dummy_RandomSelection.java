@@ -58,8 +58,6 @@ public class Dummy_RandomSelection extends RandomParkingSearch {
 					nextAct.getType());
 			
 			if (parkingId == null) {
-				//TODO: continue here!!!!
-				
 				double distance=300;
 				Collection<Parking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),1000);
 				while (parkings.size()==0){

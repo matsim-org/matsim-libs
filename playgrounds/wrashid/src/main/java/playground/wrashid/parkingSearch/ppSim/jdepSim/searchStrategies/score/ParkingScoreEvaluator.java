@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
@@ -50,9 +51,16 @@ public class ParkingScoreEvaluator {
 		
 		double walkingTimeTotalInMinutes = parkingActAttributes.getTotalWalkDurationInSeconds() / 60.0;
 		double activityDuration = parkingActAttributes.getActivityDuration();
-		double walkScore = getWalkScore(personId , activityDuration, walkingTimeTotalInMinutes);
-		parkingScore += walkScore;
+		
 
+		double accessAndEgressTimeInMinutes=0;
+		if (parkingActAttributes.getFacilityId().toString().contains("gp")){
+			accessAndEgressTimeInMinutes = ZHScenarioGlobal.loadDoubleParam("ParkingScoreEvaluator.parkingGarageAccessAndEgressTimeSumInSeconds") / 60.0;
+		}
+		
+		double walkScore = getWalkScore(personId , activityDuration, walkingTimeTotalInMinutes + accessAndEgressTimeInMinutes);
+		parkingScore += walkScore;
+		
 		// parking search time
 
 		double parkingSearchDurationInMinutes = parkingActAttributes.getParkingSearchDurationInSeconds() / 60.0;
