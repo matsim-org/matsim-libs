@@ -46,7 +46,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	private MATSimUtilityModificationCalibrator<Link> calibrator = null;
 	private PlanToPlanStep planConverter = null;
 	// private int maxDraws = 100;
-	private final PlanSelector worstPlanSelector = new WorstPlanForRemovalSelector();
+//	private final PlanSelector worstPlanSelector = new WorstPlanForRemovalSelector();
 	private int correctCnt = 0, correctMileStone = 0;
 	private double beta;
 	/* container for the old "corrections" */

@@ -28,8 +28,10 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierController;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerKai;
@@ -62,7 +64,7 @@ final class KNFreight3 {
 		
 		CarrierScoringFunctionFactory scoringFunctionFactory = new CarrierScoringFunctionFactory() {
 			@Override
-			public ScoringFunction createScoringFunction(Carrier carrier) {
+			public ScoringFunction createScoringFunction(final Carrier carrier) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 				// yyyyyy I am almost sure that we better use separate scoring functions for carriers. kai, oct'13
 				sum.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), 
@@ -90,7 +92,32 @@ final class KNFreight3 {
 					}
 					@Override
 					public void handleActivity(Activity act) {
-						score -= (act.getEndTime() - act.getStartTime()) * this.margUtlOfTime_s ;
+						// deduct score for the time spent at the facility:
+						final double actStartTime = act.getStartTime();
+						final double actEndTime = act.getEndTime();
+						score -= (actEndTime - actStartTime) * this.margUtlOfTime_s ;
+
+						CarrierService matchedService = null ;
+						for ( CarrierService service : carrier.getServices() ) {
+							if ( act.getLinkId().equals( service.getLocationLinkId() ) ) {
+								matchedService = service ;
+								break ;
+							}
+							// yy would be more efficient with a pre-fabricated lookup table. kai, nov'13
+							// yyyyyy there may be multiple services on the same link, which which case this will not function correctly. kai, nov'13
+						}
+						final double windowStartTime = matchedService.getServiceStartTimeWindow().getStart();
+						final double windowEndTime = matchedService.getServiceStartTimeWindow().getEnd();
+						final double penalty = 18/3600. ; // per second!
+						if ( actStartTime < windowStartTime ) {
+							score -= penalty * ( windowStartTime - actStartTime ) ;
+							// mobsim could let them wait ... but this is also not implemented for regular activities. kai, nov'13
+						}
+						if ( windowEndTime < actEndTime ) {
+							score -= penalty * ( actEndTime - windowEndTime ) ;
+						}
+						// (note: provide penalties that work with a gradient to help the evol algo. kai, nov'13)
+						
 					}
 					@Override
 					public void handleLastActivity(Activity act) {
@@ -141,6 +168,7 @@ final class KNFreight3 {
 		} ;
 		
 		CarrierController listener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
+//		listener.setActivityTimesGivenBy(ActivityTimesGivenBy.durationOnly);
 		listener.setEnableWithinDayActivityReScheduling(false);
 
 		ctrl.addControlerListener(listener) ;

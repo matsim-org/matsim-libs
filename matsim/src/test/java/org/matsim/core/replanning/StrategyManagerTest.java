@@ -31,7 +31,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -41,6 +40,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -66,10 +66,10 @@ public class StrategyManagerTest {
 
 		// setup StrategyManager
 		StrategyManager manager = new StrategyManager();
-		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector());
-		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector());
-		StrategyCounter strategy3 = new StrategyCounter(new RandomPlanSelector());
-		StrategyCounter strategy4 = new StrategyCounter(new RandomPlanSelector());
+		StrategyCounter strategy1 = new StrategyCounter(new RandomPlanSelector<Plan>());
+		StrategyCounter strategy2 = new StrategyCounter(new RandomPlanSelector<Plan>());
+		StrategyCounter strategy3 = new StrategyCounter(new RandomPlanSelector<Plan>());
+		StrategyCounter strategy4 = new StrategyCounter(new RandomPlanSelector<Plan>());
 
 		manager.addStrategyForDefaultSubpopulation(strategy1, 0.10);
 		manager.addStrategyForDefaultSubpopulation(strategy2, 0.20);
@@ -380,12 +380,12 @@ public class StrategyManagerTest {
 
 		private int counter = 0;
 
-		protected StrategyCounter(final PlanSelector selector) {
+		protected StrategyCounter(final GenericPlanSelector<Plan> selector) {
 			planStrategyDelegate = new PlanStrategyImpl( selector ) ;
 		}
 
 		@Override
-		public void run(final Person person) {
+		public void run(final HasPlansAndId<Plan> person) {
 			this.counter++;
 			planStrategyDelegate.run(person);
 		}

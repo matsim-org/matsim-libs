@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.utils.FreightGbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -80,9 +81,11 @@ public class CarrierReplanningStrategyManagerKai implements CarrierReplanningStr
 
 	private final void handleChangeRequests(final int iteration) 
 	{
-		Map<CarrierReplanningStrategy, Double> changes = this.changeRequests.remove(Integer.valueOf(iteration));
-		if (	changes != null) {
-			for (Map.Entry<CarrierReplanningStrategy, Double> entry : changes.entrySet()) {
+		for ( Entry<Integer, Map<CarrierReplanningStrategy, Double>> changes : this.changeRequests.entrySet() ) {
+			if ( changes.getKey() > iteration ) {
+				break ;
+			}
+			for (Map.Entry<CarrierReplanningStrategy, Double> entry : changes.getValue().entrySet()) {
 				changeWeight( entry.getKey(), entry.getValue().doubleValue() );
 			}
 		}
@@ -99,8 +102,10 @@ public class CarrierReplanningStrategyManagerKai implements CarrierReplanningStr
 		handleChangeRequests(iteration) ;
 		double randValue = MatsimRandom.getRandom().nextDouble();
 		double sumOfWeights = 0.0;
+		FreightGbl.debug(" randValue=" + randValue + " weightSum: " + weightSum ) ;
 		for ( Entry<CarrierReplanningStrategy,Double> entry : weights.entrySet() ) {
 			sumOfWeights += entry.getValue() / weightSum ;
+			FreightGbl.debug( " sumOfWeights: " + sumOfWeights + " classname: " + entry.getKey().toString() ) ;
 			if (randValue <= sumOfWeights) {
 				return entry.getKey() ;
 			}

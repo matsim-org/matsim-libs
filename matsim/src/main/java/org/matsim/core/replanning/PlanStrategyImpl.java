@@ -23,7 +23,7 @@ package org.matsim.core.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.PersonImpl;
@@ -75,7 +75,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	}
 	
 	@Override
-	public void run(final Person person) {
+	public void run(final HasPlansAndId<Plan> person) {
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:

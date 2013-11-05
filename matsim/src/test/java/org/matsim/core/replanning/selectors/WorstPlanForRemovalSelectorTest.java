@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning.selectors;
 
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -27,8 +28,8 @@ import org.matsim.core.population.PlanImpl;
 public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 
 	@Override
-	protected PlanSelector getPlanSelector() {
-		return new WorstPlanForRemovalSelector();
+	protected GenericPlanSelector<Plan> getPlanSelector() {
+		return new WorstPlanForRemovalSelector<Plan>();
 	}
 
 	/**
@@ -37,7 +38,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_nullType() {
-		PlanSelector selector = getPlanSelector();
+		GenericPlanSelector<Plan> selector = getPlanSelector();
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 
 		PlanImpl plan1 = new org.matsim.core.population.PlanImpl(person);
@@ -77,7 +78,7 @@ public class WorstPlanForRemovalSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testRemoveWorstPlans_withTypes() {
-		PlanSelector selector = getPlanSelector();
+		GenericPlanSelector<Plan> selector = getPlanSelector();
 		/* The used plans, ordered by score:
 		 * plan2: b, 22.0
 		 * plan6: b, 21.0

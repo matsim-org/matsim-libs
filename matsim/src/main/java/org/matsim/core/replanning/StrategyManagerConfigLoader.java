@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -32,11 +33,10 @@ import org.matsim.core.controler.PlanStrategyFactoryRegister;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.replanning.modules.ExternalModule;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
@@ -121,9 +121,9 @@ public final class StrategyManagerConfigLoader {
 		if ( name != null ) {
 			// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
 			// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
-			PlanSelector planSelector = null ;
+			GenericPlanSelector<Plan> planSelector = null ;
 			if ( name.equals("WorstPlanSelector") ) { 
-				planSelector = new WorstPlanForRemovalSelector(); 
+				planSelector = new WorstPlanForRemovalSelector<Plan>(); 
 			} else if ( name.equals("SelectRandom") ) {
 				planSelector = new RandomPlanSelector();
 			} else if ( name.equals("SelectExpBeta") ) {

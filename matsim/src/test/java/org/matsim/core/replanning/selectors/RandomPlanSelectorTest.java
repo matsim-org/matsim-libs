@@ -36,8 +36,8 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	private final static Logger log = Logger.getLogger(RandomPlanSelectorTest.class);
 
 	@Override
-	protected PlanSelector getPlanSelector() {
-		return new RandomPlanSelector();
+	protected GenericPlanSelector<Plan> getPlanSelector() {
+		return new RandomPlanSelector<Plan>();
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 		PlanImpl plan4 = person.createAndAddPlan(false);
 		plan4.setScore(0.0);
 
-		RandomPlanSelector selector = new RandomPlanSelector();
+		RandomPlanSelector<Plan> selector = new RandomPlanSelector<Plan>();
 		int cnt1 = 0;
 		int cnt2 = 0;
 		int cnt3 = 0;

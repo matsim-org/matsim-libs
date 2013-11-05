@@ -21,7 +21,8 @@
 package playground.wrashid.PSF.replanning;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -53,7 +54,7 @@ public class TemplatePlanStrategy implements PlanStrategy {
 		planStrategyDelegate.init(replanningContext);
 	}
 
-	public void run(Person person) {
+	public void run(HasPlansAndId<Plan> person) {
 		planStrategyDelegate.run(person);
 	}
 

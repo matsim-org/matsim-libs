@@ -18,7 +18,8 @@
  * *********************************************************************** */
 package playground.andreas.intersection.dijkstra;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -63,7 +64,7 @@ public class SignalSystemRoutePlanStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(HasPlansAndId<Plan> person) {
 		this.psDelegate.run(person);
 	}
 

@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.router.replanning;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -55,7 +56,7 @@ public class SubtourModeChoiceStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void run(final Person person) {
+	public void run(final HasPlansAndId<Plan> person) {
 		strategy.run(person);
 	}
 

@@ -44,6 +44,13 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	private final Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
 	
 	private Map<Id,CarrierAgent> driverAgentMap = new HashMap<Id, CarrierAgent>();
+	
+	public static enum ActivityTimesGivenBy { endTimeOnly, durationOnly } ;
+	private ActivityTimesGivenBy activityTimesGivenBy = ActivityTimesGivenBy.endTimeOnly ;
+
+	public void setActivityTimesGivenBy(ActivityTimesGivenBy activityTimesGivenBy) {
+		this.activityTimesGivenBy = activityTimesGivenBy;
+	}
 
 	public CarrierAgentTracker(Carriers carriers, Network network, CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		this.carriers = carriers;
@@ -71,6 +78,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	Collection<MobSimVehicleRoute> createPlans() {
 		List<MobSimVehicleRoute> vehicleRoutes = new ArrayList<MobSimVehicleRoute>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
+			carrierAgent.setActivityTimesGivenBy( this.activityTimesGivenBy ) ;
 			List<MobSimVehicleRoute> plansForCarrier = carrierAgent.createFreightDriverPlans();
 			vehicleRoutes.addAll(plansForCarrier);
 		}

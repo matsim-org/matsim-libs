@@ -38,6 +38,7 @@ import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
@@ -83,6 +84,8 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 	private CarrierAgentTracker carrierAgentTracker;
 	
 	private Carriers carriers;
+
+	private ActivityTimesGivenBy activityTimesGivenBy = ActivityTimesGivenBy.endTimeOnly ;
 	
 	
 
@@ -146,6 +149,7 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getNetwork(), carrierScoringFunctionFactory);
+		carrierAgentTracker.setActivityTimesGivenBy(this.activityTimesGivenBy );
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
 		mobsimFactory.setWithinDayActivityReScheduling(withinDayReSchedulingEnabled);
 		event.getControler().setMobsimFactory(mobsimFactory);
@@ -190,6 +194,10 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 
+	}
+
+	public void setActivityTimesGivenBy(ActivityTimesGivenBy activityTimesGivenBy) {
+		this.activityTimesGivenBy = activityTimesGivenBy;
 	}
 
 }

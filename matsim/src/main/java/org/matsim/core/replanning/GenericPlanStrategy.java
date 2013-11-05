@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * RandomPlanSelector.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.core.replanning.selectors;
+package org.matsim.core.replanning;
 
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.core.gbl.MatsimRandom;
-
 
 /**
- * Select randomly one of the existing plans of the person.
+ * @author nagel
  *
- * @author mrieser
  */
-public class RandomPlanSelector<T extends BasicPlan> implements GenericPlanSelector<T> {
+public interface GenericPlanStrategy<T extends BasicPlan> {
+	/**
+	 * Adds a person to this strategy to be handled. It is not required that
+	 * the person is immediately handled during this method-call (e.g. when using
+	 * multi-threaded strategy-modules).  This method ensures that an unscored
+	 * plan is selected if the person has such a plan ("optimistic behavior").
+	 *
+	 * @param person
+	 * @see #finish()
+	 */
+	public void run(final HasPlansAndId<T> person);
 
 	/**
-	 * Choose a random plan from the person and return it.
-	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
+	 * Tells this strategy to initialize its modules. Called before a bunch of
+	 * person are handed to this strategy.
+	 * @param replanningContext TODO
 	 */
-	@Override
-	public T selectPlan(final HasPlansAndId<T> person) {
-		// this used to use person.getRandomPlan(), but I inlined the function here in order to get rid of the function of the data class.
-		// kai, nov'13
-		if (person.getPlans().size() == 0) {
-			return null;
-		}
-		int index = (int)(MatsimRandom.getRandom().nextDouble()*person.getPlans().size());
-		return person.getPlans().get(index);
-	}
+	public void init(ReplanningContext replanningContext);
+
+	/**
+	 * Indicates that no additional persons will be handed to this module and
+	 * waits until this strategy has finished handling all persons.
+	 * @see #run(HasPlansAndId)
+	 */
+	public void finish();
+
+
 }

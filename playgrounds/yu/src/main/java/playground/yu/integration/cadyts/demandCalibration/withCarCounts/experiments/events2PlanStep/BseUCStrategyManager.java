@@ -32,7 +32,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.util.TravelTime;
 
@@ -47,7 +47,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	private PlanToPlanStep planConverter = null;
 	private EventsToPlanSteps events2PlanSteps = null;
 	// private int maxDraws = 100;
-	private final PlanSelector worstPlanSelector = new WorstPlanForRemovalSelector();
+//	private final GenericPlanSelector<Plan> worstPlanSelector = new WorstPlanForRemovalSelector<Plan>();
 	private int correctCnt = 0, correctMileStone = 0;
 	private double beta;
 	/* container for the old "corrections" */

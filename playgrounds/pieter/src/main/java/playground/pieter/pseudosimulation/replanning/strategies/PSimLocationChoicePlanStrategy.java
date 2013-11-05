@@ -1,7 +1,8 @@
 package playground.pieter.pseudosimulation.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoice;
 import org.matsim.contrib.locationchoice.LocationChoicePlanStrategy;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
@@ -44,7 +45,7 @@ public class PSimLocationChoicePlanStrategy implements PlanStrategy {
 	}
 	
 	@Override
-	public void run(Person person) {
+	public void run(HasPlansAndId<Plan> person) {
 		delegate.run(person);
 	}
 

@@ -19,7 +19,8 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
 
 /**
  * Comments:<ul>
@@ -27,32 +28,7 @@ import org.matsim.api.core.v01.population.Person;
  * </ul>
  *
  */
-public interface PlanStrategy {
+public interface PlanStrategy extends GenericPlanStrategy<Plan> {
 
-
-	/**
-	 * Adds a person to this strategy to be handled. It is not required that
-	 * the person is immediately handled during this method-call (e.g. when using
-	 * multi-threaded strategy-modules).  This method ensures that an unscored
-	 * plan is selected if the person has such a plan ("optimistic behavior").
-	 *
-	 * @param person
-	 * @see #finish()
-	 */
-	public void run(final Person person);
-
-	/**
-	 * Tells this strategy to initialize its modules. Called before a bunch of
-	 * person are handed to this strategy.
-	 * @param replanningContext TODO
-	 */
-	public void init(ReplanningContext replanningContext);
-
-	/**
-	 * Indicates that no additional persons will be handed to this module and
-	 * waits until this strategy has finished handling all persons.
-	 * @see #run(Person)
-	 */
-	public void finish();
 
 }

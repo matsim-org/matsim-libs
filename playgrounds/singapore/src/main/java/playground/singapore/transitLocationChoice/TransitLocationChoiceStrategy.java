@@ -5,7 +5,8 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -54,7 +55,7 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(HasPlansAndId<Plan> person) {
 		delegate.run(person);
 	}
 

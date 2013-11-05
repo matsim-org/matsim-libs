@@ -23,12 +23,13 @@ package playground.ikaddoura.parkAndRide.pRstrategy;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
@@ -40,7 +41,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
  */
 public final class PlanStrategyImpl_work implements PlanStrategy {
 
-	private PlanSelector planSelector = null;
+	private GenericPlanSelector<Plan> planSelector = null;
 	private PlanStrategyModule firstModule = null;
 	private final ArrayList<PlanStrategyModule> modules = new ArrayList<PlanStrategyModule>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
@@ -52,7 +53,7 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 	 *
 	 * @param planSelector
 	 */
-	public PlanStrategyImpl_work(final PlanSelector planSelector) {
+	public PlanStrategyImpl_work(final GenericPlanSelector<Plan> planSelector) {
 		this.planSelector = planSelector;
 	}
 
@@ -72,7 +73,7 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 	}
 	
 	@Override
-	public void run(final Person person) {
+	public void run(final HasPlansAndId<Plan> person) {
 		
 		this.counter++;
 		
@@ -161,7 +162,7 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 		return name.toString();
 	}
 
-	public PlanSelector getPlanSelector() {
+	public GenericPlanSelector<Plan> getPlanSelector() {
 		return planSelector;
 	}
 	

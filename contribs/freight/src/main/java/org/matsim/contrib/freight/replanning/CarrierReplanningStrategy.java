@@ -100,5 +100,14 @@ public class CarrierReplanningStrategy {
 		return copiedPlan;
 
 	}
+	
+	@Override
+	public String toString() {
+		if ( this.strategyModules.isEmpty() ) {
+			return this.carrierPlanSelector.getClass().getSimpleName() ;
+		} else {
+			return this.strategyModules.get(0).getClass().getSimpleName() ;
+		}
+	}
 
 }

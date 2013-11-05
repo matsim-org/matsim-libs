@@ -20,7 +20,6 @@
 
 package org.matsim.core.replanning.selectors;
 
-import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 
 /**

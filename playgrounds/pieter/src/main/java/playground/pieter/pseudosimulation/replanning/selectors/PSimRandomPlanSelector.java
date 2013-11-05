@@ -29,7 +29,7 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
  * @author fouriep
  * Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}.
  */
-public class PSimRandomPlanSelector extends RandomPlanSelector {
+public class PSimRandomPlanSelector extends RandomPlanSelector<Plan> {
 
 	@Override
 	public Plan selectPlan(HasPlansAndId<Plan> person) {

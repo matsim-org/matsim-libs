@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -35,6 +36,7 @@ import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -217,6 +219,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	
 	private ScoringFunction scoringFunction;
 
+	private ActivityTimesGivenBy activityTimesGivenBy = ActivityTimesGivenBy.endTimeOnly ;
+
 	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, CarrierScoringFunctionFactory scoringFunctionFactory) {
 		this.tracker = carrierAgentTracker;
 		this.carrier = carrier;
@@ -239,6 +243,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	 */
 	List<MobSimVehicleRoute> createFreightDriverPlans() {
 		clear();
+		System.out.flush();
+		Logger.getLogger(this.getClass()).warn(" activityTimesGivenBy set to: " + this.activityTimesGivenBy.toString() );
+		System.err.flush() ;
 		List<MobSimVehicleRoute> routes = new ArrayList<MobSimVehicleRoute>();
 //		List<Plan> plans = new ArrayList<Plan>();
 		if (carrier.getSelectedPlan() == null) {
@@ -268,8 +275,24 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				} else if (tourElement instanceof TourActivity) {
 					TourActivity act = (TourActivity) tourElement;
 					Activity tourElementActivity = new ActivityImpl(act.getActivityType(), act.getLocation());
-					double endTime = act.getExpectedActEnd();
-					tourElementActivity.setEndTime(endTime);
+					
+					// doing the following in order to preserve Stefan's original formulation.  Personally, I would be happy with "durationOnly".
+					// kai, nov'13
+					switch ( this.activityTimesGivenBy ) {
+					case durationOnly:
+						double duration = act.getDuration() ;
+//						System.out.flush();
+//						System.err.println(" duration=" + duration );
+//						System.err.flush();
+						tourElementActivity.setMaximumDuration(duration); // "maximum" has become a bit of a misnomer ...
+						break;
+					case endTimeOnly:
+						double endTime = act.getExpectedActEnd();
+						tourElementActivity.setEndTime(endTime);
+						break;
+					default:
+						throw new RuntimeException("case not defined; aborting ...") ;
+					}
 					plan.addActivity(tourElementActivity);
 				}
 			}
@@ -363,6 +386,10 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	
 	CarrierDriverAgent getDriver(Id driverId){
 		return carrierDriverAgents.get(driverId);
+	}
+
+	void setActivityTimesGivenBy(ActivityTimesGivenBy activityTimesGivenBy) {
+		this.activityTimesGivenBy = activityTimesGivenBy ;
 	}
 
 }

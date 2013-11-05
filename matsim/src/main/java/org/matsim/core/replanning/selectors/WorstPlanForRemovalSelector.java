@@ -23,6 +23,7 @@ package org.matsim.core.replanning.selectors;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
@@ -38,18 +39,18 @@ import org.matsim.core.population.PlanImpl;
  *
  * @author mrieser
  */
-public class WorstPlanForRemovalSelector implements PlanSelector {
+public class WorstPlanForRemovalSelector<T extends BasicPlan> implements GenericPlanSelector<T> {
 
 	private static final String UNDEFINED_TYPE = "undefined";
 
 	@Override
-	public Plan selectPlan(HasPlansAndId<Plan> person) {
+	public T selectPlan(HasPlansAndId<T> person) {
 
 		// hashmap that returns "Integer" count for given plans type:
 		Map<String, Integer> typeCounts = new ConcurrentHashMap<String, Integer>();
 
 		// count how many plans per type an agent has:
-		for (Plan plan : person.getPlans()) {
+		for (T plan : person.getPlans()) {
 			String type = ((PlanImpl) plan).getType();
 			if ( type==null ) {
 				type = UNDEFINED_TYPE ;
@@ -62,9 +63,9 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 			}
 		}
 
-		Plan worst = null;
+		T worst = null;
 		double worstScore = Double.POSITIVE_INFINITY;
-		for (Plan plan : person.getPlans()) {
+		for (T plan : person.getPlans()) {
 
 			String type = ((PlanImpl) plan).getType();
 			if ( type==null ) {
@@ -94,7 +95,7 @@ public class WorstPlanForRemovalSelector implements PlanSelector {
 		if (worst == null) {
 			// there is exactly one plan, or we have of each plan-type exactly one.
 			// select the one with worst score globally, or the first one with score=null
-			for (Plan plan : person.getPlans()) {
+			for (T plan : person.getPlans()) {
 				if (plan.getScore() == null || plan.getScore().isNaN() ) {
 					return plan;
 				}

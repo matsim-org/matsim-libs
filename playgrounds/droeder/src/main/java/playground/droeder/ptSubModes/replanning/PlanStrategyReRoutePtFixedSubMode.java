@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,6 +35,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
@@ -46,7 +48,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	private static final Logger log = Logger
 			.getLogger(PlanStrategyReRoutePtFixedSubMode.class);
 	
-	private RandomPlanSelector selector;
+	private RandomPlanSelector<Plan> selector;
 	private List<Plan> plans;
 	private List<PlanStrategyModule> modules;
 	private Scenario sc;
@@ -78,7 +80,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	}
 
 	@Override
-	public void run(Person person) {
+	public void run(HasPlansAndId<Plan> person) {
 		// try to score unscored plans anyway
 		Plan p = ((PersonImpl) person).getRandomUnscoredPlan();
 		//otherwise get random plan
@@ -132,7 +134,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 		this.plans.clear();
 	}
 
-	public PlanSelector getPlanSelector() {
+	public GenericPlanSelector<Plan> getPlanSelector() {
 		return this.selector;
 	}
 
