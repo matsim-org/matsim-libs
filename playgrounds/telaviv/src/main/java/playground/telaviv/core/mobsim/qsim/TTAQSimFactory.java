@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.SimStepParallelEventsManagerImpl;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -65,7 +66,14 @@ public class TTAQSimFactory implements MobsimFactory {
 		int numOfThreads = conf.getNumberOfThreads();
 		QNetsimEngineFactory netsimEngFactory;
 		if (numOfThreads > 1) {
-			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
+			/*
+			 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
+			 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
+			 * SynchronizedEventsManagerImpl.
+			 */
+			if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
+				eventsManager = new SynchronizedEventsManagerImpl(eventsManager);				
+			}
 			netsimEngFactory = new ParallelQNetsimEngineFactory();
 			log.info("Using parallel QSim with " + numOfThreads + " threads.");
 		} else {

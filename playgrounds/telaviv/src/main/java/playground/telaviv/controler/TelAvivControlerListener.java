@@ -149,26 +149,51 @@ public class TelAvivControlerListener implements StartupListener {
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.00);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
+		
+		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), observedPopulation, 
+				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
+		controler.addControlerListener(distanceDistribution);
+		distributionClass = distanceDistribution.createAndAddDistributionClass("observed_population-shopping");
+		distanceDistribution.addActivityCombination(distributionClass, "home", "shopping");
+		distanceDistribution.addActivityCombination(distributionClass, "shopping", "home");
+		distanceDistribution.addActivityCombination(distributionClass, "work", "shopping");
+		distanceDistribution.addActivityCombination(distributionClass, "shopping", "work");
+		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
+		
+		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), observedPopulation, 
+				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
+		controler.addControlerListener(distanceDistribution);
+		distributionClass = distanceDistribution.createAndAddDistributionClass("observed_population-leisure");
+		distanceDistribution.addActivityCombination(distributionClass, "home", "leisure");
+		distanceDistribution.addActivityCombination(distributionClass, "leisure", "home");
+		distanceDistribution.addActivityCombination(distributionClass, "work", "leisure");
+		distanceDistribution.addActivityCombination(distributionClass, "leisure", "work");
+		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
 		
 		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), observedPopulation, 
 				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
 		controler.addControlerListener(distanceDistribution);
 		distributionClass = distanceDistribution.createAndAddDistributionClass("observed_population-overall");
 		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 100.0, 0);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 100.0, 200.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 200.0, 500.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, 200000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 200000.0, 500000.0, 10);
-//		distanceDistribution.createAndAddDistanceBin(distributionClass, 500000.0, Double.MAX_VALUE, 10);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
@@ -177,7 +202,7 @@ public class TelAvivControlerListener implements StartupListener {
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.00);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
 		
 		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), scenario.getPopulation(), 
 				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
@@ -194,7 +219,7 @@ public class TelAvivControlerListener implements StartupListener {
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.00);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
 
 		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), scenario.getPopulation(), 
 				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
@@ -209,7 +234,7 @@ public class TelAvivControlerListener implements StartupListener {
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.00);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
 	}
 
 }
