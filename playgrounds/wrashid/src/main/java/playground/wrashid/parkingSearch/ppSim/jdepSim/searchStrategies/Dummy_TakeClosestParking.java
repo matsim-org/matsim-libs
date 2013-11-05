@@ -21,21 +21,30 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 
-public class Dummy_TakeClosestParking implements ParkingSearchStrategy {
+public class Dummy_TakeClosestParking extends RandomParkingSearch {
+	private HashSet<Id> parkingFound;
 
-	public Dummy_TakeClosestParking() {
-		resetForNewIteration();
+	public Dummy_TakeClosestParking(double maxDistance, Network network, String name) {
+		super(maxDistance, network, name);
 	}
-
-	HashSet<Id> parkingFound;
+	
+	public void resetForNewIteration() {
+		super.resetForNewIteration();
+		parkingFound=new HashSet<Id>();
+	}
 
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
+		
+		boolean endOfLegReached = aem.endOfLegReached();
+
+		if (endOfLegReached) {
 		if (!parkingFound.contains(personId)) {
 			parkingFound.add(personId);
 
@@ -48,35 +57,12 @@ public class Dummy_TakeClosestParking implements ParkingSearchStrategy {
 			if (parkingId == null) {
 				parkingId = AgentWithParking.parkingManager.getClosestFreeParkingFacilityId(nextAct.getLinkId());
 			}
-			AgentWithParking.parkingManager.parkVehicle(personId, parkingId);
+			
+			parkVehicle(aem, parkingId);
+		}} else {
+			super.handleAgentLeg(aem);
 		}
-		aem.processLegInDefaultWay();
-	}
-
-	@Override
-	public String getName() {
-		return "Dummy_TakeClosestParking";
-	}
-
-	@Override
-	public String getGroupName() {
-		return "GroupName";
-	}
-
-	@Override
-	public void handleParkingDepartureActivity(AgentWithParking aem) {
-		Id personId = aem.getPerson().getId();
-		parkingFound.remove(personId);
-	}
-
-	@Override
-	public void resetForNewIteration() {
-		parkingFound = new HashSet<Id>();
-	}
-
-	@Override
-	public void tollAreaEntered(AgentWithParking aem) {
-
+		
 	}
 
 }
