@@ -530,5 +530,14 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
+
+	@Override
+	public void initParkingAttributes(AgentWithParking aem) {
+		ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
+		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+		.get(aem.getPlanElementIndex() + 3);
+		parkingAttributesForScoring.destinationCoord=nextAct.getCoord();
+	}
+
 	
 }

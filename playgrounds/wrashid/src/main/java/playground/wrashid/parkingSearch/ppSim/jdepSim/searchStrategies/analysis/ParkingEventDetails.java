@@ -62,12 +62,16 @@ public class ParkingEventDetails {
 		sb.append(parkingStrategy.getName());
 		sb.append("\t");
 		sb.append(parkingStrategy.getGroupName());
+		sb.append("\t");
+		sb.append(parkingActivityAttributes.destinationCoord.getX());
+		sb.append("\t");
+		sb.append(parkingActivityAttributes.destinationCoord.getY());
 		
 		return sb.toString();
 	}
 	
 	public static String getTabSeparatedTitleString(){
-		return "personId\tparkingArrivalTime\tparkingDuration\tparkingSearchDuration\twalkDuration\tFacilityId\tparkingCost\tlegIndex\tscore\tparkingStrategy";
+		return "personId\tparkingArrivalTime\tparkingDuration\tparkingSearchDuration\twalkDuration\tFacilityId\tparkingCost\tlegIndex\tscore\tparkingStrategy\tgroupName\tdestination-X\tdestination-Y";
 	}
 }
 

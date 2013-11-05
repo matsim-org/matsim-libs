@@ -91,7 +91,7 @@ public class ParkingLoader {
 		System.out.println("numberOfPrivateParking (%):" + numberOfPrivateParking / totalNumberOfParkingZH * 100
 				+ " - ref: 75.4 - [" + numberOfPrivateParking + "]");
 
-		System.out.println("totalNumberOfParkingZH: " + Math.round(totalNumberOfParkingZH / 1000) + "k - ref: " + 267000
+		System.out.println("totalNumberOfParkingZH: " + (totalNumberOfParkingZH / 1000) + "k - ref: " + 267000
 				* populationScalingFactor / 1000 + "k");
 
 		return parkingCollection;

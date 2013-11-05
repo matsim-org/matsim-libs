@@ -88,10 +88,12 @@ public class AgentWithParking extends AgentEventMessage {
 			}
 
 			if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+				
 				performSiutationUpdatesForParkingMemory();
 				
 				logIfTolledAreaEntered();
 				
+				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).initParkingAttributes(this);
 				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).handleAgentLeg(this);
 
 			} else {

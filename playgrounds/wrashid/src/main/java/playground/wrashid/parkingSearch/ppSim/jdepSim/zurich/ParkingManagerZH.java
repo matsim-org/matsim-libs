@@ -632,6 +632,11 @@ public class ParkingManagerZH {
 			return garageParkings.get(coord.getX(), coord.getY()).getId();
 		}
 	}
+	
+	public Collection<Parking> getParkingWithinDistance(Coord coord, double distance){
+		return null;
+		//nonFullPublicParkingFacilities
+	}
 
 	public IntegerValueHashMap<Id> getOccupiedParking() {
 		return occupiedParking;

@@ -30,5 +30,6 @@ public interface ParkingSearchStrategy {
 	public void handleParkingDepartureActivity(AgentWithParking agentWithParking);
 	public void resetForNewIteration();
 	public void tollAreaEntered(AgentWithParking aem);
+	public void initParkingAttributes(AgentWithParking aem);
 }
 
