@@ -46,6 +46,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
@@ -99,7 +100,7 @@ public class ParkingManagerZH {
 
 	protected QuadTree<Parking> nonFullPublicParkingFacilities;
 	protected QuadTree<Parking> garageParkings;
-	
+
 	protected HashSet<Parking> fullPublicParkingFacilities;
 	private Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId,
 																// List<FacilityId>>
@@ -118,6 +119,8 @@ public class ParkingManagerZH {
 	private LinkedList<Parking> parkings;
 	// activity facility Id, activityType, parking facility id
 	private TwoHashMapsConcatenated<Id, String, Id> privateParkingFacilityIdMapping;
+	
+	private HashMap<Id, Route> firstAdaptedLegCache;
 
 	public ParkingManagerZH(HashMap<String, HashSet<Id>> parkingTypes, ParkingCostCalculator parkingCostCalculator,
 			LinkedList<Parking> parkings, Network network, TTMatrix ttMatrix) {
@@ -127,9 +130,11 @@ public class ParkingManagerZH {
 		this.setParkingCostCalculator(parkingCostCalculator);
 		this.network = network;
 		this.parkingTypes = parkingTypes;
+		// don't move this to reset method, as set in iteration 1!
+		firstAdaptedLegCache=new HashMap<Id, Route>();
 
 		initializeGarageParkings(parkings);
-		
+
 		reset();
 
 	}
@@ -138,14 +143,14 @@ public class ParkingManagerZH {
 		EnclosingRectangle rect = new EnclosingRectangle();
 
 		for (Parking p : parking) {
-			if (p.getId().toString().contains("gp")){
+			if (p.getId().toString().contains("gp")) {
 				rect.registerCoord(p.getCoord());
 			}
 		}
 		garageParkings = (new QuadTreeInitializer<Parking>()).getQuadTree(rect);
-		
+
 		for (Parking p : parking) {
-			if (p.getId().toString().contains("gp")){
+			if (p.getId().toString().contains("gp")) {
 				garageParkings.put(p.getCoord().getX(), p.getCoord().getY(), p);
 			}
 		}
@@ -185,7 +190,7 @@ public class ParkingManagerZH {
 				privateParkingFacilityIdMapping.put(privateParking.getActInfo().getFacilityId(), privateParking.getActInfo()
 						.getActType(), parking.getId());
 			}
-			
+
 			if (parking.getId().toString().contains("illegal")) {
 				nonFullPublicParkingFacilities.remove(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 			}
@@ -326,7 +331,7 @@ public class ParkingManagerZH {
 	}
 
 	public List<Id> getParkingsOnLink(Id linkId) {
-		if (parkingFacilitiesOnLinkMapping.containsKey(linkId)){
+		if (parkingFacilitiesOnLinkMapping.containsKey(linkId)) {
 			return parkingFacilitiesOnLinkMapping.get(linkId);
 		} else {
 			return new LinkedList<Id>();
@@ -477,74 +482,103 @@ public class ParkingManagerZH {
 	public void initFirstParkingOfDay(Population population) {
 		log.info("starting initFirstParkingOfDay");
 
-//		RerouteThread[] rerouteThreads = new RerouteThread[ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning];
-//
-//		CyclicBarrier cyclicBarrier = new CyclicBarrier(rerouteThreads.length + 1);
-//		for (int i = 0; i < rerouteThreads.length; i++) {
-//			rerouteThreads[i] = new RerouteThread(ttMatrix, network, cyclicBarrier);
-//		}
-		RerouteThreadPool rtPool=new RerouteThreadPool(ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning, ttMatrix, network);
+		// RerouteThread[] rerouteThreads = new
+		// RerouteThread[ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning];
+		//
+		// CyclicBarrier cyclicBarrier = new CyclicBarrier(rerouteThreads.length
+		// + 1);
+		// for (int i = 0; i < rerouteThreads.length; i++) {
+		// rerouteThreads[i] = new RerouteThread(ttMatrix, network,
+		// cyclicBarrier);
+		// }
 
-		for (Person person : population.getPersons().values()) {
-			for (int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++) {
-				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
-				if (pe instanceof LegImpl) {
-					LegImpl leg = (LegImpl) pe;
-					if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
-						ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i - 3);
-						ActivityImpl prevParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i - 1);
-						ActivityImpl nextParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i + 1);
-						ActivityImpl nextNonParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i + 3);
+			RerouteThreadPool rtPool = new RerouteThreadPool(ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning, ttMatrix, network);
 
-						DebugLib.traceAgent(person.getId(), 19);
+			for (Person person : population.getPersons().values()) {
+				for (int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++) {
+					PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
+					if (pe instanceof LegImpl) {
+						LegImpl leg = (LegImpl) pe;
+						if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+							ActivityImpl act = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i - 3);
+							ActivityImpl prevParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i - 1);
+							ActivityImpl nextParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i + 1);
+							ActivityImpl nextNonParkingAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(i + 3);
 
-						Id parkingId = getFreePrivateParking(act.getFacilityId(), act.getType());
+							DebugLib.traceAgent(person.getId(), 19);
 
-						if (parkingId == null) {
-							parkingId= getClosestFreeParkingFacilityId(act.getLinkId());
-							//parkingId = getClosestAcceptableFreeParkingDuringInitialization(act.getLinkId());
+							Id parkingId = getFreePrivateParking(act.getFacilityId(), act.getType());
+
+							if (parkingId == null) {
+								parkingId = getClosestFreeParkingFacilityId(act.getLinkId());
+								// parkingId =
+								// getClosestAcceptableFreeParkingDuringInitialization(act.getLinkId());
+							}
+
+							if (getLinkOfParking(parkingId).toString().equalsIgnoreCase(nextNonParkingAct.getLinkId().toString())) {
+								parkingId = getClosestParkingFacilityNotOnLink(network.getLinks().get(act.getLinkId()).getCoord(),
+										nextNonParkingAct.getLinkId());
+							}
+
+							if (getLinkOfParking(parkingId).toString().equalsIgnoreCase(nextNonParkingAct.getLinkId().toString())) {
+								DebugLib.stopSystemAndReportInconsistency();
+							}
+
+							// TODO!!!!!!!!!!!!!!!!!!!
+							// add check here, if on same link or not!!!
+
+							parkVehicle(person.getId(), parkingId);
+
+							prevParkingAct.setLinkId(getLinkOfParking(parkingId));
+
+							// leg.setRoute(editRoute.getRoute(act.getEndTime(),
+							// prevParkingAct.getLinkId(),
+							// nextParkingAct.getLinkId()));
+							// leg.setRoute(editRoute.addInitialPartToRoute(act.getEndTime(),
+							// prevParkingAct.getLinkId(),
+							// (LinkNetworkRouteImpl)
+							// leg.getRoute()));
+							// pool.submit(new
+							// AddInitialPartToRouteTask(act.getEndTime(),
+							// prevParkingAct.getLinkId(),
+							// leg,ttMatrix,network));
+
+							if (firstAdaptedLegCache.containsKey(person.getId())){
+								leg.setRoute(firstAdaptedLegCache.get(person.getId()));
+							} else {
+								rtPool.addTask(new RerouteTaskAddInitialPartToRoute(act.getEndTime(), prevParkingAct.getLinkId(), leg));
+								// rerouteThreads[numberOfTasks %
+								// rerouteThreads.length].addTask();
+							}
+							
+
+							break;
 						}
-
-						if (getLinkOfParking(parkingId).toString().equalsIgnoreCase(nextNonParkingAct.getLinkId().toString())) {
-							parkingId = getClosestParkingFacilityNotOnLink(network.getLinks().get(act.getLinkId()).getCoord(),
-									nextNonParkingAct.getLinkId());
-						}
-
-						if (getLinkOfParking(parkingId).toString().equalsIgnoreCase(nextNonParkingAct.getLinkId().toString())) {
-							DebugLib.stopSystemAndReportInconsistency();
-						}
-
-						// TODO!!!!!!!!!!!!!!!!!!!
-						// add check here, if on same link or not!!!
-
-						parkVehicle(person.getId(), parkingId);
-
-						prevParkingAct.setLinkId(getLinkOfParking(parkingId));
-
-						// leg.setRoute(editRoute.getRoute(act.getEndTime(),
-						// prevParkingAct.getLinkId(),
-						// nextParkingAct.getLinkId()));
-						// leg.setRoute(editRoute.addInitialPartToRoute(act.getEndTime(),
-						// prevParkingAct.getLinkId(), (LinkNetworkRouteImpl)
-						// leg.getRoute()));
-						// pool.submit(new
-						// AddInitialPartToRouteTask(act.getEndTime(),
-						// prevParkingAct.getLinkId(), leg,ttMatrix,network));
-
-						rtPool.addTask(new RerouteTaskAddInitialPartToRoute(act.getEndTime(),
-								prevParkingAct.getLinkId(), leg));
-						//rerouteThreads[numberOfTasks % rerouteThreads.length].addTask();
-
-						break;
 					}
 				}
 			}
-		}
 
-		rtPool.start();
+			rtPool.start();
+
+			
+			
 
 		if (ZHScenarioGlobal.iteration == 0) {
 			logInitialOccupancyToTxtFile();
+			
+			
+			for (Person person : population.getPersons().values()) {
+				for (int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++) {
+					PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
+					if (pe instanceof LegImpl) {
+						LegImpl leg = (LegImpl) pe;
+						if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+							firstAdaptedLegCache.put(person.getId(), leg.getRoute());
+							break;
+						}
+					}
+				}
+			}
 		}
 
 		log.info("completed initFirstParkingOfDay");
@@ -611,31 +645,31 @@ public class ParkingManagerZH {
 	// else gives just closest parking (not considering, if free or not)
 	public Id getClosestFreeGarageParking(Coord coord) {
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
-		
-		if (GeneralLib.getDistance(coordinatesLindenhofZH,coord)<8000){
-		double distance = 100;
-		while (true) {
-			Collection<Parking> collection = garageParkings.get(coord.getX(), coord.getY(), distance);
 
-			for (Parking p : collection) {
-				if (p.getIntCapacity()-getOccupiedParking().get(p.getId())>0) {
-					return p.getId();
+		if (GeneralLib.getDistance(coordinatesLindenhofZH, coord) < 8000) {
+			double distance = 100;
+			while (true) {
+				Collection<Parking> collection = garageParkings.get(coord.getX(), coord.getY(), distance);
+
+				for (Parking p : collection) {
+					if (p.getIntCapacity() - getOccupiedParking().get(p.getId()) > 0) {
+						return p.getId();
+					}
+				}
+
+				if (distance < 1000) {
+					distance += 100;
+				} else {
+					distance *= 2;
 				}
 			}
-			
-			if (distance < 1000) {
-				distance += 100;
-			} else {
-				distance *= 2;
-			}
-		}} else {
+		} else {
 			return garageParkings.get(coord.getX(), coord.getY()).getId();
 		}
 	}
-	
-	public Collection<Parking> getParkingWithinDistance(Coord coord, double distance){
-		return null;
-		//nonFullPublicParkingFacilities
+
+	public Collection<Parking> getParkingWithinDistance(Coord coord, double distance) {
+		return nonFullPublicParkingFacilities.get(coord.getX(), coord.getY(), distance);
 	}
 
 	public IntegerValueHashMap<Id> getOccupiedParking() {
