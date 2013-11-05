@@ -54,7 +54,6 @@ public class SAString {
 	final private static Logger LOG = Logger.getLogger(SAString.class);
 	final private Random random;
 	private Matrix distanceMatrix;
-	private Matrix interSiteDistanceMatrix;
 	private List<Id> sites;
 	private List<Id> demandPoints;
 	private List<Id> fixedSites;
@@ -70,7 +69,7 @@ public class SAString {
 
 		/* Required arguments. */
 		String distanceFilename = args[0];
-		String interSiteDistanceFilename = args[1];
+		String distanceMatrixDescription = args[1];
 		String outputFolder = args[2];
 		int numberOfThreads = Integer.parseInt(args[3]);
 
@@ -88,42 +87,30 @@ public class SAString {
 		/*
 		 * Implementing the Simulated Annealing algorithm using a single string
 		 * representation.
-		 * 
-		 * FIXME Currently the algorithm does not distinguish between using the
-		 * demand point matrix and the inter-site matrix. Only the inter-site 
-		 * matrix is used. That is, each site is a demand point. */
+		 */
 		SAString sas = new SAString(numberOfThreads, false);
 		sas.readDistanceMatrix(distanceFilename);
-		/* Don't duplicate the matrix reading if the sites are already the 
-		 * demand points. */
-		if(!distanceFilename.equalsIgnoreCase(interSiteDistanceFilename)){
-			sas.readInterSiteDistanceMatrix(interSiteDistanceFilename);
-		}
 		sas.readDemandWeights(weightsFilename);
 		sas.readFixedSites(fixedSitesFilename);
 		
 		/* Initialise the output list. */
 		List<String> outputList = new ArrayList<String>();
 		
-		int[] sitesInSolution = {5, 10, 15, 20, 25, 30, 35, 40, 45};
-//		int[] sitesInSolution = {20};
+		int[] sitesInSolution = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
 		String prefix;
 		for(int n : sitesInSolution){
 			for(int run = 1; run <= 200; run++){
 				LOG.info("====> Number of sites: " + n + "; Run " + run + " <====");
 				/* Execute for full distance matrix. */
-				prefix = n +"_full_" + String.format("%03d", run);
+				prefix = n +"_" + distanceMatrixDescription + "_" + String.format("%03d", run);
 				String outputString = sas.executeSA(n, outputFolder, prefix);
-				
-				/* Execute for demand point matrix. */
-				prefix = n +"_demand_" + run;
 				
 				outputList.add(outputString);
 			}
 		}
 		
 		/* Write out the overall multi-run results. */
-		BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder + "multiRunOutput.csv");
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder + "multiRunOutput_" + distanceMatrixDescription + ".csv");
 		try{
 			/* Write header. */
 			bw.write("sites,matrix,run,objective,incumbent");
@@ -152,8 +139,6 @@ public class SAString {
 	public SAString(int numberOfThreads, long seed, boolean useDemandPoints) {
 		this.distanceMatrix = new Matrix("Distance",
 				"Distance matrix from demand point to site.");
-		this.interSiteDistanceMatrix = new Matrix("InterDistance",
-				"Inter site distance matrix from demand point to site.");
 		this.sites = new ArrayList<Id>();
 		this.demandPoints = new ArrayList<Id>();
 		this.fixedSites = new ArrayList<Id>();
@@ -166,9 +151,6 @@ public class SAString {
 	public SAString(int numberOfThreads, boolean useDemandPoints) {
 		this(numberOfThreads, new SecureRandom().nextInt(), useDemandPoints);
 	}
-	
-	
-	
 	
 
 	/**
@@ -222,6 +204,7 @@ public class SAString {
 				}
 				/* Add the demand point to the list demand of points. */
 				Id demandPointId = new IdImpl(sa[0]);
+				//FIXME Remove once sorted out.
 				this.demandPoints.add(demandPointId);
 
 				for (int i = 1; i < sa.length; i++) {
@@ -237,7 +220,8 @@ public class SAString {
 							siteIndexMap.get(i), distance);
 				}
 			}
-			LOG.info("... read " + this.demandPoints.size() + " demand points.");
+			LOG.info("... read " + this.demandPoints.size() + " demand points (rows).");
+			LOG.info("... read " + (sa.length-1)+ " sites (columns).");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Could not read from " + filename);
@@ -252,70 +236,6 @@ public class SAString {
 	}
 	
 	
-	/**
-	 * Reads in a comma-separated value (CSV) file containing the distances
-	 * between demand points and sites. The layout is assumed to be as follows:
-	 * <ul>
-	 * <li>the first row contains the header;
-	 * <li>each column heading (starting with second) is the site description;
-	 * <li>each subsequent row starts with a demand point description;
-	 * <li>the matrix entries are the distance from demand point to the site.
-	 * </ul>
-	 * 
-	 * @param filename
-	 */
-	private void readInterSiteDistanceMatrix(String filename) {
-		LOG.info("Reading inter site distance matrix from " + filename);
-
-		BufferedReader br = IOUtils.getBufferedReader(filename);
-		try {
-			String line = br.readLine();
-			String[] sa;
-			if(line != null){
-				sa = line.split(",");
-			} else{
-				throw new NullPointerException("Null line read. Not expected.");
-			}
-
-			/* Now read the rest of the matrix. */
-			while ((line = br.readLine()) != null) {
-				sa = line.split(",");
-				/* Check the line length. */
-				if (sa.length != this.sites.size() + 1) {
-					LOG.error("Wrong line length read!!");
-				}
-				/* Add the demand point to the list demand of points. */
-				Id fromId = new IdImpl(sa[0]);
-//				this.demandPoints.add(demandPointId);
-
-				for (int i = 1; i < sa.length; i++) {
-					Id toId = this.sites.get(i-1);
-					double distance = Double.POSITIVE_INFINITY;
-					try {
-						distance = Double.parseDouble(sa[i]);
-					} catch (Exception e) {
-						LOG.error("Cannot convert " + sa[i]
-								+ " to distance of type double.");
-						e.printStackTrace();
-					}
-					interSiteDistanceMatrix.createEntry(fromId,
-							toId, distance);
-				}
-			}
-			LOG.info("... read " + this.demandPoints.size() + " demand points.");
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Could not read from " + filename);
-		} finally {
-			try {
-				br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + filename);
-			}
-		}	
-	}
-
 	private void readDemandWeights(String filename) {
 		/* Only read a filename if it exists, and is not null. */
 		this.demandPointWeights = new HashMap<Id, Double>(
@@ -674,7 +594,7 @@ public class SAString {
 		chosenSites.addAll(fixedSites);
 		
 		/* Then add randomly sampled sites until the required number is reached. */
-		int[] randomPerm = getRandomPermutation(this.demandPoints.size());
+		int[] randomPerm = getRandomPermutation(this.sites.size());
 		int nextInt = 0;
 		while(chosenSites.size() < numberOfSites){
 			Id nextId = this.sites.get(randomPerm[nextInt]);

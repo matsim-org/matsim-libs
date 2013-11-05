@@ -44,9 +44,11 @@ import playground.southafrica.utilities.Header;
 public class GpsHandler {
 	private final static Logger LOG = Logger.getLogger(GpsHandler.class);
 	private final double DISTANCE_FACTOR = 1.35;
+	private final double DEFAULT_CAPACITY = 15;
 	private CoordinateTransformation ct;
 	private List<Trip> trips = new ArrayList<GpsHandler.Trip>();
-	private List<String> outputRecords = new ArrayList<String>();
+	private List<String> outputRecordsDemand = new ArrayList<String>();
+	private List<String> outputRecordsSupply = new ArrayList<String>();
 	
 
 	/**
@@ -56,24 +58,26 @@ public class GpsHandler {
 		Header.printHeader(GpsHandler.class.toString(), args);
 
 		String inputFile = args[0];
-		String outputFile = args[1];
-		String fromCRS = args[2];
-		String toCRS = args[3];
+		String outputFileDemand = args[1];
+		String outputFileSupply = args[2];
+		String fromCRS = args[3];
+		String toCRS = args[4];
 		
 		GpsHandler gh = new GpsHandler(fromCRS, toCRS);
 		gh.parseInput(inputFile);
 		gh.processTrips();
-		gh.writeOutputRecordsToFile(outputFile);
+		gh.writeDemandOutputRecordsToFile(outputFileDemand);
+		gh.writeSupplyOutputRecordsToFile(outputFileSupply);
 		
 		LOG.info("Found " + gh.trips.size() + " trips.");
 		Header.printFooter();
 	}
 
 	
-	private void writeOutputRecordsToFile(String outputFile) {
+	private void writeDemandOutputRecordsToFile(String outputFile) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
-			for(String s : this.outputRecords){
+			for(String s : this.outputRecordsDemand){
 				bw.write(s);
 				bw.newLine();
 			}
@@ -91,24 +95,59 @@ public class GpsHandler {
 	}
 
 
+	private void writeSupplyOutputRecordsToFile(String outputFile) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
+		try{
+			for(String s : this.outputRecordsSupply){
+				bw.write(s);
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + outputFile);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + outputFile);
+			}
+		}
+	}
+	
+	
 	private void parseInput(String inputFile) {
 		int numberOfLines = 0;
 		BufferedReader br = IOUtils.getBufferedReader(inputFile);
 		Trip currentTrip = new Trip();
+
+		/* Assuming each new route starts with a String description of the
+		 * route. */
+		String tripName = null;
+		
 		try{
 			String line = br.readLine(); /* Header line */
 			numberOfLines++;
-			
+
 			while((line=br.readLine()) != null){
 				numberOfLines++;
 				String[] sa = line.split(",");
 				if(sa.length != 11){
 					/* It is a new trip. Check that the current trip is not empty. */
 					if(currentTrip.records.size() > 0){
+						currentTrip.setDescription(tripName);
 						this.trips.add(currentTrip);
+					} else{
+						/* It probably is the first entry. Do nothing. */
 					}
+					
 					/*FIXME This may be a problem... check if it overrides the Trips on the list. */
 					currentTrip = new Trip();
+
+					/* Update the trip description to the new name. */
+					if(sa.length == 1){
+						tripName = sa[0];
+					}
 				} else{
 					/* Add to existing trip. */
 					currentTrip.addRecord(sa);
@@ -128,6 +167,7 @@ public class GpsHandler {
 		
 		/* In the end, add the final (remaining) Trip. */
 		if(currentTrip.records.size() > 0){
+			currentTrip.setDescription(tripName);
 			this.trips.add(currentTrip);
 		}
 		
@@ -137,7 +177,8 @@ public class GpsHandler {
 	private void processTrips(){
 		for(Trip trip : this.trips){
 			trip.processTrip();
-			this.outputRecords.addAll(trip.outputLines);
+			this.outputRecordsDemand.addAll(trip.outputLines);
+			this.outputRecordsSupply.add(trip.outputLineTaxi);
 		}
 	}
 
@@ -155,12 +196,19 @@ public class GpsHandler {
 		private double accumulatedDistance = 0.0;
 		private List<Tuple<String[], Double>> records = new ArrayList<Tuple<String[], Double>>();
 		private List<String> outputLines = new ArrayList<String>();
+		private String outputLineTaxi;
 		private Coord lastCoordinate = null;
+		private String description = null;
 		
 		public Trip() {
 		}
 		
+		public void setDescription(String tripName) {
+			this.description = tripName;
+		}
+
 		private void addRecord(String[] sa){
+			
 			if(records.size() == 0){
 				/* It is the first record. Set the origin coordinate*/
 				double lon = Double.parseDouble(sa[2]);
@@ -205,11 +253,21 @@ public class GpsHandler {
 			String[] firstRecord = this.records.get(0).getFirst();
 			double routeCost = Double.parseDouble(firstRecord[10]);
 			
+			/* Set up the vehicle occupancy data structure. */
+			int numberOfPeopleAtStartOfTrip = Integer.parseInt(firstRecord[5]);
+			double tripIncome = numberOfPeopleAtStartOfTrip*routeCost;
+			double occupancy = numberOfPeopleAtStartOfTrip;
+			double capacity = Math.max(occupancy, DEFAULT_CAPACITY);
+			double accumulatedWeightedOccupancy = 0.0;
+			double tripPortionStart = 0.0;
+			
+			int peakClass = 0;
+			
 			/* Process each record. */
 			for(Tuple<String[], Double> tuple : this.records){
 				String[] sa = tuple.getFirst();
 				String timeString = sa[4];
-				int peakClass = getPeakClassFromTimeString(timeString);
+				peakClass = getPeakClassFromTimeString(timeString);
 				double accumulatedDistance = tuple.getSecond();
 				
 				/* TYPE 1:People getting on along the route are assumed to ride 
@@ -222,10 +280,13 @@ public class GpsHandler {
 //					LOG.info("Getting on along the route: " + costPerKilometer);
 					
 					/* Add the observations. */
-					String record = String.format("1,%d,%.2f,%.2f", peakClass, distanceTravelled, costPerKilometer);
+					String record = String.format("1,%d,%.2f,%.2f,%s", peakClass, distanceTravelled, costPerKilometer, this.description);
 					for(int i = 0; i < numberOfPeopleGettingOnAlongRoute; i++){
 						this.outputLines.add(record);
 					}
+					
+					/* Account for the income. */
+					tripIncome += numberOfPeopleGettingOnAlongRoute*uniqueCostPaidOnBoarding;
 				}
 				
 				/* TYPE 2: People getting off along the route are assumed to 
@@ -237,18 +298,18 @@ public class GpsHandler {
 //					LOG.info("Getting off along the route: " + costPerKilometer);
 					
 					/* Add the observations. */
-					String record = String.format("2,%d,%.2f,%.2f", peakClass, distanceTravelled, costPerKilometer);
+					String record = String.format("2,%d,%.2f,%.2f,%s", peakClass, distanceTravelled, costPerKilometer, this.description);
 					for(int i = 0; i < numberOfPeopleGettingOffAlongRoute; i++){
 						this.outputLines.add(record);
 					}
 				}
 				
 				/* TYPE 3: People joining along the route, switching from another
-				 * route. It is assumed that switching is `free', and the 
-				 * distance is calculated as the entire journey, as they are 
-				 * assumed to travel until the end. The cost the occupant paid 
-				 * in the other taxi is assumed to be the same as in our tracked 
-				 * taxi. */
+				 * route. It is assumed that switching is `free' for the commuter, 
+				 * and the distance is calculated as the entire journey, as they 
+				 * are assumed to travel until the end. The cost the occupant 
+				 * paid in the other taxi is assumed to be the same as in our 
+				 * tracked taxi. */
 				int numberOfPeopleSwitchingFromAnotherTaxi = Integer.parseInt(sa[7]);
 				if(numberOfPeopleSwitchingFromAnotherTaxi > 0){
 					double distanceTravelled = totalDistance;
@@ -256,10 +317,16 @@ public class GpsHandler {
 //					LOG.info("Switching from another taxi: " + costPerKilometer);
 					
 					/* Add the observations. */
-					String record = String.format("3,%d,%.2f,%.2f", peakClass, distanceTravelled, costPerKilometer);
+					String record = String.format("3,%d,%.2f,%.2f,%s", peakClass, distanceTravelled, costPerKilometer, this.description);
 					for(int i = 0; i < numberOfPeopleSwitchingFromAnotherTaxi; i++){
 						this.outputLines.add(record);
 					}
+					
+					/* Account for income (not for commuter account), but settled
+					 * among the drivers. 
+					 * TODO Confirm what the real practice is in settling these
+					 * amounts among the drivers. */
+					tripIncome += numberOfPeopleSwitchingFromAnotherTaxi*routeCost;
 				}
 				
 				/* TYPE 4: People leaving along the route, switching to another
@@ -272,13 +339,38 @@ public class GpsHandler {
 //					LOG.info("Switching to another taxi: " + costPerKilometer);
 					
 					/* Add the observations. */
-					String record = String.format("4,%d,%.2f,%.2f", peakClass, distanceTravelled, costPerKilometer);
+					String record = String.format("4,%d,%.2f,%.2f,%s", peakClass, distanceTravelled, costPerKilometer, this.description);
 					for(int i = 0; i < numberOfPeopleSwitchingToAnotherTaxi; i++){
 						this.outputLines.add(record);
 					}
+
+					/* Account for income (not for commuter account), but settled
+					 * among the drivers. 
+					 * TODO Confirm what the real practice is in settling these
+					 * amounts among the drivers. */
+					tripIncome -= numberOfPeopleSwitchingToAnotherTaxi*routeCost;
 				}
 				
+				/* Account for change in occupancy. */
+				occupancy += (numberOfPeopleGettingOnAlongRoute + numberOfPeopleSwitchingFromAnotherTaxi - numberOfPeopleGettingOffAlongRoute - numberOfPeopleSwitchingToAnotherTaxi);
+				capacity = Math.max(occupancy, capacity);
+				double tripPortionDistance = accumulatedDistance - tripPortionStart;
+				tripPortionStart = accumulatedDistance;
+				/* Weigh the occupancy with the distance travelled. */
+				accumulatedWeightedOccupancy += tripPortionDistance*occupancy;
 			}
+			
+			/* Report the taxi's weighted occupancy. The output line contains 
+			 * the following elements, an din this order:
+			 * 1. peak class;
+			 * 2. total distance;
+			 * 3. weighted average occupancy (number of people);
+			 * 4. weighted average occupancy (percentage of estimated capacity);
+			 * 5. trip income;
+			 * 6. trip description.
+			 */
+			outputLineTaxi = String.format("%d,%.2f,%.2f,%.2f,%.2f,%s", peakClass, totalDistance, accumulatedWeightedOccupancy / totalDistance, (accumulatedWeightedOccupancy / totalDistance)/capacity, tripIncome, this.description);
+			LOG.info(" -->  " + outputLineTaxi);
 			
 		}
 		
