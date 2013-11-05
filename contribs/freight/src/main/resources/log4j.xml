@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration>
+	<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %5p %C{1}:%L %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		  <param name="LevelMin" value="trace" />
+		  <param name="LevelMax" value="info" />
+		</filter>
+	</appender>
+	<appender name="stderr" class="org.apache.log4j.ConsoleAppender">
+		<param name="target" value="System.err" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %5p %C{1}:%L %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		  <param name="LevelMin" value="warn" />
+		  <param name="LevelMax" value="fatal" />
+		</filter>
+	</appender>
+
+<!--    <appender name="file" class="org.apache.log4j.RollingFileAppender">
+    <param name="file" value="matsim.log"/>
+    <param name="MaxFileSize" value="10000KB"/>
+    <param name="MaxBackupIndex" value="1"/>
+    <layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %5p %C{1}:%L %m%n"/>
+    </layout>
+  </appender>-->
+
+	 <!-- Print only messages of level warn or above in the package com.foo -->
+	<!--<logger name="org.matsim.mobsim">
+      <level value="ERROR"/>
+  </logger>--><!-- -->
+<!-- 	<logger name="org.matsim.gbl">
+      <level value="ERROR"/>
+  </logger>
+  <logger name="org.matsim.events.Events">
+      <level value="ERROR"/>
+  </logger>
+  <logger name="org.matsim.replanning.PlanStrategy">
+      <level value="ERROR"/>
+  </logger>
+  <logger name="org.matsim.replanning">
+      <level value="ERROR"/>
+  </logger> -->
+  
+	<root>
+		<priority value="debug"></priority>
+		<appender-ref ref="stdout"/>
+		<appender-ref ref="stderr"/>
+	</root>
+
+</log4j:configuration>
