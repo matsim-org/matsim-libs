@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -185,7 +186,12 @@ public class ZHScenarioGlobal {
 		
 		loadConfigParamters();
 		File file=new File(outputFolder);
-		file.mkdir();
+		
+		//file.mkdir();
+		
+		if (file.list().length>1 && !ZHScenarioGlobal.loadBooleanParam("developingMode")){
+			DebugLib.stopSystemAndReportInconsistency("output folder exists already!" + outputFolder);
+		}
 		
 		file=new File(getItersFolderPath());
 		file.mkdir();

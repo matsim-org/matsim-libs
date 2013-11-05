@@ -150,7 +150,7 @@ public class MainPPSimZurich30km {
 
 				eventsManager.resetHandlers(0);
 
-				eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".events.xml");
+				eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".events.xml.gz");
 			}
 
 			agentsMessage.clear();
