@@ -18,7 +18,9 @@
  * *********************************************************************** */
 package playground.southafrica.kai.freight;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -30,12 +32,16 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.contrib.freight.utils.Visualiser;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkChangeEventFactory;
+import org.matsim.core.network.NetworkChangeEventFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.apache.log4j.Logger;
 
 import util.Solutions;
 import basics.VehicleRoutingAlgorithm;
@@ -77,18 +83,21 @@ public class KNFreight4 {
 			System.out.println( "args[0]:" + args[0] );
 			config.controler().setOutputDirectory( args[0] );
 		}
-		config.controler().setLastIteration(3000); 
+		config.controler().setLastIteration(0);
+		
+		config.network().setInputFile(NETFILENAME);
+//		config.network().setTimeVariantNetwork(true);
 
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(NETFILENAME);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 //		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 //		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 //			double speed = link.getFreespeed() ;
-//			if ( speed > 30./3.6 ) {
+//			final double threshold = 5./3.6;
+//			if ( speed > threshold ) {
 //				{
 //					NetworkChangeEvent event = cef.createNetworkChangeEvent(7.*3600.) ;
-//					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  30./3.6 ));
+//					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
 //					event.addLink(link);
 //					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 //				}
@@ -100,7 +109,6 @@ public class KNFreight4 {
 //				}
 //			}
 //		}
-//		config.network().setTimeVariantNetwork(true);
 
 		Carriers carriers = new Carriers() ;
 		new CarrierPlanXmlReaderV2(carriers).read(CARRIERS) ;
