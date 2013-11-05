@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.withinDay_v_STRC.scoring;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 public class ParkingActivityAttributes {
@@ -119,5 +120,6 @@ public class ParkingActivityAttributes {
 	private double activityDuration;
 	private double parkingSearchDuration;
 	private double parkingCost;
+	public Coord destinationCoord;
 }
 
