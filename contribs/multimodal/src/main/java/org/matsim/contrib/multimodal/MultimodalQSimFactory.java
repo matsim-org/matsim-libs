@@ -36,15 +36,22 @@ import org.matsim.core.router.util.TravelTime;
 
 public class MultimodalQSimFactory implements MobsimFactory {
 
-	private Map<String, TravelTime> multiModalTravelTimes;
-
+	private final Map<String, TravelTime> multiModalTravelTimes;
+	private final MobsimFactory delegateFactory;
+	
 	public MultimodalQSimFactory(Map<String, TravelTime> multiModalTravelTimes) {
-		this.multiModalTravelTimes = multiModalTravelTimes;
+		// use a QSimFactory as default delegate
+		this(multiModalTravelTimes, new QSimFactory());
 	}
 
+	public MultimodalQSimFactory(Map<String, TravelTime> multiModalTravelTimes, MobsimFactory mobsimFactory) {
+		this.multiModalTravelTimes = multiModalTravelTimes;
+		this.delegateFactory = mobsimFactory;
+	}
+	
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager);
+		QSim qSim = (QSim) this.delegateFactory.createMobsim(sc, eventsManager);			
 		MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
 		qSim.addMobsimEngine(multiModalEngine);
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sc.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
