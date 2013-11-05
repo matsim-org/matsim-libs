@@ -62,11 +62,24 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 	
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Double time = event.getTime(); // wenn time = 0.0 ist, wird das Event nicht registriert
+		Double time = event.getTime(); 
+		if(time ==0.0) time = this.timeBinSize;
 		Id linkId = event.getLinkId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 		double endOfTimeInterval = 0.0;
-
+		
+		if(warmEmissionsOfEvent==null){
+			warmEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
+			for(WarmPollutant wp: WarmPollutant.values()){
+				warmEmissionsOfEvent.put(wp, 0.0);
+			}
+		}else{
+			for(WarmPollutant wp: WarmPollutant.values()){
+				if(warmEmissionsOfEvent.get(wp)==null){
+					warmEmissionsOfEvent.put(wp, 0.0);
+				}
+			}
+		}
 		for(int i = 0; i < this.noOfTimeBins; i++){
 			if(time > i * this.timeBinSize && time <= (i + 1) * this.timeBinSize){
 				endOfTimeInterval = (i + 1) * this.timeBinSize;
@@ -76,22 +89,32 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 				if(this.time2warmEmissionsTotal.get(endOfTimeInterval) != null){
 					warmEmissionsTotal = this.time2warmEmissionsTotal.get(endOfTimeInterval);
 					countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
-
+					
+					
 					if(warmEmissionsTotal.get(linkId) != null){
 						Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
-						for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
-							WarmPollutant pollutant = entry.getKey();
-							Double eventValue = entry.getValue();
-
-							Double previousValue = warmEmissionsSoFar.get(pollutant);
-							Double newValue = previousValue + eventValue;
+												
+						for(WarmPollutant wp : WarmPollutant.values()){
+							Double eventValue = warmEmissionsOfEvent.get(wp);
+							if(eventValue == null) eventValue =0.0;
 							
-							/*Is there a bug here?
-							See playground.fhuelsmann.emission.analysisForConcentration.EmissionsPerLinkWarmEventHandler.java*/
-							// TODO einzelne werte koennten null sein
-							warmEmissionsSoFar.put(pollutant, newValue);
+							Double previousValue = warmEmissionsSoFar.get(wp);
+							previousValue += eventValue;
+
 						}
-						warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
+//						for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
+//							WarmPollutant pollutant = entry.getKey();
+//							Double eventValue = new Double(entry.getValue());
+
+//							Double previousValue = new Double(warmEmissionsSoFar.get(pollutant));
+//							Double newValue = new Double(previousValue + eventValue);
+//							
+//							/*Is there a bug here?
+//							See playground.fhuelsmann.emission.analysisForConcentration.EmissionsPerLinkWarmEventHandler.java*/
+//							// TODO einzelne werte koennten null sein + aendert event value!!!!!
+//							warmEmissionsSoFar.put(pollutant, newValue);
+//						}
+						warmEmissionsTotal.put(linkId, warmEmissionsSoFar); // TODO unness?
 						double countsSoFar = countTotal.get(linkId);
 						double newValue = countsSoFar + 1.;
 						countTotal.put(linkId, newValue);
