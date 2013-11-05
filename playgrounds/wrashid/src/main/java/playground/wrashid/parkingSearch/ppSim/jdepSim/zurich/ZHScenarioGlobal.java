@@ -37,6 +37,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSe
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndLawEnforcement;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ComparisonGarageCounts;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyStats;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
@@ -96,6 +97,7 @@ public class ZHScenarioGlobal {
 		}
 		
 		writeAllParkingEventsToFile();
+		ComparisonGarageCounts.logOutput(parkingEventDetails,getItersFolderPath() + iteration + ".parkingCountsComparison");
 	}
 	
 	private static void writeAllParkingEventsToFile() {
@@ -187,6 +189,8 @@ public class ZHScenarioGlobal {
 		
 		file=new File(getItersFolderPath());
 		file.mkdir();
+		
+		ComparisonGarageCounts.init();
 	}
 	
 	private static void loadConfigParamters() {

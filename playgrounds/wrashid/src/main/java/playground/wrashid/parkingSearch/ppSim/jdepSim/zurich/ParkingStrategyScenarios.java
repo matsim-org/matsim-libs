@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Scenario;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.DummyParkingStrategy;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_TakeClosestParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
@@ -208,10 +209,9 @@ public class ParkingStrategyScenarios {
 		
 		}else if (ZHScenarioGlobal.parkingStrategyScenarioId == 9) {
 			allStrategies.add(new DummyParkingStrategy());
+		}else if (ZHScenarioGlobal.parkingStrategyScenarioId == 10) {
+			allStrategies.add(new Dummy_TakeClosestParking());
 		}
-		
-		
-		
 
 		return allStrategies;
 	}
