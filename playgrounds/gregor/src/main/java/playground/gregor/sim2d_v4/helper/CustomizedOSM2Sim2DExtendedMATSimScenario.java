@@ -87,7 +87,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 	//ped flow params
 	private static final double MAX_DENSITY = 5.4;
-	private static final double BOTTLENECK_FLOW = 1.3;
+	static final double BOTTLENECK_FLOW = 1.3;
 
 	//	private static final String TAG_HIGHWAY = "highway";
 	private static final String K_M_TRA_MODE = "m_tra_mode";
@@ -414,9 +414,9 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		//		String inputDir = "/Users/laemmel/devel/gr90_sim2d_v4/input";
 		//		String outputDir = "/Users/laemmel/devel/gr90_sim2d_v4/output";
 
-		String osmFile = "/Users/laemmel/devel/gct2/env_gen_stage2/map.osm";
-		String inputDir = "/Users/laemmel/devel/gct2/input";
-		String outputDir = "/Users/laemmel/devel/gct2/output";
+		String osmFile = "/Users/laemmel/devel/tmp/map.osm";
+		String inputDir = "/Users/laemmel/devel/gct_performance/input";
+		String outputDir = "/Users/laemmel/devel/gct_performance/output";
 
 		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);
