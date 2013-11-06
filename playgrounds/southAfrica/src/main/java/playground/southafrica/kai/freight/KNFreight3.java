@@ -31,6 +31,7 @@ import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierController;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerKai;
@@ -40,12 +41,10 @@ import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -184,7 +183,7 @@ final class KNFreight3 {
 		} ;
 		
 		CarrierController listener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
-//		listener.setActivityTimesGivenBy(ActivityTimesGivenBy.durationOnly);
+		listener.setActivityTimesGivenBy(ActivityTimesGivenBy.durationOnly);
 		listener.setEnableWithinDayActivityReScheduling(false);
 
 		ctrl.addControlerListener(listener) ;
