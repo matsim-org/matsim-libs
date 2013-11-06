@@ -26,6 +26,7 @@ public interface ParkingSearchStrategy {
 	public void handleAgentLeg(AgentWithParking aem);
 	public String getName();
 	public String getGroupName();
+	public void setGroupName(String name);
 	
 	public void handleParkingDepartureActivity(AgentWithParking agentWithParking);
 	public void resetForNewIteration();
