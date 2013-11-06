@@ -25,6 +25,7 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.router.TimeAndSpaceTourRouter;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
@@ -77,6 +78,14 @@ public class ReRouteVehicles implements CarrierReplanningStrategyModule{
 		for(ScheduledTour tour : carrierPlan.getScheduledTours()){
 			new TimeAndSpaceTourRouter(router, network, travelTime).route(tour);
 		}
+	}
+
+	@Override
+	public void prepareReplanning(ReplanningContext replanningContext) {
+	}
+
+	@Override
+	public void finishReplanning() {
 	}
 
 

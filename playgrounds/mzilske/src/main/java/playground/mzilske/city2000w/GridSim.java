@@ -31,6 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -252,6 +253,14 @@ public class GridSim {
 				carrierPlan.getScheduledTours().addAll(plan.getScheduledTours());
 				carrierPlan.setScore(plan.getScore());
 				
+			}
+
+			@Override
+			public void prepareReplanning(ReplanningContext replanningContext) {
+			}
+
+			@Override
+			public void finishReplanning() {
 			}
 		
 		};

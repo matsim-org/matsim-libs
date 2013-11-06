@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.replanning;
 
 import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 
 /**
  * This is a module to modify a carrier's plan.
@@ -11,13 +12,14 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
  * @author sschroeder
  *
  */
-public interface CarrierReplanningStrategyModule {
+public interface CarrierReplanningStrategyModule extends GenericPlanStrategyModule<CarrierPlan>{
 
 	/**
 	 * Modifies the carrierPlan.
 	 * 
 	 * @param carrierPlan to be modified.
 	 */
+	@Override
 	public void handlePlan(CarrierPlan carrierPlan);
 
 }

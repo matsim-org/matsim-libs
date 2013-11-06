@@ -12,6 +12,7 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.util.TravelTime;
 
 import util.Solutions;
@@ -121,6 +122,14 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 				//h
 //				carrierPlan.setScore(plan.getScore());
 				
+			}
+
+			@Override
+			public void prepareReplanning(ReplanningContext replanningContext) {
+			}
+
+			@Override
+			public void finishReplanning() {
 			}
 		
 		};

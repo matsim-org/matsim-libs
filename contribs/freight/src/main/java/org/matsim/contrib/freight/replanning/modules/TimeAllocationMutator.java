@@ -25,6 +25,7 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 
 /**
  * @author nagel
@@ -44,6 +45,14 @@ public class TimeAllocationMutator implements CarrierReplanningStrategyModule {
 		}
 		carrierPlan.getScheduledTours().clear(); 
 		carrierPlan.getScheduledTours().addAll( newTours ) ;
+	}
+
+	@Override
+	public void prepareReplanning(ReplanningContext replanningContext) {
+	}
+
+	@Override
+	public void finishReplanning() {
 	}
 
 }

@@ -31,7 +31,6 @@ import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierController;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerKai;
@@ -41,8 +40,13 @@ import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -166,10 +170,14 @@ final class KNFreight3 {
 				}
 				
 				
-//				GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
-//				{	
-//					GenericPlanStrategy<CarrierPlan> strategy = new  
-//				}
+				GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
+				{	
+					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new RandomPlanSelector<CarrierPlan>()) ;
+					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
+					strategy.addStrategyModule(module);
+					mgr.addStrategy(strategy, null, 0.123);
+					mgr.addChangeRequest(123, strategy, null, 0.231);
+				}
 				
 				return manager ;
 			}

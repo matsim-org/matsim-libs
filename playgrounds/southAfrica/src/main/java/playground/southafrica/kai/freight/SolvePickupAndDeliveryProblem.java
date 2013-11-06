@@ -29,6 +29,7 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.router.TimeAndSpaceTourRouter;
+import org.matsim.core.replanning.ReplanningContext;
 
 import util.Solutions;
 import algorithms.SchrimpfFactory;
@@ -93,6 +94,14 @@ public class SolvePickupAndDeliveryProblem implements CarrierReplanningStrategyM
 		}
 		carrierPlan.setScore(newPlan.getScore());
 		
+	}
+
+	@Override
+	public void prepareReplanning(ReplanningContext replanningContext) {
+	}
+
+	@Override
+	public void finishReplanning() {
 	}
 
 
