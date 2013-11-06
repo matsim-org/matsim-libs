@@ -30,16 +30,41 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Converts a table into a matrix.
+ * 
+ * 			V	H	X
+ * 			v1	h1	x1
+ * 			v1	h2	x2
+ * 			v2	h1	x3
+ * 			v2	h2	x4
+ * 			.	.	.
+ * 			.	.	.
+ * 			.	.	.
+ * 
+ * 			==>
+ * 
+ * 			V\H	h1	h2	.	.
+ * 			v1	x1	x2	.	.
+ * 			v2	x3	x4	.	.
+ * 			.	.	.	.	.
+ * 			.	.	.	.	.
+ * 
+ * 
+ * @author ikaddoura
+ */
 public class MatrixConverter {
 
 	private String inputTable = "/Users/ihab/Desktop/TC_SD.csv"; // data
-	private String busNr_file = "/Users/ihab/Desktop/busNr.csv"; 
-	private String fares_file = "/Users/ihab/Desktop/fares.csv"; 
+	private String params_vertical_file = "/Users/ihab/Desktop/busNr.csv"; 
+	private String params_horizontal_file = "/Users/ihab/Desktop/fares.csv"; 
 	private String outputMatrix = "/Users/ihab/Desktop/TC_SD_matrix.csv";
+	private String seperator = ";";
 	
 	private List<List<String>> lines = new ArrayList<List<String>>();
-	private List<String> busNr;
-	private List<String> fares;
+	private List<String> params_vertical;
+	private List<String> params_horizontal;
+	private BufferedWriter bw;
 	
 	public static void main(String[] args) {
 		MatrixConverter matrixConverter = new MatrixConverter();
@@ -49,15 +74,15 @@ public class MatrixConverter {
 	private void run() {
 		
 		readInputTable();
-		busNr = readParameters(busNr_file);
-		fares = readParameters(fares_file);
+		params_vertical = readParameters(params_vertical_file);
+		params_horizontal = readParameters(params_horizontal_file);
 		
-		System.out.println(this.lines);
-		System.out.println("Params1: " + busNr);
-		System.out.println("Params2: " + fares);
+		System.out.println("Data: " + this.lines);
+		System.out.println("Vertical parameters: " + params_vertical);
+		System.out.println("Horizontal parameters: " + params_horizontal);
 		
-		fillMatrix(busNr, fares);
-		System.out.println("Done.");
+		fillMatrix(params_vertical, params_horizontal);
+		System.out.println("Matrix file written.");
 	}
 
 	private List<String> readParameters(String file) {
@@ -88,40 +113,37 @@ public class MatrixConverter {
 		return params;
 	}
 
-	private void fillMatrix(List<String> params1, List<String> params2) {
+	private void fillMatrix(List<String> params_vertical, List<String> params_horizontal) {
 		File file = new File(this.outputMatrix);
 		
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw = new BufferedWriter(new FileWriter(file));
 			
 			// first line
-			for (String fare : this.fares){
-				bw.write(";" + fare);
+			for (String param_h : this.params_horizontal){
+				bw.write(this.seperator + param_h);
 			}
 			bw.newLine();
 			
 			// for each line
-			for (String busNr : this.busNr){
-				bw.write(busNr);
+			for (String param_v : this.params_vertical){
+				bw.write(param_v);
 				// for each column
-				for (String fare : this.fares){
+				for (String param_h : this.params_horizontal){
 					// find value for this parameter combination
 					String value = null;
-					System.out.println("BusNr: " + busNr);
-					System.out.println("Fare: " + fare);
 					for (List<String> lineEntries : this.lines){
-						if (lineEntries.get(0).equals(busNr) && lineEntries.get(1).equals(fare)) {
+						if (lineEntries.get(0).equals(param_v) && lineEntries.get(1).equals(param_h)) {
 							if (value == null) {
 								value = lineEntries.get(2);
-								bw.write(";" + value);
-								System.out.println("Value: " + lineEntries.get(2));
+								bw.write(this.seperator + value);
 							} else {
-								throw new RuntimeException("Two values found for the parameter combination " + busNr + " and " + fare + ". Aborting...");
+								throw new RuntimeException("Two values found for the parameter combination " + param_v + " and " + param_h + ". Aborting...");
 							}
 						}
 					}
 					if (value == null) {
-						throw new RuntimeException("No value found for the parameter combination " + busNr + " and " + fare + ". Aborting...");
+						throw new RuntimeException("No value found for the parameter combination " + param_v + " and " + param_h + ". Aborting...");
 					}
 				}
 				bw.newLine();
@@ -144,13 +166,7 @@ public class MatrixConverter {
 	        int lineCounter = 0;
 	        while((line = br.readLine()) != null) {
 	            if (lineCounter > 0) {	            	
-	            	String[] parts = line.split(";");
-	            	
-//	            	for (int i = 0 ; i <= parts.length; i++){
-//	            		if (parts[i].isEmpty()){
-//	        				throw new RuntimeException("The input file is not complete. Aborting...");
-//	            		}
-//	            	}
+	            	String[] parts = line.split(this.seperator);
 	            		            	
 	            	String a = parts[0];
 	            	String b = parts[1];
@@ -182,5 +198,3 @@ public class MatrixConverter {
 	}
 			 
 }
-		
-
