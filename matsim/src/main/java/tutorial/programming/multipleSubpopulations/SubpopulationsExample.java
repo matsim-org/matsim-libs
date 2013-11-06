@@ -54,6 +54,8 @@ public class SubpopulationsExample {
 			StrategySettings stratSets = new StrategySettings( new IdImpl( currentStrategyId++ ) ) ;
 			stratSets.setModuleName( PlanStrategyRegistrar.Names.TimeAllocationMutator.toString() );
 			stratSets.setSubpopulation( MyPopulationTypes.normal.toString() );
+			// Note that here, the weight is *not* equals to the probability, as
+			// this is the only strategy (effective probability is 1)
 			stratSets.setProbability(0.5);
 			config.strategy().addStrategySettings(stratSets);
 		}
