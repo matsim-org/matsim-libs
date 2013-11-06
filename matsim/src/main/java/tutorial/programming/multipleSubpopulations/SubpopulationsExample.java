@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package tutorial.programming.multipleSubpopulations;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -29,7 +27,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -50,13 +47,11 @@ public class SubpopulationsExample {
 		config.plans().setInputFile( "plans.xml" ); 
 		config.plans().setSubpopulationAttributeName("abc");
 
-		
-		Random rnd = MatsimRandom.getLocalInstance() ;
-		// (generate ids the same way git does: as random keys)
+		long currentStrategyId = 1;
 		
 		// define strategies for "normal" population:
 		{
-			StrategySettings stratSets = new StrategySettings( new IdImpl(rnd.nextLong()) ) ;
+			StrategySettings stratSets = new StrategySettings( new IdImpl( currentStrategyId++ ) ) ;
 			stratSets.setModuleName( PlanStrategyRegistrar.Names.TimeAllocationMutator.toString() );
 			stratSets.setSubpopulation( MyPopulationTypes.normal.toString() );
 			stratSets.setProbability(0.5);
@@ -64,14 +59,14 @@ public class SubpopulationsExample {
 		}
 		// define strategies for "special" population:
 		{
-			StrategySettings stratSets = new StrategySettings( new IdImpl(rnd.nextLong()) ) ;
+			StrategySettings stratSets = new StrategySettings( new IdImpl( currentStrategyId++ ) ) ;
 			stratSets.setModuleName( PlanStrategyRegistrar.Names.TimeAllocationMutator.toString() );
 			stratSets.setSubpopulation( MyPopulationTypes.special.toString() );
 			stratSets.setProbability(0.5);
 			config.strategy().addStrategySettings(stratSets);
 		}
 		{
-			StrategySettings stratSets = new StrategySettings( new IdImpl( rnd.nextLong()) ) ;
+			StrategySettings stratSets = new StrategySettings( new IdImpl( currentStrategyId++ ) ) ;
 			stratSets.setModuleName( PlanStrategyRegistrar.Names.ReRoute.toString() );
 			stratSets.setSubpopulation( MyPopulationTypes.special.toString() );
 			stratSets.setProbability(0.5);
