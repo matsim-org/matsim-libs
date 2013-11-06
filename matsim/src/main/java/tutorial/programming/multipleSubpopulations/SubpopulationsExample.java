@@ -66,14 +66,14 @@ public class SubpopulationsExample {
 		{
 			StrategySettings stratSets = new StrategySettings( new IdImpl(rnd.nextLong()) ) ;
 			stratSets.setModuleName( PlanStrategyRegistrar.Names.TimeAllocationMutator.toString() );
-			stratSets.setSubpopulation( MyPopulationTypes.normal.toString() );
+			stratSets.setSubpopulation( MyPopulationTypes.special.toString() );
 			stratSets.setProbability(0.5);
 			config.strategy().addStrategySettings(stratSets);
 		}
 		{
 			StrategySettings stratSets = new StrategySettings( new IdImpl( rnd.nextLong()) ) ;
 			stratSets.setModuleName( PlanStrategyRegistrar.Names.ReRoute.toString() );
-			stratSets.setSubpopulation( MyPopulationTypes.normal.toString() );
+			stratSets.setSubpopulation( MyPopulationTypes.special.toString() );
 			stratSets.setProbability(0.5);
 			config.strategy().addStrategySettings(stratSets);
 		}
