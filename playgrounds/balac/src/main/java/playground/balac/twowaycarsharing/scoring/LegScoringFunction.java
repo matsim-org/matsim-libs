@@ -36,6 +36,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 	private Leg currentLeg;
 	private static final Logger log = Logger.getLogger(LegScoringFunction.class);
 	private double totalTime = 0.0;
+	boolean cs = false;
 	public LegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config, FtConfigGroup ftConfigGroup, Network network)
 	{
 		super(params, network);
@@ -50,60 +51,46 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		totalTime = 0.0;
 		cs_start = 0.0;
 		cs_end = 0.0;
-		carsharing = false;
+		cs = false;
 	}
 	
 	@Override
 	public void finish() {
 		
-			score += (totalTime) * (-2.5D/3600);   //fee for renting the car per hour    
-			if (totalTime > 0 && totalTime < 1800) {  //this is used to rpevent agents from renting a car for less than 0.5h
+			score += (totalTime) * (-4.0D/3600);   //fee for renting the car per hour    
+			if (totalTime > 0 && totalTime < 1800) {  //this is used to prevent agents from renting a car for less than 0.5h
 				
 				score -= 50;
 			}
 		
 	}
-	@Override
-	public void startLeg(double time, Leg leg) {
-		// TODO Auto-generated method stub
+	
+	
+	private void calculateCarsharingTravelTime(double departureTime, double arrivalTime, Leg leg) {		
 		
-		if (!leg.getMode().equals( "carsharing" )) {
-			currentLeg = leg;
-			super.startLeg(time, leg);
-			return;
+		
+		if (!cs) {
+			cs_start = arrivalTime;
+			cs = true;
 		}
-		currentLeg = leg;
-		super.startLeg(time, leg);
-		if (leg.getMode().equals( "carsharing" ) && carsharing == false) {
-			
-			cs_start = time;
-			cs_end = 0.0;
-			carsharing = true;
+		else {
+			cs_end = departureTime;
+			if ((cs_end - cs_start) > 0.0) {
+				totalTime += (cs_end - cs_start);
+				
+			}
+			cs = false;
 		}
-	}
-
-	@Override
-	public void endLeg(double time) {
-		// TODO Auto-generated method stub	
-			if (!currentLeg.getMode().equals( "carsharing" )) {
-				
-				if (currentLeg.getMode().equals( "carsharingwalk" ) && carsharing) {
-					if (cs_end - cs_start > 0)
-						totalTime += (cs_end - cs_start);
-					carsharing = false;
-				}
-				
-				super.endLeg(time); return; 
-			}			
-			
-			cs_end = time;
-			super.endLeg(time);
-	}
+		
 	
 	
+}
 	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg)
-	{
+	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
+		
+		if (leg.getMode().equals("carsharingwalk"))
+			calculateCarsharingTravelTime(departureTime, arrivalTime, leg);
+		
 		double tmpScore = 0.0D;
 		double travelTime = arrivalTime - departureTime;
 		

@@ -57,40 +57,28 @@ public class OneWayLegScoringFunction  extends org.matsim.core.scoring.functions
 		//score -= 2;    
 	}	
 	
-	@Override
-	public void startLeg(double time, Leg leg) {
-		// TODO Auto-generated method stub
-		departureTime = time;		
+	private void calculateCarsharingTravelTime(double departureTime, double arrivalTime, Leg leg) {	
 		
-		currentLeg = leg;
-		super.startLeg(time, leg);	
-	}
-
-	@Override
-	public void endLeg(double time) {
-		//check to see if the currentLeg is the start or the end of the carsharing trip
-		
-		if (currentLeg.getMode().equals( "onewaycarsharingwalk" )) {
 			if (!cs) {
-				cs_start = time;
+				cs_start = arrivalTime;
 				cs = true;
 			}
 			else {
 				cs_end = departureTime;
+				if ((cs_end - cs_start) > 0.0) {
+					totalTime += (cs_end - cs_start);
+					
+				}
 				cs = false;
-			}			
-		}
+			}
 		
-		if ((cs_end - cs_start) > 0) 
-			totalTime += (cs_end - cs_start); //increase the totalTime of the carsharing car rental
-		
-		super.endLeg(time);
 	}
 	
-	
 	@Override
-	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg)
-	{
+	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
+		if (leg.getMode().equals("onewaycarsharingwalk"))
+			calculateCarsharingTravelTime(departureTime, arrivalTime, leg);
+		
 		double tmpScore = 0.0D;
 		double travelTime = arrivalTime - departureTime;
 		
