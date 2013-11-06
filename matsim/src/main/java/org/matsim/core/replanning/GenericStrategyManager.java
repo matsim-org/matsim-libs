@@ -68,7 +68,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * @param name the name of the subpopulation attribute
 	 * in the person's object attributes.
 	 */
-	public void setSubpopulationAttributeName(final String name) {
+	public final void setSubpopulationAttributeName(final String name) {
 		this.subpopulationName = name;
 	}
 
@@ -286,7 +286,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * @param person The person for which the strategy should be chosen
 	 * @return the chosen strategy
 	 */
-	public GenericPlanStrategy<T> chooseStrategy(final HasPlansAndId<T> person, final String subpopulation) {
+	public final GenericPlanStrategy<T> chooseStrategy(final HasPlansAndId<T> person, final String subpopulation) {
 		final StrategyWeights<T> weights = weightsPerSubpopulation.get( subpopulation );
 		double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;
 
