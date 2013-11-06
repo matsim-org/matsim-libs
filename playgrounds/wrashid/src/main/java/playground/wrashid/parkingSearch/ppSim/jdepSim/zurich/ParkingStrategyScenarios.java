@@ -303,7 +303,6 @@ public class ParkingStrategyScenarios {
 						increaseAcceptableDistanceInMetersPerMinute);
 				strategy.setGroupName("Parkagent");
 				allStrategies.add(strategy);
-				
 			}
 
 		}

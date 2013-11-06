@@ -189,7 +189,7 @@ public class ZHScenarioGlobal {
 		
 		//file.mkdir();
 		
-		if (file.list().length>1 && !ZHScenarioGlobal.loadBooleanParam("developingMode")){
+		if (file.list().length>2 && !ZHScenarioGlobal.loadBooleanParam("developingMode")){
 			DebugLib.stopSystemAndReportInconsistency("output folder exists already!" + outputFolder);
 		}
 		
