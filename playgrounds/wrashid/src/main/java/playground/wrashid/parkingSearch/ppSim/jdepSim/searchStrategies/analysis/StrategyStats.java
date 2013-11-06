@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
@@ -38,6 +39,8 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.S
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class StrategyStats {
+	
+	private static final Logger log = Logger.getLogger(StrategyStats.class);
 
 	private ArrayList<Double> averageBestList;
 	private ArrayList<Double> averageExecutedList;
@@ -139,6 +142,8 @@ public class StrategyStats {
 	}
 
 	public void writeStrategyScoresToFile() {
+		log.info("starting 'writeStrategyScoresToFile'");
+		
 		String xLabel = "Iteration";
 		String yLabel = "score";
 		String title = "Parking Strategy Score";
@@ -167,6 +172,8 @@ public class StrategyStats {
 		
 		
 		writeToTextFile(seriesLabels, matrix, "parkingStrategyScores.txt");
+		
+		log.info("finished 'writeStrategyScoresToFile'");
 	}
 
 	public void writeToTextFile(String[] seriesLabels, double[][] matrix, String fileName) {

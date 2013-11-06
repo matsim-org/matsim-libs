@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -30,11 +31,15 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.MainPPSimZurich30km;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
 public class ComparisonGarageCounts {
 
+	
+	private static final Logger log = Logger.getLogger(ComparisonGarageCounts.class);
+	
 	private static StringMatrix countsMatrix;
 	private static Set<String> selectedParkings;
 	private static double[] sumOfOccupancyCountsOfSelectedParkings;
@@ -42,6 +47,7 @@ public class ComparisonGarageCounts {
 
 	public static void logOutput(LinkedList<ParkingEventDetails> parkingEventDetails, String outputFileName) {
 		// Output file
+		log.info("starting log parking events");
 		
 		String iterationFilenamePng = outputFileName + ".png";
 		String iterationFilenameTxt = outputFileName + ".txt";
@@ -98,6 +104,8 @@ public class ComparisonGarageCounts {
 		}
 		
 		GeneralLib.writeMatrix(matrix, iterationFilenameTxt, txtFileHeader);
+		
+		log.info("finished log parking events");
 	}
 
 	public static void init() {

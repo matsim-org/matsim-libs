@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -71,6 +72,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.Par
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.HouseHoldIncomeZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingStrategyScenarios;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
@@ -79,6 +81,8 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
 
 public class MainPPSimZurich30km {
 
+	private static final Logger log = Logger.getLogger(MainPPSimZurich30km.class);
+	
 	/**
 	 * @param args
 	 */
@@ -135,7 +139,7 @@ public class MainPPSimZurich30km {
 		int skipOutputInIteration = ZHScenarioGlobal.skipOutputInIteration;
 
 		for (int iter = 0; iter < ZHScenarioGlobal.numberOfIterations; iter++) {
-			System.out.println("iteration-" + iter + " starts");
+			log.info("iteration-" + iter + " starts");
 			ZHScenarioGlobal.iteration = iter;
 
 			EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -164,10 +168,14 @@ public class MainPPSimZurich30km {
 			ParkingMemory.resetMemory();
 			RandomNumbers.reset();
 
+			
+			log.info("simulation-" + iter + " starts");
 			Mobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
 			sim.run();
 			eventsManager.finishProcessing();
 
+			log.info("simulation-" + iter + " ended");
+			
 			if (writeOutput(writeEachNthIteration, skipOutputInIteration, iter)) {
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_all.png");
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_car.png", TransportMode.car);
@@ -189,7 +197,7 @@ public class MainPPSimZurich30km {
 			AgentWithParking.parkingManager.reset();
 			resetRoutes(scenario);
 			setParkingLinkIdToClosestActivity(scenario.getPopulation().getPersons().values());
-			System.out.println("iteration-" + iter + " ended");
+			log.info("iteration-" + iter + " ended");
 		}
 
 	}

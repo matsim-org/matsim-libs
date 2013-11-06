@@ -565,6 +565,7 @@ public class ParkingManagerZH {
 
 		if (ZHScenarioGlobal.iteration == 0) {
 			logInitialOccupancyToTxtFile();
+			logInitialParkingOfEachAgent();
 			
 			
 			for (Person person : population.getPersons().values()) {
@@ -582,6 +583,18 @@ public class ParkingManagerZH {
 		}
 
 		log.info("completed initFirstParkingOfDay");
+	}
+
+	private void logInitialParkingOfEachAgent() {
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("personId\tparkingId");
+
+		for (Id personId : agentVehicleIdParkingIdMapping.keySet()) {
+			list.add(personId.toString() + "\t" + agentVehicleIdParkingIdMapping.get(personId));
+		}
+
+		GeneralLib.writeList(list, ZHScenarioGlobal.getItersFolderPath() + ZHScenarioGlobal.iteration
+				+ ".initialPersonParkingLocation.txt");
 	}
 
 	private Id getClosestAcceptableFreeParkingDuringInitialization(Id linkId) {

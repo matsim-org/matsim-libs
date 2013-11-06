@@ -86,8 +86,8 @@ public class ParkingStrategyScenarios {
 					.loadIntParam("parkingStrategyScenarioId.4.numberOfRandomSteetParkingSearch");
 			for (int i = 0; i < randomSteetParkingSearchCount; i++) {
 				RandomStreetParkingSearch strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(),
-						"RandomStreetParkingSearch-AD-" + i);
-				strategy.setGroupName("randomStreetParkingSearch");
+						"ARD-S-" + i);
+				strategy.setGroupName("ARD-S");
 				allStrategies.add(strategy);
 			}
 
@@ -95,8 +95,8 @@ public class ParkingStrategyScenarios {
 					.loadIntParam("parkingStrategyScenarioId.4.numberOfRandomGarageParkingSearch");
 			for (int i = 0; i < randomGarageParkingSearchCount; i++) {
 				RandomGarageParkingSearch strategy = new RandomGarageParkingSearch(-1, scenario.getNetwork(),
-						delayBeforeSwitchToStreetParkingSearch, "RandomGarageParkingSearch-AD-" + i);
-				strategy.setGroupName("randomGarageParkingSearch");
+						delayBeforeSwitchToStreetParkingSearch, "ARD-G-" + i);
+				strategy.setGroupName("ARD-G");
 				allStrategies.add(strategy);
 			}
 
