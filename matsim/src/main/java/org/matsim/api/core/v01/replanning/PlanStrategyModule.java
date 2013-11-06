@@ -22,6 +22,7 @@ package org.matsim.api.core.v01.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 
 
 /**
@@ -34,7 +35,7 @@ import org.matsim.core.replanning.ReplanningContext;
  * 
  * @author mrieser
  */
-public interface PlanStrategyModule {
+public interface PlanStrategyModule extends GenericPlanStrategyModule<Plan>{
 
 	/**
 	 * Initializes this module before handling plans. Modules using an external
@@ -43,6 +44,7 @@ public interface PlanStrategyModule {
 	 * their threads in this method.
 	 * @param replanningContext TODO
 	 */
+	@Override
 	public void prepareReplanning(ReplanningContext replanningContext);
 	
 	/**
@@ -55,6 +57,7 @@ public interface PlanStrategyModule {
 	 * @param plan
 	 * @see #finishReplanning()
 	 */
+	@Override
 	public void handlePlan(Plan plan);
 	
 	/**
@@ -65,5 +68,6 @@ public interface PlanStrategyModule {
 	 * 
 	 * @see #handlePlan(Plan)
 	 */
+	@Override
 	public void finishReplanning();
 }

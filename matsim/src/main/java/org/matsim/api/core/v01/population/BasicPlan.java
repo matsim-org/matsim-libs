@@ -5,5 +5,5 @@ public interface BasicPlan {
 	public abstract void setScore(Double score);
 
 	public abstract Double getScore();
-
+	
 }

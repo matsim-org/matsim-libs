@@ -29,11 +29,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
@@ -74,13 +72,6 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 		this.subpopulationName = name;
 	}
 
-	@Deprecated
-	public final void addStrategyForDefaultSubpopulation(
-			final GenericPlanStrategy<T> strategy,
-			final double weight) {
-		addStrategy( strategy , null , weight );
-	}
-
 	/**
 	 * Adds a strategy to this manager with the specified weight. This weight
 	 * compared to the sum of weights of all strategies in this manager defines
@@ -110,12 +101,6 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 		return weights;
 	}
 
-	@Deprecated
-	public final boolean removeStrategyForDefaultSubpopulation(
-			final GenericPlanStrategy<T> strategy) {
-		return removeStrategy( strategy , null );
-	}
-
 	/**
 	 * removes the specified strategy from this manager for the specified subpopulation
 	 *
@@ -136,13 +121,6 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 			return true;
 		}
 		return false;
-	}
-
-	@Deprecated
-	public final boolean changeWeightOfStrategyForDefaultSubpopulation(
-			final GenericPlanStrategy<T> strategy,
-			final double newWeight) {
-		return changeWeightOfStrategy( strategy , null , newWeight );
 	}
 
 	/**
@@ -338,14 +316,6 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 		return this.maxPlansPerAgent;
 	}
 
-	@Deprecated
-	public final void addChangeRequestForDefaultSubpopulation(
-			final int iteration,
-			final GenericPlanStrategy<T> strategy,
-			final double newWeight) {
-		addChangeRequest( iteration , strategy , null , newWeight );
-	}
-
 	/**
 	 * Schedules a {@link #changeStrategy changeStrategy(Strategy, subpopulation, double)} command for a later iteration. The
 	 * change will take place before the strategies are applied.
@@ -401,21 +371,8 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 		this.removalPlanSelector = planSelector;
 	}
 
-	@Deprecated
-	public final List<GenericPlanStrategy<T>> getStrategiesOfDefaultSubpopulation() {
-		return getStrategies( null );
-	}
-
 	public final List<GenericPlanStrategy<T>> getStrategies( final String subpopulation ) {
 		return getStrategyWeights( subpopulation ).unmodifiableStrategies;
-	}
-
-	/**
-	 * @return the weights of the strategies for the default subpopulation, in the same order as the strategies returned by {@link #getStrategiesOfDefaultSubpopulation()}
-	 */
-	@Deprecated
-	public final List<Double> getWeightsOfDefaultSubpopulation() {
-		return getWeights( null );
 	}
 
 	/**

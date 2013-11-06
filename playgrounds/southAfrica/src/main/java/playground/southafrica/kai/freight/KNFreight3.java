@@ -41,6 +41,7 @@ import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -163,6 +164,13 @@ final class KNFreight3 {
 					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
 					manager.addStrategy( strategy, 0.01 ) ;
 				}
+				
+				
+//				GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
+//				{	
+//					GenericPlanStrategy<CarrierPlan> strategy = new  
+//				}
+				
 				return manager ;
 			}
 		} ;

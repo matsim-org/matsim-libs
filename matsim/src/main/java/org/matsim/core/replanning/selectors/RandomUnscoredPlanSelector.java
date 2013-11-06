@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RandomPlanSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning;
+package org.matsim.core.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.BasicPlan;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.core.gbl.MatsimRandom;
+
 
 /**
- * Comments:<ul>
- * <li> yyyy In my view, should be re-named into StrategyModule in order to be consistent with the config file.  kai, may'12
- * </ul>
+ * Select randomly one of the existing plans of the person.
  *
+ * @author nagel
  */
-public interface PlanStrategy extends GenericPlanStrategy<Plan> {
+public class RandomUnscoredPlanSelector<T extends BasicPlan> implements GenericPlanSelector<T> {
 
-
+	/**
+	 * Choose a random plan from the person and return it.
+	 * @return The newly selected plan for this person; <code>null</code> if the person has no plans.
+	 */
+	@Override
+	public T selectPlan(final HasPlansAndId<T> person) {
+		// following code copied from PersonImpl and then made runnable
+		
+		int cntUnscored = 0;
+		for (T plan : person.getPlans()) {
+			if (plan.getScore() == null) {
+				cntUnscored++;
+			}
+		}
+		if (cntUnscored > 0) {
+			// select one of the unscored plans
+			int idxUnscored = MatsimRandom.getRandom().nextInt(cntUnscored);
+			cntUnscored = 0;
+			for (T plan : person.getPlans()) {
+				if (plan.getScore() == null) {
+					if (cntUnscored == idxUnscored) {
+						return plan;
+					}
+					cntUnscored++;
+				}
+			}
+		}
+		return null;
+	}
 }
