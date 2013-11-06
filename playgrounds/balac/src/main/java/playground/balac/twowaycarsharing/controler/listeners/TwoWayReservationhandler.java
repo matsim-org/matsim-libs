@@ -110,7 +110,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 			  activitiesCount.put(event.getPersonId(), activitiesCount.get(event.getPersonId()) + 1);
 		  }
 		  else {
-			  activitiesCount.put(event.getPersonId(), 1);
+			  activitiesCount.put(event.getPersonId(), 2);
 		  }  
 	}	
 	public int getNumberOfReroutedLegs() {
@@ -126,7 +126,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 		// TODO Auto-generated method stub
 		
 		
-		if (!(map.containsKey(event.getPersonId())) ||  (!event.getActType().equals("onewaycarsharingInteraction") && !map.get(event.getPersonId()).equals( "onewaycarsharing" ))) {
+		if (!(map.containsKey(event.getPersonId())) ||  (!event.getActType().equals("carsharingInteraction") && !map.get(event.getPersonId()).equals( "carsharing" ))) {
 			
 			//we need to check if the next activity is going to be carsharinginteraction
 		
@@ -135,14 +135,18 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 			boolean nextCS = false;   //indicator if the next leg is carsharingwalk leg			
 			if (activitiesCount.get(event.getPersonId()) == null) { //if this event is the end of the first activity in the plan
 				
-				if (((Leg)plan.getPlanElements().get(1)).getMode().equals("onewaycarsharingwalk")) {
+				if (((Leg)plan.getPlanElements().get(1)).getMode().equals("carsharingwalk")) {
 					carsharingwalkIndex  = 1;  //index of the carsharingwalk leg
 					nextCS = true;
 					
 				}
 				
 			}
-			else if (nextCS) {
+			else if ( ( (Leg)(plan.getPlanElements().get((2 * activitiesCount.get(event.getPersonId()) - 1)))).getMode().equals( "carsharingwalk" )) {
+				carsharingwalkIndex  = 2 * activitiesCount.get(event.getPersonId()) - 1;  //index of the carsharingwalk leg
+				nextCS = true;
+			}
+			if (nextCS) {
 				
 				//find the closest station that has an available car
 				//reserve it, reroute the next carsharing leg if necessary 
@@ -214,6 +218,8 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
  			((ActivityImpl)plan.getPlanElements().get(index + 1)).setLinkId(station.getLinkId());
  			
  		List<Id> ids = new ArrayList<Id>();
+ 		
+ 		// we need to locate the next carsharingInteraction
 		String type = ((Activity)plan.getPlanElements().get(index + 3)).getType();
 		double travelTime = 0.0;
 		if (type.equals( "carsharingInteraction" )) {
@@ -228,7 +234,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 			    		travelTime += ((Leg) pe).getTravelTime();
 					}
 				   
-			carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", station.getLinkId(),	station.getLinkId());
+			carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", station.getLinkId(), station.getLinkId());
 		
 			carsharingRoute.setLinkIds(station.getLinkId(),ids, station.getLinkId());
 				   
@@ -285,8 +291,10 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 			   ((LegImpl)plan.getPlanElements().get(index + 2)).setTravelTime(travelTime);
 			   ((LegImpl)plan.getPlanElements().get(index + 2)).setDepartureTime(time);
 			   ((LegImpl)plan.getPlanElements().get(index + 2)).setArrivalTime(time + travelTime);
-				((LegImpl)plan.getPlanElements().get(index + 2)).setRoute( carsharingRoute );
+			   ((LegImpl)plan.getPlanElements().get(index + 2)).setRoute( carsharingRoute );
 				int indexEnd = -1;
+				
+				
 				for (int i = index + 3; i < plan.getPlanElements().size(); i++) {
 						
 					if (plan.getPlanElements().get(i) instanceof Leg) {
@@ -310,7 +318,7 @@ public class TwoWayReservationhandler implements  PersonArrivalEventHandler, Act
 			    		travelTime += ((Leg) pe).getTravelTime();
 					}
 						  
-			    carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", fromFacility.getLinkId(),station.getLinkId());
+			    carsharingRoute = (LinkNetworkRouteImpl) modeRouteFactory.createRoute("car", fromFacility.getLinkId(), station.getLinkId());
 				
 				carsharingRoute.setLinkIds(fromFacility.getLinkId(),ids, station.getLinkId());
 
