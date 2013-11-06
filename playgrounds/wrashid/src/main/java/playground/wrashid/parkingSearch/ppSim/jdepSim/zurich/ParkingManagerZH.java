@@ -560,9 +560,6 @@ public class ParkingManagerZH {
 
 			rtPool.start();
 
-			
-			
-
 		if (ZHScenarioGlobal.iteration == 0) {
 			logInitialOccupancyToTxtFile();
 			logInitialParkingOfEachAgent();
