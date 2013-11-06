@@ -2,9 +2,7 @@ package playground.balac.onewaycarsharing.scoring;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -21,18 +19,13 @@ public class OneWayCSScoringFunctionFactory extends org.matsim.core.scoring.func
   private final Network network;
   private final OneWayCSConfigGroup ftConfigGroup;
   
-  public OneWayCSScoringFunctionFactory(Config config, Controler controler, OneWayCSConfigGroup ftConfigGroup, ActivityFacilities facilities, Network network)
+  public OneWayCSScoringFunctionFactory(Config config, OneWayCSConfigGroup ftConfigGroup, Network network)
   {
     super(config.planCalcScore(), network);
     this.network = network;
     this.config = config;
     this.ftConfigGroup = ftConfigGroup;
-  }
-  
-  private boolean usingConfigParamsForScoring = true ;
-	public void setUsingConfigParamsForScoring( boolean val ) {
-		usingConfigParamsForScoring = val ;
-	}
+  }   
 
   public ScoringFunction createNewScoringFunction(Plan plan)
   {

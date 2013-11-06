@@ -19,12 +19,10 @@
 
 package playground.balac.twowaycarsharing.controler.listeners;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -43,10 +41,7 @@ import playground.balac.twowaycarsharing.router.CarSharingStation;
 import playground.balac.twowaycarsharing.router.PlansCalcRouteFtInfo;
 
 
-
-
 public class CarSharingListener implements StartupListener, IterationEndsListener {
-	  private static final Logger log = Logger.getLogger(CarSharingListener.class);
 
   private Controler controler;
   private TwoWayReservationhandler twoWayReservationhandler;

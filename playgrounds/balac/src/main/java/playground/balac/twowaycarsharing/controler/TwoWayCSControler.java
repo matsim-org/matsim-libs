@@ -87,9 +87,9 @@ public final class TwoWayCSControler extends Controler
   public void init() {
 		
 		 FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
-			      this.config, this, 
+			      this.config, 
 			      this.ftConfigGroup, 
-			      this.getFacilities(), network);
+			      network);
 			    this.setScoringFunctionFactory(ftScoringFunctionFactory); 	
 			
 	}
@@ -149,7 +149,7 @@ public final class TwoWayCSControler extends Controler
 								// carsharing sub-part.
 								
 								router.getRoutingModule( TransportMode.car ),
-								controler.getScenario().getPopulation().getFactory(), plansCalcRouteFtInfo, controler));
+								controler.getScenario().getPopulation().getFactory(), plansCalcRouteFtInfo));
 
 						// we still need to provide a way to identify our trips
 						// as being carsharing trips.

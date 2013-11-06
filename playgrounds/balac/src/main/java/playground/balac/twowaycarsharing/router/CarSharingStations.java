@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -36,7 +34,7 @@ public class CarSharingStations implements FacilitiesPortfolio
     CalcBoundingBox bbox = new CalcBoundingBox();
     this.network = network;
     bbox.run(network);
-    this.stations = new QuadTree(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
+    this.stations = new QuadTree<CarSharingStation>(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
     log.info("Min X = " + bbox.getMinX());
     log.info("Min Y = " + bbox.getMinY());
     log.info("Max X = " + bbox.getMaxX());
@@ -45,7 +43,8 @@ public class CarSharingStations implements FacilitiesPortfolio
 
   public void readFile(String filename) throws FileNotFoundException, IOException {
     BufferedReader reader = IOUtils.getBufferedReader(filename);
-    String line = reader.readLine();
+    reader.readLine();
+    String line;
     while ((line = reader.readLine()) != null) {
       String[] parts = StringUtils.explode(line, '\t');
       if (parts.length == 7) {
@@ -122,7 +121,7 @@ public CarSharingStation getCSStation(Id id)
   {
     CarSharingStation carStation = null;
 
-    Iterator it = this.stations.values().iterator();
+    Iterator<CarSharingStation> it = this.stations.values().iterator();
     boolean notFound = true;
     while ((notFound) && (it.hasNext())) {
       carStation = (CarSharingStation)it.next();

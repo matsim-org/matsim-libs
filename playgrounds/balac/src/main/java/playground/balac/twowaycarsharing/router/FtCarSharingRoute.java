@@ -2,8 +2,6 @@ package playground.balac.twowaycarsharing.router;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -12,24 +10,18 @@ public class FtCarSharingRoute extends GenericRouteImpl
   public static final char SEPARATOR = 61;
   public static final String IDENTIFIER = "ft";
   public static final double CROW_FLY_FACTOR = 1.5D;
-  private final PlansCalcRouteFtInfo plansCalcRouteFtInfo;
-  private CarSharingStations carStations;
   private CarSharingStation toStation;
   private CarSharingStation fromStation;
   private double carTime;
 
-  public FtCarSharingRoute(Id startLinkId, Id endLinkId, PlansCalcRouteFtInfo plansCalcRouteFtInfo)
+  public FtCarSharingRoute(Id startLinkId, Id endLinkId)
   {
     super(startLinkId, endLinkId);
-    this.plansCalcRouteFtInfo = plansCalcRouteFtInfo;
-    this.carStations = plansCalcRouteFtInfo.getCarStations();
   }
 
-  public FtCarSharingRoute(Id startLinkId, Id endLinkId, PlansCalcRouteFtInfo plansCalcRouteFtInfo, CarSharingStation fromStation, CarSharingStation toStation)
+  public FtCarSharingRoute(Id startLinkId, Id endLinkId, CarSharingStation fromStation, CarSharingStation toStation)
   {
     super(startLinkId, endLinkId);
-    this.plansCalcRouteFtInfo = plansCalcRouteFtInfo;
-    this.carStations = plansCalcRouteFtInfo.getCarStations();
     this.toStation = toStation;
     this.fromStation = fromStation;
   }

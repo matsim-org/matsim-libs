@@ -84,9 +84,9 @@ public final class OneWayCSControler extends Controler
 
   public void init() {
 	  OneWayCSScoringFunctionFactory ftScoringFunctionFactory = new OneWayCSScoringFunctionFactory(
-			      this.config, this, 
+			      this.config, 
 			      this.ftConfigGroup, 
-			      this.getFacilities(), network);
+			      network);
 			    this.setScoringFunctionFactory(ftScoringFunctionFactory); 	
 			
 	}
@@ -146,7 +146,7 @@ public final class OneWayCSControler extends Controler
 								// carsharing sub-part.
 								
 								router.getRoutingModule( TransportMode.car ),
-								controler.getScenario().getPopulation().getFactory(), plansCalcRouteFtInfo, controler));
+								controler.getScenario().getPopulation().getFactory(), plansCalcRouteFtInfo));
 
 						// we still need to provide a way to identify our trips
 						// as being carsharing trips.

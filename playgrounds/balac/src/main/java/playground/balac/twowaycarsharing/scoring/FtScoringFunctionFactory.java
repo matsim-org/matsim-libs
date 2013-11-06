@@ -3,10 +3,7 @@ package playground.balac.twowaycarsharing.scoring;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -22,25 +19,16 @@ public class FtScoringFunctionFactory extends org.matsim.core.scoring.functions.
   private final Config config;
   private final Network network;
   private final FtConfigGroup ftConfigGroup;
-  private final ActivityFacilities facilities;
 
-  	private final Controler controler;
   
-  public FtScoringFunctionFactory(Config config, Controler controler,FtConfigGroup ftConfigGroup, ActivityFacilities facilities, Network network)
+  public FtScoringFunctionFactory(Config config, FtConfigGroup ftConfigGroup, Network network)
   {
     super(config.planCalcScore(), network);
     this.network = network;
     this.config = config;
     this.ftConfigGroup = ftConfigGroup;
-    this.facilities = facilities;
-    this.controler = controler;
   }
-  
-  private boolean usingConfigParamsForScoring = true ;
-	public void setUsingConfigParamsForScoring( boolean val ) {
-		usingConfigParamsForScoring = val ;
-	}
-	
+
   public ScoringFunction createNewScoringFunction(Plan plan) {
 	  
 	  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();

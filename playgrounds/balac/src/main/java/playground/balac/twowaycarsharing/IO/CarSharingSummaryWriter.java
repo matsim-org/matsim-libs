@@ -3,26 +3,18 @@ package playground.balac.twowaycarsharing.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-
 import playground.balac.twowaycarsharing.router.CarSharingStation;
-import playground.balac.twowaycarsharing.router.PlansCalcRouteFtInfo;
+
 
 
 public class CarSharingSummaryWriter
 {
-  private static final Logger log = Logger.getLogger(CarSharingSummaryWriter.class);
   private FileWriter fw = null;
   private BufferedWriter out = null;
-  private Person person;
-  private PlansCalcRouteFtInfo plansCalcRouteFtInfo;
 
   public CarSharingSummaryWriter(String outfile)
   {

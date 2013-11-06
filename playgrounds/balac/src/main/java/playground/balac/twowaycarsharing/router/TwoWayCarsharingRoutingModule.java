@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -31,22 +30,20 @@ import org.matsim.core.router.StageActivityTypesImpl;
 
 public class TwoWayCarsharingRoutingModule implements RoutingModule {
 
-	private final double epsilon = 0.000000001;
+	private final static double epsilon = 0.000000001;
 	private final RoutingModule carDelegate;
 	private final PopulationFactory populationFactory;
 	private final ModeRouteFactory modeRouteFactory;
 	private final PlansCalcRouteFtInfo plansCalcRouteFtInfo;
 	private final PlansCalcRouteConfigGroup group;
-	private Controler controler;
 	public TwoWayCarsharingRoutingModule(PlansCalcRouteConfigGroup group,
 			final RoutingModule carDelegate,
-			final PopulationFactory populationFactory, final PlansCalcRouteFtInfo plansCalcRouteFtInfo, Controler controler) {
+			final PopulationFactory populationFactory, final PlansCalcRouteFtInfo plansCalcRouteFtInfo) {
 		this.group = group;
 		this.carDelegate = carDelegate;
 		this.populationFactory = populationFactory;
 		this.modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
-		this.plansCalcRouteFtInfo = plansCalcRouteFtInfo;
-		this.controler = controler;
+		this.plansCalcRouteFtInfo = plansCalcRouteFtInfo;		
 	
 	}
 	
@@ -102,7 +99,7 @@ public class TwoWayCarsharingRoutingModule implements RoutingModule {
 		CarSharingStation fromStation = this.plansCalcRouteFtInfo.getCarStations().getClosestLocation(fromFacility.getCoord());
 		CarSharingStation toStation = this.plansCalcRouteFtInfo.getCarStations().getClosestLocation(toFacility.getCoord());
 
-		FtCarSharingRoute newRoute = new FtCarSharingRoute(fromFacility.getLinkId(), toFacility.getLinkId(), this.plansCalcRouteFtInfo, fromStation, toStation);
+		FtCarSharingRoute newRoute = new FtCarSharingRoute(fromFacility.getLinkId(), toFacility.getLinkId(), fromStation, toStation);
 		LinkNetworkRouteImpl carsharingRoute;
 		Route carsharingWalkRoute;
 		LegImpl carsharingwalkLeg;	
@@ -117,6 +114,7 @@ public class TwoWayCarsharingRoutingModule implements RoutingModule {
 			carsharingwalkLeg.setTravelTime( getAccessEgressTime(newRoute.calcAccessDistance(fromFacility.getCoord()), group) );
 			carsharingWalkRoute =  modeRouteFactory.createRoute("carsharingwalk", fromFacility.getLinkId(),	toStation.getLinkId());
 			carsharingWalkRoute.setTravelTime( getAccessEgressTime(newRoute.calcAccessDistance(fromFacility.getCoord()), group)  );
+			
 			carsharingwalkLeg.setRoute( carsharingWalkRoute );
 			trip.add( carsharingwalkLeg );
 		
