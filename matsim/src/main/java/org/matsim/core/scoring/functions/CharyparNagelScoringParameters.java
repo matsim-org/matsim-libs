@@ -91,9 +91,9 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		for (Entry<String, ModeParams> mode : modes.entrySet()) {
 			String modeName = mode.getKey();
 			ModeParams modeParams = mode.getValue();
-			double marginalUtilityOfTraveling_s = modeParams.getTraveling() / 3600.0;
+			double marginalUtilityOfTraveling_s = modeParams.getMarginalUtilityOfTraveling() / 3600.0;
 			worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
-			double marginalUtilityOfDistance_m = modeParams.getDistance();
+			double marginalUtilityOfDistance_m = modeParams.getMarginalUtilityOfDistance();
 			double monetaryDistanceCostRate = modeParams.getMonetaryDistanceCostRate();
 			double constant = modeParams.getConstant();
 			Mode newModeParams = new Mode(

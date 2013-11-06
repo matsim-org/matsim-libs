@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.basic.v01.IdImpl;
@@ -82,15 +83,13 @@ public class CharyparNagelScoringFunctionTest {
 	private double calcScore(final Fixture f) {
 		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.scenario.getNetwork());
 		ScoringFunction testee = charyparNagelScoringFunctionFactory.createNewScoringFunction(new PlanImpl());
-		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
-		testee.handleLeg((Leg) f.plan.getPlanElements().get(1));
-		testee.handleActivity((Activity) f.plan.getPlanElements().get(2));
-		testee.handleLeg((Leg) f.plan.getPlanElements().get(3));
-		testee.handleActivity((Activity) f.plan.getPlanElements().get(4));
-		testee.handleLeg((Leg) f.plan.getPlanElements().get(5));
-		testee.handleActivity((Activity) f.plan.getPlanElements().get(6));
-		testee.handleLeg((Leg) f.plan.getPlanElements().get(7));
-		testee.handleActivity((Activity) f.plan.getPlanElements().get(8));
+		for (PlanElement planElement : f.plan.getPlanElements()) {
+			if (planElement instanceof Activity) {
+				testee.handleActivity((Activity) planElement);
+			} else if (planElement instanceof Leg) {
+				testee.handleLeg((Leg) planElement);	
+			}
+		}		
 		testee.finish();
 		double score = testee.getScore();
 		EventsToScore eventsToScore = new EventsToScore(f.scenario, charyparNagelScoringFunctionFactory);
@@ -528,38 +527,6 @@ public class CharyparNagelScoringFunctionTest {
 				testee.getScore(), EPSILON);
 	}
 	
-	
-	/**
-	 * Sets up the configuration to be useful for scoring plans. This implementation
-	 * sets the parameters for scoring functions returned by
-	 * {@link CharyparNagelScoringFunctionFactory}, overwrite it to test your own
-	 * custom scoring function.
-	 *
-	 * @param config
-	 */
-	protected void setupScoringConfig(final Config config) {
-		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
-		scoring.setBrainExpBeta(2.0);
-		scoring.setLateArrival_utils_hr(-18.0);
-		scoring.setEarlyDeparture_utils_hr(0.0);
-		scoring.setPerforming_utils_hr(6.0);
-		scoring.setTraveling_utils_hr(-6.0);
-		scoring.setTravelingPt_utils_hr(0.0);
-		scoring.setMonetaryDistanceCostRateCar(0.0) ;
-		scoring.setMarginalUtilityOfMoney(1.);
-
-		scoring.setMarginalUtlOfWaiting_utils_hr(0.0);
-
-		// setup activity types h and w for scoring
-		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("home");
-		params.setTypicalDuration(16*3600);
-		scoring.addActivityParams(params);
-
-		params = new PlanCalcScoreConfigGroup.ActivityParams("work");
-		params.setTypicalDuration(8*3600);
-		scoring.addActivityParams(params);
-	}
-
 	/**
 	 * Tests if the scoring function correctly handles {@link PersonMoneyEvent}.
 	 * It generates one person with one plan having two activities (home, work)
@@ -570,7 +537,6 @@ public class CharyparNagelScoringFunctionTest {
 	@Test
 	public void testAddMoney() {
 		Fixture f = new Fixture();
-		setupScoringConfig(f.config);
 
 		// score the same plan twice
 		PersonImpl person1 = new PersonImpl(new IdImpl(1));
@@ -607,6 +573,17 @@ public class CharyparNagelScoringFunctionTest {
 		assertEquals(1.23 - 2.46 + 4.86 - 0.28, score2 - score1, EPSILON);
 	}
 
+	@Test
+	public void testUnusualMode() {
+		Fixture f = new Fixture();
+		Leg leg = (Leg) f.plan.getPlanElements().get(1);
+		leg.setMode("sackhuepfen");
+		assertEquals(-3.0, calcScore(f), EPSILON); // default for unknown modes
+		f.config.planCalcScore().addParam("traveling_sackhuepfen", "-30.0");
+		assertEquals(-15.0, calcScore(f), EPSILON);
+	}
+	
+	
 	private static class Fixture {
 		protected Config config = null;
 		private PersonImpl person = null;
