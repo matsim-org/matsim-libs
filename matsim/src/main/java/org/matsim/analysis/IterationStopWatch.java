@@ -20,9 +20,8 @@
 
 package org.matsim.analysis;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +31,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.matsim.core.controler.AbstractController;
+import org.matsim.core.utils.charts.StackedBarChart;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -44,6 +47,11 @@ import org.matsim.core.utils.misc.Time;
  */
 public class IterationStopWatch {
 
+	/*
+	 * Time spent in operations which are not measured in detail.
+	 */
+	public static final String OPERATION_OTHER = "other";
+	
 	/** The current iteration number, or null if not yet initialized. */
 	private Integer iteration = null;
 
@@ -67,7 +75,7 @@ public class IterationStopWatch {
 
 	/** A formatter for dates, used when writing out the data. */
 	private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-
+	
 	/** Creates a new IterationStopWatch. */
 	public IterationStopWatch() {
 		this.iterations = new LinkedHashMap<Integer, Map<String,Long>>();
@@ -75,7 +83,7 @@ public class IterationStopWatch {
 		this.operations = new LinkedList<String>();
 		this.currentIterationValues = null;
 	}
-
+	
 	/**
 	 * Resets the stop watch, deleting all gathered values.
 	 */
@@ -112,6 +120,11 @@ public class IterationStopWatch {
 	 * @param identifier The name of the beginning operation.
 	 */
 	public void beginOperation(final String identifier) {
+		
+		if (identifier.equals(OPERATION_OTHER)) {
+			throw new RuntimeException("Identifier " + OPERATION_OTHER + " is reserved! Please use another one. Aborting!");
+		}
+		
 		String ident = "BEGIN " + identifier;
 		ensureIdentifier(ident);
 		this.currentIterationValues.put(ident, Long.valueOf(System.currentTimeMillis()));
@@ -145,67 +158,131 @@ public class IterationStopWatch {
 	 *
 	 * @param filename The name of a file where to write the gathered data.
 	 */
-	public void write(final String filename) {
-		PrintStream stream;
+	public void writeTextFile(final String filename) {
+				
 		try {
-			stream = new PrintStream(new File(filename));
-		} catch (FileNotFoundException e) {
+			BufferedWriter writer = IOUtils.getBufferedWriter(filename + ".txt");
+			
+			// print header
+			writer.write("Iteration");
+			for (String identifier : this.identifiers) {
+				writer.write('\t');
+				writer.write(identifier);
+			}
+			writer.write('\t');
+			for (String identifier : this.operations) {
+				writer.write('\t');
+				writer.write(identifier);
+			}
+			writer.newLine();
+			
+			// print data
+			for (Map.Entry<Integer, Map<String, Long>> entry : this.iterations.entrySet()) {
+				Integer iteration = entry.getKey();
+				Map<String, Long> data = entry.getValue();
+				// iteration
+				writer.write(iteration.toString());
+				// identifiers
+				for (String identifier : this.identifiers) {
+					Long time = data.get(identifier);
+					writer.write('\t');
+					writer.write(formatMilliTime(time));
+				}
+				// blank separator
+				writer.write('\t');
+				// durations of operations
+				for (String identifier: this.operations) {
+					Long startTime = data.get("BEGIN " + identifier);
+					Long endTime = data.get("END " + identifier);
+					writer.write('\t');
+					if (startTime != null && endTime != null) {
+						double diff = (endTime.longValue() - startTime.longValue()) / 1000.0;
+						writer.write(Time.writeTime(diff));
+					}
+				}
+				
+				// finish
+				writer.newLine();
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return;
 		}
-		write(stream);
-		stream.close();
 	}
 
 	/**
-	 * Writes the gathered data tab-separated into a text stream.
+	 * Writes the gathered data as graph into a png file.
 	 *
-	 * @param stream The data stream where to write the gathered data.
+	 * @param filename The name of a file where to write the gathered data.
 	 */
-	public void write(final PrintStream stream) {
-		// print header
-		stream.print("Iteration");
-		for (String identifier : this.identifiers) {
-			stream.print('\t');
-			stream.print(identifier);
-		}
-		stream.print('\t');
-		for (String identifier : this.operations) {
-			stream.print('\t');
-			stream.print(identifier);
-		}
-		stream.println();
-
-		// print data
-		for (Map.Entry<Integer, Map<String, Long>> entry : this.iterations.entrySet()) {
-			Integer iteration = entry.getKey();
-			Map<String, Long> data = entry.getValue();
-			// iteration
-			stream.print(iteration.toString());
-			// identifiers
-			for (String identifier : this.identifiers) {
-				Long time = data.get(identifier);
-				stream.print('\t');
-				stream.print(formatMilliTime(time));
-			}
-			// blank separator
-			stream.print('\t');
+	public void writeGraphFile(String filename) {
+		
+		int iterations = this.iterations.entrySet().size();
+		Map<String, double[]> arrayMap = new HashMap<String, double[]>();
+		for (String identifier : this.operations) arrayMap.put(identifier, new double[iterations]);
+		
+		int iter = 0;
+		for (Map<String, Long> data : this.iterations.values()) {
 			// durations of operations
-			for (String identifier: this.operations) {
+			for (String identifier : this.operations) {
 				Long startTime = data.get("BEGIN " + identifier);
 				Long endTime = data.get("END " + identifier);
-				stream.print('\t');
 				if (startTime != null && endTime != null) {
 					double diff = (endTime.longValue() - startTime.longValue()) / 1000.0;
-					stream.print(Time.writeTime(diff));
+					arrayMap.get(identifier)[iter] = diff;
+				} else arrayMap.get(identifier)[iter] = 0.0;
+			}	
+			iter++;
+		}
+						
+		String title = "Compuation time distribution per iteration";
+		String xAxisLabel = "iteration";
+		String yAxisLabel = "time";
+		
+		String[] categories = new String[this.iterations.size()];
+		int index = 0;
+		for (int iteration : this.iterations.keySet()) {
+			categories[index] = String.valueOf(iteration);
+			index++;
+		}
+		
+		StackedBarChart chart = new StackedBarChart(title, xAxisLabel, yAxisLabel, categories);
+		chart.addMatsimLogo();
+		
+		/*
+		 * Rotate x-axis labels by 90° which should allow more of them to be plotted before overlapping.
+		 * However, a more general solution that also is able to skip labels would be nice.
+		 * cdobler nov'13
+		 */
+		chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+		
+		double[] iterationData = null;
+		double[] sumData = new double[iterations];
+		for (String operation : this.operations) {
+			double[] data = arrayMap.get(operation);
+			if (operation.equals(AbstractController.OPERATION_ITERATION)) {
+				iterationData = data;
+				continue;
+			} else {
+				chart.addSeries(operation, data);
+				for (int i = 0; i < iterations; i++) {
+					sumData[i] += data[i];
 				}
 			}
-
-			// finish
-			stream.println();
 		}
+		if (iterationData != null) {
+			double[] otherData = new double[iterations];
+			for (int i = 0; i < iterations; i++) {
+				otherData[i] = iterationData[i] - sumData[i];
+			}
+			chart.addSeries(OPERATION_OTHER, otherData);
+		}
+		
+		chart.saveAsPng(filename + ".png", 1024, 768);
 	}
-
+	
 	/**
 	 * Make sure the given identifier exists in our collection. If it is missing, insert it at the correct
 	 * place. "Correct" means that it tries to insert this identifier right after the last-requested identifier.
@@ -228,7 +305,7 @@ public class IterationStopWatch {
 	 *
 	 * @param identifier
 	 */
-	private void ensureOperation(final String identifier) {
+	private void ensureOperation(final String identifier) {		
 		int pos = this.operations.indexOf(identifier);
 		if (pos == -1) {
 			this.operations.add(this.nextOperationPosition, identifier);

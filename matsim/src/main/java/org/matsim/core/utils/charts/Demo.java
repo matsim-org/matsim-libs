@@ -46,6 +46,14 @@ public class Demo {
 		chart.saveAsPng(filename, 800, 600);
 	}
 
+	public void createStackedBarChart(final String filename) {
+		StackedBarChart chart = new StackedBarChart(TITLE, X_AXIS, Y_AXIS, new String[] {"A", "B", "C"});
+		chart.addSeries(SERIE_1, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
+		chart.addSeries(SERIE_2, new double[] {2.0, 3.0, 3.0, 1.5, 4.5});
+		chart.addMatsimLogo();
+		chart.saveAsPng(filename, 800, 600);
+	}
+	
 	public void createLineChart(final String filename) {
 		LineChart chart = new LineChart(TITLE, X_AXIS, Y_AXIS, new String[] {"A", "B", "C"});
 		chart.addSeries(SERIE_1, new double[] {1.0, 5.0, 2.0, 3.0, 4.5});
@@ -79,6 +87,7 @@ public class Demo {
 		log.info("start to write demo charts...");
 		Demo demo = new Demo();
 		demo.createBarChart("./output/barchart.png");
+		demo.createStackedBarChart("./output/stackedbarchart.png");
 		demo.createLineChart("./output/linechart.png");
 		demo.createXYLineChart("./output/xylinechart.png");
 		demo.createXYLogLogLineChart("./output/xylineloglogchart.png");

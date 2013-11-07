@@ -43,6 +43,11 @@ BeforeMobsimListener, AfterMobsimListener  {
 
 	private static final Logger log = Logger.getLogger(PtCountControlerListener.class);
 
+	/*
+	 * String used to identify the operation in the IterationStopWatch.
+	 */
+	public static final String OPERATION_COMPAREPTCOUNTS = "compare with pt counts";
+	
 	private final static String MODULE_NAME = "ptCounts";
 	// yy the above should be removed; the commands should be replaced by the "typed" commands.  kai, oct'10
 
@@ -119,7 +124,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 //					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
 //							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
 
-				controler.stopwatch.beginOperation("compare with pt counts");
+				controler.stopwatch.beginOperation(OPERATION_COMPAREPTCOUNTS);
 
 				double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
 				Network network = controler.getNetwork();
@@ -171,7 +176,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 					}
 				}
 
-				controler.stopwatch.endOperation("compare with pt counts");
+				controler.stopwatch.endOperation(OPERATION_COMPAREPTCOUNTS);
 			}
 		}
 	}

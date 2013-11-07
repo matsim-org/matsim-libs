@@ -49,6 +49,11 @@ import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
  */
 public class CountControlerListener implements StartupListener, IterationEndsListener {
 
+	/*
+	 * String used to identify the operation in the IterationStopWatch.
+	 */
+	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
+	
 	private final CountsConfigGroup config;
 	private final Counts counts;
 	private final Map<Id, double[]> linkStats = new HashMap<Id, double[]>();
@@ -83,7 +88,7 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 		}
 
 		if (createCountsInIteration(event.getIteration())) {
-			controler.stopwatch.beginOperation("compare with counts");
+			controler.stopwatch.beginOperation(OPERATION_COMPARECOUNTS);
 			
 			Map<Id, double[]> averages = null;
 			if (this.iterationsUsed > 1) {
@@ -132,7 +137,7 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 				ctw.writeFile(filename);
 			}
 			reset();
-			controler.stopwatch.endOperation("compare with counts");
+			controler.stopwatch.endOperation(OPERATION_COMPARECOUNTS);
 		}
 	}
 

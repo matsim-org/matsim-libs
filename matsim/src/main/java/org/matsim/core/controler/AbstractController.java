@@ -41,6 +41,13 @@ public abstract class AbstractController {
 	 * This was  public in the design that I found. kai, jul'12
 	 */
 	public final IterationStopWatch stopwatch = new IterationStopWatch();
+
+	/*
+	 * Strings used to identify the operations in the IterationStopWatch.
+	 */
+	public static final String OPERATION_ITERATION = "iteration";
+	public static final String OPERATION_MOBSIM = "mobsim";
+	public static final String OPERATION_REPLANNING = "replanning";
 	
 	/**
 	 * This is deliberately not even protected.  kai, jul'12 
@@ -112,7 +119,7 @@ public abstract class AbstractController {
 		this.controlerListenerManager.fireControlerStartupEvent();
 		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
 		prepareForSim();
-		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
+		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed(), config.controler().isCreateGraphs());
 		shutdown(false);
 	}
 	
@@ -143,7 +150,7 @@ public abstract class AbstractController {
 	 */
 	protected abstract boolean continueIterations( int iteration ) ;
 	
-	private void doIterations(int firstIteration, long rndSeed) {
+	private void doIterations(int firstIteration, long rndSeed, boolean createOutputGraphs) {
 
 		String divider = "###################################################";
 		String marker = "### ";
@@ -159,29 +166,30 @@ public abstract class AbstractController {
 			log.info(divider);
 			log.info(marker + "ITERATION " + iteration + " BEGINS");
 //			this.stopwatch.setCurrentIteration(iteration);
-			this.stopwatch.beginOperation("iteration");
+			this.stopwatch.beginOperation(OPERATION_ITERATION);
 			this.getControlerIO().createIterationDirectory(iteration);
 			resetRandomNumbers(rndSeed, iteration);
 
 			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
 			if (iteration > firstIteration) {
-				this.stopwatch.beginOperation("replanning");
+				this.stopwatch.beginOperation(OPERATION_REPLANNING);
 				this.controlerListenerManager.fireControlerReplanningEvent(iteration);
-				this.stopwatch.endOperation("replanning");
+				this.stopwatch.endOperation(OPERATION_REPLANNING);
 			}
 			this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
-			this.stopwatch.beginOperation("mobsim");
+			this.stopwatch.beginOperation(OPERATION_MOBSIM);
 			resetRandomNumbers(rndSeed, iteration);
 			runMobSim(iteration);
-			this.stopwatch.endOperation("mobsim");
+			this.stopwatch.endOperation(OPERATION_MOBSIM);
 			log.info(marker + "ITERATION " + iteration + " fires after mobsim event");
 			this.controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
 			log.info(marker + "ITERATION " + iteration + " fires scoring event");
 			this.controlerListenerManager.fireControlerScoringEvent(iteration);
 			log.info(marker + "ITERATION " + iteration + " fires iteration end event");
 			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
-			this.stopwatch.endOperation("iteration");
-			this.stopwatch.write(this.getControlerIO().getOutputFilename("stopwatch.txt"));
+			this.stopwatch.endOperation(OPERATION_ITERATION);
+			this.stopwatch.writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+			if (createOutputGraphs) this.stopwatch.writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
 			log.info(marker + "ITERATION " + iteration + " ENDS");
 			log.info(divider);
 		}
