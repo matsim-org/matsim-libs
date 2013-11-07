@@ -219,8 +219,8 @@ public class PoznanChainsProcessor
     public static void main(String[] args)
         throws IOException
     {
-        String dir = "d:\\eTaxi\\Poznan_MATSim\\BIT-dane\\";
-        String survey = "STR5-WSZ v1.1.XLS";
+        String dir = "d:\\eTaxi\\Poznan_KBR\\ankiety\\"; 
+        String survey = "STR5-WSZ v1.2.1.XLS";
         String chains = "chains.txt";
 
         PoznanChainsProcessor processor = new PoznanChainsProcessor();
