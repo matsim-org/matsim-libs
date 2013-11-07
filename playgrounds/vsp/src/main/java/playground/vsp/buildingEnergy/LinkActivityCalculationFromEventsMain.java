@@ -50,9 +50,11 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
+import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
+
 /**
- * Simple main-routine that parse an eventsfile, using {@link LinkActivityOccupancyCounter}
- * (one per half hour). The generated data is written to csv-tables.
+ * Simple main-routine that parse an eventsfile, using {@link LinkActivityOccupancyCounter}. 
+ * The generated data is written to csv-tables.
  * @author droeder
  *
  */
@@ -72,7 +74,7 @@ public final class LinkActivityCalculationFromEventsMain {
 			DIR + RUN + "\\ITERS\\it.1000\\" + RUN + ".1000.plans.xml.gz",
 			DIR + RUN + "\\ITERS\\it.1000\\" + RUN + ".1000.events.xml.gz",
 			DIR + RUN + "\\",
-			"600",
+			"900",
 			"86400",
 			RUN
 	};

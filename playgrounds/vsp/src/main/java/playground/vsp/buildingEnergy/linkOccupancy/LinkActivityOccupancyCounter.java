@@ -1,4 +1,4 @@
-package playground.vsp.buildingEnergy;
+package playground.vsp.buildingEnergy.linkOccupancy;
 
 import java.util.HashMap;
 import java.util.Map;
