@@ -50,11 +50,15 @@ public class ResponsibilityUtils {
 		
 		ArrayList<ResponsibilityEvent> rEvents = new ArrayList<ResponsibilityEvent>();
 		
-		for(EmPerLink epl: emissionPerLinkOfCurrentTimeBin){
-			if(epl.getLinkId().equals(linkId)){
-				String location = "link " + linkId.toString();
-				ResponsibilityEvent ree = new ResponsibilityEvent(epl.getPersonId(), startTime, endTime, epl.getConcentration(), location);
-				rEvents.add(ree);
+		if (emissionPerLinkOfCurrentTimeBin!=null) {
+			for (EmPerLink epl : emissionPerLinkOfCurrentTimeBin) {
+				if (epl.getLinkId().equals(linkId)) {
+					String location = "link " + linkId.toString();
+					ResponsibilityEvent ree = new ResponsibilityEvent(
+							epl.getPersonId(), startTime, endTime,
+							epl.getConcentration(), location);
+					rEvents.add(ree);
+				}
 			}
 		}
 		return rEvents;
@@ -120,6 +124,9 @@ public class ResponsibilityUtils {
 				exposureValue+=re.getExposureValue();
 			}
 			
+			//TODO go on here... something wrong - 0.0
+			System.out.println("respon value" + exposureValue);
+			
 			ExposureEvent exposureEvent = new ExposureEvent(ema.getPersonId(), startTime, endTime, exposureValue, ema.getActivityType());
 			exposure.add(exposureEvent);
 			
@@ -136,11 +143,16 @@ public class ResponsibilityUtils {
 		
 		ArrayList<ResponsibilityEvent> rEvents= new ArrayList<ResponsibilityEvent>();
 		
-		for(EmPerBin epb: emissionPerBinOfCurrentTimeBin){
-			if(epb.getXbin().equals(xBin) && epb.getYbin().equals(yBin)){
-				String location = "x = " + epb.getXbin().toString() + ", y = " + epb.getYbin();
-				ResponsibilityEvent ree = new ResponsibilityEvent(epb.getPersonId(), startTime, endTime, epb.getConcentration(), location);
-				rEvents.add(ree);
+		if (emissionPerBinOfCurrentTimeBin!=null) {
+			for (EmPerBin epb : emissionPerBinOfCurrentTimeBin) {
+				if (epb.getXbin().equals(xBin) && epb.getYbin().equals(yBin)) {
+					String location = "x = " + epb.getXbin().toString()
+							+ ", y = " + epb.getYbin();
+					ResponsibilityEvent ree = new ResponsibilityEvent(
+							epb.getPersonId(), startTime, endTime,
+							epb.getConcentration(), location);
+					rEvents.add(ree);
+				}
 			}
 		}
 		return rEvents;

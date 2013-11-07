@@ -21,16 +21,20 @@ public class ExposureEvent {
 		this.activitytype = activitytype;
 	}
 
-
 	public Id getPersonId() {
-		// TODO Auto-generated method stub
-		return this.personId;
+		return personId;
 	}
 
+	public Double getAverageExposure() {
+		return personalExposureValue/(endTime-startTime);
+	}
 
-	public String getAverageExposure() {
-		// TODO Auto-generated method stub
-		return null;
+	public Double getExposure() {
+		return personalExposureValue;
+	}
+
+	public Double getDuration() {
+		return endTime-startTime;
 	}
 
 }

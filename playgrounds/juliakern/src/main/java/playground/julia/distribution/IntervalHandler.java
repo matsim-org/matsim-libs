@@ -83,7 +83,7 @@ LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 		person2asevent.put(personId, events);
 	}
 
-	public void addActivitiesToTimetables(ArrayList<EmActivity> activities, Map<Id,Integer> link2xbins, Map<Id,Integer> link2ybins) {
+	public void addActivitiesToTimetables(ArrayList<EmActivity> activities, Map<Id,Integer> link2xbins, Map<Id,Integer> link2ybins, Double simulationEndTime) {
 		
 		// combine act start events with act leave events to em activities
 		// without emission values - store person id, time and x,y-cell
@@ -95,7 +95,12 @@ LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 				int yBin = link2ybins.get(ase.getLinkId());
 				// find corresponding act end event
 				ActivityEndEvent aee = findCorrespondingActivityEndEvent(ase, person2aeevent.get(personId));
-				Double endOfActivity = aee.getTime();
+				Double endOfActivity;
+				if(aee == null){
+					endOfActivity = simulationEndTime;
+				}else{
+					endOfActivity = aee.getTime();
+				}
 				// create em activity
 				EmActivity emact = new EmActivity(startOfActivity, endOfActivity, personId, xBin, yBin, ase.getActType());
 				activities.add(emact);
@@ -124,14 +129,19 @@ LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 		return currEvent;
 	}
 
-	public void addCarTripsToTimetables(ArrayList<EmCarTrip> carTrips) {
+	public void addCarTripsToTimetables(ArrayList<EmCarTrip> carTrips, Double simulationEndTime) {
 		// combine link enter events with link leave events to em car trip
 		for(Id personId: person2leevent.keySet()){
 			for(LinkEnterEvent lee: person2leevent.get(personId)){
 				Double startOfEvent = lee.getTime();
 				Id linkId = lee.getLinkId();
 				LinkLeaveEvent lle = findCorrespondingLinkLeaveEvent(lee, person2llevent.get(personId));
-				Double endOfEvent = lle.getTime();
+				Double endOfEvent;
+				if(lle==null){
+					endOfEvent = simulationEndTime;
+				}else{
+					endOfEvent = lle.getTime();
+				}
 				EmCarTrip emcar = new EmCarTrip(startOfEvent, endOfEvent, personId, linkId);
 				carTrips.add(emcar);
 			}

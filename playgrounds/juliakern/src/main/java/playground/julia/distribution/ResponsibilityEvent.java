@@ -4,11 +4,11 @@ import org.matsim.api.core.v01.Id;
 
 public class ResponsibilityEvent {
 
-	Id personId;
-	Double startTime;
-	Double endTime;
-	Double concentration;
-	String location;
+	private Id personId;
+	private Double startTime;
+	private Double endTime;
+	private Double concentration;
+	private String location;
 	
 	public Double getExposureValue() {
 		return this.getDuration()*this.concentration;
@@ -23,8 +23,12 @@ public class ResponsibilityEvent {
 		this.location = location;
 	}
 
-	private Double getDuration() {
+	public Double getDuration() {
 		return(this.endTime-this.startTime);
+	}
+
+	public Id getPersonId() {
+		return personId;
 	}
 
 }

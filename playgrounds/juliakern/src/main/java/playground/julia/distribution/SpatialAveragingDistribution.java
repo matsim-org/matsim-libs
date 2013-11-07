@@ -66,10 +66,7 @@ import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
 import playground.vsp.emissions.utils.EmissionUtils;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.util.Assert;
+
 
 /**
  * @author benjamin, julia
@@ -95,7 +92,7 @@ public class SpatialAveragingDistribution {
 	EmissionsPerLinkColdEventHandler coldHandler;
 	SortedSet<String> listOfPollutants;
 	double simulationEndTime;
-	String outPathStub = "output/sample";
+	String outPathStub = "input/sample/";
 	double pollutionFactorOutdoor, pollutionFactorIndoor;
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
@@ -110,7 +107,8 @@ public class SpatialAveragingDistribution {
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.;
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
-	final String pollutant2analyze = WarmPollutant.NO2.toString();
+	final WarmPollutant warmPollutant2analyze = WarmPollutant.NO2;
+	final ColdPollutant coldPollutant2analyze = ColdPollutant.NO2;
 
 	private boolean printPersonalInformation = false;
 
@@ -184,17 +182,20 @@ public class SpatialAveragingDistribution {
 		
 		//TODO mit case-namen versehen?
 		ExposureUtils exut = new ExposureUtils();
-		if(printPersonalInformation){
-			exut.printPersonalExposureTimeTables(exposure, outPathStub+"personalExposure.txt");
-			exut.printPersonalResponibility(responsibility, outPathStub + "personalExposure.txt");
-		}
 		exut.printExposureInformation(exposure, outPathStub+"exposure.txt");
 		exut.printResponsibilityInformation(responsibility, outPathStub+"responsibility.txt");
 		
-		if(storeEvents){
-			//TODO write events file for respons. and exposure
-		}
-		
+//		
+//		if(printPersonalInformation){
+//			exut.printPersonalExposureTimeTables(exposure, outPathStub+"personalExposure.txt");
+//			exut.printPersonalResponibility(responsibility, outPathStub + "personalExposure.txt");
+//		}
+//
+//		
+//		if(storeEvents){
+//			//TODO write events file for respons. and exposure
+//		}
+//		
 
 		}
 		
@@ -204,16 +205,30 @@ public class SpatialAveragingDistribution {
 			Map<Double, ArrayList<EmPerBin>> emissionPerBin,
 			Map<Double, ArrayList<EmPerLink>> emissionPerLink) {
 		
-		EventsManager eventsManager = EventsUtils.createEventsManager();
+		/*
+		 * 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		this.warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, noOfTimeBins);
+		this.coldHandler = new EmissionsPerLinkColdEventHandler(this.simulationEndTime, noOfTimeBins);
+		eventsManager.addHandler(this.warmHandler);
+		eventsManager.addHandler(this.coldHandler);
+		emissionReader.parse(emissionFile);
+		 */
 		
-		GeneratedEmissionsHandler generatedEmissionsHandler = new GeneratedEmissionsHandler(0.0, timeBinSize, link2xbin, link2ybin, emissionFile);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		
+		GeneratedEmissionsHandler generatedEmissionsHandler = new GeneratedEmissionsHandler(0.0, timeBinSize, link2xbin, link2ybin, warmPollutant2analyze, coldPollutant2analyze);
 		eventsManager.addHandler(generatedEmissionsHandler);
 		
-		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-		matsimEventsReader.readFile(emissionFile);
+		emissionReader.parse(emissionFile1);
+		
+//		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+//		matsimEventsReader.readFile(emissionFile);
 		
 		emissionPerBin = generatedEmissionsHandler.getEmissionsPerCell();
 		emissionPerLink = generatedEmissionsHandler.getEmissionsPerLink();
+
 		
 		eventsManager.removeHandler(generatedEmissionsHandler);
 		
@@ -230,8 +245,8 @@ public class SpatialAveragingDistribution {
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
 				
-		intervalHandler.addActivitiesToTimetables(activities, link2xbin, link2ybin);
-		intervalHandler.addCarTripsToTimetables(carTrips);
+		intervalHandler.addActivitiesToTimetables(activities, link2xbin, link2ybin, simulationEndTime);
+		intervalHandler.addCarTripsToTimetables(carTrips, simulationEndTime);
 		
 		eventsManager.removeHandler(intervalHandler);
 		
@@ -241,6 +256,9 @@ public class SpatialAveragingDistribution {
 		Map<Id, Integer> link2ybin = new HashMap<Id, Integer>();
 		for(Id linkId: network.getLinks().keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(network.getLinks().get(linkId).getCoord().getY()));
+			if(mapYCoordToBin(network.getLinks().get(linkId).getCoord().getY())==null){
+				System.out.println("link with null " + linkId.toString());
+			}
 		}
 		return link2ybin;
 	}
@@ -248,7 +266,7 @@ public class SpatialAveragingDistribution {
 	private Map<Id, Integer> calculateXbins() {
 		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
 		for(Id linkId: network.getLinks().keySet()){
-			link2xbin.put(linkId, mapYCoordToBin(network.getLinks().get(linkId).getCoord().getX()));
+			link2xbin.put(linkId, mapXCoordToBin(network.getLinks().get(linkId).getCoord().getX()));
 		}
 		return link2xbin;
 	}
