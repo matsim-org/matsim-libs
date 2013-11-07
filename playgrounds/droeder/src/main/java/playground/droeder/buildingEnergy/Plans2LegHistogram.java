@@ -30,11 +30,13 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
@@ -47,17 +49,15 @@ public abstract class Plans2LegHistogram {
 			.getLogger(Plans2LegHistogram.class);
 	
 	public static void main(String[] args) {
-		args = new String[]{
-				"E:\\VSP\\svn\\studies\\countries\\de\\berlin\\plans\\baseplan_900s.xml.gz",
-				"C:\\Users\\Daniel\\Desktop\\buildingEnergy\\compareData\\"
-		};
+		if(args.length == 0){
+			args = new String[]{
+					"E:\\VSP\\svn\\studies\\countries\\de\\berlin\\plans\\baseplan_900s.xml.gz",
+					"C:\\Users\\Daniel\\Desktop\\buildingEnergy\\compareData\\"
+			};
+		}
 		String plansfile = args[0];
 		String outputpath = new File(args[1]).getAbsolutePath() + System.getProperty("file.separator");
-		try {
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputpath);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputpath, "legHistograms", true));
 		OutputDirectoryLogging.catchLogEntries();
 		log.info("plansfile: " + plansfile);
 		log.info("outputpath: " + outputpath);
@@ -73,7 +73,7 @@ public abstract class Plans2LegHistogram {
 				for(int i = 1; i < pe.size(); i += 2){
 					LegImpl l = (LegImpl) pe.get(i);
 					histo.handleEvent(new PersonDepartureEvent(l.getDepartureTime(), null, null, l.getMode()));
-					double arrivaltime = (l.getArrivalTime() == Double.NaN) ? l.getDepartureTime() + l.getTravelTime() : l.getArrivalTime();
+					double arrivaltime = (l.getArrivalTime() == Time.UNDEFINED_TIME) ? l.getDepartureTime() + l.getTravelTime() : l.getArrivalTime();
 					histo.handleEvent(new PersonArrivalEvent(arrivaltime, null, null, l.getMode()));
 				}
 			}
@@ -84,8 +84,9 @@ public abstract class Plans2LegHistogram {
 		histo.writeGraphic(outputpath + "legHistogram_all.png");
 		log.info(outputpath + "legHistogram_all.png written.");
 		for(String mode : histo.getLegModes()){
-			histo.writeGraphic(outputpath + "legHistogram_" + mode + ".png", mode);
-			log.info(outputpath + "legHistogram_" + mode + ".png written.");
+			String name = new String(mode).replace(System.getProperty("file.separator"), "");
+			histo.writeGraphic(outputpath + "legHistogram_" + name + ".png", mode);
+			log.info(outputpath + "legHistogram_" + name + ".png written.");
 		}
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}

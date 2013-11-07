@@ -26,7 +26,7 @@ import java.util.Properties;
  * @author droeder
  *
  */
-public class ListSystemProperties {
+class ListSystemProperties {
 
 
 	private ListSystemProperties() {
