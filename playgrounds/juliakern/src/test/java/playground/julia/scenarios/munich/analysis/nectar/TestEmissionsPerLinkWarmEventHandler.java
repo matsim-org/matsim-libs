@@ -60,7 +60,6 @@ public class TestEmissionsPerLinkWarmEventHandler {
 	
 	double simulationEndTime = 200., simulationStartTime=0.0;
 	int noOfTimeBins = 30; //-> interval ends should be 6.666, 13.333, 20.0, 26.666, ... , 200.0
-	Map<WarmPollutant, Double> warmEmissions;
 	
 	WarmEmissionEvent event1, event2, event3, event4, event5, event6, event7;
 	
@@ -76,7 +75,8 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		double expectedEndOfTimeInterval = getIntervalEnd(timeOfEvent1); // end of time interval should be 6.666...
 		Id linkId = new IdImpl("link1");
 		Id vehicleId = new IdImpl("veh 1");
-		setUpEvent1(timeOfEvent1, linkId, vehicleId);
+		Map<WarmPollutant, Double> warmEmissions1 = new HashMap<WarmPollutant, Double>();
+		event1 = setUpEvent(timeOfEvent1, linkId, vehicleId, warmEmissions1);
 		
 		handler.handleEvent(event1);
 		
@@ -128,32 +128,35 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		
 		Assert.assertNull(handler.getTime2linkIdLeaveCount().get(expectedEndOfTimeInterval).get(new IdImpl("unused link")));
 		
+		Map<WarmPollutant, Double> warmEmissions2= new HashMap<WarmPollutant, Double>();
 		// initialize event 2,3,4 and handle them
 		// event 2: time = 0.0 -> interval end should be 6.6666...
 		// event belongs to the same time interval as event 1! 
 		// and has the same emissions as event 1
-		WarmEmissionEvent event2 = new WarmEmissionEventImpl(simulationStartTime, linkId, vehicleId, warmEmissions);
+		WarmEmissionEvent event2 = setUpEvent(simulationStartTime, linkId, vehicleId, warmEmissions2);
 		handler.handleEvent(event2);
+		Map<WarmPollutant, Double> warmEmissions3= new HashMap<WarmPollutant, Double>();
 		// event 3: time = 200.0 -> interval should be 200.0 since this is the end of the simulation
 		// has the same emissions as event 1
-		WarmEmissionEvent event3 = new WarmEmissionEventImpl(simulationEndTime, linkId, vehicleId, warmEmissions);
+		WarmEmissionEvent event3 = setUpEvent(simulationEndTime, linkId, vehicleId, warmEmissions3);
 		handler.handleEvent(event3);
 		
 		// event 4: time = 200.0/30*3.8=25.3333... -> interval should be 26.6666...
 		double timeOfEvent4 = simulationEndTime/noOfTimeBins*3.8;
 		double intervalEndOfEvent4 = getIntervalEnd(timeOfEvent4); 
-		event4 = new WarmEmissionEventImpl(timeOfEvent4, linkId, vehicleId, warmEmissions);
+		Map<WarmPollutant, Double> warmEmissions4= new HashMap<WarmPollutant, Double>();
+		event4 = setUpEvent(timeOfEvent4, linkId, vehicleId, warmEmissions4);
 		handler.handleEvent(event4);
 		
 		// check time2linkIdLeaveCount
-		//Assert.assertEquals(2.0, handler.getTime2linkIdLeaveCount().get(calulatedEndOfTimeInterval).get(linkId)); // 6.6666 - events 1 and 2
+		Assert.assertEquals(2.0, handler.getTime2linkIdLeaveCount().get(calulatedEndOfTimeInterval).get(linkId)); // 6.6666 - events 1 and 2
 		Assert.assertEquals(1.0, handler.getTime2linkIdLeaveCount().get(simulationEndTime).get(linkId));  // 200.00 - event 3
 		Assert.assertEquals(1.0, handler.getTime2linkIdLeaveCount().get(intervalEndOfEvent4).get(linkId)); // 26.6666 - event 4
 		// handler.getTime2linkIdLeaveCount should contain nothing else
 		Assert.assertEquals(3, handler.getTime2linkIdLeaveCount().size());
 		
 		// check warmEmissionsPerLinkAndTimeInterval
-		//Assert.assertEquals(2*coValue, handler.getWarmEmissionsPerLinkAndTimeInterval().get(calulatedEndOfTimeInterval).get(linkId).get(WarmPollutant.CO), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(2*coValue, handler.getWarmEmissionsPerLinkAndTimeInterval().get(calulatedEndOfTimeInterval).get(linkId).get(WarmPollutant.CO), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(coValue, handler.getWarmEmissionsPerLinkAndTimeInterval().get(simulationEndTime).get(linkId).get(WarmPollutant.CO), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(coValue, handler.getWarmEmissionsPerLinkAndTimeInterval().get(intervalEndOfEvent4).get(linkId).get(WarmPollutant.CO), MatsimTestUtils.EPSILON);
 		
@@ -171,11 +174,13 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		Assert.assertEquals(1.0, handler.getTime2linkIdLeaveCount().get(intervalEndOfEvent5).get(linkId2));
 		
 		//event 6 contains come pollutants but not all
-		warmEmissions.remove(WarmPollutant.NMHC);
-		warmEmissions.remove(WarmPollutant.NO2);
-		warmEmissions.remove(WarmPollutant.NOX);
+		
 		Id linkId3 = new IdImpl("link 3");
-		event6 = new WarmEmissionEventImpl(simulationEndTime, linkId3, vehicleId, warmEmissions);
+		Map<WarmPollutant, Double> warmEmissions6= new HashMap<WarmPollutant, Double>();
+		event6 = setUpEvent(simulationEndTime, linkId3, vehicleId, warmEmissions6);
+		warmEmissions6.remove(WarmPollutant.NMHC);
+		warmEmissions6.remove(WarmPollutant.NO2);
+		warmEmissions6.remove(WarmPollutant.NOX);
 		handler.handleEvent(event6);
 		// check event 6
 		Assert.assertEquals(1.0, handler.getTime2linkIdLeaveCount().get(simulationEndTime).get(linkId3));
@@ -225,19 +230,19 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		return intervalEnd;
 	}
 
-	private void setUpEvent1(double timeOfEvent1, Id linkId, Id vehicleId) {
-		warmEmissions = new HashMap<WarmPollutant, Double>();
-		warmEmissions.put(WarmPollutant.CO, coValue);
-		warmEmissions.put(WarmPollutant.CO2_TOTAL, c2Value);
-		warmEmissions.put(WarmPollutant.FC, fcValue);
-		warmEmissions.put(WarmPollutant.HC, hcValue);
-		warmEmissions.put(WarmPollutant.NMHC, nmValue);
-		warmEmissions.put(WarmPollutant.NO2, n2Value);
-		warmEmissions.put(WarmPollutant.NOX, nxValue);
-		warmEmissions.put(WarmPollutant.PM, pmValue);
-		warmEmissions.put(WarmPollutant.SO2, soValue);
+	private WarmEmissionEventImpl setUpEvent(double timeOfEvent1, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions) {
+		//warmEmissions = new HashMap<WarmPollutant, Double>();
+		warmEmissions.put(WarmPollutant.CO, new Double(coValue));
+		warmEmissions.put(WarmPollutant.CO2_TOTAL, new Double(c2Value));
+		warmEmissions.put(WarmPollutant.FC, new Double(fcValue));
+		warmEmissions.put(WarmPollutant.HC, new Double(hcValue));
+		warmEmissions.put(WarmPollutant.NMHC, new Double(nmValue));
+		warmEmissions.put(WarmPollutant.NO2, new Double( n2Value));
+		warmEmissions.put(WarmPollutant.NOX, new Double(nxValue));
+		warmEmissions.put(WarmPollutant.PM, new Double(pmValue));
+		warmEmissions.put(WarmPollutant.SO2, new Double(soValue));
 		
-		event1 = new WarmEmissionEventImpl(timeOfEvent1, linkId, vehicleId, warmEmissions);
+		return new WarmEmissionEventImpl(timeOfEvent1, linkId, vehicleId, warmEmissions);
 		
 	}
 
