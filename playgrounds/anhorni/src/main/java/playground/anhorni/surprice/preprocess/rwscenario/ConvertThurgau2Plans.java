@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +36,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -50,9 +48,9 @@ public class ConvertThurgau2Plans {
 	private static final String HOME = "home";
 	private static final String WORK = "work";
 	private static final String EDUCATION = "education";
-	private static final String BUSINESS = "business";
 	private static final String LEISURE = "leisure";
-	private static final String SHOP = "shop";	
+	private static final String SHOP = "shop";
+	private static final String BUSINESS = "business";
 	
 	private static final String MALE = "m";
 	private static final String FEMALE = "f";
@@ -152,6 +150,7 @@ public class ConvertThurgau2Plans {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			this.personWeeks.get(person.getId()).removeIncompleteWeeks();
 		}
+		
 		this.removeIncompletePersons();
 				
 		this.write();
@@ -202,22 +201,29 @@ public class ConvertThurgau2Plans {
 			int dow_prev = -1;
 			Id pid_prev = null;			
 			String[] lines = person_string.split("\n", -1); // last line is always an empty line
-			for (int l = 0; l < lines.length-1; l++) {	
-				
-				log.info(lines[l]);
-				
-				String[] entrs = lines[l].split("\t", -1);
-				int dow = Integer.parseInt(entrs[22].trim()) - 1;
+			for (int l = 0; l < lines.length-1; l++) {					
+				String[] line_entries = lines[l].split("\t", -1);
+				int dow = Integer.parseInt(line_entries[22].trim()) - 1; //d_o_w
 				
 				// add new plan if day of week changes or person changes
 				if (dow != dow_prev || !pid.equals(pid_prev)) {
-					this.addPlan(pid, entrs, dow);
+					this.addPlan(pid, dow);
 				}
-				this.addTripsAndActs(pid, entrs);				
+				this.addTripsAndActs(pid, line_entries);				
 				pid_prev = pid;
 				dow_prev = dow;
 			}
 		}
+	}
+	
+	private Plan addPlan(Id pid, int dow) {
+		// creating/getting plan	
+		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(pid);
+		person.createAndAddPlan(true);
+		Plan plan = person.getSelectedPlan();
+						
+		plan.setScore(dow * 1.0); // used plans score as a storage for the person weight of the MZ2000
+		return plan;
 	}
 	
 	private void addTripsAndActs(Id pid, String[] entrs) {
@@ -225,16 +231,16 @@ public class ConvertThurgau2Plans {
 		Plan plan = person.getSelectedPlan();
 		
 		// departure time (min => sec.)
-		String dp[] = (entrs[6].trim()).split(":", -1);
+		String dp[] = (entrs[6].trim()).split(":", -1); //t_dep_o
 		int departure = Integer.parseInt(dp[0].trim()) * 3600 + Integer.parseInt(dp[1].trim()) * 60 + 5; // add 5 seconds to not have div by 0
 		
 		// arrival time (min => sec.)
-		String ar[] = (entrs[7].trim()).split(":", -1);
+		String ar[] = (entrs[7].trim()).split(":", -1); // t_arr_o
 		int arrival = Integer.parseInt(ar[0].trim()) * 3600 + Integer.parseInt(ar[1].trim()) * 60;
 			
 
 		// destination activity type -------------------------------------------------
-		int purpose = Integer.parseInt(entrs[24].trim());
+		int purpose = Integer.parseInt(entrs[24].trim()); //t_pur_m
 		String acttype = null;
 		if 		(purpose == 1) { acttype = LEISURE; }	// Pick up/Drop off
 		else if (purpose == 2) { acttype = LEISURE; }	// Private business
@@ -252,9 +258,9 @@ public class ConvertThurgau2Plans {
 		if (entrs[29].trim().equals("")) {
 			throw new RuntimeException("no mode for pid = " + pid + " trip id = " + entrs[0].trim() + " " + entrs[30].trim());
 		}				
-		int m = Integer.parseInt(entrs[29].trim());
+		int m = Integer.parseInt(entrs[29].trim()); //mm
 		String mode = null;
-		if (m == 0) 	 { mode = TransportMode.car; }		// Unkown
+		if (m == 0) 	 { mode = TransportMode.car; }	// Unkown
 		else if (m == 1) { mode = TransportMode.pt; }	// Rail
 		else if (m == 2) { mode = TransportMode.pt; }	// Bus
 		else if (m == 3) { mode = TransportMode.car; }	// Car driver
@@ -262,7 +268,7 @@ public class ConvertThurgau2Plans {
 		else if (m == 5) { mode = TransportMode.car; }	// Motorcycle
 		else if (m == 6) { mode = TransportMode.bike; }	// Cycle
 		else if (m == 7) { mode = TransportMode.walk; }	// Walking
-		else if (m == 8) { mode = TransportMode.car; }			// Other
+		else if (m == 8) { mode = TransportMode.car; }	// Other
 		else {
 			throw new RuntimeException("pid = " + pid + ": m = " + m + " not known!");
 		}
@@ -287,14 +293,27 @@ public class ConvertThurgau2Plans {
 		}
 	}
 	
-	private Plan addPlan(Id pid, String[] entrs, int dow) {
-		// creating/getting plan	
-		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(pid);
-		person.createAndAddPlan(true);
-		Plan plan = person.getSelectedPlan();
-						
-		plan.setScore(dow * 1.0); // used plans score as a storage for the person weight of the MZ2000
-		return plan;
+	private void clean(Map<Id,String> person_strings) {
+		
+		Population population = this.scenario.getPopulation();
+
+		log.info("      remove plans with inconsistent times...");
+		this.removePlansInconsistentTimes(population);
+
+		log.info("      remove non home based day plans...");
+		this.removeNonHomeBasedPlans(population);
+
+		// no others anymore
+		// log.info("      remove plans with act type '"+ OTHR +"'...");
+		// this.removePlansWithTypeOther(population);
+
+		// no undefs anymore
+		//log.info("      remove plans with mode undefined ...");
+		//this.removePlansModeTypeUndef(population);
+	
+		log.info("removing routes");
+		this.removeRoutes(population);
+		log.info("    done.");
 	}
 	
 	private void createPersonWeeks(String[] entrs) {
@@ -311,48 +330,67 @@ public class ConvertThurgau2Plans {
 			
 			// micro census 2000 person weight
 			double pweight = Double.parseDouble(entrs[89].trim());						
-			// micro census 2000 trip weight
-			// double tweight = Double.parseDouble(entrs[90].trim());
 			this.personWeeks.get(pid).setPweight(pweight);
 			
 			double prev_score = 1000.0;
 			for (Plan plan : person.getPlans()) {				
-				if (plan.getScore() <= prev_score) {
+				if (plan.getScore() <= prev_score) { // if dow is smaller, then a new week starts. let us hope, that dow is increasing for all persons
 					this.personWeeks.get(pid).increaseWeek();	
 				}
 				prev_score = plan.getScore();
 				this.personWeeks.get(pid).addDay((int) Math.floor(plan.getScore()), plan);
 			}		
-			this.personWeeks.get(pid).setIsWorker();
+			this.personWeeks.get(pid).setWorkState();
 		}
 	}
-			
-	private void write() {
-		log.info("Writing population with plans ...");
-		log.info("Number of persons: " + this.scenario.getPopulation().getPersons().size());
-		new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(this.outputfile);
+				
+	private final void removePlansInconsistentTimes(final Population plans) {
+		int removeCnt = 0;
+		Set<Plan> removePlans = new HashSet<Plan>();
+		for (Person p : plans.getPersons().values()) {
+			for (Plan plan : p.getPlans()) {
+				for (int i=0; i<plan.getPlanElements().size()-2; i=i+2) {
+					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
+					if (act.getEndTime() < act.getStartTime()) {
+						removePlans.add(plan);
+						removeCnt++;
+					}
+				}
+			}
+			p.getPlans().removeAll(removePlans);
+		}
+		log.info("removed " + removeCnt + " plans");
+	}
+
+	private final void removeNonHomeBasedPlans(final Population population) {
+		int removeCnt = 0;
+		Set<Plan> removePlans = new HashSet<Plan>();
+		for (Person p : population.getPersons().values()) {
+			for (Plan plan : p.getPlans()) {
+				ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
+				if (!last.getType().equals(HOME)) {
+					removePlans.add(plan);
+					removeCnt++;
+				}
+			}
+			p.getPlans().removeAll(removePlans);
+		}
+		log.info("removed " + removeCnt + " plans");
 	}
 	
-	private void clean(Map<Id,String> person_strings) {
-		
-		Population population = this.scenario.getPopulation();
+	private final void removeRoutes(final Population plans) {
+		for (Person p : plans.getPersons().values()) {
+			Plan plan = p.getSelectedPlan();
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					((Leg)pe).setRoute(null);
+				}
+			}
+		}
+	}
 
-		log.info("      remove plans with inconsistent times...");
-		this.removePlansInconsistentTimes(population);
-
-		log.info("      remove non home based day plans...");
-		this.removeNonHomeBasedPlans(population);
-
-		// keep them
-		// log.info("      remove plans with act type '"+ OTHR +"'...");
-		// this.removePlansWithTypeOther(population);
-
-		log.info("      remove plans with mode undefined ...");
-		this.removePlansModeTypeUndef(population);
-	
-		log.info("removing routes");
-		this.removeRoutes(population);
-		log.info("    done.");
+	public TreeMap<Id, PersonWeeks> getPersonWeeks() {
+		return personWeeks;
 	}
 	
 	private void removeIncompletePersons() {
@@ -373,103 +411,9 @@ public class ConvertThurgau2Plans {
 		log.info("removing incomplete persons: " + population.getPersons().size() + " of " + originalSize + " persons left.");
 	}
 	
-	//////////////////////////////////////////////////////////////////////
-
-	private final void removeNonHomeBasedPlans(final Population population) {
-		int removeCnt = 0;
-		Set<Plan> removePlans = new HashSet<Plan>();
-		for (Person p : population.getPersons().values()) {
-			for (Plan plan : p.getPlans()) {
-				ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
-				if (!last.getType().equals(HOME)) {
-					removePlans.add(plan);
-					removeCnt++;
-				}
-			}
-			p.getPlans().removeAll(removePlans);
-		}
-		log.info("removed " + removeCnt + " plans");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	private final void removePlansWithTypeOther(final Population plans) {
-		int removeCnt = 0;
-		Set<Plan> removePlans = new HashSet<Plan>();
-		for (Person p : plans.getPersons().values()) {
-			for (Plan plan : p.getPlans()) {
-				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (act.getType().startsWith(LEISURE)) {
-							removePlans.add(plan);
-							removeCnt++;
-						}
-					}
-				}
-			}
-			p.getPlans().removeAll(removePlans);
-		}	
-		log.info("removed " + removeCnt + " plans");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	private final void removePlansModeTypeUndef(final Population plans) {
-		int removeCnt = 0;
-		Set<Plan> removePlans = new HashSet<Plan>();
-		for (Person p : plans.getPersons().values()) {
-			for (Plan plan : p.getPlans()) {
-				for (PlanElement pe : plan.getPlanElements()) {
-					if (pe instanceof Leg) {
-						Leg leg = (Leg) pe;
-						if (leg.getMode().equals("undefined")) {
-							removePlans.add(plan);
-							removeCnt++;
-						}
-					}
-				}
-			}
-			p.getPlans().removeAll(removePlans);
-		}
-		log.info("removed " + removeCnt + " plans");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	private final void removePlansInconsistentTimes(final Population plans) {
-		int removeCnt = 0;
-		Set<Plan> removePlans = new HashSet<Plan>();
-		for (Person p : plans.getPersons().values()) {
-			for (Plan plan : p.getPlans()) {
-				for (int i=0; i<plan.getPlanElements().size()-2; i=i+2) {
-					ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-					if (act.getEndTime() < act.getStartTime()) {
-						removePlans.add(plan);
-						removeCnt++;
-					}
-				}
-			}
-			p.getPlans().removeAll(removePlans);
-		}
-		log.info("removed " + removeCnt + " plans");
-	}
-
-	
-	//////////////////////////////////////////////////////////////////////
-	//remove routes again
-	private final void removeRoutes(final Population plans) {
-		for (Person p : plans.getPersons().values()) {
-			Plan plan = p.getSelectedPlan();
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					((Leg)pe).setRoute(null);
-				}
-			}
-		}
-	}
-
-	public TreeMap<Id, PersonWeeks> getPersonWeeks() {
-		return personWeeks;
+	private void write() {
+		log.info("Writing population with plans ...");
+		log.info("Number of persons: " + this.scenario.getPopulation().getPersons().size());
+		new PopulationWriter(this.scenario.getPopulation(), scenario.getNetwork()).write(this.outputfile);
 	}
 }

@@ -72,7 +72,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		this.buildShopFacQuadTree();
 		this.buildLeisFacQuadTree();
 		this.buildEducFacQuadTree();
-		this.builOtherFacQuadTree();
+		this.buildBusinessFacQuadTree();
 		System.out.println("    done.");
 	}
 
@@ -170,7 +170,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		Gbl.printRoundTime();
 	}
 	
-	private void builOtherFacQuadTree() {
+	private void buildBusinessFacQuadTree() {
 		Gbl.startMeasurement();
 		System.out.println("      building other facility quad tree...");
 		double minx = Double.POSITIVE_INFINITY;

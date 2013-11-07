@@ -85,7 +85,7 @@ public class PersonWeeks {
 		}
 	}
 		
-	public void setIsWorker() {
+	public void setWorkState() {
 		for (int i = 0; i < days.size(); i++) {
 			for (Plan plan : this.days.get(i).values()) {
 				for (PlanElement pe : plan.getPlanElements()) {

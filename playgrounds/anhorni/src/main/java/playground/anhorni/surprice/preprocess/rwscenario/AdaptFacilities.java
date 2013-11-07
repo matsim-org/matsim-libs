@@ -52,6 +52,7 @@ public class AdaptFacilities {
 	}
 	
 	public void run(String facilitiesFileIn, String facilitiesFileOut, String networkFile) {
+		log.info("start facility adaption ========================================");
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFileIn);
 				
@@ -81,5 +82,6 @@ public class AdaptFacilities {
 			aOptBusiness.setOpeningTimes(ots);
 		}
 		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(facilitiesFileOut);
+		log.info("facilities written ==============================");
 	}
 }
