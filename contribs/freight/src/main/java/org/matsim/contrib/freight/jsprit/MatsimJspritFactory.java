@@ -116,6 +116,9 @@ public class MatsimJspritFactory {
 			vehicleBuilder.setLocationCoord(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
 		}
 		VehicleImpl vehicle = vehicleBuilder.build();
+		assert carrierVehicle.getEarliestStartTime() == vehicle.getEarliestDeparture() : "carrierVeh must have the same earliestDep as vrpVeh";
+		assert carrierVehicle.getLatestEndTime() == vehicle.getLatestArrival() : "carrierVeh must have the same latestArr as vrpVeh";
+		assert carrierVehicle.getLocation().toString() == vehicle.getLocationId() : "locations must be equal";
 		return vehicle;
 	}
 	
@@ -134,6 +137,9 @@ public class MatsimJspritFactory {
 		vehicleBuilder.setEarliestStart(vehicle.getEarliestDeparture());
 		vehicleBuilder.setLatestEnd(vehicle.getLatestArrival());
 		CarrierVehicle carrierVehicle = vehicleBuilder.build();
+		assert vehicle.getEarliestDeparture() == carrierVehicle.getEarliestStartTime() : "vehicles must have the same earliestStartTime";
+		assert vehicle.getLatestArrival() == carrierVehicle.getLatestEndTime() : "vehicles must have the same latestEndTime";
+		assert vehicle.getLocationId() == carrierVehicle.getLocation().toString() : "locs must be the same";
 		return carrierVehicle;
 	}
 	
@@ -179,9 +185,11 @@ public class MatsimJspritFactory {
 	 * @throws IllegalStateException if tourActivity is NOT {@link ServiceActivity}.
 	 */
 	public static ScheduledTour createTour(VehicleRoute route) {
+		assert route.getDepartureTime() == route.getStart().getEndTime() : "at this point route.getDepartureTime and route.getStart().getEndTime() must be equal";
 		basics.route.TourActivities tour = route.getTourActivities();
-		CarrierVehicle carrierVehicle = createCarrierVehicle(route.getVehicle());
+		CarrierVehicle carrierVehicle = createCarrierVehicle(route.getVehicle());	
 		double depTime = route.getStart().getEndTime();
+ 
 		Tour.Builder tourBuilder = Tour.Builder.newInstance();
 		tourBuilder.scheduleStart(makeId(route.getStart().getLocationId()));
 		for (TourActivity act : tour.getActivities()) {
@@ -199,6 +207,7 @@ public class MatsimJspritFactory {
 		tourBuilder.scheduleEnd(makeId(route.getEnd().getLocationId()));
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, carrierVehicle, depTime);
+		assert route.getDepartureTime() == sTour.getDeparture() : "departureTime of both route and scheduledTour must be equal";
 		return sTour;
 	}
 	
@@ -222,6 +231,7 @@ public class MatsimJspritFactory {
 	public static VehicleRoute createRoute(ScheduledTour scheduledTour, Network network){
 		CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 		double depTime = scheduledTour.getDeparture();
+
 		Tour tour = scheduledTour.getTour();
 			
 		Vehicle jspritVehicle = createVehicle(carrierVehicle, findCoord(carrierVehicle.getLocation(), network));
@@ -243,7 +253,9 @@ public class MatsimJspritFactory {
 				}
 			}
 		}
-		return routeBuilder.build();
+		VehicleRoute route = routeBuilder.build();
+		assert route.getDepartureTime() == scheduledTour.getDeparture() : "departureTimes of both routes must be equal";
+		return route;
 	}
 
 	/**
@@ -282,7 +294,10 @@ public class MatsimJspritFactory {
 				if(link == null) throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId=" + v.getVehicleId() + "][locationId=" + v.getLocation() + "]");
 				coordinate = link.getCoord();
 			} else log.warn("cannot find linkId " + v.getVehicleId());
-			vrpBuilder.addVehicle(createVehicle(v, coordinate));
+			Vehicle veh = createVehicle(v, coordinate);
+			assert veh.getEarliestDeparture() == v.getEarliestStartTime() : "earliestDeparture of both vehicles must be equal";
+			assert veh.getLatestArrival() == v.getLatestEndTime() : "latestArrTime of both vehicles must be equal";
+			vrpBuilder.addVehicle(veh);
 		}
 		
 		for(CarrierService service : carrier.getServices()){

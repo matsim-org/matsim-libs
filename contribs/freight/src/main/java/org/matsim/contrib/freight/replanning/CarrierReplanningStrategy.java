@@ -96,7 +96,8 @@ public class CarrierReplanningStrategy {
 			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
 		}
 		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
-		copiedPlan.setScore(plan2copy.getScore());
+		double initialScoreOfCopiedPlan = plan2copy.getScore();
+		copiedPlan.setScore(initialScoreOfCopiedPlan);
 		return copiedPlan;
 
 	}
