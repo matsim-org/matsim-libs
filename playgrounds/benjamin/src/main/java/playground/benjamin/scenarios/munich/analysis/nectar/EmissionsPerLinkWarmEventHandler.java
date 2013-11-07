@@ -56,7 +56,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		this.time2warmEmissionsTotal.clear();
 		logger.info("Resetting warm emission aggregation to " + this.time2warmEmissionsTotal);
 		this.time2linkIdLeaveCount.clear();
-		logger.info("Resetting linkLeve counter to " + this.time2linkIdLeaveCount);
+		logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
 	}
 
 	
@@ -68,6 +68,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 		double endOfTimeInterval = 0.0;
 		
+		// TODO -> benjamin: initialisierung entfernen?
 		if(warmEmissionsOfEvent==null){
 			warmEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 			for(WarmPollutant wp: WarmPollutant.values()){
@@ -80,9 +81,12 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 				}
 			}
 		}
-		for(int i = 0; i < this.noOfTimeBins; i++){
-			if(time > i * this.timeBinSize && time <= (i + 1) * this.timeBinSize){
-				endOfTimeInterval = (i + 1) * this.timeBinSize;
+		// ende initialisierung
+		
+		endOfTimeInterval = Math.ceil(time/timeBinSize)*timeBinSize;
+		if(endOfTimeInterval<=0.0)endOfTimeInterval=timeBinSize;
+		
+
 				Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();;
 				Map<Id, Double> countTotal = new HashMap<Id, Double>();
 				
@@ -93,15 +97,11 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 					
 					if(warmEmissionsTotal.get(linkId) != null){
 						Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
-												
+						
 						for(WarmPollutant wp : WarmPollutant.values()){
-							Double eventValue = warmEmissionsOfEvent.get(wp);
-							if(eventValue == null) eventValue =0.0;
-							
-							Double previousValue = warmEmissionsSoFar.get(wp);
-							previousValue += eventValue;
-
+							warmEmissionsSoFar.put(wp, warmEmissionsOfEvent.get(wp)+warmEmissionsSoFar.get(wp));
 						}
+						
 //						for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
 //							WarmPollutant pollutant = entry.getKey();
 //							Double eventValue = new Double(entry.getValue());
@@ -111,10 +111,10 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 //							
 //							/*Is there a bug here?
 //							See playground.fhuelsmann.emission.analysisForConcentration.EmissionsPerLinkWarmEventHandler.java*/
-//							// TODO einzelne werte koennten null sein + aendert event value!!!!!
+//							// TODO einzelne werte koennten null sein + aendert event value falls das feld das gleiche ist. !!!!!
 //							warmEmissionsSoFar.put(pollutant, newValue);
 //						}
-						warmEmissionsTotal.put(linkId, warmEmissionsSoFar); // TODO unness?
+						//warmEmissionsTotal.put(linkId, warmEmissionsSoFar); // TODO unness?
 						double countsSoFar = countTotal.get(linkId);
 						double newValue = countsSoFar + 1.;
 						countTotal.put(linkId, newValue);
@@ -128,8 +128,8 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 				}
 				this.time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
 				this.time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
-			}
-		}
+		
+
 	}
 
 	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {
