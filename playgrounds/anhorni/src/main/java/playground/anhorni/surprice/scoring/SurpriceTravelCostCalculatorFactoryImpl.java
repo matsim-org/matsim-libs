@@ -26,7 +26,7 @@ import org.matsim.core.router.util.TravelTime;
 
 
 /**
- * @author dgrether
+ * @author anhorni
  *
  */
 public class SurpriceTravelCostCalculatorFactoryImpl implements TravelDisutilityFactory {

@@ -32,7 +32,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
  *
- * @author mrieser
+ * @author anhorni
  */
 public class SurpriceTravelTimeAndDistanceBasedTravelDisutility implements TravelDisutility {
 

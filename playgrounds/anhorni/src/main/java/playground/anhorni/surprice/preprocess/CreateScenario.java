@@ -361,14 +361,15 @@ public class CreateScenario {
 		Bins incomeBins = new Bins(1, 9, "incomes");
 				
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
-			incomes.putAttribute(personWeeks.getPerson().getId().toString(), "income", personWeeks.getIncome());
-			incomeBins.addVal(personWeeks.getIncome(), 1.0);
+			double incomeNormalized =  personWeeks.getIncome() / 8.0;
+			incomes.putAttribute(personWeeks.getPerson().getId().toString(), "income", incomeNormalized);
+			incomeBins.addVal(incomeNormalized * 8.0, 1.0);
 		}		
 		log.info("Writing incomes to " + outPath + "/incomes.xml");
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(incomes);
 		attributesWriter.writeFile(outPath + "/incomes.xml");
 		
-		incomeBins.plotBinnedDistribution(outPath + "/", "income", "");	
+		incomeBins.plotBinnedDistribution(outPath + "/", "income * 8", "");	
 	}
 						
 	private void writeWeek(String outPath) {
@@ -491,15 +492,18 @@ public class CreateScenario {
 		// create marginal utility of money		
 		log.info("creating preferences");
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {	
-			double offset = (0.5 - random.nextDouble()) * 4.0;
-			double dudm = (Double)(this.incomes.getAttribute(person.getId().toString(), "income")) + offset + 2.0;			
-			this.preferences.putAttribute(person.getId().toString(), "dudm", dudm);
+			double offset = (0.5 - random.nextDouble()) * 0.5; // -0.25 .. 0.25
+			double nullOffset = 0.25;
+			double totalOffset = offset + nullOffset;
+			double dudm = (Double)(this.incomes.getAttribute(person.getId().toString(), "income")) + totalOffset;
+			double dudmNormalized = dudm / (1 + nullOffset);
+			this.preferences.putAttribute(person.getId().toString(), "dudm", dudmNormalized * 10.0);
 		}
 		this.writePreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 	}
 	
 	private void writePreferences(String outPath) {
-		Bins preferencesBins = new Bins(1, 13, "preferences");
+		Bins preferencesBins = new Bins(1, 20, "preferences");
 				
 		for (Id id : this.scenario.getPopulation().getPersons().keySet()) {	
 			preferencesBins.addVal((Double)this.preferences.getAttribute(id.toString(), "dudm"), 1.0);
@@ -508,6 +512,6 @@ public class CreateScenario {
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(preferences);
 		attributesWriter.writeFile(outPath + "/preferences.xml");
 		
-		preferencesBins.plotBinnedDistribution(outPath + "/", "preferences", "");	
+		preferencesBins.plotBinnedDistribution(outPath + "/", "preferences * 12", "");	
 	}
 }
