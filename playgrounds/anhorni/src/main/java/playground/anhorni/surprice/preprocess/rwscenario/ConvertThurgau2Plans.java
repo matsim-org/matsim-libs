@@ -59,8 +59,8 @@ public class ConvertThurgau2Plans {
 	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	private String inputfileF3;
 	private String inputfileF2;
+	private String inputfileF3;
 	private String outputfile;
 	
 	private TreeMap<Id, PersonWeeks> personWeeks = new TreeMap<Id, PersonWeeks>();
@@ -91,6 +91,109 @@ public class ConvertThurgau2Plans {
 		}		
 		log.info("Scenario creation finished \n ----------------------------------------------------");
 	}
+	
+	public void convert(String outPath) throws Exception {
+		
+		Population population = this.scenario.getPopulation();
+		
+		if (population.getName() == null) {
+			population.setName("created by '" + this.getClass().getName() + "'");
+		}
+		if (!population.getPersons().isEmpty()) {
+			throw new RuntimeException("[population=" + population + " is not empty]");
+		}
+		Map<Id,String> person_strings = new TreeMap<Id, String>();
+		int id = Integer.MIN_VALUE;
+		int prev_id = Integer.MIN_VALUE;
+		Id prev_pid = new IdImpl(prev_id);
+		String person_string = "";
+		log.info("      parsing persons...");
+
+		FileReader fr = new FileReader(this.inputfileF3);
+		log.info("reading file: " + this.inputfileF3);
+		BufferedReader br = new BufferedReader(fr);
+		String[] entrs = null;
+		String curr_line = br.readLine(); // Skip header
+		while ((curr_line = br.readLine()) != null) {
+			entrs = curr_line.split("\t", -1);
+			
+			id = Integer.parseInt(entrs[2].trim());
+						
+			if (id == prev_id) {
+				person_string = person_string + curr_line + "\n"; // one trip per line (id_trip)
+			}
+			else {
+				if (prev_id != Integer.MIN_VALUE) {
+					if (person_strings.put(prev_pid, person_string) != null) {
+						throw new RuntimeException("Person id=" + prev_pid + " already parsed!");
+					}
+				}
+				person_string = curr_line + "\n";
+				prev_id = id;
+				prev_pid = new IdImpl(prev_id);
+			}
+		}
+		if (person_strings.put(prev_pid, person_string) != null) {
+			throw new RuntimeException("Person id=" + prev_pid + " already parsed!");
+		}
+		br.close();
+		fr.close();
+		log.info("      done.");
+		log.info("      # persons parsed = " + person_strings.size());
+
+		this.createPersons(outPath);
+		
+		this.addPlans(person_strings);
+		
+		this.clean(person_strings);
+		
+		this.createPersonWeeks(entrs);
+			
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			this.personWeeks.get(person.getId()).removeIncompleteWeeks();
+		}
+		this.removeIncompletePersons();
+				
+		this.write();
+	}
+	
+	private void createPersons(String outPath) throws Exception {
+		Population population = this.scenario.getPopulation();
+		
+		FileReader fr = new FileReader(this.inputfileF2);
+		BufferedReader br = new BufferedReader(fr);
+		String curr_line = br.readLine(); // Skip header
+		while ((curr_line = br.readLine()) != null) {
+			String[] entrs = curr_line.split("\t", -1);
+
+			Id id = new IdImpl(Integer.parseInt(entrs[0].trim())); //p_nr
+			
+			// person age
+			int age = Integer.parseInt(entrs[4].trim()); //age
+
+			// person gender
+			int g = Integer.parseInt(entrs[3].trim()); //sex
+			String gender = null;
+			if (g == 0) {
+				gender = FEMALE;
+			}
+			else if (g == 1) {
+				gender = MALE;
+			}
+			else { 
+				throw new RuntimeException("pid=" + id + ": g=" + g + " not known!");
+			}
+//			String houseHoldIncomeString = entrs[95].trim();
+//			int householdIncome = -99;
+//			if (!houseHoldIncomeString.equals("")) {
+//				householdIncome = Integer.parseInt(houseHoldIncomeString);
+//			}			
+			PersonImpl person = new PersonImpl(id);
+			person.setAge(age);
+			person.setSex(gender);
+			population.addPerson(person);
+		}
+	}
 
 	private void addPlans(final Map<Id, String> person_strings) {		
 		for (Id pid : person_strings.keySet()) {
@@ -99,7 +202,10 @@ public class ConvertThurgau2Plans {
 			int dow_prev = -1;
 			Id pid_prev = null;			
 			String[] lines = person_string.split("\n", -1); // last line is always an empty line
-			for (int l = 0; l < lines.length-1; l++) {				
+			for (int l = 0; l < lines.length-1; l++) {	
+				
+				log.info(lines[l]);
+				
 				String[] entrs = lines[l].split("\t", -1);
 				int dow = Integer.parseInt(entrs[22].trim()) - 1;
 				
@@ -190,70 +296,6 @@ public class ConvertThurgau2Plans {
 		plan.setScore(dow * 1.0); // used plans score as a storage for the person weight of the MZ2000
 		return plan;
 	}
-
-	public void convert(String outPath) throws Exception {
-		
-		Population population = this.scenario.getPopulation();
-		
-		if (population.getName() == null) {
-			population.setName("created by '" + this.getClass().getName() + "'");
-		}
-		if (!population.getPersons().isEmpty()) {
-			throw new RuntimeException("[population=" + population + " is not empty]");
-		}
-		Map<Id,String> person_strings = new TreeMap<Id, String>();
-		int id = Integer.MIN_VALUE;
-		int prev_id = Integer.MIN_VALUE;
-		Id prev_pid = new IdImpl(prev_id);
-		String person_string = "";
-		log.info("      parsing persons...");
-
-		FileReader fr = new FileReader(this.inputfileF3);
-		BufferedReader br = new BufferedReader(fr);
-		String[] entrs = null;
-		String curr_line = br.readLine(); // Skip header
-		while ((curr_line = br.readLine()) != null) {
-			entrs = curr_line.split("\t", -1);
-			
-			id = Integer.parseInt(entrs[2].trim());
-						
-			if (id == prev_id) {
-				person_string = person_string + curr_line + "\n";
-			}
-			else {
-				if (prev_id != Integer.MIN_VALUE) {
-					if (person_strings.put(prev_pid, person_string) != null) {
-						throw new RuntimeException("Person id=" + prev_pid + " already parsed!");
-					}
-				}
-				person_string = curr_line + "\n";
-				prev_id = id;
-				prev_pid = new IdImpl(prev_id);
-			}
-		}
-		if (person_strings.put(prev_pid, person_string) != null) {
-			throw new RuntimeException("Person id=" + prev_pid + " already parsed!");
-		}
-		br.close();
-		fr.close();
-		log.info("      done.");
-		log.info("      # persons parsed = " + person_strings.size());
-
-		this.createPersons(outPath);
-		
-		this.addPlans(person_strings);
-		
-		this.clean(person_strings);
-		
-		this.createPersonWeeks(entrs);
-			
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			this.personWeeks.get(person.getId()).removeIncompleteWeeks();
-		}
-		this.removeIncompletePersons();
-				
-		this.write();
-	}
 	
 	private void createPersonWeeks(String[] entrs) {
 		int counter = 0;
@@ -284,45 +326,7 @@ public class ConvertThurgau2Plans {
 			this.personWeeks.get(pid).setIsWorker();
 		}
 	}
-	
-	private void createPersons(String outPath) throws Exception {
-		Population population = this.scenario.getPopulation();
-		
-		FileReader fr = new FileReader(this.inputfileF2);
-		BufferedReader br = new BufferedReader(fr);
-		String curr_line = br.readLine(); // Skip header
-		while ((curr_line = br.readLine()) != null) {
-			String[] entrs = curr_line.split("\t", -1);
-
-			Id id = new IdImpl(Integer.parseInt(entrs[0].trim()));
 			
-			// person age
-			int age = Integer.parseInt(entrs[4].trim());
-
-			// person gender
-			int g = Integer.parseInt(entrs[3].trim());
-			String gender = null;
-			if (g == 0) {
-				gender = FEMALE;
-			}
-			else if (g == 1) {
-				gender = MALE;
-			}
-			else { 
-				throw new RuntimeException("pid=" + id + ": g=" + g + " not known!");
-			}
-//			String houseHoldIncomeString = entrs[95].trim();
-//			int householdIncome = -99;
-//			if (!houseHoldIncomeString.equals("")) {
-//				householdIncome = Integer.parseInt(houseHoldIncomeString);
-//			}			
-			PersonImpl person = new PersonImpl(id);
-			person.setAge(age);
-			person.setSex(gender);
-			population.addPerson(person);
-		}
-	}
-		
 	private void write() {
 		log.info("Writing population with plans ...");
 		log.info("Number of persons: " + this.scenario.getPopulation().getPersons().size());

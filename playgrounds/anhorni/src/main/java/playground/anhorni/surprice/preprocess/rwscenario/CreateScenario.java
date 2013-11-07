@@ -107,6 +107,65 @@ public class CreateScenario {
 		this.createIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"), 
 				config.findParam(Surprice.SURPRICE_PREPROCESS, "mzIncomeFile"));
 	}
+	
+	private void readMZ(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath) {
+		new MatsimNetworkReader(scenario).readFile(networkFilePath);		
+		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFilePath);
+		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
+		populationReader.readFile(plansFilePath);
+		
+		log.info("Reading population, size: " + this.scenario.getPopulation().getPersons().size());
+		
+		this.sample();
+	}
+	
+	private void sample() {
+		
+		double share = Double.parseDouble(config.getModule("surprice_preprocess").getValue("sample"));
+		
+		List<Person> persons = new Vector<Person>();
+		
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+			if (this.random.nextDouble() > (1.0 - share)) {
+				persons.add(person);
+			}
+		}
+		this.scenario.getPopulation().getPersons().clear();
+		
+		for (Person person : persons) {
+			this.scenario.getPopulation().addPerson(person);
+		}
+		log.info("Scenario size: " + this.scenario.getPopulation().getPersons().size());
+	}
+	
+	private void storeHomeAndWork() {
+		int counter = 0;
+		int nextMsg = 1;
+		for (Person p : this.scenario.getPopulation().getPersons().values()) {			
+			counter++;
+			if (counter % nextMsg == 0) {
+				nextMsg *= 2;
+				log.info(" person # " + counter);
+			}
+			PlanImpl plan = (PlanImpl)p.getSelectedPlan();
+			Id homeFacilityId = plan.getFirstActivity().getFacilityId();
+			Id workFacilityId = this.getWorkFacilityId(plan);			
+			this.personHWFacilities.put(p.getId(), new PersonHomeWork(p, homeFacilityId, workFacilityId));
+		}
+	}
+	
+	private Id getWorkFacilityId(PlanImpl plan) {
+		Id workId = null;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				ActivityImpl act = (ActivityImpl)pe;				
+				if (act.getType().startsWith("w")) {
+					workId = act.getFacilityId();
+				}
+			}
+		}
+		return workId;
+	}
 		
 	private void createIncomes(String outPath, String mzIncomeFile) {
 		TreeMap<Double, Integer> incomesNormalized = new TreeMap<Double, Integer>();
@@ -246,66 +305,7 @@ public class CreateScenario {
 					this.scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
 		}	
 	}
-		
-	private void readMZ(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath) {
-		new MatsimNetworkReader(scenario).readFile(networkFilePath);		
-		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFilePath);
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
-		populationReader.readFile(plansFilePath);
-		
-		log.info("Reading population, size: " + this.scenario.getPopulation().getPersons().size());
-		
-		this.sample();
-	}
-	
-	private void sample() {
-		
-		double share = Double.parseDouble(config.getModule("surprice_preprocess").getValue("sample"));
-		
-		List<Person> persons = new Vector<Person>();
-		
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			if (this.random.nextDouble() > (1.0 - share)) {
-				persons.add(person);
-			}
-		}
-		this.scenario.getPopulation().getPersons().clear();
-		
-		for (Person person : persons) {
-			this.scenario.getPopulation().addPerson(person);
-		}
-		log.info("Scenario size: " + this.scenario.getPopulation().getPersons().size());
-	}
-	
-	private void storeHomeAndWork() {
-		int counter = 0;
-		int nextMsg = 1;
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {			
-			counter++;
-			if (counter % nextMsg == 0) {
-				nextMsg *= 2;
-				log.info(" person # " + counter);
-			}
-			PlanImpl plan = (PlanImpl)p.getSelectedPlan();
-			Id homeFacilityId = plan.getFirstActivity().getFacilityId();
-			Id workFacilityId = this.getWorkFacilityId(plan);			
-			this.personHWFacilities.put(p.getId(), new PersonHomeWork(p, homeFacilityId, workFacilityId));
-		}
-	}
-	
-	private Id getWorkFacilityId(PlanImpl plan) {
-		Id workId = null;
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				ActivityImpl act = (ActivityImpl)pe;				
-				if (act.getType().startsWith("w")) {
-					workId = act.getFacilityId();
-				}
-			}
-		}
-		return workId;
-	}
-	
+			
 	private void merge() {
 		// prepare data structures for probabilistic draw of chains
 		// pweights + workers and non-workers
