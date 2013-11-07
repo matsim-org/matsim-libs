@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess.rwscenario;
+package playground.anhorni.surprice.preprocess;
 
 import java.util.ArrayList;
 import java.util.TreeMap;

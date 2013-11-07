@@ -54,12 +54,7 @@ public class DayControler extends Controler {
 			  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences, this.incomes)
 				);
 	} 
-			
-//	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-//		return new SurpriceScoringFunctionFactory(
-//	  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences);	  		
-//	}
-	
+				
 	protected void setUp() {
 		SurpriceTravelCostCalculatorFactoryImpl costCalculatorFactory = new SurpriceTravelCostCalculatorFactoryImpl(this.day);
 		this.setTravelDisutilityFactory(costCalculatorFactory);

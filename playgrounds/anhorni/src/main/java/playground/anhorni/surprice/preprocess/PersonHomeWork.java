@@ -17,31 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess.miniscenario;
+package playground.anhorni.surprice.preprocess;
 
-import org.matsim.core.population.PersonImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
-import playground.anhorni.surprice.AgentMemory;
-import playground.anhorni.surprice.DecisionModel;
-
-public class DecisionModelCreator {
+public class PersonHomeWork {
 	
-	public DecisionModel createDecisionModelForAgent(PersonImpl person, AgentMemory memory) {
-		DecisionModel model = new DecisionModel();
-		model.setMemory(memory);
-		
-		model.setFrequency("work", "mon-fri", 1);
-		model.setFrequency("shop", "mon-fri", 0.2);
-		model.setFrequency("leisure", "mon-fri", 0.2);
-		
-		model.setFrequency("work", "sat", 0);
-		model.setFrequency("shop", "sat", 1);
-		model.setFrequency("leisure", "sat", 0);
-		
-		model.setFrequency("work", "sun", 0);
-		model.setFrequency("shop", "sun", 0);
-		model.setFrequency("leisure", "sun", 1);
-		
-		return model;
+	Person person; 
+	Id homeFacilityId;
+	Id workFaciliyId;
+	
+	public PersonHomeWork(Person person, Id homeFacilityId, Id workFaciliyId) {
+		this.person = person;
+		this.homeFacilityId = homeFacilityId;
+		this.workFaciliyId = workFaciliyId;
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
+	public Id getHomeFacilityId() {
+		return homeFacilityId;
+	}
+
+	public void setHomeFacilityId(Id homeFacilityId) {
+		this.homeFacilityId = homeFacilityId;
+	}
+
+	public Id getWorkFaciliyId() {
+		return workFaciliyId;
+	}
+
+	public void setWorkFaciliyId(Id workFaciliyId) {
+		this.workFaciliyId = workFaciliyId;
 	}
 }

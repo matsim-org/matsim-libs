@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess.rwscenario;
+package playground.anhorni.surprice.preprocess;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,9 +55,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;
-import playground.anhorni.surprice.preprocess.Analyzer;
-import playground.anhorni.surprice.preprocess.CreateToll;
-import playground.anhorni.surprice.preprocess.Zone;
 
 
 public class CreateScenario {	
@@ -68,6 +65,8 @@ public class CreateScenario {
 	private TreeMap<Id, PersonWeeks> personWeeksMZ = new TreeMap<Id, PersonWeeks>();
 	private Config config;
 	private int [] incomeCategoryFrequencies = new int[9];
+	private ObjectAttributes incomes = new ObjectAttributes();
+	private ObjectAttributes preferences = new ObjectAttributes();
 		
 	private final static Logger log = Logger.getLogger(ConvertThurgau2Plans.class);
 		
@@ -85,13 +84,13 @@ public class CreateScenario {
 		
 		AdaptFacilities facilityAdapter = new AdaptFacilities();
 		facilityAdapter.run(config.getModule("facilities").getValue("inputFacilitiesFile"), 
-				config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath") + "facilities_incl_business.xml.gz", 
+				config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath") + "/facilities_incl_business.xml.gz", 
 				config.getModule("network").getValue("inputNetworkFile"));
 		
 		// handle MZ ...........................................................
 		this.readMZ(config.getModule("plans").getValue("inputPlansFile"), 
 				config.getModule("network").getValue("inputNetworkFile"), 
-				config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath") + "facilities_incl_business.xml.gz");
+				config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath") + "/facilities_incl_business.xml.gz");
 		
 		this.storeHomeAndWork();
 				
@@ -111,6 +110,8 @@ public class CreateScenario {
 		
 		this.createToll(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"),
 				Double.parseDouble(config.findParam(Surprice.SURPRICE_PREPROCESS, "tollRadius")));
+		
+		this.createPreferences();
 	}
 	
 	private void readMZ(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath) {
@@ -358,8 +359,7 @@ public class CreateScenario {
 	
 	private void writeIncomes(String outPath) {
 		Bins incomeBins = new Bins(1, 9, "incomes");
-		ObjectAttributes incomes = new ObjectAttributes();
-		
+				
 		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
 			incomes.putAttribute(personWeeks.getPerson().getId().toString(), "income", personWeeks.getIncome());
 			incomeBins.addVal(personWeeks.getIncome(), 1.0);
@@ -485,5 +485,29 @@ public class CreateScenario {
 				3.0,
 				"area",
 				"ZH scenario"); 
+	}
+	
+	private void createPreferences() {
+		// create marginal utility of money		
+		log.info("creating preferences");
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {	
+			double offset = (0.5 - random.nextDouble()) * 4.0;
+			double dudm = (Double)(this.incomes.getAttribute(person.getId().toString(), "income")) + offset + 2.0;			
+			this.preferences.putAttribute(person.getId().toString(), "dudm", dudm);
+		}
+		this.writePreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
+	}
+	
+	private void writePreferences(String outPath) {
+		Bins preferencesBins = new Bins(1, 13, "preferences");
+				
+		for (Id id : this.scenario.getPopulation().getPersons().keySet()) {	
+			preferencesBins.addVal((Double)this.preferences.getAttribute(id.toString(), "dudm"), 1.0);
+		}		
+		log.info("Writing preferences to " + outPath + "/preferences.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(preferences);
+		attributesWriter.writeFile(outPath + "/preferences.xml");
+		
+		preferencesBins.plotBinnedDistribution(outPath + "/", "preferences", "");	
 	}
 }
