@@ -20,7 +20,6 @@ package playground.droeder.ptSubModes.replanning;
 
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,16 +30,15 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestCase;
 
 
 /**
  * @author droeder
  *
  */
-public class FixedPtSubModePtInteractionRemoverTest {
+public class FixedPtSubModePtInteractionRemoverTest extends MatsimTestCase{
 	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public final void testOneLeg() {
@@ -60,7 +58,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		PtSubModePtInteractionRemover strategy = new PtSubModePtInteractionRemover();
 		
 		strategy.run(plan);
-		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
+		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("expecting activity home", "home", ((Activity)plan.getPlanElements().get(0)).getType());
 		Assert.assertEquals("expecting legmode 'bus'", "bus", ((Leg)plan.getPlanElements().get(1)).getMode());
 		Assert.assertEquals("expecting activity work", "work", ((Activity)plan.getPlanElements().get(2)).getType());
@@ -103,7 +101,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		
 		strategy.run(plan);
 
-		Assert.assertEquals("5 planElements expected", 5.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
+		Assert.assertEquals("5 planElements expected", 5.0, plan.getPlanElements().size(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("expecting activity home", "home", ((Activity)plan.getPlanElements().get(0)).getType());
 		Assert.assertEquals("expecting legmode 'bus'", "bus", ((Leg)plan.getPlanElements().get(1)).getMode());
 		Assert.assertEquals("expecting activity work", "work", ((Activity)plan.getPlanElements().get(2)).getType());
@@ -130,7 +128,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		
 		strategy.run(plan);
 		
-		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
+		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("expecting activity home", "home", ((Activity)plan.getPlanElements().get(0)).getType());
 		Assert.assertEquals("expecting legmode '" + TransportMode.pt + "'", TransportMode.pt, ((Leg)plan.getPlanElements().get(1)).getMode());
 		Assert.assertEquals("expecting activity work", "work", ((Activity)plan.getPlanElements().get(2)).getType());
@@ -158,7 +156,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		
 		strategy.run(plan);
 		
-		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
+		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("expecting activity home", "home", ((Activity)plan.getPlanElements().get(0)).getType());
 		Assert.assertEquals("expecting legmode 'bus'", "bus", ((Leg)plan.getPlanElements().get(1)).getMode());
 		Assert.assertEquals("expecting activity work", "work", ((Activity)plan.getPlanElements().get(2)).getType());
@@ -187,7 +185,7 @@ public class FixedPtSubModePtInteractionRemoverTest {
 		
 		strategy.run(plan);
 		
-		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestUtils .EPSILON);
+		Assert.assertEquals("3 planElements expected", 3.0, plan.getPlanElements().size(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("expecting activity home", "home", ((Activity)plan.getPlanElements().get(0)).getType());
 		Assert.assertEquals("expecting legmode 'pt'", TransportMode.pt, ((Leg)plan.getPlanElements().get(1)).getMode());
 		Assert.assertEquals("expecting activity work", "work", ((Activity)plan.getPlanElements().get(2)).getType());
