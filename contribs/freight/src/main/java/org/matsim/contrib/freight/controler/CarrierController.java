@@ -69,6 +69,8 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author sschroeder, mzilske
  *
  */
+
+/* To be consistent, should we rather not call this `CarrierControlerListener' (JWJoubert, Nov '13) */
 public class CarrierController implements StartupListener, ShutdownListener,BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 		ReplanningListener, IterationEndsListener {
 
