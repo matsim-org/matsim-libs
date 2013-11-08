@@ -55,6 +55,14 @@ public class MoneyEventHandler implements PersonMoneyEventHandler{
 		return Collections.unmodifiableMap(id2amount);
 	}
 	
+	public Double getSumOfMonetaryAmounts(){
+		double sum = 0.;
+		for (Double amount : this.id2amount.values()){
+			sum = sum + amount;
+		}
+		return sum;
+	}
+	
 	@Override
 	public void reset(int iteration) {
 		this.id2amount.clear();
