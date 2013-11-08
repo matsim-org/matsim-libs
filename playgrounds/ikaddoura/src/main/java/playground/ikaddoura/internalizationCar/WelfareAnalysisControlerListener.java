@@ -76,7 +76,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	}
 
 	private void writeAnalysis(IterationEndsEvent event) {
-
+		
 		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM);
 		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getPopulation()));
 
@@ -89,10 +89,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		}
 		this.it2userBenefits_selected.put(event.getIteration(), scoreSum_selected);
 
-		double tollSum = 0.;
-		for (Double amount : moneyHandler.getPersonId2amount().values()){
-			tollSum = tollSum + amount;
-		}
+		double tollSum = this.moneyHandler.getSumOfMonetaryAmounts();
 		this.it2tollSum.put(event.getIteration(), (-1) * tollSum);
 		
 		String fileName = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.csv";
