@@ -74,7 +74,7 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 
 	@Override
 	public void preProcessData() {
-		// do nothing
+		analyzer.reset(-1);
 	}
 
 	@Override
