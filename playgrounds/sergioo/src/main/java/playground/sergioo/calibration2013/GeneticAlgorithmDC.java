@@ -57,7 +57,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImplFactory;
 
-import com.imsl.stat.KolmogorovTwoSample;
+//import com.imsl.stat.KolmogorovTwoSample;
 
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
@@ -186,7 +186,7 @@ public class GeneticAlgorithmDC {
 					ACarSim[i] = bigMapSim.get(type).get("car").get(i);
 				for (int i=0; i<bigMapSim.get(type).get("pt").size(); i++)
 					APtSim[i] = bigMapSim.get(type).get("pt").get(i);
-				KolmogorovTwoSample SamCar = new KolmogorovTwoSample(ACarHits,ACarSim);
+				/*KolmogorovTwoSample SamCar = new KolmogorovTwoSample(ACarHits,ACarSim);
 				KolmogorovTwoSample SamPt = new KolmogorovTwoSample(APtHits,APtSim);
 				double StatCar = SamCar.getTestStatistic();
 				double StatPt = SamPt.getTestStatistic();
@@ -196,7 +196,7 @@ public class GeneticAlgorithmDC {
 				k=k+1;
 				KSTests[j]=StatPt;
 				j=j+1;
-				weight[k]=bigMapSim.get(type).get("pt").size();
+				weight[k]=bigMapSim.get(type).get("pt").size();*/
 				k=k+1;
 			}
 			double sum1 = 0;
