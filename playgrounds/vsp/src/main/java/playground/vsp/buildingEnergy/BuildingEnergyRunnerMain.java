@@ -47,9 +47,10 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.buildingEnergy.simpleTripAnalyzer.SimpleTripAnalyzer;
-import playground.vsp.buildingEnergy.simpleTripAnalyzer.Traveller;
-import playground.vsp.buildingEnergy.simpleTripAnalyzer.Trip;
+import playground.vsp.analysis.modules.simpleTripAnalyzer.SimpleTripAnalyzer;
+import playground.vsp.analysis.modules.simpleTripAnalyzer.Traveller;
+import playground.vsp.analysis.modules.simpleTripAnalyzer.Trip;
+
 
 /**
  * @author droeder

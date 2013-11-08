@@ -16,68 +16,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.buildingEnergy.simpleTripAnalyzer;
+package playground.vsp.buildingEnergy.energyCalculation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
+import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
+
 /**
+ * 
+ * Calculates the probabilities of performing a certain activity for a certain {@link LinkActivityOccupancyCounter}
  * @author droeder
  *
  */
-public class Traveller{
-	
-	static final String HEADER = "id;tripIndex;maxTripIndex;" + Trip.HEADER;
-	private List<Trip> trips = new ArrayList<Trip>();
-	final Id id;
-	int maxTripIndex = 0;
-	
-	Traveller(Id id){
-		this.id = id;
-	}
-	
-	void startTrip(double time, String mode, double dist){
-		Trip t = new Trip();
-		trips.add(t);
-		t.start = time;
-		t.mode = mode;
-		t.dist = dist;
-	}
-	
-	void passLink(double dist){
-		Trip t = trips.get(trips.size()-1);
-		t.dist += dist;
-	}
-	
-	void endTrip(double time, double dist){
-		Trip t = trips.get(trips.size()-1);
-		t.dist += dist;
-		t.end = time;
-	}
-	
-	@Override
-	public String toString(){
-		StringBuffer b = new StringBuffer();
-		for(int i = 0; i< trips.size(); i++){
-			b.append(id.toString() + ";");
-			b.append(i + ";");
-			b.append(maxTripIndex + ";");
-			b.append(trips.get(i).toString() + "\n");
-		}
-		return b.toString();
-	}
+public class BuidlingEnergyActivityProbabilityCalculator {
 
+	@SuppressWarnings("unused")
+	private static final Logger log = Logger
+			.getLogger(BuidlingEnergyActivityProbabilityCalculator.class);
+	private int maxOfActivityType;
+	private Map<String, LinkActivityOccupancyCounter> counter;
+	private Set<Id> ids;
+
+	public BuidlingEnergyActivityProbabilityCalculator(int maxOfActivityType, Map<String, LinkActivityOccupancyCounter> counter, Set<Id> linkIds) {
+		this.maxOfActivityType = maxOfActivityType;
+		this.counter = counter;
+		this.ids = linkIds;
+	}
+	
 	/**
 	 * 
+	 * @return the probabilities of performing a certain activity for a certain {@link LinkActivityOccupancyCounter}
 	 */
-	public void setStuck() {
-		trips.get(trips.size()-1).stuck = true;
+	public final Map<String, Double> run(){
+		Map<String, Double> map = new HashMap<String, Double>();
+		for(Entry<String, LinkActivityOccupancyCounter> e: this.counter.entrySet()){
+			Double d = 0.;
+			for(Id id: ids){
+				d += e.getValue().getMaximumOccupancy(id);
+			}
+			map.put(e.getKey(), d/maxOfActivityType);
+		}
+		return map;
 	}
+
 	
-	public final List<Trip> getTrips(){
-		return trips;
-	}
 }
 

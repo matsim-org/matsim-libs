@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.buildingEnergy;
+package playground.vsp.buildingEnergy.energyCalculation;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -45,8 +45,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.buildingEnergy.EnergyCalculator.EnergyCalculatorImpl;
-import playground.vsp.buildingEnergy.analysis.BuildingEnergyPlansAnalyzer;
+import playground.vsp.buildingEnergy.energyCalculation.EnergyCalculator.EnergyCalculatorImpl;
 import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
 
 /**
@@ -165,8 +164,10 @@ public class BuildingEnergyAnalyzerMain {
 		log.warn("iteration is currently hard coded...");
 		this.baseRunRawAnalyzed = analyseSingleRunRaw(baseRunId, 1000);
 		this.runsRawAnalyzed = new HashMap<String, BuildingEnergyAnalyzerMain.RawRunAnalysisData>();
+		Gbl.printMemoryUsage();
 		for(String id : runIds){
 			this.runsRawAnalyzed.put(id, analyseSingleRunRaw(id, 300));
+			Gbl.printMemoryUsage();
 		}
 		log.info("finished (processing raw-data from runs).");
 	}
@@ -380,6 +381,8 @@ public class BuildingEnergyAnalyzerMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		Gbl.startMeasurement();
+		boolean time = Gbl.enableThreadCpuTimeMeasurement();
 		args = ARGS;
 		if(args.length < 8){
 			throw new IllegalArgumentException("expecting min 8 arguments {inputpath, outputPath, timeSliceSize, tmax, baseRunId, homeActivityType, workActivityType, runIds...");
@@ -398,7 +401,6 @@ public class BuildingEnergyAnalyzerMain {
 		//catch logEntries
 		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputPath, BuildingEnergyAnalyzerMain.class.getSimpleName(), true, false));
 		OutputDirectoryLogging.catchLogEntries();
-		boolean time = Gbl.enableThreadCpuTimeMeasurement();
 		// dump input-parameters to log
 		log.info("running class: " + System.getProperty("sun.java.command"));
 		log.info("inputPath: " + inputPath);
@@ -416,6 +418,7 @@ public class BuildingEnergyAnalyzerMain {
 		if(time){
 			Gbl.printCurrentThreadCpuTime();
 		}
+		Gbl.printElapsedTime();
 		log.info("finished.");
 	}
 

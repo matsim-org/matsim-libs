@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.buildingEnergy;
+package playground.vsp.buildingEnergy.linkOccupancy;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -50,7 +50,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
-import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
 
 /**
  * Simple main-routine that parse an eventsfile, using {@link LinkActivityOccupancyCounter}. 

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.buildingEnergy.analysis;
+package playground.vsp.buildingEnergy.energyCalculation;
 
 import java.util.List;
 

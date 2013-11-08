@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.buildingEnergy.simpleTripAnalyzer;
+package playground.vsp.analysis.modules.simpleTripAnalyzer;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -176,7 +176,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	 */
 	public void dumpData(String outputPath, String fileprefix) {
 		BufferedWriter w = IOUtils.getBufferedWriter(outputPath + System.getProperty("file.separator") + 
-				fileprefix + "trips.csv.gz");
+				((fileprefix == null) ? "" : (fileprefix.endsWith(".") ? fileprefix : (fileprefix + "."))) + "trips.csv.gz");
 		try {
 			w.write(Traveller.HEADER + "\n");
 			for(Traveller t : traveller.values()){

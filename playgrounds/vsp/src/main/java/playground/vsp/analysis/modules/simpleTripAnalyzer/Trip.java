@@ -16,41 +16,59 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsp.buildingEnergy;
+package playground.vsp.analysis.modules.simpleTripAnalyzer;
 
-
+import org.matsim.api.core.v01.Coord;
 
 /**
  * @author droeder
  *
  */
-public interface EnergyCalculator{
-		
-	public double getEnergyConsumption(double maxSize, double currentLoad);
+public class Trip{
+	
+	static final String HEADER = "mode;start;end;beeline;dist;fromX;fromY;toX;toY;";
+	public Double beeline;
+	Double dist = null; 
+	Double start = Double.NaN;
+	Double end = Double.NaN;
+	String mode = null;
+	Coord from,to;
+	boolean stuck = false;
+	
+	Trip(){
+	}
+	
+	public double getDuration(){
+		return (end - start);
+	}
+	
+	@Override
+	public String toString(){
+		StringBuffer b = new StringBuffer();
+		b.append(mode + ";");
+		b.append(start + ";");
+		b.append(end + ";");
+		b.append(beeline + ";");
+		b.append(dist + ";");
+		b.append((from == null) ? null : from.getX() + ";");
+		b.append((from == null) ? null : from.getY() + ";");
+		b.append((to == null) ? null : to.getX() + ";");
+		b.append((to == null) ? null : to.getY() + ";");
+		return b.toString();
+	}
 
-	public class EnergyCalculatorImpl implements EnergyCalculator{
-		
-		private double additional;
-		private double baseLoad;
-		private double td;
+	/**
+	 * @return
+	 */
+	public final String getMode() {
+		return mode;
+	}
 
-		/**
-		 * 
-		 */
-		public EnergyCalculatorImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson) {
-			this.td = td;
-			this.baseLoad = baseLoadPerPerson;
-			this. additional = additionalLoadPerPerson;
-		}
-		
-		@Override
-		public double getEnergyConsumption(double maxSize, double currentLoad) {
-			double baseload = this.baseLoad * maxSize;
-			double additionalLoad = this.additional * maxSize;
-			
-			return (td * (baseload + additionalLoad * (1 - Math.exp(-currentLoad / maxSize))));
-		}
-		
+	/**
+	 * @return
+	 */
+	public final Double getDist() {
+		return dist;
 	}
 	
 }
