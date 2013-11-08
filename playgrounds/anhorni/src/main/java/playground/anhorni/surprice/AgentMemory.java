@@ -73,21 +73,24 @@ public class AgentMemory {
 	
 	public boolean getLagPurpose(double departureTime, String purpose, String day, String mode) {
 		boolean containsMode = false;		
-		Plan planPreviousDay = null;
+		PlanImpl planPreviousDay = null;
+			
 		if (day.equals("sun")) {
-			planPreviousDay = this.plansSat.get(0);
+			planPreviousDay = (PlanImpl)this.plansSat.get(0);
 		} 
 		else {
-			planPreviousDay = this.plansWeek.get(Surprice.days.indexOf(day));
+			planPreviousDay = (PlanImpl)this.plansWeek.get(Surprice.days.indexOf(day) - 1);
 		}
+				
 		for (PlanElement pe : planPreviousDay.getPlanElements()) {
 			if (pe instanceof Activity) {
 				ActivityImpl act = (ActivityImpl)pe;
 				
 				if (act.getType().equals(purpose)) {
-					PlanImpl pl = (PlanImpl)planPreviousDay;
-					String modePrev = pl.getPreviousLeg(act).getMode();
-					if (mode.equals(modePrev)) containsMode = true;
+					String modePrev = planPreviousDay.getPreviousLeg(act).getMode();
+					if (mode.equals(modePrev)) {
+						containsMode = true;
+					}
 				}
 			}
 		}
@@ -99,28 +102,16 @@ public class AgentMemory {
 		Plan planPreviousDay = null;
 		if (day.equals("sun")) {
 			planPreviousDay = this.plansSat.get(0);
-			
-			for (PlanElement pe : planPreviousDay.getPlanElements()) {
-				if (pe instanceof Activity) {
-					ActivityImpl act = (ActivityImpl)pe;
-					PlanImpl pl = (PlanImpl)planPreviousDay;
-					String modePrev = pl.getPreviousLeg(act).getMode();
-					if (mode.equals(modePrev)) containsMode = true;
-				}
-			}
-			
 		} 
 		else {
-			planPreviousDay = this.plansWeek.get(Surprice.days.indexOf(day));
-		}
+			planPreviousDay = this.plansWeek.get(Surprice.days.indexOf(day) - 1);
+		}		
 		for (PlanElement pe : planPreviousDay.getPlanElements()) {
 			if (pe instanceof Leg) {
-				LegImpl leg = (LegImpl)pe;
+				LegImpl leg = (LegImpl)pe;			
+				String modePrev = leg.getMode();
 				
-				if (leg.getDepartureTime() > 5.75 * 3600.0 && leg.getDepartureTime() < 8.5 * 3600.0 || 
-						leg.getDepartureTime() > 15.75 * 3600.0 && leg.getDepartureTime() < 16.5 * 3600.0 &&
-						(departureTime > 5.75 * 3600.0 && departureTime < 8.5 * 3600.0 || 
-								departureTime > 15.75 * 3600.0 && departureTime < 16.5 * 3600.0)) {
+				if (modePrev.equals(mode) && Math.abs(leg.getDepartureTime() - departureTime) < 3600.0) {
 					containsMode = true;	
 				}
 			}

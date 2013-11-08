@@ -29,105 +29,45 @@ public class Surprice {
 	public static final String SURPRICE_RUN = "surprice_run";
 	public static final String SURPRICE_PREPROCESS = "surprice_preprocess";
 	
-	public static double mean = 0.0;
-	public static double stdDev = 1.0;
+	// -------------------------------------------------
+	// betas and constants need to be negative
+			
+	public static double constant_car;
+    public static double constant_pt;
+    public static double constant_slm;
+     
+    public static double beta_TD_car_com;
+	public static double beta_TT_car_com;
+	public static double beta_TD_car_shp;
+	public static double beta_TT_car_shp;
+	public static double beta_TD_car_lei;
+	public static double beta_TT_car_lei;
 	
-	public static double costPerKm;
+	public static double beta_TD_pt_com;
+	public static double beta_TT_pt_com;	
+	public static double beta_TD_pt_shp;
+	public static double beta_TT_pt_shp;
+	public static double beta_TD_pt_lei;
+	public static double beta_TT_pt_lei;
 	
-	public static double constantCar;
-    public static double constantPt;
-    public static double constantSlm;
-       
-    public static double beta_TT_car_com;
-    public static double beta_TT_car_bus;
-    public static double beta_TT_car_shp;
-    public static double beta_TT_car_lei;
-    
-    public static double beta_TT_pt_com;
-    public static double beta_TT_pt_bus;
-    public static double beta_TT_pt_shp;
-    public static double beta_TT_pt_lei;
-    
-    public static double beta_TT_slm_com;
-    public static double beta_TT_slm_bus;
-    public static double beta_TT_slm_shp;
-    public static double beta_TT_slm_lei;
-    
-    public static double beta_TC_pt_com;
-    public static double beta_TC_pt_bus;
-    public static double beta_TC_pt_shp;
-    public static double beta_TC_pt_lei;
-    
-    public static double beta_TC_car_com;
-    public static double beta_TC_car_bus;
-    public static double beta_TC_car_shp;
-    public static double beta_TC_car_lei;
-    
-    public static double beta_TC_slm_com;
-    public static double beta_TC_slm_bus;
-    public static double beta_TC_slm_shp;
-    public static double beta_TC_slm_lei;
-        
-    public static double lambda_I_TT_car_com;
-    public static double lambda_I_TT_car_bus;
-    public static double lambda_I_TT_car_shp;
-    public static double lambda_I_TT_car_lei;
-    
-    public static double lambda_I_TT_slm_com;
-    public static double lambda_I_TT_slm_bus;
-    public static double lambda_I_TT_slm_shp;
-    public static double lambda_I_TT_slm_lei;
-        
-    public static double lambda_I_TT_pt_com;
-    public static double lambda_I_TT_pt_bus;
-    public static double lambda_I_TT_pt_shp;
-    public static double lambda_I_TT_pt_lei;
-    
-    public static double lambda_I_TC_car_com;
-    public static double lambda_I_TC_car_bus;
-    public static double lambda_I_TC_car_shp;
-    public static double lambda_I_TC_car_lei;
-    
-    public static double lambda_I_TC_pt_com;
-    public static double lambda_I_TC_pt_bus;
-    public static double lambda_I_TC_pt_shp;
-    public static double lambda_I_TC_pt_lei;
-        
-    public static double lambda_D_TC_slm_com;
-    public static double lambda_D_TC_slm_bus;
-    public static double lambda_D_TC_slm_shp;
-    public static double lambda_D_TC_slm_lei;
-    
-    public static double lambda_D_TT_car_com;
-    public static double lambda_D_TT_car_bus;
-    public static double lambda_D_TT_car_shp;
-    public static double lambda_D_TT_car_lei;
-    
-    public static double lambda_D_TT_slm_com;
-    public static double lambda_D_TT_slm_bus;
-    public static double lambda_D_TT_slm_shp;
-    public static double lambda_D_TT_slm_lei;
-        
-    public static double lambda_D_TT_pt_com;
-    public static double lambda_D_TT_pt_bus;
-    public static double lambda_D_TT_pt_shp;
-    public static double lambda_D_TT_pt_lei;
-    
-    public static double lambda_D_TC_car_com;
-    public static double lambda_D_TC_car_bus;
-    public static double lambda_D_TC_car_shp;
-    public static double lambda_D_TC_car_lei;
-    
-    public static double lambda_D_TC_pt_com;
-    public static double lambda_D_TC_pt_bus;
-    public static double lambda_D_TC_pt_shp;
-    public static double lambda_D_TC_pt_lei;
-        
-    public static double lambda_I_TC_slm_com;
-    public static double lambda_I_TC_slm_bus;
-    public static double lambda_I_TC_slm_shp;
-    public static double lambda_I_TC_slm_lei;
-    
+	public static double beta_TD_slm_com;
+	public static double beta_TT_slm_com;
+	public static double beta_TD_slm_shp;
+	public static double beta_TT_slm_shp;
+	public static double beta_TD_slm_lei;
+	public static double beta_TT_slm_lei;
+                   
+	public static double distanceCost_car;
+	public static double constantCost_car;
+	
+	public static double distanceCost_pt;
+	public static double constantCost_pt;
+	
+	public static double distanceCost_slm;
+	public static double constantCost_slm;	
+	
+	// -------------------------------------------------
+	
     public static double lag_purpose_car;
     public static double lag_purpose_pt;
     public static double lag_purpose_slm;

@@ -37,6 +37,7 @@ import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
 /**
@@ -51,12 +52,12 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	private final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 	private CalcPaidToll tollCalc = null;
 	private CalcAverageTolledTripLength cattl = null;
-	private String day;
+	private ObjectAttributes preferences;
 
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
 	
-	public RoadPricing(String day) {
-		this.day = day;
+	public RoadPricing(ObjectAttributes preferences) {
+		this.preferences = preferences;
 	}
 	
 	@Override
@@ -95,7 +96,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 					return new SurpriceTravelDisutilityIncludingToll(
 							previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), 
 							RoadPricing.this.scheme,
-							RoadPricing.this.day);
+							RoadPricing.this.preferences);
 				}
 				
 			};

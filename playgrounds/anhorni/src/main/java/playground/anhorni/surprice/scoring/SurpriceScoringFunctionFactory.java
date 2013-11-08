@@ -19,7 +19,6 @@
 
 package playground.anhorni.surprice.scoring;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -39,31 +38,19 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 	private AgentMemories memories = new AgentMemories();
 	private String day;
 	private PlanCalcScoreConfigGroup config;
-	private ObjectAttributes incomes;
-	private double avgIncome = -1;
-	
+	private ObjectAttributes preferences;
+
 
 	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
-			AgentMemories memories, String day, ObjectAttributes preferences, ObjectAttributes incomes) {
+			AgentMemories memories, String day, ObjectAttributes preferences) {
 		super(configGroup, network);
 		this.controler = controler;
 		this.memories = memories;
 		this.day = day;
 		this.config = configGroup;
-		this.incomes = incomes;
+		this.preferences = preferences;
 	}
-	
-	private double computeAverageIncome(ObjectAttributes incomes) {
-		double avgInc = 0.0;
-		if (this.avgIncome < 0.0) {	
-			for (Id personId : this.controler.getPopulation().getPersons().keySet()) {
-				avgInc += (Double)this.incomes.getAttribute(personId.toString(), "income");
-			}
-			this.avgIncome = avgInc / this.controler.getPopulation().getPersons().size();
-		}
-		return this.avgIncome;
-	}
-	
+		
 	public ScoringFunction createNewScoringFunction(Plan plan) {			
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 						
@@ -76,12 +63,12 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 				this.controler.getNetwork(), 
 				this.memories.getMemory(plan.getPerson().getId()),
 				this.day, (PersonImpl)plan.getPerson(), 
-				(Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income"), 
-				this.computeAverageIncome(this.incomes)));
+				(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "dudm")));
 		
 		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
-			scoringFunctionAccumulator.addScoringFunction(new SupriceMoneyScoringFunction(
-					new CharyparNagelScoringParameters(config), (PersonImpl)plan.getPerson(), this.day));
+			scoringFunctionAccumulator.addScoringFunction(new SupriceTollScoringFunction(
+					new CharyparNagelScoringParameters(config), (PersonImpl)plan.getPerson(), this.day,
+					(Double)this.preferences.getAttribute(plan.getPerson().getId().toString(), "dudm")));
 		}				
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;

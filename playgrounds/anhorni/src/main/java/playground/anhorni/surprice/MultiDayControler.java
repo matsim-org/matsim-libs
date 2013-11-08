@@ -59,7 +59,7 @@ public class MultiDayControler {
 			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
 						
-			DayControler controler = new DayControler(config, memories, day, preferences, populationPreviousDay, incomes);
+			DayControler controler = new DayControler(config, memories, day, preferences, populationPreviousDay);
 			controler.run();
 			
 			if (day.equals("sat")) {

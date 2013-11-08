@@ -24,21 +24,25 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.anhorni.surprice.AgentMemories;
+
 
 /**
  * @author anhorni
  *
  */
-public class SurpriceTravelCostCalculatorFactoryImpl implements TravelDisutilityFactory {
+public class SurpriceTravelDisutilityFactoryImpl implements TravelDisutilityFactory {
 	
 	private String day;
+	private AgentMemories memories;
 	
-	public SurpriceTravelCostCalculatorFactoryImpl(String day) {
+	public SurpriceTravelDisutilityFactoryImpl(String day, AgentMemories memories) {
 		this.day = day;
+		this.memories = memories;
 	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new SurpriceTravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup, day);
+		return new SurpriceTravelTravelDisutility(timeCalculator, cnScoringGroup, this.day, this.memories);
 	}
 }

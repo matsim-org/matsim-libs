@@ -27,6 +27,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -38,13 +39,15 @@ public class SurpriceTravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
-	private final TravelDisutility costHandler;
-	private String day;
+	private final TravelDisutility travelDisutilityHandler;
+	private ObjectAttributes preferences;
+	
 
-	public SurpriceTravelDisutilityIncludingToll(final TravelDisutility costCalculator, final RoadPricingScheme scheme, String day) {
+	public SurpriceTravelDisutilityIncludingToll(final TravelDisutility travelDisutilityCalculator, final RoadPricingScheme scheme,
+			ObjectAttributes preferences) {
 		this.scheme = scheme;
-		this.costHandler = costCalculator;
-		this.day = day;
+		this.preferences = preferences;
+		this.travelDisutilityHandler = travelDisutilityCalculator;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
 			this.tollCostHandler = new DistanceTollCostBehaviour();
 		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
@@ -62,19 +65,20 @@ public class SurpriceTravelDisutilityIncludingToll implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double baseCost = this.costHandler.getLinkTravelDisutility(link, time, person, vehicle);
-		double tollCost = (Double)person.getCustomAttributes().get(day + ".gamma_tot") * this.tollCostHandler.getTollCost(link, time, person);
+		double baseDisutility = this.travelDisutilityHandler.getLinkTravelDisutility(link, time, person, vehicle);
+		double dudm = (Double)this.preferences.getAttribute(person.getId().toString(), "dudm");
+		double tollDisutility = dudm * this.tollCostHandler.getTollCost(link, time, person);
 		if ( wrnCnt < 1 ) {
 			wrnCnt++ ;
 			Logger.getLogger(this.getClass()).warn("this package assumes a utility of money equal to one.  " +
 					"Make sure you are using that.  Should be fixed.  kai, mar'11") ;
 		}
-		return baseCost + tollCost;
+		return baseDisutility + tollDisutility;
 	}
 	
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return this.costHandler.getLinkMinimumTravelDisutility(link);
+		return this.travelDisutilityHandler.getLinkMinimumTravelDisutility(link);
 	}
 
 	private interface TollRouterBehaviour {

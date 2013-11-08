@@ -27,7 +27,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
-import playground.anhorni.surprice.scoring.SurpriceTravelCostCalculatorFactoryImpl;
+import playground.anhorni.surprice.scoring.SurpriceTravelDisutilityFactoryImpl;
 import playground.anhorni.surprice.warmstart.AdaptNextDay;
 
 public class DayControler extends Controler {
@@ -35,29 +35,26 @@ public class DayControler extends Controler {
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
 	private ObjectAttributes preferences;
-	private ObjectAttributes incomes;
 	private Population populationPreviousDay = null;
 	private TerminationCriterionScoreBased terminationCriterion = null;
 		
-	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences, Population populationPreviousDay,
-			ObjectAttributes incomes) {
+	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences, Population populationPreviousDay) {
 		super(config);	
 		super.setOverwriteFiles(true);
 		this.memories = memories;	
 		this.day = day;
 		this.preferences = preferences;
-		this.incomes = incomes;
 		this.populationPreviousDay = populationPreviousDay;
 		
 		this.setScoringFunctionFactory(
 				new SurpriceScoringFunctionFactory(
-			  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences, this.incomes)
+			  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences)
 				);
 	} 
 				
 	protected void setUp() {
-		SurpriceTravelCostCalculatorFactoryImpl costCalculatorFactory = new SurpriceTravelCostCalculatorFactoryImpl(this.day);
-		this.setTravelDisutilityFactory(costCalculatorFactory);
+		SurpriceTravelDisutilityFactoryImpl travelDisutilityFactory = new SurpriceTravelDisutilityFactoryImpl(this.day, this.memories);
+		this.setTravelDisutilityFactory(travelDisutilityFactory);
 		super.setUp();	
 	}
 	
@@ -75,7 +72,7 @@ public class DayControler extends Controler {
 	  	this.addControlerListener(new AgentAnalysisShutdownListener(this.day, this.getControlerIO().getOutputPath()));
 	  	
 	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
-	  		this.addControlerListener(new RoadPricing(this.day));
+	  		this.addControlerListener(new RoadPricing(this.preferences));
 		}
 	  	double stoppingCriterionVal = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "stoppingCriterionVal"));
 	  	if (stoppingCriterionVal > 0.0) {	

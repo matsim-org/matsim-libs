@@ -24,18 +24,20 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-public class SupriceMoneyScoringFunction implements MoneyScoring, BasicScoring {
+public class SupriceTollScoringFunction implements MoneyScoring, BasicScoring {
 
 	protected double score;
 	private static final double INITIAL_SCORE = 0.0;
 	private PersonImpl person;
 	private String day;
 	protected final CharyparNagelScoringParameters params;
+	private double dudm;
 
-	public SupriceMoneyScoringFunction(final CharyparNagelScoringParameters params, PersonImpl person, String day) {
+	public SupriceTollScoringFunction(final CharyparNagelScoringParameters params, PersonImpl person, String day, double dudm) {
 		this.params = params;
 		this.person = person;
 		this.day = day;
+		this.dudm = dudm;
 		this.reset();
 	}
 
@@ -47,18 +49,17 @@ public class SupriceMoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	@Override
 	public void addMoney(final double amount) {
-		this.score += amount * this.params.marginalUtilityOfMoney; // linear mapping of money to score
+		this.score -= amount * this.dudm;
 		
 		double prevVal = 0.0;
 		if (this.person.getCustomAttributes().get(day + ".tollScore") != null) {
 			prevVal = (Double)this.person.getCustomAttributes().get(day + ".tollScore");
 		}		
-		this.person.getCustomAttributes().put(day + ".tollScore", prevVal + amount * this.params.marginalUtilityOfMoney);
+		this.person.getCustomAttributes().put(day + ".tollScore", prevVal + amount * this.dudm);
 	}
 
 	@Override
 	public void finish() {
-
 	}
 
 	@Override
