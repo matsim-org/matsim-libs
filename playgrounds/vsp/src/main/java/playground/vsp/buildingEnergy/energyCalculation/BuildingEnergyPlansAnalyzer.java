@@ -18,9 +18,11 @@
  * *********************************************************************** */
 package playground.vsp.buildingEnergy.energyCalculation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -40,12 +42,18 @@ public class BuildingEnergyPlansAnalyzer extends AbstractPersonAlgorithm {
 	private static final Logger log = Logger.getLogger(BuildingEnergyPlansAnalyzer.class);
 	private String homeType;
 	private String workType;
-	private int workCnt = 0;
-	private int homeCnt = 0;
+//	private int workCnt = 0;
+//	private int homeCnt = 0;
+	private List<Id> homeWork;
+	private List<Id> home;
+	private List<Id> work;
 
 	public BuildingEnergyPlansAnalyzer(String homeType, String workType) {
 		this.homeType = homeType;
 		this.workType = workType;
+		this.homeWork = new ArrayList<Id>();
+		this.work = new ArrayList<Id>();
+		this.home = new ArrayList<Id>();
 	}
 
 	@Override
@@ -58,35 +66,53 @@ public class BuildingEnergyPlansAnalyzer extends AbstractPersonAlgorithm {
 			if(!work){
 				if(a.getType().equals(workType)){
 					work = true;
-					workCnt++;
+//					workCnt++;
 				}
 			}
 			if(!home){
 				if(a.getType().equals(homeType)){
 					home = true;
-					homeCnt++;
+//					homeCnt++;
 				}
 			}
 			// we know everything we need to know, return
-			if(home && work) return;
+			if(home && work){
+				this.homeWork.add(person.getId());
+				return;
+			}
+		}
+		if(home){
+			this.home.add(person.getId());
+		}else if (work){
+			this.work.add(person.getId());
 		}
 	}
 
-	/**
-	 * @return the workCnt
-	 */
 	public final int getWorkCnt() {
-		return workCnt;
+		return (work.size() + homeWork.size());
 	}
 
+	public int getHomeAndWorkCnt() {
+		return homeWork.size();
+	}
 
-	/**
-	 * @return the homeCnt
-	 */
 	public final int getHomeCnt() {
-		return homeCnt;
+		return (home.size() + homeWork.size());
 	}
 
+	public List<Id> getHomeOnlyHomeAgentIds(){
+		return home;
+	}
+	
+	public List<Id> getWorkOnlyAgentIds(){
+		return work;
+	}
+	
+	public List<Id> getHomeAndWorkAgentIds(){
+		return homeWork;
+	}
 
+	
+	
 }
 

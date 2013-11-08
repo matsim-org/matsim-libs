@@ -20,35 +20,49 @@ package playground.vsp.buildingEnergy.energyCalculation;
 
 
 
+
 /**
  * @author droeder
  *
  */
-public interface EnergyCalculator{
-		
-	public double getEnergyConsumption(double maxSize, double currentLoad);
+public interface EnergyConsumptionCalculator{
+	
+	/**
+	 * 
+	 * @param maxSize
+	 * @param currentOccupancy
+	 * @return energy consumption in kWh
+	 */
+	public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy);
 
-	public class EnergyCalculatorImpl implements EnergyCalculator{
+	
+	public class OfficeEnergyConsumptionCalculatorImpl implements EnergyConsumptionCalculator{
 		
 		private double additional;
 		private double baseLoad;
 		private double td;
+		private double someCoefficient;
 
 		/**
 		 * 
+		 * @param td, duration timeslice [s]
+		 * @param baseLoadPerPerson [kW]
+		 * @param additionalLoadPerPerson [kW]
 		 */
-		public EnergyCalculatorImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson) {
+		public OfficeEnergyConsumptionCalculatorImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson, double someCoefficient) {
 			this.td = td;
 			this.baseLoad = baseLoadPerPerson;
 			this. additional = additionalLoadPerPerson;
+			this.someCoefficient = someCoefficient;
 		}
 		
 		@Override
-		public double getEnergyConsumption(double maxSize, double currentLoad) {
+		public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy) {
+			if(currentOccupancy > maxSize) throw new RuntimeException("more persons on the link than expected");
+			if(maxSize == 0) return 0.;
 			double baseload = this.baseLoad * maxSize;
 			double additionalLoad = this.additional * maxSize;
-			
-			return (td * (baseload + additionalLoad * (1 - Math.exp(-currentLoad / maxSize))));
+			return (td / 3600. * (baseload + additionalLoad * (1 - Math.exp(-1.0 * currentOccupancy / maxSize * someCoefficient))));
 		}
 		
 	}
