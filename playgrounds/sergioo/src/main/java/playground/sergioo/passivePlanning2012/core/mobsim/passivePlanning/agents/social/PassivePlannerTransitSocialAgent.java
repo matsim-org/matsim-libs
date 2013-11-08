@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda;
+package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.social;
 
 import java.util.Collection;
 import java.util.Set;
@@ -26,18 +26,18 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerTransitAgent;
-import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda;
+import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.social.SinglePlannerSocialAgent;
+import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
-public class PassivePlannerTransitAgendaAgent extends PassivePlannerTransitAgent  {
+public class PassivePlannerTransitSocialAgent extends PassivePlannerTransitAgent  {
 
 	//Constructors
-	public PassivePlannerTransitAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, final Household household, Set<String> modes, Agenda agenda) {
+	public PassivePlannerTransitSocialAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, final Household household, Set<String> modes) {
 		super(basePerson, simulation, passivePlannerManager);
 		boolean carAvailability = false;
 		Collection<String> mainModes = simulation.getScenario().getConfig().qsim().getMainModes();
@@ -45,26 +45,14 @@ public class PassivePlannerTransitAgendaAgent extends PassivePlannerTransitAgent
 			if(planElement instanceof Leg)
 				if(mainModes.contains(((Leg)planElement).getMode()))
 					carAvailability = true;
-		planner = new SinglePlannerAgendaAgent(simulation.getScenario(), carAvailability, modes, basePerson.getBasePlan(), this, agenda);
+		planner = new SinglePlannerSocialAgent((ScenarioSimplerNetwork) simulation.getScenario(), carAvailability, household, modes, basePerson.getBasePlan(), this);
 		planner.setPlanElementIndex(0);
 	}
 	
 	@Override
 	public void endActivityAndComputeNextState(double now) {
 		Activity prevAct = (Activity)getCurrentPlanElement();
-		double time = 0;
-		for(PlanElement planElement:getBasePerson().getSelectedPlan().getPlanElements()) {
-			if(planElement == prevAct)
-				break;
-			if(planElement instanceof Activity)
-				if(((Activity)planElement).getEndTime()==Time.UNDEFINED_TIME)
-					time += ((Activity)planElement).getMaximumDuration();
-				else
-					time = ((Activity)planElement).getEndTime();
-			else
-				time += ((Leg)planElement).getTravelTime();
-		}
-		((SinglePlannerAgendaAgent)planner).shareKnownPlace(prevAct.getFacilityId(), time, prevAct.getType());
+		((SinglePlannerSocialAgent)planner).shareKnownPlace(prevAct.getFacilityId(), prevAct.getStartTime(), prevAct.getType());
 		super.endActivityAndComputeNextState(now);
 	}
 

@@ -16,6 +16,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
@@ -46,18 +48,32 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 		this.carAvailability = carAvailability;
 		this.plan = plan;
 		this.agenda = agenda;
+		this.modes = modes;
+		double time = 0;
+		for(PlanElement planElement:plan.getPlanElements()) {
+			if(planElement instanceof Activity && !((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
+				this.addKnownPlace(((Activity)planElement).getFacilityId(), time, ((Activity) planElement).getEndTime(), ((Activity)planElement).getType());
+			if(planElement instanceof Activity)
+				if(((Activity)planElement).getEndTime()==Time.UNDEFINED_TIME)
+					time += ((Activity)planElement).getMaximumDuration();
+				else
+					time = ((Activity)planElement).getEndTime();
+			else
+				time += ((Leg)planElement).getTravelTime();
+		}
 	}
+	
 	public void setLastActivity(Activity activity) {
 		previousActivities = new ArrayList<Tuple<String,Double>>();
 		double time = 0;
-		Set<String> modes = new HashSet<String>();
+		modes = new HashSet<String>();
 		modes.add("pt");
 		if(carAvailability)
 			modes.add("car");
 		Id carLocation = ((Activity)plan.getPlanElements().get(0)).getFacilityId();
 		for(int i=0; i<plan.getPlanElements().size()-2; i++) {
 			PlanElement element = plan.getPlanElements().get(i);
-			if(element instanceof Activity) {
+			if(element instanceof Activity && !((Activity)element).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				previousActivities.add(new Tuple<String, Double>(((Activity)element).getType(),((Activity)element).getEndTime()-time));
 				time = ((Activity)element).getEndTime();
 				Leg nextLeg = (Leg)plan.getPlanElements().get(i+1);
@@ -68,13 +84,14 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 					if(!carLocation.equals(((Activity)element).getFacilityId()))
 						modes.remove("car");
 				}
+				if(element == activity)
+					return;
 			}
-			else
+			else if(element instanceof Leg)
 				if(((Leg)element).getMode().equals("car"))
 					carLocation = ((Activity)plan.getPlanElements().get(i+1)).getFacilityId();
 		}
 	}
-	
 	@Override
 	public List<? extends PlanElement> decideRoute(double time,
 			Id startFacilityId, Id endFacilityId, String mode, TripRouter tripRouter) {
@@ -82,23 +99,32 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 		List<SchedulingLink> path = new SchedulingNetwork().createNetwork(((ScenarioImpl) scenario).getActivityFacilities(),
 				startFacilityId, endFacilityId, futureActivityType, futureActivityStartTime, 900, modes, this, agenda, previousActivities);
 		Id currentFacilityId = startFacilityId;
-		for(SchedulingLink link:path) {
-			if(link instanceof ActivitySchedulingLink) {
-				ActivitySchedulingLink activityLink = (ActivitySchedulingLink)link;
-				ActivityImpl activity = new ActivityImpl(activityLink.getActivityType(), activityLink.getCoord());
-				activity.setEndTime(((SchedulingNode)link.getToNode()).getTime());
-				planElements.add(activity);
-				currentFacilityId = new IdImpl(link.getToNode().getId().toString().split("(")[0]);
+		int numPrevious = 0;
+		if(path!=null)
+			for(SchedulingLink link:path) {
+				if(link instanceof ActivitySchedulingLink) {
+					if(numPrevious<previousActivities.size()) {
+						numPrevious++;
+						continue;
+					}
+					ActivitySchedulingLink activityLink = (ActivitySchedulingLink)link;
+					ActivityImpl activity = new ActivityImpl(activityLink.getActivityType(), activityLink.getCoord());
+					activity.setEndTime(((SchedulingNode)link.getToNode()).getTime());
+					planElements.add(activity);
+					currentFacilityId = new IdImpl(link.getToNode().getId().toString().split("\\(")[0]);
+				}
+				else {
+					JourneySchedulingLink journeyLink = (JourneySchedulingLink)link;
+					Id nextFacilityId = new IdImpl(link.getToNode().getId().toString().split("\\(")[0]);
+					planElements.addAll(tripRouter.calcRoute(journeyLink.getMode(), scenario.getActivityFacilities().getFacilities().get(currentFacilityId), scenario.getActivityFacilities().getFacilities().get(nextFacilityId), ((SchedulingNode)link.getFromNode()).getTime(), null));
+				}
 			}
-			else {
-				JourneySchedulingLink journeyLink = (JourneySchedulingLink)link;
-				Id nextFacilityId = new IdImpl(link.getToNode().getId().toString().split("(")[0]);
-				List<? extends PlanElement> route = tripRouter.calcRoute(journeyLink.getMode(), scenario.getActivityFacilities().getFacilities().get(currentFacilityId), scenario.getActivityFacilities().getFacilities().get(nextFacilityId), ((SchedulingNode)link.getFromNode()).getTime(), null);
-				for(PlanElement element:route)
-					planElements.add(element);
-			}
-		}
+		else
+			planElements.addAll(tripRouter.calcRoute(modes.iterator().next(), scenario.getActivityFacilities().getFacilities().get(currentFacilityId), scenario.getActivityFacilities().getFacilities().get(endFacilityId), time, null));
 		return planElements;
+	}
+	public Agenda getAgenda() {
+		return agenda;
 	}
 
 }

@@ -66,5 +66,8 @@ public class Agenda {
 	public Map<String, AgendaElement> getElements() {
 		return elements;
 	}
+	public boolean containsType(String type) {
+		return elements.keySet().contains(type);
+	}
 	
 }

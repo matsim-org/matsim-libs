@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.PersonHouseholdMapping;
 
-import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningSocialFactory;
+import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningAgendaFactory;
 import playground.sergioo.passivePlanning2012.core.population.BasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
@@ -86,7 +86,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 			if(event.getControler().getConfig().scenario().isUseHouseholds()) {
 				PassivePlannerManager passivePlannerManager = new PassivePlannerManager(1);
 				event.getControler().addControlerListener(passivePlannerManager);
-				event.getControler().setMobsimFactory(new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter()));
+				event.getControler().setMobsimFactory(new PassivePlanningAgendaFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter()));
 			}
 			else
 				log.error("Households information is neccesary for passive planning with social");

@@ -12,6 +12,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRoute;
@@ -28,6 +30,8 @@ import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover
 
 public class BasePlanImpl implements BasePlan {
 
+	//Constant
+	private final static String EMPTY = "empty"; 
 	//Attributes
 	private final List<PlanElement> planElements = new ArrayList<PlanElement>();
 	private Double score;
@@ -98,7 +102,7 @@ public class BasePlanImpl implements BasePlan {
 		List<Trip> trips = TripStructureUtils.getTrips( newPlan , tripRouter.getStageActivityTypes() );
 		for (Trip trip : trips) {
 			String mode = tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-			if(!mode.equals("empty")) {
+			if(!mode.equals(EMPTY)) {
 				final List<? extends PlanElement> newTrip = tripRouter.calcRoute(mode,
 						facilities.getFacilities().get(trip.getOriginActivity().getFacilityId()),
 						facilities.getFacilities().get(trip.getDestinationActivity().getFacilityId()),
@@ -114,7 +118,7 @@ public class BasePlanImpl implements BasePlan {
 		trips = TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() );
 		for (Trip trip : trips) {
 			String mode = tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-			if(!mode.equals("empty")) {
+			if(!mode.equals(EMPTY)) {
 				final List<? extends PlanElement> newTrip = tripRouter.calcRoute(mode,
 						facilities.getFacilities().get(trip.getOriginActivity().getFacilityId()),
 						facilities.getFacilities().get(trip.getDestinationActivity().getFacilityId()),
@@ -129,7 +133,9 @@ public class BasePlanImpl implements BasePlan {
 		}
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);
-		newPerson.setBasePlan(/*TODO*/newPlan);
+		BasePlanImpl copyPlan = new BasePlanImpl(newPerson);
+		copyPlan.copyFrom(newPlan);
+		newPerson.setBasePlan(copyPlan);
 	}
 	public static void convertToBasePlan(BasePersonImpl newPerson, Plan plan) {
 		BasePlanImpl newPlan = new BasePlanImpl(newPerson);
@@ -137,7 +143,7 @@ public class BasePlanImpl implements BasePlan {
 			if(planElement instanceof Activity)
 				newPlan.addActivity((Activity) planElement);
 			else {
-				if(((Leg)planElement).getMode().equals("empty")) {
+				if(((Leg)planElement).getMode().equals(EMPTY)) {
 					double travelTime = ((Leg)planElement).getTravelTime();
 					planElement = new EmptyTimeImpl(((Leg)planElement).getRoute().getStartLinkId());
 					((Leg)planElement).setTravelTime(travelTime);
@@ -147,7 +153,9 @@ public class BasePlanImpl implements BasePlan {
 			}
 		newPerson.addPlan(newPlan);
 		newPerson.setSelectedPlan(newPlan);
-		newPerson.setBasePlan(/*TODO*/newPlan);
+		BasePlanImpl copyPlan = new BasePlanImpl(newPerson);
+		copyPlan.copyFrom(newPlan);
+		newPerson.setBasePlan(copyPlan);
 	}
 
 	//Methods
@@ -232,6 +240,32 @@ public class BasePlanImpl implements BasePlan {
 			}
 		}
 		return -1;
+	}
+	public void copyFrom(final Plan in) {
+		for (PlanElement pe : in.getPlanElements()) {
+			if (pe instanceof Activity)
+				getPlanElements().add(new ActivityImpl((Activity) pe));
+			else if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
+				LegImpl l2 = null;
+				if(l.getMode().equals(EMPTY))
+					l2 = new EmptyTimeImpl(l.getRoute().getStartLinkId());
+				else
+					l2 = new LegImpl(l.getMode());
+				addLeg(l2);
+				l2.setDepartureTime(l.getDepartureTime());
+				l2.setTravelTime(l.getTravelTime());
+				if (pe instanceof LegImpl) {
+					// get the arrival time information only if available
+					l2.setArrivalTime(((LegImpl) pe).getArrivalTime());
+				}
+				if (l.getRoute() != null) {
+					l2.setRoute(l.getRoute().clone());
+				}
+			} else {
+				throw new IllegalArgumentException("unrecognized plan element type discovered");
+			}
+		}
 	}
 
 }

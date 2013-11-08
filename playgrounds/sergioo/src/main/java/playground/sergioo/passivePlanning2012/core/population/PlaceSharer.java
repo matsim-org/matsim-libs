@@ -16,12 +16,12 @@ public abstract class PlaceSharer {
 	
 	protected enum Period {
 		
-		EARLY_MORNING(0, 7*3600-1),
-		MORNING_PEAK(7*3600, 10*3600-1),
-		BEFORE_LUNCH(10*3600, 13*3600-1),
-		AFTER_LUNCH(13*3600, 18*3600-1),
-		EVENING_PEAK(18*3600, 21*3600-1),
-		NIGHT(21*3600, 24*3600-1);
+		EARLY_MORNING(0, 7*3600),
+		MORNING_PEAK(7*3600, 10*3600),
+		BEFORE_LUNCH(10*3600, 13*3600),
+		AFTER_LUNCH(13*3600, 18*3600),
+		EVENING_PEAK(18*3600, 21*3600),
+		NIGHT(21*3600, 24*3600);
 		
 		//Constants
 		private static final double PERIODS_TIME = 24*3600;
@@ -43,7 +43,7 @@ public abstract class PlaceSharer {
 		}
 		protected boolean isPeriod(double time) {
 			time = time%PERIODS_TIME;
-			if(startTime<=time && time<=endTime)
+			if(startTime<=time && time<endTime)
 				return true;
 			return false;
 		}
@@ -54,6 +54,10 @@ public abstract class PlaceSharer {
 		//Attributes
 		private Id facilityId;
 		private SortedMap<Period, Set<String>> timeTypes = new TreeMap<Period, Set<String>>();
+		/*{
+			for(Period period:Period.values())
+				timeTypes.put(period, new HashSet<String>());
+		}*/
 		protected Map<String, SortedMap<Period, Map<Id, Double>>> travelTimes = new HashMap<String, SortedMap<Period, Map<Id, Double>>>();
 		
 		//Constructors
@@ -122,6 +126,27 @@ public abstract class PlaceSharer {
 		if(types==null) {
 			types = new HashSet<String>();
 			knownPlace.timeTypes.put(Period.getPeriod(startTime), types);
+		}
+		types.add(typeOfActivity);
+	}
+	public void addKnownPlace(Id facilityId, double startTime, double endTime, String typeOfActivity) {
+		KnownPlace knownPlace = knownPlaces.get(facilityId);
+		if(knownPlace==null) {
+			knownPlace = new KnownPlace(facilityId);
+			knownPlaces.put(facilityId, knownPlace);
+		}
+		Set<String> types = knownPlace.timeTypes.get(Period.getPeriod(startTime));
+		if(types==null) {
+			types = new HashSet<String>();
+			boolean add = false;
+			for(Period period:Period.values()) {
+				if(period.startTime<=startTime && period.endTime>=startTime)
+					add = true;
+				if(add)
+					knownPlace.timeTypes.put(period, types);
+				if(period.startTime<=endTime && period.endTime>=endTime)
+					add = false;
+			}
 		}
 		types.add(typeOfActivity);
 	}

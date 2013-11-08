@@ -63,7 +63,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 			int index=currentElementIndex.get();
 			boolean emptySpace = false;
 			Leg empty = null;
-			if(startTime>previous.getEndTime()) {
+			if(startTime-previous.getEndTime()>3600) {
 				empty = new EmptyTimeImpl(old.getRoute().getStartLinkId());
 				empty.setTravelTime(startTime-previous.getEndTime());
 				plan.getPlanElements().add(index++, empty);
@@ -89,13 +89,15 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 			}
 			if(emptySpace)
 				empty.setTravelTime(empty.getTravelTime()+firstLegTime);
-			if(legActLeg.get(legActLeg.size()-1) instanceof Activity) {
+			if(legActLeg.get(legActLeg.size()-1) instanceof Activity && previous.getEndTime()+old.getTravelTime()-finalTime>3600) {
 				Id finalLinkId = ((Activity)legActLeg.get(legActLeg.size()-1)).getLinkId();
 				empty = new EmptyTimeImpl(finalLinkId);
 				empty.setTravelTime(previous.getEndTime()+old.getTravelTime()-finalTime);
 				plan.getPlanElements().add(index, empty);
 				index++;
 			}
+			else if(legActLeg.get(legActLeg.size()-1) instanceof Activity)
+				((Activity)legActLeg.get(legActLeg.size()-1)).setEndTime(endTime);
 			((BasePersonImpl)plan.getPerson()).finishPlanning();
 			return !emptySpace;
 		}

@@ -28,7 +28,9 @@ public class SinglePlannerAgendaAgent extends SinglePlannerAgentImpl {
 		return ((AgendaDecisionMaker)decisionMakers[0]).decideRoute(Double.NaN, startFacilityId, endFacilityId, null, tripRouter);
 	}
 	public void shareKnownPlace(Id facilityId, double startTime, String type) {
-		((AgendaDecisionMaker)decisionMakers[0]).shareKnownPlace(facilityId, startTime, type);
+		AgendaDecisionMaker maker = ((AgendaDecisionMaker)decisionMakers[0]);
+		if(maker.getAgenda().containsType(type))
+			maker.shareKnownPlace(facilityId, startTime, type);
 	}
 
 }
