@@ -41,7 +41,7 @@ import org.matsim.pt.PtConstants;
  * 
  * @see PtConstants#TRANSIT_ACTIVITY_TYPE
  * 
- * @author mrieser
+ * @author mrieser, sergioo
  */
 public class TransitActsRemover implements PlanAlgorithm {
 
@@ -76,7 +76,7 @@ public class TransitActsRemover implements PlanAlgorithm {
 								travelTime += ((Leg)pe2).getTravelTime();
 								if(((Leg)pe2).getRoute()!=null) {
 									distance += ((Leg)pe2).getRoute().getDistance();
-									endLinkId = ((Leg) pe2).getRoute().getEndLinkId();
+									endLinkId = ((Leg)pe2).getRoute().getEndLinkId();
 								}
 							}
 						}
