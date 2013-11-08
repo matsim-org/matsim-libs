@@ -259,8 +259,8 @@ public class MarginalCongestionHandlerV2 implements
 			}
 		}
 		
-		if (delayToPayFor == 1.) { // Maybe check if "< 1.0" is necessary
-			log.warn("Remaining delay of 1.0 sec may result from rounding errors. Setting the remaining delay to 0.0 sec.");
+		if (delayToPayFor == 1.) { // Check if "< 1.0" is also ok...
+//			log.warn("Remaining delay of 1.0 sec may result from rounding errors. Setting the remaining delay to 0.0 sec.");
 			delayToPayFor = 0.;
 		}
 		return delayToPayFor;
@@ -274,10 +274,10 @@ public class MarginalCongestionHandlerV2 implements
 		if (causingAgent == null){
 			log.warn("An agent is delayed due to storage congestion on link " + event.getLinkId() + " but no agent left the link before. " +
 					"That is, storage congestion appears due to agents departing on that link. In this version, these delays are not internalized.");
+		} else {
+			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getPersonId(), remainingDelay, event.getLinkId());
+			this.events.processEvent(congestionEvent);
 		}
-		
-		MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getPersonId(), remainingDelay, event.getLinkId());
-		this.events.processEvent(congestionEvent);
 	}
 	
 	private void updateTrackingMarginalDelays(LinkLeaveEvent event) {
