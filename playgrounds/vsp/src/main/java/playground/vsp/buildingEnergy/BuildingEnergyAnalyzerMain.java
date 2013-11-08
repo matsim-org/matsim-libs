@@ -412,7 +412,7 @@ public class BuildingEnergyAnalyzerMain {
 			log.info("caseStudy " + (i + 1) + ": " + runs.get(i));
 		}
 		// run
-		new BuildingEnergyAnalyzerMain(inputPath, outputPath, td, tmax, baseRun, runs, homeType, workType).run();
+		new BuildingEnergyAnalyzerMain(inputPath, outputPath, td, tmax, baseRun, runs, homeType, workType, new EnergyCalculatorImpl(td, 0.0, 0.0)).run();
 		if(time){
 			Gbl.printCurrentThreadCpuTime();
 		}
