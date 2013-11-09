@@ -32,6 +32,7 @@ import cadyts.calibrators.Calibrator;
  * @author yu
  * 
  */
+@Deprecated // use contrib.cadytsintegration instead
 public interface BseStrategyManager {
 
 	/*

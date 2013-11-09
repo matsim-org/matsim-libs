@@ -48,6 +48,7 @@ import playground.yu.utils.math.SimpleStatistics;
  * @author yu
  * 
  */
+@Deprecated // please use material from contrib.cadytsintegration instead. kai, nov'13
 public class StrategyManagerWithRouteComparison extends StrategyManager {
 	private Map<Id/* person */, Plan/* oldSelected */> oldSelectedPlans;
 	private List<Double> pathSizes;
@@ -60,6 +61,7 @@ public class StrategyManagerWithRouteComparison extends StrategyManager {
 		oldSelectedPlans = new HashMap<Id, Plan>();
 		pathSizes = new ArrayList<Double>();
 		this.outputFilenameBase = outputFilenameBase;
+		throw new RuntimeException("this will not work any more since beforeStrategyRunHook is no longer.  kai, nov'13") ;
 	}
 
 	/**
@@ -121,22 +123,22 @@ public class StrategyManagerWithRouteComparison extends StrategyManager {
 				+ SimpleStatistics.average(pathSizes));
 	}
 
-	/**
-	 * notices the old selected plans that contains at least one "car" leg
-	 */
-	@Override
-	protected void beforeStrategyRunHook(Person person, PlanStrategy strategy) {
-		// super.beforeStrategyRunHook(person, strategy);/*empty*/
-		Plan oldSelected = person.getSelectedPlan();
-		for (PlanElement planElement : oldSelected.getPlanElements()) {
-			if (planElement instanceof Leg) {
-				Leg leg = (Leg) planElement;
-				if (leg.getMode().equals(TransportMode.car)) {
-					oldSelectedPlans.put(person.getId(), oldSelected);
-					return;
-				}
-			}
-		}
-	}
+//	/**
+//	 * notices the old selected plans that contains at least one "car" leg
+//	 */
+//	@Override
+//	protected void beforeStrategyRunHook(Person person, PlanStrategy strategy) {
+//		// super.beforeStrategyRunHook(person, strategy);/*empty*/
+//		Plan oldSelected = person.getSelectedPlan();
+//		for (PlanElement planElement : oldSelected.getPlanElements()) {
+//			if (planElement instanceof Leg) {
+//				Leg leg = (Leg) planElement;
+//				if (leg.getMode().equals(TransportMode.car)) {
+//					oldSelectedPlans.put(person.getId(), oldSelected);
+//					return;
+//				}
+//			}
+//		}
+//	}
 
 }

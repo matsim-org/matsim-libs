@@ -41,6 +41,7 @@ import cadyts.calibrators.Calibrator;
 import cadyts.demand.Plan;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 
+@Deprecated // use contrib.cadytsintegration instead
 public class BseUCStrategyManager extends StrategyManager implements
 		BseStrategyManager {
 	private MATSimUtilityModificationCalibrator<Link> calibrator = null;
@@ -58,6 +59,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 	// ###########################DEPRECATED###########################
 	public BseUCStrategyManager(Network net) {
 		this.net = net;
+		throw new RuntimeException("this won't work any more since afterRemovePlansHook is no longer there.  kai, nov'13") ;
 	}
 
 	public void init(final Calibrator<Link> calibrator,
@@ -97,12 +99,12 @@ public class BseUCStrategyManager extends StrategyManager implements
 	// }
 	// }
 
-	@Override
-	protected void afterRemovePlanHook(
-			org.matsim.api.core.v01.population.Plan plan) {
-		// remove oldCorrection of the removed plan
-		oldCorrections.remove(plan);
-	}
+//	@Override
+//	protected void afterRemovePlanHook(
+//			org.matsim.api.core.v01.population.Plan plan) {
+//		// remove oldCorrection of the removed plan
+//		oldCorrections.remove(plan);
+//	}
 
 	@Override
 	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {

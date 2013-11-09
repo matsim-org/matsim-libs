@@ -32,8 +32,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseStrategyManager;
@@ -41,6 +39,7 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.PlanToPl
 import cadyts.calibrators.Calibrator;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 
+@Deprecated // use material in contrib.cadytsintegration instead. kai, nov'13
 public class BseUCStrategyManager extends StrategyManager implements
 		BseStrategyManager {
 	private MATSimUtilityModificationCalibrator<Link> calibrator = null;
@@ -60,6 +59,7 @@ public class BseUCStrategyManager extends StrategyManager implements
 
 	public BseUCStrategyManager(Network net) {
 		this.net = net;
+		throw new RuntimeException("this won't work any more since afterRemovePlansHook is no longer there.  kai, nov'13") ;
 	}
 
 	public void init(final Calibrator<Link> calibrator,
@@ -99,14 +99,14 @@ public class BseUCStrategyManager extends StrategyManager implements
 	// }
 	// }
 
-	@Override
-	protected void afterRemovePlanHook(Plan plan) {
-		// remove oldCorrection of the removed plan
-		oldCorrections.remove(plan);
-		// ***************************************
-		events2PlanSteps.removePlanSteps((PlanImpl) plan);
-		// ***************************************
-	}
+//	@Override
+//	protected void afterRemovePlanHook(Plan plan) {
+//		// remove oldCorrection of the removed plan
+//		oldCorrections.remove(plan);
+//		// ***************************************
+//		events2PlanSteps.removePlanSteps((PlanImpl) plan);
+//		// ***************************************
+//	}
 
 	@Override
 	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {

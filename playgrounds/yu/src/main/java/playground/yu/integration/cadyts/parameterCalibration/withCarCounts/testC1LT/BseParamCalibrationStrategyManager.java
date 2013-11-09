@@ -38,6 +38,7 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 
+@Deprecated // use material in contrib.cadytsintegration instead
 public abstract class BseParamCalibrationStrategyManager extends
 		StrategyManager implements BseStrategyManager {
 
@@ -57,6 +58,7 @@ public abstract class BseParamCalibrationStrategyManager extends
 	public BseParamCalibrationStrategyManager(int firstIteration) {
 		firstIter = firstIteration;
 		iter = firstIteration;
+		throw new RuntimeException("this won't work any more since the afterRemovePlanHook is no longer there. kai, nov'13") ;
 	}
 
 	// @Override
@@ -69,10 +71,10 @@ public abstract class BseParamCalibrationStrategyManager extends
 	// }
 	// }
 	// }
-	@Override
-	protected void afterRemovePlanHook(Plan plan) {
-		removeds.add(new Tuple<Id, Plan>(plan.getPerson().getId(), plan));
-	}
+//	@Override
+//	protected void afterRemovePlanHook(Plan plan) {
+//		removeds.add(new Tuple<Id, Plan>(plan.getPerson().getId(), plan));
+//	}
 
 	@Override
 	protected void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {
