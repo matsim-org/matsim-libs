@@ -128,7 +128,7 @@ public class SubpopulationsExample {
 			StrategySettings timeStrategySettings = new StrategySettings(new IdImpl(currentStrategyId++));
 			timeStrategySettings.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator.toString());
 			timeStrategySettings.setSubpopulation("time");
-			timeStrategySettings.setProbability(0.5);
+			timeStrategySettings.setProbability(0.2);
 			config.strategy().addStrategySettings(timeStrategySettings);
 			
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(new IdImpl(currentStrategyId++));
