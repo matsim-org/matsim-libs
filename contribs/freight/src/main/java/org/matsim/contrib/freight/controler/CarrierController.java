@@ -28,11 +28,15 @@
 
 package org.matsim.contrib.freight.controler;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanReader;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
@@ -57,6 +61,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.replanning.GenericStrategyManager;
 
 /**
  * Controls the workflow of the simulation.
@@ -72,24 +77,24 @@ import org.matsim.core.controler.listener.StartupListener;
 
 /* To be consistent, should we rather not call this `CarrierControlerListener' (JWJoubert, Nov '13) */
 public class CarrierController implements StartupListener, ShutdownListener,BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-		ReplanningListener, IterationEndsListener {
+ReplanningListener, IterationEndsListener {
 
-	
+
 	private static Logger logger = Logger.getLogger(CarrierController.class);
 
 	private boolean withinDayReSchedulingEnabled = false;
 
 	private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
-	
+
 	private CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory;
-	
+
 	private CarrierAgentTracker carrierAgentTracker;
-	
+
 	private Carriers carriers;
 
 	private ActivityTimesGivenBy activityTimesGivenBy = ActivityTimesGivenBy.endTimeOnly ;
-	
-	
+
+
 
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
@@ -104,7 +109,7 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
 		this.carrierScoringFunctionFactory = scoringFunctionFactory;
 	}
-	
+
 	/**
 	 * Constructs a controller with a carriersPlanFileName, re-planning capabilities and scoring-functions.
 	 * 
@@ -139,12 +144,12 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-//		if(carriers == null){
-//			carriers = new Carriers();
-//			new CarrierPlanReader(carriers).read(carrierPlanFilename);
-//		}
-//		assert carrierScoringFunctionFactory != null : "carrierScoringFunctionFactory must be set";
-//		assert carrierPlanStrategyManagerFactory != null : "strategyManagerFactory must be set";
+		//		if(carriers == null){
+		//			carriers = new Carriers();
+		//			new CarrierPlanReader(carriers).read(carrierPlanFilename);
+		//		}
+		//		assert carrierScoringFunctionFactory != null : "carrierScoringFunctionFactory must be set";
+		//		assert carrierPlanStrategyManagerFactory != null : "strategyManagerFactory must be set";
 	}
 
 	@Override
@@ -156,7 +161,7 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 		mobsimFactory.setWithinDayActivityReScheduling(withinDayReSchedulingEnabled);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		controler.getEvents().addHandler(carrierAgentTracker);
-//		carrierAgentTracker.createPlans();
+		//		carrierAgentTracker.createPlans();
 	}
 
 	@Override
@@ -177,20 +182,31 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 		}
 		CarrierReplanningStrategyManagerI strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager(event.getControler());
 
-		for (Carrier carrier : carriers.getCarriers().values()) {
-			if (carrier.getSelectedPlan() == null) {
-				logger.warn("carrier cannot replan since no selected plan is available");
-				continue;
+		if ( strategyManager instanceof CarrierReplanningStrategyManagerI ) {
+
+			for (Carrier carrier : carriers.getCarriers().values()) {
+				if (carrier.getSelectedPlan() == null) {
+					logger.warn("carrier cannot replan since no selected plan is available");
+					continue;
+				}
+				strategyManager.nextStrategy(event.getIteration()).run(carrier);
 			}
-			strategyManager.nextStrategy(event.getIteration()).run(carrier);
+		} else if ( strategyManager instanceof GenericStrategyManager<?>) {
+			Collection<HasPlansAndId<CarrierPlan>> collection = new ArrayList<HasPlansAndId<CarrierPlan>>() ;
+			for ( Carrier carrier : carriers.getCarriers().values() ) {
+				collection.add(carrier) ;
+			}
+			GenericStrategyManager<CarrierPlan> mgr = (GenericStrategyManager<CarrierPlan>) strategyManager ;
+			mgr.run( collection, null, event.getIteration(), null);
 		}
+
 
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-//		String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
-//		new CarrierPlanWriter(carriers.getCarriers().values()).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
+		//		String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
+		//		new CarrierPlanWriter(carriers.getCarriers().values()).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 	}
 
 	@Override

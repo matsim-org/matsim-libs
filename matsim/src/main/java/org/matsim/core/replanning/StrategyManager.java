@@ -35,7 +35,6 @@ import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 /**
@@ -62,7 +61,7 @@ public class StrategyManager implements MatsimManager {
 
 	private int maxPlansPerAgent = 0;
 
-	private GenericPlanSelector<Plan> removalPlanSelector = new WorstPlanForRemovalSelector();
+	private GenericPlanSelector<Plan> removalPlanSelector = new WorstPlanForRemovalSelector<Plan>();
 
 	// XXX to what should this be initialized?
 	private String subpopulationName = null;
@@ -186,10 +185,6 @@ public class StrategyManager implements MatsimManager {
 		// left empty for inheritance
 	}
 
-	protected void beforeStrategyRunHook( Person person, PlanStrategy strategy ) {
-		// left empty for inheritance
-	}
-
 	/**
 	 * Randomly chooses for each person of the population a strategy and uses that
 	 * strategy on the person.
@@ -222,8 +217,6 @@ public class StrategyManager implements MatsimManager {
 						(String) population.getPersonAttributes().getAttribute(
 							person.getId().toString(), subpopulationName ) );
 
-			beforeStrategyRunHook( person, strategy ) ;
-
 			// ... and run the strategy:
 			if (strategy != null) {
 				strategy.run(person);
@@ -231,7 +224,6 @@ public class StrategyManager implements MatsimManager {
 				throw new RuntimeException("No strategy found!");
 			}
 
-			afterStrategyRunHook( person, strategy ) ;
 		}
 
 		// finally make sure all strategies have finished there work
@@ -244,22 +236,8 @@ public class StrategyManager implements MatsimManager {
 		afterRunHook( population ) ;
 	}
 
-	protected void afterStrategyRunHook( Person person, PlanStrategy strategy ) {
-		// left empty for inheritance
-	}
-
 	protected void afterRunHook( Population population ) {
 		// left empty for inheritance
-	}
-
-	/**This is a hook into "removePlans", called after an individual plan has been removed.  This is usually needed in derived
-	 * methods that keep a "shadow" plans registry.  Note that this is called after every plan, not at the end of the
-	 * "removePlanS" method.  kai, sep'10
-	 *
-	 * @param the plan that is to be removed
-	 */
-	protected void afterRemovePlanHook( Plan plan ) {
-		// left empty for inheritance.  kai, sep'10
 	}
 
 	private final void removePlans(final PersonImpl person, final int maxNumberOfPlans) {
@@ -273,7 +251,6 @@ public class StrategyManager implements MatsimManager {
 				}
 				person.setSelectedPlan( newPlanToSelect );
 			}
-			afterRemovePlanHook( plan ) ;
 		}
 	}
 

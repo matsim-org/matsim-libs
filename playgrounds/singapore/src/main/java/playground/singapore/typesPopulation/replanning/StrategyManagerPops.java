@@ -210,7 +210,8 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 				}
 				person.setSelectedPlan( newPlanToSelect );
 			}
-			afterRemovePlanHook( plan ) ;
+//			afterRemovePlanHook( plan ) ;
+			// no longer used.  kai, nov'13
 		}
 	}
 

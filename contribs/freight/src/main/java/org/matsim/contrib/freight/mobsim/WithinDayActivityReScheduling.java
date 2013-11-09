@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Tour.Start;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
+import org.matsim.contrib.freight.utils.FreightGbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -63,7 +64,9 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 
 	private boolean doReplanning(MobsimAgent mobsimAgent, Netsim mobsim, double time) {
 		if (!(mobsimAgent instanceof PersonDriverAgentImpl)) {
+			System.out.flush();
 			logger.error("agent " + mobsimAgent.getId() + "of wrong type; returning ... ");
+			System.err.flush() ;
 			return false;
 		}
 		PlanAgent planAgent = (PlanAgent) mobsimAgent;
@@ -77,12 +80,14 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 		if (planAgent.getCurrentPlanElement() instanceof Activity) {
 			ActivityImpl act = (ActivityImpl) planAgent.getCurrentPlanElement();
 			if(encounteredActivities.contains(act)){
+//				logger.info(" returning false since we have already seen the activity " ) ;
 				return false;
 			}
 			CarrierDriverAgent driver = carrierAgentTracker.getDriver(agentId);
 			TourActivity plannedActivity = (TourActivity) driver.getPlannedTourElement(this.withinDayAgentUtils.getCurrentPlanElementIndex(mobsimAgent));
 			if(plannedActivity instanceof Start){
 				encounteredActivities.add(act);
+				logger.info(" returning false since this is a start activity " ) ;
 				return false;
 			}
 			else {
@@ -93,8 +98,10 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 				this.withinDayAgentUtils.calculateAndSetDepartureTime(mobsimAgent, act);
 				internalInterface.rescheduleActivityEnd(mobsimAgent);
 				encounteredActivities.add(act);
+				return true ;
 			}
 		} 	
+		FreightGbl.debug("returning without having done anything") ;
 		return true;
 	}
 

@@ -41,6 +41,7 @@ import cadyts.calibrators.Calibrator;
 import cadyts.demand.PlanStep;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 
+@Deprecated // use contrib.cadytsintegration instead
 public class BseUCStrategyManager extends StrategyManager implements
 		BseStrategyManager {
 	private MATSimUtilityModificationCalibrator<Link> calibrator = null;
