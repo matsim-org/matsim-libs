@@ -19,10 +19,9 @@
 
 package tutorial.programming.multipleSubpopulations;
 
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -52,7 +51,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  *  </ol>
  *  For both these subpopulations the indicated strategy will be chosen 20% of
  *  the time while the balance will use the <em>ChangeExpBeta</em> strategy.
- *  
+ *  <p/>
  *  The results are best visualised using senozon's Via, and colouring the two
  *  subpopulations differently. To do that you will need two lists, each 
  *  containing the {@link Id}s of all the agents in that specific subpopulation.
@@ -68,25 +67,32 @@ public class SubpopulationsExample {
 	final static String CONFIG = "./examples/tutorial/programming/MultipleSubpopulations/config.xml";
 	final static String OUTPUT = "./output/";
 
+	private static final String SUBPOP_ATTRIB_NAME = "subpopulation";
+	private static final String SUBPOP1_NAME = "time";
+	private static final String SUBPOP2_NAME = "reroute";
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		// preparation of an example scenario:
+		{
+			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+			/* Set up network and plans. */
+			MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+			mnr.parse(EQUIL_NETWORK);
+			createPopulation(sc, SUBPOP1_NAME, 100);
+			createPopulation(sc, SUBPOP2_NAME, 100);
+			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(PLANS);
+			new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(OBJECT_ATTRIBUTES);
+		}
 		
-		/* Set up network and plans. */
-		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
-		mnr.parse(EQUIL_NETWORK);
-		createPopulation(sc, "time", 100);
-		createPopulation(sc, "reroute", 100);
-		new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(PLANS);
-		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(OBJECT_ATTRIBUTES);
-		
+		// building and running the simulation based on the example scenario:
 		Config config = ConfigUtils.createConfig(); 
 		ConfigUtils.loadConfig(config, CONFIG);
 		config.plans().setInputFile(PLANS);
 		config.plans().setInputPersonAttributeFile(OBJECT_ATTRIBUTES);
-		config.plans().setSubpopulationAttributeName("subpopulation"); /* This is the default anyway. */
+		config.plans().setSubpopulationAttributeName(SUBPOP_ATTRIB_NAME); /* This is the default anyway. */
 		config.network().setInputFile(EQUIL_NETWORK);
 		config.controler().setOutputDirectory(OUTPUT);
 		
@@ -95,45 +101,36 @@ public class SubpopulationsExample {
 		 * a subpopulation attribute. For all agents with a subpopulation
 		 * attribute, you need to set up the suite of strategies for the 
 		 * subpopulation(s).
-		 * 
-		 * In the example below, we assume that the config file may already have
-		 * strategies set up. Since we cannot overwrite an existing strategy, we
-		 * need to find the next available number. */
-		long maxStrategyId = 1;
-		Iterator<StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
-		while(iterator.hasNext()){
-			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
-		}
-		long currentStrategyId = maxStrategyId + 1;
+		 */
 				
 		/* Set up the subpopulations. */
 		{
 			/* Set up the `reroute' subpopulation to consider rerouting as a 
 			 * strategy, 20% of the time, and the balance using ChangeExpBeta. */
-			StrategySettings rerouteStrategySettings = new StrategySettings(new IdImpl(currentStrategyId++));
+			StrategySettings rerouteStrategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
 			rerouteStrategySettings.setModuleName(PlanStrategyRegistrar.Names.ReRoute.toString());
-			rerouteStrategySettings.setSubpopulation("reroute");
+			rerouteStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			rerouteStrategySettings.setProbability(0.2);
 			config.strategy().addStrategySettings(rerouteStrategySettings);
 
-			StrategySettings changeExpBetaStrategySettings = new StrategySettings(new IdImpl(currentStrategyId++));
+			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
-			changeExpBetaStrategySettings.setSubpopulation("reroute");
+			changeExpBetaStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			changeExpBetaStrategySettings.setProbability(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 		}
 		{
 			/* Set up the 'time' subpopulation to only consider time allocation 
 			 * as a strategy, 20% of the time, and the balance using ChangeExpBeta. */
-			StrategySettings timeStrategySettings = new StrategySettings(new IdImpl(currentStrategyId++));
+			StrategySettings timeStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator.toString());
-			timeStrategySettings.setSubpopulation("time");
+			timeStrategySettings.setSubpopulation(SUBPOP1_NAME);
 			timeStrategySettings.setProbability(0.2);
 			config.strategy().addStrategySettings(timeStrategySettings);
 			
-			StrategySettings changeExpBetaStrategySettings = new StrategySettings(new IdImpl(currentStrategyId++));
+			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
-			changeExpBetaStrategySettings.setSubpopulation("time");
+			changeExpBetaStrategySettings.setSubpopulation(SUBPOP1_NAME);
 			changeExpBetaStrategySettings.setProbability(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 		}
@@ -143,7 +140,7 @@ public class SubpopulationsExample {
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
-	
+
 	/**
 	 * Private class to create individuals with a specific prefix in their 
 	 * {@link Person} {@link Id}s to distinguish the subpopulations.
@@ -168,16 +165,16 @@ public class SubpopulationsExample {
 			
 			/* Add the activities to the plan. */
 			plan.addActivity(h1);
-			plan.addLeg(pf.createLeg("car"));
+			plan.addLeg(pf.createLeg( TransportMode.car ));
 			plan.addActivity(w);
-			plan.addLeg(pf.createLeg("car"));
+			plan.addLeg(pf.createLeg( TransportMode.car ));
 			plan.addActivity(h2);
-			
-			/* Set the subpopulation attribute. */
-			scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", prefix);
 			
 			person.addPlan(plan);
 			scenario.getPopulation().addPerson(person);
+
+			/* Set the subpopulation attribute. */
+			scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), SUBPOP_ATTRIB_NAME, prefix);
 		}
 	}
 

@@ -20,7 +20,11 @@
 package org.matsim.core.config;
 
 import java.io.File;
+import java.util.Iterator;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
@@ -103,5 +107,14 @@ public abstract class ConfigUtils {
 		 */
 		String absolutePath = prefix + path;
 		return absolutePath;
+	}
+
+	public static Id createAvailableStrategyId(Config config) {
+		long maxStrategyId = 1;
+		Iterator<StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
+		while(iterator.hasNext()){
+			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
+		}
+		return new IdImpl(maxStrategyId + 1 );
 	}
 }
