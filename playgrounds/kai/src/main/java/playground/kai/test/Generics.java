@@ -61,6 +61,7 @@ public class Generics {
 
 		// I canNOT add MyItem any more:
 		//			box.addItem( new MyItem() ) ;
+		box.addItem( new Item() ) ;
 		Item item2 = box2.getItem();
 
 		// what was Marcels example?
