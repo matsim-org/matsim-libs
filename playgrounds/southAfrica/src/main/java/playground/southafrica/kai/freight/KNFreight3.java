@@ -104,7 +104,13 @@ final class KNFreight3 {
 					mgr.addStrategy(strategy, null, 0.123);
 					mgr.addChangeRequest(123, strategy, null, 0.231);
 				}
-				
+				{
+					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+					GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
+					strategy.addStrategyModule(module);
+					mgr.addStrategy(strategy, null, 0.123 );
+					mgr.addChangeRequest(123, strategy, null, 0. );
+				}
 				return manager ;
 			}
 		};

@@ -39,6 +39,8 @@ import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenB
 import org.matsim.contrib.freight.utils.FreightGbl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -82,10 +84,12 @@ public class KNFreight4 {
 	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
 	
-	private static final boolean generatingCarrierPlansFromScratch = true ;
+	private static final boolean generatingCarrierPlansFromScratch = false ;
 	
 	private static final boolean addingCongestion = false ;
 
+	private static final ActivityTimesGivenBy carrierActivityTimesGivenBy = ActivityTimesGivenBy.durationOnly;
+	private static final boolean usingWithinDayReScheduling = true;
 
 	public static void main(String[] args) {
 		
@@ -105,6 +109,11 @@ public class KNFreight4 {
 		if ( addingCongestion ) {
 			config.network().setTimeVariantNetwork(true);
 		}
+		
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		
+		config.vspExperimental().addParam( VspExperimentalConfigGroup.VspExperimentalConfigKey.vspDefaultsCheckingLevel, 
+				VspExperimentalConfigGroup.WARN);
 
 		// ### scenario stuff: ###
 		
@@ -124,8 +133,6 @@ public class KNFreight4 {
 
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "plannedCarriers.xml") ;
 		
-		System.exit(-1) ;
-		
 		// ### simple runs: ###
 
 		//		new Visualiser( config, scenario).visualizeLive(carriers) ;
@@ -140,8 +147,8 @@ public class KNFreight4 {
 		ctrl.setOverwriteFiles(true);
 		{
 			CarrierController listener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
-			listener.setActivityTimesGivenBy(ActivityTimesGivenBy.durationOnly);
-			listener.setEnableWithinDayActivityReScheduling(false);
+			listener.setActivityTimesGivenBy(carrierActivityTimesGivenBy);
+			listener.setEnableWithinDayActivityReScheduling(usingWithinDayReScheduling);
 			ctrl.addControlerListener(listener) ;
 		}
 		
