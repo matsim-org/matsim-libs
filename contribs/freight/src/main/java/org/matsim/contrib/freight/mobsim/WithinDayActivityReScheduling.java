@@ -87,7 +87,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 			TourActivity plannedActivity = (TourActivity) driver.getPlannedTourElement(this.withinDayAgentUtils.getCurrentPlanElementIndex(mobsimAgent));
 			if(plannedActivity instanceof Start){
 				encounteredActivities.add(act);
-				logger.info(" returning false since this is a start activity " ) ;
+//				logger.info(" returning false since this is a start activity " ) ;
 				return false;
 			}
 			else {
@@ -101,7 +101,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 				return true ;
 			}
 		} 	
-		FreightGbl.debug("returning without having done anything") ;
+//		FreightGbl.debug("returning without having done anything") ;
 		return true;
 	}
 
