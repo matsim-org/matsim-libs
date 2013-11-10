@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
@@ -133,6 +134,13 @@ public class CarrierImpl implements Carrier {
 	public boolean addPlan(CarrierPlan p) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public CarrierPlan createCopyOfSelectedPlanAndMakeSelected() {
+		CarrierPlan newPlan = CarrierReplanningStrategy.copyPlan(this.selectedPlan) ;
+		this.setSelectedPlan( newPlan ) ;
+		return newPlan ;
 	}
 
 }

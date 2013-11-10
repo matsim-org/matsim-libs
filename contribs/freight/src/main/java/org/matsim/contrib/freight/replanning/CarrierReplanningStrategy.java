@@ -87,7 +87,7 @@ public class CarrierReplanningStrategy {
 	}
 
 
-	private CarrierPlan copyPlan(CarrierPlan plan2copy) {
+	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
 		List<ScheduledTour> tours = new ArrayList<ScheduledTour>();
 		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
 			double depTime = sTour.getDeparture();
