@@ -105,21 +105,6 @@ public class SubpopulationsExample {
 				
 		/* Set up the subpopulations. */
 		{
-			/* Set up the `reroute' subpopulation to consider rerouting as a 
-			 * strategy, 20% of the time, and the balance using ChangeExpBeta. */
-			StrategySettings rerouteStrategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-			rerouteStrategySettings.setModuleName(PlanStrategyRegistrar.Names.ReRoute.toString());
-			rerouteStrategySettings.setSubpopulation(SUBPOP2_NAME);
-			rerouteStrategySettings.setProbability(0.2);
-			config.strategy().addStrategySettings(rerouteStrategySettings);
-
-			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			changeExpBetaStrategySettings.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
-			changeExpBetaStrategySettings.setSubpopulation(SUBPOP2_NAME);
-			changeExpBetaStrategySettings.setProbability(0.8);
-			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
-		}
-		{
 			/* Set up the 'time' subpopulation to only consider time allocation 
 			 * as a strategy, 20% of the time, and the balance using ChangeExpBeta. */
 			StrategySettings timeStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
@@ -131,6 +116,21 @@ public class SubpopulationsExample {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
 			changeExpBetaStrategySettings.setSubpopulation(SUBPOP1_NAME);
+			changeExpBetaStrategySettings.setProbability(0.8);
+			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
+		}
+		{
+			/* Set up the `reroute' subpopulation to consider rerouting as a 
+			 * strategy, 20% of the time, and the balance using ChangeExpBeta. */
+			StrategySettings rerouteStrategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+			rerouteStrategySettings.setModuleName(PlanStrategyRegistrar.Names.ReRoute.toString());
+			rerouteStrategySettings.setSubpopulation(SUBPOP2_NAME);
+			rerouteStrategySettings.setProbability(0.2);
+			config.strategy().addStrategySettings(rerouteStrategySettings);
+
+			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			changeExpBetaStrategySettings.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
+			changeExpBetaStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			changeExpBetaStrategySettings.setProbability(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 		}
