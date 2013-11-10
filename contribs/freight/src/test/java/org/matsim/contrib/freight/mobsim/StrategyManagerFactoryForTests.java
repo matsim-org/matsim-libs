@@ -8,6 +8,7 @@ import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -49,7 +50,7 @@ public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManage
 		}
 	}
 	
-	public CarrierReplanningStrategyManager createStrategyManager(Controler controler){
+	public MatsimManager createStrategyManager(Controler controler){
 
 		final LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(controler.getScenario()
 						.getNetwork(), new MyTravelCosts(controler

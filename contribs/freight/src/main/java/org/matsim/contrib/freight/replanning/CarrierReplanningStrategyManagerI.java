@@ -1,6 +1,8 @@
 package org.matsim.contrib.freight.replanning;
 
-public interface CarrierReplanningStrategyManagerI {
+import org.matsim.core.api.internal.MatsimManager;
+
+public interface CarrierReplanningStrategyManagerI extends MatsimManager {
 
 	/**
 	 * Adds a strategy and its probability.

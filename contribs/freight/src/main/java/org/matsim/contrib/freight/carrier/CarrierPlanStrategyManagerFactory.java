@@ -1,10 +1,13 @@
 package org.matsim.contrib.freight.carrier;
 
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.Controler;
 
 public interface CarrierPlanStrategyManagerFactory {
 	
-	public CarrierReplanningStrategyManagerI createStrategyManager(Controler controler);
+	/**
+	 * This is for the time being very unrestrictive to allow both the passing of the "normal" and the "carrier" strategy manager.  kai, nov'13
+	 */
+	public MatsimManager createStrategyManager(Controler controler);
 
 }
