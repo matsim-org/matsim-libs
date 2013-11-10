@@ -106,7 +106,7 @@ public class TtDgKoehlerStrehler2010Router {
 			// TODO Auto-generated method stub
 			
 		}
-		
+
 	};
 	
 	private Vehicle fakeVehicle = new Vehicle(){

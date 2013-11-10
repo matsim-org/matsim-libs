@@ -78,18 +78,18 @@ public class KNFreight4 {
 	
 	private static final String VEHTYPES = QVANHEERDEN_FREIGHT + "myGridSim/vehicleTypes.xml" ;
 
-//	private static final String CARRIERS = QVANHEERDEN_FREIGHT + "myGridSim/carrier.xml" ;
-	private static final String CARRIERS = "/Users/nagel/freight-kairuns/one-truck/carriers.xml.gz" ;
+	private static final String CARRIERS = QVANHEERDEN_FREIGHT + "myGridSim/carrier.xml" ;
+//	private static final String CARRIERS = "/Users/nagel/freight-kairuns/one-truck/carriers.xml.gz" ;
 
 	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
 	
-	private static final boolean generatingCarrierPlansFromScratch = false ;
+	private static final boolean generatingCarrierPlansFromScratch = true ;
 	
 	private static final boolean addingCongestion = false ;
 
 	private static final ActivityTimesGivenBy carrierActivityTimesGivenBy = ActivityTimesGivenBy.durationOnly;
-	private static final boolean usingWithinDayReScheduling = true;
+	private static final boolean usingWithinDayReScheduling = false;
 
 	public static void main(String[] args) {
 		
@@ -103,7 +103,7 @@ public class KNFreight4 {
 			System.out.println( "args[0]:" + args[0] );
 			config.controler().setOutputDirectory( args[0]+"/" );
 		}
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(500);
 		
 		config.network().setInputFile(NETFILENAME);
 		if ( addingCongestion ) {

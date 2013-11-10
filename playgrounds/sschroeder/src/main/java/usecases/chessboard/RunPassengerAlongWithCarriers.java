@@ -14,6 +14,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierController;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -122,7 +123,7 @@ public class RunPassengerAlongWithCarriers {
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			
 			@Override
-			public CarrierReplanningStrategyManager createStrategyManager(Controler controler) {
+			public MatsimManager createStrategyManager(Controler controler) {
 				final CarrierReplanningStrategyManager strategyManager = new CarrierReplanningStrategyManager();
 				strategyManager.addStrategy(new SelectBestPlanStrategyFactory().createStrategy(), 0.95);
 //				strategyManager.addStrategy(new KeepPlanSelectedStrategyFactory().createStrategy(), 0.8);

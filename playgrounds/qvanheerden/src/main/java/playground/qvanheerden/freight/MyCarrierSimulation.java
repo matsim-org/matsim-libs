@@ -19,6 +19,7 @@ import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -134,7 +135,7 @@ public class MyCarrierSimulation {
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			@Override
-			public CarrierReplanningStrategyManager createStrategyManager(Controler controler) {
+			public MatsimManager createStrategyManager(Controler controler) {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
 				TravelDisutility travelCosts = ControlerUtils.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 						travelTimes , config.planCalcScore() );

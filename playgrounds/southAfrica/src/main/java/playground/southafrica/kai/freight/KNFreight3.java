@@ -33,11 +33,11 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierController;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerKai;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
 import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
@@ -65,35 +65,35 @@ final class KNFreight3 {
 	static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario) {
 		return new CarrierPlanStrategyManagerFactory() {
 			@Override
-			public CarrierReplanningStrategyManagerI createStrategyManager(Controler controler) {
+			public MatsimManager createStrategyManager(Controler controler) {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
-				TravelDisutility travelCosts = ControlerUtils.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
+				TravelDisutility travelDisutility = ControlerUtils.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 						travelTimes , scenario.getConfig().planCalcScore() );
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
-						travelCosts, travelTimes) ;
-				CarrierReplanningStrategyManagerKai manager = new CarrierReplanningStrategyManagerKai() ;
-				{
-					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-					strategy.addModule(new ReRouteVehicles(router, scenario.getNetwork(), travelTimes));
-					manager.addStrategy(strategy, 0.3);
-					manager.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, 0.0);
-				}
+						travelDisutility, travelTimes) ;
+//				CarrierReplanningStrategyManagerKai manager = new CarrierReplanningStrategyManagerKai() ;
 //				{
 //					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-//					CarrierReplanningStrategyModule module = new SolvePickupAndDeliveryProblem(scenario.getNetwork()) ;
-//					strategy.addModule(module) ;
-//					manager.addStrategy(strategy,0.1) ;
+//					strategy.addModule(new ReRouteVehicles(router, scenario.getNetwork(), travelTimes));
+//					manager.addStrategy(strategy, 0.3);
+//					manager.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, 0.0);
 //				}
-				{
-					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new BestPlanSelector<CarrierPlan>() ) ;
-					strategy.addModule( new TimeAllocationMutator() ) ;
-					manager.addStrategy(strategy, 0.9);
-					manager.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, 0.0);
-				}
-				{
-					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-					manager.addStrategy( strategy, 0.01 ) ;
-				}
+////				{
+////					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
+////					CarrierReplanningStrategyModule module = new SolvePickupAndDeliveryProblem(scenario.getNetwork()) ;
+////					strategy.addModule(module) ;
+////					manager.addStrategy(strategy,0.1) ;
+////				}
+//				{
+//					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new BestPlanSelector<CarrierPlan>() ) ;
+//					strategy.addModule( new TimeAllocationMutator() ) ;
+//					manager.addStrategy(strategy, 0.9);
+//					manager.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, 0.0);
+//				}
+//				{
+//					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
+//					manager.addStrategy( strategy, 0.01 ) ;
+//				}
 				
 				
 				GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
@@ -101,17 +101,21 @@ final class KNFreight3 {
 					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new RandomPlanSelector<CarrierPlan>()) ;
 					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
 					strategy.addStrategyModule(module);
-					mgr.addStrategy(strategy, null, 0.123);
-					mgr.addChangeRequest(123, strategy, null, 0.231);
+					mgr.addStrategy(strategy, null, 0.1);
+					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
 				}
 				{
 					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
 					GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
 					strategy.addStrategyModule(module);
-					mgr.addStrategy(strategy, null, 0.123 );
-					mgr.addChangeRequest(123, strategy, null, 0. );
+					mgr.addStrategy(strategy, null, 0.9 );
+					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
 				}
-				return manager ;
+				{
+					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+					mgr.addStrategy( strategy, null, 0.01 ) ;
+				}
+				return mgr ;
 			}
 		};
 	}

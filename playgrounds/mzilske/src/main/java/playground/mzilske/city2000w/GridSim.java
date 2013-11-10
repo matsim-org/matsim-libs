@@ -27,6 +27,7 @@ import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -191,7 +192,7 @@ public class GridSim {
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new CarrierPlanStrategyManagerFactory() {
 			
 			@Override
-			public CarrierReplanningStrategyManager createStrategyManager(Controler controler) {
+			public MatsimManager createStrategyManager(Controler controler) {
 				return strategyManager;
 			}
 		};
