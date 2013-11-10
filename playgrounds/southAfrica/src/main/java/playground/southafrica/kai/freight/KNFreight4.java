@@ -21,12 +21,14 @@ package playground.southafrica.kai.freight;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -36,20 +38,36 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
-import org.matsim.contrib.freight.utils.FreightGbl;
+import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
+import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import util.Solutions;
 import basics.VehicleRoutingAlgorithm;
@@ -66,7 +84,7 @@ public class KNFreight4 {
 
 	private static final String MATSIM_SA = "/Users/Nagel/southafrica/MATSim-SA/" ;
 
-	private static final String QVANHEERDEN_FREIGHT=MATSIM_SA+"/sandbox/qvanheerden/input/freight/" ;
+	private static final String QVH_FREIGHT=MATSIM_SA+"/sandbox/qvanheerden/input/freight/" ;
 
 	//	private static final String NETFILENAME=QVANHEERDEN_FREIGHT+"/scenarioFromWiki/network.xml" ;
 	//	private static final String CARRIERS = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/carrier.xml" ;
@@ -76,12 +94,12 @@ public class KNFreight4 {
 	private static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_CleanV7.xml.gz"  ;
 //	private static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_FullV7.xml.gz"  ;
 	
-	private static final String VEHTYPES = QVANHEERDEN_FREIGHT + "myGridSim/vehicleTypes.xml" ;
+	private static final String VEHTYPES = QVH_FREIGHT + "myGridSim/vehicleTypes.xml" ;
 
-	private static final String CARRIERS = QVANHEERDEN_FREIGHT + "myGridSim/carrier.xml" ;
+	private static final String CARRIERS = QVH_FREIGHT + "myGridSim/carrier.xml" ;
 //	private static final String CARRIERS = "/Users/nagel/freight-kairuns/one-truck/carriers.xml.gz" ;
 
-	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
+	private static final String ALGORITHM = QVH_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
 	
 	private static final boolean generatingCarrierPlansFromScratch = true ;
@@ -120,7 +138,7 @@ public class KNFreight4 {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		if ( addingCongestion ) {
-			useTimeDependentNetwork(scenario);
+			configureTimeDependentNetwork(scenario);
 		}
 
 		CarrierVehicleTypes vehicleTypes = createVehicleTypes();
@@ -140,8 +158,8 @@ public class KNFreight4 {
 		
 		// ### iterations: ###
 
-		CarrierScoringFunctionFactory scoringFunctionFactory = KNFreight3.createMyScoringFunction(scenario);
-		CarrierPlanStrategyManagerFactory strategyManagerFactory  = KNFreight3.createMyStrategyManager(scenario) ;
+		CarrierScoringFunctionFactory scoringFunctionFactory = KNFreight4.createMyScoringFunction(scenario);
+		CarrierPlanStrategyManagerFactory strategyManagerFactory  = KNFreight4.createMyStrategyManager(scenario) ;
 		
 		final Controler ctrl = new Controler( scenario ) ;
 		ctrl.setOverwriteFiles(true);
@@ -202,7 +220,7 @@ public class KNFreight4 {
 	}
 
 
-	private static void useTimeDependentNetwork(Scenario scenario) {
+	private static void configureTimeDependentNetwork(Scenario scenario) {
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
@@ -222,6 +240,111 @@ public class KNFreight4 {
 				}
 			}
 		}
+	}
+
+
+	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario) {
+			return new CarrierPlanStrategyManagerFactory() {
+				@Override
+				public MatsimManager createStrategyManager(Controler controler) {
+					TravelTime travelTimes = controler.getLinkTravelTimes() ;
+					TravelDisutility travelDisutility = ControlerUtils.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
+							travelTimes , scenario.getConfig().planCalcScore() );
+					LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
+							travelDisutility, travelTimes) ;
+					
+					GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
+					{	
+						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new RandomPlanSelector<CarrierPlan>()) ;
+						GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
+						strategy.addStrategyModule(module);
+						mgr.addStrategy(strategy, null, 0.1);
+						mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
+					}
+					{
+						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+						GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
+						strategy.addStrategyModule(module);
+						mgr.addStrategy(strategy, null, 0.9 );
+						mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
+					}
+					{
+						GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+						mgr.addStrategy( strategy, null, 0.01 ) ;
+					}
+					return mgr ;
+				}
+			};
+		}
+
+
+	private static CarrierScoringFunctionFactory createMyScoringFunction(final Scenario scenario) {
+		return new CarrierScoringFunctionFactory() {
+			@Override
+			public ScoringFunction createScoringFunction(final Carrier carrier) {
+				SumScoringFunction sum = new SumScoringFunction() ;
+				// yyyyyy I am almost sure that we better use separate scoring functions for carriers. kai, oct'13
+				sum.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()), 
+						scenario.getNetwork() ) ) ;
+				sum.addScoringFunction( new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()) ) ) ;
+				ActivityScoring scoringFunction = new ActivityScoring() {
+					private double score = 0. ;
+					private final double margUtlOfTime_s = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600. ;
+					// yyyyyy signs???
+					// yyyyyy do not use person params!!!
+					@Override
+					public void finish() {
+					}
+					@Override
+					public double getScore() {
+						return this.score ;
+					}
+					@Override
+					public void reset() {
+						score = 0. ;
+					}
+					@Override
+					public void handleFirstActivity(Activity act) {
+						// no penalty for everything that is before the first act (people don't work)
+					}
+					@Override
+					public void handleActivity(Activity act) {
+						// deduct score for the time spent at the facility:
+						final double actStartTime = act.getStartTime();
+						final double actEndTime = act.getEndTime();
+						score -= (actEndTime - actStartTime) * this.margUtlOfTime_s ;
+	
+						CarrierService matchedService = null ;
+						for ( CarrierService service : carrier.getServices() ) {
+							if ( act.getLinkId().equals( service.getLocationLinkId() ) ) {
+								matchedService = service ;
+								break ;
+							}
+							// yy would be more efficient with a pre-fabricated lookup table. kai, nov'13
+							// yyyyyy there may be multiple services on the same link, which which case this will not function correctly. kai, nov'13
+						}
+						final double windowStartTime = matchedService.getServiceStartTimeWindow().getStart();
+						final double windowEndTime = matchedService.getServiceStartTimeWindow().getEnd();
+						final double penalty = 18/3600. ; // per second!
+						if ( actStartTime < windowStartTime ) {
+							score -= penalty * ( windowStartTime - actStartTime ) ;
+							// mobsim could let them wait ... but this is also not implemented for regular activities. kai, nov'13
+						}
+						if ( windowEndTime < actEndTime ) {
+							score -= penalty * ( actEndTime - windowEndTime ) ;
+						}
+						// (note: provide penalties that work with a gradient to help the evol algo. kai, nov'13)
+						
+					}
+					@Override
+					public void handleLastActivity(Activity act) {
+						// no penalty for everything that is after the last act (people don't work)
+					}} ;
+				sum.addScoringFunction(scoringFunction); ;
+				return sum ;
+			}
+	
+		};
 	}
 
 }
