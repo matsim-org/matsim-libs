@@ -25,6 +25,6 @@ public interface HasPlansAndId<T extends BasicPlan> extends Identifiable {
 	public abstract void setSelectedPlan(T selectedPlan);
 	
 //	@Deprecated
-//	public abstract T copySelectedPlan() ;
+	public abstract T createCopyOfSelectedPlanAndMakeSelected() ;
 
 }

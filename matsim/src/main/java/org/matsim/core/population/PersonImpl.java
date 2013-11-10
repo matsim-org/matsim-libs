@@ -169,7 +169,7 @@ public class PersonImpl implements Person {
 		setSelectedPlan(newPlan);
 	}
 
-	public Plan copySelectedPlan() {
+	public Plan createCopyOfSelectedPlanAndMakeSelected() {
 		Plan oldPlan = this.getSelectedPlan();
 		if (oldPlan == null) {
 			return null;

@@ -87,14 +87,13 @@ public class GenericPlanStrategyImpl<T extends BasicPlan> implements GenericPlan
 			log.error( planSelector+" returned no plan: not changing selected plan for person "+person );
 		}
 
-		throw new RuntimeException("need to implement deepcopy first") ;
-		/*
+
 		// if there is a "module" (i.e. "innovation"):
 		if (this.firstModule != null) {
 			
 			// set the working plan to a copy of the selected plan:
 //			plan = ((PersonImpl) person).copySelectedPlan();
-			plan = person.copySelectedPlan();
+			plan = person.createCopyOfSelectedPlanAndMakeSelected();
 			// (this makes, as a side effect, the _new_ plan selected)
 			
 			// add new plan to container that contains the plans that are handled by this PlanStrategy:
@@ -103,7 +102,7 @@ public class GenericPlanStrategyImpl<T extends BasicPlan> implements GenericPlan
 			// start working on this new plan:
 			this.firstModule.handlePlan(plan);
 		}
-		*/
+
 	}
 
 	@Override

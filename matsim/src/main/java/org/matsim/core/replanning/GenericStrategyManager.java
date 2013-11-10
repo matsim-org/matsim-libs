@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -39,7 +40,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author nagel
  *
  */
-public class GenericStrategyManager<T extends BasicPlan> {
+public class GenericStrategyManager<T extends BasicPlan> implements MatsimManager {
 	
 	static class StrategyWeights<T extends BasicPlan> {
 		 final List<GenericPlanStrategy<T>> strategies = new ArrayList<GenericPlanStrategy<T>>();
@@ -96,9 +97,10 @@ public class GenericStrategyManager<T extends BasicPlan> {
 	 * @return true if the strategy was successfully removed from this manager,
 	 * 		false if the strategy was not part of this manager and could thus not be removed.
 	 */
-	public final boolean removeStrategy(
+	final boolean removeStrategy(
 			final GenericPlanStrategy<T> strategy,
-			final String subpopulation) {
+			final String subpopulation) 
+	{
 		final StrategyWeights<T> weights = getStrategyWeights( subpopulation );
 		int idx = weights.strategies.indexOf(strategy);
 		if (idx != -1) {
@@ -140,6 +142,7 @@ public class GenericStrategyManager<T extends BasicPlan> {
 		if (idx != -1) {
 			double oldWeight = weights.weights.set(idx, Double.valueOf(newWeight)).doubleValue();
 			weights.totalWeights += (newWeight - oldWeight);
+			Logger.getLogger(this.getClass()).info( strategy.toString() + ": oldWeight=" + oldWeight + " newWeight=" + newWeight );
 			return true;
 		}
 		return false;
@@ -163,14 +166,6 @@ public class GenericStrategyManager<T extends BasicPlan> {
 		run(persons, subpopLookup, replanningContext);
 	}
 	
-	protected void beforePopulationRunHook( Collection<HasPlansAndId<T>> collection, ReplanningContext replanningContext ) {
-		// left empty for inheritance
-	}
-
-	protected void beforeStrategyRunHook( HasPlansAndId<T> person, GenericPlanStrategy<T> strategy ) {
-		// left empty for inheritance
-	}
-
 	/**
 	 * Randomly chooses for each person of the population a strategy and uses that
 	 * strategy on the person.
@@ -182,7 +177,6 @@ public class GenericStrategyManager<T extends BasicPlan> {
 			final Collection<HasPlansAndId<T>> persons, 
 			ObjectAttributes subPopLookup,
 			final ReplanningContext replanningContext) {
-		beforePopulationRunHook( persons, replanningContext ) ;
 
 		// initialize all strategies
 		for (StrategyWeights<T> weights : weightsPerSubpopulation.values()) {
@@ -206,16 +200,12 @@ public class GenericStrategyManager<T extends BasicPlan> {
 			}
 			GenericPlanStrategy<T> strategy = this.chooseStrategy( person, subpopName ) ;
 
-			beforeStrategyRunHook( person, strategy ) ;
-			
 			if ( strategy==null ) {
 				throw new RuntimeException("No strategy found!");
 			}
 
 			// ... and run the strategy:
 			strategy.run(person);
-
-			afterStrategyRunHook( person, strategy ) ;
 		}
 
 		// finally make sure all strategies have finished there work
@@ -225,25 +215,6 @@ public class GenericStrategyManager<T extends BasicPlan> {
 			}
 		}
 
-		afterRunHook( persons ) ;
-	}
-
-	protected void afterStrategyRunHook( HasPlansAndId<T> person, GenericPlanStrategy<T> strategy ) {
-		// left empty for inheritance
-	}
-
-	protected void afterRunHook( Collection<HasPlansAndId<T>> collection ) {
-		// left empty for inheritance
-	}
-
-	/**This is a hook into "removePlans", called after an individual plan has been removed.  This is usually needed in derived
-	 * methods that keep a "shadow" plans registry.  Note that this is called after every plan, not at the end of the
-	 * "removePlanS" method.  kai, sep'10
-	 *
-	 * @param the plan that is to be removed
-	 */
-	protected void afterRemovePlanHook( T plan ) {
-		// left empty for inheritance.  kai, sep'10
 	}
 
 	private final void removePlans(final HasPlansAndId<T> person, final int maxNumberOfPlans) {
@@ -258,7 +229,6 @@ public class GenericStrategyManager<T extends BasicPlan> {
 				}
 				person.setSelectedPlan( newPlanToSelect );
 			}
-			afterRemovePlanHook( plan ) ;
 		}
 	}
 
@@ -268,13 +238,16 @@ public class GenericStrategyManager<T extends BasicPlan> {
 	 * @param iteration
 	 */
 	private final void handleChangeRequests(final int iteration) {
-		for ( Map.Entry<String, StrategyWeights<T>> wentry : weightsPerSubpopulation.entrySet() ) {
-			final String subpop = wentry.getKey();
-			final StrategyWeights<T> weights = wentry.getValue();
-			Map<GenericPlanStrategy<T>, Double> changes = weights.changeRequests.remove(Integer.valueOf(iteration));
-			if (changes != null) {
-				for (Map.Entry<GenericPlanStrategy<T>, Double> entry : changes.entrySet()) {
-					changeWeightOfStrategy( entry.getKey(), subpop, entry.getValue().doubleValue() );
+		for ( int ii = 0 ; ii <= iteration ; ii++ ) { 
+			// (playing back history for those installations which recreate the strategy manager in every iteration)
+			for ( Map.Entry<String, StrategyWeights<T>> wentry : weightsPerSubpopulation.entrySet() ) {
+				final String subpop = wentry.getKey();
+				final StrategyWeights<T> weights = wentry.getValue();
+				Map<GenericPlanStrategy<T>, Double> changes = weights.changeRequests.remove(Integer.valueOf(ii));
+				if (changes != null) {
+					for (Map.Entry<GenericPlanStrategy<T>, Double> entry : changes.entrySet()) {
+						changeWeightOfStrategy( entry.getKey(), subpop, entry.getValue().doubleValue() );
+					}
 				}
 			}
 		}
@@ -333,6 +306,8 @@ public class GenericStrategyManager<T extends BasicPlan> {
 			weights.changeRequests.put(iter, iterationRequests);
 		}
 		iterationRequests.put(strategy, Double.valueOf(newWeight));
+		Logger.getLogger(this.getClass()).info( "added change request: " 
+				+ " iteration=" + iter + " newWeight=" + newWeight + " strategy=" + strategy.toString() ); 
 	}
 
 	/**
