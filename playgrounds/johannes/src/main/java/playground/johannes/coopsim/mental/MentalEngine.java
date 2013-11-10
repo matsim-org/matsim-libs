@@ -94,7 +94,7 @@ public class MentalEngine {
 		List<SocialVertex> egos = (List<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
 		List<Plan> plans = new ArrayList<Plan>(egos.size());
 		for(SocialVertex v : egos) {
-			Plan plan = v.getPerson().getPerson().copySelectedPlan();
+			Plan plan = v.getPerson().getPerson().createCopyOfSelectedPlanAndMakeSelected();
 			if(plan == null)
 				throw new NullPointerException("Outch! This person appears to have no selected plan!");
 			plans.add(plan);

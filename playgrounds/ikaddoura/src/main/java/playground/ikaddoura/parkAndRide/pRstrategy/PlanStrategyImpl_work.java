@@ -108,7 +108,7 @@ public final class PlanStrategyImpl_work implements PlanStrategy {
 			if (this.firstModule != null) {
 					
 				// set the working plan to a copy of the selected plan:
-				plan = ((PersonImpl) person).copySelectedPlan();
+				plan = ((PersonImpl) person).createCopyOfSelectedPlanAndMakeSelected();
 				// (this makes, as a side effect, the _new_ plan selected)
 				
 				// add new plan to container that contains the plans that are handled by this PlanStrategy:

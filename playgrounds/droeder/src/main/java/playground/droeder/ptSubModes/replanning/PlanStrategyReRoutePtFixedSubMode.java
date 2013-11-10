@@ -94,7 +94,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 		}
 		//make the chosen Plan selected and create a deep copy. The copied plan will be selected automatically.
 		((PersonImpl)person).setSelectedPlan(p);
-		this.plans.add(((PersonImpl)person).copySelectedPlan());
+		this.plans.add(((PersonImpl)person).createCopyOfSelectedPlanAndMakeSelected());
 	}
 
 	@Override

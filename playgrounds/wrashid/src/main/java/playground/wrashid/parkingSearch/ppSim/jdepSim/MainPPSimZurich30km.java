@@ -272,7 +272,7 @@ public class MainPPSimZurich30km {
 				PersonImpl newPerson = (PersonImpl) factory.createPerson(scenario.createId(String.valueOf(pCounter++)));
 				newPerson.setAge(((PersonImpl) origPerson).getAge());
 				newPerson.setSex(((PersonImpl) origPerson).getSex());
-				newPerson.addPlan(originPersonImpl.copySelectedPlan());
+				newPerson.addPlan(originPersonImpl.createCopyOfSelectedPlanAndMakeSelected());
 
 				scenario.getPopulation().addPerson(newPerson);
 			}

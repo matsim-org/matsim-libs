@@ -106,6 +106,12 @@ public class DgKS2010Router {
 			
 		}
 
+		@Override
+		public Plan createCopyOfSelectedPlanAndMakeSelected() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
 	};
 	
 	private Vehicle fakeVehicle = new Vehicle(){

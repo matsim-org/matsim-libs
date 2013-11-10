@@ -266,7 +266,7 @@ public class CreateScenario {
 						
 			thurgauPerson.addPlan(plan);
 			thurgauPerson.setSelectedPlan(plan);
-			Plan planNew = thurgauPerson.copySelectedPlan();
+			Plan planNew = thurgauPerson.createCopyOfSelectedPlanAndMakeSelected();
 			
 			person.addPlan(planNew);
 			person.setSelectedPlan(planNew);

@@ -51,7 +51,7 @@ public class PlanExpander {
 				Desires originDesires = originPersonImpl.getDesires();
 				
 				Person newPerson = factory.createPerson(scenario.createId(String.valueOf(pCounter++)));
-				newPerson.addPlan(originPersonImpl.copySelectedPlan());
+				newPerson.addPlan(originPersonImpl.createCopyOfSelectedPlanAndMakeSelected());
 				
 				Desires newDesires = ((PersonImpl) newPerson).createDesires(originDesires.getDesc());
 				Map<String, Double> map = originDesires.getActivityDurations();
