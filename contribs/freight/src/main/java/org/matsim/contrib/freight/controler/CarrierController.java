@@ -45,7 +45,6 @@ import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManagerI;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -183,8 +182,8 @@ ReplanningListener, IterationEndsListener {
 		}
 		MatsimManager strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager(event.getControler());
 
-		if ( strategyManager instanceof CarrierReplanningStrategyManagerI ) {
-			CarrierReplanningStrategyManagerI mgr = (CarrierReplanningStrategyManagerI) strategyManager ;
+		if ( strategyManager instanceof CarrierReplanningStrategyManager ) {
+			CarrierReplanningStrategyManager mgr = (CarrierReplanningStrategyManager) strategyManager ;
 
 			for (Carrier carrier : carriers.getCarriers().values()) {
 				if (carrier.getSelectedPlan() == null) {
@@ -201,6 +200,8 @@ ReplanningListener, IterationEndsListener {
 			@SuppressWarnings("unchecked")
 			GenericStrategyManager<CarrierPlan> mgr = (GenericStrategyManager<CarrierPlan>) strategyManager ;
 			mgr.run( collection, null, event.getIteration(), null);
+		} else {
+			throw new RuntimeException("registered strategy manager cannot be cast into one of the accepted types") ;
 		}
 
 
