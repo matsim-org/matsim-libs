@@ -160,7 +160,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 					if (tourElement instanceof Leg) {
 						Leg leg = (Leg) tourElement;
 						writer.write("\t\t\t\t\t<leg dep_time=\""
-								+ Time.writeTime(leg.getDepartureTime())
+								+ Time.writeTime(leg.getExpectedDepartureTime())
 								+ "\" transp_time=\""
 								+ Time.writeTime(leg.getExpectedTransportTime())
 								+ "\">");
@@ -190,8 +190,6 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 						writer.write("shipmentId=\""
 								+ registeredShipments.get(act.getShipment())
 								+ "\" ");
-						writer.write("end_time=\""
-								+ Time.writeTime(act.getExpectedActEnd()) + "\"");
 						writer.write("/>\n");
 					}
 

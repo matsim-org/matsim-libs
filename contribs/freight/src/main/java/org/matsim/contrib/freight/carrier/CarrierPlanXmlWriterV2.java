@@ -148,7 +148,9 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 			writer.write("\t\t\t\t<service ");
 			writer.write("id=\"" + s.getId().toString() + "\" ");
 			writer.write("to=\"" + s.getLocationLinkId() + "\" ");
-			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" ");
+			// capacity which must be available when vehicle services this service.
+			// i.e. this is a pick-up service.
+			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" "); 
 			writer.write("earliestStart=\"" + getTime(s.getServiceStartTimeWindow().getStart()) + "\" ");
 			writer.write("latestEnd=\"" + getTime(s.getServiceStartTimeWindow().getEnd()) + "\" ");
 			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()) + "\"/>\n");
@@ -195,9 +197,9 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 				for (TourElement tourElement : tour.getTour().getTourElements()) {
 					if (tourElement instanceof Leg) {
 						Leg leg = (Leg) tourElement;
-						writer.write("\t\t\t\t\t<leg dep_time=\""
-								+ Time.writeTime(leg.getDepartureTime())
-								+ "\" transp_time=\""
+						writer.write("\t\t\t\t\t<leg expected_dep_time=\""
+								+ Time.writeTime(leg.getExpectedDepartureTime())
+								+ "\" expected_transp_time=\""
 								+ Time.writeTime(leg.getExpectedTransportTime())
 								+ "\">");
 						if (leg.getRoute() != null) {
@@ -224,7 +226,6 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
 						writer.write("shipmentId=\"" + registeredShipments.get(act.getShipment()) + "\" ");
-						writer.write("end_time=\"" + Time.writeTime(act.getExpectedActEnd()) + "\"");
 						writer.write("/>\n");
 					}
 					else if (tourElement instanceof ServiceActivity){
@@ -232,7 +233,6 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 						writer.write("\t\t\t\t\t<act ");
 						writer.write("type=\"" + act.getActivityType() + "\" ");
 						writer.write("serviceId=\"" + serviceMap.get(act.getService()) + "\" ");
-						writer.write("end_time=\"" + Time.writeTime(act.getExpectedActEnd()) + "\"");
 						writer.write("/>\n");
 					}
 

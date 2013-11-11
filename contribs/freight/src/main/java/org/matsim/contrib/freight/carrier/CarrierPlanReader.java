@@ -217,13 +217,13 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				String id = atts.getValue(SHIPMENTID);
 				CarrierShipment s = currentShipments.get(id);
 				finishLeg(s.getFrom());
-				currentTourBuilder.schedulePickup(s,getDouble(atts.getValue("end_time")));
+				currentTourBuilder.schedulePickup(s);
 				previousActLoc = s.getFrom();
 			} else if (atts.getValue(TYPE).equals("delivery")) {
 				String id = atts.getValue(SHIPMENTID);
 				CarrierShipment s = currentShipments.get(id);
 				finishLeg(s.getTo());
-				currentTourBuilder.scheduleDelivery(s,getDouble(atts.getValue("end_time")));
+				currentTourBuilder.scheduleDelivery(s);
 				previousActLoc = s.getTo();
 			} else if (atts.getValue(TYPE).equals("end")) {
 				finishLeg(currentVehicle.getLocation());

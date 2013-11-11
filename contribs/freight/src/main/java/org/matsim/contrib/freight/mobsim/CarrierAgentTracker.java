@@ -9,15 +9,15 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
@@ -44,13 +44,6 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	private final Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
 	
 	private Map<Id,CarrierAgent> driverAgentMap = new HashMap<Id, CarrierAgent>();
-	
-	public static enum ActivityTimesGivenBy { endTimeOnly, durationOnly } ;
-	private ActivityTimesGivenBy activityTimesGivenBy = ActivityTimesGivenBy.endTimeOnly ;
-
-	public void setActivityTimesGivenBy(ActivityTimesGivenBy activityTimesGivenBy) {
-		this.activityTimesGivenBy = activityTimesGivenBy;
-	}
 
 	public CarrierAgentTracker(Carriers carriers, Network network, CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		this.carriers = carriers;
@@ -78,7 +71,6 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	Collection<MobSimVehicleRoute> createPlans() {
 		List<MobSimVehicleRoute> vehicleRoutes = new ArrayList<MobSimVehicleRoute>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
-			carrierAgent.setActivityTimesGivenBy( this.activityTimesGivenBy ) ;
 			List<MobSimVehicleRoute> plansForCarrier = carrierAgent.createFreightDriverPlans();
 			vehicleRoutes.addAll(plansForCarrier);
 		}

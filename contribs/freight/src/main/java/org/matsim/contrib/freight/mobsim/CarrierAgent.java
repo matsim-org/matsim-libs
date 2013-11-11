@@ -8,19 +8,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -36,7 +35,6 @@ import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -49,7 +47,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
@@ -71,21 +68,21 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	static class CarrierDriverAgent {
 
 		private static Logger logger = Logger.getLogger(CarrierDriverAgent.class);
-		
+
 		private LegImpl currentLeg;
-		
+
 		private Activity currentActivity;
-		
+
 		private List<Id> currentRoute;
-		
+
 		private final Id driverId;
 
 		private final CarrierAgent carrierAgent;
 
 		private final ScheduledTour scheduledTour;
-		
+
 		private ScoringFunction scoringFunction;
-		
+
 		private int activityCounter = 1;
 
 		CarrierDriverAgent(CarrierAgent carrierAgent, Id driverId, ScheduledTour tour, ScoringFunction scoringFunction) {
@@ -95,41 +92,41 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			this.scoringFunction = scoringFunction;
 			new HashMap<Integer, CarrierShipment>();
 		}
-		
+
 		/**
 		 * 
 		 * @param event
 		 */
 		public void handleEvent(PersonArrivalEvent event) {
-	        currentLeg.setArrivalTime(event.getTime());
-	        double travelTime = currentLeg.getArrivalTime() - currentLeg.getDepartureTime();
-	        currentLeg.setTravelTime(travelTime);
-	        if (currentRoute.size() > 1) {
-	            NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
-	            networkRoute.setTravelTime(travelTime);
-	            networkRoute.setVehicleId(getVehicle().getVehicleId());
-	            currentLeg.setRoute(networkRoute);
-	            currentRoute = null;
-	        } else {
-	        	Id startLink;
-	        	if(currentRoute.size() != 0){
-	        		startLink = currentRoute.get(0);
-	        	}
-	        	else{
-	        		startLink = event.getLinkId();
-	        	}
-	            GenericRoute genericRoute = new GenericRouteImpl(startLink, event.getLinkId());    
-	            genericRoute.setDistance(0.0);
-	            currentLeg.setRoute(genericRoute);
-	        }
-	        scoringFunction.handleLeg(currentLeg);
-	    }
-		
+			currentLeg.setArrivalTime(event.getTime());
+			double travelTime = currentLeg.getArrivalTime() - currentLeg.getDepartureTime();
+			currentLeg.setTravelTime(travelTime);
+			if (currentRoute.size() > 1) {
+				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
+				networkRoute.setTravelTime(travelTime);
+				networkRoute.setVehicleId(getVehicle().getVehicleId());
+				currentLeg.setRoute(networkRoute);
+				currentRoute = null;
+			} else {
+				Id startLink;
+				if(currentRoute.size() != 0){
+					startLink = currentRoute.get(0);
+				}
+				else{
+					startLink = event.getLinkId();
+				}
+				GenericRoute genericRoute = new GenericRouteImpl(startLink, event.getLinkId());    
+				genericRoute.setDistance(0.0);
+				currentLeg.setRoute(genericRoute);
+			}
+			scoringFunction.handleLeg(currentLeg);
+		}
+
 		public void handleEvent(PersonDepartureEvent event) {
-	        LegImpl leg = new LegImpl(event.getLegMode());
-	        leg.setDepartureTime(event.getTime());
-	        currentLeg = leg;
-	        currentRoute = new ArrayList<Id>();
+			LegImpl leg = new LegImpl(event.getLegMode());
+			leg.setDepartureTime(event.getTime());
+			currentLeg = leg;
+			currentRoute = new ArrayList<Id>();
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
@@ -152,18 +149,18 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(ActivityStartEvent event) {
-			 ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId()); 
-			 activity.setFacilityId(event.getFacilityId());
-			 activity.setStartTime(event.getTime());
-			 if(event.getActType().equals(FreightConstants.END)){
-				 activity.setEndTime(Time.UNDEFINED_TIME);
-				 scoringFunction.handleActivity(activity);
-			 }
-			 else{
-				 FreightActivity freightActivity = new FreightActivity(activity, getTourActivity().getTimeWindow());
-				 currentActivity = freightActivity; 
-			 }
-		 }
+			ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId()); 
+			activity.setFacilityId(event.getFacilityId());
+			activity.setStartTime(event.getTime());
+			if(event.getActType().equals(FreightConstants.END)){
+				activity.setEndTime(Time.UNDEFINED_TIME);
+				scoringFunction.handleActivity(activity);
+			}
+			else{
+				FreightActivity freightActivity = new FreightActivity(activity, getTourActivity().getTimeWindow());
+				currentActivity = freightActivity; 
+			}
+		}
 
 		/**
 		 * Informs the carrierAgent that an activity has been finished.
@@ -176,7 +173,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			if (FreightConstants.PICKUP.equals(activityType)) {
 				Pickup tourElement = (Pickup) tour.getTourElements().get(activityCounter);
 				carrierAgent.notifyPickup(driverId, tourElement.getShipment(),time);
-//				logger.info("pickup occured");
+				//				logger.info("pickup occured");
 				activityCounter += 2;
 			} else if (FreightConstants.DELIVERY.equals(activityType)) {
 				Delivery tourElement = (Delivery) tour.getTourElements().get(activityCounter);
@@ -188,7 +185,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		CarrierVehicle getVehicle() {
 			return scheduledTour.getVehicle();
 		}
-	
+
 		TourElement getPlannedTourElement(int elementIndex){
 			int index = elementIndex-1;
 			int elementsSize = scheduledTour.getTour().getTourElements().size();
@@ -216,10 +213,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	private Map<Id, CarrierDriverAgent> carrierDriverAgents = new HashMap<Id, CarrierDriverAgent>();
 
 	private Map<Id, ScheduledTour> driverTourMap = new HashMap<Id, ScheduledTour>();
-	
-	private ScoringFunction scoringFunction;
 
-	private ActivityTimesGivenBy activityTimesGivenBy = ActivityTimesGivenBy.endTimeOnly ;
+	private ScoringFunction scoringFunction;
 
 	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, CarrierScoringFunctionFactory scoringFunctionFactory) {
 		this.tracker = carrierAgentTracker;
@@ -244,10 +239,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	List<MobSimVehicleRoute> createFreightDriverPlans() {
 		clear();
 		System.out.flush();
-		Logger.getLogger(this.getClass()).warn(" activityTimesGivenBy set to: " + this.activityTimesGivenBy.toString() );
 		System.err.flush() ;
 		List<MobSimVehicleRoute> routes = new ArrayList<MobSimVehicleRoute>();
-//		List<Plan> plans = new ArrayList<Plan>();
+		//		List<Plan> plans = new ArrayList<Plan>();
 		if (carrier.getSelectedPlan() == null) {
 			return routes;
 		}
@@ -268,31 +262,15 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					if(route == null) throw new IllegalStateException("missing route for carrier " + this.getId());
 					LegImpl leg = new LegImpl(TransportMode.car);
 					leg.setRoute(route);
-					leg.setDepartureTime(tourLeg.getDepartureTime());
+					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 					leg.setTravelTime(tourLeg.getExpectedTransportTime());
-					leg.setArrivalTime(tourLeg.getDepartureTime() + tourLeg.getExpectedTransportTime());
+					leg.setArrivalTime(tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime());
 					plan.addLeg(leg);
 				} else if (tourElement instanceof TourActivity) {
 					TourActivity act = (TourActivity) tourElement;
-					Activity tourElementActivity = new ActivityImpl(act.getActivityType(), act.getLocation());
-					
-					// doing the following in order to preserve Stefan's original formulation.  Personally, I would be happy with "durationOnly".
-					// kai, nov'13
-					switch ( this.activityTimesGivenBy ) {
-					case durationOnly:
-						double duration = act.getDuration() ;
-//						System.out.flush();
-//						System.err.println(" duration=" + duration );
-//						System.err.flush();
-						tourElementActivity.setMaximumDuration(duration); // "maximum" has become a bit of a misnomer ...
-						break;
-					case endTimeOnly:
-						double endTime = act.getExpectedActEnd();
-						tourElementActivity.setEndTime(endTime);
-						break;
-					default:
-						throw new RuntimeException("case not defined; aborting ...") ;
-					}
+					Activity tourElementActivity = new ActivityImpl(act.getActivityType(), act.getLocation());					
+					double duration = act.getDuration() ;
+					tourElementActivity.setMaximumDuration(duration); // "maximum" has become a bit of a misnomer ...
 					plan.addActivity(tourElementActivity);
 				}
 			}
@@ -302,7 +280,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			plan.setPerson(driverPerson);
 			MobSimVehicleRoute mobsimRoute = new MobSimVehicleRoute(plan, vehicle);
 			routes.add(mobsimRoute);
-//			plans.add(plan);
+			//			plans.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
 			driverTourMap.put(driverId, scheduledTour);
 		}
@@ -323,7 +301,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	public Collection<Id> getDriverIds() {
 		return Collections.unmodifiableCollection(driverIds);
 	}
-	
+
 	private Person createDriverPerson(Id driverId) {
 		Person person = new PersonImpl(driverId);
 		return person;
@@ -352,7 +330,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		scoringFunction.finish();
 		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
 	}
-	
+
 	public void handleEvent(PersonArrivalEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
@@ -360,7 +338,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -383,13 +361,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	public void handleEvent(ActivityStartEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
-	
+
 	CarrierDriverAgent getDriver(Id driverId){
 		return carrierDriverAgents.get(driverId);
-	}
-
-	void setActivityTimesGivenBy(ActivityTimesGivenBy activityTimesGivenBy) {
-		this.activityTimesGivenBy = activityTimesGivenBy ;
 	}
 
 }

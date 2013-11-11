@@ -42,15 +42,15 @@
 			
 			<plan score="-100.0" selected="true">
 				<tour vehicleId="vehicle_c1">
-					<act type="start" end_time="07:00:00"/>
+					<act type="start" end_time="09:30:00"/>
 					<leg dep_time="07:00:00" transp_time="00:30:00">
 						<route>6</route>
 					</leg>
-					<act type="pickup" shipmentId="s1" end_time="07:00:00"/>
+					<act type="pickup" shipmentId="s1"/>
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route>20 21</route>
 					</leg>
-					<act type="delivery" shipmentId="s1" end_time="07:30:00"/>
+					<act type="delivery" shipmentId="s1"/>
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route>23</route>
 					</leg>
@@ -62,11 +62,11 @@
 					<leg dep_time="07:00:00" transp_time="00:30:00">
 						<route>6</route>
 					</leg>
-					<act type="pickup" shipmentId="s2" end_time="07:00:00"/>
+					<act type="pickup" shipmentId="s2"/>
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route>20 21</route>
 					</leg>
-					<act type="delivery" shipmentId="s2" end_time="07:30:00"/>
+					<act type="delivery" shipmentId="s2"/>
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route>23</route>
 					</leg>
@@ -90,11 +90,11 @@
 					<leg dep_time="07:00:00" transp_time="00:06:35">
 						<route>6</route>
 					</leg>
-					<act type="pickup" shipmentId="s1" end_time="07:06:35"/>
+					<act type="pickup" shipmentId="s1"/>
 					<leg dep_time="07:06:35" transp_time="00:32:59">
 						<route>20 21</route>
 					</leg>
-					<act type="delivery" shipmentId="s1" end_time="07:39:35"/>
+					<act type="delivery" shipmentId="s1"/>
 					<leg dep_time="07:39:35" transp_time="00:11:59">
 						<route>23</route>
 					</leg>

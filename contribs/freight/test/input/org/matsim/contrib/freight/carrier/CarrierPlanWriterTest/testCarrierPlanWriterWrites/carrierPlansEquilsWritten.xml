@@ -16,19 +16,19 @@
 					<leg dep_time="07:00:00" transp_time="00:30:00">
 						<route>2 3 4</route>
 					</leg>
-					<act type="pickup" shipmentId="1" end_time="07:00:00"/>
+					<act type="pickup" shipmentId="1" />
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="delivery" shipmentId="1" end_time="07:30:00"/>
+					<act type="delivery" shipmentId="1" />
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="pickup" shipmentId="2" end_time="07:30:00"/>
+					<act type="pickup" shipmentId="2" />
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="delivery" shipmentId="2" end_time="07:30:00"/>
+					<act type="delivery" shipmentId="2" />
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route></route>
 					</leg>
@@ -42,19 +42,19 @@
 					<leg dep_time="07:00:00" transp_time="00:30:00">
 						<route>2 3 4</route>
 					</leg>
-					<act type="pickup" shipmentId="1" end_time="07:00:00"/>
+					<act type="pickup" shipmentId="1" />
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="delivery" shipmentId="1" end_time="07:30:00"/>
+					<act type="delivery" shipmentId="1" />
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="pickup" shipmentId="2" end_time="07:30:00"/>
+					<act type="pickup" shipmentId="2" />
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route></route>
 					</leg>
-					<act type="delivery" shipmentId="2" end_time="07:30:00"/>
+					<act type="delivery" shipmentId="2" />
 					<leg dep_time="07:00:00" transp_time="00:00:00">
 						<route></route>
 					</leg>

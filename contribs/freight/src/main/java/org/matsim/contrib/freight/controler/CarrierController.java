@@ -42,7 +42,6 @@ import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
 import org.matsim.core.api.internal.MatsimManager;
@@ -91,9 +90,6 @@ ReplanningListener, IterationEndsListener {
 	private CarrierAgentTracker carrierAgentTracker;
 
 	private Carriers carriers;
-
-	private ActivityTimesGivenBy activityTimesGivenBy = ActivityTimesGivenBy.endTimeOnly ;
-
 
 
 	/**
@@ -156,7 +152,6 @@ ReplanningListener, IterationEndsListener {
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getNetwork(), carrierScoringFunctionFactory);
-		carrierAgentTracker.setActivityTimesGivenBy(this.activityTimesGivenBy );
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
 		mobsimFactory.setWithinDayActivityReScheduling(withinDayReSchedulingEnabled);
 		event.getControler().setMobsimFactory(mobsimFactory);
@@ -216,10 +211,6 @@ ReplanningListener, IterationEndsListener {
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 
-	}
-
-	public void setActivityTimesGivenBy(ActivityTimesGivenBy activityTimesGivenBy) {
-		this.activityTimesGivenBy = activityTimesGivenBy;
 	}
 
 }

@@ -101,7 +101,6 @@ public class TimeAndSpaceTourRouter {
 				act.setExpectedArrival(expectedArrival);
 				double startAct = Math.max(expectedArrival, act.getTimeWindow().getStart()); 
 				currTime = startAct + act.getDuration();
-				act.setExpectedActEnd(currTime);
 				prevLink = act.getLocation();
 			}
 		}
@@ -119,13 +118,13 @@ public class TimeAndSpaceTourRouter {
 			prevLeg.setRoute(route);
 			return;
 		}
-		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getDepartureTime(), person, vehicle);
+		Path path = router.calcLeastCostPath(network.getLinks().get(fromLinkId).getToNode(), network.getLinks().get(toLinkId).getFromNode(), prevLeg.getExpectedDepartureTime(), person, vehicle);
 		double travelTime = path.travelTime;
 		
 		/*
 		 *ACHTUNG. Konsistenz zu VRP 
 		 */
-		double toLinkTravelTime = this.travelTime.getLinkTravelTime(network.getLinks().get(toLinkId),prevLeg.getDepartureTime()+travelTime, person, vehicle);
+		double toLinkTravelTime = this.travelTime.getLinkTravelTime(network.getLinks().get(toLinkId),prevLeg.getExpectedDepartureTime()+travelTime, person, vehicle);
 		travelTime += toLinkTravelTime;
 		prevLeg.setExpectedTransportTime(travelTime);
 		NetworkRoute route = createRoute(fromLinkId,path,toLinkId);

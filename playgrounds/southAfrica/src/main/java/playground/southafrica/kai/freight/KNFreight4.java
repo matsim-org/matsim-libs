@@ -37,7 +37,6 @@ import org.matsim.contrib.freight.controler.CarrierController;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker.ActivityTimesGivenBy;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.api.internal.MatsimManager;
@@ -106,7 +105,6 @@ public class KNFreight4 {
 	
 	private static final boolean addingCongestion = false ;
 
-	private static final ActivityTimesGivenBy carrierActivityTimesGivenBy = ActivityTimesGivenBy.durationOnly;
 	private static final boolean usingWithinDayReScheduling = false;
 
 	public static void main(String[] args) {
@@ -165,7 +163,6 @@ public class KNFreight4 {
 		ctrl.setOverwriteFiles(true);
 		{
 			CarrierController listener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
-			listener.setActivityTimesGivenBy(carrierActivityTimesGivenBy);
 			listener.setEnableWithinDayActivityReScheduling(usingWithinDayReScheduling);
 			ctrl.addControlerListener(listener) ;
 		}

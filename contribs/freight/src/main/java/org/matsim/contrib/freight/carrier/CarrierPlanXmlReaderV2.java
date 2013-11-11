@@ -11,16 +11,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType.VehicleCostInformation;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.EngineInformationImpl;
 import org.matsim.vehicles.EngineInformation.FuelType;
+import org.matsim.vehicles.EngineInformationImpl;
 import org.xml.sax.Attributes;
 
 /**
@@ -288,11 +286,13 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 			currentTourBuilder = Tour.Builder.newInstance();
 		}
 		else if (name.equals("leg")) {
-			String depTime = atts.getValue("dep_time");
-			if(depTime == null) throw new IllegalStateException("leg.dep_time is missing.");
+			String depTime = atts.getValue("expected_dep_time");
+			if(depTime == null) depTime = atts.getValue("dep_time");
+			if(depTime == null) throw new IllegalStateException("leg.expected_dep_time is missing.");
 			currentLegDepTime = parseTimeToDouble(depTime);
-			String transpTime = atts.getValue("transp_time");
-			if(transpTime == null) throw new IllegalStateException("leg.transp_time is missing.");
+			String transpTime = atts.getValue("expected_transp_time");
+			if(transpTime == null) transpTime = atts.getValue("transp_time");
+			if(transpTime == null) throw new IllegalStateException("leg.expected_transp_time is missing.");
 			currentLegTransTime = parseTimeToDouble(transpTime);
 		}
 		else if (name.equals(ACTIVITY)) {
@@ -302,34 +302,30 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 			if (type.equals("start")) {
 				if(actEndTime == null) throw new IllegalStateException("endTime of activity \"" + type + "\" missing.");
 				currentStartTime = parseTimeToDouble(actEndTime);
-//				currentTourBuilder.scheduleStartTime(parseTimeToDouble(actEndTime));
 				previousActLoc = currentVehicle.getLocation();
 				currentTourBuilder.scheduleStart(currentVehicle.getLocation(),TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
 				
 			} else if (type.equals("pickup")) {
-				if(actEndTime == null) throw new IllegalStateException("endTime of activity \"" + type + "\" missing.");
 				String id = atts.getValue(SHIPMENTID);
 				if(id == null) throw new IllegalStateException("pickup.shipmentId is missing.");
 				CarrierShipment s = currentShipments.get(id);
 				finishLeg(s.getFrom());
-				currentTourBuilder.schedulePickup(s,parseTimeToDouble(actEndTime));
+				currentTourBuilder.schedulePickup(s);
 				previousActLoc = s.getFrom();
 			} else if (type.equals("delivery")) {
-				if(actEndTime == null) throw new IllegalStateException("endTime of activity \"" + type + "\" missing.");
 				String id = atts.getValue(SHIPMENTID);
 				if(id == null) throw new IllegalStateException("delivery.shipmentId is missing.");
 				CarrierShipment s = currentShipments.get(id);
 				finishLeg(s.getTo());
-				currentTourBuilder.scheduleDelivery(s,parseTimeToDouble(actEndTime));
+				currentTourBuilder.scheduleDelivery(s);
 				previousActLoc = s.getTo();
 			} else if (type.equals("service")){
-				if(actEndTime == null) throw new IllegalStateException("endTime of activity \"" + type + "\" missing.");
 				String id = atts.getValue("serviceId");
 				if(id == null) throw new IllegalStateException("act.serviceId is missing.");
 				CarrierService s = serviceMap.get(makeId(id));
 				if(s == null) throw new IllegalStateException("serviceId is not known.");
 				finishLeg(s.getLocationLinkId());
-				currentTourBuilder.scheduleService(s, parseTimeToDouble(actEndTime));
+				currentTourBuilder.scheduleService(s);
 				previousActLoc = s.getLocationLinkId();
 			} else if (type.equals("end")) {
 				finishLeg(currentVehicle.getLocation());
