@@ -70,7 +70,7 @@ public class UserBenefitsCalculator {
 		for(Person person : pop.getPersons().values()){
 			double utilityOfPerson_utils = calculateUtilityOfPerson_utils(person);
 			this.personId2Utility.put(person.getId(), utilityOfPerson_utils);
-			sumOfUtility_utils = utilityOfPerson_utils;
+			sumOfUtility_utils += utilityOfPerson_utils;
 		}
 		logger.info("Finished user benefits calculation...");
 		return sumOfUtility_utils;
@@ -86,6 +86,7 @@ public class UserBenefitsCalculator {
 			this.personId2Utility.put(person.getId(), utilityOfPerson_utils);
 			double utilityOfPerson_money = convertToMoney(utilityOfPerson_utils);
 			this.personId2MonetizedUtility.put(person.getId(), utilityOfPerson_money);
+			sumOfUtility_money += utilityOfPerson_money;
 		}
 		logger.info("Finished user benefits calculation...");
 		return sumOfUtility_money;
