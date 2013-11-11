@@ -142,6 +142,275 @@ public class CepasToEvents {
 	}
 
 	private class CepasVehicle {
+		/**
+		 * Clusters dwell events together into a route.
+		 */
+		private class CepasVehicleDwellEventCluster {
+			private TreeMap<Integer, CepasVehicleDwellEvent> orderedDwellEvents = new TreeMap<Integer, CepasVehicleDwellEvent>();
+			private Id routeId;
+
+			public CepasVehicleDwellEventCluster(List<CepasVehicleDwellEvent> orderedDwellEvents) {
+				super();
+				for (CepasVehicleDwellEvent de : orderedDwellEvents) {
+					this.orderedDwellEvents.put(de.arrivalTime, de);
+				}
+			}
+
+			public TreeMap<Integer, CepasVehicleDwellEvent> getOrderedDwellEvents() {
+				return orderedDwellEvents;
+			}
+
+			public Id getRouteId() {
+				return routeId;
+			}
+
+			public void setRouteId(Id routeId) {
+				this.routeId = routeId;
+			}
+
+			private void interpolateDwellEvents() {
+				LinkedList<Id> stopIds = new LinkedList<Id>();
+				stopIds.addAll(routeIdToStopIdSequence.get(this.getRouteId()));
+				// boolean circleRoute =
+				// stopIds.getFirst().equals(stopIds.getLast());
+				ArrayList<CepasVehicleDwellEvent> dwellEventsList = new ArrayList<CepasVehicleDwellEvent>();
+				dwellEventsList.addAll(orderedDwellEvents.values());
+				ArrayList<Integer> dwellEventsAsStopIndexList = new ArrayList<Integer>();
+				for (CepasVehicleDwellEvent de : dwellEventsList) {
+					dwellEventsAsStopIndexList.add(stopIds.indexOf(de.stopId));
+				}
+				// boolean success = true;
+				for (int i = 1; i < dwellEventsAsStopIndexList.size(); i++) {
+					if (dwellEventsAsStopIndexList.get(i) < dwellEventsAsStopIndexList.get(i - 1)) {
+						if (dwellEventsAsStopIndexList.get(i) == 0) {
+							dwellEventsAsStopIndexList.remove(i);
+							dwellEventsAsStopIndexList.add(i, stopIds.size() - 1);
+						}
+					}
+				}
+				int j = 0;
+				for (int i : dwellEventsAsStopIndexList) {
+					if (dwellEventsAsStopIndexList.indexOf(i) == 0){
+						j=i;//for cases where the route starts after the 1st stop
+						continue;
+					}
+					if (i - j > 1) {
+
+						CepasVehicleDwellEvent origDwellEvent = dwellEventsList.get(dwellEventsAsStopIndexList
+								.indexOf(j));
+						;
+						CepasVehicleDwellEvent destDwellEvent = dwellEventsList.get(dwellEventsAsStopIndexList
+								.indexOf(i));
+						;
+						double availableTime = destDwellEvent.arrivalTime - origDwellEvent.departureTime;
+						ArrayList<Id> stopsToVisit = new ArrayList<Id>();
+						ArrayList<Double> travelDistancesBetweenStops = new ArrayList<Double>();
+						ArrayList<Double> timeWeights = new ArrayList<Double>();
+						while (++j < i) {
+							stopsToVisit.add(stopIds.get(j));
+							double interStopDistance = getInterStopDistance(stopIds.get(j - 1), stopIds.get(j));
+							if (interStopDistance < 10)
+								System.err
+										.printf("found an interstop distance of less than 10 metres for pair of stops %s and %s on route %s\n",
+												stopIds.get(j - 1).toString(), stopIds.get(j).toString(),
+												this.getRouteId());
+							travelDistancesBetweenStops.add(Math.max(10, interStopDistance));
+						}
+						// add the last element
+						travelDistancesBetweenStops.add(getInterStopDistance(stopIds.get(j - 1), stopIds.get(i)));
+						// weight by the distances between stops over
+						// the
+						// total distance
+						double totalTravelDistanceBetweenStops = 0;
+						for (double distance : travelDistancesBetweenStops) {
+							totalTravelDistanceBetweenStops += distance;
+						}
+						for (double distance : travelDistancesBetweenStops) {
+							timeWeights.add(distance / totalTravelDistanceBetweenStops);
+						}
+						int dwellTime = origDwellEvent.departureTime;
+						// recall that the first stop is the origin; we
+						// already have a dwell event for that
+						for (Id stop : stopsToVisit) {
+							dwellTime += (int) (availableTime * timeWeights.get(stopsToVisit.indexOf(stop)));
+
+							CepasVehicleDwellEvent dwellEvent = new CepasVehicleDwellEvent(dwellTime, dwellTime, stop);
+							this.orderedDwellEvents.put(dwellTime, dwellEvent);
+							dwellEvent.interpolated = true;
+						}
+						// interpolateDwellEvents();
+
+					} else {
+						j = i;
+					}
+
+				}
+			}
+
+		}
+
+		private class CepasVehicleDwellEvent implements Comparable<CepasVehicleDwellEvent> {
+			int arrivalTime;
+			int departureTime;
+			Id stopId;
+			TransitRoute assignedRoute;
+			boolean routeAssignmentConfirmed = false;
+			boolean interpolated = false;
+
+			/*
+			 * if the arrival event is triggered by alighting event, mark the
+			 * stop event, and replace the arrival time by the first tap-in
+			 * time, if any tap-ins occurred
+			 */
+
+			ArrayList<CepasTransaction> cepasTransactions = new ArrayList<CepasTransaction>();
+
+			public int getDwellTime() {
+				return departureTime - arrivalTime;
+			}
+
+			public CepasVehicleDwellEvent(int arrivalTime, int departureTime, Id stopId) {
+				super();
+				this.arrivalTime = arrivalTime;
+				this.departureTime = departureTime;
+				this.stopId = stopId;
+			}
+
+			/**
+			 * For cases where there are too few transactions to register a
+			 * realistic dwell time, or where there are early tap-ins and
+			 * tap-outs, or GPS errors.
+			 */
+			public void simpleDwellTimeAdjustment() {
+				CepasTransaction lastAlighting = null;
+				CepasTransaction firstBoarding = null;
+				for (CepasTransaction transaction : cepasTransactions) {
+					if (transaction.type.equals(CepasTransactionType.alighting))
+						lastAlighting = transaction;
+					else {
+						if (firstBoarding == null)
+							firstBoarding = transaction;
+					}
+				}
+				if (firstBoarding != null) {
+					this.arrivalTime = firstBoarding.time;
+				}
+				if (lastAlighting != null) {
+					this.departureTime = lastAlighting.time;
+				}
+				if (departureTime <= arrivalTime) {
+					departureTime = (departureTime + arrivalTime) / 2;
+					arrivalTime = departureTime;
+					arrivalTime -= minDwellTime / 2;
+					departureTime += minDwellTime / 2;
+					return;
+				}
+				if (getDwellTime() < minDwellTime) {
+					int avgtime = (arrivalTime + departureTime) / 2;
+					arrivalTime = avgtime - minDwellTime / 2;
+					departureTime = avgtime + minDwellTime / 2;
+					return;
+				}
+			}
+
+			public void findTrueDwellTime() {
+				if (getDwellTime() < minDwellTime) {
+					int avgtime = (arrivalTime + departureTime) / 2;
+					arrivalTime = avgtime - minDwellTime / 2;
+					departureTime = avgtime + minDwellTime / 2;
+					return;
+				}
+
+				// if we have only 2-4 transactions,and we're over the minimum
+				// dwell time, we need to first find the median time, then find
+				// the last alighting after that time
+				// and set that as the departure time, and/or the first boarding
+				// and
+				// set that as the arrival time (only if it is less than the
+				// arrival time)
+				if (cepasTransactions.size() <= minTransactionClusterSize) {
+					simpleDwellTimeAdjustment();
+					return;
+				}
+				/*
+				 * cluster the transactions based on the deltaTapTimeLimit
+				 */
+				int deltaTime = 0;
+				int lastTime = cepasTransactions.get(0).time;
+
+				ArrayList<Integer> deltaTimes = new ArrayList<Integer>();
+				deltaTimes.add(0);
+				ArrayList<ArrayList<CepasTransaction>> transactionClusters = new ArrayList<ArrayList<CepasTransaction>>();
+				for (int i = 1; i < cepasTransactions.size(); i++) {
+					CepasTransaction transaction = cepasTransactions.get(i);
+					deltaTime = transaction.time - lastTime;
+					deltaTimes.add(deltaTime);
+					lastTime = transaction.time;
+				}
+				ArrayList<CepasTransaction> transactionCluster = new ArrayList<CepasTransaction>();
+				transactionClusters.add(transactionCluster);
+				for (int i = 0; i < deltaTimes.size(); i++) {
+					deltaTime = deltaTimes.get(i);
+					CepasTransaction transaction = cepasTransactions.get(i);
+					if (deltaTime < maximumDeltaTapTimeForTransactionsBelongingToOneCluster || i == 0) {
+						transactionCluster.add(transaction);
+					} else {
+						transactionCluster = new ArrayList<CepasTransaction>();
+						transactionCluster.add(transaction);
+						transactionClusters.add(transactionCluster);
+					}
+				}
+				// find the biggest cluster
+				ArrayList<CepasTransaction> targetCluster = null;
+				int maxSize = 1;
+				for (ArrayList<CepasTransaction> cluster : transactionClusters) {
+					if (cluster.size() > maxSize) {
+						targetCluster = cluster;
+						maxSize = cluster.size();
+					}
+				}
+				if (targetCluster == null) {
+					// no clusters bigger than 1, run the simplified procedure;
+					simpleDwellTimeAdjustment();
+					return;
+				} else {
+					this.arrivalTime = targetCluster.get(0).time;
+					this.departureTime = targetCluster.get(targetCluster.size() - 1).time;
+					if (getDwellTime() < minDwellTime) {
+						int avgtime = (arrivalTime + departureTime) / 2;
+						arrivalTime = avgtime - minDwellTime / 2;
+						departureTime = avgtime + minDwellTime / 2;
+					}
+					return;
+				}
+			}
+
+			private void updateTransactionTimes() {
+				for (CepasTransaction transaction : cepasTransactions) {
+					if (transaction.time < arrivalTime) {
+						transaction.time = arrivalTime;
+					}
+					if (transaction.time > departureTime) {
+						transaction.time = departureTime;
+					}
+
+				}
+
+			}
+
+			@Override
+			public String toString() {
+
+				return "stop: " + stopId.toString() + ", time: " + arrivalTime + " - " + departureTime + "\n";
+			}
+
+			@Override
+			public int compareTo(CepasVehicleDwellEvent o) {
+				return (this.arrivalTime < o.arrivalTime) ? -1 : ((this.arrivalTime == o.arrivalTime) ? 0 : 1);
+			}
+
+		}
+
 		private Id vehicleId;
 		private Id transitLineId;
 		private CepasLine cepasLine;
@@ -188,12 +457,11 @@ public class CepasToEvents {
 				CepasTransaction alightingTransaction = null;
 				CepasVehiclePassenger passenger;
 				int boardingTime = resultSet.getInt("boarding_time");
-				Id boardingStop;
-				try {
-					boardingStop = cepasStoptoMatsimStopLookup.get(resultSet.getString("boarding_stop_stn"));
-				} catch (NullPointerException e) {
-					// stop is not in the schedule, skip this
-					// guy
+				Id boardingStop = cepasStoptoMatsimStopLookup.get(resultSet.getString("boarding_stop_stn"));
+				if (boardingStop == null) {
+					System.err.println(this.vehicleId.toString() + " has a stop id = "
+							+ resultSet.getString("boarding_stop_stn")
+							+ " not appearing in matsim stops for this line, ignoring  ");
 					continue;
 				}
 				Id alightingStop = cepasStoptoMatsimStopLookup.get(resultSet.getString("alighting_stop_stn"));
@@ -269,12 +537,17 @@ public class CepasToEvents {
 						dwellEvent.departureTime = transaction.time;
 					}
 					dwellEvent.cepasTransactions.add(transaction);
-					if (transaction.type.equals(CepasTransactionType.boarding)) {
-					} else {
-						if (transaction.passenger != null) {
-						}
-					}
+					// if
+					// (transaction.type.equals(CepasTransactionType.boarding))
+					// {
+					// } else {
+					// if (transaction.passenger != null) {
+					// }
+					// }
 				}
+				// add the last dwell event
+				dwellEvents.add(dwellEvent);
+				dwellEvent.findTrueDwellTime();
 				for (CepasVehicleDwellEvent stopEvent1 : dwellEvents) {
 					this.orderedDwellEvents.put(stopEvent1.arrivalTime, stopEvent1);
 				}
@@ -324,7 +597,7 @@ public class CepasToEvents {
 				if (dwellEventsAsStopIndexList.get(i) < dwellEventsAsStopIndexList.get(i - 1)) {
 					if (i < dwellEventsAsStopIndexList.size() - 1) {
 
-						 if (circleRoute && dwellEventsAsStopIndexList.get(i) == 0) {
+						if (circleRoute && dwellEventsAsStopIndexList.get(i) == 0) {
 							if (getInterDwellEventSpeed(dwellEventsList.get(i - 1), dwellEventsList.get(i)) > getInterDwellEventSpeed(
 									dwellEventsList.get(i), dwellEventsList.get(i + 1))) {
 								// the dwell event is closer to the previous
@@ -339,17 +612,15 @@ public class CepasToEvents {
 								currentCluster = new ArrayList<CepasVehicleDwellEvent>();
 								currentCluster.add(dwellEventsList.get(i));
 							}
-						}else if (getInterDwellEventSpeed(dwellEventsList.get(i - 1), dwellEventsList.get(i + 1)) > getInterDwellEventSpeed(
-								dwellEventsList.get(i - 1), dwellEventsList.get(i))) {
-							// It's quicker to travel to the next dwell event
-							// than
-							// to this one, so this dwell event must be
-							// erroneous
+						} else if (dwellEventsAsStopIndexList.get(i + 1) > dwellEventsAsStopIndexList.get(i - 1)) {
+							// The next dwell event is in sequence, so this must
+							// be an error
 							orderedDwellEvents.remove(dwellEventsList.get(i).arrivalTime);
 							success = false;
 							break;
-						} else{
-//							this is a new cluster that doesn't start from the first stop
+						} else {
+							// this is a new cluster that doesn't start from the
+							// first stop
 							clusters.add(new CepasVehicleDwellEventCluster(currentCluster));
 							currentCluster = new ArrayList<CepasVehicleDwellEvent>();
 							currentCluster.add(dwellEventsList.get(i));
@@ -360,16 +631,26 @@ public class CepasToEvents {
 							currentCluster.add(dwellEventsList.get(i));
 						}
 					}
+				} else if (dwellEventsAsStopIndexList.get(i) == dwellEventsAsStopIndexList.get(i - 1)) {
+					// merge two consecutive dwellevents at the same stop into
+					// the first
+					dwellEventsList.get(i - 1).departureTime = dwellEventsList.get(i).departureTime;
+					dwellEventsList.get(i - 1).cepasTransactions.addAll(dwellEventsList.get(i).cepasTransactions);
+					orderedDwellEvents.remove(dwellEventsList.get(i).arrivalTime);
+					dwellEventsList.get(i - 1).findTrueDwellTime();
+					success = false;
+					break;
 				} else {
+
 					// part of the same cluster
 					currentCluster.add(dwellEventsList.get(i));
 				}
 			}
 			// add the last cluster
-			if (currentCluster.size() > 1) {
-				clusters.add(new CepasVehicleDwellEventCluster(currentCluster));
-			}
 			if (success) {
+				if (currentCluster.size() > 1) {
+					clusters.add(new CepasVehicleDwellEventCluster(currentCluster));
+				}
 				this.dwellEventClusters = clusters;
 
 			} else {
@@ -396,6 +677,12 @@ public class CepasToEvents {
 			// }
 			// }
 
+		}
+
+		public void findTrueDwellEventTimes() {
+			for (CepasVehicleDwellEvent de : this.orderedDwellEvents.values()) {
+
+			}
 		}
 
 		public void dropDwellEventsNotInRoute() {
@@ -497,9 +784,9 @@ public class CepasToEvents {
 			for (Id routeId : possibleMatsimRoutesSortedBynumberOfStops) {
 				ArrayList<Id> stopList = routeIdToStopIdSequence.get(routeId);
 				int score = 0;
-				for (Id stopId : cepasTransactionsByStopId.keySet()) {
-					if (stopList.contains(stopId))
-						score += cepasTransactionsByStopId.get(stopId).size();
+				for (CepasTransaction transaction : cepasTransactions) {
+					if (stopList.contains(transaction.stopId))
+						score++;
 				}
 				correlationCount.put(routeId, score);
 			}
@@ -511,137 +798,6 @@ public class CepasToEvents {
 		 * assume all stops belong to the longest route. interpolate stops not
 		 * visited
 		 */
-		private void interpolateDwellEvents() {
-			// start with the shortest route
-			int dwellEvtIdx = 0;
-			int origStopIdx = 0;
-			int destStopIdx = 1;
-			int recurringOrigStopidx = 0;
-			List<TransitRouteStop> transitStops = possibleMatsimRoutes.get(
-					this.routesSortedByNumberOfTransactions.last()).getStops();
-			ArrayList<Id> stopList = routeIdToStopIdSequence.get(this.routesSortedByNumberOfTransactions.last());
-			ArrayList<CepasVehicleDwellEvent> dwellEventsList = new ArrayList<CepasVehicleDwellEvent>();
-			dwellEventsList.addAll(this.orderedDwellEvents.values());
-			ITERATE_DWELL_EVENTS: while (!allDwellEventsInterpolated()) {
-				// find the first dwell event in a new route, work from there
-
-				if (dwellEventsList.get(dwellEvtIdx).interpolated) {
-					dwellEvtIdx++;
-					continue ITERATE_DWELL_EVENTS;
-				}
-
-				CepasVehicleDwellEvent origDwellEvent = dwellEventsList.get(dwellEvtIdx);
-				CepasVehicleDwellEvent destDwellEvent = null;
-				if (dwellEvtIdx == dwellEventsList.size() - 1) {
-					// either the start and end of a loop or all done
-					origDwellEvent.interpolated = true;
-					origStopIdx = 0;
-					continue ITERATE_DWELL_EVENTS;
-				} else {
-					destDwellEvent = dwellEventsList.get(dwellEvtIdx + 1);
-				}
-				TransitRouteStop origStop = null;
-				TransitRouteStop destStop = null;
-				while (origStopIdx < stopList.size() && destStopIdx < stopList.size()) {
-					if (recurringOrigStopidx > 0) {
-						origStopIdx = recurringOrigStopidx;
-						recurringOrigStopidx = 0;
-					}
-					if (origStopIdx > destStopIdx) {
-						// we have come to the end of a route
-						origDwellEvent.interpolated = true;
-						int tempIdx = origStopIdx;
-						origStopIdx = destStopIdx;
-						destStopIdx = tempIdx;
-						continue ITERATE_DWELL_EVENTS;
-					}
-					// skip both these tests if the origin stop has been found
-					if (origStop == null && origDwellEvent.stopId.equals(stopList.get(origStopIdx))) {
-						// if (dwellEvtIdx > 0 && origStopIdx > 0
-						// && dwellEventsList.get(dwellEvtIdx -
-						// 1).stopId.equals(stopList.get(origStopIdx)))
-						// origStop = transitStops.get(origStopIdx);
-						// else if (dwellEvtIdx ==0 && origStopIdx == 0)
-						origStop = transitStops.get(origStopIdx);
-						// else
-					} else if (origStop == null) {
-						origStopIdx++;
-					}
-					// if we are here, the origin stop has been found
-					if (destDwellEvent.stopId.equals(stopList.get(destStopIdx))) {
-						destStop = transitStops.get(destStopIdx);
-					} else if (destStop == null) {
-						destStopIdx++;
-					}
-					if (origStopIdx >= stopList.size()) {
-						origStopIdx = 0;
-						destStopIdx = 1;
-						recurringOrigStopidx = 0;
-					}
-					if (destStopIdx >= stopList.size()) {
-						destStopIdx = 0;
-					}
-					// check for routes that visit the same stop internally more
-					// than once
-					if (origDwellEvent.stopId.equals(stopList.get(destStopIdx))) {
-						recurringOrigStopidx = destStopIdx;
-					}
-					if (destStop != null) {
-						if (destStopIdx - origStopIdx == 1) {
-							// no interpolation necessary
-							origDwellEvent.interpolated = true;
-							origStopIdx = destStopIdx;
-							destStopIdx++;
-							continue ITERATE_DWELL_EVENTS;
-						} else {
-							// the meaty bit where the actual interpolation of
-							// dwell times happens
-							double availableTime = destDwellEvent.arrivalTime - origDwellEvent.departureTime;
-							ArrayList<Id> stopsToVisit = new ArrayList<Id>();
-							stopsToVisit.add(stopList.get(origStopIdx));
-							int numberOfStopsInterpolated = 0;
-							ArrayList<Double> travelDistancesBetweenStops = new ArrayList<Double>();
-							ArrayList<Double> timeWeights = new ArrayList<Double>();
-							while (origStopIdx < destStopIdx) {
-								origStopIdx++;
-								numberOfStopsInterpolated++;
-								stopsToVisit.add(stopList.get(origStopIdx));
-								travelDistancesBetweenStops.add(getInterStopDistance(
-										stopsToVisit.get(numberOfStopsInterpolated - 1),
-										stopsToVisit.get(numberOfStopsInterpolated)));
-							}
-							// weight by the distances between stops over the
-							// total distance
-							double totalTravelDistanceBetweenStops = 0;
-							for (double distance : travelDistancesBetweenStops) {
-								totalTravelDistanceBetweenStops += distance;
-							}
-							for (double distance : travelDistancesBetweenStops) {
-								timeWeights.add(distance / totalTravelDistanceBetweenStops);
-							}
-							int dwellTime = origDwellEvent.departureTime;
-							// recall that the first stop is the origin; we
-							// already have a dwell event for that
-							for (int i = 1; i < numberOfStopsInterpolated; i++) {
-								dwellTime += (int) (availableTime * timeWeights.get(i - 1));
-								CepasVehicleDwellEvent dwellEvent = new CepasVehicleDwellEvent(dwellTime, dwellTime,
-										stopsToVisit.get(i));
-								this.orderedDwellEvents.put(dwellTime, dwellEvent);
-								dwellEvent.interpolated = true;
-							}
-							// all done, continue from the destination
-							origDwellEvent.interpolated = true;
-							origStopIdx = destStopIdx;
-							destStopIdx++;
-							dwellEventsList = new ArrayList<CepasVehicleDwellEvent>();
-							dwellEventsList.addAll(this.orderedDwellEvents.values());
-							continue ITERATE_DWELL_EVENTS;
-						}
-					}
-				}
-			}
-			System.out.println(this.printStopsVisited());
-		}
 
 		private boolean allDwellEventsInterpolated() {
 			for (CepasVehicleDwellEvent dwellEvent : this.orderedDwellEvents.values()) {
@@ -704,6 +860,7 @@ public class CepasToEvents {
 		}
 
 		public void correctGPSErrors() {
+			int errorCount = 0;
 			Collections.sort(this.cepasTransactions);
 			int deltaTime = 0;
 			int lastTime = 0;
@@ -734,53 +891,60 @@ public class CepasToEvents {
 					if (transaction.stopId.equals(stopId)) {
 						localCluster.add(transaction);
 					} else {
+						// TODO: debug
+						errorCount++;
+						if (errorCount > 50)
+							return;
 						suspectTransaction = transaction;
 						System.err.println("Found a suspect for " + this.vehicleId + " at time "
 								+ suspectTransaction.time);
-						if (localCluster.size() < minTransactionClusterSize) {
-							// fill the localCluster up until you reach the
-							// deltaTapTimeLimit
-							int j = i + 1;
-							while (deltaTimes.get(j) < minimumTravelTimeBetweenConsecutiveStops) {
-								localCluster.add(transaction);
-								j++;
-							}
-							// iterate through the local cluster and see what is
-							// the majority opinion
-							int incumbentStopIdScore = 0;
-							int candidateStopIdScore = 0;
-							for (CepasTransaction lcTransaction : localCluster) {
-								if (lcTransaction.stopId.equals(stopId))
-									incumbentStopIdScore++;
-								else if (lcTransaction.stopId.equals(suspectTransaction.stopId))
-									candidateStopIdScore++;
-								else
-									System.err.println("Trouble classifying seemingly erroneous transactions for "
-											+ this.vehicleId + " at time " + suspectTransaction.time);
-							}
-							if (incumbentStopIdScore > candidateStopIdScore)
-								transaction.stopId = stopId;
-							else if (incumbentStopIdScore < candidateStopIdScore) {
-								referenceTransaction.stopId = transaction.stopId;
-								i = cepasTransactions.indexOf(referenceTransaction) - 1;
-								localCluster = new ArrayList<CepasToEvents.CepasTransaction>();
-							} else {
-								// the two scores are equal, check stopOrder in
-								// the matsim route to determine
-								try {
-									getInterStopDistance(stopId, prevStopId);
-									// if we get this far, the stops are in
-									// order, and the current point was
-									// misclassified
-									transaction.stopId = stopId;
-								} catch (Exception e) {
-									referenceTransaction.stopId = transaction.stopId;
-									i = cepasTransactions.indexOf(referenceTransaction) - 1;
-									localCluster = new ArrayList<CepasToEvents.CepasTransaction>();
-								}
-							}
-
+						// if (localCluster.size() < minTransactionClusterSize)
+						// {
+						// fill the localCluster up until you reach the
+						// deltaTapTimeLimit
+						int j = i + 1;
+						while (deltaTimes.get(j) < minimumTravelTimeBetweenConsecutiveStops) {
+							localCluster.add(cepasTransactions.get(j));
+							j++;
 						}
+						// }
+						// iterate through the local cluster and see what is
+						// the majority opinion
+						int incumbentStopIdScore = 0;
+						int candidateStopIdScore = 1;
+						for (CepasTransaction lcTransaction : localCluster) {
+							if (lcTransaction.stopId.equals(stopId))
+								incumbentStopIdScore++;
+							else if (lcTransaction.stopId.equals(suspectTransaction.stopId))
+								candidateStopIdScore++;
+							else
+								System.err.println("Trouble classifying seemingly erroneous transactions for "
+										+ this.vehicleId + " at time " + suspectTransaction.time);
+						}
+						if (incumbentStopIdScore >= candidateStopIdScore) {
+							try {
+								getInterStopDistance(stopId, prevStopId);
+								// if we get this far, the stops are in
+								// order, so maybe an early transaction for the
+								// following stop.
+								stopId = transaction.stopId;
+								referenceTransaction = transaction;
+								localCluster = new ArrayList<CepasToEvents.CepasTransaction>();
+								localCluster.add(referenceTransaction);
+							} catch (Exception e) {
+								transaction.stopId = stopId;
+							}
+						} else {
+							// the reference transaction is the culprit, change
+							// everything in the local cluster to the new stop
+							// id
+							for (CepasTransaction lcTransaction : localCluster) {
+								lcTransaction.stopId = transaction.stopId;
+							}
+							localCluster = new ArrayList<CepasToEvents.CepasTransaction>();
+							stopId = transaction.stopId;
+						}
+
 					}
 				}
 			}
@@ -808,6 +972,32 @@ public class CepasToEvents {
 			return sb.toString();
 		}
 
+		public void assignRoutesToDwellEventClusters() {
+			for (CepasVehicleDwellEventCluster cluster : dwellEventClusters) {
+				Id assignedRoute = null;
+				int maxScore = 0;
+				for (Id routeId : possibleMatsimRoutesSortedBynumberOfStops) {
+					ArrayList<Id> stopList = routeIdToStopIdSequence.get(routeId);
+					int score = 0;
+					for (CepasVehicleDwellEvent de : cluster.getOrderedDwellEvents().values()) {
+						if (stopList.contains(de.stopId))
+							score++;
+					}
+					if (score > maxScore) {
+						assignedRoute = routeId;
+						maxScore = score;
+					}
+				}
+				cluster.setRouteId(assignedRoute);
+			}
+		}
+
+		public void interpolateDwellEvents() {
+			for (CepasVehicleDwellEventCluster cluster : this.dwellEventClusters) {
+				cluster.interpolateDwellEvents();
+			}
+
+		}
 	}
 
 	private enum CepasTransactionType {
@@ -842,186 +1032,6 @@ public class CepasToEvents {
 		public String toString() {
 
 			return String.format("\"%s\"\t%s\t%d", this.stopId.toString(), this.type.toString(), this.time);
-		}
-	}
-
-	private class CepasVehicleDwellEvent implements Comparable<CepasVehicleDwellEvent> {
-		int arrivalTime;
-		int departureTime;
-		Id stopId;
-		TransitRoute assignedRoute;
-		boolean routeAssignmentConfirmed = false;
-		boolean interpolated = false;
-
-		/*
-		 * if the arrival event is triggered by alighting event, mark the stop
-		 * event, and replace the arrival time by the first tap-in time, if any
-		 * tap-ins occurred
-		 */
-
-		ArrayList<CepasTransaction> cepasTransactions = new ArrayList<CepasTransaction>();
-
-		public int getDwellTime() {
-			return departureTime - arrivalTime;
-		}
-
-		public CepasVehicleDwellEvent(int arrivalTime, int departureTime, Id stopId) {
-			super();
-			this.arrivalTime = arrivalTime;
-			this.departureTime = departureTime;
-			this.stopId = stopId;
-		}
-
-		/**
-		 * For cases where there are too few transactions to register a
-		 * realistic dwell time, or where there are early tap-ins and tap-outs,
-		 * or GPS errors.
-		 */
-		public void simpleDwellTimeAdjustment() {
-			CepasTransaction lastAlighting = null;
-			CepasTransaction firstBoarding = null;
-			for (CepasTransaction transaction : cepasTransactions) {
-				if (transaction.type.equals(CepasTransactionType.alighting))
-					lastAlighting = transaction;
-				else {
-					if (firstBoarding == null)
-						firstBoarding = transaction;
-				}
-			}
-			if (firstBoarding != null) {
-				this.arrivalTime = firstBoarding.time;
-			}
-			if (lastAlighting != null) {
-				this.departureTime = lastAlighting.time;
-			}
-			if (departureTime <= arrivalTime) {
-				departureTime = (departureTime + arrivalTime) / 2;
-				arrivalTime = departureTime;
-				arrivalTime -= minDwellTime / 2;
-				departureTime += minDwellTime / 2;
-				return;
-			}
-			if (getDwellTime() < minDwellTime) {
-				int avgtime = (arrivalTime + departureTime) / 2;
-				arrivalTime = avgtime - minDwellTime / 2;
-				departureTime = avgtime + minDwellTime / 2;
-				return;
-			}
-		}
-
-		public void findTrueDwellTime() {
-			if (getDwellTime() < minDwellTime) {
-				int avgtime = (arrivalTime + departureTime) / 2;
-				arrivalTime = avgtime - minDwellTime / 2;
-				departureTime = avgtime + minDwellTime / 2;
-				return;
-			}
-
-			// if we have only 2-4 transactions,and we're over the minimum
-			// dwell time, we need to first find the median time, then find
-			// the last alighting after that time
-			// and set that as the departure time, and/or the first boarding
-			// and
-			// set that as the arrival time (only if it is less than the
-			// arrival time)
-			if (cepasTransactions.size() <= minTransactionClusterSize) {
-				simpleDwellTimeAdjustment();
-				return;
-			}
-			/*
-			 * cluster the transactions based on the deltaTapTimeLimit
-			 */
-			int deltaTime = 0;
-			int lastTime = cepasTransactions.get(0).time;
-
-			ArrayList<Integer> deltaTimes = new ArrayList<Integer>();
-			deltaTimes.add(0);
-			ArrayList<ArrayList<CepasTransaction>> transactionClusters = new ArrayList<ArrayList<CepasTransaction>>();
-			for (int i = 1; i < cepasTransactions.size(); i++) {
-				CepasTransaction transaction = cepasTransactions.get(i);
-				deltaTime = transaction.time - lastTime;
-				deltaTimes.add(deltaTime);
-				lastTime = transaction.time;
-			}
-			ArrayList<CepasTransaction> transactionCluster = new ArrayList<CepasTransaction>();
-			transactionClusters.add(transactionCluster);
-			for (int i = 0; i < deltaTimes.size(); i++) {
-				deltaTime = deltaTimes.get(i);
-				CepasTransaction transaction = cepasTransactions.get(i);
-				if (deltaTime < maximumDeltaTapTimeForTransactionsBelongingToOneCluster || i == 0) {
-					transactionCluster.add(transaction);
-				} else {
-					transactionCluster = new ArrayList<CepasTransaction>();
-					transactionCluster.add(transaction);
-					transactionClusters.add(transactionCluster);
-				}
-			}
-			// find the biggest cluster
-			ArrayList<CepasTransaction> targetCluster = null;
-			int maxSize = 1;
-			for (ArrayList<CepasTransaction> cluster : transactionClusters) {
-				if (cluster.size() > maxSize) {
-					targetCluster = cluster;
-					maxSize = cluster.size();
-				}
-			}
-			if (targetCluster == null) {
-				// no clusters bigger than 1, run the simplified procedure;
-				simpleDwellTimeAdjustment();
-				return;
-			} else {
-				this.arrivalTime = targetCluster.get(0).time;
-				this.departureTime = targetCluster.get(targetCluster.size() - 1).time;
-				if (getDwellTime() < minDwellTime) {
-					int avgtime = (arrivalTime + departureTime) / 2;
-					arrivalTime = avgtime - minDwellTime / 2;
-					departureTime = avgtime + minDwellTime / 2;
-				}
-				return;
-			}
-		}
-
-		private void updateTransactionTimes() {
-			for (CepasTransaction transaction : cepasTransactions) {
-				if (transaction.time < arrivalTime) {
-					transaction.time = arrivalTime;
-				}
-				if (transaction.time > departureTime) {
-					transaction.time = departureTime;
-				}
-
-			}
-
-		}
-
-		@Override
-		public String toString() {
-
-			return "stop: " + stopId.toString() + ", time: " + arrivalTime + " - " + departureTime + "\n";
-		}
-
-		@Override
-		public int compareTo(CepasVehicleDwellEvent o) {
-			return (this.arrivalTime < o.arrivalTime) ? -1 : ((this.arrivalTime == o.arrivalTime) ? 0 : 1);
-		}
-
-	}
-
-	/**
-	 * Clusters dwell events together into a route.
-	 */
-	private class CepasVehicleDwellEventCluster {
-		private TreeMap<Integer, CepasVehicleDwellEvent> orderedDwellEvents = new TreeMap<Integer, CepasToEvents.CepasVehicleDwellEvent>();
-
-		public CepasVehicleDwellEventCluster(List<CepasVehicleDwellEvent> orderedDwellEvents) {
-			super();
-			for (CepasVehicleDwellEvent de : orderedDwellEvents) {
-				this.orderedDwellEvents.put(de.arrivalTime, de);
-			}
-		}
-
-		public TreeMap<Integer, CepasVehicleDwellEvent> getOrderedDwellEvents() {
-			return orderedDwellEvents;
 		}
 	}
 
@@ -1178,8 +1188,8 @@ public class CepasToEvents {
 			int vehicles = 0;
 			for (CepasVehicle ptVehicle : this.cepasVehicles.values()) {
 
-				if (!ptVehicle.vehicleId.toString().equals("184_1_804"))
-					continue;
+//				 if (!ptVehicle.vehicleId.toString().equals("981_1_569"))
+//				 continue;
 				if (ptVehicle.possibleMatsimRoutes == null)
 					// TODO: if we don't have this transit line in the schedule,
 					// ignore
@@ -1188,7 +1198,7 @@ public class CepasToEvents {
 				String query = String
 						.format("select *"
 								+ " from %s_passenger_preprocess where srvc_number = \'%s\' and direction = \'%d\' and bus_reg_num=\'%s\' "
-								+ " and boarding_time > 10000 and alighting_time > 10000"
+								+ " and boarding_time > 10000 and alighting_time > 10000 "
 								+ " order by boarding_time, alighting_time", tripTableName,
 								ptVehicle.cepasLine.lineId.toString(), ptVehicle.cepasRoute.direction,
 								ptVehicle.vehicleId.toString().split("_")[2]);
@@ -1201,12 +1211,13 @@ public class CepasToEvents {
 				transactionsAfterWriter.write(ptVehicle.printTransactions());
 				ptVehicle.sortCepasTransactionsByStopId();
 				ptVehicle.createDwellEventsFromTransactions();
+				dwellEventWriter.write(ptVehicle.printStopsVisited());
 				ptVehicle.dropDwellEventsNotInRoute();
 				ptVehicle.clusterDwellEventsIntoRoutes();
-				// ptVehicle.interpolateDwellEvents();
+				ptVehicle.assignRoutesToDwellEventClusters();
+				ptVehicle.interpolateDwellEvents();
 
 				clusterWriter.write(ptVehicle.printClusters());
-				dwellEventWriter.write(ptVehicle.printStopsVisited());
 				vehicles++;
 				if (vehicles > 100)
 					break;
