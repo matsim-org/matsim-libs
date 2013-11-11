@@ -147,7 +147,7 @@ public class UserBenefitsCalculator {
 			nullScore++;
 			if(nullScore <= maxWarnCnt) {
 				logger.warn("Score for person " + personId + " is " + plan.getScore() 
-						+ ". The score cannot be used for utility calculation.");
+						+ ". A null score cannot be used for utility calculation.");
 				if(nullScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 			}
 			return false;
@@ -155,7 +155,7 @@ public class UserBenefitsCalculator {
 			minusScore++;
 			if(minusScore <= maxWarnCnt) {
 				logger.warn("Score for person " + personId + " is " + plan.getScore() 
-						+ ". The score cannot be used for utility calculation.");
+						+ ". A negative score cannot be used for utility calculation.");
 				if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 			}
 			return false;
