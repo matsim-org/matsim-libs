@@ -47,11 +47,12 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.vsp.buildingEnergy.energyCalculation.EnergyConsumptionCalculator.HomeEnergyConsumptionCalculatorImpl;
 import playground.vsp.buildingEnergy.energyCalculation.EnergyConsumptionCalculator.OfficeEnergyConsumptionCalculatorImpl;
 import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
 
 /**
- * analyzes the base-run and all other runs. Compares ``other'' runs against base run. 
+ * analyzes the base-run and all other runs. Compares ``other'' runs against base run (!not yet!). 
  * The class assumes they all use the same network!
  * 
  * @author droeder
@@ -66,12 +67,17 @@ class BuildingEnergyAnalyzerMain {
 		"2kW.15",
 		"home",
 		"work",
+		"0.35625",
+		"0.83125",
+		"0.5",
+		"0.366",
+		"0.854",
 		"2kW.s1"
 	};
 
 	private static final Logger log = Logger
 			.getLogger(BuildingEnergyAnalyzerMain.class);
-	private static final String all = "--all--";
+	private static final String all = "--complete--";
 	private List<String> runIds;
 	private String baseRunId;
 	private int tMax;
@@ -84,8 +90,10 @@ class BuildingEnergyAnalyzerMain {
 	private Map<String, RawRunAnalysisData> runsRawAnalyzed;
 	private Set<Id> links;
 	private List<Integer> timeBins;
-	private HashMap<String, Map<Integer, Double>> aggregated;
-	private OfficeEnergyConsumptionCalculatorImpl ec;
+	private HashMap<String, Map<Integer, Double>> aggregatedEnergyWork;
+	private EnergyConsumptionCalculator ecWork;
+	private HashMap<String, Map<Integer, Double>> aggregatedEnergyHome;
+	private EnergyConsumptionCalculator ecHome;
 
 	BuildingEnergyAnalyzerMain(String inputPath, 
 									String outputPath, 
@@ -95,7 +103,8 @@ class BuildingEnergyAnalyzerMain {
 									List<String> runs, 
 									String homeType, 
 									String workType,
-									EnergyConsumptionCalculator calculator) {
+									EnergyConsumptionCalculator calculatorWork,
+									EnergyConsumptionCalculator calculatorHome) {
 		this.inputPath = inputPath;
 		this.outputPath = outputPath;
 		this.td = td;
@@ -104,9 +113,8 @@ class BuildingEnergyAnalyzerMain {
 		this.runIds = runs;
 		this.homeType = homeType;
 		this.workType = workType;
-		// TODO[dr] implement
-		log.warn("check energy calculator settings. Currently it's hard coded...");
-		this.ec = new OfficeEnergyConsumptionCalculatorImpl(td, 0.35625, 0.83125, 0.5);
+		this.ecHome = calculatorHome;
+		this.ecWork = calculatorWork;
 	}
 	
 	/**
@@ -118,24 +126,11 @@ class BuildingEnergyAnalyzerMain {
 		runRawAnalysis();
 		dumpRawData();
 		createAggregatedAnalysis();
-		dumpAggregatedData();
+		dumpAggregatedData(aggregatedEnergyWork, "work");
+		dumpAggregatedData(aggregatedEnergyHome, "home");
 	}
 
 
-	/**
-	 * @return
-	 */
-	private Map<Id, Integer> findOfficeSize() {
-		Map<Id, Integer> map = new HashMap<Id, Integer>();
-		for(Id link: links){
-			int temp = baseRunRawAnalyzed.getWorkActs().get(all).getMaximumOccupancy(link);
-			for(RawRunAnalysisData rra: runsRawAnalyzed.values()){
-				temp = Math.max(temp, rra.getWorkActs().get(all).getMaximumOccupancy(link));
-			}
-			map.put(link, temp);
-		}
-		return map;
-	}
 
 	/**
 	 * 
@@ -304,11 +299,39 @@ class BuildingEnergyAnalyzerMain {
 	 */
 	private void createAggregatedAnalysis() {
 		Map<Id, Integer> officeSizePerLink = findOfficeSize();
-		this.aggregated = new HashMap<String, Map<Integer,Double>>();
-		this.aggregated.put(baseRunId, calcSingleRunEnergyConsumptionWork(baseRunRawAnalyzed, officeSizePerLink));
+		Map<Id, Integer> homeCntPerLink = findHomeCnt();
+		this.aggregatedEnergyWork = new HashMap<String, Map<Integer,Double>>();
+		this.aggregatedEnergyHome = new HashMap<String, Map<Integer,Double>>();
+		this.aggregatedEnergyWork.put(baseRunId, calcSingleRunEnergyConsumptionWork(baseRunRawAnalyzed, officeSizePerLink));
+		this.aggregatedEnergyHome.put(baseRunId, calcSingleRunEnergyConsumptionHome(baseRunRawAnalyzed, homeCntPerLink));
 		for(Entry<String,RawRunAnalysisData> rra: runsRawAnalyzed.entrySet()){
-			this.aggregated.put(rra.getKey(), calcSingleRunEnergyConsumptionWork(rra.getValue(), officeSizePerLink));
+			this.aggregatedEnergyWork.put(rra.getKey(), calcSingleRunEnergyConsumptionWork(rra.getValue(), officeSizePerLink));
+			this.aggregatedEnergyHome.put(rra.getKey(), calcSingleRunEnergyConsumptionHome(rra.getValue(), homeCntPerLink));
 		}
+	}
+
+
+	/**
+	 * @param value
+	 * @param officeSizePerLink
+	 * @return
+	 */
+	private Map<Integer, Double> calcSingleRunEnergyConsumptionHome(RawRunAnalysisData value,
+			Map<Id, Integer> officeSizePerLink) {
+		Map<Integer, Double> map = new LinkedHashMap<Integer, Double>();
+		for(Id l: links){
+			Integer officeSize = officeSizePerLink.get(l);
+			// no activities.
+			if(officeSize == 0) continue;
+			for(int i : timeBins){
+				LinkActivityOccupancyCounter oc = baseRunRawAnalyzed.getHomeActs().get(String.valueOf(i));
+				Integer maxOccupancy = oc.getMaximumOccupancy(l);
+				Double energyConsumption = ecHome.getEnergyConsumption_kWh(officeSize, maxOccupancy);
+				Double d = map.put(i, energyConsumption);
+				if(d != null) map.put(i, d + energyConsumption);
+			}
+		}
+		return map;
 	}
 
 	/**
@@ -326,7 +349,7 @@ class BuildingEnergyAnalyzerMain {
 			for(int i : timeBins){
 				LinkActivityOccupancyCounter oc = baseRunRawAnalyzed.getWorkActs().get(String.valueOf(i));
 				Integer maxOccupancy = oc.getMaximumOccupancy(l);
-				Double energyConsumption = ec.getEnergyConsumption_kWh(officeSize, maxOccupancy);
+				Double energyConsumption = ecWork.getEnergyConsumption_kWh(officeSize, maxOccupancy);
 				Double d = map.put(i, energyConsumption);
 				if(d != null) map.put(i, d + energyConsumption);
 			}
@@ -336,10 +359,42 @@ class BuildingEnergyAnalyzerMain {
 	
 
 	/**
+	 * @return
+	 */
+	private Map<Id, Integer> findHomeCnt() {
+		Map<Id, Integer> map = new HashMap<Id, Integer>();
+		for(Id link: links){
+			int temp = baseRunRawAnalyzed.getHomeActs().get(all).getMaximumOccupancy(link);
+			for(RawRunAnalysisData rra: runsRawAnalyzed.values()){
+				temp = Math.max(temp, rra.getHomeActs().get(all).getMaximumOccupancy(link));
+			}
+			map.put(link, temp);
+		}
+		return map;
+	}
+	
+
+	/**
+	 * @return
+	 */
+	private Map<Id, Integer> findOfficeSize() {
+		Map<Id, Integer> map = new HashMap<Id, Integer>();
+		for(Id link: links){
+			int temp = baseRunRawAnalyzed.getWorkActs().get(all).getMaximumOccupancy(link);
+			for(RawRunAnalysisData rra: runsRawAnalyzed.values()){
+				temp = Math.max(temp, rra.getWorkActs().get(all).getMaximumOccupancy(link));
+			}
+			map.put(link, temp);
+		}
+		return map;
+	}
+	
+
+	/**
 	 * 
 	 */
-	private void dumpAggregatedData() {
-		BufferedWriter w = IOUtils.getBufferedWriter(outputPath + "energyConsumption.csv.gz");
+	private void dumpAggregatedData(Map<String, Map<Integer,Double>> values, String type) {
+		BufferedWriter w = IOUtils.getBufferedWriter(outputPath + "energyConsumption_" + type + ".csv.gz");
 		try {
 			//header
 			w.write(";");
@@ -348,7 +403,7 @@ class BuildingEnergyAnalyzerMain {
 			}
 			w.write("\n");
 			//content
-			for(Entry<String, Map<Integer, Double>> e: this.aggregated.entrySet()){
+			for(Entry<String, Map<Integer, Double>> e: values.entrySet()){
 				w.write(e.getKey() + ";");
 				for(Integer i : timeBins){
 					w.write(String.valueOf(e.getValue().get(i)) + ";");
@@ -449,10 +504,10 @@ class BuildingEnergyAnalyzerMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Gbl.startMeasurement();
 		boolean time = Gbl.enableThreadCpuTimeMeasurement();
+		Gbl.startMeasurement();
 		args = ARGS;
-		if(args.length < 7){
+		if(args.length < 12){
 			throw new IllegalArgumentException("expecting min 8 arguments {inputpath, outputPath, timeSliceSize, tmax, baseRunId, homeActivityType, workActivityType, runIds...");
 		}
 		String inputPath = new File(args[0]).getAbsolutePath() + System.getProperty("file.separator");
@@ -462,8 +517,13 @@ class BuildingEnergyAnalyzerMain {
 		String baseRun = args[4];
 		String homeType = args[5];
 		String workType = args[6];
+		Double pbo = Double.parseDouble(args[7]);
+		Double pso = Double.parseDouble(args[8]);
+		Double beta = Double.parseDouble(args[9]);
+		Double pbh = Double.parseDouble(args[10]);
+		Double pah = Double.parseDouble(args[11]);
 		List<String> runs = new ArrayList<String>();
-		for(int i = 7; i < args.length; i++){
+		for(int i = 12; i < args.length; i++){
 			runs.add(args[i]);
 		}
 		//catch logEntries
@@ -473,16 +533,23 @@ class BuildingEnergyAnalyzerMain {
 		log.info("running class: " + System.getProperty("sun.java.command"));
 		log.info("inputPath: " + inputPath);
 		log.info("outputPath: " + outputPath);
-		log.info("timeSliceDuration: " + String.valueOf(td));
-		log.info("tMax: " + tmax);
-		log.info("baseRun: " + baseRun);
+		log.info("timeSliceDuration [s]: " + String.valueOf(td));
+		log.info("tMax [s]: " + tmax);
 		log.info("homeType: " + homeType);
-		log.info("workType: " + workType); 
+		log.info("workType: " + workType);
+		log.info("P_bo [kW]: " + pbo);
+		log.info("P_so [kW]: " + pso);
+		log.info("beta []: " + beta);
+		log.info("P_bh [kW]: " + pbh);
+		log.info("P_ah [kW]: " + pah);
+		log.info("baseRun: " + baseRun);
 		for(int i = 0; i < runs.size(); i++){
 			log.info("caseStudy " + (i + 1) + ": " + runs.get(i));
 		}
+		EnergyConsumptionCalculator ecWork = new OfficeEnergyConsumptionCalculatorImpl(td, pbo, pso, beta);
+		EnergyConsumptionCalculator ecHome = new HomeEnergyConsumptionCalculatorImpl(td, pbh, pah);
 		// run
-		new BuildingEnergyAnalyzerMain(inputPath, outputPath, td, tmax, baseRun, runs, homeType, workType, null).run();
+		new BuildingEnergyAnalyzerMain(inputPath, outputPath, td, tmax, baseRun, runs, homeType, workType, ecWork, ecHome).run();
 		if(time){
 			Gbl.printCurrentThreadCpuTime();
 		}

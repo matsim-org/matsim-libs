@@ -67,5 +67,24 @@ public interface EnergyConsumptionCalculator{
 		
 	}
 	
+	public class HomeEnergyConsumptionCalculatorImpl implements EnergyConsumptionCalculator{
+		
+		private double td;
+		private double baseLoad;
+		private double additional;
+
+		public HomeEnergyConsumptionCalculatorImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson) {
+			this.td = td;
+			this.baseLoad = baseLoadPerPerson;
+			this. additional = additionalLoadPerPerson;
+		}
+
+		@Override
+		public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy) {
+			return (td/3600. * (maxSize * baseLoad + currentOccupancy * additional));
+		}
+		
+	}
+	
 }
 
