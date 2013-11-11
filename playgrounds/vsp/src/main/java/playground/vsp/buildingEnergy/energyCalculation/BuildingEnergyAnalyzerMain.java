@@ -506,7 +506,7 @@ class BuildingEnergyAnalyzerMain {
 	public static void main(String[] args) {
 		boolean time = Gbl.enableThreadCpuTimeMeasurement();
 		Gbl.startMeasurement();
-		args = ARGS;
+//		args = ARGS;
 		if(args.length < 12){
 			throw new IllegalArgumentException("expecting min 8 arguments {inputpath, outputPath, timeSliceSize, tmax, baseRunId, homeActivityType, workActivityType, runIds...");
 		}
