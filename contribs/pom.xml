@@ -97,6 +97,7 @@
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
 		<module>multimodal</module>
+		<module>integration</module>
 	</modules>
 	<repositories>
 		<repository>
