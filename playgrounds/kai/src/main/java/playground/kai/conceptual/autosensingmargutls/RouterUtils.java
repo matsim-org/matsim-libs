@@ -40,10 +40,10 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 class RouterUtils {
 	
-	static MarginalUtilitiesContainer createMarginalUtilitiesContrainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
+	static EffectiveMarginalUtilitiesContainer createMarginalUtilitiesContrainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
 		// yy one might want to make the following replaceable. kai, oct'13
 		
-		MarginalUtilitiesContainer muc = new MarginalUtilitiesContainer() ;
+		EffectiveMarginalUtilitiesContainer muc = new EffectiveMarginalUtilitiesContainer() ;
 		
 		EventsToScore e2s = new EventsToScore(scenario, scoringFunctionFactory ) ;
 		

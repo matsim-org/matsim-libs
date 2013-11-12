@@ -35,12 +35,12 @@ public class PersonIndividualTimeDistanceDisutility implements TravelDisutility 
 
 	protected final TravelTime timeCalculator;
 
-	private MarginalUtilitiesContainer muc ;
+	private EffectiveMarginalUtilitiesContainer muc ;
 	
 	private double marginalCostOfTimeMin = 0. ;
 	private double marginalCostOfDistanceMin = 0. ;
 
-	public PersonIndividualTimeDistanceDisutility(final TravelTime timeCalculator, MarginalUtilitiesContainer muc) {
+	public PersonIndividualTimeDistanceDisutility(final TravelTime timeCalculator, EffectiveMarginalUtilitiesContainer muc) {
 		this.timeCalculator = timeCalculator;
 
 
