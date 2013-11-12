@@ -120,9 +120,9 @@ public class PtCircuityAnalyzer extends AbstractAnalyisModule {
 								ptBeelineDistances.get(person.getId()).add(euclidianDistance);
 							} else if (mode.equalsIgnoreCase("transit_walk")) {
 								//Test
-								System.out.println("Found transit_walk only leg for agent "+person.getId()+" distances "+transitWalkBeelineDistances.get(person.getId()));
+								//System.out.println("Found transit_walk only leg for agent "+person.getId()+" distances "+transitWalkBeelineDistances.get(person.getId()));
 								transitWalkBeelineDistances.get(person.getId()).add(euclidianDistance);
-								System.out.println("Found transit_walk only leg for agent "+person.getId()+" distances "+transitWalkBeelineDistances.get(person.getId()));
+								//System.out.println("Found transit_walk only leg for agent "+person.getId()+" distances "+transitWalkBeelineDistances.get(person.getId()));
 							} // other modes excluded
 							// Reset transport mode for the next activity to activity leg
 							mode = null;
