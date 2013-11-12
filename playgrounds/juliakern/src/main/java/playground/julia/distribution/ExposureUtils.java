@@ -218,8 +218,88 @@ public class ExposureUtils {
 
 
 	public void printResponsibilityInformation(
-			ArrayList<ResponsibilityEvent> responsibility, String string) {
-		// TODO Auto-generated method stub
+			ArrayList<ResponsibilityEvent> responsibility, String outputPath) {
+		
+		// responsibility sum = #responsible persons x time x concentration
+		// average responsibility = sum/#responsible persons
+		// personal average min, max 
+		
+		
+		Double sum = 0.0; 
+		Map<Id, Double> person2responsibility = new HashMap<Id, Double>();
+		Double maxResponsibility=-1.0;
+		Double minResponsibility=Double.MAX_VALUE;
+		Double avgResponsibility=0.0;
+		
+		// calculate total sum, personal sum
+		for(ResponsibilityEvent re: responsibility){
+			sum += re.getExposureValue();
+			Id responsiblePerson = re.getPersonId();
+			if(!person2responsibility.containsKey(responsiblePerson)){
+				person2responsibility.put(responsiblePerson, new Double(re.getExposureValue()));
+			}else{
+				Double oldValue = person2responsibility.get(responsiblePerson);
+				person2responsibility.put(responsiblePerson, oldValue+re.getExposureValue());
+			}
+		}
+		
+		// find min and max
+		for(Id person: person2responsibility.keySet()){
+			Double currentValue = person2responsibility.get(person);
+			if(currentValue>maxResponsibility)maxResponsibility=currentValue;
+			if(currentValue<minResponsibility)minResponsibility=currentValue;
+		}
+		
+		avgResponsibility = sum/person2responsibility.size();
+		
+		BufferedWriter buffW;
+		try{
+			buffW = new BufferedWriter(new FileWriter(outputPath));
+
+			// header: Person base case compare case difference
+			buffW.write("Responsibility Information");
+			buffW.newLine();
+			buffW.write("Responsible persons x concentration value x exposure time: " + sum);
+			buffW.newLine();
+			buffW.write("Average responsibility: " + avgResponsibility);
+			buffW.newLine();
+			buffW.write("Minimal responsibility: " + minResponsibility);
+			buffW.newLine();
+			buffW.write("Maximal responsibility: " + maxResponsibility);
+			buffW.close();
+		}catch(IOException e){
+			System.err.println("Error creating " + outputPath + ".");
+		}
+		
+		/*
+		 *Double sum =0.0; // sum over person2timeXconcentration
+	
+		
+		
+		BufferedWriter buffW;
+		try {
+			buffW = new BufferedWriter(new FileWriter(outputPath));
+
+			// header: Person base case compare case difference
+			buffW.write("Exposure Information");
+			buffW.newLine();
+			
+			buffW.write("Person x time x concentration : " + sum);
+			buffW.newLine();
+			buffW.write("Average of average exposure : " + personalAverageAverage);
+			buffW.newLine();
+			buffW.write("Maximal average exposure : " + personalAverageMax);
+			buffW.newLine();
+			buffW.write("Minimal average exposure : " +personalAverageMin);
+			buffW.newLine();
+			buffW.write("Total exposure time : " +timeXpersons);
+			buffW.newLine();
+			
+			buffW.close();
+		} catch (IOException e) {
+			System.err.println("Error creating " + outputPath + ".");
+		} 
+		 */
 		
 	}
 
