@@ -262,7 +262,7 @@ public class Controler extends AbstractController {
 		// yy is it really so practical to do this in this way?  People might (re)set this factory between constructor and run()--???  kai, may'13
 		this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		
-		this.travelCostCalculatorFactory = ControlerUtils.createDefaultTravelDisutilityFactory(scenarioData);
+		this.travelCostCalculatorFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenarioData);
 
 		this.config.parallelEventHandling().makeLocked();
 	}
@@ -354,7 +354,7 @@ public class Controler extends AbstractController {
 
 
 		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = ControlerUtils.createDefaultScoringFunctionFactory(this.scenarioData) ;
+			this.scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(this.scenarioData) ;
 		}
 
 		// the default handling of plans

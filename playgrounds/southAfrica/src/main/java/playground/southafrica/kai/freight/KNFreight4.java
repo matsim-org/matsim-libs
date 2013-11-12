@@ -45,7 +45,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -245,7 +245,7 @@ public class KNFreight4 {
 				@Override
 				public MatsimManager createStrategyManager(Controler controler) {
 					TravelTime travelTimes = controler.getLinkTravelTimes() ;
-					TravelDisutility travelDisutility = ControlerUtils.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
+					TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 							travelTimes , scenario.getConfig().planCalcScore() );
 					LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
 							travelDisutility, travelTimes) ;

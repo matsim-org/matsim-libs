@@ -23,7 +23,7 @@ import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -137,7 +137,7 @@ public class MyCarrierSimulation {
 			@Override
 			public MatsimManager createStrategyManager(Controler controler) {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
-				TravelDisutility travelCosts = ControlerUtils.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
+				TravelDisutility travelCosts = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 						travelTimes , config.planCalcScore() );
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
 						travelCosts, travelTimes) ;

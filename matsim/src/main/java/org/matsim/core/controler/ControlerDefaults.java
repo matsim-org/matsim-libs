@@ -30,13 +30,16 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
  * The initial use case of this is that we want to deprecated the pattern of taking out a factory from the controler, wrapping something 
  * around it, and putting it back in, since such things may depend on the calling sequence and may thus be unstable.  Users
  * should then rather use the default factory (provided here) and wrap everything around it in a sequence they control themselves. 
+ * <p/>
+ * I just renamed this from ControlerUtils to ControlerDefaults since XxxUtils is for us, in many case, the outmost user interface,
+ * and the material here IMO is not "outermost".  kai, nov'13
  * 
  * @author nagel
  *
  */
-public class ControlerUtils {
+public class ControlerDefaults {
 	
-	private ControlerUtils(){} // should not be instantiated
+	private ControlerDefaults(){} // should not be instantiated
 
 	public static ScoringFunctionFactory createDefaultScoringFunctionFactory(Scenario scenario) {
 		return new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()) ;
