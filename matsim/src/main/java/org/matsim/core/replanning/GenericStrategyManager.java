@@ -37,7 +37,14 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
- * @author nagel
+ * Notes:<ul>
+ * <li> This version is now a bit more restrictive than the original strategy manager in terms of public methods and in terms of final methods.
+ * Given subpopulations and pluggable worst plans remover, most situations where inheritance was needed should be gone.  
+ * Please engage in a discussion with the core team if you think this class should be more liberal. kai, nov'13
+ * </ul>  
+ * 
+ * @author nagel (for the generic version)
+ * @author rieser (for the original StrategyManager)
  *
  */
 public class GenericStrategyManager<T extends BasicPlan> implements MatsimManager {
@@ -133,7 +140,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
-	private final boolean changeWeightOfStrategy(
+	final boolean changeWeightOfStrategy(
 			final GenericPlanStrategy<T> strategy,
 			final String subpopulation,
 			final double newWeight) {
@@ -173,7 +180,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * @param population
 	 * @param replanningContext 
 	 */
-	private final void run( 
+	final void run( 
 			final Collection<HasPlansAndId<T>> persons, 
 			ObjectAttributes subPopLookup,
 			final ReplanningContext replanningContext) {
@@ -237,7 +244,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 *
 	 * @param iteration
 	 */
-	private final void handleChangeRequests(final int iteration) {
+	final void handleChangeRequests(final int iteration) {
 		for ( int ii = 0 ; ii <= iteration ; ii++ ) { 
 			// (playing back history for those installations which recreate the strategy manager in every iteration)
 			for ( Map.Entry<String, StrategyWeights<T>> wentry : weightsPerSubpopulation.entrySet() ) {
@@ -259,7 +266,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * @param person The person for which the strategy should be chosen
 	 * @return the chosen strategy
 	 */
-	private final GenericPlanStrategy<T> chooseStrategy(final HasPlansAndId<T> person, final String subpopulation) {
+	final GenericPlanStrategy<T> chooseStrategy(final HasPlansAndId<T> person, final String subpopulation) {
 		final StrategyWeights<T> weights = weightsPerSubpopulation.get( subpopulation );
 		double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;
 
@@ -340,6 +347,18 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	public final void setPlanSelectorForRemoval(final GenericPlanSelector<T> planSelector) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector = planSelector;
+	}
+
+	int getMaxPlansPerAgent() {
+		return this.maxPlansPerAgent ;
+	}
+
+	public final List<GenericPlanStrategy<T>> getStrategies(String subpopulation) {
+		return getStrategyWeights( subpopulation ).unmodifiableStrategies;
+	}
+
+	public final List<Double> getWeights(String subpopulation) {
+		return getStrategyWeights( subpopulation ).unmodifiableWeights;
 	}
 
 }

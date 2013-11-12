@@ -75,6 +75,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
@@ -694,7 +695,7 @@ public class MultiModalDemo {
 			travelTimes.put(TransportMode.bike, bikeTravelTime);
 			travelTimes.put(TransportMode.walk, walkTravelTime);
 			
-			for (PlanStrategy planStrategy : this.strategyManager.getStrategiesOfDefaultSubpopulation()) {
+			for (GenericPlanStrategy<Plan> planStrategy : this.strategyManager.getStrategiesOfDefaultSubpopulation()) {
 				if (planStrategy instanceof ChooseBestLegModePlanStrategy) {
 					((ChooseBestLegModePlanStrategy) planStrategy).setWaitToLinkCalculator(waitToLinkCalculator);
 					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(travelTimes);

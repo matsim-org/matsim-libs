@@ -295,7 +295,7 @@ public class StrategyManagerTest {
 		manager.addStrategyForDefaultSubpopulation(str2, 2.0);
 		manager.addStrategyForDefaultSubpopulation(str3, 0.5);
 		
-		List<PlanStrategy> strategies = manager.getStrategiesOfDefaultSubpopulation();
+		List<GenericPlanStrategy<Plan>> strategies = manager.getStrategiesOfDefaultSubpopulation();
 		Assert.assertEquals(3, strategies.size());
 
 		Assert.assertEquals(str1, strategies.get(0));

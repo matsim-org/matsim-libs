@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 
@@ -135,10 +137,10 @@ public class SimpleAnnealer implements IterationStartsListener,
 	 */
 	public static void anneal(IterationStartsEvent event, double proportion) {
 		StrategyManager stratMan = event.getControler().getStrategyManager();
-		List<PlanStrategy> strategies = stratMan.getStrategiesOfDefaultSubpopulation();
+		List<GenericPlanStrategy<Plan>> strategies = stratMan.getStrategiesOfDefaultSubpopulation();
 		double totalWeights = 0.0;
 		double totalSelectorWeights = 0.0;
-		for (PlanStrategy strategy : strategies) {
+		for (GenericPlanStrategy<Plan> strategy : strategies) {
 			// first read off the weights of the strategies and classify them
 			String strategyName = strategy.toString().toLowerCase();
 			double weight = stratMan.getWeightsOfDefaultSubpopulation().get(
@@ -159,7 +161,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 //				/ ((totalWeights - totalSelectorWeights) / totalWeights);
 		String outputToWrite = "\t" + event.getIteration() + "\t" + currentIter
 				+ "\t" + proportion;
-		for (PlanStrategy strategy : strategies) {
+		for (GenericPlanStrategy<Plan> strategy : strategies) {
 			// first read off the weights of the strategies and classify them
 			String strategyName = strategy.toString().toLowerCase();
 			double weight = stratMan.getWeightsOfDefaultSubpopulation().get(
