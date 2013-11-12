@@ -70,8 +70,11 @@ public class ResponsibilityUtils {
 			ArrayList<ExposureEvent> exposure,
 			ArrayList<ResponsibilityEvent> responsibility, Double timeBinSize, Double simulationEndTime) {
 		
+		//System.out.println("emission per bin" + emissionPerBin.keySet());
 		
 		for(EmActivity ema: activities){
+			
+			//System.out.println(ema.getActivityType());
 			
 			// activity location
 			int xBin = ema.getXBin();
@@ -125,7 +128,7 @@ public class ResponsibilityUtils {
 			}
 			
 			//TODO go on here... something wrong - 0.0
-			System.out.println("respon value" + exposureValue);
+			//System.out.println("respon value" + exposureValue);
 			
 			ExposureEvent exposureEvent = new ExposureEvent(ema.getPersonId(), startTime, endTime, exposureValue, ema.getActivityType());
 			exposure.add(exposureEvent);
@@ -151,6 +154,7 @@ public class ResponsibilityUtils {
 					ResponsibilityEvent ree = new ResponsibilityEvent(
 							epb.getPersonId(), startTime, endTime,
 							epb.getConcentration(), location);
+				//	System.out.println("epb concentration" + epb.getConcentration());
 					rEvents.add(ree);
 				}
 			}

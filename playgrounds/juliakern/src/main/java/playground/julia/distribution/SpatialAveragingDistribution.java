@@ -116,6 +116,9 @@ public class SpatialAveragingDistribution {
 
 	Map<Id, Integer> link2xbin;
 	Map<Id, Integer> link2ybin;
+	
+	Map<Double, ArrayList<EmPerBin>> emissionPerBin ;
+	Map<Double, ArrayList<EmPerLink>> emissionPerLink;
 
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile1);
@@ -151,11 +154,11 @@ public class SpatialAveragingDistribution {
 		ArrayList<EmActivity> activities = new ArrayList<EmActivity>();
 		ArrayList<EmCarTrip> carTrips= new ArrayList<EmCarTrip>();
 		
-		Map<Double, ArrayList<EmPerBin>> emissionPerBin = new HashMap<Double, ArrayList<EmPerBin>>();
-		Map<Double, ArrayList<EmPerLink>> emissionPerLink = new HashMap<Double, ArrayList<EmPerLink>>();
+		emissionPerBin = new HashMap<Double, ArrayList<EmPerBin>>();
+		emissionPerLink = new HashMap<Double, ArrayList<EmPerLink>>();
 		
 		generateActivitiesAndTrips(eventsFile1, activities, carTrips);
-		generateEmissions(emissionFile1, emissionPerBin, emissionPerLink);
+		generateEmissions(emissionFile1);
 		
 		/*
 		 * two lists to store information on exposure and responsibility 
@@ -201,20 +204,8 @@ public class SpatialAveragingDistribution {
 		
 
 
-	private void generateEmissions(String emissionFile,
-			Map<Double, ArrayList<EmPerBin>> emissionPerBin,
-			Map<Double, ArrayList<EmPerLink>> emissionPerLink) {
-		
-		/*
-		 * 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		this.warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, noOfTimeBins);
-		this.coldHandler = new EmissionsPerLinkColdEventHandler(this.simulationEndTime, noOfTimeBins);
-		eventsManager.addHandler(this.warmHandler);
-		eventsManager.addHandler(this.coldHandler);
-		emissionReader.parse(emissionFile);
-		 */
-		
+	private void generateEmissions(String emissionFile) {
+				
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		
@@ -222,15 +213,11 @@ public class SpatialAveragingDistribution {
 		eventsManager.addHandler(generatedEmissionsHandler);
 		
 		emissionReader.parse(emissionFile1);
-		
-//		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-//		matsimEventsReader.readFile(emissionFile);
-		
+
 		emissionPerBin = generatedEmissionsHandler.getEmissionsPerCell();
 		emissionPerLink = generatedEmissionsHandler.getEmissionsPerLink();
-
 		
-		eventsManager.removeHandler(generatedEmissionsHandler);
+		logger.info("Done calculating emissions per bin and link.");
 		
 	}
 
@@ -257,7 +244,7 @@ public class SpatialAveragingDistribution {
 		for(Id linkId: network.getLinks().keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(network.getLinks().get(linkId).getCoord().getY()));
 			if(mapYCoordToBin(network.getLinks().get(linkId).getCoord().getY())==null){
-				System.out.println("link with null " + linkId.toString());
+				//System.out.println("link with null " + linkId.toString());
 			}
 		}
 		return link2ybin;

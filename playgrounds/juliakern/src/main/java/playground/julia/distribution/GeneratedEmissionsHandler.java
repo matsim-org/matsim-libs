@@ -27,7 +27,6 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	
 	public GeneratedEmissionsHandler(Double simulationStartTime, Double timeBinSize, Map<Id, Integer>link2xbins, Map<Id, Integer>link2ybins,
 			WarmPollutant warmPollutant2analyze, ColdPollutant coldPollutant2analyze){
-		System.out.println("new handler");
 		this.simulationStartTime = simulationStartTime;
 		this.timeBinSize= timeBinSize;
 		this.link2xbins = link2xbins;
@@ -46,7 +45,6 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-		System.out.println("shtn");
 		Id linkId = event.getLinkId();
 		Integer xBin = link2xbins.get(linkId);
 		Integer yBin = link2ybins.get(linkId);
@@ -71,9 +69,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	}
 
 	@Override
-	public void handleEvent(WarmEmissionEvent event) {
-		System.out.println("warm event");
-		
+	public void handleEvent(WarmEmissionEvent event) {		
 		Id linkId = event.getLinkId();
 
 		Integer xBin = link2xbins.get(linkId);
@@ -82,7 +78,6 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		if (xBin != null && yBin != null) {
 			//TODO person id statt vehicleid??? woher?
 			Id personId = event.getVehicleId();
-			System.out.println("warm 5");
 			Double value = event.getWarmEmissions().get(warmPollutant2analyze); //TODO funktioniert das so? enum casten?
 			EmPerBin epb = new EmPerBin(xBin, yBin, personId, value);
 			Double endOfTimeIntervall = getEndOfTimeInterval(event.getTime());
@@ -97,7 +92,6 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 						new ArrayList<EmPerLink>());
 			}
 			emissionPerLink.get(endOfTimeIntervall).add(epl);
-			System.out.println("handling warm with value" + value);
 		}
 	}
 
