@@ -248,11 +248,12 @@ class BuildingEnergyAnalyzerMain {
 		boolean time = Gbl.enableThreadCpuTimeMeasurement();
 		Gbl.startMeasurement();
 		if(args.length == 0){
+			log.warn("using hard coded static variables. Make sure this what you want.");
 			args = ARGS;
 		}
 		if(args.length < 12){
 			throw new IllegalArgumentException("expecting min 12 arguments {inputpath, outputPath, timeSliceSize, tmax, " +
-					"baseRunId, homeActivityType, workActivityType, P_bo, P_so, beta, P_bh, P_ah, runIds...");
+					"baseRunId, homeActivityType, workActivityType, P_bo, P_so, beta, P_bh, P_ah, runIds...}");
 		}
 		String inputPath = new File(args[0]).getAbsolutePath() + System.getProperty("file.separator");
 		String outputPath = new File(args[1]).getAbsolutePath() + System.getProperty("file.separator");
@@ -292,11 +293,12 @@ class BuildingEnergyAnalyzerMain {
 		}
 		BuildingEnergyConsumptionRule ecWork = new OfficeEnergyConsumptionRuleImpl(td, pbo, pso, beta);
 		BuildingEnergyConsumptionRule ecHome = new HomeEnergyConsumptionRuleImpl(td, pbh, pah);
+		BuildingEnergyConsumptionRule ecNotSpecified = new HomeEnergyConsumptionRuleImpl(td, 0, pah);
 		BuildingEnergyConsumptionRuleFactory factory =  new BuildingEnergyConsumptionRuleFactory();
 		factory.setRule(homeType, ecHome);
 		factory.setRule(workType, ecWork);
 		// seems ``not specified'' is the morning home-activity (for the berlin-scenario)
-		factory.setRule(new String("not specified"), ecHome);
+		factory.setRule(new String("not specified"), ecNotSpecified);
 		// run
 		new BuildingEnergyAnalyzerMain(inputPath, outputPath, td, tmax, baseRun, runs, homeType, workType, factory).run();
 		if(time){

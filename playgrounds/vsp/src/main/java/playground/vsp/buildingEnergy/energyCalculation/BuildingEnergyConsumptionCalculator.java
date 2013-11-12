@@ -59,10 +59,6 @@ class BuildingEnergyConsumptionCalculator {
 	 */
 	private void init() {
 		this.consumption = new HashMap<String, EnergyConsumption>();
-//		for(String s: this.rules.keySet()){
-//			this.consumption.put(s, new EnergyConsumption());
-//		}
-		
 	}
 
 	Map<String, EnergyConsumption> getEnergyConsumptionPerRun(){
@@ -70,6 +66,7 @@ class BuildingEnergyConsumptionCalculator {
 	}
 	
 	void process(Map<String, Map<String, LinkOccupancyStats>> occupancyRun2Type2Occupancy){
+		log.info("calculating energy-consumption.");
 		for(Entry<String, Map<String, LinkOccupancyStats>> e: occupancyRun2Type2Occupancy.entrySet()){
 			EnergyConsumption c = consumption.get(e.getKey());
 			if(c == null){
@@ -82,6 +79,7 @@ class BuildingEnergyConsumptionCalculator {
 				calcEnergyConsumptionPerType(ee.getValue(), maxValues, rule, c, ee.getKey());
 			}
 		}
+		log.info("finished (calculating energy-consumption).");
 	}
 	
 	

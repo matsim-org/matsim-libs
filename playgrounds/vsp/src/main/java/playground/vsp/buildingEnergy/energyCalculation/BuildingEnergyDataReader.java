@@ -28,6 +28,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,6 +43,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -50,7 +55,6 @@ import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
  */
 class BuildingEnergyDataReader {
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(BuildingEnergyDataReader.class);
 	private List<Integer> timeBins;
@@ -74,14 +78,14 @@ class BuildingEnergyDataReader {
 	
 	void run(String net, String plans, String events, String homeType, String workType){
 		BuildingEnergyPlansAnalyzer plansAna = new BuildingEnergyPlansAnalyzer(homeType, workType);
-		Population p = prepareScenario(plans, net, plansAna).getPopulation();
+		prepareScenario(plans, net, plansAna);
+		log.warn("only persons with work- and home-Activities will be handled!");
 		this.populationStats = plansAna.getStats();
 		this.type2OccupancyStats = new HashMap<String, LinkOccupancyStats>();
 		for(String s: activityTypes){
-			this.type2OccupancyStats.put(s, initOccupancyCounter(s, p));
+			this.type2OccupancyStats.put(s, initOccupancyCounter(s, plansAna.getPopulation()));
 		}
 		parseEvents(events);
-		
 	}
 	
 	PopulationStats getPStats(){
@@ -101,11 +105,13 @@ class BuildingEnergyDataReader {
 	 */
 	private void parseEvents(String events) {
 		EventsManager manager = EventsUtils.createEventsManager();
+		MyEventsFilter filter = new MyEventsFilter(this.populationStats.getHomeAndWorkAgentIds());
 		for(LinkOccupancyStats los: this.type2OccupancyStats.values()){
 			for(LinkActivityOccupancyCounter laoc: los.getStats().values()){
-				manager.addHandler(laoc);
+				filter.addCounter(laoc);
 			}
 		}
+		manager.addHandler(filter);
 		new MatsimEventsReader(manager).readFile(events);
 		for(LinkOccupancyStats los: this.type2OccupancyStats.values()){
 			for(LinkActivityOccupancyCounter laoc: los.getStats().values()){
@@ -113,23 +119,67 @@ class BuildingEnergyDataReader {
 			}
 		}		
 	}
+	
+	/*
+	 * this is very quick and dirty hack but I don't want to change the other impl here... //dr, nov'13
+	 */
+	static class MyEventsFilter implements ActivityStartEventHandler, ActivityEndEventHandler{
+		
+		private List<Id> personFilter;
+		private List<LinkActivityOccupancyCounter> handler = new ArrayList<LinkActivityOccupancyCounter>();
+
+		public MyEventsFilter(List<Id> personFilter) {
+			log.warn("filtering events --- functionality is only ensured for Berlin-Scenario!");
+			this.personFilter = personFilter;
+		}
+		
+		void addCounter(LinkActivityOccupancyCounter counter){
+			handler.add(counter);
+		}
+
+		@Override
+		public void reset(int iteration) {
+			
+		}
+
+		@Override
+		public void handleEvent(ActivityEndEvent event) {
+			if(personFilter.contains(event.getPersonId())){
+				for(LinkActivityOccupancyCounter laoc: handler){
+					laoc.handleEvent(event);
+				}
+			}
+		}
+
+		@Override
+		public void handleEvent(ActivityStartEvent event) {
+			if(personFilter.contains(event.getPersonId())){
+				for(LinkActivityOccupancyCounter laoc: handler){
+					laoc.handleEvent(event);
+				}
+			}
+		}
+		
+	}
 
 	/**
 	 * @param plansFile
 	 * @param plansAna 
 	 * @return
 	 */
-	private Scenario prepareScenario(String plansFile, String networkFile, BuildingEnergyPlansAnalyzer plansAna) {
+	private void prepareScenario(String plansFile, String networkFile, BuildingEnergyPlansAnalyzer plansAna) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		plansAna.setPopulation(new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		new MatsimNetworkReader(sc).readFile(networkFile);
 		if(links == null){
 			this.links = new ArrayList<Id>(sc.getNetwork().getLinks().keySet());
 		}
 		Collections.sort(links);
-		new MatsimPopulationReader(sc).readFile(plansFile);
+		// TODO[dr] this slows down the very drastic. Streaming is only necessary here because we need a 
+		// filtered population for the berlin-scenario. 
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(plansAna);
-		((PopulationImpl) sc.getPopulation()).runAlgorithms();
-		return sc;
+		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
+		new MatsimPopulationReader(sc).readFile(plansFile);
 	}
 
 	/**
@@ -178,16 +228,27 @@ class BuildingEnergyDataReader {
 
 		private String homeType;
 		private String workType;
-		private List<Id> homeWork;
 		private List<Id> home;
 		private List<Id> work;
+		private Population population;
 
 		BuildingEnergyPlansAnalyzer(String homeType, String workType) {
 			this.homeType = homeType;
 			this.workType = workType;
-			this.homeWork = new ArrayList<Id>();
 			this.work = new ArrayList<Id>();
 			this.home = new ArrayList<Id>();
+			log.warn("currently activityType ``not specified'' is handled equals to ``home'' (necessary for Berlin-Scennrio)");
+		}
+
+		/**
+		 * @param population
+		 */
+		public void setPopulation(Population population) {
+			this.population = population;
+		}
+		
+		public Population getPopulation(){
+			return population;
 		}
 
 		@Override
@@ -203,25 +264,28 @@ class BuildingEnergyDataReader {
 					}
 				}
 				if(!home){
-					if(a.getType().equals(homeType)){
+					if(a.getType().equals(homeType) || a.getType().equals("not specified")){
 						home = true;
 					}
 				}
 				// we know everything we need to know, return
 				if(home && work){
-					this.homeWork.add(person.getId());
+					this.population.addPerson(person);
+					this.home.remove(person.getId());
+					this.work.remove(person.getId());
 					return;
 				}
 			}
 			if(home){
 				this.home.add(person.getId());
-			}else if (work){
+			} 
+			if (work){
 				this.work.add(person.getId());
 			}
 		}
 		
 		public PopulationStats getStats(){
-			return new PopulationStats(homeWork, home, work);
+			return new PopulationStats(new ArrayList<Id>(this.population.getPersons().keySet()), home, work);
 		}
 
 		
@@ -252,7 +316,7 @@ class BuildingEnergyDataReader {
 			return (home.size() + homeWork.size());
 		}
 		
-		public final List<Id> getHomeOnlyHomeAgentIds(){
+		public final List<Id> getHomeOnlyAgentIds(){
 			return home;
 		}
 		
