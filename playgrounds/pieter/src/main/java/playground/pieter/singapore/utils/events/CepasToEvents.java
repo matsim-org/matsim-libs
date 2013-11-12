@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -45,13 +46,25 @@ import java.util.TreeSet;
 import org.cyberneko.html.HTMLScanner.PlaybackInputStream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -62,6 +75,7 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -141,6 +155,8 @@ public class CepasToEvents {
 		}
 	}
 
+	public int departureId = 0;
+
 	private class CepasVehicle {
 		/**
 		 * Clusters dwell events together into a route.
@@ -152,7 +168,7 @@ public class CepasToEvents {
 			public CepasVehicleDwellEventCluster(List<CepasVehicleDwellEvent> orderedDwellEvents) {
 				super();
 				for (CepasVehicleDwellEvent de : orderedDwellEvents) {
-					this.orderedDwellEvents.put(de.arrivalTime, de);
+					this.orderedDwellEvents.put((int) de.arrivalTime, de);
 				}
 			}
 
@@ -190,18 +206,19 @@ public class CepasToEvents {
 				}
 				int j = 0;
 				for (int i : dwellEventsAsStopIndexList) {
-					if (dwellEventsAsStopIndexList.indexOf(i) == 0){
-						j=i;//for cases where the route starts after the 1st stop
+					if (dwellEventsAsStopIndexList.indexOf(i) == 0) {
+						j = i;// for cases where the route starts after the 1st
+								// stop
 						continue;
 					}
 					if (i - j > 1) {
 
 						CepasVehicleDwellEvent origDwellEvent = dwellEventsList.get(dwellEventsAsStopIndexList
 								.indexOf(j));
-						;
+
 						CepasVehicleDwellEvent destDwellEvent = dwellEventsList.get(dwellEventsAsStopIndexList
 								.indexOf(i));
-						;
+
 						double availableTime = destDwellEvent.arrivalTime - origDwellEvent.departureTime;
 						ArrayList<Id> stopsToVisit = new ArrayList<Id>();
 						ArrayList<Double> travelDistancesBetweenStops = new ArrayList<Double>();
@@ -228,7 +245,7 @@ public class CepasToEvents {
 						for (double distance : travelDistancesBetweenStops) {
 							timeWeights.add(distance / totalTravelDistanceBetweenStops);
 						}
-						int dwellTime = origDwellEvent.departureTime;
+						int dwellTime = (int) origDwellEvent.departureTime;
 						// recall that the first stop is the origin; we
 						// already have a dwell event for that
 						for (Id stop : stopsToVisit) {
@@ -236,7 +253,6 @@ public class CepasToEvents {
 
 							CepasVehicleDwellEvent dwellEvent = new CepasVehicleDwellEvent(dwellTime, dwellTime, stop);
 							this.orderedDwellEvents.put(dwellTime, dwellEvent);
-							dwellEvent.interpolated = true;
 						}
 						// interpolateDwellEvents();
 
@@ -255,7 +271,6 @@ public class CepasToEvents {
 			Id stopId;
 			TransitRoute assignedRoute;
 			boolean routeAssignmentConfirmed = false;
-			boolean interpolated = false;
 
 			/*
 			 * if the arrival event is triggered by alighting event, mark the
@@ -265,7 +280,7 @@ public class CepasToEvents {
 
 			ArrayList<CepasTransaction> cepasTransactions = new ArrayList<CepasTransaction>();
 
-			public int getDwellTime() {
+			public double getDwellTime() {
 				return departureTime - arrivalTime;
 			}
 
@@ -293,10 +308,10 @@ public class CepasToEvents {
 					}
 				}
 				if (firstBoarding != null) {
-					this.arrivalTime = firstBoarding.time;
+					this.arrivalTime = (int) firstBoarding.time;
 				}
 				if (lastAlighting != null) {
-					this.departureTime = lastAlighting.time;
+					this.departureTime = (int) lastAlighting.time;
 				}
 				if (departureTime <= arrivalTime) {
 					departureTime = (departureTime + arrivalTime) / 2;
@@ -306,18 +321,18 @@ public class CepasToEvents {
 					return;
 				}
 				if (getDwellTime() < minDwellTime) {
-					int avgtime = (arrivalTime + departureTime) / 2;
-					arrivalTime = avgtime - minDwellTime / 2;
-					departureTime = avgtime + minDwellTime / 2;
+					double avgtime = (arrivalTime + departureTime) / 2;
+					arrivalTime = (int) (avgtime - minDwellTime / 2);
+					departureTime = (int) (avgtime + minDwellTime / 2);
 					return;
 				}
 			}
 
 			public void findTrueDwellTime() {
 				if (getDwellTime() < minDwellTime) {
-					int avgtime = (arrivalTime + departureTime) / 2;
-					arrivalTime = avgtime - minDwellTime / 2;
-					departureTime = avgtime + minDwellTime / 2;
+					double avgtime = (arrivalTime + departureTime) / 2;
+					arrivalTime = (int) (avgtime - minDwellTime / 2);
+					departureTime = (int) (avgtime + minDwellTime / 2);
 					return;
 				}
 
@@ -336,16 +351,16 @@ public class CepasToEvents {
 				 * cluster the transactions based on the deltaTapTimeLimit
 				 */
 				int deltaTime = 0;
-				int lastTime = cepasTransactions.get(0).time;
+				int lastTime = (int) cepasTransactions.get(0).time;
 
 				ArrayList<Integer> deltaTimes = new ArrayList<Integer>();
 				deltaTimes.add(0);
 				ArrayList<ArrayList<CepasTransaction>> transactionClusters = new ArrayList<ArrayList<CepasTransaction>>();
 				for (int i = 1; i < cepasTransactions.size(); i++) {
 					CepasTransaction transaction = cepasTransactions.get(i);
-					deltaTime = transaction.time - lastTime;
+					deltaTime = (int) (transaction.time - lastTime);
 					deltaTimes.add(deltaTime);
-					lastTime = transaction.time;
+					lastTime = (int) transaction.time;
 				}
 				ArrayList<CepasTransaction> transactionCluster = new ArrayList<CepasTransaction>();
 				transactionClusters.add(transactionCluster);
@@ -374,10 +389,10 @@ public class CepasToEvents {
 					simpleDwellTimeAdjustment();
 					return;
 				} else {
-					this.arrivalTime = targetCluster.get(0).time;
-					this.departureTime = targetCluster.get(targetCluster.size() - 1).time;
+					this.arrivalTime = (int) targetCluster.get(0).time;
+					this.departureTime = (int) targetCluster.get(targetCluster.size() - 1).time;
 					if (getDwellTime() < minDwellTime) {
-						int avgtime = (arrivalTime + departureTime) / 2;
+						int avgtime = (int) ((arrivalTime + departureTime) / 2);
 						arrivalTime = avgtime - minDwellTime / 2;
 						departureTime = avgtime + minDwellTime / 2;
 					}
@@ -386,12 +401,13 @@ public class CepasToEvents {
 			}
 
 			private void updateTransactionTimes() {
+				Random random = MatsimRandom.getRandom();
 				for (CepasTransaction transaction : cepasTransactions) {
-					if (transaction.time < arrivalTime) {
-						transaction.time = arrivalTime;
+					if (transaction.time <= arrivalTime) {
+						transaction.time = arrivalTime + random.nextDouble();
 					}
-					if (transaction.time > departureTime) {
-						transaction.time = departureTime;
+					if (transaction.time >= departureTime) {
+						transaction.time = departureTime - random.nextDouble();
 					}
 
 				}
@@ -433,6 +449,8 @@ public class CepasToEvents {
 		private TreeSet<Id> routesSortedByNumberOfTransactions;
 		private List<CepasVehicleDwellEventCluster> dwellEventClusters;
 		private ArrayList<CepasTransaction> cepasTransactions = new ArrayList<CepasToEvents.CepasTransaction>();
+		private LinkedList<Event> eventQueue;
+		private final double maxSpeed = 80 / 3.6;
 
 		// Constructors
 		public CepasVehicle(Id matsimTransitLineId, CepasRoute cepasRoute, Id busRegNumber) {
@@ -440,6 +458,7 @@ public class CepasToEvents {
 			this.cepasRoute = cepasRoute;
 			this.cepasLine = cepasRoute.line;
 			this.vehicleId = busRegNumber;
+			this.eventQueue = new LinkedList<Event>();
 			sortMatsimRoutesbyNumberOfStops();
 		}
 
@@ -518,9 +537,9 @@ public class CepasToEvents {
 				ArrayList<Integer> deltaTimes = new ArrayList<Integer>();
 				for (int i = 0; i < transactions.size(); i++) {
 					CepasTransaction transaction = transactions.get(i);
-					deltaTime = transaction.time - lastTime;
+					deltaTime = (int) (transaction.time - lastTime);
 					deltaTimes.add(deltaTime);
-					lastTime = transaction.time;
+					lastTime = (int) transaction.time;
 				}
 				ArrayList<CepasVehicleDwellEvent> dwellEvents = new ArrayList<CepasVehicleDwellEvent>();
 				CepasVehicleDwellEvent dwellEvent = null;
@@ -532,9 +551,9 @@ public class CepasToEvents {
 							dwellEvents.add(dwellEvent);
 							dwellEvent.findTrueDwellTime();
 						}
-						dwellEvent = new CepasVehicleDwellEvent(transaction.time, transaction.time, stopId);
+						dwellEvent = new CepasVehicleDwellEvent((int) transaction.time, (int) transaction.time, stopId);
 					} else {
-						dwellEvent.departureTime = transaction.time;
+						dwellEvent.departureTime = (int) transaction.time;
 					}
 					dwellEvent.cepasTransactions.add(transaction);
 					// if
@@ -549,7 +568,7 @@ public class CepasToEvents {
 				dwellEvents.add(dwellEvent);
 				dwellEvent.findTrueDwellTime();
 				for (CepasVehicleDwellEvent stopEvent1 : dwellEvents) {
-					this.orderedDwellEvents.put(stopEvent1.arrivalTime, stopEvent1);
+					this.orderedDwellEvents.put((int) stopEvent1.arrivalTime, stopEvent1);
 				}
 
 			}
@@ -820,15 +839,15 @@ public class CepasToEvents {
 			}
 		}
 
-		private double getInterStopDistance(Id stopId, Id stopId2) {
+		private double getInterStopDistance(Id fromStopId, Id toStopId) {
 			Id likeliestRoute = this.routesSortedByNumberOfTransactions.last();
 			List<TransitRouteStop> stops = this.possibleMatsimRoutes.get(likeliestRoute).getStops();
 			Link fromLink = null;
 			Link toLink = null;
 			for (TransitRouteStop tss : stops) {
-				if (tss.getStopFacility().getId().equals(stopId))
+				if (tss.getStopFacility().getId().equals(fromStopId))
 					fromLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
-				if (tss.getStopFacility().getId().equals(stopId2))
+				if (tss.getStopFacility().getId().equals(toStopId))
 					toLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
 			}
 			if (fromLink == null || toLink == null)
@@ -838,14 +857,15 @@ public class CepasToEvents {
 						.getRoutes().get(likeliestRoute).getRoute();
 				try {
 					NetworkRoute subRoute = route.getSubRoute(fromLink.getId(), toLink.getId());
-					return RouteUtils.calcDistance(subRoute, scenario.getNetwork());
+					return RouteUtils.calcDistance(subRoute, scenario.getNetwork()) + toLink.getLength();
 
 				} catch (IllegalArgumentException e) {
 					double distance = RouteUtils.calcDistance(
-							route.getSubRoute(fromLink.getId(), route.getEndLinkId()), scenario.getNetwork());
+							route.getSubRoute(fromLink.getId(), route.getEndLinkId()), scenario.getNetwork())
+							+ scenario.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
 					return distance
 							+ RouteUtils.calcDistance(route.getSubRoute(route.getStartLinkId(), toLink.getId()),
-									scenario.getNetwork());
+									scenario.getNetwork()) + toLink.getLength();
 
 				}
 
@@ -867,9 +887,9 @@ public class CepasToEvents {
 			ArrayList<Integer> deltaTimes = new ArrayList<Integer>();
 			for (int i = 0; i < cepasTransactions.size(); i++) {
 				CepasTransaction transaction = cepasTransactions.get(i);
-				deltaTime = transaction.time - lastTime;
+				deltaTime = (int) (transaction.time - lastTime);
 				deltaTimes.add(deltaTime);
-				lastTime = transaction.time;
+				lastTime = (int) transaction.time;
 			}
 			Id stopId = null;
 			Id prevStopId = null;
@@ -893,7 +913,7 @@ public class CepasToEvents {
 					} else {
 						// TODO: debug
 						errorCount++;
-						if (errorCount > 50)
+						if (errorCount > 150)
 							return;
 						suspectTransaction = transaction;
 						System.err.println("Found a suspect for " + this.vehicleId + " at time "
@@ -964,9 +984,9 @@ public class CepasToEvents {
 		}
 
 		public String printTransactions() {
-			StringBuffer sb = new StringBuffer("stop_id\ttransaction_type\ttime\n");
+			StringBuffer sb = new StringBuffer("veh_id\tstop_id\ttransaction_type\ttime\n");
 			for (CepasTransaction transaction : this.cepasTransactions) {
-				sb.append(transaction.toString() + "\n");
+				sb.append(this.vehicleId.toString() + "\t" + transaction.toString() + "\n");
 			}
 
 			return sb.toString();
@@ -998,6 +1018,133 @@ public class CepasToEvents {
 			}
 
 		}
+
+		public void updatetransactionTimes() {
+			for (CepasVehicleDwellEvent dwellEvent : this.orderedDwellEvents.values()) {
+				dwellEvent.updateTransactionTimes();
+			}
+
+		}
+
+		public void fireEvents() {
+			IdImpl driverId = new IdImpl("pt_tr_" + this.vehicleId.toString());
+			Id busRegNum = new IdImpl(vehicleId.toString().split("_")[2]);
+			Map<Id, ? extends Link> links = scenario.getNetwork().getLinks();
+			for (CepasVehicleDwellEventCluster cluster : this.dwellEventClusters) {
+
+				NetworkRoute route = scenario.getTransitSchedule().getTransitLines().get(transitLineId).getRoutes()
+						.get(cluster.getRouteId()).getRoute();
+				List<TransitRouteStop> stops = scenario.getTransitSchedule().getTransitLines().get(transitLineId)
+						.getRoutes().get(cluster.getRouteId()).getStops();
+				TransitRouteStop firstStop = stops.get(0);
+				Id departureLinkId = firstStop.getStopFacility().getLinkId();
+				Event driverStarts = new TransitDriverStartsEvent(cluster.orderedDwellEvents.firstKey() - 0.004,
+						driverId, busRegNum, this.transitLineId, cluster.routeId, new IdImpl(departureId++));
+				Event transitDriverDeparture = new PersonDepartureEvent(
+						(double) cluster.orderedDwellEvents.firstKey() - 0.003, driverId, departureLinkId,
+						TransportMode.car);
+				Event personEntersVehicle = new PersonEntersVehicleEvent(
+						(double) cluster.orderedDwellEvents.firstKey() - 0.002, driverId, busRegNum);
+				Event wait2Link = new Wait2LinkEvent((double) cluster.orderedDwellEvents.firstKey() - 0.001, driverId,
+						departureLinkId, busRegNum);
+				this.eventQueue.addLast(driverStarts);
+				this.eventQueue.addLast(transitDriverDeparture);
+				this.eventQueue.addLast(personEntersVehicle);
+				this.eventQueue.addLast(wait2Link);
+				CepasVehicleDwellEvent lastDwellEvent = null;
+				Event vehArrival = null;
+				Event vehDeparture = null;
+				for (CepasVehicleDwellEvent dwellEvent : cluster.getOrderedDwellEvents().values()) {
+					if (dwellEvent.arrivalTime != cluster.getOrderedDwellEvents().firstKey()) {
+						Id fromLinkId = null;
+						Id toLinkId = null;
+						for (TransitRouteStop tss : stops) {
+							if (tss.getStopFacility().getId().equals(lastDwellEvent.stopId))
+								fromLinkId = tss.getStopFacility().getLinkId();
+							if (tss.getStopFacility().getId().equals(dwellEvent.stopId))
+								toLinkId = tss.getStopFacility().getLinkId();
+						}
+						NetworkRoute subRoute = route.getSubRoute(fromLinkId, toLinkId);
+						LinkedList<Double> linkTravelTimes = new LinkedList<Double>();
+						double totalExpectedtravelTime = 0;
+						for (Id linkId : subRoute.getLinkIds()) {
+							Link link = links.get(linkId);
+							linkTravelTimes.add(link.getLength() / Math.min(link.getFreespeed(), maxSpeed));
+							totalExpectedtravelTime += linkTravelTimes.getLast();
+						}
+						Link toLink = links.get(toLinkId);
+						totalExpectedtravelTime += toLink.getLength() / Math.min(toLink.getFreespeed(), maxSpeed);// not
+																													// going
+																													// to
+																													// evaluate
+																													// the
+																													// last
+																													// link's
+																													// travel
+																													// time,
+																													// as
+																													// the
+																													// arrives
+																													// at
+																													// facility
+																													// event
+																													// will
+																													// happen
+																													// then
+
+						double availableTime = dwellEvent.arrivalTime - lastDwellEvent.departureTime;
+						double lastTime = lastDwellEvent.departureTime;
+						Event linkLeave = new LinkLeaveEvent(lastTime += 0.001, driverId, fromLinkId, busRegNum);
+						Event linkEnter = null;
+
+						this.eventQueue.addLast(linkLeave);
+						List<Id> linkIds = subRoute.getLinkIds();
+						for (int i = 0; i < linkIds.size(); i++) {
+							linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, linkIds.get(i), busRegNum);
+							linkLeave = new LinkLeaveEvent(
+									lastTime += (availableTime * linkTravelTimes.get(i) / totalExpectedtravelTime),
+									driverId, linkIds.get(i), busRegNum);
+							this.eventQueue.addLast(linkEnter);
+							this.eventQueue.addLast(linkLeave);
+						}
+						linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, toLinkId, busRegNum);
+						this.eventQueue.addLast(linkEnter);
+					}
+					vehArrival = new VehicleArrivesAtFacilityEvent(dwellEvent.arrivalTime, busRegNum,
+							dwellEvent.stopId, 0.0);
+					this.eventQueue.addLast(vehArrival);
+					for (CepasTransaction transaction : dwellEvent.cepasTransactions) {
+						Event transactionEvent = null;
+						if (transaction.type.equals(CepasTransactionType.boarding)) {
+							this.eventQueue.addLast(new PersonEntersVehicleEvent(transaction.time,
+									transaction.passenger.personId, vehicleId));
+						} else {
+							this.eventQueue.addLast(new PersonLeavesVehicleEvent(transaction.time,
+									transaction.passenger.personId, vehicleId));
+						}
+					}
+					vehDeparture = new VehicleDepartsAtFacilityEvent(dwellEvent.departureTime, busRegNum,
+							dwellEvent.stopId, 0.0);
+					this.eventQueue.addLast(vehDeparture);
+					lastDwellEvent = dwellEvent;
+				}
+				TransitRouteStop lastStop = stops.get(stops.size() - 1);
+				Id arrivalLinkId = lastStop.getStopFacility().getLinkId();
+				Event personLeavesvehicle = new PersonLeavesVehicleEvent(lastDwellEvent.departureTime + 0.001,
+						driverId, busRegNum);
+				Event transitDriverArrival = new PersonArrivalEvent(lastDwellEvent.departureTime + 0.002, driverId,
+						arrivalLinkId, TransportMode.car);
+				eventQueue.addLast(personLeavesvehicle);
+				eventQueue.addLast(transitDriverArrival);
+			}
+
+		}
+
+		public void processEventsQueue() {
+			for (Event event : eventQueue) {
+				eventsManager.processEvent(event);
+			}
+		}
 	}
 
 	private enum CepasTransactionType {
@@ -1008,7 +1155,7 @@ public class CepasToEvents {
 		CepasVehiclePassenger passenger;
 		Id stopId;
 
-		public CepasTransaction(CepasVehiclePassenger passenger, CepasTransactionType type, int time, Id stopId) {
+		public CepasTransaction(CepasVehiclePassenger passenger, CepasTransactionType type, double time, Id stopId) {
 			super();
 			this.passenger = passenger;
 			this.stopId = stopId;
@@ -1017,12 +1164,12 @@ public class CepasToEvents {
 		}
 
 		CepasTransactionType type;
-		int time;
+		double time;
 
 		@Override
 		public int compareTo(CepasTransaction o) {
 
-			return ((Integer) this.time).compareTo(o.time);
+			return ((Double) this.time).compareTo(o.time);
 		}
 
 		/**
@@ -1031,7 +1178,7 @@ public class CepasToEvents {
 		@Override
 		public String toString() {
 
-			return String.format("\"%s\"\t%s\t%d", this.stopId.toString(), this.type.toString(), this.time);
+			return String.format("\"%s\"\t%s\t%.0f", this.stopId.toString(), this.type.toString(), this.time);
 		}
 	}
 
@@ -1067,13 +1214,13 @@ public class CepasToEvents {
 	private static final int maximumDeltaTapTimeForTransactionsBelongingToOneCluster = 15;
 	private static final int minDwellTime = 10;
 	private static final int minTransactionClusterSize = 4;
+
 	// fields
 	DataBaseAdmin dba;
 	Scenario scenario;
 	String outputEventsFile;
 	private String stopLookupTableName;
 	private String tripTableName;
-	Queue<Event> eventQueue;
 	EventsManager eventsManager;
 	/**
 	 * This map of lines, organized by id, should correspond to the lines in the
@@ -1091,6 +1238,7 @@ public class CepasToEvents {
 	 * ids in a map than have to call getId() every time
 	 */
 	private HashMap<Id, ArrayList<Id>> routeIdToStopIdSequence;
+	private EventWriterXML eventWriter;
 
 	// constructors
 	/**
@@ -1126,19 +1274,12 @@ public class CepasToEvents {
 		TransitScheduleReader tsr = new TransitScheduleReader(scenario);
 		tsr.readFile(transitSchedule);
 		eventsManager = EventsUtils.createEventsManager();
-		EventWriterXML ewx = new EventWriterXML(outputEventsFile);
-		eventsManager.addHandler(ewx);
-		eventQueue = new LinkedList<Event>();
+		this.eventWriter = new EventWriterXML(outputEventsFile);
+		eventsManager.addHandler(eventWriter);
+
 		this.tripTableName = tripTableName;
 		this.stopLookupTableName = stopLookupTableName;
 
-	}
-
-	// non-static public methods
-	public void processEventsQueue() {
-		for (Event event : eventQueue) {
-			eventsManager.processEvent(event);
-		}
 	}
 
 	public void run() throws SQLException, NoConnectionException {
@@ -1148,6 +1289,7 @@ public class CepasToEvents {
 		System.out.println(new Date());
 		processCepasTransactionRecordsByLineDirectionBusRegNum();
 		System.out.println(new Date());
+		this.eventWriter.closeFile();
 	}
 
 	private void generateRouteIdToStopIdSequence() {
@@ -1183,13 +1325,15 @@ public class CepasToEvents {
 					"transactionsBeforeGPSCorrection.csv"));
 			BufferedWriter transactionsAfterWriter = new BufferedWriter(new FileWriter(
 					"transactionsAfterGPSCorrection.csv"));
+			BufferedWriter transactionsAfterTimeCorrectionWriter = new BufferedWriter(new FileWriter(
+					"transactionsAfterTimeCorrection.csv"));
 			BufferedWriter clusterWriter = new BufferedWriter(new FileWriter("clusters.csv"));
 			BufferedWriter dwellEventWriter = new BufferedWriter(new FileWriter("dwellEvents.csv"));
 			int vehicles = 0;
 			for (CepasVehicle ptVehicle : this.cepasVehicles.values()) {
-
-//				 if (!ptVehicle.vehicleId.toString().equals("981_1_569"))
-//				 continue;
+//
+//				if (!ptVehicle.vehicleId.toString().equals("241_1_7480"))
+//					continue;
 				if (ptVehicle.possibleMatsimRoutes == null)
 					// TODO: if we don't have this transit line in the schedule,
 					// ignore
@@ -1217,6 +1361,11 @@ public class CepasToEvents {
 				ptVehicle.assignRoutesToDwellEventClusters();
 				ptVehicle.interpolateDwellEvents();
 
+				ptVehicle.updatetransactionTimes();
+				ptVehicle.fireEvents();
+				ptVehicle.processEventsQueue();
+
+				transactionsAfterTimeCorrectionWriter.write(ptVehicle.printTransactions());
 				clusterWriter.write(ptVehicle.printClusters());
 				vehicles++;
 				if (vehicles > 100)
@@ -1224,6 +1373,7 @@ public class CepasToEvents {
 			}
 			transactionsBeforeWriter.close();
 			transactionsAfterWriter.close();
+			transactionsAfterTimeCorrectionWriter.close();
 			clusterWriter.close();
 			dwellEventWriter.close();
 		} catch (SQLException se) {
@@ -1330,6 +1480,7 @@ public class CepasToEvents {
 		String outputEventsFile = "f:\\data\\sing2.2\\cepasevents.xml";
 		String tripTableName = "a_lta_ezlink_week.trips11042011";
 		String stopLookupTableName = "d_ezlink2events.matsim2ezlink_stop_lookup";
+		MatsimRandom.reset(12345678L);
 		CepasToEvents cepasToEvents = new CepasToEvents(databaseProperties, transitSchedule, networkFile,
 				outputEventsFile, tripTableName, stopLookupTableName);
 		cepasToEvents.run();
