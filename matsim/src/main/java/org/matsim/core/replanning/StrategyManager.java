@@ -20,6 +20,7 @@
 
 package org.matsim.core.replanning;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -139,12 +140,19 @@ public class StrategyManager implements MatsimManager {
 	 * @param population
 	 * @param replanningContext 
 	 */
-	@SuppressWarnings("unchecked")
 	public final void run( final Population population, final ReplanningContext replanningContext) {
 		beforePopulationRunHook( population, replanningContext ) ;
 		
-		delegate.run( (Collection<HasPlansAndId<Plan>>)population.getPersons().values(), population.getPersonAttributes(), replanningContext);
+		// if anybody has a better idea of how to do the following, please go ahead, kai, nov'13
+		Collection<HasPlansAndId<Plan>> members = new ArrayList<HasPlansAndId<Plan>>() ;
+		for ( Person person : population.getPersons().values() ) {
+			members.add(person) ;
+		}
+		delegate.run( members, population.getPersonAttributes(), replanningContext ) ;
+		
+//		delegate.run( (Collection<HasPlansAndId<Plan>>)population.getPersons().values(), population.getPersonAttributes(), replanningContext);
 		// not sure why I need to cast this but I think in this case the <? extends Person> backfires. kai, nov'13
+		// compiles under eclipse, but not on the build server. kai, nov'13
 
 		afterRunHook( population ) ;
 	}
