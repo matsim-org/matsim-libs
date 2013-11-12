@@ -25,7 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -92,7 +92,7 @@ public class Main {
 			controler.setTravelDisutilityFactory(new TravelDisutilityFactory() {
 				@Override
 				public TravelDisutility createTravelDisutility(final TravelTime timeCalculator, final PlanCalcScoreConfigGroup cnScoringGroup) {
-					final TravelDisutilityFactory factory = ControlerUtils.createDefaultTravelDisutilityFactory(scenario);
+					final TravelDisutilityFactory factory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 					final TravelDisutility previousTravelDisutility = factory.createTravelDisutility(timeCalculator, cnScoringGroup);
 					// TravelDisutilityIncludingToll searches by itself if the custom attribute is there, and uses it if yes 
 					return new TravelDisutilityIncludingToll( previousTravelDisutility, scheme, config );

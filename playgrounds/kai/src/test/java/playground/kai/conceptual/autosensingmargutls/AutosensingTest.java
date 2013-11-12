@@ -34,7 +34,7 @@ import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
-import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -54,6 +54,7 @@ public class AutosensingTest {
     
 	@Test
 	public final void testOne() {
+		// === CONFIG: ===
 		Config config = ConfigUtils.createConfig() ;
 
 		ActivityParams params = new ActivityParams("h") ;
@@ -68,6 +69,7 @@ public class AutosensingTest {
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency(); 
 	
+		// === SCENARIO: ===
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
 	
 		Population pop = scenario.getPopulation() ;
@@ -82,8 +84,9 @@ public class AutosensingTest {
 		Activity act = pf.createActivityFromCoord("h", new CoordImpl(0.,0.) ) ;
 		plan.addActivity(act); 
 	
+		// === CONTROLER INFRASTRUCTURE (without actually running the controler): ===
 		TravelTime tt = new FreeSpeedTravelTime() ;
-		ScoringFunctionFactory scoringFunctionFactory = ControlerUtils.createDefaultScoringFunctionFactory(scenario) ;
+		ScoringFunctionFactory scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(scenario) ;
 		MarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContrainer(scenario, scoringFunctionFactory) ;
 		
 		Assert.assertEquals(-12.0/3600., (double)muc.getEffectiveMarginalUtilityOfTravelTime().get(person), 0.01 ) ;
