@@ -123,6 +123,9 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	boolean generatingEvents = false;
 	
 	// get properties no longer from qlink, but have them by yourself:
+	// NOTE: we need to have qlink since we need access e.g. for vehicle arrival or for public transit
+	// On the other hand, the qlink properties (e.g. number of lanes) may not be the ones we need here because they
+	// may be divided between parallel lanes.  So we need both.
 	double length = Double.NaN ;
 	private double unscaledFlowCapacity_s = Double.NaN ;
 	private double effectiveNumberOfLanes = Double.NaN ;
@@ -450,6 +453,8 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	@Override
 	public final void recalcTimeVariantAttributes( final double now) {
 		freespeedTravelTime = this.length / qLink.getLink().getFreespeed(now);
+		// as of now, speed is NOT explicity set but pulled from the qlink since we assume that all lanes have the same freespeed as the
+		// qlink
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
 		}
