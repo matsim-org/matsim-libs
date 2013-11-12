@@ -47,14 +47,14 @@ import org.matsim.core.utils.misc.Time;
  * Returns the time when an agent could leave a link if he can travel
  * at free speed. After this time, the agent cannot stop on its current link
  * anymore which influences its possible replanning operations.
- * 
+ *
  * @author cdobler
  */
 public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, PersonArrivalEventHandler,
 		PersonDepartureEventHandler, PersonStuckEventHandler {
 
 	private static final Logger log = Logger.getLogger(EarliestLinkExitTimeProvider.class);
-	
+
 	/*
 	 * We have to create an internal TransportModeProvider and delegate the events to it.
 	 * Otherwise, race conditions could occur since an it could not be guaranteed that an
@@ -62,31 +62,31 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 	 * handles an event.
 	 */
 	private final TransportModeProvider transportModeProvider;
-	
+
 	private final Scenario scenario;
 	private final Map<String, TravelTime> multiModalTravelTimes;
 	private final TravelTime freeSpeedTravelTime;
-	
+
 	private final Map<Id, Double> earliestLinkExitTimes = new ConcurrentHashMap<Id, Double>();
 	private final Map<Double, Set<Id>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<Double, Set<Id>>();
-	
+
 	public EarliestLinkExitTimeProvider(Scenario scenario) {
 		this(scenario, null);
 		log.info("Note: no map containing TravelTime objects for all simulated modes is given. Therefore use free speed " +
 				"car travel time as minimal link travel time for all modes.");
 	}
-	
+
 	public EarliestLinkExitTimeProvider(Scenario scenario, Map<String, TravelTime> multiModalTravelTimes) {
 		this.scenario = scenario;
 		this.multiModalTravelTimes = multiModalTravelTimes;
 		this.transportModeProvider = new TransportModeProvider();
 		this.freeSpeedTravelTime = new FreeSpeedTravelTime();
 	}
-	
+
 	public TransportModeProvider getTransportModeProvider() {
 		return this.transportModeProvider;
 	}
-	
+
 	public double getEarliestLinkExitTime(Id agentId) {
 		Double earliestExitTime = this.earliestLinkExitTimes.get(agentId);
 		if (earliestExitTime == null) return Time.UNDEFINED_TIME;
@@ -102,15 +102,15 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return null;
 	}
-	
+
 	public Map<Double, Set<Id>> getEarliestLinkExitTimesPerTimeStep() {
 		return Collections.unmodifiableMap(this.earliestLinkExitTimesPerTimeStep);
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		this.transportModeProvider.reset(iteration);
-		
+
 		this.earliestLinkExitTimes.clear();
 		this.earliestLinkExitTimesPerTimeStep.clear();
 	}
@@ -123,12 +123,12 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		
+
 		String transportMode = this.transportModeProvider.getTransportMode(event.getPersonId());
 		double now = event.getTime();
 		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
 		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
-		
+
 		double earliestExitTime = Time.UNDEFINED_TIME;
 		if (this.multiModalTravelTimes != null) {
 			if (transportMode == null) {
@@ -138,16 +138,16 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 				if (travelTime == null) {
 					throw new RuntimeException("No TravelTime object was found for mode " + transportMode + ". Aborting!");
 				}
-				
+
 				earliestExitTime = travelTime.getLinkTravelTime(link, now, person, null);
 			}
 		} else {
 			earliestExitTime = Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
 		}
-		
+
 		this.handleAddEarliestLinkExitTime(event.getPersonId(), earliestExitTime);
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		this.transportModeProvider.handleEvent(event);
@@ -159,11 +159,11 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 		this.transportModeProvider.handleEvent(event);
 		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
 	}
-	
+
 	private void handleAddEarliestLinkExitTime(Id agentId, double earliestExitTime) {
-		
+
 		this.earliestLinkExitTimes.put(agentId, earliestExitTime);
-				
+
 		Set<Id> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
 		if (earliestLinkExitTimesAtTime == null) {
 			earliestLinkExitTimesAtTime = new HashSet<Id>();
@@ -171,7 +171,7 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 		}
 		earliestLinkExitTimesAtTime.add(agentId);
 	}
-	
+
 	private void removeEarliestLinkExitTimesAtTime(Id agentId) {
 
 		Double earliestExitTime = this.earliestLinkExitTimes.remove(agentId);
@@ -179,9 +179,11 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 		if (earliestExitTime != null) {
 			Set<Id> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
 			if (earliestLinkExitTimesAtTime != null) {
-				this.earliestLinkExitTimesPerTimeStep.remove(agentId);
-				if (earliestLinkExitTimesAtTime.size() == 0) this.earliestLinkExitTimesPerTimeStep.remove(earliestLinkExitTimesAtTime);
-			}			
+				earliestLinkExitTimesAtTime.remove(agentId);
+				if (earliestLinkExitTimesAtTime.isEmpty()) {
+					this.earliestLinkExitTimesPerTimeStep.remove(earliestExitTime);
+				}
+			}
 		}
 	}
 }

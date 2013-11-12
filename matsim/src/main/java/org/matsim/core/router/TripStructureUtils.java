@@ -65,7 +65,7 @@ public class TripStructureUtils {
 			final List<PlanElement> planElements,
 			final StageActivityTypes stageActivities) {
 		final List<Activity> activities = new ArrayList<Activity>();
-		
+
 		for (PlanElement pe : planElements) {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
@@ -412,6 +412,7 @@ public class TripStructureUtils {
 
 		@Override
 		public boolean equals(final Object other) {
+			if (other == null) return false;
 			if ( !other.getClass().equals( getClass() ) ) return false;
 			final Subtour s = (Subtour) other;
 			return s.trips.equals( trips ) &&
