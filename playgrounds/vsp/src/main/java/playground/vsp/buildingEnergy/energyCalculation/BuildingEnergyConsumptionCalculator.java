@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.BuildingEnergyConsumptionRuleFactory;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyDataReader.LinkOccupancyStats;
 import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
 
@@ -38,13 +39,13 @@ class BuildingEnergyConsumptionCalculator {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(BuildingEnergyConsumptionCalculator.class);
-	private Map<String, BuildingEnergyConsumptionRule> rules;
+	private BuildingEnergyConsumptionRuleFactory rules;
 	private Map<String, EnergyConsumption> consumption;
 	private List<Id> links;
 	private List<Integer> timeBins;
 	private Map<String, Map<Id, Integer>> maxValues;
 
-	BuildingEnergyConsumptionCalculator(Map<String, BuildingEnergyConsumptionRule> rules, 
+	BuildingEnergyConsumptionCalculator(BuildingEnergyConsumptionRuleFactory rules, 
 				List<Id> links, List<Integer> timeBins, Map<String, Map<Id, Integer>> maxValues) {
 		this.rules = rules;
 		this.links = links;
@@ -76,7 +77,7 @@ class BuildingEnergyConsumptionCalculator {
 				consumption.put(e.getKey(), c);
 			}
 			for(Entry<String, LinkOccupancyStats> ee: e.getValue().entrySet()){
-				BuildingEnergyConsumptionRule rule = rules.get(ee.getKey());
+				BuildingEnergyConsumptionRule rule = rules.getRule(ee.getKey());
 				Map<Id, Integer> maxValues = this.maxValues.get(ee.getKey());
 				calcEnergyConsumptionPerType(ee.getValue(), maxValues, rule, c, ee.getKey());
 			}

@@ -35,7 +35,6 @@ import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumption
  */
 class BuidlingEnergyAggregatedDataWriter {
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(BuidlingEnergyAggregatedDataWriter.class);
 
@@ -46,8 +45,8 @@ class BuidlingEnergyAggregatedDataWriter {
 	 * @param outputPath
 	 */
 	void write(String outputPath, Map<String, EnergyConsumption> energyConsumption, List<Integer> timeBins) {
+		log.info("writing energy-consumption-data to " + outputPath + "energyConsumption.csv.gz.");
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputPath + "energyConsumption.csv.gz");
-		
 		try {
 			//write the header
 			writer.write("run;activityType;");
@@ -67,6 +66,7 @@ class BuidlingEnergyAggregatedDataWriter {
 			}
 			writer.flush();
 			writer.close();
+			log.info("finished (writing energy-consumption-data to " + outputPath + "energyConsumption.csv.gz).");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

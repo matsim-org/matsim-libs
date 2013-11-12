@@ -63,7 +63,7 @@ public class BuildingEnergyRawDataWriter {
 	/**
 	 */
 	void write(String path) {
-		log.info("writing raw-data to + " + path + ".");
+		log.info("writing raw-data to " + path + ".");
 		StringBuffer b = new StringBuffer();
 		b.append(";personWithWorkActivity;personsWithHomeActivity;personWithHomeAndWorkActivity;\n");
 		dumpSingleRunRawData(path, baseRunId, run2type2RawOccupancy.get(baseRunId));
@@ -85,7 +85,7 @@ public class BuildingEnergyRawDataWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		log.info("finished (writing raw-data to + " + path + ").");
+		log.info("finished (writing raw-data to " + path + ").");
 	}
 
 	/**

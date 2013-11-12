@@ -18,6 +18,9 @@
  * *********************************************************************** */
 package playground.vsp.buildingEnergy.energyCalculation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 
 
@@ -25,7 +28,7 @@ package playground.vsp.buildingEnergy.energyCalculation;
  * @author droeder
  *
  */
-public interface BuildingEnergyConsumptionRule{
+interface BuildingEnergyConsumptionRule{
 	
 	/**
 	 * 
@@ -33,10 +36,26 @@ public interface BuildingEnergyConsumptionRule{
 	 * @param currentOccupancy
 	 * @return energy consumption in kWh
 	 */
-	public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy);
+	double getEnergyConsumption_kWh(double maxSize, double currentOccupancy);
 
 	
-	public class OfficeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
+	
+	class BuildingEnergyConsumptionRuleFactory{
+		
+		private Map<String, BuildingEnergyConsumptionRule> rules = new HashMap<String, BuildingEnergyConsumptionRule>();   
+
+		void setRule(String actType, BuildingEnergyConsumptionRule rule){
+			this.rules.put(actType, rule);
+		}
+		
+		BuildingEnergyConsumptionRule getRule(String actType){
+			return rules.get(actType);
+		}
+	}
+	
+	
+	
+	class OfficeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
 		
 		private double additional;
 		private double baseLoad;
@@ -49,7 +68,7 @@ public interface BuildingEnergyConsumptionRule{
 		 * @param baseLoadPerPerson [kW]
 		 * @param additionalLoadPerPerson [kW]
 		 */
-		public OfficeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson, double someCoefficient) {
+		OfficeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson, double someCoefficient) {
 			this.td = td;
 			this.baseLoad = baseLoadPerPerson;
 			this. additional = additionalLoadPerPerson;
@@ -67,7 +86,7 @@ public interface BuildingEnergyConsumptionRule{
 		
 	}
 	
-	public class HomeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
+	class HomeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
 		
 		private double td;
 		private double baseLoad;
@@ -79,7 +98,7 @@ public interface BuildingEnergyConsumptionRule{
 		 * @param baseLoadPerPerson
 		 * @param additionalLoadPerPerson
 		 */
-		public HomeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson) {
+		HomeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson) {
 			this.td = td;
 			this.baseLoad = baseLoadPerPerson;
 			this. additional = additionalLoadPerPerson;

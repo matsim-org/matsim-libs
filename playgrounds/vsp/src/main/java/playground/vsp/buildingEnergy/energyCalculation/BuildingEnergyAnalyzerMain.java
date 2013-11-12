@@ -32,13 +32,14 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.Gbl;
 
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionCalculator.EnergyConsumption;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.BuildingEnergyConsumptionRuleFactory;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.HomeEnergyConsumptionRuleImpl;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.OfficeEnergyConsumptionRuleImpl;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyDataReader.LinkOccupancyStats;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyDataReader.PopulationStats;
 
 /**
- * analyzes the base-run and all other runs. Compares ``other'' runs against base run (!not yet!). 
+ * Analyzes the base-run and all other runs for the agents energy consumption.
  * The class assumes they all use the same network!
  * 
  * @author droeder
@@ -78,9 +79,7 @@ class BuildingEnergyAnalyzerMain {
 	private List<Integer> timeBins;
 	private HashSet<String> actTypes;
 	private HashMap<String, Map<Id, Integer>> maxPerLink;
-
-	private HashMap<String, BuildingEnergyConsumptionRule> rules;
-
+	private BuildingEnergyConsumptionRuleFactory rules;
 	private Map<String, EnergyConsumption> energyConsumption;
 
 	BuildingEnergyAnalyzerMain(String inputPath, 
@@ -91,8 +90,10 @@ class BuildingEnergyAnalyzerMain {
 									List<String> runs, 
 									final String homeType, 
 									final String workType,
-									final BuildingEnergyConsumptionRule calculatorWork,
-									final BuildingEnergyConsumptionRule calculatorHome) {
+									BuildingEnergyConsumptionRuleFactory consumptionRuleFactory)
+//									final BuildingEnergyConsumptionRule calculatorWork,
+//									final BuildingEnergyConsumptionRule calculatorHome) 
+									{
 		this.inputPath = inputPath;
 		this.outputPath = outputPath;
 		this.td = td;
@@ -101,16 +102,14 @@ class BuildingEnergyAnalyzerMain {
 		this.runIds = runs;
 		this.homeType = homeType;
 		this.workType = workType;
+		log.warn("check the analyzed activitytypes.");
 		this.actTypes = new HashSet<String>(){{
 			// TODO[dr] make this configurable
 			add(homeType);
 			add(workType);
+			add(new String("not specified"));
 		}};
-		this.rules = new HashMap<String, BuildingEnergyConsumptionRule>(){{
-			// TODO[dr] make this configurable
-			put(homeType, calculatorHome);
-			put(workType, calculatorWork);
-		}};
+		this.rules = consumptionRuleFactory;
 	}
 	
 	/**
@@ -252,7 +251,8 @@ class BuildingEnergyAnalyzerMain {
 			args = ARGS;
 		}
 		if(args.length < 12){
-			throw new IllegalArgumentException("expecting min 8 arguments {inputpath, outputPath, timeSliceSize, tmax, baseRunId, homeActivityType, workActivityType, runIds...");
+			throw new IllegalArgumentException("expecting min 12 arguments {inputpath, outputPath, timeSliceSize, tmax, " +
+					"baseRunId, homeActivityType, workActivityType, P_bo, P_so, beta, P_bh, P_ah, runIds...");
 		}
 		String inputPath = new File(args[0]).getAbsolutePath() + System.getProperty("file.separator");
 		String outputPath = new File(args[1]).getAbsolutePath() + System.getProperty("file.separator");
@@ -292,8 +292,13 @@ class BuildingEnergyAnalyzerMain {
 		}
 		BuildingEnergyConsumptionRule ecWork = new OfficeEnergyConsumptionRuleImpl(td, pbo, pso, beta);
 		BuildingEnergyConsumptionRule ecHome = new HomeEnergyConsumptionRuleImpl(td, pbh, pah);
+		BuildingEnergyConsumptionRuleFactory factory =  new BuildingEnergyConsumptionRuleFactory();
+		factory.setRule(homeType, ecHome);
+		factory.setRule(workType, ecWork);
+		// seems ``not specified'' is the morning home-activity (for the berlin-scenario)
+		factory.setRule(new String("not specified"), ecHome);
 		// run
-		new BuildingEnergyAnalyzerMain(inputPath, outputPath, td, tmax, baseRun, runs, homeType, workType, ecWork, ecHome).run();
+		new BuildingEnergyAnalyzerMain(inputPath, outputPath, td, tmax, baseRun, runs, homeType, workType, factory).run();
 		if(time){
 			Gbl.printCurrentThreadCpuTime();
 		}
