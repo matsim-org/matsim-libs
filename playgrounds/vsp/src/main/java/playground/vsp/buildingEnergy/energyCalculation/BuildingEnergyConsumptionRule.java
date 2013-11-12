@@ -25,7 +25,7 @@ package playground.vsp.buildingEnergy.energyCalculation;
  * @author droeder
  *
  */
-public interface EnergyConsumptionCalculator{
+public interface BuildingEnergyConsumptionRule{
 	
 	/**
 	 * 
@@ -36,7 +36,7 @@ public interface EnergyConsumptionCalculator{
 	public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy);
 
 	
-	public class OfficeEnergyConsumptionCalculatorImpl implements EnergyConsumptionCalculator{
+	public class OfficeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
 		
 		private double additional;
 		private double baseLoad;
@@ -49,7 +49,7 @@ public interface EnergyConsumptionCalculator{
 		 * @param baseLoadPerPerson [kW]
 		 * @param additionalLoadPerPerson [kW]
 		 */
-		public OfficeEnergyConsumptionCalculatorImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson, double someCoefficient) {
+		public OfficeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson, double someCoefficient) {
 			this.td = td;
 			this.baseLoad = baseLoadPerPerson;
 			this. additional = additionalLoadPerPerson;
@@ -67,13 +67,19 @@ public interface EnergyConsumptionCalculator{
 		
 	}
 	
-	public class HomeEnergyConsumptionCalculatorImpl implements EnergyConsumptionCalculator{
+	public class HomeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
 		
 		private double td;
 		private double baseLoad;
 		private double additional;
 
-		public HomeEnergyConsumptionCalculatorImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson) {
+		/**
+		 * 
+		 * @param td
+		 * @param baseLoadPerPerson
+		 * @param additionalLoadPerPerson
+		 */
+		public HomeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson) {
 			this.td = td;
 			this.baseLoad = baseLoadPerPerson;
 			this. additional = additionalLoadPerPerson;
