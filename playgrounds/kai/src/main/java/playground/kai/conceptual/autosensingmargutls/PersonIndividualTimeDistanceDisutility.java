@@ -27,7 +27,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * A simple cost calculator which only respects time and distance to calculate generalized costs
+ * A  travel disutility calculator respecting (only) time and distance, but taking person-individual effective marginal disutilities into account.
  *
  * @author nagel
  */
@@ -43,7 +43,15 @@ public class PersonIndividualTimeDistanceDisutility implements TravelDisutility 
 	public PersonIndividualTimeDistanceDisutility(final TravelTime timeCalculator, EffectiveMarginalUtilitiesContainer muc) {
 		this.timeCalculator = timeCalculator;
 
-
+		this.marginalCostOfTimeMin = - muc.getEffectiveMarginalUtilityOfTravelTimeMAX() ;
+		if ( this.marginalCostOfTimeMin < 0. ) {
+			throw new RuntimeException( "marginal cost of time < 0.; probably sign error somewhere ... ") ;
+		}
+		
+		this.marginalCostOfDistanceMin = - muc.getEffectiveMarginalUtilityOfDistanceMAX() ;
+		if ( this.marginalCostOfDistanceMin < 0. ) {
+			throw new RuntimeException( "marginal cost of distance < 0. ; probably sign error somewhere ... ") ;
+		}
 	}
 
 	@Override
@@ -51,16 +59,26 @@ public class PersonIndividualTimeDistanceDisutility implements TravelDisutility 
 	{
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
-		double marginalCostOfTime = muc.getEffectiveMarginalUtilityOfTravelTime().get(person) ;
-		double marginalCostOfDistance = muc.getMarginalUtilityOfDistance().get(person) ;
+		double marginalCostOfTime = - muc.getEffectiveMarginalUtilityOfTravelTime().get(person) ;
+		if ( marginalCostOfTime < 0. ) {
+			throw new RuntimeException("marginalCostOfTime < 0; probably a sign error somewhere") ;
+		}
+		double marginalCostOfDistance = - muc.getMarginalUtilityOfDistance().get(person) ;
+		if ( marginalCostOfDistance < 0. ) {
+			throw new RuntimeException("marginalCostOfDistance < 0; probably a sign error somewhere") ;
+		}
+
 		return marginalCostOfTime * travelTime + marginalCostOfDistance * link.getLength();
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(final Link link) {
+		// Person is not available here, so we cannot make it person dependent.  However, this may be used for the router preprocessing,
+		// in which case a dependence on person-specific attributes does not make sense anyways. kai, nov'13
 
-		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTimeMin
-				+ this.marginalCostOfDistanceMin * link.getLength();
+		double travelTime = link.getLength() / link.getFreespeed() ;
+
+		return this.marginalCostOfTimeMin * travelTime + this.marginalCostOfDistanceMin * link.getLength();
 	}
 
 }

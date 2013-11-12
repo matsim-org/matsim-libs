@@ -47,6 +47,9 @@ class RouterUtils {
 		
 		EventsToScore e2s = new EventsToScore(scenario, scoringFunctionFactory ) ;
 		
+		double effMargUtlTTimeMAX = Double.NEGATIVE_INFINITY ;
+		double effMargUtlDistanceMAX = Double.NEGATIVE_INFINITY ;
+		
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			List<Double> scores = new ArrayList<Double>() ;
 			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0) ;
@@ -75,10 +78,12 @@ class RouterUtils {
 			double utts = (  (scores.get(2) - scores.get(1)) - (scores.get(1)-scores.get(0)) ) / deltaTriptime ;
 			System.out.println( "eff marg utl of travel time: " + (utts * 3600.) + " per hr") ;
 			muc.getEffectiveMarginalUtilityOfTravelTime().put( person, utts ) ;
+			effMargUtlTTimeMAX = Math.max( effMargUtlTTimeMAX, utts ) ;
 			
 			double utds = - ( (scores.get(3) - scores.get(2)) - ( scores.get(2)-scores.get(1)) ) / deltaDistance ;
 			System.out.println( "marg utl of travel distance: " + (utds * 1000.) + " per km"); 
 			muc.getMarginalUtilityOfDistance().put( person, utds ) ;
+			effMargUtlDistanceMAX = Math.max( effMargUtlDistanceMAX, utds ) ;
 			
 			e2s.handleEvent( new PersonMoneyEvent( 33.*3600., person.getId(), 1. ) ) ;
 			scores.add( e2s.getScoringFunctionForAgent( person.getId() ).getScore() ) ;
@@ -87,6 +92,9 @@ class RouterUtils {
 			muc.getMarginalUtilityOfMoney().put( person, mum )  ;
 
 		}
+		
+		muc.setEffectiveMarginalUtilityOfTravelTimeMAX( effMargUtlTTimeMAX );
+		muc.setEffectiveMarginalUtilityOfDistanceMAX( effMargUtlDistanceMAX );
 		
 		return muc ;
 	}
