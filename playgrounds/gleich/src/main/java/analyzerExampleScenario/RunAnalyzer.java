@@ -1,5 +1,6 @@
 package analyzerExampleScenario;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -70,54 +71,41 @@ public class RunAnalyzer {
 		// Some analyzers read the result plan files
 		Config config = ConfigUtils.loadConfig("Z:/WinHome/ArbeitWorkspace/Analyzer/input/config_pttutorial_resultPaths.xml"); //loads plans for iteration 0
 
-		//config.vspExperimental().set......    //input missing
-
-		
 		scenario = ScenarioUtils.loadScenario(config);
 		//new MatsimNetworkReader(scenario).readFile("input/network_tut.xml");
 		//new MatsimPopulationReader(scenario).readFile("output/test1/ITERS/it.10/10.plans.xml.gz");
 		
-		/* TODO: emissions?, check missing results of monetarypaymentsanalyzer, PtTripAnalysis (no runClass found)
-		*  
-		* second line and second mode (bus) added from node 14 to 23
-		*  
-		* everywhere working coordinate system: "DHDN_GK4"
-		*/
-		
-//		rAct2Mode();//shows the arrivals at wrong coordinates
-//		rAct2ModeWithPlanCoord();
-//		rBeeline2PtDistanceAnalysis();
-//		rBoardingAlightingCountAnalyzer();
-//		rBvgAna();// mehrere Analyzer
-//		rCarDistanceAnalyzer();
-//		rEmissionsAnalyzer(); //needs an emission events file created with the package emissionsWriter which needs settings made with VspExperimentalConfigGroup which is not intended for public use -> shall this analyzer be included or not?
-//		rLegModeDistanceDistribution(); // reads the plans in the scenario -> scenario should include the most recent plans (set in config)
-//		rMonetaryPaymentsAnalyzer(); //returns 0.0, maybe because there are no transfers, however the sum is intended to equal operator revenue: data per agent missing?
-//		rPlansSubset();
-//		rPtAccesibility();
-//		rPtDriverPrefix();
-//		rPtOperator();
-//		rPtPaxVolumes();
-//		rPtRoutes2PaxAnalysis();
-//		rPtTravelStats();
-//		rPtTripAnalysis();
-//		rStuckAgents();
-//		rTransitSchedule2Shp();
-//		rTransitScheduleAnalyser();
-//		rTransitVehicleVolume();
-//		rTravelTimeAnalyzer();
-//		rUserBenefits();
-//		rWaitingTimes();
-//		rWelfareAnalyzer();
+		rAct2Mode();//shows the arrivals at wrong coordinates
+		rAct2ModeWithPlanCoord();
+		rBoardingAlightingCountAnalyzer();
+		rBvgAna();// mehrere Analyzer
+		rCarDistanceAnalyzer();
+		/*rEmissionsAnalyzer(); */ //not included: needs an emission events file created with the package emissionsWriter which needs settings made with VspExperimentalConfigGroup which is not intended for public use
+		rLegModeDistanceDistribution(); // reads the plans in the scenario -> scenario should include the most recent plans (set in config)
+		rMonetaryPaymentsAnalyzer();
+		rPlansSubset();
+		rPtAccesibility();
+		rPtCircuityAnalysis();
+		rPtDriverPrefix();
+		rPtOperator();
+		rPtPaxVolumes();
+		rPtRoutes2PaxAnalysis();
+		rPtTravelStats();
+		/*rPtTripAnalysis(); */ // not working and not included
+		rStuckAgents();
+		rTransitSchedule2Shp();
+		rTransitScheduleAnalyser();
+		rTransitVehicleVolume();
+		rTravelTimeAnalyzer();
+		rUserBenefits();
+		rWaitingTimes();
+		rWelfareAnalyzer();
 	}
 	
 	private static void rAct2Mode() {
-		//test without facilities, although stated to be necessary in ActivityToModeAnalysis
+		//works without facilities, although stated to be necessary in ActivityToModeAnalysis
 		Set<Id> personsOfInterest = new TreeSet<Id>();
-		/*personsOfInterest.add(new IdImpl(2));
-		personsOfInterest.add(new IdImpl(20));
-		personsOfInterest.add(new IdImpl(200));
-		personsOfInterest.add(new IdImpl(500));*/
+
 		for(Id id: scenario.getPopulation().getPersons().keySet()){
 			personsOfInterest.add(id);
 		}
@@ -130,20 +118,18 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		analysis.postProcessData();
+		(new File(outputDirectory + "Act2Mode")).mkdir(); 
 		analysis.writeResults(outputDirectory + "Act2Mode/");
 	}
-/* ---	
+
 	private static void rAct2ModeWithPlanCoord() {
-		//test without facilities, although stated to be necessary in ActivityToModeAnalysis
 		Set<Id> personsOfInterest = new TreeSet<Id>();
-		/*personsOfInterest.add(new IdImpl(2));
-		personsOfInterest.add(new IdImpl(20));
-		personsOfInterest.add(new IdImpl(200));
-		personsOfInterest.add(new IdImpl(500));*/
-/* ---	
-	for(Id id: scenario.getPopulation().getPersons().keySet()){
+		//personsOfInterest.add(new IdImpl("car_11_to_12_Nr100"));
+		
+		for(Id id: scenario.getPopulation().getPersons().keySet()){
 			personsOfInterest.add(id);
 		}
+		
 		Act2ModeWithPlanCoordAnalysis analysis = new Act2ModeWithPlanCoordAnalysis(scenario, personsOfInterest, 30*60, "DHDN_GK4");
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = analysis.getEventHandler();
@@ -153,9 +139,10 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		analysis.postProcessData();
+		(new File(outputDirectory + "Act2ModeWithPlanCoord")).mkdir(); 
 		analysis.writeResults(outputDirectory + "Act2ModeWithPlanCoord/");
 	}
---- */	
+
 	private static void rBvgAna(){
 		VehDelayAtStopHistogramAnalyzer cda = new VehDelayAtStopHistogramAnalyzer(100);
 		cda.init((ScenarioImpl) scenario);
@@ -168,6 +155,7 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		cda.postProcessData();
+		(new File(outputDirectory + "BvgAna")).mkdir(); 
 		cda.writeResults(outputDirectory + "BvgAna/");
 		
 		PtTripTravelTimeTransfersAnalyzer transfer = new PtTripTravelTimeTransfersAnalyzer();
@@ -181,12 +169,12 @@ public class RunAnalyzer {
 		MatsimEventsReader reader2 = new MatsimEventsReader(events2);
 		reader2.readFile(eventFile);
 		transfer.postProcessData();
-		transfer.writeResults(outputDirectory + "output/BvgAna/");//pTripTransfers.txt empty due to no transfers
+		transfer.writeResults(outputDirectory + "BvgAna/");
+		//pTripTransfers.txt empty due to no transfers in the example Scenario
 	}
 
 	private static void rBoardingAlightingCountAnalyzer(){
-		BoardingAlightingCountAnalyzer ba = new BoardingAlightingCountAnalyzer(scenario, 30*60, "DHDN_GK4");	//Coordinate system Atlantis is used in the config_pttutorial
-		//ba.preProcessData();  // unused in BoardingAlightingCountAnalyzer
+		BoardingAlightingCountAnalyzer ba = new BoardingAlightingCountAnalyzer(scenario, 30*60, "DHDN_GK4");
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = ba.getEventHandler();
 		for(EventHandler eh : handler){
@@ -195,6 +183,7 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		ba.postProcessData();
+		(new File(outputDirectory + "BoardingAlightingCountAnalyzer")).mkdir(); 
 		ba.writeResults(outputDirectory + "BoardingAlightingCountAnalyzer/");
 	}
 	
@@ -210,11 +199,13 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		cda.postProcessData();
+		(new File(outputDirectory + "CarDistanceAnalyzer")).mkdir(); 
 		cda.writeResults(outputDirectory + "CarDistanceAnalyzer/");
 	}
 	
 	private static void rEmissionsAnalyzer() {
-		EmissionsAnalyzer ema = new EmissionsAnalyzer("Z:/WinHome/ArbeitWorkspace/Analyzer/output/test1/ITERS/it.10/10.events.xml.gz"); //insert emissions event file
+		 //insert emissions event file
+		EmissionsAnalyzer ema = new EmissionsAnalyzer("Z:/WinHome/ArbeitWorkspace/Analyzer/output/test1/ITERS/it.10/10.events.xml.gz");
 		ema.init((ScenarioImpl) scenario);
 		ema.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
@@ -225,21 +216,21 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		ema.postProcessData();
+		(new File(outputDirectory + "EmissionsAnalyzer")).mkdir(); 
 		ema.writeResults(outputDirectory + "EmissionsAnalyzer/");
 	}
 	
 	private static void rLegModeDistanceDistribution(){
 		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
 		lmdd.init(scenario);
-		// LegModeDistancedistribution neither uses preProcessData() nor EventHandler
 		lmdd.postProcessData();
+		(new File(outputDirectory + "LegModeDistanceDistribution")).mkdir(); 
 		lmdd.writeResults(outputDirectory + "LegModeDistanceDistribution/");
 	}
 	
 	private static void rMonetaryPaymentsAnalyzer(){
 		MonetaryPaymentsAnalyzer mpa = new MonetaryPaymentsAnalyzer();
 		mpa.init((ScenarioImpl) scenario);
-		//mpa.preProcessData(); //unused
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = mpa.getEventHandler();
 		for(EventHandler eh : handler){
@@ -248,6 +239,7 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		mpa.postProcessData();
+		(new File(outputDirectory + "MonetaryPaymentsAnalyzer")).mkdir(); 
 		mpa.writeResults(outputDirectory + "MonetaryPaymentsAnalyzer/");
 	}
 	
@@ -258,6 +250,7 @@ public class RunAnalyzer {
 		GetPlansSubset gps = new GetPlansSubset(scenario, selection, true);
 		//gps.preProcessData(); //unused, no EventHandler
 		gps.postProcessData();
+		(new File(outputDirectory + "PlansSubset")).mkdir(); 
 		gps.writeResults(outputDirectory + "PlansSubset/");
 	}
 	
@@ -278,6 +271,7 @@ public class RunAnalyzer {
 		PtAccessibility pta = new PtAccessibility(scenario, distanceCluster, 16, activityCluster, "DHDN_GK4", 10);
 		pta.preProcessData();
 		pta.postProcessData();
+		(new File(outputDirectory + "PtAccessibility")).mkdir(); 
 		pta.writeResults(outputDirectory + "PtAccessibility/");
 	}
 	
@@ -294,7 +288,8 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		analysis.postProcessData();
-		analysis.writeResults(outputDirectory + "Beeline2PtDistanceAnalysis/");
+		(new File(outputDirectory + "PtCircuityAnalysis")).mkdir(); 
+		analysis.writeResults(outputDirectory + "PtCircuityAnalysis/");
 	}
 	
 	private static void rPtDriverPrefix(){
@@ -307,6 +302,7 @@ public class RunAnalyzer {
 		}
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
+		(new File(outputDirectory + "PtDriverIdAnalyzer")).mkdir(); 
 		pda.writeResults(outputDirectory + "PtDriverIdAnalyzer/");//no output file, only console
 	}
 	
@@ -322,6 +318,7 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		poa.postProcessData();
+		(new File(outputDirectory + "PtOperator")).mkdir(); 
 		poa.writeResults(outputDirectory + "PtOperator/");
 	}
 	
@@ -335,6 +332,7 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		ppv.postProcessData();
+		(new File(outputDirectory + "PtPaxVolumes")).mkdir(); 
 		ppv.writeResults(outputDirectory + "PtPaxVolumes/");
 	}
 	
@@ -345,7 +343,8 @@ public class RunAnalyzer {
 		ScenarioImpl sc = (ScenarioImpl) scenario;
 
 		Vehicles vehicles = sc.getVehicles();
-		PtRoutes2PaxAnalysis ppa = new PtRoutes2PaxAnalysis(lines, vehicles, 60*60, 24*(60/60));//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices)
+		//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices)
+		PtRoutes2PaxAnalysis ppa = new PtRoutes2PaxAnalysis(lines, vehicles, 60*60, 24*(60/60));
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = ppa.getEventHandler();
@@ -354,7 +353,8 @@ public class RunAnalyzer {
 		}
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
-		ppa.writeResults(outputDirectory + "PtRoutes2PaxAnalysis/interval60min/");//R-data not yet checked
+		(new File(outputDirectory + "PtRoutes2PaxAnalysis")).mkdir(); 
+		ppa.writeResults(outputDirectory + "PtRoutes2PaxAnalysis/");
 	}
 	
 	private static void rPtTravelStats(){
@@ -366,7 +366,7 @@ public class RunAnalyzer {
 		}
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
-		//neither init() nor pre- nor postProcess()
+		(new File(outputDirectory + "PtTravelStats")).mkdir(); 
 		tsa.writeResults(outputDirectory + "PtTravelStats/");
 	}
 	
@@ -379,6 +379,8 @@ public class RunAnalyzer {
 		networkModes.add("car");
 		networkModes.add("bus");
 		TTtripAnalysis analysis = new TTtripAnalysis(ptModes, networkModes, scenario.getPopulation());
+		(new File(outputDirectory + "PtTripAnalysis")).mkdir(); 
+		analysis.writeResults(outputDirectory + "PtTripAnalysis/");
 	}
 	
 	private static void rStuckAgents(){
@@ -391,18 +393,20 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		stuck.postProcessData();
-		stuck.writeResults(outputDirectory + "StuckAgents/");//empty due to no stuck events to be written
+		(new File(outputDirectory + "StuckAgents")).mkdir(); 
+		stuck.writeResults(outputDirectory + "StuckAgents/");
+		//empty due to no stuck events to be written
 	}
 	
 	private static void rTransitSchedule2Shp(){
-		TransitSchedule2Shp tshp = new TransitSchedule2Shp(scenario, "DHDN_GK4");//problem with the coordinate system solved
-		//no init(), pre(9, post(), events
+		TransitSchedule2Shp tshp = new TransitSchedule2Shp(scenario, "DHDN_GK4");
+		(new File(outputDirectory + "TransitSchedule2Shp")).mkdir(); 
 		tshp.writeResults(outputDirectory + "TransitSchedule2Shp/");
 	}
 	
 	private static void rTransitScheduleAnalyser(){
 		TransitScheduleAnalyser tsa = new TransitScheduleAnalyser(scenario);
-		//no init(), pre(9, post(), events
+		(new File(outputDirectory + "TransitScheduleAnalyser")).mkdir(); 
 		tsa.writeResults(outputDirectory + "TransitScheduleAnalyser/");
 	}
 	
@@ -415,8 +419,8 @@ public class RunAnalyzer {
 		}
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
-		//neither init() nor pre- Process()
 		tsa.postProcessData();
+		(new File(outputDirectory + "TransitVehicleVolume")).mkdir(); 
 		tsa.writeResults(outputDirectory + "TransitVehicleVolume/");
 	}
 		
@@ -432,6 +436,7 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		tt.postProcessData();
+		(new File(outputDirectory + "TravelTimeAnalyzer")).mkdir(); 
 		tt.writeResults(outputDirectory + "TravelTimeAnalyzer/");
 	}
 
@@ -439,6 +444,7 @@ public class RunAnalyzer {
 		UserBenefitsAnalyzer uba = new UserBenefitsAnalyzer();
 		uba.init((ScenarioImpl) scenario);
 		uba.preProcessData();
+		(new File(outputDirectory + "UserBenefits")).mkdir(); 
 		uba.writeResults(outputDirectory + "UserBenefits/");
 		
 	}
@@ -455,6 +461,7 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		tt.postProcessData();
+		(new File(outputDirectory + "WaitingTimes")).mkdir(); 
 		tt.writeResults(outputDirectory + "WaitingTimes/");
 	}
 	
@@ -470,6 +477,7 @@ public class RunAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventFile);
 		tt.postProcessData();
+		(new File(outputDirectory + "WelfareAnalyzer")).mkdir(); 
 		tt.writeResults(outputDirectory + "WelfareAnalyzer/");
 	}
 }
