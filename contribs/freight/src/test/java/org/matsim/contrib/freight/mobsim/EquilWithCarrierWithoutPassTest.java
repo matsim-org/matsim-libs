@@ -37,7 +37,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
-		String NETWORK_FILENAME = getInputDirectory() + "network.xml";
+		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		
@@ -56,7 +56,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);
 
-		planFile = getInputDirectory() + "carrierPlansEquils.xml";
+		planFile = getClassInputDirectory() + "carrierPlansEquils.xml";
 	}
 
 	
@@ -95,25 +95,32 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	}
 	
 	public void testScoringInSeconds(){
-//		try{
+
 		CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
-//		carrierControler.setEnableWithinDayActivityReScheduling(true);
+
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);
 		controler.run();	
 
-
-
-		Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
-		assertEquals(-8040.0,carrier1.getSelectedPlan().getScore());
+		Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));	
+		assertEquals(-240.0, carrier1.getSelectedPlan().getScore(),2.0);
 
 		Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
-		assertEquals(-3062.0,carrier2.getSelectedPlan().getScore(),50.0);
+		assertEquals(0.0,carrier2.getSelectedPlan().getScore());
 
-//		}
-//		catch(Exception e){
-//			assertTrue(false);
-//		}
+	}
+	
+	public void testScoringInSecondsWithWithinDayRescheduling(){
+		CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
+		carrierControler.setEnableWithinDayActivityReScheduling(true);
+		controler.addControlerListener(carrierControler);
+		controler.setOverwriteFiles(true);
+		controler.run();	
+
+		Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));	
+		assertEquals(-4871.0, carrier1.getSelectedPlan().getScore(),2.0);
+
+		
 	}
 
 	

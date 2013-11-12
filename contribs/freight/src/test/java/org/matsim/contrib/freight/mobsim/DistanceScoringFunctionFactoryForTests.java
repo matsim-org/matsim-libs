@@ -101,7 +101,8 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 			}
 			
 			private double getFixEmploymentCost(CarrierVehicle vehicle) {
-				return vehicle.getVehicleType().getVehicleCostInformation().fix;
+				return 0;
+//				return vehicle.getVehicleType().getVehicleCostInformation().fix;
 			}
 
 			private double getToll(Id linkId, CarrierVehicle vehicle, Person driver) {
@@ -109,11 +110,13 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 			}
 
 			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
-				return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
+				return 1.0;
+//				return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
 			}
 
 			private double getTimeParameter(CarrierVehicle vehicle, Person driver) {
-				return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
+				return 0.0;
+//				return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
 			}
 
 			private CarrierVehicle getVehicle(Id vehicleId) {

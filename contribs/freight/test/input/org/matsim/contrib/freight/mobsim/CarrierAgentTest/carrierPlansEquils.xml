@@ -29,14 +29,14 @@
 
 <carriers>
 		<carrier id="carrier1" linkId="1">
-			<vehicles>
-				<vehicle id="vehicle_c1" linkId="1" cap="30" earliestStart="06:00:00" latestEnd="23:59:59"/>
-				<vehicle id="vehicle_c2" linkId="1" cap="30" earliestStart="06:00:00" latestEnd="23:59:59"/>
-			</vehicles>
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="vehicle_c1" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
 			
 			<shipments>
-				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="09:00:00" endDelivery="20:00:00" pickupServiceTime="00:02:00" deliveryServiceTime="00:02:00"/>
-				<shipment id="s2" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="00:0:00" deliveryServiceTime="00:0:00"/>
+				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/>
 <!-- 				<shipment id="s2" from="20" to="22" size="10" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/> -->
 			</shipments>
 			
@@ -56,53 +56,34 @@
 					</leg>
 					<act type="end"/>
 				</tour>
-				
-				<tour vehicleId="vehicle_c2">
-					<act type="start" end_time="07:00:00"/>
-					<leg dep_time="07:00:00" transp_time="00:30:00">
-						<route>6</route>
-					</leg>
-					<act type="pickup" shipmentId="s2" end_time="07:00:00"/>
-					<leg dep_time="07:00:00" transp_time="00:00:00">
-						<route>20 21</route>
-					</leg>
-					<act type="delivery" shipmentId="s2" end_time="07:30:00"/>
-					<leg dep_time="07:00:00" transp_time="00:00:00">
-						<route>23</route>
-					</leg>
-					<act type="end"/>
-				</tour>
 			</plan>
-		</carrier>
-		
-		<carrier id="carrier2" linkId="1">
-			<vehicles>
-				<vehicle id="c2_vehicle_c1" linkId="1" cap="30" earliestStart="06:00:00" latestEnd="23:59:59"/>
-			</vehicles>
 			
-			<shipments>
-				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
-			</shipments>
-			
-			<plan score="-100.0" selected="true">
-				<tour vehicleId="c2_vehicle_c1">
-					<act type="start" end_time="07:00:00"/>
-					<leg dep_time="07:00:00" transp_time="00:30:00">
-						<route>6</route>
-					</leg>
-					<act type="pickup" shipmentId="s1" end_time="07:00:00"/>
-					<leg dep_time="07:00:00" transp_time="00:00:00">
-						<route>20 21</route>
-					</leg>
-					<act type="delivery" shipmentId="s1" end_time="07:30:00"/>
-					<leg dep_time="07:00:00" transp_time="00:00:00">
-						<route>23</route>
-					</leg>
-					<act type="end"/>
-				</tour>
-			</plan>
+<!-- 			<plan score="-1000.0" selected="false"> -->
+<!-- 				<tour vehicleId="vehicle_c1"> -->
+<!-- 					<act type="start" end_time="07:00:00"/> -->
+<!-- 					<leg dep_time="07:00:00" transp_time="00:30:00"> -->
+<!-- 						<route>2 3 4</route> -->
+<!-- 					</leg> -->
+<!-- 					<act type="pickup" shipmentId="s1" end_time="07:00:00"/> -->
+<!-- 					<leg dep_time="07:00:00" transp_time="00:00:00"> -->
+<!-- 						<route></route> -->
+<!-- 					</leg> -->
+<!-- 					<act type="delivery" shipmentId="s1" end_time="07:30:00"/> -->
+<!-- 					<leg dep_time="07:00:00" transp_time="00:00:00"> -->
+<!-- 						<route></route> -->
+<!-- 					</leg> -->
+<!-- 					<act type="pickup" shipmentId="s2" end_time="07:30:00"/> -->
+<!-- 					<leg dep_time="07:00:00" transp_time="00:00:00"> -->
+<!-- 						<route></route> -->
+<!-- 					</leg> -->
+<!-- 					<act type="delivery" shipmentId="s2" end_time="07:30:00"/> -->
+<!-- 					<leg dep_time="07:00:00" transp_time="00:00:00"> -->
+<!-- 						<route></route> -->
+<!-- 					</leg> -->
+<!-- 					<act type="end"/> -->
+<!-- 				</tour> -->
+<!-- 			</plan> -->
 		</carrier>
-		
 	</carriers>
 	
 	

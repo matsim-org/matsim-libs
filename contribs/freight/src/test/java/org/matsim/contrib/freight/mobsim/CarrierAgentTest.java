@@ -19,7 +19,7 @@ public class CarrierAgentTest extends MatsimTestCase{
 		super.setUp();
 		
 		carriers = new Carriers();
-		new CarrierPlanReader(carriers).read(getInputDirectory() + "carrierPlansEquils.xml");
+		new CarrierPlanReader(carriers).read(getClassInputDirectory() + "carrierPlansEquils.xml");
 		
 //		network = Scenario
 //		getInputDirectory() + "network.xml"

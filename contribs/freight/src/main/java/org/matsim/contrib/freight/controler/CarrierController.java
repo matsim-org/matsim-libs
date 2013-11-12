@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanReader;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
@@ -113,11 +113,11 @@ ReplanningListener, IterationEndsListener {
 	 * 
 	 * @param carrierPlansFilename
 	 * @param strategyManagerFactory
-	 * @param scoringFunctionFactory
+	 * @param scoringFunctionFactory (not null)
 	 */
 	public CarrierController(String carrierPlansFilename, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory){
 		this.carriers = new Carriers();
-		new CarrierPlanReader(carriers).read(carrierPlansFilename);
+		new CarrierPlanXmlReaderV2(carriers).read(carrierPlansFilename);
 		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
 		this.carrierScoringFunctionFactory = scoringFunctionFactory;
 	}
@@ -139,14 +139,7 @@ ReplanningListener, IterationEndsListener {
 	}
 
 	@Override
-	public void notifyStartup(StartupEvent event) {
-		//		if(carriers == null){
-		//			carriers = new Carriers();
-		//			new CarrierPlanReader(carriers).read(carrierPlanFilename);
-		//		}
-		//		assert carrierScoringFunctionFactory != null : "carrierScoringFunctionFactory must be set";
-		//		assert carrierPlanStrategyManagerFactory != null : "strategyManagerFactory must be set";
-	}
+	public void notifyStartup(StartupEvent event) {}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
@@ -156,7 +149,6 @@ ReplanningListener, IterationEndsListener {
 		mobsimFactory.setWithinDayActivityReScheduling(withinDayReSchedulingEnabled);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		controler.getEvents().addHandler(carrierAgentTracker);
-		//		carrierAgentTracker.createPlans();
 	}
 
 	@Override
@@ -203,10 +195,7 @@ ReplanningListener, IterationEndsListener {
 	}
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		//		String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
-		//		new CarrierPlanWriter(carriers.getCarriers().values()).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
-	}
+	public void notifyIterationEnds(IterationEndsEvent event) {}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {

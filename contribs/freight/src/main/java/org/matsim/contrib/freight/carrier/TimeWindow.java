@@ -1,5 +1,9 @@
 package org.matsim.contrib.freight.carrier;
 
+
+import org.matsim.core.utils.misc.Time;
+
+
 /**
  * Q: What happens/should happen if the time window is not sufficient to unload, or
  * the vehicle arrives after the time window?
@@ -29,6 +33,7 @@ package org.matsim.contrib.freight.carrier;
  * 
  * @author (of code) sschroeder (of docu) kai based on sschroeder
  */
+
 public class TimeWindow {
 
 	public static TimeWindow newInstance(double start, double end) {
@@ -54,7 +59,7 @@ public class TimeWindow {
 
 	@Override
 	public String toString() {
-		return "[start=" + start + ", end=" + end + "]";
+		return "[start=" + Time.writeTime(start) + ", end=" + Time.writeTime(end) + "]";
 	}
 
 }

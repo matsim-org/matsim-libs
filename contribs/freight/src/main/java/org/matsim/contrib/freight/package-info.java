@@ -7,3 +7,5 @@
  * @author (of documentation) nagel
   */
 package org.matsim.contrib.freight;
+
+  

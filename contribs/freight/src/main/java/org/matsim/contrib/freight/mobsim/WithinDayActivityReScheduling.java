@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.freight.carrier.Tour.Start;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
@@ -22,6 +23,8 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.utils.misc.Time;
 
 class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener{
 
@@ -77,8 +80,11 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 			return false;
 		}	
 		
-		if (planAgent.getCurrentPlanElement() instanceof Activity) {
-			ActivityImpl act = (ActivityImpl) planAgent.getCurrentPlanElement();
+		PlanElement currentPlanElement = planAgent.getCurrentPlanElement();
+//		logger.warn("PLANELEMENT time="+time+" " + currentPlanElement);
+		
+		if (currentPlanElement instanceof Activity) {
+			ActivityImpl act = (ActivityImpl) currentPlanElement;
 			if(encounteredActivities.contains(act)){
 //				logger.info(" returning false since we have already seen the activity " ) ;
 				return false;
@@ -92,8 +98,9 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 			}
 			else {
 				double newEndTime = Math.max(time, plannedActivity.getTimeWindow().getStart()) + plannedActivity.getDuration();
-				logger.info("[agentId="+ agentId + "][currentTime="+time+"][actDuration="+plannedActivity.getDuration()+
-						"[plannedActEnd="+ act.getEndTime() + "][newActEnd="+newEndTime+"]");
+				logger.info("[agentId="+ agentId + "][currentTime="+Time.writeTime(time)+"][actDuration="+plannedActivity.getDuration()+
+						"[timeWindow="+ plannedActivity.getTimeWindow() + "][plannedActEnd="+ Time.writeTime(act.getEndTime()) + "][newActEnd="+Time.writeTime(newEndTime)+"]");
+				act.setMaximumDuration(Time.UNDEFINED_TIME);
 				act.setEndTime(newEndTime);
 				this.withinDayAgentUtils.calculateAndSetDepartureTime(mobsimAgent, act);
 				internalInterface.rescheduleActivityEnd(mobsimAgent);

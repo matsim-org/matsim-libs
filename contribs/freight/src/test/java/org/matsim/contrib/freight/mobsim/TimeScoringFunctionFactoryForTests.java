@@ -19,6 +19,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.core.utils.misc.Time;
 
 @Ignore
 public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
@@ -101,7 +102,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 			}
 			
 			private double getFixEmploymentCost(CarrierVehicle vehicle) {
-				return vehicle.getVehicleType().getVehicleCostInformation().fix;
+				return 0.0;
 			}
 
 			private double getToll(Id linkId, CarrierVehicle vehicle, Person driver) {
@@ -109,11 +110,11 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 			}
 
 			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
-				return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
+				return 0.0;
 			}
 
 			private double getTimeParameter(CarrierVehicle vehicle, Person driver) {
-				return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
+				return 1.0;
 			}
 
 			private CarrierVehicle getVehicle(Id vehicleId) {
@@ -135,22 +136,29 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 		 
 		 double startTimeOfEnd; 
 		 
+		 double timeAtActivities = 0.0;
+		 
 		 double amountPerHour = 20.0;
+		 
+		 double startCurrentAct;
+		 
+		 double time_at_activities = 0.0;
 		 
 		@Override
 		public void startActivity(double time, Activity act) {
-			if(act.getType().equals(FreightConstants.END)){
-				startTimeOfEnd = time;
+			if(!act.getType().equals(FreightConstants.END)){
+				System.out.println("act_start="+ Time.writeTime(time)+" act="+act);
+				startCurrentAct = time;				
 			}
 		}
 
 		@Override
 		public void endActivity(double time, Activity act) {
-			if(firstEnd){
-				startTime = time;
-				firstEnd = false;
-			}
-			
+			if(!act.getType().equals("start")){
+				System.out.println("act_end="+Time.writeTime(time)+" act="+act);
+				time_at_activities += time - startCurrentAct;
+				System.out.println("time_at_activities="+time_at_activities);
+			}		
 		}
 
 		@Override
@@ -161,13 +169,14 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 		@Override
 		public double getScore() {
-			return Math.round((-1)*(startTimeOfEnd-startTime));
+			return Math.round((-1)*(time_at_activities));
 		}
 
 		@Override
 		public void reset() {
 			startTime = 0.0;
 			startTimeOfEnd = 0.0;
+			time_at_activities = 0.0;
 			firstEnd = true;
 		}
 		 

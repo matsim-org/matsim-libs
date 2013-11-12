@@ -29,10 +29,12 @@
 
 <carriers>
 		<carrier id="carrier1" linkId="1">
-			<vehicles>
-				<vehicle id="vehicle_c1" linkId="1" cap="30" earliestStart="06:00:00" latestEnd="23:59:59"/>
-				<vehicle id="vehicle_c2" linkId="1" cap="30" earliestStart="06:00:00" latestEnd="23:59:59"/>
-			</vehicles>
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="vehicle_c1" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
+					<vehicle id="vehicle_c2" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
 			
 			<shipments>
 				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="09:00:00" endDelivery="20:00:00" pickupServiceTime="00:02:00" deliveryServiceTime="00:02:00"/>
@@ -76,9 +78,11 @@
 		</carrier>
 		
 		<carrier id="carrier2" linkId="1">
-			<vehicles>
-				<vehicle id="c2_vehicle_c1" linkId="1" cap="30" earliestStart="06:00:00" latestEnd="23:59:59"/>
-			</vehicles>
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="c2_vehicle_c1" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
 			
 			<shipments>
 				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0" pickupServiceTime="00:00:00" deliveryServiceTime="00:00:00"/>
@@ -104,9 +108,11 @@
 		</carrier>
 		
 		<carrier id="carrier3" linkId="1">
-			<vehicles>
-				<vehicle id="c3_vehicle_c1" linkId="1" cap="30" earliestStart="05:59:00" latestEnd="23:59:59"/>
-			</vehicles>
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="c3_vehicle_c1" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
 			
 			<shipments>
 				<shipment id="s1" from="15" to="22" size="30" startPickup="06:01:00" endPickup="07:00:00" startDelivery="0.0" endDelivery="12:00:00" pickupServiceTime="00:20:00" deliveryServiceTime="00:00:00"/>
