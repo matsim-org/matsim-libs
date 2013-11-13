@@ -72,13 +72,13 @@ public class GeneticAlgorithmDC {
 	private static int NUM_PARAMETERS = actTypes.split(",").length+9;
 	private static Map<String, Map<String, List<Double>>> distancesHits = createMap();
 	
-	private static class ParametersMatrix {
+	private static class ParametersArray {
 		
 		private double[] parameters = new double[NUM_PARAMETERS];
 		private double[] scores = new double[actTypes.split(",").length];
 		private double score;
 		
-		public ParametersMatrix(Scenario scenario) {
+		public ParametersArray(Scenario scenario) {
 			int k=0;
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getAnalysisBinSize());
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getAnalysisBoundary());
@@ -95,7 +95,7 @@ public class GeneticAlgorithmDC {
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getTravelSpeed_pt());
 			calculateScore(scenario);
 		}
-		public ParametersMatrix(double[] parameters, Scenario scenario) {
+		public ParametersArray(double[] parameters, Scenario scenario) {
 			this.parameters = parameters;
 			modifyConfig(scenario);
 			calculateScore(scenario);
@@ -164,7 +164,7 @@ public class GeneticAlgorithmDC {
 					else
 						prevMode = ((Leg)planElement).getMode();
 			}
-			//score = Math.abs(sumDistances/numSec-avgDistance);
+			score = Math.abs(sumDistances/numSec-avgDistance);
 			score = compare(distances, distancesHits);
 		}
 		public double compare(Map<String,Map<String,List<Double>>> bigMapSim, Map<String,Map<String,List<Double>>> bigMapHits) {
@@ -196,8 +196,8 @@ public class GeneticAlgorithmDC {
 				k=k+1;
 				KSTests[j]=StatPt;
 				j=j+1;
-				weight[k]=bigMapSim.get(type).get("pt").size();*/
-				k=k+1;
+				weight[k]=bigMapSim.get(type).get("pt").size();
+				k=k+1;*/
 			}
 			double sum1 = 0;
 			double sum2 = 0;
@@ -209,20 +209,20 @@ public class GeneticAlgorithmDC {
 			double avg = sum1/sum2;
 			return avg;
 		}
-		private ParametersMatrix mutate(Scenario scenario) {
+		private ParametersArray mutate(Scenario scenario) {
 			double[] parameters = new double[NUM_PARAMETERS];
 			for(int i=0; i<parameters.length; i++)
 				parameters[i] = mutate(this.parameters[i]);
-			return new ParametersMatrix(parameters, scenario);
+			return new ParametersArray(parameters, scenario);
 		}
 		private double mutate(double d) {
 			return d*(0.5+Math.random());
 		}
-		private ParametersMatrix recombinate(ParametersMatrix parametersMatrix, Scenario scenario) {
+		private ParametersArray recombinate(ParametersArray parametersMatrix, Scenario scenario) {
 			double[] parameters = new double[NUM_PARAMETERS];
 			for(int i=0; i<parameters.length; i++)
 				parameters[i] = (this.parameters[i]+parametersMatrix.parameters[i])/2;
-			return new ParametersMatrix(parameters, scenario);
+			return new ParametersArray(parameters, scenario);
 		}
 		
 	}
@@ -333,31 +333,31 @@ public class GeneticAlgorithmDC {
 		int numIterations = new Integer(args[4]);
 		avgDistance = new Double(args[5]);
 		int maxElements = new Integer(args[6]);
-		NavigableSet<ParametersMatrix> memory = new TreeSet<ParametersMatrix>(new Comparator<ParametersMatrix>() {
+		NavigableSet<ParametersArray> memory = new TreeSet<ParametersArray>(new Comparator<ParametersArray>() {
 			@Override
-			public int compare(ParametersMatrix o1, ParametersMatrix o2) {
+			public int compare(ParametersArray o1, ParametersArray o2) {
 				return Double.compare(o1.score, o2.score);
 			}
 		});
-		memory.add(new ParametersMatrix(scenario));
+		memory.add(new ParametersArray(scenario));
 		for(int i=0; i<numIterations; i++) {
-			PrintWriter printer = new PrintWriter(new FileWriter(args[7], true));
-			Collection<ParametersMatrix> tempMemory = new ArrayList<ParametersMatrix>();
-			for(ParametersMatrix parametersMatrix:memory)
+			Collection<ParametersArray> tempMemory = new ArrayList<ParametersArray>();
+			for(ParametersArray parametersMatrix:memory)
 				if(parametersMatrix!=null)
 					tempMemory.add(parametersMatrix.mutate(scenario));
-			for(ParametersMatrix parametersMatrix:tempMemory) {
+			for(ParametersArray parametersMatrix:tempMemory) {
 				PrintWriter printer2 = new PrintWriter(new FileWriter(args[8], true));
 				printer2.println(Arrays.toString(parametersMatrix.parameters));
 				printer2.println(Arrays.toString(parametersMatrix.scores));
 				printer2.println(parametersMatrix.score);
 				printer2.close();
 				memory.add(parametersMatrix);
-				System.out.println(parametersMatrix.score+": "+parametersMatrix.parameters);
+				System.out.println(parametersMatrix.score+": "+Arrays.toString(parametersMatrix.parameters));
 				if(memory.size()>maxElements)
 					memory.pollLast();
 			}
 			System.out.println(memory.first().score);
+			PrintWriter printer = new PrintWriter(new FileWriter(args[7], true));
 			printer.println(memory.first().score);
 			printer.close();
 		}

@@ -3,6 +3,10 @@ package playground.sergioo.calibration2013;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,6 +60,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImplFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
@@ -66,15 +71,15 @@ public class GeneticAlgorithmMode {
 	private static ReplanningContext context;
 	private static ReRoute module;
 	private static int NUM_PARAMETERS = 11;
-	private static SortedMap<Double, int[]> distancesHits = createMap();
 	private static double[] limits = {100, 200, 500, 1000, 2000, 5000};
+	private static SortedMap<Double, int[]> distancesHits = createMap();
 	
-	private static class ParametersMatrix {
+	private static class ParametersArray {
 		
 		private double[] parameters = new double[NUM_PARAMETERS];
 		private double score;
 		
-		public ParametersMatrix(Scenario scenario) {
+		public ParametersArray(Scenario scenario) {
 			int k=0;
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getConstantCar();
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getConstantPt();
@@ -89,7 +94,7 @@ public class GeneticAlgorithmMode {
 			this.parameters[k++] = scenario.getConfig().planCalcScore().getUtilityOfLineSwitch();
 			calculateScore(scenario);
 		}
-		public ParametersMatrix(double[] parameters, Scenario scenario) {
+		public ParametersArray(double[] parameters, Scenario scenario) {
 			this.parameters = parameters;
 			modifyConfig(scenario);
 			calculateScore(scenario);
@@ -136,8 +141,6 @@ public class GeneticAlgorithmMode {
 				copiedPlansPT.add(copyPlan);
 			}
 			module.finishReplanning();
-			double sumDistances=0;
-			int numSec = 0;
 			SortedMap<Double, int[]> distanceDist = new TreeMap<Double, int[]>();
 			for(PlanImpl plan:copiedPlansCar)
 				for(PlanElement planElement:plan.getPlanElements())
@@ -186,8 +189,9 @@ public class GeneticAlgorithmMode {
 							}
 						else if(((Leg) planElement).getMode().equals("pt")) {
 							String[] parts = ((GenericRoute)((Leg) planElement).getRoute()).getRouteDescription().split("===");
-							NetworkRoute lineRoute = scenario.getTransitSchedule().getTransitLines().get(new IdImpl(parts[2])).getRoutes().get(new IdImpl(parts[2])).getRoute();
-							distance += RouteUtils.calcDistance(lineRoute.getSubRoute(new IdImpl(parts[1]), new IdImpl(parts[4])), scenario.getNetwork());
+							NetworkRoute lineRoute = scenario.getTransitSchedule().getTransitLines().get(new IdImpl(parts[2])).getRoutes().get(new IdImpl(parts[3])).getRoute();
+							distance += RouteUtils.calcDistance(lineRoute.getSubRoute(scenario.getTransitSchedule().getFacilities().get(new IdImpl(parts[1])).getLinkId(),
+									scenario.getTransitSchedule().getFacilities().get(new IdImpl(parts[4])).getLinkId()), scenario.getNetwork());
 						}
 						else {
 							Link start = scenario.getNetwork().getLinks().get(((Leg) planElement).getRoute().getStartLinkId());
@@ -221,29 +225,83 @@ public class GeneticAlgorithmMode {
 
 			score = compare(distanceDist, distancesHits);
 		}
-		public double compare(SortedMap<Double, int[]> bigMapSim, SortedMap<Double, int[]> bigMapHits) {
+		public double compare(SortedMap<Double, int[]> sim, SortedMap<Double, int[]> hits) {
+			double [] bias = new double [limits.length];
+			int i = 0;
+			double sum1 = 0;
+			double sum2 = 0;
 			double avg = 0;
+			for(double limit:limits){
+				double bia = Math.abs((double)hits.get(limit)[0]/(hits.get(limit)[0]+hits.get(limit)[1])-(double)sim.get(limit)[0]/(sim.get(limit)[0]+sim.get(limit)[1]))
+						+ Math.abs((double)hits.get(limit)[1]/(hits.get(limit)[0]+hits.get(limit)[1])-(double)sim.get(limit)[1]/(sim.get(limit)[0]+sim.get(limit)[1]));				
+				bias[i]=bia*(sim.get(limit)[0]+sim.get(limit)[1]); 
+				System.out.println(bias[i]);
+				sum1 = sum1 + (sim.get(limit)[0]+sim.get(limit)[1]);
+				i=i+1;	
+			}
+			for(int j=0;j<bias.length; j++)
+				sum2 = sum2 + bias[j];
+			avg=sum2/sum1;
 			return avg;
 		}
-		private ParametersMatrix mutate(Scenario scenario) {
+		private ParametersArray mutate(Scenario scenario) {
 			double[] parameters = new double[NUM_PARAMETERS];
 			for(int i=0; i<parameters.length; i++)
 				parameters[i] = mutate(this.parameters[i]);
-			return new ParametersMatrix(parameters, scenario);
+			return new ParametersArray(parameters, scenario);
 		}
 		private double mutate(double d) {
 			return d*(0.5+Math.random());
 		}
-		private ParametersMatrix recombinate(ParametersMatrix parametersMatrix, Scenario scenario) {
+		private ParametersArray recombinate(ParametersArray parametersMatrix, Scenario scenario) {
 			double[] parameters = new double[NUM_PARAMETERS];
 			for(int i=0; i<parameters.length; i++)
 				parameters[i] = (this.parameters[i]+parametersMatrix.parameters[i])/2;
-			return new ParametersMatrix(parameters, scenario);
+			return new ParametersArray(parameters, scenario);
 		}
 	
 	}
 
 	public static SortedMap<Double, int[]> createMap() {
+		Connection c = null;
+		Statement stmt1 = null;
+		Statement stmt2 = null;
+		SortedMap <Double, int[]> obsmap = new TreeMap<Double,int[]>();
+		double low = 0;
+		try {
+			Class.forName("org.postgresql.Driver");
+			c = DriverManager.getConnection("jdbc:postgresql://localhost:5433/module_viii","igorm", "Highrise#123");
+			c.setAutoCommit(false);
+			System.out.println("Opened database successfully");
+			for(double limit:limits){
+				int [] obs = new int[2];
+				double high = limit;
+				stmt1 = c.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY );
+				stmt2 = c.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY );
+				ResultSet rscar = stmt1.executeQuery("Select count(travdistance) from u_igorm.person_travel_summary where ((travdistance between "+low+" and "+high+") and (\"driveStages\" is not null or \"psgrStages\" is not null));"); 
+				ResultSet rspt = stmt2.executeQuery("Select count(travdistance) from u_igorm.person_travel_summary where ((travdistance between "+low+" and "+high+") and (\"driveStages\" is null or \"psgrStages\" is null));");
+				low = high;
+				while ( rscar.next() )
+					obs[0] = rscar.getInt("count");
+				while ( rspt.next() )
+					obs[1] = rspt.getInt("count");
+				obsmap.put(limit, obs);
+				rscar.beforeFirst();
+				rspt.beforeFirst();
+				rscar.close();
+				rspt.close();
+				stmt1.close(); 
+				stmt2.close();
+			}
+			c.close();
+			System.out.println("Operation done successfully");
+			System.out.println(obsmap);
+			return obsmap;
+		}
+		catch ( Exception e ) {
+			System.err.println( e.getClass().getName()+": "+ e.getMessage() );
+			System.exit(0);
+		}
 		return null;
 	}
 
@@ -252,6 +310,7 @@ public class GeneticAlgorithmMode {
 		new MatsimPopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		new MatsimNetworkReader(scenario).readFile(args[3]);
+		new TransitScheduleReader(scenario).readFile(args[4]);
 		for(Link link:scenario.getNetwork().getLinks().values()) {
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
 			modes.add("pt");
@@ -299,36 +358,36 @@ public class GeneticAlgorithmMode {
 		rcms.readOrCreateMaxDCScore(new Controler(scenario), dcContext.kValsAreRead());
 		rcms.getPersonsMaxEpsUnscaled();
 		module = new ReRoute(scenario);
-		int numIterations = new Integer(args[4]);
-		int maxElements = new Integer(args[5]);
-		NavigableSet<ParametersMatrix> memory = new TreeSet<ParametersMatrix>(new Comparator<ParametersMatrix>() {
+		int numIterations = new Integer(args[5]);
+		int maxElements = new Integer(args[6]);
+		NavigableSet<ParametersArray> memory = new TreeSet<ParametersArray>(new Comparator<ParametersArray>() {
 			@Override
-			public int compare(ParametersMatrix o1, ParametersMatrix o2) {
+			public int compare(ParametersArray o1, ParametersArray o2) {
 				return Double.compare(o1.score, o2.score);
 			}
 		});
-		memory.add(new ParametersMatrix(scenario));
+		memory.add(new ParametersArray(scenario));
 		for(int i=0; i<numIterations; i++) {
-			PrintWriter printer = new PrintWriter(new FileWriter(args[6], true));
-			Collection<ParametersMatrix> tempMemory = new ArrayList<ParametersMatrix>();
-			for(ParametersMatrix parametersMatrix:memory)
+			Collection<ParametersArray> tempMemory = new ArrayList<ParametersArray>();
+			for(ParametersArray parametersMatrix:memory)
 				if(parametersMatrix!=null)
 					tempMemory.add(parametersMatrix.mutate(scenario));
-			for(ParametersMatrix parametersMatrix:tempMemory) {
-				PrintWriter printer2 = new PrintWriter(new FileWriter(args[7], true));
+			for(ParametersArray parametersMatrix:tempMemory) {
+				PrintWriter printer2 = new PrintWriter(new FileWriter(args[8], true));
 				printer2.println(Arrays.toString(parametersMatrix.parameters));
 				printer2.println(parametersMatrix.score);
 				printer2.close();
 				memory.add(parametersMatrix);
-				System.out.println(parametersMatrix.score+": "+parametersMatrix.parameters);
+				System.out.println(parametersMatrix.score+": "+Arrays.toString(parametersMatrix.parameters));
 				if(memory.size()>maxElements)
 					memory.pollLast();
 			}
 			System.out.println(memory.first().score);
+			PrintWriter printer = new PrintWriter(new FileWriter(args[7], true));
 			printer.println(memory.first().score);
 			printer.close();
 		}
-		PrintWriter printer = new PrintWriter(new FileWriter(args[6], true));
+		PrintWriter printer = new PrintWriter(new FileWriter(args[7], true));
 		printer.println(Arrays.toString(memory.first().parameters));
 		printer.close();
 		System.out.println(Arrays.toString(memory.first().parameters));
