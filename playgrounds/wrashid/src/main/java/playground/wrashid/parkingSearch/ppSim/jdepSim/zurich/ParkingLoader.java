@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -178,10 +179,13 @@ public class ParkingLoader {
 	}
 
 	private static void addIllegalParking(Network network, LinkedList<Parking> parkings) {
+		double shareOfLinksWithIllegalParking=ZHScenarioGlobal.loadDoubleParam("ParkingLoader.shareOfLinksWithIllegalParking");
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
+		Random rand=new Random();
+		
 		int i = 0;
 		for (Link link : network.getLinks().values()) {
-			if (GeneralLib.getDistance(coordinatesLindenhofZH, link.getCoord()) < 7000) {
+			if (GeneralLib.getDistance(coordinatesLindenhofZH, link.getCoord()) < 7000 && rand.nextDouble()<shareOfLinksWithIllegalParking) {
 				PublicParking parking = new PublicParking(link.getCoord());
 				parking.setMaxCapacity(1.0);
 				parking.setParkingId(new IdImpl("illegal-" + i));
