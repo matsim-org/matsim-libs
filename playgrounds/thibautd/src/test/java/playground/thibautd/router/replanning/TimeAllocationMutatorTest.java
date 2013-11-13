@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -84,7 +85,8 @@ public class TimeAllocationMutatorTest {
 		TripsToLegsAlgorithm trips2legs =
 			new TripsToLegsAlgorithm(
 					new StageActivityTypesImpl(
-						PtConstants.TRANSIT_ACTIVITY_TYPE ));
+						PtConstants.TRANSIT_ACTIVITY_TYPE ),
+					new MainModeIdentifierImpl() );
 
 		Counter counter = new Counter( getClass().getSimpleName()+": testing plan # " );
 		for (PlanImpl plan : plans) {

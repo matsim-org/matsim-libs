@@ -39,6 +39,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 
@@ -243,7 +244,7 @@ public class TripsToLegsAlgorithmTest {
 						DUMMY_1,
 						DUMMY_2 ));
 
-		final TripsToLegsAlgorithm algorithm = new TripsToLegsAlgorithm( types );
+		final TripsToLegsAlgorithm algorithm = new TripsToLegsAlgorithm( types , new MainModeIdentifierImpl() );
 		algorithm.run( fixture.plan );
 
 		assertEquals(

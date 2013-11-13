@@ -43,14 +43,11 @@ public class TripsToLegsAlgorithm implements PlanAlgorithm {
 	private final MainModeIdentifier mainModeIdentifier;
 
 	public TripsToLegsAlgorithm(final TripRouter router) {
-		this( router.getStageActivityTypes() );
+		this(
+				router.getStageActivityTypes(),
+				router.getMainModeIdentifier() );
 	}
 
-	
-	public TripsToLegsAlgorithm(
-			final StageActivityTypes blackList) {
-		this( blackList , new MainModeIdentifierImpl() );
-	}
 	
 	public TripsToLegsAlgorithm(
 			final StageActivityTypes blackList,
