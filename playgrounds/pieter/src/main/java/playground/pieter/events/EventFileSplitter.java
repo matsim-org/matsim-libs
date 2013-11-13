@@ -19,7 +19,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.pieter.singapore.utils.events.listeners.TrimEventsWithPersonIds;
 
-public class EventsMergeSorter {
+public class EventFileSplitter {
 	String inFileName;
 	String outFileName;
 	String numberedEventsFileName;
@@ -28,7 +28,7 @@ public class EventsMergeSorter {
 	
 	
 	
-	public EventsMergeSorter(String inFileName, String outFileName) {
+	public EventFileSplitter(String inFileName, String outFileName) {
 		super();
 		this.inFileName = inFileName;
 		this.outFileName = outFileName;
@@ -82,7 +82,7 @@ public class EventsMergeSorter {
 	public static void main(String[] args) {
 		
 		
-		EventsMergeSorter eventMergeSorter = new EventsMergeSorter(args[0],args[1]);
+		EventFileSplitter eventMergeSorter = new EventFileSplitter(args[0],args[1]);
 		eventMergeSorter.run();
 		
 
