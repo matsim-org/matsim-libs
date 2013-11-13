@@ -23,6 +23,8 @@ package playground.telaviv.controler;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,7 +41,11 @@ import org.matsim.contrib.analysis.christoph.DistanceDistribution.DistributionCl
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -50,8 +56,9 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.core.mobsim.qsim.agents.FilteredPopulation;
+import playground.telaviv.counts.CountsCompareToCSV;
 
-public class TelAvivControlerListener implements StartupListener {
+public class TelAvivControlerListener implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final static Logger log = Logger.getLogger(TelAvivControlerListener.class);
 	
@@ -141,16 +148,16 @@ public class TelAvivControlerListener implements StartupListener {
 //		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, 200000.0, 10);
 //		distanceDistribution.createAndAddDistanceBin(distributionClass, 200000.0, 500000.0, 10);
 //		distanceDistribution.createAndAddDistanceBin(distributionClass, 500000.0, Double.MAX_VALUE, 10);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0438);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.1006);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
-		
+
 		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), observedPopulation, 
 				new MainModeIdentifierImpl(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
 		controler.addControlerListener(distanceDistribution);
@@ -194,14 +201,14 @@ public class TelAvivControlerListener implements StartupListener {
 		controler.addControlerListener(distanceDistribution);
 		distributionClass = distanceDistribution.createAndAddDistributionClass("observed_population-overall");
 		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0438);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.1006);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0483);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0187);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0852);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.2660);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.2250);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2133);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.1402);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0034);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
 		
 		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), scenario.getPopulation(), 
@@ -211,14 +218,14 @@ public class TelAvivControlerListener implements StartupListener {
 		distanceDistribution.addActivityCombination(distributionClass, "home", "work");
 		distanceDistribution.addActivityCombination(distributionClass, "work", "home");
 		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0438);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.1006);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.0);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
 
 		distanceDistribution = new DistanceDistribution(scenario.getNetwork(), scenario.getPopulation(), 
@@ -226,15 +233,51 @@ public class TelAvivControlerListener implements StartupListener {
 		controler.addControlerListener(distanceDistribution);
 		distributionClass = distanceDistribution.createAndAddDistributionClass("total_population-overall");
 		distanceDistribution.addMainMode(distributionClass, TransportMode.car);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0009);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0012);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0072);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.0438);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.1006);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2632);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.5150);
-		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0681);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 0.0, 500.0, 0.0483);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 500.0, 1000.0, 0.0187);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 1000.0, 2000.0, 0.0852);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 2000.0, 5000.0, 0.2660);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 5000.0, 10000.0, 0.2250);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 10000.0, 20000.0, 0.2133);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.1402);
+		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0034);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
 	}
+	
 
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		
+		String runId = event.getControler().getConfig().controler().getRunId();
+		if (runId == null) runId = "";
+		else if (runId.length() > 0) runId = runId + ".";
+		
+		int iteration = event.getIteration();
+		
+		runCountsCompare(iteration, runId);
+	}
+	
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		String runId = event.getControler().getConfig().controler().getRunId();
+		if (runId == null) runId = "";
+		else if (runId.length() > 0) runId = runId + ".";
+		
+		int lastIter = event.getControler().getConfig().controler().getLastIteration();
+		
+		runCountsCompare(lastIter, runId);
+	}
+
+	private void runCountsCompare(int iteration, String runId) {
+		try {
+			String inputFile = TelAvivConfig.basePath + "/output/ITERS/it." + iteration + 
+					"/" + runId +  iteration + ".countscompare.txt";
+			String outputFile =  TelAvivConfig.basePath + "/output/ITERS/it." + iteration + 
+					"/" + runId +  iteration + ".countscompare.csv";
+			
+			if (new File(inputFile).exists()) new CountsCompareToCSV(inputFile, outputFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
