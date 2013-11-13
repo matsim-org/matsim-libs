@@ -22,6 +22,7 @@ package playground.thibautd.analysis.listeners;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
@@ -43,12 +44,18 @@ public class IndividualExecutedScoreDumper implements IterationEndsListener, Shu
 
 
 	final private Collection<Person> persons;
-	final private BufferedWriter out;
+	final private String filename;
+
+	private BufferedWriter out;
 	
 	public IndividualExecutedScoreDumper(
-			final Collection<Person> persons,
+			final Collection<? extends Person> persons,
 			final String filename){
-		this.persons = persons;
+		this.persons = new ArrayList<Person>( persons );
+		this.filename = filename;
+	}
+
+	private void createOut() {
 		this.out = IOUtils.getBufferedWriter(filename);
 
 		try {
@@ -64,9 +71,11 @@ public class IndividualExecutedScoreDumper implements IterationEndsListener, Shu
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
+		// need to wait for controler to create the directories.
+		if ( this.out == null ) createOut();
 		try {
 			this.out.newLine();
-			this.out.write( event.getIteration() );
+			this.out.write( ""+event.getIteration() );
 
 			for ( Person person : this.persons ) {
 				this.out.write( "\t"+person.getSelectedPlan().getScore() );
