@@ -51,6 +51,8 @@ public class ParkingEventDetails {
 		sb.append("\t");
 		sb.append(parkingActivityAttributes.getToActWalkDuration());
 		sb.append("\t");
+		sb.append(parkingActivityAttributes.getWalkDistance());
+		sb.append("\t");
 		sb.append(parkingActivityAttributes.getFacilityId());
 		sb.append("\t");
 		sb.append(parkingActivityAttributes.getParkingCost());
@@ -71,7 +73,7 @@ public class ParkingEventDetails {
 	}
 	
 	public static String getTabSeparatedTitleString(){
-		return "personId\tparkingArrivalTime\tparkingDuration\tparkingSearchDuration\twalkDuration\tFacilityId\tparkingCost\tlegIndex\tscore\tparkingStrategy\tgroupName\tdestination-X\tdestination-Y";
+		return "personId\tparkingArrivalTime\tparkingDuration\tparkingSearchDuration\twalkDuration\twalkDistance\tFacilityId\tparkingCost\tlegIndex\tscore\tparkingStrategy\tgroupName\tdestination-X\tdestination-Y";
 	}
 }
 
