@@ -57,4 +57,30 @@ public class LocationFilter {
 		homeActCoord = homeAct.getCoord();
 		return homeActCoord;
 	}
+	
+	// alternative (slower but more reliable?) way of finding a person's home coord
+//	private Coord findHomeCoord(Person person) {
+//		Plan plan = person.getSelectedPlan();
+//		Coord homeCoord = null;
+//		for (PlanElement pe : plan.getPlanElements()) {
+//			if(pe instanceof Activity){
+//				Activity act =  ((Activity) pe);
+//				if(act.getType().equals("home")){
+//					homeCoord = act.getCoord();
+//					break;
+//				} else if(act.getType().equals("pvHome")){
+//					homeCoord = act.getCoord();
+//					break;
+//				} else if(act.getType().equals("gvHome")){
+//					homeCoord = act.getCoord();
+//					break;
+//				}
+//			}
+//		}
+//		if(homeCoord == null){
+//			throw new RuntimeException("Person " + person.getId() + " has no homeCoord. Aborting...");
+//		} else {
+//			return homeCoord;
+//		}
+//	}
 }
