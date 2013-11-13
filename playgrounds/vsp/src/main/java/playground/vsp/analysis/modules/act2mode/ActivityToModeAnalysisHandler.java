@@ -133,7 +133,7 @@ public class ActivityToModeAnalysisHandler implements
 			if(this.person2ArrMode.containsKey(event.getPersonId())){
 				Link link = this.net.getLinks().get(event.getLinkId());
 				this.arrivals.add(
-						new ActivityToMode(event.getActType(), this.person2ArrMode.get(event.getPersonId()), event.getTime(),link.getCoord())
+						new ActivityToMode(event.getActType(), this.person2ArrMode.get(event.getPersonId()), event.getTime(),link.getToNode().getCoord())
 						);
 			}
 		}
