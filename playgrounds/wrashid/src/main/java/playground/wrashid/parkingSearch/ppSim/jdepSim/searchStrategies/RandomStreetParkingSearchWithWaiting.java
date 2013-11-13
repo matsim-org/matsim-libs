@@ -31,6 +31,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 
+// private parking not considered at beginning!
 // wait on first link if needed, afterwards random search.
 public class RandomStreetParkingSearchWithWaiting extends RandomParkingSearch {
 

@@ -135,9 +135,6 @@ public class MainPPSimZurich30km {
 		// TODO: load parking infrastructure files from:
 		// Z:\data\experiments\TRBAug2011\parkings
 
-		int writeEachNthIteration = ZHScenarioGlobal.writeEventsEachNthIteration;
-		int skipOutputInIteration = ZHScenarioGlobal.skipOutputInIteration;
-
 		for (int iter = 0; iter < ZHScenarioGlobal.numberOfIterations; iter++) {
 			log.info("iteration-" + iter + " starts");
 			ZHScenarioGlobal.iteration = iter;
@@ -145,7 +142,7 @@ public class MainPPSimZurich30km {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			LegHistogram lh = new LegHistogram(300);
 			EventWriterXML eventsWriter = new EventWriterXML(ZHScenarioGlobal.outputFolder + "events.xml.gz");
-			if (writeOutput(writeEachNthIteration, skipOutputInIteration, iter)) {
+			if (ZHScenarioGlobal.writeOutputInCurrentIteration()) {
 				eventsManager.addHandler(eventsWriter);
 				eventsManager.addHandler(lh);
 
@@ -176,7 +173,7 @@ public class MainPPSimZurich30km {
 
 			log.info("simulation-" + iter + " ended");
 			
-			if (writeOutput(writeEachNthIteration, skipOutputInIteration, iter)) {
+			if (ZHScenarioGlobal.writeOutputInCurrentIteration()) {
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_all.png");
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_car.png", TransportMode.car);
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
@@ -357,18 +354,6 @@ public class MainPPSimZurich30km {
 				i++;
 			}
 		}
-	}
-
-	private static boolean writeOutput(int writeEachNthIteration, int skipOutputInIteration, int iter) {
-		if (iter==ZHScenarioGlobal.loadIntParam("ZHScenarioGlobal.writeOutputAtIteration-1")){
-			return true;
-		}
-		
-		if (iter==ZHScenarioGlobal.loadIntParam("ZHScenarioGlobal.writeOutputAtIteration-2")){
-			return true;
-		}
-		
-		return iter % writeEachNthIteration == 0 && iter != skipOutputInIteration;
 	}
 
 	private static void addParkingActivityAndWalkLegToPlans(Collection<? extends Person> persons) {

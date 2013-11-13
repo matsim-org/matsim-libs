@@ -56,32 +56,32 @@ public class ZHScenarioGlobal {
 	public static int writeEventsEachNthIteration = -1;
 	public static int skipOutputInIteration = -1;
 	public static LinkedList<ParkingEventDetails> parkingEventDetails;
-	public static int populationExpensionFactor=-1;
-	public static int numberOfRoutingThreadsAtBeginning=-1;
-	public static int numberOfRoutingThreadsDuringSim=-1;
-	public static boolean turnParallelRoutingOnDuringSim=true;
+	public static int populationExpensionFactor = -1;
+	public static int numberOfRoutingThreadsAtBeginning = -1;
+	public static int numberOfRoutingThreadsDuringSim = -1;
+	public static boolean turnParallelRoutingOnDuringSim = true;
 	public static Config config;
-	public static int parkingStrategyScenarioId=-1;
-	
+	public static int parkingStrategyScenarioId = -1;
+
 	// personId, legIndex, route
 	public static TwoHashMapsConcatenated<Id, Integer, LinkNetworkRouteImpl> initialRoutes;
 	public static String plansFile;
 	public static RerouteThreadDuringSim[] rerouteThreadsDuringSim;
 	public static Scenario scenario;
 
-	public static String getItersFolderPath(){
+	public static String getItersFolderPath() {
 		return outputFolder + "ITERS/";
 	}
-	
-	public static void init(TTMatrix ttMatrix, Network network){
-		rerouteThreadsDuringSim=new RerouteThreadDuringSim[numberOfRoutingThreadsDuringSim];
-		
-		for (int i=0;i<numberOfRoutingThreadsDuringSim;i++){
-			rerouteThreadsDuringSim[i]=new RerouteThreadDuringSim(ttMatrix,network);
+
+	public static void init(TTMatrix ttMatrix, Network network) {
+		rerouteThreadsDuringSim = new RerouteThreadDuringSim[numberOfRoutingThreadsDuringSim];
+
+		for (int i = 0; i < numberOfRoutingThreadsDuringSim; i++) {
+			rerouteThreadsDuringSim[i] = new RerouteThreadDuringSim(ttMatrix, network);
 			rerouteThreadsDuringSim[i].start();
 		}
 	}
-	
+
 	public static void reset() {
 		parkingEventDetails = new LinkedList<ParkingEventDetails>();
 	}
@@ -92,24 +92,26 @@ public class ZHScenarioGlobal {
 		printFilteredParkingStatsParkingType("gp");
 		printFilteredParkingStatsParkingType("private");
 		printFilteredParkingStatsParkingType("illegal");
-		
-		for (ParkingSearchStrategy strategy:ParkingStrategyManager.allStrategies){
+
+		for (ParkingSearchStrategy strategy : ParkingStrategyManager.allStrategies) {
 			printParkingStraregyStats(strategy.getName());
 		}
-		
-		writeAllParkingEventsToFile();
-		ComparisonGarageCounts.logOutput(parkingEventDetails,getItersFolderPath() + iteration + ".parkingCountsComparison");
-	}
-	
-	private static void writeAllParkingEventsToFile() {
-		ArrayList<String> list=new ArrayList<String>();
-		
-		list.add(ParkingEventDetails.getTabSeparatedTitleString());
-		
-		for (ParkingEventDetails ped:parkingEventDetails){
-				list.add(ped.getTabSeparatedLogString());
+
+		if (writeOutputInCurrentIteration()) {
+			writeAllParkingEventsToFile();
+			ComparisonGarageCounts.logOutput(parkingEventDetails, getItersFolderPath() + iteration + ".parkingCountsComparison");
 		}
-		
+	}
+
+	private static void writeAllParkingEventsToFile() {
+		ArrayList<String> list = new ArrayList<String>();
+
+		list.add(ParkingEventDetails.getTabSeparatedTitleString());
+
+		for (ParkingEventDetails ped : parkingEventDetails) {
+			list.add(ped.getTabSeparatedLogString());
+		}
+
 		GeneralLib.writeList(list, getItersFolderPath() + iteration + ".parkingEvents.txt");
 	}
 
@@ -167,7 +169,7 @@ public class ZHScenarioGlobal {
 		double averageWalkDuration = 0;
 
 		System.out.println("general parking stats");
-		
+
 		for (ParkingEventDetails ped : parkingEventDetails) {
 			averageParkingDuration += ped.parkingActivityAttributes.getParkingDuration();
 			averageSearchDuration += ped.parkingActivityAttributes.getParkingSearchDuration();
@@ -183,31 +185,31 @@ public class ZHScenarioGlobal {
 	}
 
 	public static void init() {
-		
+
 		loadConfigParamters();
-		File file=new File(outputFolder);
-		
-		//file.mkdir();
-		
-		if (file.list().length>2 && !ZHScenarioGlobal.loadBooleanParam("developingMode")){
+		File file = new File(outputFolder);
+
+		// file.mkdir();
+
+		if (file.list().length > 2 && !ZHScenarioGlobal.loadBooleanParam("developingMode")) {
 			DebugLib.stopSystemAndReportInconsistency("output folder exists already!" + outputFolder);
 		}
-		
-		file=new File(getItersFolderPath());
+
+		file = new File(getItersFolderPath());
 		file.mkdir();
-		
+
 		ComparisonGarageCounts.init();
 	}
-	
+
 	private static void loadConfigParamters() {
-		ZHScenarioGlobal.outputFolder=loadStringParam("outputFolder");
-		
+		ZHScenarioGlobal.outputFolder = loadStringParam("outputFolder");
+
 		ParkingLoader.parkingsOutsideZHCityScaling = loadDoubleParam("ParkingLoader.parkingsOutsideZHCityScaling");
 		ParkingLoader.streetParkingCalibrationFactor = loadDoubleParam("ParkingLoader.streetParkingCalibrationFactor");
 		ParkingLoader.garageParkingCalibrationFactor = loadDoubleParam("ParkingLoader.garageParkingCalibrationFactor");
 		ParkingLoader.privateParkingCalibrationFactorZHCity = loadDoubleParam("ParkingLoader.privateParkingCalibrationFactorZHCity");
 		ParkingLoader.populationScalingFactor = loadDoubleParam("ParkingLoader.populationScalingFactor");
-		
+
 		ZHScenarioGlobal.parkingStrategyScenarioId = loadIntParam("ZHScenarioGlobal.parkingStrategyScenarioId");
 		ZHScenarioGlobal.numberOfIterations = loadIntParam("ZHScenarioGlobal.numberOfIterations");
 		ZHScenarioGlobal.writeEventsEachNthIteration = loadIntParam("ZHScenarioGlobal.writeEventsEachNthIteration");
@@ -216,24 +218,36 @@ public class ZHScenarioGlobal {
 		ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning = loadIntParam("ZHScenarioGlobal.numberOfRoutingThreadsAtBeginning");
 		ZHScenarioGlobal.numberOfRoutingThreadsDuringSim = loadIntParam("ZHScenarioGlobal.numberOfRoutingThreadsDuringSim");
 	}
-	
-	public static boolean paramterExists(String paramName){
-		return config.findParam("parkingSearch", paramName)!=null;
+
+	public static boolean writeOutputInCurrentIteration() {
+		if (iteration == ZHScenarioGlobal.loadIntParam("ZHScenarioGlobal.writeOutputAtIteration-1")) {
+			return true;
+		}
+
+		if (iteration == ZHScenarioGlobal.loadIntParam("ZHScenarioGlobal.writeOutputAtIteration-2")) {
+			return true;
+		}
+
+		return iteration % writeEventsEachNthIteration == 0 && iteration != skipOutputInIteration;
 	}
-	
-	public static double loadDoubleParam(String paramName){
+
+	public static boolean paramterExists(String paramName) {
+		return config.findParam("parkingSearch", paramName) != null;
+	}
+
+	public static double loadDoubleParam(String paramName) {
 		return Double.parseDouble(config.getParam("parkingSearch", paramName));
 	}
-	
-	public static boolean loadBooleanParam(String paramName){
+
+	public static boolean loadBooleanParam(String paramName) {
 		return Boolean.parseBoolean(config.getParam("parkingSearch", paramName));
 	}
-	
-	public static int loadIntParam(String paramName){
+
+	public static int loadIntParam(String paramName) {
 		return Integer.parseInt(config.getParam("parkingSearch", paramName));
 	}
-	
-	public static String loadStringParam(String paramName){
+
+	public static String loadStringParam(String paramName) {
 		return config.getParam("parkingSearch", paramName);
 	}
 }

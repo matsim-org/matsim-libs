@@ -79,47 +79,49 @@ public class ParkingStrategyManager {
 						agentHashMap.put(i, new EvaluationContainer(allStrategies));
 						evaluationContainer = agentHashMap.get(i);
 					}
-					
-					
+
 					handleDropWorseGroupStrategies(evaluationContainer);
-					
 
 					if (ZHScenarioGlobal.loadBooleanParam("convergance.evaluateAllStrategiesOnceAtBeginning")
 							&& !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
 						evaluationContainer.selectStrategyNotExecutedTillNow();
 					} else {
 						/*
+						 * if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
+						 * .loadIntParam(
+						 * "convergance.executeRandomStrategy.stopStrategyAtIteration"
+						 * )) { evaluationContainer.selectRandomStrategy(); }
+						 * else
+						 */
 						if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
-								.loadIntParam("convergance.executeRandomStrategy.stopStrategyAtIteration")) {
-							evaluationContainer.selectRandomStrategy();
-						} else
-					*/		
-					if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
 								.loadIntParam("convergance.fixedPropbabilityBestStrategy.stopStrategyAtIteration")) {
 							evaluationContainer.selectStrategyAccordingToFixedProbabilityForBestStrategy();
 						} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
 								.loadIntParam("convergance.MNLExpScore.startStrategyAtIteration")) {
 							evaluationContainer.selectNextStrategyAccordingToMNLExp();
-						}else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
+						} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
 								.loadIntParam("convergance.MNLScore.startStrategyAtIteration")) {
 							evaluationContainer.selectNextStrategyAccordingToProbability();
 						} else {
 							DebugLib.stopSystemAndReportInconsistency();
 						}
 					}
-					
-					if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropAllOnce")){
-						if (ZHScenarioGlobal.loadIntParam("convergance.dropAllOnce.atIteration")==ZHScenarioGlobal.iteration){
-							evaluationContainer.trimStrategySet(ZHScenarioGlobal.loadIntParam("convergance.dropStrategy.minNumberOfStrategies"));
+
+					if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropAllOnce")) {
+						if (ZHScenarioGlobal.loadIntParam("convergance.dropAllOnce.atIteration") == ZHScenarioGlobal.iteration) {
+							evaluationContainer.trimStrategySet(ZHScenarioGlobal
+									.loadIntParam("convergance.dropStrategy.minNumberOfStrategies"));
 						}
-					} else if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropOneByOne")){
-						if (evaluationContainer.getNumberOfStrategies()>ZHScenarioGlobal.loadIntParam("convergance.dropStrategy.minNumberOfStrategies")){
+					} else if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropOneByOne")) {
+						if (evaluationContainer.getNumberOfStrategies() > ZHScenarioGlobal
+								.loadIntParam("convergance.dropStrategy.minNumberOfStrategies")) {
 							int startDrop = ZHScenarioGlobal.loadIntParam("convergance.dropOneByOne.startDroppingAtIteration");
-							if (startDrop==ZHScenarioGlobal.iteration){
+							if (startDrop == ZHScenarioGlobal.iteration) {
 								evaluationContainer.dropWostStrategy();
-							} else if (startDrop<ZHScenarioGlobal.iteration){
-								int dropEachNthIter = ZHScenarioGlobal.loadIntParam("convergance.dropOneByOne.dropEachNthIteration");
-								if ((ZHScenarioGlobal.iteration-startDrop) % dropEachNthIter==0){
+							} else if (startDrop < ZHScenarioGlobal.iteration) {
+								int dropEachNthIter = ZHScenarioGlobal
+										.loadIntParam("convergance.dropOneByOne.dropEachNthIteration");
+								if ((ZHScenarioGlobal.iteration - startDrop) % dropEachNthIter == 0) {
 									evaluationContainer.dropWostStrategy();
 								}
 							}
@@ -131,15 +133,16 @@ public class ParkingStrategyManager {
 	}
 
 	private void handleDropWorseGroupStrategies(EvaluationContainer evaluationContainer) {
-		
-		for (int i=0;i<10;i++){
-			if (ZHScenarioGlobal.paramterExists("convergance.dropWorseGroupStrategies-" + i + "-AtIteration")){
+
+		for (int i = 0; i < 10; i++) {
+			if (ZHScenarioGlobal.paramterExists("convergance.dropWorseGroupStrategies-" + i + "-AtIteration")) {
 				int dropAtIteration = ZHScenarioGlobal.loadIntParam("convergance.dropWorseGroupStrategies-" + i + "-AtIteration");
-			
-				if (ZHScenarioGlobal.iteration==dropAtIteration){
-					int numberOfStrategiesToDrop = ZHScenarioGlobal.loadIntParam("convergance.dropWorseGroupStrategies-" + i + "-NumberOfStrategies");
-				
-					for (int j=0;j<numberOfStrategiesToDrop;j++){
+
+				if (ZHScenarioGlobal.iteration == dropAtIteration) {
+					int numberOfStrategiesToDrop = ZHScenarioGlobal.loadIntParam("convergance.dropWorseGroupStrategies-" + i
+							+ "-NumberOfStrategies");
+
+					for (int j = 0; j < numberOfStrategiesToDrop; j++) {
 						evaluationContainer.dropWostGroupStrategiesWithoutEliminatingGroup();
 					}
 				}
@@ -187,7 +190,10 @@ public class ParkingStrategyManager {
 		ZHScenarioGlobal.strategyScoreStats.writeAllStrategySharesToFile();
 		ZHScenarioGlobal.strategyScoreStats.writeNonPPStrategySharesToFile();
 		ZHScenarioGlobal.strategyScoreStats.writeNonPPGroupSharesToFile();
-		ZHScenarioGlobal.strategyScoreStats.writeToTextFile(getStrategyEvaluations());
+
+		if (ZHScenarioGlobal.writeOutputInCurrentIteration()) {
+			ZHScenarioGlobal.strategyScoreStats.writeToTextFile(getStrategyEvaluations());
+		}
 	}
 
 	public void reset() {
