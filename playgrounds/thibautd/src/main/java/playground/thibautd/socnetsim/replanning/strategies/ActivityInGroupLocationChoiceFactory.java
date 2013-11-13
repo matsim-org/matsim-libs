@@ -20,6 +20,7 @@
 package playground.thibautd.socnetsim.replanning.strategies;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
@@ -29,11 +30,6 @@ import playground.thibautd.socnetsim.replanning.modules.MutateActivityLocationsT
  * @author thibautd
  */
 public class ActivityInGroupLocationChoiceFactory implements GroupPlanStrategyFactory {
-	private final String type;
-
-	public ActivityInGroupLocationChoiceFactory(final String activityType) {
-		this.type = activityType;
-	}
 
 	@Override
 	public GroupPlanStrategy createStrategy( final ControllerRegistry registry ) {
@@ -41,11 +37,14 @@ public class ActivityInGroupLocationChoiceFactory implements GroupPlanStrategyFa
 				GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy(
 					registry.getIncompatiblePlansIdentifierFactory());
 
+		final GroupReplanningConfigGroup configGroup = (GroupReplanningConfigGroup)
+				registry.getScenario().getConfig().getModule(
+						GroupReplanningConfigGroup.GROUP_NAME );
 		strategy.addStrategyModule(
 				new MutateActivityLocationsToLocationsOfOthersModule(
 					registry.getScenario().getConfig().global().getNumberOfThreads(),
 					registry.getScenario().getPopulation(),
-					type ) );
+					configGroup.getLocationChoiceActivityType() ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
@@ -54,7 +53,6 @@ public class ActivityInGroupLocationChoiceFactory implements GroupPlanStrategyFa
 					registry.getTripRouterFactory() ) );
 
 		return strategy;
-
 	}
 }
 
