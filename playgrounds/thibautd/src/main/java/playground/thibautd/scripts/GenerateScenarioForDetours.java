@@ -62,8 +62,8 @@ import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 
 import playground.thibautd.config.NonFlatConfigWriter;
-import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup.StrategyParameterSet;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.utils.UniqueIdFactory;
 
 /**

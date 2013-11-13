@@ -58,6 +58,8 @@ import playground.thibautd.scoring.BeingTogetherScoring.LogOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
 import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
@@ -79,7 +81,6 @@ import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgori
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
-import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;

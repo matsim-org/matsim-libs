@@ -19,12 +19,12 @@
 
 package playground.thibautd.socnetsim.replanning.removers;
 
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.run.GroupReplanningConfigGroup;
 
 public class MinimumWeightedSumSelectorFactory extends AbstractDumbRemoverFactory {
 	@Override
