@@ -2,6 +2,7 @@ package josmMatsimPlugin;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.MapFrame;
+import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
 import org.openstreetmap.josm.plugins.Plugin;
 import org.openstreetmap.josm.plugins.PluginInformation;
@@ -11,9 +12,10 @@ import org.openstreetmap.josm.plugins.PluginInformation;
  * @author nkuehnel
  * 
  */
-public class MATSimPlugin extends Plugin{
+public class MATSimPlugin extends Plugin {
     
 	private MATSimAction Action;
+	protected static MATSimToggleDialog toggleDialog;
 	
     public MATSimPlugin(PluginInformation info) {
         super(info);
@@ -28,15 +30,14 @@ public class MATSimPlugin extends Plugin{
     @Override
     public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {             
         if (oldFrame == null && newFrame != null) { // map frame added
-        	
-        	
+        	toggleDialog = new MATSimToggleDialog();
+        	Main.map.addToggleDialog(toggleDialog);
+        	MapView.addLayerChangeListener(toggleDialog);
         }
     }
 
     @Override
     public PreferenceSetting getPreferenceSetting() {
 		return null;
-    	
     }
-    
 }

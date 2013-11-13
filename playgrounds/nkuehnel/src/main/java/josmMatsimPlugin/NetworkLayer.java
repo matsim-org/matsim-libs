@@ -3,6 +3,7 @@ package josmMatsimPlugin;
 import java.io.File;
 
 import org.matsim.api.core.v01.network.Network;
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 
@@ -27,6 +28,7 @@ public class NetworkLayer extends OsmDataLayer
 		super(data, name, associatedFile);
 		this.matsimNetwork=network;
 		this.coordSystem=coordSystem;
+		
 	}
 
 
