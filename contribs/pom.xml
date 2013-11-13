@@ -98,6 +98,7 @@
 		<module>roadpricing</module>
 		<module>multimodal</module>
 		<module>integration</module>
+		<module>wagonSim</module>
 	</modules>
 	<repositories>
 		<repository>
