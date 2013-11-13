@@ -28,7 +28,7 @@ import java.util.Map;
  * @author droeder
  *
  */
-interface BuildingEnergyConsumptionRule{
+public interface BuildingEnergyConsumptionRule{
 	
 	/**
 	 * 
@@ -36,15 +36,15 @@ interface BuildingEnergyConsumptionRule{
 	 * @param currentOccupancy
 	 * @return energy consumption in kWh
 	 */
-	double getEnergyConsumption_kWh(double maxSize, double currentOccupancy);
+	public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy);
 
 	
 	
-	class BuildingEnergyConsumptionRuleFactory{
+	public class BuildingEnergyConsumptionRuleFactory{
 		
 		private Map<String, BuildingEnergyConsumptionRule> rules = new HashMap<String, BuildingEnergyConsumptionRule>();   
 
-		void setRule(String actType, BuildingEnergyConsumptionRule rule){
+		public void setRule(String actType, BuildingEnergyConsumptionRule rule){
 			this.rules.put(actType, rule);
 		}
 		
@@ -55,61 +55,7 @@ interface BuildingEnergyConsumptionRule{
 	
 	
 	
-	class OfficeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
-		
-		private double additional;
-		private double baseLoad;
-		private double td;
-		private double someCoefficient;
-
-		/**
-		 * 
-		 * @param td, duration timeslice [s]
-		 * @param baseLoadPerPerson [kW]
-		 * @param additionalLoadPerPerson [kW]
-		 */
-		OfficeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson, double someCoefficient) {
-			this.td = td;
-			this.baseLoad = baseLoadPerPerson;
-			this. additional = additionalLoadPerPerson;
-			this.someCoefficient = someCoefficient;
-		}
-		
-		@Override
-		public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy) {
-			if(currentOccupancy > maxSize) throw new RuntimeException("more persons on the link than expected");
-			if(maxSize == 0) return 0.;
-			double baseload = this.baseLoad * maxSize;
-			double additionalLoad = this.additional * maxSize;
-			return (td / 3600. * (baseload + additionalLoad * (1 - Math.exp(-1.0 * currentOccupancy / maxSize * someCoefficient))));
-		}
-		
-	}
 	
-	class HomeEnergyConsumptionRuleImpl implements BuildingEnergyConsumptionRule{
-		
-		private double td;
-		private double baseLoad;
-		private double additional;
-
-		/**
-		 * 
-		 * @param td
-		 * @param baseLoadPerPerson
-		 * @param additionalLoadPerPerson
-		 */
-		HomeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson) {
-			this.td = td;
-			this.baseLoad = baseLoadPerPerson;
-			this. additional = additionalLoadPerPerson;
-		}
-
-		@Override
-		public double getEnergyConsumption_kWh(double maxSize, double currentOccupancy) {
-			return (td/3600. * (maxSize * baseLoad + currentOccupancy * additional));
-		}
-		
-	}
 	
 }
 

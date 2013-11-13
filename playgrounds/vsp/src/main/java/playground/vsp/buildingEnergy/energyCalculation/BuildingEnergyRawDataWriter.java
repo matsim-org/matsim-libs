@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyDataReader.LinkOccupancyStats;
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyDataReader.PopulationStats;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyMATSimDataReader.LinkOccupancyStats;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyMATSimDataReader.PopulationStats;
 import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
 
 /**
@@ -110,7 +110,7 @@ public class BuildingEnergyRawDataWriter {
 			for(int t: bins){
 				writer.write(String.valueOf(t) + ";");
 			}
-			writer.write(BuildingEnergyAnalyzerMain.all+ ";");
+			writer.write(BuildingEnergyAnalyzer.all+ ";");
 			//write content
 			writer.write("\n");
 			for(Id l: this.links){
@@ -118,7 +118,7 @@ public class BuildingEnergyRawDataWriter {
 				for(int t: bins){
 					writer.write(map.get(String.valueOf(t)).getMaximumOccupancy(l)+ ";");
 				}
-				writer.write(map.get(BuildingEnergyAnalyzerMain.all).getMaximumOccupancy(l)+ ";");
+				writer.write(map.get(BuildingEnergyAnalyzer.all).getMaximumOccupancy(l)+ ";");
 				writer.write("\n");
 			}
 			writer.flush();

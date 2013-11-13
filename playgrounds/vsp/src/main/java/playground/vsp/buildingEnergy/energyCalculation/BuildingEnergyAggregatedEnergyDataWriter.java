@@ -18,53 +18,60 @@
  * *********************************************************************** */
 package playground.vsp.buildingEnergy.energyCalculation;
 
-import java.util.HashMap;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyAggregatedEnergyConsumptionCalculator.EnergyConsumption;
 
 /**
- * 
- * Calculates the probabilities of performing a certain activity for a certain {@link LinkActivityOccupancyCounter}
  * @author droeder
  *
  */
-public class BuidlingEnergyActivityProbabilityCalculator {
+class BuildingEnergyAggregatedEnergyDataWriter {
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger
-			.getLogger(BuidlingEnergyActivityProbabilityCalculator.class);
-	private int maxOfActivityType;
-	private Map<String, LinkActivityOccupancyCounter> counter;
-	private Set<Id> ids;
+			.getLogger(BuildingEnergyAggregatedEnergyDataWriter.class);
 
-	public BuidlingEnergyActivityProbabilityCalculator(int maxOfActivityType, Map<String, LinkActivityOccupancyCounter> counter, Set<Id> linkIds) {
-		this.maxOfActivityType = maxOfActivityType;
-		this.counter = counter;
-		this.ids = linkIds;
+	BuildingEnergyAggregatedEnergyDataWriter() {
 	}
-	
+
 	/**
-	 * 
-	 * @return the probabilities of performing a certain activity for a certain {@link LinkActivityOccupancyCounter}
+	 * @param outputPath
 	 */
-	public final Map<String, Double> run(){
-		Map<String, Double> map = new HashMap<String, Double>();
-		for(Entry<String, LinkActivityOccupancyCounter> e: this.counter.entrySet()){
-			Double d = 0.;
-			for(Id id: ids){
-				d += e.getValue().getMaximumOccupancy(id);
+	void write(String outputPath, Map<String, EnergyConsumption> energyConsumption, List<Integer> timeBins) {
+		String file = outputPath + "buildingEnergyConsumption.csv.gz";
+		log.info("writing building-energy-consumption-data to " + file + ".");
+		BufferedWriter writer = IOUtils.getBufferedWriter(file);
+		try {
+			//write the header
+			writer.write("run;activityType;");
+			for(Integer i: timeBins){
+				writer.write(String.valueOf(i) + ";");
 			}
-			map.put(e.getKey(), d/maxOfActivityType);
+			writer.write("\n");
+			// write the content
+			for(Entry<String, EnergyConsumption> run: energyConsumption.entrySet()){
+				for(Entry<String, Map<Integer, Double>> activityType :run.getValue().getActType2Consumption().entrySet()){
+					writer.write(run.getKey() + ";" + activityType.getKey() + ";");
+					for(Integer i: timeBins){
+						writer.write(String.valueOf(activityType.getValue().get(i)) + ";");
+					}
+					writer.write("\n");
+				}
+			}
+			writer.flush();
+			writer.close();
+			log.info("finished (writing building-energy-consumption-data to " + file + ".");
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return map;
 	}
 
-	
 }
 

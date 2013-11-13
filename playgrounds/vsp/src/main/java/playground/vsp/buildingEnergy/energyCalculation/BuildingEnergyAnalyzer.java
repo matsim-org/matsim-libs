@@ -27,44 +27,27 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.gbl.Gbl;
 
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionCalculator.EnergyConsumption;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyActivityProbabilityCalculator.ActivityProbabilities;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyAggregatedEnergyConsumptionCalculator.EnergyConsumption;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.BuildingEnergyConsumptionRuleFactory;
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.HomeEnergyConsumptionRuleImpl;
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.OfficeEnergyConsumptionRuleImpl;
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyDataReader.LinkOccupancyStats;
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyDataReader.PopulationStats;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyMATSimDataReader.LinkOccupancyStats;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyMATSimDataReader.PopulationStats;
 
 /**
  * Analyzes the base-run and all other runs for the agents energy consumption.
  * The class assumes they all use the same network!
+ * Only agents that perform both, home and work-activities, will be analyzed. 
  * 
  * @author droeder
  *
  */
-class BuildingEnergyAnalyzerMain {
-	private static final String[] ARGS = new String[]{
-		"E:\\VSP\\svn\\shared-svn\\studies\\droeder\\buildingEnergy\\runs\\",
-		"E:\\VSP\\svn\\shared-svn\\studies\\droeder\\buildingEnergy\\runs\\outputCaseStudies\\",
-		"900",
-		"86400",
-		"2kW.15",
-		"home",
-		"work",
-		"0.35625",
-		"0.83125",
-		"5.0",
-		"0.366",
-		"0.854",
-		"2kW.s1"
-	};
+public class BuildingEnergyAnalyzer {
+
 
 	private static final Logger log = Logger
-			.getLogger(BuildingEnergyAnalyzerMain.class);
-	static final String all = "--complete--";
+			.getLogger(BuildingEnergyAnalyzer.class);
+	/*package*/ static final String all = "--complete--";
 	private List<String> runIds;
 	private String baseRunId;
 	private int tMax;
@@ -82,7 +65,11 @@ class BuildingEnergyAnalyzerMain {
 	private BuildingEnergyConsumptionRuleFactory rules;
 	private Map<String, EnergyConsumption> energyConsumption;
 
-	BuildingEnergyAnalyzerMain(String inputPath, 
+	private ActivityProbabilities probabilities;
+	
+	/*package*/ static boolean berlin = false;
+
+	public BuildingEnergyAnalyzer(String inputPath, 
 									String outputPath, 
 									int td, 
 									int tmax, 
@@ -91,37 +78,42 @@ class BuildingEnergyAnalyzerMain {
 									final String homeType, 
 									final String workType,
 									BuildingEnergyConsumptionRuleFactory consumptionRuleFactory)
-//									final BuildingEnergyConsumptionRule calculatorWork,
-//									final BuildingEnergyConsumptionRule calculatorHome) 
 									{
 		this.inputPath = inputPath;
 		this.outputPath = outputPath;
+		if(!new File(outputPath).exists()){
+			throw new IllegalArgumentException(outputPath + " does not exist.");
+		}
 		this.td = td;
 		this.tMax = tmax;
 		this.baseRunId = baseRun;
 		this.runIds = runs;
 		this.homeType = homeType;
 		this.workType = workType;
-		log.warn("check the analyzed activitytypes.");
 		this.actTypes = new HashSet<String>(){{
 			// TODO[dr] make this configurable
 			add(homeType);
 			add(workType);
-			add(new String("not specified"));
 		}};
 		this.rules = consumptionRuleFactory;
+		log.warn("you may define more activity-types than home and work. Note, the analysis of probabilities and " +
+				"populationstatistics will be based only on home- and work-activities.");
 	}
 	
 	/**
 	 * @param outputPath 
 	 * 
 	 */
-	private void run() {
+	public void run() {
+		if(berlin){
+			log.warn("Plans and events will be modified. All ``not specified'' activities and events will be replaced " +
+					"with " + homeType + "-activities. This will work for Berlin-Scenario only! Make sure this is what you want!");
+		}
 		initTimeBins();
 		runRawAnalysis();
-		dumpRawData();
+		writeRawData();
 		createAggregatedAnalysis();
-		writeEnergyConsumption();
+		writeAggregatedData();
 	}
 
 	/**
@@ -142,7 +134,7 @@ class BuildingEnergyAnalyzerMain {
 		// TODO[dr] make iterations configurable
 		log.warn("iteration is currently hard coded...");
 		this.run2type2RawOccupancy = new HashMap<String, Map<String, LinkOccupancyStats>>();
-		this.run2PopulationStats =  new HashMap<String, BuildingEnergyDataReader.PopulationStats>();
+		this.run2PopulationStats =  new HashMap<String, BuildingEnergyMATSimDataReader.PopulationStats>();
 		analyseSingleRunRaw(baseRunId, 1000);
 		for(String id : runIds){
 			analyseSingleRunRaw(id, 300);
@@ -159,7 +151,7 @@ class BuildingEnergyAnalyzerMain {
 		String plansFile = getPlansFileName(runId, iter);
 		String networkFile = getNetworkFileName(runId);
 		String eventsFile = getEventsFileName(runId, iter);
-		BuildingEnergyDataReader reader = new BuildingEnergyDataReader(timeBins, iter, tMax, actTypes);
+		BuildingEnergyMATSimDataReader reader = new BuildingEnergyMATSimDataReader(timeBins, iter, tMax, actTypes);
 		reader.run(networkFile, plansFile, eventsFile, homeType, workType);
 		run2type2RawOccupancy.put(runId, reader.getLinkActivityStats());
 		run2PopulationStats.put(runId, reader.getPStats());
@@ -172,7 +164,7 @@ class BuildingEnergyAnalyzerMain {
 	
 	/**
 	 */
-	private void dumpRawData() {
+	private void writeRawData() {
 		new BuildingEnergyRawDataWriter(baseRunId, run2type2RawOccupancy, 
 				run2PopulationStats, timeBins, links).write(outputPath);
 	}
@@ -187,10 +179,11 @@ class BuildingEnergyAnalyzerMain {
 		for(String s: actTypes){
 			maxPerLink.put(s, findGlobalMaxPerLink(s));
 		}
-		BuildingEnergyConsumptionCalculator calculator =  new BuildingEnergyConsumptionCalculator(rules, links, timeBins, maxPerLink);
-		calculator.process(run2type2RawOccupancy);
-		this.energyConsumption = calculator.getEnergyConsumptionPerRun();
+		BuildingEnergyAggregatedEnergyConsumptionCalculator calculator =  new BuildingEnergyAggregatedEnergyConsumptionCalculator(rules, links, timeBins, maxPerLink);
+		this.energyConsumption = calculator.run(run2type2RawOccupancy);
+		this.probabilities = new BuildingEnergyActivityProbabilityCalculator(links).run(run2type2RawOccupancy, run2PopulationStats);
 	}
+
 
 	/**
 	 * @return
@@ -207,8 +200,9 @@ class BuildingEnergyAnalyzerMain {
 		return map;
 	}
 	
-	private void writeEnergyConsumption(){
-		new BuidlingEnergyAggregatedDataWriter().write(outputPath, energyConsumption, timeBins);
+	private void writeAggregatedData(){
+		new BuildingEnergyAggregatedEnergyDataWriter().write(outputPath, energyConsumption, timeBins);
+		new BuildingEnergyActivityProbabilityDataWriter().write(outputPath, probabilities, timeBins);
 	}
 	
 	
@@ -238,76 +232,12 @@ class BuildingEnergyAnalyzerMain {
 		return new String(inputPath + runId + System.getProperty("file.separator") + "ITERS" + System.getProperty("file.separator") +
 				"it." + String.valueOf(iter) + System.getProperty("file.separator") +  runId + "." + String.valueOf(iter) + ".plans.xml.gz");
 	}
-	
+
 	/**
-	 * 
-	 * 
-	 * @param args
+	 * @param isBerlin
 	 */
-	public static void main(String[] args) {
-		boolean time = Gbl.enableThreadCpuTimeMeasurement();
-		Gbl.startMeasurement();
-		if(args.length == 0){
-			log.warn("using hard coded static variables. Make sure this what you want.");
-			args = ARGS;
-		}
-		if(args.length < 12){
-			throw new IllegalArgumentException("expecting min 12 arguments {inputpath, outputPath, timeSliceSize, tmax, " +
-					"baseRunId, homeActivityType, workActivityType, P_bo, P_so, beta, P_bh, P_ah, runIds...}");
-		}
-		String inputPath = new File(args[0]).getAbsolutePath() + System.getProperty("file.separator");
-		String outputPath = new File(args[1]).getAbsolutePath() + System.getProperty("file.separator");
-		int td = Integer.parseInt(args[2]);
-		int tmax = Integer.parseInt(args[3]);
-		String baseRun = args[4];
-		String homeType = args[5];
-		String workType = args[6];
-		Double pbo = Double.parseDouble(args[7]);
-		Double pso = Double.parseDouble(args[8]);
-		Double beta = Double.parseDouble(args[9]);
-		Double pbh = Double.parseDouble(args[10]);
-		Double pah = Double.parseDouble(args[11]);
-		List<String> runs = new ArrayList<String>();
-		for(int i = 12; i < args.length; i++){
-			runs.add(args[i]);
-		}
-		//catch logEntries
-		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputPath, BuildingEnergyAnalyzerMain.class.getSimpleName(), true, false));
-		OutputDirectoryLogging.catchLogEntries();
-		// dump input-parameters to log
-		log.info("running class: " + System.getProperty("sun.java.command"));
-		log.info("inputPath: " + inputPath);
-		log.info("outputPath: " + outputPath);
-		log.info("timeSliceDuration [s]\t: " + String.valueOf(td));
-		log.info("tMax [s]\t\t\t: " + tmax);
-		log.info("homeType\t\t\t: " + homeType);
-		log.info("workType\t\t\t: " + workType);
-		log.info("P_bo [kW]\t\t\t: " + pbo);
-		log.info("P_so [kW]\t\t\t: " + pso);
-		log.info("beta []\t\t\t: " + beta);
-		log.info("P_bh [kW]\t\t\t: " + pbh);
-		log.info("P_ah [kW]\t\t\t: " + pah);
-		log.info("baseRun\t\t\t: " + baseRun);
-		for(int i = 0; i < runs.size(); i++){
-			log.info("caseStudy " + (i + 1) + "\t\t: " + runs.get(i));
-		}
-		BuildingEnergyConsumptionRule ecWork = new OfficeEnergyConsumptionRuleImpl(td, pbo, pso, beta);
-		BuildingEnergyConsumptionRule ecHome = new HomeEnergyConsumptionRuleImpl(td, pbh, pah);
-		BuildingEnergyConsumptionRule ecNotSpecified = new HomeEnergyConsumptionRuleImpl(td, 0, pah);
-		BuildingEnergyConsumptionRuleFactory factory =  new BuildingEnergyConsumptionRuleFactory();
-		factory.setRule(homeType, ecHome);
-		factory.setRule(workType, ecWork);
-		// seems ``not specified'' is the morning home-activity (for the berlin-scenario)
-		factory.setRule(new String("not specified"), ecNotSpecified);
-		// run
-		new BuildingEnergyAnalyzerMain(inputPath, outputPath, td, tmax, baseRun, runs, homeType, workType, factory).run();
-		if(time){
-			Gbl.printCurrentThreadCpuTime();
-		}
-		Gbl.printElapsedTime();
-		log.info("finished.");
+	public void setBerlin(Boolean isBerlin) {
+		berlin = isBerlin;
 	}
-
-
 }
 

@@ -21,6 +21,7 @@ package playground.vsp.buildingEnergy.energyCalculation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -53,10 +55,10 @@ import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
  * @author droeder
  *
  */
-class BuildingEnergyDataReader {
+class BuildingEnergyMATSimDataReader {
 
 	private static final Logger log = Logger
-			.getLogger(BuildingEnergyDataReader.class);
+			.getLogger(BuildingEnergyMATSimDataReader.class);
 	private List<Integer> timeBins;
 	private Set<String> activityTypes;
 	private double tmax;
@@ -66,7 +68,7 @@ class BuildingEnergyDataReader {
 	private PopulationStats populationStats;
 	private ArrayList<Id> links;
 
-	BuildingEnergyDataReader(List<Integer> timeBins,
+	BuildingEnergyMATSimDataReader(List<Integer> timeBins,
 							double td,
 							double tmax,
 							Set<String> activityTypes) {
@@ -85,7 +87,7 @@ class BuildingEnergyDataReader {
 		for(String s: activityTypes){
 			this.type2OccupancyStats.put(s, initOccupancyCounter(s, plansAna.getPopulation()));
 		}
-		parseEvents(events);
+		parseEvents(events, homeType);
 	}
 	
 	PopulationStats getPStats(){
@@ -103,16 +105,19 @@ class BuildingEnergyDataReader {
 	/**
 	 * @param events
 	 */
-	private void parseEvents(String events) {
+	private void parseEvents(String events, String homeType) {
 		EventsManager manager = EventsUtils.createEventsManager();
-		MyEventsFilter filter = new MyEventsFilter(this.populationStats.getHomeAndWorkAgentIds());
+		// create a filter and add the handler 
+		EventsFilter filter = new EventsFilter(this.populationStats.getHomeAndWorkAgentIds(), homeType);
 		for(LinkOccupancyStats los: this.type2OccupancyStats.values()){
 			for(LinkActivityOccupancyCounter laoc: los.getStats().values()){
 				filter.addCounter(laoc);
 			}
 		}
 		manager.addHandler(filter);
+		//handle events via filter
 		new MatsimEventsReader(manager).readFile(events);
+		//finish handler
 		for(LinkOccupancyStats los: this.type2OccupancyStats.values()){
 			for(LinkActivityOccupancyCounter laoc: los.getStats().values()){
 				laoc.finish();
@@ -121,16 +126,25 @@ class BuildingEnergyDataReader {
 	}
 	
 	/*
-	 * this is very quick and dirty hack but I don't want to change the other impl here... //dr, nov'13
+	 * this is very quick and dirty hack but I don't want to change the other impl here
+	 * I want to use only agents with both, home and work activities. Further for the
+	 * Berlin-scenario it is necessary to ``refactor'' ``not specified''-activities
+	 * as they are mostly home-activities... //dr, nov'13
 	 */
-	static class MyEventsFilter implements ActivityStartEventHandler, ActivityEndEventHandler{
+	private static class EventsFilter implements ActivityStartEventHandler, ActivityEndEventHandler{
 		
 		private List<Id> personFilter;
 		private List<LinkActivityOccupancyCounter> handler = new ArrayList<LinkActivityOccupancyCounter>();
+		private String homeType;
+		private boolean warn;
 
-		public MyEventsFilter(List<Id> personFilter) {
-			log.warn("filtering events --- functionality is only ensured for Berlin-Scenario!");
+		public EventsFilter(List<Id> personFilter, String homeType) {
+			if(BuildingEnergyAnalyzer.berlin){
+				log.warn("Will replace events with activity ``not specified'' with events of type ``" + homeType + "''.");
+			}
+			this.homeType = homeType;
 			this.personFilter = personFilter;
+			warn = true;
 		}
 		
 		void addCounter(LinkActivityOccupancyCounter counter){
@@ -145,19 +159,59 @@ class BuildingEnergyDataReader {
 		@Override
 		public void handleEvent(ActivityEndEvent event) {
 			if(personFilter.contains(event.getPersonId())){
+				ActivityEndEvent e = modifyIfNecessary(event);
 				for(LinkActivityOccupancyCounter laoc: handler){
-					laoc.handleEvent(event);
+					laoc.handleEvent(e);
 				}
 			}
+		}
+
+		/**
+		 * @param event
+		 * @return
+		 */
+		private ActivityEndEvent modifyIfNecessary(ActivityEndEvent event) {
+			if(event.getActType().equals("not specified") && BuildingEnergyAnalyzer.berlin){
+				if(warn){
+					log.warn("modifying events for berlin-scenario. Thrown only once.");
+					warn = false;
+				}
+				return new ActivityEndEvent(event.getTime(), 
+								event.getPersonId(), 
+								event.getLinkId(), 
+								event.getFacilityId(), 
+								homeType);
+			}
+			return event;
 		}
 
 		@Override
 		public void handleEvent(ActivityStartEvent event) {
 			if(personFilter.contains(event.getPersonId())){
+				ActivityStartEvent e = modifyIfNecessary(event);
 				for(LinkActivityOccupancyCounter laoc: handler){
-					laoc.handleEvent(event);
+					laoc.handleEvent(e);
 				}
 			}
+		}
+
+		/**
+		 * @param event
+		 * @return
+		 */
+		private ActivityStartEvent modifyIfNecessary(ActivityStartEvent event) {
+			if(event.getActType().equals("not specified") && BuildingEnergyAnalyzer.berlin){
+				if(warn){
+					log.warn("modifying events for berlin-scenario. Thrown only once.");
+					warn = false;
+				}
+				return new ActivityStartEvent(event.getTime(), 
+								event.getPersonId(), 
+								event.getLinkId(), 
+								event.getFacilityId(), 
+								homeType);
+			}
+			return event;
 		}
 		
 	}
@@ -180,6 +234,7 @@ class BuildingEnergyDataReader {
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(plansAna);
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
 		new MatsimPopulationReader(sc).readFile(plansFile);
+		log.info("resulting population contains " + plansAna.getPopulation().getPersons().size() + " persons.");
 	}
 
 	/**
@@ -194,7 +249,7 @@ class BuildingEnergyDataReader {
 		for(int i : timeBins){
 			stats.add(String.valueOf(i), new LinkActivityOccupancyCounter(p, i, i + td , string));
 		}
-		stats.add(BuildingEnergyAnalyzerMain.all , new LinkActivityOccupancyCounter(p, 0, tmax , string));
+		stats.add(BuildingEnergyAnalyzer.all , new LinkActivityOccupancyCounter(p, 0, tmax , string));
 		return stats;
 	}
 	
@@ -202,7 +257,7 @@ class BuildingEnergyDataReader {
 //	
 	protected class LinkOccupancyStats{
 		
-		private Map<String, LinkActivityOccupancyCounter> l = new HashMap<String, LinkActivityOccupancyCounter>();
+		private Map<String, LinkActivityOccupancyCounter> l = new LinkedHashMap<String, LinkActivityOccupancyCounter>();
 		
 		public LinkOccupancyStats() {
 		}
@@ -231,13 +286,17 @@ class BuildingEnergyDataReader {
 		private List<Id> home;
 		private List<Id> work;
 		private Population population;
+		private boolean warn;
 
 		BuildingEnergyPlansAnalyzer(String homeType, String workType) {
 			this.homeType = homeType;
 			this.workType = workType;
 			this.work = new ArrayList<Id>();
 			this.home = new ArrayList<Id>();
-			log.warn("currently activityType ``not specified'' is handled equals to ``home'' (necessary for Berlin-Scennrio)");
+			if(BuildingEnergyAnalyzer.berlin){
+				log.warn("currently activityType ``not specified'' is handled equals to ``" + homeType + "'' (necessary for Berlin-Scenario)");
+			}
+			warn = true;
 		}
 
 		/**
@@ -270,7 +329,21 @@ class BuildingEnergyDataReader {
 				}
 				// we know everything we need to know, return
 				if(home && work){
-					this.population.addPerson(person);
+					// this is not really necessary but saves memory
+					Person p = this.population.getFactory().createPerson(person.getId());
+					Plan plan =  this.population.getFactory().createPlan();
+					Activity aa = (Activity) pe.get(0);
+					// this is a "hack", necessary for the berlin-scenario...
+					if(aa.getType().equals("not specified") && BuildingEnergyAnalyzer.berlin){
+						aa = this.population.getFactory().createActivityFromLinkId(homeType, aa.getLinkId());
+						if(warn){
+							log.warn("modifying activitytypes for berlin-scenario. Thrown only once...");
+							warn = false;
+						}
+					}
+					plan.addActivity(aa);
+					p.addPlan(plan);
+					this.population.addPerson(p);
 					this.home.remove(person.getId());
 					this.work.remove(person.getId());
 					return;

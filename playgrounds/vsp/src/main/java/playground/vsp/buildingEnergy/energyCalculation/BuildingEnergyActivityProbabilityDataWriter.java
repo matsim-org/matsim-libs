@@ -27,26 +27,24 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionCalculator.EnergyConsumption;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyActivityProbabilityCalculator.ActivityProbabilities;
 
 /**
  * @author droeder
  *
  */
-class BuidlingEnergyAggregatedDataWriter {
+class BuildingEnergyActivityProbabilityDataWriter {
 
 	private static final Logger log = Logger
-			.getLogger(BuidlingEnergyAggregatedDataWriter.class);
+			.getLogger(BuildingEnergyActivityProbabilityDataWriter.class);
 
-	BuidlingEnergyAggregatedDataWriter() {
+	BuildingEnergyActivityProbabilityDataWriter() {
 	}
-
-	/**
-	 * @param outputPath
-	 */
-	void write(String outputPath, Map<String, EnergyConsumption> energyConsumption, List<Integer> timeBins) {
-		log.info("writing energy-consumption-data to " + outputPath + "energyConsumption.csv.gz.");
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputPath + "energyConsumption.csv.gz");
+	
+	void write(String outputPath, ActivityProbabilities proba, List<Integer> timeBins) {
+		String file = outputPath + "activityProbability.csv.gz";
+		log.info("writing activity-probability-data to " + file + ".");
+		BufferedWriter writer = IOUtils.getBufferedWriter(file);
 		try {
 			//write the header
 			writer.write("run;activityType;");
@@ -55,18 +53,18 @@ class BuidlingEnergyAggregatedDataWriter {
 			}
 			writer.write("\n");
 			// write the content
-			for(Entry<String, EnergyConsumption> run: energyConsumption.entrySet()){
-				for(Entry<String, Map<Integer, Double>> activityType :run.getValue().getActType2Consumption().entrySet()){
+			for(Entry<String, Map<String, Map<String, Double>>> run: proba.getProbabilities().entrySet()){
+				for(Entry<String, Map<String, Double>> activityType :run.getValue().entrySet()){
 					writer.write(run.getKey() + ";" + activityType.getKey() + ";");
 					for(Integer i: timeBins){
-						writer.write(String.valueOf(activityType.getValue().get(i)) + ";");
+						writer.write(String.valueOf(activityType.getValue().get(String.valueOf(i))) + ";");
 					}
 					writer.write("\n");
 				}
 			}
 			writer.flush();
 			writer.close();
-			log.info("finished (writing energy-consumption-data to " + outputPath + "energyConsumption.csv.gz).");
+			log.info("finished (writing activity-probability-data to " + file + ".");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

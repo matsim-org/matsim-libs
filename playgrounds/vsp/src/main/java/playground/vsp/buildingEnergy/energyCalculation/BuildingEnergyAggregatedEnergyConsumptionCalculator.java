@@ -27,25 +27,25 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.BuildingEnergyConsumptionRuleFactory;
-import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyDataReader.LinkOccupancyStats;
+import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyMATSimDataReader.LinkOccupancyStats;
 import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
 
 /**
  * @author droeder
  *
  */
-class BuildingEnergyConsumptionCalculator {
+class BuildingEnergyAggregatedEnergyConsumptionCalculator {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
-			.getLogger(BuildingEnergyConsumptionCalculator.class);
+			.getLogger(BuildingEnergyAggregatedEnergyConsumptionCalculator.class);
 	private BuildingEnergyConsumptionRuleFactory rules;
 	private Map<String, EnergyConsumption> consumption;
 	private List<Id> links;
 	private List<Integer> timeBins;
 	private Map<String, Map<Id, Integer>> maxValues;
 
-	BuildingEnergyConsumptionCalculator(BuildingEnergyConsumptionRuleFactory rules, 
+	BuildingEnergyAggregatedEnergyConsumptionCalculator(BuildingEnergyConsumptionRuleFactory rules, 
 				List<Id> links, List<Integer> timeBins, Map<String, Map<Id, Integer>> maxValues) {
 		this.rules = rules;
 		this.links = links;
@@ -61,11 +61,11 @@ class BuildingEnergyConsumptionCalculator {
 		this.consumption = new HashMap<String, EnergyConsumption>();
 	}
 
-	Map<String, EnergyConsumption> getEnergyConsumptionPerRun(){
-		return this.consumption;
-	}
+//	Map<String, EnergyConsumption> getEnergyConsumptionPerRun(){
+//		return this.consumption;
+//	}
 	
-	void process(Map<String, Map<String, LinkOccupancyStats>> occupancyRun2Type2Occupancy){
+	Map<String, EnergyConsumption> run(Map<String, Map<String, LinkOccupancyStats>> occupancyRun2Type2Occupancy){
 		log.info("calculating energy-consumption.");
 		for(Entry<String, Map<String, LinkOccupancyStats>> e: occupancyRun2Type2Occupancy.entrySet()){
 			EnergyConsumption c = consumption.get(e.getKey());
@@ -80,6 +80,7 @@ class BuildingEnergyConsumptionCalculator {
 			}
 		}
 		log.info("finished (calculating energy-consumption).");
+		return consumption;
 	}
 	
 	
