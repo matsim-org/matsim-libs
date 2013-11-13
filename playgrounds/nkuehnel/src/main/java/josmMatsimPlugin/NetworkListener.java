@@ -53,7 +53,6 @@ public class NetworkListener implements DataSetListener
 	{
 		// TODO Auto-generated method stub
 		System.out.println("data changed");
-		MATSimPlugin.toggleDialog.updateTable(layer);
 	}
 
 	@Override
@@ -66,6 +65,8 @@ public class NetworkListener implements DataSetListener
 				moved.getNode().getCoor().lon(), moved.getNode().getCoor()
 						.lat()));
 		network.getNodes().get(id).getCoord().setXY(temp.getX(), temp.getY());
+
+		MATSimPlugin.toggleDialog.updateTable(layer);
 		
 
 //		for (Link link : network.getLinks().values())
@@ -234,6 +235,8 @@ public class NetworkListener implements DataSetListener
 			return Collections.emptyList();
 		if (!keys.containsKey("permlanes"))
 			return Collections.emptyList();
+		if (!keys.containsKey("length"))
+			return Collections.emptyList();
 		Node fromNode = matsim4osm(way.firstNode());
 		Node toNode = matsim4osm(way.lastNode());
 		Link link = network.getFactory().createLink(new IdImpl(way.getId()),
@@ -241,6 +244,7 @@ public class NetworkListener implements DataSetListener
 		link.setCapacity(Double.parseDouble(keys.get("capacity")));
 		link.setFreespeed(Double.parseDouble(keys.get("freespeed")));
 		link.setNumberOfLanes(Double.parseDouble(keys.get("permlanes")));
+		link.setLength(Double.parseDouble(keys.get("length")));
 		return Collections.singletonList(link);
 	}
 
@@ -306,6 +310,8 @@ public class NetworkListener implements DataSetListener
 		}
 
 		System.out.println("have links: " + network.getLinks().size());
+
+		MATSimPlugin.toggleDialog.updateTable(layer);
 	}
 
 	@Override
