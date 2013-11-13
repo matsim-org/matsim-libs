@@ -105,16 +105,16 @@ public class ProductionToMATSimNetworkConverterMain {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		args = new String[] {
-				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/rangierbahnhof_2013_CargoRail.txt",
-				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/teambahnhof_2013_CargoRail.txt",
-				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/bedienpunkte_2013_CargoRail.txt",
-				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/versandtyp_2013_CargoRail.txt",
-				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/tagesganglinie_2013_CargoRail.txt",
-				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/leitwege_2013_CargoRail.txt",
-				"D:/tmp/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkProduction",
-		};
+//		args = new String[] {
+//				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/rangierbahnhof_2013_CargoRail.txt",
+//				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/teambahnhof_2013_CargoRail.txt",
+//				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/bedienpunkte_2013_CargoRail.txt",
+//				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/versandtyp_2013_CargoRail.txt",
+//				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/tagesganglinie_2013_CargoRail.txt",
+//				"D:/tmp/sbb/0002/20130604_Daten_Produktionsstruktur/20130604_Daten_Produktionsstruktur/leitwege_2013_CargoRail.txt",
+//				"D:/tmp/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkProduction",
+//		};
 		
 		if (args.length != 8) {
 			log.error(ProductionToMATSimNetworkConverterMain.class.getCanonicalName()+" rbFile rcpFile satFile deliveryTypeFile timeVariationFile routeFile nemoInfraXmlFile outputBase");

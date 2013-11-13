@@ -97,10 +97,10 @@ public class NEMOInfraToMATSimNetworkConverterMain {
 	 */
 	public static void main(String[] args) {
 
-		args = new String[] {
-				"D:/tmp/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkNemoInfra",
-		};
+//		args = new String[] {
+//				"D:/tmp/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/networkNemoInfra",
+//		};
 		
 		if (args.length != 2) {
 			log.error(NEMOInfraToMATSimNetworkConverterMain.class.getCanonicalName()+" nemoInfraXmlFile outputBase");

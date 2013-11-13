@@ -103,29 +103,13 @@ public class OttToMATSimScheduleConverterMain {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		args = new String[] {
-				"D:/tmp/sbb/0002/20130715_Fahrplandaten/OTT_20120308.csv",
-				"D:/tmp/sbb/0002/20130715_Fahrplandaten/Traintypes.csv",
-				"D:/tmp/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
-				"D:/tmp/sbb/0002/20130828_nodeMergeList/NodeMap.csv",
-				"true", // true := performance schedule; false := target schedule
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance",
-		};
-		
 //		args = new String[] {
 //				"D:/tmp/sbb/0002/20130715_Fahrplandaten/OTT_20120308.csv",
+//				"D:/tmp/sbb/0002/20130715_Fahrplandaten/Traintypes.csv",
 //				"D:/tmp/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
 //				"D:/tmp/sbb/0002/20130828_nodeMergeList/NodeMap.csv",
-//				"false", // true := performance schedule; false := target schedule
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/scheduleTarget",
-//		};
-		
-//		args = new String[] {
-//				"S:/raw/europe/ch/ch/sbb/0002/20130715_Fahrplandaten/OTT_20120308.csv",
-//				"S:/raw/europe/ch/ch/sbb/0002/20130524_Daten_Infrastruktur/._infra.xml",
-//				"S:/raw/europe/ch/ch/sbb/0002/20130828_nodeMergeList/NodeMap.csv",
-//				"false", // true := performance schedule; false := target schedule
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/scheduleTarget",
+//				"true", // true := performance schedule; false := target schedule
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance",
 //		};
 		
 		if (args.length != 6) {

@@ -59,7 +59,6 @@ public class WagonSimController extends Controler {
 	public WagonSimController(Scenario scenario,ObjectAttributes vehicleLinkSpeedAttributes, Map<Id,Double> minShuntingTimes) {
 		super(scenario);
 		
-		super.setOverwriteFiles(true);
 		WagonSimVehicleLoadListener listener = new WagonSimVehicleLoadListener(scenario.getPopulation().getPersonAttributes());
 		this.setMobsimFactory(new WagonSimQSimFactory(vehicleLinkSpeedAttributes, listener));
 		this.addControlerListener(listener);
@@ -75,155 +74,22 @@ public class WagonSimController extends Controler {
 		this.addControlerListener(new WagonSimAnalysisListener());
 	}
 	
-//	//////////////////////////////////////////////////////////////////////
-//	// inner classes
-//	//////////////////////////////////////////////////////////////////////
-//
-//	// almost copy/paste from QSimFactory
-//	static class MyQSimFactory implements MobsimFactory {
-//		
-//		//////////////////////////////////////////////////////////////////////
-//
-//		private final LocomotiveLinkSpeedCalculator linkSpeedCalculator;
-//		
-//		//////////////////////////////////////////////////////////////////////
-//
-//		public MyQSimFactory(ObjectAttributes vehicleLinkSpeedAttributes) {
-//			this.linkSpeedCalculator  = new LocomotiveLinkSpeedCalculator(vehicleLinkSpeedAttributes);
-//		}
-//		
-//		//////////////////////////////////////////////////////////////////////
-//
-//		@Override
-//		public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
-//			QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
-//			if (conf == null) {
-//				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-//			}
-//
-//			// Get number of parallel Threads
-//			int numOfThreads = conf.getNumberOfThreads();
-//			QNetsimEngineFactory netsimEngFactory;
-//			if (numOfThreads > 1) {
-//				/*
-//				 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
-//				 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
-//				 * SynchronizedEventsManagerImpl.
-//				 */
-//				if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
-//					eventsManager = new SynchronizedEventsManagerImpl(eventsManager);				
-//				}
-//				netsimEngFactory = new ParallelQNetsimEngineFactory();
-//				log.info("Using parallel QSim with " + numOfThreads + " threads.");
-//			} else {
-//				netsimEngFactory = new DefaultQSimEngineFactory();
-//			}
-//			QSim qSim = new QSim(sc, eventsManager);
-//			ActivityEngine activityEngine = new ActivityEngine();
-//			qSim.addMobsimEngine(activityEngine);
-//			qSim.addActivityHandler(activityEngine);
-//			QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-//			qSim.addMobsimEngine(netsimEngine);
-//			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-//			// setting the linkSpeedCalculator
-//			netsimEngine.setLinkSpeedCalculator(linkSpeedCalculator);
-//			TeleportationEngine teleportationEngine = new TeleportationEngine();
-//			qSim.addMobsimEngine(teleportationEngine);
-//
-//			AgentFactory agentFactory;
-//			if (sc.getConfig().scenario().isUseTransit()) {
-//				agentFactory = new TransitAgentFactory(qSim);
-//				TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-//				transitEngine.setUseUmlaeufe(true);
-//				transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//				qSim.addDepartureHandler(transitEngine);
-//				qSim.addAgentSource(transitEngine);
-//				qSim.addMobsimEngine(transitEngine);
-//			} else {
-//				agentFactory = new DefaultAgentFactory(qSim);
-//			}
-//			if (sc.getConfig().network().isTimeVariantNetwork()) {
-//				qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
-//			}
-//			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-//			qSim.addAgentSource(agentSource);
-//			return qSim;
-//		}
-//	}
-//	
-//	//////////////////////////////////////////////////////////////////////
-//
-//	static class LocomotiveLinkSpeedCalculator implements LinkSpeedCalculator {
-//
-//		//////////////////////////////////////////////////////////////////////
-//
-//		private final ObjectAttributes vehicleLinkSpeedAttributes;
-//		
-//		//////////////////////////////////////////////////////////////////////
-//
-//		LocomotiveLinkSpeedCalculator(final ObjectAttributes vehicleLinkSpeedAttributes) {
-//			this.vehicleLinkSpeedAttributes = vehicleLinkSpeedAttributes;
-//		}
-//
-//		//////////////////////////////////////////////////////////////////////
-//
-//		@Override
-//		public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
-//			Object obj = (Double)vehicleLinkSpeedAttributes.getAttribute(vehicle.getId().toString(),link.getId().toString());
-//			if (obj == null) { throw new RuntimeException("time="+time+",vId="+vehicle.getId()+",lId="+link.getId()+": no speed defined in vehicleLinkSpeedAttributes. Bailing out."); }
-//			return (Double)obj;
-//		}
-//	}
-	
 	//////////////////////////////////////////////////////////////////////
 	// main
 	//////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {
 
-		args = new String[] {
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/network.enriched.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitSchedule.enriched.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/shuntingTimes.enriched.txt",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitVehicles.enriched.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitVehicleAttributes.enriched.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnrichedDemand/demand.wagons.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnrichedDemand/wagonAttributes.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb",
-				"run0000_OttPerfEnr"
-		};
-
 //		args = new String[] {
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/network.ott.performance.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitSchedule.ott.performance.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitVehicles.ott.performance.xml",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitVehicleLinkSpeedAttributes.performance.ott.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/demand/demand.wagons.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/demand/wagonAttributes.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/runs",
-//				"run0000_OttPerf"
-//		};
-
-//		args = new String[] {
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/network.ott.performance.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitSchedule.ott.performance.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitVehicles.ott.performance.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitVehicleLinkSpeedAttributes.performance.ott.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/input/population.empty.xml",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/demand/wagonAttributes.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/runs",
-//				"runOttPerfEmptyPlans"
-//		};
-
-//		args = new String[] {
-//				"C:\\Users\\Daniel\\Desktop\\wagonSim\\network.ott.performance.xml.gz",
-//				"C:\\Users\\Daniel\\Desktop\\wagonSim\\transitSchedule.ott.performance.xml.gz",
-//				"C:\\Users\\Daniel\\Desktop\\wagonSim\\transitVehicles.ott.performance.xml.gz",
-//				"C:\\Users\\Daniel\\Desktop\\wagonSim\\transitVehicleLinkSpeedAttributes.performance.ott.xml.gz",
-//				"C:\\Users\\Daniel\\Desktop\\wagonSim\\demand.wagons.xml.gz",
-//				"C:\\Users\\Daniel\\Desktop\\wagonSim\\wagonAttributes.xml.gz",
-//				"C:\\Users\\Daniel\\Desktop\\wagonSim\\runs\\",
-//				"runOttPerfWithPlans"
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/network.enriched.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitSchedule.enriched.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/shuntingTimes.enriched.txt",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitVehicles.enriched.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitVehicleAttributes.enriched.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnrichedDemand/demand.wagons.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnrichedDemand/wagonAttributes.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb",
+//				"run0000_OttPerfEnr"
 //		};
 
 		if (args.length != 9) {
@@ -240,14 +106,8 @@ public class WagonSimController extends Controler {
 		String wagonAttributeFile = args[6];
 		String outputBase = args[7];
 		String runId = args[8];
-		// creates a new runId, depending on the number of runs performed before
-//		File f = new File(outputBase);
-//		runId = runId + (f.listFiles().length + 1);
 		
-		
-		// catch log-entries, otherwise all messages written before the controler is set up are lost...
 		OutputDirectoryLogging.catchLogEntries();
-//		log.warn("########################### check config-settings ###########################");
 		log.info("Main: "+WagonSimController.class.getCanonicalName());
 		log.info("networkFile: "+networkFile);
 		log.info("scheduleFile: "+scheduleFile);

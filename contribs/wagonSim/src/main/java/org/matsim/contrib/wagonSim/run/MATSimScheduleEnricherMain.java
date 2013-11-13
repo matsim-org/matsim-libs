@@ -103,16 +103,16 @@ public class MATSimScheduleEnricherMain {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		args = new String[] {
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/network.ott.performance.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitSchedule.ott.performance.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitVehicles.ott.performance.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitVehicleAttributes.ott.performance.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/shuntingTable.ott.performance.txt",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/shuntingTimes.ott.performance.txt",
-				"999999",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched",
-		};
+//		args = new String[] {
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/network.ott.performance.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitSchedule.ott.performance.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitVehicles.ott.performance.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitVehicleAttributes.ott.performance.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/shuntingTable.ott.performance.txt",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/shuntingTimes.ott.performance.txt",
+//				"999999",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched",
+//		};
 		
 		if (args.length != 8) {
 			log.error(MATSimScheduleEnricherMain.class.getCanonicalName()+" networkFile transitScheduleFile transitVehiclesFile transitVehicleAttributesFile shuntingTableFile shuntingTimesFile minDwellTime outputBase");

@@ -117,25 +117,14 @@ public class WagonToDemandConverterMain {
 //		args = new String[] {
 //				"D:/tmp/sbb/0002/20130604_Wagendaten/20130603_Wagendaten_2012/wagendaten_2012_CargoRail.csv.gz",
 //				"D:/tmp/sbb/0002/20130604_Wagendaten/20130603_Wagendaten_2012/zuordnung_verkehrszellen_CargoRail_2012.csv",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/network.ott.performance.xml.gz",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformance/transitSchedule.ott.performance.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/network.enriched.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitSchedule.enriched.xml.gz",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitVehicleAttributes.enriched.xml.gz",
 //				"D:/tmp/sbb/0002/20130828_nodeMergeList/NodeMap.csv",
 //				"2012-06-14",
-//				"14:00:00",
-//				"D:/Users/balmermi/Documents/eclipse/output/sbb/demand"
+//				"14.00.00",
+//				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnrichedDemand"
 //		};
-				
-		args = new String[] {
-				"D:/tmp/sbb/0002/20130604_Wagendaten/20130603_Wagendaten_2012/wagendaten_2012_CargoRail.csv.gz",
-				"D:/tmp/sbb/0002/20130604_Wagendaten/20130603_Wagendaten_2012/zuordnung_verkehrszellen_CargoRail_2012.csv",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/network.enriched.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitSchedule.enriched.xml.gz",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnriched/transitVehicleAttributes.enriched.xml.gz",
-				"D:/tmp/sbb/0002/20130828_nodeMergeList/NodeMap.csv",
-				"2012-06-14",
-				"14.00.00",
-				"D:/Users/balmermi/Documents/eclipse/output/sbb/schedulePerformanceEnrichedDemand"
-		};
 				
 		if (args.length != 9) {
 			log.error(WagonToDemandConverterMain.class.getCanonicalName()+" wagonDataFile zoneToNodeMapFile scheduleNetworkFile scheduleFile transitVehicleAttributesFile nodeMapFile demandDate[YYYY-MM-DD] demandStartTime[HH.MM.SS] outputBase");
