@@ -1,11 +1,11 @@
-package playground.kai.conceptual.autosensingmargutls;
+package playground.southafrica.gauteng.routing;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.population.Person;
 
-class EffectiveMarginalUtilitiesContainer {
+public class EffectiveMarginalUtilitiesContainer {
 	private final Map<Person,Double> effectiveMarginalUtilityOfTravelTime = new HashMap<Person,Double>() ;
 	private final Map<Person,Double> marginalUtilityOfDistance = new HashMap<Person,Double>() ;
 	private final Map<Person,Double> marginalUtilityOfMoney = new HashMap<Person,Double>() ;

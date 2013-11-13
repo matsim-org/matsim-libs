@@ -16,7 +16,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.conceptual.autosensingmargutls;
+package playground.southAfrica.gauteng.routing;
+
+import static org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey.vspDefaultsCheckingLevel;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -32,9 +34,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -42,7 +46,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import static org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey.* ;
+import playground.southafrica.gauteng.routing.EffectiveMarginalUtilitiesContainer;
+import playground.southafrica.gauteng.routing.RouterUtils;
 
 /**
  * @author nagel
@@ -61,8 +66,21 @@ public class AutosensingTest {
 		params.setTypicalDuration(12.*3600.);
 		config.planCalcScore().addActivityParams(params);
 		
-		final double monetaryDistanceCostRateCar = -0.21/1000.;
-		config.planCalcScore().setMonetaryDistanceCostRateCar(monetaryDistanceCostRateCar); // utils per meter!
+		final double monetaryDistanceCostRateCarCONFIG = -0.21/1000.;
+		config.planCalcScore().setMonetaryDistanceCostRateCar(monetaryDistanceCostRateCarCONFIG); // utils per meter!
+		
+		final double marginalUtilityOfMoneyCONFIG = 2. ;
+		config.planCalcScore().setMarginalUtilityOfMoney(marginalUtilityOfMoneyCONFIG);
+		
+		StrategySettings stratSets = new StrategySettings( new IdImpl(1) ) ;
+		stratSets.setModuleName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );
+		stratSets.setProbability(1.);
+		config.strategy().addStrategySettings(stratSets);
+		
+		config.timeAllocationMutator().setMutationRange(7200.);
+		
+		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
+		config.vspExperimental().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		
 		config.vspExperimental().addParam( vspDefaultsCheckingLevel, VspExperimentalConfigGroup.WARN );
 		
@@ -89,11 +107,11 @@ public class AutosensingTest {
 		ScoringFunctionFactory scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(scenario) ;
 		EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContrainer(scenario, scoringFunctionFactory) ;
 		
-		Assert.assertEquals(-12.0/3600., (double)muc.getEffectiveMarginalUtilityOfTravelTime().get(person), 0.01 ) ;
-		final double marginalUtilityOfMoney = (double) muc.getMarginalUtilityOfMoney().get(person);
-		Assert.assertEquals(1.0, marginalUtilityOfMoney, 0.0001 ) ;
-		final double marginalUtilityOfDistance = marginalUtilityOfMoney * (double)muc.getMarginalUtilityOfDistance().get(person) ;
-		Assert.assertEquals(monetaryDistanceCostRateCar, marginalUtilityOfDistance , 0.01) ;
+		Assert.assertEquals(-12.0/3600., muc.getEffectiveMarginalUtilityOfTravelTime().get(person), 0.01 ) ;
+
+		Assert.assertEquals(marginalUtilityOfMoneyCONFIG, muc.getMarginalUtilityOfMoney().get(person), 0.0001 ) ;
+
+		Assert.assertEquals(monetaryDistanceCostRateCarCONFIG*marginalUtilityOfMoneyCONFIG, muc.getMarginalUtilityOfDistance().get(person) , 0.001) ;
 		
 //		TravelDisutility td = new PersonIndividualTimeDistanceDisutility(tt, muc ) ;
 	}

@@ -42,6 +42,18 @@ import org.matsim.core.utils.misc.Time;
 public class JDEQSimulation implements Mobsim {
 
 	private final static Logger log = Logger.getLogger(JDEQSimulation.class);
+
+	// READING SIMULATION PARAMETERS FROM CONFIG FILE
+	public final static String JDEQ_SIM = "JDEQSim";
+	public final static String SQUEEZE_TIME = "squeezeTime";
+	public final static String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
+	public final static String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
+	public final static String MINIMUM_INFLOW_CAPACITY = "minimumInFlowCapacity";
+	public final static String CAR_SIZE = "carSize";
+	public final static String GAP_TRAVEL_SPEED = "gapTravelSpeed";
+	public final static String END_TIME = "endTime";
+	// made these public static so I can use them from elsewhere for "config in java". kai, nov'13
+
 	protected Scenario scenario;
 
 
@@ -56,16 +68,6 @@ public class JDEQSimulation implements Mobsim {
 		// initialize the events handler to which the micro simulatation gives the events
 		SimulationParameters.setProcessEventThread(events);
 
-
-		// READING SIMULATION PARAMETERS FROM CONFIG FILE
-		final String JDEQ_SIM = "JDEQSim";
-		final String SQUEEZE_TIME = "squeezeTime";
-		final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
-		final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
-		final String MINIMUM_INFLOW_CAPACITY = "minimumInFlowCapacity";
-		final String CAR_SIZE = "carSize";
-		final String GAP_TRAVEL_SPEED = "gapTravelSpeed";
-		final String END_TIME = "endTime";
 
 		Config config = this.scenario.getConfig();
 		String squeezeTime = config.findParam(JDEQ_SIM, SQUEEZE_TIME);

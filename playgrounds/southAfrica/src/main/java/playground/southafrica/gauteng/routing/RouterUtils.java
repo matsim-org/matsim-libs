@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.conceptual.autosensingmargutls;
+package playground.southafrica.gauteng.routing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +38,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  * @author nagel
  *
  */
-class RouterUtils {
+public class RouterUtils {
 	
-	static EffectiveMarginalUtilitiesContainer createMarginalUtilitiesContrainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
+	public static EffectiveMarginalUtilitiesContainer createMarginalUtilitiesContrainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
 		// yy one might want to make the following replaceable. kai, oct'13
 		
 		EffectiveMarginalUtilitiesContainer muc = new EffectiveMarginalUtilitiesContainer() ;

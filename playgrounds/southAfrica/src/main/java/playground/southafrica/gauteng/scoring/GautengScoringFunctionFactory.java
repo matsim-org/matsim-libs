@@ -55,6 +55,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		this.utlOfMon = utlOfMon ;
 	}
 
+	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		// Design comment: This is the only place where the person is available (via plan.getPerson()).  Thus, all 
 		// person-specific scoring actions need to be injected from here. kai, mar'12

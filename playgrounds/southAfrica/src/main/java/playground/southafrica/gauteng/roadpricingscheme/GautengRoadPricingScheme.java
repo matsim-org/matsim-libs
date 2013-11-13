@@ -20,8 +20,6 @@
 
 package playground.southafrica.gauteng.roadpricingscheme;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -30,10 +28,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
@@ -46,7 +43,7 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 	private Population population ;
 	private  double FACTOR = 1. ;
 	
-	public GautengRoadPricingScheme( Config config, Network network, Population population ) {
+	public GautengRoadPricingScheme( String tollLinksFileName, Network network, Population population ) {
 		this.network = network ;
 		this.population = population ; 
 		if ( FACTOR != 1. ) { 
@@ -59,13 +56,14 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
-			rpReader.parse( config.roadpricing().getTollLinksFile());
+			rpReader.parse( tollLinksFileName  );
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		this.delegate = scheme ;
 	}
 
+	@Override
 	public String getDescription() {
 		return delegate.getDescription();
 	}
@@ -88,14 +86,17 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 		return new Cost( baseToll.startTime, baseToll.endTime, FACTOR * baseToll.amount * tollFactor );
 	}
 
+	@Override
 	public Set<Id> getTolledLinkIds() {
 		return delegate.getTolledLinkIds();
 	}
 
+	@Override
 	public String getName() {
 		return delegate.getName();
 	}
 
+	@Override
 	public String getType() {
 		return delegate.getType();
 //		return "link" ;

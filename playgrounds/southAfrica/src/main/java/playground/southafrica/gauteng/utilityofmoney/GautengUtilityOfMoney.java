@@ -47,6 +47,7 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		this.commercialMultiplier = valueOfTimeMultiplier ;
 	}
 
+	@Override
 	public double getUtilityOfMoney_normally_positive(final Id personId ) {
 		Type vehicleType = SanralTollFactor.typeOf(personId);
 		double valueOfTime_hr = getValueOfTime_hr(vehicleType);
@@ -70,6 +71,8 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		return utilityOfTravelTime_hr;
 	}
 
+	private static int wrncnt=0 ;
+	
 	private double getValueOfTime_hr(Type vehicleType) {
 		double valueOfTime_hr = baseValueOfTime ;
 		switch( vehicleType ) {
@@ -86,12 +89,22 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		case commercialClassCWithoutTag:
 			valueOfTime_hr = baseValueOfTime*commercialMultiplier ; 
 			break ;
+		case commercialClassAWithTag:
+		case commercialClassAWithoutTag:
 		case taxiWithTag:
 		case taxiWithoutTag:
 		case extWithTag:
 		case extWithoutTag:
 			valueOfTime_hr = baseValueOfTime;
 			break ;
+		default:
+			throw new RuntimeException("vehicle type not implemented") ;
+		}
+		if ( wrncnt<1 ) {
+			wrncnt++ ;
+			Logger.getLogger(this.getClass()).warn("Johan, commercialClassAWith/WithoutTag were not explicitly given a value of time.  I now added them "
+					+ "under the vehicle types which are getting the base value of time ... which is what they must have gotten implicitly in previous runs. "
+					+ "Could you please modify if necessary, and in any case remove this warning when things are ok.  Thanks, kai, nov'13");
 		}
 		return valueOfTime_hr;
 	}

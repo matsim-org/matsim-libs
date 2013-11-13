@@ -145,7 +145,7 @@ STRIP_FROM_INC_PATH    =
 # (but less readable) file names. This can be useful if your file system 
 # doesn't support long names like on DOS, Mac, or CD-ROM.
 
-SHORT_NAMES            = NO
+SHORT_NAMES            = YES
 
 # If the JAVADOC_AUTOBRIEF tag is set to YES then Doxygen 
 # will interpret the first line (until the first dot) of a JavaDoc-style 
@@ -1816,7 +1816,7 @@ DIRECTORY_GRAPH        = NO
 # HTML_FILE_EXTENSION to xhtml in order to make the SVG files 
 # visible in IE 9+ (other browsers do not have this requirement).
 
-DOT_IMAGE_FORMAT       = png
+DOT_IMAGE_FORMAT       = svg
 
 # If DOT_IMAGE_FORMAT is set to svg, then this option can be set to YES to 
 # enable generation of interactive SVG images that allow zooming and panning. 
@@ -1825,7 +1825,7 @@ DOT_IMAGE_FORMAT       = png
 # need to set HTML_FILE_EXTENSION to xhtml in order to make the SVG files 
 # visible. Older versions of IE do not have SVG support.
 
-INTERACTIVE_SVG        = NO
+INTERACTIVE_SVG        = YES
 
 # The tag DOT_PATH can be used to specify the path where the dot tool can be 
 # found. If left blank, it is assumed the dot tool can be found in the path.

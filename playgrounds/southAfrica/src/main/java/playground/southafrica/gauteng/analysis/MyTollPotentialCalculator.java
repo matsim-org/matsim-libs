@@ -90,7 +90,8 @@ public class MyTollPotentialCalculator {
 		
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
-		GautengRoadPricingScheme scheme = new GautengRoadPricingScheme(mtpc.getScenario().getConfig(), mtpc.getScenario().getNetwork(), mtpc.getScenario().getPopulation());
+		String tollLinksFileName = mtpc.getScenario().getConfig().roadpricing().getTollLinksFile() ;
+		GautengRoadPricingScheme scheme = new GautengRoadPricingScheme(tollLinksFileName, mtpc.getScenario().getNetwork(), mtpc.getScenario().getPopulation());
 		mtpc.processEventsFile(baseFilename, linkList, breakList, scheme);
 		mtpc.writeMaps(outputFolder);
 		

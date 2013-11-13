@@ -30,8 +30,10 @@ public class Header {
 		LOG.info("======================================================================");
 		LOG.info(classString);
 		LOG.info("----------------------------------------------------------------------");
-		for(int i = 0; i < args.length; i++){
-			LOG.info("args[" + i + "]: " + args[i]);
+		if ( args != null ) {
+			for(int i = 0; i < args.length; i++){
+				LOG.info("args[" + i + "]: " + args[i]);
+			}
 		}
 		LOG.info("----------------------------------------------------------------------");
 		Gbl.printSystemInfo();

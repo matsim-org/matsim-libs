@@ -92,7 +92,7 @@ class GautengControler {
 		
 		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
 		RoadPricingScheme vehDepScheme = 
-			new GautengRoadPricingScheme( sc.getConfig(), sc.getNetwork() , sc.getPopulation() );
+			new GautengRoadPricingScheme( sc.getConfig().roadpricing().getTollLinksFile() , sc.getNetwork() , sc.getPopulation() );
 
 		// CONSTRUCT UTILITY OF MONEY:
 		

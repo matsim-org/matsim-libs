@@ -135,6 +135,11 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 				// this may happen if nobody of the type paid toll.
 				continue ;
 			}
+			try {
+				out.write( "AV_TOLL\tN_VEHS\n" ) ;
+			}catch ( IOException e) {
+				e.printStackTrace();
+			}
 			for ( int idx=0 ; idx<=maxIdx.get(sType) ; idx++ ) {
 				String key = countsTable.createKey( sType, idx ) ;
 				if ( countsTable.getEntry(key) != 0. ) {
