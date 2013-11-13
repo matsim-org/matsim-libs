@@ -121,5 +121,12 @@ public class ParkingActivityAttributes {
 	private double parkingSearchDuration;
 	private double parkingCost;
 	public Coord destinationCoord;
+	private double walkDistance;
+	public double getWalkDistance() {
+		return walkDistance;
+	}
+	public void setWalkDistance(double walkDistance) {
+		this.walkDistance = walkDistance;
+	}
 }
 
