@@ -32,6 +32,7 @@ import playground.thibautd.socnetsim.replanning.removers.ParetoMinSelectorFactor
 import playground.thibautd.socnetsim.replanning.removers.WhoIsTheBossMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CliqueJointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
+import playground.thibautd.socnetsim.replanning.strategies.GroupActivitySequenceMutator;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinLossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupOptimizingTourVehicleAllocationFactory;
@@ -74,6 +75,8 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory( "MinLossSelectExpBeta" , new GroupMinLossSelectExpBetaFactory() );
 		addFactory( "ParetoSelectExpBeta" , new ParetoExpBetaFactory() );
 		addFactory( "CoalitionSelectExpBeta" , new CoalitionExpBetaFactory() );
+
+		addFactory( "ActivitySequenceMutator" , new GroupActivitySequenceMutator() );
 
 		// default removers
 		// ---------------------------------------------------------------------
