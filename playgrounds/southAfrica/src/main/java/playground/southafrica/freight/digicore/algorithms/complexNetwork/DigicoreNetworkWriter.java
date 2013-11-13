@@ -33,6 +33,8 @@ import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.containers.DigicoreNetwork;
 import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.io.graphml.GraphMetadata;
+import edu.uci.ics.jung.io.graphml.GraphMetadata.EdgeDefault;
 
 /**
  * Class to write a {@link DigicoreNetwork} in different formats to file. Current
@@ -46,7 +48,7 @@ import edu.uci.ics.jung.graph.util.Pair;
  * 		<li> GraphML (partially complete);
  * 		<li> GXL;
  * </ul>
- * @author johanwjoubert
+ * @author jwjoubert
  *
  */
 public class DigicoreNetworkWriter {
