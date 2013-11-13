@@ -67,6 +67,7 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory( "OptimizingTourVehicleAllocation" , new GroupOptimizingTourVehicleAllocationFactory() );
 		addFactory( "RandomJointPlanRecomposer" , new GroupRandomJointPlanRecomposerFactory() );
 		addFactory( "ActivityInGroupLocationChoice" , new ActivityInGroupLocationChoiceFactory() );
+		addFactory( "ActivitySequenceMutator" , new GroupActivitySequenceMutator() );
 
 		addFactory( "SelectExpBeta" , new GroupSelectExpBetaFactory() );
 		addFactory( "WeightedSelectExpBeta" , new GroupWeightedSelectExpBetaFactory() );
@@ -75,8 +76,6 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory( "MinLossSelectExpBeta" , new GroupMinLossSelectExpBetaFactory() );
 		addFactory( "ParetoSelectExpBeta" , new ParetoExpBetaFactory() );
 		addFactory( "CoalitionSelectExpBeta" , new CoalitionExpBetaFactory() );
-
-		addFactory( "ActivitySequenceMutator" , new GroupActivitySequenceMutator() );
 
 		// default removers
 		// ---------------------------------------------------------------------
