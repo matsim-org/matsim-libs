@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.algorithms.djcluster;
+package playground.southafrica.freight.digicore.algorithms.djcluster;
 
 
 import org.matsim.testcases.MatsimTestCase;

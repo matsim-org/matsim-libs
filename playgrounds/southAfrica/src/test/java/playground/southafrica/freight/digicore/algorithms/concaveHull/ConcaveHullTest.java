@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.algorithms.concaveHull;
+package playground.southafrica.freight.digicore.algorithms.concaveHull;
 
 import org.matsim.testcases.MatsimTestCase;
 

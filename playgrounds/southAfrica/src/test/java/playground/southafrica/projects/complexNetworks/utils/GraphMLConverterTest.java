@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.projects.complexNetworks.utils;
+package playground.southafrica.projects.complexNetworks.utils;
 
 import java.util.Iterator;
 

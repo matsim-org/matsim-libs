@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.utilities.openstreetmap.shopping;
+package playground.southafrica.utilities.openstreetmap.shopping;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,7 +27,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.southAfrica.utilities.openstreetmap.shopping");
+		TestSuite suite = new TestSuite("Tests for playground.southafrica.utilities.openstreetmap.shopping");
 		
 		suite.addTestSuite(MyShoppingReaderTest.class);
 

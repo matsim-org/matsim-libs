@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.analysis.postClustering;
+package playground.southafrica.freight.digicore.analysis.postClustering;
 
 import java.io.File;
 import java.io.IOException;

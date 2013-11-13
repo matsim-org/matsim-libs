@@ -1,4 +1,4 @@
-package playground.southAfrica.freight.digicore.containers;
+package playground.southafrica.freight.digicore.containers;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.containers");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.freight.digicore.containers");
 
 		suite.addTestSuite(DigicoreActivityTest.class);
 		suite.addTestSuite(DigicoreChainTest.class);

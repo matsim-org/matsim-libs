@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.utilities;
+package playground.southafrica.utilities;
 
 
 import org.matsim.testcases.MatsimTestCase;

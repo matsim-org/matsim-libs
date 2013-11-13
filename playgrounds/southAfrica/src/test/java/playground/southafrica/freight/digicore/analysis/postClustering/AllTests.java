@@ -1,4 +1,4 @@
-package playground.southAfrica.freight.digicore.analysis.postClustering;
+package playground.southafrica.freight.digicore.analysis.postClustering;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.analysis.postClustering");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.freight.digicore.analysis.postClustering");
 		
 		suite.addTestSuite(ClusteredChainGeneratorTest.class);
 		

@@ -1,4 +1,4 @@
-package playground.southAfrica.population;
+package playground.southafrica.population;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.population");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.population");
 		
 
 		return suite;

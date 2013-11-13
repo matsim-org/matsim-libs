@@ -1,4 +1,4 @@
-package playground.southAfrica.freight.digicore.io;
+package playground.southafrica.freight.digicore.io;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,10 +26,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.io");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.freight.digicore.io");
 		
-		suite.addTestSuite(playground.southAfrica.freight.digicore.io.DigicoreVehicleWriterTest.class);
-		suite.addTestSuite(playground.southAfrica.freight.digicore.io.DigicoreVehicleReaderTest.class);
+		suite.addTestSuite(playground.southafrica.freight.digicore.io.DigicoreVehicleWriterTest.class);
+		suite.addTestSuite(playground.southafrica.freight.digicore.io.DigicoreVehicleReaderTest.class);
 
 		return suite;
 	}

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.algorithms.complexNetworks;
+package playground.southafrica.freight.digicore.algorithms.complexNetworks;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -27,7 +27,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.algorithms.complexNetworks");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.freight.digicore.algorithms.complexNetworks");
 		
 		suite.addTestSuite(DigicoreNetworkBuilderTest.class);
 		suite.addTestSuite(DigicoreNetworkWriterTest.class);

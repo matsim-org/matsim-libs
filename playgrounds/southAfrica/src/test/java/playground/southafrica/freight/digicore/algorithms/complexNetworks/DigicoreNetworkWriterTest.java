@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.algorithms.complexNetworks;
+package playground.southafrica.freight.digicore.algorithms.complexNetworks;
 
 
 import java.io.BufferedReader;

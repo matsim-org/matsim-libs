@@ -1,4 +1,4 @@
-package playground.southAfrica.freight.digicore.analysis.geographicClassifier;
+package playground.southafrica.freight.digicore.analysis.geographicClassifier;
 
 import java.io.BufferedReader;
 import java.io.File;

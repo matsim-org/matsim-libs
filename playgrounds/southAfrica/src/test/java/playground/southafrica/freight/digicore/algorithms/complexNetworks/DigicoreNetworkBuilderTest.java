@@ -1,4 +1,4 @@
-package playground.southAfrica.freight.digicore.algorithms.complexNetworks;
+package playground.southafrica.freight.digicore.algorithms.complexNetworks;
 
 import java.util.ArrayList;
 import java.util.List;

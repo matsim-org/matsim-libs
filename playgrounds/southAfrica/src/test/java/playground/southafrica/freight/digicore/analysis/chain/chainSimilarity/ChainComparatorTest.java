@@ -1,4 +1,4 @@
-package playground.southAfrica.freight.digicore.analysis.chain.chainSimilarity;
+package playground.southafrica.freight.digicore.analysis.chain.chainSimilarity;
 
 import java.util.Locale;
 import java.util.TimeZone;

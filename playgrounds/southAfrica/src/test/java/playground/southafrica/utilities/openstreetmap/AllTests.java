@@ -1,4 +1,4 @@
-package playground.southAfrica.utilities.openstreetmap;
+package playground.southafrica.utilities.openstreetmap;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,9 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.utilities.openstreetmap");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.utilities.openstreetmap");
 		
-		suite.addTest(playground.southAfrica.utilities.openstreetmap.shopping.AllTests.suite());
+		suite.addTest(playground.southafrica.utilities.openstreetmap.shopping.AllTests.suite());
 
 		return suite;
 	}

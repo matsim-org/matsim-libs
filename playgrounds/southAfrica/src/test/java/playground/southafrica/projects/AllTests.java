@@ -1,4 +1,4 @@
-package playground.southAfrica.projects;
+package playground.southafrica.projects;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,9 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.projects");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.projects");
 		
-		suite.addTest(playground.southAfrica.projects.complexNetworks.AllTests.suite());
+		suite.addTest(playground.southafrica.projects.complexNetworks.AllTests.suite());
 
 		return suite;
 	}

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.containers;
+package playground.southafrica.freight.digicore.containers;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

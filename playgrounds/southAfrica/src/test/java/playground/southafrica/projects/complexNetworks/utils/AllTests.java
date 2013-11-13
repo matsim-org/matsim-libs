@@ -1,4 +1,4 @@
-package playground.southAfrica.projects.complexNetworks.utils;
+package playground.southafrica.projects.complexNetworks.utils;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.projects.complexNetworks.utils");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.projects.complexNetworks.utils");
 		
 		suite.addTestSuite(GraphMLConverterTest.class);
 

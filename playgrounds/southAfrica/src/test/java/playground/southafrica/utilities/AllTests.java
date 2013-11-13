@@ -1,4 +1,4 @@
-package playground.southAfrica.utilities;
+package playground.southafrica.utilities;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,10 +26,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.utilities");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica.utilities");
 		
-		suite.addTest(playground.southAfrica.utilities.openstreetmap.AllTests.suite());
-		suite.addTestSuite(playground.southAfrica.utilities.SouthAfricaInflationCorrectorTest.class);
+		suite.addTest(playground.southafrica.utilities.openstreetmap.AllTests.suite());
+		suite.addTestSuite(playground.southafrica.utilities.SouthAfricaInflationCorrectorTest.class);
 
 		return suite;
 	}

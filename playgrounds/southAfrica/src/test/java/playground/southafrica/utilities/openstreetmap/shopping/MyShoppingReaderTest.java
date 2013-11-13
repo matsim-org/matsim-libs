@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.southAfrica.utilities.openstreetmap.shopping;
+package playground.southafrica.utilities.openstreetmap.shopping;
 
 
 import java.io.FileNotFoundException;

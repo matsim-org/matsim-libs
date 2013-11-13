@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.io;
+package playground.southafrica.freight.digicore.io;
 
 
 import java.util.Locale;

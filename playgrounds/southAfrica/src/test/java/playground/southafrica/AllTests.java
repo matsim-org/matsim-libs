@@ -1,4 +1,4 @@
-package playground.southAfrica;
+package playground.southafrica;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,12 +26,12 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica");
+		TestSuite suite = new TestSuite("All tests for playground.southafrica");
 		
-		suite.addTest(playground.southAfrica.freight.AllTests.suite());
-		suite.addTest(playground.southAfrica.population.AllTests.suite());
-		suite.addTest(playground.southAfrica.projects.AllTests.suite());
-		suite.addTest(playground.southAfrica.utilities.AllTests.suite());
+		suite.addTest(playground.southafrica.freight.AllTests.suite());
+		suite.addTest(playground.southafrica.population.AllTests.suite());
+		suite.addTest(playground.southafrica.projects.AllTests.suite());
+		suite.addTest(playground.southafrica.utilities.AllTests.suite());
 
 		return suite;
 	}

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.algorithms.djcluster;
+package playground.southafrica.freight.digicore.algorithms.djcluster;
 
 import java.util.ArrayList;
 import java.util.List;

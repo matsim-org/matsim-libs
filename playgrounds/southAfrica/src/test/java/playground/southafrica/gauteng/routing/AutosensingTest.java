@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southAfrica.gauteng.routing;
+package playground.southafrica.gauteng.routing;
 
 import static org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey.vspDefaultsCheckingLevel;
 
