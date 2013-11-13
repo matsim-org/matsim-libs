@@ -154,6 +154,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 		double walkDuration = walkDistance / walkSpeed;
 		paa.setToActWalkDuration(walkDuration);
 		paa.setToParkWalkDuration(walkDuration);
+		paa.setWalkDistance(walkDistance);
 
 		paa.setParkingArrivalTime(aem.getMessageArrivalTime());
 

@@ -38,9 +38,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -70,11 +72,12 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	protected Network network;
 	protected Random random;
 	private final double parkingDuration = 60 * 2;
-	protected final double walkSpeed = 3.0 / 3.6; // [m/s]
+	protected double walkSpeed = 3.0 / 3.6; // [m/s]
 	protected double scoreInterrupationValue = 0;
 	private String name;
 	public HashSet<Id> extraSearchPathNeeded = new HashSet<Id>();
 	private String groupName;
+	private WalkTravelTime walkTravelTime;
 	
 
 	// go to final link if no parking there, then try parking at other places.
@@ -85,6 +88,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		this.maxDistance = maxDistance;
 		this.network = network;
 		this.name = name;
+		
+		walkTravelTime=new WalkTravelTime(new PlansCalcRouteConfigGroup(),ZHScenarioGlobal.linkSlopes);
 		resetForNewIteration();
 	}
 
@@ -96,7 +101,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
-
+		
+		
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 1);
@@ -214,12 +220,14 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		nextAct.setLinkId(parkingLink.getId());
 
+		walkSpeed=getWalkSpeed(aem);
 		double walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), nextNonParkingAct.getCoord());
 		// TODO: improve this later (no straight line)
 		double walkDuration = walkDistance / walkSpeed;
 		nextWalkLeg.setTravelTime(walkDuration);
 		getParkingAttributesForScoring(aem).setToActWalkDuration(walkDuration);
 		getParkingAttributesForScoring(aem).setToParkWalkDuration(walkDuration);
+		getParkingAttributesForScoring(aem).setWalkDistance(walkDistance);
 
 		// TODO: update this later, this is an approximation
 		getParkingAttributesForScoring(aem).setParkingArrivalTime(aem.getMessageArrivalTime());
@@ -273,6 +281,13 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		}
 
 		aem.processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(nextAct);
+	}
+
+	private double getWalkSpeed(AgentWithParking aem) {
+		Link currentLink = aem.getCurrentLink();
+		double length=currentLink.getLength();
+		double walkTime=walkTravelTime.getLinkTravelTime(aem.getCurrentLink(), 0, aem.getPerson(), null);
+		return length/walkTime;
 	}
 
 	public void addRandomLinkToRoute(LinkNetworkRouteImpl route) {

@@ -95,6 +95,7 @@ public class MainPPSimZurich30km {
 		String facilititiesPath = ZHScenarioGlobal.loadStringParam("facilitiesFile");
 		ZHScenarioGlobal.scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 		Scenario scenario=ZHScenarioGlobal.scenario;
+		ZHScenarioGlobal.initNetworkLinkSlopes();
 		
 		filterPopulationWithinScenarioRadius(scenario);
 		removeNotSelectedPlans(scenario);

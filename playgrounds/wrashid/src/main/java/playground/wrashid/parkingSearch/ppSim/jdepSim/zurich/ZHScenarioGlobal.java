@@ -20,7 +20,9 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.zurich;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,6 +31,8 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.scoring.ParkingInfo;
@@ -68,6 +72,7 @@ public class ZHScenarioGlobal {
 	public static String plansFile;
 	public static RerouteThreadDuringSim[] rerouteThreadsDuringSim;
 	public static Scenario scenario;
+	public static Map<Id, Double> linkSlopes;
 
 	public static String getItersFolderPath() {
 		return outputFolder + "ITERS/";
@@ -119,6 +124,7 @@ public class ZHScenarioGlobal {
 		double averageParkingDuration = 0;
 		double averageSearchDuration = 0;
 		double averageWalkDuration = 0;
+		double averageWalkDistance = 0;
 
 		System.out.println("stats for parking strategy: " + parkingStrategyName);
 
@@ -128,13 +134,15 @@ public class ZHScenarioGlobal {
 				averageParkingDuration += ped.parkingActivityAttributes.getParkingDuration();
 				averageSearchDuration += ped.parkingActivityAttributes.getParkingSearchDuration();
 				averageWalkDuration += ped.parkingActivityAttributes.getToActWalkDuration();
+				averageWalkDistance += ped.parkingActivityAttributes.getWalkDistance();
 				numberOfParkingOperations++;
 			}
 		}
 
-		System.out.println("averageParkingDuration: " + averageParkingDuration / numberOfParkingOperations);
-		System.out.println("averageSearchDuration: " + averageSearchDuration / numberOfParkingOperations);
-		System.out.println("averageWalkDuration: " + averageWalkDuration / numberOfParkingOperations);
+		System.out.println("averageParkingDuration [s]: " + averageParkingDuration / numberOfParkingOperations);
+		System.out.println("averageSearchDuration [s]: " + averageSearchDuration / numberOfParkingOperations);
+		System.out.println("averageWalkDuration [s]: " + averageWalkDuration / numberOfParkingOperations);
+		System.out.println("averageWalkDistance [m]: " + averageWalkDistance / numberOfParkingOperations);
 		System.out.println("numberOfParkingOperations: " + numberOfParkingOperations);
 		System.out.println("========================");
 	}
@@ -199,6 +207,22 @@ public class ZHScenarioGlobal {
 		file.mkdir();
 
 		ComparisonGarageCounts.init();
+
+	}
+
+	public static void initNetworkLinkSlopes() {
+		linkSlopes = new HashMap<Id, Double>();
+		if (!paramterExists("networkLinkSlopes")) {
+			linkSlopes = null;
+		} else {
+			String linkSlopeAttributeFile = ZHScenarioGlobal.loadStringParam("networkLinkSlopes");
+			ObjectAttributes lp = new ObjectAttributes();
+			new ObjectAttributesXmlReader(lp).parse(linkSlopeAttributeFile);
+
+			for (Id linkId : scenario.getNetwork().getLinks().keySet()) {
+				linkSlopes.put(linkId, (Double) lp.getAttribute(linkId.toString(), "slope"));
+			}
+		}
 	}
 
 	private static void loadConfigParamters() {
