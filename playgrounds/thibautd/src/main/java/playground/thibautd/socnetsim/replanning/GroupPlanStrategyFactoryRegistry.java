@@ -30,6 +30,7 @@ import playground.thibautd.socnetsim.replanning.removers.MinimumSumSelectorFacto
 import playground.thibautd.socnetsim.replanning.removers.MinimumWeightedSumSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.ParetoMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.WhoIsTheBossMinSelectorFactory;
+import playground.thibautd.socnetsim.replanning.strategies.ActivityInGroupLocationChoiceFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CliqueJointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupActivitySequenceMutator;
@@ -64,8 +65,7 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory( "PlanVehicleAllocation" , new GroupPlanVehicleAllocationFactory() );
 		addFactory( "OptimizingTourVehicleAllocation" , new GroupOptimizingTourVehicleAllocationFactory() );
 		addFactory( "RandomJointPlanRecomposer" , new GroupRandomJointPlanRecomposerFactory() );
-		// XXX c'tor needs parameters
-		// addFactory( "ActivityInGroupLocationChoice" , new ActivityInGroupLocationChoiceFactory( type ) );
+		addFactory( "ActivityInGroupLocationChoice" , new ActivityInGroupLocationChoiceFactory() );
 
 		addFactory( "SelectExpBeta" , new GroupSelectExpBetaFactory() );
 		// XXX c'tor needs parameters
