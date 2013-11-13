@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.replanning.strategies;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
@@ -32,14 +33,13 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  * @author thibautd
  */
 public class GroupWeightedSelectExpBetaFactory implements GroupPlanStrategyFactory {
-	private final String weightAttributeName;
-
-	public GroupWeightedSelectExpBetaFactory(final String weightAttributeName) {
-		this.weightAttributeName = weightAttributeName;
-	}
 
 	@Override
 	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
+		final GroupReplanningConfigGroup configGroup = (GroupReplanningConfigGroup)
+				registry.getScenario().getConfig().getModule(
+						GroupReplanningConfigGroup.GROUP_NAME );
+
 		return new GroupPlanStrategy(
 				 new HighestWeightSelector(
 					 registry.getIncompatiblePlansIdentifierFactory() ,
@@ -47,7 +47,7 @@ public class GroupWeightedSelectExpBetaFactory implements GroupPlanStrategyFacto
 						 new LogitWeight(
 							MatsimRandom.getLocalInstance(),
 							registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()),
-						 weightAttributeName,
+						 configGroup.getWeightAttributeName(),
 						 registry.getScenario().getPopulation().getPersonAttributes() ) ) );
 
 	}
