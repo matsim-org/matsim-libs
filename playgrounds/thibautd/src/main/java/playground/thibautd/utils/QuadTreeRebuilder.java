@@ -20,7 +20,7 @@
 package playground.thibautd.utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
@@ -39,15 +39,17 @@ public class QuadTreeRebuilder<T> {
 	private double maxX = Double.NEGATIVE_INFINITY;
 	private double maxY = Double.NEGATIVE_INFINITY;
 
-	private Collection< Tuple<Coord, T> > elements = new ArrayList< Tuple<Coord, T> >();
+	private List< Tuple<Coord, T> > elements = new ArrayList< Tuple<Coord, T> >();
 	private QuadTree<T> quadTree = null;
 
-	public QuadTree<T> getQuadTree() {
+	public synchronized QuadTree<T> getQuadTree() {
 		if ( quadTree == null ) buildQuadTree();
 		return quadTree;
 	}
 
 	private void buildQuadTree() {
+		assert minX < maxX;
+		assert minY < maxY;
 		this.quadTree = new QuadTree<T>(
 				minX - EPSILON ,
 				minY - EPSILON ,
@@ -63,7 +65,9 @@ public class QuadTreeRebuilder<T> {
 			}
 			catch ( Exception e ) {
 				// if insertion fail, give more informative error message.
-				throw new RuntimeException( "problem at inserting "
+				throw new RuntimeException( "problem at inserting element "
+						+elements.indexOf( element )+" of "
+						+elements.size()+": "
 						+element+" with bounds"
 						+" minX="+minX
 						+" minY="+minY
