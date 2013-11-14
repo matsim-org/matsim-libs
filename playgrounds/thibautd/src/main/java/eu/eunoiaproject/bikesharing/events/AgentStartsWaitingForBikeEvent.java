@@ -19,12 +19,23 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.events;
 
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.Id;
 
 /**
  * @author thibautd
  */
 public class AgentStartsWaitingForBikeEvent extends AbstractPersonEvent {
+	public static final String EVENT_TYPE = "agentStartsWaitingForBike";
+
+	public AgentStartsWaitingForBikeEvent(
+			final Event event) {
+		super( event );
+		if ( !event.getEventType().equals( EVENT_TYPE ) ) {
+			throw new IllegalArgumentException( event.toString() );
+		}
+	}
+
 	public AgentStartsWaitingForBikeEvent(
 			final double time,
 			final Id personId) {
@@ -33,7 +44,7 @@ public class AgentStartsWaitingForBikeEvent extends AbstractPersonEvent {
 
 	@Override
 	public String getEventType() {
-		return "agentStartsWaitingForBike";
+		return EVENT_TYPE;
 	}
 }
 

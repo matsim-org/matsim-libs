@@ -24,12 +24,20 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author thibautd
  */
 abstract class AbstractPersonEvent extends Event implements HasPersonId {
 	private final Id personId;
+
+	/*package*/ AbstractPersonEvent(
+			final Event event) {
+		this( event.getTime() ,
+				new IdImpl(
+					event.getAttributes().get( "person" ) ) );
+	}
 
 	public AbstractPersonEvent(
 			final double time,
