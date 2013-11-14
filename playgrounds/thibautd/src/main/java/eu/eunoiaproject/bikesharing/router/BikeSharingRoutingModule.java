@@ -110,6 +110,7 @@ public class BikeSharingRoutingModule implements RoutingModule {
 	private static PlanElement createInteraction( final Facility facility ) {
 		final Activity act = new ActivityImpl( BikeSharingConstants.INTERACTION_TYPE , facility.getCoord() );
 		act.setMaximumDuration( 0 );
+		((ActivityImpl) act).setLinkId( facility.getLinkId() );
 		return act;
 	}
 
