@@ -211,7 +211,7 @@ public class BikeSharingEventsToXyTable implements BasicEventHandler {
 		try {
 			final BikeSharingFacility facility = facilities.getFacilities().get( event.getFacilityId() );
 
-			final int newAmount = getNumberOfWaitingForBikeAgent( facility.getId() ) - 1;
+			final int newAmount = getNumberOfWaitingForBikeAgent( facility.getId() ) + 1;
 			waitingForBikeAgents.put( event.getFacilityId() , newAmount );
 
 			writer.newLine();
