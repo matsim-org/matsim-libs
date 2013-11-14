@@ -52,12 +52,25 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		if (xBin != null && yBin != null) {
 		//TODO person id statt vehicleid??? woher?
 		Id personId = event.getVehicleId();
-		Double value = event.getColdEmissions().get(coldPollutant2analyze); //TODO funktioniert das so? enum casten?
-		EmPerBin epb = new EmPerBin(xBin, yBin, personId, value);
+		Double value = event.getColdEmissions().get(coldPollutant2analyze); 
+		
+		//TODO auf mehrere Zellen verteilen
+		ArrayList<EmPerBin> arrayEpb = new ArrayList<EmPerBin>();
+		arrayEpb= distributeOnCells(xBin, yBin, personId, value);
 		Double endOfTimeIntervall = getEndOfTimeInterval(event.getTime());
-		emissionPerBin.get(endOfTimeIntervall).add(epb);
-		EmPerLink epl = new EmPerLink(linkId, personId, value);
-		emissionPerLink.get(endOfTimeIntervall).add(epl);
+		if (!emissionPerBin.containsKey(endOfTimeIntervall)) {
+			emissionPerBin.put(endOfTimeIntervall,
+					new ArrayList<EmPerBin>());
+		}
+		emissionPerBin.get(endOfTimeIntervall).addAll(arrayEpb);
+		
+		ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
+		arrayEpl = distributeOnLinks(linkId, personId, value);
+		if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
+			emissionPerLink.put(endOfTimeIntervall,
+					new ArrayList<EmPerLink>());
+		}
+		emissionPerLink.get(endOfTimeIntervall).addAll(arrayEpl);
 		}
 	}
 
@@ -79,20 +92,95 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 			//TODO person id statt vehicleid??? woher?
 			Id personId = event.getVehicleId();
 			Double value = event.getWarmEmissions().get(warmPollutant2analyze); //TODO funktioniert das so? enum casten?
-			EmPerBin epb = new EmPerBin(xBin, yBin, personId, value);
+			//TODO auf mehrere Zellen verteilen
+			ArrayList<EmPerBin> arrayEpb = new ArrayList<EmPerBin>();
+			arrayEpb= distributeOnCells(xBin, yBin, personId, value);
 			Double endOfTimeIntervall = getEndOfTimeInterval(event.getTime());
 			if (!emissionPerBin.containsKey(endOfTimeIntervall)) {
 				emissionPerBin.put(endOfTimeIntervall,
 						new ArrayList<EmPerBin>());
 			}
-			emissionPerBin.get(endOfTimeIntervall).add(epb);
-			EmPerLink epl = new EmPerLink(linkId, personId, value);
+			emissionPerBin.get(endOfTimeIntervall).addAll(arrayEpb);
+			// TODO auf mehrere Links verteilen
+			//EmPerLink epl = new EmPerLink(linkId, personId, value);
+			ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
+			arrayEpl = distributeOnLinks(linkId, personId, value);
 			if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
 				emissionPerLink.put(endOfTimeIntervall,
 						new ArrayList<EmPerLink>());
 			}
-			emissionPerLink.get(endOfTimeIntervall).add(epl);
+			emissionPerLink.get(endOfTimeIntervall).addAll(arrayEpl);
+			//emissionPerLink.get(endOfTimeIntervall).add(epl);
 		}
+	}
+
+	private ArrayList<EmPerLink> distributeOnLinks(Id sourcelinkId, Id personId,
+			Double value) {
+		
+		ArrayList<EmPerLink> distributedEmissions = new ArrayList<EmPerLink>();
+		
+		//EmPerLink epl = new EmPerLink(linkId, personId, value);
+		
+		// for each link: if distance to current link < ??
+		// => EmPerLink with value = distance dependent factor * current value
+		
+		int sourceX = link2xbins.get(sourcelinkId);
+		int sourceY = link2ybins.get(sourcelinkId);
+		
+		for(Id linkId: link2xbins.keySet()){
+			if(link2xbins.get(linkId)!=null && link2ybins.get(linkId)!=null){
+			int xDistance = Math.abs(sourceX-link2xbins.get(linkId));
+			int yDistance = Math.abs(sourceY-link2ybins.get(linkId));
+			int totalDistance = xDistance+yDistance;
+			
+			if(xDistance<4 && yDistance <4 && (totalDistance<4)){
+				Double distributionFactor = 0.0;
+				switch(totalDistance){
+				case 0: distributionFactor = 0.170;
+				case 1: distributionFactor = 0.104;
+				case 2: distributionFactor = 0.024;
+				case 3: distributionFactor = 0.019;
+				}
+				if (distributionFactor>0.0) {
+					EmPerLink epl = new EmPerLink(linkId, personId, value
+							* distributionFactor);
+					distributedEmissions.add(epl);
+				}
+			}
+		}
+		}
+		
+		return distributedEmissions;
+	}
+
+	private ArrayList<EmPerBin> distributeOnCells(Integer xBin, Integer yBin,
+			Id personId, Double value) {
+		
+		ArrayList<EmPerBin> distributedEmissions = new ArrayList<EmPerBin>();
+		
+		// distribute value onto cells: origin ... dist(origin)=3
+		// factors depending on distance (measured by number of cells)
+		for(int xIndex = xBin-3; xIndex<=xBin+3; xIndex++){
+			for(int yIndex = yBin-3; yIndex <= yBin+3; yIndex++){
+				// TODO ausserhalb des untersuchungsraums?
+				Double distributionFactor = 0.0;
+				int distance = Math.abs(xBin-xIndex+yBin-yIndex);
+				switch(distance){
+				case 0: distributionFactor = 0.170;
+				case 1: distributionFactor = 0.104;
+				case 2: distributionFactor = 0.024;
+				case 3: distributionFactor = 0.019;
+				default: distributionFactor =0.0;
+				}
+				if (distributionFactor>0.0) {
+					EmPerBin epb = new EmPerBin(xIndex, yIndex, personId, value
+							* distributionFactor);
+					distributedEmissions.add(epb);
+				}
+			}
+			
+		}
+		return distributedEmissions;
 	}
 
 	public Map<Double, ArrayList<EmPerLink>> getEmissionsPerLink() {

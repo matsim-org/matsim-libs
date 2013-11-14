@@ -18,21 +18,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package playground.julia.distribution;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 
-public interface ExposureEvent {
+public class ExposureEventImpl extends Event implements ExposureEvent {
 	
-	public final static String EVENT_TYPE = "exposureEvent";
+	// ! exposure value = time x concentration
+	Id personId; 
+	Double startTime; 
+	Double endTime;
+	Double personalExposureValue; 
+	String activitytype;
 	
-	public final static String ATTRIBUTE_PERSON_ID = "personId";
-	
-	public Id getPersonId();
-	
-	public Double getExposure();
-	
-	public Double getDuration();
+
+	public ExposureEventImpl(Id personId, double startTime, double endTime,
+			Double personalExposureValue, String activitytype) {
+		super(startTime);
+		this.personId = personId;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.personalExposureValue = personalExposureValue;
+		this.activitytype = activitytype;
+	}
+
+	public Id getPersonId() {
+		return personId;
+	}
+
+	public Double getAverageExposure() {
+		return personalExposureValue/(endTime-startTime);
+	}
+
+	public Double getExposure() {
+		return personalExposureValue;
+	}
+
+	public Double getDuration() {
+		return endTime-startTime;
+	}
+
+	@Override
+	public String getEventType() {
+		return ExposureEvent.EVENT_TYPE;
+	}
 
 }

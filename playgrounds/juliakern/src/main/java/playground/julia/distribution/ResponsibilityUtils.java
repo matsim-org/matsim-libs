@@ -11,8 +11,8 @@ public class ResponsibilityUtils {
 	public void addExposureAndResponsibilityLinkwise(
 			ArrayList<EmCarTrip> carTrips,
 			Map<Double, ArrayList<EmPerLink>> emissionPerLink,
-			ArrayList<ExposureEvent> exposure,
-			ArrayList<ResponsibilityEvent> responsibility, double timeBinSize, double simulationEndTime) {
+			ArrayList<ExposureEventImpl> exposure,
+			ArrayList<ResponsibilityEventImpl> responsibility, double timeBinSize, double simulationEndTime) {
 		
 		  		for(EmCarTrip ect: carTrips){
 				Id linkId = ect.getLinkId();
@@ -24,7 +24,7 @@ public class ResponsibilityUtils {
 				Double endOfTimeInterval = Math.ceil(ect.getStartTime()/ timeBinSize)* timeBinSize;
 				
 				// all responsibility events for this activity
-				ArrayList<ResponsibilityEvent> currentREvents = new ArrayList<ResponsibilityEvent>();
+				ArrayList<ResponsibilityEventImpl> currentREvents = new ArrayList<ResponsibilityEventImpl>();
 				currentREvents.addAll(generateResponsibilityEventsForLink(emissionPerLink.get(endOfTimeInterval), linkId, startTime, endTime));
 				
 				
@@ -36,7 +36,7 @@ public class ResponsibilityUtils {
 				}
 				
 				String actType = "car on link " + ect.getLinkId().toString();
-				ExposureEvent exposureEvent = new ExposureEvent(exposedPersonId, startTime, endTime, exposureValue, actType);
+				ExposureEventImpl exposureEvent = new ExposureEventImpl(exposedPersonId, startTime, endTime, exposureValue, actType);
 				exposure.add(exposureEvent);
 				
 				responsibility.addAll(currentREvents);
@@ -44,17 +44,17 @@ public class ResponsibilityUtils {
 		
 	}
 
-	private ArrayList<ResponsibilityEvent> generateResponsibilityEventsForLink(
+	private ArrayList<ResponsibilityEventImpl> generateResponsibilityEventsForLink(
 			ArrayList<EmPerLink> emissionPerLinkOfCurrentTimeBin, Id linkId, Double startTime,
 			Double endTime) {
 		
-		ArrayList<ResponsibilityEvent> rEvents = new ArrayList<ResponsibilityEvent>();
+		ArrayList<ResponsibilityEventImpl> rEvents = new ArrayList<ResponsibilityEventImpl>();
 		
 		if (emissionPerLinkOfCurrentTimeBin!=null) {
 			for (EmPerLink epl : emissionPerLinkOfCurrentTimeBin) {
 				if (epl.getLinkId().equals(linkId)) {
 					String location = "link " + linkId.toString();
-					ResponsibilityEvent ree = new ResponsibilityEvent(
+					ResponsibilityEventImpl ree = new ResponsibilityEventImpl(
 							epl.getPersonId(), startTime, endTime,
 							epl.getConcentration(), location);
 					rEvents.add(ree);
@@ -67,8 +67,8 @@ public class ResponsibilityUtils {
 	public void addExposureAndResponsibilityBinwise(
 			ArrayList<EmActivity> activities,
 			Map<Double, ArrayList<EmPerBin>> emissionPerBin,
-			ArrayList<ExposureEvent> exposure,
-			ArrayList<ResponsibilityEvent> responsibility, Double timeBinSize, Double simulationEndTime) {
+			ArrayList<ExposureEventImpl> exposure,
+			ArrayList<ResponsibilityEventImpl> responsibility, Double timeBinSize, Double simulationEndTime) {
 		
 		//System.out.println("emission per bin" + emissionPerBin.keySet());
 		
@@ -81,7 +81,7 @@ public class ResponsibilityUtils {
 			int yBin = ema.getYBin();
 			
 			// all responsibility events for this activity
-			ArrayList<ResponsibilityEvent> currentREvents = new ArrayList<ResponsibilityEvent>();
+			ArrayList<ResponsibilityEventImpl> currentREvents = new ArrayList<ResponsibilityEventImpl>();
 			
 			// split activity according to time bins 
 			Double startTime = ema.getStartTime();
@@ -127,31 +127,26 @@ public class ResponsibilityUtils {
 				exposureValue+=re.getExposureValue();
 			}
 			
-			//TODO go on here... something wrong - 0.0
-			//System.out.println("respon value" + exposureValue);
-			
-			ExposureEvent exposureEvent = new ExposureEvent(ema.getPersonId(), startTime, endTime, exposureValue, ema.getActivityType());
+			ExposureEventImpl exposureEvent = new ExposureEventImpl(ema.getPersonId(), startTime, endTime, exposureValue, ema.getActivityType());
 			exposure.add(exposureEvent);
 			
 			responsibility.addAll(currentREvents);
-			
-			
-		}
-		
+	
+		}		
 	}
 
-	private ArrayList<ResponsibilityEvent> generateResponsibilityEventsForCell(
+	private ArrayList<ResponsibilityEventImpl> generateResponsibilityEventsForCell(
 			ArrayList<EmPerBin> emissionPerBinOfCurrentTimeBin, int firstTimeBin,
 			int xBin, int yBin, Double startTime, Double endTime) {
 		
-		ArrayList<ResponsibilityEvent> rEvents= new ArrayList<ResponsibilityEvent>();
+		ArrayList<ResponsibilityEventImpl> rEvents= new ArrayList<ResponsibilityEventImpl>();
 		
 		if (emissionPerBinOfCurrentTimeBin!=null) {
 			for (EmPerBin epb : emissionPerBinOfCurrentTimeBin) {
 				if (epb.getXbin().equals(xBin) && epb.getYbin().equals(yBin)) {
 					String location = "x = " + epb.getXbin().toString()
 							+ ", y = " + epb.getYbin();
-					ResponsibilityEvent ree = new ResponsibilityEvent(
+					ResponsibilityEventImpl ree = new ResponsibilityEventImpl(
 							epb.getPersonId(), startTime, endTime,
 							epb.getConcentration(), location);
 				//	System.out.println("epb concentration" + epb.getConcentration());

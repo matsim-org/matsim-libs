@@ -47,15 +47,7 @@ public class ExposureUtils {
 		}
 	}
 
-
-	
-	public void printPersonalExposureTimeTables(ArrayList<ExposureEvent> exposure,
-			String outPathForTimeTables) {
-//TODO
-		
-	}
-
-	public void printPersonalResponibility(ArrayList<ResponsibilityEvent> responsibility,
+	public void printDetailedResponsibilityInformation(ArrayList<ResponsibilityEventImpl> responsibility,
 			String outputPath) {
 		// sum, average
 		
@@ -69,7 +61,7 @@ public class ExposureUtils {
 		Map<Id, Double> person2time = new HashMap<Id, Double>();
 		Map<Id, Double> person2average = new HashMap<Id, Double>();
 		
-		for(ResponsibilityEvent re : responsibility){
+		for(ResponsibilityEventImpl re : responsibility){
 			Id personId = re.getPersonId();
 			if(person2timeXconcentration.containsKey(personId)){
 				Double newValue = person2timeXconcentration.get(personId)+re.getExposureValue();
@@ -140,7 +132,7 @@ public class ExposureUtils {
 			
 	}
 
-	public void printExposureInformation(ArrayList<ExposureEvent> exposure,
+	public void printExposureInformation(ArrayList<ExposureEventImpl> exposure,
 			String outputPath) {
 		
 		// sum = #persons x time x concentration
@@ -154,7 +146,7 @@ public class ExposureUtils {
 		Map<Id, Double> person2time = new HashMap<Id, Double>();
 		Map<Id, Double> person2average = new HashMap<Id, Double>();
 		
-		for(ExposureEvent exe: exposure){
+		for(ExposureEventImpl exe: exposure){
 			Id personId = exe.getPersonId();
 			if (person2timeXconcentration.containsKey(exe.getPersonId())) {
 				Double newValue = person2timeXconcentration.get(personId) + exe.getExposure();
@@ -182,7 +174,6 @@ public class ExposureUtils {
 		for(Id personId: person2average.keySet()){
 			Double pa = person2average.get(personId);
 			personalAverageAverage+= pa;
-			System.out.println(pa);
 			if(pa<personalAverageMin)personalAverageMin=pa;
 			if(pa>personalAverageMax)personalAverageMax=pa;
 		}
@@ -218,7 +209,7 @@ public class ExposureUtils {
 
 
 	public void printResponsibilityInformation(
-			ArrayList<ResponsibilityEvent> responsibility, String outputPath) {
+			ArrayList<ResponsibilityEventImpl> responsibility, String outputPath) {
 		
 		// responsibility sum = #responsible persons x time x concentration
 		// average responsibility = sum/#responsible persons
@@ -256,7 +247,6 @@ public class ExposureUtils {
 		try{
 			buffW = new BufferedWriter(new FileWriter(outputPath));
 
-			// header: Person base case compare case difference
 			buffW.write("Responsibility Information");
 			buffW.newLine();
 			buffW.write("Responsible persons x concentration value x exposure time: " + sum);
@@ -269,37 +259,51 @@ public class ExposureUtils {
 			buffW.close();
 		}catch(IOException e){
 			System.err.println("Error creating " + outputPath + ".");
+		}		
+	}
+
+	public void printPersonalResponsibilityInformation(
+			ArrayList<ResponsibilityEventImpl> responsibility, String outputPath) {
+		
+		Map <Id, ArrayList<ResponsibilityEvent>> person2ResponsibilityEvents = new HashMap<Id, ArrayList<ResponsibilityEvent>>();
+		
+		for(ResponsibilityEvent ree: responsibility){
+			if(!person2ResponsibilityEvents.containsKey(ree.getPersonId())){
+				person2ResponsibilityEvents.put(ree.getPersonId(), new ArrayList<ResponsibilityEvent>());
+			}
+			person2ResponsibilityEvents.get(ree.getPersonId()).add(ree);
 		}
 		
-		/*
-		 *Double sum =0.0; // sum over person2timeXconcentration
-	
-		
-		
 		BufferedWriter buffW;
-		try {
+		try{
 			buffW = new BufferedWriter(new FileWriter(outputPath));
 
-			// header: Person base case compare case difference
-			buffW.write("Exposure Information");
-			buffW.newLine();
+			buffW.write("Personal Responsibility Information");
+			buffW.newLine();buffW.newLine();
 			
-			buffW.write("Person x time x concentration : " + sum);
-			buffW.newLine();
-			buffW.write("Average of average exposure : " + personalAverageAverage);
-			buffW.newLine();
-			buffW.write("Maximal average exposure : " + personalAverageMax);
-			buffW.newLine();
-			buffW.write("Minimal average exposure : " +personalAverageMin);
-			buffW.newLine();
-			buffW.write("Total exposure time : " +timeXpersons);
-			buffW.newLine();
 			
+			for (Id personId: person2ResponsibilityEvents.keySet()) {
+				buffW.write("PersonId: " + personId);
+				buffW.newLine();
+				
+				Double personalTotal =0.0;
+				for(ResponsibilityEvent ree: person2ResponsibilityEvents.get(personId)){
+					personalTotal += ree.getExposureValue();
+				}
+				
+				buffW.write("Total responsibility: " + personalTotal);
+				buffW.newLine();
+				
+				for (ResponsibilityEvent ree : person2ResponsibilityEvents.get(personId)) {
+					buffW.write(ree.getInformation());
+					buffW.newLine();
+				}
+				buffW.newLine();
+			}
 			buffW.close();
-		} catch (IOException e) {
+		}catch(IOException e){
 			System.err.println("Error creating " + outputPath + ".");
-		} 
-		 */
+		}
 		
 	}
 

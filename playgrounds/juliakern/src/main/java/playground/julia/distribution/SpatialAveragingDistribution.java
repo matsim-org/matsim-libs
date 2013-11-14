@@ -19,41 +19,24 @@
  * *********************************************************************** */
 package playground.julia.distribution;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -81,9 +64,13 @@ public class SpatialAveragingDistribution {
 	private final String munichShapeFile = runDirectory1 + "cityArea.shp";
 
 	private static String configFile1 = runDirectory1 + "sample_config.xml.gz";
-	private final String emissionFile1 = runDirectory1 + "basecase.sample.emission.events.xml";
-	String plansFile1 = runDirectory1+"basecase.sample.plans.xml";
-	String eventsFile1 = runDirectory1+"basecase.sample.events.xml";
+//	private final String emissionFile1 = runDirectory1 + "basecase.sample.emission.events.xml";
+//	String plansFile1 = runDirectory1+"basecase.sample.plans.xml";
+//	String eventsFile1 = runDirectory1+"basecase.sample.events.xml";
+	private final String emissionFile1 = runDirectory1 + "compcase.sample.emission.events.xml";
+	String plansFile1 = runDirectory1+"compcase.sample.plans.xml";
+	String eventsFile1 = runDirectory1+"compcase.sample.events.xml";
+	String outPathStub = "input/sample/";
 	
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
@@ -92,7 +79,6 @@ public class SpatialAveragingDistribution {
 	EmissionsPerLinkColdEventHandler coldHandler;
 	SortedSet<String> listOfPollutants;
 	double simulationEndTime;
-	String outPathStub = "input/sample/";
 	double pollutionFactorOutdoor, pollutionFactorIndoor;
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
@@ -101,7 +87,7 @@ public class SpatialAveragingDistribution {
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 
-	final int noOfTimeBins = 1; // one bin for each hour? //TODO 30? sim endtime ist 30...
+	final int noOfTimeBins = 30; // one bin for each hour? //TODO 30? sim endtime ist 30...
 	double timeBinSize;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
@@ -109,10 +95,6 @@ public class SpatialAveragingDistribution {
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 	final WarmPollutant warmPollutant2analyze = WarmPollutant.NO2;
 	final ColdPollutant coldPollutant2analyze = ColdPollutant.NO2;
-
-	private boolean printPersonalInformation = false;
-
-	private boolean storeEvents = false;
 
 	Map<Id, Integer> link2xbin;
 	Map<Id, Integer> link2ybin;
@@ -169,40 +151,26 @@ public class SpatialAveragingDistribution {
 		 * TODO later: write emission per bin/link into xml... handle as exposure events
 		 */
 		
-		ArrayList<ResponsibilityEvent> responsibility = new ArrayList<ResponsibilityEvent>();
-		ArrayList<ExposureEvent> exposure = new ArrayList<ExposureEvent>();
+		ArrayList<ResponsibilityEventImpl> responsibility = new ArrayList<ResponsibilityEventImpl>();
+		ArrayList<ExposureEventImpl> exposure = new ArrayList<ExposureEventImpl>();
 		
 		ResponsibilityUtils reut = new ResponsibilityUtils();
 		reut.addExposureAndResponsibilityBinwise(activities, emissionPerBin, exposure, responsibility, timeBinSize, simulationEndTime);
-		reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, exposure, responsibility, timeBinSize, simulationEndTime);
+		//reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, exposure, responsibility, timeBinSize, simulationEndTime);
 		
 		/*
 		 * analysis
 		 * exposure analysis: sum, average, welfare, personal time table
 		 * responsibility analysis: sum, average, welfare
-		 *  TODO
+		 *  TODO: welfare!
 		 */
 		
 		//TODO mit case-namen versehen?
 		ExposureUtils exut = new ExposureUtils();
 		exut.printExposureInformation(exposure, outPathStub+"exposure.txt");
 		exut.printResponsibilityInformation(responsibility, outPathStub+"responsibility.txt");
-		
-//		
-//		if(printPersonalInformation){
-//			exut.printPersonalExposureTimeTables(exposure, outPathStub+"personalExposure.txt");
-//			exut.printPersonalResponibility(responsibility, outPathStub + "personalExposure.txt");
-//		}
-//
-//		
-//		if(storeEvents){
-//			//TODO write events file for respons. and exposure
-//		}
-//		
-
+		exut.printPersonalResponsibilityInformation(responsibility, outPathStub+"personalResponsibility.txt");
 		}
-		
-
 
 	private void generateEmissions(String emissionFile) {
 				
@@ -244,7 +212,6 @@ public class SpatialAveragingDistribution {
 		for(Id linkId: network.getLinks().keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(network.getLinks().get(linkId).getCoord().getY()));
 			if(mapYCoordToBin(network.getLinks().get(linkId).getCoord().getY())==null){
-				//System.out.println("link with null " + linkId.toString());
 			}
 		}
 		return link2ybin;
@@ -258,131 +225,6 @@ public class SpatialAveragingDistribution {
 		return link2xbin;
 	}
 
-
-	private Double calculateAvgDifference(Map<Id, Double> person2emission,
-			Map<Id, Double> person2emission2) {
-		
-		Double sum = 0.0;
-		for(Id personId: person2emission.keySet()){
-			sum += person2emission2.get(personId)-person2emission.get(personId);
-		}
-		return sum/person2emission.size();
-	}
-
-	private Map<Id, Double> calculatePersonalConcentration(	Map<Double, double[][]> time2WeightedEmissions,
-			Population pop) {
-		
-		Map<Id, Double> person2emission = new HashMap<Id, Double>();
-		// for each person
-		// calculate time spend in each bin
-		// calculate corresponding concentration - in total //TODO erweitern
-		// acitivty types home shopping leisure home pickup work education
-		// leg mod bike walk car pt
-		for(Id personId: pop.getPersons().keySet()){
-			person2emission.put(personId, 0.0);
-			Plan plan = pop.getPersons().get(personId).getSelectedPlan();
-			
-			for(PlanElement pe: plan.getPlanElements()){
-				if(pe instanceof Activity){
-					Double poll = getExposureFromActivity(time2WeightedEmissions, pe, ((Activity) pe).getStartTime()); //TODO andere zeit benutzen?
-					Double oldvalue = person2emission.get(personId);
-					person2emission.put(personId, oldvalue+poll);
-				}
-				if(pe instanceof Leg){
-					Leg pel = (Leg)pe;
-					Double poll = getExposureFromLeg(time2WeightedEmissions, pel);
-					Double oldvalue = person2emission.get(personId);
-					person2emission.put(personId, oldvalue+poll);
-					
-				}
-			}
-			
-			
-		}
-		return person2emission;
-	}
-
-	private Double getExposureFromLeg(
-			Map<Double, double[][]> time2WeightedEmissions, Leg currentLeg) {
-		Double travelTime = currentLeg.getTravelTime();
-		Double currentTimeBin = Math.ceil(currentLeg.getDepartureTime()/timeBinSize)*timeBinSize;
-		if(currentTimeBin<timeBinSize)currentTimeBin=timeBinSize;
-		Id startLinkId = currentLeg.getRoute().getStartLinkId();
-		Double xCoord = network.getLinks().get(startLinkId).getCoord().getX();
-		Double yCoord = network.getLinks().get(startLinkId).getCoord().getY();
-		int xBin = mapXCoordToBin(xCoord);
-		int yBin = mapYCoordToBin(yCoord);
-		Double poll;
-		try {
-			poll = travelTime * time2WeightedEmissions.get(currentTimeBin)[xBin][yBin]*pollutionFactorOutdoor;
-		} catch (NullPointerException e) {
-			poll =0.0;
-		}
-		return poll;
-	}
-
-	private Double getExposureFromActivity(
-			Map<Double, double[][]> time2WeightedEmissions, PlanElement pe, Double endOfTimeInterval) {
-
-		Activity currentActivity = (Activity)pe;
-
-		if(endOfTimeInterval<timeBinSize)endOfTimeInterval=timeBinSize;
-		if(endOfTimeInterval>simulationEndTime)endOfTimeInterval=simulationEndTime;
-		
-		int xBin= mapXCoordToBin(currentActivity.getCoord().getX());
-		int yBin= mapYCoordToBin(currentActivity.getCoord().getY());
-		
-		// polution: time [sec] * binvalue * factor
-		Double poll;
-		try {
-			poll = time2WeightedEmissions.get(endOfTimeInterval)[xBin][yBin]*pollutionFactorIndoor;
-		} catch (NullPointerException e) {
-			poll =0.0;
-		}
-		return poll;
-	}
-	
-	private void writeRoutputForPersons(Map<Id, Double> basecase, Map<Id, Double> comparecase, String outputPathForR) {
-		try {
-			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
-			String valueString = new String();
-			
-			
-			// header: Person base case compare case difference
-			valueString = "Person \t base case \t compare case \t absolute difference \t relative difference in percent";
-			buffW.write(valueString);
-			buffW.newLine();
-			
-			valueString = new String();
-			
-			for(Id personId: basecase.keySet()){
-				
-				Double baseValue = basecase.get(personId);
-				Double compValue = comparecase.get(personId);
-				
-				// id
-				valueString = personId.toString() + "\t";
-				// base value
-				valueString += baseValue + "\t";
-				// compare value
-				valueString += compValue + "\t";
-				// absolute difference
-				valueString += (compValue-baseValue)+"\t";
-				// relative difference
-				valueString += ((compValue-baseValue)/baseValue);
-								
-				buffW.write(valueString);
-				buffW.newLine();
-				valueString = new String();
-			}
-			
-			buffW.close();	
-		} catch (IOException e) {
-			throw new RuntimeException("Failed writing output for R.");
-		}	
-		logger.info("Finished writing output for R to " + outputPathForR);
-	}
-	
 	private Integer mapYCoordToBin(double yCoord) {
 		if (yCoord <= yMin || yCoord >= yMax) return null; // yCoord is not in area of interest
 		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * noOfYbins); // gives the relative position along the y-range
