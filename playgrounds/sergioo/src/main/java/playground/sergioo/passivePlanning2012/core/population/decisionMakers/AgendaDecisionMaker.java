@@ -78,6 +78,8 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 				time = ((Activity)element).getEndTime();
 				Leg nextLeg = (Leg)plan.getPlanElements().get(i+1);
 				if(((Activity)element).getEndTime()==activity.getEndTime() && nextLeg instanceof EmptyTime) {
+					if(plan.getPlanElements().get(i+2) instanceof EmptyTime)
+						System.out.println();
 					Activity nextActivity = (Activity)plan.getPlanElements().get(i+2);
 					futureActivityType = nextActivity.getType();
 					futureActivityStartTime = time + nextLeg.getTravelTime();
@@ -110,6 +112,7 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 					ActivitySchedulingLink activityLink = (ActivitySchedulingLink)link;
 					ActivityImpl activity = new ActivityImpl(activityLink.getActivityType(), activityLink.getCoord());
 					activity.setEndTime(((SchedulingNode)link.getToNode()).getTime());
+					activity.setFacilityId(activityLink.getFacilityId());
 					planElements.add(activity);
 					currentFacilityId = new IdImpl(link.getToNode().getId().toString().split("\\(")[0]);
 				}

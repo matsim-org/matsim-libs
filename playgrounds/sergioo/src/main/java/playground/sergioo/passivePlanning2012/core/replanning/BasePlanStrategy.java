@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -72,10 +73,8 @@ public class BasePlanStrategy implements PlanStrategy {
 	private final ExceptionHandler exceptionHandler = new ExceptionHandler(hadException);
 
 	//Constructors
-	public BasePlanStrategy(int numThreads) {
-		if(numThreads<1)
-			numThreads = 1;
-		basePlanThreads = new BasePlanThread[numThreads];
+	public BasePlanStrategy(Scenario scenario) {
+		basePlanThreads = new BasePlanThread[3];
 	}
 
 	//Methods

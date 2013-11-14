@@ -178,15 +178,20 @@ public class SchedulingNetwork implements Network {
 	
 	public class ActivitySchedulingLink extends SchedulingLink {
 	
-		private String activityType;
-	
-		public ActivitySchedulingLink(Id id, Node fromNode, Node toNode, String activityType) {
+		private final String activityType;
+		private final Id facilityId;
+		
+		public ActivitySchedulingLink(Id id, Node fromNode, Node toNode, String activityType, Id facilityId) {
 			super(id, fromNode, toNode, ((SchedulingNode)toNode).time-((SchedulingNode)fromNode).time);
 			this.activityType = activityType;
+			this.facilityId = facilityId;
 		}
 	
 		public String getActivityType() {
 			return activityType;
+		}
+		public Id getFacilityId() {
+			return facilityId;
 		}
 		@Override
 		public String toString() {
@@ -296,7 +301,7 @@ public class SchedulingNetwork implements Network {
 			timeOfDay += previousActivity.getSecond();
 			timeOfDay = timeOfDay-timeOfDay%timeInterval;
 			SchedulingNode node = new SchedulingNode(new IdImpl(originId.toString()+"("+(int)timeOfDay+")"), origin, timeOfDay, getMaxActivityUtility(lastTime-timeOfDay));
-			path.add(new ActivitySchedulingLink(new IdImpl(previousActivity.getFirst()+","+originId+"("+previousTime+"-"+(int)timeOfDay+")"), previousNode, node, previousActivity.getFirst()));
+			path.add(new ActivitySchedulingLink(new IdImpl(previousActivity.getFirst()+","+originId+"("+previousTime+"-"+(int)timeOfDay+")"), previousNode, node, previousActivity.getFirst(), originId));
 			previousNode = node;
 		}
 		if(!delegate.getNodes().containsKey(previousNode.getId()))
@@ -316,7 +321,7 @@ public class SchedulingNetwork implements Network {
 			Id linkId = new IdImpl(activityType+","+originId+"("+(int)((SchedulingNode)path.get(path.size()-1).fromNode).time+"-"+fromNode.time+")");
 			SchedulingLink link = (SchedulingLink) delegate.getLinks().get(linkId);
 			if(link==null) {
-				link = new ActivitySchedulingLink(linkId, path.get(path.size()-1).fromNode, fromNode, activityType);
+				link = new ActivitySchedulingLink(linkId, path.get(path.size()-1).fromNode, fromNode, activityType, originId);
 				addLink(link);
 			}
 			path.remove(path.size()-1);
@@ -341,10 +346,10 @@ public class SchedulingNetwork implements Network {
 				if(!(pLink instanceof ActivitySchedulingLink && ((ActivitySchedulingLink)pLink).getActivityType().equals("visit"))) {
 					Id toNodeId = new IdImpl(originId.toString()+"("+(int)endTime+")");
 					SchedulingNode toNode = (SchedulingNode) delegate.getNodes().get(toNodeId);
-					Id linkId = new IdImpl(lastActivity+","+originId.toString()+"("+(int)node.time+"-"+(int)endTime+")");
+					Id linkId = new IdImpl(lastActivity+","+originId+"("+(int)node.time+"-"+(int)endTime+")");
 					SchedulingLink link = (SchedulingLink) delegate.getLinks().get(linkId);
 					if(link==null) {
-						link = new ActivitySchedulingLink(linkId, node, toNode, lastActivity);
+						link = new ActivitySchedulingLink(linkId, node, toNode, lastActivity, originId);
 						addLink(link);
 					}
 					path.add(link);
@@ -384,7 +389,7 @@ public class SchedulingNetwork implements Network {
 								Id linkId = new IdImpl(activityType+","+originId+"("+(int)node.time+"-"+variableEndTime+")");
 								SchedulingLink link = (SchedulingLink) delegate.getLinks().get(linkId);
 								if(link==null) {
-									link = new ActivitySchedulingLink(linkId, node, toNode, activityType);
+									link = new ActivitySchedulingLink(linkId, node, toNode, activityType, originId);
 									addLink(link);
 								}
 								path.add(link);

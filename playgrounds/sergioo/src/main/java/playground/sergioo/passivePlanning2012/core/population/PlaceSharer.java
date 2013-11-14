@@ -84,7 +84,12 @@ public abstract class PlaceSharer {
 			return activities;
 		}
 		public Set<String> getActivityTypes(double time) {
-			return timeTypes.get(Period.getPeriod(time));
+			Set<String> types = timeTypes.get(Period.getPeriod(time));
+			if(types==null) {
+				types = new HashSet<String>();
+				timeTypes.put(Period.getPeriod(time), types);
+			}
+			return types;
 		}
 		public double getTravelTime(String mode, double startTime, Id destinationId) {
 			SortedMap<Period, Map<Id, Double>> timess = travelTimes.get(mode);

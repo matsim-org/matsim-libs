@@ -12,6 +12,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
+import flexlm.config;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
 import playground.sergioo.passivePlanning2012.core.population.BasePersonImpl;
@@ -59,23 +60,20 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 			return false;
 		else {
 			Activity previous = (Activity) plan.getPlanElements().get(currentElementIndex.get()-1);
+			double previousEnd = previous.getEndTime();
 			EmptyTime old = (EmptyTime) plan.getPlanElements().remove(currentElementIndex.get());
 			int index=currentElementIndex.get();
 			boolean emptySpace = false;
 			Leg empty = null;
-			if(startTime-previous.getEndTime()>3600) {
+			if(startTime-previousEnd>3600) {
 				empty = new EmptyTimeImpl(old.getRoute().getStartLinkId());
-				empty.setTravelTime(startTime-previous.getEndTime());
+				empty.setTravelTime(startTime-previousEnd);
 				plan.getPlanElements().add(index++, empty);
 				emptySpace = true;
 			}
 			double finalTime = startTime, firstLegTime=0;
 			boolean firstLeg = true;
 			for(PlanElement planElement:legActLeg) {
-				if(planElement instanceof Activity && !((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
-					firstLeg = false;
-				if(!(firstLeg && emptySpace))
-					plan.getPlanElements().add(index++, planElement);
 				if(planElement instanceof Leg) {
 					finalTime += ((Leg)planElement).getTravelTime();
 					if(firstLeg && emptySpace)
@@ -86,18 +84,27 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 						finalTime = ((Activity)planElement).getEndTime();
 					else
 						finalTime += ((Activity)planElement).getMaximumDuration();
+				if(firstLeg && planElement instanceof Activity && !((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+					firstLeg = false;
+					if(((Activity)planElement).getType().equals(previous.getType())) {
+						previous.setEndTime(((Activity)planElement).getEndTime());
+						continue;
+					}
+				}
+				if(!(firstLeg && emptySpace))
+					plan.getPlanElements().add(index++, planElement);
 			}
 			if(emptySpace)
 				empty.setTravelTime(empty.getTravelTime()+firstLegTime);
-			if(legActLeg.get(legActLeg.size()-1) instanceof Activity && previous.getEndTime()+old.getTravelTime()-finalTime>3600) {
+			if(legActLeg.get(legActLeg.size()-1) instanceof Activity && previousEnd+old.getTravelTime()-finalTime>3600) {
 				Id finalLinkId = ((Activity)legActLeg.get(legActLeg.size()-1)).getLinkId();
 				empty = new EmptyTimeImpl(finalLinkId);
-				empty.setTravelTime(previous.getEndTime()+old.getTravelTime()-finalTime);
+				empty.setTravelTime(previousEnd+old.getTravelTime()-finalTime);
 				plan.getPlanElements().add(index, empty);
 				index++;
 			}
-			else if(legActLeg.get(legActLeg.size()-1) instanceof Activity)
-				((Activity)legActLeg.get(legActLeg.size()-1)).setEndTime(endTime);
+			else if(plan.getPlanElements().get(index-1) instanceof Activity)
+				plan.getPlanElements().remove(index-1);
 			((BasePersonImpl)plan.getPerson()).finishPlanning();
 			return !emptySpace;
 		}

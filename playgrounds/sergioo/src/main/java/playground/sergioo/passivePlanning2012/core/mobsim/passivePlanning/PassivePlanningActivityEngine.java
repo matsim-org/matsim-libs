@@ -6,12 +6,15 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
 
@@ -73,7 +76,12 @@ public class PassivePlanningActivityEngine implements MobsimEngine, ActivityHand
 		while (activityEndsList.peek() != null) {
 			MobsimAgent agent = activityEndsList.peek().agent;
 			if (activityEndsList.peek().activityEndTime <= time) {
-				activityEndsList.poll();
+				AgentEntry entry = activityEndsList.poll();
+				if(entry.agent instanceof PassivePlannerDriverAgent) {
+					PlanElement element = ((PassivePlannerDriverAgent)entry.agent).getCurrentPlanElement();
+					if(entry.agent.getActivityEndTime()==Time.UNDEFINED_TIME && element instanceof Activity && !((Activity)element).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
+						System.out.println();
+				}
 				unregisterAgentAtActivityLocation(agent);
 				agent.endActivityAndComputeNextState(time);
 				if(!(agent instanceof PassivePlannerDriverAgent) || ((PassivePlannerDriverAgent)agent).isPlanned())

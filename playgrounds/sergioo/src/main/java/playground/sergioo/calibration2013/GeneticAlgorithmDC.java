@@ -28,10 +28,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -59,8 +62,15 @@ import org.matsim.pt.router.TransitRouterImplFactory;
 
 //import com.imsl.stat.KolmogorovTwoSample;
 
+
+
+
+
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
 import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
 
 public class GeneticAlgorithmDC {
@@ -298,10 +308,17 @@ public class GeneticAlgorithmDC {
 		scenario.getConfig().locationchoice().setDestinationSamplePercent(args[9]);
 		scenario.getConfig().locationchoice().setRestraintFcnExp("1");
 		scenario.getConfig().locationchoice().setRestraintFcnFactor("1");
+		EventsManager events = new EventsManagerImpl();
 		final TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		events.addHandler(travelTimeCalculator);
+		final WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
+		events.addHandler(waitTimeCalculator);
+		final StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
+		events.addHandler(stopStopTimeCalculator);
+		new MatsimEventsReader(events).readFile(args[10]);
 		final TravelDisutilityFactory factory = new TravelCostCalculatorFactoryImpl();
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
-		final TransitRouterFactory transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), new TransitRouterConfig(scenario.getConfig()));
+		final TransitRouterFactory transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		context = new ReplanningContext() {
 			@Override
 			public TravelDisutility getTravelDisutility() {

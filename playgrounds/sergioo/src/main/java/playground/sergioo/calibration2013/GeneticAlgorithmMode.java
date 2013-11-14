@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedMap;
@@ -25,12 +24,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -57,13 +56,14 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
 import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
 
 public class GeneticAlgorithmMode {
@@ -326,10 +326,17 @@ public class GeneticAlgorithmMode {
 					((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
 		for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
+		EventsManager events = new EventsManagerImpl();
 		final TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		events.addHandler(travelTimeCalculator);
+		final WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
+		events.addHandler(waitTimeCalculator);
+		final StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
+		events.addHandler(stopStopTimeCalculator);
+		new MatsimEventsReader(events).readFile(args[5]);
 		final TravelDisutilityFactory factory = new TravelCostCalculatorFactoryImpl();
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
-		final TransitRouterFactory transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), new TransitRouterConfig(scenario.getConfig()));
+		final TransitRouterFactory transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		context = new ReplanningContext() {
 			@Override
 			public TravelDisutility getTravelDisutility() {
@@ -352,14 +359,9 @@ public class GeneticAlgorithmMode {
 				return new TripRouterFactoryImpl(scenario, factory, travelTimeCalculator.getLinkTravelTimes(), new DijkstraFactory(), transitRouterFactory).instantiateAndConfigureTripRouter();
 			}
 		};
-		DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);
-		dcContext.init();
-		ReadOrComputeMaxDCScore rcms = new ReadOrComputeMaxDCScore(dcContext);
-		rcms.readOrCreateMaxDCScore(new Controler(scenario), dcContext.kValsAreRead());
-		rcms.getPersonsMaxEpsUnscaled();
 		module = new ReRoute(scenario);
-		int numIterations = new Integer(args[5]);
-		int maxElements = new Integer(args[6]);
+		int numIterations = new Integer(args[6]);
+		int maxElements = new Integer(args[7]);
 		NavigableSet<ParametersArray> memory = new TreeSet<ParametersArray>(new Comparator<ParametersArray>() {
 			@Override
 			public int compare(ParametersArray o1, ParametersArray o2) {
@@ -373,7 +375,7 @@ public class GeneticAlgorithmMode {
 				if(parametersMatrix!=null)
 					tempMemory.add(parametersMatrix.mutate(scenario));
 			for(ParametersArray parametersMatrix:tempMemory) {
-				PrintWriter printer2 = new PrintWriter(new FileWriter(args[8], true));
+				PrintWriter printer2 = new PrintWriter(new FileWriter(args[9], true));
 				printer2.println(Arrays.toString(parametersMatrix.parameters));
 				printer2.println(parametersMatrix.score);
 				printer2.close();
@@ -383,11 +385,11 @@ public class GeneticAlgorithmMode {
 					memory.pollLast();
 			}
 			System.out.println(memory.first().score);
-			PrintWriter printer = new PrintWriter(new FileWriter(args[7], true));
+			PrintWriter printer = new PrintWriter(new FileWriter(args[8], true));
 			printer.println(memory.first().score);
 			printer.close();
 		}
-		PrintWriter printer = new PrintWriter(new FileWriter(args[7], true));
+		PrintWriter printer = new PrintWriter(new FileWriter(args[8], true));
 		printer.println(Arrays.toString(memory.first().parameters));
 		printer.close();
 		System.out.println(Arrays.toString(memory.first().parameters));

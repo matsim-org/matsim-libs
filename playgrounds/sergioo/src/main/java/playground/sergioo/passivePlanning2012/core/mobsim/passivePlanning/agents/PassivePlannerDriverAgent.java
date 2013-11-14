@@ -140,7 +140,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 			return departure;
 		}
 	}
-	protected PlanElement getCurrentPlanElement() {
+	public PlanElement getCurrentPlanElement() {
 		return basePerson.getSelectedPlan().getPlanElements().get(planner.getPlanElementIndex());
 	}
 	private PlanElement getNextPlanElement() {
