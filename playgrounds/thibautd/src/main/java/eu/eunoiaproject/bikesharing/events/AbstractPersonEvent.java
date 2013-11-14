@@ -31,19 +31,24 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 abstract class AbstractPersonEvent extends Event implements HasPersonId {
 	private final Id personId;
+	private final Id facilityId;
 
 	/*package*/ AbstractPersonEvent(
 			final Event event) {
 		this( event.getTime() ,
 				new IdImpl(
-					event.getAttributes().get( "person" ) ) );
+					event.getAttributes().get( "person" ) ), 
+				new IdImpl(
+					event.getAttributes().get( "facility" ) ) );
 	}
 
 	public AbstractPersonEvent(
 			final double time,
-			final Id personId) {
+			final Id personId,
+			final Id facilityId) {
 		super( time );
 		this.personId = personId;
+		this.facilityId = facilityId;
 	}
 
 	@Override
@@ -51,10 +56,15 @@ abstract class AbstractPersonEvent extends Event implements HasPersonId {
 		return personId;
 	}
 
+	public Id getFacilityId() {
+		return facilityId;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		final Map<String, String> map = super.getAttributes();
 		map.put( "person" , personId.toString() );
+		map.put( "facility" , facilityId.toString() );
 		return map;
 	}
 }

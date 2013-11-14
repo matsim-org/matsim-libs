@@ -38,8 +38,9 @@ public class AgentStartsWaitingForFreeBikeSlotEvent extends AbstractPersonEvent 
 
 	public AgentStartsWaitingForFreeBikeSlotEvent(
 			final double time,
-			final Id personId) {
-		super( time , personId );
+			final Id personId,
+			final Id facilityId) {
+		super( time , personId , facilityId );
 	}
 
 	@Override

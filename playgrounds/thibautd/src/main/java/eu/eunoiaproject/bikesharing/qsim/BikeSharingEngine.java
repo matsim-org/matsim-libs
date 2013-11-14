@@ -99,7 +99,8 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 				internalInterface.getMobsim().getEventsManager().processEvent(
 						new AgentStopsWaitingForBikeEvent(
 							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-							agent.getId() ) );
+							agent.getId(),
+							facilityInNewState.getId() ) );
 
 			}
 		}
@@ -120,7 +121,8 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 				internalInterface.getMobsim().getEventsManager().processEvent(
 						new AgentStopsWaitingForFreeBikeSlotEvent(
 							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-							agent.getId() ) );
+							agent.getId(),
+							facilityInNewState.getId() ) );
 			}
 		}
 	}
@@ -140,7 +142,8 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 				internalInterface.getMobsim().getEventsManager().processEvent(
 						new AgentStartsWaitingForFreeBikeSlotEvent(
 							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-							agent.getId() ) );
+							agent.getId(),
+							arrivalFacility.getId() ) );
 			}
 		}
 	}
@@ -211,7 +214,8 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 		internalInterface.getMobsim().getEventsManager().processEvent(
 				new AgentStartsWaitingForBikeEvent(
 					internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-					agent.getId() ) );
+					agent.getId(),
+					departureFacility.getId() ) );
 
 		return true;
 	}
