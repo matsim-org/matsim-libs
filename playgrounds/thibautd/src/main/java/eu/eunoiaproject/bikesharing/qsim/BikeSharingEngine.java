@@ -205,7 +205,8 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 		if ( departureFacility.hasBikes() ) {
 			makeAgentDepart(
 					now,
-					agent );
+					agent,
+					departureFacility );
 			return true;
 		}
 
@@ -234,13 +235,15 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 
 	private void makeAgentDepart(
 			final double now,
-			final MobsimAgent agent ) {
+			final MobsimAgent agent,
+			final StatefulBikeSharingFacility departureFacility ) {
 		final double tt = agent.getExpectedTravelTime();
 		if ( tt == Time.UNDEFINED_TIME ) {
 			throw new RuntimeException( "agent "+agent+" has an undefined travel time for its bike sharing leg" );
 		}
 
 		arrivalQueue.addAgent( now + tt , agent );
+		bikeSharingManager.takeBike( departureFacility.getId() );
 		// XXX no need to fire departure event?
 	}
 
