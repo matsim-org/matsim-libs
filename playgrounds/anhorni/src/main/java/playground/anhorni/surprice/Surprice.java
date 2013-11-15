@@ -30,7 +30,7 @@ public class Surprice {
 	public static final String SURPRICE_PREPROCESS = "surprice_preprocess";
 	
 	// -------------------------------------------------
-	// betas and constants need to be negative
+	// betas and constants need to be negative!!!
 			
 	public static double constant_car;
     public static double constant_pt;
@@ -57,7 +57,7 @@ public class Surprice {
 	public static double beta_TD_slm_lei;
 	public static double beta_TT_slm_lei;
                    
-	public static double distanceCost_car;
+	public static double distanceCost_car; 
 	public static double constantCost_car;
 	
 	public static double distanceCost_pt;

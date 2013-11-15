@@ -39,16 +39,16 @@ import playground.anhorni.surprice.AgentMemories;
  *
  * @author anhorni
  */
-public class SurpriceTravelTravelDisutility implements TravelDisutility {
+public class SurpriceTravelDisutility implements TravelDisutility {
 
 	protected final TravelTime timeCalculator;
 	private double dudm;
 	private String day;
 	private AgentMemories memories;
 	
-	private final static Logger log = Logger.getLogger(SurpriceTravelTravelDisutility.class);
+	private final static Logger log = Logger.getLogger(SurpriceTravelDisutility.class);
 	
-	public SurpriceTravelTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, 
+	public SurpriceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, 
 			String day, AgentMemories memories) {
 		this.day = day;
 		this.memories = memories;
@@ -56,7 +56,8 @@ public class SurpriceTravelTravelDisutility implements TravelDisutility {
 	}
 	
 	/*
-	 * link travel disutility is only used for routing in a toll scenario. That is why, the trip constants are (luckily) not required.
+	 * link travel disutility is only used for routing and not mode choice (!) in a toll scenario. 
+	 * For routing only, the trip constants can (luckily) be neglected.
 	 */
 
 	@Override
@@ -89,7 +90,7 @@ public class SurpriceTravelTravelDisutility implements TravelDisutility {
 		double distanceCostFactor = params.getDistanceCostFactor(); // [EUR / m]
 
 		tmpScore += dudm * (distanceCostFactor * distance);
-		return tmpScore;
+		return (tmpScore * -1.0); // disutility needs to be positive!
 	}
 
 	@Override

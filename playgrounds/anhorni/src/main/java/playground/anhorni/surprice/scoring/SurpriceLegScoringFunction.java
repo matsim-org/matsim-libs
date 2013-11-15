@@ -72,6 +72,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		this.score = INITIAL_SCORE;
 		this.person.getCustomAttributes().put(day + ".legScore", null);
 		this.person.getCustomAttributes().put(day + ".legMonetaryCosts", null);
+		this.person.getCustomAttributes().put(day + ".legScoreLag", null);
 	}
 
 	@Override
@@ -126,7 +127,13 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		if (this.person.getCustomAttributes().get(day + ".legScoreLag") != null) {
 			prevValLag = (Double)this.person.getCustomAttributes().get(day + ".legScoreLag");
 		}
-		person.getCustomAttributes().put(day + ".legScoreLag", prevValLag + tmpScore);
+		person.getCustomAttributes().put(day + ".legScoreLag", prevValLag + lagP + lagT);
+		
+		double prevValMonetary = 0.0;
+		if (this.person.getCustomAttributes().get(day + ".legMonetaryCosts") != null) {
+			prevValMonetary = (Double)this.person.getCustomAttributes().get(day + ".legMonetaryCosts");
+		}
+		person.getCustomAttributes().put(day + ".legMonetaryCosts", prevValMonetary + dudm * (distanceCostFactor * distance + constCost));
 		
 		double prevVal = 0.0;
 		if (this.person.getCustomAttributes().get(day + ".legScore") != null) {

@@ -55,7 +55,7 @@ public class SupriceTollScoringFunction implements MoneyScoring, BasicScoring {
 		if (this.person.getCustomAttributes().get(day + ".tollScore") != null) {
 			prevVal = (Double)this.person.getCustomAttributes().get(day + ".tollScore");
 		}		
-		this.person.getCustomAttributes().put(day + ".tollScore", prevVal + amount * this.dudm);
+		this.person.getCustomAttributes().put(day + ".tollScore", prevVal - amount * this.dudm);
 	}
 
 	@Override

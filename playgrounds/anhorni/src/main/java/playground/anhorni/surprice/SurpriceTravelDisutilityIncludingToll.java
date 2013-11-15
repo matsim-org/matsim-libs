@@ -61,18 +61,11 @@ public class SurpriceTravelDisutilityIncludingToll implements TravelDisutility {
 		}
 	}
 	
-	private static int wrnCnt = 0 ;
-
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double baseDisutility = this.travelDisutilityHandler.getLinkTravelDisutility(link, time, person, vehicle);
 		double dudm = (Double)this.preferences.getAttribute(person.getId().toString(), "dudm");
 		double tollDisutility = dudm * this.tollCostHandler.getTollCost(link, time, person);
-		if ( wrnCnt < 1 ) {
-			wrnCnt++ ;
-			Logger.getLogger(this.getClass()).warn("this package assumes a utility of money equal to one.  " +
-					"Make sure you are using that.  Should be fixed.  kai, mar'11") ;
-		}
 		return baseDisutility + tollDisutility;
 	}
 	

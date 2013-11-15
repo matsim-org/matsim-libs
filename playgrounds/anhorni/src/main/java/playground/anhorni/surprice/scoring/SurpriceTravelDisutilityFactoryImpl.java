@@ -43,6 +43,6 @@ public class SurpriceTravelDisutilityFactoryImpl implements TravelDisutilityFact
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new SurpriceTravelTravelDisutility(timeCalculator, cnScoringGroup, this.day, this.memories);
+		return new SurpriceTravelDisutility(timeCalculator, cnScoringGroup, this.day, this.memories);
 	}
 }
