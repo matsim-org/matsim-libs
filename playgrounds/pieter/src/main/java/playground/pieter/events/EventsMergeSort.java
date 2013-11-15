@@ -55,8 +55,10 @@ public class EventsMergeSort {
 	public void run() throws IOException {
 		intermediaryFiles = new ArrayList<String>();
 		int numberOfFiles = inputFiles.size();
-		if (numberOfFiles % 2 != 0)
+		if (numberOfFiles % 2 != 0){
 			intermediaryFiles.add(inputFiles.get(numberOfFiles - 1));
+			inputFiles.remove(inputFiles.get(numberOfFiles - 1));			
+		}
 		for (int i = 1; i < numberOfFiles; i += 2) {
 			String fileName = null;
 			if (inputFiles.size() > 2) {
@@ -123,6 +125,12 @@ public class EventsMergeSort {
 			writer.close();
 		}
 		if (intermediaryFiles.size() > 1) {
+			for(String fileName:inputFiles){
+				if(fileName.startsWith("merge")){
+					File file = new File(inputEventsPath + "/"+fileName); 
+					file.delete();
+				}
+			}
 			inputFiles = intermediaryFiles;
 			run();
 		}

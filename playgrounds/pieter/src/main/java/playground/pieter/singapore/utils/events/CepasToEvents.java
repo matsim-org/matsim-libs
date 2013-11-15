@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -43,6 +44,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.cyberneko.html.HTMLScanner.PlaybackInputStream;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -69,6 +71,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -133,18 +136,20 @@ public class CepasToEvents {
 			veherrs.get(vehicleId).transactionCount++;
 
 		}
+
 		public String writeStats(Id vehicleId) {
 			StringBuffer sb = new StringBuffer(
-					!calledBefore?"vehId\tstopIdNotInRoute\ttransactionCount\tdwellEventCount"
+					!calledBefore ? "vehId\tstopIdNotInRoute\ttransactionCount\tdwellEventCount"
 							+ "\tdwellEventsDropped\tdwellEventTransactionsDropped"
-							+ "\tfastTransactionDropped\tinterpolatedDwells\n":"");
-			if(!calledBefore)
+							+ "\tfastTransactionDropped\tinterpolatedDwells\n" : "");
+			if (!calledBefore)
 				calledBefore = true;
-			
-				sb.append(String.format("%s\t%s\n", vehicleId.toString(), this.veherrs.get(vehicleId).toString()));
-			
+
+			sb.append(String.format("%s\t%s\n", vehicleId.toString(), this.veherrs.get(vehicleId).toString()));
+
 			return sb.toString();
 		}
+
 		public String toString() {
 			StringBuffer sb = new StringBuffer(
 					"vehId\tstopIdNotInRoute\ttransactionCount\tdwellEventCount\tdwellEventsDropped\tdwellEventTransactionsDropped\tfastTransactionDropped\tinterpolatedDwells\n");
@@ -244,7 +249,7 @@ public class CepasToEvents {
 	}
 
 	public int departureId = 0;
-	public static final int minimumNumberOfDwellEventsForProcessing = 10;
+	public static final int minimumNumberOfDwellEventsForProcessing = 2;
 
 	private class CepasVehicle {
 		/**
@@ -1517,6 +1522,7 @@ public class CepasToEvents {
 	 */
 	private HashMap<Id, ArrayList<Id>> routeIdToStopIdSequence;
 	private ErrorTracker errorTracker;
+	private ArrayList<String> alreadyCompletedVehicles = new ArrayList<String>();
 
 	// constructors
 	/**
@@ -1558,12 +1564,12 @@ public class CepasToEvents {
 
 	}
 
-	public void run() throws SQLException, NoConnectionException, IOException {
+	public void run(boolean continueFromBreak) throws SQLException, NoConnectionException, IOException {
 		generateRouteIdToStopIdSequence();
 		createVehiclesByCepasLineDirectionAndBusRegNum();
 		createCepasToMatsimStopLookupTable();
 		System.out.println(new Date());
-		processCepasTransactionRecordsByLineDirectionBusRegNum();
+		processCepasTransactionRecordsByLineDirectionBusRegNum(continueFromBreak);
 		System.out.println(new Date());
 	}
 
@@ -1594,8 +1600,8 @@ public class CepasToEvents {
 
 	}
 
-	private void processCepasTransactionRecordsByLineDirectionBusRegNum() throws SQLException, NoConnectionException,
-			IOException {
+	private void processCepasTransactionRecordsByLineDirectionBusRegNum(boolean continueFromBreak) throws SQLException,
+			NoConnectionException, IOException {
 		BufferedWriter transactionsBeforeWriter = null;
 		BufferedWriter transactionsAfterWriter = null;
 		BufferedWriter transactionsAfterTimeCorrectionWriter = null;
@@ -1603,22 +1609,40 @@ public class CepasToEvents {
 		BufferedWriter dwellEventWriter = null;
 		BufferedWriter errorWriter = null;
 		try {
-			errorWriter = new BufferedWriter(new FileWriter("errors.csv"));
-			transactionsBeforeWriter = new BufferedWriter(new FileWriter("transactionsBeforeGPSCorrection.csv"));
-			transactionsAfterWriter = new BufferedWriter(new FileWriter("transactionsAfterGPSCorrection.csv"));
-			transactionsAfterTimeCorrectionWriter = new BufferedWriter(new FileWriter(
-					"transactionsAfterTimeCorrection.csv"));
-			clusterWriter = new BufferedWriter(new FileWriter("clusters.csv"));
-			dwellEventWriter = new BufferedWriter(new FileWriter("dwellEvents.csv"));
+			if (continueFromBreak) {
+				checkForExistingfiles(outputEventsPath);
+				errorWriter = IOUtils.getAppendingBufferedWriter(outputEventsPath + "/" + "errors.csv");
+				transactionsBeforeWriter = IOUtils.getAppendingBufferedWriter(outputEventsPath + "/"
+						+ "transactionsBeforeGPSCorrection.csv");
+				transactionsAfterWriter = IOUtils.getAppendingBufferedWriter(outputEventsPath + "/"
+						+ "transactionsAfterGPSCorrection.csv");
+				transactionsAfterTimeCorrectionWriter = IOUtils.getAppendingBufferedWriter(outputEventsPath + "/"
+						+ "transactionsAfterTimeCorrection.csv");
+				clusterWriter = IOUtils.getAppendingBufferedWriter(outputEventsPath + "/" + "clusters.csv");
+				dwellEventWriter = IOUtils.getAppendingBufferedWriter(outputEventsPath + "/" + "dwellEvents.csv");
+			} else {
+
+				errorWriter = new BufferedWriter(new FileWriter(outputEventsPath + "/" + "errors.csv"));
+				transactionsBeforeWriter = new BufferedWriter(new FileWriter(outputEventsPath + "/"
+						+ "transactionsBeforeGPSCorrection.csv"));
+				transactionsAfterWriter = new BufferedWriter(new FileWriter(outputEventsPath + "/"
+						+ "transactionsAfterGPSCorrection.csv"));
+				transactionsAfterTimeCorrectionWriter = new BufferedWriter(new FileWriter(outputEventsPath + "/"
+						+ "transactionsAfterTimeCorrection.csv"));
+				clusterWriter = new BufferedWriter(new FileWriter(outputEventsPath + "/" + "clusters.csv"));
+				dwellEventWriter = new BufferedWriter(new FileWriter(outputEventsPath + "/" + "dwellEvents.csv"));
+			}
 			int vehicles = 0;
-			int numberOfVehicles = this.cepasVehicles.size();
+			int numberOfVehicles = this.cepasVehicles.size()-this.alreadyCompletedVehicles.size();
 			for (CepasVehicle ptVehicle : this.cepasVehicles.values()) {
 				// if (vehicles <= 2367) {
 				// vehicles++;
 				// continue;
 				// }
-//				 if (!ptVehicle.vehicleId.toString().equals("552_0_2619"))
-//				 continue;
+				// if (!ptVehicle.vehicleId.toString().equals("552_0_2619"))
+				// continue;
+				if (alreadyCompletedVehicles.contains(ptVehicle.vehicleId.toString()))
+					continue;
 				if (ptVehicle.possibleMatsimRoutes == null)
 					// TODO: if we don't have this transit line in the schedule,
 					// ignore
@@ -1653,6 +1677,13 @@ public class CepasToEvents {
 					System.err.printf("The vehicle with id %s has fewer than the required number of dwell events (%d)"
 							+ ", not firing events for it\n", ptVehicle.vehicleId,
 							minimumNumberOfDwellEventsForProcessing);
+					BufferedWriter emptyXML = IOUtils.getBufferedWriter(outputEventsPath + "/" + ptVehicle.vehicleId.toString()
+						+ ".xml");
+					emptyXML.close();
+					transactionsBeforeWriter.flush();
+					transactionsAfterWriter.flush();
+					errorWriter.write(errorTracker.writeStats(ptVehicle.vehicleId));
+					errorWriter.flush();
 					continue;
 
 				}
@@ -1802,13 +1833,35 @@ public class CepasToEvents {
 		String databaseProperties = "f:/data/matsim2postgres.properties";
 		String transitSchedule = "f:\\data\\sing2.2\\input\\transit\\transitSchedule.xml";
 		String networkFile = "f:\\data\\sing2.2\\input\\network\\network100by4TL.xml.gz";
-		String outputEventsFile = "f:\\data\\sing2.2\\cepasevents";
+		String outputEventsPath = "f:\\data\\sing2.2\\cepasevents";
 		String tripTableName = "a_lta_ezlink_week.trips11042011";
 		String stopLookupTableName = "d_ezlink2events.matsim2ezlink_stop_lookup";
 		MatsimRandom.reset(12345678L);
 		CepasToEvents cepasToEvents = new CepasToEvents(databaseProperties, transitSchedule, networkFile,
-				outputEventsFile, tripTableName, stopLookupTableName);
-		cepasToEvents.run();
+				outputEventsPath, tripTableName, stopLookupTableName);
+		cepasToEvents.run(true);
+	}
+
+	private void checkForExistingfiles(String inputEventsPath) {
+		File f = new File(inputEventsPath);
+		ArrayList<String> tempFileNames = new ArrayList<String>(Arrays.asList(f.list()));
+		ArrayList<String> removeFiles = new ArrayList<String>();
+		for (String fileName : tempFileNames) {
+			if (!(fileName.endsWith("xml") || fileName.endsWith("xml.gz")) || fileName.startsWith("merge")
+					|| fileName.startsWith("OUT")) {
+				removeFiles.add(fileName);
+
+			}
+		}
+		for (String file : removeFiles) {
+			tempFileNames.remove(file);
+		}
+		alreadyCompletedVehicles = new ArrayList<String>();
+		for (String fileName : tempFileNames) {
+			alreadyCompletedVehicles.add(fileName.split("\\.")[0]);
+		}
+		System.out.println("skipping vehicle ids: " + alreadyCompletedVehicles.toString());
+
 	}
 
 }
