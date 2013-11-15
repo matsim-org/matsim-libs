@@ -334,7 +334,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		if (links.size()==1){
 			return links.get(0);
-		} else if (GeneralLib.getDistance(link.getCoord(), nextNonParkingAct.getCoord()) < getRandomSearchDistance() || searchBeta==1000) {
+		} else if (GeneralLib.getDistance(link.getCoord(), nextNonParkingAct.getCoord()) < getRandomSearchDistance() || searchBeta==-1) {
 			return randomNextLink(link);
 		} else {
 			//if (oppositeDirectionLink!=null){
