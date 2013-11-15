@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -78,7 +79,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	public HashSet<Id> extraSearchPathNeeded = new HashSet<Id>();
 	private String groupName;
 	private WalkTravelTime walkTravelTime;
-	
+	private double searchBeta;
+	private double randomSearchDistance;
 
 	// go to final link if no parking there, then try parking at other places.
 	// accept only parking within 300m, choose random links, but if leave 300m
@@ -88,8 +90,11 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		this.maxDistance = maxDistance;
 		this.network = network;
 		this.name = name;
+
+		setSearchBeta(ZHScenarioGlobal.loadDoubleParam("RandomParkingSearch.searchBeta"));
+		setRandomSearchDistance(ZHScenarioGlobal.loadDoubleParam("RandomParkingSearch.randomSearchDistance"));
 		
-		walkTravelTime=new WalkTravelTime(new PlansCalcRouteConfigGroup(),ZHScenarioGlobal.linkSlopes);
+		walkTravelTime = new WalkTravelTime(new PlansCalcRouteConfigGroup(), ZHScenarioGlobal.linkSlopes);
 		resetForNewIteration();
 	}
 
@@ -97,11 +102,9 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		return name;
 	}
 
-	
-
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
-		
+		walkSpeed = getWalkSpeed(aem);
 		
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
@@ -133,7 +136,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					// extraSearchPathNeeded.add(personId);
 
 					random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
-					addRandomLinkToRoute(route);
+					addRandomLinkToRoute(route, aem);
 
 					// this will just continue the search of the agent
 					aem.processLegInDefaultWay();
@@ -220,7 +223,6 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		nextAct.setLinkId(parkingLink.getId());
 
-		walkSpeed=getWalkSpeed(aem);
 		double walkDistance = GeneralLib.getDistance(parkingLink.getCoord(), nextNonParkingAct.getCoord());
 		// TODO: improve this later (no straight line)
 		double walkDuration = walkDistance / walkSpeed;
@@ -283,18 +285,21 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		aem.processEndOfLegCarMode_scheduleNextActivityEndEventIfNeeded(nextAct);
 	}
 
-	private double getWalkSpeed(AgentWithParking aem) {
+	protected double getWalkSpeed(AgentWithParking aem) {
+		if (ZHScenarioGlobal.paramterExists("globalWalkSpeedInMetersPerSecond")){
+			return ZHScenarioGlobal.loadDoubleParam("globalWalkSpeedInMetersPerSecond");
+		}
+		
 		Link currentLink = aem.getCurrentLink();
-		double length=currentLink.getLength();
-		double walkTime=walkTravelTime.getLinkTravelTime(aem.getCurrentLink(), 0, aem.getPerson(), null);
-		return length/walkTime;
+		double length = currentLink.getLength();
+		double walkTime = walkTravelTime.getLinkTravelTime(aem.getCurrentLink(), 0, aem.getPerson(), null);
+		return length / walkTime;
 	}
 
-	public void addRandomLinkToRoute(LinkNetworkRouteImpl route) {
-		Random r = new Random();
+	public void addRandomLinkToRoute(LinkNetworkRouteImpl route, AgentWithParking aem) {
 		Link link = network.getLinks().get(route.getEndLinkId());
 
-		Link nextLink = randomNextLink(link);
+		Link nextLink = getNextLink(link, aem);
 
 		ArrayList<Id> newRoute = new ArrayList<Id>();
 		newRoute.addAll(route.getLinkIds());
@@ -308,6 +313,122 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			nextAct.setEndTime(aem.getMessageArrivalTime() + parkingDuration);
 		}
 	}
+
+	private Link getOppositeDirectionLink(Link link){
+		List<Link> links = new ArrayList<Link>(link.getToNode().getOutLinks().values());
+		
+		for (Link candidate:links){
+			if (candidate.getToNode().equals(link.getFromNode())){
+				return candidate;
+			}
+		}
+		
+		return null;
+	}
+	
+	private Link getNextLink(Link link, AgentWithParking aem) {
+		Link oppositeDirectionLink=getOppositeDirectionLink(link);
+		List<Link> links = new ArrayList<Link>(link.getToNode().getOutLinks().values());
+		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+				.get(aem.getPlanElementIndex() + 3);
+
+		if (GeneralLib.getDistance(link.getCoord(), nextNonParkingAct.getCoord()) < getRandomSearchDistance()) {
+			return randomNextLink(link);
+		} else {
+			double exponentialSum = 0;
+			double[] distances = new double[links.size()];
+			double[] selectionProbabilities = new double[links.size()];
+			double minDistance=Double.MAX_VALUE;
+			double averageDistance=0;
+
+			for (int i = 0; i < links.size(); i++) {
+				distances[i] = GeneralLib.getDistance(links.get(i).getToNode().getCoord(), nextNonParkingAct.getCoord());
+
+				if (minDistance>distances[i]){
+					minDistance=distances[i];
+				}
+				
+				if (links.size()>1 && oppositeDirectionLink!=null && oppositeDirectionLink==links.get(i)){
+					distances[i]*=10;
+				}
+				
+				averageDistance+=distances[i];
+			}
+			
+			for (int i = 0; i < links.size(); i++) {
+				averageDistance+=distances[i]-minDistance;
+			}
+			
+			averageDistance/=(links.size()+1);
+			averageDistance/=searchBeta;
+			
+			for (int i = 0; i < links.size(); i++) {
+				exponentialSum += getSearchBeta() / (distances[i]-minDistance+averageDistance);
+			}
+
+			for (int i = 0; i < links.size(); i++) {
+				selectionProbabilities[i] = getSearchBeta() / (distances[i]-minDistance+averageDistance) / exponentialSum;
+			}
+
+			double r = random.nextDouble();
+			int index = 0;
+			double sum = 0;
+
+			while (sum + selectionProbabilities[index] < r) {
+				sum += selectionProbabilities[index];
+				index++;
+			}
+
+			return links.get(index);
+		}
+	}
+	
+//	private Link getNextLink(Link link, AgentWithParking aem) {
+//		Link oppositeDirectionLink=getOppositeDirectionLink(link);
+//		List<Link> links = new ArrayList<Link>(link.getToNode().getOutLinks().values());
+//		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+//				.get(aem.getPlanElementIndex() + 3);
+//
+//		if (GeneralLib.getDistance(link.getCoord(), nextNonParkingAct.getCoord()) < getRandomSearchDistance()) {
+//			return randomNextLink(link);
+//		} else {
+//			double exponentialSum = 0;
+//			double[] distances = new double[links.size()];
+//			double[] selectionProbabilities = new double[links.size()];
+//			double minDistance=Double.MAX_VALUE;
+//
+//			for (int i = 0; i < links.size(); i++) {
+//				distances[i] = GeneralLib.getDistance(links.get(i).getToNode().getCoord(), nextNonParkingAct.getCoord());
+//
+//				if (minDistance>distances[i]){
+//					minDistance=distances[i];
+//				}
+//				
+//				if (links.size()>1 && oppositeDirectionLink!=null && oppositeDirectionLink==links.get(i)){
+//					distances[i]*=10;
+//				}
+//			}
+//
+//			for (int i = 0; i < links.size(); i++) {
+//				exponentialSum += Math.exp(getSearchBeta() / (distances[i]-minDistance+100));
+//			}
+//
+//			for (int i = 0; i < links.size(); i++) {
+//				selectionProbabilities[i] = Math.exp(getSearchBeta() / (distances[i]-minDistance+100)) / exponentialSum;
+//			}
+//
+//			double r = random.nextDouble();
+//			int index = 0;
+//			double sum = 0;
+//
+//			while (sum + selectionProbabilities[index] < r) {
+//				sum += selectionProbabilities[index];
+//				index++;
+//			}
+//
+//			return links.get(index);
+//		}
+//	}
 
 	private Link randomNextLink(Link link) {
 		List<Link> links = new ArrayList<Link>(link.getToNode().getOutLinks().values());
@@ -386,11 +507,14 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	}
 
 	public double handleCostScore(Id personId, ParkingActivityAttributes parkingAttributesForScoring, double parkingScore) {
-		if (tollAreaEntered.contains(personId) && !parkingAttributesForScoring.getFacilityId().toString().contains("privateParkings")){
-			scoreInterrupationValue +=ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId, ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
+		if (tollAreaEntered.contains(personId)
+				&& !parkingAttributesForScoring.getFacilityId().toString().contains("privateParkings")) {
+			scoreInterrupationValue += ZHScenarioGlobal.parkingScoreEvaluator.getParkingCostScore(personId,
+					ZHScenarioGlobal.loadDoubleParam("costForEnertingTolledArea"));
 		}
-		
-		if ((parkingAttributesForScoring.getFacilityId().toString().contains("illegal") || tollAreaEntered.contains(personId)) && ! parkingAttributesForScoring.getFacilityId().toString().contains("privateParkings")) {
+
+		if ((parkingAttributesForScoring.getFacilityId().toString().contains("illegal") || tollAreaEntered.contains(personId))
+				&& !parkingAttributesForScoring.getFacilityId().toString().contains("privateParkings")) {
 			parkingScore += scoreInterrupationValue;
 			parkingAttributesForScoring.setParkingCost(scoreInterrupationValue);
 		}
@@ -435,7 +559,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		parkingScore = handleCostScore(personId, parkingAttributesForScoring, parkingScore);
-		
+
 		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
 		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
 		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore,
@@ -465,7 +589,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		startSearchTime = new DoubleValueHashMap<Id>();
 		parkingActAttributes = new HashMap<Id, ParkingActivityAttributes>();
 		useSpecifiedParkingType = new HashMap<Id, String>();
-		tollAreaEntered=new HashSet<Id>();
+		tollAreaEntered = new HashSet<Id>();
 	}
 
 	/*
@@ -532,8 +656,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 	@Override
 	public void tollAreaEntered(AgentWithParking aem) {
-		if (!tollAreaEntered.contains(aem.getPerson().getId())){
-			tollAreaEntered.add(aem.getPerson().getId());		
+		if (!tollAreaEntered.contains(aem.getPerson().getId())) {
+			tollAreaEntered.add(aem.getPerson().getId());
 		}
 	}
 
@@ -550,9 +674,24 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	public void initParkingAttributes(AgentWithParking aem) {
 		ParkingActivityAttributes parkingAttributesForScoring = getParkingAttributesForScoring(aem);
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-		.get(aem.getPlanElementIndex() + 3);
-		parkingAttributesForScoring.destinationCoord=nextAct.getCoord();
+				.get(aem.getPlanElementIndex() + 3);
+		parkingAttributesForScoring.destinationCoord = nextAct.getCoord();
 	}
 
-	
+	public double getSearchBeta() {
+		return searchBeta;
+	}
+
+	public void setSearchBeta(double searchBeta) {
+		this.searchBeta = searchBeta;
+	}
+
+	public double getRandomSearchDistance() {
+		return randomSearchDistance;
+	}
+
+	public void setRandomSearchDistance(double randomSearchDistance) {
+		this.randomSearchDistance = randomSearchDistance;
+	}
+
 }

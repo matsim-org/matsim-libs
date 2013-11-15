@@ -52,6 +52,7 @@ public class Dummy_OptimalScore extends RandomParkingSearch {
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
+		walkSpeed = getWalkSpeed(aem);
 
 		boolean endOfLegReached = aem.endOfLegReached();
 

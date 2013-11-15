@@ -97,6 +97,7 @@ public class ZHScenarioGlobal {
 		printFilteredParkingStatsParkingType("gp");
 		printFilteredParkingStatsParkingType("private");
 		printFilteredParkingStatsParkingType("illegal");
+		printFilteredParkingStatsParkingType("publicPOutsideCityZH");
 
 		for (ParkingSearchStrategy strategy : ParkingStrategyManager.allStrategies) {
 			printParkingStraregyStats(strategy.getName());
@@ -151,6 +152,7 @@ public class ZHScenarioGlobal {
 		double averageParkingDuration = 0;
 		double averageSearchDuration = 0;
 		double averageWalkDuration = 0;
+		double averageWalkDistance = 0;
 
 		System.out.println("stats for parking type: " + type);
 
@@ -160,13 +162,15 @@ public class ZHScenarioGlobal {
 				averageParkingDuration += ped.parkingActivityAttributes.getParkingDuration();
 				averageSearchDuration += ped.parkingActivityAttributes.getParkingSearchDuration();
 				averageWalkDuration += ped.parkingActivityAttributes.getToActWalkDuration();
+				averageWalkDistance += ped.parkingActivityAttributes.getWalkDistance();
 				numberOfParkingOperations++;
 			}
 		}
 
-		System.out.println("averageParkingDuration: " + averageParkingDuration / numberOfParkingOperations);
-		System.out.println("averageSearchDuration: " + averageSearchDuration / numberOfParkingOperations);
-		System.out.println("averageWalkDuration: " + averageWalkDuration / numberOfParkingOperations);
+		System.out.println("averageParkingDuration [s]: " + averageParkingDuration / numberOfParkingOperations);
+		System.out.println("averageSearchDuration [s]: " + averageSearchDuration / numberOfParkingOperations);
+		System.out.println("averageWalkDuration [s]: " + averageWalkDuration / numberOfParkingOperations);
+		System.out.println("averageWalkDistance [m]: " + averageWalkDistance / numberOfParkingOperations);
 		System.out.println("numberOfParkingOperations: " + numberOfParkingOperations);
 		System.out.println("========================");
 	}
@@ -175,6 +179,8 @@ public class ZHScenarioGlobal {
 		double averageParkingDuration = 0;
 		double averageSearchDuration = 0;
 		double averageWalkDuration = 0;
+		double averageWalkDistance = 0;
+		
 
 		System.out.println("general parking stats");
 
@@ -182,12 +188,14 @@ public class ZHScenarioGlobal {
 			averageParkingDuration += ped.parkingActivityAttributes.getParkingDuration();
 			averageSearchDuration += ped.parkingActivityAttributes.getParkingSearchDuration();
 			averageWalkDuration += ped.parkingActivityAttributes.getToActWalkDuration();
+			averageWalkDistance += ped.parkingActivityAttributes.getWalkDistance();
 		}
 
 		int numberOfParkingOperations = parkingEventDetails.size();
-		System.out.println("averageParkingDuration: " + averageParkingDuration / numberOfParkingOperations);
-		System.out.println("averageSearchDuration: " + averageSearchDuration / numberOfParkingOperations);
-		System.out.println("averageWalkDuration: " + averageWalkDuration / numberOfParkingOperations);
+		System.out.println("averageParkingDuration [s]: " + averageParkingDuration / numberOfParkingOperations);
+		System.out.println("averageSearchDuration [s]: " + averageSearchDuration / numberOfParkingOperations);
+		System.out.println("averageWalkDuration [s]: " + averageWalkDuration / numberOfParkingOperations);
+		System.out.println("averageWalkDistance [m]: " + averageWalkDistance / numberOfParkingOperations);
 		System.out.println("numberOfParkingOperations: " + numberOfParkingOperations);
 		System.out.println("========================");
 	}

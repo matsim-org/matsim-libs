@@ -139,7 +139,7 @@ public class ParkAgent extends RandomParkingSearch {
 					if (parkingId == null || isInvalidLink
 							|| GeneralLib.getDistance(nextAct.getCoord(), nextLink.getCoord()) > acceptableParkingDistance) {
 
-						addRandomLinkToRoute(route);
+						addRandomLinkToRoute(route,aem);
 
 						aem.processLegInDefaultWay();
 					} else {

@@ -28,6 +28,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_Tak
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.PrivateParkingWithWaitAndRandomSearchAsBackup;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy2;
@@ -247,8 +248,7 @@ public class ParkingStrategyScenarios {
 			Dummy_OptimalScore dummy = new Dummy_OptimalScore(-1, scenario.getNetwork(), "Dummy_OptimalScore");
 			dummy.setGroupName("dummy group");
 			allStrategies.add(dummy);
-		}
-		if (ZHScenarioGlobal.parkingStrategyScenarioId == 12) {
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 12) {
 			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
 					.loadIntParam("parkingStrategyScenarioId.12.numberOfStrategiesInEachGroup");
 
@@ -305,6 +305,23 @@ public class ParkingStrategyScenarios {
 				allStrategies.add(strategy);
 			}
 
+		}else if (ZHScenarioGlobal.parkingStrategyScenarioId == 13) {
+			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
+					.loadIntParam("parkingStrategyScenarioId.13.numberOfStrategiesInEachGroup");
+			
+			for (int i = 0; i < numberOfStrategiesInEachGroup; i++) {
+				RandomParkingSearch strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-A" + i);
+				strategy.setSearchBeta(1.0);
+				strategy.setRandomSearchDistance(100.0);
+				strategy.setGroupName("ARD-S-1-100");
+				allStrategies.add(strategy);
+				
+				strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-D" + i);
+				strategy.setSearchBeta(100.0);
+				strategy.setRandomSearchDistance(100.0);
+				strategy.setGroupName("ARD-S-100-100");
+				allStrategies.add(strategy);
+			}
 		}
 
 		return allStrategies;
