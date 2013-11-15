@@ -32,7 +32,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 public abstract class AbstractController {
-	
+
 	private static Logger log = Logger.getLogger(AbstractController.class);
 
 	private OutputDirectoryHierarchy controlerIO;
@@ -48,31 +48,26 @@ public abstract class AbstractController {
 	public static final String OPERATION_ITERATION = "iteration";
 	public static final String OPERATION_MOBSIM = "mobsim";
 	public static final String OPERATION_REPLANNING = "replanning";
-	
+
 	/**
-	 * This is deliberately not even protected.  kai, jul'12 
+	 * This is deliberately not even protected.  kai, jul'12
 	 */
 	ControlerListenerManager controlerListenerManager;
-	
+
 	// for tests
 	protected volatile Throwable uncaughtException;
-	
+
 	private Thread shutdownHook = new Thread() {
 		@SuppressWarnings("synthetic-access")
 		@Override
 		public void run() {
-			log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
 			shutdown(true);
-			System.out.println();
-			log.error("ERROR --- MATSim terminated with some error. Please check the output or the logfile with warnings and errors for hints.");
-			log.error("ERROR --- results should not be used for further analysis.");
-			log.error("S H U T D O W N   ---   unexpected shutdown request completed. ");
 		}
 	};
 
 	@Deprecated
 	/*package*/ Integer thisIteration = null;
-	
+
 
 	protected AbstractController() {
 		OutputDirectoryLogging.catchLogEntries();
@@ -122,8 +117,17 @@ public abstract class AbstractController {
 		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed(), config.controler().isCreateGraphs());
 		shutdown(false);
 	}
-	
+
 	final void shutdown(final boolean unexpected) {
+		if (unexpected) {
+			log.error("S H U T D O W N   ---   received unexpected shutdown request.");
+		} else {
+			log.info("S H U T D O W N   ---   start regular shutdown.");
+		}
+		if (this.uncaughtException != null) {
+			log.error(
+					"Shutdown probably caused by the following Exception.", this.uncaughtException);
+		}
 		this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
 		try {
 			Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
@@ -131,15 +135,22 @@ public abstract class AbstractController {
 			log.info("Cannot remove shutdown hook. " + e.getMessage());
 		}
 		this.shutdownHook = null; // important for test cases to free the memory
+		if (unexpected) {
+			log.error("ERROR --- MATSim terminated with some error. Please check the output or the logfile with warnings and errors for hints.");
+			log.error("ERROR --- results should not be used for further analysis.");
+			log.error("S H U T D O W N   ---   unexpected shutdown request completed. ");
+		} else {
+			log.info("S H U T D O W N   ---   regular shutdown completed.");
+		}
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 
 	protected abstract void loadCoreListeners();
-	
+
 	protected abstract void runMobSim(int iteration);
-	
+
 	protected abstract void prepareForSim();
-	
+
 	/**
 	 * Stopping criterion for iterations.  Design thoughts:<ul>
 	 * <li> AbstractController only controls process, not content.  Stopping iterations controls process based on content.
@@ -148,15 +159,15 @@ public abstract class AbstractController {
 	 * method in the SimplifiedControllerUtils class ... as with all other abstract methods.
 	 * </ul>
 	 */
-	protected abstract boolean continueIterations( int iteration ) ;
-	
+	protected abstract boolean continueIterations(int iteration);
+
 	private void doIterations(int firstIteration, long rndSeed, boolean createOutputGraphs) {
 
 		String divider = "###################################################";
 		String marker = "### ";
 
 		for (int iteration = firstIteration; continueIterations(iteration) ; iteration++ ) {
-			
+
 			// setting the other iteration counter to the same value:
 			this.thisIteration = iteration ;
 			// (this other iteration counter may have its own ++ !?!?)
@@ -239,6 +250,6 @@ public abstract class AbstractController {
 	public final OutputDirectoryHierarchy getControlerIO() {
 		return controlerIO;
 	}
-	
-	
+
+
 }
