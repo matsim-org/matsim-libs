@@ -144,8 +144,14 @@ public class CepasToEvents {
 							+ "\tfastTransactionDropped\tinterpolatedDwells\n" : "");
 			if (!calledBefore)
 				calledBefore = true;
-
-			sb.append(String.format("%s\t%s\n", vehicleId.toString(), this.veherrs.get(vehicleId).toString()));
+			try{
+				sb.append(String.format("%s\t%s\n", vehicleId.toString(), this.veherrs.get(vehicleId).toString()));
+				
+			}catch(NullPointerException ne){
+				sb.append(String.format("%s\t%s\n", vehicleId.toString(), String.format("%04d\t%04d\t%04d\t%04d\t%04d\t%04d\t%04d", 0, 0,
+						0, 0, 0, 0,
+						0)));
+			}
 
 			return sb.toString();
 		}
@@ -1294,7 +1300,11 @@ public class CepasToEvents {
 				List<TransitRouteStop> stops = scenario.getTransitSchedule().getTransitLines().get(transitLineId)
 						.getRoutes().get(cluster.getRouteId()).getStops();
 				TransitRouteStop firstStop = stops.get(0);
-				Id departureLinkId = firstStop.getStopFacility().getLinkId();
+				Id departureLinkId = null;
+				for (TransitRouteStop tss : stops) {
+					if (tss.getStopFacility().getId().equals(cluster.orderedDwellEvents.firstEntry().getValue().stopId))
+						departureLinkId = tss.getStopFacility().getLinkId();
+				}
 				Event driverStarts = new TransitDriverStartsEvent(cluster.orderedDwellEvents.firstKey() - 0.004,
 						driverId, busRegNum, this.transitLineId, cluster.routeId, new IdImpl(departureId++));
 				Event transitDriverDeparture = new PersonDepartureEvent(
@@ -1312,9 +1322,9 @@ public class CepasToEvents {
 				Event vehArrival = null;
 				Event vehDeparture = null;
 				int nullPassengerCounter = 0;
+				Id fromLinkId = departureLinkId;
 				for (CepasVehicleDwellEvent dwellEvent : cluster.getOrderedDwellEvents().values()) {
 					if (dwellEvent.arrivalTime != cluster.getOrderedDwellEvents().firstKey()) {
-						Id fromLinkId = null;
 						Id toLinkId = null;
 						for (TransitRouteStop tss : stops) {
 							if (tss.getStopFacility().getId().equals(lastDwellEvent.stopId))
@@ -1639,8 +1649,8 @@ public class CepasToEvents {
 				// vehicles++;
 				// continue;
 				// }
-				// if (!ptVehicle.vehicleId.toString().equals("552_0_2619"))
-				// continue;
+//				 if (!ptVehicle.vehicleId.toString().equals("171_1_864"))
+//				 continue;
 				if (alreadyCompletedVehicles.contains(ptVehicle.vehicleId.toString()))
 					continue;
 				if (ptVehicle.possibleMatsimRoutes == null)
