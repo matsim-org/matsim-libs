@@ -332,10 +332,16 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
 
-		if (GeneralLib.getDistance(link.getCoord(), nextNonParkingAct.getCoord()) < getRandomSearchDistance()) {
+		if (links.size()==1){
+			return links.get(0);
+		} else if (GeneralLib.getDistance(link.getCoord(), nextNonParkingAct.getCoord()) < getRandomSearchDistance() || searchBeta==1000) {
 			return randomNextLink(link);
 		} else {
-			double exponentialSum = 0;
+			//if (oppositeDirectionLink!=null){
+			//	links.remove(oppositeDirectionLink);
+			//}
+			
+			double probabilitySum = 0;
 			double[] distances = new double[links.size()];
 			double[] selectionProbabilities = new double[links.size()];
 			double minDistance=Double.MAX_VALUE;
@@ -348,26 +354,25 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					minDistance=distances[i];
 				}
 				
-				if (links.size()>1 && oppositeDirectionLink!=null && oppositeDirectionLink==links.get(i)){
-					distances[i]*=10;
-				}
+			//	if (links.size()>1 && oppositeDirectionLink!=null && oppositeDirectionLink==links.get(i)){
+			//		distances[i]*=2;
+			//	}
 				
-				averageDistance+=distances[i];
 			}
 			
 			for (int i = 0; i < links.size(); i++) {
 				averageDistance+=distances[i]-minDistance;
 			}
 			
-			averageDistance/=(links.size()+1);
+			averageDistance/=links.size();
 			averageDistance/=searchBeta;
 			
 			for (int i = 0; i < links.size(); i++) {
-				exponentialSum += getSearchBeta() / (distances[i]-minDistance+averageDistance);
+				probabilitySum += 1 / (distances[i]-minDistance+averageDistance);
 			}
 
 			for (int i = 0; i < links.size(); i++) {
-				selectionProbabilities[i] = getSearchBeta() / (distances[i]-minDistance+averageDistance) / exponentialSum;
+				selectionProbabilities[i] = 1 / (distances[i]-minDistance+averageDistance) / probabilitySum;
 			}
 
 			double r = random.nextDouble();
@@ -379,7 +384,11 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 				index++;
 			}
 
-			return links.get(index);
+			//if (oppositeDirectionLink!=null && random.nextDouble()>0.8){
+			//	return oppositeDirectionLink;
+			//} else {
+				return links.get(index);
+			//}
 		}
 	}
 	

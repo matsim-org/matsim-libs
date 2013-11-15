@@ -317,9 +317,9 @@ public class ParkingStrategyScenarios {
 				allStrategies.add(strategy);
 				
 				strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-D" + i);
-				strategy.setSearchBeta(100.0);
+				strategy.setSearchBeta(1000.0);
 				strategy.setRandomSearchDistance(100.0);
-				strategy.setGroupName("ARD-S-100-100");
+				strategy.setGroupName("ARD-S-1000.0-100");
 				allStrategies.add(strategy);
 			}
 		}
