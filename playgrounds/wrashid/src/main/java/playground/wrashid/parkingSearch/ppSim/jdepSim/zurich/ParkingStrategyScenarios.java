@@ -292,12 +292,12 @@ public class ParkingStrategyScenarios {
 				strategy.setGroupName("ARD-waiting-S");
 				allStrategies.add(strategy);
 				
-				strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "ARD_TakeClosestGarageParking");
-				strategy.setGroupName("ARD_TakeClosestGarageParking");
+				strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "ARD-TakeClosestGarageParking-" + i);
+				strategy.setGroupName("ARD-TakeClosestGarageParking");
 				allStrategies.add(strategy);
 				
-				strategy = new Dummy_BRD_TakeClosestGarageParking(-1, scenario.getNetwork(), "BRD_TakeClosestGarageParking", 300.0);
-				strategy.setGroupName("BRD_TakeClosestGarageParking");
+				strategy = new Dummy_BRD_TakeClosestGarageParking(-1, scenario.getNetwork(), "BRD-TakeClosestGarageParking-" + i, 300.0);
+				strategy.setGroupName("BRD-TakeClosestGarageParking");
 				allStrategies.add(strategy);
 				
 				double startStrategyAtDistanceFromDestination = 250;
