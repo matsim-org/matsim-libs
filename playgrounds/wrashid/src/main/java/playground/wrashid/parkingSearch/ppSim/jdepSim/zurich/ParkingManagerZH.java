@@ -651,8 +651,7 @@ public class ParkingManagerZH {
 		System.out.println("number of occupied parking: " + sum + " (" + comment + ")");
 	}
 
-	// only ensures giving back free parking if dest in city
-	// else gives just closest parking (not considering, if free or not)
+	// return null if 
 	public Id getClosestFreeGarageParking(Coord coord) {
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
 
@@ -674,8 +673,16 @@ public class ParkingManagerZH {
 				}
 			}
 		} else {
-			return garageParkings.get(coord.getX(), coord.getY()).getId();
+			Collection<Parking> collection = garageParkings.values();
+
+			for (Parking p : collection) {
+				if (p.getIntCapacity() - getOccupiedParking().get(p.getId()) > 0) {
+					return p.getId();
+				}
+			}
 		}
+		
+		return null;
 	}
 
 	public Collection<Parking> getParkingWithinDistance(Coord coord, double distance) {

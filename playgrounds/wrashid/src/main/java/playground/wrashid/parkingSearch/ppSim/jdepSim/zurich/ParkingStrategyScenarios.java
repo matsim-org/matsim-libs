@@ -22,8 +22,10 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Scenario;
 
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_BRD_TakeClosestGarageParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_OptimalScore;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_RandomSelection;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_ARD_TakeClosestGarageParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_TakeClosestParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_WorstScore;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
@@ -339,6 +341,15 @@ public class ParkingStrategyScenarios {
 			strategy = new Dummy_WorstScore(-1, scenario.getNetwork(), "Dummy_WorstScore");
 			strategy.setGroupName("dummy group");
 			allStrategies.add(strategy);
+			
+			strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "Dummy_ARD_TakeClosestGarageParking");
+			strategy.setGroupName("dummy group");
+			allStrategies.add(strategy);
+			
+			strategy = new Dummy_BRD_TakeClosestGarageParking(-1, scenario.getNetwork(), "Dummy_BRD_TakeClosestGarageParking", 300.0);
+			strategy.setGroupName("dummy group");
+			allStrategies.add(strategy);
+			
 		}
 
 		return allStrategies;

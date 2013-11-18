@@ -73,12 +73,14 @@ public class ZHScenarioGlobal {
 	public static RerouteThreadDuringSim[] rerouteThreadsDuringSim;
 	public static Scenario scenario;
 	public static Map<Id, Double> linkSlopes;
+	public static TTMatrix ttMatrix;
 
 	public static String getItersFolderPath() {
 		return outputFolder + "ITERS/";
 	}
 
 	public static void init(TTMatrix ttMatrix, Network network) {
+		ZHScenarioGlobal.ttMatrix = ttMatrix;
 		rerouteThreadsDuringSim = new RerouteThreadDuringSim[numberOfRoutingThreadsDuringSim];
 
 		for (int i = 0; i < numberOfRoutingThreadsDuringSim; i++) {

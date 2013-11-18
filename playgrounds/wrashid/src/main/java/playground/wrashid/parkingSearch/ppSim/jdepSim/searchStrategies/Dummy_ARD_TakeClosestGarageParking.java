@@ -21,25 +21,17 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
-public class Dummy_TakeClosestParking extends RandomParkingSearch {
-	protected HashSet<Id> parkingFound;
+public class Dummy_ARD_TakeClosestGarageParking extends Dummy_TakeClosestParking {
 
-	public Dummy_TakeClosestParking(double maxDistance, Network network, String name) {
+	public Dummy_ARD_TakeClosestGarageParking(double maxDistance, Network network, String name) {
 		super(maxDistance, network, name);
 	}
 	
-	public void resetForNewIteration() {
-		super.resetForNewIteration();
-		parkingFound=new HashSet<Id>();
-	}
 
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
@@ -58,7 +50,7 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 					nextAct.getType());
 			
 			if (parkingId == null) {
-				parkingId = AgentWithParking.parkingManager.getClosestFreeParkingFacilityId(nextAct.getLinkId());
+				parkingId = AgentWithParking.parkingManager.getClosestFreeGarageParking(aem.getCurrentLink().getCoord());
 			}
 			
 			parkVehicleAndLogSearchTime(aem, personId, parkingId);
@@ -66,26 +58,6 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 			super.handleAgentLeg(aem);
 		}
 		
-	}
-
-	public void parkVehicleAndLogSearchTime(AgentWithParking aem, Id personId, Id parkingId) {
-		Link currentLink = aem.getCurrentLink();
-		double travelTime = ZHScenarioGlobal.ttMatrix.getTravelTime(aem.getMessageArrivalTime(), currentLink.getId());
-		double speed=currentLink.getLength()/travelTime;
-		
-		Id linkOfParking = AgentWithParking.parkingManager.getLinkOfParking(parkingId);
-		double distance = GeneralLib.getDistance(ZHScenarioGlobal.scenario.getNetwork().getLinks().get(linkOfParking).getCoord(), currentLink.getCoord());
-		
-		double searchTime = distance/speed*1.4;
-		triggerSeachTimeStart(personId, aem.getMessageArrivalTime()-searchTime);
-		
-		parkVehicle(aem, parkingId);
-	}
-	
-	@Override
-	public void handleParkingDepartureActivity(AgentWithParking aem) {
-		super.handleParkingDepartureActivity(aem);
-		parkingFound.remove(aem.getPerson().getId());
 	}
 
 }
