@@ -54,7 +54,7 @@ public class BikeSharingEngineTest {
 			facilities.getFactory().createBikeSharingFacility(
 					new IdImpl( "departure" ),
 					new CoordImpl( 0 , 0 ),
-					new IdImpl( "some_link" ),
+					new IdImpl( "departure_link" ),
 					5,
 					initialNBikes );
 		facilities.addFacility( departureFacility );
@@ -63,7 +63,7 @@ public class BikeSharingEngineTest {
 			facilities.getFactory().createBikeSharingFacility(
 					new IdImpl( "arrival" ),
 					new CoordImpl( 10 , 10 ),
-					new IdImpl( "some_other_link" ),
+					new IdImpl( "arrival_link" ),
 					5,
 					initialNBikes );
 		facilities.addFacility( arrivalFacility );
@@ -109,6 +109,10 @@ public class BikeSharingEngineTest {
 				initialNBikes + 1,
 				manager.getFacilities().get( arrivalFacility.getId() ).getNumberOfBikes() );
 
+		Assert.assertEquals(
+				"agent at wrong link",
+				arrivalFacility.getLinkId(),
+				agent.getCurrentLinkId() );
 	}
 
 	public static class DummyInternalInterface implements InternalInterface {
