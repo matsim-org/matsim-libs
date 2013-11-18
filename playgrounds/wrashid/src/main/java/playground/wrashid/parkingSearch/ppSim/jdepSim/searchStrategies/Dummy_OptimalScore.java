@@ -38,8 +38,11 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivity
 
 public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 
+	protected double scoreFactor=0;
+	
 	public Dummy_OptimalScore(double maxDistance, Network network, String name) {
 		super(maxDistance, network, name);
+		scoreFactor=-1;
 	}
 
 	@Override
@@ -82,7 +85,7 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 						parkingAttributes.setToParkWalkDuration(walkDuration);
 
 						double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributes);
-						priorityQueue.add(new SortableMapObject<Parking>(parking, parkingScore));
+						priorityQueue.add(new SortableMapObject<Parking>(parking, scoreFactor*parkingScore));
 					}
 
 					parkingId = priorityQueue.poll().getKey().getId();
