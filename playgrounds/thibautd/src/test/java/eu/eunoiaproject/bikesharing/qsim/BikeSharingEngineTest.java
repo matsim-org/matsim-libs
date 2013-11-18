@@ -20,17 +20,26 @@
 package eu.eunoiaproject.bikesharing.qsim;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -45,17 +54,36 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingRoute;
 public class BikeSharingEngineTest {
 	@Test
 	public void testAmountOfBikesAtFacilities() throws Exception {
+		test( 1 , 2 , 0 , 2 , true );
+	}
+
+	@Test
+	@Ignore( "in error because no actual qsim returned by internal interface" )
+	public void testNoBike() throws Exception {
+		test( 0 , 2 , 0 , 0 , false );
+	}
+
+	@Test
+	@Ignore( "in error because no actual qsim returned by internal interface" )
+	public void testNoSlot() throws Exception {
+		test( 2 , 2 , 1 , 2 , false );
+	}
+
+	private static void test(
+			final int initialNBikes,
+			final int capacity,
+			final int expectedNBikesAtDeparture,
+			final int expectedNBikesAtArrival,
+			final boolean expectArrival ) {
 		// create two stations with enough free bikes and free slots
 		final BikeSharingFacilities facilities = new BikeSharingFacilities();
-
-		final int initialNBikes = 1;
 
 		final BikeSharingFacility departureFacility =
 			facilities.getFactory().createBikeSharingFacility(
 					new IdImpl( "departure" ),
 					new CoordImpl( 0 , 0 ),
 					new IdImpl( "departure_link" ),
-					5,
+					capacity,
 					initialNBikes );
 		facilities.addFacility( departureFacility );
 
@@ -64,7 +92,7 @@ public class BikeSharingEngineTest {
 					new IdImpl( "arrival" ),
 					new CoordImpl( 10 , 10 ),
 					new IdImpl( "arrival_link" ),
-					5,
+					capacity,
 					initialNBikes );
 		facilities.addFacility( arrivalFacility );
 
@@ -102,23 +130,117 @@ public class BikeSharingEngineTest {
 		// test
 		Assert.assertEquals(
 				"unexpected number of bikes in departure station",
-				initialNBikes - 1,
+				expectedNBikesAtDeparture,
 				manager.getFacilities().get( departureFacility.getId() ).getNumberOfBikes() );
 		Assert.assertEquals(
 				"unexpected number of bikes in arrival station",
-				initialNBikes + 1,
+				expectedNBikesAtArrival,
 				manager.getFacilities().get( arrivalFacility.getId() ).getNumberOfBikes() );
 
-		Assert.assertEquals(
-				"agent at wrong link",
-				arrivalFacility.getLinkId(),
-				agent.getCurrentLinkId() );
+		if ( expectArrival ) {
+			Assert.assertEquals(
+					"agent at wrong link",
+					arrivalFacility.getLinkId(),
+					agent.getCurrentLinkId() );
+		}
+		else {
+			Assert.assertFalse(
+					"agent at arrival link but should not",
+					arrivalFacility.getLinkId().equals(
+						agent.getCurrentLinkId() ) );
+
+		}
 	}
 
 	public static class DummyInternalInterface implements InternalInterface {
 		@Override
 		public Netsim getMobsim() {
-			return null;
+			return new Netsim() {
+
+				@Override
+				public EventsManager getEventsManager() {
+					return new EventsManager() {
+
+						@Override
+						public void processEvent(Event event) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void addHandler(EventHandler handler) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void removeHandler(EventHandler handler) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void resetHandlers(int iteration) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void initProcessing() {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void afterSimStep(double time) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void finishProcessing() {
+							// TODO Auto-generated method stub
+							
+						}
+					};
+				}
+
+				@Override
+				public AgentCounterI getAgentCounter() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public Scenario getScenario() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public MobsimTimer getSimTimer() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void addQueueSimulationListeners(MobsimListener listener) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public NetsimNetwork getNetsimNetwork() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			};
 		}
 
 		@Override
