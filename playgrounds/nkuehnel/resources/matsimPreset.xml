@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<presets xmlns="http://josm.openstreetmap.de/tagging-preset-1.0"
+author="nkuehnel"
+version="0.1_2013-11-13"
+description="MATSim Preset"
+shortdescription="MATSim Preset"
+
+de.description="MATSim Vorlage"
+de.shortdescription="MATSim Vorlage"
+
+fr.description="Modèle de MATSim"
+fr.shortdescription="Modèle de MATSim">
+
+<!--
+Please recheck translation.
+-->
+
+  <group icon="images/dialogs/logo.png" name="MATSim" de.name="MATSim" fr.name="MATSim">
+    <item name="Link" de.name="Kante" icon="images/dialogs/logo.png" type="way">
+      <label text="Edit" />
+      <space/>
+	  <key key="length" value="0.00" />
+	  <text key="freespeed" text="freespeed" default="0.00" delete_if_empty="false" />
+	  <text key="capacity" text="capacity" default="0.00" delete_if_empty="false" />
+	  <text key="permlanes" text="permanent lanes" default="0.00" delete_if_empty="false" />	 
+    </item>            
+  </group> 
+</presets>

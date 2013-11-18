@@ -29,7 +29,8 @@ import org.openstreetmap.josm.data.osm.event.RelationMembersChangedEvent;
 import org.openstreetmap.josm.data.osm.event.TagsChangedEvent;
 import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
 
-public class NetworkListener implements DataSetListener {
+public class NetworkListener implements DataSetListener
+{
 	private Network network;
 	private CoordinateTransformation ct;
 	private String originSystem;
@@ -37,7 +38,8 @@ public class NetworkListener implements DataSetListener {
 	private NetworkLayer layer;
 
 	public NetworkListener(NetworkLayer layer, Network network,
-			Map<Way, List<Link>> way2Links, String originSystem) {
+			Map<Way, List<Link>> way2Links, String originSystem)
+	{
 		this.layer = layer;
 		this.network = network;
 		this.originSystem = originSystem;
@@ -47,44 +49,49 @@ public class NetworkListener implements DataSetListener {
 	}
 
 	@Override
-	public void dataChanged(DataChangedEvent arg0) {
+	public void dataChanged(DataChangedEvent arg0)
+	{
 		// TODO Auto-generated method stub
 		System.out.println("data changed");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.openstreetmap.josm.data.osm.event.DataSetListener#nodeMoved(org.
-	 * openstreetmap.josm.data.osm.event.NodeMovedEvent)
-	 */
 	@Override
-	public void nodeMoved(NodeMovedEvent moved) {
+	public void nodeMoved(NodeMovedEvent moved)
+	{
+
 		Id id = new IdImpl(String.valueOf(moved.getNode().getUniqueId()));
+
 		Coord temp = ct.transform(new CoordImpl(
 				moved.getNode().getCoor().lon(), moved.getNode().getCoor()
 						.lat()));
 		network.getNodes().get(id).getCoord().setXY(temp.getX(), temp.getY());
+
 		MATSimPlugin.toggleDialog.updateTable(layer);
 	}
+	
 
 	@Override
-	public void otherDatasetChange(AbstractDatasetChangedEvent arg0) {
+	public void otherDatasetChange(AbstractDatasetChangedEvent arg0)
+	{
 		// TODO Auto-generated method stub
 		System.out.println("other");
 	}
 
 	@Override
-	public void primitivesAdded(PrimitivesAddedEvent added) {
+	public void primitivesAdded(PrimitivesAddedEvent added)
+	{
 		// added.getDataset().clearSelection();
 		System.out.println(added.wasIncomplete());
-		for (OsmPrimitive primitive : added.getPrimitives()) {
-			if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
+		for (OsmPrimitive primitive : added.getPrimitives())
+		{
+			if (primitive instanceof org.openstreetmap.josm.data.osm.Node)
+			{
 				org.openstreetmap.josm.data.osm.Node node = (org.openstreetmap.josm.data.osm.Node) primitive;
 				Coord coord = new CoordImpl(node.getCoor().lon(), node
 						.getCoor().lat());
 				IdImpl id = new IdImpl(primitive.getUniqueId());
-				if (!network.getNodes().containsKey(id)) {
+				if (!network.getNodes().containsKey(id))
+				{
 					System.out.println(id);
 					System.out.println(primitive.isDeleted() + " "
 							+ primitive.isUndeleted());
@@ -93,11 +100,14 @@ public class NetworkListener implements DataSetListener {
 					System.out.println("node hinzugefuegt!" + nodeTemp.getId());
 				}
 
-			} else if (primitive instanceof Way) {
+			} else if (primitive instanceof Way)
+			{
 				Way way = (Way) primitive;
-				if (!way2Links.containsKey(way)) {
+				if (!way2Links.containsKey(way))
+				{
 					List<Link> links = enterWay2Links(way);
-					for (Link link : links) {
+					for (Link link : links)
+					{
 						network.addLink(link);
 					}
 				}
@@ -185,16 +195,19 @@ public class NetworkListener implements DataSetListener {
 		MATSimPlugin.toggleDialog.updateTable(layer);
 	}
 
-	private List<Link> enterWay2Links(Way way) {
+	private List<Link> enterWay2Links(Way way)
+	{
 		List<Link> links = computeWay2Links(way);
 		List<Link> previous = way2Links.put(way, links);
-		if (previous != null) {
+		if (previous != null)
+		{
 			throw new RuntimeException("Shouldn't happen.");
 		}
 		return links;
 	}
 
-	public List<Link> computeWay2Links(Way way) {
+	public List<Link> computeWay2Links(Way way)
+	{
 		Map<String, String> keys = way.getKeys();
 		if (way.getNodesCount() != 2)
 			return Collections.emptyList();
@@ -208,8 +221,8 @@ public class NetworkListener implements DataSetListener {
 			return Collections.emptyList();
 		Node fromNode = matsim4osm(way.firstNode());
 		Node toNode = matsim4osm(way.lastNode());
-		Link link = network.getFactory().createLink(
-				new IdImpl(way.getUniqueId()), fromNode, toNode);
+		Link link = network.getFactory().createLink(new IdImpl(way.getId()),
+				fromNode, toNode);
 		link.setCapacity(Double.parseDouble(keys.get("capacity")));
 		link.setFreespeed(Double.parseDouble(keys.get("freespeed")));
 		link.setNumberOfLanes(Double.parseDouble(keys.get("permlanes")));
@@ -217,22 +230,28 @@ public class NetworkListener implements DataSetListener {
 		return Collections.singletonList(link);
 	}
 
-	public Node matsim4osm(org.openstreetmap.josm.data.osm.Node firstNode) {
+	public Node matsim4osm(org.openstreetmap.josm.data.osm.Node firstNode)
+	{
 		return network.getNodes().get(new IdImpl(firstNode.getUniqueId()));
 	}
 
 	@Override
-	public void primitivesRemoved(PrimitivesRemovedEvent primitivesRemoved) {
+	public void primitivesRemoved(PrimitivesRemovedEvent primitivesRemoved)
+	{
 		System.out.println(primitivesRemoved.wasComplete());
-		for (OsmPrimitive primitive : primitivesRemoved.getPrimitives()) {
-			if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
+		for (OsmPrimitive primitive : primitivesRemoved.getPrimitives())
+		{
+			if (primitive instanceof org.openstreetmap.josm.data.osm.Node)
+			{
 				String id = String.valueOf(primitive.getUniqueId());
 				Node node = network.getNodes().get(new IdImpl(id));
 				System.out.println("node removed!");
 				network.removeNode(node.getId());
-			} else if (primitive instanceof Way) {
+			} else if (primitive instanceof Way)
+			{
 				List<Link> links = way2Links.remove(((Way) primitive));
-				for (Link link : links) {
+				for (Link link : links)
+				{
 					network.removeLink(link.getId());
 					System.out.println("link removed!");
 				}
@@ -243,23 +262,29 @@ public class NetworkListener implements DataSetListener {
 	}
 
 	@Override
-	public void relationMembersChanged(RelationMembersChangedEvent arg0) {
+	public void relationMembersChanged(RelationMembersChangedEvent arg0)
+	{
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void tagsChanged(TagsChangedEvent changed) {
-		for (OsmPrimitive primitive : changed.getPrimitives()) {
-			if (primitive instanceof Way) {
+	public void tagsChanged(TagsChangedEvent changed)
+	{
+		for (OsmPrimitive primitive : changed.getPrimitives())
+		{
+			if (primitive instanceof Way)
+			{
 				Way way = (Way) primitive;
 				List<Link> oldLinks = way2Links.remove(way);
 				List<Link> newLinks = enterWay2Links(way);
-				for (Link link : oldLinks) {
+				for (Link link : oldLinks)
+				{
 					System.out.println("remove because tag changed.");
 					network.removeLink(link.getId());
 				}
-				for (Link link : newLinks) {
+				for (Link link : newLinks)
+				{
 					System.out.println("add because tag changed.");
 					network.addLink(link);
 				}
@@ -272,9 +297,9 @@ public class NetworkListener implements DataSetListener {
 	}
 
 	@Override
-	public void wayNodesChanged(WayNodesChangedEvent changed) {
-		System.out
-				.println("waychange " + changed.getChangedWay().getUniqueId());
+	public void wayNodesChanged(WayNodesChangedEvent changed)
+	{
+		System.out.println("waychange " + changed.getChangedWay().getUniqueId());
 
 	}
 
