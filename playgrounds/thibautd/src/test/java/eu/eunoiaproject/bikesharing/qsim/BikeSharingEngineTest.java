@@ -19,19 +19,19 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.qsim;
 
+import org.apache.log4j.Logger;
+
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -52,19 +52,20 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingRoute;
  * @author thibautd
  */
 public class BikeSharingEngineTest {
+	private static final Logger log =
+		Logger.getLogger(BikeSharingEngineTest.class);
+
 	@Test
 	public void testAmountOfBikesAtFacilities() throws Exception {
 		test( 1 , 2 , 0 , 2 , true );
 	}
 
 	@Test
-	@Ignore( "in error because no actual qsim returned by internal interface" )
 	public void testNoBike() throws Exception {
 		test( 0 , 2 , 0 , 0 , false );
 	}
 
 	@Test
-	@Ignore( "in error because no actual qsim returned by internal interface" )
 	public void testNoSlot() throws Exception {
 		test( 2 , 2 , 1 , 2 , false );
 	}
@@ -118,13 +119,15 @@ public class BikeSharingEngineTest {
 		final LegAgent agent = new LegAgent( leg );
 
 		// run
+		final InternalInterface internalInterface = new DummyInternalInterface();
+		internalInterface.getMobsim().getSimTimer().setTime( 0 );
 		engine.onPrepareSim();
-		engine.setInternalInterface(
-				new DummyInternalInterface() );
+		engine.setInternalInterface( internalInterface );
 		engine.handleDeparture(
 				0, 
 				agent,
 				departureFacility.getLinkId() );
+		internalInterface.getMobsim().getSimTimer().setTime( 20 );
 		engine.doSimStep( 20 );
 
 		// test
@@ -153,112 +156,73 @@ public class BikeSharingEngineTest {
 	}
 
 	public static class DummyInternalInterface implements InternalInterface {
-		@Override
-		public Netsim getMobsim() {
-			return new Netsim() {
+		private final EventsManager events = EventsUtils.createEventsManager();
+		private final MobsimTimer timer = new MobsimTimer();
 
+		private final Netsim netsim =
+			new Netsim() {
 				@Override
 				public EventsManager getEventsManager() {
-					return new EventsManager() {
-
-						@Override
-						public void processEvent(Event event) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void addHandler(EventHandler handler) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void removeHandler(EventHandler handler) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void resetHandlers(int iteration) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void initProcessing() {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void afterSimStep(double time) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void finishProcessing() {
-							// TODO Auto-generated method stub
-							
-						}
-					};
+					return events;
 				}
 
 				@Override
 				public AgentCounterI getAgentCounter() {
-					// TODO Auto-generated method stub
-					return null;
+					throw new UnsupportedOperationException();
 				}
 
 				@Override
 				public Scenario getScenario() {
-					// TODO Auto-generated method stub
-					return null;
+					throw new UnsupportedOperationException();
 				}
 
 				@Override
 				public MobsimTimer getSimTimer() {
-					// TODO Auto-generated method stub
-					return null;
+					return timer;
 				}
 
 				@Override
 				public void addQueueSimulationListeners(MobsimListener listener) {
-					// TODO Auto-generated method stub
-					
+					throw new UnsupportedOperationException();
 				}
 
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
-					
+					throw new UnsupportedOperationException();
 				}
 
 				@Override
 				public NetsimNetwork getNetsimNetwork() {
-					// TODO Auto-generated method stub
-					return null;
+					throw new UnsupportedOperationException();
 				}
 			};
+
+
+		@Override
+		public Netsim getMobsim() {
+			return netsim;
 		}
 
 		@Override
 		public void arrangeNextAgentState(MobsimAgent a) {
+			log.info ( "call to arrangeNextAgentState on "+a );
 		}
 
 		@Override
 		public void registerAdditionalAgentOnLink(MobsimAgent a) {
+			log.info ( "call to registerAdditionalAgentOnLink on "+a );
 		}
 
 		@Override
 		public MobsimAgent unregisterAdditionalAgentOnLink(
 				Id agentId, Id linkId) {
+			log.info ( "call to unregisterAdditionalAgentOnLink on "+agentId+" on link "+linkId );
 			return null;
 		}
 
 		@Override
 		public void rescheduleActivityEnd(MobsimAgent a) {
+			log.info ( "call to rescheduleActivityEnd on "+a );
 		}
 	}
 
