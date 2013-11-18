@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.thibautd.utils.QuadTreeRebuilder;
 
@@ -39,6 +40,7 @@ public class BikeSharingFacilities implements MatsimToplevelContainer {
 		new LinkedHashMap<Id, BikeSharingFacility>();
 	private final Map<Id, BikeSharingFacility> unmodifiableFacilities =
 		Collections.unmodifiableMap( facilities );
+	private final ObjectAttributes facilitiesAttributes = new ObjectAttributes();
 
 	private final QuadTreeRebuilder<BikeSharingFacility> quadTreeBuilder = new QuadTreeRebuilder<BikeSharingFacility>();
 
@@ -76,6 +78,10 @@ public class BikeSharingFacilities implements MatsimToplevelContainer {
 							initialNumberOfBikes);
 			}
 		};
+	}
+
+	public ObjectAttributes getFacilitiesAttributes() {
+		return facilitiesAttributes;
 	}
 }
 

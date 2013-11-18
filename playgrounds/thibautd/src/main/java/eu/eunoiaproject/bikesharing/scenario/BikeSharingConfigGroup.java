@@ -27,11 +27,22 @@ import org.matsim.core.config.experimental.ReflectiveModule;
 public class BikeSharingConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "bikeSharing";
 
+	private String facilitiesAttributesFile = null;
 	private String facilitiesFile = null;
 	private double searchRadius = 500;
 
 	public BikeSharingConfigGroup() {
 		super( GROUP_NAME );
+	}
+
+	@StringGetter( "facilitiesAttributesFile" )
+	public String getFacilitiesAttributesFile() {
+		return this.facilitiesAttributesFile;
+	}
+
+	@StringSetter( "facilitiesAttributesFile" )
+	public void setFacilitiesAttributesFile(String facilitiesAttributesFile) {
+		this.facilitiesAttributesFile = facilitiesAttributesFile;
 	}
 
 	@StringGetter( "facilitiesFile" )
