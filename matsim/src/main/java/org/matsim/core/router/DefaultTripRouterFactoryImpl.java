@@ -21,7 +21,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
     private static Logger log = Logger.getLogger(DefaultTripRouterFactoryImpl.class);
 
     public static DefaultTripRouterFactoryImpl createRichTripRouterFactoryImpl(Scenario scenario) {
-		return (DefaultTripRouterFactoryImpl) new TripRouterFactoryBuilderWithDefaults().build(scenario);
+		return new TripRouterFactoryBuilderWithDefaults().build(scenario);
 		
 	}
 

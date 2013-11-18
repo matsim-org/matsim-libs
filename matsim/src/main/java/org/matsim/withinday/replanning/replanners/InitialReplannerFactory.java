@@ -48,7 +48,7 @@ public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 		WithinDayInitialReplanner replanner = new InitialReplanner(super.getId(), scenario, 
 				this.getWithinDayEngine().getInternalInterface(),
 				new PlanRouter(this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), 
-						((ScenarioImpl) this.scenario).getActivityFacilities()));
+						this.scenario.getActivityFacilities()));
 		return replanner;
 	}
 

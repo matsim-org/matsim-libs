@@ -72,7 +72,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		}
 
 		// older checks, valid for the implicit mobsim selection by putting in the corresponding config group.
-		if ( (SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)!=null ) {
+		if ( config.getModule(SimulationConfigGroup.GROUP_NAME) !=null ) {
 			if (!config.controler().getMobsim().equals(MobsimType.queueSimulation.toString())) {
 				throw new RuntimeException("You have a 'simulation' config group, but have not set " +
 						"the mobsim type to 'queueSimulation'. Aborting...");

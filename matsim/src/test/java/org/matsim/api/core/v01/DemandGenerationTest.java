@@ -81,7 +81,6 @@ public class DemandGenerationTest extends MatsimTestCase {
 		Plan plan;
 		Activity activity;
 		Leg leg;
-		Route route;
 
 		for (int i = 0; i < ids.size(); i++){
 			//create the person and add it to the population

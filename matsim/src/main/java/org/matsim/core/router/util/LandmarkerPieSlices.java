@@ -216,7 +216,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 		double minAngelFactor = 0.5;
 		while (doRefine) {
 			doRefine = false;
-			for (int i = 0; i < this.landmarks.length && sectors.get(i).isEmpty() == false; i++) {
+			for (int i = 0; i < this.landmarks.length && !sectors.get(i).isEmpty(); i++) {
 				int preInd = i - 1;
 				double angelDiff;
 				if (preInd == -1) {

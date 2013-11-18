@@ -224,7 +224,7 @@ public class KnowledgeImpl {
 		if (activities == null) { return new ArrayList<ActivityOptionImpl>(0); }
 		ArrayList<ActivityOptionImpl> acts = new ArrayList<ActivityOptionImpl>(INIT_ACTIVITY_CAPACITY);
 		for (KActivity ka : activities) {
-			if (((ActivityOptionImpl) ka.activity).getFacility().getId().equals(facilityId)) {
+			if (ka.activity.getFacility().getId().equals(facilityId)) {
 				acts.add((ActivityOptionImpl) ka.activity);
 			}
 		}
@@ -334,7 +334,7 @@ public class KnowledgeImpl {
 		}
 		for (KActivity ka : activities) {
 			if ((ka.isPrimary) &&  (ka.activity.getType().equals(act_type)) &&
-					(((ActivityOptionImpl) ka.activity).getFacility().getId().equals(facilityId))) {
+					(ka.activity.getFacility().getId().equals(facilityId))) {
 				return true;
 			}
 		}

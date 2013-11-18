@@ -84,7 +84,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startFacilities(final Attributes atts) {
-		((ActivityFacilitiesImpl) this.facilities).setName(atts.getValue("name"));
+		this.facilities.setName(atts.getValue("name"));
 		if (atts.getValue("aggregation_layer") != null) {
 			Logger.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
 		}

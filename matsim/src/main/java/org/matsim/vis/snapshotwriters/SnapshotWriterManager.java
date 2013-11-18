@@ -51,7 +51,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private int findSnapshotPeriod(Config config) {
 		if (config.qsim() != null) {
 			return (int) config.qsim().getSnapshotPeriod();
-		} else if ((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
+		} else if (config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
 			return (int) ((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod();
 		} else {
 			return 1;

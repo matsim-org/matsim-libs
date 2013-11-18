@@ -66,7 +66,7 @@ public class ActivityFacilitiesImplTest {
 		try {
 			facilities.addActivityFacility(facility1);
 			Assert.fail("Expected exception, got none.");
-		} catch (IllegalArgumentException expected) {};
+		} catch (IllegalArgumentException expected) {}
 
 		Assert.assertEquals(2, facilities.getFacilities().size());
 	}
@@ -84,9 +84,9 @@ public class ActivityFacilitiesImplTest {
 		try {
 			facilities.addActivityFacility(facility2);
 			Assert.fail("Expected exception, got none.");
-		} catch (IllegalArgumentException expected) {};
+		} catch (IllegalArgumentException expected) {}
 
-		Assert.assertEquals(1, facilities.getFacilities().size());
+        Assert.assertEquals(1, facilities.getFacilities().size());
 		Assert.assertEquals(facility1, facilities.getFacilities().get(new IdImpl(1)));
 	}
 

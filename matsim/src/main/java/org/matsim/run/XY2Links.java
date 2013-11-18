@@ -115,7 +115,7 @@ public class XY2Links {
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.plansfile);
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links((ScenarioImpl) scenario));
+		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(scenario));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

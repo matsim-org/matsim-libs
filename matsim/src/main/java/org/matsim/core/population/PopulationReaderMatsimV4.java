@@ -103,7 +103,7 @@ import org.xml.sax.Attributes;
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
 		if (scenario instanceof ScenarioImpl) {
-			this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+			this.facilities = scenario.getActivityFacilities();
 			Knowledges k = null;
 			if (scenario.getConfig().scenario().isUseKnowledges()) {
 				k = ((ScenarioImpl) scenario).getKnowledges();

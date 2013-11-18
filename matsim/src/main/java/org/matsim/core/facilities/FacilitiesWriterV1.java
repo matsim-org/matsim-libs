@@ -75,7 +75,7 @@ import org.matsim.core.utils.misc.Time;
 				this.startActivity((ActivityOptionImpl) a, this.writer);
 				this.startCapacity((ActivityOptionImpl) a, this.writer);
 				this.endCapacity(this.writer);
-				SortedSet<OpeningTime> o_set = ((ActivityOptionImpl) a).getOpeningTimes();
+				SortedSet<OpeningTime> o_set = a.getOpeningTimes();
 				Iterator<OpeningTime> o_it = o_set.iterator();
 				while (o_it.hasNext()) {
 					OpeningTime o = o_it.next();
@@ -108,8 +108,8 @@ import org.matsim.core.utils.misc.Time;
 
 	public void startFacilities(final ActivityFacilities facilities, final BufferedWriter out) throws IOException {
 		out.write("<facilities");
-		if (((ActivityFacilitiesImpl) facilities).getName() != null) {
-			out.write(" name=\"" + ((ActivityFacilitiesImpl) facilities).getName() + "\"");
+		if (facilities.getName() != null) {
+			out.write(" name=\"" + facilities.getName() + "\"");
 		}
 		out.write(">\n\n");
 	}

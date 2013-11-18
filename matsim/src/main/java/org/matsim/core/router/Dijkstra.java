@@ -170,7 +170,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		this.nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 
 		if (preProcessData != null) {
-			if (preProcessData.containsData() == false) {
+			if (!preProcessData.containsData()) {
 				this.pruneDeadEnds = false;
 				log.warn("The preprocessing data provided to router class Dijkstra contains no data! Please execute its run(...) method first!");
 				log.warn("Running without dead-end pruning.");
@@ -214,7 +214,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		this.person = person;
 		this.vehicle = vehicle;
 
-		if (this.pruneDeadEnds == true) {
+		if (this.pruneDeadEnds) {
 			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
 		}
 

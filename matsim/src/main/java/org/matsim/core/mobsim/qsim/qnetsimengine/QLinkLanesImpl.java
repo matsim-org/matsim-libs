@@ -192,7 +192,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 					laneList.add(currentQLane);
 					lastQLane.addAToLane(currentQLane);
 				}
-				laneLength = (link.getLength() - nextMetersFromLinkEnd) - (link.getLength() -  lastQLane.getLaneData().getStartsAtMeterFromLinkEnd());
 				laneLength = lastQLane.getLaneData().getStartsAtMeterFromLinkEnd() - nextMetersFromLinkEnd;
 				lastQLane.setEndsAtMetersFromLinkEnd(nextMetersFromLinkEnd);
 			}

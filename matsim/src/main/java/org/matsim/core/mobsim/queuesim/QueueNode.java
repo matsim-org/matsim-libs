@@ -120,17 +120,18 @@ class QueueNode implements MatsimNetworkObject {
 			// check if veh is stuck!
 			QueueSimulation qSim = this.queueNetwork.getMobsim() ;
 			Scenario sc = qSim.getScenario() ;
-		
+            SimulationConfigGroup cfgGroup = (SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME);
+
 			//			if ((now - link.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
-			if ((now - link.bufferLastMovedTime) > ((SimulationConfigGroup) this.queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation")).getStuckTime() ) {
+			if ((now - link.bufferLastMovedTime) > cfgGroup.getStuckTime() ) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
-				if (((SimulationConfigGroup) this.queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation")).isRemoveStuckVehicles()) {
+				if (cfgGroup.isRemoveStuckVehicles()) {
 					link.popFirstFromBuffer();
-					this.queueNetwork.getMobsim().getAgentCounter().decLiving();
-					this.queueNetwork.getMobsim().getAgentCounter().incLost();
+					qSim.getAgentCounter().decLiving();
+					qSim.getAgentCounter().incLost();
 					QueueSimulation.getEvents().processEvent(
 							new PersonStuckEvent(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
 				} else {

@@ -80,7 +80,6 @@ public abstract class PtCountsComparisonAlgorithm {
 	 * countAttribute Attribute of this class.
 	 */
 	protected void compare() {
-		double countValue;
 		for (Count count : this.counts.getCounts().values()) {
 			Id stopId = count.getLocId();
 			if (!isInRange(count.getCoord())) {
@@ -110,7 +109,7 @@ public abstract class PtCountsComparisonAlgorithm {
 					this.content.append(hour);
 					this.content.append('\t');
 
-					countValue = volume.getValue();
+					double countValue = volume.getValue();
 					double simValue = volumes[hour - 1];
 
 					this.content.append(simValue);
@@ -126,8 +125,6 @@ public abstract class PtCountsComparisonAlgorithm {
 					this.countSimComp.add(new CountSimComparisonImpl(stopId,
 							hour, countValue, simValue));
 
-				} else {
-					countValue = 0.0;
 				}
 
 			}

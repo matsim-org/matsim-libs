@@ -126,7 +126,6 @@ public class WorldConnectLocations {
 		if (this.config != null) {
 			String inputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_INPUTF2LFile);
 			if (inputF2LFile != null) {
-				inputF2LFile = inputF2LFile;
 				connectByFile(facilities,network,inputF2LFile,remainingFacilities);
 			}
 		}
@@ -143,7 +142,6 @@ public class WorldConnectLocations {
 		if (this.config != null) {
 			String outputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_OUTPUTF2LFile);
 			if (outputF2LFile != null) {
-				outputF2LFile = outputF2LFile;
 				writeF2LFile(facilities,outputF2LFile);
 			}
 		}

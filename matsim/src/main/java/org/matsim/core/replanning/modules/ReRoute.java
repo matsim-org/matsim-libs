@@ -46,7 +46,7 @@ public class ReRoute extends AbstractMultithreadedModule {
 
 			return new PlanRouter(
 					getReplanningContext().getTripRouter(),
-					((ScenarioImpl) scenario).getActivityFacilities());
+					scenario.getActivityFacilities());
 	}
 
 }

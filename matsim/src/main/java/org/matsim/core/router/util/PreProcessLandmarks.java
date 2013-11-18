@@ -181,7 +181,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			role.setToLandmarkTravelTime(this.landmarkIdx, 0.0);
 			role.setFromLandmarkTravelTime(this.landmarkIdx, 0.0);
 			pendingNodes.add(this.landmark);
-			while (pendingNodes.isEmpty() == false) {
+			while (!pendingNodes.isEmpty()) {
 				Node node = pendingNodes.poll();
 				double fromTravTime = ((LandmarksData) this.nodeData.get(node)).getFromLandmarkTravelTime(this.landmarkIdx);
 				LandmarksData role2;
@@ -206,7 +206,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			role.setToLandmarkTravelTime(this.landmarkIdx, 0.0);
 			role.setFromLandmarkTravelTime(this.landmarkIdx, 0.0);
 			pendingNodes.add(this.landmark);
-			while (pendingNodes.isEmpty() == false) {
+			while (!pendingNodes.isEmpty()) {
 				Node node = pendingNodes.poll();
 				double toTravTime = ((LandmarksData) this.nodeData.get(node)).getToLandmarkTravelTime(this.landmarkIdx);
 				LandmarksData role2;

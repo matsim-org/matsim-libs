@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -48,7 +47,7 @@ public class TripsToLegsAlgorithm implements PlanAlgorithm {
 				router.getMainModeIdentifier() );
 	}
 
-	
+
 	public TripsToLegsAlgorithm(
 			final StageActivityTypes blackList,
 			final MainModeIdentifier mainModeIdentifier) {
@@ -60,7 +59,7 @@ public class TripsToLegsAlgorithm implements PlanAlgorithm {
 	public void run(final Plan plan) {
 		final List<PlanElement> planElements = plan.getPlanElements();
 		final List<Trip> trips = TripStructureUtils.getTrips( plan , blackList );
-		
+
 		for ( Trip trip : trips ) {
 			final List<PlanElement> fullTrip =
 				planElements.subList(

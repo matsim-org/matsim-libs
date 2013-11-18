@@ -88,7 +88,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		
 		// "select" that plan:
 		if ( plan != null ) {
-			((PersonImpl) person).setSelectedPlan(plan);
+			person.setSelectedPlan(plan);
 		}
 		else {
 			log.error( planSelector+" returned no plan: not changing selected plan for person "+person );
@@ -98,7 +98,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		if (this.firstModule != null) {
 			
 			// set the working plan to a copy of the selected plan:
-			plan = ((PersonImpl) person).createCopyOfSelectedPlanAndMakeSelected();
+			plan = person.createCopyOfSelectedPlanAndMakeSelected();
 			// (this makes, as a side effect, the _new_ plan selected)
 			
 			// add new plan to container that contains the plans that are handled by this PlanStrategy:

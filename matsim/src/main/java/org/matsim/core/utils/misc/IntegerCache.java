@@ -47,7 +47,7 @@ public class IntegerCache {
 	}
 	
 	synchronized private static void init() {
-		if (initialized == true) {
+		if (initialized) {
 			log.warn("IntegerCache has already been initialized.");
 			return;
 		}

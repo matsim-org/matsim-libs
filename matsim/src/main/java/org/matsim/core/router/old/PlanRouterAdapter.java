@@ -108,7 +108,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 			final Controler controler) {
 		this.planRouter = new PlanRouter(
 							controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
-							((ScenarioImpl) controler.getScenario()).getActivityFacilities() );
+							controler.getScenario().getActivityFacilities() );
 		
 		TravelTime time = controler.getLinkTravelTimes();
 		TravelDisutility disutility =

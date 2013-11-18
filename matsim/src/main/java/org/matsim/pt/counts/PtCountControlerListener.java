@@ -106,11 +106,8 @@ BeforeMobsimListener, AfterMobsimListener  {
 	}
 
 	private boolean isActiveInThisIteration( int iter , Controler controler ) {
-		if ( iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0 && iter >= controler.getFirstIteration() ) {
-			return true ;
-		}
-		return false ;
-	}
+        return iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0 && iter >= controler.getFirstIteration();
+    }
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {

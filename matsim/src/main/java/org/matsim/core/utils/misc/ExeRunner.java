@@ -67,7 +67,7 @@ public abstract class ExeRunner {
 	 * @return exit-code of the executable.
 	 */
 	public static int run(final String cmd, final String stdoutFileName, final int timeout, final String workingDirectory) {
-		ExternalExecutor myExecutor = new ExternalExecutor(cmd, stdoutFileName, workingDirectory);
+		final ExternalExecutor myExecutor = new ExternalExecutor(cmd, stdoutFileName, workingDirectory);
 
 		synchronized (myExecutor) {
 			try {

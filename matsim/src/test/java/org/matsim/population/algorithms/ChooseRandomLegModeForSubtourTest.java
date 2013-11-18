@@ -147,7 +147,6 @@ public class ChooseRandomLegModeForSubtourTest {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		TripStructureAnalysisLayerOption tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.facility;
 		this.testSubTourMutationToCar(facilities);
 		this.testSubTourMutationToPt(facilities);
 		this.testUnknownModeDoesntMutate(facilities);

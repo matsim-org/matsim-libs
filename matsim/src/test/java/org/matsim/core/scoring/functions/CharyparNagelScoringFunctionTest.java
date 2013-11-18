@@ -600,7 +600,7 @@ public class CharyparNagelScoringFunctionTest {
 		private int fourthLegStartTime;
 
 		public Fixture() {
-			firstLegStartTime = 07 * 3600;
+			firstLegStartTime = 7 * 3600;
 			firstLegTravelTime = 30 * 60;
 			thirdLegTravelTime = 30 * 60;
 			secondLegStartTime = 10 * 3600;

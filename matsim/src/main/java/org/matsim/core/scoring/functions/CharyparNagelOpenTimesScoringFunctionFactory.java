@@ -55,7 +55,7 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 			this.params = new CharyparNagelScoringParameters(this.config);
 		}
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(plan, params, ((ScenarioImpl) scenario).getActivityFacilities()));
+		sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(plan, params, scenario.getActivityFacilities()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));

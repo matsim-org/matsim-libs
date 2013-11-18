@@ -82,7 +82,7 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 		    this.currmodule = this.config.qsim();
 		  } else if ( name.equals(SimulationConfigGroup.GROUP_NAME) ) {
 			  this.currmodule = new SimulationConfigGroup() ;
-			  this.config.addModule( (SimulationConfigGroup) this.currmodule );
+			  this.config.addModule(this.currmodule);
 		  }
 		  //it must be a not type safe generic module
 		  else {

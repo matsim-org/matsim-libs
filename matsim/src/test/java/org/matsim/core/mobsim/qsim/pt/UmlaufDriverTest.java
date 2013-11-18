@@ -76,7 +76,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		Config c = super.loadConfig(null);
+		super.loadConfig(null);
 	}
 
 	public void testInitializationNetworkRoute() {
@@ -203,8 +203,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	
+
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertEquals(0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
 		assertEquals(stop2, driver.getNextTransitStop());

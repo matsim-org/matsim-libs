@@ -84,7 +84,6 @@ public class QLinkTest extends MatsimTestCase {
 
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		p.addPlan(new PlanImpl());
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		f.qlink1.addFromUpstream(v);
