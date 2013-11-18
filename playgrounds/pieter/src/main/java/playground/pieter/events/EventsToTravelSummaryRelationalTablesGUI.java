@@ -426,7 +426,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 						tableSuffixComponent.getText());
 
 			} else {
-
+				System.out.println("WRITING TO SQL");
 				test.writeSimulationResultsToSQL(new File(
 						postgresPropertiesComponent.getText()),
 						eventsFileComponent.getText(), tableSuffixComponent
