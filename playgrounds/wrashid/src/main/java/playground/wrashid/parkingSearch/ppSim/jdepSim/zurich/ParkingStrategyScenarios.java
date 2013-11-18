@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_OptimalScore;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_RandomSelection;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_TakeClosestParking;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_WorstScore;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.PrivateParkingWithWaitAndRandomSearchAsBackup;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
@@ -332,6 +333,10 @@ public class ParkingStrategyScenarios {
 			allStrategies.add(strategy);
 			
 			strategy = new Dummy_OptimalScore(-1, scenario.getNetwork(), "Dummy_OptimalScore");
+			strategy.setGroupName("dummy group");
+			allStrategies.add(strategy);
+			
+			strategy = new Dummy_WorstScore(-1, scenario.getNetwork(), "Dummy_WorstScore");
 			strategy.setGroupName("dummy group");
 			allStrategies.add(strategy);
 		}
