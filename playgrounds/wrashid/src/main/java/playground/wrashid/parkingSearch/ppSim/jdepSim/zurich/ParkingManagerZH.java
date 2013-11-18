@@ -464,7 +464,7 @@ public class ParkingManagerZH {
 	public Id getClosestFreeParkingFacilityId(Id linkId) {
 		return getClosestParkingFacility(this.network.getLinks().get(linkId).getCoord());
 	}
-
+	
 	public Id getFreePrivateParking(Id actFacilityId, String actType) {
 		Id parkingFacilityId = privateParkingFacilityIdMapping.get(actFacilityId, actType);
 
@@ -652,7 +652,7 @@ public class ParkingManagerZH {
 	}
 
 	// return null if 
-	public Id getClosestFreeGarageParking(Coord coord) {
+	public Id getClosestFreeGarageParkingNotOnLink(Coord coord, Id linkId) {
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
 
 		if (GeneralLib.getDistance(coordinatesLindenhofZH, coord) < 8000) {
@@ -661,7 +661,7 @@ public class ParkingManagerZH {
 				Collection<Parking> collection = garageParkings.get(coord.getX(), coord.getY(), distance);
 
 				for (Parking p : collection) {
-					if (p.getIntCapacity() - getOccupiedParking().get(p.getId()) > 0) {
+					if (p.getIntCapacity() - getOccupiedParking().get(p.getId()) > 0 && !parkingIdToLinkIdMapping.get(p.getId()).equals(linkId)) {
 						return p.getId();
 					}
 				}
@@ -676,7 +676,7 @@ public class ParkingManagerZH {
 			Collection<Parking> collection = garageParkings.values();
 
 			for (Parking p : collection) {
-				if (p.getIntCapacity() - getOccupiedParking().get(p.getId()) > 0) {
+				if (p.getIntCapacity() - getOccupiedParking().get(p.getId()) > 0 && !parkingIdToLinkIdMapping.get(p.getId()).equals(linkId)) {
 					return p.getId();
 				}
 			}

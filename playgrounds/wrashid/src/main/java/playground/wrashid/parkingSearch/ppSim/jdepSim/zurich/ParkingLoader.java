@@ -186,6 +186,13 @@ public class ParkingLoader {
 		parking.setParkingId(new IdImpl("backupParking"));
 		parking.setType("public");
 		parkings.add(parking);
+		
+		
+		parking = new PublicParking(new CoordImpl(100000000,100000000));
+		parking.setMaxCapacity(100000000000.0);
+		parking.setParkingId(new IdImpl("gp-bkp"));
+		parking.setType("public");
+		parkings.add(parking);
 	}
 
 	private static void addIllegalParking(Network network, LinkedList<Parking> parkings) {

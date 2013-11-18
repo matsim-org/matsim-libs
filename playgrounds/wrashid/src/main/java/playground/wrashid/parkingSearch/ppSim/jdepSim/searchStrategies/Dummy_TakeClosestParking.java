@@ -23,6 +23,7 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 
@@ -51,14 +52,16 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 		if (!parkingFound.contains(personId)) {
 			parkingFound.add(personId);
 
+			DebugLib.traceAgent(personId);
+			
 			ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
 
 			Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextAct.getFacilityId(),
 					nextAct.getType());
 			
-			if (parkingId == null) {
-				parkingId = AgentWithParking.parkingManager.getClosestFreeParkingFacilityId(nextAct.getLinkId());
+			if (isInvalidParking(aem, parkingId)) {
+				parkingId =  AgentWithParking.parkingManager.getClosestParkingFacilityNotOnLink(nextAct.getCoord(),aem.getInvalidLinkForParking());
 			}
 			
 			parkVehicleAndLogSearchTime(aem, personId, parkingId);
@@ -76,7 +79,7 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 		Id linkOfParking = AgentWithParking.parkingManager.getLinkOfParking(parkingId);
 		double distance = GeneralLib.getDistance(ZHScenarioGlobal.scenario.getNetwork().getLinks().get(linkOfParking).getCoord(), currentLink.getCoord());
 		
-		double searchTime = distance/speed*1.4;
+		double searchTime = distance/speed*ZHScenarioGlobal.loadDoubleParam("Dummy_SearchTimeFactor");
 		triggerSeachTimeStart(personId, aem.getMessageArrivalTime()-searchTime);
 		
 		parkVehicle(aem, parkingId);

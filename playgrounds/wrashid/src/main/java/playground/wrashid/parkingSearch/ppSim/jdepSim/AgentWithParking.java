@@ -88,11 +88,11 @@ public class AgentWithParking extends AgentEventMessage {
 			}
 
 			if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
-				
+
 				performSiutationUpdatesForParkingMemory();
-				
+
 				logIfTolledAreaEntered();
-				
+
 				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).initParkingAttributes(this);
 				parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).handleAgentLeg(this);
 
@@ -104,26 +104,34 @@ public class AgentWithParking extends AgentEventMessage {
 
 	private void logIfTolledAreaEntered() {
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
-		
+
 		Link currentLink = getCurrentLink();
-		Link nextLink=getNextLink();
-		
-		if (GeneralLib.getDistance(currentLink.getCoord(), coordinatesLindenhofZH)>ZHScenarioGlobal.loadDoubleParam("radiusTolledArea") && GeneralLib.getDistance(nextLink.getCoord(), coordinatesLindenhofZH)<ZHScenarioGlobal.loadDoubleParam("radiusTolledArea")){
+		Link nextLink = getNextLink();
+
+		if (GeneralLib.getDistance(currentLink.getCoord(), coordinatesLindenhofZH) > ZHScenarioGlobal
+				.loadDoubleParam("radiusTolledArea")
+				&& GeneralLib.getDistance(nextLink.getCoord(), coordinatesLindenhofZH) < ZHScenarioGlobal
+						.loadDoubleParam("radiusTolledArea")) {
 			parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).tollAreaEntered(this);
 		}
 	}
 
 	private void performSiutationUpdatesForParkingMemory() {
 		/*
-		ParkingMemory parkingMemory = ParkingMemory.getParkingMemory(getPerson().getId(), getPlanElementIndex());
-		if (parkingMemory.closestFreeGarageParkingAtTimeOfArrival == null) {
-			Activity nextActivity = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex() + 3);
-
-			Id closestFreeGarageParking = parkingManager.getClosestFreeGarageParking(nextActivity.getCoord());
-
-			parkingMemory.closestFreeGarageParkingAtTimeOfArrival = closestFreeGarageParking;
-		}
-		*/
+		 * ParkingMemory parkingMemory =
+		 * ParkingMemory.getParkingMemory(getPerson().getId(),
+		 * getPlanElementIndex()); if
+		 * (parkingMemory.closestFreeGarageParkingAtTimeOfArrival == null) {
+		 * Activity nextActivity = (Activity)
+		 * getPerson().getSelectedPlan().getPlanElements
+		 * ().get(getPlanElementIndex() + 3);
+		 * 
+		 * Id closestFreeGarageParking =
+		 * parkingManager.getClosestFreeGarageParking(nextActivity.getCoord());
+		 * 
+		 * parkingMemory.closestFreeGarageParkingAtTimeOfArrival =
+		 * closestFreeGarageParking; }
+		 */
 	}
 
 	public void processLegInDefaultWay() {
@@ -140,13 +148,22 @@ public class AgentWithParking extends AgentEventMessage {
 		boolean isInvalidLink = false;
 		int nextCarLegIndex = duringCarLeg_getPlanElementIndexOfNextCarLeg();
 		if (nextCarLegIndex != -1) {
-			ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements()
-					.get(nextCarLegIndex + 3);
-			isInvalidLink = route.getEndLinkId().toString().equalsIgnoreCase(nextActAfterNextCarLeg.getLinkId().toString());
+			isInvalidLink = route.getEndLinkId().toString().equalsIgnoreCase(getInvalidLinkForParking().toString());
 		}
 		return isInvalidLink;
 	}
-	
+
+	public Id getInvalidLinkForParking() {
+		int nextCarLegIndex = duringCarLeg_getPlanElementIndexOfNextCarLeg();
+		if (nextCarLegIndex != -1) {
+			ActivityImpl nextActAfterNextCarLeg = (ActivityImpl) getPerson().getSelectedPlan().getPlanElements()
+					.get(nextCarLegIndex + 1);
+			return nextActAfterNextCarLeg.getLinkId();
+		} else {
+			return null;
+		}
+	}
+
 	public boolean isInvalidLinkForParking(Id linkId) {
 		boolean isInvalidLink = false;
 		int nextCarLegIndex = duringCarLeg_getPlanElementIndexOfNextCarLeg();
@@ -157,7 +174,6 @@ public class AgentWithParking extends AgentEventMessage {
 		}
 		return isInvalidLink;
 	}
-	
 
 	public ActivityImpl getCurrentActivity() {
 		return (ActivityImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
@@ -178,7 +194,7 @@ public class AgentWithParking extends AgentEventMessage {
 			return linkIds.get(getCurrentLinkIndex());
 		}
 	}
-	
+
 	public Link getNextLink() {
 		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
@@ -190,7 +206,7 @@ public class AgentWithParking extends AgentEventMessage {
 		}
 		return ZHScenarioGlobal.scenario.getNetwork().getLinks().get(nextLinkId);
 	}
-	
+
 	public boolean endOfLegReached() {
 		Leg leg = (LegImpl) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex());
 		List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();

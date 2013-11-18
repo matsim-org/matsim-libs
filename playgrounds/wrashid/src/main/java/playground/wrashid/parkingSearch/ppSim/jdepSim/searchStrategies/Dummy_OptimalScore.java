@@ -61,13 +61,16 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 
 				Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextAct.getFacilityId(), nextAct.getType());
 
-				if (parkingId == null) {
+				if (isInvalidParking(aem, parkingId)) {
 					double distance = 300;
 					Collection<Parking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),
 							1000);
+					Dummy_RandomSelection.removeInvalidParking(aem, parkings);
 					while (parkings.size() == 0) {
 						distance *= 2;
 						parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(), distance);
+					
+						Dummy_RandomSelection.removeInvalidParking(aem, parkings);
 					}
 
 					PriorityQueue<SortableMapObject<Parking>> priorityQueue = new PriorityQueue<SortableMapObject<Parking>>();

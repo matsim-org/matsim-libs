@@ -127,7 +127,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 			Id endLinkId = leg.getRoute().getEndLinkId();
 			
 			Link parkingLink = network.getLinks().get(endLinkId);
-			Id closestFreeGarageParkingId = AgentWithParking.parkingManager.getClosestFreeGarageParking(parkingLink.getCoord());
+			Id closestFreeGarageParkingId = AgentWithParking.parkingManager.getClosestFreeGarageParkingNotOnLink(parkingLink.getCoord(),aem.getInvalidLinkForParking());
 
 			
 
@@ -241,7 +241,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 
 	private void findClosestFreeGarageAndDriveThere(AgentWithParking aem) {
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
-		Id closestFreeGarageParking = AgentWithParking.parkingManager.getClosestFreeGarageParking(getCurrentLinkCoordinate(aem));
+		Id closestFreeGarageParking = AgentWithParking.parkingManager.getClosestFreeGarageParkingNotOnLink(getCurrentLinkCoordinate(aem),aem.getInvalidLinkForParking());
 		Id linkOfParking = AgentWithParking.parkingManager.getLinkOfParking(closestFreeGarageParking);
 		EditRoute.globalEditRoute.addLastPartToRoute(aem.getMessageArrivalTime(), leg, linkOfParking);
 		super.handleAgentLeg(aem);

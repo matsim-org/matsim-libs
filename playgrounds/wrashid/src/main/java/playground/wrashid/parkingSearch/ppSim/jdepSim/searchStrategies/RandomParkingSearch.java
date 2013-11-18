@@ -204,10 +204,18 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		// skipped here
 		// ||
 		// !AgentWithParking.parkingManager.getLinkOfParking(parkingId).toString().equalsIgnoreCase(route.getEndLinkId().toString())
-		if (parkingId == null) {
+		
+		
+		
+		if (isInvalidParking(aem, parkingId)) {
 			parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), filterParkingType);
 		}
 		return parkingId;
+	}
+
+	public static boolean isInvalidParking(AgentWithParking aem, Id parkingId) {
+		Id linkOfParking = AgentWithParking.parkingManager.getLinkOfParking(parkingId);
+		return parkingId == null || (aem.getInvalidLinkForParking()!=null && linkOfParking.toString().equals(aem.getInvalidLinkForParking().toString()));
 	}
 
 	public void triggerSeachTimeStart(Id personId, double time) {
@@ -230,7 +238,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		setDurationOfParkingActivity(aem, nextAct);
 
 		Leg nextWalkLeg = (Leg) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex() + 2);
-		Link parkingLink = network.getLinks().get(route.getEndLinkId());
+		//Link parkingLink = network.getLinks().get(route.getEndLinkId());
+		Link parkingLink= network.getLinks().get( AgentWithParking.parkingManager.getLinkOfParking(parkingId));
 
 		nextAct.setLinkId(parkingLink.getId());
 
@@ -268,7 +277,14 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			nextwalkLegToParking.setTravelTime(walkDuration);
 
 			nextParkingAct.setLinkId(parkingLink.getId());
-
+			
+			ActivityImpl overNextParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+					.get(indexOfNextCarLeg + 1);
+			if (nextParkingAct.getLinkId().toString().equals(overNextParkingAct.getLinkId().toString())){
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
+			
+			
 			if (ZHScenarioGlobal.loadBooleanParam("RandomParkingSearch.performReroutingDuringSimulation")) {
 				if (ZHScenarioGlobal.turnParallelRoutingOnDuringSim) {
 					aem.rerouteTask = new RerouteTaskDuringSim(nextNonParkingAct.getEndTime(), parkingLink.getId(), nextCarLeg);

@@ -51,12 +51,16 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 			Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextAct.getFacilityId(),
 					nextAct.getType());
 			
-			if (parkingId == null) {
+			if (isInvalidParking(aem, parkingId)) {
 				double distance=300;
 				Collection<Parking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),1000);
+				removeInvalidParking(aem, parkings);
+				
 				while (parkings.size()==0){
 					distance*=2;
 					parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),distance);
+				
+					removeInvalidParking(aem, parkings);
 				}
 				
 				random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
@@ -76,6 +80,17 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 			super.handleAgentLeg(aem);
 		}
 		
+	}
+
+	public static void removeInvalidParking(AgentWithParking aem, Collection<Parking> parkings) {
+		Parking invalidParking=null;
+		for (Parking parking:parkings){
+			if (isInvalidParking(aem, parking.getId())) {
+				invalidParking=parking;
+				break;
+			}
+		}
+		parkings.remove(invalidParking);
 	}
 
 

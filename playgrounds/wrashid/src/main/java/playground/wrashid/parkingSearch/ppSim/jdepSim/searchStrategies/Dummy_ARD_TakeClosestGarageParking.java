@@ -49,8 +49,8 @@ public class Dummy_ARD_TakeClosestGarageParking extends Dummy_TakeClosestParking
 			Id parkingId = AgentWithParking.parkingManager.getFreePrivateParking(nextAct.getFacilityId(),
 					nextAct.getType());
 			
-			if (parkingId == null) {
-				parkingId = AgentWithParking.parkingManager.getClosestFreeGarageParking(aem.getCurrentLink().getCoord());
+			if (isInvalidParking(aem, parkingId)) {
+				parkingId = AgentWithParking.parkingManager.getClosestFreeGarageParkingNotOnLink(aem.getCurrentLink().getCoord(),aem.getInvalidLinkForParking());
 			}
 			
 			parkVehicleAndLogSearchTime(aem, personId, parkingId);
