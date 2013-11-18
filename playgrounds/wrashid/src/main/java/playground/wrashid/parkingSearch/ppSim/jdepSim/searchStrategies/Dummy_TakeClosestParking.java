@@ -58,11 +58,19 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 				parkingId = AgentWithParking.parkingManager.getClosestFreeParkingFacilityId(nextAct.getLinkId());
 			}
 			
+			triggerSeachTimeStart(personId, aem.getMessageArrivalTime()-0.1);
+			
 			parkVehicle(aem, parkingId);
 		}} else {
 			super.handleAgentLeg(aem);
 		}
 		
+	}
+	
+	@Override
+	public void handleParkingDepartureActivity(AgentWithParking aem) {
+		super.handleParkingDepartureActivity(aem);
+		parkingFound.remove(aem.getPerson().getId());
 	}
 
 }
