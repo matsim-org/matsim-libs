@@ -97,7 +97,7 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.HighStreetTariffZones
 				} else {
 					return 0.0;
 				}
-			}else if(parkingId.toString().contains("illegal")){
+			}else if(parkingId.toString().contains("illegal") || parkingId.toString().contains("backupParking")){
 				return 0.0;
 			}
 			

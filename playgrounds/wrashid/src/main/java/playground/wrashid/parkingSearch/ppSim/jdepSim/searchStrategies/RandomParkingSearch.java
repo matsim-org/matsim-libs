@@ -43,6 +43,7 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -131,6 +132,16 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 				triggerSeachTimeStart(personId, aem.getMessageArrivalTime());
 
+				if (getSearchTime(aem)>ZHScenarioGlobal.loadDoubleParam("RandomParkingSearch.maxSearchTime")){
+					ActivityImpl nextNonParkAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+							.get(aem.getPlanElementIndex() + 3);
+					
+					//parkingId=AgentWithParking.parkingManager.getClosestFreeGarageParking(nextNonParkAct.getCoord());
+					parkingId=new IdImpl("backupParking");
+					startSearchTime.put(personId, -1.0);
+				}
+				
+				
 				if (parkingId == null || isInvalidLink) {
 					DebugLib.traceAgent(personId, 1);
 					// extraSearchPathNeeded.add(personId);
@@ -477,6 +488,10 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 	public double getSearchTime(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
+		if (startSearchTime.get(personId)==-1){
+			return 86400;
+		}
+		
 		double searchDuration = GeneralLib.getIntervalDuration(startSearchTime.get(personId), aem.getMessageArrivalTime());
 
 		if (searchDuration == 86400) {

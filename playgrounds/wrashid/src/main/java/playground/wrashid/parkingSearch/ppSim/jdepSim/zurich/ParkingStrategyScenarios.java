@@ -311,13 +311,13 @@ public class ParkingStrategyScenarios {
 			
 			for (int i = 0; i < numberOfStrategiesInEachGroup; i++) {
 				RandomParkingSearch strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-A" + i);
-				strategy.setSearchBeta(1.0);
+				strategy.setSearchBeta(-1.0);
 				strategy.setRandomSearchDistance(100.0);
 				strategy.setGroupName("ARD-S-1-100");
 				allStrategies.add(strategy);
 				
 				strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-D" + i);
-				strategy.setSearchBeta(1000.0);
+				strategy.setSearchBeta(1.0);
 				strategy.setRandomSearchDistance(100.0);
 				strategy.setGroupName("ARD-S-1000.0-100");
 				allStrategies.add(strategy);

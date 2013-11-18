@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.PublicParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
@@ -174,8 +175,17 @@ public class ParkingLoader {
 	public static ParkingManagerZH getParkingManagerZH(Network network, TTMatrix ttMatrix) {
 		LinkedList<Parking> parkings = getParkingsForScenario();
 		addIllegalParking(network, parkings);
+		addDummyParking(parkings);
 
 		return getParkingManagerZH(parkings, network, ttMatrix);
+	}
+
+	private static void addDummyParking(LinkedList<Parking> parkings) {
+		PublicParking parking = new PublicParking(new CoordImpl(100000000,100000000));
+		parking.setMaxCapacity(100000000000.0);
+		parking.setParkingId(new IdImpl("backupParking"));
+		parking.setType("public");
+		parkings.add(parking);
 	}
 
 	private static void addIllegalParking(Network network, LinkedList<Parking> parkings) {

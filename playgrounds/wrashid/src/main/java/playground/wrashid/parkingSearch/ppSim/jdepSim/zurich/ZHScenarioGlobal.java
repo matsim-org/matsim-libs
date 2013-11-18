@@ -98,6 +98,7 @@ public class ZHScenarioGlobal {
 		printFilteredParkingStatsParkingType("private");
 		printFilteredParkingStatsParkingType("illegal");
 		printFilteredParkingStatsParkingType("publicPOutsideCityZH");
+		printFilteredParkingStatsParkingType("backupParking");
 
 		for (ParkingSearchStrategy strategy : ParkingStrategyManager.allStrategies) {
 			printParkingStraregyStats(strategy.getName());
