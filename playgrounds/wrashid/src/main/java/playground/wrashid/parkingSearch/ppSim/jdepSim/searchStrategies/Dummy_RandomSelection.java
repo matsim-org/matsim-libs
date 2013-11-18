@@ -20,6 +20,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -84,6 +85,7 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 
 	public static void removeInvalidParking(AgentWithParking aem, Collection<Parking> parkings) {
 		Parking invalidParking=null;
+		removePrivateParkings(parkings);
 		for (Parking parking:parkings){
 			if (isInvalidParking(aem, parking.getId())) {
 				invalidParking=parking;
@@ -91,6 +93,18 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 			}
 		}
 		parkings.remove(invalidParking);
+	}
+	
+	public static void removePrivateParkings(Collection<Parking> parkings){
+		LinkedList<Parking> removeList=new LinkedList<Parking>();
+		
+		for (Parking parking:parkings){
+			if (parking.getType().equalsIgnoreCase("private")){
+				removeList.add(parking);
+			}
+		}
+		
+		parkings.removeAll(removeList);
 	}
 
 

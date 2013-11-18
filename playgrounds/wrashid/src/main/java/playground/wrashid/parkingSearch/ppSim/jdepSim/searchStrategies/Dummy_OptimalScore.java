@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -52,7 +53,10 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 
 		boolean endOfLegReached = aem.endOfLegReached();
 
+		
+		
 		if (endOfLegReached) {
+			DebugLib.traceAgent(personId);
 			if (!parkingFound.contains(personId)) {
 				parkingFound.add(personId);
 
