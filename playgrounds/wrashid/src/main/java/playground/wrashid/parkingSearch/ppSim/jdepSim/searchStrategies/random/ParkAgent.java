@@ -119,7 +119,6 @@ public class ParkAgent extends RandomParkingSearch {
 				Link nextLink = getNextLink(aem);
 				Id freeParkingFacilityOnLink = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(nextLink.getId(),
 						"streetParking");
-				boolean isInvalidLink = aem.isInvalidLinkForParking(nextLink.getId());
 
 				if (endOfLegReached(aem)) {
 					triggerSeachTimeStart(personId, aem.getMessageArrivalTime());
@@ -136,7 +135,7 @@ public class ParkAgent extends RandomParkingSearch {
 					double searchTimeDurationAfterReachingTarget = getSearchTimeDurationAfterReachingTarget(aem);
 					double acceptableParkingDistance = getAcceptableParkingDistance(searchTimeDurationAfterReachingTarget);
 
-					if (parkingId == null || isInvalidLink
+					if (isInvalidParking(aem, parkingId)
 							|| GeneralLib.getDistance(nextAct.getCoord(), nextLink.getCoord()) > acceptableParkingDistance) {
 
 						addRandomLinkToRoute(route,aem);
@@ -163,7 +162,7 @@ public class ParkAgent extends RandomParkingSearch {
 						double F_exp = parkingAttr.totalUnOccupied / parkingAttr.totalCapacity
 								* parkingAttr.capacitiesOfAllParkingTillDestination;
 
-						if (!isInvalidLink && freeParkingFacilityOnLink != null && shouldParkVehicle(F_exp)) {
+						if (!isInvalidParking(aem, freeParkingFacilityOnLink) && shouldParkVehicle(F_exp)) {
 							throughAwayRestOfRoute(aem);
 							parkVehicle(aem, freeParkingFacilityOnLink);
 						} else {

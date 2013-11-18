@@ -72,6 +72,13 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 	}
 
 	public void parkVehicleAndLogSearchTime(AgentWithParking aem, Id personId, Id parkingId) {
+		double searchTime = getSearchTime(aem, parkingId);
+		triggerSeachTimeStart(personId, aem.getMessageArrivalTime()-searchTime);
+		
+		parkVehicle(aem, parkingId);
+	}
+
+	public static double getSearchTime(AgentWithParking aem, Id parkingId) {
 		Link currentLink = aem.getCurrentLink();
 		double travelTime = ZHScenarioGlobal.ttMatrix.getTravelTime(aem.getMessageArrivalTime(), currentLink.getId());
 		double speed=currentLink.getLength()/travelTime;
@@ -80,9 +87,7 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 		double distance = GeneralLib.getDistance(ZHScenarioGlobal.scenario.getNetwork().getLinks().get(linkOfParking).getCoord(), currentLink.getCoord());
 		
 		double searchTime = distance/speed*ZHScenarioGlobal.loadDoubleParam("Dummy_SearchTimeFactor");
-		triggerSeachTimeStart(personId, aem.getMessageArrivalTime()-searchTime);
-		
-		parkVehicle(aem, parkingId);
+		return searchTime;
 	}
 	
 	@Override

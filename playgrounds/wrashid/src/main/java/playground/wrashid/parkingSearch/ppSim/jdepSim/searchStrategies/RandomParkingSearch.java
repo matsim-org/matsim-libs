@@ -120,13 +120,13 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			boolean endOfLegReached = aem.getCurrentLinkIndex() == linkIds.size() - 1;
 
 			if (endOfLegReached) {
-				// DebugLib.traceAgent(personId);
+				 
 
 				String filterParkingType = getParkingFilterType(personId);
 
 				Id parkingId = getParkingLinkId(aem, filterParkingType);
 
-				boolean isInvalidLink = aem.isLastLinkOfRouteInvalidLinkForParking();
+			//	boolean isInvalidLink = aem.isLastLinkOfRouteInvalidLinkForParking();
 
 				// TODO: include max distance here (maxDistance variable)
 
@@ -137,12 +137,31 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 							.get(aem.getPlanElementIndex() + 3);
 					
 					//parkingId=AgentWithParking.parkingManager.getClosestFreeGarageParking(nextNonParkAct.getCoord());
-					parkingId=new IdImpl("backupParking");
-					startSearchTime.put(personId, -1.0);
+					//parkingId=new IdImpl("backupParking");
+					
+					if (isInvalidParking(aem, parkingId)) {
+						parkingId = AgentWithParking.parkingManager.getClosestFreeGarageParkingNotOnLink(aem.getCurrentLink().getCoord(),aem.getInvalidLinkForParking());
+					}
+					
+					
+					
+					if (parkingId!=null){
+						// add search time
+						double searchTime = Dummy_TakeClosestParking.getSearchTime(aem, parkingId);
+						if (startSearchTime.containsKey(personId)){
+							double d = startSearchTime.get(personId);
+							d-=searchTime;
+							startSearchTime.put(personId, d);
+						}
+					} else {
+						parkingId=new IdImpl("backupParking");
+					}
+					
+					//startSearchTime.put(personId, -1.0);
 				}
 				
 				
-				if (parkingId == null || isInvalidLink) {
+				if (isInvalidParking(aem, parkingId)) {
 					DebugLib.traceAgent(personId, 1);
 					// extraSearchPathNeeded.add(personId);
 
