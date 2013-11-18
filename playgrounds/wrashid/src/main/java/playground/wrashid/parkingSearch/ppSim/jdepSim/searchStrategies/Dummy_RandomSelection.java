@@ -27,20 +27,14 @@ import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 
-public class Dummy_RandomSelection extends RandomParkingSearch {
-
-	private HashSet<Id> parkingFound;
+public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 
 	public Dummy_RandomSelection(double maxDistance, Network network, String name) {
 		super(maxDistance, network, name);
 	}
 	
-	public void resetForNewIteration() {
-		super.resetForNewIteration();
-		parkingFound=new HashSet<Id>();
-	}
-
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
 		Id personId = aem.getPerson().getId();
@@ -65,6 +59,7 @@ public class Dummy_RandomSelection extends RandomParkingSearch {
 					parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),distance);
 				}
 				
+				random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
 				int randomInt = random.nextInt(parkings.size());
 				int i=0;
 				for (Parking parking:parkings){
@@ -76,7 +71,7 @@ public class Dummy_RandomSelection extends RandomParkingSearch {
 				}
 			}
 			
-			parkVehicle(aem, parkingId);
+			parkVehicleAndLogSearchTime(aem, personId, parkingId);
 		}} else {
 			super.handleAgentLeg(aem);
 		}

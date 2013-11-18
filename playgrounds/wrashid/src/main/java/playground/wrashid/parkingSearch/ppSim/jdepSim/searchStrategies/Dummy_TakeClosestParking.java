@@ -27,7 +27,7 @@ import org.matsim.core.population.ActivityImpl;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 
 public class Dummy_TakeClosestParking extends RandomParkingSearch {
-	private HashSet<Id> parkingFound;
+	protected HashSet<Id> parkingFound;
 
 	public Dummy_TakeClosestParking(double maxDistance, Network network, String name) {
 		super(maxDistance, network, name);
@@ -58,13 +58,17 @@ public class Dummy_TakeClosestParking extends RandomParkingSearch {
 				parkingId = AgentWithParking.parkingManager.getClosestFreeParkingFacilityId(nextAct.getLinkId());
 			}
 			
-			triggerSeachTimeStart(personId, aem.getMessageArrivalTime()-0.1);
-			
-			parkVehicle(aem, parkingId);
+			parkVehicleAndLogSearchTime(aem, personId, parkingId);
 		}} else {
 			super.handleAgentLeg(aem);
 		}
 		
+	}
+
+	public void parkVehicleAndLogSearchTime(AgentWithParking aem, Id personId, Id parkingId) {
+		triggerSeachTimeStart(personId, aem.getMessageArrivalTime()-0.1);
+		
+		parkVehicle(aem, parkingId);
 	}
 	
 	@Override

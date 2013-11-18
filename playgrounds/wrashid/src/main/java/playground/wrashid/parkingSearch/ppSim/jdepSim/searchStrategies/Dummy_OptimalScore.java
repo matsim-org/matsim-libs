@@ -36,17 +36,10 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
-public class Dummy_OptimalScore extends RandomParkingSearch {
-
-	private HashSet<Id> parkingFound;
+public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 
 	public Dummy_OptimalScore(double maxDistance, Network network, String name) {
 		super(maxDistance, network, name);
-	}
-
-	public void resetForNewIteration() {
-		super.resetForNewIteration();
-		parkingFound = new HashSet<Id>();
 	}
 
 	@Override
@@ -95,7 +88,7 @@ public class Dummy_OptimalScore extends RandomParkingSearch {
 					parkingId = priorityQueue.poll().getKey().getId();
 				}
 
-				parkVehicle(aem, parkingId);
+				parkVehicleAndLogSearchTime(aem, personId, parkingId);
 			}
 		} else {
 			super.handleAgentLeg(aem);
