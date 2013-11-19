@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.replanning.strategies;
 
 import playground.thibautd.replanning.ActivitySequenceMutatorModule;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
@@ -40,7 +41,8 @@ public class GroupActivitySequenceMutator implements GroupPlanStrategyFactory {
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
 					new ActivitySequenceMutatorModule(
-						registry.getScenario().getConfig().global().getNumberOfThreads() ) ) );
+						registry.getScenario().getConfig().global().getNumberOfThreads(),
+						JointActingTypes.JOINT_STAGE_ACTS ) ) );
 	
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
