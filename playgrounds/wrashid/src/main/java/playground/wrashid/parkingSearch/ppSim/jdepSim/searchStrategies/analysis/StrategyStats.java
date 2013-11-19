@@ -171,7 +171,7 @@ public class StrategyStats {
 				seriesLabels, xValues);
 		
 		
-		writeToTextFile(seriesLabels, matrix, "parkingStrategyScores.txt.gz");
+		writeToTextFile(seriesLabels, matrix, "parkingStrategyScores.txt");
 		
 		log.info("finished 'writeStrategyScoresToFile'");
 	}
@@ -246,7 +246,7 @@ public class StrategyStats {
 			}
 		}
 
-		GeneralLib.writeList(list, ZHScenarioGlobal.getItersFolderPath() + ZHScenarioGlobal.iteration + ".strategyScores.txt");
+		GeneralLib.writeList(list, ZHScenarioGlobal.getItersFolderPath() + ZHScenarioGlobal.iteration + ".strategyScores.txt.gz");
 	}
 
 	public void updateStrategyGroupsSharesWithoutPP() {
