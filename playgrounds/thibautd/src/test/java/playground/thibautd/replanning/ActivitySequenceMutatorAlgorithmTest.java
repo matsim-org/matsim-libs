@@ -32,6 +32,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -114,6 +115,44 @@ public class ActivitySequenceMutatorAlgorithmTest {
 				"unexpected size of plan "+plan.getPlanElements(),
 				plan.getPlanElements().size(),
 				3 );
+	}
+
+	@Test
+	public void testStage() throws Exception {
+		final Plan plan = new PlanImpl( new PersonImpl( new IdImpl( "somebody" ) ) );
+		
+		plan.addActivity( new ActivityImpl( "h" , new IdImpl( "h" ) ) );
+		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addActivity( new ActivityImpl( "stage" , new IdImpl( "s" ) ) );
+		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addActivity( new ActivityImpl( "w" , new IdImpl( "w" ) ) );
+		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addActivity( new ActivityImpl( "l" , new IdImpl( "l" ) ) );
+		plan.addLeg( new LegImpl( "mode" ) );
+		plan.addActivity( new ActivityImpl( "h" , new IdImpl( "h" ) ) );
+
+		final PlanAlgorithm testee =
+			new ActivitySequenceMutatorAlgorithm(
+					new Random( 890 ),
+					new StageActivityTypesImpl( "stage" ) );
+		testee.run( plan );
+
+		Assert.assertEquals(
+				"unexpected size of plan "+plan.getPlanElements(),
+				plan.getPlanElements().size(),
+				9 );
+		Assert.assertEquals(
+				"unexpected type of first in-plan activity",
+				((Activity) plan.getPlanElements().get( 2 )).getType(),
+				"stage" );
+		Assert.assertEquals(
+				"unexpected type of second in-plan activity",
+				((Activity) plan.getPlanElements().get( 4 )).getType(),
+				"l" );
+		Assert.assertEquals(
+				"unexpected type of third in-plan activity",
+				((Activity) plan.getPlanElements().get( 6 )).getType(),
+				"w" );
 	}
 }
 
