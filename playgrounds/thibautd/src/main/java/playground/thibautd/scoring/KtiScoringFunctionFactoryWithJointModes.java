@@ -49,7 +49,6 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 
 	// basically to compensate for utility transfers
 	private final double additionalMarginalUtilOfBeingDriver_s;
-	private final double additionalMarginalUtilOfDetour_s;
 
 	private static final double UTIL_OF_NOT_PERF = -1000;
 
@@ -58,7 +57,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
-		this( 0, 0,
+		this( 0,
 			typesNotToScore,
 			ktiConfig,
 			config,
@@ -68,13 +67,11 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 
 	public KtiScoringFunctionFactoryWithJointModes(
 			final double additionalMarginalUtilityOfBeingDriver_s,
-			final double additionalMarginalUtilityOfDetour_s,
 			final StageActivityTypes typesNotToScore,
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
 		this.additionalMarginalUtilOfBeingDriver_s = additionalMarginalUtilityOfBeingDriver_s;
-		this.additionalMarginalUtilOfDetour_s = additionalMarginalUtilityOfDetour_s;
 		this.scenario = scenario;
 		this.params = new CharyparNagelScoringParameters(config);
 		this.delegate = new KtiLikeActivitiesScoringFunctionFactory(
@@ -107,9 +104,6 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 						// passenger doesn't pay gasoline
 						0 ),
 					scenario.getNetwork()));
-
-		scoringFunctionAccumulator.addScoringFunction(
-				new DetourScorer( additionalMarginalUtilOfDetour_s ) );
 
 		scoringFunctionAccumulator.addScoringFunction( 
 				// technical penalty: penalize plans which do not result in performing

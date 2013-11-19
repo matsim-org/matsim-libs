@@ -201,7 +201,6 @@ public class RunCliquesWithModularStrategies {
 							scoringFunctionConf.isUseKtiScoring() ?
 							new KtiScoringFunctionFactoryWithJointModes(
 								scoringFunctionConf.getAdditionalUtilityOfBeingDriver_s(),
-								scoringFunctionConf.getAdditionalUtilityOfDetour_s(),
 								new StageActivityTypesImpl(
 										Arrays.asList(
 												PtConstants.TRANSIT_ACTIVITY_TYPE,
