@@ -29,6 +29,9 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.grips.control.Controller;
+import org.matsim.contrib.grips.evacuationptlineseditor.BusStop;
+import org.matsim.contrib.grips.evacuationptlineseditor.PTLinesGenerator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.PlanStrategyRegistrar;
@@ -43,10 +46,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleWriterV1;
-
-import org.matsim.contrib.grips.control.Controller;
-import org.matsim.contrib.grips.evacuationptlineseditor.BusStop;
-import org.matsim.contrib.grips.evacuationptlineseditor.PTLinesGenerator;
 
 /**
  * all i/o functions involving the configuration files
@@ -81,16 +80,16 @@ public class ConfigIO
 			{
 				Entry<Id, String> pairs = it.next();
 
-				Id currentId = (Id) pairs.getKey();
-				String timeString = (String) pairs.getValue();
+				Id currentId = pairs.getKey();
+				String timeString = pairs.getValue();
 
 				try
 				{
 					double time = Time.parseTime(timeString);
 					NetworkChangeEvent ev = fac.createNetworkChangeEvent(time);
-					// ev.setFreespeedChange(new
-					// ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
-					ev.setFlowCapacityChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
+					 ev.setFreespeedChange(new
+					 ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
+//					ev.setFlowCapacityChange(new ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0));
 
 					ev.addLink(scenario.getNetwork().getLinks().get(currentId));
 					evs.add(ev);
