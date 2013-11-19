@@ -201,6 +201,11 @@ public class TourModeUnifierAlgorithmTest {
 
 		final List<Trip> trips = TripStructureUtils.getTrips( plan , types );
 
+		Assert.assertEquals(
+				"unexpected number of trips",
+				13,
+				trips.size() );
+
 		for ( int tripNr : new int[]{0,1,6,11,12} ) {
 			Assert.assertEquals(
 					"unexpected mode for trip "+tripNr,
@@ -221,6 +226,83 @@ public class TourModeUnifierAlgorithmTest {
 		}
 
 		for ( int tripNr : new int[]{7,8,9,10} ) {
+			Assert.assertEquals(
+					"unexpected length for trip "+tripNr,
+					1,
+					trips.get( tripNr ).getLegsOnly().size() );
+
+			Assert.assertEquals(
+					"unexpected mode for trip "+tripNr,
+					mode2,
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+		}
+	}
+
+	@Test
+	public void testPlanWithTwoHomeBasedTours() throws Exception {
+		final Plan plan = new PlanImpl( new PersonImpl( new IdImpl( "jojo" ) ) );
+
+		final Id anchorLink = new IdImpl( "anchor" );
+		final Random random = new Random( 234 );
+
+		final String stageType = "stage";
+		final String mode1 = "first_mode";
+		final String mode2 = "second_mode";
+
+		plan.addActivity( new ActivityImpl( "h" , anchorLink ) );
+		plan.addLeg( new LegImpl( mode1 ) );
+		plan.addActivity( new ActivityImpl( stageType , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "h" , anchorLink ) );
+		plan.addLeg( new LegImpl( mode2 ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "h" , anchorLink ) );
+
+		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
+		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
+
+		final PlanAlgorithm testee =
+			new TourModeUnifierAlgorithm( 
+					types,
+					new MainModeIdentifierImpl() );
+		testee.run( plan );
+
+		Assert.assertEquals(
+				"unexpected plan size",
+				2 * nActs - 1,
+				plan.getPlanElements().size() );
+
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , types );
+
+		Assert.assertEquals(
+				"unexpected number of trips",
+				8,
+				trips.size() );
+
+		for ( int tripNr : new int[]{0,1,2,3} ) {
+			Assert.assertEquals(
+					"unexpected length for trip "+tripNr,
+					1,
+					trips.get( tripNr ).getLegsOnly().size() );
+
+			Assert.assertEquals(
+					"unexpected mode for trip "+tripNr,
+					mode1,
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+		}
+
+		for ( int tripNr : new int[]{4,5,6,7} ) {
 			Assert.assertEquals(
 					"unexpected length for trip "+tripNr,
 					1,
