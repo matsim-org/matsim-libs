@@ -145,12 +145,12 @@ public class MainPPSimZurich30km {
 			ZHScenarioGlobal.iteration = iter;
 
 			EventsManager eventsManager = EventsUtils.createEventsManager();
-			LegHistogram lh = new LegHistogram(300);
 			EventWriterXML eventsWriter = new EventWriterXML(ZHScenarioGlobal.outputFolder + "events.xml.gz");
+			LegHistogram lh = new LegHistogram(300);
 			if (ZHScenarioGlobal.writeOutputInCurrentIteration()) {
+				eventsManager.addHandler(lh);
 				if (ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
 					eventsManager.addHandler(eventsWriter);
-					eventsManager.addHandler(lh);
 
 					eventsManager.resetHandlers(0);
 					eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "events.xml.gz");
@@ -190,7 +190,10 @@ public class MainPPSimZurich30km {
 
 				}
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
-				eventsWriter.reset(0);
+				
+				if (ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
+					eventsWriter.reset(0);
+				}
 			}
 
 			ZHScenarioGlobal.produceOutputStats();
