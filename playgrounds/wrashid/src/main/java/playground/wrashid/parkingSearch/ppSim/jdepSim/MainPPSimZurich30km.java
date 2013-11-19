@@ -87,21 +87,21 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
 public class MainPPSimZurich30km {
 
 	private static final Logger log = Logger.getLogger(MainPPSimZurich30km.class);
-	
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		ZHScenarioGlobal.config = ConfigUtils.loadConfig(args[0]);
 		ZHScenarioGlobal.init();
-		
+
 		String plansFile = ZHScenarioGlobal.loadStringParam("plansFile");
 		String networkFile = ZHScenarioGlobal.loadStringParam("networkFile");
 		String facilititiesPath = ZHScenarioGlobal.loadStringParam("facilitiesFile");
 		ZHScenarioGlobal.scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
-		Scenario scenario=ZHScenarioGlobal.scenario;
+		Scenario scenario = ZHScenarioGlobal.scenario;
 		ZHScenarioGlobal.initNetworkLinkSlopes();
-		
+
 		filterPopulationWithinScenarioRadius(scenario);
 		removeNotSelectedPlans(scenario);
 		multiplyPopulation(scenario, ZHScenarioGlobal.populationExpensionFactor);
@@ -116,11 +116,10 @@ public class MainPPSimZurich30km {
 
 		ZHScenarioGlobal.initialRoutes = getInitialRoutes(scenario);
 
-		Message.ttMatrix = new TTMatrixFromStoredTable(ZHScenarioGlobal.loadStringParam("ttMatrixFile"),
-				scenario.getNetwork());
+		Message.ttMatrix = new TTMatrixFromStoredTable(ZHScenarioGlobal.loadStringParam("ttMatrixFile"), scenario.getNetwork());
 
 		LinkedList<ParkingSearchStrategy> allStrategies = ParkingStrategyScenarios.getScenarioStrategies(scenario);
-				
+
 		AgentWithParking.parkingStrategyManager = new ParkingStrategyManager(allStrategies);
 
 		LinkedList<AgentWithParking> agentsMessage = new LinkedList<AgentWithParking>();
@@ -149,15 +148,17 @@ public class MainPPSimZurich30km {
 			LegHistogram lh = new LegHistogram(300);
 			EventWriterXML eventsWriter = new EventWriterXML(ZHScenarioGlobal.outputFolder + "events.xml.gz");
 			if (ZHScenarioGlobal.writeOutputInCurrentIteration()) {
-				eventsManager.addHandler(eventsWriter);
-				eventsManager.addHandler(lh);
+				if (ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
+					eventsManager.addHandler(eventsWriter);
+					eventsManager.addHandler(lh);
 
-				eventsManager.resetHandlers(0);
-				eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "events.xml.gz");
+					eventsManager.resetHandlers(0);
+					eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "events.xml.gz");
 
-				eventsManager.resetHandlers(0);
+					eventsManager.resetHandlers(0);
 
-				eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".events.xml.gz");
+					eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".events.xml.gz");
+				}
 			}
 
 			agentsMessage.clear();
@@ -171,20 +172,20 @@ public class MainPPSimZurich30km {
 			ParkingMemory.resetMemory();
 			RandomNumbers.reset();
 
-			
 			log.info("simulation-" + iter + " starts");
 			Mobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
 			sim.run();
 			eventsManager.finishProcessing();
 
 			log.info("simulation-" + iter + " ended");
-			
+
 			if (ZHScenarioGlobal.writeOutputInCurrentIteration()) {
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_all.png");
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_car.png", TransportMode.car);
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
 				try {
-					lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_ride.png", TransportMode.ride);
+					lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_ride.png",
+							TransportMode.ride);
 				} catch (Exception e) {
 
 				}
@@ -206,14 +207,13 @@ public class MainPPSimZurich30km {
 	}
 
 	public static void initGlobalReroute(Scenario scenario) {
-		if (ZHScenarioGlobal
-				.loadDoubleParam("radiusTolledArea")>0){
-			
-			TravelDisutility travelCost=new TollAreaTravelDisutility();
-			TravelTime travelTime=new TTMatrixBasedTravelTime(Message.ttMatrix);
-			Dijkstra routingAlgo = new Dijkstra(scenario.getNetwork(), travelCost,travelTime);
-			
-			EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork(),routingAlgo);
+		if (ZHScenarioGlobal.loadDoubleParam("radiusTolledArea") > 0) {
+
+			TravelDisutility travelCost = new TollAreaTravelDisutility();
+			TravelTime travelTime = new TTMatrixBasedTravelTime(Message.ttMatrix);
+			Dijkstra routingAlgo = new Dijkstra(scenario.getNetwork(), travelCost, travelTime);
+
+			EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork(), routingAlgo);
 		} else {
 			EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork());
 		}
@@ -321,7 +321,8 @@ public class MainPPSimZurich30km {
 				if (planElements.get(i) instanceof Activity) {
 					Activity act = (Activity) planElements.get(i);
 
-					if (GeneralLib.getDistance(coordinatesLindenhofZH, act.getCoord()) < ZHScenarioGlobal.loadDoubleParam("scenarioRadiusInMeters")) {
+					if (GeneralLib.getDistance(coordinatesLindenhofZH, act.getCoord()) < ZHScenarioGlobal
+							.loadDoubleParam("scenarioRadiusInMeters")) {
 						removeFromPopulatation = false;
 						break;
 					}
