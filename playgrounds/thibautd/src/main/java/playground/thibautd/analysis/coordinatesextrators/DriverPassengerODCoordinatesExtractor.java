@@ -70,7 +70,7 @@ public class DriverPassengerODCoordinatesExtractor {
 					}
 					relevantActivity = (Activity) elements[i - 2];
 				}
-				else if ( ((Activity) elements[i]).getType().equals( JointActingTypes.DROP_OFF ) ) {
+				else if ( ((Activity) elements[i]).getType().equals( JointActingTypes.INTERACTION ) ) {
 					if ( ((Leg) elements[i - 1]).getMode().equals( JointActingTypes.PASSENGER ) ) {
 						currentList = passengerDestinations;
 					}

@@ -97,14 +97,14 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 
 		builder.startLeg( TransportMode.car , 100 );
 
-		builder.startActivity( JointActingTypes.PICK_UP , link2 );
+		builder.startActivity( JointActingTypes.INTERACTION , link2 );
 
 		builder.startLeg( JointActingTypes.DRIVER , 100 );
 		final DriverRoute dr1 = new DriverRoute( link2 , link3 );
 		dr1.addPassenger( passengerId1 );
 		builder.setCurrentLegRoute( dr1 );
 
-		builder.startActivity( JointActingTypes.PICK_UP , link3 );
+		builder.startActivity( JointActingTypes.INTERACTION , link3 );
 
 		builder.startLeg( JointActingTypes.DRIVER , 100 );
 		final DriverRoute dr2 = new DriverRoute( link3 , link4 );
@@ -112,7 +112,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		dr2.addPassenger( passengerId2 );
 		builder.setCurrentLegRoute( dr2 );
 
-		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+		builder.startActivity( JointActingTypes.INTERACTION , link4 );
 
 		builder.startLeg( TransportMode.car , 100 );
 
@@ -127,14 +127,14 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 
 		builder.startLeg( TransportMode.walk , 200 );
 
-		builder.startActivity( JointActingTypes.PICK_UP , link2 );
+		builder.startActivity( JointActingTypes.INTERACTION , link2 );
 
 		builder.startLeg( JointActingTypes.PASSENGER , 200 );
 		final PassengerRoute pr1 = new PassengerRoute( link2 , link4 );
 		pr1.setDriverId( driverId );
 		builder.setCurrentLegRoute( pr1 );
 
-		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+		builder.startActivity( JointActingTypes.INTERACTION , link4 );
 
 		builder.startLeg( TransportMode.car , 200 );
 
@@ -152,7 +152,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		walkRoute.setTravelTime( 50 );
 		builder.setCurrentLegRoute( walkRoute );
 
-		builder.startActivity( JointActingTypes.PICK_UP , link3 );
+		builder.startActivity( JointActingTypes.INTERACTION , link3 );
 
 		builder.startLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute pr2 = new PassengerRoute( link3 , link4 );
@@ -160,7 +160,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		pr2.setTravelTime( 50 );
 		builder.setCurrentLegRoute( pr2 );
 
-		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+		builder.startActivity( JointActingTypes.INTERACTION , link4 );
 
 		builder.startLeg( TransportMode.walk , 50 );
 
@@ -190,14 +190,14 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 
 		builder.startLeg( TransportMode.car , 100 );
 
-		builder.startActivity( JointActingTypes.PICK_UP , link2 );
+		builder.startActivity( JointActingTypes.INTERACTION , link2 );
 
 		builder.startLeg( JointActingTypes.DRIVER , 100 );
 		final DriverRoute dr1 = new DriverRoute( link2 , link3 );
 		dr1.addPassenger( passengerId1 );
 		builder.setCurrentLegRoute( dr1 );
 
-		builder.startActivity( JointActingTypes.PICK_UP , link3 );
+		builder.startActivity( JointActingTypes.INTERACTION , link3 );
 
 		builder.startLeg( JointActingTypes.DRIVER , 100 );
 		final DriverRoute dr2 = new DriverRoute( link3 , link4 );
@@ -205,7 +205,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		dr2.addPassenger( passengerId2 );
 		builder.setCurrentLegRoute( dr2 );
 
-		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+		builder.startActivity( JointActingTypes.INTERACTION , link4 );
 
 		builder.startLeg( TransportMode.car , 100 );
 
@@ -220,14 +220,14 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 
 		builder.startLeg( TransportMode.walk , 2000 );
 
-		builder.startActivity( JointActingTypes.PICK_UP , link2 );
+		builder.startActivity( JointActingTypes.INTERACTION , link2 );
 
 		builder.startLeg( JointActingTypes.PASSENGER , 200 );
 		final PassengerRoute pr1 = new PassengerRoute( link2 , link4 );
 		pr1.setDriverId( driverId );
 		builder.setCurrentLegRoute( pr1 );
 
-		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+		builder.startActivity( JointActingTypes.INTERACTION , link4 );
 
 		builder.startLeg( TransportMode.car , 200 );
 
@@ -245,7 +245,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		walkRoute.setTravelTime( 500000000 );
 		builder.setCurrentLegRoute( walkRoute );
 
-		builder.startActivity( JointActingTypes.PICK_UP , link3 );
+		builder.startActivity( JointActingTypes.INTERACTION , link3 );
 
 		builder.startLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute pr2 = new PassengerRoute( link3 , link4 );
@@ -253,7 +253,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		pr2.setTravelTime( 50 );
 		builder.setCurrentLegRoute( pr2 );
 
-		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+		builder.startActivity( JointActingTypes.INTERACTION , link4 );
 
 		builder.startLeg( TransportMode.walk , 50 );
 

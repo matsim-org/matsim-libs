@@ -204,8 +204,7 @@ public class RunCliquesWithModularStrategies {
 								new StageActivityTypesImpl(
 										Arrays.asList(
 												PtConstants.TRANSIT_ACTIVITY_TYPE,
-												JointActingTypes.PICK_UP,
-												JointActingTypes.DROP_OFF) ),
+												JointActingTypes.INTERACTION) ),
 								(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
 								config.planCalcScore(),
 								scenario) :

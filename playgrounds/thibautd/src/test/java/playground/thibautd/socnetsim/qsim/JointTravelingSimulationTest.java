@@ -223,7 +223,7 @@ public class JointTravelingSimulationTest {
 
 		if (insertDummyActivities) {
 			act = factory.createActivityFromLinkId(
-						JointActingTypes.PICK_UP,
+						JointActingTypes.INTERACTION,
 						puLink );
 			driverPlan.addActivity( act );
 			act.setMaximumDuration( 0 );
@@ -245,7 +245,7 @@ public class JointTravelingSimulationTest {
 
 		if (insertDummyActivities) {
 			act = factory.createActivityFromLinkId(
-						JointActingTypes.DROP_OFF,
+						JointActingTypes.INTERACTION,
 						doLink );
 			driverPlan.addActivity( act );
 			act.setMaximumDuration( 0 );
@@ -280,7 +280,7 @@ public class JointTravelingSimulationTest {
 
 			if (insertDummyActivities) {
 				act = factory.createActivityFromLinkId(
-							JointActingTypes.PICK_UP,
+							JointActingTypes.INTERACTION,
 							puLink );
 				p1Plan.addActivity( act );
 				act.setMaximumDuration( 0 );
@@ -297,7 +297,7 @@ public class JointTravelingSimulationTest {
 
 			if (insertDummyActivities) {
 				act = factory.createActivityFromLinkId(
-							JointActingTypes.DROP_OFF,
+							JointActingTypes.INTERACTION,
 							doLink );
 				p1Plan.addActivity( act );
 				act.setMaximumDuration( 0 );

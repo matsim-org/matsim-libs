@@ -321,8 +321,7 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 	}
 
 	private static boolean isPuDo(final String actType) {
-		 return JointActingTypes.PICK_UP.equals( actType ) ||
-				JointActingTypes.DROP_OFF.equals( actType ) ;
+		 return JointActingTypes.INTERACTION.equals( actType );
 	}
 
 	@Override

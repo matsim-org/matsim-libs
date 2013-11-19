@@ -67,8 +67,8 @@ public class ExtractTripModeShares20kmFromBellevue {
 		new StageActivityTypesImpl(
 				Arrays.asList(
 					PtConstants.TRANSIT_ACTIVITY_TYPE,
-					JointActingTypes.PICK_UP,
-					JointActingTypes.DROP_OFF ) );
+					JointActingTypes.INTERACTION,
+					JointActingTypes.INTERACTION ) );
 	private static final MainModeIdentifier MODE_IDENTIFIER = 
 		new MainModeIdentifier() {
 			final MainModeIdentifier delegate = new JointMainModeIdentifier( new MainModeIdentifierImpl() );

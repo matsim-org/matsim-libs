@@ -135,9 +135,9 @@ public class IgnoranceBehaviorTest {
 			individualPlans.put( driverId , plan );
 			plan.createAndAddActivity( "first_act_d"+i , new IdImpl( "some_link" ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );
-			plan.createAndAddActivity( JointActingTypes.PICK_UP , puLink ).setMaximumDuration( 0 );
+			plan.createAndAddActivity( JointActingTypes.INTERACTION , puLink ).setMaximumDuration( 0 );
 			Leg driverLeg1 = plan.createAndAddLeg( JointActingTypes.DRIVER );
-			plan.createAndAddActivity( JointActingTypes.DROP_OFF , doLink ).setMaximumDuration( 0 );
+			plan.createAndAddActivity( JointActingTypes.INTERACTION , doLink ).setMaximumDuration( 0 );
 			plan.createAndAddLeg( TransportMode.car );
 			plan.createAndAddActivity( "second_act_d"+i , new IdImpl( "nowhere" ) );
 
@@ -147,9 +147,9 @@ public class IgnoranceBehaviorTest {
 			individualPlans.put( passengerId , plan );
 			plan.createAndAddActivity( "first_act_p"+i , new IdImpl( "earth" ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.walk );
-			plan.createAndAddActivity( JointActingTypes.PICK_UP , puLink ).setMaximumDuration( 0 );
+			plan.createAndAddActivity( JointActingTypes.INTERACTION , puLink ).setMaximumDuration( 0 );
 			Leg passengerLeg1 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
-			plan.createAndAddActivity( JointActingTypes.DROP_OFF , doLink ).setMaximumDuration( 0 );
+			plan.createAndAddActivity( JointActingTypes.INTERACTION , doLink ).setMaximumDuration( 0 );
 			plan.createAndAddLeg( TransportMode.walk );
 			plan.createAndAddActivity( "second_act_p"+i , new IdImpl( "space" ) );
 

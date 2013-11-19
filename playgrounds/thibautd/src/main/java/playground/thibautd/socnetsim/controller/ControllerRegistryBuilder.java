@@ -245,8 +245,7 @@ public class ControllerRegistryBuilder {
 			this.scoringFunctionFactory =
 					new CharyparNagelWithJointModesScoringFunctionFactory(
 							new StageActivityTypesImpl(
-								JointActingTypes.PICK_UP,
-								JointActingTypes.DROP_OFF ),
+								JointActingTypes.INTERACTION ),
 							scenario);
 		}
 		return scoringFunctionFactory;

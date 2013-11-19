@@ -176,25 +176,13 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 				Collections.<Id>emptySet();
 			// note that no check of the mode is done...
 			if ( !newPassengers.equals( currentPassengers ) ) {
-				// note that this allows passengers to be pick-up at drop offs
-				// (and reverse) if more passengers are droped off that picked up
-				// (or reverse).
-				if ( newPassengers.size() > currentPassengers.size() ) {
-					newTrip.add(
-							new ActivityImpl(
-								JointActingTypes.PICK_UP,
-								route != null ?
-									route.getStartLinkId() :
+				newTrip.add(
+						new ActivityImpl(
+							JointActingTypes.INTERACTION,
+							route != null ?
+								route.getStartLinkId() :
 									subtrip.getOriginActivity().getLinkId() ) );
-				}
-				else {
-					newTrip.add(
-							new ActivityImpl(
-								JointActingTypes.DROP_OFF,
-								route != null ?
-									route.getStartLinkId() :
-									subtrip.getOriginActivity().getLinkId() ) );
-				}
+
 				// as the spatial structure of the trip is modified, it is possible
 				// that some pre-existing subtours are removed. Thus, a driver that may
 				// have walked to a pick up (because at the same location as its departure)

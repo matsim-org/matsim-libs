@@ -157,8 +157,8 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		final boolean isPartOfJointTrip = 
 			mode.equals( JointActingTypes.PASSENGER ) ||
 			mode.equals( JointActingTypes.DRIVER ) ||
-			destType.equals( JointActingTypes.PICK_UP ) ||
-			orType.equals( JointActingTypes.DROP_OFF );
+			destType.equals( JointActingTypes.INTERACTION ) ||
+			orType.equals( JointActingTypes.INTERACTION );
 		return !isPartOfJointTrip;
 	}
 
@@ -265,7 +265,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		List<PlanElement> driverTrip = new ArrayList<PlanElement>();
 		driverTrip.add( new LegImpl( TransportMode.car ) );
 		Activity act = new ActivityImpl(
-				JointActingTypes.PICK_UP,
+				JointActingTypes.INTERACTION,
 				match.tripPassenger.departure.getCoord(),
 				match.tripPassenger.departure.getLinkId());
 		act.setMaximumDuration( 0 );
@@ -278,7 +278,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		leg.setRoute( dRoute );
 		driverTrip.add( leg );
 		act = new ActivityImpl(
-				JointActingTypes.DROP_OFF,
+				JointActingTypes.INTERACTION,
 				match.tripPassenger.arrival.getCoord(),
 				match.tripPassenger.arrival.getLinkId());
 		act.setMaximumDuration( 0 );
@@ -289,7 +289,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		List<PlanElement> passengerTrip = new ArrayList<PlanElement>();
 		passengerTrip.add( new LegImpl( match.tripPassenger.initialMode ) );
 		act = new ActivityImpl(
-				JointActingTypes.PICK_UP,
+				JointActingTypes.INTERACTION,
 				match.tripPassenger.departure.getCoord(),
 				match.tripPassenger.departure.getLinkId());
 		act.setMaximumDuration( 0 );
@@ -302,7 +302,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		leg.setRoute( pRoute );
 		passengerTrip.add( leg );
 		act = new ActivityImpl(
-				JointActingTypes.DROP_OFF,
+				JointActingTypes.INTERACTION,
 				match.tripPassenger.arrival.getCoord(),
 				match.tripPassenger.arrival.getLinkId());
 		act.setMaximumDuration( 0 );

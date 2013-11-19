@@ -110,9 +110,9 @@ public class JointTripRouterFactoryTest {
 
 		plan.createAndAddActivity( "home" , link1 ).setEndTime( 32454 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( JointActingTypes.PICK_UP , link1 ).setMaximumDuration( 0 );
+		plan.createAndAddActivity( JointActingTypes.INTERACTION , link1 ).setMaximumDuration( 0 );
 		Leg dLeg = plan.createAndAddLeg( JointActingTypes.DRIVER );
-		plan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 ).setMaximumDuration( 0 );
+		plan.createAndAddActivity( JointActingTypes.INTERACTION , link3 ).setMaximumDuration( 0 );
 		plan.createAndAddLeg( TransportMode.car );
 		plan.createAndAddActivity( "home" , link3 );
 
@@ -131,11 +131,11 @@ public class JointTripRouterFactoryTest {
 		a.setEndTime( 1246534 );
 		a.setCoord( new CoordImpl( 0 , 1 ) );
 		plan.createAndAddLeg( TransportMode.walk );
-		a = plan.createAndAddActivity( JointActingTypes.PICK_UP , link1 );
+		a = plan.createAndAddActivity( JointActingTypes.INTERACTION , link1 );
 		a.setMaximumDuration( 0 );
 		a.setCoord( new CoordImpl( 0 , 2 ) );
 		Leg pLeg = plan.createAndAddLeg( JointActingTypes.PASSENGER );
-		a = plan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		a = plan.createAndAddActivity( JointActingTypes.INTERACTION , link3 );
 		a.setMaximumDuration( 0 );
 		a.setCoord( new CoordImpl( 0 , 3 ) );
 		plan.createAndAddLeg( TransportMode.walk );
