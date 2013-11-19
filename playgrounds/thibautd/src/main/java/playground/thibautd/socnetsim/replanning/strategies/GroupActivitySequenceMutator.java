@@ -45,6 +45,11 @@ public class GroupActivitySequenceMutator implements GroupPlanStrategyFactory {
 						JointActingTypes.JOINT_STAGE_ACTS ) ) );
 	
 		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
+					registry.getScenario().getConfig(),
+					registry.getTripRouterFactory() ) );
+
+		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
 					registry.getScenario().getConfig(),
 					registry.getPlanRoutingAlgorithmFactory(),
