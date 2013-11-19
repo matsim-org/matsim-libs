@@ -132,7 +132,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			//	boolean isInvalidLink = aem.isLastLinkOfRouteInvalidLinkForParking();
 
 				// TODO: include max distance here (maxDistance variable)
-
+				parkingId = injectBackupGarageParkingIfNeeded(aem, personId, parkingId);
 
 				
 				
@@ -207,7 +207,10 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), filterParkingType);
 		}
 		
-		
+		return parkingId;
+	}
+
+	public Id injectBackupGarageParkingIfNeeded(AgentWithParking aem, Id personId, Id parkingId) {
 		if (getSearchTime(aem)>maxSearchDuration){
 			ActivityImpl nextNonParkAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
@@ -219,8 +222,6 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 				parkingId = AgentWithParking.parkingManager.getClosestFreeGarageParkingNotOnLink(aem.getCurrentLink().getCoord(),aem.getInvalidLinkForParking());
 			}
 			
-			
-			
 			if (parkingId!=null){
 				// add search time
 				double searchTime = Dummy_TakeClosestParking.getSearchTime(aem, parkingId);
@@ -228,6 +229,10 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					double d = startSearchTime.get(personId);
 					d-=searchTime;
 					startSearchTime.put(personId, d);
+					
+					if (d<0){
+						DebugLib.emptyFunctionForSettingBreakPoint();
+					}
 				}
 			} else {
 				parkingId=new IdImpl("backupParking");
@@ -235,8 +240,6 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			
 			//startSearchTime.put(personId, -1.0);
 		}
-		
-		
 		return parkingId;
 	}
 
@@ -246,6 +249,11 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	}
 
 	public void triggerSeachTimeStart(Id personId, double time) {
+		if (time<0){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
+		
 		if (!startSearchTime.containsKey(personId)) {
 			startSearchTime.put(personId, time);
 		}
