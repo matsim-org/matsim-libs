@@ -68,7 +68,6 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 		double endOfTimeInterval = 0.0;
 		
-		// TODO -> benjamin: initialisierung entfernen?
 		if(warmEmissionsOfEvent==null){
 			warmEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 			for(WarmPollutant wp: WarmPollutant.values()){
@@ -81,7 +80,6 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 				}
 			}
 		}
-		// ende initialisierung
 		
 		endOfTimeInterval = Math.ceil(time/timeBinSize)*timeBinSize;
 		if(endOfTimeInterval<=0.0)endOfTimeInterval=timeBinSize;
@@ -102,19 +100,6 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 							warmEmissionsSoFar.put(wp, warmEmissionsOfEvent.get(wp)+warmEmissionsSoFar.get(wp));
 						}
 						
-//						for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
-//							WarmPollutant pollutant = entry.getKey();
-//							Double eventValue = new Double(entry.getValue());
-
-//							Double previousValue = new Double(warmEmissionsSoFar.get(pollutant));
-//							Double newValue = new Double(previousValue + eventValue);
-//							
-//							/*Is there a bug here?
-//							See playground.fhuelsmann.emission.analysisForConcentration.EmissionsPerLinkWarmEventHandler.java*/
-//							// TODO einzelne werte koennten null sein + aendert event value falls das feld das gleiche ist. !!!!!
-//							warmEmissionsSoFar.put(pollutant, newValue);
-//						}
-						//warmEmissionsTotal.put(linkId, warmEmissionsSoFar); // TODO unness?
 						double countsSoFar = countTotal.get(linkId);
 						double newValue = countsSoFar + 1.;
 						countTotal.put(linkId, newValue);
