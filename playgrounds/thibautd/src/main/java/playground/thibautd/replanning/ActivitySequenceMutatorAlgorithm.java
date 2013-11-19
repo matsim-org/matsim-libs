@@ -47,6 +47,8 @@ public class ActivitySequenceMutatorAlgorithm implements PlanAlgorithm {
 	@Override
 	public void run(final Plan plan) {
 		final List<Activity> activities = TripStructureUtils.getActivities( plan , stageTypes );
+		// we need at least two activities in addition to the first/last
+		if ( activities.size() < 4 ) return;
 
 		// first act: not first nor last
 		final int firstActIndex = 1 + random.nextInt( activities.size() - 2 );
