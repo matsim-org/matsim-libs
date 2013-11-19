@@ -47,6 +47,11 @@ public class ActivityInGroupLocationChoiceFactory implements GroupPlanStrategyFa
 					configGroup.getLocationChoiceActivityType() ) );
 
 		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
+					registry.getScenario().getConfig(),
+					registry.getTripRouterFactory() ) );
+
+		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
 					registry.getScenario().getConfig(),
 					registry.getPlanRoutingAlgorithmFactory(),
