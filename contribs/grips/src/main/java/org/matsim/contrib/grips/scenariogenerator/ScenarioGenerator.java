@@ -121,10 +121,8 @@ public class ScenarioGenerator {
 
 		}
 
-		this.c.addModule( new SimulationConfigGroup() );
 		this.c.global().setCoordinateSystem("EPSG:3395");
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
-		this.c.controler().setMobsim("queueSimulation");
 
 		
 		QSimConfigGroup qsim = this.c.qsim();
