@@ -21,22 +21,43 @@ package playground.thibautd.replanning;
 
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author thibautd
  */
 public class ActivitySequenceMutatorModule extends AbstractMultithreadedModule {
+	private final StageActivityTypes additionalBlackList;
 
-	public ActivitySequenceMutatorModule(final int numOfThreads) {
+
+	public ActivitySequenceMutatorModule(
+			final int numOfThreads ) {
+		this( numOfThreads , null );
+	}
+
+	public ActivitySequenceMutatorModule(
+			final int numOfThreads,
+			final StageActivityTypes additionalBlackList) {
 		super(numOfThreads);
+		this.additionalBlackList = additionalBlackList;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
+		final CompositeStageActivityTypes actualBlackList = new CompositeStageActivityTypes();
+		actualBlackList.addActivityTypes(
+				getReplanningContext().getTripRouter().getStageActivityTypes() );
+
+		if ( additionalBlackList != null ) {
+			actualBlackList.addActivityTypes(
+					additionalBlackList );
+		}
+
 		return new ActivitySequenceMutatorAlgorithm(
 				MatsimRandom.getLocalInstance(),
-				getReplanningContext().getTripRouter().getStageActivityTypes() );
+				actualBlackList );
 	}
 }
 
