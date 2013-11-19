@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.replanning;
 
+import java.util.List;
 import java.util.Random;
 
 import org.junit.Assert;
@@ -134,6 +135,101 @@ public class TourModeUnifierAlgorithmTest {
 					"unexpected mode of trip "+trip,
 					mode,
 					((Leg) trip.getTripElements().get( 0 )).getMode() );
+		}
+	}
+
+	@Test
+	public void testPlanWithTwoToursOnOpenTour() throws Exception {
+		final Plan plan = new PlanImpl( new PersonImpl( new IdImpl( "jojo" ) ) );
+
+		final Id entranceLink = new IdImpl( "entrance" );
+		final Id exitLink = new IdImpl( "exit" );
+		final Id anchorLink1 = new IdImpl( "anchor1" );
+		final Id anchorLink2 = new IdImpl( "anchor2" );
+		final Random random = new Random( 234 );
+
+		final String stageType = "stage";
+		final String mode1 = "first_mode";
+		final String mode2 = "second_mode";
+		final String modeOfOpenTour = "space_shuttle";
+
+		plan.addActivity( new ActivityImpl( "e" , entranceLink ) );
+		plan.addLeg( new LegImpl( modeOfOpenTour ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( modeOfOpenTour ) );
+		plan.addActivity( new ActivityImpl( stageType , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( modeOfOpenTour ) );
+		plan.addActivity( new ActivityImpl( "h" , anchorLink1 ) );
+		plan.addLeg( new LegImpl( mode1 ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "h" , anchorLink1 ) );
+		plan.addLeg( new LegImpl( modeOfOpenTour ) );
+		plan.addActivity( new ActivityImpl( stageType , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( modeOfOpenTour ) );
+		plan.addActivity( new ActivityImpl( "w" , anchorLink2 ) );
+		plan.addLeg( new LegImpl( mode2 ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( "mode-"+random.nextLong() ) );
+		plan.addActivity( new ActivityImpl( "w" , anchorLink2 ) );
+		plan.addLeg( new LegImpl( modeOfOpenTour ) );
+		plan.addActivity( new ActivityImpl( "type-"+random.nextLong() , new IdImpl( random.nextLong() ) ) );
+		plan.addLeg( new LegImpl( modeOfOpenTour ) );
+		plan.addActivity( new ActivityImpl( "s" , exitLink ) );
+
+
+		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
+
+		final PlanAlgorithm testee =
+			new TourModeUnifierAlgorithm( 
+					types,
+					new MainModeIdentifierImpl() );
+		testee.run( plan );
+
+		Assert.assertEquals(
+				"unexpected plan size",
+				31,
+				plan.getPlanElements().size() );
+
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , types );
+
+		for ( int tripNr : new int[]{0,1,6,11,12} ) {
+			Assert.assertEquals(
+					"unexpected mode for trip "+tripNr,
+					modeOfOpenTour,
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+		}
+
+		for ( int tripNr : new int[]{2,3,3,4,5} ) {
+			Assert.assertEquals(
+					"unexpected length for trip "+tripNr,
+					1,
+					trips.get( tripNr ).getLegsOnly().size() );
+
+			Assert.assertEquals(
+					"unexpected mode for trip "+tripNr,
+					mode1,
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
+		}
+
+		for ( int tripNr : new int[]{7,8,9,10} ) {
+			Assert.assertEquals(
+					"unexpected length for trip "+tripNr,
+					1,
+					trips.get( tripNr ).getLegsOnly().size() );
+
+			Assert.assertEquals(
+					"unexpected mode for trip "+tripNr,
+					mode2,
+					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
 		}
 	}
 }
