@@ -96,7 +96,12 @@ public class AgentWithParking extends AgentEventMessage {
 			}
 
 			if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
-
+				LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
+				if (route.getLinkIds().size()>500){
+					DebugLib.emptyFunctionForSettingBreakPoint();
+				}
+				
+				
 				performSiutationUpdatesForParkingMemory();
 
 				logIfTolledAreaEntered();

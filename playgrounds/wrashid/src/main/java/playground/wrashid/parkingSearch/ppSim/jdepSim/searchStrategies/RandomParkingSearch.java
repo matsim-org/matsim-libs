@@ -82,6 +82,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	private WalkTravelTime walkTravelTime;
 	private double searchBeta;
 	private double randomSearchDistance;
+	protected double maxSearchDuration;
 
 	// go to final link if no parking there, then try parking at other places.
 	// accept only parking within 300m, choose random links, but if leave 300m
@@ -105,6 +106,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 	@Override
 	public void handleAgentLeg(AgentWithParking aem) {
+		maxSearchDuration=ZHScenarioGlobal.loadDoubleParam("RandomParkingSearch.maxSearchTime");
 		walkSpeed = getWalkSpeed(aem);
 		
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
@@ -120,6 +122,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			boolean endOfLegReached = aem.getCurrentLinkIndex() == linkIds.size() - 1;
 
 			if (endOfLegReached) {
+				triggerSeachTimeStart(personId, aem.getMessageArrivalTime());
 				 
 
 				String filterParkingType = getParkingFilterType(personId);
@@ -130,35 +133,8 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 				// TODO: include max distance here (maxDistance variable)
 
-				triggerSeachTimeStart(personId, aem.getMessageArrivalTime());
 
-				if (getSearchTime(aem)>ZHScenarioGlobal.loadDoubleParam("RandomParkingSearch.maxSearchTime")){
-					ActivityImpl nextNonParkAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
-							.get(aem.getPlanElementIndex() + 3);
-					
-					//parkingId=AgentWithParking.parkingManager.getClosestFreeGarageParking(nextNonParkAct.getCoord());
-					//parkingId=new IdImpl("backupParking");
-					
-					if (isInvalidParking(aem, parkingId)) {
-						parkingId = AgentWithParking.parkingManager.getClosestFreeGarageParkingNotOnLink(aem.getCurrentLink().getCoord(),aem.getInvalidLinkForParking());
-					}
-					
-					
-					
-					if (parkingId!=null){
-						// add search time
-						double searchTime = Dummy_TakeClosestParking.getSearchTime(aem, parkingId);
-						if (startSearchTime.containsKey(personId)){
-							double d = startSearchTime.get(personId);
-							d-=searchTime;
-							startSearchTime.put(personId, d);
-						}
-					} else {
-						parkingId=new IdImpl("backupParking");
-					}
-					
-					//startSearchTime.put(personId, -1.0);
-				}
+				
 				
 				
 				if (isInvalidParking(aem, parkingId)) {
@@ -211,6 +187,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	}
 
 	public Id getParkingLinkId(AgentWithParking aem, String filterParkingType) {
+		Id personId = aem.getPerson().getId();
 		Leg leg = (LegImpl) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getPlanElementIndex());
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) leg.getRoute();
 		ActivityImpl nextNonParkingAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
@@ -229,6 +206,37 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		if (isInvalidParking(aem, parkingId)) {
 			parkingId = AgentWithParking.parkingManager.getFreeParkingFacilityOnLink(route.getEndLinkId(), filterParkingType);
 		}
+		
+		
+		if (getSearchTime(aem)>maxSearchDuration){
+			ActivityImpl nextNonParkAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
+					.get(aem.getPlanElementIndex() + 3);
+			
+			//parkingId=AgentWithParking.parkingManager.getClosestFreeGarageParking(nextNonParkAct.getCoord());
+			//parkingId=new IdImpl("backupParking");
+			
+			if (isInvalidParking(aem, parkingId)) {
+				parkingId = AgentWithParking.parkingManager.getClosestFreeGarageParkingNotOnLink(aem.getCurrentLink().getCoord(),aem.getInvalidLinkForParking());
+			}
+			
+			
+			
+			if (parkingId!=null){
+				// add search time
+				double searchTime = Dummy_TakeClosestParking.getSearchTime(aem, parkingId);
+				if (startSearchTime.containsKey(personId)){
+					double d = startSearchTime.get(personId);
+					d-=searchTime;
+					startSearchTime.put(personId, d);
+				}
+			} else {
+				parkingId=new IdImpl("backupParking");
+			}
+			
+			//startSearchTime.put(personId, -1.0);
+		}
+		
+		
 		return parkingId;
 	}
 

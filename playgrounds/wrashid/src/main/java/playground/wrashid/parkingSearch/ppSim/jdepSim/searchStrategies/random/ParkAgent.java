@@ -28,13 +28,16 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_TakeClosestParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class ParkAgent extends RandomParkingSearch {
 
@@ -49,7 +52,7 @@ public class ParkAgent extends RandomParkingSearch {
 	int F1;
 	int F2;
 	double maxDistanceAcceptableForWalk;
-	double maxSeachDuration;
+	double maxSeachDur;
 	double increaseAcceptableDistanceInMetersPerMinute;
 
 	HashMap<Id, ParkAgentAttributes> attributes;
@@ -62,9 +65,10 @@ public class ParkAgent extends RandomParkingSearch {
 		this.F1 = F1;
 		this.F2 = F2;
 		this.maxDistanceAcceptableForWalk = maxDistanceAcceptableForWalk;
-		this.maxSeachDuration = maxSeachDuration;
+		this.maxSeachDur = maxSeachDuration;
 		increaseAcceptableDistanceInMetersPerMinute = increaseAcceptableDistancePerMinute;
 		this.parkingType = "streetParking";
+		super.maxSearchDuration=maxSeachDur;
 	}
 
 	public void resetForNewIteration() {
@@ -78,21 +82,17 @@ public class ParkAgent extends RandomParkingSearch {
 		if (startSearchTime.containsKey(personId)){
 			double searchDuration=getSearchTime(aem);
 			
-			if (searchDuration>maxSeachDuration){
-				useSpecifiedParkingType.put(personId, "garageParking");
+			if (searchDuration>maxSeachDur){
+				super.handleAgentLeg(aem);
+			} else {
+				parkAgentStrategy(aem, personId);
 			}
-			
-			if (searchDuration>2*maxSeachDuration){
-				useSpecifiedParkingType.put(personId, "streetParking");
-			}
+		} else 	{
+			parkAgentStrategy(aem, personId);
 		}
-		
-		
-		
-		
-		
-		
-		
+	}
+
+	public void parkAgentStrategy(AgentWithParking aem, Id personId) {
 		random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
 		ActivityImpl nextAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 				.get(aem.getPlanElementIndex() + 3);
@@ -196,7 +196,7 @@ public class ParkAgent extends RandomParkingSearch {
 	}
 
 	private double getAcceptableParkingDistance(double searchTimeDurationAfterReachingTarget) {
-		if (searchTimeDurationAfterReachingTarget > maxSeachDuration) {
+		if (searchTimeDurationAfterReachingTarget > maxSeachDur) {
 			return Double.MAX_VALUE;
 		} else {
 			
