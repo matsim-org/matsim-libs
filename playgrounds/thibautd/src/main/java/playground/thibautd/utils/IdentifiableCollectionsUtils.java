@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.mobsim.framework.PassengerAgent;
 
 /**
  * @author thibautd
@@ -50,8 +49,8 @@ public class IdentifiableCollectionsUtils {
 
 	public static void addAll(
 			final Collection<Id> collectionToFill,
-			final Collection<? extends PassengerAgent> passengers) {
-		for ( PassengerAgent p : passengers ) collectionToFill.add( p.getId() );
+			final Collection<? extends Identifiable> passengers) {
+		for ( Identifiable p : passengers ) collectionToFill.add( p.getId() );
 	}
 
 
