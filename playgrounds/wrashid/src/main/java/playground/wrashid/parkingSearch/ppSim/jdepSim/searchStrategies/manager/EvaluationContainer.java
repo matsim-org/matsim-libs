@@ -99,14 +99,14 @@ public class EvaluationContainer {
 	}
 
 	public void selectNextStrategyAccordingToProbability() {
-		double exponentialSum = 0;
+		double absoluteSumScore = 0;
 		double[] selectionProbabilities = new double[getEvaluations().size()];
 		for (int i = 0; i < getEvaluations().size(); i++) {
-			exponentialSum += Math.abs(getEvaluations().get(i).score);
+			absoluteSumScore += 1/Math.abs(getEvaluations().get(i).score);
 		}
 
 		for (int i = 0; i < getEvaluations().size(); i++) {
-			selectionProbabilities[i] = Math.abs(getEvaluations().get(i).score) / exponentialSum;
+			selectionProbabilities[i] = 1/Math.abs(getEvaluations().get(i).score) / absoluteSumScore;
 		}
 
 		double r = random.nextDouble();
@@ -126,7 +126,14 @@ public class EvaluationContainer {
 				.loadDoubleParam("convergance.fixedPropbabilityBestStrategy.probabilityBestStrategy")) {
 			selectBestStrategyForExecution();
 		} else {
-			selectLongestNonExecutedStrategyForExecution();
+			String option = ZHScenarioGlobal.loadStringParam("convergance.fixedPropbabilityBestStrategy.choiceOfNotBestStrategy");
+			if (option.equalsIgnoreCase("selectLongestNonExecutedStrategy")){
+				selectLongestNonExecutedStrategyForExecution();
+			} else if (option.equalsIgnoreCase("selectAccordingToScoreWeight")) {
+				selectNextStrategyAccordingToProbability();
+			} else {
+				DebugLib.stopSystemAndReportInconsistency();
+			}
 		}
 	}
 

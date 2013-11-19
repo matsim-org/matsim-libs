@@ -19,6 +19,7 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
@@ -40,6 +41,7 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingMemory;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
@@ -49,7 +51,12 @@ public class AgentWithParking extends AgentEventMessage {
 	public static ParkingStrategyManager parkingStrategyManager;
 	public static ParkingManagerZH parkingManager;
 	public RerouteTaskDuringSim rerouteTask = null;
+	public static int numberOfTollAreaEntryEvents;
 
+	public static void reset() {
+		numberOfTollAreaEntryEvents=0;
+	}
+	
 	public AgentWithParking(Person person) {
 		this.setPerson(person);
 		this.setPlanElementIndex(0);
@@ -123,6 +130,7 @@ public class AgentWithParking extends AgentEventMessage {
 				&& GeneralLib.getDistance(nextLink.getCoord(), coordinatesLindenhofZH) < ZHScenarioGlobal
 						.loadDoubleParam("radiusTolledArea")) {
 			parkingStrategyManager.getParkingStrategyForCurrentLeg(getPerson(), planElementIndex).tollAreaEntered(this);
+			numberOfTollAreaEntryEvents++;
 		}
 	}
 

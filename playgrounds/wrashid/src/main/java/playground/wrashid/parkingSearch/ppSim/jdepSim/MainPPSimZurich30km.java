@@ -147,9 +147,8 @@ public class MainPPSimZurich30km {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			EventWriterXML eventsWriter = new EventWriterXML(ZHScenarioGlobal.outputFolder + "events.xml.gz");
 			LegHistogram lh = new LegHistogram(300);
-			if (ZHScenarioGlobal.writeOutputInCurrentIteration()) {
-				eventsManager.addHandler(lh);
-				if (ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
+			if (ZHScenarioGlobal.writeOutputInCurrentIteration() && ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
+					eventsManager.addHandler(lh);
 					eventsManager.addHandler(eventsWriter);
 
 					eventsManager.resetHandlers(0);
@@ -158,7 +157,7 @@ public class MainPPSimZurich30km {
 					eventsManager.resetHandlers(0);
 
 					eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".events.xml.gz");
-				}
+				
 			}
 
 			agentsMessage.clear();
@@ -168,6 +167,7 @@ public class MainPPSimZurich30km {
 			}
 			AgentWithParking.parkingManager.initFirstParkingOfDay(scenario.getPopulation());
 			ZHScenarioGlobal.reset();
+			AgentWithParking.reset();
 			ParkingMemory.prepareForNextIteration();
 			ParkingMemory.resetMemory();
 			RandomNumbers.reset();
@@ -179,7 +179,7 @@ public class MainPPSimZurich30km {
 
 			log.info("simulation-" + iter + " ended");
 
-			if (ZHScenarioGlobal.writeOutputInCurrentIteration()) {
+			if (ZHScenarioGlobal.writeOutputInCurrentIteration() && ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_all.png");
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_car.png", TransportMode.car);
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
@@ -191,9 +191,7 @@ public class MainPPSimZurich30km {
 				}
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
 				
-				if (ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
-					eventsWriter.reset(0);
-				}
+				eventsWriter.reset(0);
 			}
 
 			ZHScenarioGlobal.produceOutputStats();
@@ -204,6 +202,8 @@ public class MainPPSimZurich30km {
 			AgentWithParking.parkingManager.reset();
 			resetRoutes(scenario);
 			setParkingLinkIdToClosestActivity(scenario.getPopulation().getPersons().values());
+			log.info("number of numberOfTollAreaEntryEvents: " + AgentWithParking.numberOfTollAreaEntryEvents);
+			
 			log.info("iteration-" + iter + " ended");
 		}
 

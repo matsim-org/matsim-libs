@@ -171,7 +171,7 @@ public class StrategyStats {
 				seriesLabels, xValues);
 		
 		
-		writeToTextFile(seriesLabels, matrix, "parkingStrategyScores.txt");
+		writeToTextFile(seriesLabels, matrix, "parkingStrategyScores.txt.gz");
 		
 		log.info("finished 'writeStrategyScoresToFile'");
 	}

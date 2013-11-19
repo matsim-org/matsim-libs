@@ -121,7 +121,7 @@ public class ZHScenarioGlobal {
 			list.add(ped.getTabSeparatedLogString());
 		}
 
-		GeneralLib.writeList(list, getItersFolderPath() + iteration + ".parkingEvents.txt");
+		GeneralLib.writeList(list, getItersFolderPath() + iteration + ".parkingEvents.txt.gz");
 	}
 
 	private static void printParkingStraregyStats(String parkingStrategyName) {
