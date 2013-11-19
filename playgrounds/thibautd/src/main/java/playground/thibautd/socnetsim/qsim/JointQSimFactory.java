@@ -26,8 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -39,7 +37,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
@@ -62,20 +59,6 @@ public class JointQSimFactory implements MobsimFactory {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
 
-		return create( sc,
-				conf.getNumberOfThreads() > 1 && !(eventsManager instanceof SimStepParallelEventsManagerImpl) ?
-					new SynchronizedEventsManagerImpl(eventsManager) :
-					eventsManager );
-	}
-
-	private Mobsim create(
-			final Scenario sc,
-			final EventsManager eventsManager) {
-		final QSimConfigGroup conf = sc.getConfig().qsim();
-		if (conf == null) {
-			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-		}
-
 		if ( !conf.getMainModes().contains( JointActingTypes.DRIVER ) ) {
 			log.warn( "adding the driver mode as a main mode in the config at "+getClass()+" initialisation!" );
 			final List<String> ms = new ArrayList<String>( conf.getMainModes() );
@@ -90,12 +73,10 @@ public class JointQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
-		final QNetsimEngineFactory netsimEngFactory =
-				conf.getNumberOfThreads() > 1 ?
-					new ParallelQNetsimEngineFactory() :
-					new DefaultQSimEngineFactory();
+		final QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
 		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
 		qSim.addMobsimEngine( netsimEngine );
+
 		final JointModesDepartureHandler jointDepHandler = new JointModesDepartureHandler( netsimEngine );
 		qSim.addDepartureHandler( jointDepHandler );
 		qSim.addMobsimEngine( jointDepHandler );
@@ -104,7 +85,7 @@ public class JointQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine( teleportationEngine );
 
         if (sc.getConfig().scenario().isUseTransit()) {
-            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
