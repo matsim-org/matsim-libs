@@ -76,6 +76,9 @@ public class JointPlanRouter implements PlanAlgorithm {
 			oldRoute = oldPlan.nextJointRoute();
 			newRoute = newPlan.nextJointRoute();
 		}
+
+		assert oldRoute == null;
+		assert newRoute == null;
 	}
 
 	public TripRouter getTripRouter() {
