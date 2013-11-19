@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
 
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
@@ -176,8 +177,24 @@ public class IterativeActionTest {
 				if ( !(pe instanceof Leg) ) continue;
 				final Leg l = (Leg) pe;
 				final String mode = l.getMode();
-				if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
-				if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+				if ( JointActingTypes.DRIVER.equals( mode ) ) {
+					Assert.assertNotNull(
+							"route must not be null",
+							l.getRoute() );
+					Assert.assertTrue(
+							"unexpected route type "+l.getRoute().getClass().getName(),
+							l.getRoute() instanceof DriverRoute );
+					d++;
+				}
+				if ( JointActingTypes.PASSENGER.equals( mode ) ) {
+					Assert.assertNotNull(
+							"route must not be null",
+							l.getRoute() );
+					Assert.assertTrue(
+							"unexpected route type "+l.getRoute().getClass().getName(),
+							l.getRoute() instanceof PassengerRoute );
+					p++;
+				}
 			}
 		}
 
@@ -218,8 +235,24 @@ public class IterativeActionTest {
 				if ( !(pe instanceof Leg) ) continue;
 				final Leg l = (Leg) pe;
 				final String mode = l.getMode();
-				if ( JointActingTypes.DRIVER.equals( mode ) ) d++;
-				if ( JointActingTypes.PASSENGER.equals( mode ) ) p++;
+				if ( JointActingTypes.DRIVER.equals( mode ) ) {
+					Assert.assertNotNull(
+							"route must not be null",
+							l.getRoute() );
+					Assert.assertTrue(
+							"unexpected route type "+l.getRoute().getClass().getName(),
+							l.getRoute() instanceof DriverRoute );
+					d++;
+				}
+				if ( JointActingTypes.PASSENGER.equals( mode ) ) {
+					Assert.assertNotNull(
+							"route must not be null",
+							l.getRoute() );
+					Assert.assertTrue(
+							"unexpected route type "+l.getRoute().getClass().getName(),
+							l.getRoute() instanceof PassengerRoute );
+					p++;
+				}
 			}
 		}
 
