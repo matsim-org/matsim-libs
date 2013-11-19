@@ -106,60 +106,42 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			if ( agentsToIgnore.contains( id ) ) continue;
 			final Plan plan = entry.getValue();
 
+			// identify the joint trips as one single trips.
+			// Otherwise, the process will insert joint trips to access pick-ups
+			// or go from drop offs...
 			final CompositeStageActivityTypes types = new CompositeStageActivityTypes();
 			types.addActivityTypes( router.getStageActivityTypes() );
 			types.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 
-			// identify the joint trips as one single trips.
-			// Otherwise, the process will insert joint trips to access pick-ups
-			// or go from drop offs...
 			final MainModeIdentifier mainModeIdentifier =
 				new JointMainModeIdentifier(
 						router.getMainModeIdentifier() );
 
 			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , types ) ) {
 				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );
-				if ( isElectableTrip(
-							trip.getOriginActivity(),
-							mode,
-							trip.getDestinationActivity() ) ) {
-					if ( mode.equals( TransportMode.car ) ) {
-						trips.carTrips.add(
-								new Trip(
-									trip.getOriginActivity(),
-									trip.getDestinationActivity(),
-									calcEndOfActivity( trip.getOriginActivity() , plan ),
-									id,
-									TransportMode.car) );
-					}
-					else if ( !chainBasedModes.contains( mode ) ) {
-						trips.nonChainBasedModeTrips.add(
-								new Trip(
-									trip.getOriginActivity(),
-									trip.getDestinationActivity(),
-									calcEndOfActivity( trip.getOriginActivity() , plan ),
-									id,
-									mode) );
-					}
+
+				if ( mode.equals( TransportMode.car ) ) {
+					trips.carTrips.add(
+							new Trip(
+								trip.getOriginActivity(),
+								trip.getDestinationActivity(),
+								calcEndOfActivity( trip.getOriginActivity() , plan ),
+								id) );
+				}
+				else if (
+						!JointActingTypes.JOINT_MODES.contains( mode ) &&
+						!chainBasedModes.contains( mode ) ) {
+					trips.nonChainBasedModeTrips.add(
+							new Trip(
+								trip.getOriginActivity(),
+								trip.getDestinationActivity(),
+								calcEndOfActivity( trip.getOriginActivity() , plan ),
+								id) );
 				}
 			}
 		}
 
 		return trips;
-	}
-
-	private static boolean isElectableTrip(
-			final Activity origin,
-			final String mode,
-			final Activity destination) {
-		final String orType = origin.getType();
-		final String destType = destination.getType();
-		final boolean isPartOfJointTrip = 
-			mode.equals( JointActingTypes.PASSENGER ) ||
-			mode.equals( JointActingTypes.DRIVER ) ||
-			destType.equals( JointActingTypes.INTERACTION ) ||
-			orType.equals( JointActingTypes.INTERACTION );
-		return !isPartOfJointTrip;
 	}
 
 	private List<Match> extractMatches(
@@ -262,55 +244,47 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		final Plan passengerPlan = jointPlan.getIndividualPlans().get( match.tripPassenger.agentId );
 
 		// insert in driver plan
-		List<PlanElement> driverTrip = new ArrayList<PlanElement>();
+		final List<PlanElement> driverTrip = new ArrayList<PlanElement>();
 		driverTrip.add( new LegImpl( TransportMode.car ) );
-		Activity act = new ActivityImpl(
+		final Activity firstAct = new ActivityImpl(
 				JointActingTypes.INTERACTION,
 				match.tripPassenger.departure.getCoord(),
 				match.tripPassenger.departure.getLinkId());
-		act.setMaximumDuration( 0 );
-		driverTrip.add( act );
-		Leg leg =  new LegImpl( JointActingTypes.DRIVER );
-		DriverRoute dRoute = new DriverRoute(
+		firstAct.setMaximumDuration( 0 );
+		driverTrip.add( firstAct );
+		final Leg leg =  new LegImpl( JointActingTypes.DRIVER );
+		final DriverRoute dRoute = new DriverRoute(
 				match.tripPassenger.departure.getLinkId(),
 				match.tripPassenger.arrival.getLinkId());
 		dRoute.addPassenger( match.tripPassenger.agentId );
 		leg.setRoute( dRoute );
 		driverTrip.add( leg );
-		act = new ActivityImpl(
+		final Activity secondAct = new ActivityImpl(
 				JointActingTypes.INTERACTION,
 				match.tripPassenger.arrival.getCoord(),
 				match.tripPassenger.arrival.getLinkId());
-		act.setMaximumDuration( 0 );
-		driverTrip.add( act );
+		secondAct.setMaximumDuration( 0 );
+		driverTrip.add( secondAct );
 		driverTrip.add( new LegImpl( TransportMode.car ) );
 
 		// insert in passenger plan
-		List<PlanElement> passengerTrip = new ArrayList<PlanElement>();
-		passengerTrip.add( new LegImpl( match.tripPassenger.initialMode ) );
-		act = new ActivityImpl(
-				JointActingTypes.INTERACTION,
-				match.tripPassenger.departure.getCoord(),
-				match.tripPassenger.departure.getLinkId());
-		act.setMaximumDuration( 0 );
-		passengerTrip.add( act );
-		leg =  new LegImpl( JointActingTypes.PASSENGER );
-		PassengerRoute pRoute = new PassengerRoute(
+		final Leg pLeg =  new LegImpl( JointActingTypes.PASSENGER );
+		final PassengerRoute pRoute = new PassengerRoute(
 				match.tripPassenger.departure.getLinkId(),
 				match.tripPassenger.arrival.getLinkId());
 		pRoute.setDriverId( match.tripDriver.agentId );
 		leg.setRoute( pRoute );
-		passengerTrip.add( leg );
-		act = new ActivityImpl(
-				JointActingTypes.INTERACTION,
-				match.tripPassenger.arrival.getCoord(),
-				match.tripPassenger.arrival.getLinkId());
-		act.setMaximumDuration( 0 );
-		passengerTrip.add( act );
-		passengerTrip.add( new LegImpl( match.tripPassenger.initialMode ) );
 
-		TripRouter.insertTrip( driverPlan , match.tripDriver.departure , driverTrip , match.tripDriver.arrival );
-		TripRouter.insertTrip( passengerPlan , match.tripPassenger.departure , passengerTrip , match.tripPassenger.arrival );
+		TripRouter.insertTrip(
+				driverPlan,
+				match.tripDriver.departure,
+				driverTrip,
+				match.tripDriver.arrival );
+		TripRouter.insertTrip(
+				passengerPlan,
+				match.tripPassenger.departure,
+				Collections.singletonList( pLeg ),
+				match.tripPassenger.arrival );
 	}
 
 	private static double calcEndOfActivity(
@@ -375,20 +349,17 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		final double departureTime;
 		final double length;
 		final Id agentId;
-		final String initialMode;
 
 		public Trip(
 				final Activity departure,
 				final Activity arrival,
 				final double departureTime,
-				final Id agentId,
-				final String initialMode) {
+				final Id agentId) {
 			this.departure = departure;
 			this.arrival = arrival;
 			this.departureTime = departureTime;
 			this.length = CoordUtils.calcDistance( departure.getCoord() , arrival.getCoord() );
 			this.agentId = agentId;
-			this.initialMode = initialMode;
 		}
 	}
 
