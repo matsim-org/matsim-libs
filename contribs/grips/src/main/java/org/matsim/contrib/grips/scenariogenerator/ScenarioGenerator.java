@@ -40,7 +40,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkImpl;
@@ -174,7 +173,7 @@ public class ScenarioGenerator {
 
 
 
-		((SimulationConfigGroup) this.c.getModule(SimulationConfigGroup.GROUP_NAME)).setRemoveStuckVehicles(false);
+		this.c.qsim().setRemoveStuckVehicles(false);
 
 		this.c.travelTimeCalculator().setTraveltimeBinSize(120);
 		this.c.travelTimeCalculator().setTravelTimeCalculatorType("TravelTimeCalculatorHashMap");
@@ -223,8 +222,8 @@ public class ScenarioGenerator {
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), gcm.getSampleSize()).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
 
-		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(gcm.getSampleSize());
-		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(gcm.getSampleSize());
+		sc.getConfig().qsim().setStorageCapFactor(gcm.getSampleSize());
+		sc.getConfig().qsim().setFlowCapFactor(gcm.getSampleSize());
 
 		ActivityParams pre = new ActivityParams("pre-evac");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
