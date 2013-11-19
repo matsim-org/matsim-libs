@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads;
 
+import java.util.LinkedList;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -32,6 +33,7 @@ public class RerouteThreadPool {
 	private RerouteThread[] rerouteThreads;
 	int counter=0;
 	private CyclicBarrier cyclicBarrier;
+	public LinkedList<RerouteTask> rerouteTasks=new LinkedList<RerouteTask>();
 
 	public RerouteThreadPool(int numberOfThreads, TTMatrix ttMatrix, Network network){
 		rerouteThreads = new RerouteThread[numberOfThreads];
@@ -43,6 +45,7 @@ public class RerouteThreadPool {
 	}
 	
 	public void addTask(RerouteTask rt){
+		rerouteTasks.add(rt);
 		rerouteThreads[counter % rerouteThreads.length].addTask(rt);
 		counter++;
 	}

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -108,6 +109,15 @@ public class AgentWithParking extends AgentEventMessage {
 		Link currentLink = getCurrentLink();
 		Link nextLink = getNextLink();
 
+		if (getPerson().getId().toString().equalsIgnoreCase("948") && getPlanElementIndex()==11){
+			
+			Activity act = (Activity) getPerson().getSelectedPlan().getPlanElements().get(getPlanElementIndex()+3);
+			
+			boolean a=GeneralLib.getDistance(act.getCoord(), coordinatesLindenhofZH) > ZHScenarioGlobal.loadDoubleParam("radiusTolledArea");
+			boolean b=GeneralLib.getDistance(currentLink.getCoord(), coordinatesLindenhofZH) > ZHScenarioGlobal.loadDoubleParam("radiusTolledArea");
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
+		
 		if (GeneralLib.getDistance(currentLink.getCoord(), coordinatesLindenhofZH) > ZHScenarioGlobal
 				.loadDoubleParam("radiusTolledArea")
 				&& GeneralLib.getDistance(nextLink.getCoord(), coordinatesLindenhofZH) < ZHScenarioGlobal

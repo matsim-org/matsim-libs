@@ -49,6 +49,9 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.Desires;
@@ -56,6 +59,8 @@ import org.matsim.population.Desires;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TTMatrixBasedTravelTime;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TollAreaTravelDisutility;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingMemory;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.PrivateParkingWithWaitAndRandomSearchAsBackup;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
@@ -120,7 +125,7 @@ public class MainPPSimZurich30km {
 
 		LinkedList<AgentWithParking> agentsMessage = new LinkedList<AgentWithParking>();
 
-		EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork());
+		initGlobalReroute(scenario);
 		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork(), Message.ttMatrix);
 		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas((ScenarioImpl) scenario,
 				HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((ScenarioImpl) scenario));
@@ -198,6 +203,20 @@ public class MainPPSimZurich30km {
 			log.info("iteration-" + iter + " ended");
 		}
 
+	}
+
+	public static void initGlobalReroute(Scenario scenario) {
+		if (ZHScenarioGlobal
+				.loadDoubleParam("radiusTolledArea")>0){
+			
+			TravelDisutility travelCost=new TollAreaTravelDisutility();
+			TravelTime travelTime=new TTMatrixBasedTravelTime(Message.ttMatrix);
+			Dijkstra routingAlgo = new Dijkstra(scenario.getNetwork(), travelCost,travelTime);
+			
+			EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork(),routingAlgo);
+		} else {
+			EditRoute.globalEditRoute = new EditRoute(Message.ttMatrix, scenario.getNetwork());
+		}
 	}
 
 	private static void resetRoutes(Scenario scenario) {

@@ -22,6 +22,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Scenario;
 
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.AvoidRoutingThroughTolledArea;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_BRD_TakeClosestGarageParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_OptimalScore;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_RandomSelection;
@@ -32,6 +33,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSe
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.PrivateParkingWithWaitAndRandomSearchAsBackup;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetSearchFromDepature;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy2;
@@ -381,8 +383,15 @@ public class ParkingStrategyScenarios {
 				strategy = new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "BRD(500m)-S-" + i, 500);
 				strategy.setGroupName("BRD(500m)-S");
 				allStrategies.add(strategy);
+				
+				strategy = new RandomStreetSearchFromDepature(-1, scenario.getNetwork(), "RandomStreetSearchFromDepature" + i);
+				strategy.setGroupName("RandomStreetSearchFromDepature");
+				allStrategies.add(strategy);
+				
+				strategy = new AvoidRoutingThroughTolledArea(-1, scenario.getNetwork(), "AvoidRoutingThroughTolledArea" + i);
+				strategy.setGroupName("AvoidRoutingThroughTolledArea");
+				allStrategies.add(strategy);
 			}
-
 		}
 
 		return allStrategies;

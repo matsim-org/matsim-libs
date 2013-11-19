@@ -28,8 +28,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkEvent;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.DummyTravelDisutility;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TTMatrixBasedTravelTime;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TollAreaTravelDisutility;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
 
@@ -45,7 +51,18 @@ public class RerouteThreadDuringSim extends Thread {
 	}
 
 	public RerouteThreadDuringSim(TTMatrix ttMatrix, Network network) {
-		this.editRoute = new EditRoute(ttMatrix, network);
+		if (ZHScenarioGlobal
+				.loadDoubleParam("radiusTolledArea")>0){
+			
+			TravelDisutility travelCost=new TollAreaTravelDisutility();
+			TravelTime travelTime=new TTMatrixBasedTravelTime(ttMatrix);
+			Dijkstra routingAlgo = new Dijkstra(network, travelCost,travelTime);
+			
+			this.editRoute = new EditRoute(ttMatrix, network,routingAlgo);
+		} else {
+			this.editRoute = new EditRoute(ttMatrix, network);
+		}
+		
 	}
 
 	public void run() {

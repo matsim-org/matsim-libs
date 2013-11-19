@@ -54,6 +54,11 @@ public class EditRoute {
 		routingAlgo = new Dijkstra(network, travelCost,travelTime);
 	}
 	
+	public EditRoute(TTMatrix ttMatrix,Network network, LeastCostPathCalculator routingAlgo){
+		this.network=network;
+		this.routingAlgo = routingAlgo;
+	}
+	
 	public LinkNetworkRouteImpl getRoute(double time, Id startLinkId, Id endLinkId){
 		Path calcLeastCostPath = routingAlgo.calcLeastCostPath(network.getLinks().get(startLinkId).getToNode(), network.getLinks().get(endLinkId).getToNode(), time, null, null);
 		List<Link> links=calcLeastCostPath.links;

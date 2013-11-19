@@ -83,6 +83,8 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTas
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskAddInitialPartToRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadPool;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.AvoidRoutingThroughTolledArea;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.EvaluationContainer;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.StrategyEvaluation;
@@ -543,8 +545,13 @@ public class ParkingManagerZH {
 							// prevParkingAct.getLinkId(),
 							// leg,ttMatrix,network));
 
+							if (person.getId().toString().equalsIgnoreCase("504")) {
+								DebugLib.emptyFunctionForSettingBreakPoint();
+							}
+							
+							
 							if (firstAdaptedLegCache.containsKey(person.getId())){
-								leg.setRoute(firstAdaptedLegCache.get(person.getId()));
+								leg.setRoute(firstAdaptedLegCache.get(person.getId()).clone());
 							} else {
 								rtPool.addTask(new RerouteTaskAddInitialPartToRoute(act.getEndTime(), prevParkingAct.getLinkId(), leg));
 								// rerouteThreads[numberOfTasks %
@@ -571,7 +578,12 @@ public class ParkingManagerZH {
 					if (pe instanceof LegImpl) {
 						LegImpl leg = (LegImpl) pe;
 						if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
-							firstAdaptedLegCache.put(person.getId(), leg.getRoute());
+							
+							if (person.getId().toString().equalsIgnoreCase("504")) {
+								DebugLib.emptyFunctionForSettingBreakPoint();
+							}
+							
+							firstAdaptedLegCache.put(person.getId(), leg.getRoute().clone());
 							break;
 						}
 					}
@@ -580,6 +592,18 @@ public class ParkingManagerZH {
 		}
 
 		log.info("completed initFirstParkingOfDay");
+		
+		
+		if (ZHScenarioGlobal.iteration == 0) {
+			for (ParkingSearchStrategy pss:ParkingStrategyManager.allStrategies){
+				if (pss instanceof AvoidRoutingThroughTolledArea){
+					if (AvoidRoutingThroughTolledArea.routes==null){
+						AvoidRoutingThroughTolledArea.initRoutes();
+					} 
+				}
+			}
+			
+		}
 	}
 
 	private void logInitialParkingOfEachAgent() {
