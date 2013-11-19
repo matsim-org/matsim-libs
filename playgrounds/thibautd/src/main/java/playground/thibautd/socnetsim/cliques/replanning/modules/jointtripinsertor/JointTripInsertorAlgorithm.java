@@ -247,25 +247,31 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			// insert in driver plan
 			final List<PlanElement> driverTrip = new ArrayList<PlanElement>();
 			driverTrip.add( new LegImpl( TransportMode.car ) );
-			final Activity firstAct = new ActivityImpl(
-					JointActingTypes.INTERACTION,
-					match.tripPassenger.departure.getCoord(),
-					match.tripPassenger.departure.getLinkId());
-			firstAct.setMaximumDuration( 0 );
-			driverTrip.add( firstAct );
-			final Leg leg =  new LegImpl( JointActingTypes.DRIVER );
-			final DriverRoute dRoute = new DriverRoute(
-					match.tripPassenger.departure.getLinkId(),
-					match.tripPassenger.arrival.getLinkId());
-			dRoute.addPassenger( match.tripPassenger.agentId );
-			leg.setRoute( dRoute );
-			driverTrip.add( leg );
-			final Activity secondAct = new ActivityImpl(
-					JointActingTypes.INTERACTION,
-					match.tripPassenger.arrival.getCoord(),
-					match.tripPassenger.arrival.getLinkId());
-			secondAct.setMaximumDuration( 0 );
-			driverTrip.add( secondAct );
+			/* scope of firstAct */ {
+				final Activity firstAct = new ActivityImpl(
+						JointActingTypes.INTERACTION,
+						match.tripPassenger.departure.getCoord(),
+						match.tripPassenger.departure.getLinkId());
+				firstAct.setMaximumDuration( 0 );
+				driverTrip.add( firstAct );
+			}
+			/* scope of leg */ {
+				final Leg leg =  new LegImpl( JointActingTypes.DRIVER );
+				final DriverRoute dRoute = new DriverRoute(
+						match.tripPassenger.departure.getLinkId(),
+						match.tripPassenger.arrival.getLinkId());
+				dRoute.addPassenger( match.tripPassenger.agentId );
+				leg.setRoute( dRoute );
+				driverTrip.add( leg );
+			}
+			/* scope of secondAct */ {
+				final Activity secondAct = new ActivityImpl(
+						JointActingTypes.INTERACTION,
+						match.tripPassenger.arrival.getCoord(),
+						match.tripPassenger.arrival.getLinkId());
+				secondAct.setMaximumDuration( 0 );
+				driverTrip.add( secondAct );
+			}
 			driverTrip.add( new LegImpl( TransportMode.car ) );
 
 			TripRouter.insertTrip(
