@@ -273,7 +273,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 				match.tripPassenger.departure.getLinkId(),
 				match.tripPassenger.arrival.getLinkId());
 		pRoute.setDriverId( match.tripDriver.agentId );
-		leg.setRoute( pRoute );
+		pLeg.setRoute( pRoute );
 
 		TripRouter.insertTrip(
 				driverPlan,
