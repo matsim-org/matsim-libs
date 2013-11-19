@@ -243,48 +243,54 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		final Plan driverPlan = jointPlan.getIndividualPlans().get( match.tripDriver.agentId );
 		final Plan passengerPlan = jointPlan.getIndividualPlans().get( match.tripPassenger.agentId );
 
-		// insert in driver plan
-		final List<PlanElement> driverTrip = new ArrayList<PlanElement>();
-		driverTrip.add( new LegImpl( TransportMode.car ) );
-		final Activity firstAct = new ActivityImpl(
-				JointActingTypes.INTERACTION,
-				match.tripPassenger.departure.getCoord(),
-				match.tripPassenger.departure.getLinkId());
-		firstAct.setMaximumDuration( 0 );
-		driverTrip.add( firstAct );
-		final Leg leg =  new LegImpl( JointActingTypes.DRIVER );
-		final DriverRoute dRoute = new DriverRoute(
-				match.tripPassenger.departure.getLinkId(),
-				match.tripPassenger.arrival.getLinkId());
-		dRoute.addPassenger( match.tripPassenger.agentId );
-		leg.setRoute( dRoute );
-		driverTrip.add( leg );
-		final Activity secondAct = new ActivityImpl(
-				JointActingTypes.INTERACTION,
-				match.tripPassenger.arrival.getCoord(),
-				match.tripPassenger.arrival.getLinkId());
-		secondAct.setMaximumDuration( 0 );
-		driverTrip.add( secondAct );
-		driverTrip.add( new LegImpl( TransportMode.car ) );
+		/* scope of driver-specific variables */ {
+			// insert in driver plan
+			final List<PlanElement> driverTrip = new ArrayList<PlanElement>();
+			driverTrip.add( new LegImpl( TransportMode.car ) );
+			final Activity firstAct = new ActivityImpl(
+					JointActingTypes.INTERACTION,
+					match.tripPassenger.departure.getCoord(),
+					match.tripPassenger.departure.getLinkId());
+			firstAct.setMaximumDuration( 0 );
+			driverTrip.add( firstAct );
+			final Leg leg =  new LegImpl( JointActingTypes.DRIVER );
+			final DriverRoute dRoute = new DriverRoute(
+					match.tripPassenger.departure.getLinkId(),
+					match.tripPassenger.arrival.getLinkId());
+			dRoute.addPassenger( match.tripPassenger.agentId );
+			leg.setRoute( dRoute );
+			driverTrip.add( leg );
+			final Activity secondAct = new ActivityImpl(
+					JointActingTypes.INTERACTION,
+					match.tripPassenger.arrival.getCoord(),
+					match.tripPassenger.arrival.getLinkId());
+			secondAct.setMaximumDuration( 0 );
+			driverTrip.add( secondAct );
+			driverTrip.add( new LegImpl( TransportMode.car ) );
 
-		// insert in passenger plan
-		final Leg pLeg =  new LegImpl( JointActingTypes.PASSENGER );
-		final PassengerRoute pRoute = new PassengerRoute(
-				match.tripPassenger.departure.getLinkId(),
-				match.tripPassenger.arrival.getLinkId());
-		pRoute.setDriverId( match.tripDriver.agentId );
-		pLeg.setRoute( pRoute );
+			TripRouter.insertTrip(
+					driverPlan,
+					match.tripDriver.departure,
+					driverTrip,
+					match.tripDriver.arrival );
+		}
 
-		TripRouter.insertTrip(
-				driverPlan,
-				match.tripDriver.departure,
-				driverTrip,
-				match.tripDriver.arrival );
-		TripRouter.insertTrip(
-				passengerPlan,
-				match.tripPassenger.departure,
-				Collections.singletonList( pLeg ),
-				match.tripPassenger.arrival );
+		/* scope of passenger-specific variables */ {
+			// insert in passenger plan
+			final Leg pLeg =  new LegImpl( JointActingTypes.PASSENGER );
+			final PassengerRoute pRoute = new PassengerRoute(
+					match.tripPassenger.departure.getLinkId(),
+					match.tripPassenger.arrival.getLinkId());
+			pRoute.setDriverId( match.tripDriver.agentId );
+			pLeg.setRoute( pRoute );
+
+
+			TripRouter.insertTrip(
+					passengerPlan,
+					match.tripPassenger.departure,
+					Collections.singletonList( pLeg ),
+					match.tripPassenger.arrival );
+		}
 	}
 
 	private static double calcEndOfActivity(
