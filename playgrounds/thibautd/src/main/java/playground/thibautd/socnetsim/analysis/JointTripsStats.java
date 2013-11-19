@@ -20,7 +20,7 @@
 package playground.thibautd.socnetsim.analysis;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -44,9 +44,8 @@ public class JointTripsStats extends AbstractPlanAnalyzerPerGroup {
 	protected double calcStat(final Plan plan) {
 		int count = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity &&
-					((Activity) pe).getType().equals(
-						JointActingTypes.PICK_UP )) {
+			if (pe instanceof Leg &&
+					JointActingTypes.JOINT_MODES.contains( ((Leg) pe).getMode() ) ) {
 				count++;
 			}
 		}
