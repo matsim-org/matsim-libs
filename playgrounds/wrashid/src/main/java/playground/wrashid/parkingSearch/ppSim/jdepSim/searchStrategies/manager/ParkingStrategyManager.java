@@ -38,6 +38,7 @@ import org.matsim.core.population.LegImpl;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyStats;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 
@@ -48,10 +49,13 @@ public class ParkingStrategyManager {
 	public static LinkedList<ParkingSearchStrategy> allStrategies;
 	private HashMap<Id, HashMap<Integer, EvaluationContainer>> strategyEvaluations = new HashMap<Id, HashMap<Integer, EvaluationContainer>>();
 
+	private Random globalbRandom;
+
 	// personId, legIndex
 
 	public ParkingStrategyManager(LinkedList<ParkingSearchStrategy> allStrategies) {
 		ParkingStrategyManager.allStrategies = allStrategies;
+		globalbRandom = RandomNumbers.getGlobalbRandom();
 	}
 
 	// this needs to be invoked at the starting of an iteration (does not assume
@@ -80,52 +84,74 @@ public class ParkingStrategyManager {
 						evaluationContainer = agentHashMap.get(i);
 					}
 
-					handleDropWorseGroupStrategies(evaluationContainer);
-
-					if (ZHScenarioGlobal.loadBooleanParam("convergance.evaluateAllStrategiesOnceAtBeginning")
-							&& !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
-						evaluationContainer.selectStrategyNotExecutedTillNow();
+					if (ZHScenarioGlobal.loadBooleanParam("convergance.useMATSimLikeConvergence")){
+						handleMATSimApproach(evaluationContainer);
 					} else {
-						/*
-						 * if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
-						 * .loadIntParam(
-						 * "convergance.executeRandomStrategy.stopStrategyAtIteration"
-						 * )) { evaluationContainer.selectRandomStrategy(); }
-						 * else
-						 */
-						if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
-								.loadIntParam("convergance.fixedPropbabilityBestStrategy.stopStrategyAtIteration")) {
-							evaluationContainer.selectStrategyAccordingToFixedProbabilityForBestStrategy();
-						} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
-								.loadIntParam("convergance.MNLExpScore.startStrategyAtIteration")) {
-							evaluationContainer.selectNextStrategyAccordingToMNLExp();
-						} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
-								.loadIntParam("convergance.MNLScore.startStrategyAtIteration")) {
-							evaluationContainer.selectNextStrategyAccordingToProbability();
-						} else {
-							DebugLib.stopSystemAndReportInconsistency();
-						}
+						handleNonMATSimApproach(evaluationContainer);
 					}
+				}
+			}
+		}
+	}
 
-					if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropAllOnce")) {
-						if (ZHScenarioGlobal.loadIntParam("convergance.dropAllOnce.atIteration") == ZHScenarioGlobal.iteration) {
-							evaluationContainer.trimStrategySet(ZHScenarioGlobal
-									.loadIntParam("convergance.dropStrategy.minNumberOfStrategies"));
-						}
-					} else if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropOneByOne")) {
-						if (evaluationContainer.getNumberOfStrategies() > ZHScenarioGlobal
-								.loadIntParam("convergance.dropStrategy.minNumberOfStrategies")) {
-							int startDrop = ZHScenarioGlobal.loadIntParam("convergance.dropOneByOne.startDroppingAtIteration");
-							if (startDrop == ZHScenarioGlobal.iteration) {
-								evaluationContainer.dropWostStrategy();
-							} else if (startDrop < ZHScenarioGlobal.iteration) {
-								int dropEachNthIter = ZHScenarioGlobal
-										.loadIntParam("convergance.dropOneByOne.dropEachNthIteration");
-								if ((ZHScenarioGlobal.iteration - startDrop) % dropEachNthIter == 0) {
-									evaluationContainer.dropWostStrategy();
-								}
-							}
-						}
+	private void handleMATSimApproach(EvaluationContainer evaluationContainer) {
+		evaluationContainer.trimStrategySet(ZHScenarioGlobal.loadIntParam("convergance.maxNumberOfPlansInMemory"));
+	
+		if (globalbRandom.nextDouble()<ZHScenarioGlobal.loadDoubleParam("convergance.executionProbabilityMNL")){
+			if (evaluationContainer.allStrategiesHaveBeenExecutedOnce()){
+				evaluationContainer.selectNextStrategyAccordingToMNLExp();
+			} else {
+				evaluationContainer.selectStrategyNotExecutedTillNow();
+			}
+		} else {
+			evaluationContainer.addRandomPlanAndSelectForExecution();
+		}
+	}
+
+	public void handleNonMATSimApproach(EvaluationContainer evaluationContainer) {
+		handleDropWorseGroupStrategies(evaluationContainer);
+
+		if (ZHScenarioGlobal.loadBooleanParam("convergance.evaluateAllStrategiesOnceAtBeginning")
+				&& !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
+			evaluationContainer.selectStrategyNotExecutedTillNow();
+		} else {
+			/*
+			 * if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
+			 * .loadIntParam(
+			 * "convergance.executeRandomStrategy.stopStrategyAtIteration"
+			 * )) { evaluationContainer.selectRandomStrategy(); }
+			 * else
+			 */
+			if (ZHScenarioGlobal.iteration < ZHScenarioGlobal
+					.loadIntParam("convergance.fixedPropbabilityBestStrategy.stopStrategyAtIteration")) {
+				evaluationContainer.selectStrategyAccordingToFixedProbabilityForBestStrategy();
+			} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
+					.loadIntParam("convergance.MNLExpScore.startStrategyAtIteration")) {
+				evaluationContainer.selectNextStrategyAccordingToMNLExp();
+			} else if (ZHScenarioGlobal.iteration >= ZHScenarioGlobal
+					.loadIntParam("convergance.MNLScore.startStrategyAtIteration")) {
+				evaluationContainer.selectNextStrategyAccordingToProbability();
+			} else {
+				DebugLib.stopSystemAndReportInconsistency();
+			}
+		}
+
+		if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropAllOnce")) {
+			if (ZHScenarioGlobal.loadIntParam("convergance.dropAllOnce.atIteration") == ZHScenarioGlobal.iteration) {
+				evaluationContainer.trimStrategySet(ZHScenarioGlobal
+						.loadIntParam("convergance.dropStrategy.minNumberOfStrategies"));
+			}
+		} else if (ZHScenarioGlobal.loadStringParam("convergance.dropStrategy").equalsIgnoreCase("dropOneByOne")) {
+			if (evaluationContainer.getNumberOfStrategies() > ZHScenarioGlobal
+					.loadIntParam("convergance.dropStrategy.minNumberOfStrategies")) {
+				int startDrop = ZHScenarioGlobal.loadIntParam("convergance.dropOneByOne.startDroppingAtIteration");
+				if (startDrop == ZHScenarioGlobal.iteration) {
+					evaluationContainer.dropWostStrategy();
+				} else if (startDrop < ZHScenarioGlobal.iteration) {
+					int dropEachNthIter = ZHScenarioGlobal
+							.loadIntParam("convergance.dropOneByOne.dropEachNthIteration");
+					if ((ZHScenarioGlobal.iteration - startDrop) % dropEachNthIter == 0) {
+						evaluationContainer.dropWostStrategy();
 					}
 				}
 			}

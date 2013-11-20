@@ -28,6 +28,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
@@ -40,8 +41,11 @@ public class EvaluationContainer {
 
 	private Random random;
 
+	private LinkedList<ParkingSearchStrategy> allStrategies;
+
 	public EvaluationContainer(LinkedList<ParkingSearchStrategy> allStrategies) {
-		random = MatsimRandom.getLocalInstance();
+		this.allStrategies = allStrategies;
+		random = RandomNumbers.getGlobalbRandom();
 		setEvaluations(new LinkedList<StrategyEvaluation>());
 		createAndStorePermutation(allStrategies);
 	}
@@ -270,6 +274,27 @@ public class EvaluationContainer {
 	public void selectRandomStrategy() {
 		int randomIndex = random.nextInt(evaluations.size());
 		evaluations.addFirst(evaluations.remove(randomIndex));
+	}
+
+	public void addRandomPlanAndSelectForExecution() {
+		int randomIndex = random.nextInt(allStrategies.size());
+		ParkingSearchStrategy newParkingStrategy = allStrategies.get(randomIndex);
+		
+		while (strategyEvaluationExistsAlready(newParkingStrategy)){
+			randomIndex = random.nextInt(allStrategies.size());
+			newParkingStrategy = allStrategies.get(randomIndex);
+		}
+		
+		evaluations.addFirst(new StrategyEvaluation(newParkingStrategy));
+	}
+
+	private boolean strategyEvaluationExistsAlready(ParkingSearchStrategy newParkingStrategy) {
+		for (StrategyEvaluation se : getEvaluations()) {
+			if (se.strategy.getName().equalsIgnoreCase(newParkingStrategy.getName())){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

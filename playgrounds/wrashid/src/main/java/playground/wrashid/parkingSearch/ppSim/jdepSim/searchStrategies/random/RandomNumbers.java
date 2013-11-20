@@ -29,6 +29,8 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 public class RandomNumbers {
 
 	static TwoHashMapsConcatenated<Id, Integer, Random> randomNumbers;
+	
+	static int counter=0;
 
 	public static Random getRandomNumber(Id personId,Integer legIndex,String strategyName){
 		if (randomNumbers.get(personId, legIndex)==null){
@@ -44,6 +46,10 @@ public class RandomNumbers {
 	
 	public static void reset(){
 		randomNumbers=new TwoHashMapsConcatenated<Id, Integer, Random>();
+	}
+	
+	public static Random getGlobalbRandom(){
+		return new Random(ZHScenarioGlobal.loadIntParam("RandomNumbers.seed") + counter++);
 	}
 	
 }
