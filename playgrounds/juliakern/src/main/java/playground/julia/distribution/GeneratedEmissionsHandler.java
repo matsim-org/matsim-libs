@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ColdEmissionEvent.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.julia.distribution;
 
 import java.util.ArrayList;
@@ -48,6 +68,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		Id linkId = event.getLinkId();
 		Integer xBin = link2xbins.get(linkId);
 		Integer yBin = link2ybins.get(linkId);
+		Double eventStartTime = event.getTime();
 		
 		if (xBin != null && yBin != null) {
 		//TODO person id statt vehicleid??? woher?
@@ -56,7 +77,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		
 		//TODO auf mehrere Zellen verteilen
 		ArrayList<EmPerBin> arrayEpb = new ArrayList<EmPerBin>();
-		arrayEpb= distributeOnCells(xBin, yBin, personId, value);
+		arrayEpb= distributeOnCells(xBin, yBin, personId, value, eventStartTime);
 		Double endOfTimeIntervall = getEndOfTimeInterval(event.getTime());
 		if (!emissionPerBin.containsKey(endOfTimeIntervall)) {
 			emissionPerBin.put(endOfTimeIntervall,
@@ -65,7 +86,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		emissionPerBin.get(endOfTimeIntervall).addAll(arrayEpb);
 		
 		ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
-		arrayEpl = distributeOnLinks(linkId, personId, value);
+		arrayEpl = distributeOnLinks(linkId, personId, value, eventStartTime);
 		if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
 			emissionPerLink.put(endOfTimeIntervall,
 					new ArrayList<EmPerLink>());
@@ -88,13 +109,15 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		Integer xBin = link2xbins.get(linkId);
 		Integer yBin = link2ybins.get(linkId);
 		
+		Double eventStartTime = event.getTime();
+		
 		if (xBin != null && yBin != null) {
 			//TODO person id statt vehicleid??? woher?
 			Id personId = event.getVehicleId();
 			Double value = event.getWarmEmissions().get(warmPollutant2analyze); //TODO funktioniert das so? enum casten?
 			//TODO auf mehrere Zellen verteilen
 			ArrayList<EmPerBin> arrayEpb = new ArrayList<EmPerBin>();
-			arrayEpb= distributeOnCells(xBin, yBin, personId, value);
+			arrayEpb= distributeOnCells(xBin, yBin, personId, value, eventStartTime);
 			Double endOfTimeIntervall = getEndOfTimeInterval(event.getTime());
 			if (!emissionPerBin.containsKey(endOfTimeIntervall)) {
 				emissionPerBin.put(endOfTimeIntervall,
@@ -104,7 +127,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 			// TODO auf mehrere Links verteilen
 			//EmPerLink epl = new EmPerLink(linkId, personId, value);
 			ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
-			arrayEpl = distributeOnLinks(linkId, personId, value);
+			arrayEpl = distributeOnLinks(linkId, personId, value, eventStartTime);
 			if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
 				emissionPerLink.put(endOfTimeIntervall,
 						new ArrayList<EmPerLink>());
@@ -115,7 +138,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	}
 
 	private ArrayList<EmPerLink> distributeOnLinks(Id sourcelinkId, Id personId,
-			Double value) {
+			Double value, Double eventStartTime) {
 		
 		ArrayList<EmPerLink> distributedEmissions = new ArrayList<EmPerLink>();
 		
@@ -142,8 +165,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 				case 3: distributionFactor = 0.019;
 				}
 				if (distributionFactor>0.0) {
-					EmPerLink epl = new EmPerLink(linkId, personId, value
-							* distributionFactor);
+					EmPerLink epl = new EmPerLink(linkId, personId, value * distributionFactor, eventStartTime);
 					distributedEmissions.add(epl);
 				}
 			}
@@ -154,7 +176,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	}
 
 	private ArrayList<EmPerBin> distributeOnCells(Integer xBin, Integer yBin,
-			Id personId, Double value) {
+			Id personId, Double value, Double eventStartTime) {
 		
 		ArrayList<EmPerBin> distributedEmissions = new ArrayList<EmPerBin>();
 		
@@ -173,8 +195,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 				default: distributionFactor =0.0;
 				}
 				if (distributionFactor>0.0) {
-					EmPerBin epb = new EmPerBin(xIndex, yIndex, personId, value
-							* distributionFactor);
+					EmPerBin epb = new EmPerBin(xIndex, yIndex, personId, value	* distributionFactor, eventStartTime);
 					distributedEmissions.add(epb);
 				}
 			}

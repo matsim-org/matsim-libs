@@ -4,16 +4,18 @@ import org.matsim.api.core.v01.Id;
 
 public class EmPerBin {
 	
-	Integer xBin;
-	Integer yBin;
-	Id personId;
-	Double value;
+	private Integer xBin;
+	private Integer yBin;
+	private Id responsiblePersonId;
+	private Double concentration;
+	private Double emissionEventStartTime;
 	
-	public EmPerBin(Integer xBin, Integer yBin, Id personId, Double value) {
+	public EmPerBin(Integer xBin, Integer yBin, Id personId, Double concentration, Double emissisionEventStartTime) {
 		this.xBin = xBin;
 		this.yBin = yBin;
-		this.personId = personId;
-		this.value = value;
+		this.responsiblePersonId = personId;
+		this.concentration = concentration;
+		this.emissionEventStartTime = emissisionEventStartTime;
 	}
 
 	public Integer getXbin() {
@@ -25,11 +27,15 @@ public class EmPerBin {
 	}
 
 	public Id getPersonId() {
-		return this.personId;
+		return this.responsiblePersonId;
 	}
 
 	public Double getConcentration() {
-		return this.value;
+		return this.concentration;
+	}
+
+	public Double getEmissionEventStartTime() {
+		return emissionEventStartTime;
 	}
 
 }

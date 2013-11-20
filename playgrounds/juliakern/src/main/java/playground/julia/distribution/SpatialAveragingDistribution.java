@@ -44,6 +44,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
+import playground.julia.archiv.ExposureEventImpl;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
@@ -70,7 +71,7 @@ public class SpatialAveragingDistribution {
 	private final String emissionFile1 = runDirectory1 + "compcase.sample.emission.events.xml";
 	String plansFile1 = runDirectory1+"compcase.sample.plans.xml";
 	String eventsFile1 = runDirectory1+"compcase.sample.events.xml";
-	String outPathStub = "input/sample/";
+	String outPathStub = "output/sample/";
 	
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
@@ -89,7 +90,7 @@ public class SpatialAveragingDistribution {
 
 	final int noOfTimeBins = 30; // one bin for each hour? //TODO 30? sim endtime ist 30...
 	double timeBinSize;
-	final int noOfXbins = 160;
+	final int noOfXbins = 160; //TODO rethink this
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.;
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
@@ -151,12 +152,11 @@ public class SpatialAveragingDistribution {
 		 * TODO later: write emission per bin/link into xml... handle as exposure events
 		 */
 		
-		ArrayList<ResponsibilityEventImpl> responsibility = new ArrayList<ResponsibilityEventImpl>();
-		ArrayList<ExposureEventImpl> exposure = new ArrayList<ExposureEventImpl>();
+		ArrayList<ResponsibilityEvent> responsibilityAndExposure = new ArrayList<ResponsibilityEvent>();
 		
 		ResponsibilityUtils reut = new ResponsibilityUtils();
-		reut.addExposureAndResponsibilityBinwise(activities, emissionPerBin, exposure, responsibility, timeBinSize, simulationEndTime);
-		//reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, exposure, responsibility, timeBinSize, simulationEndTime);
+		reut.addExposureAndResponsibilityBinwise(activities, emissionPerBin, responsibilityAndExposure, timeBinSize, simulationEndTime);
+		//reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, responsibilityAndExposure, timeBinSize, simulationEndTime);
 		
 		/*
 		 * analysis
@@ -167,9 +167,9 @@ public class SpatialAveragingDistribution {
 		
 		//TODO mit case-namen versehen?
 		ExposureUtils exut = new ExposureUtils();
-		exut.printExposureInformation(exposure, outPathStub+"exposure.txt");
-		exut.printResponsibilityInformation(responsibility, outPathStub+"responsibility.txt");
-		exut.printPersonalResponsibilityInformation(responsibility, outPathStub+"personalResponsibility.txt");
+		exut.printExposureInformation(responsibilityAndExposure, outPathStub+"exposure.txt");
+		exut.printResponsibilityInformation(responsibilityAndExposure, outPathStub+"responsibility.txt");
+		exut.printPersonalResponsibilityInformation(responsibilityAndExposure, outPathStub+"personalResponsibility.txt");
 		}
 
 	private void generateEmissions(String emissionFile) {

@@ -26,12 +26,16 @@ public interface ResponsibilityEvent {
 	
 	public final static String EVENT_TYPE = "responsibilityEvent";
 	
-	public final static String ATTRIBUTE_PERSON_ID = "personId";
+	public final static String ATTRIBUTE_RESPONSIBLE_PERSON_ID = "personId";
 
 	public Double getExposureValue();
 
-	public Id getPersonId();
+	public Id getResponsiblePersonId();
 
 	public String getInformation();
+
+	public Id getReceivingPersonId();
+
+	public Double getDuration();
 
 }

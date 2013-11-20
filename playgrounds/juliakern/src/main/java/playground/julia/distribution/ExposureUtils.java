@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * SpatialAveragingForLinkEmissions.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.julia.distribution;
 
 import java.io.BufferedWriter;
@@ -10,42 +29,45 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.julia.archiv.ExposureEventImpl;
+import playground.julia.archiv.TimeDependendExposure;
+
 public class ExposureUtils {
 
-	public void printTimeTables(List<PersonalExposure> popExposure, String outPathForTimeTables) {
-		BufferedWriter buffW;
-		try {
-			buffW = new BufferedWriter(new FileWriter(outPathForTimeTables));
-
-			// header: Person base case compare case difference
-			buffW.write("Timetable");
-			buffW.newLine();
-
-			for (PersonalExposure perEx : popExposure) {
-				buffW.write("Person id: " + perEx.getPersonalId().toString());
-				buffW.newLine();
-				buffW.write("Average exposure:" + perEx.getAverageExposure());
-				buffW.newLine();
-				buffW.write("activity type \t start time \t end time \t duration \t exposure value \t exposure x duration");
-				buffW.newLine();
-
-				TimeDependendExposure next = perEx.getNextTimeDependendExposure(null);
-
-				while (next != null) {
-					buffW.write(perEx.getStringForInterval(next));
-					buffW.newLine();
-					next = perEx.getNextTimeDependendExposure(next);
-				}
-
-				buffW.newLine();
-			}
-
-			buffW.close();
-
-		} catch (IOException e) {
-			System.err.println("Error creating " + outPathForTimeTables + ".");
-		}
-	}
+//	public void printTimeTables(List<PersonalExposure> popExposure, String outPathForTimeTables) {
+//		BufferedWriter buffW;
+//		try {
+//			buffW = new BufferedWriter(new FileWriter(outPathForTimeTables));
+//
+//			// header: Person base case compare case difference
+//			buffW.write("Timetable");
+//			buffW.newLine();
+//
+//			for (PersonalExposure perEx : popExposure) {
+//				buffW.write("Person id: " + perEx.getPersonalId().toString());
+//				buffW.newLine();
+//				buffW.write("Average exposure:" + perEx.getAverageExposure());
+//				buffW.newLine();
+//				buffW.write("activity type \t start time \t end time \t duration \t exposure value \t exposure x duration");
+//				buffW.newLine();
+//
+//				TimeDependendExposure next = perEx.getNextTimeDependendExposure(null);
+//
+//				while (next != null) {
+//					buffW.write(perEx.getStringForInterval(next));
+//					buffW.newLine();
+//					next = perEx.getNextTimeDependendExposure(next);
+//				}
+//
+//				buffW.newLine();
+//			}
+//
+//			buffW.close();
+//
+//		} catch (IOException e) {
+//			System.err.println("Error creating " + outPathForTimeTables + ".");
+//		}
+//	}
 
 	public void printDetailedResponsibilityInformation(ArrayList<ResponsibilityEventImpl> responsibility,
 			String outputPath) {
@@ -62,7 +84,7 @@ public class ExposureUtils {
 		Map<Id, Double> person2average = new HashMap<Id, Double>();
 		
 		for(ResponsibilityEventImpl re : responsibility){
-			Id personId = re.getPersonId();
+			Id personId = re.getResponsiblePersonId();
 			if(person2timeXconcentration.containsKey(personId)){
 				Double newValue = person2timeXconcentration.get(personId)+re.getExposureValue();
 				person2timeXconcentration.put(personId, newValue);
@@ -132,7 +154,7 @@ public class ExposureUtils {
 			
 	}
 
-	public void printExposureInformation(ArrayList<ExposureEventImpl> exposure,
+	public void printExposureInformation(ArrayList<ResponsibilityEvent> responsibility,
 			String outputPath) {
 		
 		// sum = #persons x time x concentration
@@ -146,15 +168,15 @@ public class ExposureUtils {
 		Map<Id, Double> person2time = new HashMap<Id, Double>();
 		Map<Id, Double> person2average = new HashMap<Id, Double>();
 		
-		for(ExposureEventImpl exe: exposure){
-			Id personId = exe.getPersonId();
-			if (person2timeXconcentration.containsKey(exe.getPersonId())) {
-				Double newValue = person2timeXconcentration.get(personId) + exe.getExposure();
+		for(ResponsibilityEvent exe: responsibility){
+			Id personId = exe.getReceivingPersonId();
+			if (person2timeXconcentration.containsKey(exe.getReceivingPersonId())) {
+				Double newValue = person2timeXconcentration.get(personId) + exe.getExposureValue();
 				person2timeXconcentration.put(personId, newValue);
 				Double newTime = person2time.get(personId)+exe.getDuration();
 				person2time.put(personId, newTime);
 			}else{
-				person2timeXconcentration.put(personId,	exe.getExposure());
+				person2timeXconcentration.put(personId,	exe.getExposureValue());
 				person2time.put(personId, exe.getDuration());
 			}
 		}
@@ -209,7 +231,7 @@ public class ExposureUtils {
 
 
 	public void printResponsibilityInformation(
-			ArrayList<ResponsibilityEventImpl> responsibility, String outputPath) {
+			ArrayList<ResponsibilityEvent> responsibility, String outputPath) {
 		
 		// responsibility sum = #responsible persons x time x concentration
 		// average responsibility = sum/#responsible persons
@@ -225,7 +247,7 @@ public class ExposureUtils {
 		// calculate total sum, personal sum
 		for(ResponsibilityEvent re: responsibility){
 			sum += re.getExposureValue();
-			Id responsiblePerson = re.getPersonId();
+			Id responsiblePerson = re.getResponsiblePersonId();
 			if(!person2responsibility.containsKey(responsiblePerson)){
 				person2responsibility.put(responsiblePerson, new Double(re.getExposureValue()));
 			}else{
@@ -263,15 +285,15 @@ public class ExposureUtils {
 	}
 
 	public void printPersonalResponsibilityInformation(
-			ArrayList<ResponsibilityEventImpl> responsibility, String outputPath) {
+			ArrayList<ResponsibilityEvent> responsibility, String outputPath) {
 		
 		Map <Id, ArrayList<ResponsibilityEvent>> person2ResponsibilityEvents = new HashMap<Id, ArrayList<ResponsibilityEvent>>();
 		
 		for(ResponsibilityEvent ree: responsibility){
-			if(!person2ResponsibilityEvents.containsKey(ree.getPersonId())){
-				person2ResponsibilityEvents.put(ree.getPersonId(), new ArrayList<ResponsibilityEvent>());
+			if(!person2ResponsibilityEvents.containsKey(ree.getResponsiblePersonId())){
+				person2ResponsibilityEvents.put(ree.getResponsiblePersonId(), new ArrayList<ResponsibilityEvent>());
 			}
-			person2ResponsibilityEvents.get(ree.getPersonId()).add(ree);
+			person2ResponsibilityEvents.get(ree.getResponsiblePersonId()).add(ree);
 		}
 		
 		BufferedWriter buffW;

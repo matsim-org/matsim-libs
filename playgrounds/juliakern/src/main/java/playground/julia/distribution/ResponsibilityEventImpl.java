@@ -25,36 +25,44 @@ import org.matsim.api.core.v01.events.Event;
 
 public class ResponsibilityEventImpl extends Event implements ResponsibilityEvent {
 
-	private Id personId;
-	private Double startTime;
-	private Double endTime;
+	private Id responsiblePersonId;
+	private Id receivingPersonId;
+	private Double emissionEventTime;
+	private Double exposureStartTime;
+	private Double exposureEndTime;
 	private Double concentration;
-	private String location;
+	private String exposureLocation;
 	
 	@Override
 	public Double getExposureValue() {
 		return this.getDuration()*this.concentration;
 	}
 
-	public ResponsibilityEventImpl(Id personId, Double startTime, Double endTime,
-			Double concentration, String location) {
-		super(startTime);
-		this.personId = personId;
-		this.startTime = startTime;
-		this.endTime = endTime;
+	public ResponsibilityEventImpl(Id responsiblePersonId, Id receivingPersonId, Double emissionEventTime, Double exposureStartTime, Double exposureEndTime,
+			Double concentration, String exposureLocation) {
+		super(exposureStartTime);
+		this.emissionEventTime = emissionEventTime;
+		this.responsiblePersonId = responsiblePersonId;
+		this.receivingPersonId = receivingPersonId;
+		this.exposureStartTime = exposureStartTime;
+		this.exposureEndTime = exposureEndTime;
 		this.concentration = concentration;
-		this.location = location;
+		this.exposureLocation = exposureLocation;
 	}
 
 	public Double getDuration() {
-		return(this.endTime-this.startTime);
+		return(this.exposureEndTime-this.exposureStartTime);
 	}
 
 	@Override
-	public Id getPersonId() {
-		return personId;
+	public Id getResponsiblePersonId() {
+		return responsiblePersonId;
 	}
 
+	public Id getReceivingPersonId(){
+		return receivingPersonId;
+	}
+	
 	@Override
 	public String getEventType() {
 		return ResponsibilityEvent.EVENT_TYPE;
@@ -63,10 +71,11 @@ public class ResponsibilityEventImpl extends Event implements ResponsibilityEven
 	@Override
 	public String getInformation() {
 		
-		String info = "Start time = " + startTime.toString();
-		info+= ", end time = " + endTime.toString();
-		info+= ", exposure value = " + this.getExposureValue();
-		info+= ", location = " + location;
+		String info = "Exposure for Person " + responsiblePersonId.toString(); 
+		info += " exposure time: " + exposureStartTime + " - " + exposureEndTime;
+		info += " with exposure value " + this.getExposureValue();
+		info += " at/during " + exposureLocation + ". ";
+		info += "Caused by emission event at " + emissionEventTime + ".";
 		return info;
 	}
 

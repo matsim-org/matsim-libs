@@ -1,17 +1,38 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * SpatialAveragingForLinkEmissions.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.julia.distribution;
 
 import org.matsim.api.core.v01.Id;
 
 public class EmPerLink {
 	
-	Id linkId;
-	Id personId;
-	Double value;
+	private Id linkId;
+	private Id responsiblePersonId;
+	private Double concentration;
+	private Double emissionEventStartTime;
 
-	public EmPerLink(Id linkId, Id personId, Double value) {
+	public EmPerLink(Id linkId, Id personId, Double concentration, Double emissionEventStartTime) {
 		this.linkId = linkId;
-		this.personId = personId;
-		this.value = value;
+		this.responsiblePersonId = personId;
+		this.concentration = concentration;
+		this.emissionEventStartTime = emissionEventStartTime;
 	}
 
 	public Id getLinkId() {
@@ -19,11 +40,15 @@ public class EmPerLink {
 	}
 
 	public Id getPersonId() {
-		return this.personId;
+		return this.responsiblePersonId;
 	}
 
 	public Double getConcentration() {
-		return this.value;
+		return this.concentration;
+	}
+
+	public Double getEmissionEventStartTime() {
+		return emissionEventStartTime;
 	}
 
 }
