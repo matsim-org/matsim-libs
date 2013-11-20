@@ -356,7 +356,7 @@ public class Analyzer {
 			} else {
 				utilities.add(person.getSelectedPlan().getScore());
 				
-				double income = (Double)this.incomes.getAttribute(person.getId().toString(), "income");
+				double income = (Double)this.incomes.getAttribute(person.getId().toString(), "income") * 8.0;
 				this.utilityBins.addVal(income, person.getSelectedPlan().getScore());
 			}
 		}
@@ -365,7 +365,7 @@ public class Analyzer {
 	
 	private void computeModesPerIncome() {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			double income = (Double)this.incomes.getAttribute(person.getId().toString(), "income");
+			double income = (Double)this.incomes.getAttribute(person.getId().toString(), "income") * 8.0;
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;

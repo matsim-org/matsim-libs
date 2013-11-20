@@ -100,7 +100,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, Person
 			// if this is not zero, accumulate it into some global accumulated length ...
 			this.sumLength += length.doubleValue();
 			
-			double income = (Double)this.incomes.getAttribute(event.getPersonId().toString(), "income");
+			double income = (Double)this.incomes.getAttribute(event.getPersonId().toString(), "income") * 8.0;
 			this.tolltdBins.addVal(income, length.doubleValue());
 			
 			this.sumLengthIncomeWeighted += length.doubleValue() * income;

@@ -25,8 +25,6 @@ public class AgentAnalysisShutdownListener implements ShutdownListener {
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(oa);
 						
 		for (Person person : population.getPersons().values()) {
-			oa.putAttribute(person.getId().toString(), day + ".alpha_tot", person.getCustomAttributes().get(day + ".alpha_tot"));
-			oa.putAttribute(person.getId().toString(), day + ".gamma_tot", person.getCustomAttributes().get(day + ".gamma_tot"));
 			if (person.getCustomAttributes().get(day + ".tollScore") != null) {
 				oa.putAttribute(person.getId().toString(), day + ".tollScore", person.getCustomAttributes().get(day + ".tollScore"));
 			}

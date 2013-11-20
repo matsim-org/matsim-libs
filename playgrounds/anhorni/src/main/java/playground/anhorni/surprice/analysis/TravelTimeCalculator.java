@@ -83,7 +83,7 @@ public class TravelTimeCalculator implements PersonDepartureEventHandler, Person
 			
 			this.travelTimes.add(travTime);
 			
-			double income = (Double)this.incomes.getAttribute(event.getPersonId().toString(), "income");
+			double income = (Double)this.incomes.getAttribute(event.getPersonId().toString(), "income") * 8.0;
 			this.ttBins.addVal(income, travTime);
 			
 			this.sumTripDurationsIncomeWeighted += travTime * income;

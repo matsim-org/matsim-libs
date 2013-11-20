@@ -79,7 +79,7 @@ public class TravelDistanceCalculator extends AbstractPersonAlgorithm implements
 					this.sumLength += dist;
 					this.cntTrips++;
 					
-					double income = (Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income");
+					double income = (Double)this.incomes.getAttribute(plan.getPerson().getId().toString(), "income") * 8.0;
 					this.tdBins.addVal(income, dist);
 					
 					this.sumLenghtIncomeWeighted += dist * income;

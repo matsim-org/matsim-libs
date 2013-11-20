@@ -50,7 +50,7 @@ import utils.Utils;
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 
 /**
- * Collects and processes data on the mode shares, based on the travelled
+ * Collects and processes data on the mode shares, based on the traveled
  * (euclidean) distance.
  * Can also produce statistics on the mode shares based on the number of
  * legs.
@@ -195,7 +195,6 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 
 	public void printInfo(final int iteration) {
 		Map<String, Double> currentModeXYs = getModeXYs();
-//		long nLegs = this.getNumberOfLegs();
 		double totalXY = currentModeXYs.remove(ALL_MODES);
 
 		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
@@ -206,12 +205,6 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 				log.info("Share of " + mode.getKey() + ":\t" + "distance [km]: " + (100d*mode.getValue() / totalXY) +"%");
 			}
 		}
-// not needed anymore
-//		for (Map.Entry<String, Double> mode : currentModeXYs.entrySet()) {
-//			if (this.xy.equals("times")) {
-//				log.info("Share of " + mode.getKey() + ":\t" + "number of legs: "+ (100d * this.getNumberOfLegs(mode.getKey()) / nLegs)+"%");
-//			}
-//		}
 	}
 
 	/**
