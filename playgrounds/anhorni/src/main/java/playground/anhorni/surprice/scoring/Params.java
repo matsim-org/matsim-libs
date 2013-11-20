@@ -140,5 +140,4 @@ public class Params {
 	public void setDistanceCostFactor(double distanceCostFactor) {
 		this.distanceCostFactor = distanceCostFactor;
 	}
-
 }
