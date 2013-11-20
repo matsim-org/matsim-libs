@@ -29,14 +29,13 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 public class RandomNumbers {
 
 	static TwoHashMapsConcatenated<Id, Integer, Random> randomNumbers;
-	static double startTime=-1;
 
 	public static Random getRandomNumber(Id personId,Integer legIndex,String strategyName){
 		if (randomNumbers.get(personId, legIndex)==null){
-			int seed=strategyName.toString().hashCode();
-			if (startTime!=-1){
-				seed+=startTime;
-			}
+			int seed=ZHScenarioGlobal.loadIntParam("RandomNumbers.seed");
+			seed+=strategyName.toString().hashCode();
+			seed+=legIndex;
+			seed+=personId.toString().hashCode();
 			
 			randomNumbers.put(personId, legIndex, new Random(seed));
 		}
@@ -44,9 +43,6 @@ public class RandomNumbers {
 	}
 	
 	public static void reset(){
-		if (ZHScenarioGlobal.loadBooleanParam("RandomNumbers.useStartTimeForRandomSeedInitialization")){
-			startTime=System.currentTimeMillis();
-		}
 		randomNumbers=new TwoHashMapsConcatenated<Id, Integer, Random>();
 	}
 	
