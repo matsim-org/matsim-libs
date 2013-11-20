@@ -20,12 +20,8 @@
 package playground.julia.distribution;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-
-import playground.julia.archiv.ExposureEventImpl;
 
 public class ResponsibilityUtils {
 

@@ -24,13 +24,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-
-import playground.julia.archiv.ExposureEventImpl;
-import playground.julia.archiv.TimeDependendExposure;
 
 public class ExposureUtils {
 
