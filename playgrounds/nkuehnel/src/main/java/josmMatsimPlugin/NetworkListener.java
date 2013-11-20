@@ -221,7 +221,7 @@ public class NetworkListener implements DataSetListener
 			return Collections.emptyList();
 		Node fromNode = matsim4osm(way.firstNode());
 		Node toNode = matsim4osm(way.lastNode());
-		Link link = network.getFactory().createLink(new IdImpl(way.getId()),
+		Link link = network.getFactory().createLink(new IdImpl(way.getUniqueId()),
 				fromNode, toNode);
 		link.setCapacity(Double.parseDouble(keys.get("capacity")));
 		link.setFreespeed(Double.parseDouble(keys.get("freespeed")));
