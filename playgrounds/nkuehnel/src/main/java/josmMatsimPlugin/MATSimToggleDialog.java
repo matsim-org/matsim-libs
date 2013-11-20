@@ -1,19 +1,16 @@
 package josmMatsimPlugin;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.LinkImpl;
 import org.openstreetmap.josm.data.SelectionChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -28,7 +25,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	private JTable table;
 
 	private String[] columnNames =
-	{ "id", "length", "freespeed", "capacity", "permlanes" };
+	{ "id", "internal-id", "length", "freespeed", "capacity", "permlanes" };
 
 	public MATSimToggleDialog()
 	{
@@ -61,15 +58,17 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	{
 		setTitle(tr("Links: {0} / Nodes: {1}",layer.getMatsimNetwork().getLinks().size(), layer.getMatsimNetwork().getNodes().size()));
 		Network network = layer.getMatsimNetwork();
-		Object[][] data = new Object[network.getLinks().size()][5];
+		Object[][] data = new Object[network.getLinks().size()][6];
 		int counter = 0;
 		for (Link link : network.getLinks().values())
 		{
-			data[counter][0] = link.getId().toString();
-			data[counter][1] = link.getLength();
-			data[counter][2] = link.getFreespeed();
-			data[counter][3] = link.getCapacity();
-			data[counter][4] = link.getNumberOfLanes();
+			String id = ((LinkImpl) link).getOrigId();
+			data[counter][0] = id;
+			data[counter][1] = link.getId().toString();
+			data[counter][2] = link.getLength();
+			data[counter][3] = link.getFreespeed();
+			data[counter][4] = link.getCapacity();
+			data[counter][5] = link.getNumberOfLanes();
 			counter++;
 		}
 		table.setModel(new DefaultTableModel(data, columnNames));
@@ -89,7 +88,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		{
 			if (prim instanceof Way)
 			{
-				String id = String.valueOf(prim.getId());
+				String id = String.valueOf(prim.getUniqueId());
 				for (int i = 0; i < table.getRowCount(); i++)
 				{
 					if (id.equalsIgnoreCase(table.getValueAt(i, 0).toString()))

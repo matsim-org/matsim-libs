@@ -137,7 +137,7 @@ public class RootDialog extends JPanel
 				Config config = ConfigUtils.createConfig();
 				Scenario scenario = ScenarioUtils.createScenario(config);
 				NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", new File("new Layer"), scenario.getNetwork(), "WGS84");
-				dataSet.addDataSetListener(new NetworkListener(layer, scenario.getNetwork(), new HashMap<Way, List<Link>>(), "WGS84"));
+				dataSet.addDataSetListener(new NetworkListener(layer, new HashMap<Way, List<Link>>(), "WGS84"));
 				Main.main.addLayer(layer);
 			}
 		});

@@ -3,22 +3,22 @@
  */
 package josmMatsimPlugin;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
-import josmMatsimPlugin.Defaults.OsmHighwayDefaults;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -74,46 +74,44 @@ public class ExportTask extends PleaseWaitRunnable
 	 */
 	@Override
 	protected void realRun() throws SAXException, IOException,
-			OsmTransferException, UncheckedIOException
-	{
-		
+	OsmTransferException, UncheckedIOException {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
-		Network net = sc.getNetwork();
+		Network network = sc.getNetwork();
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
 						Defaults.targetSystem);
-		
+
 		Layer layer = Main.main.getActiveLayer();
-		
-		if (layer instanceof OsmDataLayer)
-		{
-			if (layer instanceof NetworkLayer)
-			{
-				net = ((NetworkLayer) layer).getMatsimNetwork();
-				if(!(((NetworkLayer) layer).getCoordSystem().equals(Defaults.targetSystem)))
-				{
-					for(Node node: ((NetworkImpl)net).getNodes().values())
-					{
-						Coord temp=ct.transform(node.getCoord());
-						node.getCoord().setXY(temp.getX(), temp.getY());
-					}
+		if (layer instanceof OsmDataLayer) {
+			if (layer instanceof NetworkLayer) {
+				for(Node node : ((NetworkLayer) layer).getMatsimNetwork().getNodes().values()) {
+					Node newNode = network.getFactory().createNode(new IdImpl(((NodeImpl)node).getOrigId()), node.getCoord());
+					network.addNode(newNode);
 				}
-			}
-			else
-			{
-				Converter converter = new Converter(((OsmDataLayer) layer).data, net, Defaults.defaults, Defaults.keepPaths);
+				for(Link link : ((NetworkLayer) layer).getMatsimNetwork().getLinks().values()) {
+					Link newLink = network.getFactory().createLink(
+							new IdImpl(((LinkImpl) link).getOrigId()), 
+							network.getNodes().get(new IdImpl(((NodeImpl) link.getFromNode()).getOrigId())), 
+							network.getNodes().get(new IdImpl(((NodeImpl) link.getToNode()).getOrigId())));
+					newLink.setFreespeed(link.getFreespeed());
+					newLink.setCapacity(link.getCapacity());
+					newLink.setLength(link.getLength());
+					newLink.setNumberOfLanes(link.getNumberOfLanes());
+					newLink.setAllowedModes(link.getAllowedModes());
+					network.addLink(newLink);
+				}
+			} else {
+				Converter converter = new Converter(((OsmDataLayer) layer).data, network, Defaults.defaults, Defaults.keepPaths);
 				converter.convert();
-				if (!(Defaults.targetSystem.equals("WGS84")))
-				{
-					for(Node node: ((NetworkImpl)net).getNodes().values())
-					{
+				if (!(Defaults.targetSystem.equals("WGS84"))) {
+					for(Node node: ((NetworkImpl) network).getNodes().values()) {
 						Coord temp=ct.transform(node.getCoord());
 						node.getCoord().setXY(temp.getX(), temp.getY());
 					}
 				}
 			}
-			new NetworkWriter(net).write(Defaults.exportPath+".xml");
+			new NetworkWriter(network).write(Defaults.exportPath+".xml");
 		}
 		System.out.println("schreibe: "+Defaults.exportPath+".xml"+" von WGS84 nach "+Defaults.targetSystem);
 	}

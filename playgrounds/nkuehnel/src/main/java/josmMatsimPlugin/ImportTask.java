@@ -6,15 +6,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -23,7 +26,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.DataSet;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.io.OsmTransferException;
@@ -36,6 +38,8 @@ import org.xml.sax.SAXException;
  */
 public class ImportTask extends PleaseWaitRunnable 
 {
+	public static final String NODE_TAG_ID = "id";
+	public static final String WAY_TAG_ID = "id";
 	private NetworkLayer layer;
 	
 	public ImportTask()
@@ -62,8 +66,12 @@ public class ImportTask extends PleaseWaitRunnable
 	@Override
 	protected void finish()
 	{
-		Main.main.addLayer(layer);
-		Main.map.mapView.setActiveLayer(layer);
+		// layer = null happens if Exception happens during import, 
+		// as Exceptions are handled only after this method is called.
+		if (layer != null) {
+			Main.main.addLayer(layer);
+			Main.map.mapView.setActiveLayer(layer);
+		}
 	}
 
 	
@@ -85,7 +93,10 @@ public class ImportTask extends PleaseWaitRunnable
 		Config config= ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(Defaults.importPath);
+		Network network = NetworkImpl.createNetwork();
+		
 		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
+		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		for (Node node: scenario.getNetwork().getNodes().values())
 		{
 			Coord tmpCoor= node.getCoord();
@@ -101,33 +112,44 @@ public class ImportTask extends PleaseWaitRunnable
 				coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
 			}
 			org.openstreetmap.josm.data.osm.Node nodeOsm = new org.openstreetmap.josm.data.osm.Node(coor);
-			nodeOsm.setOsmId(Long.parseLong(node.getId().toString()), 1);
+			nodeOsm.put(NODE_TAG_ID, node.getId().toString());
+			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
+			Node newNode = network.getFactory().createNode(new IdImpl(Long.toString(nodeOsm.getUniqueId())), node.getCoord());
+			((NodeImpl) newNode).setOrigId(node.getId().toString());
+			network.addNode(newNode);
 		}
 		
 		for (Link link: scenario.getNetwork().getLinks().values())
 		{
-			Way way = new Way(Long.parseLong(link.getId().toString()), 1);
-			
-			String fromNode=link.getFromNode().getId().toString();
-			String toNode=link.getToNode().getId().toString();
-			
-			OsmPrimitiveType type=OsmPrimitiveType.NODE;
-			way.addNode((org.openstreetmap.josm.data.osm.Node) dataSet.getPrimitiveById(Long.parseLong(toNode), type));
-			way.addNode((org.openstreetmap.josm.data.osm.Node) dataSet.getPrimitiveById(Long.parseLong(fromNode), type));
-			
+			Way way = new Way();
+			org.openstreetmap.josm.data.osm.Node fromNode = node2OsmNode.get(link.getFromNode());
+			way.addNode(fromNode);
+			org.openstreetmap.josm.data.osm.Node toNode = node2OsmNode.get(link.getToNode());
+			way.addNode(toNode);
+			way.put(WAY_TAG_ID, link.getId().toString());
 			way.put("freespeed", String.valueOf(link.getFreespeed()));
 			way.put("capacity", String.valueOf(link.getCapacity()));
 			way.put("length", String.valueOf(link.getLength()));
 			way.put("permlanes", String.valueOf(link.getNumberOfLanes()));
 			way.put("modes", String.valueOf(link.getAllowedModes()));
-			
 			dataSet.addPrimitive(way);
-			way2Links.put(way, Collections.singletonList(link));
+			Link newLink = network.getFactory().createLink(
+					new IdImpl(Long.toString(way.getUniqueId())), 
+					network.getNodes().get(new IdImpl(Long.toString(fromNode.getUniqueId()))), 
+					network.getNodes().get(new IdImpl(Long.toString(toNode.getUniqueId()))));
+			newLink.setFreespeed(link.getFreespeed());
+			newLink.setCapacity(link.getCapacity());
+			newLink.setLength(link.getLength());
+			newLink.setNumberOfLanes(link.getNumberOfLanes());
+			newLink.setAllowedModes(link.getAllowedModes());
+			((LinkImpl) newLink).setOrigId(link.getId().toString());
+			network.addLink(newLink);
+			way2Links.put(way, Collections.singletonList(newLink));
 		}
 
-		layer = new NetworkLayer(dataSet, Defaults.importPath, new File(Defaults.importPath), scenario.getNetwork(), Defaults.originSystem);
-		dataSet.addDataSetListener(new NetworkListener(layer, scenario.getNetwork(), way2Links, Defaults.originSystem));
+		layer = new NetworkLayer(dataSet, Defaults.importPath, new File(Defaults.importPath), network, Defaults.originSystem);
+		dataSet.addDataSetListener(new NetworkListener(layer, way2Links, Defaults.originSystem));
 	}
 
 	
