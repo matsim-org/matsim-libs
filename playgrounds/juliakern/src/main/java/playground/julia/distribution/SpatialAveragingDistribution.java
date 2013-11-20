@@ -44,7 +44,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
-import playground.julia.archiv.ExposureEventImpl;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
@@ -88,7 +87,7 @@ public class SpatialAveragingDistribution {
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 
-	final int noOfTimeBins = 30; // one bin for each hour? //TODO 30? sim endtime ist 30...
+	final int noOfTimeBins = 1; // one bin for each hour? //TODO 30? sim endtime ist 30...
 	double timeBinSize;
 	final int noOfXbins = 160; //TODO rethink this
 	final int noOfYbins = 120;

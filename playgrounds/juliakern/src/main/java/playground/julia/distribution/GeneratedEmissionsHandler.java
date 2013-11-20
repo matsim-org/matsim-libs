@@ -187,19 +187,19 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 				// TODO ausserhalb des untersuchungsraums?
 				Double distributionFactor = 0.0;
 				int distance = Math.abs(xBin-xIndex+yBin-yIndex);
+				
 				switch(distance){
 				case 0: distributionFactor = 0.170;
 				case 1: distributionFactor = 0.104;
 				case 2: distributionFactor = 0.024;
 				case 3: distributionFactor = 0.019;
-				default: distributionFactor =0.0;
 				}
+				
 				if (distributionFactor>0.0) {
 					EmPerBin epb = new EmPerBin(xIndex, yIndex, personId, value	* distributionFactor, eventStartTime);
 					distributedEmissions.add(epb);
 				}
-			}
-			
+			}			
 		}
 		return distributedEmissions;
 	}

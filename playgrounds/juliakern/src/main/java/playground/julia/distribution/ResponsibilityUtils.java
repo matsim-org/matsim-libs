@@ -100,8 +100,6 @@ public class ResponsibilityUtils {
 			Map<Double, ArrayList<EmPerBin>> emissionPerBin,
 			ArrayList<ResponsibilityEvent> responsibility, Double timeBinSize, Double simulationEndTime) {
 		
-		//System.out.println("emission per bin" + emissionPerBin.keySet());
-		
 		/*
 		 * for each activity:
 		 * split into time intervalls accoriding to time bin sizes
@@ -181,13 +179,9 @@ public class ResponsibilityUtils {
 		
 		if (emissionPerBinOfCurrentTimeBin!=null) {
 			for (EmPerBin epb : emissionPerBinOfCurrentTimeBin) {
-				if (epb.getXbin().equals(xBin) && epb.getYbin().equals(yBin)) {
-					
+				if (epb.getXbin().equals(xBin) && epb.getYbin().equals(yBin)) {					
 					String location = "x = " + epb.getXbin().toString()	+ ", y = " + epb.getYbin();
-					
 					ResponsibilityEvent ree = new ResponsibilityEventImpl(epb.getPersonId(), exposedPersonId, epb.getEmissionEventStartTime(), startTime, endTime, epb.getConcentration(), location);
-				//	ResponsibilityEventImpl ree = new ResponsibilityEventImpl(epb.getPersonId(), startTime, endTime,epb.getConcentration(), location);
-				//	System.out.println("epb concentration" + epb.getConcentration());
 					rEvents.add(ree);
 				}
 			}
