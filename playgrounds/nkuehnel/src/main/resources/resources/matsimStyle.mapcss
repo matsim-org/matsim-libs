@@ -1,0 +1,51 @@
+meta 
+{
+    title: "MATSim";
+    description: "show existing MATSim links";
+    version: "0.1_2013-11-20";
+    author: "nkuehnel";
+}
+
+meta[lang=de]
+{
+    title: "MATSim";
+    description: "Visualisiert existierende MATSim links";
+}
+
+canvas {
+  default-points: false;
+}
+
+node {
+  symbol-size:5;
+  symbol-shape: square;
+  symbol-stroke-color: #5091BE;
+  symbol-fill-color: white;
+}
+
+
+node:connection {
+  symbol-fill-color: white;
+}
+
+
+
+
+way[capacity][freespeed][permlanes]  { z-index: 1; color: #FFFFFF; width: 1 ; casing-color: #5091BE; casing-width: 3; casing-dashes: 3;}
+way[capacity>0][freespeed>0][permlanes>0]  {z-index: 1; color: #5091BE; width: 1 ; casing-color: #5091BE; casing-width: 1;  casing-dashes: 0;}
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
