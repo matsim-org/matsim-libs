@@ -574,10 +574,12 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		parkingScore = handleCostScore(personId, parkingAttributesForScoring, parkingScore);
 
+		Activity nextActivity = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getIndexOfFirstCarLegOfDay() + 3);
+		
 		AgentWithParking.parkingStrategyManager.updateScore(personId, aem.getPlanElementIndex(), parkingScore);
 		ZHScenarioGlobal.parkingEventDetails
 				.add(new ParkingEventDetails(aem.getPlanElementIndex(), parkingScore, AgentWithParking.parkingStrategyManager
-						.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()), parkingAttributesForScoring));
+						.getParkingStrategyForCurrentLeg(aem.getPerson(), aem.getPlanElementIndex()), parkingAttributesForScoring,nextActivity.getType()));
 		resetVariables(personId);
 	}
 
@@ -635,11 +637,14 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributesForScoring);
 		parkingScore = handleCostScore(personId, parkingAttributesForScoring, parkingScore);
 
+		Activity nextActivity = (Activity) aem.getPerson().getSelectedPlan().getPlanElements().get(aem.getIndexOfFirstCarLegOfDay() + 3);
+		
+		
 		int legIndex = aem.duringAct_getPlanElementIndexOfPreviousCarLeg();
 		AgentWithParking.parkingStrategyManager.updateScore(personId, legIndex, parkingScore);
 		ZHScenarioGlobal.parkingEventDetails.add(new ParkingEventDetails(legIndex, parkingScore,
 				AgentWithParking.parkingStrategyManager.getParkingStrategyForCurrentLeg(aem.getPerson(), legIndex),
-				parkingAttributesForScoring));
+				parkingAttributesForScoring,nextActivity.getType()));
 		resetVariables(personId);
 	}
 

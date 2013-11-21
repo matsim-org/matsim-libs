@@ -24,17 +24,19 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivity
 public class ParkingEventDetails {
 
 	public ParkingEventDetails(int legIndex, double score, ParkingSearchStrategy parkingStrategy,
-			ParkingActivityAttributes parkingActivityAttributes) {
+			ParkingActivityAttributes parkingActivityAttributes, String activityType) {
 		super();
 		this.legIndex = legIndex;
 		this.score = score;
 		this.parkingStrategy = parkingStrategy;
 		this.parkingActivityAttributes = parkingActivityAttributes;
+		this.activityType = activityType;
 	}
 	public int legIndex;
 	public double score;
 	public ParkingSearchStrategy parkingStrategy;
 	public ParkingActivityAttributes parkingActivityAttributes;
+	public String activityType;
 	
 	public String getTabSeparatedLogString(){
 		StringBuffer sb=null;
@@ -68,12 +70,14 @@ public class ParkingEventDetails {
 		sb.append(parkingActivityAttributes.destinationCoord.getX());
 		sb.append("\t");
 		sb.append(parkingActivityAttributes.destinationCoord.getY());
+		sb.append("\t");
+		sb.append(activityType);
 		
 		return sb.toString();
 	}
 	
 	public static String getTabSeparatedTitleString(){
-		return "personId\tparkingArrivalTime\tparkingDuration\tparkingSearchDuration\twalkDuration\twalkDistance\tFacilityId\tparkingCost\tlegIndex\tscore\tparkingStrategy\tgroupName\tdestination-X\tdestination-Y";
+		return "personId\tparkingArrivalTime\tparkingDuration\tparkingSearchDuration\twalkDuration\twalkDistance\tFacilityId\tparkingCost\tlegIndex\tscore\tparkingStrategy\tgroupName\tdestination-X\tdestination-Y\tactivityType";
 	}
 }
 

@@ -242,15 +242,15 @@ public class ParkingStrategyScenarios {
 
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 9) {
 			Dummy_RandomSelection dummy = new Dummy_RandomSelection(-1, scenario.getNetwork(), "Dummy_RandomSelection");
-			dummy.setGroupName("dummy group");
+			dummy.setGroupName("dummyGroup");
 			allStrategies.add(dummy);
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 10) {
 			Dummy_TakeClosestParking dummy = new Dummy_TakeClosestParking(-1, scenario.getNetwork(), "Dummy_TakeClosestParking");
-			dummy.setGroupName("dummy group");
+			dummy.setGroupName("dummyGroup");
 			allStrategies.add(dummy);
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 11) {
 			Dummy_OptimalScore dummy = new Dummy_OptimalScore(-1, scenario.getNetwork(), "Dummy_OptimalScore");
-			dummy.setGroupName("dummy group");
+			dummy.setGroupName("dummyGroup");
 			allStrategies.add(dummy);
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 12) {
 			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
@@ -337,28 +337,28 @@ public class ParkingStrategyScenarios {
 			}
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 14) {
 			RandomParkingSearch strategy = new Dummy_RandomSelection(-1, scenario.getNetwork(), "Dummy_RandomSelection");
-			strategy.setGroupName("dummy group");
+			strategy.setGroupName("dummyGroup");
 			allStrategies.add(strategy);
 
 			strategy = new Dummy_TakeClosestParking(-1, scenario.getNetwork(), "Dummy_TakeClosestParking");
-			strategy.setGroupName("dummy group");
+			strategy.setGroupName("dummyGroup");
 			allStrategies.add(strategy);
 
 			strategy = new Dummy_OptimalScore(-1, scenario.getNetwork(), "Dummy_OptimalScore");
-			strategy.setGroupName("dummy group");
+			strategy.setGroupName("dummyGroup");
 			allStrategies.add(strategy);
 
 			strategy = new Dummy_WorstScore(-1, scenario.getNetwork(), "Dummy_WorstScore");
-			strategy.setGroupName("dummy group");
+			strategy.setGroupName("dummyGroup");
 			allStrategies.add(strategy);
 
 			strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "Dummy_ARD_TakeClosestGarageParking");
-			strategy.setGroupName("dummy group");
+			strategy.setGroupName("dummyGroup");
 			allStrategies.add(strategy);
 
 			strategy = new Dummy_BRD_TakeClosestGarageParking(-1, scenario.getNetwork(), "Dummy_BRD_TakeClosestGarageParking",
 					300.0);
-			strategy.setGroupName("dummy group");
+			strategy.setGroupName("dummyGroup");
 			allStrategies.add(strategy);
 
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 15) {

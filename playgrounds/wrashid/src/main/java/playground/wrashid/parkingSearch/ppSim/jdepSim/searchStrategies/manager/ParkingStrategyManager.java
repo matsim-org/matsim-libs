@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -105,8 +106,36 @@ public class ParkingStrategyManager {
 			evaluationContainer.selectNextStrategyAccordingToMNLExp();
 		} else {
 
-			if (globalbRandom.nextDouble() < ZHScenarioGlobal
-					.loadDoubleParam("convergance.useMATSimLikeConvergence.executionProbabilityMNL") || !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
+			double executionProbabilityMNL=0;
+			
+			if (ZHScenarioGlobal.loadBooleanParam("convergance.useMATSimLikeConvergence.varyExecutionProbabilityOfMNL")){
+				
+				String interpolationFunction=ZHScenarioGlobal.loadStringParam("convergance.useMATSimLikeConvergence.varyExecutionProbabilityOfMNL.interpolationFunction");
+				double initialProbability=ZHScenarioGlobal.loadDoubleParam("convergance.useMATSimLikeConvergence.varyExecutionProbabilityOfMNL.initialProbability");
+				double finalProbability=ZHScenarioGlobal.loadDoubleParam("convergance.useMATSimLikeConvergence.varyExecutionProbabilityOfMNL.finalProbability");
+				int finalProbabilityReachedAtIteration=ZHScenarioGlobal.loadIntParam("convergance.useMATSimLikeConvergence.varyExecutionProbabilityOfMNL.finalProbabilityReachedAtIteration");
+				
+				if (interpolationFunction.equalsIgnoreCase("linear")){
+					double m=(finalProbability-initialProbability)/finalProbabilityReachedAtIteration;
+					executionProbabilityMNL=m*ZHScenarioGlobal.iteration+initialProbability;
+				} else if (interpolationFunction.equalsIgnoreCase("quadratic")){
+					double a=(finalProbability-initialProbability)/(finalProbabilityReachedAtIteration*finalProbabilityReachedAtIteration);
+					executionProbabilityMNL=a*ZHScenarioGlobal.iteration*ZHScenarioGlobal.iteration+initialProbability;
+				} else {
+					DebugLib.stopSystemAndReportInconsistency();
+				}
+			} else {
+				executionProbabilityMNL = ZHScenarioGlobal
+						.loadDoubleParam("convergance.useMATSimLikeConvergence.executionProbabilityMNL");
+			}
+			
+			if (executionProbabilityMNL>1){
+				executionProbabilityMNL=1.0;
+			}
+			
+			int randomizationPhaseEndsAtIteration=ZHScenarioGlobal.loadIntParam("convergance.useMATSimLikeConvergence.randomizationPhaseEndsAtIteration");
+			
+			if ((globalbRandom.nextDouble() < executionProbabilityMNL || !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) && randomizationPhaseEndsAtIteration<ZHScenarioGlobal.iteration) {
 				if (evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
 					evaluationContainer.selectNextStrategyAccordingToMNLExp();
 				} else {
