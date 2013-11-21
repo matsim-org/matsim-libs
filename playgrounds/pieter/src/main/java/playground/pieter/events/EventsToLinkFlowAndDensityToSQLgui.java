@@ -48,8 +48,8 @@ import playground.pieter.singapore.utils.postgresql.PostgresType;
 import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
 import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
 import playground.pieter.singapore.utils.postgresql.TableWriter;
-import playground.wrashid.nan.MainDensityAnalysisWithPt;
-import playground.wrashid.nan.NetworkReadExample;
+import playground.pieter.wrashid.nan.MainDensityAnalysisWithPt;
+import playground.pieter.wrashid.nan.NetworkReadExample;
 
 public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 
