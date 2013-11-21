@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -58,7 +57,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -89,7 +90,13 @@ public class JointTravelingSimulationTest {
 	// helps to understand test failures, but makes the test more expensive.
 	// => to set to true when fixing tests only
 	private static final boolean DUMP_EVENTS = true;
-	private static final Level TEST_LOG_LEVEL = Level.INFO;
+
+	static {
+		Logger.getLogger( "org.matsim" ).setLevel( Level.INFO );
+		Logger.getLogger( EventsManagerImpl.class ).setLevel( Level.WARN );
+		Logger.getLogger( Gbl.class ).setLevel( Level.WARN );
+		log.setLevel( Level.INFO );
+	}
 
 	private static final int N_LAPS = 5;
 
@@ -106,13 +113,6 @@ public class JointTravelingSimulationTest {
 	private static final String ORIGIN_ACT = "chill";
 	private static final String DESTINATION_ACT = "stress";
 
-	@Before
-	public void setupLogging() {
-		// avoid polution from the lengthy QSim log: just keep warnings and errors
-		Logger.getLogger( "org.matsim" ).setLevel( Level.WARN );
-		log.setLevel( TEST_LOG_LEVEL );
-	}
-	
 	@Test
 	public void testAgentsArriveTogetherWithoutDummies() throws Exception {
 		testAgentsArriveTogether(
