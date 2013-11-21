@@ -75,6 +75,8 @@ public class JointTravelingSimulationTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
+	private static enum RouteType { normal, puAtDo }; 
+
 	// helps to understand test failures, but makes the test more expensive.
 	// => to set to true when fixing tests only
 	private static final boolean DUMP_EVENTS = true;
@@ -92,32 +94,45 @@ public class JointTravelingSimulationTest {
 	
 	@Test
 	public void testAgentsArriveTogetherWithoutDummies() throws Exception {
-		testAgentsArriveTogether( false , false );
+		testAgentsArriveTogether(
+				createFixture(
+					false,
+					RouteType.normal ) );
 	}
 
 	@Test
 	public void testAgentsArriveTogetherWithDummies() throws Exception {
-		testAgentsArriveTogether( true , false );
+		testAgentsArriveTogether(
+				createFixture(
+					true,
+					RouteType.normal ) );
 	}
 
 	@Test
 	public void testAgentsArriveTogetherWithDummiesAndDoAtPu() throws Exception {
-		testAgentsArriveTogether( true , true );
+		testAgentsArriveTogether(
+				createFixture(
+					true,
+					RouteType.puAtDo ) );
 	}
 
 	@Test
 	public void testAgentsArriveTogetherWithoutDummiesAndDoAtPu() throws Exception {
-		testAgentsArriveTogether( false , true );
+		testAgentsArriveTogether(
+				createFixture(
+					false,
+					RouteType.puAtDo ) );
 	}
 
-	public void testAgentsArriveTogether(final boolean insertDummies, final boolean dropOffAtPu) throws Exception {
+	public void testAgentsArriveTogether( final Fixture fixture ) throws Exception {
 		final Random random = new Random( 1234 );
 
 		for (int i=0; i < 50; i++) {
 			log.info( "random test scenario "+i );
-			final Scenario sc = dropOffAtPu ?
-				createTestScenarioWithDoAtPu( insertDummies , random ) :
-				createTestScenario( insertDummies , random );
+			final Scenario sc =
+				createTestScenario(
+						fixture,
+						random);
 			final EventsManager events = EventsUtils.createEventsManager();
 
 			final EventWriter eventsWriter = new EventWriterXML( utils.getOutputDirectory()+"/events.xml.gz" );
@@ -156,7 +171,7 @@ public class JointTravelingSimulationTest {
 
 						Assert.assertEquals(
 								"run "+scNr+": unexpected arrival location for mode "+mode,
-								dropOffAtPu ? PU_LINK : DO_LINK,
+								fixture.doLink,
 								event.getLinkId() );
 					}
 
@@ -196,7 +211,7 @@ public class JointTravelingSimulationTest {
 
 		for (int i=0; i < 50; i++) {
 			log.info( "random test scenario "+i );
-			final Scenario sc = createTestScenario( false , random );
+			final Scenario sc = createTestScenario( createFixture( false , RouteType.normal ) , random );
 			final EventsManager events = EventsUtils.createEventsManager();
 
 			final AtomicInteger enterCount = new AtomicInteger( 0 );
@@ -231,39 +246,33 @@ public class JointTravelingSimulationTest {
 		}
 	}
 
-	private static Scenario createTestScenario(
+	private static Fixture createFixture(
 			final boolean insertDummyActivities,
-			final Random random) {
-		return createTestScenario(
-				insertDummyActivities,
-				PU_LINK,
-				DO_LINK,
-				Arrays.asList( TO_PU_LINK ),
-				Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 ),
-				Arrays.asList( TO_DESTINATION_LINK ),
-				random);
+			final RouteType routeType) {
+		switch ( routeType ) {
+			case normal:
+				return new Fixture(
+						insertDummyActivities,
+						PU_LINK,
+						DO_LINK,
+						Arrays.asList( TO_PU_LINK ),
+						Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 ),
+						Arrays.asList( TO_DESTINATION_LINK ));
+			case puAtDo:
+				return new Fixture(
+						insertDummyActivities,
+						PU_LINK,
+						PU_LINK,
+						Arrays.asList( TO_PU_LINK ),
+						Collections.<Id> emptyList(),
+						Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 , TO_DESTINATION_LINK ) );
+			default:
+				throw new RuntimeException( routeType.toString() );
+		}
 	}
 
-	private static Scenario createTestScenarioWithDoAtPu(
-			final boolean insertDummyActivities,
-			final Random random) {
-		return createTestScenario(
-				insertDummyActivities,
-				PU_LINK,
-				PU_LINK,
-				Arrays.asList( TO_PU_LINK ),
-				Collections.<Id> emptyList(),
-				Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 , TO_DESTINATION_LINK ),
-				random);
-	}
-
 	private static Scenario createTestScenario(
-			final boolean insertDummyActivities,
-			final Id puLink,
-			final Id doLink,
-			final List<Id> toPuRoute,
-			final List<Id> puToDoRoute,
-			final List<Id> doToDestRoute,
+			final Fixture fixture,
 			final Random random) {
 		final Config config = ConfigUtils.createConfig();
 		final QSimConfigGroup qsimConf = config.qsim();
@@ -295,13 +304,13 @@ public class JointTravelingSimulationTest {
 				driverPlan.addActivity( act );
 
 				Leg l = factory.createLeg( TransportMode.car );
-				l.setRoute( new LinkNetworkRouteImpl( ORIGIN_LINK , toPuRoute , puLink ) );
+				l.setRoute( new LinkNetworkRouteImpl( ORIGIN_LINK , fixture.toPuRoute , fixture.puLink ) );
 				driverPlan.addLeg( l );
 
-				if (insertDummyActivities) {
+				if ( fixture.insertDummyActivities ) {
 					act = factory.createActivityFromLinkId(
 								JointActingTypes.INTERACTION,
-								puLink );
+								fixture.puLink );
 					driverPlan.addActivity( act );
 					act.setMaximumDuration( 0 );
 				}
@@ -309,27 +318,27 @@ public class JointTravelingSimulationTest {
 				l = factory.createLeg( JointActingTypes.DRIVER );
 				DriverRoute dRoute =
 					new DriverRoute(
-							puLink,
-							doLink );
+							fixture.puLink,
+							fixture.doLink );
 				dRoute.setLinkIds(
-						puLink , 
-						puToDoRoute,
-						doLink);
+						fixture.puLink , 
+						fixture.puToDoRoute,
+						fixture.doLink);
 				dRoute.addPassenger( passengerId1 );
 				dRoute.addPassenger( passengerId2 );
 				l.setRoute( dRoute );
 				driverPlan.addLeg( l );
 
-				if (insertDummyActivities) {
+				if ( fixture.insertDummyActivities ) {
 					act = factory.createActivityFromLinkId(
 								JointActingTypes.INTERACTION,
-								doLink );
+								fixture.doLink );
 					driverPlan.addActivity( act );
 					act.setMaximumDuration( 0 );
 				}
 
 				l = factory.createLeg( TransportMode.car );
-				l.setRoute( new LinkNetworkRouteImpl( doLink , doToDestRoute , DESTINATION_LINK ) );
+				l.setRoute( new LinkNetworkRouteImpl( fixture.doLink , fixture.doToDestRoute , DESTINATION_LINK ) );
 				driverPlan.addLeg( l );
 
 				final Activity work = factory.createActivityFromLinkId( "w" , DESTINATION_LINK );
@@ -364,16 +373,16 @@ public class JointTravelingSimulationTest {
 
 				Leg l = factory.createLeg( TransportMode.walk );
 				double tt = random.nextDouble() * 1234;
-				Route walkRoute = new GenericRouteImpl( ORIGIN_LINK , puLink );
+				Route walkRoute = new GenericRouteImpl( ORIGIN_LINK , fixture.puLink );
 				walkRoute.setTravelTime( tt );
 				l.setTravelTime( tt );
 				l.setRoute( walkRoute );
 				p1Plan.addLeg( l );
 
-				if (insertDummyActivities) {
+				if ( fixture.insertDummyActivities ) {
 					act = factory.createActivityFromLinkId(
 								JointActingTypes.INTERACTION,
-								puLink );
+								fixture.puLink );
 					p1Plan.addActivity( act );
 					act.setMaximumDuration( 0 );
 				}
@@ -381,23 +390,23 @@ public class JointTravelingSimulationTest {
 				l = factory.createLeg( JointActingTypes.PASSENGER );
 				PassengerRoute pRoute =
 					new PassengerRoute(
-							puLink,
-							doLink );
+							fixture.puLink,
+							fixture.doLink );
 				pRoute.setDriverId( driverId );
 				l.setRoute( pRoute );
 				p1Plan.addLeg( l );
 
-				if (insertDummyActivities) {
+				if ( fixture.insertDummyActivities ) {
 					act = factory.createActivityFromLinkId(
 								JointActingTypes.INTERACTION,
-								doLink );
+								fixture.doLink );
 					p1Plan.addActivity( act );
 					act.setMaximumDuration( 0 );
 				}
 
 				l = factory.createLeg( TransportMode.walk );
 				tt = random.nextDouble() * 1234;
-				walkRoute = new GenericRouteImpl( doLink , DESTINATION_LINK );
+				walkRoute = new GenericRouteImpl( fixture.doLink , DESTINATION_LINK );
 				walkRoute.setTravelTime( tt );
 				l.setTravelTime( tt );
 				l.setRoute( walkRoute );
@@ -444,6 +453,30 @@ public class JointTravelingSimulationTest {
 		}
 
 		network.addLink( network.getFactory().createLink( RETURN_LINK , node2 , firstNode ) );
+	}
+
+	private static class Fixture {
+		final private boolean insertDummyActivities;
+		final private Id puLink;
+		final private Id doLink;
+		final private List<Id> toPuRoute;
+		final private List<Id> puToDoRoute;
+		final private List<Id> doToDestRoute;
+
+		public Fixture(
+				final boolean insertDummyActivities,
+				final Id puLink,
+				final Id doLink,
+				final List<Id> toPuRoute,
+				final List<Id> puToDoRoute,
+				final List<Id> doToDestRoute) {
+			this.insertDummyActivities = insertDummyActivities;
+			this.puLink = puLink;
+			this.doLink = doLink;
+			this.toPuRoute = toPuRoute;
+			this.puToDoRoute = puToDoRoute;
+			this.doToDestRoute = doToDestRoute;
+		}
 	}
 
 	private static class RunAbortedEvent extends Event {
