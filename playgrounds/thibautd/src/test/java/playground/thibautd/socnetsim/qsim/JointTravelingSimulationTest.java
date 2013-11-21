@@ -20,6 +20,7 @@
 package playground.thibautd.socnetsim.qsim;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -66,14 +67,14 @@ public class JointTravelingSimulationTest {
 	private static final Logger log =
 		Logger.getLogger(JointTravelingSimulationTest.class);
 
-	private static final Id originLink = new IdImpl( "origin" );
-	private static final Id toPuLink = new IdImpl( "toPu" );
-	private static final Id puLink = new IdImpl( "pu" );
-	private static final Id travelLink1 = new IdImpl( 1 );
-	private static final Id travelLink2 = new IdImpl( 2 );
-	private static final Id doLink = new IdImpl( "do" );
-	private static final Id toDestinationLink = new IdImpl( "to_destination" );
-	private static final Id destinationLink = new IdImpl( "destination" );
+	private static final Id ORIGIN_LINK = new IdImpl( "origin" );
+	private static final Id TO_PU_LINK = new IdImpl( "toPu" );
+	private static final Id PU_LINK = new IdImpl( "pu" );
+	private static final Id TRAVEL_LINK_1 = new IdImpl( 1 );
+	private static final Id TRAVEL_LINK_2 = new IdImpl( 2 );
+	private static final Id DO_LINK = new IdImpl( "do" );
+	private static final Id TO_DESTINATION_LINK = new IdImpl( "to_destination" );
+	private static final Id DESTINATION_LINK = new IdImpl( "destination" );
 	
 	@Test
 	public void testAgentsArriveTogetherWithoutDummies() throws Exception {
@@ -120,11 +121,11 @@ public class JointTravelingSimulationTest {
 
 						Assert.assertEquals(
 								"unexpected arrival location for mode "+mode,
-								doLink,
+								DO_LINK,
 								event.getLinkId() );
 					}
 
-					if ( event.getLinkId().equals( destinationLink ) ) {
+					if ( event.getLinkId().equals( DESTINATION_LINK ) ) {
 						atDestCount.incrementAndGet();
 					}
 				}
@@ -186,8 +187,26 @@ public class JointTravelingSimulationTest {
 		}
 	}
 
-	private Scenario createTestScenario(
+	private static Scenario createTestScenario(
 			final boolean insertDummyActivities,
+			final Random random) {
+		return createTestScenario(
+				insertDummyActivities,
+				PU_LINK,
+				DO_LINK,
+				Arrays.asList( TO_PU_LINK ),
+				Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 ),
+				Arrays.asList( TO_DESTINATION_LINK ),
+				random);
+	}
+
+	private static Scenario createTestScenario(
+			final boolean insertDummyActivities,
+			final Id puLink,
+			final Id doLink,
+			final List<Id> toPuRoute,
+			final List<Id> puToDoRoute,
+			final List<Id> doToDestRoute,
 			final Random random) {
 		final Config config = ConfigUtils.createConfig();
 		final QSimConfigGroup qsimConf = config.qsim();
@@ -213,12 +232,12 @@ public class JointTravelingSimulationTest {
 		driver.addPlan( driverPlan );
 		sc.getPopulation().addPerson( driver );
 
-		Activity act = factory.createActivityFromLinkId( "h" , originLink );
+		Activity act = factory.createActivityFromLinkId( "h" , ORIGIN_LINK );
 		act.setEndTime( random.nextDouble() * 12 * 3600 );
 		driverPlan.addActivity( act );
 
 		Leg l = factory.createLeg( TransportMode.car );
-		l.setRoute( new LinkNetworkRouteImpl( originLink , Arrays.asList( toPuLink ) , puLink ) );
+		l.setRoute( new LinkNetworkRouteImpl( ORIGIN_LINK , toPuRoute , puLink ) );
 		driverPlan.addLeg( l );
 
 		if (insertDummyActivities) {
@@ -236,7 +255,7 @@ public class JointTravelingSimulationTest {
 					doLink );
 		dRoute.setLinkIds(
 				puLink , 
-				Arrays.asList( travelLink1 , travelLink2 ),
+				puToDoRoute,
 				doLink);
 		dRoute.addPassenger( passengerId1 );
 		dRoute.addPassenger( passengerId2 );
@@ -252,10 +271,10 @@ public class JointTravelingSimulationTest {
 		}
 
 		l = factory.createLeg( TransportMode.car );
-		l.setRoute( new LinkNetworkRouteImpl( doLink , Arrays.asList( toDestinationLink ) , destinationLink ) );
+		l.setRoute( new LinkNetworkRouteImpl( doLink , doToDestRoute , DESTINATION_LINK ) );
 		driverPlan.addLeg( l );
 
-		act = factory.createActivityFromLinkId( "h" , destinationLink );
+		act = factory.createActivityFromLinkId( "h" , DESTINATION_LINK );
 		driverPlan.addActivity( act );
 
 		// passengers 
@@ -266,13 +285,13 @@ public class JointTravelingSimulationTest {
 			p1.addPlan( p1Plan );
 			sc.getPopulation().addPerson( p1 );
 
-			act = factory.createActivityFromLinkId( "h" , originLink );
+			act = factory.createActivityFromLinkId( "h" , ORIGIN_LINK );
 			act.setEndTime( random.nextDouble() * 12 * 3600 );
 			p1Plan.addActivity( act );
 
 			l = factory.createLeg( TransportMode.walk );
 			double tt = random.nextDouble() * 1234;
-			Route walkRoute = new GenericRouteImpl( originLink , puLink );
+			Route walkRoute = new GenericRouteImpl( ORIGIN_LINK , puLink );
 			walkRoute.setTravelTime( tt );
 			l.setTravelTime( tt );
 			l.setRoute( walkRoute );
@@ -305,20 +324,20 @@ public class JointTravelingSimulationTest {
 
 			l = factory.createLeg( TransportMode.walk );
 			tt = random.nextDouble() * 1234;
-			walkRoute = new GenericRouteImpl( doLink , destinationLink );
+			walkRoute = new GenericRouteImpl( doLink , DESTINATION_LINK );
 			walkRoute.setTravelTime( tt );
 			l.setTravelTime( tt );
 			l.setRoute( walkRoute );
 			p1Plan.addLeg( l );
 
-			act = factory.createActivityFromLinkId( "h" , destinationLink );
+			act = factory.createActivityFromLinkId( "h" , DESTINATION_LINK );
 			p1Plan.addActivity( act );
 		}
 
 		return sc;
 	}
 
-	private void createNetwork(final Network network) {
+	private static void createNetwork(final Network network) {
 		int c = 0;
 		int d = 0;
 
@@ -327,9 +346,9 @@ public class JointTravelingSimulationTest {
 
 		network.addNode( node1 );
 		network.addNode( node2 );
-		network.addLink( network.getFactory().createLink( originLink , node1 , node2 ) );
+		network.addLink( network.getFactory().createLink( ORIGIN_LINK , node1 , node2 ) );
 
-		for (Id linkId : new Id[]{ toPuLink , puLink , travelLink1 , travelLink2 , doLink , toDestinationLink , destinationLink }) {
+		for (Id linkId : new Id[]{ TO_PU_LINK , PU_LINK , TRAVEL_LINK_1 , TRAVEL_LINK_2 , DO_LINK , TO_DESTINATION_LINK , DESTINATION_LINK }) {
 			node1 = node2;
 			node2 = network.getFactory().createNode( new IdImpl( c++ ) , new CoordImpl( 0 , d++ ) );
 			network.addNode( node2 );
