@@ -25,6 +25,7 @@ package playground.ikaddoura.internalizationCar;
 
 
 import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -35,27 +36,32 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
  *
  */
 public class InternalizationCarControler {
-	
 	private static final Logger log = Logger.getLogger(InternalizationCarControler.class);
 	
-	static String configFile;
+	static String configFile1;
+	static String configFile2;
+	static String configFile3;
 			
 	public static void main(String[] args) throws IOException {
-				
-		if (args.length > 0) {
-			configFile = args[0];		
-			log.info("configFile: "+ configFile);
-			
-		} else {
-			configFile = "/Users/Ihab/Desktop/testScenario_input/config.xml";
-		}
 		
-		InternalizationCarControler main = new InternalizationCarControler();
-		main.run();
+		configFile1 = args[0];
+		configFile2 = args[1];
+		configFile2 = args[2];
+		
+		InternalizationCarControler internalizationCarControler = new InternalizationCarControler();
+		internalizationCarControler.runBaseCase(configFile1);
+		internalizationCarControler.runInternalization(configFile2);
+		internalizationCarControler.runBaseCase(configFile3);
 	}
 	
-	private void run() {
-		
+	private void runBaseCase(String configFile) {
+		Controler controler = new Controler(configFile);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+
+	private void runInternalization(String configFile) {
 		Controler controler = new Controler(configFile);
 
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
@@ -67,7 +73,5 @@ public class InternalizationCarControler {
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.setOverwriteFiles(true);
 		controler.run();
-		
 	}
 }
-	
