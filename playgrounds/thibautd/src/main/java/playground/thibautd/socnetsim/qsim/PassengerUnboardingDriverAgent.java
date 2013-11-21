@@ -62,6 +62,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 			final MobsimAgent delegate,
 			final QNetsimEngine netsimEngine,
 			final InternalInterface internalInterface) {
+		if ( delegate == null ) throw new IllegalArgumentException( "delegate cannot be null" );
 		this.delegate = (MobsimDriverAgent) delegate;
 		this.ptDelegate = delegate instanceof PTPassengerAgent ? (PTPassengerAgent) delegate : null;
 		this.planDelegate = (PlanAgent) delegate;
@@ -74,7 +75,15 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public void endLegAndComputeNextState(final double now) {
-		if ( delegate.getMode().equals( JointActingTypes.DRIVER ) ) {
+		final String mode = delegate.getMode();
+
+		if ( mode == null ) {
+			throw new IllegalStateException(
+					"delegate "+delegate+" returned a null mode. Probably in a wrong state: "
+					+delegate.getState()+" with current plan element "+getCurrentPlanElement() );
+		}
+
+		if ( mode.equals( JointActingTypes.DRIVER ) ) {
 			if ( !passengersToBoard.isEmpty() ) {
 				assert ((NetworkRoute) ((Leg) getCurrentPlanElement()).getRoute()).getLinkIds().isEmpty();
 				boardPassengers();
