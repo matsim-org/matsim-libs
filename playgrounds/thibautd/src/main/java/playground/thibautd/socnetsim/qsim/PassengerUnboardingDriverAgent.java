@@ -79,7 +79,9 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 
 		if ( mode == null ) {
 			throw new IllegalStateException(
-					"delegate "+delegate+" returned a null mode. Probably in a wrong state: "
+					"delegate "+delegate+
+					" for agent "+delegate.getId()+
+					" returned a null mode. Probably in a wrong state: "
 					+delegate.getState()+" with current plan element "+getCurrentPlanElement() );
 		}
 
