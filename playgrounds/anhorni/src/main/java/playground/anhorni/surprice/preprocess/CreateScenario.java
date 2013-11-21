@@ -497,7 +497,7 @@ public class CreateScenario {
 			double totalOffset = offset + nullOffset;
 			double dudm = (Double)(this.incomes.getAttribute(person.getId().toString(), "income")) + totalOffset;
 			double dudmNormalized = dudm / (1 + nullOffset);
-			this.preferences.putAttribute(person.getId().toString(), "dudm", dudmNormalized * 10.0);
+			this.preferences.putAttribute(person.getId().toString(), "dudm", dudmNormalized);
 		}
 		this.writePreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
 	}
@@ -506,7 +506,7 @@ public class CreateScenario {
 		Bins preferencesBins = new Bins(1, 20, "preferences");
 				
 		for (Id id : this.scenario.getPopulation().getPersons().keySet()) {	
-			preferencesBins.addVal((Double)this.preferences.getAttribute(id.toString(), "dudm"), 1.0);
+			preferencesBins.addVal((Double)this.preferences.getAttribute(id.toString(), "dudm") * 12.0, 1.0);
 		}		
 		log.info("Writing preferences to " + outPath + "/preferences.xml");
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(preferences);
