@@ -408,6 +408,19 @@ public class ParkingStrategyScenarios {
 				strategy.setGroupName("ARD-S-1000.0-100");
 				allStrategies.add(strategy);
 			}
+		} if (ZHScenarioGlobal.parkingStrategyScenarioId == 17) {
+			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
+					.loadIntParam("parkingStrategyScenarioId.17.numberOfStrategiesInEachGroup");
+
+			for (int i = 0; i < numberOfStrategiesInEachGroup; i++) {
+				RandomParkingSearch strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-" + i);
+				strategy.setGroupName("ARD-S");
+				allStrategies.add(strategy);
+				
+				strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "ARD_TakeClosestGarageParking");
+				strategy.setGroupName("ARD_TakeClosestGarageParking");
+				allStrategies.add(strategy);
+			}
 		}
 
 		return allStrategies;
