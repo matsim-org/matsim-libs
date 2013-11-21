@@ -146,14 +146,29 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 				throw new RuntimeException( "failed to handle departure. Check the main modes?" );
 			}
 
+			if ( log.isTraceEnabled() ) {
+				log.trace( "departure of driver "+driverId+" handled succesfully" );
+			}
+
 			waitingDrivers.remove( driverId );
+
+			if ( log.isTraceEnabled() ) {
+				log.trace( "driver "+driverId+" removed from waiting list." );
+				log.trace( "waiting list is now "+waitingDrivers.keySet() );
+			}
 		}
 		else {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "NOT all passengers "+passengerIds+" in present passengers "+presentPassengers );
 				log.trace( "NOT (yet) processing to departure for driver "+driverId );
 			}
+
 			waitingDrivers.put( driverId , new WaitingDriver( agent , linkId ) );
+
+			if ( log.isTraceEnabled() ) {
+				log.trace( "driver "+driverId+" added to waiting list." );
+				log.trace( "waiting list is now "+waitingDrivers.keySet() );
+			}
 		}
 	}
 
@@ -198,6 +213,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		}
 		else if ( log.isTraceEnabled() ) {
 			log.trace( "driver "+driverId+" NOT found waiting: DO NOTHING for passenger "+agent.getId() );
+			log.trace( "waiting list is "+waitingDrivers.keySet() );
 		}
 	}
 

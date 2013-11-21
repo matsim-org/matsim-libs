@@ -251,6 +251,8 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 		return "["+getClass().getSimpleName()+
 			": id="+getId()+
 			"; currentElement="+getCurrentPlanElement()+
+			"; positionInPlan="+getSelectedPlan().getPlanElements().indexOf( getCurrentPlanElement() )+
+			" / "+getSelectedPlan().getPlanElements().size()+
 			"; currentLinkId="+getCurrentLinkId()+
 			"; state="+getState()+
 			"]";
