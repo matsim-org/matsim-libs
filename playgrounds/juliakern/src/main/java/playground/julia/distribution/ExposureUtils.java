@@ -30,40 +30,48 @@ import org.matsim.api.core.v01.Id;
 
 public class ExposureUtils {
 
-//	public void printTimeTables(List<PersonalExposure> popExposure, String outPathForTimeTables) {
-//		BufferedWriter buffW;
-//		try {
-//			buffW = new BufferedWriter(new FileWriter(outPathForTimeTables));
-//
-//			// header: Person base case compare case difference
-//			buffW.write("Timetable");
-//			buffW.newLine();
-//
-//			for (PersonalExposure perEx : popExposure) {
-//				buffW.write("Person id: " + perEx.getPersonalId().toString());
-//				buffW.newLine();
-//				buffW.write("Average exposure:" + perEx.getAverageExposure());
-//				buffW.newLine();
-//				buffW.write("activity type \t start time \t end time \t duration \t exposure value \t exposure x duration");
-//				buffW.newLine();
-//
-//				TimeDependendExposure next = perEx.getNextTimeDependendExposure(null);
-//
-//				while (next != null) {
-//					buffW.write(perEx.getStringForInterval(next));
-//					buffW.newLine();
-//					next = perEx.getNextTimeDependendExposure(next);
-//				}
-//
-//				buffW.newLine();
-//			}
-//
-//			buffW.close();
-//
-//		} catch (IOException e) {
-//			System.err.println("Error creating " + outPathForTimeTables + ".");
-//		}
-//	}
+	public void printPersonalExposureInformation(ArrayList<ResponsibilityEvent> responsibilityAndExposure,String outputPath) {
+				
+		Map <Id, ArrayList<ResponsibilityEvent>> person2ResponsibilityEvents = new HashMap<Id, ArrayList<ResponsibilityEvent>>();
+		
+		for(ResponsibilityEvent ree: responsibilityAndExposure){
+			if(!person2ResponsibilityEvents.containsKey(ree.getReceivingPersonId())){
+				person2ResponsibilityEvents.put(ree.getReceivingPersonId(), new ArrayList<ResponsibilityEvent>());
+			}
+			person2ResponsibilityEvents.get(ree.getReceivingPersonId()).add(ree);
+		}
+		
+		BufferedWriter buffW;
+		try{
+			buffW = new BufferedWriter(new FileWriter(outputPath));
+
+			buffW.write("Personal Exposure Information");
+			buffW.newLine();buffW.newLine();
+			
+			
+			for (Id personId: person2ResponsibilityEvents.keySet()) {
+				buffW.write("PersonId: " + personId);
+				buffW.newLine();
+				
+				Double personalTotal =0.0;
+				for(ResponsibilityEvent ree: person2ResponsibilityEvents.get(personId)){
+					personalTotal += ree.getExposureValue();
+				}
+				
+				buffW.write("Total exposure: " + personalTotal);
+				buffW.newLine();
+				
+				for (ResponsibilityEvent ree : person2ResponsibilityEvents.get(personId)) {
+					buffW.write(ree.getExposureInformation());
+					buffW.newLine();
+				}
+				buffW.newLine();
+			}
+			buffW.close();
+		}catch(IOException e){
+			System.err.println("Error creating " + outputPath + ".");
+		}	 	
+	}
 
 	public void printDetailedResponsibilityInformation(ArrayList<ResponsibilityEventImpl> responsibility,
 			String outputPath) {
@@ -313,7 +321,7 @@ public class ExposureUtils {
 				buffW.newLine();
 				
 				for (ResponsibilityEvent ree : person2ResponsibilityEvents.get(personId)) {
-					buffW.write(ree.getInformation());
+					buffW.write(ree.getResponsibilityInformation());
 					buffW.newLine();
 				}
 				buffW.newLine();
@@ -321,10 +329,6 @@ public class ExposureUtils {
 			buffW.close();
 		}catch(IOException e){
 			System.err.println("Error creating " + outputPath + ".");
-		}
-		
+		}	
 	}
-
-
-
 }

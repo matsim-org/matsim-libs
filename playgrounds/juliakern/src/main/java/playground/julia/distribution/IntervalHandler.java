@@ -90,25 +90,29 @@ LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 		for(Id personId: person2asevent.keySet()){
 			for(ActivityStartEvent ase: person2asevent.get(personId)){
 				Double startOfActivity = ase.getTime();
-				int xBin = link2xbins.get(ase.getLinkId());
-				int yBin = link2ybins.get(ase.getLinkId());
-				// find corresponding act end event
-				ActivityEndEvent aee = findCorrespondingActivityEndEvent(ase, person2aeevent.get(personId));
-				Double endOfActivity;
-				if(aee == null){
-					endOfActivity = simulationEndTime;
-				}else{
-					endOfActivity = aee.getTime();
+				if (link2xbins.get(ase.getLinkId())!=null && link2ybins.get(ase.getLinkId())!=null) {
+					int xBin = link2xbins.get(ase.getLinkId());
+					int yBin = link2ybins.get(ase.getLinkId());
+					// find corresponding act end event
+					ActivityEndEvent aee = findCorrespondingActivityEndEvent(
+							ase, person2aeevent.get(personId));
+					Double endOfActivity;
+					if (aee == null) {
+						endOfActivity = simulationEndTime;
+					} else {
+						endOfActivity = aee.getTime();
+					}
+					// create em activity
+					EmActivity emact = new EmActivity(startOfActivity,
+							endOfActivity, personId, xBin, yBin,
+							ase.getActType());
+					activities.add(emact);
+					// remove act end events from arrays
+					// do not remove act start events - iteration
+					// TODO sinnvoll? beschleunigt das entsprechend?
+					// hinterher auch act start loeschen?
+					person2aeevent.get(personId).remove(aee);
 				}
-				// create em activity
-				EmActivity emact = new EmActivity(startOfActivity, endOfActivity, personId, xBin, yBin, ase.getActType());
-				activities.add(emact);
-				
-				// remove act end events from arrays
-				// do not remove act start events - iteration
-				// TODO sinnvoll? beschleunigt das entsprechend?
-				// hinterher auch act start loeschen?
-				person2aeevent.get(personId).remove(aee);
 				
 			}
 		}		

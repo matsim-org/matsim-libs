@@ -67,10 +67,12 @@ public class SpatialAveragingDistribution {
 //	private final String emissionFile1 = runDirectory1 + "basecase.sample.emission.events.xml";
 //	String plansFile1 = runDirectory1+"basecase.sample.plans.xml";
 //	String eventsFile1 = runDirectory1+"basecase.sample.events.xml";
+//	String outPathStub = "output/sample/basecase_30timebins_";
+	
 	private final String emissionFile1 = runDirectory1 + "compcase.sample.emission.events.xml";
 	String plansFile1 = runDirectory1+"compcase.sample.plans.xml";
 	String eventsFile1 = runDirectory1+"compcase.sample.events.xml";
-	String outPathStub = "output/sample/";
+	String outPathStub = "output/sample/compcase_30timebins_";
 	
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
@@ -87,7 +89,7 @@ public class SpatialAveragingDistribution {
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 
-	final int noOfTimeBins = 1; // one bin for each hour? //TODO 30? sim endtime ist 30...
+	final int noOfTimeBins = 30; // one bin for each hour? //TODO 30? sim endtime ist 30...
 	double timeBinSize;
 	final int noOfXbins = 160; //TODO rethink this
 	final int noOfYbins = 120;
@@ -101,6 +103,10 @@ public class SpatialAveragingDistribution {
 	
 	Map<Double, ArrayList<EmPerCell>> emissionPerBin ;
 	Map<Double, ArrayList<EmPerLink>> emissionPerLink;
+
+	private boolean storeResponsibilityEvents = true;
+
+	private String responsibilityEventOutputFile = outPathStub + "responsibilityEvents.xml";
 
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile1);
@@ -142,6 +148,7 @@ public class SpatialAveragingDistribution {
 		generateActivitiesAndTrips(eventsFile1, activities, carTrips);
 		generateEmissions(emissionFile1);
 		
+		logger.info("Done calculating emissions per bin and link.");
 		
 		/*
 		 * two lists to store information on exposure and responsibility 
@@ -158,6 +165,12 @@ public class SpatialAveragingDistribution {
 		reut.addExposureAndResponsibilityBinwise(activities, emissionPerBin, responsibilityAndExposure, timeBinSize, simulationEndTime);
 		//reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, responsibilityAndExposure, timeBinSize, simulationEndTime);
 		
+		logger.info("Done calculating responsibility events.");
+		
+		if(storeResponsibilityEvents ){
+			writeResponsibilityEventsToXml(responsibilityAndExposure);
+		}
+		
 		/*
 		 * analysis
 		 * exposure analysis: sum, average, welfare, personal time table
@@ -169,8 +182,37 @@ public class SpatialAveragingDistribution {
 		ExposureUtils exut = new ExposureUtils();
 		exut.printExposureInformation(responsibilityAndExposure, outPathStub+"exposure.txt");
 		exut.printResponsibilityInformation(responsibilityAndExposure, outPathStub+"responsibility.txt");
+		exut.printPersonalExposureInformation(responsibilityAndExposure, outPathStub+"personalExposure.txt");
 		exut.printPersonalResponsibilityInformation(responsibilityAndExposure, outPathStub+"personalResponsibility.txt");
+		
+		logger.info("Finished writing output to "+ outPathStub +".");
 		}
+
+	private void writeResponsibilityEventsToXml(Collection<ResponsibilityEvent> responsibilityAndExposure) {
+		
+		ResponsibilityEventWriter rew = new ResponsibilityEventWriter(responsibilityEventOutputFile);
+		for(ResponsibilityEvent ree: responsibilityAndExposure){
+			rew.handleResponsibilityEvent(ree);
+		}
+		rew.closeFile();
+		/*
+		 * 		EmissionModule emissionModule = new EmissionModule(scenario);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
+		
+*/
+	//	EventsManager eventsManager = EventsUtils.createEventsManager();
+	//	eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
+	//	eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+		
+	//	EventWriterXML emissionEventWriter = new EventWriterXML(responsibilityEventOutputFile);
+
+		
+//		emissionEventWriter.closeFile();
+
+	//	emissionModule.writeEmissionInformation(responsibilityEventOutputFile);
+		
+	}
 
 	private void generateEmissions(String emissionFile) {
 				
@@ -184,8 +226,6 @@ public class SpatialAveragingDistribution {
 
 		emissionPerBin = generatedEmissionsHandler.getEmissionsPerCell();
 		emissionPerLink = generatedEmissionsHandler.getEmissionsPerLink();
-		
-		logger.info("Done calculating emissions per bin and link.");
 		
 	}
 
@@ -211,8 +251,6 @@ public class SpatialAveragingDistribution {
 		Map<Id, Integer> link2ybin = new HashMap<Id, Integer>();
 		for(Id linkId: network.getLinks().keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(network.getLinks().get(linkId).getCoord().getY()));
-			if(mapYCoordToBin(network.getLinks().get(linkId).getCoord().getY())==null){
-			}
 		}
 		return link2ybin;
 	}

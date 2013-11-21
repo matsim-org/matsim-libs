@@ -20,6 +20,9 @@
 
 package playground.julia.distribution;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 
@@ -69,13 +72,36 @@ public class ResponsibilityEventImpl extends Event implements ResponsibilityEven
 	}
 
 	@Override
-	public String getInformation() {
+	public String getResponsibilityInformation() {
 		
-		String info = "Exposure for Person " + responsiblePersonId.toString(); 
+		String info = "Exposure for person " + receivingPersonId.toString(); 
 		info += " exposure time: " + exposureStartTime + " - " + exposureEndTime;
 		info += " with exposure value " + this.getExposureValue();
 		info += " at/during " + exposureLocation + ". ";
 		info += "Caused by emission event at " + emissionEventTime + ".";
+		return info;
+	}
+	
+	public String getExposureInformation(){
+		String info = "Responsible person " + responsiblePersonId.toString();
+		info += " exposure time: " + exposureStartTime + " - " + exposureEndTime;
+		info += " with exposure value " + this.getExposureValue();
+		info += " at/during " + exposureLocation + ". ";
+		info += "Caused by emission event at " + emissionEventTime + ".";
+		return info;
+	}
+
+	@Override
+	public Map<String, String> getInformationMap() {
+		Map<String, String> info = new HashMap<String, String>();
+		info.put(RECEIVING_PERSON_ID, receivingPersonId.toString());
+		info.put(RESPONSIBLE_PERSON_ID, responsiblePersonId.toString());
+		info.put(EMISSIONEVENT_STARTTIME, emissionEventTime.toString());
+		info.put(EXPOSURE_STARTTIME, exposureStartTime.toString());
+		info.put(EXPOSURE_ENDTIME, exposureEndTime.toString());
+		info.put(LOCATION, exposureLocation);
+		info.put(CONCENTRATION, concentration.toString());
+
 		return info;
 	}
 

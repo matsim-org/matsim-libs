@@ -20,22 +20,33 @@
 
 package playground.julia.distribution;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 
 public interface ResponsibilityEvent {
 	
 	public final static String EVENT_TYPE = "responsibilityEvent";
-	
-	public final static String ATTRIBUTE_RESPONSIBLE_PERSON_ID = "personId";
+	public final static String RESPONSIBLE_PERSON_ID = "responsiblePersonId";
+	public final static String RECEIVING_PERSON_ID = "receivingPersonId";
+	public final static String EMISSIONEVENT_STARTTIME = "emissionEventStartTime";
+	public final static String EXPOSURE_STARTTIME = "exposureStartTime";
+	public final static String EXPOSURE_ENDTIME = "exposureEndTime";
+	public final static String LOCATION = "location";
+	public final static String CONCENTRATION = "concentration";
 
 	public Double getExposureValue();
 
 	public Id getResponsiblePersonId();
 
-	public String getInformation();
+	public String getResponsibilityInformation();
+	
+	public String getExposureInformation();
 
 	public Id getReceivingPersonId();
 
 	public Double getDuration();
+
+	public Map<String, String> getInformationMap();
 
 }

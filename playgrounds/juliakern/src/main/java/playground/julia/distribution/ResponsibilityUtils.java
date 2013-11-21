@@ -30,7 +30,6 @@ public class ResponsibilityUtils {
 	 * from car trips and emissions per link
 	 * 
 	 * -> generate responsibility(and exposure) events 
-	 * 
 	 */
 	public void addExposureAndResponsibilityLinkwise(ArrayList<EmCarTrip> carTrips,
 													Map<Double, ArrayList<EmPerLink>> emissionPerLink,
