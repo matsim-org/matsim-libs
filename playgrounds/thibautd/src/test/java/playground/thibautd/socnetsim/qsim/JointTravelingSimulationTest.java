@@ -60,6 +60,8 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -92,10 +94,13 @@ public class JointTravelingSimulationTest {
 	private static final boolean DUMP_EVENTS = true;
 
 	static {
-		Logger.getLogger( "org.matsim" ).setLevel( Level.INFO );
+		Logger.getLogger( "org.matsim" ).setLevel( Level.WARN );
 		Logger.getLogger( EventsManagerImpl.class ).setLevel( Level.WARN );
 		Logger.getLogger( Gbl.class ).setLevel( Level.WARN );
-		log.setLevel( Level.INFO );
+
+		Logger.getLogger( "playground.thibautd.socnetsim.qsim" ).setLevel( Level.TRACE );
+
+		log.setLevel( Level.WARN );
 	}
 
 	private static final int N_LAPS = 5;
@@ -243,9 +248,10 @@ public class JointTravelingSimulationTest {
 				}
 			});
 
+			final JointQSimFactory factory = new JointQSimFactory( );
+			final QSim qsim = factory.createMobsim( sc , events );
 			try {
-				final JointQSimFactory factory = new JointQSimFactory( );
-				factory.createMobsim( sc , events ).run();
+				qsim.run();
 			}
 			catch ( AssertionError t ) {
 				events.processEvent( new RunAbortedEvent() );
@@ -254,6 +260,9 @@ public class JointTravelingSimulationTest {
 			finally {
 				eventsWriter.closeFile();
 			}
+
+			// for easier tracking of test failures
+			logFinalQSimState( qsim );
 
 			Assert.assertEquals(
 					"run "+i+": unexpected number of joint arrivals",
@@ -264,6 +273,12 @@ public class JointTravelingSimulationTest {
 					"run "+i+": unexpected number of agents arriving at destination",
 					N_LAPS * sc.getPopulation().getPersons().size(),
 					atDestCount.get());
+		}
+	}
+
+	private static void logFinalQSimState(final QSim qsim) {
+		for ( MobsimAgent agent : qsim.getAgents() ) {
+			log.info( "agent state at end: "+agent );
 		}
 	}
 
