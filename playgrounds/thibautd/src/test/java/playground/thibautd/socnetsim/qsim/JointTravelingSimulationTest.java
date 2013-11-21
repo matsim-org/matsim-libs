@@ -91,7 +91,7 @@ public class JointTravelingSimulationTest {
 
 	// helps to understand test failures, but makes the test more expensive.
 	// => to set to true when fixing tests only
-	private static final boolean DUMP_EVENTS = true;
+	private static final boolean DUMP_EVENTS = false;
 
 	static {
 		Logger.getLogger( "org.matsim" ).setLevel( Level.WARN );
