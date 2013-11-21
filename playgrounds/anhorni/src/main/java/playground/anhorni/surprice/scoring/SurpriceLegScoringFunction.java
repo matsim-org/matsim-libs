@@ -20,10 +20,13 @@
 
 package playground.anhorni.surprice.scoring;
 
-import org.matsim.api.core.v01.TransportMode;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -33,7 +36,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.anhorni.surprice.AgentMemory;
-import playground.anhorni.surprice.Surprice;
+
+
 
 public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
@@ -52,6 +56,10 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private String day;
     private AgentMemory memory;
     private double dudm;
+    
+    private int legCnt = 0;
+    
+    private final static Logger log = Logger.getLogger(SurpriceLegScoringFunction.class);
         
     
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, AgentMemory memory, 
@@ -73,6 +81,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		this.person.getCustomAttributes().put(day + ".legScore", null);
 		this.person.getCustomAttributes().put(day + ".legMonetaryCosts", null);
 		this.person.getCustomAttributes().put(day + ".legScoreLag", null);
+		this.legCnt = 0;
 	}
 
 	@Override
@@ -92,12 +101,24 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		this.score += calcLegScore(this.lastTime, time, leg);
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		
-		String purpose = ((PlanImpl)this.person.getSelectedPlan()).getNextActivity(leg).getType();	
-		
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
+		String purpose = "undef";
+		this.legCnt++;
+		int actIndex = 0;
+		for (PlanElement pe : ((PlanImpl)this.person.getSelectedPlan()).getPlanElements()) {			
+			if (pe instanceof Activity && actIndex == this.legCnt) {		
+				if (actIndex == this.legCnt) {
+					Activity act = (Activity)pe;
+					purpose = act.getType();
+					break;
+				}
+				else {
+					actIndex++;
+				}
+			}
+		} // let's just hope that works
 		Params params = new Params();
-		params.initParams(purpose, leg.getMode(), this.memory, this.day, departureTime);
+		params.setParams(purpose, leg.getMode(), this.memory, this.day, departureTime);
 				
 		double beta_TD = params.getBeta_TD();
 		double beta_TT = params.getBeta_TT();

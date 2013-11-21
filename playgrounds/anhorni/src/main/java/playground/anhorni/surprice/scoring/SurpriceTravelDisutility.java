@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -64,7 +65,7 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		// get mode and purpose
 		String mode = null;;
-		String purpose = null;
+		String purpose = "undef";
 		LegImpl leg = null;
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -78,7 +79,7 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 			}
 		}			
 		Params params = new Params();
-		params.initParams(purpose, mode, this.memories.getMemory(plan.getPerson().getId()), this.day, leg.getDepartureTime());
+		params.setParams(purpose, mode, this.memories.getMemory(plan.getPerson().getId()), this.day, leg.getDepartureTime());
 		
 		double beta_TD = params.getBeta_TD();
 		double beta_TT = params.getBeta_TT();

@@ -16,9 +16,8 @@ public class Params {
 	
 	private double constCost = 0.0; // [EUR]
 	private double distanceCostFactor = 0.0; // [EUR / m]
-		
-	public void initParams(String purpose, String mode, AgentMemory memory, String day, double departureTime) {
-		
+				
+	public void setParams(String purpose, String mode, AgentMemory memory, String day, double departureTime) {			
 		boolean mLag_purpose = false;
 		boolean mLag_time = false;		
 		// lag effects for tue - sun: 
@@ -31,7 +30,8 @@ public class Params {
 		constCost = Surprice.constantCost_car;	
 		
 	// ============= car, other, unkown, pax, mtb ================================	
-		if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home")) {
+		// purpose == undef in initialization
+		if (purpose.equals("undef") || purpose.equals("work") || purpose.equals("education") || purpose.equals("home")) {
 			beta_TD = Surprice.beta_TD_car_com;
 			beta_TT = Surprice.beta_TT_car_com;
 		} else if (purpose.equals("shop")) {
@@ -105,39 +105,11 @@ public class Params {
 		return lagT;
 	}
 
-	public void setBeta_TD(double beta_TD) {
-		this.beta_TD = beta_TD;
-	}
-
-	public void setBeta_TT(double beta_TT) {
-		this.beta_TT = beta_TT;
-	}
-
-	public void setAsc(double asc) {
-		this.asc = asc;
-	}
-
-	public void setLagP(double lagP) {
-		this.lagP = lagP;
-	}
-
-	public void setLagT(double lagT) {
-		this.lagT = lagT;
-	}
-
 	public double getConstCost() {
 		return constCost;
 	}
 
 	public double getDistanceCostFactor() {
 		return distanceCostFactor;
-	}
-
-	public void setConstCost(double constCost) {
-		this.constCost = constCost;
-	}
-
-	public void setDistanceCostFactor(double distanceCostFactor) {
-		this.distanceCostFactor = distanceCostFactor;
 	}
 }
