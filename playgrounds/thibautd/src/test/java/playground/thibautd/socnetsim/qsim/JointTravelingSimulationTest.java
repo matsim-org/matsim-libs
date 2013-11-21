@@ -140,7 +140,7 @@ public class JointTravelingSimulationTest {
 					RouteType.puAtDoFullCycle ) );
 	}
 
-	public void testAgentsArriveTogether( final Fixture fixture ) throws Exception {
+	private void testAgentsArriveTogether( final Fixture fixture ) throws Exception {
 		final Random random = new Random( 1234 );
 
 		for (int i=0; i < 50; i++) {
@@ -191,7 +191,7 @@ public class JointTravelingSimulationTest {
 								event.getLinkId() );
 					}
 
-					if ( event.getLinkId().equals( DESTINATION_LINK ) ) {
+					if ( event.getLinkId().equals( fixture.destinationLink ) ) {
 						atDestCount.incrementAndGet();
 					}
 				}
@@ -214,6 +214,8 @@ public class JointTravelingSimulationTest {
 					N_LAPS * 3,
 					arrCount.get());
 
+			// FIXME does not work if destination link also PU/DO/ORIGIN/Whatever
+			// Perhaps better to test if activity at destination performed?
 			Assert.assertEquals(
 					"run "+i+": unexpected number of agents arriving at destination",
 					N_LAPS * sc.getPopulation().getPersons().size(),
@@ -269,28 +271,36 @@ public class JointTravelingSimulationTest {
 			case normal:
 				return new Fixture(
 						insertDummyActivities,
+						ORIGIN_LINK,
 						PU_LINK,
 						DO_LINK,
+						DESTINATION_LINK,
 						Arrays.asList( TO_PU_LINK ),
 						Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 ),
-						Arrays.asList( TO_DESTINATION_LINK ));
+						Arrays.asList( TO_DESTINATION_LINK ),
+						Arrays.asList( RETURN_LINK ));
 			case puAtDo:
 				return new Fixture(
 						insertDummyActivities,
+						ORIGIN_LINK,
 						PU_LINK,
 						PU_LINK,
+						DESTINATION_LINK,
 						Arrays.asList( TO_PU_LINK ),
 						Collections.<Id> emptyList(),
 						Arrays.asList(
 							TRAVEL_LINK_1,
 							TRAVEL_LINK_2,
 							DO_LINK,
-							TO_DESTINATION_LINK ) );
+							TO_DESTINATION_LINK ),
+						Arrays.asList( RETURN_LINK ));
 			case puAtDoFullCycle:
 				return new Fixture(
 						insertDummyActivities,
+						ORIGIN_LINK,
 						PU_LINK,
 						PU_LINK,
+						DESTINATION_LINK,
 						Arrays.asList( TO_PU_LINK ),
 						Arrays.asList(
 							TRAVEL_LINK_1,
@@ -305,7 +315,8 @@ public class JointTravelingSimulationTest {
 							TRAVEL_LINK_1,
 							TRAVEL_LINK_2,
 							DO_LINK,
-							TO_DESTINATION_LINK ) );
+							TO_DESTINATION_LINK ),
+						Arrays.asList( RETURN_LINK ));
 			default:
 				throw new RuntimeException( routeType.toString() );
 		}
@@ -339,12 +350,12 @@ public class JointTravelingSimulationTest {
 			sc.getPopulation().addPerson( driver );
 
 			for ( int i=0; i < N_LAPS; i++ ) {
-				Activity act = factory.createActivityFromLinkId( "h" , ORIGIN_LINK );
+				Activity act = factory.createActivityFromLinkId( "h" , fixture.originLink );
 				act.setEndTime( (i * 12) + random.nextDouble() * 6 * 3600 );
 				driverPlan.addActivity( act );
 
 				Leg l = factory.createLeg( TransportMode.car );
-				l.setRoute( new LinkNetworkRouteImpl( ORIGIN_LINK , fixture.toPuRoute , fixture.puLink ) );
+				l.setRoute( new LinkNetworkRouteImpl( fixture.originLink , fixture.toPuRoute , fixture.puLink ) );
 				driverPlan.addLeg( l );
 
 				if ( fixture.insertDummyActivities ) {
@@ -378,23 +389,23 @@ public class JointTravelingSimulationTest {
 				}
 
 				l = factory.createLeg( TransportMode.car );
-				l.setRoute( new LinkNetworkRouteImpl( fixture.doLink , fixture.doToDestRoute , DESTINATION_LINK ) );
+				l.setRoute( new LinkNetworkRouteImpl( fixture.doLink , fixture.doToDestRoute , fixture.destinationLink ) );
 				driverPlan.addLeg( l );
 
-				final Activity work = factory.createActivityFromLinkId( "w" , DESTINATION_LINK );
+				final Activity work = factory.createActivityFromLinkId( "w" , fixture.destinationLink );
 				work.setEndTime( (i * 12) + random.nextDouble() * 12 * 3600 );
 				driverPlan.addActivity( work );
 
 				l = factory.createLeg( TransportMode.car );
 				l.setRoute(
 						new LinkNetworkRouteImpl(
-							DESTINATION_LINK,
-							Collections.singletonList( RETURN_LINK ),
-							ORIGIN_LINK ) );
+							fixture.destinationLink,
+							fixture.destToOrigRoute,
+							fixture.originLink ) );
 				driverPlan.addLeg( l );
 			}
 
-			final Activity act = factory.createActivityFromLinkId( "h" , ORIGIN_LINK );
+			final Activity act = factory.createActivityFromLinkId( "h" , fixture.originLink );
 			driverPlan.addActivity( act );
 		}
 
@@ -407,13 +418,13 @@ public class JointTravelingSimulationTest {
 			sc.getPopulation().addPerson( p1 );
 
 			for ( int i=0; i < N_LAPS; i++ ) {
-				Activity act = factory.createActivityFromLinkId( "h" , ORIGIN_LINK );
+				Activity act = factory.createActivityFromLinkId( "h" , fixture.originLink );
 				act.setEndTime( (i * 12) + random.nextDouble() * 6 * 3600 );
 				p1Plan.addActivity( act );
 
 				Leg l = factory.createLeg( TransportMode.walk );
 				double tt = random.nextDouble() * 1234;
-				Route walkRoute = new GenericRouteImpl( ORIGIN_LINK , fixture.puLink );
+				Route walkRoute = new GenericRouteImpl( fixture.originLink , fixture.puLink );
 				walkRoute.setTravelTime( tt );
 				l.setTravelTime( tt );
 				l.setRoute( walkRoute );
@@ -446,19 +457,19 @@ public class JointTravelingSimulationTest {
 
 				l = factory.createLeg( TransportMode.walk );
 				tt = random.nextDouble() * 1234;
-				walkRoute = new GenericRouteImpl( fixture.doLink , DESTINATION_LINK );
+				walkRoute = new GenericRouteImpl( fixture.doLink , fixture.destinationLink );
 				walkRoute.setTravelTime( tt );
 				l.setTravelTime( tt );
 				l.setRoute( walkRoute );
 				p1Plan.addLeg( l );
 
-				act = factory.createActivityFromLinkId( "w" , DESTINATION_LINK );
+				act = factory.createActivityFromLinkId( "w" , fixture.destinationLink );
 				act.setEndTime( (i * 12) + random.nextDouble() * 12 * 3600 );
 				p1Plan.addActivity( act );
 
 				l = factory.createLeg( TransportMode.walk );
 				tt = random.nextDouble() * 1234;
-				walkRoute = new GenericRouteImpl( DESTINATION_LINK , ORIGIN_LINK );
+				walkRoute = new GenericRouteImpl( fixture.destinationLink , fixture.originLink );
 				walkRoute.setTravelTime( tt );
 				l.setTravelTime( tt );
 				l.setRoute( walkRoute );
@@ -466,7 +477,7 @@ public class JointTravelingSimulationTest {
 
 			}
 
-			final Activity act = factory.createActivityFromLinkId( "h" , ORIGIN_LINK );
+			final Activity act = factory.createActivityFromLinkId( "h" , fixture.originLink );
 			p1Plan.addActivity( act );
 		}
 
@@ -497,25 +508,34 @@ public class JointTravelingSimulationTest {
 
 	private static class Fixture {
 		final private boolean insertDummyActivities;
+		final private Id originLink;
 		final private Id puLink;
 		final private Id doLink;
+		final private Id destinationLink;
 		final private List<Id> toPuRoute;
 		final private List<Id> puToDoRoute;
 		final private List<Id> doToDestRoute;
+		final private List<Id> destToOrigRoute;
 
 		public Fixture(
 				final boolean insertDummyActivities,
+				final Id originLink,
 				final Id puLink,
 				final Id doLink,
+				final Id destinationLink,
 				final List<Id> toPuRoute,
 				final List<Id> puToDoRoute,
-				final List<Id> doToDestRoute) {
+				final List<Id> doToDestRoute,
+				final List<Id> destToOrigRoute) {
 			this.insertDummyActivities = insertDummyActivities;
+			this.originLink = originLink;
 			this.puLink = puLink;
 			this.doLink = doLink;
+			this.destinationLink = destinationLink;
 			this.toPuRoute = toPuRoute;
 			this.puToDoRoute = puToDoRoute;
 			this.doToDestRoute = doToDestRoute;
+			this.destToOrigRoute = destToOrigRoute;
 		}
 	}
 
