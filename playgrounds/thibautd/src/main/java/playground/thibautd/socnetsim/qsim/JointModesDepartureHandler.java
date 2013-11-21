@@ -131,6 +131,16 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 				else assert IdentifiableCollectionsUtils.contains( vehicle.getPassengers(), passengerId );
 			}
 
+			// this needs to happen before calling the network departure handler!
+			// in case of A-to-A legs or zero duration activities,
+			// the departure handler will call arangeAgentNextState before returning.
+			// This caused problems when there were other joint trips in this sequence.
+			waitingDrivers.remove( driverId );
+			if ( log.isTraceEnabled() ) {
+				log.trace( "driver "+driverId+" removed from waiting list." );
+				log.trace( "waiting list is now "+waitingDrivers.keySet() );
+			}
+
 			// it is possible that not all passengers boarded yet,
 			// but the car mustn't contain passengers that are not
 			// identified as such.
@@ -148,13 +158,6 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 
 			if ( log.isTraceEnabled() ) {
 				log.trace( "departure of driver "+driverId+" handled succesfully" );
-			}
-
-			waitingDrivers.remove( driverId );
-
-			if ( log.isTraceEnabled() ) {
-				log.trace( "driver "+driverId+" removed from waiting list." );
-				log.trace( "waiting list is now "+waitingDrivers.keySet() );
 			}
 		}
 		else {
