@@ -29,7 +29,9 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -91,6 +93,9 @@ public class JointTravelingSimulationTest {
 	private static final Id TO_DESTINATION_LINK = new IdImpl( "to_destination" );
 	private static final Id DESTINATION_LINK = new IdImpl( "destination" );
 	private static final Id RETURN_LINK = new IdImpl( "return" );
+
+	private static final String ORIGIN_ACT = "chill";
+	private static final String DESTINATION_ACT = "stress";
 	
 	@Test
 	public void testAgentsArriveTogetherWithoutDummies() throws Exception {
@@ -158,7 +163,6 @@ public class JointTravelingSimulationTest {
 			}
 
 			final AtomicInteger arrCount = new AtomicInteger( 0 );
-			final AtomicInteger atDestCount = new AtomicInteger( 0 );
 			final int scNr = i;
 			events.addHandler( new PersonArrivalEventHandler() {
 				private double arrival = -100;
@@ -190,8 +194,16 @@ public class JointTravelingSimulationTest {
 								fixture.doLink,
 								event.getLinkId() );
 					}
+				}
+			});
+			final AtomicInteger atDestCount = new AtomicInteger( 0 );
+			events.addHandler( new ActivityStartEventHandler() {
+				@Override
+				public void reset(final int iteration) {}
 
-					if ( event.getLinkId().equals( fixture.destinationLink ) ) {
+				@Override
+				public void handleEvent(final ActivityStartEvent event) {
+					if ( event.getActType().equals( DESTINATION_ACT ) ) {
 						atDestCount.incrementAndGet();
 					}
 				}
@@ -214,8 +226,6 @@ public class JointTravelingSimulationTest {
 					N_LAPS * 3,
 					arrCount.get());
 
-			// FIXME does not work if destination link also PU/DO/ORIGIN/Whatever
-			// Perhaps better to test if activity at destination performed?
 			Assert.assertEquals(
 					"run "+i+": unexpected number of agents arriving at destination",
 					N_LAPS * sc.getPopulation().getPersons().size(),
@@ -350,7 +360,7 @@ public class JointTravelingSimulationTest {
 			sc.getPopulation().addPerson( driver );
 
 			for ( int i=0; i < N_LAPS; i++ ) {
-				Activity act = factory.createActivityFromLinkId( "h" , fixture.originLink );
+				Activity act = factory.createActivityFromLinkId( ORIGIN_ACT , fixture.originLink );
 				act.setEndTime( (i * 12) + random.nextDouble() * 6 * 3600 );
 				driverPlan.addActivity( act );
 
@@ -392,7 +402,7 @@ public class JointTravelingSimulationTest {
 				l.setRoute( new LinkNetworkRouteImpl( fixture.doLink , fixture.doToDestRoute , fixture.destinationLink ) );
 				driverPlan.addLeg( l );
 
-				final Activity work = factory.createActivityFromLinkId( "w" , fixture.destinationLink );
+				final Activity work = factory.createActivityFromLinkId( DESTINATION_ACT , fixture.destinationLink );
 				work.setEndTime( (i * 12) + random.nextDouble() * 12 * 3600 );
 				driverPlan.addActivity( work );
 
@@ -405,7 +415,7 @@ public class JointTravelingSimulationTest {
 				driverPlan.addLeg( l );
 			}
 
-			final Activity act = factory.createActivityFromLinkId( "h" , fixture.originLink );
+			final Activity act = factory.createActivityFromLinkId( ORIGIN_ACT , fixture.originLink );
 			driverPlan.addActivity( act );
 		}
 
@@ -418,7 +428,7 @@ public class JointTravelingSimulationTest {
 			sc.getPopulation().addPerson( p1 );
 
 			for ( int i=0; i < N_LAPS; i++ ) {
-				Activity act = factory.createActivityFromLinkId( "h" , fixture.originLink );
+				Activity act = factory.createActivityFromLinkId( ORIGIN_ACT , fixture.originLink );
 				act.setEndTime( (i * 12) + random.nextDouble() * 6 * 3600 );
 				p1Plan.addActivity( act );
 
@@ -463,7 +473,7 @@ public class JointTravelingSimulationTest {
 				l.setRoute( walkRoute );
 				p1Plan.addLeg( l );
 
-				act = factory.createActivityFromLinkId( "w" , fixture.destinationLink );
+				act = factory.createActivityFromLinkId( DESTINATION_ACT , fixture.destinationLink );
 				act.setEndTime( (i * 12) + random.nextDouble() * 12 * 3600 );
 				p1Plan.addActivity( act );
 
@@ -477,7 +487,7 @@ public class JointTravelingSimulationTest {
 
 			}
 
-			final Activity act = factory.createActivityFromLinkId( "h" , fixture.originLink );
+			final Activity act = factory.createActivityFromLinkId( ORIGIN_ACT , fixture.originLink );
 			p1Plan.addActivity( act );
 		}
 
