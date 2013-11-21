@@ -126,7 +126,9 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	@Override
 	public void handleEvent(final PersonStuckEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).stuck(getEventAgent(event.getPersonId(), event.getTime()));
+		if (event.getLinkId() != null) { // link id is optional - agent can be teleporting or whatever.
+			this.eventLinks.get(event.getLinkId()).stuck(getEventAgent(event.getPersonId(), event.getTime()));
+		}
 	}
 
 	@Override
