@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -51,7 +50,7 @@ public class JointQSimFactory implements MobsimFactory {
 		Logger.getLogger(JointQSimFactory.class);
 
 	@Override
-	public Mobsim createMobsim(
+	public QSim createMobsim(
 			final Scenario sc,
 			final EventsManager eventsManager) {
         final QSimConfigGroup conf = sc.getConfig().qsim();
