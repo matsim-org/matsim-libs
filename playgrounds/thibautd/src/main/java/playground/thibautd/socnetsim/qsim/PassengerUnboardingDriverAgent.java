@@ -104,6 +104,9 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 
 			final EventsManager events = internalInterface.getMobsim().getEventsManager();
 			for (PassengerAgent p : passengersToUnboard) {
+				assert p != this;
+				assert !p.getId().equals( getId() );
+
 				vehicle.removePassenger( p );
 				((MobsimAgent) p).notifyArrivalOnLinkByNonNetworkMode( delegate.getCurrentLinkId() );
 				((MobsimAgent) p).endLegAndComputeNextState( now );
