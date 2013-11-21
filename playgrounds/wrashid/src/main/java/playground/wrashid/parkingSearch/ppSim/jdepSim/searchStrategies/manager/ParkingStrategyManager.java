@@ -98,12 +98,15 @@ public class ParkingStrategyManager {
 		evaluationContainer.trimStrategySet(ZHScenarioGlobal
 				.loadIntParam("convergance.useMATSimLikeConvergence.maxNumberOfPlansInMemory"));
 
+		
+		DebugLib.emptyFunctionForSettingBreakPoint();
+		
 		if (ZHScenarioGlobal.loadIntParam("convergance.useMATSimLikeConvergence.switchToMNLOnlyAfterIteration") < ZHScenarioGlobal.iteration) {
 			evaluationContainer.selectNextStrategyAccordingToMNLExp();
 		} else {
 
 			if (globalbRandom.nextDouble() < ZHScenarioGlobal
-					.loadDoubleParam("convergance.useMATSimLikeConvergence.executionProbabilityMNL")) {
+					.loadDoubleParam("convergance.useMATSimLikeConvergence.executionProbabilityMNL") || !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
 				if (evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
 					evaluationContainer.selectNextStrategyAccordingToMNLExp();
 				} else {
@@ -113,6 +116,8 @@ public class ParkingStrategyManager {
 				evaluationContainer.addRandomPlanAndSelectForExecution();
 			}
 		}
+		
+		DebugLib.emptyFunctionForSettingBreakPoint();
 	}
 
 	public void handleNonMATSimApproach(EvaluationContainer evaluationContainer) {
