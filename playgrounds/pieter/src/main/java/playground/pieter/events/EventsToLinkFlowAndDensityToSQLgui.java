@@ -515,7 +515,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		// if there arent any postgres properties, attempt to write to csv, else
 		// write to postgres
 		writeResults(!postgresPropertiesComponent.getText().equals(""));
-
+		System.out.println("entering:exiting = " + flowAndDensityCollector.getEnterLinkCount()+":"+flowAndDensityCollector.getLeavLinkCount());
 	}
 
 	private void writeResults(boolean toSQL) throws InstantiationException, IllegalAccessException,
@@ -576,6 +576,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 				}
 				args[4] = modeString;
 				int argsIndex = 5;
+				double flowSum=0.0;
 				for (MultiModalFlowAndDensityCollector.FlowType flowType : MultiModalFlowAndDensityCollector.FlowType
 						.values()) {
 					HashMap<Id, int[]> linkOutFlow = this.linkOutFlowsByType.get(flowType);
@@ -585,11 +586,16 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 					int[] flows = linkOutFlow.get(id);
 					int[] occupancy = instantaneousLinkOccupancy.get(id);
 					double[] avgOccup = averageLinkDensities.get(id);
-					args[argsIndex++] = flows == null ? 0 : new Integer(flows[i]);
-					args[argsIndex++] = occupancy == null ? 0 : new Integer(occupancy[i]);
-					args[argsIndex++] = avgOccup == null ? 0 : new Double(avgOccup[i]);
+					args[argsIndex] = flows == null ? 0 : new Integer(flows[i]);
+					flowSum += (Integer)args[argsIndex++];
+					args[argsIndex] = occupancy == null ? 0 : new Integer(occupancy[i]);
+					flowSum += (Integer)args[argsIndex++];
+					args[argsIndex] = avgOccup == null ? 0 : new Double(avgOccup[i]);
+					flowSum += (Double)args[argsIndex++];
 				}
-				densityWriter.addLine(args);
+				if(flowSum>0){
+					densityWriter.addLine(args);					
+				}
 			}
 
 		}

@@ -137,15 +137,15 @@ public class CepasToEvents {
 
 		}
 
-		public String writeStats(Id vehicleId) {
+		public String writeStats(Id vehicleId, boolean errorProcessing) {
 			StringBuffer sb = new StringBuffer(
 					!calledBefore ? "vehId\tstopIdNotInRoute\ttransactionCount\tdwellEventCount"
 							+ "\tdwellEventsDropped\tdwellEventTransactionsDropped"
-							+ "\tfastTransactionDropped\tinterpolatedDwells\n" : "");
+							+ "\tfastTransactionDropped\tinterpolatedDwells\tERROR\n" : "");
 			if (!calledBefore)
 				calledBefore = true;
 			try{
-				sb.append(String.format("%s\t%s\n", vehicleId.toString(), this.veherrs.get(vehicleId).toString()));
+				sb.append(String.format("%s\t%s\t%s\n", vehicleId.toString(), this.veherrs.get(vehicleId).toString(),errorProcessing?"Y":"N"));
 				
 			}catch(NullPointerException ne){
 				sb.append(String.format("%s\t%s\n", vehicleId.toString(), String.format("%04d\t%04d\t%04d\t%04d\t%04d\t%04d\t%04d", 0, 0,
@@ -1291,7 +1291,7 @@ public class CepasToEvents {
 
 		public void fireEvents() {
 			IdImpl driverId = new IdImpl("pt_tr_" + this.vehicleId.toString());
-			Id busRegNum = new IdImpl(vehicleId.toString().split("_")[2]);
+			Id busRegNum = vehicleId;
 			Map<Id, ? extends Link> links = scenario.getNetwork().getLinks();
 			for (CepasVehicleDwellEventCluster cluster : this.dwellEventClusters) {
 
@@ -1381,8 +1381,11 @@ public class CepasToEvents {
 					this.eventQueue.addLast(vehDeparture);
 					lastDwellEvent = dwellEvent;
 				}
-				TransitRouteStop lastStop = stops.get(stops.size() - 1);
-				Id arrivalLinkId = lastStop.getStopFacility().getLinkId();
+				Id arrivalLinkId = null;
+				for (TransitRouteStop tss : stops) {
+					if (tss.getStopFacility().getId().equals(cluster.orderedDwellEvents.lastEntry().getValue().stopId))
+						arrivalLinkId = tss.getStopFacility().getLinkId();
+				}
 				Event personLeavesvehicle = new PersonLeavesVehicleEvent(lastDwellEvent.departureTime + 0.001,
 						driverId, busRegNum);
 				Event transitDriverArrival = new PersonArrivalEvent(lastDwellEvent.departureTime + 0.002, driverId,
@@ -1644,19 +1647,32 @@ public class CepasToEvents {
 			}
 			int vehicles = 0;
 			int numberOfVehicles = this.cepasVehicles.size()-this.alreadyCompletedVehicles.size();
-			for (CepasVehicle ptVehicle : this.cepasVehicles.values()) {
+			//copy the keys into a set so we can drop completed vehicles to save memory
+			Set<String> vehicleIdStrings = new HashSet<String>();
+			vehicleIdStrings.addAll(this.cepasVehicles.keySet());
+			for ( String vehIdString:vehicleIdStrings) {
+				CepasVehicle ptVehicle = this.cepasVehicles.get(vehIdString);
 				// if (vehicles <= 2367) {
 				// vehicles++;
 				// continue;
 				// }
-//				 if (!ptVehicle.vehicleId.toString().equals("171_1_864"))
+//				 if (!ptVehicle.vehicleId.toString().equals("155_1_8801"))
 //				 continue;
 				if (alreadyCompletedVehicles.contains(ptVehicle.vehicleId.toString()))
 					continue;
-				if (ptVehicle.possibleMatsimRoutes == null)
+				if (ptVehicle.possibleMatsimRoutes == null){
 					// TODO: if we don't have this transit line in the schedule,
 					// ignore
+					System.err.printf("The vehicle with id %s has no possible Matsim route, not firing events for it\n", ptVehicle.vehicleId,
+							minimumNumberOfDwellEventsForProcessing);
+					BufferedWriter emptyXML = IOUtils.getBufferedWriter(outputEventsPath + "/" + ptVehicle.vehicleId.toString()
+						+ ".xml");
+					emptyXML.close();
+					errorWriter.write(errorTracker.writeStats(ptVehicle.vehicleId,true));
+					errorWriter.flush();
 					continue;
+					
+				}
 
 				String query = String
 						.format("select *"
@@ -1692,7 +1708,7 @@ public class CepasToEvents {
 					emptyXML.close();
 					transactionsBeforeWriter.flush();
 					transactionsAfterWriter.flush();
-					errorWriter.write(errorTracker.writeStats(ptVehicle.vehicleId));
+					errorWriter.write(errorTracker.writeStats(ptVehicle.vehicleId,true));
 					errorWriter.flush();
 					continue;
 
@@ -1702,7 +1718,19 @@ public class CepasToEvents {
 				// if (!ptVehicle.dropDwellEventsNotInRoute()) {
 				// }
 
-				ptVehicle.clusterDwellEventsIntoRoutes();
+				try {
+					ptVehicle.clusterDwellEventsIntoRoutes();
+				} catch (StackOverflowError e1) {
+					System.err.println("Something went wrong with clustering dwellEvents for " + ptVehicle.vehicleId.toString());
+					BufferedWriter emptyXML = IOUtils.getBufferedWriter(outputEventsPath + "/" + ptVehicle.vehicleId.toString()
+							+ ".xml");
+						emptyXML.close();
+						transactionsBeforeWriter.flush();
+						transactionsAfterWriter.flush();
+						errorWriter.write(errorTracker.writeStats(ptVehicle.vehicleId,true));
+						errorWriter.flush();
+						continue;
+				}
 				ptVehicle.assignRoutesToDwellEventClusters();
 				ptVehicle.dwellEventOverlapCheck();
 				ptVehicle.interpolateDwellEvents();
@@ -1712,7 +1740,19 @@ public class CepasToEvents {
 				EventWriterXML eventWriter = new EventWriterXML(outputEventsPath + "/" + ptVehicle.vehicleId.toString()
 						+ ".xml");
 				eventsManager.addHandler(eventWriter);
-				ptVehicle.fireEvents();
+				try{
+					ptVehicle.fireEvents();
+				}catch(Exception e){
+					System.err.println("Something went wrong witgh firing events for " + ptVehicle.vehicleId.toString());
+					BufferedWriter emptyXML = IOUtils.getBufferedWriter(outputEventsPath + "/" + ptVehicle.vehicleId.toString()
+							+ ".xml");
+						emptyXML.close();
+						transactionsBeforeWriter.flush();
+						transactionsAfterWriter.flush();
+						errorWriter.write(errorTracker.writeStats(ptVehicle.vehicleId,true));
+						errorWriter.flush();
+						continue;
+				}
 				ptVehicle.processEventsQueue(eventsManager);
 				eventWriter.closeFile();
 
@@ -1720,9 +1760,11 @@ public class CepasToEvents {
 				transactionsAfterTimeCorrectionWriter.flush();
 				clusterWriter.write(ptVehicle.printClusters());
 				clusterWriter.flush();
-				errorWriter.write(errorTracker.writeStats(ptVehicle.vehicleId));
+				errorWriter.write(errorTracker.writeStats(ptVehicle.vehicleId,false));
 				errorWriter.flush();
 				vehicles++;
+				//save memory
+				this.cepasVehicles.remove(vehIdString);
 				// if (vehicles > 100)
 				// break;
 			}

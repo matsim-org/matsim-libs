@@ -124,6 +124,8 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	private HashMap<Id, TreeMap<Integer, Integer>> deltaFlowPTPassenger;
 	private HashMap<Id, double[]> avgDeltaFlowPTPassenger;
 	private double lastTime;
+	private int enterLinkCount;
+	private int leavLinkCount;
 
 	public MultiModalFlowAndDensityCollector(Map<Id, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
@@ -161,6 +163,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	}
 
 	private void leaveLink(Id linkId, double time, boolean isTransitVehicle, Id vehicleId) {
+		this.leavLinkCount++;
 		this.lastTime = time;
 		if (!filteredEquilNetLinks.containsKey(linkId)) {
 			return; // if the link is not in the link set, then exit the method
@@ -241,6 +244,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	}
 
 	private void enterLink(Id linkId, double time, boolean isTransitVehicle, Id vehicleId) {
+		this.enterLinkCount++;
 		this.lastTime = time;
 		if (!filteredEquilNetLinks.containsKey(linkId)) {
 			return; // if the link is not in the link set, then exit the method
@@ -628,5 +632,13 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		}
 
 		return occupancy;
+	}
+
+	public int getEnterLinkCount() {
+		return enterLinkCount;
+	}
+
+	public int getLeavLinkCount() {
+		return leavLinkCount;
 	}
 }

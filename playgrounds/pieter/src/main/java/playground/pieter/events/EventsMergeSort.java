@@ -61,7 +61,7 @@ public class EventsMergeSort {
 		}
 		for (int i = 1; i < numberOfFiles; i += 2) {
 			String fileName = null;
-			if (inputFiles.size() > 2) {
+			if (numberOfFiles > 2) {
 				fileName = "mergesortfile_" + counter++ + ".xml.gz";
 				intermediaryFiles.add(fileName);
 				fileName = inputEventsPath + "/" + fileName;
@@ -87,7 +87,6 @@ public class EventsMergeSort {
 					boolean finishedReadingRest = false;
 					while (!finishedReadingRest) {
 
-						line2 = reader2.readLine();
 						if (line2 != null) {
 							writer.write(line2 + "\n");
 
@@ -96,6 +95,7 @@ public class EventsMergeSort {
 							finishedReadingRest = true;
 							doneReading = true;
 						}
+						line2 = reader2.readLine();
 
 					}
 				} else if (line2 == null || line2.startsWith("</")) {
@@ -103,7 +103,6 @@ public class EventsMergeSort {
 					boolean finishedReadingRest = false;
 					while (!finishedReadingRest) {
 
-						line1 = reader1.readLine();
 						if (line1 != null) {
 
 							writer.write(line1 + "\n");
@@ -111,6 +110,7 @@ public class EventsMergeSort {
 							finishedReadingRest = true;
 							doneReading = true;
 						}
+						line1 = reader1.readLine();
 					}
 				} else if (Double.parseDouble(line1.split("\"")[1]) >= Double.parseDouble(line2.split("\"")[1])) {
 					writer.write(line2 + "\n");
@@ -125,12 +125,12 @@ public class EventsMergeSort {
 			writer.close();
 		}
 		if (intermediaryFiles.size() > 1) {
-			for(String fileName:inputFiles){
-				if(fileName.startsWith("merge")){
-					File file = new File(inputEventsPath + "/"+fileName); 
-					file.delete();
-				}
-			}
+//			for(String fileName:inputFiles){
+//				if(fileName.startsWith("merge")){
+//					File file = new File(inputEventsPath + "/"+fileName); 
+//					file.delete();
+//				}
+//			}
 			inputFiles = intermediaryFiles;
 			run();
 		}
