@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -45,6 +47,9 @@ import playground.thibautd.utils.IdentifiableCollectionsUtils;
  * @author thibautd
  */
 public class JointModesDepartureHandler implements DepartureHandler , MobsimEngine {
+	private static final Logger log =
+		Logger.getLogger(JointModesDepartureHandler.class);
+
 	private final QNetsimEngine netsimEngine;
 	private final PassengersWaitingPerDriver passengersWaitingPerDriver = new PassengersWaitingPerDriver();
 	// map driverId -> driver info
@@ -67,11 +72,17 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		final String mode = agent.getMode();
 
 		if ( mode.equals( JointActingTypes.DRIVER ) ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "Handling DRIVER departure for agent "+agent );
+			}
 			handleDriverDeparture( now , agent , linkId );
 			return true;
 		}
 
 		if ( mode.equals( JointActingTypes.PASSENGER ) ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "Handling PASSENGER departure for agent "+agent );
+			}
 			handlePassengerDeparture( now , agent , linkId );
 			return true;
 		}
@@ -83,6 +94,8 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			final double now,
 			final MobsimAgent agent,
 			final Id linkId) {
+		assert agent.getCurrentLinkId().equals( linkId ) : agent+" not at link "+linkId;
+
 		final Id driverId = agent.getId();
 		final Collection<Id> passengerIds = getPassengerIds( agent );
 		final Id vehicleId = getVehicleId( agent );
@@ -100,6 +113,11 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			passengerIds+" does not contains all of "+vehicle.getPassengers()+" with present passengers "+presentPassengers;
 
 		if ( presentPassengers.containsAll( passengerIds ) ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "All passengers "+passengerIds+" in present passengers "+presentPassengers );
+				log.trace( "Processing to departure for driver "+driverId );
+			}
+
 			// all passengers are or already in the car,
 			// or waiting. Board waiting passengers and depart.
 			for (Id passengerId : passengerIds) {
@@ -131,6 +149,10 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			waitingDrivers.remove( driverId );
 		}
 		else {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "NOT all passengers "+passengerIds+" in present passengers "+presentPassengers );
+				log.trace( "NOT (yet) processing to departure for driver "+driverId );
+			}
 			waitingDrivers.put( driverId , new WaitingDriver( agent , linkId ) );
 		}
 	}
@@ -166,10 +188,16 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		// otherwise, everybody will wait for everybody to be here.
 		final WaitingDriver wDriver = waitingDrivers.get( driverId );
 		if ( wDriver != null && wDriver.linkId.equals( linkId ) ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "driver "+driverId+" found waiting: ask him to depart for passenger "+agent.getId() );
+			}
 			handleDriverDeparture(
 					now,
 					wDriver.driverAgent,
 					linkId );
+		}
+		else if ( log.isTraceEnabled() ) {
+			log.trace( "driver "+driverId+" NOT found waiting: DO NOTHING for passenger "+agent.getId() );
 		}
 	}
 

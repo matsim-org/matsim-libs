@@ -248,7 +248,12 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 
 	@Override
 	public String toString() {
-		return "["+getClass().getSimpleName()+": id="+getId()+"; currentElement="+getCurrentPlanElement()+"; currentLinkId="+getCurrentLinkId()+"]";
+		return "["+getClass().getSimpleName()+
+			": id="+getId()+
+			"; currentElement="+getCurrentPlanElement()+
+			"; currentLinkId="+getCurrentLinkId()+
+			"; state="+getState()+
+			"]";
 	}
 
 	@Override
