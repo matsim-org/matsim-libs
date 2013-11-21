@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
 /**
- * These are the "threads" of the {@link ParallelQNetsimEngine}.  The "run()" method is implicitly called by starting the thread.  
+ * These are the "threads" of the {@link ParallelQNetsimEngine}. The "run()" method is implicitly called by starting the thread.  
  * 
  * @author (of this documentation) nagel
  *
@@ -47,8 +47,8 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 	private final CyclicBarrier separationBarrier;
 	private final CyclicBarrier endBarrier;
 
-	private List<QNode> nodesList = null;
-	private List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
+	private final List<QNode> nodesList = new ArrayList<QNode>();
+	private final List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
 
 	/** 
 	 * This is the collection of nodes that have to be activated in the current time step.
@@ -69,14 +69,6 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;
-	}
-
-	/*package*/ void setQNodeList(List<QNode> nodes) {
-		this.nodesList = nodes;
-	}
-
-	/*package*/ void setLinks(List<QLinkInternalI> links) {
-		this.linksList = links;
 	}
 
 	/*package*/ void setTime(final double t) {
@@ -192,7 +184,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 	}
 
 	public NetsimNetworkFactory<QNode,QLinkInternalI> getNetsimNetworkFactory() {
-		return new DefaultQNetworkFactory() ;
+		return new DefaultQNetworkFactory();
 	}
 
 }
