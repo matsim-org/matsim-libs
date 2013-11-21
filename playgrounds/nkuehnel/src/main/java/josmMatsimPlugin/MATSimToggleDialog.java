@@ -91,7 +91,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				String id = String.valueOf(prim.getUniqueId());
 				for (int i = 0; i < table.getRowCount(); i++)
 				{
-					if (id.equalsIgnoreCase(table.getValueAt(i, 0).toString()))
+					if (id.equalsIgnoreCase(table.getValueAt(i, 1).toString()))
 					{
 						table.addRowSelectionInterval(i, i);
 					}
