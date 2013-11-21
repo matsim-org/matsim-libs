@@ -76,6 +76,7 @@ public class JointQSimFactory implements MobsimFactory {
 		final QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
 		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
 		qSim.addMobsimEngine( netsimEngine );
+		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
 
 		final JointModesDepartureHandler jointDepHandler = new JointModesDepartureHandler( netsimEngine );
 		qSim.addDepartureHandler( jointDepHandler );
