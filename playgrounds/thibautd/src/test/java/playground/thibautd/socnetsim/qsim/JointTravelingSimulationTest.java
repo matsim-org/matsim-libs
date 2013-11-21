@@ -25,8 +25,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -77,11 +79,18 @@ public class JointTravelingSimulationTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	private static enum RouteType { normal, puAtDo, puAtDoFullCycle }; 
+	private static enum RouteType {
+		normal,
+		puAtDo,
+		puAtDoFullCycle,
+		everythingAtOrigin
+	}; 
 
 	// helps to understand test failures, but makes the test more expensive.
 	// => to set to true when fixing tests only
-	private static final boolean DUMP_EVENTS = false;
+	private static final boolean DUMP_EVENTS = true;
+	private static final Level TEST_LOG_LEVEL = Level.INFO;
+
 	private static final int N_LAPS = 5;
 
 	private static final Id ORIGIN_LINK = new IdImpl( "origin" );
@@ -96,6 +105,13 @@ public class JointTravelingSimulationTest {
 
 	private static final String ORIGIN_ACT = "chill";
 	private static final String DESTINATION_ACT = "stress";
+
+	@Before
+	public void setupLogging() {
+		// avoid polution from the lengthy QSim log: just keep warnings and errors
+		Logger.getLogger( "org.matsim" ).setLevel( Level.WARN );
+		log.setLevel( TEST_LOG_LEVEL );
+	}
 	
 	@Test
 	public void testAgentsArriveTogetherWithoutDummies() throws Exception {
@@ -145,6 +161,23 @@ public class JointTravelingSimulationTest {
 					RouteType.puAtDoFullCycle ) );
 	}
 
+	@Test
+	public void testAgentsArriveTogetherWithDummiesAndEverythingAtOrigin() throws Exception {
+		testAgentsArriveTogether(
+				createFixture(
+					true,
+					RouteType.everythingAtOrigin ) );
+	}
+
+	@Test
+	public void testAgentsArriveTogetherWithoutDummiesAndEverythingAtOrigin() throws Exception {
+		testAgentsArriveTogether(
+				createFixture(
+					false,
+					RouteType.everythingAtOrigin ) );
+	}
+
+
 	private void testAgentsArriveTogether( final Fixture fixture ) throws Exception {
 		final Random random = new Random( 1234 );
 
@@ -174,7 +207,7 @@ public class JointTravelingSimulationTest {
 				@Override
 				public void handleEvent(final PersonArrivalEvent event) {
 					final String mode = event.getLegMode();
-					log.info( mode+" arrival at "+event.getTime() );
+					log.info( "agent "+event.getPersonId()+": "+mode+" arrival at "+event.getTime() );
 					if ( mode.equals( JointActingTypes.DRIVER ) ||
 							mode.equals( JointActingTypes.PASSENGER ) ) {
 						if ( nArrival++ % 3 == 0 ) {
@@ -203,6 +236,7 @@ public class JointTravelingSimulationTest {
 
 				@Override
 				public void handleEvent(final ActivityStartEvent event) {
+					log.info( "agent "+event.getPersonId()+": "+event.getActType()+" start at "+event.getTime() );
 					if ( event.getActType().equals( DESTINATION_ACT ) ) {
 						atDestCount.incrementAndGet();
 					}
@@ -327,6 +361,17 @@ public class JointTravelingSimulationTest {
 							DO_LINK,
 							TO_DESTINATION_LINK ),
 						Arrays.asList( RETURN_LINK ));
+			case everythingAtOrigin:
+					return new Fixture(
+							insertDummyActivities,
+							ORIGIN_LINK,
+							ORIGIN_LINK,
+							ORIGIN_LINK,
+							ORIGIN_LINK,
+							Collections.<Id> emptyList(),
+							Collections.<Id> emptyList(),
+							Collections.<Id> emptyList(),
+							Collections.<Id> emptyList());
 			default:
 				throw new RuntimeException( routeType.toString() );
 		}
