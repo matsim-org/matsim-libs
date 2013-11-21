@@ -98,8 +98,7 @@ public class JointTravelingSimulationTest {
 		Logger.getLogger( EventsManagerImpl.class ).setLevel( Level.WARN );
 		Logger.getLogger( Gbl.class ).setLevel( Level.WARN );
 
-		Logger.getLogger( "playground.thibautd.socnetsim.qsim" ).setLevel( Level.TRACE );
-
+		//Logger.getLogger( "playground.thibautd.socnetsim.qsim" ).setLevel( Level.TRACE );
 		log.setLevel( Level.WARN );
 	}
 
