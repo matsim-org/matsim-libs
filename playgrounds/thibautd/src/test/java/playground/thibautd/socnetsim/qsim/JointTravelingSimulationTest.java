@@ -20,6 +20,7 @@
 package playground.thibautd.socnetsim.qsim;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -78,20 +79,32 @@ public class JointTravelingSimulationTest {
 	
 	@Test
 	public void testAgentsArriveTogetherWithoutDummies() throws Exception {
-		testAgentsArriveTogether( false );
+		testAgentsArriveTogether( false , false );
 	}
 
 	@Test
 	public void testAgentsArriveTogetherWithDummies() throws Exception {
-		testAgentsArriveTogether( true );
+		testAgentsArriveTogether( true , false );
 	}
 
-	public void testAgentsArriveTogether(final boolean insertDummies) throws Exception {
+	@Test
+	public void testAgentsArriveTogetherWithDummiesAndDoAtPu() throws Exception {
+		testAgentsArriveTogether( true , true );
+	}
+
+	@Test
+	public void testAgentsArriveTogetherWithoutDummiesAndDoAtPu() throws Exception {
+		testAgentsArriveTogether( false , true );
+	}
+
+	public void testAgentsArriveTogether(final boolean insertDummies, final boolean dropOffAtPu) throws Exception {
 		final Random random = new Random( 1234 );
 
 		for (int i=0; i < 50; i++) {
 			log.info( "random test scenario "+i );
-			final Scenario sc = createTestScenario( insertDummies , random );
+			final Scenario sc = dropOffAtPu ?
+				createTestScenarioWithDoAtPu( insertDummies , random ) :
+				createTestScenario( insertDummies , random );
 			final EventsManager events = EventsUtils.createEventsManager();
 
 			final AtomicInteger arrCount = new AtomicInteger( 0 );
@@ -121,7 +134,7 @@ public class JointTravelingSimulationTest {
 
 						Assert.assertEquals(
 								"unexpected arrival location for mode "+mode,
-								DO_LINK,
+								dropOffAtPu ? PU_LINK : DO_LINK,
 								event.getLinkId() );
 					}
 
@@ -197,6 +210,19 @@ public class JointTravelingSimulationTest {
 				Arrays.asList( TO_PU_LINK ),
 				Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 ),
 				Arrays.asList( TO_DESTINATION_LINK ),
+				random);
+	}
+
+	private static Scenario createTestScenarioWithDoAtPu(
+			final boolean insertDummyActivities,
+			final Random random) {
+		return createTestScenario(
+				insertDummyActivities,
+				PU_LINK,
+				PU_LINK,
+				Arrays.asList( TO_PU_LINK ),
+				Collections.<Id> emptyList(),
+				Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 , TO_DESTINATION_LINK ),
 				random);
 	}
 
