@@ -1,13 +1,11 @@
 package playground.mzilske.cdr;
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -16,7 +14,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -26,7 +23,6 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgorithmProvider;
@@ -46,7 +42,7 @@ public class PopulationFromSightings {
 
 	private static Random rnd = MatsimRandom.getRandom();
 	
-	public static void readSampleWithOneRandomPointForEachSightingInNewCell(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) throws FileNotFoundException {
+	public static void readSampleWithOneRandomPointForEachSightingInNewCell(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
 		Map<Activity, String> cellsOfSightings;
 		cellsOfSightings = new HashMap<Activity, String>();
 		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {

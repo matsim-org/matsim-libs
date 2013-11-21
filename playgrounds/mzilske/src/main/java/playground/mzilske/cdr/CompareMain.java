@@ -36,19 +36,47 @@ public class CompareMain {
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
 	private static final int dailyRate = 200;
+	private CallProcessTicker ticker;
+	private CallProcess callProcess;
+	private VolumesAnalyzer volumesAnalyzer1;
+	private LinkToZoneResolver linkToZoneResolver;
+	private Scenario scenario;
 	
 
 	public static void main(String[] args) throws FileNotFoundException {
-		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile("input/potsdam/network.xml");
-		final Network network = scenario.getNetwork();
-
 		new MatsimPopulationReader(scenario).readFile("output-homogeneous-37/ITERS/it.0/0.plans.xml.gz");
+		EventsManager events = EventsUtils.createEventsManager();
+		CompareMain compareMain = new CompareMain(scenario, events);
+		new MatsimEventsReader(events).readFile("output-homogeneous-37/ITERS/it.0/0.events.xml.gz");
+		compareMain.finish();
+	}
+
+	public void finish() {
+
+		ticker.finish();
+		
+		callProcess.dump();
+
+
+		List<Sighting> sightings = callProcess.getSightings();
+
+		VolumesAnalyzer volumesAnalyzer2 = runSimulationFromSightings(scenario.getNetwork(), linkToZoneResolver, sightings);
+		
+
+		dumpVolumesCompareAllDay(scenario.getNetwork(), volumesAnalyzer1, volumesAnalyzer2);
+		dumpVolumesCompareTimebins(scenario.getNetwork(), volumesAnalyzer1, volumesAnalyzer2);
+	}
+
+	CompareMain(Scenario scenario, EventsManager events) {
+		super();
+		this.scenario = scenario;
 
 		Map<Id, Id> initialPersonInZone = new HashMap<Id, Id>();
 		
 
-		final Zones cellularCoverage = SyntheticCellTowerDistribution.naive(network);
+		// final Zones cellularCoverage = SyntheticCellTowerDistribution.naive(scenario.getNetwork());
 		
 		LinkToZoneResolver trivialLinkToZoneResolver = new LinkToZoneResolver() {
 
@@ -63,9 +91,9 @@ public class CompareMain {
 			
 		};
 		
-		// LinkToZoneResolver linkToZoneResolver = trivialLinkToZoneResolver;
+		linkToZoneResolver = trivialLinkToZoneResolver;
 		
-		LinkToZoneResolver linkToZoneResolver = new CellularCoverageLinkToZoneResolver(cellularCoverage, network);
+		// linkToZoneResolver = new CellularCoverageLinkToZoneResolver(cellularCoverage, scenario.getNetwork());
 		
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Id linkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
@@ -73,34 +101,19 @@ public class CompareMain {
 			initialPersonInZone.put(p.getId(), linkToZoneResolver.resolveLinkToZone(linkId));
 		}
 
-		EventsManager events = EventsUtils.createEventsManager();
-		CallProcessTicker ticker = new CallProcessTicker();
+		ticker = new CallProcessTicker();
 		events.addHandler(ticker);
 		
 		
 		ZoneTracker zoneTracker = new ZoneTracker(events, linkToZoneResolver, initialPersonInZone);
-		CallProcess callProcess = new CallProcess(null, scenario.getPopulation(), zoneTracker, dailyRate);
+		callProcess = new CallProcess(null, scenario.getPopulation(), zoneTracker, dailyRate);
 		ticker.addHandler(zoneTracker);
 
 		ticker.addHandler(callProcess);
 		ticker.addSteppable(callProcess);
 
-		VolumesAnalyzer volumesAnalyzer1 = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, network);
+		volumesAnalyzer1 = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, scenario.getNetwork());
 		events.addHandler(volumesAnalyzer1);
-
-		new MatsimEventsReader(events).readFile("output-homogeneous-37/ITERS/it.0/0.events.xml.gz");
-		ticker.finish();
-		
-		callProcess.dump();
-
-
-		List<Sighting> sightings = callProcess.getSightings();
-
-		VolumesAnalyzer volumesAnalyzer2 = runSimulationFromSightings(linkToZoneResolver, linkToZoneResolver, sightings);
-		
-
-		dumpVolumesCompareAllDay(network, volumesAnalyzer1, volumesAnalyzer2);
-		dumpVolumesCompareTimebins(network, volumesAnalyzer1, volumesAnalyzer2);
 	}
 
 	public static void dumpVolumesCompareAllDay(final Network network, VolumesAnalyzer volumesAnalyzer1, VolumesAnalyzer volumesAnalyzer2) {
@@ -128,18 +141,17 @@ public class CompareMain {
 			for (int i = 0; i < volumesForLink1.length; ++i) {
 				int diff = volumesForLink1[i] - volumesForLink2[i];
 				squares += diff * diff;
-//				if (diff != 0) {
-//					System.out.println(Arrays.toString(volumesForLink1));
-//					System.out.println(Arrays.toString(volumesForLink2));
-//					System.out.println("=== " + link.getId());
-//				}
+				if (diff != 0) {
+					System.out.println(Arrays.toString(volumesForLink1));
+					System.out.println(Arrays.toString(volumesForLink2));
+					System.out.println("=== " + link.getId());
+				}
 			}
 		}
 		System.out.println(Math.sqrt(squares));
 	}
 
-	public static VolumesAnalyzer runSimulationFromSightings(final LinkToZoneResolver linkToZoneResolver, LinkToZoneResolver linkToZoneResolver2,
-			List<Sighting> sightings) throws FileNotFoundException {
+	public static VolumesAnalyzer runSimulationFromSightings(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings) {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		// sighting.setOpeningTime(0.0);
@@ -157,7 +169,7 @@ public class CompareMain {
 		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
 		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario2).readFile("input/potsdam/network.xml");
+		scenario2.setNetwork(network);
 
 
 
@@ -177,7 +189,7 @@ public class CompareMain {
 
 
 		PopulationFromSightings.readSampleWithOneRandomPointForEachSightingInNewCell(scenario2, linkToZoneResolver, allSightings);
-		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver2, allSightings);
+		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
 
 		Controler controler = new Controler(scenario2);
 		controler.setOverwriteFiles(true);
