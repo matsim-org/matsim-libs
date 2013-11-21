@@ -75,11 +75,11 @@ public class JointTravelingSimulationTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	private static enum RouteType { normal, puAtDo }; 
+	private static enum RouteType { normal, puAtDo, puAtDoFullCycle }; 
 
 	// helps to understand test failures, but makes the test more expensive.
 	// => to set to true when fixing tests only
-	private static final boolean DUMP_EVENTS = true;
+	private static final boolean DUMP_EVENTS = false;
 	private static final int N_LAPS = 5;
 
 	private static final Id ORIGIN_LINK = new IdImpl( "origin" );
@@ -122,6 +122,22 @@ public class JointTravelingSimulationTest {
 				createFixture(
 					false,
 					RouteType.puAtDo ) );
+	}
+
+	@Test
+	public void testAgentsArriveTogetherWithDummiesAndDoAtPuFullCycle() throws Exception {
+		testAgentsArriveTogether(
+				createFixture(
+					true,
+					RouteType.puAtDoFullCycle ) );
+	}
+
+	@Test
+	public void testAgentsArriveTogetherWithoutDummiesAndDoAtPuFullCycle() throws Exception {
+		testAgentsArriveTogether(
+				createFixture(
+					false,
+					RouteType.puAtDoFullCycle ) );
 	}
 
 	public void testAgentsArriveTogether( final Fixture fixture ) throws Exception {
@@ -265,7 +281,31 @@ public class JointTravelingSimulationTest {
 						PU_LINK,
 						Arrays.asList( TO_PU_LINK ),
 						Collections.<Id> emptyList(),
-						Arrays.asList( TRAVEL_LINK_1 , TRAVEL_LINK_2 , TO_DESTINATION_LINK ) );
+						Arrays.asList(
+							TRAVEL_LINK_1,
+							TRAVEL_LINK_2,
+							DO_LINK,
+							TO_DESTINATION_LINK ) );
+			case puAtDoFullCycle:
+				return new Fixture(
+						insertDummyActivities,
+						PU_LINK,
+						PU_LINK,
+						Arrays.asList( TO_PU_LINK ),
+						Arrays.asList(
+							TRAVEL_LINK_1,
+							TRAVEL_LINK_2,
+							DO_LINK,
+							TO_DESTINATION_LINK,
+							DESTINATION_LINK,
+							RETURN_LINK,
+							ORIGIN_LINK,
+							TO_PU_LINK ),
+						Arrays.asList(
+							TRAVEL_LINK_1,
+							TRAVEL_LINK_2,
+							DO_LINK,
+							TO_DESTINATION_LINK ) );
 			default:
 				throw new RuntimeException( routeType.toString() );
 		}
