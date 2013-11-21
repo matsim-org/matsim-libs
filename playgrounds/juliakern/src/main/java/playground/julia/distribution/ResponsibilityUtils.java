@@ -93,7 +93,7 @@ public class ResponsibilityUtils {
 	 */
 	public void addExposureAndResponsibilityBinwise(
 			ArrayList<EmActivity> activities,
-			Map<Double, ArrayList<EmPerBin>> emissionPerBin,
+			Map<Double, ArrayList<EmPerCell>> emissionPerBin,
 			ArrayList<ResponsibilityEvent> responsibility, Double timeBinSize, Double simulationEndTime) {
 		
 		/*
@@ -168,13 +168,13 @@ public class ResponsibilityUtils {
 	 *  emission concentration)
 	 */
 	private ArrayList<ResponsibilityEvent> generateResponsibilityEventsForCell(
-			Id exposedPersonId, ArrayList<EmPerBin> emissionPerBinOfCurrentTimeBin, int firstTimeBin,
+			Id exposedPersonId, ArrayList<EmPerCell> emissionPerBinOfCurrentTimeBin, int firstTimeBin,
 			int xBin, int yBin, Double startTime, Double endTime) {
 		
 		ArrayList<ResponsibilityEvent> rEvents= new ArrayList<ResponsibilityEvent>();
 		
 		if (emissionPerBinOfCurrentTimeBin!=null) {
-			for (EmPerBin epb : emissionPerBinOfCurrentTimeBin) {
+			for (EmPerCell epb : emissionPerBinOfCurrentTimeBin) {
 				if (epb.getXbin().equals(xBin) && epb.getYbin().equals(yBin)) {					
 					String location = "x = " + epb.getXbin().toString()	+ ", y = " + epb.getYbin();
 					ResponsibilityEvent ree = new ResponsibilityEventImpl(epb.getPersonId(), exposedPersonId, epb.getEmissionEventStartTime(), startTime, endTime, epb.getConcentration(), location);

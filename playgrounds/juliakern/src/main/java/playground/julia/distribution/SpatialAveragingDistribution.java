@@ -99,7 +99,7 @@ public class SpatialAveragingDistribution {
 	Map<Id, Integer> link2xbin;
 	Map<Id, Integer> link2ybin;
 	
-	Map<Double, ArrayList<EmPerBin>> emissionPerBin ;
+	Map<Double, ArrayList<EmPerCell>> emissionPerBin ;
 	Map<Double, ArrayList<EmPerLink>> emissionPerLink;
 
 	private void run() throws IOException{
@@ -136,11 +136,12 @@ public class SpatialAveragingDistribution {
 		ArrayList<EmActivity> activities = new ArrayList<EmActivity>();
 		ArrayList<EmCarTrip> carTrips= new ArrayList<EmCarTrip>();
 		
-		emissionPerBin = new HashMap<Double, ArrayList<EmPerBin>>();
+		emissionPerBin = new HashMap<Double, ArrayList<EmPerCell>>();
 		emissionPerLink = new HashMap<Double, ArrayList<EmPerLink>>();
 		
 		generateActivitiesAndTrips(eventsFile1, activities, carTrips);
 		generateEmissions(emissionFile1);
+		
 		
 		/*
 		 * two lists to store information on exposure and responsibility 

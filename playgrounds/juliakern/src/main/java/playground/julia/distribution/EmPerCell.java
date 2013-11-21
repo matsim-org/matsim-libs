@@ -2,7 +2,7 @@ package playground.julia.distribution;
 
 import org.matsim.api.core.v01.Id;
 
-public class EmPerBin {
+public class EmPerCell {
 	
 	private Integer xBin;
 	private Integer yBin;
@@ -10,7 +10,7 @@ public class EmPerBin {
 	private Double concentration;
 	private Double emissionEventStartTime;
 	
-	public EmPerBin(Integer xBin, Integer yBin, Id personId, Double concentration, Double emissisionEventStartTime) {
+	public EmPerCell(Integer xBin, Integer yBin, Id personId, Double concentration, Double emissisionEventStartTime) {
 		this.xBin = xBin;
 		this.yBin = yBin;
 		this.responsiblePersonId = personId;

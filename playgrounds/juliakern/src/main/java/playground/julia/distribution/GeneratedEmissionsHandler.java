@@ -33,11 +33,18 @@ import playground.vsp.emissions.events.WarmEmissionEventHandler;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
 
+/*
+ * class to handle warm and cold emission events
+ * 
+ * for each emission event: distribute the emission value onto nearby cells and/or links
+ * store information as emission per link/ emission per cell
+ * 
+ */
 public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
 	Double simulationStartTime;
 	Double timeBinSize;
-	Map<Double, ArrayList<EmPerBin>> emissionPerBin;
+	Map<Double, ArrayList<EmPerCell>> emissionPerCell;
 	Map<Double, ArrayList<EmPerLink>> emissionPerLink;
 	Map<Id,Integer> link2xbins; 
 	Map<Id,Integer> link2ybins;
@@ -53,96 +60,90 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		this.link2ybins = link2ybins;
 		this.warmPollutant2analyze = warmPollutant2analyze;
 		this.coldPollutant2analyze = coldPollutant2analyze;
-		this.emissionPerBin = new HashMap<Double, ArrayList<EmPerBin>>();
+		this.emissionPerCell = new HashMap<Double, ArrayList<EmPerCell>>();
 		this.emissionPerLink = new HashMap<Double, ArrayList<EmPerLink>>();
 	}
 	
 	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
+	public void reset(int iteration) {		
 	}
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
+		//event information
 		Id linkId = event.getLinkId();
 		Integer xBin = link2xbins.get(linkId);
 		Integer yBin = link2ybins.get(linkId);
 		Double eventStartTime = event.getTime();
 		
 		if (xBin != null && yBin != null) {
-		//TODO person id statt vehicleid??? woher?
-		Id personId = event.getVehicleId();
-		Double value = event.getColdEmissions().get(coldPollutant2analyze); 
-		
-		//TODO auf mehrere Zellen verteilen
-		ArrayList<EmPerBin> arrayEpb = new ArrayList<EmPerBin>();
-		arrayEpb= distributeOnCells(xBin, yBin, personId, value, eventStartTime);
-		Double endOfTimeIntervall = getEndOfTimeInterval(event.getTime());
-		if (!emissionPerBin.containsKey(endOfTimeIntervall)) {
-			emissionPerBin.put(endOfTimeIntervall,
-					new ArrayList<EmPerBin>());
-		}
-		emissionPerBin.get(endOfTimeIntervall).addAll(arrayEpb);
-		
-		ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
-		arrayEpl = distributeOnLinks(linkId, personId, value, eventStartTime);
-		if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
-			emissionPerLink.put(endOfTimeIntervall,
-					new ArrayList<EmPerLink>());
-		}
-		emissionPerLink.get(endOfTimeIntervall).addAll(arrayEpl);
-		}
-	}
+			// TODO person id statt vehicleid??? woher?
+			Id personId = event.getVehicleId();
+			Double value = event.getColdEmissions().get(coldPollutant2analyze);
 
-	//TODO funktioniert nur so, wenn die simulation start time =0 ist!!!!
-	private Double getEndOfTimeInterval(double time) {
-		Double end = Math.ceil(time/timeBinSize)*timeBinSize;
-		if(end>0.0) return end;
-		return timeBinSize;
+			// distribute onto cells
+			ArrayList<EmPerCell> arrayEpb = new ArrayList<EmPerCell>();
+			arrayEpb = distributeOnCells(xBin, yBin, personId, value, eventStartTime);
+			Double endOfTimeIntervall = getEndOfTimeInterval(event.getTime());
+			if (!emissionPerCell.containsKey(endOfTimeIntervall)) {
+				emissionPerCell.put(endOfTimeIntervall, new ArrayList<EmPerCell>());
+			}
+			emissionPerCell.get(endOfTimeIntervall).addAll(arrayEpb);
+
+			// distribute onto links
+			ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
+			arrayEpl = distributeOnLinks(linkId, personId, value,	eventStartTime);
+			if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
+				emissionPerLink.put(endOfTimeIntervall,	new ArrayList<EmPerLink>());
+			}
+			emissionPerLink.get(endOfTimeIntervall).addAll(arrayEpl);
+		}
 	}
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {		
+		// event information 
 		Id linkId = event.getLinkId();
-
 		Integer xBin = link2xbins.get(linkId);
 		Integer yBin = link2ybins.get(linkId);
-		
 		Double eventStartTime = event.getTime();
 		
 		if (xBin != null && yBin != null) {
 			//TODO person id statt vehicleid??? woher?
 			Id personId = event.getVehicleId();
-			Double value = event.getWarmEmissions().get(warmPollutant2analyze); //TODO funktioniert das so? enum casten?
-			//TODO auf mehrere Zellen verteilen
-			ArrayList<EmPerBin> arrayEpb = new ArrayList<EmPerBin>();
+			Double value = event.getWarmEmissions().get(warmPollutant2analyze);
+			//distribute onto cells
+			ArrayList<EmPerCell> arrayEpb = new ArrayList<EmPerCell>();
 			arrayEpb= distributeOnCells(xBin, yBin, personId, value, eventStartTime);
 			Double endOfTimeIntervall = getEndOfTimeInterval(event.getTime());
-			if (!emissionPerBin.containsKey(endOfTimeIntervall)) {
-				emissionPerBin.put(endOfTimeIntervall,
-						new ArrayList<EmPerBin>());
+			if (!emissionPerCell.containsKey(endOfTimeIntervall)) {
+				emissionPerCell.put(endOfTimeIntervall,	new ArrayList<EmPerCell>());
 			}
-			emissionPerBin.get(endOfTimeIntervall).addAll(arrayEpb);
-			// TODO auf mehrere Links verteilen
-			//EmPerLink epl = new EmPerLink(linkId, personId, value);
+			emissionPerCell.get(endOfTimeIntervall).addAll(arrayEpb);
+			//distribute onto links
 			ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
 			arrayEpl = distributeOnLinks(linkId, personId, value, eventStartTime);
 			if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
-				emissionPerLink.put(endOfTimeIntervall,
-						new ArrayList<EmPerLink>());
+				emissionPerLink.put(endOfTimeIntervall,	new ArrayList<EmPerLink>());
 			}
 			emissionPerLink.get(endOfTimeIntervall).addAll(arrayEpl);
-			//emissionPerLink.get(endOfTimeIntervall).add(epl);
 		}
 	}
 
 	private ArrayList<EmPerLink> distributeOnLinks(Id sourcelinkId, Id personId,
 			Double value, Double eventStartTime) {
 		
-		ArrayList<EmPerLink> distributedEmissions = new ArrayList<EmPerLink>();
+		/*
+		 * distribute the emission value onto 25 cells:
+		 * use the distance from the source cell as a measure for the distribution weights.
+		 * origin cell factor: 0.216, distance = 1 -> 0.132, distance = 2 -> 0.029,
+		 * distance = 3 -> 0.002 
+		 * values are oriented at a normalized Gaussian distribution
+		 * and therefore add up to 1.0
+		 * 
+		 */
 		
-		//EmPerLink epl = new EmPerLink(linkId, personId, value);
+		ArrayList<EmPerLink> distributedEmissions = new ArrayList<EmPerLink>();
 		
 		// for each link: if distance to current link < ??
 		// => EmPerLink with value = distance dependent factor * current value
@@ -159,44 +160,54 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 			if(xDistance<4 && yDistance <4 && (totalDistance<4)){
 				Double distributionFactor = 0.0;
 				switch(totalDistance){
-				case 0: distributionFactor = 0.170;
-				case 1: distributionFactor = 0.104;
-				case 2: distributionFactor = 0.024;
-				case 3: distributionFactor = 0.019;
+				case 0: distributionFactor = 0.216;
+				case 1: distributionFactor = 0.132;
+				case 2: distributionFactor = 0.029;
+				case 3: distributionFactor = 0.002;
 				}
 				if (distributionFactor>0.0) {
 					EmPerLink epl = new EmPerLink(linkId, personId, value * distributionFactor, eventStartTime);
 					distributedEmissions.add(epl);
+					}
 				}
 			}
 		}
-		}
-		
 		return distributedEmissions;
 	}
 
-	private ArrayList<EmPerBin> distributeOnCells(Integer xBin, Integer yBin,
+	private ArrayList<EmPerCell> distributeOnCells(Integer xBin, Integer yBin,
 			Id personId, Double value, Double eventStartTime) {
 		
-		ArrayList<EmPerBin> distributedEmissions = new ArrayList<EmPerBin>();
+		/*
+		 * negative emission values are distributed as well
+		 *
+		 * distribute the emission value onto 25 cells:
+		 * use the distance from the source cell as a measure for the distribution weights.
+		 * origin cell factor: 0.216, distance = 1 -> 0.132, distance = 2 -> 0.029,
+		 * distance = 3 -> 0.002 
+		 * values are oriented at a normalized Gaussian distribution
+		 * and therefore add up to 1.0
+		 * 
+		 */
+		
+		ArrayList<EmPerCell> distributedEmissions = new ArrayList<EmPerCell>();
 		
 		// distribute value onto cells: origin ... dist(origin)=3
 		// factors depending on distance (measured by number of cells)
 		for(int xIndex = xBin-3; xIndex<=xBin+3; xIndex++){
 			for(int yIndex = yBin-3; yIndex <= yBin+3; yIndex++){
-				// TODO ausserhalb des untersuchungsraums?
 				Double distributionFactor = 0.0;
 				int distance = Math.abs(xBin-xIndex+yBin-yIndex);
 				
 				switch(distance){
-				case 0: distributionFactor = 0.170;
-				case 1: distributionFactor = 0.104;
-				case 2: distributionFactor = 0.024;
-				case 3: distributionFactor = 0.019;
+				case 0: distributionFactor = 0.216;
+				case 1: distributionFactor = 0.132;
+				case 2: distributionFactor = 0.029;
+				case 3: distributionFactor = 0.002;
 				}
 				
 				if (distributionFactor>0.0) {
-					EmPerBin epb = new EmPerBin(xIndex, yIndex, personId, value	* distributionFactor, eventStartTime);
+					EmPerCell epb = new EmPerCell(xIndex, yIndex, personId, value	* distributionFactor, eventStartTime);
 					distributedEmissions.add(epb);
 				}
 			}			
@@ -204,14 +215,17 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		return distributedEmissions;
 	}
 
+	private Double getEndOfTimeInterval(double time) {
+		Double end = Math.ceil(time/timeBinSize)*timeBinSize;
+		if(end>0.0) return end;
+		return timeBinSize;
+	}
+	
 	public Map<Double, ArrayList<EmPerLink>> getEmissionsPerLink() {
 		return emissionPerLink;
 	}
 
-	public Map<Double, ArrayList<EmPerBin>> getEmissionsPerCell() {
-		return emissionPerBin;
+	public Map<Double, ArrayList<EmPerCell>> getEmissionsPerCell() {
+		return emissionPerCell;
 	}
-
-
-
 }
