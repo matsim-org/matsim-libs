@@ -27,7 +27,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -50,6 +52,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -68,6 +72,12 @@ public class JointTravelingSimulationTest {
 	private static final Logger log =
 		Logger.getLogger(JointTravelingSimulationTest.class);
 
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+
+	// helps to understand test failures, but makes the test more expensive.
+	// => to set to true when fixing tests only
+	private static final boolean DUMP_EVENTS = true;
 	private static final int N_LAPS = 5;
 
 	private static final Id ORIGIN_LINK = new IdImpl( "origin" );
@@ -110,8 +120,15 @@ public class JointTravelingSimulationTest {
 				createTestScenario( insertDummies , random );
 			final EventsManager events = EventsUtils.createEventsManager();
 
+			final EventWriter eventsWriter = new EventWriterXML( utils.getOutputDirectory()+"/events.xml.gz" );
+			if ( DUMP_EVENTS ) {
+				// do listen to events only if we are actually interested in them
+				events.addHandler( eventsWriter );
+			}
+
 			final AtomicInteger arrCount = new AtomicInteger( 0 );
 			final AtomicInteger atDestCount = new AtomicInteger( 0 );
+			final int scNr = i;
 			events.addHandler( new PersonArrivalEventHandler() {
 				private double arrival = -100;
 				private int nArrival = 0;
@@ -132,13 +149,13 @@ public class JointTravelingSimulationTest {
 
 						arrCount.incrementAndGet();
 						Assert.assertEquals(
-							"unexpected joint arrival time",
+							"run "+scNr+": unexpected joint arrival time",
 							arrival,
 							event.getTime(),
 							MatsimTestUtils.EPSILON);
 
 						Assert.assertEquals(
-								"unexpected arrival location for mode "+mode,
+								"run "+scNr+": unexpected arrival location for mode "+mode,
 								dropOffAtPu ? PU_LINK : DO_LINK,
 								event.getLinkId() );
 					}
@@ -149,16 +166,25 @@ public class JointTravelingSimulationTest {
 				}
 			});
 
-			final JointQSimFactory factory = new JointQSimFactory( );
-			factory.createMobsim( sc , events ).run();
+			try {
+				final JointQSimFactory factory = new JointQSimFactory( );
+				factory.createMobsim( sc , events ).run();
+			}
+			catch ( AssertionError t ) {
+				events.processEvent( new RunAbortedEvent() );
+				throw t;
+			}
+			finally {
+				eventsWriter.closeFile();
+			}
 
 			Assert.assertEquals(
-					"unexpected number of joint arrivals",
+					"run "+i+": unexpected number of joint arrivals",
 					N_LAPS * 3,
 					arrCount.get());
 
 			Assert.assertEquals(
-					"unexpected number of agents arriving at destination",
+					"run "+i+": unexpected number of agents arriving at destination",
 					N_LAPS * sc.getPopulation().getPersons().size(),
 					atDestCount.get());
 		}
@@ -418,6 +444,17 @@ public class JointTravelingSimulationTest {
 		}
 
 		network.addLink( network.getFactory().createLink( RETURN_LINK , node2 , firstNode ) );
+	}
+
+	private static class RunAbortedEvent extends Event {
+		public RunAbortedEvent() {
+			super( Double.NaN );
+		}
+
+		@Override
+		public String getEventType() {
+			return "RunAborted";
+		}
 	}
 }
 
