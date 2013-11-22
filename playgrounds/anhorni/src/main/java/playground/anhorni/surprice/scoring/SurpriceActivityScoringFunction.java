@@ -148,11 +148,8 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 				foundAct = true;
 
 				// choose appropriate opentime:
-				// if none is given, use undefined opentimes
+				// if none is given, use undefined
 				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes();
-				if (opentimes == null) {
-					opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes();
-				}
 				if (opentimes != null) {
 					// ignoring lunch breaks with the following procedure:
 					// if there is only one wed/wkday open time interval, use it
