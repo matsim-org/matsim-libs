@@ -251,8 +251,8 @@ public class TravelDistanceStats {
 						double distance = leg.getRoute().getDistance();
 						if (!Double.isNaN(distance)) {
 							planTravelDistance += distance;
+							numberOfLegs++;
 						}
-						numberOfLegs++;
 					}
 				}
 			}
