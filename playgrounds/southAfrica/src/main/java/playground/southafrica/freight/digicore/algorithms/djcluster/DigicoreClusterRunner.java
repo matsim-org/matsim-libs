@@ -403,10 +403,12 @@ public class DigicoreClusterRunner {
 				DigicoreActivityReaderRunnable rdar = new DigicoreActivityReaderRunnable(vehicleFile, zoneQT, counter);
 				threadList.add(rdar);
 				threadExecutor.execute(rdar);
+			}
 
-				threadExecutor.shutdown();
-				while(!threadExecutor.isTerminated()){
-				}
+			/* Shut down the thread executor for this block, and wait until it
+			 * is finished before proceeding. */
+			threadExecutor.shutdown();
+			while(!threadExecutor.isTerminated()){
 			}
 			
 			/* Aggregate the results of the current block. */
