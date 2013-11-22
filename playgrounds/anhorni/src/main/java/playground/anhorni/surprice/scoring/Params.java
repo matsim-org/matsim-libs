@@ -31,7 +31,8 @@ public class Params {
 		
 	// ============= car, other, unkown, pax, mtb ================================	
 		// purpose == undef in initialization
-		if (purpose.equals("undef") || purpose.equals("work") || purpose.equals("education") || purpose.equals("home")) {
+		if (purpose.equals("undef") || purpose.equals("work") || purpose.equals("education") || purpose.equals("home")
+				|| purpose.equals("business")) {
 			beta_TD = Surprice.beta_TD_car_com;
 			beta_TT = Surprice.beta_TT_car_com;
 		} else if (purpose.equals("shop")) {
@@ -47,7 +48,8 @@ public class Params {
 							
 		// ============= PT =======================================================
 		if (TransportMode.pt.equals(mode)) {			
-			if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home")) {
+			if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home")
+					|| purpose.equals("business")) {
 				beta_TD = Surprice.beta_TD_pt_com;
 				beta_TT = Surprice.beta_TT_pt_com;
 			} else if (purpose.equals("shop")) {
@@ -66,7 +68,8 @@ public class Params {
 		
 		// ============= slm =======================================================
 		} else if (TransportMode.bike.equals(mode) || TransportMode.walk.equals(mode)) {
-			if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home")) {
+			if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home") 
+					|| purpose.equals("business")) {
 				beta_TD = Surprice.beta_TD_slm_com;
 				beta_TT = Surprice.beta_TT_slm_com;
 			} else if (purpose.equals("shop")) {
