@@ -206,6 +206,8 @@ public class MainPPSimZurich30km {
 			
 			log.info("iteration-" + iter + " ended");
 		}
+		
+		System.exit(0);
 
 	}
 
