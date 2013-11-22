@@ -34,6 +34,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -45,9 +46,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MyMultiFeatureReader {
 
 	private List<MyZone> zones;
-	private final Logger log = Logger.getLogger(MyMultiFeatureReader.class);
-	
-	
+	private final static Logger LOG = Logger.getLogger(MyMultiFeatureReader.class);
 	public MyMultiFeatureReader(){
 
 	}
@@ -72,7 +71,7 @@ public class MyMultiFeatureReader {
 		if(!f.exists() || !f.canRead()){
 			throw new IOException("Cannot read from " + shapefile);
 		}
-		log.info("Start reading shapefile " + shapefile);
+		LOG.info("Start reading shapefile " + shapefile);
 
 		this.zones = new ArrayList<MyZone>();
 		MultiPolygon mp = null;
@@ -84,24 +83,24 @@ public class MyMultiFeatureReader {
 			if( shape instanceof MultiPolygon ){
 				mp = (MultiPolygon)shape;
 				if( !mp.isSimple() ){
-					log.warn("This polygon is NOT simple!" );
+					LOG.warn("This polygon is NOT simple!" );
 				}
 				Polygon polygonArray[] = new Polygon[mp.getNumGeometries()];
 				for(int j = 0; j < mp.getNumGeometries(); j++ ){
 					if(mp.getGeometryN(j) instanceof Polygon ){
 						polygonArray[j] = (Polygon) mp.getGeometryN(j);							
 					} else{
-						log.warn("Subset of multipolygon is NOT a polygon.");
+						LOG.warn("Subset of multipolygon is NOT a polygon.");
 					}
 				}
 				MyZone newZone = new MyZone(polygonArray, gf, new IdImpl(name));
 
 				this.zones.add( newZone );
 			} else{
-				log.warn("This is not a multipolygon!");
+				LOG.warn("This is not a multipolygon!");
 			}
 		}
-		log.info("Done reading shapefile.");
+		LOG.info("Done reading shapefile.");
 	}
 
 	public MyZone getZone(Id id){
@@ -113,7 +112,7 @@ public class MyMultiFeatureReader {
 		}
 		if(result == null){
 			String errorMessage = "Could not find the requested zone: " + id.toString();
-			log.error(errorMessage);
+			LOG.error(errorMessage);
 		}
 		return result;
 	}
@@ -164,6 +163,41 @@ public class MyMultiFeatureReader {
 		}
 		return list;
 	}
+	
+	
+	/**
+	 * Implementation of the shapefile reader to check which fields contains the
+	 * zone id.
+	 * @param args
+	 */
+	public static void main(String[] args){
+		Header.printHeader(MyMultiFeatureReader.class.toString(), args);
+		
+		MyMultiFeatureReader mr = new MyMultiFeatureReader();
+		try {
+			mr.readMultizoneShapefile(args[0], Integer.parseInt(args[1]));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot parse multi-feature shapefile.");
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot parse multi-feature shapefile.");
+		}
+		
+		/* Report the Ids of the first ten entries... */
+		LOG.info("The zone Ids of the first ten entries:");
+		for(int i = 0; i < 10; i++){
+			LOG.info("   " + mr.getAllZones().get(i).getId().toString());
+		}
+		LOG.info("       |");
+		LOG.info("       |");
+		LOG.info("       |");
+		LOG.info("       V");
+		
+		LOG.info("If this doesn't makes sense, then you've got the wrong ID field, probably ;-)");
+		Header.printFooter();
+	}
+	
 
 
 }
