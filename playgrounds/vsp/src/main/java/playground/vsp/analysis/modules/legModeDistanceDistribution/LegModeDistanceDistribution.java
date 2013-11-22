@@ -34,15 +34,19 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.PtConstants;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
@@ -53,7 +57,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * Trip distances are beeline distances between activity locations.
  * The actual (driven, teleported, ...) distances may differ significantly. 
  * 
- * @author aneumann, benjamin
+ * @author aneumann, benjamin, ihab
  *
  */
 public class LegModeDistanceDistribution extends AbstractAnalyisModule{
@@ -90,7 +94,37 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 
 	@Override
 	public void preProcessData() {
-		// nothing to do here
+		
+		log.info("Checking if the plans file that will be analyzed is based on a run with simulated public transport.");
+		log.info("Transit activities and belonging transit walk legs will be removed from the plan.");
+		
+		for (Person person : this.scenario.getPopulation().getPersons().values()){
+			for (Plan plan : person.getPlans()){
+				List<PlanElement> planElements = plan.getPlanElements();
+				for (int i = 0, n = planElements.size(); i < n; i++) {
+					PlanElement pe = planElements.get(i);
+					if (pe instanceof Activity) {
+						Activity act = (Activity) pe;
+						if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
+							PlanElement previousPe = (PlanElement) planElements.get(i-1);
+							if (previousPe instanceof Leg) {
+								Leg previousLeg = (Leg) previousPe;
+								previousLeg.setMode(TransportMode.pt);
+								previousLeg.setRoute(null);
+							} else {
+								throw new RuntimeException("A transit activity should follow a leg! Aborting...");
+							}
+							((PlanImpl) plan).removeActivity(i); // also removes the following leg
+							n -= 2;
+							i--;
+						}
+					}
+				}
+			}
+		}
+
+//		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), null);
+//		popWriter.write("/Users/ihab/Desktop/plan_modified.xml");
 	}
 
 	@Override
@@ -220,6 +254,7 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 		this.distanceClasses.add(endOfDistanceClass);
 		
 		while(endOfDistanceClass <= longestBeelineDistance){
+//			endOfDistanceClass = endOfDistanceClass + 1000;
 			endOfDistanceClass = 100 * (int) Math.pow(2, classCounter);
 			classCounter++;
 			this.distanceClasses.add(endOfDistanceClass);
