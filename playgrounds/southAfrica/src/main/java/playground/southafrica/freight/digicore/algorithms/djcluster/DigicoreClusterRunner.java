@@ -64,7 +64,8 @@ import com.vividsolutions.jts.geom.Polygon;
 
 
 public class DigicoreClusterRunner {
-	private static final Logger log = Logger.getLogger(DigicoreClusterRunner.class);
+	private final static Logger LOG = Logger.getLogger(DigicoreClusterRunner.class);
+	private final static int BLOCK_SIZE = 100; 
 	
 	private final int numberOfThreads;
 	private Map<Id, List<Coord>> zoneMap = null;
@@ -99,7 +100,7 @@ public class DigicoreClusterRunner {
 		String outputFolderName = args[4];		
 		
 		/* Read all the `minor' DigicoreActivities from the *.xml.gz Vehicle files. */
-		log.info(" Reading points to cluster...");
+		LOG.info(" Reading points to cluster...");
 		DigicoreClusterRunner dcr = new DigicoreClusterRunner(numberOfThreads);
 		try {
 			dcr.buildPointLists(sourceFolder, shapefile, idField);
@@ -109,8 +110,8 @@ public class DigicoreClusterRunner {
 		long readTime = System.currentTimeMillis() - jobStart;
 		
 		/* Cluster the points. */
-		log.info("-------------------------------------------------------------");
-		log.info(" Clustering the points...");
+		LOG.info("-------------------------------------------------------------");
+		LOG.info(" Clustering the points...");
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
 		double[] radii = {1, 2, 5}; //, 10, 15, 20, 25, 30, 35, 40};
@@ -120,9 +121,9 @@ public class DigicoreClusterRunner {
 			for(int thisPmin : pmins){
 				/* Just write some indication to the log file as to what we're 
 				 * busy with at this point in time. */
-				log.info("================================================================================");
-				log.info("Executing clustering for radius " + thisRadius + ", and pmin of " + thisPmin);
-				log.info("================================================================================");
+				LOG.info("================================================================================");
+				LOG.info("Executing clustering for radius " + thisRadius + ", and pmin of " + thisPmin);
+				LOG.info("================================================================================");
 				
 				/* Create configuration-specific filenames. */
 				String outputFolder = String.format("%s%.0f_%d/", outputFolderName, thisRadius, thisPmin);
@@ -134,8 +135,8 @@ public class DigicoreClusterRunner {
 				/* Create the output folders. If it exists... first delete it. */
 				File folder = new File(outputFolder);
 				if(folder.exists()){
-					log.warn("Output folder exists, and will be deleted. ");
-					log.warn("  --> " + folder.getAbsolutePath());
+					LOG.warn("Output folder exists, and will be deleted. ");
+					LOG.warn("  --> " + folder.getAbsolutePath());
 					FileUtils.delete(folder);
 				}
 				folder.mkdirs();
@@ -158,13 +159,13 @@ public class DigicoreClusterRunner {
 		long clusterTime = System.currentTimeMillis() - jobStart - readTime;
 
 		long totalTime = System.currentTimeMillis() - jobStart;
-		log.info("-------------------------------------------------------------");
-		log.info("  Done.");
-		log.info("-------------------------------------------------------------");
-		log.info("    Read time (s): " + readTime/1000);
-		log.info(" Cluster time (s): " + clusterTime/1000);
-		log.info("   Total time (s): " + totalTime/1000);
-		log.info("=============================================================");
+		LOG.info("-------------------------------------------------------------");
+		LOG.info("  Done.");
+		LOG.info("-------------------------------------------------------------");
+		LOG.info("    Read time (s): " + readTime/1000);
+		LOG.info(" Cluster time (s): " + clusterTime/1000);
+		LOG.info("   Total time (s): " + totalTime/1000);
+		LOG.info("=============================================================");
 
 	}
 
@@ -172,11 +173,11 @@ public class DigicoreClusterRunner {
 
 	public void writeOutput(String theFacilityFile, String theFacilityAttributeFile) {
 		/* Write (for the current configuration) facilities, and the attributes, to file. */
-		log.info("-------------------------------------------------------------");
-		log.info(" Writing the facilities to file: " + theFacilityFile);
+		LOG.info("-------------------------------------------------------------");
+		LOG.info(" Writing the facilities to file: " + theFacilityFile);
 		FacilitiesWriter fw = new FacilitiesWriter(facilities);
 		fw.write(theFacilityFile);				
-		log.info(" Writing the facility attributes to file: " + theFacilityAttributeFile);
+		LOG.info(" Writing the facility attributes to file: " + theFacilityAttributeFile);
 		ObjectAttributesXmlWriter ow = new ObjectAttributesXmlWriter(facilityAttributes);
 		ow.putAttributeConverter(Point.class, new HullConverter());
 		ow.putAttributeConverter(LineString.class, new HullConverter());
@@ -188,7 +189,7 @@ public class DigicoreClusterRunner {
 
 	public void writePrettyCsv(String theFacilityCsvFile) {
 		/* Write out pretty CSV file. */
-		log.info(" Writing the facilities to csv: " + theFacilityCsvFile);
+		LOG.info(" Writing the facilities to csv: " + theFacilityCsvFile);
 		BufferedWriter bw = IOUtils.getBufferedWriter(theFacilityCsvFile);
 		try{
 			bw.write("Id,Long,Lat,Count");
@@ -222,8 +223,8 @@ public class DigicoreClusterRunner {
 
 		File folder = new File(outputFolder);
 		if(folder.exists()){
-			log.warn("Facility points folder exists, and will be deleted. ");
-			log.warn("  --> " + folder.getAbsolutePath());
+			LOG.warn("Facility points folder exists, and will be deleted. ");
+			LOG.warn("  --> " + folder.getAbsolutePath());
 			FileUtils.delete(folder);
 		}
 		folder.mkdirs();
@@ -234,6 +235,10 @@ public class DigicoreClusterRunner {
 		}
 		
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(this.numberOfThreads);
+		
+		/* Break up the thread execution into blocks. */
+		
+		
 		List<Future<List<DigicoreCluster>>> listOfJobs = new ArrayList<Future<List<DigicoreCluster>>>();
 		
 		Counter counter = new Counter("   Zones completed: ");
@@ -281,7 +286,7 @@ public class DigicoreClusterRunner {
 							facilityAttributes.putAttribute(facilityId.toString(), "DigicoreActivityCount", String.valueOf(dc.getPoints().size()));
 							facilityAttributes.putAttribute(facilityId.toString(), "concaveHull", hull);
 						} else{
-							log.debug("Facility " + facilityId.toString() + " is not added. Hull is an empty geometry!");
+							LOG.debug("Facility " + facilityId.toString() + " is not added. Hull is an empty geometry!");
 							numberOfFacilitiesOmitted++;
 						}
 					}
@@ -327,7 +332,7 @@ public class DigicoreClusterRunner {
 		
 		/*TODO Can remove after debugging. Report the number of
 		 * facilities that were ignored because of empty geometries. */
-		log.debug("Facilities omitted: " + radius + "_" + minimumPoints + "(" + numberOfFacilitiesOmitted + ")");
+		LOG.debug("Facilities omitted: " + radius + "_" + minimumPoints + "(" + numberOfFacilitiesOmitted + ")");
 	}
 
 
@@ -346,7 +351,7 @@ public class DigicoreClusterRunner {
 		List<MyZone> zoneList = mfr.getAllZones();
 		
 		/* Build a QuadTree of the Zones. */
-		log.info(" Building QuadTree from zones...");
+		LOG.info(" Building QuadTree from zones...");
 		double minX = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
@@ -361,56 +366,68 @@ public class DigicoreClusterRunner {
 		for(MyZone mz : zoneList){
 			zoneQT.put(mz.getEnvelope().getCentroid().getX(), mz.getEnvelope().getCentroid().getY(), mz);
 		}
-		log.info("Done building QuadTree.");
+		LOG.info("Done building QuadTree.");
 				
 		/* Read the activities from vehicle files. */
+		long startTime = System.currentTimeMillis();
+
 		File folder = new File(sourceFolder);
 		List<File> vehicleList = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter("xml.gz"));
 		int inActivities = 0;
 		int outActivities = 0;
+
 		
-		ExecutorService threadExecutor = Executors.newFixedThreadPool(this.numberOfThreads);
-		
-		long startTime = System.currentTimeMillis();
-		List<DigicoreActivityReaderRunnable> threadList = new ArrayList<DigicoreActivityReaderRunnable>();
-		
-		//set a counter to keep track of number of threads that completed
+		/* Set up the infrastructure so that threaded code is executed in blocks. */
+		ExecutorService threadExecutor = null;
+		List<DigicoreActivityReaderRunnable> threadList = null;
+		int vehicleCounter = 0;
 		Counter counter = new Counter("   Vehicles completed: ");
-		for(File vehicleFile : vehicleList){
-			DigicoreActivityReaderRunnable rdar = new DigicoreActivityReaderRunnable(vehicleFile, zoneQT, counter);
-			threadList.add(rdar);
-			threadExecutor.execute(rdar);
-		}
-		
-		threadExecutor.shutdown();
-		while(!threadExecutor.isTerminated()){
-		}
-		counter.printCounter();
-		
-		/* Get all the results. */
-		log.info("Aggregating all vehicles' activity coordinates.");
-		/* Create a new map with an empty list for each zone. These will be passed to threads later. */
+
+		/* Set up the output infrastructure:
+		 * Create a new map with an empty list for each zone. These will be passed to threads later. */
 		zoneMap = new HashMap<Id, List<Coord>>();
 		for(MyZone mz : zoneList){
 			zoneMap.put(mz.getId(), new ArrayList<Coord>());
 		}
 		Map<Id, List<Coord>> theMap = null;
-		/* Add all the coordinates from each vehicle to the main map. */
-		for(DigicoreActivityReaderRunnable rdar : threadList){
-			theMap = rdar.getMap();
-			for(Id id : theMap.keySet()){
-				zoneMap.get(id).addAll(theMap.get(id));
+		
+		while(vehicleCounter < vehicleList.size()){
+			int blockCounter = 0;
+			threadExecutor = Executors.newFixedThreadPool(this.numberOfThreads);
+			threadList = new ArrayList<DigicoreActivityReaderRunnable>();
+			
+			/* Assign the jobs in blocks. */
+			while(blockCounter++ < BLOCK_SIZE && vehicleCounter < vehicleList.size()){
+				File vehicleFile = vehicleList.get(vehicleCounter++);
+
+				DigicoreActivityReaderRunnable rdar = new DigicoreActivityReaderRunnable(vehicleFile, zoneQT, counter);
+				threadList.add(rdar);
+				threadExecutor.execute(rdar);
+
+				threadExecutor.shutdown();
+				while(!threadExecutor.isTerminated()){
+				}
 			}
-			inActivities += rdar.getInCount();
-			outActivities += rdar.getOutCount();			
-		}		
+			
+			/* Aggregate the results of the current block. */
+			/* Add all the coordinates from each vehicle to the main map. */
+			for(DigicoreActivityReaderRunnable rdar : threadList){
+				theMap = rdar.getMap();
+				for(Id id : theMap.keySet()){
+					zoneMap.get(id).addAll(theMap.get(id));
+				}
+				inActivities += rdar.getInCount();
+				outActivities += rdar.getOutCount();			
+			}		
+		}
+		counter.printCounter();
 		
 		long time = (System.currentTimeMillis() - startTime) / 1000;
 		int totalPoints = inActivities + outActivities;
-		log.info("Total number of activities checked: " + totalPoints);
-		log.info("   In: " + inActivities);
-		log.info("  Out: " + outActivities);
-		log.info("Time (s): " + time);
+		LOG.info("Total number of activities checked: " + totalPoints);
+		LOG.info("   In: " + inActivities);
+		LOG.info("  Out: " + outActivities);
+		LOG.info("Time (s): " + time);
 	}
 
 	public DigicoreClusterRunner(int numberOfThreads) {
