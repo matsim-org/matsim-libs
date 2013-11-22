@@ -113,8 +113,8 @@ public class DigicoreClusterRunner {
 		log.info(" Clustering the points...");
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
-		double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
-		int[] pmins = {1, 5, 10, 15, 20, 25};
+		double[] radii = {1, 2, 5}; //, 10, 15, 20, 25, 30, 35, 40};
+		int[] pmins = {2, 5}; //, 10, 15, 20, 25};
 
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
