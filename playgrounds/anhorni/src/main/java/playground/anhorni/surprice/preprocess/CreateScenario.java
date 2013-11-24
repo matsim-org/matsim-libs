@@ -302,53 +302,10 @@ public class CreateScenario {
 				this.personWeeksMZ.put(person.getId(), new PersonWeeks(person));
 				this.personWeeksMZ.get(person.getId()).setCurrentWeek(week);
 			}
-			this.adaptTimes(person.getSelectedPlan());
 			this.personWeeksMZ.get(person.getId()).addDay(dow, person.getSelectedPlan());
 		}
 	}
-	
-	private void adaptTimes(Plan plan) {
-		double currentTime = 0.0;
-		Leg leg = null;
-		Activity prevAct = null;
-		
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				ActivityImpl act = (ActivityImpl)pe;	
-				
-				act.setStartTime(currentTime);
-								
-				double desiredDuration = ((PersonImpl)plan.getPerson()).getDesires().getActivityDuration(act.getType());
-				
-				if (leg != null && prevAct != null) {
-					currentTime += this.estimateTravelTime(plan.getPerson(), leg, prevAct, act, prevAct.getEndTime());
-				}
-				currentTime += desiredDuration;
-				
-				if (act != ((PlanImpl)plan).getLastActivity()) {
-					act.setEndTime(currentTime);
-					leg = ((PlanImpl)plan).getNextLeg(act);
-					prevAct = act;
-				}	
-			}
-		}
-	}
-	
-	private double estimateTravelTime(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
-		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
-		double carSpeed = 10.0;
-		return dist * 1.5 /carSpeed;		
-		
-//		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
-//		TeleportationLegRouter router = new TeleportationLegRouter(
-//	            ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
-//	            routeConfigGroup.getTeleportedModeSpeeds().get(leg.getMode()),
-//	            routeConfigGroup.getBeelineDistanceFactor());
-//		
-//		return router.routeLeg(person, leg, fromAct, toAct, depTime);
-	}
-	
-	
+			
 	private void createIncomes(String outPath, String mzIncomeFile) {
 		TreeMap<Double, Integer> incomesNormalized = new TreeMap<Double, Integer>();
 		try {
@@ -440,6 +397,8 @@ public class CreateScenario {
 			
 			this.createDesiresForPersons();
 			
+			this.adaptTimesForPersons();
+								
 			log.info("Writing population with plans ..." + outPath + "/" + DayConverter.getDayString(dow) + "/plans.xml.gz");
 			new File(outPath + "/" + DayConverter.getDayString(dow) + "/").mkdirs();
 			new PopulationWriter(
@@ -490,8 +449,52 @@ public class CreateScenario {
 			if (lDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("leisure", lDur);
 			if (eDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("education", eDur);
 			if (bDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("business", bDur);
-			if (hDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("home", hDur);			
+			if (hDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("home", hDur);		
 		}
+	}
+	
+	private void adaptTimesForPersons() {
+		double currentTime = 0.0;
+		Leg leg = null;
+		Activity prevAct = null;
+		
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {	
+			Plan plan = person.getSelectedPlan();
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Activity) {
+					ActivityImpl act = (ActivityImpl)pe;	
+					
+					act.setStartTime(currentTime);
+									
+					double desiredDuration = ((PersonImpl)plan.getPerson()).getDesires().getActivityDuration(act.getType());
+					
+					if (leg != null && prevAct != null) {
+						currentTime += this.estimateTravelTime(plan.getPerson(), leg, prevAct, act, prevAct.getEndTime());
+					}
+					currentTime += desiredDuration;
+					
+					if (act != ((PlanImpl)plan).getLastActivity()) {
+						act.setEndTime(currentTime);
+						leg = ((PlanImpl)plan).getNextLeg(act);
+						prevAct = act;
+					}	
+				}
+			}
+		}
+	}
+	
+	private double estimateTravelTime(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+		double carSpeed = 10.0;
+		return dist * 1.5 /carSpeed;		
+		
+//		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
+//		TeleportationLegRouter router = new TeleportationLegRouter(
+//	            ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
+//	            routeConfigGroup.getTeleportedModeSpeeds().get(leg.getMode()),
+//	            routeConfigGroup.getBeelineDistanceFactor());
+//		
+//		return router.routeLeg(person, leg, fromAct, toAct, depTime);
 	}
 	
 	private void createToll(String outPath, double radius) {	
