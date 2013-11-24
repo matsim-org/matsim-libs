@@ -40,7 +40,6 @@ import playground.anhorni.surprice.DayConverter;
 
 public class SurpriceActivityScoringFunction extends CharyparNagelActivityScoring {
 	private CharyparNagelScoringParameters params;
-	private Config config;
 	private final ActivityFacilities facilities;
 	private DayType day;
 	private Plan plan;
@@ -52,7 +51,6 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		this.day = DayConverter.getDayType(day);
 		this.plan = plan;
 		this.params = params;
-		this.config = config;
 		this.resetting();				
 	}
 	
@@ -160,6 +158,10 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
 						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
 					}
+				}
+				else {
+					openInterval[0] = 0.0;
+					openInterval[1] = 0.0;
 				}
 			}
 		}
