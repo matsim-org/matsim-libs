@@ -37,7 +37,6 @@ public class Analyzer {
 		double avgShop = 0;
 		double avgLeisure = 0;
 		double avgEducation = 0;
-		double avgOther = 0;
 				
 		for (Person person : population.getPersons().values()) {
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
@@ -53,8 +52,6 @@ public class Analyzer {
 						avgLeisure++;
 					} else if (act.getType().startsWith("e")) {
 						avgEducation++;
-					} else if (act.getType().startsWith("o")) {
-						avgOther++;
 					}
 				}
 			}			
@@ -64,16 +61,15 @@ public class Analyzer {
 		avgWork /= population.getPersons().size();
 		avgShop /= population.getPersons().size();
 		avgLeisure /= population.getPersons().size();
-		avgOther /= population.getPersons().size();
 		avgEducation /= population.getPersons().size();
 		avgNumberOfActs /= population.getPersons().size();
-		this.write(avgNumberOfActs, avgHome, avgWork, avgShop, avgLeisure, avgEducation, avgOther, outPath, day);
+		this.write(avgNumberOfActs, avgHome, avgWork, avgShop, avgLeisure, avgEducation, outPath, day);
 	}
 	
 	public void writeHeader(String outPath) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt", true)); 
-			bufferedWriter.write("day\tavg\th\tw\ts\tl\te\to");
+			bufferedWriter.write("day\tsum\th\tw\ts\tl\te\to");
 			bufferedWriter.newLine();			
 		    bufferedWriter.flush();
 		    bufferedWriter.close();
@@ -84,10 +80,10 @@ public class Analyzer {
 	}
 	
 	private void write(double avgNumberOfActs, double avgHome, double avgWork, double avgShop, double avgLeisure, double avgEducation,
-			double avgOther, String outPath, String day) {
+			String outPath, String day) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt", true)); 
-			bufferedWriter.append(day + "\t" + avgNumberOfActs + "\t" + avgHome  + "\t" + avgWork  + "\t" + avgShop  + "\t" + avgLeisure  +  "\t" + avgEducation + "\t" + avgOther);
+			bufferedWriter.append(day + "\t" + avgNumberOfActs + "\t" + avgHome  + "\t" + avgWork  + "\t" + avgShop  + "\t" + avgLeisure  +  "\t" + avgEducation);
 			bufferedWriter.newLine();			
 		    bufferedWriter.flush();
 		    bufferedWriter.close();

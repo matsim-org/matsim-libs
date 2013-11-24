@@ -32,12 +32,14 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -46,10 +48,13 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -102,7 +107,7 @@ public class CreateScenario {
 		
 		// merge ................................................................
 		this.merge();
-								
+										
 		this.createIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"), 
 				config.findParam(Surprice.SURPRICE_PREPROCESS, "mzIncomeFile"));
 		
@@ -297,9 +302,52 @@ public class CreateScenario {
 				this.personWeeksMZ.put(person.getId(), new PersonWeeks(person));
 				this.personWeeksMZ.get(person.getId()).setCurrentWeek(week);
 			}
+			this.adaptTimes(person.getSelectedPlan());
 			this.personWeeksMZ.get(person.getId()).addDay(dow, person.getSelectedPlan());
 		}
 	}
+	
+	private void adaptTimes(Plan plan) {
+		double currentTime = 0.0;
+		Leg leg = null;
+		Activity prevAct = null;
+		
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				ActivityImpl act = (ActivityImpl)pe;	
+				
+				act.setStartTime(currentTime);
+								
+				double desiredDuration = ((PersonImpl)plan.getPerson()).getDesires().getActivityDuration(act.getType());
+				
+				if (leg != null && prevAct != null) {
+					currentTime += this.estimateTravelTime(plan.getPerson(), leg, prevAct, act, prevAct.getEndTime());
+				}
+				currentTime += desiredDuration;
+				
+				if (act != ((PlanImpl)plan).getLastActivity()) {
+					act.setEndTime(currentTime);
+					leg = ((PlanImpl)plan).getNextLeg(act);
+					prevAct = act;
+				}	
+			}
+		}
+	}
+	
+	private double estimateTravelTime(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+		double carSpeed = 10.0;
+		return dist * 1.5 /carSpeed;		
+		
+//		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
+//		TeleportationLegRouter router = new TeleportationLegRouter(
+//	            ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
+//	            routeConfigGroup.getTeleportedModeSpeeds().get(leg.getMode()),
+//	            routeConfigGroup.getBeelineDistanceFactor());
+//		
+//		return router.routeLeg(person, leg, fromAct, toAct, depTime);
+	}
+	
 	
 	private void createIncomes(String outPath, String mzIncomeFile) {
 		TreeMap<Double, Integer> incomesNormalized = new TreeMap<Double, Integer>();
@@ -496,7 +544,7 @@ public class CreateScenario {
 			double nullOffset = 0.25;
 			double totalOffset = offset + nullOffset;
 			double dudm = (Double)(this.incomes.getAttribute(person.getId().toString(), "income")) + totalOffset;
-			double dudmNormalized = dudm / (1 + nullOffset);
+			double dudmNormalized = dudm / 1.5;
 			this.preferences.putAttribute(person.getId().toString(), "dudm", dudmNormalized);
 		}
 		this.writePreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
@@ -506,12 +554,12 @@ public class CreateScenario {
 		Bins preferencesBins = new Bins(1, 20, "preferences");
 				
 		for (Id id : this.scenario.getPopulation().getPersons().keySet()) {	
-			preferencesBins.addVal((Double)this.preferences.getAttribute(id.toString(), "dudm") * 12.0, 1.0);
+			preferencesBins.addVal((Double)this.preferences.getAttribute(id.toString(), "dudm") * 10.0, 1.0);
 		}		
 		log.info("Writing preferences to " + outPath + "/preferences.xml");
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(preferences);
 		attributesWriter.writeFile(outPath + "/preferences.xml");
 		
-		preferencesBins.plotBinnedDistribution(outPath + "/", "preferences * 12", "");	
+		preferencesBins.plotBinnedDistribution(outPath + "/", "preferences * 10", "");	
 	}
 }
