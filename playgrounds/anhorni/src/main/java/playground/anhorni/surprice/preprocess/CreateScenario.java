@@ -453,26 +453,29 @@ public class CreateScenario {
 		}
 	}
 	
-	private void adaptTimesForPersons() {
-		double currentTime = 0.0;
-		Leg leg = null;
-		Activity prevAct = null;
-		
+	private void adaptTimesForPersons() {		
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {	
 			Plan plan = person.getSelectedPlan();
+			Leg leg = null;
+			Activity prevAct = null;
+			double currentTime = 0.0;
+			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;	
-					
-					act.setStartTime(currentTime);
 									
-					double desiredDuration = ((PersonImpl)plan.getPerson()).getDesires().getActivityDuration(act.getType());
 					
-					if (leg != null && prevAct != null) {
-						currentTime += this.estimateTravelTime(plan.getPerson(), leg, prevAct, act, prevAct.getEndTime());
+					if (leg != null) {
+						//leg.setDepartureTime(currentTime);
+						double tt = 2.0 * this.estimateTravelTime(leg, prevAct, act); // add factor 2 to not have a fictive best plan until the end!
+						currentTime += tt;
+						//leg.setTravelTime(tt);
+						
 					}
+					act.setStartTime(currentTime);
+					double desiredDuration = ((PersonImpl)plan.getPerson()).getDesires().getActivityDuration(act.getType());
 					currentTime += desiredDuration;
-					
+									
 					if (act != ((PlanImpl)plan).getLastActivity()) {
 						act.setEndTime(currentTime);
 						leg = ((PlanImpl)plan).getNextLeg(act);
@@ -483,7 +486,7 @@ public class CreateScenario {
 		}
 	}
 	
-	private double estimateTravelTime(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+	private double estimateTravelTime(Leg leg, Activity fromAct, Activity toAct) {
 		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
 		double carSpeed = 10.0;
 		return dist * 1.5 /carSpeed;		
