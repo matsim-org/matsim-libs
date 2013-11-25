@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.grips.scenariogenerator;
+package playground.hkluepfel.scenariogenerator;
 
 import java.awt.image.BufferedImage;
 

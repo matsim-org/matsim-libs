@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.grips.scenariogenerator;
+package playground.hkluepfel.scenariogenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +33,8 @@ import org.matsim.contrib.grips.experimental.CustomizedOsmNetworkReader;
 import org.matsim.contrib.grips.io.GripsConfigDeserializer;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.model.events.InfoEvent;
+import org.matsim.contrib.grips.scenariogenerator.EvacuationNetworkGenerator;
+import org.matsim.contrib.grips.scenariogenerator.PopulationFromESRIShapeFileGenerator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

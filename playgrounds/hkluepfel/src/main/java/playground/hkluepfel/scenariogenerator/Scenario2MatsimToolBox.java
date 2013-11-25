@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.grips.scenariogenerator;
+package playground.hkluepfel.scenariogenerator;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -100,7 +100,7 @@ public class Scenario2MatsimToolBox extends JPanel
 						protected String doInBackground()
 						{
 							String gripsFile = Scenario2MatsimToolBox.this.controller.getGripsFile();
-							Scenario2MatsimConverter s2m = new org.matsim.contrib.grips.scenariogenerator.Scenario2MatsimConverter(gripsFile);
+							Scenario2MatsimConverter s2m = new Scenario2MatsimConverter(gripsFile);
 							s2m.run();
 							return "";
 						}
