@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -106,7 +105,7 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 					if (pe instanceof Activity) {
 						Activity act = (Activity) pe;
 						if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
-							PlanElement previousPe = (PlanElement) planElements.get(i-1);
+							PlanElement previousPe = planElements.get(i-1);
 							if (previousPe instanceof Leg) {
 								Leg previousLeg = (Leg) previousPe;
 								previousLeg.setMode(TransportMode.pt);
@@ -122,9 +121,6 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 				}
 			}
 		}
-
-//		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), null);
-//		popWriter.write("/Users/ihab/Desktop/plan_modified.xml");
 	}
 
 	@Override
@@ -169,11 +165,15 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 			}
 			writer2.flush();
 			writer2.close(); //Close the output stream
-
 			log.info("Finished writing output to " + outFile);
+			
 		}catch (Exception e){
 			log.error("Error: " + e.getMessage());
 		}
+		
+//		log.info("Dumping population for control in case legs were cut out (simulated public transport)...");
+//		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), null);
+//		popWriter.write(outputFolder + "plans_modified.xml.gz");
 	}
 
 	private SortedMap<String, Double> calculateModeShare(SortedMap<String, Integer> mode2NoOfLegs) {
