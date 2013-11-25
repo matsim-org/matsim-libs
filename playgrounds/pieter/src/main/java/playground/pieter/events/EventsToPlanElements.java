@@ -348,6 +348,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 							.getCoord());
 					journey.setEndTime(event.getTime());
 				}
+			}else{
+				Journey journey = chain.getJourneys().getLast();
+				journey.setEndTime(event.getTime());
+				journey.setDest(network.getLinks().get(event.getLinkId())
+						.getCoord());
+				journey.setEndTime(event.getTime());
 			}
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
@@ -420,6 +426,18 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 					trip.setMode(event.getLegMode());
 					trip.setStartTime(event.getTime());
 				}
+			}else{
+				//teleport mode
+				journey = chain.addJourney();
+				journey.setTeleportJourney(true);
+				journey.setOrig(network.getLinks().get(event.getLinkId())
+						.getCoord());
+				journey.setFromAct(chain.getActs().getLast());
+				journey.setStartTime(event.getTime());
+				journey.setMainmode(event.getLegMode());
+				Trip trip = journey.addTrip();
+				trip.setMode(event.getLegMode());
+				trip.setStartTime(event.getTime());
 			}
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils

@@ -125,12 +125,12 @@ public class EventsMergeSort {
 			writer.close();
 		}
 		if (intermediaryFiles.size() > 1) {
-//			for(String fileName:inputFiles){
-//				if(fileName.startsWith("merge")){
-//					File file = new File(inputEventsPath + "/"+fileName); 
-//					file.delete();
-//				}
-//			}
+			for(String fileName:inputFiles){
+				if(fileName.startsWith("merge")){
+					File file = new File(inputEventsPath + "/"+fileName); 
+					file.delete();
+				}
+			}
 			inputFiles = intermediaryFiles;
 			run();
 		}
