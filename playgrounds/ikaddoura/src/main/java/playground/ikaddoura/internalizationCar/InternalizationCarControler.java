@@ -46,7 +46,7 @@ public class InternalizationCarControler {
 		
 		configFile1 = args[0];
 		configFile2 = args[1];
-		configFile2 = args[2];
+		configFile3 = args[2];
 		
 		InternalizationCarControler internalizationCarControler = new InternalizationCarControler();
 		internalizationCarControler.runBaseCase(configFile1);
