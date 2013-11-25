@@ -5,10 +5,13 @@ import java.util.NoSuchElementException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.pt.router.TransitRouterConfig;
 
 
 public class TravelComponent {
 
+	public static double walkSpeed = new TransitRouterConfig(ConfigUtils.createConfig()).getBeelineWalkSpeed();
 	public double getDuration() {
 		return getEndTime() - getStartTime();
 	}

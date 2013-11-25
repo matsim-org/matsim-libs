@@ -5,6 +5,8 @@ import java.util.NoSuchElementException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.pt.router.TransitRouterConfig;
 
 public class Journey extends TravelComponent {
 	private String trip_idx;
@@ -65,6 +67,8 @@ public class Journey extends TravelComponent {
 	}
 
 	public double getInVehDistance() {
+		if(getMainMode().equals("walk"))
+			return 0;
 		if (!isCarJourney()) {
 			double distance = 0;
 			for (Trip t : getTrips()) {
@@ -76,6 +80,8 @@ public class Journey extends TravelComponent {
 	}
 
 	double getWalkDistance() {
+		if(getMainMode().equals("walk"))
+			return walkSpeed * getDuration();
 		if (!isCarJourney()) {
 			double distance = 0;
 			for (Walk w : getWalks()) {
@@ -87,6 +93,8 @@ public class Journey extends TravelComponent {
 	}
 
 	public double getInVehTime() {
+		if(getMainMode().equals("walk"))
+			return 0;
 		if (!isCarJourney()) {
 			double time = 0;
 			for (Trip t : getTrips()) {
@@ -356,5 +364,9 @@ public class Journey extends TravelComponent {
 
 	public void setTeleportJourney(boolean teleportJourney) {
 		this.teleportJourney = teleportJourney;
+	}
+
+	public static void setWalkSpeed(double walkSpeed) {
+		Journey.walkSpeed = walkSpeed;
 	}
 }
