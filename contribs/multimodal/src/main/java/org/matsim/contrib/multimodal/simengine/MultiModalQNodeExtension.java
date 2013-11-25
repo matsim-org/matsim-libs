@@ -20,21 +20,19 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 
 public class MultiModalQNodeExtension {
 	
 	private static final Logger log = Logger.getLogger(MultiModalQNodeExtension.class);
 	
-	private final Node node;
 	private MultiModalSimEngine simEngine;
 	private final MultiModalQLinkExtension[] inLinksArrayCache;
 	
@@ -43,18 +41,16 @@ public class MultiModalQNodeExtension {
 	 */
 	protected AtomicBoolean isActive = new AtomicBoolean(false);
 	
-	public MultiModalQNodeExtension(Node node, MultiModalSimEngine simEngine) {	
-		this.node = node;
+	/*package*/ MultiModalQNodeExtension(MultiModalSimEngine simEngine, int numInLinks) {	
 		this.simEngine = simEngine;
 		
-		int nofInLinks = node.getInLinks().size();
-		this.inLinksArrayCache = new MultiModalQLinkExtension[nofInLinks];
+		this.inLinksArrayCache = new MultiModalQLinkExtension[numInLinks];
 	}
 	
-	/*package*/ void init() {
+	/*package*/ void init(Collection<MultiModalQLinkExtension> inLinks) {
 		int i = 0;
-		for (Link link : node.getInLinks().values()) {
-			this.inLinksArrayCache[i] = simEngine.getMultiModalQLinkExtension(link.getId());
+		for (MultiModalQLinkExtension inLink : inLinks) {
+			this.inLinksArrayCache[i] = inLink;
 			i++;
 		}
 	}
@@ -129,14 +125,12 @@ public class MultiModalQNodeExtension {
 	protected boolean moveAgentOverNode(final MobsimAgent personAgent, final double now) {
 		
 		Id currentLinkId = personAgent.getCurrentLinkId();
-		Id nextLinkId = ((MobsimDriverAgent)personAgent).chooseNextLinkId();
+		Id nextLinkId = ((MobsimDriverAgent) personAgent).chooseNextLinkId();
 		
-		NetsimLink currentQLink = this.simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(currentLinkId);
-		Link currentLink = currentQLink.getLink();
+		Link currentLink = this.simEngine.getMultiModalQLinkExtension(currentLinkId).getLink();
 		
 		if (nextLinkId != null) {
-			NetsimLink nextQLink = this.simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(nextLinkId);			
-			Link nextLink = nextQLink.getLink();
+			Link nextLink = this.simEngine.getMultiModalQLinkExtension(nextLinkId).getLink();
 			
 			this.checkNextLinkSemantics(currentLink, nextLink, personAgent);
 			

@@ -20,21 +20,28 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
@@ -45,7 +52,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 
 	private static final int INFO_PERIOD = 3600;
 	
-	/*package*/ Netsim qSim;
+	/*package*/ Mobsim qSim;
 	/*package*/ Map<String, TravelTime> multiModalTravelTimes;
 	/*package*/ Collection<MultiModalQLinkExtension> activeLinks;
 	/*package*/ Collection<MultiModalQNodeExtension> activeNodes;
@@ -56,11 +63,11 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	/*package*/ InternalInterface internalInterface = null;
 
 	@Override
-	public void setInternalInterface( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface ;
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
 	}
 
-	/*package*/ MultiModalSimEngine(Netsim qSim, Map<String, TravelTime> multiModalTravelTimes) {
+	/*package*/ MultiModalSimEngine(Mobsim qSim, Map<String, TravelTime> multiModalTravelTimes) {
 		this.qSim = qSim;
 
 		/*
@@ -83,7 +90,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		this.multiModalTravelTimes = multiModalTravelTimes;
 	}
 
-	Netsim getMobsim() {
+	/*package*/ Mobsim getMobsim() {
 		return qSim;
 	}
 
@@ -93,23 +100,58 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		// debug message
 		log.info("TravelTime classes used for multi-modal simulation: ");
 		for (Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
-			log.info(entry.getKey() + "\t" + entry.getValue().getClass().toString());
+			log.info("\t" + entry.getKey() + "\t" + entry.getValue().getClass().toString());
 		}
 		
-		for (NetsimNode node : qSim.getNetsimNetwork().getNetsimNodes().values()) {
-			MultiModalQNodeExtension extension = new MultiModalQNodeExtension(node.getNode(), this);
-			nodes.put(node.getNode().getId(), extension);
+		Scenario scenario = this.qSim.getScenario();
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+		Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
+		
+		/*
+		 * Identify links and nodes that allow one of the simulated modes.
+		 */
+		Set<Link> simulatedLinks = new LinkedHashSet<Link>();
+		Set<Node> simulatedNodes = new LinkedHashSet<Node>();
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			// node mode restrictions -> use link
+			if (link.getAllowedModes() == null) {
+				simulatedLinks.add(link);
+				simulatedNodes.add(link.getFromNode());
+				simulatedNodes.add(link.getToNode());
+			} else {
+				for (String mode : link.getAllowedModes()) {
+					if (simulatedModes.contains(mode)) {
+						simulatedLinks.add(link);
+						simulatedNodes.add(link.getFromNode());
+						simulatedNodes.add(link.getToNode());
+						break;
+					}
+				}
+			}
 		}
 		
-		for (NetsimLink link : qSim.getNetsimNetwork().getNetsimLinks().values()) {
-			Id toNodeId = link.getLink().getToNode().getId();
-			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link.getLink(), this, getMultiModalQNodeExtension(toNodeId));
-			links.put(link.getLink().getId(), extension);
+		for (Node node : simulatedNodes) {
+			int numInLinks = 0;
+			for (Link inLink : node.getInLinks().values()) {
+				if (simulatedLinks.contains(inLink)) numInLinks++;
+			}
+			MultiModalQNodeExtension extension = new MultiModalQNodeExtension(this, numInLinks);
+			this.nodes.put(node.getId(), extension);
 		}
 		
-		for (NetsimNode node : qSim.getNetsimNetwork().getNetsimNodes().values()) {
-			MultiModalQNodeExtension extension = getMultiModalQNodeExtension(node.getNode().getId());
-			extension.init();
+		for (Link link : simulatedLinks) {
+			Id toNodeId = link.getToNode().getId();
+			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, this, getMultiModalQNodeExtension(toNodeId));
+			this.links.put(link.getId(), extension);
+		}
+		
+		for (Node node : simulatedNodes) {
+			MultiModalQNodeExtension extension = this.getMultiModalQNodeExtension(node.getId());
+			List<MultiModalQLinkExtension> inLinks = new ArrayList<MultiModalQLinkExtension>();
+			for (Link inLink : node.getInLinks().values()) {
+				if (simulatedLinks.contains(inLink)) inLinks.add(this.getMultiModalQLinkExtension(inLink.getId()));
+			}
+			extension.init(inLinks);
 		}
 		
 		/*
@@ -213,11 +255,10 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	}
 
 	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(Id nodeId) {
-		return nodes.get(nodeId);
+		return this.nodes.get(nodeId);
 	}
 
 	/*package*/ MultiModalQLinkExtension getMultiModalQLinkExtension(Id linkId) {
-		return links.get(linkId);
-	}
-	
+		return this.links.get(linkId);
+	}	
 }

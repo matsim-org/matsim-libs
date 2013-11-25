@@ -26,7 +26,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.router.util.TravelTime;
 
 public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Runnable {
@@ -40,7 +40,7 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	private final MultiModalSimEngine multiModalSimEngine;
 	
 	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier separationBarrier, 
-			CyclicBarrier endBarrier, Netsim sim, Map<String, TravelTime> multiModalTravelTime, 
+			CyclicBarrier endBarrier, Mobsim sim, Map<String, TravelTime> multiModalTravelTime, 
 			MultiModalSimEngine multiModalSimEngine) {
 		super(sim, multiModalTravelTime);
 		this.startBarrier = startBarrier;

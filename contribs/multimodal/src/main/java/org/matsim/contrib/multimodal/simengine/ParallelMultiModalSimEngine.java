@@ -24,14 +24,18 @@ import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
 import org.matsim.core.router.util.TravelTime;
 
 class ParallelMultiModalSimEngine extends MultiModalSimEngine {
+	
+	private final static Logger log = Logger.getLogger(ParallelMultiModalSimEngine.class);
 	
 	private final int numOfThreads;
 	
@@ -44,7 +48,8 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	// use the factory
 	/*package*/ ParallelMultiModalSimEngine(Netsim sim, Map<String, TravelTime> multiModalTravelTimes) {
 		super(sim, multiModalTravelTimes);
-		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sim.getScenario().getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+		this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
 	}
 	
 	@Override
@@ -209,21 +214,43 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	}
 
 	private void assignSimEngines() {
-		int roundRobin = 0;
 
-		for (NetsimNode node : this.getMobsim().getNetsimNetwork().getNetsimNodes().values()) {
-			MultiModalSimEngine simEngine = engines[roundRobin % this.numOfThreads];
-			super.getMultiModalQNodeExtension(node.getNode().getId()).setMultiModalSimEngine(simEngine);
+		// only for statistics
+		int nodes[] = new int[this.engines.length];
+		int links[] = new int[this.engines.length];
 		
-			/*
-			 * Assign each link to its in-node to ensure that they are processed by the same
-			 * thread which should avoid running into some race conditions.
-			 */
-			for (Link l : node.getNode().getOutLinks().values()) {
-				super.getMultiModalQLinkExtension(l.getId()).setMultiModalSimEngine(simEngine);
-			}
+		int roundRobin = 0;
+		Scenario scenario = this.qSim.getScenario();
+		
+		for (Node node : scenario.getNetwork().getNodes().values()) {
+			MultiModalQNodeExtension multiModalQNodeExtension = this.getMultiModalQNodeExtension(node.getId());
 			
-			roundRobin++;
+			// if the node is simulated by the MultiModalSimulation
+			if (multiModalQNodeExtension != null) {
+				int i = roundRobin % this.numOfThreads;
+				MultiModalSimEngine simEngine = this.engines[i];
+				multiModalQNodeExtension.setMultiModalSimEngine(simEngine);
+				nodes[i]++;
+				
+				/*
+				 * Assign each link to its in-node to ensure that they are processed by the same
+				 * thread which should avoid running into some race conditions.
+				 */
+				for (Link link : node.getOutLinks().values()) {
+					MultiModalQLinkExtension multiModalQLinkExtension = this.getMultiModalQLinkExtension(link.getId());
+					if (multiModalQLinkExtension != null) {
+						multiModalQLinkExtension.setMultiModalSimEngine(simEngine);
+						links[i]++;
+					}
+				}
+				
+				roundRobin++;
+			}
+		}
+		
+		// print some statistics
+		for (int i = 0; i < this.engines.length; i++) {
+			log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to MultiModalSimEngineRunner #" + i);
 		}
 	}
 	
