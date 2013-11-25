@@ -67,6 +67,7 @@ import playground.pieter.singapore.utils.postgresql.*;
 import playground.singapore.travelsummary.travelcomponents.Activity;
 import playground.singapore.travelsummary.travelcomponents.Journey;
 import playground.singapore.travelsummary.travelcomponents.Transfer;
+import playground.singapore.travelsummary.travelcomponents.TravelComponent;
 import playground.singapore.travelsummary.travelcomponents.TravellerChain;
 import playground.singapore.travelsummary.travelcomponents.Trip;
 import playground.singapore.travelsummary.travelcomponents.Wait;
@@ -156,6 +157,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		this.isTransitScenario = true;
 		this.network = network;
 		this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
+		TravelComponent.walkSpeed = walkSpeed;
 		this.schemaName = schemaName;
 //		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 //		new VehicleReaderV1(vehicles).readFile(transitVehiclesfile);
@@ -165,6 +167,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			Network network, Config config, String suffix, String schemaName) {
 		this.network = network;
 		this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
+		TravelComponent.walkSpeed = walkSpeed;
 		this.schemaName = schemaName;
 	}
 
@@ -354,6 +357,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				journey.setDest(network.getLinks().get(event.getLinkId())
 						.getCoord());
 				journey.setEndTime(event.getTime());
+				
 			}
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
