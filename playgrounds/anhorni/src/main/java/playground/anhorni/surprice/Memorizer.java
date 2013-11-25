@@ -24,13 +24,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 
 /**
  * @author anhorni
  */
-public class Memorizer implements IterationEndsListener {	
+public class Memorizer implements ShutdownListener {	
 	private AgentMemories memories;
 	private String day;
 	
@@ -40,7 +40,7 @@ public class Memorizer implements IterationEndsListener {
 	}
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
+	public void notifyShutdown(ShutdownEvent event) {
 		Controler controler = event.getControler();		
 		Population population = controler.getPopulation();
 		for (Person person : population.getPersons().values()) {
