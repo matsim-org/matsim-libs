@@ -593,9 +593,9 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 					args[argsIndex] = avgOccup == null ? 0 : new Double(avgOccup[i]);
 					flowSum += (Double)args[argsIndex++];
 				}
-				if(flowSum>0){
-					densityWriter.addLine(args);					
-				}
+//				if(flowSum>0){
+//					densityWriter.addLine(args);					
+//				}
 			}
 
 		}
