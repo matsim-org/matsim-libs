@@ -32,11 +32,14 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -101,7 +104,7 @@ public class EventsToScore implements BasicEventHandler {
 		this.eventsToActivities = new EventsToActivities();
 		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(scenario, factory);
 		this.eventsToActivities.setActivityHandler(this.scoringFunctionsForPopulation);
-		this.eventsToLegs = new EventsToLegs();
+		this.eventsToLegs = new EventsToLegs(this.scenario);
 		this.eventsToLegs.setLegHandler(this.scoringFunctionsForPopulation);
 	}
 
@@ -122,6 +125,12 @@ public class EventsToScore implements BasicEventHandler {
 			eventsToActivities.handleEvent( (ActivityEndEvent) event ) ;
 		} else if ( event instanceof TeleportationArrivalEvent ) {
 			eventsToLegs.handleEvent( (TeleportationArrivalEvent) event ) ;
+		} else if ( event instanceof PersonEntersVehicleEvent ) {
+			eventsToLegs.handleEvent( (PersonEntersVehicleEvent) event) ;
+		} else if ( event instanceof VehicleArrivesAtFacilityEvent ) {
+			eventsToLegs.handleEvent( (VehicleArrivesAtFacilityEvent) event ) ;
+		} else if ( event instanceof TransitDriverStartsEvent ) {
+			eventsToLegs.handleEvent( (TransitDriverStartsEvent) event ) ;
 		} 
 
 		// this is for the stuff that is directly based on events.

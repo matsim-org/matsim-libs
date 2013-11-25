@@ -22,6 +22,7 @@ package org.matsim.core.scoring;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -35,7 +36,8 @@ public class EventsToLegsTest {
 
 	@Test
 	public void testCreatesLeg() {
-		EventsToLegs eventsToLegs = new EventsToLegs();
+		Scenario scenario = null;
+		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
 		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, new IdImpl("1"), new IdImpl("l1"), "walk"));
@@ -49,7 +51,8 @@ public class EventsToLegsTest {
 
 	@Test
 	public void testCreatesLegWithRoute() {
-		EventsToLegs eventsToLegs = new EventsToLegs();
+		Scenario scenario = null;
+		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
 		IdImpl agentId = new IdImpl("1");

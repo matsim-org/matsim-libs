@@ -92,7 +92,7 @@ public class EventsToScoreNoFilter implements BasicEventHandler {
 			functionsMap.put( id , scoringFunctionsForPopulation.getScoringFunctionForAgent( id ) );
 		}
 		this.eventsToActivities.setActivityHandler(this.scoringFunctionsForPopulation);
-		this.eventsToLegs = new EventsToLegs();
+		this.eventsToLegs = new EventsToLegs(scenario);
 		this.eventsToLegs.setLegHandler(this.scoringFunctionsForPopulation);
 	}
 

@@ -92,12 +92,12 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		call(event.getTime(), event.getPersonId());
+		// call(event.getTime(), event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		 call(event.getTime(), event.getPersonId());
+		// call(event.getTime(), event.getPersonId());
 	}
 
 }

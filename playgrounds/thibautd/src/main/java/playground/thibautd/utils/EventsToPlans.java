@@ -46,7 +46,7 @@ import org.matsim.core.scoring.EventsToLegs.LegHandler;
  */
 public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private final EventsToActivities eventsToActivities = new EventsToActivities();
-	private final EventsToLegs eventsToLegs = new EventsToLegs();
+	private final EventsToLegs eventsToLegs = new EventsToLegs(null);
 
 	private boolean locked = false;
 	private final Map<Id, Plan> agentsPlans = new HashMap<Id, Plan>();

@@ -35,7 +35,7 @@ public class CompareMain {
 
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
-	private static final int dailyRate = 200;
+	private static final int dailyRate = 100;
 	private CallProcessTicker ticker;
 	private CallProcess callProcess;
 	private VolumesAnalyzer volumesAnalyzer1;

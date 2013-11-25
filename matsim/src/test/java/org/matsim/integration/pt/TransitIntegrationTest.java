@@ -34,6 +34,7 @@ public class TransitIntegrationTest {
 	@Test
 	public void test_RunTutorial() {
 		Config config = this.utils.loadConfig("test/scenarios/pt-tutorial/config.xml");
+		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.controler().setLastIteration(0);
 		config.plans().setInputFile("test/scenarios/pt-tutorial/population2.xml");
 		Controler controler = new Controler(config);

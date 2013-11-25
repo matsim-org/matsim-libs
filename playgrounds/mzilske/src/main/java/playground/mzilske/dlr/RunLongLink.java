@@ -153,7 +153,7 @@ public class RunLongLink {
 
 		final int[] outqueue = new int[N_VEH - CUTOFF];
 
-		EventsToLegs eventsToLegs = new EventsToLegs();
+		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		eventsToLegs.setLegHandler(new LegHandler() {
 
 			int idx = 0;

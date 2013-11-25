@@ -17,12 +17,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class OneLoop {
+public class OneWorkplace {
 	
 	private Scenario scenario;
 
 	public static void main(String[] args) {
-		new OneLoop().run();
+		new OneWorkplace().run();
 	}
 
 	private void run() {
@@ -41,7 +41,7 @@ public class OneLoop {
 		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
 		scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("one-loop.xml"));
+		new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
 		Population population = scenario.getPopulation();
 		for (int i=0; i<quantity; i++) {
 			Person person = population.getFactory().createPerson(createId(i));

@@ -37,6 +37,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -114,25 +115,24 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 				modeParams = this.params.modeParams.get(TransportMode.other);
 			}
 		}
-		double dist = 0.0; // distance in meters
-		if ( Double.isNaN(dist) ) {
-			if ( ccc<10 ) {
-				ccc++ ;
-				Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: router does not " +
-						"write distance into plan.  Needs to be fixed or these plans will die out.") ;
-				if ( ccc==10 ) {
-					Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
-				}
-			}
-		}
+		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
 		if (modeParams.marginalUtilityOfDistance_m != 0.0
 				|| modeParams.monetaryDistanceCostRate != 0.0) {
 			Route route = leg.getRoute();
-			dist = getDistance(route);
+			double dist = getDistance(route); // distance in meters
+			if ( Double.isNaN(dist) ) {
+				if ( ccc<10 ) {
+					ccc++ ;
+					Logger.getLogger(this.getClass()).warn("distance is NaN. Will make score of this plan NaN. Possible reason: router does not " +
+							"write distance into plan.  Needs to be fixed or these plans will die out.") ;
+					if ( ccc==10 ) {
+						Logger.getLogger(this.getClass()).warn(Gbl.FUTURE_SUPPRESSED) ;
+					}
+				}
+			}
+			tmpScore += modeParams.marginalUtilityOfDistance_m * dist;
+			tmpScore += modeParams.monetaryDistanceCostRate * this.params.marginalUtilityOfMoney * dist;
 		}
-		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
-		tmpScore += modeParams.marginalUtilityOfDistance_m * dist;
-		tmpScore += modeParams.monetaryDistanceCostRate * this.params.marginalUtilityOfMoney * dist;
 		tmpScore += modeParams.constant;
 		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
 		// (yy NOTE: the constant is added for _every_ pt leg.  This is not how such models are estimated.  kai, nov'12)
@@ -142,7 +142,9 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	protected double getDistance(Route route) {
 		double dist;
 		if (route instanceof NetworkRoute) {
-			dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
+			dist = RouteUtils.calcDistance((NetworkRoute) route, network);
+		} else if (route instanceof ExperimentalTransitRoute) {
+			dist = 0.0;
 		} else {
 			dist = route.getDistance();
 		}

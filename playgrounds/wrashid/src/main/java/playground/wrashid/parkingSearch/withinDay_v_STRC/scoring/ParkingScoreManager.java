@@ -105,7 +105,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 		this.eventsToActivities = new EventsToActivities();
 		this.eventsToActivities.setActivityHandler(this);
 		
-		this.eventsToLegs = new EventsToLegs();
+		this.eventsToLegs = new EventsToLegs(scenario);
 		this.eventsToLegs.setLegHandler(this);
 		
 		this.planElementMap = new HashMap<Id, List<PlanElement>>();
