@@ -87,7 +87,6 @@ public class ScenarioManager extends DefaultWindow
 		controller.setParentComponent(manager);		
 		controller.setMainPanel(manager.getMainPanel(), true);
 		
-		
 		manager.setVisible(true);
 	}
 	
@@ -102,7 +101,7 @@ public class ScenarioManager extends DefaultWindow
 		JPanel tabSelectPanel = new JPanel();
 		JPanel panels = new JPanel();
 		panels.add(tabPanel);
-//		panels.add(tabSelectPanel);
+		panels.add(tabSelectPanel);
 		panels.setMaximumSize(new Dimension(width, 120));
 		panels.setPreferredSize(new Dimension(width, 120));
 		panels.setBackground(Color.darkGray);
@@ -121,6 +120,7 @@ public class ScenarioManager extends DefaultWindow
 			TabButton button = new TabButton(module.getModuleType(),panel,80,80);
 			
 			button.setIcon(new ImageIcon(Constants.getModuleImage(module.getModuleType())));
+			button.setToolTipText(getToolTipText(module.getModuleType()));
 			
 			button.setFocusPainted(false);
 			
@@ -155,6 +155,22 @@ public class ScenarioManager extends DefaultWindow
 		
 	}
 	
+	private String getToolTipText(ModuleType moduleType) {
+		String txt="Grips";
+		switch (moduleType)
+		{
+		case EVACUATION :     txt = "GEBIET AUSWÄHLEN"; break;
+		case POPULATION :     txt = "POPULATION AUSWÄHLEN"; break;
+		case GRIPSSCENARIO :  txt = "SIMULATIONSDATEN ERZEUGEN"; break;
+		case ROADCLOSURE :    txt = "STRASSEN SPERREN"; break;
+		case BUSSTOPS :       txt = "BUSHALTESTELLEN FESTLEGEN"; break;
+		case ANALYSIS :       txt = "ERGEBNISSE ANALYSIEREN"; break;
+		case MATSIMSCENARIO : txt = "SIMULATION AUSFÜHREN"; break;
+		}
+		
+		return txt;
+	}
+
 	private class ModuleButtonListener implements MouseInputListener, ActionListener
 	{
 		private ScenarioManager manager;
