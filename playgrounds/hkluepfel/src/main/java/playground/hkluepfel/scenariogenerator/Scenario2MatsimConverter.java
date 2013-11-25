@@ -85,57 +85,57 @@ public class Scenario2MatsimConverter {
 	protected final String configFile;
 	protected String matsimConfigFile;
 	protected Id safeLinkId;
-	protected final EventsManager em;
-	protected Config c;
-	protected Scenario sc;
+	protected final EventsManager eventsmanager;
+	protected Config config;
+	protected Scenario scenario;
 
 	public Scenario2MatsimConverter(String config) {
-		this.em = EventsUtils.createEventsManager();
+		this.eventsmanager = EventsUtils.createEventsManager();
 		this.configFile = config;
 	}
 
 	public Scenario2MatsimConverter(String config, EventHandler handler) {
-		this.em = EventsUtils.createEventsManager();
-		this.em.addHandler(handler);
+		this.eventsmanager = EventsUtils.createEventsManager();
+		this.eventsmanager.addHandler(handler);
 		this.configFile = config;
 	}
 
 	public void run() {
 		log.info("loading config file");
 		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "loading config file");
-		this.em.processEvent(e);
+		this.eventsmanager.processEvent(e);
 
 		try {
-			this.c = ConfigUtils.createConfig();
+			this.config = ConfigUtils.createConfig();
 			GripsConfigModule gcm = new GripsConfigModule("grips");
-			this.c.addModule(gcm);
+			this.config.addModule(gcm);
 
-			this.c.global().setCoordinateSystem("EPSG:3395");
+			this.config.global().setCoordinateSystem("EPSG:3395");
 
 			GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
 			parser.readFile(this.configFile);
 		} catch(Exception ee) {
 			//TODO for backwards compatibility should be remove soon
 			log.warn("File is not a  grips config file. Guessing it is a common MATSim config file");
-			this.c = ConfigUtils.loadConfig(this.configFile);
+			this.config = ConfigUtils.loadConfig(this.configFile);
 
 		}
 
-		this.c.global().setCoordinateSystem("EPSG:3395");
-		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		this.config.global().setCoordinateSystem("EPSG:3395");
+		this.config.controler().setOutputDirectory(getGripsConfig(this.config).getOutputDir()+"/output");
 
 		
-		QSimConfigGroup qsim = this.c.qsim();
+		QSimConfigGroup qsim = this.config.qsim();
 		qsim.setEndTime(30*3600);
 		
-		this.c.timeAllocationMutator().setMutationRange(0.);
+		this.config.timeAllocationMutator().setMutationRange(0.);
 
-		this.sc = ScenarioUtils.createScenario(this.c);
-		this.safeLinkId = this.sc.createId("el1");
+		this.scenario = ScenarioUtils.createScenario(this.config);
+		this.safeLinkId = this.scenario.createId("el1");
 
-		GripsConfigModule gcm = getGripsConfig(this.sc.getConfig());
+		GripsConfigModule gcm = getGripsConfig(this.scenario.getConfig());
 		
-		Module scg = this.sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME);
+		// Module scg = this.sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME);
 		double samplesize = gcm.getSampleSize();
 		qsim.setFlowCapFactor(samplesize);
 		qsim.setStorageCapFactor(samplesize);
@@ -149,43 +149,43 @@ public class Scenario2MatsimConverter {
 
 		log.info("generating network file");
 		e = new InfoEvent(System.currentTimeMillis(), "generating network file");
-		this.em.processEvent(e);
-		generateAndSaveNetwork(this.sc);
+		this.eventsmanager.processEvent(e);
+		generateAndSaveNetwork(this.scenario);
 		if (DEBUG) {
-			dumpNetworkAsShapeFile(this.sc);
+			dumpNetworkAsShapeFile(this.scenario);
 		}
 
 		log.info("generating population file");
 		e = new InfoEvent(System.currentTimeMillis(), "generating population file");
-		this.em.processEvent(e);
-		generateAndSavePopulation(this.sc);
+		this.eventsmanager.processEvent(e);
+		generateAndSavePopulation(this.scenario);
 
 		log.info("saving simulation config file");
 		e = new InfoEvent(System.currentTimeMillis(), "simulation config file");
-		this.em.processEvent(e);
+		this.eventsmanager.processEvent(e);
 
-		this.c.otfVis().setMapOverlayMode(true);
+		this.config.otfVis().setMapOverlayMode(true);
 
-		this.c.controler().setLastIteration(10);
-		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		this.config.controler().setLastIteration(10);
+		this.config.controler().setOutputDirectory(getGripsConfig(this.config).getOutputDir()+"/output");
 
-		this.c.strategy().setMaxAgentPlanMemorySize(3);
+		this.config.strategy().setMaxAgentPlanMemorySize(3);
 
-		this.c.strategy().addParam("ModuleDisableAfterIteration_1", "75");
-		this.c.strategy().addParam("maxAgentPlanMemorySize", "3");
-		this.c.strategy().addParam("Module_1", "ReRoute");
-		this.c.strategy().addParam("ModuleProbability_1", "0.1");
-		this.c.strategy().addParam("Module_2", "ChangeExpBeta");
-		this.c.strategy().addParam("ModuleProbability_2", "0.9");
+		this.config.strategy().addParam("ModuleDisableAfterIteration_1", "75");
+		this.config.strategy().addParam("maxAgentPlanMemorySize", "3");
+		this.config.strategy().addParam("Module_1", "ReRoute");
+		this.config.strategy().addParam("ModuleProbability_1", "0.1");
+		this.config.strategy().addParam("Module_2", "ChangeExpBeta");
+		this.config.strategy().addParam("ModuleProbability_2", "0.9");
 
-		this.c.travelTimeCalculator().setTraveltimeBinSize(120);
-		this.c.travelTimeCalculator().setTravelTimeCalculatorType("TravelTimeCalculatorHashMap");
+		this.config.travelTimeCalculator().setTraveltimeBinSize(120);
+		this.config.travelTimeCalculator().setTravelTimeCalculatorType("TravelTimeCalculatorHashMap");
 
-		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir() + "/config.xml";
+		this.matsimConfigFile = getGripsConfig(this.config).getOutputDir() + "/config.xml";
 
-		new ConfigWriter(this.c).write(this.matsimConfigFile);
+		new ConfigWriter(this.config).write(this.matsimConfigFile);
 		e = new InfoEvent(System.currentTimeMillis(), "scenario generation finished.");
-		this.em.processEvent(e);
+		this.eventsmanager.processEvent(e);
 
 	}
 
@@ -198,14 +198,14 @@ public class Scenario2MatsimConverter {
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-		new Links2ESRIShape(network,getGripsConfig(this.c).getOutputDir()+"/links_ls.shp", builder).write();
+		new Links2ESRIShape(network,getGripsConfig(this.config).getOutputDir()+"/links_ls.shp", builder).write();
 
 		CoordinateReferenceSystem crs = MGC.getCRS(sc.getConfig().global().getCoordinateSystem());
 		builder.setWidthCoefficient(0.003);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
-		new Links2ESRIShape(network,getGripsConfig(this.c).getOutputDir()+"/links_p.shp", builder).write();
+		new Links2ESRIShape(network,getGripsConfig(this.config).getOutputDir()+"/links_p.shp", builder).write();
 
 	}
 
@@ -266,7 +266,7 @@ public class Scenario2MatsimConverter {
 		// Step 1 raw network input
 		// for now grips network meta format is osm
 		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
-		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", this.c.global().getCoordinateSystem());
+		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", this.config.global().getCoordinateSystem());
 
 		
 		if (gcm.getMainTrafficType().equals("vehicular")) {
@@ -329,7 +329,7 @@ public class Scenario2MatsimConverter {
 		SimpleFeature ft = null;
 		try {
 			ft = (SimpleFeature) fs.getFeatures().features().next();
-			FeatureTransformer.transform(ft,fs.getSchema().getCoordinateReferenceSystem(),this.c);
+			FeatureTransformer.transform(ft,fs.getSchema().getCoordinateReferenceSystem(),this.config);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-2);
@@ -362,12 +362,12 @@ public class Scenario2MatsimConverter {
 
 
 	public GripsConfigModule getGripsConfig() {
-		Module m = this.c.getModule("grips");
+		Module m = this.config.getModule("grips");
 		if (m instanceof GripsConfigModule) {
 			return (GripsConfigModule) m;
 		}
 		GripsConfigModule gcm = new GripsConfigModule(m);
-		this.c.getModules().put("grips", gcm);
+		this.config.getModules().put("grips", gcm);
 		return gcm;
 	}
 
