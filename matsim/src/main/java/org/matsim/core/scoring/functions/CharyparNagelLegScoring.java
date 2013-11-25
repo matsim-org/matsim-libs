@@ -37,7 +37,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -143,8 +142,6 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		double dist;
 		if (route instanceof NetworkRoute) {
 			dist = RouteUtils.calcDistance((NetworkRoute) route, network);
-		} else if (route instanceof ExperimentalTransitRoute) {
-			dist = 0.0;
 		} else {
 			dist = route.getDistance();
 		}
