@@ -56,7 +56,12 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		double tmpScore = 0.0;
-		double[] openingInterval = this.getOpeningInterval(act);
+		double[] openingInterval = new double[]{0.0, 24.0 * 3600.0};
+		
+		if (!act.getType().startsWith("h")) {
+			openingInterval = this.getOpeningInterval(act);
+		}
+		
 		double openingTime = openingInterval[0];
 		double closingTime = openingInterval[1];
 
@@ -159,10 +164,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
 					}
 				}
-				else {
-					openInterval[0] = 0.0;
-					openInterval[1] = 0.0;
-				}
+				// else return undefined				
 			}
 		}
 		if (!foundAct) {
