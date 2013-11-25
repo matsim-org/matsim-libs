@@ -34,14 +34,7 @@ public class AgentAnalysisShutdownListener implements ShutdownListener {
 			oa.putAttribute(person.getId().toString(), day + ".actScore", person.getCustomAttributes().get(day + ".actScore"));
 			oa.putAttribute(person.getId().toString(), day + ".legScore", person.getCustomAttributes().get(day + ".legScore"));	
 			oa.putAttribute(person.getId().toString(), day + ".legMonetaryCosts", person.getCustomAttributes().get(day + ".legMonetaryCosts"));	
-			oa.putAttribute(person.getId().toString(), day + ".fLagged", person.getCustomAttributes().get(day + ".fLagged"));	
-			
-			if (person.getCustomAttributes().get(day + ".constantCar") != null) {
-				oa.putAttribute(person.getId().toString(), day + ".constantCar", person.getCustomAttributes().get(day + ".constantCar"));
-				oa.putAttribute(person.getId().toString(), day + ".constantPt", person.getCustomAttributes().get(day + ".constantPt"));
-				oa.putAttribute(person.getId().toString(), day + ".constantBike", person.getCustomAttributes().get(day + ".constantBike"));
-				oa.putAttribute(person.getId().toString(), day + ".constantWalk", person.getCustomAttributes().get(day + ".constantWalk"));
-			}
+			oa.putAttribute(person.getId().toString(), day + ".legScoreLag", person.getCustomAttributes().get(day + ".legScoreLag"));
 		}
 		attributesWriter.writeFile(outPath + "/" + day + ".perAgent.txt");
 	}
