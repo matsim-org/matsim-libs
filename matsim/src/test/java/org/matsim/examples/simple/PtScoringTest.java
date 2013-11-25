@@ -340,13 +340,6 @@ public class PtScoringTest {
 		for (Event event : allEvents) {
 			System.out.println(event.toString());
 		}
-	
-		String inEventsFileName = this.utils.getInputDirectory() + "0.events.xml" ;
-		String outEventsFileName = controler.getControlerIO().getOutputPath() + "/ITERS/it.0/0.events.xml.gz" ;
-		Assert.assertEquals("different event files after iteration 0 ",
-				CRCChecksum.getCRCFromFile( inEventsFileName ) ,
-				CRCChecksum.getCRCFromFile( outEventsFileName ) ) ;
-
 
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
@@ -416,13 +409,6 @@ public class PtScoringTest {
 		for (Event event : allEvents) {
 			System.out.println(event.toString());
 		}
-
-		String inEventsFileName = this.utils.getInputDirectory() + "0.events.xml" ;
-		String outEventsFileName = controler.getControlerIO().getOutputPath() + "/ITERS/it.0/0.events.xml.gz" ;
-		Assert.assertEquals("different event files after iteration 0 ",
-				CRCChecksum.getCRCFromFile( inEventsFileName ) ,
-				CRCChecksum.getCRCFromFile( outEventsFileName ) ) ;
-
 
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;

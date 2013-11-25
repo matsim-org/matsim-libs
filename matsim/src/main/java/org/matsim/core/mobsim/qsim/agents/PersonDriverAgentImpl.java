@@ -144,8 +144,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
 		this.currentLinkId = linkId;
-		double distance = ((Leg) getCurrentPlanElement()).getRoute().getDistance();
-		this.simulation.getEventsManager().processEvent(new TeleportationArrivalEvent(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
 	}
 
 	@Override
