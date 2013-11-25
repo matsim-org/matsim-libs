@@ -66,8 +66,7 @@ public class ParkingStrategyScenarios {
 			// allStrategies.add(new
 			// PrivateParkingWithWaitAndRandomSearchAsBackup(500.0,
 			// scenario.getNetwork(),5*60));
-			allStrategies.add(new AxPo1989_Strategy7(-1, scenario.getNetwork(), ZHScenarioGlobal
-					.loadDoubleParam("parkingStrategyScenarioId.1.expectedIllegalParkingFeeForWholeDay"), "AxPo1989_Strategy7"));
+			allStrategies.add(new AxPo1989_Strategy7(-1, scenario.getNetwork(), "AxPo1989_Strategy7"));
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 2) {
 			allStrategies.add(new RandomStreetParkingSearch(-1, scenario.getNetwork(), "RandomStreetParkingSearch"));
 			allStrategies.add(new AxPo1989_Strategy3(-1, scenario.getNetwork(), "AxPo1989_Strategy3"));
@@ -259,64 +258,8 @@ public class ParkingStrategyScenarios {
 			int delayBeforeSwitchToStreetParkingSearch = ZHScenarioGlobal
 					.loadIntParam("parkingStrategyScenarioId.12.delayBeforeSwitchToStreetParkingSearch");
 
-			double expectedIllegalParkingFeeForWholeDay = ZHScenarioGlobal
-					.loadDoubleParam("parkingStrategyScenarioId.12.expectedIllegalParkingFeeForWholeDay");
-
 			for (int i = 0; i < numberOfStrategiesInEachGroup; i++) {
-				ParkingSearchStrategy strategy = new RandomGarageParkingSearch(-1, scenario.getNetwork(),
-						delayBeforeSwitchToStreetParkingSearch, "ARD-G-" + i);
-				strategy.setGroupName("ARD-G");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-" + i);
-				strategy.setGroupName("ARD-S");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				strategy = new RandomGarageParkingSearchBRD(-1, scenario.getNetwork(), "BRD(300m)-G-" + i, 300,
-						delayBeforeSwitchToStreetParkingSearch);
-				strategy.setGroupName("BRD-G");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				strategy = new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "BRD(300m)-S-" + i, 300);
-				strategy.setGroupName("BRD(300m)-S");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				strategy = new AxPo1989_Strategy2(-1, scenario.getNetwork(), "BRD(300m)-S-G-" + i, 300.0);
-				strategy.setGroupName("BRD(300m)-S-G");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				strategy = new AxPo1989_Strategy7(-1, scenario.getNetwork(), expectedIllegalParkingFeeForWholeDay, "ARD-illegal-S-"
-						+ i);
-				strategy.setGroupName("ARD-illegal-S");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				strategy = new PrivateParkingWithWaitAndRandomSearchAsBackup(-1, scenario.getNetwork(),
-						delayBeforeSwitchToStreetParkingSearch, "ARD-waiting-S-" + i);
-				strategy.setGroupName("ARD-waiting-S");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "ARD-TakeClosestGarageParking-" + i);
-				strategy.setGroupName("ARD-TakeClosestGarageParking");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				strategy = new Dummy_BRD_TakeClosestGarageParking(-1, scenario.getNetwork(), "BRD-TakeClosestGarageParking-" + i,
-						300.0);
-				strategy.setGroupName("BRD-TakeClosestGarageParking");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
-
-				double startStrategyAtDistanceFromDestination = 250;
-				double startParkingDecision = 100;
-				int F1 = 1;
-				int F2 = 3;
-				double maxDistanceAcceptableForWalk = 400;
-				double maxSeachDuration = 10 * 60;
-				double increaseAcceptableDistanceInMetersPerMinute = 30;
-
-				strategy = new ParkAgent(-1, scenario.getNetwork(), "Parkagent-" + i, startStrategyAtDistanceFromDestination,
-						startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,
-						increaseAcceptableDistanceInMetersPerMinute);
-				strategy.setGroupName("Parkagent");
-				addStrategyAndSetLayerValues(allStrategies, strategy,i);
+				addScenario12Strategies(scenario, allStrategies, delayBeforeSwitchToStreetParkingSearch, i);
 			}
 		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 13) {
 			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
@@ -366,32 +309,9 @@ public class ParkingStrategyScenarios {
 					.loadIntParam("parkingStrategyScenarioId.15.numberOfStrategiesInEachGroup");
 
 			for (int i = 0; i < numberOfStrategiesInEachGroup; i++) {
-				RandomParkingSearch strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-" + i);
-				strategy.setGroupName("ARD-S");
-				allStrategies.add(strategy);
-				
-				strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "ARD_TakeClosestGarageParking-" + i);
-				strategy.setGroupName("ARD_TakeClosestGarageParking");
-				allStrategies.add(strategy);
-				
-				strategy = new Dummy_BRD_TakeClosestGarageParking(-1, scenario.getNetwork(), "BRD_TakeClosestGarageParking-" + i,
-						500.0);
-				strategy.setGroupName("BRD_TakeClosestGarageParking");
-				allStrategies.add(strategy);
-				
-				strategy = new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "BRD(500m)-S-" + i, 500);
-				strategy.setGroupName("BRD(500m)-S");
-				allStrategies.add(strategy);
-				
-				strategy = new RandomStreetSearchFromDepature(-1, scenario.getNetwork(), "RandomStreetSearchFromDepature" + i);
-				strategy.setGroupName("RandomStreetSearchFromDepature");
-				allStrategies.add(strategy);
-				
-				strategy = new AvoidRoutingThroughTolledArea(-1, scenario.getNetwork(), "AvoidRoutingThroughTolledArea" + i);
-				strategy.setGroupName("AvoidRoutingThroughTolledArea");
-				allStrategies.add(strategy);
+				addScenario15Strategies(scenario, allStrategies, i);
 			}
-		}else if (ZHScenarioGlobal.parkingStrategyScenarioId == 16) {
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 16) {
 			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
 					.loadIntParam("parkingStrategyScenarioId.16.numberOfStrategiesInEachGroup");
 
@@ -408,7 +328,7 @@ public class ParkingStrategyScenarios {
 				strategy.setGroupName("ARD-S-1000.0-100");
 				allStrategies.add(strategy);
 			}
-		} if (ZHScenarioGlobal.parkingStrategyScenarioId == 17) {
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 17) {
 			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
 					.loadIntParam("parkingStrategyScenarioId.17.numberOfStrategiesInEachGroup");
 
@@ -416,23 +336,137 @@ public class ParkingStrategyScenarios {
 				RandomParkingSearch strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-" + i);
 				strategy.setGroupName("ARD-S");
 				allStrategies.add(strategy);
-				
+
 				strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "ARD_TakeClosestGarageParking");
 				strategy.setGroupName("ARD_TakeClosestGarageParking");
 				allStrategies.add(strategy);
 			}
+		} else if (ZHScenarioGlobal.parkingStrategyScenarioId == 18){
+			
+			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
+					.loadIntParam("parkingStrategyScenarioId.18.numberOfStrategiesInEachGroup");
+
+			int delayBeforeSwitchToStreetParkingSearch = ZHScenarioGlobal
+					.loadIntParam("parkingStrategyScenarioId.18.delayBeforeSwitchToStreetParkingSearch");
+
+			for (int i = 0; i < numberOfStrategiesInEachGroup; i++) {
+				addScenario12Strategies(scenario, allStrategies, delayBeforeSwitchToStreetParkingSearch, i);
+				
+				RandomParkingSearch strategy =null;
+
+				strategy = new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "BRD(500m)-S-" + i, 500);
+				strategy.setGroupName("BRD(500m)-S");
+				allStrategies.add(strategy);
+
+				strategy = new RandomStreetSearchFromDepature(-1, scenario.getNetwork(), "RandomStreetSearchFromDepature" + i);
+				strategy.setGroupName("RandomStreetSearchFromDepature");
+				allStrategies.add(strategy);
+
+				strategy = new AvoidRoutingThroughTolledArea(-1, scenario.getNetwork(), "AvoidRoutingThroughTolledArea" + i);
+				strategy.setGroupName("AvoidRoutingThroughTolledArea");
+				allStrategies.add(strategy);
+				
+			}
+			
+			
 		}
 
 		return allStrategies;
 	}
 
-	public static void addStrategyAndSetLayerValues(LinkedList<ParkingSearchStrategy> allStrategies, ParkingSearchStrategy strategy, int layerIndex) {
-		double searchBeta = ZHScenarioGlobal
-				.loadDoubleParam("parkingStrategyScenarioId." + ZHScenarioGlobal.parkingStrategyScenarioId + ".layer."+ layerIndex +".searchBeta");
-		
-		double randomSearchDistance = ZHScenarioGlobal
-				.loadDoubleParam("parkingStrategyScenarioId." + ZHScenarioGlobal.parkingStrategyScenarioId + ".layer."+ layerIndex +".randomSearchDistance");
-		
+	public static void addScenario15Strategies(Scenario scenario, LinkedList<ParkingSearchStrategy> allStrategies, int i) {
+		RandomParkingSearch strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-" + i);
+		strategy.setGroupName("ARD-S");
+		allStrategies.add(strategy);
+
+		strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "ARD_TakeClosestGarageParking-" + i);
+		strategy.setGroupName("ARD_TakeClosestGarageParking");
+		allStrategies.add(strategy);
+
+		strategy = new Dummy_BRD_TakeClosestGarageParking(-1, scenario.getNetwork(), "BRD_TakeClosestGarageParking-" + i,
+				500.0);
+		strategy.setGroupName("BRD_TakeClosestGarageParking");
+		allStrategies.add(strategy);
+
+		strategy = new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "BRD(500m)-S-" + i, 500);
+		strategy.setGroupName("BRD(500m)-S");
+		allStrategies.add(strategy);
+
+		strategy = new RandomStreetSearchFromDepature(-1, scenario.getNetwork(), "RandomStreetSearchFromDepature" + i);
+		strategy.setGroupName("RandomStreetSearchFromDepature");
+		allStrategies.add(strategy);
+
+		strategy = new AvoidRoutingThroughTolledArea(-1, scenario.getNetwork(), "AvoidRoutingThroughTolledArea" + i);
+		strategy.setGroupName("AvoidRoutingThroughTolledArea");
+		allStrategies.add(strategy);
+	}
+
+	public static void addScenario12Strategies(Scenario scenario, LinkedList<ParkingSearchStrategy> allStrategies,
+			int delayBeforeSwitchToStreetParkingSearch, int i) {
+		ParkingSearchStrategy strategy;
+		strategy = new RandomGarageParkingSearch(-1, scenario.getNetwork(), delayBeforeSwitchToStreetParkingSearch,
+				"ARD-G-" + i);
+		strategy.setGroupName("ARD-G");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		strategy = new RandomStreetParkingSearch(-1, scenario.getNetwork(), "ARD-S-" + i);
+		strategy.setGroupName("ARD-S");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		strategy = new RandomGarageParkingSearchBRD(-1, scenario.getNetwork(), "BRD(300m)-G-" + i, 300,
+				delayBeforeSwitchToStreetParkingSearch);
+		strategy.setGroupName("BRD-G");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		strategy = new RandomStreetParkingSearchBRD(-1, scenario.getNetwork(), "BRD(300m)-S-" + i, 300);
+		strategy.setGroupName("BRD(300m)-S");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		strategy = new AxPo1989_Strategy2(-1, scenario.getNetwork(), "BRD(300m)-S-G-" + i, 300.0);
+		strategy.setGroupName("BRD(300m)-S-G");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		strategy = new AxPo1989_Strategy7(-1, scenario.getNetwork(), "ARD-illegal-S-" + i);
+		strategy.setGroupName("ARD-illegal-S");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		strategy = new PrivateParkingWithWaitAndRandomSearchAsBackup(-1, scenario.getNetwork(),
+				delayBeforeSwitchToStreetParkingSearch, "ARD-waiting-S-" + i);
+		strategy.setGroupName("ARD-waiting-S");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		strategy = new Dummy_ARD_TakeClosestGarageParking(-1, scenario.getNetwork(), "ARD-TakeClosestGarageParking-" + i);
+		strategy.setGroupName("ARD-TakeClosestGarageParking");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		strategy = new Dummy_BRD_TakeClosestGarageParking(-1, scenario.getNetwork(), "BRD-TakeClosestGarageParking-" + i,
+				300.0);
+		strategy.setGroupName("BRD-TakeClosestGarageParking");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+
+		double startStrategyAtDistanceFromDestination = 250;
+		double startParkingDecision = 100;
+		int F1 = 1;
+		int F2 = 3;
+		double maxDistanceAcceptableForWalk = 400;
+		double maxSeachDuration = 10 * 60;
+		double increaseAcceptableDistanceInMetersPerMinute = 30;
+
+		strategy = new ParkAgent(-1, scenario.getNetwork(), "Parkagent-" + i, startStrategyAtDistanceFromDestination,
+				startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,
+				increaseAcceptableDistanceInMetersPerMinute);
+		strategy.setGroupName("Parkagent");
+		addStrategyAndSetLayerValues(allStrategies, strategy, i);
+	}
+
+	public static void addStrategyAndSetLayerValues(LinkedList<ParkingSearchStrategy> allStrategies,
+			ParkingSearchStrategy strategy, int layerIndex) {
+		double searchBeta = ZHScenarioGlobal.loadDoubleParam("parkingStrategyScenarioId."
+				+ ZHScenarioGlobal.parkingStrategyScenarioId + ".layer." + layerIndex + ".searchBeta");
+
+		double randomSearchDistance = ZHScenarioGlobal.loadDoubleParam("parkingStrategyScenarioId."
+				+ ZHScenarioGlobal.parkingStrategyScenarioId + ".layer." + layerIndex + ".randomSearchDistance");
+
 		((RandomParkingSearch) strategy).setSearchBeta(searchBeta);
 		((RandomParkingSearch) strategy).setRandomSearchDistance(randomSearchDistance);
 		allStrategies.add(strategy);
