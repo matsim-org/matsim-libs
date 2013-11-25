@@ -37,12 +37,14 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 
 import playground.anhorni.surprice.DayConverter;
+import playground.anhorni.surprice.Surprice;
 
 public class SurpriceActivityScoringFunction extends CharyparNagelActivityScoring {
 	private CharyparNagelScoringParameters params;
 	private final ActivityFacilities facilities;
 	private DayType day;
 	private Plan plan;
+	double dayOffset = 0.0;
 		
 	public SurpriceActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final Config config,
 			ActivityFacilities facilities, String day) {
@@ -51,6 +53,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 		this.day = DayConverter.getDayType(day);
 		this.plan = plan;
 		this.params = params;
+		this.dayOffset = Surprice.days.indexOf(day) * 24.0 * 3600.0; // working with single days for the moment. No week-optimization!!!
 		this.resetting();				
 	}
 	
@@ -160,8 +163,14 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 					openInterval[0] = Double.MAX_VALUE;
 					openInterval[1] = Double.MIN_VALUE;
 					for (OpeningTime opentime : opentimes) {
-						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
-						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+						if (opentime.getStartTime() >= dayOffset && 
+								opentime.getEndTime() >= dayOffset &&
+								opentime.getStartTime() <= (dayOffset + 24.0 * 3600.0) &&
+								opentime.getEndTime() <= (dayOffset + 24.0 * 3600.0)) {
+						
+							openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
+							openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+						}
 					}
 				}
 				// else return undefined				

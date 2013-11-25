@@ -28,7 +28,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -54,7 +53,7 @@ public class AdaptFacilities {
 	public void run(String facilitiesFileIn, String facilitiesFileOut, String networkFile) {
 		log.info("start facility adaption ========================================");
 		new MatsimNetworkReader(scenario).readFile(networkFile);
-		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFileIn);
+		new FacilitiesReaderConvertOTs(scenario).readFile(facilitiesFileIn);
 				
 		// -------------------------------------------------------
 		// adding new act type: business and merge work_sector 2 and 3
