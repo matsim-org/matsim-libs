@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,6 +48,8 @@ public class AgentMemory {
 	private TreeMap<String, Integer> activitiesSat = new TreeMap<String, Integer>();
 	private TreeMap<String, Integer> activitiesSun = new TreeMap<String, Integer>();	
 	private Zone homeZone;
+	
+	private final static Logger log = Logger.getLogger(AgentMemory.class);
 			
 	public void setHomeZone(Zone homeZone) {
 		this.homeZone = homeZone;
@@ -86,8 +91,13 @@ public class AgentMemory {
 			if (pe instanceof Activity) {
 				ActivityImpl act = (ActivityImpl)pe;
 				
-				if (act.getType().equals(purpose)) {
-					String modePrev = planPreviousDay.getPreviousLeg(act).getMode();
+				if (act.getType().equals(purpose) && planPreviousDay.getFirstActivity() != act) {					
+					Leg leg = planPreviousDay.getPreviousLeg(act);					
+					String modePrev = "undefined";							
+					
+					if (leg != null) {
+						modePrev = leg.getMode();
+					}					
 					if (mode.equals(modePrev)) {
 						containsMode = true;
 					}
