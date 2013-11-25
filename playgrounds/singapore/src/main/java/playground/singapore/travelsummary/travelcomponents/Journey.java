@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 
 public class Journey extends TravelComponent {
 	private String trip_idx;
-	private String mainmode=null;
+	private String mainmode = null;
 	private Activity fromAct;
 	private Activity toAct;
 	private boolean carJourney = false;
@@ -59,11 +59,9 @@ public class Journey extends TravelComponent {
 	}
 
 	public String toString() {
-		return String
-				.format("JOURNEY: start: %6.0f end: %6.0f dur: %6.0f invehDist: %6.0f walkDist: %6.0f \n %s",
-						getStartTime(), getEndTime(), getDuration(),
-						getInVehDistance(), getWalkDistance(),
-						planElements.toString());
+		return String.format("JOURNEY: start: %6.0f end: %6.0f dur: %6.0f invehDist: %6.0f walkDist: %6.0f \n %s",
+				getStartTime(), getEndTime(), getDuration(), getInVehDistance(), getWalkDistance(),
+				planElements.toString());
 	}
 
 	public double getInVehDistance() {
@@ -122,7 +120,7 @@ public class Journey extends TravelComponent {
 	}
 
 	public String getMainMode() {
-		if(!(mainmode==null)){
+		if (!(mainmode == null)) {
 			return mainmode;
 		}
 		if (isCarJourney()) {
@@ -132,8 +130,7 @@ public class Journey extends TravelComponent {
 			Trip longestTrip = getTrips().getFirst();
 			if (getTrips().size() > 1) {
 				for (int i = 1; i < getTrips().size(); i++) {
-					if (getTrips().get(i).getDistance() > longestTrip
-							.getDistance()) {
+					if (getTrips().get(i).getDistance() > longestTrip.getDistance()) {
 						longestTrip = getTrips().get(i);
 					}
 				}
@@ -152,49 +149,57 @@ public class Journey extends TravelComponent {
 	}
 
 	public double getAccessWalkDistance() {
-		if (!isCarJourney()) {
+
+		try {
 			return getWalks().getFirst().getDistance();
+		} catch (NoSuchElementException e) {
+			return 0;
 		}
-		return 0;
 	}
 
 	public double getAccessWalkTime() {
-		if (!isCarJourney()) {
+
+		try {
 			return getWalks().getFirst().getDuration();
+		} catch (NoSuchElementException e) {
+			return 0;
 		}
-		return 0;
+
 	}
 
 	public double getAccessWaitTime() {
-		if (!isCarJourney()) {
+
 			try {
 				return getWaits().getFirst().getDuration();
 
 			} catch (NoSuchElementException e) {
-
+				return 0;
 			}
-		}
-		return 0;
+
 	}
 
 	public double getEgressWalkDistance() {
-		if (!isCarJourney()) {
+		try{
 			for (Walk w : getWalks()) {
 				if (w.isEgressWalk())
 					return w.getDistance();
 			}
+		}catch(Exception e){
+			return 0;
 		}
 		return 0;
+		
 	}
 
 	public double getEgressWalkTime() {
-		if (!isCarJourney()) {
+		try{
 			for (Walk w : getWalks()) {
 				if (w.isEgressWalk())
 					return w.getDuration();
 			}
+		}catch(Exception e){
+			return 0;
 		}
-
 		return 0;
 	}
 
@@ -278,7 +283,6 @@ public class Journey extends TravelComponent {
 		this.waits = waits;
 	}
 
-
 	public void setMainmode(String mainmode) {
 		this.mainmode = mainmode;
 	}
@@ -333,14 +337,14 @@ public class Journey extends TravelComponent {
 	}
 
 	public Id getFirstBoardingStop() {
-		if (!isCarJourney() && this.getTrips().size()>0) {
+		if (!isCarJourney() && this.getTrips().size() > 0) {
 			return this.getTrips().getFirst().getBoardingStop();
 		}
 		return null;
 	}
 
 	public Id getLastAlightingStop() {
-		if (!isCarJourney()&& this.getTrips().size()>0) {
+		if (!isCarJourney() && this.getTrips().size() > 0) {
 			return this.getTrips().getLast().getAlightingStop();
 		}
 		return null;
