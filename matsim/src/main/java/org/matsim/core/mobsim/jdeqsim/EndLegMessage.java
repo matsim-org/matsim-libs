@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -39,10 +41,13 @@ import org.matsim.core.utils.misc.Time;
  * @author rashid_waraich
  */
 public class EndLegMessage extends EventMessage {
-
+	private final VspExperimentalConfigGroup.ActivityDurationInterpretation activityDurationInterpretation ;
 	public EndLegMessage(final Scheduler scheduler, final Vehicle vehicle) {
+		// need the time interpretation info here.  Attaching it to the message feels weird.  The scheduler seems a pure simulation object.
+		// Consequence: attach it to Vehicle
 		super(scheduler, vehicle);
 		this.priority = SimulationParameters.PRIORITY_ARRIVAL_MESSAGE;
+		this.activityDurationInterpretation = vehicle.getActivityEndTimeInterpretation() ;
 	}
 
 	@Override
@@ -75,9 +80,11 @@ public class EndLegMessage extends EventMessage {
 			if (currentAct.getEndTime() != Time.UNDEFINED_TIME) {
 				actEndTimeBasedDepartureTime = currentAct.getEndTime();
 			}
-
 			double departureTime = actDurBasedDepartureTime < actEndTimeBasedDepartureTime ? actDurBasedDepartureTime
 					: actEndTimeBasedDepartureTime;
+			if ( this.activityDurationInterpretation!=ActivityDurationInterpretation.minOfDurationAndEndTime ) {
+				throw new RuntimeException("not yet implemented; please implement ...") ;
+			}
 
 			/*
 			 * if the departureTime from the act is in the past (this means we

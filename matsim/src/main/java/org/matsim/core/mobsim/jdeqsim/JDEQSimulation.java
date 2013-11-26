@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.utils.misc.Time;
@@ -56,11 +57,14 @@ public class JDEQSimulation implements Mobsim {
 
 	protected Scenario scenario;
 
+	protected final ActivityDurationInterpretation activityDurationInterpretation;
+
 
 	public JDEQSimulation(final Scenario scenario, final EventsManager events) {
 		// constructor
 
 		this.scenario = scenario;
+		this.activityDurationInterpretation = this.scenario.getConfig().vspExperimental().getActivityDurationInterpretation() ;
 
 		// reset simulation parameters
 		SimulationParameters.reset();
@@ -147,7 +151,7 @@ public class JDEQSimulation implements Mobsim {
 		}
 
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			new Vehicle(scheduler, person); // the vehicle registers itself to the scheduler
+			new Vehicle(scheduler, person, activityDurationInterpretation); // the vehicle registers itself to the scheduler
 		}
 
 		scheduler.startSimulation();

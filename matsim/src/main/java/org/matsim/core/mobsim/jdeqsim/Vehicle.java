@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
@@ -44,10 +45,12 @@ public class Vehicle extends SimUnit {
 	private Id currentLinkId = null;
 	private int linkIndex;
 	private Id[] currentLinkRoute = null;
+	private final ActivityDurationInterpretation activityEndTimeInterpretation;
 
-	public Vehicle(Scheduler scheduler, Person ownerPerson) {
+	public Vehicle(Scheduler scheduler, Person ownerPerson, ActivityDurationInterpretation activityDurationInterpretation) {
 		super(scheduler);
 		this.ownerPerson = ownerPerson;
+		this.activityEndTimeInterpretation = activityDurationInterpretation;
 		initialize();
 	}
 
@@ -286,6 +289,10 @@ public class Vehicle extends SimUnit {
 		DeadlockPreventionMessage dpMessage = MessageFactory.getDeadlockPreventionMessage(road.scheduler, this);
 		sendMessage(dpMessage, road, scheduleTime);
 		return dpMessage;
+	}
+
+	public ActivityDurationInterpretation getActivityEndTimeInterpretation() {
+		return this.activityEndTimeInterpretation ;
 	}
 
 }
