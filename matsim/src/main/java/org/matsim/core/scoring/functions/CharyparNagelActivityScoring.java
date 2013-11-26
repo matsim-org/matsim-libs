@@ -186,13 +186,34 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 			// utility of performing an action, duration is >= 1, thus log is no problem
 			double typicalDuration = actParams.getTypicalDuration();
 
-			if (duration > 0) {
-				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
-				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
-				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+			if ( this.params.usingOldScoringBelowZeroUtilityDuration ) {
+				if (duration > 0) {
+					double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
+							* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
+					double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
+					tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+				} else {
+					tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
+				}
 			} else {
-				tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
+				if ( duration >= actParams.getZeroUtilityDuration_h() ) {
+					double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
+							* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
+					// also removing the "wait" alternative scoring.
+					tmpScore += utilPerf ;
+				} else {
+					// below zeroUtilityDuration, we linearly extend the slope ...:
+					double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*actParams.getZeroUtilityDuration_h() ) ;
+					if ( slopeAtZeroUtility <= 0. ) {
+						throw new RuntimeException( "slope at zero utility < 0.; this should not happen ...");
+					}
+					double durationUnderrun = actParams.getZeroUtilityDuration_h()*3600. - duration ;
+					if ( durationUnderrun < 0. ) {
+						throw new RuntimeException( "durationUnderrun < 0; this should not happen ...") ;
+					}
+					tmpScore -= slopeAtZeroUtility * durationUnderrun ;
+				}
+				
 			}
 
 			// disutility if stopping too early

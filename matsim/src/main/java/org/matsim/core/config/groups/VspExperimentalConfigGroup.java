@@ -33,6 +33,7 @@ interface ConfigKey {}
  */
 public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
+	// !! the below cannot be renamed ... since they are at the same time the config file keys !!
 	public static enum VspExperimentalConfigKey implements ConfigKey {
 		//			activityDurationInterpretation,
 		vspDefaultsCheckingLevel,
@@ -42,6 +43,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		isAbleToOverwritePtInteractionParams,
 		isUsingOpportunityCostOfTimeForLocationChoice
 	}
+	// !! the above cannot be renamed ... since they are at the same time the config file keys !!
 
 	private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
 

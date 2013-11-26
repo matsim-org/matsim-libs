@@ -163,6 +163,7 @@ public class KNGautengControler {
 			config.vspExperimental().addParam( VspExperimentalConfigKey.scoreMSAStartsAtIteration,  Long.toString((long)(firstIt + 0.8*diff)) ) ;
 			
 //			config.timeAllocationMutator().setMutationRange(7200.);
+//			config.planCalcScore().setUsingOldScoringBelowZeroUtilityDuration(true);
 			
 			// VSP DEFAULTS:
 //			config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);

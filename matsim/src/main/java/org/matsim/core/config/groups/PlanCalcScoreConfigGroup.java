@@ -129,11 +129,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	private double waiting = -0.0;
 
-	/**
-	 * See the config parameter comment. 
-	 */
-	private Double waitingPt = null ; // yyyy because of backwards compability reasons. 
-	// would make a lot more sense to set this to travelingPt.  kai, oct'12
+	private Double waitingPt = null ;  // if not actively set by user, it will later be set to "travelingPt".
 
 	private double marginalUtilityOfMoney = 1.0 ;
 
@@ -144,6 +140,13 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	private boolean writeExperiencedPlans = false;
 
+	// ---
+	
+	private static final String USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION = "usingOldScoringBelowZeroUtilityDuration" ;
+	private boolean usingOldScoringBelowZeroUtilityDuration = false ;
+	
+	// ---
+
 	@Override
 	public String getValue(final String key) {
 		throw new IllegalArgumentException(key + ": getValue access disabled; use direct getter");
@@ -151,7 +154,9 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	@Override
 	public void addParam(final String key, final String value) {
-		if (LEARNING_RATE.equals(key)) {
+		if ( USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION.equals(key)) {
+			this.setUsingOldScoringBelowZeroUtilityDuration(Boolean.parseBoolean(value));
+		} else if (LEARNING_RATE.equals(key)) {
 			setLearningRate(Double.parseDouble(value));
 		} else if (BRAIN_EXP_BETA.equals(key)) {
 			setBrainExpBeta(Double.parseDouble(value));
@@ -261,6 +266,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 public Map<String, String> getParams() {
 	LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 
+	map.put(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION, Boolean.toString(this.usingOldScoringBelowZeroUtilityDuration )) ;
 	map.put(LEARNING_RATE, Double.toString(this.getLearningRate()) );
 	map.put(BRAIN_EXP_BETA, Double.toString(this.getBrainExpBeta()) );
 	map.put(PATH_SIZE_LOGIT_BETA, Double.toString(this.getPathSizeLogitBeta()) );
@@ -298,6 +304,9 @@ public Map<String, String> getParams() {
 @Override
 public final Map<String, String> getComments() {
 	Map<String,String> map = super.getComments();
+	map.put(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION, "There used to be a plateau between duration=0 and duration=zeroUtilityDuration. "
+			+ "This caused durations to evolve to zero once they were below zeroUtilityDuration, causing problems.  Only use this switch if you need to be "
+			+ "backwards compatible with some old results.  (changed nov'13)") ;
 	map.put(PERFORMING,"[utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of " +
 			"time if agent is doing nothing.");
 	map.put(LATE_ARRIVAL, "[utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative") ;
@@ -755,6 +764,14 @@ public boolean isWriteExperiencedPlans() {
 
 public void setWriteExperiencedPlans(boolean outputExperience) {
 	this.writeExperiencedPlans = outputExperience;
+}
+
+public boolean isUsingOldScoringBelowZeroUtilityDuration() {
+	return this.usingOldScoringBelowZeroUtilityDuration ;
+}
+
+public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
+	this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
 }
 
 }
