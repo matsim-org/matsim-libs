@@ -19,32 +19,36 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	
 	private final Logger log = Logger.getLogger(GautengUtilityOfMoney.class);
 	private PlanCalcScoreConfigGroup planCalcScore;
-	private final double baseValueOfTime;
+	private final double baseValueOfTime_h;
 	private final double commercialMultiplier;
 
 	/**
 	 * Class to calculate the marginal utility of money (beta_money) for 
 	 * different vehicle types given the value of time (VoT).  
 	 * @param cnScoringGroup
-	 * @param baseValueOfTime expressed in Currency/hr that is currently (March 
+	 * @param baseValueOfTime_h expressed in Currency/hr that is currently (March 
 	 * 2012) used for private cars, taxis and external traffic. 
 	 * @param valueOfTimeMultiplier to inflate the base VoT for heavy commercial 
 	 * vehicles. A multiplier of <i>half</i> this value is used for busses and
 	 * smaller commercial vehicles.
 	 */
-	public GautengUtilityOfMoney( final PlanCalcScoreConfigGroup cnScoringGroup, double baseValueOfTime, double valueOfTimeMultiplier ) {
+	public GautengUtilityOfMoney( final PlanCalcScoreConfigGroup cnScoringGroup, double baseValueOfTime_h, double valueOfTimeMultiplier ) {
 		this.planCalcScore = cnScoringGroup ;
-		log.warn("Value of Time (VoT) used as base: " + baseValueOfTime) ;
+		log.warn("Value of Time (VoT) used as base: " + baseValueOfTime_h) ;
 		log.warn("Value of Time multiplier: " + valueOfTimeMultiplier) ;
 		
+		this.baseValueOfTime_h = baseValueOfTime_h ;
+		this.commercialMultiplier = valueOfTimeMultiplier ;
+
 		for ( Type vehType : Type.values() ) {
 			log.info( " vehType: " + vehType.toString() 
 					+ "; utility of travel time savings per hr: " + getUtilityOfTravelTime_hr()
 					+ "; value of travel time savings per hr: " + getValueOfTime_hr(vehType)
 					+ "; => utility of money: " + getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr(vehType)) ) ;
 		}
-		this.baseValueOfTime = baseValueOfTime ;
-		this.commercialMultiplier = valueOfTimeMultiplier ;
+		// (I found these logging statements _above_ setting this.baseValueOfTime etc.  In consequence, I would think that they
+		// were giving wrong information.  Originally, the values came from the config file only or were
+		// hard-coded.  kai, nov'13)
 	}
 
 	@Override
@@ -74,7 +78,7 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	private static int wrncnt=0 ;
 	
 	private double getValueOfTime_hr(Type vehicleType) {
-		double valueOfTime_hr = baseValueOfTime ;
+		double valueOfTime_hr = baseValueOfTime_h ;
 		switch( vehicleType ) {
 		case carWithTag:
 		case carWithoutTag:
@@ -83,11 +87,12 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		case commercialClassBWithoutTag:
 		case busWithTag:
 		case busWithoutTag:
-			valueOfTime_hr = baseValueOfTime*0.5*commercialMultiplier ; 
+			valueOfTime_hr = baseValueOfTime_h*0.5*commercialMultiplier ; 
+			// yy if someone sets the commercial multiplier to less than two, this may not work as intended. kai, nov'13
 			break;
 		case commercialClassCWithTag:
 		case commercialClassCWithoutTag:
-			valueOfTime_hr = baseValueOfTime*commercialMultiplier ; 
+			valueOfTime_hr = baseValueOfTime_h*commercialMultiplier ; 
 			break ;
 		case commercialClassAWithTag:
 		case commercialClassAWithoutTag:
@@ -95,7 +100,7 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		case taxiWithoutTag:
 		case extWithTag:
 		case extWithoutTag:
-			valueOfTime_hr = baseValueOfTime;
+			valueOfTime_hr = baseValueOfTime_h;
 			break ;
 		default:
 			throw new RuntimeException("vehicle type not implemented") ;

@@ -36,12 +36,12 @@ import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
  * @author kn after bkick after dgrether
  *
  */
-public class GautengTravelDisutilityInclTollFactory implements TravelDisutilityFactory {
+public class PersonSpecificTravelDisutilityInclTollFactory implements TravelDisutilityFactory {
 
 	final private RoadPricingScheme scheme;
 	private final UtilityOfMoneyI utlOfMon ;
 
-	public GautengTravelDisutilityInclTollFactory( RoadPricingScheme scheme, UtilityOfMoneyI utlOfMon ) {
+	public PersonSpecificTravelDisutilityInclTollFactory( RoadPricingScheme scheme, UtilityOfMoneyI utlOfMon ) {
 		this.scheme = scheme ;
 		this.utlOfMon = utlOfMon ;
 	}

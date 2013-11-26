@@ -14,8 +14,8 @@ import org.matsim.households.Households;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
-import playground.southafrica.gauteng.routing.GautengTravelDisutilityInclTollFactory;
-import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
+import playground.southafrica.gauteng.routing.PersonSpecificTravelDisutilityInclTollFactory;
+import playground.southafrica.gauteng.scoring.PersonSpecificUoMScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
@@ -106,12 +106,12 @@ class GautengControler {
 		
 		
 		controler.setScoringFunctionFactory(
-				new GautengScoringFunctionFactory(sc.getConfig(), sc.getNetwork(), personSpecificUtilityOfMoney )
+				new PersonSpecificUoMScoringFunctionFactory(sc.getConfig(), sc.getNetwork(), personSpecificUtilityOfMoney )
 		);
 
 		// insert into routing:
 		controler.setTravelDisutilityFactory( 
-				new GautengTravelDisutilityInclTollFactory( vehDepScheme, personSpecificUtilityOfMoney ) 
+				new PersonSpecificTravelDisutilityInclTollFactory( vehDepScheme, personSpecificUtilityOfMoney ) 
 		);
 		
 		

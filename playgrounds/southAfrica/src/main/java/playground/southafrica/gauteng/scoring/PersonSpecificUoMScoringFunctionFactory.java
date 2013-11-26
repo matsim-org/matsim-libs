@@ -39,7 +39,7 @@ import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
  * @author kickhoefer after
  * @author dgrether
  */
-public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
+public class PersonSpecificUoMScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private Config config;
 	private PlanCalcScoreConfigGroup configGroup;
@@ -47,7 +47,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 	private final Network network;
 	private final UtilityOfMoneyI utlOfMon ;
 
-	public GautengScoringFunctionFactory(Config config, Network network, UtilityOfMoneyI utlOfMon) {
+	public PersonSpecificUoMScoringFunctionFactory(Config config, Network network, UtilityOfMoneyI utlOfMon) {
 		this.config = config;
 		this.configGroup = config.planCalcScore();
 		this.params = new CharyparNagelScoringParameters(configGroup);
