@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -72,23 +73,7 @@ public class EndLegMessage extends EventMessage {
 			ActivityImpl currentAct = (ActivityImpl) actsLegs.get(this.vehicle.getLegIndex() - 1);
 			// the leg the agent performs
 
-			// if only duration or end time of act is defined, take that
-			// if both are defined: take the one, which is earlier in time
-			double actDurBasedDepartureTime = Double.MAX_VALUE;
-			double actEndTimeBasedDepartureTime = Double.MAX_VALUE;
-
-			if (currentAct.getMaximumDuration() != Time.UNDEFINED_TIME) {
-				actDurBasedDepartureTime = getMessageArrivalTime() + currentAct.getMaximumDuration();
-			}
-
-			if (currentAct.getEndTime() != Time.UNDEFINED_TIME) {
-				actEndTimeBasedDepartureTime = currentAct.getEndTime();
-			}
-			double departureTime = actDurBasedDepartureTime < actEndTimeBasedDepartureTime ? actDurBasedDepartureTime
-					: actEndTimeBasedDepartureTime;
-			if ( this.activityDurationInterpretation!=ActivityDurationInterpretation.minOfDurationAndEndTime ) {
-				throw new RuntimeException("not yet implemented; please implement ...") ;
-			}
+			double departureTime = ActivityDurationUtils.calculateDepartureTime(currentAct, getMessageArrivalTime(), activityDurationInterpretation) ;
 
 			/*
 			 * if the departureTime from the act is in the past (this means we

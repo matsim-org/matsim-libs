@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.utils.misc.Time;
 
-class ActivityDurationUtils {
+public class ActivityDurationUtils {
 
 	/**
 	 * 
@@ -36,7 +36,7 @@ class ActivityDurationUtils {
 	 * @return The departure time
 	 */
 	
-	static double calculateDepartureTime(Activity act, double now, ActivityDurationInterpretation activityDurationInterpretation) {
+	public static double calculateDepartureTime(Activity act, double now, ActivityDurationInterpretation activityDurationInterpretation) {
 		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
 			return Double.POSITIVE_INFINITY ;
