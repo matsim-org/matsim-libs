@@ -53,35 +53,45 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	
 	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface BasicScoring {
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		public void finish();
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		public double getScore();
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		public void reset();
 	}
 	
 	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface ActivityScoring extends BasicScoring {
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		void startActivity(final double time, final Activity act);
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		void endActivity(final double time, final Activity act);
 	}
 
 	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface LegScoring extends BasicScoring {
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		void startLeg(final double time, final Leg leg);
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		void endLeg(final double time);
 	}
 	
 	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface MoneyScoring extends BasicScoring {
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		void addMoney(final double amount);
 	}
 
 	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface AgentStuckScoring extends BasicScoring {
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		void agentStuck(final double time);
 	}
 	
 	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public interface ArbitraryEventScoring extends BasicScoring {
+		@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 		void handleEvent( final Event event ) ;
 	}
 	
@@ -94,6 +104,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
 	private ArrayList<ArbitraryEventScoring> arbtraryEventScoringFunctions = new ArrayList<ArbitraryEventScoring>() ;
 	
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public ScoringFunctionAccumulator() {} // empty constructor so I can find where this is called.  kai, dec'12
 
 	@Override
@@ -209,6 +220,7 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	 * 
 	 * @param scoringFunction
 	 */
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public void addScoringFunction(BasicScoring scoringFunction) {
 		basicScoringFunctions.add(scoringFunction);
 
