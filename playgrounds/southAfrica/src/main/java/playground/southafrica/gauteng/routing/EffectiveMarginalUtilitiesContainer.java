@@ -3,11 +3,14 @@ package playground.southafrica.gauteng.routing;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-public class EffectiveMarginalUtilitiesContainer {
+import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
+
+public class EffectiveMarginalUtilitiesContainer implements UtilityOfMoneyI {
 	private final Map<Person,Double> effectiveMarginalUtilityOfTravelTime = new HashMap<Person,Double>() ;
-	private final Map<Person,Double> marginalUtilityOfDistance = new HashMap<Person,Double>() ;
+	private final Map<Person,Double> effectiveMarginalUtilityOfDistance = new HashMap<Person,Double>() ;
 	private final Map<Person,Double> marginalUtilityOfMoney = new HashMap<Person,Double>() ;
 	
 	private double effectiveMarginalUtilityOfTravelTimeMAX = Double.NEGATIVE_INFINITY ;
@@ -22,8 +25,8 @@ public class EffectiveMarginalUtilitiesContainer {
 	 * value, so giving the disutility ("cost" in computer science terms) is really not so bad.  kai, nov'13
 	 * </ul>
 	 */
-	public Map<Person,Double> getMarginalUtilityOfDistance() {
-		return marginalUtilityOfDistance;
+	public Map<Person,Double> getEffectiveMarginalUtilityOfDistance() {
+		return effectiveMarginalUtilityOfDistance;
 	}
 	public Map<Person,Double> getMarginalUtilityOfMoney() {
 		return marginalUtilityOfMoney;
@@ -39,6 +42,10 @@ public class EffectiveMarginalUtilitiesContainer {
 	}
 	public void setEffectiveMarginalUtilityOfDistanceMAX(double effectiveMarginalUtilityOfDistanceMAX) {
 		this.effectiveMarginalUtilityOfDistanceMAX = effectiveMarginalUtilityOfDistanceMAX;
+	}
+	@Override
+	public double getMarginalUtilityOfMoney(Id personId) {
+		return marginalUtilityOfMoney.get(personId) ;
 	}
 	
 	

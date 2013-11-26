@@ -52,7 +52,7 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	}
 
 	@Override
-	public double getUtilityOfMoney_normally_positive(final Id personId ) {
+	public double getMarginalUtilityOfMoney(final Id personId ) {
 		Type vehicleType = SanralTollFactor.typeOf(personId);
 		double valueOfTime_hr = getValueOfTime_hr(vehicleType);
 		double utilityOfMoney = getUtilityOfMoneyFromValueOfTime(valueOfTime_hr);

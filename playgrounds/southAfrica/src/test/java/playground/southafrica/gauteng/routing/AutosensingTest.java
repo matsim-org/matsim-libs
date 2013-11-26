@@ -103,15 +103,20 @@ public class AutosensingTest {
 		plan.addActivity(act); 
 	
 		// === CONTROLER INFRASTRUCTURE (without actually running the controler): ===
-		TravelTime tt = new FreeSpeedTravelTime() ;
+//		TravelTime tt = new FreeSpeedTravelTime() ;
 		ScoringFunctionFactory scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(scenario) ;
-		EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContrainer(scenario, scoringFunctionFactory) ;
+		EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory) ;
 		
-		Assert.assertEquals(-12.0/3600., muc.getEffectiveMarginalUtilityOfTravelTime().get(person), 0.01 ) ;
+		Assert.assertEquals(-12.0/3600., muc.getEffectiveMarginalUtilityOfTravelTime().get(person), 0.01/3600. ) ;
+		Assert.assertTrue(muc.getEffectiveMarginalUtilityOfTravelTime().get(person) < 0. );
+		// (the first condition is not very precise ... since the autosensing is not that exact.  So the second condition tests
+		// in addition for the exact sign.)
 
-		Assert.assertEquals(marginalUtilityOfMoneyCONFIG, muc.getMarginalUtilityOfMoney().get(person), 0.0001 ) ;
+		Assert.assertEquals(marginalUtilityOfMoneyCONFIG, muc.getMarginalUtilityOfMoney().get(person), 1.e-15 ) ;
 
-		Assert.assertEquals(monetaryDistanceCostRateCarCONFIG*marginalUtilityOfMoneyCONFIG, muc.getMarginalUtilityOfDistance().get(person) , 0.001) ;
+		Assert.assertEquals(monetaryDistanceCostRateCarCONFIG*marginalUtilityOfMoneyCONFIG, 
+				muc.getEffectiveMarginalUtilityOfDistance().get(person) , 1.e-15 ) ;
+		// (for the time being, the utilities of distance are linear in the distance, thus autosensing is exact.)
 		
 //		TravelDisutility td = new PersonIndividualTimeDistanceDisutility(tt, muc ) ;
 	}

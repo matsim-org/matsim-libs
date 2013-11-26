@@ -67,7 +67,7 @@ public class PersonSpecificUoMScoringFunctionFactory implements ScoringFunctionF
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(params));
 
 		// person-dependent money scoring function (standard implementation contains person-indep scoring function):
-		double utilityOfMoney_normally_positive = this.utlOfMon.getUtilityOfMoney_normally_positive(plan.getPerson().getId());
+		double utilityOfMoney_normally_positive = this.utlOfMon.getMarginalUtilityOfMoney(plan.getPerson().getId());
 		scoringFunctionAccumulator.addScoringFunction( new MoneyScoringImpl(utilityOfMoney_normally_positive) ) ;
 		
 		return scoringFunctionAccumulator;
@@ -99,7 +99,7 @@ class MoneyScoringImpl implements MoneyScoring, BasicScoring {
 		
 		if ( cnt < 10 ) {
 			cnt++ ;
-			log.info("toll paid: " + amount_usually_negative + "; resulting accumulated toll utility: " + this.score );
+			log.info("money added: " + amount_usually_negative + "; resulting accumulated money utility: " + this.score );
 			if (cnt==10 ) {
 				log.info(Gbl.FUTURE_SUPPRESSED) ;
 			}

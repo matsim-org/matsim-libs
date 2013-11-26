@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -50,15 +51,21 @@ public class AutosensingTravelDisutilityInclTollFactory implements TravelDisutil
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, 
-			PlanCalcScoreConfigGroup cnScoringGroup) {
-		final EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContrainer(scenario, scoringFunctionFactory) ;
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		final EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory) ;
 		final TravelDisutility delegate = new PersonIndividualTimeDistanceDisutility(timeCalculator, muc) ;
 		final RoadPricingScheme localScheme = this.scheme ;
 		
 		return new TravelDisutility() {
+			private Person oldPerson = null ;
+			private double utilityOfMoney_normally_positive = 0. ;
 			@Override
 			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+				if ( person != oldPerson ) {
+					oldPerson = person ;
+//					double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(person.getId() ) ;
+					utilityOfMoney_normally_positive = 5.* MatsimRandom.getRandom().nextDouble() * muc.getMarginalUtilityOfMoney().get( person );
+				}
 				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time, person, vehicle);
 				double toll_usually_positive = 0. ;
 				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
@@ -77,9 +84,6 @@ public class AutosensingTravelDisutilityInclTollFactory implements TravelDisutil
 						 * computation here, especially since we do not need it.  kai, apr'12 */
 						throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
 					}
-
-//					double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(person.getId() ) ;
-					double utilityOfMoney_normally_positive = muc.getMarginalUtilityOfMoney().get( person.getId() );
 
 					linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
 					// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)

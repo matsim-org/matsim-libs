@@ -21,6 +21,7 @@ package playground.southafrica.gauteng.routing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -39,59 +40,111 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  *
  */
 public class RouterUtils {
+	private static Logger log = Logger.getLogger( RouterUtils.class );
 	
-	public static EffectiveMarginalUtilitiesContainer createMarginalUtilitiesContrainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
+	public static EffectiveMarginalUtilitiesContainer createMarginalUtilitiesContainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
 		// yy one might want to make the following replaceable. kai, oct'13
+		log.warn("running ..."); 
+		
+		final int N_TESTS = 3 ;
 		
 		EffectiveMarginalUtilitiesContainer muc = new EffectiveMarginalUtilitiesContainer() ;
 		
-		EventsToScore e2s = new EventsToScore(scenario, scoringFunctionFactory ) ;
+		List<EventsToScore> e2s = new ArrayList<EventsToScore>() ;
+		for ( int ii=0 ; ii<N_TESTS+1 ; ii++ ) {
+			e2s.add( new EventsToScore(scenario, scoringFunctionFactory,0.0 ) ) ;
+			// EventsToScore does not only compute scores, but also updates the plan score (taken from scenario).  Setting the 
+			// learning rate to 0.0 will hopefully not do anything there.
+			// yyyy still dangerous.  assume someone counts how often a plan is scored ...
+		}
 		
 		double effMargUtlTTimeMAX = Double.NEGATIVE_INFINITY ;
 		double effMargUtlDistanceMAX = Double.NEGATIVE_INFINITY ;
+		double margUtlOfMoneyMAX = Double.NEGATIVE_INFINITY ;
+		double mVTTSMAX = Double.NEGATIVE_INFINITY ;
+		double mVTDSMAX = Double.NEGATIVE_INFINITY ;
+		
+		double effMargUtlTTimeMIN = Double.POSITIVE_INFINITY ;
+		double effMargUtlDistanceMIN = Double.POSITIVE_INFINITY ;
+		double margUtlOfMoneyMIN = Double.POSITIVE_INFINITY ;
+		double mVTTSMIN = Double.POSITIVE_INFINITY ;
+		double mVTDSMIN = Double.POSITIVE_INFINITY ;
+		
+		final double ARRIVAL = 8.5*3600., DELTA_TRIPTIME = 3600. , DELTA_DISTANCE = 100. * 1000. ;
 		
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			List<Double> scores = new ArrayList<Double>() ;
+
 			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0) ;
 			// (need this because we need a valid activity type)
+			/* 
+			 * yy would certainly be better to play back the full plan
+			 * yy would be even better to play back the experienced plan
+			 */
 
-			double triptime=0, distance=0, deltaTriptime = 3600. , deltaDistance = 100. * 1000. ;
-			double arrival = 32.5*3600. ;
-			scores.add(e2s.getScoringFunctionForAgent( person.getId() ).getScore()) ;
-			for ( int ii=1 ; ii<=3 ; ii++ ) {
-				if ( ii==1 ) {
+			double triptime=0, distance=0 ;
+			for ( int ii=0 ; ii<N_TESTS ; ii++ ) {
+				if ( ii==0 ) {
 					triptime = 0. ; distance = 0. ;
+				} else if ( ii==1 ) {
+					triptime = DELTA_TRIPTIME ; distance = 0. ;
 				} else if ( ii==2 ) {
-					triptime = deltaTriptime ; distance = 0. ;
-				} else if ( ii==3 ) {
-					triptime = deltaTriptime ; distance = deltaDistance ;
+					triptime = DELTA_TRIPTIME ; distance = DELTA_DISTANCE ;
 				}
-				e2s.handleEvent( new ActivityStartEvent(20.0*3600., person.getId(), null, null, firstAct.getType() ) ) ;
-				double now = arrival - triptime ;
-				e2s.handleEvent( new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
-				e2s.handleEvent( new PersonDepartureEvent(now, person.getId(), null, TransportMode.car ) );
-				now = arrival ;
-				e2s.handleEvent( new TeleportationArrivalEvent( now, person.getId(), distance ) ) ;
-				e2s.handleEvent( new PersonArrivalEvent( now, person.getId(), null, TransportMode.car ) );
-				scores.add( e2s.getScoringFunctionForAgent( person.getId() ).getScore() ) ;
+				double now = ARRIVAL - triptime ;
+				e2s.get(ii).handleEvent( new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
+				e2s.get(ii).handleEvent( new PersonDepartureEvent(now, person.getId(), null, TransportMode.car ) );
+				now = ARRIVAL ;
+				e2s.get(ii).handleEvent( new TeleportationArrivalEvent( now, person.getId(), distance ) ) ;
+				e2s.get(ii).handleEvent( new PersonArrivalEvent( now, person.getId(), null, TransportMode.car ) );
+				e2s.get(ii).handleEvent( new ActivityStartEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
+				now += (24.-12.5)*3600. ;
+				e2s.get(ii).handleEvent( new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
+				e2s.get(ii).handleEvent( new PersonDepartureEvent(now, person.getId(), null, TransportMode.car ) );
+				e2s.get(ii).handleEvent( new TeleportationArrivalEvent( now, person.getId(), 0. ) ) ;
+				e2s.get(ii).handleEvent( new PersonArrivalEvent( now, person.getId(), null, TransportMode.car ) );
+				e2s.get(ii).handleEvent( new ActivityStartEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
 			}
-			double utts = (  (scores.get(2) - scores.get(1)) - (scores.get(1)-scores.get(0)) ) / deltaTriptime ;
-			System.out.println( "eff marg utl of travel time: " + (utts * 3600.) + " per hr") ;
+			e2s.get(N_TESTS).handleEvent( new PersonMoneyEvent( 33.*3600., person.getId(), 1. ) ) ;
+		}
+		for ( EventsToScore eee : e2s ) {
+			eee.finish();
+		}
+		long cnt=-1 ;
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			cnt++ ;
+			double utts = ( e2s.get(1).getAgentScore(person.getId()) - e2s.get(0).getAgentScore(person.getId()) ) / DELTA_TRIPTIME ;
 			muc.getEffectiveMarginalUtilityOfTravelTime().put( person, utts ) ;
 			effMargUtlTTimeMAX = Math.max( effMargUtlTTimeMAX, utts ) ;
+			effMargUtlTTimeMIN = Math.min( effMargUtlTTimeMIN, utts ) ;
 			
-			double utds = - ( (scores.get(3) - scores.get(2)) - ( scores.get(2)-scores.get(1)) ) / deltaDistance ;
-			System.out.println( "marg utl of travel distance: " + (utds * 1000.) + " per km"); 
-			muc.getMarginalUtilityOfDistance().put( person, utds ) ;
+			double utds = ( e2s.get(2).getAgentScore(person.getId()) - e2s.get(1).getAgentScore(person.getId()) ) / DELTA_DISTANCE ;
+			muc.getEffectiveMarginalUtilityOfDistance().put( person, utds ) ;
 			effMargUtlDistanceMAX = Math.max( effMargUtlDistanceMAX, utds ) ;
+			effMargUtlDistanceMIN = Math.min( effMargUtlDistanceMIN, utds ) ;
 			
-			e2s.handleEvent( new PersonMoneyEvent( 33.*3600., person.getId(), 1. ) ) ;
-			scores.add( e2s.getScoringFunctionForAgent( person.getId() ).getScore() ) ;
-			double mum = scores.get(4)-scores.get(3);
-			System.out.println( "marg utl of money: " + mum  + " per unit of money");
+			double mum = e2s.get(N_TESTS).getAgentScore(person.getId()) ;
 			muc.getMarginalUtilityOfMoney().put( person, mum )  ;
+			margUtlOfMoneyMAX = Math.max( margUtlOfMoneyMAX, mum ) ;
+			margUtlOfMoneyMIN = Math.min( margUtlOfMoneyMIN, mum ) ;
+			mVTTSMAX = Math.max( mVTTSMAX, -utts/mum ) ;
+			mVTTSMIN = Math.min( mVTTSMIN, -utts/mum ) ;
+			mVTDSMAX = Math.max( mVTDSMAX, -utds/mum ) ;
+			mVTDSMIN = Math.min( mVTDSMIN, -utds/mum ) ;
 
+			if ( cnt%1000==0 ) {
+				log.info( "eff marg utl of travel time: " + (utts * 3600.) + " per hr") ;
+				log.info( "marg utl of travel distance: " + (utds * 1000.) + " per km"); 
+				log.info( "marg utl of money: " + mum  + " per unit of money");
+			}
 		}
+		
+		log.info( "marginal utilities of money stretch from " + margUtlOfMoneyMIN + " to " + margUtlOfMoneyMAX + " per monetary unit");
+		log.info( "effective marginal utilities of ttime stretch from " + 3600.*effMargUtlTTimeMIN + 
+				" to " + 3600.*effMargUtlTTimeMAX + " per hour");
+		log.info( "effective marginal utilities of distance stretch from " + 1000.*effMargUtlDistanceMIN + 
+				" to " + 1000.*effMargUtlDistanceMAX + " per km") ;
+		log.info( "mVTTS stretch from " + 3600.*mVTTSMIN + " to " + 3600.*mVTTSMAX + " [monetary units]/hour" );
+		log.info( "mVTDS stretch from " + 1000.*mVTDSMIN + " to " + 1000.*mVTDSMAX + " [monetary units]/km" );
 		
 		muc.setEffectiveMarginalUtilityOfTravelTimeMAX( effMargUtlTTimeMAX );
 		muc.setEffectiveMarginalUtilityOfDistanceMAX( effMargUtlDistanceMAX );

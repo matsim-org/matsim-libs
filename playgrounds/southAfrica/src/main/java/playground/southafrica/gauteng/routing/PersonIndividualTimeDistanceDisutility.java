@@ -35,13 +35,14 @@ public class PersonIndividualTimeDistanceDisutility implements TravelDisutility 
 
 	protected final TravelTime timeCalculator;
 
-	private EffectiveMarginalUtilitiesContainer muc ;
+	private final EffectiveMarginalUtilitiesContainer muc ;
 	
 	private double marginalCostOfTimeMin = 0. ;
 	private double marginalCostOfDistanceMin = 0. ;
 
-	public PersonIndividualTimeDistanceDisutility(final TravelTime timeCalculator, EffectiveMarginalUtilitiesContainer muc) {
+	public PersonIndividualTimeDistanceDisutility(final TravelTime timeCalculator, final EffectiveMarginalUtilitiesContainer muc) {
 		this.timeCalculator = timeCalculator;
+		this.muc = muc ;
 
 		this.marginalCostOfTimeMin = - muc.getEffectiveMarginalUtilityOfTravelTimeMAX() ;
 		if ( this.marginalCostOfTimeMin < 0. ) {
@@ -63,7 +64,7 @@ public class PersonIndividualTimeDistanceDisutility implements TravelDisutility 
 		if ( marginalCostOfTime < 0. ) {
 			throw new RuntimeException("marginalCostOfTime < 0; probably a sign error somewhere") ;
 		}
-		double marginalCostOfDistance = - muc.getMarginalUtilityOfDistance().get(person) ;
+		double marginalCostOfDistance = - muc.getEffectiveMarginalUtilityOfDistance().get(person) ;
 		if ( marginalCostOfDistance < 0. ) {
 			throw new RuntimeException("marginalCostOfDistance < 0; probably a sign error somewhere") ;
 		}
