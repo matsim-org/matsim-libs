@@ -31,14 +31,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.emissions.utils.EmissionUtils;
-
-
 
 /**
  * @author benjamin, julia
@@ -46,10 +41,6 @@ import playground.vsp.emissions.utils.EmissionUtils;
  */
 public class SpatialAveragingDistribution {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDistribution.class);
-	
-	EmissionUtils emissionUtils = new EmissionUtils();
-	EmissionsPerLinkWarmEventHandler warmHandler;
-	EmissionsPerLinkColdEventHandler coldHandler;
 
 	Map<Id, Integer> link2xbin;
 	Map<Id, Integer> link2ybin;
@@ -116,7 +107,7 @@ public class SpatialAveragingDistribution {
 		
 		ResponsibilityUtils reut = new ResponsibilityUtils();
 		reut.addExposureAndResponsibilityBinwise(activities, emissionPerBin, responsibilityAndExposure, timeBinSize, simulationEndTime);
-		//reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, responsibilityAndExposure, timeBinSize, simulationEndTime);
+		reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, responsibilityAndExposure, timeBinSize, simulationEndTime);
 		
 		logger.info("Done calculating responsibility events.");
 		

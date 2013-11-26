@@ -19,9 +19,7 @@
 
 package playground.julia.distribution;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,18 +31,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.emissions.utils.EmissionUtils;
 
 public class DistributionConfig {
 	
-	final double scalingFactor = 100;
 	private final static String runDirectory1 = "input/sample/";
 	private final String netFile1 = runDirectory1 + "sample_network.xml.gz";
 	private final String munichShapeFile = runDirectory1 + "cityArea.shp";
@@ -58,16 +51,7 @@ public class DistributionConfig {
 	private final String emissionFile1 = runDirectory1 + "compcase.sample.emission.events.xml";
 	String plansFile1 = runDirectory1+"compcase.sample.plans.xml";
 	String eventsFile1 = runDirectory1+"compcase.sample.events.xml";
-	String outPathStub = "output/sample/compcase_30timebins_";
-	
-	Network network;
-	Collection<SimpleFeature> featuresInMunich;
-	EmissionUtils emissionUtils = new EmissionUtils();
-	EmissionsPerLinkWarmEventHandler warmHandler;
-	EmissionsPerLinkColdEventHandler coldHandler;
-	SortedSet<String> listOfPollutants;
-	double simulationEndTime;
-	double pollutionFactorOutdoor, pollutionFactorIndoor;
+	String outPathStub = "output/sample/compcase_30timebins_16x12cells_";
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static double xMin = 4452550.25;
@@ -75,19 +59,19 @@ public class DistributionConfig {
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 
-	final int noOfTimeBins = 30; // one bin for each hour? //TODO 30? sim endtime ist 30...
-	double timeBinSize;
-	final int noOfXbins = 160; //TODO rethink this
-	final int noOfYbins = 120;
-	final double smoothingRadius_m = 500.;
-	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
+	final int noOfTimeBins = 30; //30
+	final int noOfXbins = 16; //160 
+	final int noOfYbins = 12; //120
 	final WarmPollutant warmPollutant2analyze = WarmPollutant.NO2;
 	final ColdPollutant coldPollutant2analyze = ColdPollutant.NO2;
+		
 	
+	Network network;
+	double simulationEndTime;
 	Config config;
 	private Scenario scenario;
 	private boolean storeResponsibilityEvents = true;
-	private int numberOfTimeBins = 30;
+	double timeBinSize;
 	
 	/*
 	 * load scenario
@@ -104,6 +88,10 @@ public class DistributionConfig {
 		this.scenario = ScenarioUtils.loadScenario(config);
 		logger.info("Simulation end time is: " + simulationEndTime / 3600 + " hours.");
 		logger.info("Aggregating emissions for " + (int) (simulationEndTime / 3600 / noOfTimeBins) + " hour time bins.");
+		
+		if(noOfXbins<4 || noOfYbins<4){
+			logger.warn("Emission distribution works better for larger grids, i.e. more than 10 x and y bins.");
+		}
 	}
 
 	public Double getSimulationEndTime() {
@@ -151,7 +139,7 @@ public class DistributionConfig {
 	}
 
 	public int getNoOfTimeBins() {
-		return numberOfTimeBins;
+		return noOfTimeBins;
 	}
 	
 	public int getNumberOfXBins(){
