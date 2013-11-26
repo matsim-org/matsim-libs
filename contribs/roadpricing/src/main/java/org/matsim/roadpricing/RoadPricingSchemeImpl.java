@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
+import org.apache.log4j.Logger;
 
 /**
  * A road pricing scheme (sometimes also called toll scheme) contains the type of the toll, a list of the
@@ -35,13 +37,14 @@ import org.matsim.api.core.v01.Id;
  * @author mrieser
  */
 public class RoadPricingSchemeImpl implements RoadPricingScheme {
+	private static Logger log = Logger.getLogger( RoadPricingSchemeImpl.class ) ;
 
 	private Map<Id, List<Cost>> linkIds = null;
 
 	private String name = null;
 	private String type = null;
 	private String description = null;
-	private ArrayList<Cost> costs = null;
+	private final ArrayList<Cost> costs ;
 
 	private boolean cacheIsInvalid = true;
 	private Cost[] costCache = null;
@@ -82,7 +85,18 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 		return this.description;
 	}
 
+	private static int wrnCnt = 0 ;
+	
 	public Cost addCost(final double startTime, final double endTime, final double amount) {
+		if ( startTime==0. && endTime == 24.*3600. ) {
+			if (wrnCnt < 1) {
+				wrnCnt++ ;
+				log.warn("startTime=0:00 and endTime=24:00 means NO toll after 24h (no wrap-around); make sure this is what you want" ) ;
+				if ( wrnCnt==1 ) {
+					log.warn( Gbl.ONLYONCE ) ;
+				}
+			}
+		}
 		Cost cost = new Cost(startTime, endTime, amount);
 		this.costs.add(cost);
 		this.cacheIsInvalid = true;
@@ -90,6 +104,15 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	}
 
 	public void addLinkCost(Id linkId, double startTime, double endTime, double amount) {
+		if ( startTime==0. && endTime == 24.*3600. ) {
+			if (wrnCnt < 1) {
+				wrnCnt++ ;
+				log.warn("startTime=0:00 and endTime=24:00 means NO toll after 24h (no wrap-around); make sure this is what you want" ) ;
+				if ( wrnCnt==1 ) {
+					log.warn( Gbl.ONLYONCE ) ;
+				}
+			}
+		}
 		Cost cost = new Cost(startTime, endTime, amount);
 		List<Cost> cs = this.linkIds.get(linkId);
 		if (cs == null) {
@@ -100,6 +123,7 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	}
 
 	public boolean removeCost(final Cost cost) {
+		this.cacheIsInvalid = true; // added this without testing it.  kai, nov'13
 		return this.costs.remove(cost);
 	}
 
@@ -134,10 +158,11 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 		// Reason: A big advantage of agent-based simulation over traditional methods is heterogeneity of agent population.
 		// But if we make this hard to use, the advantage shrinks.  kai, mar'12)
 
-		if (this.cacheIsInvalid) buildCache();
+		if (this.cacheIsInvalid) buildCache(); //(*)
 		if (this.linkIds.containsKey(linkId)) {
-			List<Cost> costs = this.linkIds.get(linkId);
-			if (costs == null) {
+			List<Cost> linkSpecificCosts = this.linkIds.get(linkId);
+			if (linkSpecificCosts == null) {
+				// no link specific info found, apply "general" cost (which is in costCache after (*)):
 				for (Cost cost : this.costCache) {
 					if ((time >= cost.startTime) && (time < cost.endTime)) {
 						return cost;
@@ -145,7 +170,7 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 				}
 			}
 			else {
-				for (Cost cost : costs){
+				for (Cost cost : linkSpecificCosts){
 					if ((time >= cost.startTime) && (time < cost.endTime)) {
 						return cost;
 					}
