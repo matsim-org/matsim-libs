@@ -73,7 +73,7 @@ public class ActivityUtilityParameters implements MatsimParameters {
 			this.latestStartTime = ppp.getLatestStartTime() ;
 			this.minimalDuration = ppp.getMinimalDuration() ;
 			this.openingTime = ppp.getOpeningTime() ;
-			this.scoreAtAll = true ; // yy
+			this.scoreAtAll = ppp.isScoringThisActivityAtAll() ;
 		}
 
 		public void setType(String type) {

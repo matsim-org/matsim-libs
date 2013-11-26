@@ -100,6 +100,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private static final String ACTIVITY_LATEST_START_TIME = "activityLatestStartTime_";
 	private static final String ACTIVITY_EARLIEST_END_TIME = "activityEarliestEndTime_";
 	private static final String ACTIVITY_CLOSING_TIME = "activityClosingTime_";
+	
+	private static final String SCORING_THIS_ACTIVITY_AT_ALL = "scoringThisActivityAtAll_" ;
 
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
@@ -236,6 +238,9 @@ public class PlanCalcScoreConfigGroup extends Module {
 		} else if (key.startsWith(ACTIVITY_CLOSING_TIME)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), true);
 			actParams.setClosingTime(Time.parseTime(value));
+		} else if (key.startsWith(SCORING_THIS_ACTIVITY_AT_ALL)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(SCORING_THIS_ACTIVITY_AT_ALL.length()), true);
+			actParams.setScoringThisActivityAtAll( Boolean.parseBoolean(value) );
 		} else if (key.startsWith(TRAVELING)) {
 			ModeParams modeParams = getOrCreateModeParams(key.substring(TRAVELING.length()));
 			modeParams.setMarginalUtilityOfTraveling(Double.parseDouble(value));
@@ -290,6 +295,7 @@ public Map<String, String> getParams() {
 		map.put(ACTIVITY_LATEST_START_TIME + key, Time.writeTime(params.latestStartTime));
 		map.put(ACTIVITY_EARLIEST_END_TIME + key, Time.writeTime(params.earliestEndTime));
 		map.put(ACTIVITY_CLOSING_TIME + key, Time.writeTime(params.closingTime));
+		map.put(SCORING_THIS_ACTIVITY_AT_ALL + key, Boolean.toString( params.scoringThisActivityAtAll ) ) ;
 	}
 	for (Entry<String, ModeParams> params : this.modes.entrySet()) {
 		String mode = params.getKey();
@@ -371,16 +377,20 @@ public void checkConsistency() {
 	boolean hasOpeningTimeAndLatePenalty = false ;
 
 	for (ActivityParams actType : this.activityTypes.values()) {
-		if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
-			hasOpeningAndClosingTime = true;
-		}
-		if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
-			hasOpeningTimeAndLatePenalty = true;
-		}
-		if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
-			log.error("it looks like you have an activity type with opening time set to 0:00 and closing " +
-					"time set to 24:00. This is most probably not the same as not setting them at all.  " +
-					"In particular, activities which extend past midnight may not accumulate scores.") ;
+		if ( actType.isScoringThisActivityAtAll() ) {
+			// (checking consistency only if activity is scored at all)
+			
+			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
+				hasOpeningAndClosingTime = true;
+			}
+			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
+				hasOpeningTimeAndLatePenalty = true;
+			}
+			if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
+				log.error("it looks like you have an activity type with opening time set to 0:00 and closing " +
+						"time set to 24:00. This is most probably not the same as not setting them at all.  " +
+						"In particular, activities which extend past midnight may not accumulate scores.") ;
+			}
 		}
 	}
 	if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
@@ -560,6 +570,7 @@ public static class ActivityParams implements MatsimParameters {
 	private double latestStartTime = Time.UNDEFINED_TIME;
 	private double earliestEndTime = Time.UNDEFINED_TIME;
 	private double closingTime = Time.UNDEFINED_TIME;
+	private boolean scoringThisActivityAtAll = true ;
 
 	public ActivityParams(final String type) {
 		this.type = type;
@@ -626,6 +637,14 @@ public static class ActivityParams implements MatsimParameters {
 	}
 	public void setClosingTime(final double closingTime) {
 		this.closingTime = closingTime;
+	}
+
+	public boolean isScoringThisActivityAtAll() {
+		return scoringThisActivityAtAll;
+	}
+
+	public void setScoringThisActivityAtAll(boolean scoringThisActivityAtAll) {
+		this.scoringThisActivityAtAll = scoringThisActivityAtAll;
 	}
 }
 
