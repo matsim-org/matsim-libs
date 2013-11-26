@@ -75,6 +75,9 @@ public final class StrategyManagerConfigLoader {
 			double rate = settings.getProbability();
 			if (rate == 0.0) {
 				continue;
+				// yyyy is this so practical?  Some people might want to instantiate it, and set the rate/probability/weight to something different
+				// from zero at a later iteration.  (Not possible from config, but possible in code.)  kai, nov'13
+				// yy It is neither a rate nor a probability, since either would need to be normalized. kai, nov'13
 			}
 			String moduleName = settings.getModuleName();
 
