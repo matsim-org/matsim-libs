@@ -134,53 +134,85 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 	}
 	
 	protected double[] getOpeningInterval(Activity act) {
-
-		// openInterval has two values
-		// openInterval[0] will be the opening time
-		// openInterval[1] will be the closing time
 		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
-
-		boolean foundAct = false;
-
-		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
-		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
-		String facilityActType = null;
-		Set<OpeningTime> opentimes = null;
-
-		while (facilityActTypeIterator.hasNext() && !foundAct) {
-
-			facilityActType = facilityActTypeIterator.next();
-			if (act.getType().substring(0, 1).equals(facilityActType.substring(0, 1))) {
-				foundAct = true;
-
-				// choose appropriate opentime:
-				// if none is given, use undefined
-				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes();
-				if (opentimes != null) {
-					// ignoring lunch breaks with the following procedure:
-					// if there is only one wed/wkday open time interval, use it
-					// if there are two or more, use the earliest start time and the latest end time
-					openInterval[0] = Double.MAX_VALUE;
-					openInterval[1] = Double.MIN_VALUE;
-					for (OpeningTime opentime : opentimes) {
-						if (opentime.getStartTime() >= dayOffset && 
-								opentime.getEndTime() >= dayOffset &&
-								opentime.getStartTime() <= (dayOffset + 24.0 * 3600.0) &&
-								opentime.getEndTime() <= (dayOffset + 24.0 * 3600.0)) {
-						
-							openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
-							openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
-						}
-					}
-				}
-				// else return undefined				
-			}
+		double h = 3600.0;
+		
+		if (act.getType().equals("work") || act.getType().equals("business")) { 
+			openInterval[0] = 6.0 * h; openInterval[1] = 22.0 * h;
+		} else if (act.getType().equals("education")) { 
+			openInterval[0] = 8.0 * h; openInterval[1] = 22.0 * h;
 		}
-		if (!foundAct) {
-			throw new RuntimeException("No suitable facility activity type found. Aborting...");
-		}
+		
+		if (this.day.equals("sun")) {
+			if (act.getType().equals("shop")) { 
+				openInterval[0] = 10.0 * h; openInterval[1] = 16.0 * h;
+			} else if (act.getType().equals("leisure")) {
+				openInterval[0] = 8.5 * h; openInterval[1] = 23.0 * h;
+			} 
+		} else if (this.day.equals("sat")) {
+			if (act.getType().equals("shop")) { 
+				openInterval[0] = 8.5 * h; openInterval[1] = 18.0 * h;
+			} else if (act.getType().equals("leisure")) {
+				openInterval[0] = 8.5 * h; openInterval[1] = 24.0 * h;
+			} 
+		} else {
+			 if (act.getType().equals("shop")) { 
+				openInterval[0] = 8.5 * h; openInterval[1] = 19.0 * h;
+			} else if (act.getType().equals("leisure")) {
+				openInterval[0] = 8.5 * h; openInterval[1] = 22.0 * h;
+			} 
+		}	
 		return openInterval;
 	}
+	
+//	protected double[] getOpeningInterval(Activity act) {
+//
+//		// openInterval has two values
+//		// openInterval[0] will be the opening time
+//		// openInterval[1] will be the closing time
+//		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+//
+//		boolean foundAct = false;
+//
+//		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());
+//		Iterator<String> facilityActTypeIterator = facility.getActivityOptions().keySet().iterator();
+//		String facilityActType = null;
+//		Set<OpeningTime> opentimes = null;
+//
+//		while (facilityActTypeIterator.hasNext() && !foundAct) {
+//
+//			facilityActType = facilityActTypeIterator.next();
+//			if (act.getType().substring(0, 1).equals(facilityActType.substring(0, 1))) {
+//				foundAct = true;
+//
+//				// choose appropriate opentime:
+//				// if none is given, use undefined
+//				opentimes = ((ActivityFacilityImpl) facility).getActivityOptions().get(facilityActType).getOpeningTimes();
+//				if (opentimes != null) {
+//					// ignoring lunch breaks with the following procedure:
+//					// if there is only one wed/wkday open time interval, use it
+//					// if there are two or more, use the earliest start time and the latest end time
+//					openInterval[0] = Double.MAX_VALUE;
+//					openInterval[1] = Double.MIN_VALUE;
+//					for (OpeningTime opentime : opentimes) {
+//						if (opentime.getStartTime() >= dayOffset && 
+//								opentime.getEndTime() >= dayOffset &&
+//								opentime.getStartTime() <= (dayOffset + 24.0 * 3600.0) &&
+//								opentime.getEndTime() <= (dayOffset + 24.0 * 3600.0)) {
+//						
+//							openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
+//							openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+//						}
+//					}
+//				}
+//				// else return undefined				
+//			}
+//		}
+//		if (!foundAct) {
+//			throw new RuntimeException("No suitable facility activity type found. Aborting...");
+//		}
+//		return openInterval;
+//	}
 	
 	public void resetting() {
 		this.plan.getPerson().getCustomAttributes().put(day + ".actScore", null);

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
@@ -70,15 +71,21 @@ public class AdaptFacilities {
 				SortedSet<OpeningTime> ots = actOpt.getOpeningTimes();
 				aOptWork.setOpeningTimes(ots);
 			}
+			
+			for (ActivityOption ao : facility.getActivityOptions().values()) {
+				ao.getOpeningTimes().clear();
+			}
+			
 		}
 		
 		TreeMap<Id, ActivityFacility> workFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType("work");		
 		for (ActivityFacility facility : workFacilities.values()) {
-			ActivityOptionImpl aOptWork = (ActivityOptionImpl) facility.getActivityOptions().get("work");
-			SortedSet<OpeningTime> ots = aOptWork.getOpeningTimes();
+			//ActivityOptionImpl aOptWork = (ActivityOptionImpl) facility.getActivityOptions().get("work");
+			//SortedSet<OpeningTime> ots = aOptWork.getOpeningTimes();
 					
 			ActivityOptionImpl aOptBusiness = ((ActivityFacilityImpl)facility).createActivityOption("business");
-			aOptBusiness.setOpeningTimes(ots);
+			
+			//aOptBusiness.setOpeningTimes(ots);
 		}
 		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(facilitiesFileOut);
 		log.info("facilities written ==============================");
