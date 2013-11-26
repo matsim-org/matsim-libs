@@ -21,18 +21,25 @@
 package org.matsim.core.utils.misc;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.Config;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
  * @author nagel
@@ -130,5 +137,127 @@ public class PopulationUtils {
 		Map<Id, Person> treeMap = new TreeMap<Id, Person>(map);
 		map.clear();
 		map.putAll(treeMap);
+	}
+
+	/**
+	 * Convenience method to compute (expected or planned) activity end time, depending on the different time interpretations.
+	 * <p/>
+	 * Design comments:<ul>
+	 * <li> The whole Config is part of the argument, since it may eventually make sense to move the config parameter from VspExperimental to
+	 * some more regular place.  kai, jan'13
+	 * </ul>
+	 */
+	public static double getActivityEndTime( Activity act, double now, Config config ) {
+		switch ( config.vspExperimental().getActivityDurationInterpretation() ) {
+		case endTimeOnly:
+			return act.getEndTime() ;
+		case tryEndTimeThenDuration:
+			if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
+				return act.getEndTime() ;
+			} else if ( act.getMaximumDuration() != Time.UNDEFINED_TIME ) {
+				return now + act.getMaximumDuration() ;
+			} else {
+				return Time.UNDEFINED_TIME ;
+			}
+		case minOfDurationAndEndTime:
+			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
+		}
+		return Time.UNDEFINED_TIME ;
+	}
+
+	/**
+	 * A pointer to material in TripStructureUtils
+	 * 
+	 * @param plan
+	 * @param stageActivities
+	 * @return
+	 */
+	public static List<Activity> getActivities( Plan plan, StageActivityTypes stageActivities ) {
+		return TripStructureUtils.getActivities(plan, stageActivities ) ;
+	}
+
+	/**
+	 * A pointer to material in TripStructureUtils
+	 * 
+	 * @param plan
+	 * @return
+	 */
+	public static List<Leg> getLegs( Plan plan ) {
+		return TripStructureUtils.getLegs( plan ) ;
+	}
+
+	/**
+	 * Notes:<ul>
+	 * <li>not normalized (for the time being?)
+	 * <li>does not look at times (for the time being?)
+	 * </ul>
+	 * 
+	 * @param legs1
+	 * @param legs2
+	 * @param network
+	 * @param sameModeReward
+	 * @param sameRouteReward
+	 * @return
+	 */
+	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network, 
+			double sameModeReward, double sameRouteReward ) {
+		// yy this is a bit at the limit of where a static method makes sense. kai, nov'13
+		double simil = 0. ;
+		Iterator<Leg> it1 = legs1.iterator();
+		Iterator<Leg> it2 = legs2.iterator();
+		for ( ; it1.hasNext() && it2.hasNext(); ) {
+			Leg leg1 = it1.next() ;
+			Leg leg2 = it2.next() ;
+			if ( leg1.getMode().equals( leg2.getMode() ) ) {
+				simil += sameModeReward ;
+			}
+			// the easy way for the route is to not go along the links but just check for overlap.
+			Route route1 = leg1.getRoute() ;
+			Route route2 = leg2.getRoute() ;
+			// currently only for network routes:
+			NetworkRoute nr1, nr2 ;
+			if ( route1 instanceof NetworkRoute ) {
+				nr1 = (NetworkRoute) route1 ;
+			} else {
+				continue ; // next leg
+			}
+			if ( route1 instanceof NetworkRoute ) {
+				nr2 = (NetworkRoute) route2 ;
+			} else {
+				continue ; // next leg
+			}
+			simil += sameRouteReward * RouteUtils.calculateCoverage(nr1, nr2, network) ;
+		}
+		return simil ;
+	}
+
+	/**
+	 * Notes:<ul>
+	 * <li> not normalized (for the time being?)
+	 * <li> does not look at times (for the time being?) 
+	 * </ul>
+	 * @param activities1
+	 * @param activities2
+	 * @param sameActivityTypeReward
+	 * @param sameActivityLocationReward
+	 * @return
+	 */
+	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypeReward, 
+			double sameActivityLocationReward ) {
+		double simil = 0. ;
+		Iterator<Activity> it1 = activities1.iterator() ;
+		Iterator<Activity> it2 = activities2.iterator() ;
+		for ( ; it1.hasNext() && it2.hasNext() ; ) {
+			Activity act1 = it1.next() ;
+			Activity act2 = it2.next() ;
+			if ( act1.getType().equals(act2.getType() ) ) {
+				simil += sameActivityTypeReward ;
+			}
+			if ( act1.getCoord().equals( act2.getCoord() ) ){ 
+				simil += sameActivityLocationReward ;
+			}
+			// I don't look at times for the time being.
+		}
+		return simil ;
 	}
 }
