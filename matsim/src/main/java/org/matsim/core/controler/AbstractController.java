@@ -48,6 +48,7 @@ public abstract class AbstractController {
 	public static final String OPERATION_ITERATION = "iteration";
 	public static final String OPERATION_MOBSIM = "mobsim";
 	public static final String OPERATION_REPLANNING = "replanning";
+	public static final String OPERATION_SCORING = "scoring" ;
 
 	/**
 	 * This is deliberately not even protected.  kai, jul'12
@@ -181,23 +182,44 @@ public abstract class AbstractController {
 			this.getControlerIO().createIterationDirectory(iteration);
 			resetRandomNumbers(rndSeed, iteration);
 
+			final String OPERATION_ITERATION_STARTS_LISTENERS = "iterationStartsListeners";
+			this.stopwatch.beginOperation(OPERATION_ITERATION_STARTS_LISTENERS) ;
 			this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
+			this.stopwatch.endOperation(OPERATION_ITERATION_STARTS_LISTENERS) ;
+
 			if (iteration > firstIteration) {
 				this.stopwatch.beginOperation(OPERATION_REPLANNING);
 				this.controlerListenerManager.fireControlerReplanningEvent(iteration);
 				this.stopwatch.endOperation(OPERATION_REPLANNING);
 			}
+
+			final String OPERATION_BEFORE_MOBSIM_LISTENERS = "beforeMobsimListeners";
+			this.stopwatch.beginOperation(OPERATION_BEFORE_MOBSIM_LISTENERS);
 			this.controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
+			this.stopwatch.endOperation(OPERATION_BEFORE_MOBSIM_LISTENERS);
+
 			this.stopwatch.beginOperation(OPERATION_MOBSIM);
 			resetRandomNumbers(rndSeed, iteration);
 			runMobSim(iteration);
 			this.stopwatch.endOperation(OPERATION_MOBSIM);
+
+			final String OPERATION_AFTER_MOBSIM_LISTENERS = "afterMobsimListeners";
+			this.stopwatch.beginOperation(OPERATION_AFTER_MOBSIM_LISTENERS) ;
 			log.info(marker + "ITERATION " + iteration + " fires after mobsim event");
 			this.controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
+			this.stopwatch.endOperation(OPERATION_AFTER_MOBSIM_LISTENERS) ;
+
+			this.stopwatch.beginOperation(OPERATION_SCORING);
 			log.info(marker + "ITERATION " + iteration + " fires scoring event");
 			this.controlerListenerManager.fireControlerScoringEvent(iteration);
+			this.stopwatch.endOperation(OPERATION_SCORING);
+			
+			final String OPERATION_ITERATION_ENDS_LISTENERS = "iterationEndsListeners";
+			this.stopwatch.beginOperation(OPERATION_ITERATION_ENDS_LISTENERS) ;
 			log.info(marker + "ITERATION " + iteration + " fires iteration end event");
 			this.controlerListenerManager.fireControlerIterationEndsEvent(iteration);
+			this.stopwatch.endOperation(OPERATION_ITERATION_ENDS_LISTENERS) ;
+
 			this.stopwatch.endOperation(OPERATION_ITERATION);
 			this.stopwatch.writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
 			if (createOutputGraphs) this.stopwatch.writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
