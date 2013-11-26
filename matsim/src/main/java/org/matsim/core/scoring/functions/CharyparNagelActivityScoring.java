@@ -22,6 +22,7 @@ package org.matsim.core.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.utils.misc.Time;
 
@@ -39,7 +40,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	private double firstActivityEndTime;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
+	private static final double INITIAL_FIRST_ACT_END_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
 
 	private static int firstLastActWarning = 0;
@@ -62,7 +63,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	public void reset() {
 		this.firstAct = true;
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
-		this.firstActivityEndTime = INITIAL_FIRST_ACT_TIME;
+		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;
 		this.score = INITIAL_SCORE;
 		
 		firstLastActWarning = 0 ;
@@ -108,6 +109,8 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	public double getScore() {
 		return this.score;
 	}
+	
+	private static int wrnCnt = 0 ;
 
 	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 
@@ -202,7 +205,13 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 					// also removing the "wait" alternative scoring.
 					tmpScore += utilPerf ;
 				} else {
-					log.warn("encountering duration < zeroUtilityDuration; score must change ...") ;
+					if ( wrnCnt < 1 ) {
+						wrnCnt++ ;
+						log.warn("encountering duration < zeroUtilityDuration; the logic for this was changed around mid-nov") ;
+						log.warn( "your final score thus will be different from earlier runs; set usingOldScoringBelowZeroUtilityDuration to true if you "
+								+ "absolutely need the old version.  See https://matsim.atlassian.net/browse/MATSIM-191." );
+						log.warn( Gbl.ONLYONCE ) ;
+					}
 					
 					// below zeroUtilityDuration, we linearly extend the slope ...:
 					double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*actParams.getZeroUtilityDuration_h() ) ;
