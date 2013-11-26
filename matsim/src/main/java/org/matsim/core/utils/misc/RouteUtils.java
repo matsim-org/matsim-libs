@@ -141,6 +141,8 @@ public class RouteUtils {
 		 * TODO the route-distance does not contain the length of the
 		 * first or last link of the route, because the route doesn't
 		 * know those. Should be fixed somehow, but how? MR, jan07
+		 * yy But doesn't the route have startLinkId and endLinkId??  Presumably a development that happened after
+		 * the above comment was written.  kai, nov'13
 		 */
 		double dist = 0;
 		for (Id linkId : route.getLinkIds()) {
@@ -196,6 +198,26 @@ public class RouteUtils {
 			dist += l.getLength();
 		}
 		return dist;
+	}
+
+	/**
+	 * How much of route is "covered" by the links of route2.  Based on Ramming.  Note that this is not symmetric,
+	 * i.e. route1 can be fully covered by route2, but not the other way around.  kai, nov'13
+	 * 
+	 * @param route1
+	 * @param route2
+	 * @return a number between 0 (no coverage) and 1 (route2 fully covers route1)
+	 */
+	public static double calculateCoverage(NetworkRoute route1, NetworkRoute route2, Network network ) {
+		double routeLength = 0. ;
+		double coveredLength = 0. ;
+		for ( Id id : route1.getLinkIds() ) {
+			routeLength += network.getLinks().get( id ).getLength() ;
+			if ( route2.getLinkIds().contains(id) ) {
+				coveredLength += network.getLinks().get( id ).getLength() ;
+			}
+		}
+		return coveredLength/routeLength ;
 	}
 
 }

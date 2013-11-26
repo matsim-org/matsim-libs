@@ -38,6 +38,49 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RouteUtilsTest {
+	
+	@Test
+	public void testCalculateCoverage() {
+		Fixture f = new Fixture();
+		f.network.getLinks().get(f.ids[0]).setLength(100.0);
+		f.network.getLinks().get(f.ids[1]).setLength(200.0);
+		f.network.getLinks().get(f.ids[2]).setLength(300.0);
+		f.network.getLinks().get(f.ids[3]).setLength(400.0);
+		f.network.getLinks().get(f.ids[4]).setLength(500.0);
+		f.network.getLinks().get(f.ids[5]).setLength(600.0);
+		
+		NetworkRoute route, route2, route3 ;
+		{
+			Link startLink = f.network.getLinks().get(f.ids[0]);
+			Link endLink = f.network.getLinks().get(f.ids[5]);
+			List<Id> linkIds = new ArrayList<Id>(4);
+			Collections.addAll(linkIds, f.ids[1], f.ids[2], f.ids[3], f.ids[4]);
+			route = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
+			route.setLinkIds(startLink.getId(), linkIds, endLink.getId());
+		}
+		{
+			Link startLink = f.network.getLinks().get(f.ids[0]);
+			Link endLink = f.network.getLinks().get(f.ids[5]);
+			List<Id> linkIds = new ArrayList<Id>(4);
+			Collections.addAll(linkIds, f.ids[1], f.ids[2], f.ids[3], f.ids[4]);
+			route2 = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
+			route2.setLinkIds(startLink.getId(), linkIds, endLink.getId());
+		}
+		{
+			Link startLink = f.network.getLinks().get(f.ids[0]);
+			Link endLink = f.network.getLinks().get(f.ids[5]);
+			List<Id> linkIds = new ArrayList<Id>(3);
+			Collections.addAll(linkIds, f.ids[1],  f.ids[3], f.ids[4]);
+			// (inconsistent route, but I don't think anything cares at this level here)
+			route3 = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
+			route3.setLinkIds(startLink.getId(), linkIds, endLink.getId());
+		}
+		
+		Assert.assertEquals( 1. , RouteUtils.calculateCoverage( route, route2, f.network ), 0.0001 );
+		Assert.assertEquals( (200.+400.+500.)/(200.+300.+400.+500.) , RouteUtils.calculateCoverage( route, route3, f.network ), 0.0001 );
+		Assert.assertEquals( 1. , RouteUtils.calculateCoverage( route3, route, f.network ), 0.0001 );
+		
+	}
 
 	@Test
 	public void testGetNodes() {
