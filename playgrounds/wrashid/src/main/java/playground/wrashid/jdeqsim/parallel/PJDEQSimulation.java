@@ -189,7 +189,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		// initialize vehicles
 		for (Person person : population.getPersons().values()) {
-			new PVehicle(scheduler, person); // the vehicle registers itself to the scheduler
+			new PVehicle(scheduler, person, activityDurationInterpretation); // the vehicle registers itself to the scheduler
 		}
 
 		scheduler.startSimulation();
