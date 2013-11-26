@@ -47,6 +47,7 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
+import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor;
 import playground.southafrica.utilities.Header;
 
 public class MyTollPotentialCalculator {
@@ -91,7 +92,8 @@ public class MyTollPotentialCalculator {
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
 		String tollLinksFileName = mtpc.getScenario().getConfig().roadpricing().getTollLinksFile() ;
-		GautengRoadPricingScheme scheme = new GautengRoadPricingScheme(tollLinksFileName, mtpc.getScenario().getNetwork(), mtpc.getScenario().getPopulation());
+		GautengRoadPricingScheme scheme = new GautengRoadPricingScheme(tollLinksFileName, mtpc.getScenario().getNetwork(), 
+				mtpc.getScenario().getPopulation(), new SanralTollFactor());
 		mtpc.processEventsFile(baseFilename, linkList, breakList, scheme);
 		mtpc.writeMaps(outputFolder);
 		

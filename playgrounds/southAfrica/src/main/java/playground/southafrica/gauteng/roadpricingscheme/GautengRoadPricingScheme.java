@@ -41,8 +41,9 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 	private RoadPricingScheme delegate = null ;
 	private Network network;
 	private Population population ;
+	private final TollFactorI tollFactor ;
 	
-	public GautengRoadPricingScheme( String tollLinksFileName, Network network, Population population ) {
+	public GautengRoadPricingScheme( String tollLinksFileName, Network network, Population population, TollFactorI tollFactor ) {
 		this.network = network ;
 		this.population = population ; 
 		Logger.getLogger(this.getClass()).warn("for me, using this as cordon toll did not work; using it as new scheme `link' " +
@@ -57,6 +58,7 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 			throw new RuntimeException(e);
 		}
 		this.delegate = scheme ;
+		this.tollFactor = tollFactor ;
 	}
 
 	@Override
@@ -78,8 +80,8 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 		}
 		Link link = network.getLinks().get(linkId) ;
 		Person person = population.getPersons().get(personId) ;
-		final double tollFactor = SanralTollFactor.getTollFactor(person, link.getId(), time);
-		return new Cost( baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactor );
+		final double tollFactorVal = tollFactor.getTollFactor(person, link.getId(), time);
+		return new Cost( baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal );
 	}
 
 	@Override
@@ -97,6 +99,5 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 		return delegate.getType();
 //		return "link" ;
 	}
-
 
 }

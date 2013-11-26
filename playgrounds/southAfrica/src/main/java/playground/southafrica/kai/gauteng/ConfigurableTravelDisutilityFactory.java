@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.gauteng.routing;
+package playground.southafrica.kai.gauteng;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -32,70 +33,158 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
+import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
+
 /**
  * @author kn after bkick after dgrether
  *
  */
-public class AutosensingTravelDisutilityInclTollFactory implements TravelDisutilityFactory {
+public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFactory {
 
-	private final RoadPricingScheme scheme;
 	private final Scenario scenario;
-	private final ScoringFunctionFactory scoringFunctionFactory;
+	
+	private UtilityOfMoneyI uom = null ;
+	private UtilityOfDistanceI uod = null ;
+	private UtilityOfTtimeI uott = null ;
 
-	public AutosensingTravelDisutilityInclTollFactory( RoadPricingScheme scheme, Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
-		this.scheme = scheme ;
-		this.scenario = scenario ;
+	private ScoringFunctionFactory scoringFunctionFactory = null ;
+	private RoadPricingScheme scheme = null ;
+	private double sigma = 0. ;
+
+	public void setRandomness( double val ) {
+		this.sigma = val ;
+	}
+
+	/**
+	 * Obviously, this is for setting a scoring function factory.  If set, and the effective marginal utilities container is <i>not</i> set,
+	 * then this is used to auto-sense the marginal utilities.
+	 * 
+	 * @param scoringFunctionFactory
+	 */
+	public void setScoringFunctionFactory( ScoringFunctionFactory scoringFunctionFactory ) {
 		this.scoringFunctionFactory = scoringFunctionFactory ;
 	}
 
+	/**
+	 * Obviously, this is for setting a road pricing scheme.  If a road pricing scheme is set, it will be considered.  Otherwise,
+	 * tolls are assumed to be zero everywhere.
+	 * 
+	 * @param scheme
+	 */
+	public void setRoadPricingScheme( RoadPricingScheme scheme ) {
+		this.scheme = scheme ;
+	}
+
+	public ConfigurableTravelDisutilityFactory( Scenario scenario ) {
+		this.scenario = scenario ;
+	}
+	
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		final EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory) ;
-		final TravelDisutility delegate = new PersonIndividualTimeDistanceDisutility(timeCalculator, muc) ;
-		final RoadPricingScheme localScheme = this.scheme ;
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, final PlanCalcScoreConfigGroup cnScoringGroup) {
+		if ( (this.uom==null || this.uod==null || this.uott==null ) && this.scoringFunctionFactory != null ) { 
+			EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
+			if ( this.uom==null ) {
+				this.uom = muc ; // works because muc fulfills _all_ the interfaces.  Maybe not so nice.
+			}
+			if ( this.uod==null ) {
+				this.uod=muc ;
+			}
+			if ( this.uott==null ) {
+				this.uott=muc ;
+			}
+		}
+		final UtilityOfMoneyI localUom = this.uom ; // (generating final variable for anonymous class)
 		
+		TravelDisutility tmp ;
+		if ( this.uott==null && this.uod==null ) {
+			tmp = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup) ;
+		} else {
+			tmp = new PersonIndividualTimeDistanceDisutility(timeCalculator, this.uott, this.uod ) ;
+		}
+		final TravelDisutility delegate = tmp ; // (generating final variable for anonymous class)
+		
+		
+		final double normalization = 1./Math.exp( this.sigma*this.sigma/2 );
+
+		// generating final variables for anonymous class:
+		final RoadPricingScheme localScheme = this.scheme ;
+
+		// anonymous class:
 		return new TravelDisutility() {
-			private Person oldPerson = null ;
+			private Person prevPerson = null ;
 			private double utilityOfMoney_normally_positive = 0. ;
 			@Override
 			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-				if ( person != oldPerson ) {
-					oldPerson = person ;
-//					double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(person.getId() ) ;
-					utilityOfMoney_normally_positive = 5.* MatsimRandom.getRandom().nextDouble() * muc.getMarginalUtilityOfMoney().get( person );
+				if ( person != prevPerson ) {
+					prevPerson = person ;
+					if ( localUom!=null ) {
+						this.utilityOfMoney_normally_positive = localUom.getMarginalUtilityOfMoney( person.getId() ) ;
+					} else {
+						this.utilityOfMoney_normally_positive = cnScoringGroup.getMarginalUtilityOfMoney() ;
+					}
+					
+					// randomize if applicable:
+					if ( sigma != 0. ) {
+						double logNormal = Math.exp( sigma * MatsimRandom.getRandom().nextGaussian() ) ;
+						logNormal *= normalization ;
+						// this should be a log-normal distribution with sigma as the "width" parameter.   Instead of figuring out the "location"
+						// parameter mu, I rather just normalize (which should be the same). kai, nov'13
+						
+						this.utilityOfMoney_normally_positive *= logNormal ;
+						// yy the expectation value of this should be tested ...
+					}
+					// end randomize
+					
 				}
 				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time, person, vehicle);
-				double toll_usually_positive = 0. ;
-				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
-				if ( cost != null ) {
-					/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
-					 * Cost objects with amount=0.  kai, apr'12
-					 */
-					if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
-						toll_usually_positive = link.getLength() * cost.amount ;
-					} else if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
-						toll_usually_positive = cost.amount ;
-					} else {
-						/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
-						/* This still does not work for cordon, and I currently think it never will.  Marcel's cordon toll
-						 * is different from other software packages, and so I don't want to mirror the
-						 * computation here, especially since we do not need it.  kai, apr'12 */
-						throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
-					}
-
-					linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
-					// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
-				}
 				
+				// apply toll if applicable:
+				if ( localScheme != null ) {
+					double toll_usually_positive = 0. ;
+					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
+					if ( cost != null ) {
+						/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
+						 * Cost objects with amount=0.  kai, apr'12
+						 */
+						if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
+							toll_usually_positive = link.getLength() * cost.amount ;
+						} else if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
+							toll_usually_positive = cost.amount ;
+						} else {
+							/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
+							/* This still does not work for cordon, and I currently think it never will.  Marcel's cordon toll
+							 * is different from other software packages, and so I don't want to mirror the
+							 * computation here, especially since we do not need it.  kai, apr'12 */
+							throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
+						}
+
+						linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
+						// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
+					}
+					// end toll
+					
+				}
+
 				return linkTravelDisutility;
 			}
-			
+
 			@Override
 			public double getLinkMinimumTravelDisutility(Link link) {
-				// TODO Auto-generated method stub
-				throw new UnsupportedOperationException();
+				return delegate.getLinkMinimumTravelDisutility(link) ;
 			}
 		};
+	}
+
+	public void setUom(UtilityOfMoneyI uom) {
+		this.uom = uom;
+	}
+
+	public void setUod(UtilityOfDistanceI uod) {
+		this.uod = uod;
+	}
+
+	public void setUott(UtilityOfTtimeI uott) {
+		this.uott = uott;
 	}
 
 }

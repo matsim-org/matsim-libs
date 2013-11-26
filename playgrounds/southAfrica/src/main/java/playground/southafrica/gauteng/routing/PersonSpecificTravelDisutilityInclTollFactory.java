@@ -53,43 +53,73 @@ public class PersonSpecificTravelDisutilityInclTollFactory implements TravelDisu
 		final RoadPricingScheme localScheme = this.scheme ;
 		final UtilityOfMoneyI localUtlOfMon = this.utlOfMon ;
 		
-		return new TravelDisutility() {
-			@Override
-			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time, person, vehicle);
-				double toll_usually_positive = 0. ;
-				Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
-				if ( cost != null ) {
-					/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
-					 * Cost objects with amount=0.  kai, apr'12
-					 */
-					if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
-						toll_usually_positive = link.getLength() * cost.amount ;
-					} else if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
-						toll_usually_positive = cost.amount ;
-					} else {
-						/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
-						/* This still does not work for cordon, and I currently think it never will.  Marcel's cordon toll
-						 * is different from other software packages, and so I don't want to mirror the
-						 * computation here, especially since we do not need it.  kai, apr'12 */
-						throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
-					}
-
-					double utilityOfMoney_normally_positive = localUtlOfMon.getUtilityOfMoney_normally_positive(person.getId() ) ; 
-
-					linkTravelDisutility += utilityOfMoney_normally_positive * toll_usually_positive ;
-					// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
-				}
-				
-				return linkTravelDisutility;
-			}
-			
-			@Override
-			public double getLinkMinimumTravelDisutility(Link link) {
-				// TODO Auto-generated method stub
-				throw new UnsupportedOperationException();
-			}
-		};
+		if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_DISTANCE) ) {
+			return new DistanceTollTravelDisutility(delegate, localScheme, localUtlOfMon);
+		} else if ( localScheme.getType().equalsIgnoreCase(RoadPricingScheme.TOLL_TYPE_LINK ) ) {
+			return new LinkTollTravelDisutility(delegate, localScheme, localUtlOfMon);
+		} else {
+			/* I guess we can/should take out this exception since `cordon' should now be working? - JWJ Apr '12 */
+			/* This still does not work for cordon, and I currently think it never will.  Marcel's cordon toll
+			 * is different from other software packages, and so I don't want to mirror the
+			 * computation here, especially since we do not need it.  kai, apr'12 */
+			throw new RuntimeException("not set up for toll type: " + localScheme.getType() + ". aborting ...") ;
+		}
 	}
+	
+	private static class LinkTollTravelDisutility extends DistanceTollTravelDisutility {
+		LinkTollTravelDisutility(TravelDisutility delegate, RoadPricingScheme localScheme, UtilityOfMoneyI localUtlOfMon) {
+			super(delegate, localScheme, localUtlOfMon);
+		}
+		@Override
+		double calculateToll(final Link link, Cost cost) {
+			double toll_usually_positive;
+			toll_usually_positive = cost.amount ;
+			return toll_usually_positive;
+		}
+	}
+	
+	private static class DistanceTollTravelDisutility implements TravelDisutility {
+		private final TravelDisutility delegate;
+		private final RoadPricingScheme localScheme;
+		private final UtilityOfMoneyI localUtlOfMon;
+
+		DistanceTollTravelDisutility(TravelDisutility delegate, RoadPricingScheme localScheme, UtilityOfMoneyI localUtlOfMon) {
+			this.delegate = delegate;
+			this.localScheme = localScheme;
+			this.localUtlOfMon = localUtlOfMon;
+
+		}
+
+		@Override
+		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+			double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time, person, vehicle);
+			double toll_usually_positive = 0. ;
+			Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
+			if ( cost != null ) {
+				/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
+				 * Cost objects with amount=0.  kai, apr'12
+				 */
+					toll_usually_positive = calculateToll(link, cost);
+			}
+
+			linkTravelDisutility += localUtlOfMon.getMarginalUtilityOfMoney(person.getId() ) * toll_usually_positive ;
+			// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
+			
+			return linkTravelDisutility;
+		}
+
+		double calculateToll(final Link link, Cost cost) {
+			double toll_usually_positive;
+			toll_usually_positive = link.getLength() * cost.amount ;
+			return toll_usually_positive;
+		}
+		
+		@Override
+		public double getLinkMinimumTravelDisutility(Link link) {
+			// TODO Auto-generated method stub
+			throw new UnsupportedOperationException();
+		}
+	}
+
 
 }

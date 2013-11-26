@@ -2,14 +2,17 @@ package playground.southafrica.kai.gauteng;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -21,21 +24,29 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.PlanStrategyRegistrar.Names;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
-import playground.southafrica.gauteng.routing.AutosensingTravelDisutilityInclTollFactory;
+import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
+import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactorOLD;
+import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
+import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
+import playground.southafrica.gauteng.routing.PersonSpecificTravelDisutilityInclTollFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.scoring.PersonSpecificUoMScoringFunctionFactory;
+import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.utilities.Header;
 import difflib.Delta;
@@ -57,11 +68,12 @@ public class KNGautengControler {
 	final static String SANRAL2010 = MATSIM_SA_TRUNK + "data/sanral2010/" ;
 	final static String outputDirectoryName = "/Users/nagel/kairuns/output3/";
 	
-//	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-
+	static enum Case {equil,gauteng} ;
+	static final Case ccc = Case.gauteng ;
+	
 	private Config config = null;
 
-	private Double baseValueOfTime_h = 100.; 
+	private Double baseValueOfTime_h = 110.; 
 	private Double valueOfTimeMultiplier = 4.;
 
 	private void createConfiguration(String[] args) {
@@ -69,58 +81,69 @@ public class KNGautengControler {
 
 			config = ConfigUtils.loadConfig(SANRAL2010 + "config/kaiconfig.xml") ;
 
-			// === sanral scenario start ===
-//			config.network().setInputFile(SANRAL2010 + "network/gautengNetwork_CleanV2.xml.gz");
-//			config.plans().setInputFile(SANRAL2010 + "plans/car-com-bus-taxi-ext_plans_2009_1pct-with-routesV0.xml.gz") ;
-//			config.roadpricing().setTollLinksFile(SANRAL2010 + "toll/gauteng_toll_joint_weekday_02.xml" );
-//			double sampleFactor = 0.01 ;
-//			config.counts().setCountsFileName("/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/counts/2007/Counts_Wednesday_Total.xml.gz");
-//			config.counts().setCountsScaleFactor(100);
-//			config.counts().setOutputFormat("kml,txt");
-			// === sanral scenario end ===
-			
-			// === equil test scenario start ===
-			config.network().setInputFile("../../../matsim/trunk/examples/equil/network.xml");
-			config.plans().setInputFile("../../../matsim/trunk/examples/equil/plans2000.xml.gz" ) ;
-			config.roadpricing().setTollLinksFile("../../../matsim/trunk/examples/equil/toll.xml" ) ;
-			double sampleFactor = 1. ;
-			config.counts().setCountsFileName(null) ;
-			{
-				ActivityParams params = new ActivityParams("w") ;
-				params.setTypicalDuration(2.*3600.);
-//				params.setOpeningTime(8.*3600.);
-//				params.setLatestStartTime(8.*3600.);
-				config.planCalcScore().addActivityParams(params);
-			}
-			{
-				ActivityParams params = new ActivityParams("h") ;
-				params.setTypicalDuration(12.*3600.);
-				config.planCalcScore().addActivityParams(params);
-			}
-			config.planCalcScore().setBrainExpBeta(10.);
-			// === equil test scenario end ===
-			
 			config.controler().setOutputDirectory(outputDirectoryName);
-			config.controler().setLastIteration(1000);
+			config.controler().setLastIteration(100);
 			config.controler().setWriteEventsInterval(10);
 			config.controler().setWriteSnapshotsInterval(0);
 			config.controler().setWritePlansInterval(100);
 			
-//			config.controler().setMobsim(MobsimType.JDEQSim.toString());
-//			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
-//			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.CAR_SIZE, "7.5" ) ;
-//			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
-//			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.GAP_TRAVEL_SPEED, "15.0" ) ; 
-//			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.MINIMUM_INFLOW_CAPACITY, "1800." ) ;
-//			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.SQUEEZE_TIME, "5" ) ;
-//			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
-
-			config.controler().setMobsim(MobsimType.qsim.toString() );
-			config.qsim().setEndTime(36.*3600.);
-			config.qsim().setFlowCapFactor(sampleFactor);
-			config.qsim().setStorageCapFactor( Math.pow(sampleFactor,-0.25) );
+			double sampleFactor = 1. ;
+			switch( ccc ) {
+			case equil:
+				// === equil test scenario start ===
+				config.network().setInputFile("../../../matsim/trunk/examples/equil/network.xml");
+				config.plans().setInputFile("../../../matsim/trunk/examples/equil/plans2000.xml.gz" ) ;
+				config.roadpricing().setTollLinksFile("../../../matsim/trunk/examples/equil/toll.xml" ) ;
+				config.counts().setCountsFileName(null) ;
+				{
+					ActivityParams params = new ActivityParams("w") ;
+					params.setTypicalDuration(2.*3600.);
+//					params.setOpeningTime(8.*3600.);
+//					params.setLatestStartTime(8.*3600.);
+					config.planCalcScore().addActivityParams(params);
+				}
+				{
+					ActivityParams params = new ActivityParams("h") ;
+					params.setTypicalDuration(12.*3600.);
+					config.planCalcScore().addActivityParams(params);
+				}
+				config.planCalcScore().setBrainExpBeta(1.);
+				// === equil test scenario end ===
+				break;
+			case gauteng:
+				// === sanral scenario start ===
+				config.network().setInputFile(SANRAL2010 + "network/gautengNetwork_CleanV2.xml.gz");
+				config.plans().setInputFile(SANRAL2010 + "plans/car-com-bus-taxi-ext_plans_2009_1pct-with-routesV0.xml.gz") ;
+				config.roadpricing().setTollLinksFile(SANRAL2010 + "toll/gauteng_toll_joint_weekday_02.xml" );
+				sampleFactor = 0.01 ;
+				config.counts().setCountsFileName("/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/counts/2007/Counts_Wednesday_Total.xml.gz");
+				config.counts().setCountsScaleFactor(100);
+				config.counts().setOutputFormat("kml,txt");
+				// === sanral scenario end ===
+				break;
+			default:
+				throw new RuntimeException("todo") ;
+			}
 			
-			config.global().setNumberOfThreads(1);
+			
+			config.controler().setMobsim(MobsimType.JDEQSim.toString());
+			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
+			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
+			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.SQUEEZE_TIME, "5" ) ;
+			config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
+
+//			config.controler().setMobsim(MobsimType.qsim.toString() );
+//			config.qsim().setEndTime(36.*3600.);
+//			config.qsim().setFlowCapFactor(sampleFactor);
+//			config.qsim().setStorageCapFactor( Math.pow(sampleFactor,-0.25) );
+			
+			config.global().setNumberOfThreads(1); // replanning!
+			// 4 instead of 1 reduces replanning times from about 100sec to about 70sec
+			// I have not taken measurements with "2" but the computer is difficult to use with it.
+			
+			config.parallelEventHandling().setNumberOfThreads(1); 
+			// using this (with 1) reduces jdeqsim times from about 29sec to about 19sec
+			// This does not seem as bad as the replanning.  Let's leave it for the time being.
 			
 			// strategy:
 			{
@@ -135,27 +158,20 @@ public class KNGautengControler {
 				stratSets.setProbability(0.1);
 				config.strategy().addStrategySettings(stratSets);
 			}
-//			{
-//				StrategySettings stratSets = new StrategySettings(new IdImpl(3)) ;
-//				stratSets.setModuleName(Names.TimeAllocationMutator.toString()) ;
-//				stratSets.setProbability(0.1);
-//				config.strategy().addStrategySettings(stratSets);
-//			}
+
 			config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-//			config.strategy().setPlanSelectorForRemoval("abd");
-			
-			final int firstIt = config.controler().getFirstIteration();
-			long diff = config.controler().getLastIteration() - firstIt ;
-			config.vspExperimental().addParam( VspExperimentalConfigKey.scoreMSAStartsAtIteration,  Long.toString((long)(firstIt + 0.8*diff)) ) ;
-			
-			config.timeAllocationMutator().setMutationRange(7200.);
+			{			
+				final int firstIt = config.controler().getFirstIteration();
+				long diff = config.controler().getLastIteration() - firstIt ;
+				config.vspExperimental().addParam( VspExperimentalConfigKey.scoreMSAStartsAtIteration,  Long.toString((long)(firstIt + 0.8*diff)) ) ;
+			}
 			
 			// VSP DEFAULTS:
 			config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 			config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+			config.timeAllocationMutator().setMutationRange(7200.);
 			
-			config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.WARN ) ;
-		
+			config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
 	}
 
 	private void run () {
@@ -168,26 +184,56 @@ public class KNGautengControler {
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
-		// CONSTRUCT UTILITY OF MONEY:
-//		UtilityOfMoneyI personSpecificUtilityOfMoney = 
-//				new GautengUtilityOfMoney( config.planCalcScore() , baseValueOfTime_h, valueOfTimeMultiplier) ;
-		UtilityOfMoneyI personSpecificUtilityOfMoney = 
-				new UtilityOfMoneyI(){
-			@Override
-			public double getMarginalUtilityOfMoney(Id personId) {
-				return 100./(1.+Double.parseDouble( personId.toString() ) ) ;
+		TollFactorI tollFactor = new SanralTollFactorOLD() ;
+		
+		Map<SanralTollVehicleType,Double> cnt = new HashMap<SanralTollVehicleType,Double>() ;
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			SanralTollVehicleType type = tollFactor.typeOf( person.getId() ) ;
+			if ( cnt.get(type)==null ) {
+				cnt.put(type, 0.) ;
 			}
-		} ;
+			cnt.put( type, 1. + cnt.get(type) ) ;
+		}
+		for ( SanralTollVehicleType type : SanralTollVehicleType.values() ) {
+			log.info( String.format( "type: %30s; cnt: %8.0f", type.toString() , cnt.get(type) ) );
+		}
+		
+		// CONSTRUCT UTILITY OF MONEY:
+		UtilityOfMoneyI personSpecificUtilityOfMoney ;
+		switch (ccc ) {
+		case equil:
+			personSpecificUtilityOfMoney = new UtilityOfMoneyI(){
+				@Override
+				public double getMarginalUtilityOfMoney(Id personId) {
+					return 100./(1.+Double.parseDouble( personId.toString() ) ) ;
+				}
+			} ;
+			break;
+		case gauteng:
+			personSpecificUtilityOfMoney = new GautengUtilityOfMoney( config.planCalcScore() , baseValueOfTime_h, valueOfTimeMultiplier, tollFactor) ;
+			break;
+		default:
+			throw new RuntimeException("missing") ;
+		}
+		
+		// SCORING FUNCTION:
 		final ScoringFunctionFactory scoringFunctionFactory = 
 				new PersonSpecificUoMScoringFunctionFactory(scenario.getConfig(), scenario.getNetwork(), personSpecificUtilityOfMoney );
 
 		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
-		RoadPricingSchemeImpl scheme = 
-//				new GautengRoadPricingScheme( config.roadpricing().getTollLinksFile(), scenario.getNetwork() , scenario.getPopulation() );
-				new RoadPricingSchemeImpl() ;
-		new RoadPricingReaderXMLv1(scheme).parse( config.roadpricing().getTollLinksFile() );
-
-		
+		RoadPricingScheme scheme = null ;
+		switch( ccc ) {
+		case equil:
+			RoadPricingSchemeImpl schemeImpl = new RoadPricingSchemeImpl() ;
+			new RoadPricingReaderXMLv1(schemeImpl).parse( config.roadpricing().getTollLinksFile() );
+			scheme = schemeImpl ;
+			break;
+		case gauteng:
+			scheme = new GautengRoadPricingScheme( config.roadpricing().getTollLinksFile(), scenario.getNetwork() , scenario.getPopulation(), tollFactor );
+			break;
+		default:
+			break;
+		}
 		
 		// === CONTROLER: ===
 
@@ -196,20 +242,24 @@ public class KNGautengControler {
 
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing class):
 		// insert into scoring:
-		controler.addControlerListener( new GenerationOfMoneyEvents( scenario.getNetwork(), scenario.getPopulation(), scheme) ) ;
+		controler.addControlerListener( new GenerationOfMoneyEvents( scenario.getNetwork(), scenario.getPopulation(), scheme, tollFactor) ) ;
 		controler.setScoringFunctionFactory( scoringFunctionFactory );
 
 		// insert into routing:
-//		controler.setTravelDisutilityFactory( new PersonSpecificTravelDisutilityInclTollFactory(scheme, personSpecificUtilityOfMoney) ) ;
-		controler.setTravelDisutilityFactory( new AutosensingTravelDisutilityInclTollFactory(scheme, scenario, scoringFunctionFactory) );
+			final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( scenario );
+			travelDisutilityFactory.setRoadPricingScheme(scheme);
+//			travelDisutilityFactory.setUom(personSpecificUtilityOfMoney);
+			travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory);
+//			travelDisutilityFactory.setRandomness(1.);
+			controler.setTravelDisutilityFactory( travelDisutilityFactory );
 		
-		// plans removal:
-		controler.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				event.getControler().getStrategyManager().setPlanSelectorForRemoval(new MyPlanSelectorForRemoval(scenario.getNetwork()));
-			}
-		});
+//		// plans removal:
+//		controler.addControlerListener(new StartupListener(){
+//			@Override
+//			public void notifyStartup(StartupEvent event) {
+//				event.getControler().getStrategyManager().setPlanSelectorForRemoval(new MyPlanSelectorForRemoval(scenario.getNetwork()));
+//			}
+//		});
 		
 		// ADDITIONAL ANALYSIS:
 		controler.addControlerListener(new KaiAnalysisListener()) ;
@@ -221,6 +271,7 @@ public class KNGautengControler {
 
 	
 	public static void main( String[] args ) {
+		OutputDirectoryLogging.catchLogEntries();
 		KNGautengControler controler = new KNGautengControler() ;
 		controler.createConfiguration(args); ;
 		controler.run();

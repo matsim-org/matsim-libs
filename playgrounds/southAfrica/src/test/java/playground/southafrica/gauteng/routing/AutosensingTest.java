@@ -46,8 +46,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.southafrica.gauteng.routing.EffectiveMarginalUtilitiesContainer;
-import playground.southafrica.gauteng.routing.RouterUtils;
+import playground.southafrica.kai.gauteng.EffectiveMarginalUtilitiesContainer;
+import playground.southafrica.kai.gauteng.RouterUtils;
 
 /**
  * @author nagel
@@ -107,15 +107,15 @@ public class AutosensingTest {
 		ScoringFunctionFactory scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(scenario) ;
 		EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory) ;
 		
-		Assert.assertEquals(-12.0/3600., muc.getEffectiveMarginalUtilityOfTravelTime().get(person), 0.01/3600. ) ;
-		Assert.assertTrue(muc.getEffectiveMarginalUtilityOfTravelTime().get(person) < 0. );
+		Assert.assertEquals(-12.0/3600., muc.getEffectiveMarginalUtilityOfTtime(person.getId()), 0.01/3600. ) ;
+		Assert.assertTrue(muc.getEffectiveMarginalUtilityOfTtime(person.getId()) < 0. );
 		// (the first condition is not very precise ... since the autosensing is not that exact.  So the second condition tests
 		// in addition for the exact sign.)
 
-		Assert.assertEquals(marginalUtilityOfMoneyCONFIG, muc.getMarginalUtilityOfMoney().get(person), 1.e-15 ) ;
+		Assert.assertEquals(marginalUtilityOfMoneyCONFIG, muc.getMarginalUtilityOfMoney(person.getId()), 1.e-15 ) ;
 
 		Assert.assertEquals(monetaryDistanceCostRateCarCONFIG*marginalUtilityOfMoneyCONFIG, 
-				muc.getEffectiveMarginalUtilityOfDistance().get(person) , 1.e-15 ) ;
+				muc.getMarginalUtilityOfDistance(person.getId()) , 1.e-15 ) ;
 		// (for the time being, the utilities of distance are linear in the distance, thus autosensing is exact.)
 		
 //		TravelDisutility td = new PersonIndividualTimeDistanceDisutility(tt, muc ) ;

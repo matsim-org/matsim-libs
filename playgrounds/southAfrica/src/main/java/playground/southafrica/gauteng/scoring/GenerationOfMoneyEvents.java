@@ -19,6 +19,7 @@ import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.southafrica.gauteng.GautengTollStatistics;
+import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
 
 /**
  * @author nagel
@@ -30,10 +31,10 @@ public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimList
 	final CalcAverageTolledTripLength cattl ;
 	final GautengTollStatistics gautengTollStatistics ;
 	
-	public GenerationOfMoneyEvents( Network network, Population population, RoadPricingScheme vehDepScheme ) {
+	public GenerationOfMoneyEvents( Network network, Population population, RoadPricingScheme vehDepScheme, TollFactorI tollFactor ) {
 		calcPaidToll = new CalcPaidToll(network, vehDepScheme) ;
 		cattl = new CalcAverageTolledTripLength(network, vehDepScheme );
-		gautengTollStatistics = new GautengTollStatistics() ;
+		gautengTollStatistics = new GautengTollStatistics(tollFactor) ;
 	}
 
 	@Override

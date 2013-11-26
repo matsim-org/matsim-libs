@@ -7,8 +7,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
-import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor;
-import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor.Type;
+import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
+import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
 
 /**
  * Calculates the utility of money from a given Value of Time (VoT). 
@@ -21,6 +21,8 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	private PlanCalcScoreConfigGroup planCalcScore;
 	private final double baseValueOfTime_h;
 	private final double commercialMultiplier;
+	
+	private final TollFactorI tollFactor ;
 
 	/**
 	 * Class to calculate the marginal utility of money (beta_money) for 
@@ -31,29 +33,32 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 	 * @param valueOfTimeMultiplier to inflate the base VoT for heavy commercial 
 	 * vehicles. A multiplier of <i>half</i> this value is used for busses and
 	 * smaller commercial vehicles.
+	 * @param tollFactor TODO
 	 */
-	public GautengUtilityOfMoney( final PlanCalcScoreConfigGroup cnScoringGroup, double baseValueOfTime_h, double valueOfTimeMultiplier ) {
+	public GautengUtilityOfMoney( final PlanCalcScoreConfigGroup cnScoringGroup, double baseValueOfTime_h, double valueOfTimeMultiplier, TollFactorI tollFactor ) {
 		this.planCalcScore = cnScoringGroup ;
 		log.warn("Value of Time (VoT) used as base: " + baseValueOfTime_h) ;
 		log.warn("Value of Time multiplier: " + valueOfTimeMultiplier) ;
 		
 		this.baseValueOfTime_h = baseValueOfTime_h ;
 		this.commercialMultiplier = valueOfTimeMultiplier ;
+		
+		this.tollFactor = tollFactor ;
 
-		for ( Type vehType : Type.values() ) {
-			log.info( " vehType: " + vehType.toString() 
-					+ "; utility of travel time savings per hr: " + getUtilityOfTravelTime_hr()
-					+ "; value of travel time savings per hr: " + getValueOfTime_hr(vehType)
-					+ "; => utility of money: " + getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr(vehType)) ) ;
+		for ( SanralTollVehicleType vehType : SanralTollVehicleType.values() ) {
+			log.info( String.format("%30s: mUTTS: %5.2f/hr; mVTTS: %5.0f ZAR/hr; mUoM: %5.3f/ZAR", 
+					vehType.toString(), (double)getUtilityOfTravelTime_hr(), (double)getValueOfTime_hr(vehType), 
+					(double)getUtilityOfMoneyFromValueOfTime( getValueOfTime_hr(vehType)) ) ) ;
 		}
-		// (I found these logging statements _above_ setting this.baseValueOfTime etc.  In consequence, I would think that they
+		// (I found (the previous verison of) these logging statements _above_ setting this.baseValueOfTime etc.  In consequence, I would think that they
 		// were giving wrong information.  Originally, the values came from the config file only or were
 		// hard-coded.  kai, nov'13)
+		
 	}
 
 	@Override
 	public double getMarginalUtilityOfMoney(final Id personId ) {
-		Type vehicleType = SanralTollFactor.typeOf(personId);
+		SanralTollVehicleType vehicleType = tollFactor.typeOf(personId);
 		double valueOfTime_hr = getValueOfTime_hr(vehicleType);
 		double utilityOfMoney = getUtilityOfMoneyFromValueOfTime(valueOfTime_hr);
 		
@@ -77,7 +82,7 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 
 	private static int wrncnt=0 ;
 	
-	private double getValueOfTime_hr(Type vehicleType) {
+	private double getValueOfTime_hr(SanralTollVehicleType vehicleType) {
 		double valueOfTime_hr = baseValueOfTime_h ;
 		switch( vehicleType ) {
 		case carWithTag:

@@ -1,4 +1,4 @@
-package playground.southafrica.gauteng.routing;
+package playground.southafrica.kai.gauteng;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,40 +8,55 @@ import org.matsim.api.core.v01.population.Person;
 
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
-public class EffectiveMarginalUtilitiesContainer implements UtilityOfMoneyI {
-	private final Map<Person,Double> effectiveMarginalUtilityOfTravelTime = new HashMap<Person,Double>() ;
-	private final Map<Person,Double> effectiveMarginalUtilityOfDistance = new HashMap<Person,Double>() ;
-	private final Map<Person,Double> marginalUtilityOfMoney = new HashMap<Person,Double>() ;
+public class EffectiveMarginalUtilitiesContainer implements UtilityOfMoneyI, UtilityOfDistanceI, UtilityOfTtimeI {
+	private final Map<Id,Double> effectiveMarginalUtilityOfTravelTime = new HashMap<Id,Double>() ;
+	private final Map<Id,Double> effectiveMarginalUtilityOfDistance = new HashMap<Id,Double>() ;
+	private final Map<Id,Double> marginalUtilityOfMoney = new HashMap<Id,Double>() ;
 	
 	private double effectiveMarginalUtilityOfTravelTimeMAX = Double.NEGATIVE_INFINITY ;
 	private double effectiveMarginalUtilityOfDistanceMAX = Double.NEGATIVE_INFINITY ;
 
-	public Map<Person,Double> getEffectiveMarginalUtilityOfTravelTime() {
-		return effectiveMarginalUtilityOfTravelTime;
+	@Override
+	public double getEffectiveMarginalUtilityOfTtime( Id personId ) {
+		return this.effectiveMarginalUtilityOfTravelTime.get( personId ) ;
 	}
+	public Double putEffectiveMarginalUtilityOfTtime( Id personId, double val ) {
+		return this.effectiveMarginalUtilityOfTravelTime.put( personId, val ) ;
+	}
+	
 	/**
 	 * Notes:<ul>
 	 * <li> One might want to pull this apart into distance cost rate and utl of money.  On the other hand, it is the _effective_
 	 * value, so giving the disutility ("cost" in computer science terms) is really not so bad.  kai, nov'13
 	 * </ul>
 	 */
-	public Map<Person,Double> getEffectiveMarginalUtilityOfDistance() {
-		return effectiveMarginalUtilityOfDistance;
+	public Double putMarginalUtilityOfDistance( Id personId, double val ) {
+		return this.effectiveMarginalUtilityOfDistance.put( personId,  val ) ;
 	}
-	public Map<Person,Double> getMarginalUtilityOfMoney() {
-		return marginalUtilityOfMoney;
+	@Override
+	public double getMarginalUtilityOfDistance( Id personId ) {
+		return this.effectiveMarginalUtilityOfDistance.get(personId) ;
 	}
-	public double getEffectiveMarginalUtilityOfTravelTimeMAX() {
+	
+	@Override
+	public double getEffectiveMarginalUtilityOfTtimeMAX() {
 		return effectiveMarginalUtilityOfTravelTimeMAX;
 	}
-	public void setEffectiveMarginalUtilityOfTravelTimeMAX(double effectiveMarginalUtilityOfTravelTimeMAX) {
+	public void setMarginalUtilityOfTravelTimeMAX(double effectiveMarginalUtilityOfTravelTimeMAX) {
 		this.effectiveMarginalUtilityOfTravelTimeMAX = effectiveMarginalUtilityOfTravelTimeMAX;
 	}
-	public double getEffectiveMarginalUtilityOfDistanceMAX() {
+	@Override
+	public double getMarginalUtilityOfDistanceMAX() {
 		return effectiveMarginalUtilityOfDistanceMAX;
 	}
 	public void setEffectiveMarginalUtilityOfDistanceMAX(double effectiveMarginalUtilityOfDistanceMAX) {
 		this.effectiveMarginalUtilityOfDistanceMAX = effectiveMarginalUtilityOfDistanceMAX;
+	}
+
+	// yyyyyy this should deliberately not return the container but just the values so that a computation rather than 
+	// a lookup can be put behind the interface.
+	public Double putMarginalUtilityOfMoney( Id personId, double val ) {
+		return this.marginalUtilityOfMoney.put( personId, val) ;
 	}
 	@Override
 	public double getMarginalUtilityOfMoney(Id personId) {

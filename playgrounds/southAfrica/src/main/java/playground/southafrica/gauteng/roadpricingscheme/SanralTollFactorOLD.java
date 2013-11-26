@@ -22,15 +22,11 @@ package playground.southafrica.gauteng.roadpricingscheme;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-public class SanralTollFactor implements TollFactorI {
+public  class SanralTollFactorOLD implements TollFactorI {
 	private final  int carStartId = 0;
 	private final  int carEndId = 157517;
-	private final  int comIntraStartId = 1100000;
-	private final  int comIntraEndId = 1199999;
-	private final  int comInterInOutStartId = 1200000;
-	private final  int comInterInOutEndId = 1299999;
-	private final  int comInterOutInStartId = 1300000;
-	private final  int comInterOutInEndId = 1399999;
+	private final  int comStartId = 1000000;
+	private final  int comEndId = 1009999;
 	private final  int busStartId = 2000000;
 	private final  int busEndId = 2000209;
 	private final  int taxiStartId = 3000000;
@@ -38,9 +34,6 @@ public class SanralTollFactor implements TollFactorI {
 	private final  int extStartId = 4000000;
 	private final  int extEndId = 4020181;
 	
-	/* (non-Javadoc)
-	 * @see playground.southafrica.gauteng.roadpricingscheme.TollFactorI#typeOf(org.matsim.api.core.v01.Id)
-	 */
     @Override
 	public  SanralTollVehicleType typeOf ( Id idObj ) {
 		long id = Long.parseLong(idObj.toString());
@@ -51,36 +44,18 @@ public class SanralTollFactor implements TollFactorI {
 		} else if (id <= carEndId) {
 			/* It is a private car without a tag. */
 			return SanralTollVehicleType.carWithoutTag ;
-		} else if(id < comIntraStartId + fractionCommercialClassAIntra*(comIntraEndId - comIntraStartId)*TagPenetration.COMMERCIAL ||
-				id < comInterInOutStartId + fractionCommercialClassAInter*(comInterInOutEndId - comInterInOutStartId)*TagPenetration.COMMERCIAL ||
-				id < comInterOutInStartId + fractionCommercialClassAInter*(comInterOutInEndId - comInterOutInStartId)*TagPenetration.COMMERCIAL ){
-			/* It is a Class A commercial vehicle with a tag. */
-			return SanralTollVehicleType.commercialClassAWithTag;
-		} else if(id < comIntraStartId + fractionCommercialClassAIntra*(comIntraEndId - comIntraStartId) ||
-				id < comInterInOutStartId + fractionCommercialClassAInter*(comInterInOutEndId - comInterInOutStartId) ||
-				id < comInterOutInStartId + fractionCommercialClassAInter*(comInterOutInEndId - comInterOutInStartId) ){
-			/* It is a Class A commercial vehicle without a tag. */
-			return SanralTollVehicleType.commercialClassAWithoutTag;
-		} else if(id < (comIntraStartId + fractionCommercialClassAIntra*(comIntraEndId - comIntraStartId)) + fractionCommercialClassBIntra*(comIntraEndId - comIntraStartId)*TagPenetration.COMMERCIAL ||
-				  id < (comInterInOutStartId + fractionCommercialClassAInter*(comInterInOutEndId - comInterInOutStartId)) + fractionCommercialClassBInter*(comInterInOutEndId - comInterInOutStartId)*TagPenetration.COMMERCIAL ||
-				  id < (comInterOutInStartId + fractionCommercialClassAInter*(comInterOutInEndId - comInterOutInStartId)) + fractionCommercialClassBInter*(comInterOutInEndId - comInterOutInStartId)*TagPenetration.COMMERCIAL ){
+		} else if (id < comStartId + fractionClassB*((comEndId - comStartId)*TagPenetration.COMMERCIAL)){
 			/* It is a Class B commercial vehicle with a tag. */
-			return SanralTollVehicleType.commercialClassBWithTag;
-		} else if(id < (comIntraStartId + fractionCommercialClassAIntra*(comIntraEndId - comIntraStartId)) + fractionCommercialClassBIntra*(comIntraEndId - comIntraStartId) ||
-				id < (comInterInOutStartId + fractionCommercialClassAInter*(comInterInOutEndId - comInterInOutStartId)) + fractionCommercialClassBInter*(comInterInOutEndId - comInterInOutStartId) ||
-				id < (comInterOutInStartId + fractionCommercialClassAInter*(comInterOutInEndId - comInterOutInStartId)) + fractionCommercialClassBInter*(comInterOutInEndId - comInterOutInStartId) ){
-			/* It is a Class B commercial vehicle without a tag. */
-			return SanralTollVehicleType.commercialClassBWithoutTag;
-		} else if(id < (comIntraStartId + (fractionCommercialClassAIntra + fractionCommercialClassBIntra)*(comIntraEndId - comIntraStartId)) + fractionCommercialClassCIntra*(comIntraEndId - comIntraStartId)*TagPenetration.COMMERCIAL ||
-				id < (comInterInOutStartId + (fractionCommercialClassAInter + fractionCommercialClassBInter)*(comInterInOutEndId - comInterInOutStartId)) + fractionCommercialClassCInter*(comInterInOutEndId - comInterInOutStartId)*TagPenetration.COMMERCIAL ||
-				id < (comInterOutInStartId + (fractionCommercialClassAInter + fractionCommercialClassBInter)*(comInterOutInEndId - comInterOutInStartId)) + fractionCommercialClassCInter*(comInterOutInEndId - comInterOutInStartId)*TagPenetration.COMMERCIAL ){
+			return SanralTollVehicleType.commercialClassBWithTag ;
+		} else if (id < comStartId + (comEndId - comStartId)*TagPenetration.COMMERCIAL){
 			/* It is a Class C commercial vehicle with a tag. */
-			return SanralTollVehicleType.commercialClassCWithTag;
-		} else if(id <= comIntraEndId ||
-				  id <= comInterInOutEndId ||
-				  id <= comInterOutInEndId){
+			return SanralTollVehicleType.commercialClassCWithTag ;
+		} else if (id < comEndId - (comEndId - comStartId)*(1-TagPenetration.COMMERCIAL)*fractionClassB){
+			/* It is a Class B commercial vehicle without a tag. */
+			return SanralTollVehicleType.commercialClassBWithoutTag ;
+		} else if (id <= comEndId){
 			/* It is a Class C commercial vehicle without a tag. */
-			return SanralTollVehicleType.commercialClassCWithoutTag;
+			return SanralTollVehicleType.commercialClassCWithoutTag ;
 		} else if (id < busStartId + (busEndId - busStartId)*TagPenetration.BUS) {
 			/* It is a bus with a tag. */
 			return SanralTollVehicleType.busWithTag ;
@@ -103,18 +78,11 @@ public class SanralTollFactor implements TollFactorI {
 
 	}
     
-    
 	
 	/* From the counting station data I've inferred that the split between 
 	 * Class B and C is about 50:50, assuming that `Short' represents Class B, 
 	 * and `Medium' and `Long' combined represent Class C vehicles. */
-	private final  double fractionCommercialClassAIntra = 0.50;
-	private final  double fractionCommercialClassBIntra = 0.30;
-	private final  double fractionCommercialClassCIntra = 0.20;
-
-	private final  double fractionCommercialClassAInter = 0.30;
-	private final  double fractionCommercialClassBInter = 0.40;
-	private final  double fractionCommercialClassCInter = 0.30;
+	private final  double fractionClassB = 0.50;
 	
 	
 	private  double getTollFactor(final Id vehicleId, final Id linkId, final double time){		
@@ -130,22 +98,16 @@ public class SanralTollFactor implements TollFactorI {
 		case carWithoutTag:
 			// nothing
 			break ;
-		case commercialClassAWithTag:
-			tagDiscount = 0.25;
-			break;
-		case commercialClassAWithoutTag:
-			// nothing
-			break ;
 		case commercialClassBWithTag:
 			sizeFactor = 3;
 			tagDiscount = 0.25;
 			break ;
-		case commercialClassBWithoutTag:
-			sizeFactor = 3;
-			break ;
 		case commercialClassCWithTag:
 			sizeFactor = 6;
 			tagDiscount = 0.25;
+			break ;
+		case commercialClassBWithoutTag:
+			sizeFactor = 3;
 			break ;
 		case commercialClassCWithoutTag:
 			sizeFactor = 6;
@@ -172,14 +134,17 @@ public class SanralTollFactor implements TollFactorI {
 		case extWithoutTag:
 			// nothing
 			break ;
+		case commercialClassAWithTag:
+			break;
+		case commercialClassAWithoutTag:
+			break;
+		default:
+			throw new RuntimeException("todo") ;
 		}
 		return getDiscountEligibility(linkId) ? sizeFactor*(1 - Math.min(1.0, timeDiscount + tagDiscount + ptDiscount)) : sizeFactor;
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.southafrica.gauteng.roadpricingscheme.TollFactorI#getTollFactor(org.matsim.api.core.v01.population.Person, org.matsim.api.core.v01.Id, double)
-	 */
 	@Override
 	public  double getTollFactor(final Person person, final Id linkId, final double time) {
 		// yyyyyy aaarrrrgh ... (assuming vehId = personId).  kai, mar'12
@@ -215,7 +180,7 @@ public class SanralTollFactor implements TollFactorI {
 	 * @param linkId
 	 * @return
 	 */
-	private static boolean getDiscountEligibility(Id linkId){
+	private  boolean getDiscountEligibility(Id linkId){
 		if(NoDiscountLinks.getList().contains(linkId)){
 			return false;
 		} else{

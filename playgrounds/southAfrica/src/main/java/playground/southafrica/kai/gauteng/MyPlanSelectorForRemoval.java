@@ -35,13 +35,15 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.apache.log4j.Logger ;
 
 /**
  * @author nagel
  *
  */
 final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
-
+	static private final Logger log = Logger.getLogger(MyPlanSelectorForRemoval.class);
+	
 	private static final double sameActTypeReward = 1;
 	private static final double sameLocationReward = 1;
 	private static final double sameRouteReward = 1;
@@ -54,6 +56,11 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 
 	@Override
 	protected Map<Plan, Double> calcWeights(List<? extends Plan> plans) {
+		if ( plans.isEmpty() ) {
+			throw new RuntimeException("empty plans set; this will not work ...") ;
+		}
+		
+		
 		Map<Plan,Double> map = new HashMap<Plan,Double>() ;
 
 		double[] utils = new double[plans.size()] ;
@@ -69,6 +76,9 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 		for ( Plan plan1 : plans ) {
 			for ( Plan plan2 : plans ) {
 				utils[rr] -= similarity( plan1, plan2, null, network ) ; 
+				if ( Double.isNaN(utils[rr]) ) {
+					log.warn( "utils is NaN" ) ;
+				}
 			}
 			rr++ ;
 		}
@@ -95,6 +105,13 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 				minIdx = kk ;
 			}
 		}
+		if ( minIdx==null ) {
+			log.warn("minIdx is still null; there is a problem somehwere.") ;
+			for ( int kk=0 ; kk<utils.length; kk++ ) {
+				log.warn( "kk: " + kk + "; utils: " + utils[kk] ) ;
+			}
+		}
+		
 		int ab = 0 ;
 		for ( Plan plan : plans ) {
 			if ( ab==minIdx){

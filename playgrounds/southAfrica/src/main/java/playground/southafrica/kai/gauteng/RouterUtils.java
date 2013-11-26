@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.gauteng.routing;
+package playground.southafrica.kai.gauteng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,17 +113,17 @@ public class RouterUtils {
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			cnt++ ;
 			double utts = ( e2s.get(1).getAgentScore(person.getId()) - e2s.get(0).getAgentScore(person.getId()) ) / DELTA_TRIPTIME ;
-			muc.getEffectiveMarginalUtilityOfTravelTime().put( person, utts ) ;
+			muc.putEffectiveMarginalUtilityOfTtime( person.getId(), utts ) ;
 			effMargUtlTTimeMAX = Math.max( effMargUtlTTimeMAX, utts ) ;
 			effMargUtlTTimeMIN = Math.min( effMargUtlTTimeMIN, utts ) ;
 			
 			double utds = ( e2s.get(2).getAgentScore(person.getId()) - e2s.get(1).getAgentScore(person.getId()) ) / DELTA_DISTANCE ;
-			muc.getEffectiveMarginalUtilityOfDistance().put( person, utds ) ;
+			muc.putMarginalUtilityOfDistance( person.getId(), utds ) ;
 			effMargUtlDistanceMAX = Math.max( effMargUtlDistanceMAX, utds ) ;
 			effMargUtlDistanceMIN = Math.min( effMargUtlDistanceMIN, utds ) ;
 			
 			double mum = e2s.get(N_TESTS).getAgentScore(person.getId()) ;
-			muc.getMarginalUtilityOfMoney().put( person, mum )  ;
+			muc.putMarginalUtilityOfMoney( person.getId(), mum )  ;
 			margUtlOfMoneyMAX = Math.max( margUtlOfMoneyMAX, mum ) ;
 			margUtlOfMoneyMIN = Math.min( margUtlOfMoneyMIN, mum ) ;
 			mVTTSMAX = Math.max( mVTTSMAX, -utts/mum ) ;
@@ -146,7 +146,7 @@ public class RouterUtils {
 		log.info( "mVTTS stretch from " + 3600.*mVTTSMIN + " to " + 3600.*mVTTSMAX + " [monetary units]/hour" );
 		log.info( "mVTDS stretch from " + 1000.*mVTDSMIN + " to " + 1000.*mVTDSMAX + " [monetary units]/km" );
 		
-		muc.setEffectiveMarginalUtilityOfTravelTimeMAX( effMargUtlTTimeMAX );
+		muc.setMarginalUtilityOfTravelTimeMAX( effMargUtlTTimeMAX );
 		muc.setEffectiveMarginalUtilityOfDistanceMAX( effMargUtlDistanceMAX );
 		
 		return muc ;

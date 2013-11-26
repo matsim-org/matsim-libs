@@ -8,15 +8,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor;
-import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor.Type;
+import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
+import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
 
 /**
  * @author nagel
@@ -27,9 +26,15 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 	private Map<Id,Double> personMoneyMap = new HashMap<Id,Double>() ;
 	private Map<Id,Double> personCountMap = new HashMap<Id,Double>() ;
 	
-	private Map<Type,Double> typeMoneyMap = new HashMap<Type,Double>() ;
-	private Map<Type,Double> typeCountMap = new HashMap<Type,Double>() ;
+	private Map<SanralTollVehicleType,Double> typeMoneyMap = new HashMap<SanralTollVehicleType,Double>() ;
+	private Map<SanralTollVehicleType,Double> typeCountMap = new HashMap<SanralTollVehicleType,Double>() ;
 
+	private final TollFactorI tollFactor ;
+
+	public GautengTollStatistics( TollFactorI tollFactor ) {
+		this.tollFactor = tollFactor ;
+	}
+	
 	@Override
 	public void reset(int iteration) {
 //		Logger.getLogger(this.getClass()).warn("calling reset ...") ;
@@ -63,7 +68,7 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 		return (int)(amount/5.) ;
 	}
 
-	enum SimplifiedType {priv, comm} ;  
+	enum SimplifiedType {privateCar, commercialVehicle, otherVehicle } ;  
 
 	class TwoWayTable<K,L,V> {
 		Map<String,Double> values = new HashMap<String,Double>() ;
@@ -81,7 +86,6 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 		}
 	}
 
-	static int maxIdx = 0 ;
 	public void printTollInfo(String directoryname) {
 		TwoWayTable<SimplifiedType,Integer,Double> countsTable = new TwoWayTable<SimplifiedType,Integer,Double>() ;
 		TwoWayTable<SimplifiedType,Integer,Double> moneyTable = new TwoWayTable<SimplifiedType,Integer,Double>() ;
@@ -93,17 +97,28 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 			}
 			Integer idx = moneyToBin( amount ) ;
 //			System.err.println( " person: " + personId + " money: " + amount ) ;
-			Type agentType = SanralTollFactor.typeOf(personId) ;
+			SanralTollVehicleType agentType = tollFactor.typeOf(personId) ;
 			SimplifiedType sType = null ;
 			switch ( agentType ) {
 			case carWithoutTag:
 			case carWithTag:
-				sType = SimplifiedType.priv ; break ;
+			case commercialClassAWithTag:
+			case commercialClassAWithoutTag:
+				sType = SimplifiedType.privateCar ; break ;
 			case commercialClassBWithoutTag:
 			case commercialClassBWithTag:
 			case commercialClassCWithoutTag:
 			case commercialClassCWithTag:
-				sType = SimplifiedType.comm ; break ;
+				sType = SimplifiedType.commercialVehicle ; break ;
+			case busWithTag:
+			case busWithoutTag:
+			case taxiWithTag:
+			case taxiWithoutTag:
+			case extWithTag:
+			case extWithoutTag:
+				sType = SimplifiedType.otherVehicle ; break ;
+			default:
+				throw new RuntimeException("case statement missing for type: " + agentType ) ;
 			}
 
 			if ( sType != null ) { 
@@ -136,7 +151,7 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 				continue ;
 			}
 			try {
-				out.write( "AV_TOLL\tN_VEHS\n" ) ;
+				out.write( "#AV_TOLL\tN_VEHS\n" ) ;
 			}catch ( IOException e) {
 				e.printStackTrace();
 			}

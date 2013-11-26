@@ -30,6 +30,10 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
@@ -72,10 +76,24 @@ public class PersonSpecificUoMScoringFunctionFactory implements ScoringFunctionF
 		
 		return scoringFunctionAccumulator;
 	}
+	
+	public ScoringFunction createNewScoringFunction2( Plan plan ) {
+		SumScoringFunction sum = new SumScoringFunction() ;
+
+		sum.addScoringFunction(new CharyparNagelActivityScoring(params));
+		sum.addScoringFunction(new CharyparNagelLegScoring(params,network));
+		sum.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+		// person-dependent money scoring function (standard implementation contains person-indep scoring function):
+		double utilityOfMoney_normally_positive = this.utlOfMon.getMarginalUtilityOfMoney(plan.getPerson().getId());
+		sum.addScoringFunction( new MoneyScoringImpl(utilityOfMoney_normally_positive) ) ;
+		
+		return sum ;
+	}
 
 }
 
-class MoneyScoringImpl implements MoneyScoring, BasicScoring {
+class MoneyScoringImpl implements MoneyScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring {
 	final static private Logger log = Logger.getLogger(MoneyScoringImpl.class);
 
 	private double score = 0.0;

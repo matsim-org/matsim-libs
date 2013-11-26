@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.gauteng.routing;
+package playground.southafrica.kai.gauteng;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -35,21 +35,29 @@ public class PersonIndividualTimeDistanceDisutility implements TravelDisutility 
 
 	protected final TravelTime timeCalculator;
 
-	private final EffectiveMarginalUtilitiesContainer muc ;
+	private final UtilityOfTtimeI uot ;
+	private final UtilityOfDistanceI uod ;
 	
 	private double marginalCostOfTimeMin = 0. ;
 	private double marginalCostOfDistanceMin = 0. ;
+	
+	private Person prevPerson = null ;
 
-	public PersonIndividualTimeDistanceDisutility(final TravelTime timeCalculator, final EffectiveMarginalUtilitiesContainer muc) {
+	private double marginalCostOfTime;
+
+	private double marginalCostOfDistance;
+
+	public PersonIndividualTimeDistanceDisutility(final TravelTime timeCalculator, final UtilityOfTtimeI uot, final UtilityOfDistanceI uod ) {
 		this.timeCalculator = timeCalculator;
-		this.muc = muc ;
+		this.uot = uot ;
+		this.uod = uod ;
 
-		this.marginalCostOfTimeMin = - muc.getEffectiveMarginalUtilityOfTravelTimeMAX() ;
+		this.marginalCostOfTimeMin = - uot.getEffectiveMarginalUtilityOfTtimeMAX() ;
 		if ( this.marginalCostOfTimeMin < 0. ) {
 			throw new RuntimeException( "marginal cost of time < 0.; probably sign error somewhere ... ") ;
 		}
 		
-		this.marginalCostOfDistanceMin = - muc.getEffectiveMarginalUtilityOfDistanceMAX() ;
+		this.marginalCostOfDistanceMin = - uod.getMarginalUtilityOfDistanceMAX() ;
 		if ( this.marginalCostOfDistanceMin < 0. ) {
 			throw new RuntimeException( "marginal cost of distance < 0. ; probably sign error somewhere ... ") ;
 		}
@@ -58,16 +66,20 @@ public class PersonIndividualTimeDistanceDisutility implements TravelDisutility 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) 
 	{
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+		if ( person != prevPerson ) {
+			prevPerson = person ;
+			this.marginalCostOfTime = - uot.getEffectiveMarginalUtilityOfTtime(person.getId()) ;
+			if ( this.marginalCostOfTime < 0. ) {
+				throw new RuntimeException("marginalCostOfTime < 0; probably a sign error somewhere") ;
+			}
+			this.marginalCostOfDistance = - uod.getMarginalUtilityOfDistance(person.getId()) ;
+			if ( this.marginalCostOfDistance < 0. ) {
+				throw new RuntimeException("marginalCostOfDistance < 0; probably a sign error somewhere") ;
+			}
 
-		double marginalCostOfTime = - muc.getEffectiveMarginalUtilityOfTravelTime().get(person) ;
-		if ( marginalCostOfTime < 0. ) {
-			throw new RuntimeException("marginalCostOfTime < 0; probably a sign error somewhere") ;
 		}
-		double marginalCostOfDistance = - muc.getEffectiveMarginalUtilityOfDistance().get(person) ;
-		if ( marginalCostOfDistance < 0. ) {
-			throw new RuntimeException("marginalCostOfDistance < 0; probably a sign error somewhere") ;
-		}
+		
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
 		return marginalCostOfTime * travelTime + marginalCostOfDistance * link.getLength();
 	}
