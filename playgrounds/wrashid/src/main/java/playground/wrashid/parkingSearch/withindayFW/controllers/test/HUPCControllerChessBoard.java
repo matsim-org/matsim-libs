@@ -34,7 +34,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
@@ -73,7 +73,7 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.config.plansCalcRoute()));
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 
 		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.config.planCalcScore());
 		

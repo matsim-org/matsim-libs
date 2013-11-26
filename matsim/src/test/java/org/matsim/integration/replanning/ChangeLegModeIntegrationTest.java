@@ -39,7 +39,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -112,7 +112,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 			@Override
 			public TripRouter getTripRouter() {
-				return new TripRouterFactoryImpl( scenario, new OnlyTimeDependentTravelCostCalculatorFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null ).instantiateAndConfigureTripRouter();
+				return new TripRouterFactoryImpl( scenario, new OnlyTimeDependentTravelDisutilityFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null ).instantiateAndConfigureTripRouter();
 			}
 			
 		});

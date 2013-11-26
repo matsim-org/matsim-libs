@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -90,7 +90,7 @@ public class CostNavigationRouteSample {
     	createNetwork(scenario);
     	
     	TravelTime travelTime = new TravelTimeCost();
-		OnlyTimeDependentTravelCostCalculatorFactory travelDisutilityFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		OnlyTimeDependentTravelDisutilityFactory travelDisutilityFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, null);
 		
 		LeastCostPathCalculatorFactory factory = new FastDijkstraFactory();

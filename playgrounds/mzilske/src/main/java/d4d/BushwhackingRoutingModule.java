@@ -21,7 +21,7 @@ import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.TravelTime;
@@ -42,7 +42,7 @@ public class BushwhackingRoutingModule implements RoutingModule {
 		mrf.setRouteFactory("unknown", new GenericRouteFactory());
 		teleportationLegRouter = new LegRouterWrapper("unknown", pf, new TeleportationLegRouter(mrf, 2.0, 1.7));
 		TravelTime ttc = new FreeSpeedTravelTime();
-		networkLegRouter = new LegRouterWrapper("unknown", pf, new NetworkLegRouter(network, new Dijkstra(network, new OnlyTimeDependentTravelDisutilityCalculator(ttc), ttc), mrf));
+		networkLegRouter = new LegRouterWrapper("unknown", pf, new NetworkLegRouter(network, new Dijkstra(network, new OnlyTimeDependentTravelDisutility(ttc), ttc), mrf));
 	}
 
 	@Override

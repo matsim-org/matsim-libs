@@ -35,7 +35,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -147,7 +147,7 @@ public class MapMatching {
 				Network subNetwork = null;
 				
 				FreeSpeedTravelTime freespeedCalc = new FreeSpeedTravelTime();
-				OnlyTimeDependentTravelDisutilityCalculator disutilityCalc = new OnlyTimeDependentTravelDisutilityCalculator(freespeedCalc);
+				OnlyTimeDependentTravelDisutility disutilityCalc = new OnlyTimeDependentTravelDisutility(freespeedCalc);
 				
 				if (route.mode == "train"){					
 					pather = new Dijkstra(TrainNetwork, disutilityCalc, freespeedCalc);

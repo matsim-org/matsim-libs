@@ -69,7 +69,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -783,7 +783,7 @@ public final class MarathonRunner implements StartupListener,
 //							new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime()).createTravelTime()).createTravelTime());
 		
 //		// add time dependent penalties to travel costs within the affected area
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, coordAnalyzer);
 
 		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenario, travelTimes, penaltyCostFactory);

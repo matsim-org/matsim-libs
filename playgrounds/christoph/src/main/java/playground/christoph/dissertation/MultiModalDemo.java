@@ -79,7 +79,7 @@ import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -672,7 +672,7 @@ public class MultiModalDemo {
 			super(scenario);
 			
 			this.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-			this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
+			this.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
 		}
 		
 		@Override

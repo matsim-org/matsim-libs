@@ -34,13 +34,13 @@ import org.matsim.vehicles.Vehicle;
  *  
  * @author cdobler
  */
-public class OnlyTimeDependentTravelDisutilityCalculator implements TravelDisutility {
+public class OnlyTimeDependentTravelDisutility implements TravelDisutility {
 
-	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelDisutilityCalculator.class);
+	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelDisutility.class);
 	
 	protected final TravelTime travelTime;
 
-	public OnlyTimeDependentTravelDisutilityCalculator(final TravelTime travelTime) {
+	public OnlyTimeDependentTravelDisutility(final TravelTime travelTime) {
 		if (travelTime == null) {
 			log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
 			this.travelTime = new FreeSpeedTravelTime();

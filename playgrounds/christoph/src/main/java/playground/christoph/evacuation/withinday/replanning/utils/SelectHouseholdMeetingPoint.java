@@ -45,7 +45,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -134,7 +134,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 	
 	private void init() {
 		
-		this.disutilityFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		this.disutilityFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(this.scenario);
 		TransitRouterFactory transitRouterFactory = null;

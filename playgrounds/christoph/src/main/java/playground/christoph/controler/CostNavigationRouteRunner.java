@@ -35,7 +35,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.controller.WithinDayControlerListener;
@@ -117,7 +117,7 @@ public class CostNavigationRouteRunner implements MobsimInitializedListener, Aft
 
 		TravelTime travelTime = this.lookupTravelTime;
 		
-		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		OnlyTimeDependentTravelDisutilityFactory travelCostFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		
 		LinkReplanningMap linkReplanningMap = this.withinDayControlerListener.getLinkReplanningMap();
 		MobsimDataProvider mobsimDataProvider = this.withinDayControlerListener.getMobsimDataProvider();

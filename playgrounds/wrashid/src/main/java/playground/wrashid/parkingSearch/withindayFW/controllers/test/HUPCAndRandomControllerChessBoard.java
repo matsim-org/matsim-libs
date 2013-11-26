@@ -36,7 +36,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -78,7 +78,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		// travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 		// Only the "non-simulated" modes handled by the multimodal extension should go in there.
 		
-		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
+		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
 		this.initWithinDayTripRouterFactory();
 		
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());

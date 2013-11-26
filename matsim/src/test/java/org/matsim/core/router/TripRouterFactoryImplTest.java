@@ -41,7 +41,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -113,7 +113,7 @@ public class TripRouterFactoryImplTest {
 		TripRouterFactoryInternal factory =
 			new TripRouterFactoryImpl(
 					scenario,
-					new OnlyTimeDependentTravelCostCalculatorFactory(),
+					new OnlyTimeDependentTravelDisutilityFactory(),
 					new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),
 					new DijkstraFactory(),
 					new TransitRouterImplFactory(
@@ -185,7 +185,7 @@ public class TripRouterFactoryImplTest {
 		TripRouterFactoryInternal factory =
 			new TripRouterFactoryImpl(
 					scenario,
-					new OnlyTimeDependentTravelCostCalculatorFactory(),
+					new OnlyTimeDependentTravelDisutilityFactory(),
 					new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),
 					new DijkstraFactory(),
 					new TransitRouterImplFactory(

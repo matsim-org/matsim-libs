@@ -45,7 +45,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -405,7 +405,7 @@ public class EvacuationControlerListener implements StartupListener {
 		/*
 		 * Add time dependent penalties to travel costs within the affected area.
 		 */
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		this.withinDayTravelDisutilityFactory = new PenaltyTravelCostFactory(costFactory, penaltyCalculator);
 		
 		LeastCostPathCalculatorFactory nonPanicFactory = new FastAStarLandmarksFactory(scenario.getNetwork(), 

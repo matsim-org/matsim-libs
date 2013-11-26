@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
@@ -94,7 +94,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.config.plansCalcRoute()));
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 		
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		
 		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.config.planCalcScore());
 		

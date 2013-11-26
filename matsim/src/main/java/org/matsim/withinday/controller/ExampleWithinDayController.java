@@ -26,7 +26,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
@@ -113,7 +113,7 @@ public class ExampleWithinDayController implements StartupListener {
 		
 		// Use a Scoring Function, that only scores the travel times!
 		controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-		controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
+		controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
 		
 		// workaround
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());

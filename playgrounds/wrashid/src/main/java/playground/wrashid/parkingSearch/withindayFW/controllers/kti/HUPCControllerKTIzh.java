@@ -43,7 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -156,7 +156,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		analyzedModes.add(TransportMode.car);
 		super.createAndInitTravelTimeCollector(analyzedModes);
 		
-		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
+		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
 		this.initWithinDayTripRouterFactory();
 
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());

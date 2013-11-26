@@ -32,8 +32,6 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
-import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
-
 /**
  * @author kn after bkick after dgrether
  *
