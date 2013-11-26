@@ -1,4 +1,4 @@
-package playground.kai.devmtg.mynetwork2;
+package playground.kai.softwaredesign.mynetwork2;
 
 import java.util.Map;
 

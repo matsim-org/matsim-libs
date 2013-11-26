@@ -1,4 +1,4 @@
-package playground.kai.devmtg.subpackages.sub;
+package playground.kai.softwaredesign.subpackages.sub;
 
 public class ClassB {
 
