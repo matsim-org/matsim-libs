@@ -206,7 +206,11 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 					
 					// below zeroUtilityDuration, we linearly extend the slope ...:
 					double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*actParams.getZeroUtilityDuration_h() ) ;
-					if ( slopeAtZeroUtility <= 0. ) {
+					if ( slopeAtZeroUtility < 0. ) {
+						// (beta_perf might be = 0)
+						System.err.println("beta_perf: " + this.params.marginalUtilityOfPerforming_s);
+						System.err.println("typicalDuration: " + typicalDuration );
+						System.err.println( "zero utl duration: " + actParams.getZeroUtilityDuration_h() );
 						throw new RuntimeException( "slope at zero utility < 0.; this should not happen ...");
 					}
 					double durationUnderrun = actParams.getZeroUtilityDuration_h()*3600. - duration ;

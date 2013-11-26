@@ -118,11 +118,13 @@ public class PtScoringTest {
 		score += pcs.getTravelingWalk_utils_hr() * (home2Arr-ptIA2ActEnd)/3600. ;
 		System.out.println("score after walk: " + score ) ;
 
+		final double duration = homeAct2End-home2Arr;
 		double tmpScore = (pcs.getPerforming_utils_hr()/3600.) * typicalDuration_s 
-				* Math.log((homeAct2End-home2Arr)/zeroUtilityDurationHome_s) ;
+				* Math.log(duration/zeroUtilityDurationHome_s) ;
 		if ( tmpScore < 0 ) {
 			System.out.println("home2score< 0; replacing ... ") ;
-			tmpScore = 0. ;
+			double slope = (pcs.getPerforming_utils_hr()/3600.) * typicalDuration_s / zeroUtilityDurationHome_s ;
+			tmpScore = zeroUtilityDurationHome_s * slope ;
 		}
 		score += tmpScore ;
 		System.out.println("score after home act: " + score ) ;
@@ -177,7 +179,7 @@ public class PtScoringTest {
 			// (there is only one person, but we need to get it)
 
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
-			Assert.assertEquals(85.37156911866275, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
+			Assert.assertEquals(-21.28929580072052, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
 		}
 
 	}
@@ -257,7 +259,8 @@ public class PtScoringTest {
 				* Math.log((homeAct2End-home2Arr)/zeroUtilityDurationHome_s) ;
 		if ( tmpScore < 0 ) {
 			System.out.println("home2score< 0; replacing ... ") ;
-			tmpScore = 0. ;
+			double slope = (pcs.getPerforming_utils_hr()/3600.) * typicalDuration_s / zeroUtilityDurationHome_s ;
+			tmpScore = zeroUtilityDurationHome_s * slope ;
 		}
 		score += tmpScore ;
 		System.out.println("score after home act: " + score ) ;
@@ -315,7 +318,7 @@ public class PtScoringTest {
 			// (there is only one person, but we need to get it)
 
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
-			Assert.assertEquals(87.37156911866275, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
+			Assert.assertEquals(-19.28929580072052, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
 		}
 
 	}
