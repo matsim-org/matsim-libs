@@ -183,13 +183,16 @@ public class Config {
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
 
-		if ( ! this.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).
-				equalsIgnoreCase(VspExperimentalConfigGroup.IGNORE) ) {
+//		if ( ! this.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).
+//				equalsIgnoreCase(VspExperimentalConfigGroup.IGNORE) ) {
 			this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 			// (I deliberately put this here, rather into the Controler where the standard consistency checker is added,
 			// because at this point my intuition is that one should assume that this is _always_ added ... and not just
 			// in one specific execution path but not in another.  kai, may'11)
-		}
+			// (I disabled the "IGNORE" check, since in some execution paths it was not added although the setting was different
+			// from "IGNORE".  I presume this happens because first an empty config is loaded, with having this on "IGNORE",
+			// thus ignoring this consistency checker, and then never getting back to the issue.  kai, nov'13)
+//		}
 
 		this.otfVis = new OTFVisConfigGroup();
 		this.modules.put(OTFVisConfigGroup.GROUP_NAME, this.otfVis);
