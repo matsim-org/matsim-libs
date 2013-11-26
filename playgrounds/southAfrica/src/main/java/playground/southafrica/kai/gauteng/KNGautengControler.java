@@ -1,4 +1,4 @@
-package playground.southafrica.gauteng;
+package playground.southafrica.kai.gauteng;
 
 import java.io.BufferedReader;
 import java.io.IOException;

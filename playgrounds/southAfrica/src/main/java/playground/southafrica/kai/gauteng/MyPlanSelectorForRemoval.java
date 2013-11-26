@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.southafrica.gauteng;
+package playground.southafrica.kai.gauteng;
 
 import java.util.HashMap;
 import java.util.Iterator;
