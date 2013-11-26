@@ -11,7 +11,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -101,7 +101,7 @@ public class LoadedNetworkRouter {
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
 		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(sl.getScenario(), eventsFile);
-		TravelDisutilityFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
+		TravelDisutilityFactory travelCostCalculatorFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
 		plans.addAlgorithm(
 				new PlanRouter(

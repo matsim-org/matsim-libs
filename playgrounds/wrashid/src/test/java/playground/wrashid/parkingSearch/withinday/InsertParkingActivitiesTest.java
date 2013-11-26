@@ -56,7 +56,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -135,7 +135,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl();
 		TravelTime travelTime = ttCalcFactory.createTravelTimeCalculator(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 		
-		TripRouter tripRouter = new TripRouterFactoryImpl(sc, new TravelCostCalculatorFactoryImpl(), travelTime, new DijkstraFactory(), null).instantiateAndConfigureTripRouter();
+		TripRouter tripRouter = new TripRouterFactoryImpl(sc, new TravelTimeAndDistanceBasedTravelDisutilityFactory(), travelTime, new DijkstraFactory(), null).instantiateAndConfigureTripRouter();
 		
 		// initialize routes
 		new PersonPrepareForSim(new PlanRouter(tripRouter), (ScenarioImpl) sc).run(sc.getPopulation());

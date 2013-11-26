@@ -50,7 +50,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -79,7 +79,7 @@ public class PrepareEvacuationScenarioListener {
 
 	private static final Logger log = Logger.getLogger(PrepareEvacuationScenarioListener.class);
 	
-	private final TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+	private final TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	
 	private TransitRouterNetwork transitRouterNetwork;

@@ -19,7 +19,7 @@
 package org.matsim.core.controler;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -46,7 +46,7 @@ public class ControlerDefaults {
 	}
 
 	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory(Scenario scenario) {
-		return new TravelCostCalculatorFactoryImpl();
+		return new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 	}
 
 }

@@ -54,7 +54,7 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -99,7 +99,7 @@ public class MyZoneToZoneRouter {
 		log.info("Processing the events file for zone-to-zone travel time calculation");
 		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = ttcf.createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-		TravelDisutilityFactory tccf = new TravelCostCalculatorFactoryImpl();
+		TravelDisutilityFactory tccf = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		
 		EventsManager em = EventsUtils.createEventsManager();

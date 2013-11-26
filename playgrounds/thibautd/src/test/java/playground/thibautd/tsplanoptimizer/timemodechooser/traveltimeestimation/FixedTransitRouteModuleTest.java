@@ -41,7 +41,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -62,7 +62,7 @@ public class FixedTransitRouteModuleTest {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 		TripRouterFactoryInternal tripRouterFactory =  new TripRouterFactoryImpl(
 				scenario,
-				new TravelCostCalculatorFactoryImpl(),
+				new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
 				new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),
 				new DijkstraFactory(),
 				new TransitRouterImplFactory(

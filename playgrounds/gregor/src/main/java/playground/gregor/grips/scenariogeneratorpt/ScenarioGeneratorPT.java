@@ -48,7 +48,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
@@ -183,7 +183,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 	private void createPTSchedule() {
 		Network network = this.sc.getNetwork();
 		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
-		TravelDisutility cost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
+		TravelDisutility cost = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(fs,this.sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
 		
 		

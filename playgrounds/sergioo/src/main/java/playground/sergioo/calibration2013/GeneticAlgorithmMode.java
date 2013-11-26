@@ -44,7 +44,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -334,7 +334,7 @@ public class GeneticAlgorithmMode {
 		final StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
 		events.addHandler(stopStopTimeCalculator);
 		new MatsimEventsReader(events).readFile(args[5]);
-		final TravelDisutilityFactory factory = new TravelCostCalculatorFactoryImpl();
+		final TravelDisutilityFactory factory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		final TransitRouterFactory transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		context = new ReplanningContext() {

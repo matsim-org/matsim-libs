@@ -38,7 +38,7 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -292,7 +292,7 @@ public class ControllerRegistryBuilder {
 
 	public TravelDisutilityFactory getTravelDisutilityFactory() {
 		if ( travelDisutilityFactory == null ) {
-			this.travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+			this.travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		}
 		return travelDisutilityFactory;
 	}

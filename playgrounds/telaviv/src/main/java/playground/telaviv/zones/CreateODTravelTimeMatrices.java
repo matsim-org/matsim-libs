@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
@@ -76,7 +76,7 @@ public class CreateODTravelTimeMatrices {
 		this.zoneMapping = zoneMapping;
 		this.travelTime = travelTime2;
 		
-		travelCost = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTime2, scenario.getConfig().planCalcScore());	
+		travelCost = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(travelTime2, scenario.getConfig().planCalcScore());	
 		getConnectorNodes();
 	}
 	

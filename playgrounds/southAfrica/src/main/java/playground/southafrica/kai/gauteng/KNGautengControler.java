@@ -187,9 +187,7 @@ public class KNGautengControler {
 				new RoadPricingSchemeImpl() ;
 		new RoadPricingReaderXMLv1(scheme).parse( config.roadpricing().getTollLinksFile() );
 
-		final TravelDisutilityFactory travelDisutilityFactory = 
-//				new PersonSpecificTravelDisutilityInclTollFactory( scheme, personSpecificUtilityOfMoney );
-				new AutosensingTravelDisutilityInclTollFactory(scheme, scenario, scoringFunctionFactory);
+		
 		
 		// === CONTROLER: ===
 
@@ -202,7 +200,8 @@ public class KNGautengControler {
 		controler.setScoringFunctionFactory( scoringFunctionFactory );
 
 		// insert into routing:
-		controler.setTravelDisutilityFactory( travelDisutilityFactory );
+//		controler.setTravelDisutilityFactory( new PersonSpecificTravelDisutilityInclTollFactory(scheme, personSpecificUtilityOfMoney) ) ;
+		controler.setTravelDisutilityFactory( new AutosensingTravelDisutilityInclTollFactory(scheme, scenario, scoringFunctionFactory) );
 		
 		// plans removal:
 		controler.addControlerListener(new StartupListener(){

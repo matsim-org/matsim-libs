@@ -51,7 +51,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -89,7 +89,7 @@ public class MultiModalTripRouterTest {
 
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
-		TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		
 		/*
 		 * Use a ...

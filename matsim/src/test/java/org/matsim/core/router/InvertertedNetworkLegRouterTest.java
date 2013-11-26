@@ -38,7 +38,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.InvertedNetworkLegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -66,7 +66,7 @@ public class InvertertedNetworkLegRouterTest {
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
-		TravelDisutilityFactory tc = new TravelCostCalculatorFactoryImpl();
+		TravelDisutilityFactory tc = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
 		Person person = new PersonImpl(new IdImpl(1));

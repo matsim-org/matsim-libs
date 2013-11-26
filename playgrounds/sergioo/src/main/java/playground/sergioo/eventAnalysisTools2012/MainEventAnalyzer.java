@@ -47,7 +47,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;

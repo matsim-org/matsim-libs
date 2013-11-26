@@ -28,7 +28,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author dgrether
  *
  */
-public class TravelCostCalculatorFactoryImpl implements TravelDisutilityFactory {
+public class TravelTimeAndDistanceBasedTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {

@@ -41,7 +41,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -121,7 +121,7 @@ public class PassengerRunner {
 	}
 	
 	private static TripRouter createTripRouterInstance(Scenario scenario, TripRouterFactory tripRouterFactory) {
-		TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
@@ -140,7 +140,7 @@ public class PassengerRunner {
 		TransitRouterFactory transitRouterFactory = null;
 		if (scenario.getConfig().scenario().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(scenario);
 		
-		TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
 		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());

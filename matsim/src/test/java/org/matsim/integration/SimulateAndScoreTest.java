@@ -49,7 +49,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -159,7 +159,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		//		scenario.getConfig().vspExperimental()));
 
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(network, config.travelTimeCalculator());
-		TravelDisutility travelCostCalculator = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), config.planCalcScore());
+		TravelDisutility travelCostCalculator = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), config.planCalcScore());
 		//PlansCalcTransitRoute plansCalcRoute =
 		//	new PlansCalcTransitRoute(
 		//			config.plansCalcRoute(),

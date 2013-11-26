@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -53,7 +53,7 @@ public class RoutePersonTask implements PersonSinkSource {
 					scenario.getNetwork(),
 					scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		TravelDisutility travelCosts =
-			new TravelCostCalculatorFactoryImpl().createTravelDisutility(
+			new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(
 					travelTimes,
 					scenario.getConfig().planCalcScore());
 		personPrepareForSim =

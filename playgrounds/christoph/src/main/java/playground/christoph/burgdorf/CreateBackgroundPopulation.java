@@ -45,7 +45,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -145,7 +145,7 @@ public class CreateBackgroundPopulation {
 		int numOrigins = startLinkIds.length;
 		
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new TravelCostCalculatorFactoryImpl().createTravelDisutility(travelTime,
+		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(travelTime,
 				config.planCalcScore());
 		HighwayTravelDisutility highwayTravelDisutility = new HighwayTravelDisutility(travelDisutility);
 		
