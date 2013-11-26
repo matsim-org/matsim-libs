@@ -170,6 +170,10 @@ public class EventsToScore implements BasicEventHandler {
 	}
 	
 	private void assignNewScores() {
+		int cnt = 0 ;
+		System.out.flush();
+		System.err.println("it: " + this.iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
+		System.err.flush();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
 			double score = sf.getScore();
@@ -182,16 +186,33 @@ public class EventsToScore implements BasicEventHandler {
 				}
 			} else {
 				if ( this.scoreMSAstartsAtIteration == null || this.iteration < this.scoreMSAstartsAtIteration ) {
+					if ( this.iteration > -1 && cnt < 20 ) { 
+						cnt++ ;
+						System.out.flush() ;
+						System.err.println( " lrn: " + this.learningRate + " oldScore: " + oldScore + " simScore: " + score );
+						System.err.flush();
+					}
 					plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
 					if ( plan.getScore().isNaN() ) {
 						Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
 					}
 				} else {
 					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration + 1) ;
+					alpha *= scenario.getConfig().strategy().getMaxAgentPlanMemorySize() ; //(**)
+					if ( alpha>1 ) {
+						alpha = 1. ;
+					}
+					if ( this.iteration > -1 && cnt < 20 ) {
+						cnt++ ;
+						System.out.flush() ;
+						System.err.println( " alpha: " + alpha + " oldScore: " + oldScore + " simScore: " + score );
+						System.err.flush();
+					}
 					plan.setScore( alpha * score + (1.-alpha) * oldScore ) ;
 					if ( plan.getScore().isNaN() ) {
 						Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
 					}
+					/*
 					// the above is some variant of MSA (method of successive
 					// averages). It is not the same as MSA since
 					// a plan is typically not scored in every iteration.
@@ -200,8 +221,11 @@ public class EventsToScore implements BasicEventHandler {
 					// still diverges in the same way as 1/x
 					// when integrated, so MSA should still converge to the
 					// correct result. kai, oct'12
+					// The above argument may be correct.  But something 9/10*old+1/10*new is too slow.  Now
+					// multiplying with number of plans (**) in hope that it is better.  (Where is the theory department?) kai, nov'13 
 					// yyyy this has never been tested with scenarios :-(  .  At least there is a test case.  kai, oct'12
-					// (In the meantime, I have used it in certain of my own 1% runs, e.g. Ivory Coast.)  
+					// (In the meantime, I have used it in certain of my own 1% runs, e.g. Ivory Coast.)
+					 */
 				}
 			}
 
