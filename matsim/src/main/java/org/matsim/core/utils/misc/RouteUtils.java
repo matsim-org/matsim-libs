@@ -26,8 +26,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * Provides helper methods to work with routes.
@@ -152,6 +157,45 @@ public class RouteUtils {
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
+	}
+
+	public static double calcDistance(ExperimentalTransitRoute route, TransitSchedule ts, Network network) {
+		
+		Id lineId = route.getLineId();
+		Id routeId = route.getRouteId();
+		Id enterStopId = route.getAccessStopId();
+		Id exitStopId = route.getEgressStopId();
+	
+		TransitLine line = ts.getTransitLines().get(lineId);
+		TransitRoute tr = line.getRoutes().get(routeId);
+	
+		Id enterLinkId = ts.getFacilities().get(enterStopId).getLinkId();
+		Id exitLinkId = ts.getFacilities().get(exitStopId).getLinkId();
+	
+		NetworkRoute nr = tr.getRoute();
+		double dist = 0;
+		boolean count = false;
+		if (enterLinkId.equals(nr.getStartLinkId())) {
+			count = true;
+		}
+		for (Id linkId : nr.getLinkIds()) {
+			if (count) {
+				Link l = network.getLinks().get(linkId);
+				dist += l.getLength();
+			}
+			if (enterLinkId.equals(linkId)) {
+				count = true;
+			}
+			if (exitLinkId.equals(linkId)) {
+				count = false;
+				break;
+			}
+		}
+		if (count) {
+			Link l = network.getLinks().get(nr.getEndLinkId());
+			dist += l.getLength();
+		}
+		return dist;
 	}
 
 }

@@ -19,14 +19,10 @@
 
 package playground.mrieser.routedistance;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class ExperimentalTransitRouteDistanceCalculator implements RouteDistanceCalculator {
@@ -44,41 +40,7 @@ public class ExperimentalTransitRouteDistanceCalculator implements RouteDistance
 		if (!(route instanceof ExperimentalTransitRoute)) {
 			throw new IllegalArgumentException("wrong type of route, expected ExperimentalTransitRoute, but was " + (route != null ? route.getClass() : "null"));
 		}
-		ExperimentalTransitRoute r = (ExperimentalTransitRoute) route;
-		Id lineId = r.getLineId();
-		Id routeId = r.getRouteId();
-		Id enterStopId = r.getAccessStopId();
-		Id exitStopId = r.getEgressStopId();
-
-		TransitLine line = this.schedule.getTransitLines().get(lineId);
-		TransitRoute tr = line.getRoutes().get(routeId);
-
-		Id enterLinkId = this.schedule.getFacilities().get(enterStopId).getLinkId();
-		Id exitLinkId = this.schedule.getFacilities().get(exitStopId).getLinkId();
-
-		NetworkRoute nr = tr.getRoute();
-		double dist = 0;
-		boolean count = false;
-		if (enterLinkId.equals(nr.getStartLinkId())) {
-			count = true;
-		}
-		for (Id linkId : nr.getLinkIds()) {
-			if (count) {
-				Link l = this.network.getLinks().get(linkId);
-				dist += l.getLength();
-			}
-			if (enterLinkId.equals(linkId)) {
-				count = true;
-			}
-			if (exitLinkId.equals(linkId)) {
-				count = false;
-				break;
-			}
-		}
-		if (count) {
-			Link l = this.network.getLinks().get(nr.getEndLinkId());
-			dist += l.getLength();
-		}
+		double dist = RouteUtils.calcDistance((ExperimentalTransitRoute) route, this.schedule, this.network);
 		route.setDistance(dist);
 		return dist;
 	}

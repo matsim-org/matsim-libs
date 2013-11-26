@@ -37,6 +37,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -56,16 +58,23 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	protected final CharyparNagelScoringParameters params;
 	private Leg currentLeg;
 	protected Network network;
+	private TransitSchedule transitSchedule;
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
-
+	
 	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network) {
 		this.params = params;
 		this.network = network;
 		this.reset();
 	}
+	
+	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network, TransitSchedule transitSchedule) {
+		this(params, network);
+		this.transitSchedule = transitSchedule;
+	}
+
 
 	@Override
 	public void reset() {
@@ -142,6 +151,8 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 		double dist;
 		if (route instanceof NetworkRoute) {
 			dist = RouteUtils.calcDistance((NetworkRoute) route, network);
+		} else if (route instanceof ExperimentalTransitRoute) {
+			dist = RouteUtils.calcDistance((ExperimentalTransitRoute) route, transitSchedule, network);
 		} else {
 			dist = route.getDistance();
 		}
