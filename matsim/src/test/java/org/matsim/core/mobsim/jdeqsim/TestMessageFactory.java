@@ -1,6 +1,7 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -76,7 +77,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		SimulationParameters.setGC_MESSAGES(true);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		PersonImpl person= new PersonImpl(new IdImpl("abc"));
-		Vehicle vehicle=new Vehicle(scheduler, person );
+		Vehicle vehicle=new Vehicle(scheduler, person, ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getEnterRoadMessage(scheduler, vehicle).scheduler==scheduler);
@@ -99,7 +100,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		SimulationParameters.setGC_MESSAGES(false);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
 		PersonImpl person= new PersonImpl(new IdImpl("abc"));
-		Vehicle vehicle=new Vehicle(scheduler, person );
+		Vehicle vehicle=new Vehicle(scheduler, person, ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);
 		assertEquals(true,MessageFactory.getEnterRoadMessage(scheduler, vehicle).scheduler==scheduler);
