@@ -39,7 +39,7 @@ public abstract class Gbl {
 	
 	public final static String ONLYONCE = " This message given only once.";
 	
-	public final static String FUTURE_SUPPRESSED = " Future occurences of this warning are suppressed." ;
+	public final static String FUTURE_SUPPRESSED = " Future occurences of this logging statement are suppressed." ;
 	
 	public final static String SEPARATOR = "****************************" ;
 
