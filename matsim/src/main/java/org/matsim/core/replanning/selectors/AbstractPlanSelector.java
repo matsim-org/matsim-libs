@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
