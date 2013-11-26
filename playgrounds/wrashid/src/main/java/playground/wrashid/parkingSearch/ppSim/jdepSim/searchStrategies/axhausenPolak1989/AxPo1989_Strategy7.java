@@ -64,10 +64,9 @@ public class AxPo1989_Strategy7 extends RandomStreetParkingWithIllegalParkingAnd
 
 			Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
 			
-			Link parkingLink = ZHScenarioGlobal.scenario.getNetwork().getLinks().get(AgentWithParking.parkingManager.getLinkOfParking(currentParkingId));
+			//Link parkingLink = ZHScenarioGlobal.scenario.getNetwork().getLinks().get(AgentWithParking.parkingManager.getLinkOfParking(currentParkingId));
 			
-			
-			if (GeneralLib.getDistance(parkingLink.getCoord(), coordinatesLindenhofZH)<ZHScenarioGlobal.loadDoubleParam("AxPo1989_Strategy7.radius")){
+			if (GeneralLib.getDistance(AgentWithParking.parkingManager.getParkingsHashMap().get(currentParkingId).getCoord(), coordinatesLindenhofZH)<ZHScenarioGlobal.loadDoubleParam("AxPo1989_Strategy7.radius")){
 				expectedIllegalParkingFeeForWholeDay = ZHScenarioGlobal.loadDoubleParam("AxPo1989_Strategy7.expectedIllegalParkingFeeForWholeDayInsideCircle");
 			} else {
 				expectedIllegalParkingFeeForWholeDay = ZHScenarioGlobal.loadDoubleParam("AxPo1989_Strategy7.expectedIllegalParkingFeeForWholeDayOutsideCircle");
