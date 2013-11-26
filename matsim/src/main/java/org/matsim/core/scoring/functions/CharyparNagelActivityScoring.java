@@ -196,12 +196,14 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 					tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
 				}
 			} else {
-				if ( duration >= actParams.getZeroUtilityDuration_h() ) {
+				if ( duration >= 3600.*actParams.getZeroUtilityDuration_h() ) {
 					double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 							* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
 					// also removing the "wait" alternative scoring.
 					tmpScore += utilPerf ;
 				} else {
+					log.warn("encountering duration < zeroUtilityDuration; score must change ...") ;
+					
 					// below zeroUtilityDuration, we linearly extend the slope ...:
 					double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*actParams.getZeroUtilityDuration_h() ) ;
 					if ( slopeAtZeroUtility <= 0. ) {
