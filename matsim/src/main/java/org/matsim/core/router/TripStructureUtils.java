@@ -53,6 +53,23 @@ public class TripStructureUtils {
 
 	private TripStructureUtils() {}
 
+	// also need this for plain old fashioned legs.  kai
+    public static List<Leg> getLegs(final Plan plan) {
+		return getLegs( plan.getPlanElements() );
+	}
+
+	public static List<Leg> getLegs( final List<PlanElement> planElements ) {
+		final List<Leg> legs = new ArrayList<Leg>();
+
+		for (PlanElement pe : planElements) {
+			if ( !(pe instanceof Leg) ) continue;
+			legs.add( (Leg) pe );
+		}
+
+		// it is not backed to the plan: fail if try to modify
+		return Collections.unmodifiableList( legs );
+	}
+
     public static List<Activity> getActivities(
 			final Plan plan,
 			final StageActivityTypes stageActivities) {
@@ -70,7 +87,7 @@ public class TripStructureUtils {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
-			if ( !stageActivities.isStageActivity( act.getType() ) ) {
+			if ( stageActivities == null || !stageActivities.isStageActivity( act.getType() ) ) {
 				activities.add( act );
 			}
 		}
