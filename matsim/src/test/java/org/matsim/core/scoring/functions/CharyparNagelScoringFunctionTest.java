@@ -145,12 +145,13 @@ public class CharyparNagelScoringFunctionTest {
 	 * The reference implementation to calculate the zero utility duration, the duration of
 	 * an activity at which its utility is zero.
 	 *
-	 * @param typicalDuration_h The typical duration of the activity in hours
+	 * @param typicalDuration_hrs The typical duration of the activity in hours
 	 * @param priority
 	 * @return the duration (in hours) at which the activity has a utility of 0.
 	 */
-	private double getZeroUtilDuration_h(final double typicalDuration_h, final double priority) {
-		return typicalDuration_h * Math.exp(-10.0 / typicalDuration_h / priority);
+	private double getZeroUtilDuration_hrs(final double typicalDuration_hrs, final double priority) {
+		// yy could/should use static function from CharyparNagelScoringUtils. kai, nov'13
+		return typicalDuration_hrs * Math.exp(-10.0 / typicalDuration_hrs / priority);
 	}
 
 	/**
@@ -158,9 +159,9 @@ public class CharyparNagelScoringFunctionTest {
 	 */
 	@Test
 	public void testZeroUtilityDuration() {
-		double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
-		double zeroUtilDurW2 = getZeroUtilDuration_h(8.0, 2.0);
+		double zeroUtilDurW = getZeroUtilDuration_hrs(8.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(16.0, 1.0);
+		double zeroUtilDurW2 = getZeroUtilDuration_hrs(8.0, 2.0);
 
 		ActivityUtilityParameters params = new ActivityUtilityParameters("w", 1.0, 8.0 * 3600);
 		assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
@@ -225,8 +226,8 @@ public class CharyparNagelScoringFunctionTest {
 		Fixture f = new Fixture();
 		
 		double perf = +6.0;
-		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
+		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(15.0, 1.0);
 
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
 		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
@@ -284,9 +285,8 @@ public class CharyparNagelScoringFunctionTest {
 	@Test
 	public void testOpeningClosingTime() {
 		Fixture f = new Fixture();
-		double perf = +6.0;
-		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
-		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		double perf_hrs = +6.0;
+		f.config.planCalcScore().setPerforming_utils_hr(perf_hrs);
 		double initialScore = calcScore(f);
 
 		// test1: agents has to wait before and after
@@ -297,9 +297,9 @@ public class CharyparNagelScoringFunctionTest {
 		double score = calcScore(f);
 
 		// check the differences for all work activities
-		assertEquals(perf * 3.0 * Math.log(2.5 / 2.0)
-				+ perf * 3.0 * Math.log(2.75 / 2.75)
-				+ perf * 3.0 * Math.log(2.5 / 1.5)
+		assertEquals(perf_hrs * 3.0 * Math.log(2.5 / 2.0)
+				+ perf_hrs * 3.0 * Math.log(2.75 / 2.75)
+				+ perf_hrs * 3.0 * Math.log(2.5 / 1.5)
 				, initialScore - score, EPSILON);
 
 		// test 2: agents has to wait all the time, because work place opens later
@@ -307,8 +307,16 @@ public class CharyparNagelScoringFunctionTest {
 		wParams.setOpeningTime(20*3600.0);
 		wParams.setClosingTime(21*3600.0);
 
-		// only the home-activity should add to the score
-		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
+//		// only the home-activity should add to the score
+//		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
+		// not longer true, since not doing a scheduled activity now carries a penalty.  kai, nov'13
+		double score_home = perf_hrs * 15.0 * Math.log(14.75 / getZeroUtilDuration_hrs(15.0, 1.0)) ;
+
+		final double typicalDuration_work_sec = wParams.getTypicalDuration();
+		final double zeroUtilityDuration_work_sec = 3600. * getZeroUtilDuration_hrs(typicalDuration_work_sec/3600., 1. );
+		double slope_work_at_zero_utility_h = perf_hrs * typicalDuration_work_sec / zeroUtilityDuration_work_sec ;
+		double score_work = - zeroUtilityDuration_work_sec * slope_work_at_zero_utility_h / 3600. ;
+		assertEquals( score_home+3.*score_work  , calcScore(f), EPSILON ) ;
 
 		// test 3: agents has to wait all the time, because work place opened earlier
 
@@ -316,7 +324,7 @@ public class CharyparNagelScoringFunctionTest {
 		wParams.setClosingTime(2*3600.0);
 
 		// only the home-activity should add to the score
-		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
+		assertEquals(score_home+3.*score_work , calcScore(f), EPSILON);
 
 		// test 4: work opens and closes at same time but while agent is there
 		// (this may be useful to emulate that the activity is never open ... such as pt interaction)
@@ -325,8 +333,7 @@ public class CharyparNagelScoringFunctionTest {
 		wParams.setClosingTime (8.*3600.0 + 15.*60. );
 		// (note that even _some_ opening time causes zero score, since the minDuration needs to be overcome!)
 		
-		// only the home-activity should add to the score
-		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
+		assertEquals(score_home+3.*score_work , calcScore(f), EPSILON);
 	}
 
 	/**
@@ -483,9 +490,9 @@ public class CharyparNagelScoringFunctionTest {
 		
 		double perf = +6.0;
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
-		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(6.0, 1.0);
-		double zeroUtilDurH2 = getZeroUtilDuration_h(8.0, 1.0);
+		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(6.0, 1.0);
+		double zeroUtilDurH2 = getZeroUtilDuration_hrs(8.0, 1.0);
 
 		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
 				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
@@ -502,8 +509,8 @@ public class CharyparNagelScoringFunctionTest {
 	@Test
 	public void testNoNightActivity() {
 		
-		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(7.0, 1.0);
+		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(7.0, 1.0);
 		double perf = +3.0;
 		
 		Fixture f = new Fixture();
