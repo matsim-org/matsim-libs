@@ -45,6 +45,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 
 	@Override
 	public void checkConsistency(Config config) {
+		log.info("running checkConsistency ...");
 		VspExperimentalConfigGroup vspConfig = config.vspExperimental() ; // convenience variable
 		
 		boolean problem = false ; // ini
