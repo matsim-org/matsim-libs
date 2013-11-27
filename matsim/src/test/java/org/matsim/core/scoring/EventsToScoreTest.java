@@ -87,7 +87,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(e2s);
 		
-		for ( int mockIteration = 99 ; mockIteration <= 102 ; mockIteration++ ) {
+		for ( int mockIteration = 99 ; mockIteration <= 110 ; mockIteration++ ) {
 
 			events.resetHandlers(mockIteration) ;
 
@@ -107,12 +107,44 @@ public class EventsToScoreTest extends MatsimTestCase {
 				assertEquals(2.0, person.getSelectedPlan().getScore() ) ;
 				break ;
 			case 101:
-				// second MSA iteration: (2+3)/2 = 2.5:
-				assertEquals(2.5, person.getSelectedPlan().getScore() ) ;
+				// second MSA iteration
+				assertEquals(3.0, person.getSelectedPlan().getScore() ) ;
 				break ;
 			case 102:
-				// 3rd MSA iteration: (2+3+4)/3 = 3:
-				assertEquals(3.0, person.getSelectedPlan().getScore() ) ;
+				// 3rd MSA iteration
+				assertEquals(4.0, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 103:
+				// 3rd MSA iteration
+				assertEquals(5.0, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 104:
+				// 3rd MSA iteration
+				assertEquals(6.0, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 105:
+				// 3rd MSA iteration
+				assertEquals(6.833333333333334, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 106:
+				// 3rd MSA iteration
+				assertEquals(7.666666666666667, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 107:
+				// 3rd MSA iteration
+				assertEquals(8.5, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 108:
+				// 3rd MSA iteration
+				assertEquals(9.333333333333332, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 109:
+				// 3rd MSA iteration
+				assertEquals(10.166666666666666, person.getSelectedPlan().getScore() ) ;
+				break ;
+			case 110:
+				// 3rd MSA iteration
+				assertEquals(11.0, person.getSelectedPlan().getScore() ) ;
 				break ;
 			}
 			

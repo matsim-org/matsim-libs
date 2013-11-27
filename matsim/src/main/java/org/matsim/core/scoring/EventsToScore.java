@@ -60,6 +60,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
  * @author mrieser, michaz
  */
 public class EventsToScore implements BasicEventHandler {
+	static private final Logger log = Logger.getLogger(EventsToScore.class);
 
 	private EventsToActivities eventsToActivities;
 	private EventsToLegs eventsToLegs;
@@ -172,7 +173,7 @@ public class EventsToScore implements BasicEventHandler {
 	private void assignNewScores() {
 		int cnt = 0 ;
 		System.out.flush();
-		System.err.println("it: " + this.iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
+		log.warn("it: " + this.iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
 		System.err.flush();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
@@ -182,19 +183,20 @@ public class EventsToScore implements BasicEventHandler {
 			if (oldScore == null) {
 				plan.setScore(score);
 				if ( plan.getScore().isNaN() ) {
-					Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
+					log.warn("score is NaN; plan:" + plan.toString() );
 				}
 			} else {
 				if ( this.scoreMSAstartsAtIteration == null || this.iteration < this.scoreMSAstartsAtIteration ) {
+					final double newScore = this.learningRate * score + (1 - this.learningRate) * oldScore;
 					if ( this.iteration > -1 && cnt < 20 ) { 
 						cnt++ ;
 						System.out.flush() ;
-						System.err.println( " lrn: " + this.learningRate + " oldScore: " + oldScore + " simScore: " + score );
+						log.warn( " lrn: " + this.learningRate + " oldScore: " + oldScore + " simScore: " + score + " newScore: " + newScore );
 						System.err.flush();
 					}
-					plan.setScore(this.learningRate * score + (1 - this.learningRate) * oldScore);
+					plan.setScore(newScore);
 					if ( plan.getScore().isNaN() ) {
-						Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
+						log.warn("score is NaN; plan:" + plan.toString() );
 					}
 				} else {
 					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration + 1) ;
@@ -202,15 +204,16 @@ public class EventsToScore implements BasicEventHandler {
 					if ( alpha>1 ) {
 						alpha = 1. ;
 					}
+					final double newScore = alpha * score + (1.-alpha) * oldScore;
 					if ( this.iteration > -1 && cnt < 20 ) {
 						cnt++ ;
 						System.out.flush() ;
-						System.err.println( " alpha: " + alpha + " oldScore: " + oldScore + " simScore: " + score );
+						log.warn( " alpha: " + alpha + " oldScore: " + oldScore + " simScore: " + score + " newScore: " + newScore );
 						System.err.flush();
 					}
-					plan.setScore( alpha * score + (1.-alpha) * oldScore ) ;
+					plan.setScore( newScore ) ;
 					if ( plan.getScore().isNaN() ) {
-						Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
+						log.warn("score is NaN; plan:" + plan.toString() );
 					}
 					/*
 					// the above is some variant of MSA (method of successive
