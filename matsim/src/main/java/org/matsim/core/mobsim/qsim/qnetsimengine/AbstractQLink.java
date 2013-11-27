@@ -52,7 +52,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 /**
  * QLinkInternalI is the interface; this here is an abstract class that contains implementation
  * of non-traffic-dynamics "infrastructure" provided by the link, such as parking or the logic for transit.
- * 
+ *
  * @author nagel
  *
  */
@@ -60,16 +60,16 @@ abstract class AbstractQLink extends QLinkInternalI {
 
 	public enum HandleTransitStopResult {
 		continue_driving, rehandle, accepted
-	
+
 	}
 
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
 	private static Logger log = Logger.getLogger(AbstractQLink.class);
-	
+
 	final Link link;
 
-	final QNetwork network;	
+	final QNetwork network;
 
 	// joint implementation for Customizable
 	private Map<String, Object> customAttributes = new HashMap<String, Object>();
@@ -79,10 +79,10 @@ abstract class AbstractQLink extends QLinkInternalI {
 	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<Id, MobsimAgent>();
 
 	private final Map<Id, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<Id, Queue<MobsimDriverAgent>>();
-	
+
 	private final Map<Id, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<Id, MobsimDriverAgent>();
-	
-	// vehicleId 
+
+	// vehicleId
 	private final Map<Id, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<Id, Set<MobsimAgent>>();
 
 	/**
@@ -93,7 +93,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
 
 	/**
-	 * This is often the simEngine, but not when it is a parallel simulation. 
+	 * This is often the simEngine, but not when it is a parallel simulation.
 	 */
 	NetElementActivator netElementActivator;
 
@@ -105,12 +105,12 @@ abstract class AbstractQLink extends QLinkInternalI {
 	 */
 	protected final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
-	
+
 	AbstractQLink(Link link, QNetwork network) {
 		this.link = link ;
 		this.network = network;
 		this.netElementActivator = network.simEngine;
-		this.insertingWaitingVehiclesBeforeDrivingVehicles = 
+		this.insertingWaitingVehiclesBeforeDrivingVehicles =
 				network.simEngine.getMobsim().getScenario().getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}
 
@@ -132,7 +132,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
-	
+
 	/*package*/ final void addDepartingVehicle(MobsimVehicle mvehicle) {
 		QVehicle vehicle = (QVehicle) mvehicle;
 		this.waitingList.add(vehicle);
@@ -164,7 +164,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		 * Ensure that only one stuck event per agent is created.
 		 */
 		Set<Id> stuckAgents = new HashSet<Id>();
-		
+
 		for (QVehicle veh : this.parkedVehicles.values()) {
 			if (veh.getDriver() != null) {
 				// skip transit driver which perform an activity while their vehicle is parked
@@ -172,20 +172,20 @@ abstract class AbstractQLink extends QLinkInternalI {
 
 				if (stuckAgents.contains(veh.getDriver().getId())) continue;
 				else stuckAgents.add(veh.getDriver().getId());
-				
-				
+
+
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
 						new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
-			
+
 			for (PassengerAgent passenger : veh.getPassengers()) {
 				if (stuckAgents.contains(passenger.getId())) continue;
 				else stuckAgents.add(passenger.getId());
-				
+
 				MobsimAgent mobsimAgent = (MobsimAgent) passenger;
-				
+
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
 						new PersonStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
@@ -193,23 +193,23 @@ abstract class AbstractQLink extends QLinkInternalI {
 			}
 		}
 		this.parkedVehicles.clear();
-		for (MobsimAgent driver : driversWaitingForPassengers.values()) {		
+		for (MobsimAgent driver : driversWaitingForPassengers.values()) {
 			if (stuckAgents.contains(driver.getId())) continue;
 			else stuckAgents.add(driver.getId());
-			
+
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		driversWaitingForPassengers.clear();
-		
-		
+
+
 		for (Queue<MobsimDriverAgent> queue : driversWaitingForCars.values()) {
 			for (MobsimAgent driver : queue) {
 				if (stuckAgents.contains(driver.getId())) continue;
 				stuckAgents.add(driver.getId());
-				
+
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
 						new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
@@ -221,19 +221,19 @@ abstract class AbstractQLink extends QLinkInternalI {
 			for (MobsimAgent passenger : passengers) {
 				if (stuckAgents.contains(passenger.getId())) continue;
 				else stuckAgents.add(passenger.getId());
-				
+
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
 						new PersonStuckEvent(now, passenger.getId(), passenger.getCurrentLinkId(), passenger.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
-				this.network.simEngine.getMobsim().getAgentCounter().decLiving();				
+				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
 		}
 		this.passengersWaitingForCars.clear();
-		
+
 		for (QVehicle veh : this.waitingList) {
 			if (stuckAgents.contains(veh.getDriver().getId())) continue;
 			else stuckAgents.add(veh.getDriver().getId());
-			
+
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
@@ -243,7 +243,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	}
 
 	void makeVehicleAvailableToNextDriver(QVehicle veh, double now) {
-		
+
 		/*
 		 * Insert waiting passengers into vehicle.
 		 */
@@ -257,7 +257,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 				this.insertPassengerIntoVehicle(passenger, vehicleId, now);
 			}
 		}
-		
+
 		/*
 		 * If the next driver is already waiting for the vehicle, check whether
 		 * all passengers are also there. If not, the driver is not inserted
@@ -271,7 +271,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 						driversWaitingForCar.element().getId());
 			if (driverWaitingForPassengers != null) return;
 		}
-		
+
 		/*
 		 * If there is a driver waiting for its vehicle, and this car is not currently already leaving again with the
 		 * same vehicle, put the new driver into the vehicle and let it depart.
@@ -292,7 +292,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	final void letVehicleDepart(QVehicle vehicle, double now) {
 		MobsimDriverAgent driver = vehicle.getDriver();
 		if (driver == null) throw new RuntimeException("Vehicle cannot depart without a driver!");
-		
+
 		EventsManager eventsManager = network.simEngine.getMobsim().getEventsManager();
 		eventsManager.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
 		this.addDepartingVehicle(vehicle);
@@ -306,7 +306,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	@Override
 	final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId, double now) {
 		QVehicle vehicle = this.getParkedVehicle(vehicleId);
-		
+
 		// if the vehicle is not parked at the link, mark the agent as passenger waiting for vehicle
 		if (vehicle == null) {
 			registerPassengerAgentWaitingForCar(passenger, vehicleId);
@@ -314,17 +314,17 @@ abstract class AbstractQLink extends QLinkInternalI {
 		} else {
 			boolean added = vehicle.addPassenger((PassengerAgent) passenger);
 			if (!added) {
-				log.warn("Passenger " + passenger.getId().toString() + 
+				log.warn("Passenger " + passenger.getId().toString() +
 				" could not be inserted into vehicle " + vehicleId.toString() +
 				" since there is no free seat available!");
 				return false;
 			}
-			
+
 			((PassengerAgent) passenger).setVehicle(vehicle);
 			EventsManager eventsManager = network.simEngine.getMobsim().getEventsManager();
 			eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), vehicle.getId()));
 			// TODO: allow setting passenger's currentLinkId to null
-			
+
 			return true;
 		}
 	}
@@ -373,7 +373,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	/*package*/ MobsimAgent unregisterDriverAgentWaitingForPassengers(Id agentId) {
 		return driversWaitingForPassengers.remove(agentId);
 	}
-	
+
 	@Override
 	/*package*/ void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
@@ -383,14 +383,14 @@ abstract class AbstractQLink extends QLinkInternalI {
 		}
 		passengers.add(agent);
 	}
-	
+
 	@Override
 	/*package*/ MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
 		if (passengers != null && passengers.remove(agent)) return agent;
 		else return null;
 	}
-	
+
 	@Override
 	/*package*/ Set<MobsimAgent> getAgentsWaitingForCar(Id vehicleId) {
 		Set<MobsimAgent> set = passengersWaitingForCars.get(vehicleId);
@@ -398,33 +398,27 @@ abstract class AbstractQLink extends QLinkInternalI {
 		else return null;
 	}
 
-	protected HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, final MobsimDriverAgent driver) {
-		if (driver instanceof TransitDriverAgent) {
-			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
-			TransitStopFacility stop = transitDriver.getNextTransitStop();
-			if ((stop != null) && (stop.getLinkId().equals(getLink().getId()))) {
-				double delay = transitDriver.handleTransitStop(stop, now);
-				if (delay > 0.0) {
-					veh.setEarliestLinkExitTime(now + delay);
-					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
-					if (!stop.getIsBlockingLane()) {
-						transitVehicleStopQueue.add(veh); 
-						// transit vehicle which is removed to the transit stop space
-						return HandleTransitStopResult.accepted;
-					} else {
-						// transit vehicle which blocks its lane by getting its exit time increased
-						return HandleTransitStopResult.rehandle;
-					}
+	protected HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, final TransitDriverAgent transitDriver) {
+		TransitStopFacility stop = transitDriver.getNextTransitStop();
+		if ((stop != null) && (stop.getLinkId().equals(getLink().getId()))) {
+			double delay = transitDriver.handleTransitStop(stop, now);
+			if (delay > 0.0) {
+				veh.setEarliestLinkExitTime(now + delay);
+				// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
+				if (!stop.getIsBlockingLane()) {
+					transitVehicleStopQueue.add(veh);
+					// transit vehicle which is removed to the transit stop space
+					return HandleTransitStopResult.accepted;
 				} else {
-					// transit vehicle which instantaneously delivered passangers
+					// transit vehicle which blocks its lane by getting its exit time increased
 					return HandleTransitStopResult.rehandle;
 				}
 			} else {
-				// transit vehicle which either arrives or continues driving
-				return HandleTransitStopResult.continue_driving;
+				// transit vehicle which instantaneously delivered passangers
+				return HandleTransitStopResult.rehandle;
 			}
 		} else {
-			// not a transit vehicle
+			// transit vehicle which either arrives or continues driving
 			return HandleTransitStopResult.continue_driving;
 		}
 	}
