@@ -30,6 +30,8 @@ public class ParkingPersonalBetas {
 
 	private final ScenarioImpl scenario;
 	private final HashMap<Id, Double> houseHoldIncome;
+	public double externalWalkFactor=1.0;
+	public double externalSearchFactor=1.0;
 
 	public ParkingPersonalBetas(ScenarioImpl scenario, HashMap<Id, Double> houseHoldIncome) {
 		this.scenario = scenario;
@@ -67,7 +69,7 @@ public class ParkingPersonalBetas {
 			isMale=!person.getSex().contains("f")?1:0;
 		}
 		//return -1.0*-0.135 * (-0.1) / -0.056 * -0.135 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.1012*isMale));
-		return -0.135 * 60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.102*isMale));
+		return -0.135 * 60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.246)*(1+(-0.102*isMale))*externalSearchFactor;
 	}
 
 	public double getParkingWalkTimeBeta(Id personId, double activityDurationInSeconds) {
@@ -79,7 +81,7 @@ public class ParkingPersonalBetas {
 		}
 		int age=person.getAge();
 		//return -1.0*-0.108 * (-0.1) / -0.056 * -0.108*60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236);
-		return -0.108 *60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236);
+		return -0.108 *60 * Math.pow(activityDurationInSeconds / 60 / 135, -0.08)*(1+(0.021*isMale))*Math.pow(age / 40.0, 0.236)*externalWalkFactor;
 	}
 
 }

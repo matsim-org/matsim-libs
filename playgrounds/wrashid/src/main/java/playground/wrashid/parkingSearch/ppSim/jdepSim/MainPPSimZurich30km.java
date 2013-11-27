@@ -128,6 +128,9 @@ public class MainPPSimZurich30km {
 		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork(), Message.ttMatrix);
 		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas((ScenarioImpl) scenario,
 				HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((ScenarioImpl) scenario));
+		
+		parkingPersonalBetas.externalWalkFactor=ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalWalkFactor");
+		parkingPersonalBetas.externalSearchFactor=ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalSearchFactor");
 
 		ParkingCostCalculatorZH parkingCostCalculatorZH = (ParkingCostCalculatorZH) AgentWithParking.parkingManager
 				.getParkingCostCalculator();
