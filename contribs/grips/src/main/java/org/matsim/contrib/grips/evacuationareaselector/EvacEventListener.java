@@ -30,6 +30,8 @@ import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.control.ShapeFactory;
 import org.matsim.contrib.grips.control.eventlistener.AbstractListener;
 import org.matsim.contrib.grips.model.Constants;
+import org.matsim.contrib.grips.model.MultiSelectionInterface;
+import org.matsim.contrib.grips.model.Constants.SelectionMode;
 import org.matsim.contrib.grips.model.shape.CircleShape;
 import org.matsim.contrib.grips.model.shape.PolygonShape;
 import org.matsim.contrib.grips.model.shape.Shape;
@@ -40,35 +42,55 @@ import org.matsim.contrib.grips.model.shape.Shape;
  * @author wdoering
  * 
  */
-class EvacEventListener extends AbstractListener {
+class EvacEventListener extends AbstractListener implements MultiSelectionInterface {
 	private Rectangle viewPortBounds;
 	private int border;
 	private int offsetX;
 	private int offsetY;
+	private SelectionMode selectionMode;
+	private boolean inSelection;
 
 	public EvacEventListener(Controller controller) {
 		super(controller);
 		this.border = controller.getImageContainer().getBorderWidth();
 		this.offsetX = this.border;
 		this.offsetY = this.border;
+		this.selectionMode = SelectionMode.CIRCLE;
+		this.inSelection = false;
 
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON1) {
-			// get origin
-			this.controller.c0 = this.controller.pixelToGeo(getGeoPoint(e.getPoint()));
-			this.controller.c1 = this.controller.c0;
-
-			// set evacuation circle
-			setEvacCircle(this.controller.c0, this.controller.c1);
-
-			// drawing a circle (goal is not achieved yet), repaint and fix view
-			controller.getActiveToolBox().setGoalAchieved(false);
-			controller.paintLayers();
-			this.fixed = true;
-
+		
+		if (this.selectionMode.equals(SelectionMode.CIRCLE))
+		{
+		
+			if (e.getButton() == MouseEvent.BUTTON1) {
+				// get origin
+				this.controller.c0 = this.controller.pixelToGeo(getGeoPoint(e.getPoint()));
+				this.controller.c1 = this.controller.c0;
+	
+				// set evacuation circle
+				setEvacCircle(this.controller.c0, this.controller.c1);
+	
+				// drawing a circle (goal is not achieved yet), repaint and fix view
+				controller.getActiveToolBox().setGoalAchieved(false);
+				controller.paintLayers();
+				this.fixed = true;
+	
+			}
+		}
+		else if (this.selectionMode.equals(SelectionMode.POLYGONAL))
+		{
+			if (this.inSelection)
+			{
+				
+			}
+			else
+			{
+				
+			}
 		}
 		super.mousePressed(e);
 	}
@@ -119,10 +141,24 @@ class EvacEventListener extends AbstractListener {
 		this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(evacCircle);
 
 	}
+	
+	
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		super.mouseWheelMoved(e);
 		controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(true);
+	}
+
+	@Override
+	public void setSelectionMode(SelectionMode selectionMode) {
+		this.selectionMode = selectionMode;
+		this.inSelection = false;
+		
+	}
+
+	@Override
+	public SelectionMode getSelectionMode() {
+		return this.selectionMode;
 	}
 }

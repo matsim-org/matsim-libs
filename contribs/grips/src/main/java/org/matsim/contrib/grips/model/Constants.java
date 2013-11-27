@@ -44,7 +44,9 @@ public class Constants
 	public static enum ModuleType { EVACUATION, POPULATION, BUSSTOPS, ROADCLOSURE, ANALYSIS, MATSIMSCENARIO, GRIPSSCENARIO };
 	public static enum LayerType { SLIPPYMAP, SHAPE, LINES, INFO, MISC };
 	public static enum Mode { EVACUATION, UTILIZATION, CLEARING };
+	public static enum SelectionMode { POLYGONAL, CIRCLE };
 	public enum Unit { TIME, PEOPLE }
+	
 
 
 	public static String DEFAULT_MATSIM_CONFIG_DESTINATION = "/output/config.xml";
