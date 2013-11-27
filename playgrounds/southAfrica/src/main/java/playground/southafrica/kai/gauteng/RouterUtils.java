@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -70,7 +71,7 @@ public class RouterUtils {
 		double mVTTSMIN = Double.POSITIVE_INFINITY ;
 		double mVTDSMIN = Double.POSITIVE_INFINITY ;
 		
-		final double ARRIVAL = 8.5*3600., DELTA_TRIPTIME = 3600. , DELTA_DISTANCE = 100. * 1000. ;
+		final double DEPARTURE = 7.5*3600., DELTA_TRIPTIME = 100. , DELTA_DISTANCE = 100. * 1000. ;
 		
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 
@@ -80,6 +81,7 @@ public class RouterUtils {
 			 * yy would certainly be better to play back the full plan
 			 * yy would be even better to play back the experienced plan
 			 */
+			double typicalDuration = scenario.getConfig().planCalcScore().getActivityParams( firstAct.getType() ).getTypicalDuration() ;
 
 			double triptime=0, distance=0 ;
 			for ( int ii=0 ; ii<N_TESTS ; ii++ ) {
@@ -90,14 +92,14 @@ public class RouterUtils {
 				} else if ( ii==2 ) {
 					triptime = DELTA_TRIPTIME ; distance = DELTA_DISTANCE ;
 				}
-				double now = ARRIVAL - triptime ;
+				double now = DEPARTURE ;
 				e2s.get(ii).handleEvent( new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
 				e2s.get(ii).handleEvent( new PersonDepartureEvent(now, person.getId(), null, TransportMode.car ) );
-				now = ARRIVAL ;
+				now = DEPARTURE + triptime ;
 				e2s.get(ii).handleEvent( new TeleportationArrivalEvent( now, person.getId(), distance ) ) ;
 				e2s.get(ii).handleEvent( new PersonArrivalEvent( now, person.getId(), null, TransportMode.car ) );
 				e2s.get(ii).handleEvent( new ActivityStartEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
-				now += (24.-12.5)*3600. ;
+				now = DEPARTURE + typicalDuration + 0.5*DELTA_TRIPTIME ;
 				e2s.get(ii).handleEvent( new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
 				e2s.get(ii).handleEvent( new PersonDepartureEvent(now, person.getId(), null, TransportMode.car ) );
 				e2s.get(ii).handleEvent( new TeleportationArrivalEvent( now, person.getId(), 0. ) ) ;
@@ -131,7 +133,8 @@ public class RouterUtils {
 			mVTDSMAX = Math.max( mVTDSMAX, -utds/mum ) ;
 			mVTDSMIN = Math.min( mVTDSMIN, -utds/mum ) ;
 
-			if ( cnt%1000==0 ) {
+			if ( cnt%1000==0 || utts*3600>-5. ) {
+				log.info( "personId: " + person.getId() ) ;
 				log.info( "eff marg utl of travel time: " + (utts * 3600.) + " per hr") ;
 				log.info( "marg utl of travel distance: " + (utds * 1000.) + " per km"); 
 				log.info( "marg utl of money: " + mum  + " per unit of money");
