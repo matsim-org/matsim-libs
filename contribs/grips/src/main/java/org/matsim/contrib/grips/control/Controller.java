@@ -54,6 +54,7 @@ import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
 import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.Constants.ModuleType;
+import org.matsim.contrib.grips.model.Constants.SelectionMode;
 import org.matsim.contrib.grips.model.ModuleChain;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.model.imagecontainer.ImageContainerInterface;
@@ -84,9 +85,6 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class Controller {
-	public static enum SelectionMode {
-		CIRCLE, POLYGON
-	};
 
 	private ArrayList<Shape> shapes;
 	private Visualizer visualizer;
