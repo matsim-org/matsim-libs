@@ -46,7 +46,7 @@ import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 
 /**
- * @author dgrether
+ * @author tthunig
  */
 public class TtSimSimTrafficAnalyser {
 
@@ -112,8 +112,15 @@ public class TtSimSimTrafficAnalyser {
 
 		if (args == null || args.length == 0){
 			
-			String runNr1 = "1910";
-			String runNr2 = "1912";
+//			String runNr1 = "1745"; // base case (based on 1712), changes in routes + times
+//			String runNr2 = "1746"; // commodities > 10
+//			String runNr2 = "1747"; // commodities > 50
+//			String runNr2 = "1748"; // sylvia
+			
+			String runNr1 = "1910"; // base case (based on 1712), changes in routes only
+//			String runNr2 = "1911"; // commodities > 10
+//			String runNr2 = "1912"; // commodities > 50
+			String runNr2 = "1913"; // sylvia
 			
 			net = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/"+runNr1+".output_network.xml.gz";
 			eventsFileCountValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/ITERS/it.2000/"+runNr1+".2000.events.xml.gz";
