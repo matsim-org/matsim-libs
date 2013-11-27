@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.pt.TransitDriver;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -142,7 +143,9 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 
 			MobsimDriverAgent driver = veh.getDriver();
 
-			HandleTransitStopResult handleTransitStop = qLink.handleTransitStop(now, veh, driver);
+			if ( driver instanceof TransitDriver ) {
+				TransitDriver transitDriver = (TransitDriver) driver ;
+			HandleTransitStopResult handleTransitStop = qLink.handleTransitStop(now, veh, transitDriver);
 			if (handleTransitStop == HandleTransitStopResult.accepted) {
 				// vehicle has been accepted into the transit vehicle queue of the link.
 				removeVehicleFromQueue(now) ;
@@ -154,7 +157,8 @@ class AssignmentEmulatingQLane extends QLaneInternalI {
 			} else if (handleTransitStop == HandleTransitStopResult.continue_driving) {
 				// Do nothing, but go on.. 
 			} 
-
+			}
+			
 			// Check if veh has reached destination:
 			if ((driver.chooseNextLinkId() == null)) {
 				letVehicleArrive(now, veh);
