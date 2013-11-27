@@ -35,7 +35,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
-import org.matsim.contrib.grips.analysis.EvacuationAnalysis;
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.evacuationareaselector.EvacuationAreaSelector;
 import org.matsim.contrib.grips.evacuationptlineseditor.EvacuationPTLinesEditor;
@@ -50,6 +49,8 @@ import org.matsim.contrib.grips.scenariogenerator.MatsimNetworkGenerator;
 import org.matsim.contrib.grips.scenariogenerator.MatsimScenarioGenerator;
 import org.matsim.contrib.grips.view.DefaultWindow;
 import org.matsim.contrib.grips.view.TabButton;
+
+import playground.hkluepfel.analysis.Analysis;
 
 public class ScenarioManager extends DefaultWindow
 {
@@ -77,7 +78,7 @@ public class ScenarioManager extends DefaultWindow
 		moduleChain.add(new RoadClosuresEditor(controller));
 		moduleChain.add(new EvacuationPTLinesEditor(controller));
 		moduleChain.add(new MatsimScenarioGenerator(controller));
-		moduleChain.add(new EvacuationAnalysis(controller));
+		moduleChain.add(new Analysis(controller));
 		
 		controller.addModuleChain(moduleChain);
 		

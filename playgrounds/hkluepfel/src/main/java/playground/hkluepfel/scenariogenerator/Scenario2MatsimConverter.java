@@ -42,7 +42,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkImpl;
@@ -107,7 +106,7 @@ public class Scenario2MatsimConverter {
 
 		try {
 			this.config = ConfigUtils.createConfig();
-			GripsConfigModule gcm = new GripsConfigModule("grips");
+			org.matsim.contrib.grips.model.config.GripsConfigModule gcm = new org.matsim.contrib.grips.model.config.GripsConfigModule("grips");
 			this.config.addModule(gcm);
 
 			this.config.global().setCoordinateSystem("EPSG:3395");

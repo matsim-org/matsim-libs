@@ -68,10 +68,10 @@ public class Analysis extends AbstractModule {
 	private AbstractDataPanel graphPanel;
 	private KeyPanel keyPanel;
 	private Thread readerThread;
-	private double gridSize = 200;
+	private double gridSize = 600;
 	private Mode mode;
 
-	private AnylsisToolBox toolBox;
+	private AnalysisToolBox toolBox;
 
 	public static void main(String[] args) {
 		// set up controller and image interface
@@ -162,7 +162,7 @@ public class Analysis extends AbstractModule {
 	@Override
 	public AbstractToolBox getToolBox() {
 		if (this.toolBox == null)
-			this.toolBox = new AnylsisToolBox(this, this.controller);
+			this.toolBox = new AnalysisToolBox(this, this.controller);
 		return this.toolBox;
 	}
 
@@ -200,8 +200,8 @@ public class Analysis extends AbstractModule {
 				this.toolBox.getOpenOTFVisBtn().setEnabled(true);
 		}
 		if ((graphPanel == null) || (keyPanel == null)) {
-			graphPanel = ((AnylsisToolBox) getToolBox()).getGraphPanel();
-			keyPanel = ((AnylsisToolBox) getToolBox()).getKeyPanel();
+			graphPanel = ((AnalysisToolBox) getToolBox()).getGraphPanel();
+			keyPanel = ((AnalysisToolBox) getToolBox()).getKeyPanel();
 		}
 
 		// run event reader
@@ -223,9 +223,9 @@ public class Analysis extends AbstractModule {
 			graphPanel.updateData(data);
 			keyPanel.updateData(data);
 		}
-		((AnylsisToolBox) getToolBox()).setEventFileItems(eventFiles);
+		((AnalysisToolBox) getToolBox()).setEventFileItems(eventFiles);
 
-		((AnylsisToolBox) getToolBox()).setFirstLoad(false);
+		((AnalysisToolBox) getToolBox()).setFirstLoad(false);
 
 	}
 
