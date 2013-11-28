@@ -43,16 +43,16 @@ public class Surprice {
 	public static double beta_TT_car_lei = -1.0 * hs;
 	
 	public static double beta_TT_pt_com = -4.0 * hs;		
-	public static double beta_TT_pt_shp = -2.0 * hs;
-	public static double beta_TT_pt_lei = -1.0 * hs;
+	public static double beta_TT_pt_shp = -3.0 * hs;
+	public static double beta_TT_pt_lei = -2.0 * hs;
 	
 	public static double beta_TT_bike_com = -4.0 * hs;
 	public static double beta_TT_bike_shp = -2.0 * hs;
 	public static double beta_TT_bike_lei = -1.0 * hs;
 	
-	public static double beta_TT_walk_com = -1.0 * hs;
-	public static double beta_TT_walk_shp = -1.0 * hs;
-	public static double beta_TT_walk_lei = -1.0 * hs;
+	public static double beta_TT_walk_com = -0.5 * hs;
+	public static double beta_TT_walk_shp = -0.5 * hs;
+	public static double beta_TT_walk_lei = -0.5 * hs;
 
 	// distance disutility
 	private static double km = 0.001; // scaling from km to m
