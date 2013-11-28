@@ -114,8 +114,8 @@ public class DigicoreClusterRunner {
 		LOG.info(" Clustering the points...");
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
-		double[] radii = {1, 2, 5}; //, 10, 15, 20, 25, 30, 35, 40};
-		int[] pmins = {2, 5}; //, 10, 15, 20, 25};
+		double[] radii = {30, 35}; //, 10, 15, 20, 25, 30, 35, 40};
+		int[] pmins = {10, 15}; //, 10, 15, 20, 25};
 
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
@@ -291,9 +291,6 @@ public class DigicoreClusterRunner {
 						}
 					}
 								
-					/*TODO If we want to, we need to write all the cluster members out to file HERE. 
-					 * Update (20130627): Or, rather write out the concave hull. */
-					
 					/* First, remove duplicate points. 
 					 * TODO Consider the UniqueCoordinateArrayFilter class from vividsolutions.*/
 					List<Coord> coordList = new ArrayList<Coord>();
@@ -302,7 +299,11 @@ public class DigicoreClusterRunner {
 							coordList.add(ca.getCoord());
 						}
 					}
-					
+
+					/*TODO If we want to, we need to write all the cluster members out to file HERE. 
+					 * Update (20130627): Or, rather write out the concave hull. */
+					/* FIXME Consider 'not' writing the facilities to file, as 
+					 * this takes up a HUGE amount of disk space (JWJ Nov '13) */
 					String clusterFile = String.format("%s%.0f_%d_points_%s.csv", outputFolder, radius, minimumPoints, facilityId.toString());
 					BufferedWriter bw = IOUtils.getBufferedWriter(clusterFile);
 					try{
