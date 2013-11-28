@@ -10,7 +10,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierController;
+import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
@@ -122,7 +122,7 @@ public class MyCarrierSimulation {
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
 		
-		CarrierController carrierController = new CarrierController(carriers, stratManFactory, scoringFactory);
+		CarrierControlerListener carrierController = new CarrierControlerListener(carriers, stratManFactory, scoringFactory);
 		carrierController.setEnableWithinDayActivityReScheduling(false);
 		controler.addControlerListener(carrierController);
 		controler.run();

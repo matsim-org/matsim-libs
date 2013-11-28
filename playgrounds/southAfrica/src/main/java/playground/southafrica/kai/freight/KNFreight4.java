@@ -33,7 +33,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierController;
+import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
@@ -162,7 +162,7 @@ public class KNFreight4 {
 		final Controler ctrl = new Controler( scenario ) ;
 		ctrl.setOverwriteFiles(true);
 		{
-			CarrierController listener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
+			CarrierControlerListener listener = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
 			listener.setEnableWithinDayActivityReScheduling(usingWithinDayReScheduling);
 			ctrl.addControlerListener(listener) ;
 		}

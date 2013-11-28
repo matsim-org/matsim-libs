@@ -19,7 +19,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierController;
+import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
@@ -198,7 +198,7 @@ public class GridSim {
 		};
 		
 		//put all together
-		CarrierController carrierController = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory);
+		CarrierControlerListener carrierController = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory);
 		
 		//and run simulation
 		Controler matsimController = new Controler(scenario);

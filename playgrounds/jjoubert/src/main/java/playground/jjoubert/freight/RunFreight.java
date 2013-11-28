@@ -24,7 +24,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierController;
+import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
@@ -99,7 +99,7 @@ final class RunFreight {
 			}
 		};
 
-		CarrierController carrierControlerListener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory);
+		CarrierControlerListener carrierControlerListener = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory);
 		carrierControlerListener.setEnableWithinDayActivityReScheduling(false);
 
 		controler.addControlerListener(carrierControlerListener);
