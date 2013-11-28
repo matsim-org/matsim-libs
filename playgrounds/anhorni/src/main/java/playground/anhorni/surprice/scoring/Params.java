@@ -67,25 +67,43 @@ public class Params {
 			constCost = Surprice.constantCost_pt;
 		
 		// ============= slm =======================================================
-		} else if (TransportMode.bike.equals(mode) || TransportMode.walk.equals(mode)) {
+		} else if (TransportMode.bike.equals(mode)) {
 			if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home") 
 					|| purpose.equals("business")) {
-				beta_TD = Surprice.beta_TD_slm_com;
-				beta_TT = Surprice.beta_TT_slm_com;
+				beta_TD = Surprice.beta_TD_bike_com;
+				beta_TT = Surprice.beta_TT_bike_com;
 			} else if (purpose.equals("shop")) {
-				beta_TD = Surprice.beta_TD_slm_shp;
-				beta_TT = Surprice.beta_TT_slm_shp;
+				beta_TD = Surprice.beta_TD_bike_shp;
+				beta_TT = Surprice.beta_TT_bike_shp;
 			} else if (purpose.equals("leisure")) {
-				beta_TD = Surprice.beta_TD_slm_lei;
-				beta_TT = Surprice.beta_TT_slm_lei;
+				beta_TD = Surprice.beta_TD_bike_lei;
+				beta_TT = Surprice.beta_TT_bike_lei;
 			} 
-			lagP = (mLag_purpose? 1 : 0) * Surprice.lag_purpose_slm;
-			lagT = (mLag_time? 1 : 0) * Surprice.lag_time_slm;
-			asc = Surprice.constant_slm;
+			lagP = (mLag_purpose? 1 : 0) * Surprice.lag_purpose_bike;
+			lagT = (mLag_time? 1 : 0) * Surprice.lag_time_bike;
+			asc = Surprice.constant_bike;
 			
-			distanceCostFactor = Surprice.distanceCost_slm;
-			constCost = Surprice.constantCost_slm;
-		} 
+			distanceCostFactor = Surprice.distanceCost_bike;
+			constCost = Surprice.constantCost_bike; 
+		} else if (TransportMode.walk.equals(mode)) {
+			if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home") 
+					|| purpose.equals("business")) {
+				beta_TD = Surprice.beta_TD_walk_com;
+				beta_TT = Surprice.beta_TT_walk_com;
+			} else if (purpose.equals("shop")) {
+				beta_TD = Surprice.beta_TD_walk_shp;
+				beta_TT = Surprice.beta_TT_walk_shp;
+			} else if (purpose.equals("leisure")) {
+				beta_TD = Surprice.beta_TD_walk_lei;
+				beta_TT = Surprice.beta_TT_walk_lei;
+			} 
+			lagP = (mLag_purpose? 1 : 0) * Surprice.lag_purpose_walk;
+			lagT = (mLag_time? 1 : 0) * Surprice.lag_time_walk;
+			asc = Surprice.constant_walk;
+			
+			distanceCostFactor = Surprice.distanceCost_walk;
+			constCost = Surprice.constantCost_walk;
+	}
 	}
 
 	public double getBeta_TD() {
