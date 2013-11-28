@@ -96,10 +96,10 @@ public class SAString {
 		/* Initialise the output list. */
 		List<String> outputList = new ArrayList<String>();
 		
-		int[] sitesInSolution = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
+		int[] sitesInSolution = {5};//{5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
 		String prefix;
 		for(int n : sitesInSolution){
-			for(int run = 1; run <= 200; run++){
+			for(int run = 1; run <= 10; run++){
 				LOG.info("====> Number of sites: " + n + "; Run " + run + " <====");
 				/* Execute for full distance matrix. */
 				prefix = n +"_" + distanceMatrixDescription + "_" + String.format("%03d", run);
@@ -362,8 +362,8 @@ public class SAString {
 		 * 
 		 * TODO Perform parameter analysis/tweaking */
 		int iteration = 0;
-		int iterationMax = 500;
-		double temp = 1000;
+		int iterationMax = 750;
+		double temp = 10000;
 		int tempChangeFrequency = 20;
 		double tempChangeFraction = 0.75;
 		int nonImprovingIterations = 0;
@@ -404,7 +404,7 @@ public class SAString {
 				solutionList.add(currentSolution.copy());
 
 				/* Update temperature, if necessary. */
-				if(nonImprovingIterations % tempChangeFrequency == 0){
+				if(nonImprovingIterations > 0 && nonImprovingIterations % tempChangeFrequency == 0){
 					temp *= tempChangeFraction;
 				}
 
@@ -446,7 +446,7 @@ public class SAString {
 		return String.format("%s,%.4f,%s", runPrefix.replaceAll("_", ","), incumbent.objective, incumbent.toString());
 	}
 	
-	
+	@Deprecated
 	public Solution getNearestNeighbour(Solution current, double temperature){
 		Solution newCurrent = null;
 		
@@ -536,8 +536,9 @@ public class SAString {
 		
 		/* Consider all possible moves for this site, but again ignore fixed sites. */
 		for(Id nextSite : this.sites){
-			if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) &&
-			   !this.fixedSites.contains(nextSite)){
+			if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) && 	/* Don't replace a site with itself. */ 
+			   !this.fixedSites.contains(nextSite) && 								/* Don't replace a fixed site. */ 
+			   !currentRepresentation.contains(nextSite)){							/* Don't replace with a site that is already in the current solution. */
 				/* Consider this possible move. */
 				Solution possibleMove = current.copy();
 				
@@ -576,6 +577,9 @@ public class SAString {
 			}
 		}
 
+		if(newCurrent == null){
+			LOG.warn("No new solution found...");
+		}
 		return newCurrent;
 	}
 	
