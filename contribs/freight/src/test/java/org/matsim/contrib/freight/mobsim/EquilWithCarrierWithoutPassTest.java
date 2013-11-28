@@ -21,7 +21,7 @@
 package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.controler.CarrierController;
+import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -62,7 +62,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	
 	public void testMobsimWithCarrierRunsWithoutException() {
 		try{
-			CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
+			CarrierControlerListener carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
 //			carrierControler.setEnableWithinDayActivityReScheduling(true);
 			controler.addControlerListener(carrierControler);
 			controler.setOverwriteFiles(true);
@@ -76,7 +76,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	
 	public void testScoringInMeters(){
 		try{
-			CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
+			CarrierControlerListener carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
 //			carrierControler.setEnableWithinDayActivityReScheduling(true);
 			controler.addControlerListener(carrierControler);
 			controler.setOverwriteFiles(true);
@@ -96,7 +96,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	
 	public void testScoringInSeconds(){
 
-		CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
+		CarrierControlerListener carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
 
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);
@@ -111,7 +111,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	}
 	
 	public void testScoringInSecondsWithWithinDayRescheduling(){
-		CarrierController carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
+		CarrierControlerListener carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
 		carrierControler.setEnableWithinDayActivityReScheduling(true);
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);

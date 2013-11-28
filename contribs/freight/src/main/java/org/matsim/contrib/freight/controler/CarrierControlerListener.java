@@ -74,12 +74,11 @@ import org.matsim.core.replanning.GenericStrategyManager;
  *
  */
 
-/* To be consistent, should we rather not call this `CarrierControlerListener' (JWJoubert, Nov '13) */
-public class CarrierController implements StartupListener, ShutdownListener,BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+public class CarrierControlerListener implements StartupListener, ShutdownListener,BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 ReplanningListener, IterationEndsListener {
 
 
-	private static Logger logger = Logger.getLogger(CarrierController.class);
+	private static Logger logger = Logger.getLogger(CarrierControlerListener.class);
 
 	private boolean withinDayReSchedulingEnabled = false;
 
@@ -100,7 +99,7 @@ ReplanningListener, IterationEndsListener {
 	 * @param scoringFunctionFactory
 	 * 
 	 */
-	public CarrierController(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory){
+	public CarrierControlerListener(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory){
 		this.carriers = carriers;
 		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
 		this.carrierScoringFunctionFactory = scoringFunctionFactory;
@@ -115,7 +114,7 @@ ReplanningListener, IterationEndsListener {
 	 * @param strategyManagerFactory
 	 * @param scoringFunctionFactory (not null)
 	 */
-	public CarrierController(String carrierPlansFilename, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory){
+	public CarrierControlerListener(String carrierPlansFilename, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory){
 		this.carriers = new Carriers();
 		new CarrierPlanXmlReaderV2(carriers).read(carrierPlansFilename);
 		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;

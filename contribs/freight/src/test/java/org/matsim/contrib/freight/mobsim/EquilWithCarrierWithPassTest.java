@@ -21,7 +21,7 @@
 package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.controler.CarrierController;
+import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -34,7 +34,7 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 	
 	Controler controler;
 	
-	CarrierController carrierControler;
+	CarrierControlerListener carrierControler;
 
 	private String planFile;
 	
@@ -81,7 +81,7 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 	
 	public void testScoringInMeters(){
 //		try{
-		carrierControler = new CarrierController(planFile,new StrategyManagerFactoryForTests(),new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
+		carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(),new DistanceScoringFunctionFactoryForTests(controler.getNetwork()));
 		
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);
