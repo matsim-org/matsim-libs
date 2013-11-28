@@ -20,26 +20,35 @@
 
 package playground.staheale.preprocess;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class AdaptPlans {
@@ -53,372 +62,123 @@ public class AdaptPlans {
 	private QuadTree<ActivityFacility> shopRetailQuadTree;
 	private QuadTree<ActivityFacility> shopServiceQuadTree;
 	boolean tta = false;
+	Random random = new Random(37835409);
+	int homeAct = 0;
+	int workAct = 0;
+	int shopAct = 0;
+	int leisureAct = 0;
+	int educationAct = 0;
+	int ptLeg = 0;
+	int walkLeg = 0;
+	int carLeg = 0;
+	int bikeLeg = 0;
+	double latestStarttime = 0;
+	Id id = null;
+	int isWorking = 0;
 
-public AdaptPlans() {
-	super();		
-}
+//public AdaptPlans() {
+//}
 	
 public static void main(String[] args) throws IOException {
 	AdaptPlans adaptPlans = new AdaptPlans();
 	adaptPlans.run();
 	}
 
-public void run() {
+public void run() throws IOException {
 	scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	
-    log.info("Reading network xml file...");
-    MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
-	NetworkReader.readFile("./input/network.xml");
-	Network network = scenario.getNetwork();
-    log.info("Reading network xml file...done.");
-    log.info("Number of nodes: " +network.getNodes().size());
-    log.info("Number of links: " +network.getLinks().size());
-	
+
 	MatsimPopulationReader PlansReader = new MatsimPopulationReader(scenario); 
-	PlansReader.readFile("./input/plans.xml.gz");
+	PlansReader.readFile("./input/population2010baseline.xml.gz");
+	Population pop = scenario.getPopulation();
+	log.info("Initial population size is " +pop.getPersons().size());
 	
-	MatsimFacilitiesReader FacReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);  
-	System.out.println("Reading facilities xml file... ");
-	FacReader.readFile("./input/facilities.xml.gz");
-	System.out.println("Reading facilities xml file...done.");
-	ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
-    log.info("Number of facilities: " +facilities.getFacilities().size());
+	//////////////////////////////////////////////////////////////////////
+	// preparing output file for commuting distances
+
+	final String header="Person_id;Distance";
+	final BufferedWriter out =
+			IOUtils.getBufferedWriter("./output/distances.txt");
+	out.write(header);
+	out.newLine();
+	
+	for (Person p : pop.getPersons().values()) {
+		List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
+		Iterator<PlanElement> iter = pes.iterator();
+		Coord homeCoords = null;
+		Coord workCoords = null;
+		int start = 0;
+		while (iter.hasNext()) {
+			PlanElement pe = iter.next();
+			if (pe instanceof Activity) {
+				ActivityImpl a = (ActivityImpl) pe;
+				if (a.getType().equals("home") != true && a.getType().equals("work") != true
+						&& a.getType().equals("shopping") != true && a.getType().equals("leisure") != true 
+						&& a.getType().equals("education") != true) {
+					log.warn("act type: " +a.getType()+ ", person: " +p.getId());
+				}
+				if (a.getType().equals("home") && start < 1 && iter.hasNext()) { homeAct += 1; start += 1; homeCoords = a.getCoord();}
+				else if (a.getType().equals("work")) { workAct += 1; workCoords = a.getCoord();}
+				else if (a.getType().equals("shopping")) { shopAct += 1; }
+				else if (a.getType().equals("leisure")) { leisureAct += 1; }
+				else if (a.getType().equals("education")) { educationAct += 1; }
+				if (a.getStartTime() > latestStarttime) {
+					latestStarttime = a.getStartTime();
+					id = p.getId();
+				}
+			}
+			if (pe instanceof Leg) {
+				LegImpl l = (LegImpl) pe;
+				if (l.getMode() != "walk" && l.getMode() != "bike" && l.getMode() != "car" && l.getMode() != "pt") {
+					log.warn("leg type: " +l.getMode()+ ", person: " +p.getId());
+				}
+				if (l.getMode().equals("car")) { carLeg += 1; }
+				else if (l.getMode().equals("pt")) { ptLeg += 1; }
+				else if (l.getMode().equals("walk")) { walkLeg += 1; }
+				else if (l.getMode().equals("bike")) { bikeLeg += 1; }				
+			}
+		}
+		// check commuter distances
+		if (workCoords != null) {
+			
+			double dx = workCoords.getX() - homeCoords.getX();
+			double dy = workCoords.getY() - homeCoords.getY();
+			double dist = Math.sqrt(dx*dx+dy*dy);
+			out.write(p.getId().toString()+";"+dist);
+			out.newLine();
+			isWorking += 1;
+		}
+		workCoords = null;
+		homeCoords = null;
+	}
+	out.flush();
+	out.close();
+	log.info("number of home acts: " +homeAct);
+	log.info("number of work acts: " +workAct);
+	log.info("number of shopping acts: " +shopAct);
+	log.info("number of leisure acts: " +leisureAct);
+	log.info("number of education acts: " +educationAct);
+	log.info("number of car legs: " +carLeg);
+	log.info("number of pt legs: " +ptLeg);
+	log.info("number of walk legs: " +walkLeg);
+	log.info("number of bike legs: " +bikeLeg);
+	log.info("latestStarttime: " +latestStarttime+ " for person " +id.toString());
+	log.info("number of people working: " +isWorking);
     
 	scenarioNew = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-    MatsimNetworkReader NetworkReader2 = new MatsimNetworkReader(scenarioNew);
-	NetworkReader2.readFile("./input/network.xml");
+	int prob = 0;
+	int popCount = 0;
+	int popSize = pop.getPersons().size();
 	
-	MatsimPopulationReader PlansReader2 = new MatsimPopulationReader(scenarioNew); 
-	PlansReader2.readFile("./input/plans0.xml");
-	
-	MatsimFacilitiesReader FacReader2 = new MatsimFacilitiesReader((ScenarioImpl) scenarioNew);  
-	FacReader2.readFile("./input/facilities.xml.gz");
-
-    
-//	Random random = new Random(4711);
-
-//	for (Person p : scenario.getPopulation().getPersons().values()) {
-//		for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
-//			if (pe instanceof Activity) {
-//				((PersonImpl)p).createDesires("desired activity durations");
-//                ActivityImpl act = (ActivityImpl)pe;                         
-//                if (act.getType().startsWith("s")) {
-//                	if (random.nextDouble()<0.95){
-//                		String OLD_ACT_TYPE = act.getType();
-//    					String DE = OLD_ACT_TYPE.substring(1);
-//    					double desire = Double.parseDouble(DE)*3600;
-//                    	((PersonImpl)p).getDesires().putActivityDuration("shop_retail", desire);
-//                		act.setType("shop_retail");
-//                	}
-//                	else {
-//                		String OLD_ACT_TYPE = act.getType();
-//    					String DE = OLD_ACT_TYPE.substring(1);
-//    					double desire = Double.parseDouble(DE)*3600;
-//                    	((PersonImpl)p).getDesires().putActivityDuration("shop_service", desire);
-//                		act.setType("shop_service");
-//                	}
-//                }
-//                if (act.getType().startsWith("l")) {
-//                	if (random.nextDouble()<0.5){
-//                		String OLD_ACT_TYPE = act.getType();
-//    					String DE = OLD_ACT_TYPE.substring(1);
-//    					double desire = Double.parseDouble(DE)*3600;
-//                    	((PersonImpl)p).getDesires().putActivityDuration("sports_fun", desire);
-//                		act.setType("sports_fun");
-//                	}
-//                	else {
-//                		String OLD_ACT_TYPE = act.getType();
-//    					String DE = OLD_ACT_TYPE.substring(1);
-//    					double desire = Double.parseDouble(DE)*3600;
-//                    	((PersonImpl)p).getDesires().putActivityDuration("gastro_culture", desire);
-//                		act.setType("gastro_culture");
-//                	}
-//                }
-//                if (act.getType().startsWith("w")) {
-//                	String OLD_ACT_TYPE = act.getType();
-//					String DE = OLD_ACT_TYPE.substring(1);
-//					double desire = Double.parseDouble(DE)*3600;
-//                	((PersonImpl)p).getDesires().putActivityDuration("work", desire);
-//                	act.setType("work");
-//                }
-//                if (act.getType().startsWith("h")) {
-//                	String OLD_ACT_TYPE = act.getType();
-//					String DE = OLD_ACT_TYPE.substring(1);
-//					double desire = Double.parseDouble(DE)*3600;
-//                	((PersonImpl)p).getDesires().putActivityDuration("home", desire);
-//                	act.setType("home");
-//                }
-//                if (act.getType().startsWith("e")) {
-//                	String OLD_ACT_TYPE = act.getType();
-//					String DE = OLD_ACT_TYPE.substring(1);
-//					double desire = Double.parseDouble(DE)*3600;
-//                	((PersonImpl)p).getDesires().putActivityDuration("education", desire);
-//                	act.setType("education");
-//                }
-//			}
-//		}
-//	}
-
-	//---------------------adapt activity facility to newly generated facilities
-	
-//	TreeMap<Id,ActivityFacility> shopRetailFacilities = facilities.getFacilitiesForActivityType("shop_retail");
-//	log.info("Shop retail facilities: " +shopRetailFacilities.size());
-//	TreeMap<Id,ActivityFacility> shopServiceFacilities = facilities.getFacilitiesForActivityType("shop_service");
-//	log.info("Shop service facilities: " +shopServiceFacilities.size());
-//	TreeMap<Id,ActivityFacility> sportsFunFacilities = facilities.getFacilitiesForActivityType("sports_fun");
-//	log.info("Sports & fun facilities: " +sportsFunFacilities.size());
-	
-	
-//	TreeMap<Id,ActivityFacility> workFacilities = facilities.getFacilitiesForActivityType("work_sector2");
-//	TreeMap<Id,ActivityFacility> work3Facilities = facilities.getFacilitiesForActivityType("work_sector3");
-//	for (ActivityFacility f : work3Facilities.values()){
-//		workFacilities.put(f.getId(), f);
-//	}
-//	log.info("Work facilities: " +workFacilities.size());
-	
-	
-//	TreeMap<Id,ActivityFacility> gastroCultureFacilities = facilities.getFacilitiesForActivityType("gastro_culture");
-//	log.info("Gastro & culture facilities: " +gastroCultureFacilities.size());
-//	TreeMap<Id,ActivityFacility> educationFacilities = facilities.getFacilitiesForActivityType("education");
-//	log.info("Education facilities: " +educationFacilities.size());
-//
-//	shopRetailQuadTree = this.buildShopRetailQuadTree(shopRetailFacilities);
-//	log.info(" shopRetailQuadTree size: " +this.shopRetailQuadTree.size());
-//	
-//	shopServiceQuadTree = this.buildShopServiceQuadTree(shopServiceFacilities);
-//	log.info(" shopServiceQuadTree size: " +this.shopServiceQuadTree.size());
-//
-//	sportsFunQuadTree = this.buildSportsFunQuadTree(sportsFunFacilities);
-//	log.info(" sportsFunQuadTree size: " +this.sportsFunQuadTree.size());
-
-//	workQuadTree = this.buildWorkQuadTree(workFacilities);
-//	log.info(" workQuadTree size: " +this.workQuadTree.size());
-	
-//	gastroCultureQuadTree = this.buildGastroCultureQuadTree(gastroCultureFacilities);
-//	log.info(" gastroCultureQuadTree size: " +this.gastroCultureQuadTree.size());
-
-//	educationQuadTree = this.buildEducationQuadTree(educationFacilities);
-//	log.info(" educationQuadTree size: " +this.educationQuadTree.size());
-
-	for (Person p : scenario.getPopulation().getPersons().values()) {
-		for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
-			if (pe instanceof Activity) {
-				ActivityImpl act = (ActivityImpl)pe; 
-				if (!act.getType().startsWith("tta") && tta == false) {
-					tta = true;
-					log.info("tta set true for person "+p.getId());
-					scenarioNew.getPopulation().addPerson(p);
-					log.info("person " +p.getId()+ " added to population");
-				}
-            }
+	for (Person p : pop.getPersons().values()) {
+		prob = random.nextInt(2);
+		//log.info("prob = " +prob);
+		if (prob == 1 && popCount < 2*(popSize/10)) { //(popSize/10)
+			scenarioNew.getPopulation().addPerson(p);
+			popCount += 1;
 		}
-		tta = false;
-
-//		if (tta == false){
-//			log.info("tta false for person "+p.getId());
-//			scenarioNew.getPopulation().addPerson(p);
-//		}
-	}
 		
-//	for (Person p : scenario.getPopulation().getPersons().values()) {
-//		for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
-//			if (pe instanceof Activity) {
-//                ActivityImpl act = (ActivityImpl)pe; 
-//                if (act.getType().startsWith("shop_re")) {
-//        			Double x = act.getCoord().getX();
-//        			Double y = act.getCoord().getY();
-//        			ActivityFacility closestShopRetail = shopRetailQuadTree.get(x,y);
-//        			act.setFacilityId(closestShopRetail.getId());
-//        			act.setCoord(closestShopRetail.getCoord()); 
-//                }
-//                if (act.getType().startsWith("shop_ser")) {
-//        			Double x = act.getCoord().getX();
-//        			Double y = act.getCoord().getY();
-//        			ActivityFacility closestShopService = shopServiceQuadTree.get(x,y);
-//        			act.setFacilityId(closestShopService.getId());
-//        			act.setCoord(closestShopService.getCoord()); 
-//                }
-//                if (act.getType().startsWith("sports")) {
-//        			Double x = act.getCoord().getX();
-//        			Double y = act.getCoord().getY();
-//        			ActivityFacility closestSportsFun = sportsFunQuadTree.get(x,y);
-//        			act.setFacilityId(closestSportsFun.getId());
-//        			act.setCoord(closestSportsFun.getCoord()); 
-//                }
-////                if (act.getType().startsWith("wor")) {
-////        			Double x = act.getCoord().getX();
-////        			Double y = act.getCoord().getY();
-////        			ActivityFacility closestWork = workQuadTree.get(x,y);
-////        			act.setFacilityId(closestWork.getId());
-////        			act.setCoord(closestWork.getCoord()); 
-////                }
-//                if (act.getType().startsWith("gastro")) {
-//        			Double x = act.getCoord().getX();
-//        			Double y = act.getCoord().getY();
-//        			ActivityFacility closestGastroCulture = gastroCultureQuadTree.get(x,y);
-//        			act.setFacilityId(closestGastroCulture.getId());
-//        			act.setCoord(closestGastroCulture.getCoord()); 
-//                }
-////                if (act.getType().startsWith("edu")) {
-////        			Double x = act.getCoord().getX();
-////        			Double y = act.getCoord().getY();
-////        			ActivityFacility closestEducation = educationQuadTree.get(x,y);
-////        			act.setFacilityId(closestEducation.getId());
-////        			act.setCoord(closestEducation.getCoord()); 
-////                }
-//			}
-//		}
-//	}
-	new PopulationWriter(scenarioNew.getPopulation(), scenarioNew.getNetwork()).write("./output/plans.xml.gz");	
-
 	}
-
-private QuadTree<ActivityFacility> buildSportsFunQuadTree(TreeMap<Id,ActivityFacility> sportsFunFacilities) {
-	double minx = Double.POSITIVE_INFINITY;
-	double miny = Double.POSITIVE_INFINITY;
-	double maxx = Double.NEGATIVE_INFINITY;
-	double maxy = Double.NEGATIVE_INFINITY;
-	
-	for (final ActivityFacility f : sportsFunFacilities.values()) {
-		if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-		if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-		if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-		if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-	}
-	minx -= 1.0;
-	miny -= 1.0;
-	maxx += 1.0;
-	maxy += 1.0;
-	log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-
-	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-	for (final ActivityFacility f : sportsFunFacilities.values()) {
-		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
-		}
-	return quadtree;
-	}
-
-//private QuadTree<ActivityFacility> buildWorkQuadTree(TreeMap<Id,ActivityFacility> workFacilities) {
-//	double minx = Double.POSITIVE_INFINITY;
-//	double miny = Double.POSITIVE_INFINITY;
-//	double maxx = Double.NEGATIVE_INFINITY;
-//	double maxy = Double.NEGATIVE_INFINITY;
-//	
-//	for (final ActivityFacility f : workFacilities.values()) {
-//		if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-//		if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-//		if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-//		if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-//	}
-//	minx -= 1.0;
-//	miny -= 1.0;
-//	maxx += 1.0;
-//	maxy += 1.0;
-//	log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-//
-//	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-//	for (final ActivityFacility f : workFacilities.values()) {
-//		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
-//		}
-//	return quadtree;
-//	}
-
-private QuadTree<ActivityFacility> buildGastroCultureQuadTree(TreeMap<Id,ActivityFacility> gastroCultureFacilities) {
-	double minx = Double.POSITIVE_INFINITY;
-	double miny = Double.POSITIVE_INFINITY;
-	double maxx = Double.NEGATIVE_INFINITY;
-	double maxy = Double.NEGATIVE_INFINITY;
-	
-	for (final ActivityFacility f : gastroCultureFacilities.values()) {
-		if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-		if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-		if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-		if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-	}
-	minx -= 1.0;
-	miny -= 1.0;
-	maxx += 1.0;
-	maxy += 1.0;
-	log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-
-	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-	for (final ActivityFacility f : gastroCultureFacilities.values()) {
-		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
-		}
-	return quadtree;
-	}
-
-//private QuadTree<ActivityFacility> buildEducationQuadTree(TreeMap<Id,ActivityFacility> educationFacilities) {
-//	double minx = Double.POSITIVE_INFINITY;
-//	double miny = Double.POSITIVE_INFINITY;
-//	double maxx = Double.NEGATIVE_INFINITY;
-//	double maxy = Double.NEGATIVE_INFINITY;
-//	
-//	for (final ActivityFacility f : educationFacilities.values()) {
-//		if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-//		if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-//		if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-//		if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-//	}
-//	minx -= 1.0;
-//	miny -= 1.0;
-//	maxx += 1.0;
-//	maxy += 1.0;
-//	log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-//
-//	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-//	for (final ActivityFacility f : educationFacilities.values()) {
-//		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
-//		}
-//	return quadtree;
-//	}
-private QuadTree<ActivityFacility> buildShopRetailQuadTree(TreeMap<Id,ActivityFacility> shopRetailFacilities) {
-	double minx = Double.POSITIVE_INFINITY;
-	double miny = Double.POSITIVE_INFINITY;
-	double maxx = Double.NEGATIVE_INFINITY;
-	double maxy = Double.NEGATIVE_INFINITY;
-	
-	for (final ActivityFacility f : shopRetailFacilities.values()) {
-		if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-		if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-		if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-		if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-	}
-	minx -= 1.0;
-	miny -= 1.0;
-	maxx += 1.0;
-	maxy += 1.0;
-	log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-
-	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-	for (final ActivityFacility f : shopRetailFacilities.values()) {
-		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
-		}
-	return quadtree;
-	}
-private QuadTree<ActivityFacility> buildShopServiceQuadTree(TreeMap<Id,ActivityFacility> shopServiceFacilities) {
-	double minx = Double.POSITIVE_INFINITY;
-	double miny = Double.POSITIVE_INFINITY;
-	double maxx = Double.NEGATIVE_INFINITY;
-	double maxy = Double.NEGATIVE_INFINITY;
-	
-	for (final ActivityFacility f : shopServiceFacilities.values()) {
-		if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-		if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-		if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-		if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-	}
-	minx -= 1.0;
-	miny -= 1.0;
-	maxx += 1.0;
-	maxy += 1.0;
-	log.info("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-
-	QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-	for (final ActivityFacility f : shopServiceFacilities.values()) {
-		quadtree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacility) f);
-		}
-	return quadtree;
+	log.info("pop size is: " +scenarioNew.getPopulation().getPersons().size());
+	new PopulationWriter(scenarioNew.getPopulation(), null).write("./output/population2010baseline_2percent.xml.gz");	
 	}
 }
