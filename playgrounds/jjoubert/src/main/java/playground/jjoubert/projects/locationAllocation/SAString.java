@@ -96,7 +96,7 @@ public class SAString {
 		/* Initialise the output list. */
 		List<String> outputList = new ArrayList<String>();
 		
-		int[] sitesInSolution = {5};//{5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
+		int[] sitesInSolution = {10, 20};//{5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
 		String prefix;
 		for(int n : sitesInSolution){
 			for(int run = 1; run <= 10; run++){
