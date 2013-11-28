@@ -54,7 +54,7 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 	private ObjectAttributes attributes;
 	private final CharyparNagelScoringParameters params;
 	private final ActivityFacilities facilities;
-	private Network network;
+	private Network network1;
 	private double scaleNumberOfPersons;
 
 	private final Controler controler;
@@ -76,7 +76,7 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 		super(config, network);
 		this.params = new CharyparNagelScoringParameters(config);
 		this.facilities = facilities;
-		this.network = network;
+		this.network = network1;
 		this.scaleNumberOfPersons = scaleNumberOfPersons;
 		this.facilityOccupancies = facilityOccupancies;
 		this.attributes = attributes;
@@ -144,7 +144,7 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network1));
 		//scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 		return scoringFunctionAccumulator;
