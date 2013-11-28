@@ -31,7 +31,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class Events2Trips {
 
-	private static Logger log = Logger.getLogger(AnalyseOutputPlans.class);
+	private static Logger log = Logger.getLogger(Events2Trips.class);
 
 	public static void main(String[] args) throws IOException {
 		String eventsFile = "C:/Users/staha/workspace/playgrounds/staheale/output/run2030combined/run.combined.150.events.xml.gz";
