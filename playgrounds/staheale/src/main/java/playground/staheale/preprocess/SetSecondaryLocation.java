@@ -64,13 +64,13 @@ public class SetSecondaryLocation  {
 	public void run() {
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = sc.getPopulation();
-
+				
 		//////////////////////////////////////////////////////////////////////
 		// read in population
 
 		log.info("Reading plans...");	
 		MatsimPopulationReader PlansReader = new MatsimPopulationReader(sc); 
-		PlansReader.readFile("./input/population2010sample.xml.gz");
+		PlansReader.readFile("./input/population2030combined_without_facilities.xml.gz");
 		log.info("Reading plans...done.");
 		log.info("Population size is " +population.getPersons().size());
 
@@ -109,7 +109,7 @@ public class SetSecondaryLocation  {
 		//set location
 
 		PopulationWriter pw = new PopulationWriter(population, null);
-		pw.writeStartPlans("./output/population2010sampleFinal.xml.gz");
+		pw.writeStartPlans("./output/population2030combined.xml.gz");
 
 		for (Person p : population.getPersons().values()) {
 			if (p.getSelectedPlan() != null) {
@@ -153,7 +153,7 @@ public class SetSecondaryLocation  {
 				}
 
 				// case 1: home/secondary activity - secondary activity - home/secondary activity --> radius around home location
-				else if (secondaryAct != false && work != true){
+				if (secondaryAct != false && work != true){
 					for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 						if (pe instanceof ActivityImpl) {
 							ActivityImpl act = (ActivityImpl) pe;
@@ -189,7 +189,7 @@ public class SetSecondaryLocation  {
 							if (L.equals(act.getType()) || SHOPACT.equals(act.getType())) {
 								double dx = work_coord.getX() - home_coord.getX();
 								double dy = work_coord.getY() - home_coord.getY();
-								radius = Math.sqrt(dx*dx+dy*dy)/3.0;
+								radius = Math.max(Math.sqrt(dx*dx+dy*dy)/3.0,1);
 								dx = dx/6.0;
 								dy = dy/6.0;
 								CoordImpl coord1 = new CoordImpl(home_coord.getX()+dx,home_coord.getY()+dy);
@@ -217,6 +217,7 @@ public class SetSecondaryLocation  {
 		pw.writeEndPlans();
 		log.info("Writing plans...done");
 		log.info("final population size is: " +countPop);
+		
 	}
 
 	//////////////////////////////////////////////////////////////////////
