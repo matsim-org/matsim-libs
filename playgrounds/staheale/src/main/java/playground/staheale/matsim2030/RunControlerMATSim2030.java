@@ -1,19 +1,36 @@
 package playground.staheale.matsim2030;
 
 
+import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
+import herbie.running.controler.listeners.LegDistanceDistributionWriter;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
-//import org.matsim.core.config.Config;
-//import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
+import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
-import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.pt.PtConstants;
+import org.matsim.pt.router.TransitRouterConfig;
+import playground.thibautd.analysis.listeners.TripModeShares;
+
 
 public class RunControlerMATSim2030 extends Controler {
 	
-	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
-	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
+	protected static final String CALC_LEG_TIMES_FILE_NAME = "calcLegTimes.txt";
+	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "multimodalLegDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 	private DestinationChoiceBestResponseContext lcContext;
 
@@ -22,11 +39,16 @@ public class RunControlerMATSim2030 extends Controler {
 		super(args);	
 	}
 
+	public RunControlerMATSim2030(Scenario scenario) {
+		super( scenario );
+	}
+
 	public static void main(String[] args) {
-		//String configFile = args[0];
-		//Config config = ConfigUtils.loadConfig(configFile);
-		//Controler controler = new Controler(config);
-		RunControlerMATSim2030 controler = new RunControlerMATSim2030(args);
+		RunControlerMATSim2030 controler =
+				new RunControlerMATSim2030(
+						ScenarioUtils.loadScenario(
+								ConfigUtils.loadConfig(
+										args[ 0 ] ) ) );
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
 		controler.init();
@@ -34,6 +56,16 @@ public class RunControlerMATSim2030 extends Controler {
 	}
 	
 	private void init() {
+		
+		ActivityFacilities facilities = this.getFacilities();
+		//log.warn("number of facilities: " +facilities.getFacilities().size());
+		NetworkImpl network = (NetworkImpl) this.getNetwork();
+		//log.warn("number of links: " +network.getLinks().size());
+
+		WorldConnectLocations wcl = new WorldConnectLocations(this.getConfig());
+		wcl.connectFacilitiesWithLinks(facilities, network);
+		
+		
 		/*
 		 * would be muuuuch nicer to have this in DestinationChoiceInitializer, but startupListeners are called after corelisteners are called
 		 * -> scoringFunctionFactory cannot be replaced
@@ -45,7 +77,38 @@ public class RunControlerMATSim2030 extends Controler {
 		 */
   		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.lcContext); 	
 		super.setScoringFunctionFactory(dcScoringFunctionFactory);
-		// dcScoringFunctionFactory.setUsingFacilityOpeningTimes(false); // TODO: make this configurable
+		dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);		
+		
+		TransitRouterConfig conf = new TransitRouterConfig(super.config);
+		NewTransitRouterImplFactory factory = new NewTransitRouterImplFactory(super.scenarioData.getTransitSchedule(), conf, this.config);
+		
+		
+		
+		
+		/*
+		 * Cannot get the factory from the controler, therefore create a new one as the controler does. 
+		 */
+		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(this.getScenario());
+		
+		/*
+		 * Use a ...
+		 * - defaultDelegateFactory for the QNetsim modes
+		 * - transitTripRouterFactory for transit trips
+		 * 
+		 * Note that a FastDijkstraFactory is used for the multiModalTripRouterFactory
+		 * since ...
+		 * - only "fast" router implementations handle sub-networks correct
+		 * - AStarLandmarks uses link speed information instead of agent speeds
+		 */
+		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
+		mmcg.setSimulatedModes("");
+		config.addModule(mmcg);
+		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(this.getScenario(), leastCostPathCalculatorFactory);
+		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(this.getScenario(), defaultDelegateFactory, 
+				factory);
+		this.setTripRouterFactory(transitTripRouterFactory);
+		
 	}
 	
 	protected void loadControlerListeners() {
@@ -53,8 +116,10 @@ public class RunControlerMATSim2030 extends Controler {
 		
 		this.addControlerListener(new DestinationChoiceInitializer(this.lcContext));
 		
-		this.addControlerListener(new CalcLegTimesKTIListener("calcLegTimesKTI.txt", "legTravelTimeDistribution.txt"));
-		this.addControlerListener(new LegDistanceDistributionWriter("legDistanceDistribution.txt"));
+		this.addControlerListener(new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
+		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.scenarioData.getNetwork()));
+		this.addControlerListener(new TripModeShares(1, this.getControlerIO(), this.getScenario(),
+				new MainModeIdentifierImpl(), new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE )));
 		super.loadControlerListeners();
 	}
 }
