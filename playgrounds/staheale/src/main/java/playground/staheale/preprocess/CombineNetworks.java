@@ -61,13 +61,16 @@ public class CombineNetworks {
 //	    }
 	    
 	    log.info("Reading teleatlas network xml file...");
-	    new MatsimNetworkReader(streetScenario).parse("./input/teleatlas2010network.xml.gz");
+	    new MatsimNetworkReader(streetScenario).parse("./input/teleatlas2030networkSingleMode_Cleaned.xml.gz"); //teleatlas2010networkSingleMode.xml.gz
 	    Network streetNetwork = streetScenario.getNetwork();
-	    new MatsimNetworkReader(transitScenario).parse("./input/UVEK_2005_OeV_adapted_final.xml.gz");
+	    log.info("Reading teleatlas network xml file...done");
+	    log.info("Reading pt network xml file...");
+	    new MatsimNetworkReader(transitScenario).parse("./input/uvek2030network_adjusted.xml.gz"); //uvek2005network_adjusted.xml.gz
 	    Network transitNetwork = transitScenario.getNetwork();
+	    log.info("Reading pt network xml file...done");
 
 	    MergeNetworks.merge(streetNetwork, "", transitNetwork);
-	    new NetworkWriter(streetNetwork).write("./output/multimodalNetwork2010.xml.gz");
+	    new NetworkWriter(streetNetwork).write("./output/multimodalNetwork2030final.xml.gz"); //multimodalNetwork2010final.xml.gz
 	    
 //	    MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
 //		NetworkReader.readFile("./input/teleatlas2010network.xml.gz");
