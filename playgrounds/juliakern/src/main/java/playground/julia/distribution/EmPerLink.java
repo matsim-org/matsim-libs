@@ -21,6 +21,12 @@ package playground.julia.distribution;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * store (distributed) emissions for each links 
+ * with associated responsible person, time, concentration value
+ * @author julia
+ *
+ */
 public class EmPerLink {
 	
 	private Id linkId;

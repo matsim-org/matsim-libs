@@ -28,52 +28,18 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * class to analyze responsibility events 
+ *  
+ *  
+ *  
+ * @author julia
+ *
+ */
+
 public class ExposureUtils {
 
-	public void printPersonalExposureInformation(ArrayList<ResponsibilityEvent> responsibilityAndExposure,String outputPath) {
-				
-		Map <Id, ArrayList<ResponsibilityEvent>> person2ResponsibilityEvents = new HashMap<Id, ArrayList<ResponsibilityEvent>>();
-		
-		for(ResponsibilityEvent ree: responsibilityAndExposure){
-			if(!person2ResponsibilityEvents.containsKey(ree.getReceivingPersonId())){
-				person2ResponsibilityEvents.put(ree.getReceivingPersonId(), new ArrayList<ResponsibilityEvent>());
-			}
-			person2ResponsibilityEvents.get(ree.getReceivingPersonId()).add(ree);
-		}
-		
-		BufferedWriter buffW;
-		try{
-			buffW = new BufferedWriter(new FileWriter(outputPath));
-
-			buffW.write("Personal Exposure Information");
-			buffW.newLine();buffW.newLine();
-			
-			
-			for (Id personId: person2ResponsibilityEvents.keySet()) {
-				buffW.write("PersonId: " + personId);
-				buffW.newLine();
-				
-				Double personalTotal =0.0;
-				for(ResponsibilityEvent ree: person2ResponsibilityEvents.get(personId)){
-					personalTotal += ree.getExposureValue();
-				}
-				
-				buffW.write("Total exposure: " + personalTotal);
-				buffW.newLine();
-				
-				for (ResponsibilityEvent ree : person2ResponsibilityEvents.get(personId)) {
-					buffW.write(ree.getExposureInformation());
-					buffW.newLine();
-				}
-				buffW.newLine();
-			}
-			buffW.close();
-		}catch(IOException e){
-			System.err.println("Error creating " + outputPath + ".");
-		}	 	
-	}
-
-	public void printDetailedResponsibilityInformation(ArrayList<ResponsibilityEventImpl> responsibility,
+	public void printResponsibilityInformation(ArrayList<ResponsibilityEvent> responsibilityAndExposure,
 			String outputPath) {
 		// sum, average
 		
@@ -87,7 +53,7 @@ public class ExposureUtils {
 		Map<Id, Double> person2time = new HashMap<Id, Double>();
 		Map<Id, Double> person2average = new HashMap<Id, Double>();
 		
-		for(ResponsibilityEventImpl re : responsibility){
+		for(ResponsibilityEvent re : responsibilityAndExposure){
 			Id personId = re.getResponsiblePersonId();
 			if(person2timeXconcentration.containsKey(personId)){
 				Double newValue = person2timeXconcentration.get(personId)+re.getExposureValue();
@@ -158,6 +124,50 @@ public class ExposureUtils {
 			
 	}
 
+	public void printPersonalResponsibilityInformation(
+			ArrayList<ResponsibilityEvent> responsibility, String outputPath) {
+		
+		Map <Id, ArrayList<ResponsibilityEvent>> person2ResponsibilityEvents = new HashMap<Id, ArrayList<ResponsibilityEvent>>();
+		
+		for(ResponsibilityEvent ree: responsibility){
+			if(!person2ResponsibilityEvents.containsKey(ree.getResponsiblePersonId())){
+				person2ResponsibilityEvents.put(ree.getResponsiblePersonId(), new ArrayList<ResponsibilityEvent>());
+			}
+			person2ResponsibilityEvents.get(ree.getResponsiblePersonId()).add(ree);
+		}
+		
+		BufferedWriter buffW;
+		try{
+			buffW = new BufferedWriter(new FileWriter(outputPath));
+
+			buffW.write("Personal Responsibility Information");
+			buffW.newLine();buffW.newLine();
+			
+			
+			for (Id personId: person2ResponsibilityEvents.keySet()) {
+				buffW.write("PersonId: " + personId);
+				buffW.newLine();
+				
+				Double personalTotal =0.0;
+				for(ResponsibilityEvent ree: person2ResponsibilityEvents.get(personId)){
+					personalTotal += ree.getExposureValue();
+				}
+				
+				buffW.write("Total responsibility: " + personalTotal);
+				buffW.newLine();
+				
+				for (ResponsibilityEvent ree : person2ResponsibilityEvents.get(personId)) {
+					buffW.write(ree.getResponsibilityInformation());
+					buffW.newLine();
+				}
+				buffW.newLine();
+			}
+			buffW.close();
+		}catch(IOException e){
+			System.err.println("Error creating " + outputPath + ".");
+		}	
+	}
+
 	public void printExposureInformation(ArrayList<ResponsibilityEvent> responsibility,
 			String outputPath) {
 		
@@ -209,7 +219,7 @@ public class ExposureUtils {
 		BufferedWriter buffW;
 		try {
 			buffW = new BufferedWriter(new FileWriter(outputPath));
-
+	
 			// header: Person base case compare case difference
 			buffW.write("Exposure Information");
 			buffW.newLine();
@@ -232,79 +242,22 @@ public class ExposureUtils {
 		
 	}
 
-
-
-	public void printResponsibilityInformation(
-			ArrayList<ResponsibilityEvent> responsibility, String outputPath) {
-		
-		// responsibility sum = #responsible persons x time x concentration
-		// average responsibility = sum/#responsible persons
-		// personal average min, max 
-		
-		
-		Double sum = 0.0; 
-		Map<Id, Double> person2responsibility = new HashMap<Id, Double>();
-		Double maxResponsibility=-1.0;
-		Double minResponsibility=Double.MAX_VALUE;
-		Double avgResponsibility=0.0;
-		
-		// calculate total sum, personal sum
-		for(ResponsibilityEvent re: responsibility){
-			sum += re.getExposureValue();
-			Id responsiblePerson = re.getResponsiblePersonId();
-			if(!person2responsibility.containsKey(responsiblePerson)){
-				person2responsibility.put(responsiblePerson, new Double(re.getExposureValue()));
-			}else{
-				Double oldValue = person2responsibility.get(responsiblePerson);
-				person2responsibility.put(responsiblePerson, oldValue+re.getExposureValue());
-			}
-		}
-		
-		// find min and max
-		for(Id person: person2responsibility.keySet()){
-			Double currentValue = person2responsibility.get(person);
-			if(currentValue>maxResponsibility)maxResponsibility=currentValue;
-			if(currentValue<minResponsibility)minResponsibility=currentValue;
-		}
-		
-		avgResponsibility = sum/person2responsibility.size();
-		
-		BufferedWriter buffW;
-		try{
-			buffW = new BufferedWriter(new FileWriter(outputPath));
-
-			buffW.write("Responsibility Information");
-			buffW.newLine();
-			buffW.write("Responsible persons x concentration value x exposure time: " + sum);
-			buffW.newLine();
-			buffW.write("Average responsibility: " + avgResponsibility);
-			buffW.newLine();
-			buffW.write("Minimal responsibility: " + minResponsibility);
-			buffW.newLine();
-			buffW.write("Maximal responsibility: " + maxResponsibility);
-			buffW.close();
-		}catch(IOException e){
-			System.err.println("Error creating " + outputPath + ".");
-		}		
-	}
-
-	public void printPersonalResponsibilityInformation(
-			ArrayList<ResponsibilityEvent> responsibility, String outputPath) {
-		
+	public void printPersonalExposureInformation(ArrayList<ResponsibilityEvent> responsibilityAndExposure,String outputPath) {
+				
 		Map <Id, ArrayList<ResponsibilityEvent>> person2ResponsibilityEvents = new HashMap<Id, ArrayList<ResponsibilityEvent>>();
 		
-		for(ResponsibilityEvent ree: responsibility){
-			if(!person2ResponsibilityEvents.containsKey(ree.getResponsiblePersonId())){
-				person2ResponsibilityEvents.put(ree.getResponsiblePersonId(), new ArrayList<ResponsibilityEvent>());
+		for(ResponsibilityEvent ree: responsibilityAndExposure){
+			if(!person2ResponsibilityEvents.containsKey(ree.getReceivingPersonId())){
+				person2ResponsibilityEvents.put(ree.getReceivingPersonId(), new ArrayList<ResponsibilityEvent>());
 			}
-			person2ResponsibilityEvents.get(ree.getResponsiblePersonId()).add(ree);
+			person2ResponsibilityEvents.get(ree.getReceivingPersonId()).add(ree);
 		}
 		
 		BufferedWriter buffW;
 		try{
 			buffW = new BufferedWriter(new FileWriter(outputPath));
-
-			buffW.write("Personal Responsibility Information");
+	
+			buffW.write("Personal Exposure Information");
 			buffW.newLine();buffW.newLine();
 			
 			
@@ -317,11 +270,11 @@ public class ExposureUtils {
 					personalTotal += ree.getExposureValue();
 				}
 				
-				buffW.write("Total responsibility: " + personalTotal);
+				buffW.write("Total exposure: " + personalTotal);
 				buffW.newLine();
 				
 				for (ResponsibilityEvent ree : person2ResponsibilityEvents.get(personId)) {
-					buffW.write(ree.getResponsibilityInformation());
+					buffW.write(ree.getExposureInformation());
 					buffW.newLine();
 				}
 				buffW.newLine();
@@ -329,6 +282,6 @@ public class ExposureUtils {
 			buffW.close();
 		}catch(IOException e){
 			System.err.println("Error creating " + outputPath + ".");
-		}	
+		}	 	
 	}
 }

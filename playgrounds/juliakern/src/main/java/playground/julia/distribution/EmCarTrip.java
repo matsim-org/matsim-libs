@@ -21,9 +21,10 @@ package playground.julia.distribution;
 
 import org.matsim.api.core.v01.Id;
 
-/*
+/**
  * simple class to store information on agents' (car) trips
  * used to calculate exposure values 
+ * @author julia
  */
 public class EmCarTrip {
 	Double startTime;

@@ -24,8 +24,10 @@ LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 	
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
+		person2llevent.clear();
+		person2leevent.clear();
+		person2aeevent.clear();
+		person2aeevent.clear();
 	}
 
 	@Override

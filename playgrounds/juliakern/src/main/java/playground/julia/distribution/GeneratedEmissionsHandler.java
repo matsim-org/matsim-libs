@@ -33,12 +33,14 @@ import playground.vsp.emissions.events.WarmEmissionEventHandler;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
 
-/*
+/**
+ * 
  * class to handle warm and cold emission events
  * 
  * for each emission event: distribute the emission value onto nearby cells and/or links
  * store information as emission per link/ emission per cell
  * 
+ * @author julia, benjamin
  */
 public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
@@ -51,6 +53,10 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	WarmPollutant warmPollutant2analyze;
 	ColdPollutant coldPollutant2analyze;
 	
+	private final static Double dist0factor = 0.216;
+	private final static Double dist1factor = 0.132;
+	private final static Double dist2factor = 0.029;
+	private final static Double dist3factor = 0.002;	
 	
 	public GeneratedEmissionsHandler(Double simulationStartTime, Double timeBinSize, Map<Id, Integer>link2xbins, Map<Id, Integer>link2ybins,
 			WarmPollutant warmPollutant2analyze, ColdPollutant coldPollutant2analyze){
@@ -160,10 +166,10 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 			if(xDistance<4 && yDistance <4 && (totalDistance<4)){
 				Double distributionFactor = 0.0;
 				switch(totalDistance){
-				case 0: distributionFactor = 0.216;
-				case 1: distributionFactor = 0.132;
-				case 2: distributionFactor = 0.029;
-				case 3: distributionFactor = 0.002;
+				case 0: distributionFactor = dist0factor;
+				case 1: distributionFactor = dist1factor;
+				case 2: distributionFactor = dist2factor;
+				case 3: distributionFactor = dist3factor;
 				}
 				if (distributionFactor>0.0) {
 					EmPerLink epl = new EmPerLink(linkId, personId, value * distributionFactor, eventStartTime);
@@ -200,10 +206,10 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 				int distance = Math.abs(xBin-xIndex+yBin-yIndex);
 				
 				switch(distance){
-				case 0: distributionFactor = 0.216;
-				case 1: distributionFactor = 0.132;
-				case 2: distributionFactor = 0.029;
-				case 3: distributionFactor = 0.002;
+				case 0: distributionFactor = dist0factor;
+				case 1: distributionFactor = dist1factor;
+				case 2: distributionFactor = dist2factor;
+				case 3: distributionFactor = dist3factor;
 				}
 				
 				if (distributionFactor>0.0) {

@@ -24,6 +24,11 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * 
+ * @author julia
+ *
+ */
 public interface ResponsibilityEvent {
 	
 	public final static String EVENT_TYPE = "responsibilityEvent";

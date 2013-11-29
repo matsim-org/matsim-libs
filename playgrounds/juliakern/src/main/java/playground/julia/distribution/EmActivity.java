@@ -21,10 +21,12 @@ package playground.julia.distribution;
 
 import org.matsim.api.core.v01.Id;
 
-/*
+/**
  * simple class to store information on agents' activities
- * used to calculate exposure values 
+ * used to calculate exposure values
+ * @author julia 
  */
+
 public class EmActivity {
 	Double startOfActivity;
 	Double endOfActivity;
