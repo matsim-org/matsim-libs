@@ -185,14 +185,14 @@ public class MyMultiFeatureReader {
 		}
 		
 		/* Report the Ids of the first ten entries... */
-		LOG.info("The zone Ids of the first ten entries:");
-		for(int i = 0; i < 10; i++){
+		LOG.info("The zone Ids of the first ten (or fewer) entries:");
+		for(int i = 0; i < Math.min(10, mr.getAllZones().size()); i++){
 			LOG.info("   " + mr.getAllZones().get(i).getId().toString());
 		}
-		LOG.info("       |");
-		LOG.info("       |");
-		LOG.info("       |");
-		LOG.info("       V");
+		LOG.info("   :");
+		LOG.info("   :");
+		LOG.info("   :");
+		LOG.info("   :_");
 		
 		LOG.info("If this doesn't makes sense, then you've got the wrong ID field, probably ;-)");
 		Header.printFooter();

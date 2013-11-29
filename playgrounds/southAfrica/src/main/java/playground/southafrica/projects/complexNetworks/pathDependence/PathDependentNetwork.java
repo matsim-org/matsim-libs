@@ -373,6 +373,9 @@ public class PathDependentNetwork {
 		 * @return
 		 */
 		protected Id sampleBiasedNextPathDependentNode(Id previousNodeId, double randomValue){
+			
+			previousNodeId = previousNodeId == null ? new IdImpl("source") : previousNodeId;
+			
 			/* Check that the path-dependent sequence exist. */
 			if(!pathDependence.containsKey(previousNodeId)){
 				LOG.error("There is no next node travelling from " + previousNodeId.toString() + " via " + this.getId().toString());
@@ -411,6 +414,12 @@ public class PathDependentNetwork {
 		
 		
 		public void addPathDependentLink(Id previousNodeId, Id nextNodeId){
+			/* DEBUG Remove after problem sorted... why are there links from
+			 * a node to itself if the network has already been cleaned?! */
+			if(this.getId().toString().equalsIgnoreCase(nextNodeId.toString())){
+				LOG.debug("Link from node to itself.");
+			}		
+			
 			Id id = previousNodeId == null ? new IdImpl("source") : previousNodeId;
 			if(previousNodeId == null){
 				this.setAsSource();

@@ -25,27 +25,39 @@ import org.matsim.core.gbl.Gbl;
 
 public class Header {
 	private final static Logger LOG = Logger.getLogger(Header.class);
+	private static int length = 10;
 	
 	public static void printHeader(String classString, String[] args){
-		LOG.info("======================================================================");
+		length = classString.length();
+		LOG.info(getLineString("=", length));
 		LOG.info(classString);
-		LOG.info("----------------------------------------------------------------------");
+		LOG.info(getLineString("-", length));
 		if ( args != null ) {
 			for(int i = 0; i < args.length; i++){
 				LOG.info("args[" + i + "]: " + args[i]);
 			}
 		}
-		LOG.info("----------------------------------------------------------------------");
+		LOG.info(getLineString("-", length));
 		Gbl.printSystemInfo();
 		Gbl.startMeasurement();
 	}
 
 	public static void printFooter(){
+		
 		Gbl.printElapsedTime();
-		LOG.info("----------------------------------------------------------------------");
-		LOG.info("                               Done");
-		LOG.info("======================================================================");
+		LOG.info(getLineString("-", length));
+		String s = "";
+		for(int i = 0; i < length/2 - 2; i++){ s += " "; }
+		LOG.info(s + "Done");
+		LOG.info(getLineString("=", length));
 	}
 
+	private static String getLineString(String string, int length){
+		String s = "";
+		for(int i = 0; i <= length; i++){
+			s += string;
+		}
+		return s;
+	}
 }
 

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 public class DigicorePathDependentNetworkReader_v1 extends MatsimXmlParser {
@@ -47,6 +48,8 @@ public class DigicorePathDependentNetworkReader_v1 extends MatsimXmlParser {
 	private Id currentNodeId = null;
 	private Id currentPrecedingId = null;
 	
+	private final Counter counter = new Counter("  vertices # ");
+	
 	
 	/**
 	 * Executes the path-dependent network reader.
@@ -63,6 +66,11 @@ public class DigicorePathDependentNetworkReader_v1 extends MatsimXmlParser {
 	public DigicorePathDependentNetworkReader_v1() {
 
 	}
+	
+	public PathDependentNetwork getPathDependentNetwork(){
+		return this.network;
+	}
+	
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
@@ -91,9 +99,11 @@ public class DigicorePathDependentNetworkReader_v1 extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(NETWORK.equals(name)){
-			/* Do nothing. */
+			/* Do nothing, but print the counter. */
+			counter.printCounter();
 		} else if(NODE.equals(name)){
 			currentNodeId = null;
+			counter.incCounter();
 		} else if(PRECEDING.equals(name)){
 			currentPrecedingId = null;
 		} else if (FOLLOWING.equals(name)){
