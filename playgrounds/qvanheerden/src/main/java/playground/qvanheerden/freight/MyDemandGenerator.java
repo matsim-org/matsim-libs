@@ -12,8 +12,10 @@ import java.util.Map;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.utilities.FileUtils;
@@ -27,13 +29,14 @@ public class MyDemandGenerator {
 	public List<Map<Tuple<String, String>, List<Double>>> listOfDowMaps = new ArrayList<Map<Tuple<String,String>,List<Double>>>();
 	public List<Map<Tuple<String, String>, double[]>> listOfDecileMaps = new ArrayList<Map<Tuple<String,String>,double[]>>();
 	public List<Map<Tuple<String, String>, double[]>> listOfNewDecileMaps = new ArrayList<Map<Tuple<String,String>,double[]>>();
+	public Map<String, Coord> customerMap = new HashMap<String, Coord>();
 	
 	/**
 	 * This class will create a csv file containing shipments that can be 
 	 * read in when running the {@link MyCarrierPlanGenerator}.
 	 * 
-	 * For now only generates two customers with a shipment each.  Will eventually 
-	 * contain a demand generation model.
+	 * For now only generates demand for all customers for one day of the year.
+	 * Will eventually contain a demand generation model.
 	 * 
 	 * @param args
 	 * 
@@ -42,31 +45,43 @@ public class MyDemandGenerator {
 	public static void main(String[] args) {
 		Header.printHeader(MyDemandGenerator.class.toString(), args);
 		
-		String outputFile = args[0];
-		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
+		String distributionFile = args[0];
+		String customerFile = args[1];
+		String simpleDemandOutput = args[2];
 		
-		/* For now just write two shipments to work with
-		 * - not all these fields are used in the model, but I may want to use 
-		 * 	 some of the values eventually for my own analyses.
-		 */
+		MyDemandGenerator mdg = new MyDemandGenerator();
+		mdg.parseCustomerFile(customerFile);
+		mdg.generateSimpleDemand(distributionFile, simpleDemandOutput);
+		
+		Header.printFooter();
+	}
+	
+	public void parseCustomerFile(String inputFile){
+		BufferedReader br = IOUtils.getBufferedReader(inputFile);
+		
 		try {
-			bw.write("customer,long,lat,product,mass,sale,duration,start,end");
-			bw.newLine();
-			bw.write("customer_1,148340.842,-3708473.484,product_1,2500,392,500,0,86400");
-			bw.newLine();
-			bw.write("customer_2,140308.0297,-3704398.509,product_2,1000,577.5,500,0,86400");
+			br.readLine(); //skip header
 			
-		} catch (IOException e) {
-			log.error("Could not write to file " + outputFile);
-		} finally{
+			String line;
+			while((line=br.readLine())!=null){
+				String[] array = line.split(",");
+				String customer = array[1];
+				double longi = Double.parseDouble(array[2]);
+				double lati = Double.parseDouble(array[3]);
+				
+				customerMap.put(customer, new CoordImpl(longi, lati));
+				
+			}
+		}catch(IOException e){
+			log.error("Could not read customer file");
+		}finally{
 			try {
-				bw.close();
+				br.close();
 			} catch (IOException e) {
-				log.error("Could not close writer.");
+				log.info("Could not close customer file");
 			}
 		}
-
-		Header.printFooter();
+		
 	}
 	
 	public void parseDistributionFile(String inputFile){
@@ -101,6 +116,7 @@ public class MyDemandGenerator {
 				
 				Tuple<String, String> key = new Tuple<String, String>(order.getCustomer(), order.getProduct());
 				
+				//TODO check switch case statement - probably need to check if maps contain mapping yet.
 				switch (order.getDayOfWeek()) {
 				case 1:
 					List<Double> monList = monMap.get(key);
@@ -259,6 +275,72 @@ public class MyDemandGenerator {
 	//TODO finish
 	public void generateDemand(){
 		
+	}
+
+	public void generateSimpleDemand(String inputFile, String outputFile){
+		BufferedReader br = IOUtils.getBufferedReader(inputFile);
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
+		
+		//choose arbitrary date to work with: Tuesday, 3 July 2012
+		int month = 7;
+		int day = 3;
+		
+		try {
+			bw.write("customer, long, lat, product, mass, sale, duration, start, end");
+			bw.newLine();
+			br.readLine(); //skip header
+			
+			String line;
+			
+			while((line=br.readLine())!=null){
+				String[] array = line.split(",");
+				
+				int busMonth = Integer.parseInt(array[0]);
+				int busDay = Integer.parseInt(array[1]);
+				int calMonth = Integer.parseInt(array[2]);
+				int calDay = Integer.parseInt(array[3]);
+				int seqDay = Integer.parseInt(array[4]);
+				int dow = Integer.parseInt(array[5]);
+				String supplier = array[6];
+				String customer = array[7];
+				String group = array[8];
+				String product = array[9];
+				double mass = Integer.parseInt(array[10]);
+				double sale = Integer.parseInt(array[11]);
+				int daysSinceLast = Integer.parseInt(array[12]);
+				double lastMass = Integer.parseInt(array[13]);
+				double lastSale = Integer.parseInt(array[14]);
+				double distance = Integer.parseInt(array[15]);
+				
+				//ignore everything up to sequential day=3 (that is 3 july 2013)
+				if(seqDay==3){
+					//customer, long, lat, product, mass, sale, duration, start, end
+					double longi = customerMap.get(customer).getX();
+					double lati = customerMap.get(customer).getY();
+					bw.write(customer + "," + longi + "," + lati + "," + product + "," + mass + "," + sale + ",600,0,86400");
+					bw.newLine();
+					
+				}else if(seqDay > 3){ //break from while loop once seqDay > 3
+					break;
+				}
+				
+				
+			}
+		}catch(IOException e){
+			log.error("Could not read distribution file...");
+		}finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				log.error("Could not close reader.");
+			}
+
+			try {
+				bw.close();
+			} catch (IOException e) {
+				log.error("Could not close writer.");
+			}
+		}
 	}
 	
 }
