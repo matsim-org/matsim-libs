@@ -108,7 +108,9 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 
 		// generating final variables for anonymous class:
 		final RoadPricingScheme localScheme = this.scheme ;
-
+		
+		int cnt = 0 ;
+		
 		// anonymous class:
 		return new TravelDisutility() {
 			private Person prevPerson = null ;

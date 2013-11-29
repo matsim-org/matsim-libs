@@ -87,6 +87,8 @@ public class KNGautengControler {
 			config.controler().setWriteSnapshotsInterval(0);
 			config.controler().setWritePlansInterval(100);
 			
+//			config.global().setRandomSeed(4713);
+			
 			double sampleFactor = 1. ;
 			switch( ccc ) {
 			case equil:
@@ -246,12 +248,15 @@ public class KNGautengControler {
 		controler.setScoringFunctionFactory( scoringFunctionFactory );
 
 		// insert into routing:
-			final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( scenario );
-			travelDisutilityFactory.setRoadPricingScheme(scheme);
-//			travelDisutilityFactory.setUom(personSpecificUtilityOfMoney);
-			travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory);
-//			travelDisutilityFactory.setRandomness(1.);
-			controler.setTravelDisutilityFactory( travelDisutilityFactory );
+		config.planCalcScore().setMarginalUtilityOfMoney(0.01);
+		System.err.println( "setting UoM in config to 0.01!!!");
+		
+		final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( scenario );
+		travelDisutilityFactory.setRoadPricingScheme(scheme);
+//		travelDisutilityFactory.setUom(personSpecificUtilityOfMoney);
+//		travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory);
+		travelDisutilityFactory.setRandomness(1.);
+		controler.setTravelDisutilityFactory( travelDisutilityFactory );
 		
 //		// plans removal:
 //		controler.addControlerListener(new StartupListener(){

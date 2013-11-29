@@ -69,6 +69,9 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 		int pp=0 ;
 		for ( Plan plan : plans ) {
 			utils[pp] = plan.getScore() ;
+			if ( Double.isNaN(utils[pp]) ) {
+				log.warn( "utils is NaN; id: "  + plan.getPerson().getId() ) ;
+			}
 			pp++ ;
 		}
 
@@ -77,7 +80,7 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 			for ( Plan plan2 : plans ) {
 				utils[rr] -= similarity( plan1, plan2, null, network ) ; 
 				if ( Double.isNaN(utils[rr]) ) {
-					log.warn( "utils is NaN" ) ;
+					log.warn( "utils is NaN; id: " + plan1.getPerson().getId() ) ;
 				}
 			}
 			rr++ ;
@@ -132,11 +135,17 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
 			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, stageActivities) ;
 			simil += PopulationUtils.calculateSimilarity(activities1, activities2, sameActTypeReward, sameLocationReward) ;
+			if ( Double.isNaN(simil) ) {
+				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
+			}
 		}
 		{
 			List<Leg> legs1 = TripStructureUtils.getLegs(plan1 ) ;
 			List<Leg> legs2 = TripStructureUtils.getLegs(plan2 ) ;
 			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, sameModeReward, sameRouteReward ) ;
+			if ( Double.isNaN(simil) ) {
+				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
+			}
 		}		
 
 		return simil ;
