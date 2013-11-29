@@ -31,23 +31,23 @@ public class Surprice {
 	
 	// -------------------------------------------------
 	// betas and constants need to be negative!!!			
-	public static double constant_car = -3.0;
-    public static double constant_pt = -3.0;
-    public static double constant_bike = -6.0;
+	public static double constant_car = -4.0;
+    public static double constant_pt = -5.0;
+    public static double constant_bike = -7.0;
     public static double constant_walk = 0.0;
      
     // time disutility
     private static double hs = 1.0 / 3600.0; // scaling from hour to seconds
-	public static double beta_TT_car_com = -4.0 * hs;
-	public static double beta_TT_car_shp = -2.0 * hs;	
+	public static double beta_TT_car_com = -6.0 * hs;
+	public static double beta_TT_car_shp = -3.0 * hs;	
 	public static double beta_TT_car_lei = -1.0 * hs;
 	
-	public static double beta_TT_pt_com = -4.0 * hs;		
+	public static double beta_TT_pt_com = -6.0 * hs;		
 	public static double beta_TT_pt_shp = -3.0 * hs;
-	public static double beta_TT_pt_lei = -2.0 * hs;
+	public static double beta_TT_pt_lei = -1.0 * hs;
 	
-	public static double beta_TT_bike_com = -4.0 * hs;
-	public static double beta_TT_bike_shp = -2.0 * hs;
+	public static double beta_TT_bike_com = -6.0 * hs;
+	public static double beta_TT_bike_shp = -3.0 * hs;
 	public static double beta_TT_bike_lei = -1.0 * hs;
 	
 	public static double beta_TT_walk_com = -0.5 * hs;
@@ -56,9 +56,9 @@ public class Surprice {
 
 	// distance disutility
 	private static double km = 0.001; // scaling from km to m
-	public static double beta_TD_car_com = 0.0;
-	public static double beta_TD_car_shp = 0.0;
-	public static double beta_TD_car_lei = 0.0;
+	public static double beta_TD_car_com = -0.2 * km;
+	public static double beta_TD_car_shp = -0.2 * km;
+	public static double beta_TD_car_lei = -0.2 * km;
 	
 	public static double beta_TD_pt_com = 0.0;
 	public static double beta_TD_pt_shp = 0.0;
@@ -76,8 +76,8 @@ public class Surprice {
 	public static double distanceCost_car = -0.0005; 
 	public static double constantCost_car = -8.0; // parking
 	
-	public static double distanceCost_pt = -0.0003;
-	public static double constantCost_pt = -3.0; // zone tickets
+	public static double distanceCost_pt = -0.0001;
+	public static double constantCost_pt = -5.0; // zone tickets
 	
 	public static double distanceCost_bike = 0.0;
 	public static double constantCost_bike = 0.0;
