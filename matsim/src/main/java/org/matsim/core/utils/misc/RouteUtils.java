@@ -217,7 +217,11 @@ public class RouteUtils {
 				coveredLength += network.getLinks().get( id ).getLength() ;
 			}
 		}
-		return coveredLength/routeLength ;
+		if ( routeLength > 0. ) {
+			return coveredLength/routeLength ;
+		} else {
+			return 1. ; // route has zero length = fully covered by any other route.  (but they are not similar!?!?!?)
+		}
 	}
 
 }

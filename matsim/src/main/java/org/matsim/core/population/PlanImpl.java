@@ -68,23 +68,23 @@ public class PlanImpl implements Plan {
 
 	private Customizable customizableDelegate;
 
-	@Deprecated // use methods of interface Person
+	@Deprecated // use scenario.getPopulation().getFactory().createPlan(...) instead
 	public PlanImpl(final Person person) {
 		this.person = person;
 	}
 
-	@Deprecated // use methods of interface Person
+	@Deprecated // use scenario.getPopulation().getFactory().createPlan(...) instead
 	public PlanImpl() {
 	}
 
-	@Deprecated // use methods of interface Person
+	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
 	public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
 		ActivityImpl a = new ActivityImpl(type, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
-	@Deprecated // use methods of interface Person
+	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
 	public final ActivityImpl createAndAddActivity(final String type) {
 		ActivityImpl a = new ActivityImpl(type);
 		getPlanElements().add(a);
@@ -92,7 +92,7 @@ public class PlanImpl implements Plan {
 	}
 
 
-	@Deprecated // use methods of interface Person
+	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
 	public final ActivityImpl createAndAddActivity(final String type, final Id linkId) {
 		ActivityImpl a = new ActivityImpl(type, linkId);
 		getPlanElements().add(a);
@@ -103,7 +103,7 @@ public class PlanImpl implements Plan {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Deprecated // use methods of interface Plan
+	@Deprecated // use scenario.getPopulation().getFactory().createLeg(...) instead, and add it yourself
 	public LegImpl createAndAddLeg(final String mode) {
 		verifyCreateLeg();
 		LegImpl leg = new LegImpl(mode);

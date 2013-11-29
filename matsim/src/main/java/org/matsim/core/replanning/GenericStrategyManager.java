@@ -324,12 +324,13 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * <p/>
 	 * Thoughts about using the logit-type selectors with negative logit model scale parameter:<ul>
 	 * <li> Look at one agent.
-	 * <li> Assume she has the choice between <i>n</i> different plans.
+	 * <li> Assume she has the choice between <i>n</i> different plans (although fewer of them are in the MATSim choice set).
 	 * <li> (Continuous) fraction <i>f(i)</i> of plan <i>i</i> develops as (master equation) 
 	 * <blockquote><i>
 	 * df(i)/dt = - p(i) * f(i) + 1/n
 	 * </i></blockquote>
-	 * where <i>p(i)</i> is from the choice model. 
+	 * where <i>p(i)</i> is from the removal selector, and <i>1/n</i> makes the assumption that each possible plan is (re-)inserted with equal probability
+	 * by the innovative modules. 
 	 * <li> Steady state solution (<i>df/dt=0</i>) <i> f(i) = 1/n * 1/p(i) </i>.
 	 * <li> If <i> p(i) = e<sup>-b*U(i)</sup></i>, then <i> f(i) = e<sup>b*U(i)</sup> / n </i>.  Or in words:
 	 * <i><b> If you use a logit model with a minus in front of the beta for plans removal, the resulting steady state distribution is
