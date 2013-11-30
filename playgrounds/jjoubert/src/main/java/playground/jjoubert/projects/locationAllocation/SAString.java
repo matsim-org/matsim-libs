@@ -374,7 +374,8 @@ public class SAString {
 		
 		/* Get initial solution. */
 //		Solution initialSolution = generateInitialSolution(numberOfSites);
-		Solution initialSolution = generateGreedyInitialSolution(numberOfSites);
+//		Solution initialSolution = generateGreedyInitialSolution(numberOfSites);
+		Solution initialSolution = generateDemandDrivenInitialSolution(numberOfSites);
 		
 		Solution currentSolution = initialSolution;
 		Solution incumbent = initialSolution;
@@ -735,6 +736,29 @@ public class SAString {
 		LOG.info("Greedy initial solution generated.");
 		return new Solution(initial);
 	}
+	
+	private Solution generateDemandDrivenInitialSolution(int numberOfSites){
+		LOG.info("Generating demand-driven initial solution.");
+		List<Id> initial = new ArrayList<Id>(numberOfSites);
+		
+		int[] randomDemandSites = getRandomPermutation(this.demandPoints.size());
+		
+		int demandIndex = 0;
+		do {
+			Id demandId = this.demandPoints.get( randomDemandSites[demandIndex] );
+			Id closestSite = new EvaluateClosestSiteCallable(demandId, initial).getClosestSite();
+			if(initial.contains(closestSite)){
+				demandIndex++;
+			} else{
+				initial.add(closestSite);
+				demandIndex++;
+			}
+		} while (initial.size() < numberOfSites);
+		
+		LOG.info("Demand-driven initial solution generated.");
+		return new Solution(initial);
+	}
+	
 
 	private double evaluatePartialSolution(List<Id> sites){
 		double sum = 0.0;
