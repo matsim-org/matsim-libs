@@ -52,7 +52,7 @@ import playground.southafrica.utilities.Header;
 
 public class SAString {
 	final private static Logger LOG = Logger.getLogger(SAString.class);
-	final private static double FRACTION_OF_SOLUTIONS_CHECKED = 0.1; 
+	final private static double FRACTION_OF_SOLUTIONS_CHECKED = 0.5; 
 	final private Random random;
 	private Matrix distanceMatrix;
 	private List<Id> sites;
@@ -372,7 +372,9 @@ public class SAString {
 		int returnToIncumbentThreshold = 10;
 		
 		/* Get initial solution. */
-		Solution initialSolution = generateInitialSolution(numberOfSites);
+//		Solution initialSolution = generateInitialSolution(numberOfSites);
+		Solution initialSolution = generateGreedyInitialSolution(numberOfSites);
+		
 		Solution currentSolution = initialSolution;
 		Solution incumbent = initialSolution;
 		
@@ -604,13 +606,19 @@ public class SAString {
 						!currentRepresentation.contains(nextSite)){						/* Don't replace with a site that is already in the current solution. */
 					/* Consider this possible move. */
 					Solution possibleMove = current.copy();
-					
-					/*TODO Parallelise the objective function evaluation. */ 
-					map.put(new Tuple<Id, Id>(selectedSite, nextSite), possibleMove.evaluateObjectiveFunctionDifference(selectedSite));
+
+					/* Evaluate the exact objective function difference. */
+					possibleMove.makeMove(selectedSite, nextSite);
+					double actualDifference = current.objective - possibleMove.objective;						
+					map.put(new Tuple<Id, Id>(selectedSite, nextSite), actualDifference );
+
+					/* Estimate the objective function difference. */
+//					double estimatedDifference = possibleMove.evaluateObjectiveFunctionDifference(selectedSite);
+//					map.put(new Tuple<Id, Id>(selectedSite, nextSite), estimatedDifference );
 				}
 			}
 		}
-		
+
 
 		sortedMap.putAll(map);
 		
@@ -681,6 +689,63 @@ public class SAString {
 		}
 		
 		return new Solution(chosenSites);
+	}
+	
+	
+	private Solution generateGreedyInitialSolution(int numberOfSites){
+		LOG.info("Generating a greedy initial solution");
+		Counter counter = new Counter("  sites # ");
+		List<Id> initial = new ArrayList<Id>(numberOfSites);
+		
+		/* Randomly pick the seed. */
+		int[] permutation = getRandomPermutation(this.sites.size());
+		initial.add(this.sites.get(permutation[0]));
+		counter.incCounter();
+		
+		double partialObjective = evaluatePartialSolution(initial); 
+
+		do {
+			double best = Double.NEGATIVE_INFINITY;
+			Id bestId =  null;
+			List<Id> evaluateList = new ArrayList<Id>( initial.size()+1 );
+			evaluateList.addAll(initial);
+			for(Id siteId : this.sites){
+				if(!initial.contains(siteId)){
+					evaluateList.add(siteId);
+					
+					/* Evaluate the possible insertion. */
+					double thisInsertion = evaluatePartialSolution(evaluateList);
+					if(partialObjective - thisInsertion > best){
+						bestId = siteId;
+						best = partialObjective - thisInsertion;
+					}
+					evaluateList.remove(siteId);
+				}
+			}
+			initial.add(bestId);
+			partialObjective -= best;
+			counter.incCounter();
+			
+		} while (initial.size() < numberOfSites);
+		counter.printCounter();
+		
+		LOG.info("Greedy initial solution generated.");
+		return new Solution(initial);
+	}
+
+	private double evaluatePartialSolution(List<Id> sites){
+		double sum = 0.0;
+		for(Id demandPoint : this.demandPoints){
+			double closestDistance = Double.POSITIVE_INFINITY;
+			for(Id siteId : sites){
+				double thisDistance = this.distanceMatrix.getEntry(demandPoint, siteId).getValue();
+				if(thisDistance < closestDistance){
+					closestDistance = thisDistance;
+				}
+			}
+			sum += closestDistance;
+		}
+		return sum;
 	}
 	
 		
