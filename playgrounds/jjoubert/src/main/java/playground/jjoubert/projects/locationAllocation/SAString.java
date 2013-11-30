@@ -52,7 +52,7 @@ import playground.southafrica.utilities.Header;
 
 public class SAString {
 	final private static Logger LOG = Logger.getLogger(SAString.class);
-	final private static double FRACTION_OF_SOLUTIONS_CHECKED = 0.5; 
+	private static double FRACTION_OF_SOLUTIONS_CHECKED; 
 	final private Random random;
 	private Matrix distanceMatrix;
 	private List<Id> sites;
@@ -73,6 +73,7 @@ public class SAString {
 		String distanceMatrixDescription = args[1];
 		String outputFolder = args[2];
 		int numberOfThreads = Integer.parseInt(args[3]);
+		FRACTION_OF_SOLUTIONS_CHECKED = Double.parseDouble(args[4]);
 
 		/*
 		 * Optional arguments. If used, BOTH MUST be given, even if it is an
@@ -380,7 +381,7 @@ public class SAString {
 		
 		solutionList.add(currentSolution.copy());
 		incumbentList.add(incumbent.copy());
-		LOG.info( String.format("    ===> First incumbent: %.2f", incumbent.objective) );
+		LOG.info( String.format("    >=> First incumbent: %.2f", incumbent.objective) );
 		
 		/* Repeat until termination criteria is met. */
 		LOG.info("Executing the simulated annealing algorithm...");
@@ -410,7 +411,7 @@ public class SAString {
 				/* Test incumbent. */
 				if(newCurrent.getObjective() < incumbent.getObjective()){
 					incumbent = newCurrent;
-					LOG.info( String.format("    ===> New incumbent: %.2f", incumbent.objective) );
+					LOG.info( String.format("    >=> New incumbent: %.2f", incumbent.objective) );
 				} else{
 					nonImprovingIterations++;
 				}
@@ -544,7 +545,7 @@ public class SAString {
 //		 * selected sites.
 //		 */
 		{
-			/*TODO In progress: select a number of sites. */
+			/* Select a number of sites. */
 			int numberOfSitesToConsiderForNeighborhood = Math.max(1, (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*((double)current.getRepresentation().size())) );
 			List<Id> sitesToConsiderForMoves = new ArrayList<Id>(numberOfSitesToConsiderForNeighborhood);
 			
