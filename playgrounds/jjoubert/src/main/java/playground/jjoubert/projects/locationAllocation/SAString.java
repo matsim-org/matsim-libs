@@ -746,7 +746,17 @@ public class SAString {
 		int demandIndex = 0;
 		do {
 			Id demandId = this.demandPoints.get( randomDemandSites[demandIndex] );
-			Id closestSite = new EvaluateClosestSiteCallable(demandId, initial).getClosestSite();
+			
+			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(demandId);
+			Comparator<Entry> entryComparator = new Comparator<Entry>() {
+				@Override
+				public int compare(Entry e1, Entry e2) {
+					return new Double(e1.getValue()).compareTo(new Double(e2.getValue()));
+				}
+			};
+			Collections.sort(thisDemandPointSites, entryComparator);
+			Id closestSite = thisDemandPointSites.get(0).getToLocation();
+
 			if(initial.contains(closestSite)){
 				demandIndex++;
 			} else{
