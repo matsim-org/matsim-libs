@@ -373,8 +373,8 @@ public class SAString {
 		
 		/* Get initial solution. */
 //		Solution initialSolution = generateInitialSolution(numberOfSites);
-//		Solution initialSolution = generateGreedyInitialSolution(numberOfSites);
-		Solution initialSolution = generateDemandDrivenInitialSolution(numberOfSites);
+		Solution initialSolution = generateGreedyInitialSolution(numberOfSites);
+//		Solution initialSolution = generateDemandDrivenInitialSolution(numberOfSites);
 		
 		Solution currentSolution = initialSolution;
 		Solution incumbent = initialSolution;
