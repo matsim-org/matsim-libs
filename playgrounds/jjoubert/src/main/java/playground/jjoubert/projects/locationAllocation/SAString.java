@@ -81,9 +81,9 @@ public class SAString {
 		 */
 		String weightsFilename = null;
 		String fixedSitesFilename = null;
-		if (args.length > 4) {
-			weightsFilename = args[4];
-			fixedSitesFilename = args[5];
+		if (args.length > 5) {
+			weightsFilename = args[5];
+			fixedSitesFilename = args[6];
 		}
 
 		/*
