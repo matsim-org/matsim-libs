@@ -570,9 +570,11 @@ public class SAString {
 						/* Consider this possible move. */
 						Solution possibleMove = current.copy();
 						
-						/* Evaluate the exact objective function difference. */
+						/* Evaluate the exact objective function difference. 
+						 * If it is an improvement, the difference should be
+						 * negative. */
 						possibleMove.makeMove(selectedSite, nextSite);
-						double actualDifference = current.objective - possibleMove.objective;						
+						double actualDifference = possibleMove.objective - current.objective;						
 						map.put(new Tuple<Id, Id>(selectedSite, nextSite), actualDifference );
 						
 						/* Estimate the objective function difference. */
