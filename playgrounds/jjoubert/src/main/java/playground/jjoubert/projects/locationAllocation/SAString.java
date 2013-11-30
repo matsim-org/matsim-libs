@@ -363,7 +363,7 @@ public class SAString {
 		 * 
 		 * TODO Perform parameter analysis/tweaking */
 		int iteration = 0;
-		int iterationMax = 500;
+		int iterationMax = 100;
 		double temp = 10;
 		int tempChangeFrequency = 20;
 		double tempChangeFraction = 0.25;
