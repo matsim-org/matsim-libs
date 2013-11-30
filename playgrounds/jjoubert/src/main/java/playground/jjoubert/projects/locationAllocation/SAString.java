@@ -74,6 +74,8 @@ public class SAString {
 		String outputFolder = args[2];
 		int numberOfThreads = Integer.parseInt(args[3]);
 		FRACTION_OF_SOLUTIONS_CHECKED = Double.parseDouble(args[4]);
+		int numberOfSites = Integer.parseInt(args[5]);
+		int numberOfRuns = Integer.parseInt(args[6]);
 
 		/*
 		 * Optional arguments. If used, BOTH MUST be given, even if it is an
@@ -81,9 +83,9 @@ public class SAString {
 		 */
 		String weightsFilename = null;
 		String fixedSitesFilename = null;
-		if (args.length > 5) {
-			weightsFilename = args[5];
-			fixedSitesFilename = args[6];
+		if (args.length > 7) {
+			weightsFilename = args[7];
+			fixedSitesFilename = args[8];
 		}
 
 		/*
@@ -98,21 +100,18 @@ public class SAString {
 		/* Initialise the output list. */
 		List<String> outputList = new ArrayList<String>();
 		
-		int[] sitesInSolution = {5, 10, 15};//, 20, 25, 30, 35, 40, 45, 50};
 		String prefix;
-		for(int n : sitesInSolution){
-			for(int run = 1; run <= 200; run++){
-				LOG.info("====> Number of sites: " + n + "; Run " + run + " <====");
-				/* Execute for full distance matrix. */
-				prefix = String.format("%02d_%s_%03d", n, distanceMatrixDescription, run);
-				String outputString = sas.executeSA(n, outputFolder, prefix);
-				
-				outputList.add(outputString);
-			}
+		for(int run = 1; run <= numberOfRuns; run++){
+			LOG.info("====> Number of sites: " + numberOfSites + "; Run " + run + " <====");
+			/* Execute for full distance matrix. */
+			prefix = String.format("%02d_%s_%03d", numberOfSites, distanceMatrixDescription, run);
+			String outputString = sas.executeSA(numberOfSites, outputFolder, prefix);
+
+			outputList.add(outputString);
 		}
 		
 		/* Write out the overall multi-run results. */
-		BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder + "multiRunOutput_" + distanceMatrixDescription + ".csv");
+		BufferedWriter bw = IOUtils.getBufferedWriter(String.format("%s%02d_multiRunOutput_%s.csv", outputFolder, numberOfSites, distanceMatrixDescription));
 		try{
 			/* Write header. */
 			bw.write("sites,matrix,run,objective,incumbent");
