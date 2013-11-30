@@ -385,7 +385,6 @@ public class SAString {
 		Counter counter = new Counter("  iteration # ");
 		boolean terminate = false;
 		while(!terminate){
-			counter.incCounter();
 			iteration++;
 			
 			/* Get the best neighborhood solution, for current temperature. */
@@ -427,6 +426,7 @@ public class SAString {
 					terminate = true;
 				}
 			{}
+			counter.incCounter();
 		}
 		counter.printCounter();
 		LOG.info(" -> Final temperature: " + temp);
@@ -535,82 +535,82 @@ public class SAString {
 //		}
 		
 		
-		/* The following block of code selects a fraction of the current 
-		 * solution's sites, and calculate the neighborhood for all those 
-		 * selected sites.
-		 */
-		{
-			/*TODO In progress: select a number of sites. */
-			int numberOfSitesToConsiderForNeighborhood = (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*((double)current.getRepresentation().size()));
-			List<Id> sitesToConsiderForMoves = new ArrayList<Id>(numberOfSitesToConsiderForNeighborhood);
-			
-			List<Id> currentRepresentation = current.getRepresentation();
-			int[] randomPermutation = getRandomPermutation(currentRepresentation.size());
-			while(sitesToConsiderForMoves.size() < numberOfSitesToConsiderForNeighborhood){
-				Id siteId = currentRepresentation.get( randomPermutation[sitesToConsiderForMoves.size()] );
-				
-				/* Only add the site if it is NOT a fixed site. */
-				if(!this.fixedSites.contains(siteId)){
-					sitesToConsiderForMoves.add( siteId );
-				}
-			}
-			
-			for(Id selectedSite : sitesToConsiderForMoves){
-				/* Consider all possible moves for this site, but again ignore fixed sites. */
-				for(Id nextSite : this.sites){
-					if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) && 	/* Don't replace a site with itself. */ 
-							!this.fixedSites.contains(nextSite) && 								/* Don't replace a fixed site. */ 
-							!currentRepresentation.contains(nextSite)){							/* Don't replace with a site that is already in the current solution. */
-						/* Consider this possible move. */
-						Solution possibleMove = current.copy();
-						
-						/* Evaluate the exact objective function difference. */
-						possibleMove.makeMove(selectedSite, nextSite);
-						double actualDifference = current.objective - possibleMove.objective;						
-						map.put(new Tuple<Id, Id>(selectedSite, nextSite), actualDifference );
-						
-						/* Estimate the objective function difference. */
-//						double estimatedDifference = possibleMove.evaluateObjectiveFunctionDifference(selectedSite, nextSite);
+//		/* The following block of code selects a fraction of the current 
+//		 * solution's sites, and calculate the neighborhood for all those 
+//		 * selected sites.
+//		 */
+//		{
+//			/*TODO In progress: select a number of sites. */
+//			int numberOfSitesToConsiderForNeighborhood = Math.max(1, (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*((double)current.getRepresentation().size())) );
+//			List<Id> sitesToConsiderForMoves = new ArrayList<Id>(numberOfSitesToConsiderForNeighborhood);
+//			
+//			List<Id> currentRepresentation = current.getRepresentation();
+//			int[] randomPermutation = getRandomPermutation(currentRepresentation.size());
+//			while(sitesToConsiderForMoves.size() < numberOfSitesToConsiderForNeighborhood){
+//				Id siteId = currentRepresentation.get( randomPermutation[sitesToConsiderForMoves.size()] );
+//				
+//				/* Only add the site if it is NOT a fixed site. */
+//				if(!this.fixedSites.contains(siteId)){
+//					sitesToConsiderForMoves.add( siteId );
+//				}
+//			}
+//			
+//			for(Id selectedSite : sitesToConsiderForMoves){
+//				/* Consider all possible moves for this site, but again ignore fixed sites. */
+//				for(Id nextSite : this.sites){
+//					if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) && 	/* Don't replace a site with itself. */ 
+//							!this.fixedSites.contains(nextSite) && 							/* Don't replace a fixed site. */ 
+//							!currentRepresentation.contains(nextSite)){						/* Don't replace with a site that is already in the current solution. */
+//						/* Consider this possible move. */
+//						Solution possibleMove = current.copy();
+//						
+//						/* Evaluate the exact objective function difference. */
+////						possibleMove.makeMove(selectedSite, nextSite);
+////						double actualDifference = current.objective - possibleMove.objective;						
+////						map.put(new Tuple<Id, Id>(selectedSite, nextSite), actualDifference );
+//						
+//						/* Estimate the objective function difference. */
+//						double estimatedDifference = possibleMove.evaluateObjectiveFunctionDifference(selectedSite);
 //						map.put(new Tuple<Id, Id>(selectedSite, nextSite), estimatedDifference );
-					}
-				}
-			}
-		}
+//					}
+//				}
+//			}
+//		}
 		
 		
 		/* The following block of code ONLY selects ONE site and calculates its 
 		 * entire neighborhood.
 		 */
-//		{
-//			/* Select a random current site to remove, but only if it is NOT a fixed 
-//			 * site. This is achieved by only considering sites that appear AFTER the
-//			 * fixed sites in the representation. */
-//			List<Id> currentRepresentation = current.getRepresentation();
-//			/* Generate the random permutation. */
-//			int[] randomPermutation = getRandomPermutation(currentRepresentation.size()-fixedSites.size());
-//			/* Adapt random permutation to only start searching after fixed sites. */
-//			for(int i = 0; i < randomPermutation.length; i++){
-//				randomPermutation[i] = randomPermutation[i] + fixedSites.size();
-//			}
-//			Id selectedSite = currentRepresentation.get(randomPermutation[0]);
-//			if(fixedSites.contains(selectedSite)){
-//				throw new RuntimeException("Found a fixed site to remove. Shouldn't happen!!");
-//			}			
-//
-//			/* Consider all possible moves for this site, but again ignore fixed sites. */
-//			for(Id nextSite : this.sites){
-//				if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) && 	/* Don't replace a site with itself. */ 
-//						!this.fixedSites.contains(nextSite) && 								/* Don't replace a fixed site. */ 
-//						!currentRepresentation.contains(nextSite)){							/* Don't replace with a site that is already in the current solution. */
-//					/* Consider this possible move. */
-//					Solution possibleMove = current.copy();
-//					
-//					/*TODO Parallelise the objective function evaluation. */ 
-//					map.put(new Tuple<Id, Id>(selectedSite, nextSite), possibleMove.evaluateObjectiveFunctionDifference(selectedSite, nextSite));
-//				}
-//			}
-//		}
-//		
+		{
+			/* Select a random current site to remove, but only if it is NOT a fixed 
+			 * site. This is achieved by only considering sites that appear AFTER the
+			 * fixed sites in the representation. */
+			List<Id> currentRepresentation = current.getRepresentation();
+			/* Generate the random permutation. */
+			int[] randomPermutation = getRandomPermutation(currentRepresentation.size()-fixedSites.size());
+			/* Adapt random permutation to only start searching after fixed sites. */
+			for(int i = 0; i < randomPermutation.length; i++){
+				randomPermutation[i] = randomPermutation[i] + fixedSites.size();
+			}
+			Id selectedSite = currentRepresentation.get(randomPermutation[0]);
+			if(fixedSites.contains(selectedSite)){
+				throw new RuntimeException("Found a fixed site to remove. Shouldn't happen!!");
+			}			
+
+			/* Consider all possible moves for this site, but again ignore fixed sites. */
+			for(Id nextSite : this.sites){
+				if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) && 	/* Don't replace a site with itself. */ 
+						!this.fixedSites.contains(nextSite) && 							/* Don't replace a fixed site. */ 
+						!currentRepresentation.contains(nextSite)){						/* Don't replace with a site that is already in the current solution. */
+					/* Consider this possible move. */
+					Solution possibleMove = current.copy();
+					
+					/*TODO Parallelise the objective function evaluation. */ 
+					map.put(new Tuple<Id, Id>(selectedSite, nextSite), possibleMove.evaluateObjectiveFunctionDifference(selectedSite));
+				}
+			}
+		}
+		
 
 		sortedMap.putAll(map);
 		
@@ -623,7 +623,13 @@ public class SAString {
 			
 			Tuple<Id, Id> thisMove = entry.getKey();
 			double thisSaving = entry.getValue();
-			if(thisSaving < 0){
+			/* Since the objective function difference is a conservative estimate,
+			 * we also accept all moves that are deteriorating the current solution
+			 * by no more than 5%, assuming the benefit will be made up when making
+			 * the move and realising additional savings from other allocations. 
+			 */
+			if(thisSaving < 0.0*current.objective){
+				LOG.debug("     ==> Improving move: ");
 				found = true;
 				newCurrent = current.copy();
 				newCurrent.makeMove(thisMove.getFirst(), thisMove.getSecond());
@@ -752,7 +758,7 @@ public class SAString {
 			return ss;
 		}
 
-		public double evaluateObjectiveFunctionDifference(Id oldId, Id newId){
+		public double evaluateObjectiveFunctionDifference(Id oldId){
 			double difference = 0.0;
 		
 			/* Check each demand point's allocated site. */
@@ -763,7 +769,29 @@ public class SAString {
 				if(thisAllocationId.toString().equalsIgnoreCase(oldId.toString())){
 					/* Calculate the difference. */
 					difference -= distanceMatrix.getEntry(id, oldId).getValue();
-					difference += distanceMatrix.getEntry(id, newId).getValue();
+					
+					/* Now get the affected site's new closest distance, BUT don't
+					 * consider the site will be removed. */
+					Id newAllocationId = null;					
+					List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
+					Comparator<Entry> entryComparator = new Comparator<Entry>() {
+						@Override
+						public int compare(Entry e1, Entry e2) {
+							return new Double(e1.getValue()).compareTo(new Double(e2.getValue()));
+						}
+					};
+					Collections.sort(thisDemandPointSites, entryComparator);
+					boolean foundClosest = false;
+					Iterator<Entry> siteIterator = thisDemandPointSites.iterator();
+					while(!foundClosest && siteIterator.hasNext()){
+						Id thisSite = siteIterator.next().getToLocation();
+						if(this.representation.contains(thisSite) && !thisSite.toString().equalsIgnoreCase(oldId.toString()) ){
+							foundClosest = true;
+							newAllocationId = thisSite;
+						}
+					}
+					
+					difference += distanceMatrix.getEntry(id, newAllocationId).getValue();
 				}
 			}
 			
@@ -849,6 +877,14 @@ public class SAString {
 
 		@Override
 		public Tuple<Tuple<Id,Id>, Double> call() throws Exception {
+			Id closest = getClosestSite();
+			
+			Tuple<Id, Id> idPair = new Tuple<Id, Id>(this.id, closest);
+			Double distance = distanceMatrix.getEntry(id, closest).getValue();
+			return new Tuple<Tuple<Id,Id>, Double>(idPair, distance);
+		}
+		
+		public Id getClosestSite(){
 			Id closest = null;
 			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
 			Comparator<Entry> entryComparator = new Comparator<Entry>() {
@@ -867,11 +903,9 @@ public class SAString {
 					closest = thisSite;
 				}
 			}
-			
-			Tuple<Id, Id> idPair = new Tuple<Id, Id>(this.id, closest);
-			Double distance = distanceMatrix.getEntry(id, closest).getValue();
-			return new Tuple<Tuple<Id,Id>, Double>(idPair, distance);
+			return closest;
 		}
+		
 	}
 
 	
