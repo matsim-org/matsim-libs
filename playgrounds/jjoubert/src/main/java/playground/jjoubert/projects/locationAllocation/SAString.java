@@ -98,10 +98,10 @@ public class SAString {
 		/* Initialise the output list. */
 		List<String> outputList = new ArrayList<String>();
 		
-		int[] sitesInSolution = {10};//{5, 10, 15, 20, 25, 30, 35, 40, 45, 50};
+		int[] sitesInSolution = {5, 10, 15};//, 20, 25, 30, 35, 40, 45, 50};
 		String prefix;
 		for(int n : sitesInSolution){
-			for(int run = 1; run <= 5; run++){
+			for(int run = 1; run <= 200; run++){
 				LOG.info("====> Number of sites: " + n + "; Run " + run + " <====");
 				/* Execute for full distance matrix. */
 				prefix = String.format("%02d_%s_%03d", n, distanceMatrixDescription, run);
