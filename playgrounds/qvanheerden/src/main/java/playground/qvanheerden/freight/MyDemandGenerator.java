@@ -30,7 +30,8 @@ public class MyDemandGenerator {
 	public List<Map<Tuple<String, String>, double[]>> listOfDecileMaps = new ArrayList<Map<Tuple<String,String>,double[]>>();
 	public List<Map<Tuple<String, String>, double[]>> listOfNewDecileMaps = new ArrayList<Map<Tuple<String,String>,double[]>>();
 	public Map<String, Coord> customerMap = new HashMap<String, Coord>();
-	
+	public List<String> productList = new ArrayList<String>();
+
 	/**
 	 * This class will create a csv file containing shipments that can be 
 	 * read in when running the {@link MyCarrierPlanGenerator}.
@@ -44,33 +45,58 @@ public class MyDemandGenerator {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(MyDemandGenerator.class.toString(), args);
-		
+
 		String distributionFile = args[0];
 		String customerFile = args[1];
-		String simpleDemandOutput = args[2];
+		String productFile = args[2];
+		String simpleDemandOutput = args[3];
 		
 		MyDemandGenerator mdg = new MyDemandGenerator();
+		mdg.parseProductFile(productFile);
 		mdg.parseCustomerFile(customerFile);
 		mdg.generateSimpleDemand(distributionFile, simpleDemandOutput);
-		
+
 		Header.printFooter();
 	}
-	
-	public void parseCustomerFile(String inputFile){
-		BufferedReader br = IOUtils.getBufferedReader(inputFile);
-		
+
+	public void parseProductFile(String productFile){
+		BufferedReader br = IOUtils.getBufferedReader(productFile);
+
 		try {
 			br.readLine(); //skip header
-			
+
+			String line;
+			while((line=br.readLine())!=null){
+				String[] array = line.split(",");
+				String product = array[1];
+				productList.add(product);
+			}
+		}catch(IOException e){
+			log.error("Could not read product file");
+		}finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				log.error("Could not close product file");
+			}
+		}
+	}
+
+	public void parseCustomerFile(String inputFile){
+		BufferedReader br = IOUtils.getBufferedReader(inputFile);
+
+		try {
+			br.readLine(); //skip header
+
 			String line;
 			while((line=br.readLine())!=null){
 				String[] array = line.split(",");
 				String customer = array[1];
 				double longi = Double.parseDouble(array[2]);
 				double lati = Double.parseDouble(array[3]);
-				
+
 				customerMap.put(customer, new CoordImpl(longi, lati));
-				
+
 			}
 		}catch(IOException e){
 			log.error("Could not read customer file");
@@ -81,19 +107,19 @@ public class MyDemandGenerator {
 				log.info("Could not close customer file");
 			}
 		}
-		
+
 	}
-	
+
 	public void parseDistributionFile(String inputFile){
 		BufferedReader br = IOUtils.getBufferedReader(inputFile);
-		
+
 		try {
 			br.readLine(); //skip header
-			
+
 			String line;
 			while((line=br.readLine())!=null){
 				String[] array = line.split(",");
-				
+
 				int busMonth = Integer.parseInt(array[0]);
 				int busDay = Integer.parseInt(array[1]);
 				int calMonth = Integer.parseInt(array[2]);
@@ -110,12 +136,12 @@ public class MyDemandGenerator {
 				double lastMass = Integer.parseInt(array[13]);
 				double lastSale = Integer.parseInt(array[14]);
 				double distance = Integer.parseInt(array[15]);
-				
+
 				//work with "order" object to enable extra work with values later...
 				Order order = new Order(busMonth, busDay, calMonth, calDay, seqDay, dow, supplier, customer, group, product, mass, sale, daysSinceLast, lastMass, lastSale, distance);
-				
+
 				Tuple<String, String> key = new Tuple<String, String>(order.getCustomer(), order.getProduct());
-				
+
 				//TODO check switch case statement - probably need to check if maps contain mapping yet.
 				switch (order.getDayOfWeek()) {
 				case 1:
@@ -148,7 +174,7 @@ public class MyDemandGenerator {
 					break;
 				}
 			}
-			
+
 		} catch (IOException e) {
 			log.error("Could not read distribution file...");
 		} finally{
@@ -158,9 +184,9 @@ public class MyDemandGenerator {
 				log.error("Could not close reader...");
 			}
 		}
-		
+
 		log.info("Finished parsing file and populated 5 maps.");
-		
+
 	}
 
 	public void calculateDeciles(){
@@ -169,13 +195,13 @@ public class MyDemandGenerator {
 		listOfDowMaps.add(wedMap);
 		listOfDowMaps.add(thuMap);
 		listOfDowMaps.add(friMap);
-		
+
 		listOfDecileMaps.add(monDecileMap);
 		listOfDecileMaps.add(tueDecileMap);
 		listOfDecileMaps.add(wedDecileMap);
 		listOfDecileMaps.add(thuDecileMap);
 		listOfDecileMaps.add(friDecileMap);
-		
+
 		for(int i = 0; i < listOfDowMaps.size(); i++){
 			Map<Tuple<String, String>, List<Double>> dowMap = listOfDowMaps.get(i);
 			Map<Tuple<String, String>, double[]> decileMap = listOfDecileMaps.get(i);
@@ -200,12 +226,12 @@ public class MyDemandGenerator {
 
 				decileMap.put(key, values);
 			}
-			
+
 			listOfNewDecileMaps.add(decileMap);
 		}
-	
+
 	}
-	
+
 	public void writeDecilesToFile(String outputFolder){
 
 		for(int i = 0; i < listOfNewDecileMaps.size(); i++){
@@ -214,12 +240,12 @@ public class MyDemandGenerator {
 			try {
 				bw.write("customer,product,10,20,30,40,50,60,70,80,90,99");
 				bw.newLine();
-				
+
 				Map<Tuple<String, String>, double[]> decMap = listOfNewDecileMaps.get(i);
-				
+
 				for(Tuple<String, String> tuple : decMap.keySet()){
 					bw.write(tuple.getFirst() + "," + tuple.getSecond() + ",");
-					
+
 					for(int j = 0; j < decMap.get(tuple).length - 1; j++){
 						bw.write(String.format("%.0f,", decMap.get(tuple)[j]));
 						bw.write(",");
@@ -241,16 +267,16 @@ public class MyDemandGenerator {
 
 		}
 	}
-	
+
 	//TODO finish
 	public void parseDecilesFromFile(String decileFolder){
 		File folder = new File(decileFolder);
 		if(!folder.canRead() || !folder.exists()){
 			log.error("Decile file does not exist or is corrupt.");
 		}
-		
+
 		List<File> fileList = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter(".csv"));
-		
+
 		/*check if there are entries in new decile map...
 		 * if yes - clear because if we parse a file we want new values
 		 * if no - do nothing
@@ -258,43 +284,43 @@ public class MyDemandGenerator {
 		if(!listOfNewDecileMaps.isEmpty()){
 			listOfNewDecileMaps.clear();
 		}
-		
+
 		//check if this from index is correct
 		for(File file : fileList){
 			String theDay = file.getName().substring(file.getName().indexOf("_")+1, file.getName().indexOf("."));
 			int dow = Integer.parseInt(theDay);
-			
-			
-			
+
+
+
 			Map<Tuple<String, String>, double[]> decMap;
-			
+
 		}
-		
+
 	}
-	
+
 	//TODO finish
 	public void generateDemand(){
-		
+
 	}
 
 	public void generateSimpleDemand(String inputFile, String outputFile){
 		BufferedReader br = IOUtils.getBufferedReader(inputFile);
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
-		
+
 		//choose arbitrary date to work with: Tuesday, 3 July 2012
 		int month = 7;
 		int day = 3;
-		
+
 		try {
 			bw.write("customer, long, lat, product, mass, sale, duration, start, end");
 			bw.newLine();
 			br.readLine(); //skip header
-			
+
 			String line;
-			
+
 			while((line=br.readLine())!=null){
 				String[] array = line.split(",");
-				
+
 				int busMonth = Integer.parseInt(array[0]);
 				int busDay = Integer.parseInt(array[1]);
 				int calMonth = Integer.parseInt(array[2]);
@@ -305,26 +331,26 @@ public class MyDemandGenerator {
 				String customer = array[7];
 				String group = array[8];
 				String product = array[9];
-				double mass = Integer.parseInt(array[10]);
-				double sale = Integer.parseInt(array[11]);
+				double mass = Double.parseDouble(array[10]);
+				double sale = Double.parseDouble(array[11]);
 				int daysSinceLast = Integer.parseInt(array[12]);
-				double lastMass = Integer.parseInt(array[13]);
-				double lastSale = Integer.parseInt(array[14]);
-				double distance = Integer.parseInt(array[15]);
-				
+				double lastMass = Double.parseDouble(array[13]);
+				double lastSale = Double.parseDouble(array[14]);
+				//double distance = Double.parseDouble(array[15]);
+
 				//ignore everything up to sequential day=3 (that is 3 july 2013)
-				if(seqDay==3){
+				if(seqDay==3 && customerMap.containsKey(customer) && productList.contains(product)){
 					//customer, long, lat, product, mass, sale, duration, start, end
 					double longi = customerMap.get(customer).getX();
 					double lati = customerMap.get(customer).getY();
 					bw.write(customer + "," + longi + "," + lati + "," + product + "," + mass + "," + sale + ",600,0,86400");
 					bw.newLine();
-					
+
 				}else if(seqDay > 3){ //break from while loop once seqDay > 3
 					break;
 				}
-				
-				
+
+
 			}
 		}catch(IOException e){
 			log.error("Could not read distribution file...");
@@ -342,5 +368,5 @@ public class MyDemandGenerator {
 			}
 		}
 	}
-	
+
 }

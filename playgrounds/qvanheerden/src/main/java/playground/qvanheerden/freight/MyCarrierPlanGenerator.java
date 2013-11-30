@@ -24,6 +24,7 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.contrib.freight.utils.Visualiser;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,12 +40,10 @@ import basics.VehicleRoutingProblem;
 import basics.VehicleRoutingProblemSolution;
 
 import playground.southafrica.utilities.Header;
-import util.Coordinate;
 import util.Solutions;
 
 public class MyCarrierPlanGenerator {
 	private final static Logger log = Logger.getLogger(MyCarrierPlanGenerator.class);
-	public static Coordinate depotCoordinate;
 	public static Coord depotCoord;
 	public static Id depotLink;
 	public CarrierVehicleTypes carrierVehicleTypes;
@@ -85,7 +84,6 @@ public class MyCarrierPlanGenerator {
 		
 		/* Set coordinate and linkId of depot */
 		depotCoord = new CoordImpl(depotLong, depotLat);
-		depotCoordinate = new Coordinate(depotLong, depotLat);
 		depotLink = ((NetworkImpl) network).getNearestLink((Coord) depotCoord).getId();
 		
 		/* Build vehicle types */
@@ -106,6 +104,8 @@ public class MyCarrierPlanGenerator {
 		carriers.addCarrier(carrier);
 		CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
 		planWriter.write(carrierPlanOutputFile);
+		
+		//new Visualiser(config, scenario).visualizeLive(carriers);
 		
 		Header.printFooter();
 
@@ -162,7 +162,7 @@ public class MyCarrierPlanGenerator {
 				double longi = Double.parseDouble(array[1]);
 				double lati = Double.parseDouble(array[2]);
 				String product = array[3];
-				int mass = Integer.parseInt(array[4]);
+				double mass = Double.parseDouble(array[4]);
 				double sale = Double.parseDouble(array[5]);
 				double duration = Double.parseDouble(array[6]);
 				int start = Integer.parseInt(array[7]);
@@ -182,7 +182,7 @@ public class MyCarrierPlanGenerator {
 //						.build();
 				
 				CarrierService serv = CarrierService.Builder.newInstance(new IdImpl(i), linkId).
-						setCapacityDemand(mass).
+						setCapacityDemand((int) mass).
 						setServiceDuration(duration).
 						setName(customer).
 						setServiceStartTimeWindow(TimeWindow.newInstance(start, end)).

@@ -93,25 +93,25 @@ public class MyCarrierSimulation {
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 
 		//get initial solution (using this from KnFreight2)
-		for ( Carrier carrier : carriers.getCarriers().values() ) {
-			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder( carrier, scenario.getNetwork() ) ;
-			NetworkBasedTransportCosts netBasedCosts =
-					NetworkBasedTransportCosts.Builder.newInstance( scenario.getNetwork()
-							, vehicleTypes.getVehicleTypes().values() ).build() ;
-			vrpBuilder.setRoutingCost(netBasedCosts) ;
-			VehicleRoutingProblem problem = vrpBuilder.build() ;
-
-			VehicleRoutingAlgorithm vra = algorithms.VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem,initialPlanAlgorithm);
-
-			VehicleRoutingProblemSolution solution = Solutions.getBest(vra.searchSolutions());
-			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;
-
-			NetworkRouter.routePlan(newPlan,netBasedCosts) ;
-			// (maybe not optimal, but since re-routing is a matsim strategy, 
-			// certainly ok as initial solution)
-			carrier.setSelectedPlan(newPlan) ;
-
-		}
+//		for ( Carrier carrier : carriers.getCarriers().values() ) {
+//			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder( carrier, scenario.getNetwork() ) ;
+//			NetworkBasedTransportCosts netBasedCosts =
+//					NetworkBasedTransportCosts.Builder.newInstance( scenario.getNetwork()
+//							, vehicleTypes.getVehicleTypes().values() ).build() ;
+//			vrpBuilder.setRoutingCost(netBasedCosts) ;
+//			VehicleRoutingProblem problem = vrpBuilder.build() ;
+//
+//			VehicleRoutingAlgorithm vra = algorithms.VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem,initialPlanAlgorithm);
+//
+//			VehicleRoutingProblemSolution solution = Solutions.getBest(vra.searchSolutions());
+//			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;
+//
+//			NetworkRouter.routePlan(newPlan,netBasedCosts) ;
+//			// (maybe not optimal, but since re-routing is a matsim strategy, 
+//			// certainly ok as initial solution)
+//			carrier.setSelectedPlan(newPlan) ;
+//
+//		}
 		
 		//get replan strategy and scoring function factory
 		MyCarrierSimulation mcs = new MyCarrierSimulation();
