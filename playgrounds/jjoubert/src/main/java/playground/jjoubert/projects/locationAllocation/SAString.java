@@ -53,6 +53,9 @@ import playground.southafrica.utilities.Header;
 public class SAString {
 	final private static Logger LOG = Logger.getLogger(SAString.class);
 	private static double FRACTION_OF_SOLUTIONS_CHECKED; 
+	private static int INITIAL_SOLUTION_STRATEGY;
+	private static int NEIGHBOURHOOD_STRATEGY;
+	private static int OBJECTIVE_FUNCTION_STRATEGY;
 	final private Random random;
 	private Matrix distanceMatrix;
 	private List<Id> sites;
@@ -73,9 +76,13 @@ public class SAString {
 		String distanceMatrixDescription = args[1];
 		String outputFolder = args[2];
 		int numberOfThreads = Integer.parseInt(args[3]);
-		FRACTION_OF_SOLUTIONS_CHECKED = Double.parseDouble(args[4]);
-		int numberOfSites = Integer.parseInt(args[5]);
-		int numberOfRuns = Integer.parseInt(args[6]);
+		int numberOfSites = Integer.parseInt(args[4]);
+		int numberOfRuns = Integer.parseInt(args[5]);
+		
+		FRACTION_OF_SOLUTIONS_CHECKED = Double.parseDouble(args[6]);
+		INITIAL_SOLUTION_STRATEGY = Integer.parseInt(args[7]);
+		NEIGHBOURHOOD_STRATEGY = Integer.parseInt(args[8]);
+		OBJECTIVE_FUNCTION_STRATEGY = Integer.parseInt(args[9]);
 
 		/*
 		 * Optional arguments. If used, BOTH MUST be given, even if it is an
@@ -83,9 +90,9 @@ public class SAString {
 		 */
 		String weightsFilename = null;
 		String fixedSitesFilename = null;
-		if (args.length > 7) {
-			weightsFilename = args[7];
-			fixedSitesFilename = args[8];
+		if (args.length > 10) {
+			weightsFilename = args[10];
+			fixedSitesFilename = args[11];
 		}
 
 		/*
@@ -330,7 +337,7 @@ public class SAString {
 
 	
 	/**
-	 * Generate a random permutation of `n' integers in what I believe is O(n)
+	 * Generate a random permutation of 'n' integers in what I believe is O(n)
 	 * complexity.
 	 * @param n
 	 * @return
@@ -362,7 +369,6 @@ public class SAString {
 		/* Initialise the algorithm. 
 		 * 
 		 * TODO Perform parameter analysis/tweaking */
-		int iteration = 0;
 		int iterationMax = 100;
 		double temp = 10;
 		int tempChangeFrequency = 20;
@@ -372,9 +378,35 @@ public class SAString {
 		int returnToIncumbentThreshold = 10;
 		
 		/* Get initial solution. */
-//		Solution initialSolution = generateInitialSolution(numberOfSites);
-		Solution initialSolution = generateGreedyInitialSolution(numberOfSites);
-//		Solution initialSolution = generateDemandDrivenInitialSolution(numberOfSites);
+		Solution initialSolution;
+		switch (INITIAL_SOLUTION_STRATEGY) {
+		case 1:
+			/* Generate a random initial solution. A permutation of 'n' integer
+			 * numbers are generated, where 'n' is the total number of sites.
+			 * The first 'm' integer values of the permutation is used as
+			 * indices, and the associated sites are added to the initial 
+			 * solution. */
+			initialSolution = generateRandomInitialSolution(numberOfSites);
+			break;
+		case 2:
+			/* Generates a greedy initial solution. A random seed site is selected,
+			 * and then, iteratively, each other site is evaluated for insertion.
+			 * The site with the biggest improvement (saving in distance) is 
+			 * selected next, until the entire initial solution is filled. */
+			initialSolution = generateGreedyInitialSolution(numberOfSites);
+			break;
+		case 3:
+			/* Generates a demand-driven initial solution. The demand points are 
+			 * randomly selected, and for each selected demand point, its 
+			 * closest site is added. But if the closest site is already in the
+			 * initial solution, then the demand point is skipped, and we move 
+			 * to the next demand point. The process repeats until the initial
+			 * solution is complete. */
+			initialSolution = generateDemandDrivenInitialSolution(numberOfSites);
+			break;
+		default:
+			throw new IllegalArgumentException("Cannot interpret " + INITIAL_SOLUTION_STRATEGY + " as a valid initial solution strategy.");
+		}
 		
 		Solution currentSolution = initialSolution;
 		Solution incumbent = initialSolution;
@@ -389,13 +421,13 @@ public class SAString {
 		Counter counter = new Counter("  iteration # ");
 		boolean terminate = false;
 		while(!terminate){
-			iteration++;
 			
 			/* Get the best neighborhood solution, for current temperature. */
 			Solution newCurrent = getNeighbour(currentSolution, temp);
 //			Solution newCurrent = getNearestNeighbour(currentSolution, temp);
+			
 			if(newCurrent == null){
-				LOG.warn("Cannot make a move...");
+				LOG.warn("Cannot make a move... returning to the incumbent.");
 				
 				/* Return to the incumbent solution. */
 				newCurrent = incumbent;
@@ -406,32 +438,32 @@ public class SAString {
 				}
 				
 				/*FIXME Consider terminating at this point. */
-//				terminate = true;
-			} else{}
-				/* Test incumbent. */
-				if(newCurrent.getObjective() < incumbent.getObjective()){
-					incumbent = newCurrent;
-					LOG.info( String.format("    >=> New incumbent: %.2f", incumbent.objective) );
-				} else{
-					nonImprovingIterations++;
-				}
-				
-				/* Update the solution progress. */
-				incumbentList.add(incumbent.copy());
-				currentSolution = newCurrent;
-				solutionList.add(currentSolution.copy());
+				//				terminate = true;
+			}
+			
+			/* Test incumbent. */
+			if(newCurrent.getObjective() < incumbent.getObjective()){
+				incumbent = newCurrent;
+				LOG.info( String.format("    >=> New incumbent: %.2f", incumbent.objective) );
+			} else{
+				nonImprovingIterations++;
+			}
 
-				/* Update temperature, if necessary. */
-				if(nonImprovingIterations > 0 && nonImprovingIterations % tempChangeFrequency == 0){
-					temp *= tempChangeFraction;
-				}
+			/* Update the solution progress. */
+			incumbentList.add(incumbent.copy());
+			currentSolution = newCurrent;
+			solutionList.add(currentSolution.copy());
 
-				/* Update termination criteria. */
-				if(iteration >= iterationMax){
-					terminate = true;
-				}
-			{}
+			/* Update temperature, if necessary. */
+			if(nonImprovingIterations > 0 && nonImprovingIterations % tempChangeFrequency == 0){
+				temp *= tempChangeFraction;
+			}
+
+			/* Update termination criteria. */
 			counter.incCounter();
+			if(counter.getCounter() >= iterationMax){
+				terminate = true;
+			}
 		}
 		counter.printCounter();
 		LOG.info(" -> Final temperature: " + temp);
@@ -465,6 +497,7 @@ public class SAString {
 		/* Update the solution string. */
 		return String.format("%s,%.4f,%s", runPrefix.replaceAll("_", ","), incumbent.objective, incumbent.toString());
 	}
+	
 	
 	@Deprecated
 	public Solution getNearestNeighbour(Solution current, double temperature){
@@ -523,44 +556,53 @@ public class SAString {
 	
 	public Solution getNeighbour(Solution current, double temperature){
 		Solution newCurrent = null;
-		
+
+		/*----------------------------------------------------------------------
+		 * The following block of code selects a fraction of the current 
+		 * solution's sites, and calculate the neighborhood for all those 
+		 * selected sites.
+		 * 
+		 * A minimum of one site will be considered, irrespective of how small
+		 * the fraction is.
+		 * 
+		 * TODO - Consider the implication on diversification when using 
+		 * different fraction values. 
+		 *--------------------------------------------------------------------*/
 		Map<Tuple<Id, Id>, Double> map = new HashMap<Tuple<Id, Id>, Double>(); 
-		ValueComparatorIncreasing vc = new ValueComparatorIncreasing(map);
-		Map<Tuple<Id, Id>, Double> sortedMap = new TreeMap<Tuple<Id, Id>, Double>(vc); 
 		
-		/* Check for each current site in the solution. */
-//		for(Id currentSite : current.getRepresentation()){
-//			for(Id nextSite : this.sites){
-//				if(!currentSite.toString().equalsIgnoreCase(nextSite.toString())){
-//					/* Consider this possible move. */
-//					Solution possibleMove = current.copy();
-//					map.put(new Tuple<Id, Id>(currentSite, nextSite), possibleMove.evaluateObjectiveFunctionDifference(currentSite, nextSite));
-//				}
-//			}
-//		}
-		
-		
-//		/* The following block of code selects a fraction of the current 
-//		 * solution's sites, and calculate the neighborhood for all those 
-//		 * selected sites.
-//		 */
-		{
-			/* Select a number of sites. */
-			int numberOfSitesToConsiderForNeighborhood = Math.max(1, (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*((double)current.getRepresentation().size())) );
-			List<Id> sitesToConsiderForMoves = new ArrayList<Id>(numberOfSitesToConsiderForNeighborhood);
-			
-			List<Id> currentRepresentation = current.getRepresentation();
-			int[] randomPermutation = getRandomPermutation(currentRepresentation.size());
-			while(sitesToConsiderForMoves.size() < numberOfSitesToConsiderForNeighborhood){
-				Id siteId = currentRepresentation.get( randomPermutation[sitesToConsiderForMoves.size()] );
-				
-				/* Only add the site if it is NOT a fixed site. */
-				if(!this.fixedSites.contains(siteId)){
-					sitesToConsiderForMoves.add( siteId );
-				}
+		/* Select, randomly, the sites to consider for a move. */
+		int numberOfSitesToConsiderForNeighborhood = Math.max(1, (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*((double)current.getRepresentation().size())) );
+		List<Id> sitesToConsiderForMoves = new ArrayList<Id>(numberOfSitesToConsiderForNeighborhood);
+
+		List<Id> currentRepresentation = current.getRepresentation();
+		int[] randomPermutation = getRandomPermutation(currentRepresentation.size());
+		while(sitesToConsiderForMoves.size() < numberOfSitesToConsiderForNeighborhood){
+			Id siteId = currentRepresentation.get( randomPermutation[sitesToConsiderForMoves.size()] );
+
+			/* Only add the site if it is NOT a fixed site. */
+			if(!this.fixedSites.contains(siteId)){
+				sitesToConsiderForMoves.add( siteId );
 			}
+		}
+
+		/* Consider the various moves. */
+		for(Id selectedSite : sitesToConsiderForMoves){
 			
-			for(Id selectedSite : sitesToConsiderForMoves){
+			switch (NEIGHBOURHOOD_STRATEGY) {
+			case 1:
+				/* TODO Consider the twenty sites that are farthest away from the
+				 * sites in the current solution. */
+				List<Id> farthestSites = new ArrayList<Id>(20);
+				for(Id site : this.sites){
+					if(!current.representation.contains(site)){
+						/* The site is not in the current solution. But to check 
+						 * how far it is from the OTHER SITES, we need to read 
+						 * in the inter-site distance matrix as well... damn. 24*/
+					}
+				}
+				break;
+				
+			case 2:
 				/* Consider all possible moves for this site, but again ignore fixed sites. */
 				for(Id nextSite : this.sites){
 					if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) && 	/* Don't replace a site with itself. */ 
@@ -569,62 +611,36 @@ public class SAString {
 						/* Consider this possible move. */
 						Solution possibleMove = current.copy();
 						
-						/* Evaluate the exact objective function difference. 
-						 * If it is an improvement, the difference should be
-						 * negative. */
-						possibleMove.makeMove(selectedSite, nextSite);
-						double actualDifference = possibleMove.objective - current.objective;						
-						map.put(new Tuple<Id, Id>(selectedSite, nextSite), actualDifference );
-						
-						/* Estimate the objective function difference. */
-//						double estimatedDifference = possibleMove.evaluateObjectiveFunctionDifference(selectedSite);
-//						map.put(new Tuple<Id, Id>(selectedSite, nextSite), estimatedDifference );
+						switch (OBJECTIVE_FUNCTION_STRATEGY) {
+						case 1:
+							/* Evaluate the exact objective function difference. 
+							 * If it is an improvement, the difference should be
+							 * negative. */
+							possibleMove.makeMove(selectedSite, nextSite);
+							double actualDifference = possibleMove.objective - current.objective;						
+							map.put(new Tuple<Id, Id>(selectedSite, nextSite), actualDifference );
+							break;
+							
+						case 2:
+							/* Estimate the objective function difference. */
+							double estimatedDifference = possibleMove.evaluateObjectiveFunctionDifference(selectedSite);
+							map.put(new Tuple<Id, Id>(selectedSite, nextSite), estimatedDifference );
+							
+						default:
+							throw new IllegalArgumentException("Cannot interpret " + OBJECTIVE_FUNCTION_STRATEGY + " as a valid objective function strategy.");
+						}
 					}
 				}
+				break;
+				
+			default:
+				throw new IllegalArgumentException("Cannot interpret " + NEIGHBOURHOOD_STRATEGY + " as a valid neighbourhood strategy.");
 			}
 		}
-		
-		
-		/* The following block of code ONLY selects ONE site and calculates its 
-		 * entire neighborhood.
-		 */
-//		{
-//			/* Select a random current site to remove, but only if it is NOT a fixed 
-//			 * site. This is achieved by only considering sites that appear AFTER the
-//			 * fixed sites in the representation. */
-//			List<Id> currentRepresentation = current.getRepresentation();
-//			/* Generate the random permutation. */
-//			int[] randomPermutation = getRandomPermutation(currentRepresentation.size()-fixedSites.size());
-//			/* Adapt random permutation to only start searching after fixed sites. */
-//			for(int i = 0; i < randomPermutation.length; i++){
-//				randomPermutation[i] = randomPermutation[i] + fixedSites.size();
-//			}
-//			Id selectedSite = currentRepresentation.get(randomPermutation[0]);
-//			if(fixedSites.contains(selectedSite)){
-//				throw new RuntimeException("Found a fixed site to remove. Shouldn't happen!!");
-//			}			
-//
-//			/* Consider all possible moves for this site, but again ignore fixed sites. */
-//			for(Id nextSite : this.sites){
-//				if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) && 	/* Don't replace a site with itself. */ 
-//						!this.fixedSites.contains(nextSite) && 							/* Don't replace a fixed site. */ 
-//						!currentRepresentation.contains(nextSite)){						/* Don't replace with a site that is already in the current solution. */
-//					/* Consider this possible move. */
-//					Solution possibleMove = current.copy();
-//
-//					/* Evaluate the exact objective function difference. */
-//					possibleMove.makeMove(selectedSite, nextSite);
-//					double actualDifference = current.objective - possibleMove.objective;						
-//					map.put(new Tuple<Id, Id>(selectedSite, nextSite), actualDifference );
-//
-//					/* Estimate the objective function difference. */
-////					double estimatedDifference = possibleMove.evaluateObjectiveFunctionDifference(selectedSite);
-////					map.put(new Tuple<Id, Id>(selectedSite, nextSite), estimatedDifference );
-//				}
-//			}
-//		}
 
-
+		/* Rank the neighbourhood moves from best to worst. */
+		ValueComparatorIncreasing vc = new ValueComparatorIncreasing(map);
+		Map<Tuple<Id, Id>, Double> sortedMap = new TreeMap<Tuple<Id, Id>, Double>(vc); 
 		sortedMap.putAll(map);
 		
 		/* Get the first (best) accepted move */
@@ -636,13 +652,34 @@ public class SAString {
 			
 			Tuple<Id, Id> thisMove = entry.getKey();
 			double thisSaving = entry.getValue();
-			/* Since the objective function difference is a conservative estimate,
-			 * we also accept all moves that are deteriorating the current solution
-			 * by no more than 5%, assuming the benefit will be made up when making
-			 * the move and realising additional savings from other allocations. 
+			
+			/* Consider what is considered an "acceptable" move, based on the
+			 * objective function evaluation strategy
 			 */
-			if(thisSaving < 0.0*current.objective){
-				LOG.debug("     ==> Improving move: ");
+			double acceptanceLevel = 0.0;
+			switch (OBJECTIVE_FUNCTION_STRATEGY) {
+			case 1:
+				/* The objective function difference is calculated exactly. The
+				 * default acceptance level of zero holds. Only truly improving
+				 * moves are accepted. */
+				break;
+				
+			case 2:
+				/* Since the objective function difference is a conservative 
+				 * estimate, we also accept all moves that are deteriorating the 
+				 * current solution by no more than 5%, assuming the benefit 
+				 * will be made up when making the move and realising additional 
+				 * savings from other allocations. 
+				 */
+				acceptanceLevel = 0.05*current.objective;
+				break;
+				
+			default:
+				throw new IllegalArgumentException("Cannot interpret " + OBJECTIVE_FUNCTION_STRATEGY + " as a valid objective function strategy.");
+			}
+			
+			if(thisSaving < acceptanceLevel){
+//				LOG.debug("     ==> Improving move: ");
 				found = true;
 				newCurrent = current.copy();
 				newCurrent.makeMove(thisMove.getFirst(), thisMove.getSecond());
@@ -651,7 +688,7 @@ public class SAString {
 				/* Check if the deteriorating move will be accepted. */
 				double random = Math.random();
 				double threshold = Math.exp((- thisSaving) / temperature);
-				LOG.debug("     ==> Probability of selecting deteriorating move: " + threshold);
+//				LOG.debug("     ==> Probability of selecting deteriorating move: " + threshold);
 				if(random <= threshold){
 					found = true;
 					newCurrent = current.copy();
@@ -668,11 +705,11 @@ public class SAString {
 	
 	
 	
-	private Solution generateInitialSolution(int numberOfSites){
+	private Solution generateRandomInitialSolution(int numberOfSites){
 		/* Throw an error if the maximum number of required sites are less than 
 		 * the number of fixed sites that MUST be included in the solution. */
 		if(numberOfSites < this.fixedSites.size()){
-			LOG.error("The number of fixed sites exceeds the required number of sites. Aborting algorithm.");
+			LOG.error("The number of compulsory fixed sites exceeds the required number of sites. Aborting algorithm.");
 			throw new IllegalArgumentException();
 		}
 		
@@ -692,7 +729,6 @@ public class SAString {
 			}
 			nextInt++;
 		}
-		
 		return new Solution(chosenSites);
 	}
 	
@@ -738,6 +774,23 @@ public class SAString {
 		return new Solution(initial);
 	}
 	
+	
+	private double evaluatePartialSolution(List<Id> sites){
+		double sum = 0.0;
+		for(Id demandPoint : this.demandPoints){
+			double closestDistance = Double.POSITIVE_INFINITY;
+			for(Id siteId : sites){
+				double thisDistance = this.distanceMatrix.getEntry(demandPoint, siteId).getValue();
+				if(thisDistance < closestDistance){
+					closestDistance = thisDistance;
+				}
+			}
+			sum += closestDistance;
+		}
+		return sum;
+	}
+	
+	
 	private Solution generateDemandDrivenInitialSolution(int numberOfSites){
 		LOG.info("Generating demand-driven initial solution.");
 		List<Id> initial = new ArrayList<Id>(numberOfSites);
@@ -768,22 +821,6 @@ public class SAString {
 		
 		LOG.info("Demand-driven initial solution generated.");
 		return new Solution(initial);
-	}
-	
-
-	private double evaluatePartialSolution(List<Id> sites){
-		double sum = 0.0;
-		for(Id demandPoint : this.demandPoints){
-			double closestDistance = Double.POSITIVE_INFINITY;
-			for(Id siteId : sites){
-				double thisDistance = this.distanceMatrix.getEntry(demandPoint, siteId).getValue();
-				if(thisDistance < closestDistance){
-					closestDistance = thisDistance;
-				}
-			}
-			sum += closestDistance;
-		}
-		return sum;
 	}
 	
 		
