@@ -154,6 +154,10 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
 		vehicles.put(veh.getId(), (QVehicle) veh);
 		QLinkInternalI qlink = network.getNetsimLinks().get(startLinkId);
+		if ( qlink==null ) {
+			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network.  Possible vehicles "
+					+ "or activities or facilities are registered to a different network.") ;
+		}
 		qlink.addParkedVehicle(veh);
 	}
 
