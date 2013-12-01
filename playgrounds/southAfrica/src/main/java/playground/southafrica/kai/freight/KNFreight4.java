@@ -90,13 +90,18 @@ public class KNFreight4 {
 	//	private static final String VEHTYPES = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/vehicleTypes.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT+"/scenarioFromWiki/algorithm.xml" ;
 
-	private static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_CleanV7.xml.gz"  ;
 //	private static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_FullV7.xml.gz"  ;
+//	private static final String NETFILENAME = MATSIM_SA + "data/areas/nmbm/network/NMBM_Network_CleanV7.xml.gz"  ;
+	private static final String NETFILENAME = QVH_FREIGHT + "network/merged-network-simplified.xml.gz" ;
 	
-	private static final String VEHTYPES = QVH_FREIGHT + "myGridSim/vehicleTypes.xml" ;
+//	private static final String VEHTYPES = QVH_FREIGHT + "myGridSim/vehicleTypes.xml" ;
+	private static final String VEHTYPES = "/Users/nagel/freight-kairuns/inputs/kai/vehicleTypes.xml" ;
 
-	private static final String CARRIERS = QVH_FREIGHT + "myGridSim/carrier.xml" ;
+//	private static final String CARRIERS = QVH_FREIGHT + "myGridSim/carrier.xml" ;
 //	private static final String CARRIERS = "/Users/nagel/freight-kairuns/one-truck/carriers.xml.gz" ;
+//	private static final String CARRIERS = "/Users/nagel/freight-kairuns/inputs/2013-11-30-08h54/carrier.xml" ;
+	private static final String CARRIERS = "/Users/nagel/freight-kairuns/inputs/kai/carrier.xml" ;
+
 
 	private static final String ALGORITHM = QVH_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
@@ -105,7 +110,7 @@ public class KNFreight4 {
 	
 	private static final boolean addingCongestion = false ;
 
-	private static final boolean usingWithinDayReScheduling = false;
+	private static final boolean usingWithinDayReScheduling = false ;
 
 	public static void main(String[] args) {
 		
@@ -119,7 +124,7 @@ public class KNFreight4 {
 			System.out.println( "args[0]:" + args[0] );
 			config.controler().setOutputDirectory( args[0]+"/" );
 		}
-		config.controler().setLastIteration(500);
+		config.controler().setLastIteration(0);
 		
 		config.network().setInputFile(NETFILENAME);
 		if ( addingCongestion ) {
