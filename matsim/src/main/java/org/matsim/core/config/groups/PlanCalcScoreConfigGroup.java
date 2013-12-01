@@ -146,6 +146,16 @@ public class PlanCalcScoreConfigGroup extends Module {
 	
 	private static final String USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION = "usingOldScoringBelowZeroUtilityDuration" ;
 	private boolean usingOldScoringBelowZeroUtilityDuration = false ;
+
+	/**
+	 * can't set this from outside java since for the time being it is not useful there. kai, dec'13
+	 */
+	private boolean memorizingExperiencedPlans = false ;
+
+	/**
+	 * This is the key for customizable.  where should this go?
+	 */
+	public static final String EXPERIENCED_PLAN_KEY = "experiencedPlan";
 	
 	// ---
 
@@ -791,6 +801,14 @@ public boolean isUsingOldScoringBelowZeroUtilityDuration() {
 
 public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
 	this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
+}
+
+public boolean isMemorizingExperiencedPlans() {
+	return this.memorizingExperiencedPlans ;
+}
+
+public void setMemorizingExperiencedPlans(boolean memorizingExperiencedPlans) {
+	this.memorizingExperiencedPlans = memorizingExperiencedPlans;
 }
 
 }
