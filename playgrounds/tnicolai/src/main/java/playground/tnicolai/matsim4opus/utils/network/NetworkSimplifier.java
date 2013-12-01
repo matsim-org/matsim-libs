@@ -53,7 +53,6 @@ public class NetworkSimplifier {
 	private boolean mergeLinkStats = false;
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
-	@SuppressWarnings("deprecation")
 	public void run(final Network network) {
 
 		if(this.nodeTopoToMerge.size() == 0){
@@ -163,7 +162,7 @@ public class NetworkSimplifier {
 	 * @param nodeTypesToMerge A Set of integer indicating the node types as specified by {@link NetworkCalcTopoType}
 	 * @see NetworkCalcTopoType NetworkCalcTopoType for a list of available classifications.
 	 */
-	public void setNodesToMerge(Set<Integer> nodeTypesToMerge){
+	public void setNodeTypesToMerge(Set<Integer> nodeTypesToMerge){
 		this.nodeTopoToMerge.addAll(nodeTypesToMerge);
 	}
 
@@ -208,7 +207,7 @@ public class NetworkSimplifier {
 		new MatsimNetworkReader(scenario).readFile("/Users/thomas/Downloads/belgiumResidential.xml.gz");
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
-		nsimply.setNodesToMerge(nodeTypesToMerge);
+		nsimply.setNodeTypesToMerge(nodeTypesToMerge);
 		nsimply.setMergeLinkStats(false); //default = false
 		nsimply.run(network);
 

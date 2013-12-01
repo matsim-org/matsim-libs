@@ -85,7 +85,7 @@ public class OSM2MATSimNetworkV2 {
 		Set<Integer> nodeTypess2merge = new HashSet<Integer>();
 		nodeTypess2merge.add(new Integer(4));
 		nodeTypess2merge.add(new Integer(5));
-		simplifier.setNodesToMerge(nodeTypess2merge);
+		simplifier.setNodeTypesToMerge(nodeTypess2merge);
 		simplifier.run(network);
 		new NetworkWriter(network).write(OUTFILE.split(".xml")[0]
 				+ "_clean_simple.xml.gz");
