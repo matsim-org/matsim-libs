@@ -53,7 +53,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @deprecated this is just a way to keep old code running,
  * and should by no means be used in new code.
  */
-@Deprecated
+@Deprecated // use TripRouter instead. kai, dec'13 
 public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	private final LeastCostPathCalculator routeAlgo;
 	private final LeastCostPathCalculator routeAlgoPtFreeFlow;
@@ -62,6 +62,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	private final PopulationFactory populationFactory;
 	private final PlanRouter planRouter;
 
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public static double handleLeg(TripRouter tripRouter, final Person person,
 			final Leg leg, final Activity fromAct, final Activity toAct,
 			final double depTime) {
@@ -89,6 +90,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 				tripLeg.getTravelTime();
 	}
 
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public PlanRouterAdapter(
 			final PlanRouter planRouter,
 			final LeastCostPathCalculator routeAlgo,
@@ -104,6 +106,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 		this.planRouter = planRouter;
 	}
 
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public PlanRouterAdapter(
 			final Controler controler) {
 		this.planRouter = new PlanRouter(
@@ -126,6 +129,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 		this.routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 	}
 
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public PlanRouterAdapter(
 			final PlanRouter planRouter,
 			final Network network,
@@ -146,14 +150,17 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	}
 
 
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public final LeastCostPathCalculator getLeastCostPathCalculator(){
 		return this.routeAlgo;
 	}
 
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public final LeastCostPathCalculator getPtFreeflowLeastCostPathCalculator(){
 		return this.routeAlgoPtFreeFlow;
 	}
 
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public final void addLegHandler(
 			final String transportMode,
 			final LegRouter legHandler) {
@@ -166,6 +173,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	}
 
 	@Override
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public void run(final Person person) {
 		for (Plan plan : person.getPlans()) {
 			run( plan);
@@ -173,6 +181,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	}
 
 	@Override
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public void run(final Plan plan) {
 		planRouter.run( plan );
 	}
@@ -185,6 +194,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	 * @param depTime the time (seconds from midnight) the leg starts
 	 * @return the estimated travel time for this leg
 	 */
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public double handleLeg(
 			final Person person,
 			final Leg leg,
@@ -195,6 +205,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 		return handleLeg(tripRouter, person, leg, fromAct, toAct, depTime);
 	}
 
+	@Deprecated // use TripRouter instead. kai, dec'13 
 	public ModeRouteFactory getRouteFactory() {
 		return routeFactory;
 	}

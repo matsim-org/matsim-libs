@@ -33,6 +33,8 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
+import org.apache.log4j.Logger;
+
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
 /**
@@ -40,6 +42,7 @@ import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
  *
  */
 public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFactory {
+	private static final Logger log = Logger.getLogger(ConfigurableTravelDisutilityFactory.class ) ;
 
 	private final Scenario scenario;
 	
@@ -50,6 +53,12 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 	private ScoringFunctionFactory scoringFunctionFactory = null ;
 	private RoadPricingScheme scheme = null ;
 	private double sigma = 0. ;
+
+	private UtilityOfTtimeI externalUott;
+
+	private UtilityOfDistanceI externalUod;
+
+	private UtilityOfMoneyI externalUom;
 
 	public void setRandomness( double val ) {
 		this.sigma = val ;
@@ -81,17 +90,25 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 	
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, final PlanCalcScoreConfigGroup cnScoringGroup) {
-		if ( (this.uom==null || this.uod==null || this.uott==null ) && this.scoringFunctionFactory != null ) { 
+		log.warn( "calling createTravelDisutility" ) ;
+		if ( (this.externalUom==null || this.externalUod==null || this.externalUott==null ) && this.scoringFunctionFactory != null ) { 
 			EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
-			if ( this.uom==null ) {
+			if ( this.externalUom==null ) {
 				this.uom = muc ; // works because muc fulfills _all_ the interfaces.  Maybe not so nice.
+			} else {
+				this.uom = this.externalUom ;
 			}
-			if ( this.uod==null ) {
+			if ( this.externalUom==null ) {
 				this.uod=muc ;
+			} else {
+				this.uod = this.externalUod ;
 			}
-			if ( this.uott==null ) {
+			if ( this.externalUom==null ) {
 				this.uott=muc ;
+			} else {
+				this.uott = this.externalUott ;
 			}
+			// yyyy the above is all not well tested. kai, dec'13
 		}
 		final UtilityOfMoneyI localUom = this.uom ; // (generating final variable for anonymous class)
 		
@@ -178,15 +195,15 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 	}
 
 	public void setUom(UtilityOfMoneyI uom) {
-		this.uom = uom;
+		this.externalUom = uom;
 	}
 
 	public void setUod(UtilityOfDistanceI uod) {
-		this.uod = uod;
+		this.externalUod = uod;
 	}
 
 	public void setUott(UtilityOfTtimeI uott) {
-		this.uott = uott;
+		this.externalUott = uott;
 	}
 
 }

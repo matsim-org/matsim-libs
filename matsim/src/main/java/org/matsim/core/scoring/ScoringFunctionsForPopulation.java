@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -152,6 +153,18 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			out.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	@Deprecated // this is not (yet?) for public use.  kai, dec'13
+	public void memorizeExperiencedPlans() {
+		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
+			Plan experiencedPlan = agentRecords.get( person.getId() ) ;
+			if ( experiencedPlan==null ) {
+				throw new RuntimeException("experienced plan is null; I don't think this should happen") ;
+			}
+			Plan selectedPlan = person.getSelectedPlan() ;
+			selectedPlan.getCustomAttributes().put(PlanCalcScoreConfigGroup.EXPERIENCED_PLAN_KEY, experiencedPlan ) ;
 		}
 	}
 

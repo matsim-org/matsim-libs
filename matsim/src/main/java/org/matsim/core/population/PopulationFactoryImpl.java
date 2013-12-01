@@ -83,9 +83,13 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	public Activity createActivityFromFacilityIdAndSetCoordAndLinkId(final String actType, final Id facilityId) {
 		ActivityImpl act = new ActivityImpl(actType);
 		act.setFacilityId(facilityId);
+
 		final ActivityFacility activityFacility = this.scenario.getActivityFacilities().getFacilities().get( facilityId);
 		act.setCoord( activityFacility.getCoord() ) ;
 		act.setLinkId( activityFacility.getLinkId() ) ;
+		// yyyyyy I am pretty sure that this is something we had decided to avoid: containers should not depend on each other.
+		// kai, dec'13
+		
 		return act;
 	}
 

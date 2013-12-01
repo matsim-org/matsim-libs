@@ -730,6 +730,8 @@ public class Controler extends AbstractController {
 
 	// Not sure if necessary. Perhaps try to unwind, directly calling
 	// createTravelDisutilityCalculator instead? michaz
+	// or the other way round: provide the factory, but not createTravelDisutilityCalculator.  To me, providing the factory seems more
+	// lightweight, since otherwise people will once more pass the Controler around just to have access to the create method. kai, dec'13
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.travelCostCalculatorFactory;
 	}

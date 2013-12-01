@@ -293,4 +293,8 @@ public class EventsToScore implements BasicEventHandler {
 		scoringFunctionsForPopulation.writeExperiencedPlans(iterationFilename);
 	}
 
+	public void memorizeExperiencedPlans() {
+		scoringFunctionsForPopulation.memorizeExperiencedPlans() ;
+	}
+
 }

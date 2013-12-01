@@ -71,6 +71,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	}
 
 	@Override
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public void startActivity(final double time, final Activity act) {
 		assert act != null;
 		this.currentActivity = act;
@@ -78,6 +79,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	}
 
 	@Override
+	@Deprecated // preferably use SumScoringFunction.  kai, oct'13
 	public void endActivity(final double time, final Activity act) {
 		assert act != null;
 		assert currentActivity == null || currentActivity.getType().equals(act.getType());

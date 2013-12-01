@@ -44,10 +44,10 @@ import org.apache.log4j.Logger ;
 final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 	static private final Logger log = Logger.getLogger(MyPlanSelectorForRemoval.class);
 	
-	private static final double sameActTypeReward = 1;
-	private static final double sameLocationReward = 1;
-	private static final double sameRouteReward = 1;
-	private static final double sameModeReward = 1;
+	private static final double sameActTypePenalty = 5;
+	private static final double sameLocationPenalty = 5;
+	private static final double sameRoutePenalty = 5;
+	private static final double samePenalty = 5;
 	private final Network network;
 	
 	public MyPlanSelectorForRemoval( Network network ) {
@@ -134,7 +134,7 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 		{
 			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
 			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, stageActivities) ;
-			simil += PopulationUtils.calculateSimilarity(activities1, activities2, sameActTypeReward, sameLocationReward) ;
+			simil += PopulationUtils.calculateSimilarity(activities1, activities2, sameActTypePenalty, sameLocationPenalty) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
 			}
@@ -142,7 +142,7 @@ final class MyPlanSelectorForRemoval extends AbstractPlanSelector {
 		{
 			List<Leg> legs1 = TripStructureUtils.getLegs(plan1 ) ;
 			List<Leg> legs2 = TripStructureUtils.getLegs(plan2 ) ;
-			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, sameModeReward, sameRouteReward ) ;
+			simil += PopulationUtils.calculateSimilarity(legs1, legs2, network, samePenalty, sameRoutePenalty ) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;
 			}

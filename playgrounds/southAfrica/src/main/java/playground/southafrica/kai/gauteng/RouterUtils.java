@@ -31,10 +31,13 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.misc.PopulationUtils;
 
 /**
  * @author nagel
@@ -43,6 +46,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class RouterUtils {
 	private static Logger log = Logger.getLogger( RouterUtils.class );
 	
+	private static int cnt = 0 ;
 	public static EffectiveMarginalUtilitiesContainer createMarginalUtilitiesContainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
 		// yy one might want to make the following replaceable. kai, oct'13
 		log.warn("running ..."); 
@@ -71,7 +75,7 @@ public class RouterUtils {
 		double mVTTSMIN = Double.POSITIVE_INFINITY ;
 		double mVTDSMIN = Double.POSITIVE_INFINITY ;
 		
-		final double DEPARTURE = 7.5*3600., DELTA_TRIPTIME = 100. , DELTA_DISTANCE = 100. * 1000. ;
+		final double DEPARTURE = 7.5*3600., DELTA_TRIPTIME = 10. /*seconds*/, DELTA_DISTANCE = 100./*meters*/  ;
 		
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 
@@ -82,6 +86,16 @@ public class RouterUtils {
 			 * yy would be even better to play back the experienced plan
 			 */
 			double typicalDuration = scenario.getConfig().planCalcScore().getActivityParams( firstAct.getType() ).getTypicalDuration() ;
+			final Plan experiencedPlan = (Plan) person.getSelectedPlan().getCustomAttributes().get( PlanCalcScoreConfigGroup.EXPERIENCED_PLAN_KEY );
+			if ( experiencedPlan != null ) {
+				if ( cnt < 1 ) {
+					cnt++ ;	
+					log.warn( "using an experienced plan ... ") ;
+				}
+				StageActivityTypes stageActivities = null ; // yyyy should be set to something meaningful
+				List<Activity> activities = PopulationUtils.getActivities(experiencedPlan, stageActivities ) ;
+				typicalDuration = activities.get(1).getEndTime() - activities.get(1).getStartTime() ; 
+			}
 
 			double triptime=0, distance=0 ;
 			for ( int ii=0 ; ii<N_TESTS ; ii++ ) {

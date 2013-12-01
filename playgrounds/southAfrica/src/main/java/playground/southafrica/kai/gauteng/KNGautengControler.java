@@ -66,7 +66,7 @@ public class KNGautengControler {
 
 	final static String MATSIM_SA_TRUNK = "/Users/nagel/ie-calvin/MATSim-SA/trunk/";
 	final static String SANRAL2010 = MATSIM_SA_TRUNK + "data/sanral2010/" ;
-	final static String outputDirectoryName = "/Users/nagel/kairuns/output3/";
+	final static String outputDirectoryName = "/Users/nagel/kairuns/output2/";
 	
 	static enum Case {equil,gauteng} ;
 	static final Case ccc = Case.gauteng ;
@@ -87,7 +87,7 @@ public class KNGautengControler {
 			config.controler().setWriteSnapshotsInterval(0);
 			config.controler().setWritePlansInterval(100);
 			
-//			config.global().setRandomSeed(4713);
+			config.global().setRandomSeed(4713);
 			
 			double sampleFactor = 1. ;
 			switch( ccc ) {
@@ -115,7 +115,10 @@ public class KNGautengControler {
 			case gauteng:
 				// === sanral scenario start ===
 				config.network().setInputFile(SANRAL2010 + "network/gautengNetwork_CleanV2.xml.gz");
-				config.plans().setInputFile(SANRAL2010 + "plans/car-com-bus-taxi-ext_plans_2009_1pct-with-routesV0.xml.gz") ;
+//				config.plans().setInputFile(SANRAL2010 + "plans/car-com-bus-taxi-ext_plans_2009_1pct-with-routesV0.xml.gz") ;
+				config.plans().setInputFile("/Users/nagel/gauteng-kairuns/runs/2013-11-30-14h50/output_plans.xml.gz") ;
+
+				
 				config.roadpricing().setTollLinksFile(SANRAL2010 + "toll/gauteng_toll_joint_weekday_02.xml" );
 				sampleFactor = 0.01 ;
 				config.counts().setCountsFileName("/Users/nagel/ie-calvin/MATSim-SA/trunk/data/sanral2010/counts/2007/Counts_Wednesday_Total.xml.gz");
@@ -143,9 +146,10 @@ public class KNGautengControler {
 			// 4 instead of 1 reduces replanning times from about 100sec to about 70sec
 			// I have not taken measurements with "2" but the computer is difficult to use with it.
 			
-			config.parallelEventHandling().setNumberOfThreads(1); 
+//			config.parallelEventHandling().setNumberOfThreads(1); 
 			// using this (with 1) reduces jdeqsim times from about 29sec to about 19sec
 			// This does not seem as bad as the replanning.  Let's leave it for the time being.
+			// I think it is also bad, it just does not last that long.
 			
 			// strategy:
 			{
@@ -240,22 +244,25 @@ public class KNGautengControler {
 		// === CONTROLER: ===
 
 		final Controler controler = new Controler( scenario ) ;
-		controler.setOverwriteFiles(true) ;
+//		controler.setOverwriteFiles(true) ;
 
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing class):
 		// insert into scoring:
 		controler.addControlerListener( new GenerationOfMoneyEvents( scenario.getNetwork(), scenario.getPopulation(), scheme, tollFactor) ) ;
 		controler.setScoringFunctionFactory( scoringFunctionFactory );
 
-		// insert into routing:
-		config.planCalcScore().setMarginalUtilityOfMoney(0.01);
-		System.err.println( "setting UoM in config to 0.01!!!");
+		double mUTTS_hr = config.planCalcScore().getPerforming_utils_hr() - config.planCalcScore().getTraveling_utils_hr() ;
+		config.planCalcScore().setMarginalUtilityOfMoney( mUTTS_hr / baseValueOfTime_h );
+		System.err.println( "setting UoM in config to: " + config.planCalcScore().getMarginalUtilityOfMoney() );
 		
+//		config.planCalcScore().setMemorizingExperiencedPlans(true);
+		
+		// insert into routing:
 		final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( scenario );
 		travelDisutilityFactory.setRoadPricingScheme(scheme);
 //		travelDisutilityFactory.setUom(personSpecificUtilityOfMoney);
 //		travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory);
-		travelDisutilityFactory.setRandomness(1.);
+		travelDisutilityFactory.setRandomness(10.);
 		controler.setTravelDisutilityFactory( travelDisutilityFactory );
 		
 //		// plans removal:

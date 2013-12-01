@@ -86,8 +86,12 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 			this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
 		}
 		this.travelDistanceStats.addIteration(event.getIteration(), eventsToScore.getAgentRecords());
+		if ( sc.getConfig().planCalcScore().isMemorizingExperiencedPlans() ) {
+			this.eventsToScore.memorizeExperiencedPlans() ;
+		}
 	}
 
+	@Override
 	public void notifyShutdown(ShutdownEvent controlerShudownEvent) {
 		travelDistanceStats.close();
 	}
