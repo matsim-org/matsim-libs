@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.router.TimeAndSpaceTourRouter;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
@@ -35,7 +35,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author sschroeder
  *
  */
-public class ReRouteVehicles implements CarrierReplanningStrategyModule{
+public class ReRouteVehicles implements GenericPlanStrategyModule<CarrierPlan>{
 
 	@SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(ReRouteVehicles.class);

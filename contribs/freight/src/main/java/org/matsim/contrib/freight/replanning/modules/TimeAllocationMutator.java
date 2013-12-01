@@ -23,15 +23,15 @@ import java.util.Collection;
 
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 
 /**
  * @author nagel
  *
  */
-public class TimeAllocationMutator implements CarrierReplanningStrategyModule {
+public class TimeAllocationMutator implements GenericPlanStrategyModule<CarrierPlan> {
 
 	@Override
 	public void handlePlan(CarrierPlan carrierPlan) {

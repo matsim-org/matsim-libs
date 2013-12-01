@@ -19,17 +19,15 @@
 
 package playground.southafrica.kai.freight;
 
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.router.TimeAndSpaceTourRouter;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 
 import util.Solutions;
 import algorithms.SchrimpfFactory;
@@ -44,7 +42,7 @@ import basics.VehicleRoutingProblemSolution;
  * @author nagel
  *
  */
-public class SolvePickupAndDeliveryProblem implements CarrierReplanningStrategyModule{
+public class SolvePickupAndDeliveryProblem implements GenericPlanStrategyModule<CarrierPlan>{
 
 	@SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(SolvePickupAndDeliveryProblem.class);

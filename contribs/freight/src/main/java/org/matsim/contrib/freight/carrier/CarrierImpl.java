@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
@@ -138,9 +137,24 @@ public class CarrierImpl implements Carrier {
 
 	@Override
 	public CarrierPlan createCopyOfSelectedPlanAndMakeSelected() {
-		CarrierPlan newPlan = CarrierReplanningStrategy.copyPlan(this.selectedPlan) ;
+		CarrierPlan newPlan = CarrierImpl.copyPlan(this.selectedPlan) ;
 		this.setSelectedPlan( newPlan ) ;
 		return newPlan ;
+	}
+
+	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
+		List<ScheduledTour> tours = new ArrayList<ScheduledTour>();
+		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
+			double depTime = sTour.getDeparture();
+			CarrierVehicle vehicle = sTour.getVehicle();
+			Tour tour = sTour.getTour().duplicate();
+			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
+		}
+		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
+		double initialScoreOfCopiedPlan = plan2copy.getScore();
+		copiedPlan.setScore(initialScoreOfCopiedPlan);
+		return copiedPlan;
+	
 	}
 
 }
