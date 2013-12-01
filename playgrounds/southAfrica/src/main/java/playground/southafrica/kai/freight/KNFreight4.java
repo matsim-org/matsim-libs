@@ -248,7 +248,7 @@ public class KNFreight4 {
 	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario) {
 			return new CarrierPlanStrategyManagerFactory() {
 				@Override
-				public MatsimManager createStrategyManager(Controler controler) {
+				public GenericStrategyManager<CarrierPlan> createStrategyManager(Controler controler) {
 					TravelTime travelTimes = controler.getLinkTravelTimes() ;
 					TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 							travelTimes , scenario.getConfig().planCalcScore() );

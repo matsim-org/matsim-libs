@@ -9,15 +9,16 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
 import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
-import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.util.TravelTime;
 
 import util.Solutions;
 import algorithms.VehicleRoutingAlgorithms;
-import analysis.AlgorithmSearchProgressChartListener;
 import basics.VehicleRoutingAlgorithm;
 import basics.VehicleRoutingProblem;
 import basics.VehicleRoutingProblemSolution;
@@ -41,10 +42,11 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 		this.travelTimes = travelTimes;
 	}
 
-	public CarrierReplanningStrategy createStrategy(){
-		CarrierReplanningStrategy replanningStrat = new CarrierReplanningStrategy(new SelectBestPlan());
+	public GenericPlanStrategy<CarrierPlan> createStrategy(){
+//		CarrierReplanningStrategy replanningStrat = new CarrierReplanningStrategy(new SelectBestPlan());
+		GenericPlanStrategyImpl<CarrierPlan> replanningStrat = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
 		
-		CarrierReplanningStrategyModule vraModule = new CarrierReplanningStrategyModule() {
+		GenericPlanStrategyModule<CarrierPlan> vraModule = new GenericPlanStrategyModule<CarrierPlan>() {
 			
 			@Override
 			public void handlePlan(CarrierPlan carrierPlan) {
@@ -134,7 +136,7 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 		
 		};
 	
-		replanningStrat.addModule(vraModule);
+		replanningStrat.addStrategyModule(vraModule) ;
 		return replanningStrat;
 	}
 

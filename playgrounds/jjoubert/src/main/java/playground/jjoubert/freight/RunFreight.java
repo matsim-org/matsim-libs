@@ -21,18 +21,20 @@ package playground.jjoubert.freight;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
-import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -77,23 +79,24 @@ final class RunFreight {
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new CarrierPlanStrategyManagerFactory() {
 
 			@Override
-			public CarrierReplanningStrategyManager createStrategyManager(
+			public GenericStrategyManager<CarrierPlan> createStrategyManager(
 					Controler controler) {
 
-				CarrierReplanningStrategyManager strategyManager = new CarrierReplanningStrategyManager();
+				GenericStrategyManager<CarrierPlan> strategyManager = new GenericStrategyManager<CarrierPlan>() ;
 
 				/* Create a basic ReRouting module. */
 				TravelTime travelTime = controler.getLinkTravelTimes();
 				TravelDisutility travelCost = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(travelTime, config.planCalcScore());
-				CarrierReplanningStrategy rerouteStrategy = new CarrierReplanningStrategy(new SelectBestPlan());
+				GenericPlanStrategyImpl<CarrierPlan> rerouteStrategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>()) ;
+
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
-				CarrierReplanningStrategyModule rerouteModule = new ReRouteVehicles(router , scenario.getNetwork(), travelTime);
-				rerouteStrategy.addModule(rerouteModule);
-				strategyManager.addStrategy(rerouteStrategy, 0.1);
+				GenericPlanStrategyModule<CarrierPlan> rerouteModule = new ReRouteVehicles(router , scenario.getNetwork(), travelTime);
+				rerouteStrategy.addStrategyModule( rerouteModule );
+				strategyManager.addStrategy(rerouteStrategy, null, 0.1);
 
 				/* Alternative: do nothing, but select best plan. */
-				CarrierReplanningStrategy selectBestStrategy = new CarrierReplanningStrategy(new SelectBestPlan());
-				strategyManager.addStrategy(selectBestStrategy, 0.9);
+				GenericPlanStrategy<CarrierPlan> selectBestStrategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+				strategyManager.addStrategy(selectBestStrategy, null, 0.9);
 
 				return strategyManager;
 			}

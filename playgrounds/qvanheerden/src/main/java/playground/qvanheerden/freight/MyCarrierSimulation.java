@@ -11,20 +11,18 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
-import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
-import org.matsim.core.api.internal.MatsimManager;
+import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -37,12 +35,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.southafrica.kai.freight.SolvePickupAndDeliveryProblem;
 import playground.southafrica.utilities.Header;
-import util.Solutions;
-import basics.VehicleRoutingAlgorithm;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblemSolution;
 
 
 public class MyCarrierSimulation {
@@ -135,30 +128,38 @@ public class MyCarrierSimulation {
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			@Override
-			public MatsimManager createStrategyManager(Controler controler) {
+			public GenericStrategyManager<CarrierPlan> createStrategyManager(Controler controler) {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
 				TravelDisutility travelCosts = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
 						travelTimes , config.planCalcScore() );
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
 						travelCosts, travelTimes) ;
-				CarrierReplanningStrategyManager manager = new CarrierReplanningStrategyManager() ;
-				{
-					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-					CarrierReplanningStrategyModule module = new ReRouteVehicles(router, scenario.getNetwork(), travelTimes) ;
-					strategy.addModule(module);
-					manager.addStrategy(strategy, 1.0);
+				GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
+				{	
+					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new RandomPlanSelector<CarrierPlan>()) ;
+					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
+					strategy.addStrategyModule(module);
+					mgr.addStrategy(strategy, null, 1.);
+//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
+					// you should add the above line. kai
 				}
 				{
-					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-					CarrierReplanningStrategyModule module = new SolvePickupAndDeliveryProblem(scenario.getNetwork()) ;
-					strategy.addModule(module) ;
-					manager.addStrategy(strategy,0) ;
+					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+					GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
+					strategy.addStrategyModule(module);
+					mgr.addStrategy(strategy, null, 0. );
+//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
+					// you should add the above line. kai
 				}
 				{
-					CarrierReplanningStrategy strategy = new CarrierReplanningStrategy( new SelectBestPlan() ) ;
-					manager.addStrategy( strategy, 0 ) ;
+					// the strategy to solve the pickup-and-delivery problem during the iterations is gone for the time being.  enough other
+					// things to figure out, I think.  kai 
 				}
-				return manager;
+				{
+					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+					mgr.addStrategy( strategy, null, 0.01 ) ;
+				}
+				return mgr ;
 			}
 		};
 		return stratManFactory;

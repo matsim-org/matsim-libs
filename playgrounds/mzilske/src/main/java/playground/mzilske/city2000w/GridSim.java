@@ -23,16 +23,18 @@ import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategy;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyModule;
-import org.matsim.contrib.freight.replanning.selectors.SelectBestPlan;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -185,14 +187,18 @@ public class GridSim {
 		CarrierScoringFunctionFactory scoringFunctionFactory = defineAndCreateScoringFunction(carriers, scenario.getNetwork());
 		
 		//define replanning strategy
-		final CarrierReplanningStrategyManager strategyManager = new CarrierReplanningStrategyManager();
-		CarrierReplanningStrategy vra = defineAndCreateVehicleRoutingAlgorithm(scenario.getNetwork(),vehicleTypes);
-		strategyManager.addStrategy(vra, 1.0);
+//		final CarrierReplanningStrategyManager strategyManager = new CarrierReplanningStrategyManager();
+//		CarrierReplanningStrategy vra = defineAndCreateVehicleRoutingAlgorithm(scenario.getNetwork(),vehicleTypes);
+//		strategyManager.addStrategy(vra, 1.0);
+		
+		final GenericStrategyManager<CarrierPlan> strategyManager = new GenericStrategyManager<CarrierPlan>() ;
+		GenericPlanStrategy<CarrierPlan> vra = defineAndCreateVehicleRoutingAlgorithm( scenario.getNetwork(), vehicleTypes ) ;
+		strategyManager.addStrategy( vra, null, 1.0 ) ;
 		
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new CarrierPlanStrategyManagerFactory() {
 			
 			@Override
-			public MatsimManager createStrategyManager(Controler controler) {
+			public GenericStrategyManager<CarrierPlan> createStrategyManager(Controler controler) {
 				return strategyManager;
 			}
 		};
@@ -207,10 +213,10 @@ public class GridSim {
 		matsimController.run();
 	}
 
-	private static CarrierReplanningStrategy defineAndCreateVehicleRoutingAlgorithm(final Network network, final CarrierVehicleTypes vehicleTypes) {
-		CarrierReplanningStrategy vra = new CarrierReplanningStrategy(new SelectBestPlan());
+	private static GenericPlanStrategy<CarrierPlan> defineAndCreateVehicleRoutingAlgorithm(final Network network, final CarrierVehicleTypes vehicleTypes) {
+		GenericPlanStrategyImpl<CarrierPlan> vra = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ; 
 		
-		CarrierReplanningStrategyModule vraModule = new CarrierReplanningStrategyModule() {
+		GenericPlanStrategyModule<CarrierPlan> vraModule = new GenericPlanStrategyModule<CarrierPlan>() {
 			
 			@Override
 			public void handlePlan(CarrierPlan carrierPlan) {
@@ -266,7 +272,7 @@ public class GridSim {
 		
 		};
 		
-		vra.addModule(vraModule);
+		vra.addStrategyModule( vraModule ) ;
 		return vra;
 	}
 

@@ -43,8 +43,6 @@ import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
-import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -166,19 +164,19 @@ ReplanningListener, IterationEndsListener {
 		if(carrierPlanStrategyManagerFactory == null){
 			return;
 		}
-		MatsimManager strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager(event.getControler());
+		GenericStrategyManager<CarrierPlan> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager(event.getControler());
 
-		if ( strategyManager instanceof CarrierReplanningStrategyManager ) {
-			CarrierReplanningStrategyManager mgr = (CarrierReplanningStrategyManager) strategyManager ;
-
-			for (Carrier carrier : carriers.getCarriers().values()) {
-				if (carrier.getSelectedPlan() == null) {
-					logger.warn("carrier cannot replan since no selected plan is available");
-					continue;
-				}
-				mgr.nextStrategy(event.getIteration()).run(carrier);
-			}
-		} else if ( strategyManager instanceof GenericStrategyManager<?>) {
+//		if ( strategyManager instanceof CarrierReplanningStrategyManager ) {
+//			CarrierReplanningStrategyManager mgr = (CarrierReplanningStrategyManager) strategyManager ;
+//
+//			for (Carrier carrier : carriers.getCarriers().values()) {
+//				if (carrier.getSelectedPlan() == null) {
+//					logger.warn("carrier cannot replan since no selected plan is available");
+//					continue;
+//				}
+//				mgr.nextStrategy(event.getIteration()).run(carrier);
+//			}
+//		} else if ( strategyManager instanceof GenericStrategyManager<?>) {
 			Collection<HasPlansAndId<CarrierPlan>> collection = new ArrayList<HasPlansAndId<CarrierPlan>>() ;
 			for ( Carrier carrier : carriers.getCarriers().values() ) {
 				collection.add(carrier) ;
@@ -186,9 +184,9 @@ ReplanningListener, IterationEndsListener {
 			@SuppressWarnings("unchecked")
 			GenericStrategyManager<CarrierPlan> mgr = (GenericStrategyManager<CarrierPlan>) strategyManager ;
 			mgr.run( collection, null, event.getIteration(), null);
-		} else {
-			throw new RuntimeException("registered strategy manager cannot be cast into one of the accepted types") ;
-		}
+//		} else {
+//			throw new RuntimeException("registered strategy manager cannot be cast into one of the accepted types") ;
+//		}
 
 
 	}

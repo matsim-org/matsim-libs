@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
@@ -13,14 +14,16 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
-import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
-import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.GenericPlanStrategyImpl;
+import org.matsim.core.replanning.GenericStrategyManager;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 
@@ -123,12 +126,24 @@ public class RunPassengerAlongWithCarriers {
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			
 			@Override
-			public MatsimManager createStrategyManager(Controler controler) {
-				final CarrierReplanningStrategyManager strategyManager = new CarrierReplanningStrategyManager();
-				strategyManager.addStrategy(new SelectBestPlanStrategyFactory().createStrategy(), 0.95);
-//				strategyManager.addStrategy(new KeepPlanSelectedStrategyFactory().createStrategy(), 0.8);
-				strategyManager.addStrategy(new SelectBestPlanAndOptimizeItsVehicleRouteFactory(controler.getNetwork(), types, controler.getLinkTravelTimes()).createStrategy(), 0.05);
-				return strategyManager;
+			public GenericStrategyManager<CarrierPlan> createStrategyManager(Controler controler) {
+//				final CarrierReplanningStrategyManager strategyManager = new CarrierReplanningStrategyManager();
+//				strategyManager.addStrategy(new SelectBestPlanStrategyFactory().createStrategy(), 0.95);
+////				strategyManager.addStrategy(new KeepPlanSelectedStrategyFactory().createStrategy(), 0.8);
+//				strategyManager.addStrategy(new SelectBestPlanAndOptimizeItsVehicleRouteFactory(controler.getNetwork(), types, controler.getLinkTravelTimes()).createStrategy(), 0.05);
+//				return strategyManager;
+				
+				final GenericStrategyManager<CarrierPlan> strategyManager = new GenericStrategyManager<CarrierPlan>() ;
+				{
+					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+					strategyManager.addStrategy( strategy, null, 0.95 ) ;
+				}
+				{
+					GenericPlanStrategy<CarrierPlan> strategy = 
+							new SelectBestPlanAndOptimizeItsVehicleRouteFactory(controler.getNetwork(), types, controler.getLinkTravelTimes()).createStrategy() ;
+					strategyManager.addStrategy( strategy, null, 0.05 ) ;
+				}
+				return strategyManager ;
 			}
 		};
 		return stratManFactory;
