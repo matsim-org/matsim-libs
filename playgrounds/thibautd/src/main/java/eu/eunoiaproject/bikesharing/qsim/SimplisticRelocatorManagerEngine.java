@@ -24,14 +24,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.WeakHashMap;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -39,8 +36,11 @@ import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -70,19 +70,29 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 	private final List<SimplisticRelocationAgent> agents = new ArrayList<SimplisticRelocationAgent>();
 	private final List<SimplisticRelocationAgent> idleAgents = new ArrayList<SimplisticRelocationAgent>();
 
-	private final TripRouter tripRouter;
+	private final Network network;
+	private final LeastCostPathCalculator dijkstra;
 	private InternalInterface internalInterface;
+
+	// this is a cache for shortest paths
+	private final Map< Tuple<Id,Id> , Iterable<Id> > cachedRoutes = new WeakHashMap< Tuple<Id, Id> , Iterable<Id> >();
 
 	public SimplisticRelocatorManagerEngine(
 			final int nAgents,
-			final TripRouter tripRouter,
+			final Network network,
 			final BikeSharingManager facilities) {
 		this.nAgents = nAgents;
 		this.facilities = facilities;
 		this.random = MatsimRandom.getLocalInstance();
-		this.tripRouter = tripRouter;
-
 		this.vehicleType = VehicleUtils.getDefaultVehicleType();
+
+		this.network = network;
+		final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
+		this.dijkstra =
+			new Dijkstra(
+					network,
+					tt,
+					tt);
 	}
 
 	@Override
@@ -130,24 +140,38 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 				facilities.getFacilities().values().toArray(
 						new StatefulBikeSharingFacility[ facilities.getFacilities().size() ] )
 							[ random.nextInt( facilities.getFacilities().size() ) ];
-			final List<? extends PlanElement> trip =
-				tripRouter.calcRoute(
-						TransportMode.car,
-						new LinkIdFacility( agent.getCurrentLinkId() ),
-						destinationFacility,
-						time,
-						null );
-			if ( trip.size() != 1 ) throw new RuntimeException( "cannot handle complex car trips" );
-
-			final Route route = ((Leg) trip.get( 0 )).getRoute();
 
 			agent.setNextDestination(
 					destinationFacility,
-					((NetworkRoute) route).getLinkIds() );
+					getRoute(
+						agent.getCurrentLinkId(),
+						destinationFacility.getLinkId() ) );
 
 			// "re-insert" agent in mobsim
 			internalInterface.arrangeNextAgentState( agent );
 		}
+	}
+
+	private Iterable<Id> getRoute( final Id originLinkId , final Id destinationLinkId ) {
+		final Link originLink = network.getLinks().get( originLinkId );
+		final Link destinationLink = network.getLinks().get( destinationLinkId );
+		final Tuple<Id, Id> key = new Tuple<Id, Id>( originLink.getToNode().getId() , destinationLink.getFromNode().getId() );
+
+		final Iterable<Id> cached = cachedRoutes.get( key );
+		if ( cached != null ) return cached;
+
+		final Path path = dijkstra.calcLeastCostPath(
+				originLink.getToNode(),
+				destinationLink.getFromNode(),
+				0,
+				null,
+				null );
+
+		final List<Id> ids = new ArrayList<Id>();
+		for ( Link l : path.links ) ids.add( l.getId() );
+
+		cachedRoutes.put( key , ids );
+		return ids;
 	}
 
 	@Override
@@ -200,32 +224,5 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 		return false;
 	}
 
-	private static class LinkIdFacility implements Facility {
-		private final Id linkId;
-
-		public LinkIdFacility(final Id linkId) {
-			this.linkId = linkId;
-		}
-
-		@Override
-		public Coord getCoord() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Id getId() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Map<String, Object> getCustomAttributes() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Id getLinkId() {
-			return linkId;
-		}
-	}
 }
 

@@ -39,8 +39,7 @@ public class RunBikeSharingSimulationWithSimplisticRelocator {
 		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc ) );
 		controler.setMobsimFactory(
 				new BikeSharingWithSimplisticRelocationQSimFactory(
-					3,
-					controler.getTripRouterFactory() ) );
+					3 ) );
 
 		controler.run();
 	}

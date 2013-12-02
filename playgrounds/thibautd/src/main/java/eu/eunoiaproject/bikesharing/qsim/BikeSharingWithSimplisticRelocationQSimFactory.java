@@ -36,22 +36,17 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-import org.matsim.core.router.TripRouterFactoryInternal;
-
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
 
 /**
  * @author thibautd
  */
 public class BikeSharingWithSimplisticRelocationQSimFactory implements MobsimFactory {
-	private final TripRouterFactoryInternal tripRouterFactory;
 	private final int nVehicles;
 
 	public  BikeSharingWithSimplisticRelocationQSimFactory(
-			final int nVehicles,
-			final TripRouterFactoryInternal tripRouterFactory) {
+			final int nVehicles ) {
 		this.nVehicles = nVehicles;
-		this.tripRouterFactory = tripRouterFactory;
 	}
 
 	@Override
@@ -89,7 +84,7 @@ public class BikeSharingWithSimplisticRelocationQSimFactory implements MobsimFac
 		final SimplisticRelocatorManagerEngine relocatorManager =
 			new SimplisticRelocatorManagerEngine(
 					nVehicles,
-					tripRouterFactory.instantiateAndConfigureTripRouter(),
+					sc.getNetwork(),
 					bikeSharingManager );
 		qSim.addMobsimEngine( relocatorManager );
 		qSim.addActivityHandler( relocatorManager );
