@@ -131,8 +131,18 @@ public class ChoiceSet {
 			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra,
 			int interation) {
 				
-		TreeMap<Double, Id> map = this.createReducedChoiceSetWithScores(actlegIndex, facilities, scoringFunction, plan, 
-				tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra);
+		TreeMap<Double, Id> map;
+		
+		// if we have no destinations defined so far, we can shorten this
+		if (this.destinations.size() > 0) {
+			map = this.createReducedChoiceSetWithScores(actlegIndex, facilities, scoringFunction, plan, 
+					tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra);		
+		} else {
+			// currently handled activity which should be re-located
+			Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
+			Id facilityIdWithLargestScore = act.getFacilityId();
+			map = createEmptyChoiceMap(facilityIdWithLargestScore);
+		}
 				
 		/*  the same seed for every agent????? kai, jan'13
 		 * 
@@ -312,10 +322,17 @@ public class ChoiceSet {
 			 * 
 			 * yyyyyy If facilityIdWithLargestScore is defined, it is also in list and thus in mapCorrected.  No?  kai, feb'13
 			 */
-			TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
-			mapTmp.put(1.1, facilityIdWithLargestScore);
-			return mapTmp;
+//			TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
+//			mapTmp.put(1.1, facilityIdWithLargestScore);
+//			return mapTmp;
+			return createEmptyChoiceMap(facilityIdWithLargestScore);
 		}
+	}
+	
+	private TreeMap<Double, Id> createEmptyChoiceMap(Id facilityIdWithLargestScore) {
+		TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
+		mapTmp.put(1.1, facilityIdWithLargestScore);
+		return mapTmp;
 	}
 	
 	private double getTotalScore(ArrayList<ScoredAlternative> list) {
