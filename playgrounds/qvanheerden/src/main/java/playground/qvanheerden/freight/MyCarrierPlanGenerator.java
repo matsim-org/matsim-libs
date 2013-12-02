@@ -4,6 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Collection;
 
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -24,7 +30,6 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.contrib.freight.utils.Visualiser;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,13 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import algorithms.VehicleRoutingAlgorithms;
-import basics.VehicleRoutingAlgorithm;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblemSolution;
-
 import playground.southafrica.utilities.Header;
-import util.Solutions;
 
 public class MyCarrierPlanGenerator {
 	private final static Logger log = Logger.getLogger(MyCarrierPlanGenerator.class);
@@ -121,7 +120,7 @@ public class MyCarrierPlanGenerator {
 		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, initialPlanAlgorithm);
 		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 		
-		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.getBest(solutions));
+		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf(solutions));
 		NetworkRouter.routePlan(plan, costs);
 		carrier.setSelectedPlan(plan);
 		log.info("Initial plans created...");

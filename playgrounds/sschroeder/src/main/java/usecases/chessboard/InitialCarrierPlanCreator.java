@@ -2,6 +2,13 @@ package usecases.chessboard;
 
 import java.util.Collection;
 
+import jsprit.analysis.toolbox.AlgorithmSearchProgressChartListener;
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -19,14 +26,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import util.Solutions;
-
-import algorithms.VehicleRoutingAlgorithms;
-import analysis.AlgorithmSearchProgressChartListener;
-import basics.VehicleRoutingAlgorithm;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblemSolution;
-
 public class InitialCarrierPlanCreator {
 	
 	private Network network;
@@ -43,10 +42,10 @@ public class InitialCarrierPlanCreator {
 		VehicleRoutingProblem vrp = vrpBuilder.build();
 		
 		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "input/usecases/chessboard/vrpalgo/initialPlanAlgorithm.xml");
-		vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrier.getId()+".png"));
+//		vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrier.getId()+".png"));
 		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 		
-		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.getBest(solutions));
+		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf(solutions));
 		NetworkRouter.routePlan(plan, costs);
 		return plan;
 	}

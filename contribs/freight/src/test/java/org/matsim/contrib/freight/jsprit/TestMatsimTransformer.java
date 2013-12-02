@@ -10,6 +10,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import jsprit.core.problem.job.Service;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.problem.solution.route.VehicleRoute;
+import jsprit.core.problem.vehicle.Vehicle;
+import jsprit.core.problem.vehicle.VehicleImpl;
+import jsprit.core.problem.vehicle.VehicleType;
+import jsprit.core.problem.vehicle.VehicleTypeImpl;
+
 import org.junit.Test;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -21,14 +29,6 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.core.basic.v01.IdImpl;
-
-import basics.Service;
-import basics.VehicleRoutingProblemSolution;
-import basics.route.Vehicle;
-import basics.route.VehicleImpl;
-import basics.route.VehicleRoute;
-import basics.route.VehicleType;
-import basics.route.VehicleTypeImpl;
 
 public class TestMatsimTransformer {
 	
@@ -109,7 +109,7 @@ public class TestMatsimTransformer {
 	@Test
 	public void whenTransforming_jspritService2matsimService_isMadeCorrectly(){
 		Service carrierService = Service.Builder.newInstance("serviceId",50).setLocationId("locationId")
-				.setServiceTime(30.0).setTimeWindow(basics.route.TimeWindow.newInstance(10.0, 20.0)).build();
+				.setServiceTime(30.0).setTimeWindow(jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(10.0, 20.0)).build();
 		
 		CarrierService service = MatsimJspritFactory.createCarrierService(carrierService);
 		assertNotNull(service);

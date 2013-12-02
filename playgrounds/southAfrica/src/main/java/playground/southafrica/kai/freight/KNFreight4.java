@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package playground.southafrica.kai.freight;
 
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -39,7 +45,6 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -67,11 +72,6 @@ import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
-import util.Solutions;
-import basics.VehicleRoutingAlgorithm;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblemSolution;
 
 /**
  * @author nagel
@@ -206,10 +206,10 @@ public class KNFreight4 {
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem problem = vrpBuilder.build() ;
 
-			VehicleRoutingAlgorithm algorithm = algorithms.VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem,ALGORITHM);
+			VehicleRoutingAlgorithm algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem,ALGORITHM);
 			//			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
-			VehicleRoutingProblemSolution solution = Solutions.getBest(algorithm.searchSolutions());
+			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;
 
 			NetworkRouter.routePlan(newPlan,netBasedCosts) ;

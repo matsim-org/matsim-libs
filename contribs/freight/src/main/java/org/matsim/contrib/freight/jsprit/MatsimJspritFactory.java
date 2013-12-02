@@ -16,6 +16,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
+import jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import jsprit.core.problem.cost.VehicleRoutingTransportCosts;
+import jsprit.core.problem.driver.DriverImpl;
+import jsprit.core.problem.job.Service;
+import jsprit.core.problem.job.Service.Builder;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.problem.solution.route.VehicleRoute;
+import jsprit.core.problem.solution.route.activity.PickupService;
+import jsprit.core.problem.solution.route.activity.ServiceActivity;
+import jsprit.core.problem.solution.route.activity.TourActivity;
+import jsprit.core.problem.solution.route.activity.TourActivity.JobActivity;
+import jsprit.core.problem.vehicle.Vehicle;
+import jsprit.core.problem.vehicle.VehicleImpl;
+import jsprit.core.problem.vehicle.VehicleType;
+import jsprit.core.problem.vehicle.VehicleTypeImpl;
+import jsprit.core.util.Coordinate;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,24 +54,6 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.basic.v01.IdImpl;
-
-import util.Coordinate;
-import basics.Service;
-import basics.Service.Builder;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblem.FleetSize;
-import basics.VehicleRoutingProblemSolution;
-import basics.costs.VehicleRoutingActivityCosts;
-import basics.costs.VehicleRoutingTransportCosts;
-import basics.route.End;
-import basics.route.ServiceActivity;
-import basics.route.Start;
-import basics.route.TourActivity;
-import basics.route.Vehicle;
-import basics.route.VehicleImpl;
-import basics.route.VehicleRoute;
-import basics.route.VehicleType;
-import basics.route.VehicleTypeImpl;
 
 
 /**
@@ -79,7 +80,7 @@ public class MatsimJspritFactory {
 	static Service createService(CarrierService carrierService, Coord locationCoord) {
 		Builder serviceBuilder = Service.Builder.newInstance(carrierService.getId().toString(), carrierService.getCapacityDemand());
 		serviceBuilder.setLocationId(carrierService.getLocationLinkId().toString()).setServiceTime(carrierService.getServiceDuration())
-			.setTimeWindow(basics.route.TimeWindow.newInstance(carrierService.getServiceStartTimeWindow().getStart(), carrierService.getServiceStartTimeWindow().getEnd()));
+			.setTimeWindow(jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierService.getServiceStartTimeWindow().getStart(), carrierService.getServiceStartTimeWindow().getEnd()));
 		if(locationCoord != null){
 			serviceBuilder.setCoord(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
 		}
@@ -186,15 +187,15 @@ public class MatsimJspritFactory {
 	 */
 	public static ScheduledTour createTour(VehicleRoute route) {
 		assert route.getDepartureTime() == route.getStart().getEndTime() : "at this point route.getDepartureTime and route.getStart().getEndTime() must be equal";
-		basics.route.TourActivities tour = route.getTourActivities();
+		jsprit.core.problem.solution.route.activity.TourActivities tour = route.getTourActivities();
 		CarrierVehicle carrierVehicle = createCarrierVehicle(route.getVehicle());	
 		double depTime = route.getStart().getEndTime();
  
 		Tour.Builder tourBuilder = Tour.Builder.newInstance();
 		tourBuilder.scheduleStart(makeId(route.getStart().getLocationId()));
 		for (TourActivity act : tour.getActivities()) {
-			if(act instanceof ServiceActivity){
-				Service job = ((ServiceActivity) act).getJob();				 
+			if(act instanceof ServiceActivity || act instanceof PickupService){
+				Service job = (Service) ((JobActivity) act).getJob();				 
 				CarrierService carrierService = createCarrierService(job);
 				tourBuilder.addLeg(new Leg());
 				tourBuilder.scheduleService(carrierService);
@@ -231,25 +232,18 @@ public class MatsimJspritFactory {
 	public static VehicleRoute createRoute(ScheduledTour scheduledTour, Network network){
 		CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 		double depTime = scheduledTour.getDeparture();
-
-		Tour tour = scheduledTour.getTour();
-			
+		Tour tour = scheduledTour.getTour();			
 		Vehicle jspritVehicle = createVehicle(carrierVehicle, findCoord(carrierVehicle.getLocation(), network));
 		
-		Start start = Start.newInstance(tour.getStartLinkId().toString(), carrierVehicle.getEarliestStartTime(), carrierVehicle.getLatestEndTime());
-		start.setEndTime(depTime);
-		End end = End.newInstance(tour.getEndLinkId().toString(), carrierVehicle.getEarliestStartTime(), carrierVehicle.getLatestEndTime());
-		
-		basics.route.VehicleRoute.Builder routeBuilder = VehicleRoute.Builder.newInstance(start, end);
-		routeBuilder.setVehicle(jspritVehicle);
-		
+		jsprit.core.problem.solution.route.VehicleRoute.Builder routeBuilder = VehicleRoute.Builder.newInstance(jspritVehicle, DriverImpl.noDriver());
+		routeBuilder.setDepartureTime(depTime);
+
 		for(TourElement e : tour.getTourElements()){
 			if(e instanceof org.matsim.contrib.freight.carrier.Tour.TourActivity){
 				if(e instanceof org.matsim.contrib.freight.carrier.Tour.ServiceActivity){
 					CarrierService carrierService = ((org.matsim.contrib.freight.carrier.Tour.ServiceActivity) e).getService();
 					Service service = createService(carrierService, findCoord(carrierService.getLocationLinkId(), network));
-					ServiceActivity serviceAct = ServiceActivity.newInstance(service);
-					routeBuilder.addActivity(serviceAct);
+					routeBuilder.addService(service);
 				}
 			}
 		}
@@ -284,9 +278,9 @@ public class MatsimJspritFactory {
 			fleetSize = FleetSize.FINITE;
 			vrpBuilder.setFleetSize(fleetSize);
 		}
-		for(CarrierVehicleType vehicleType : carrierCapabilities.getVehicleTypes()){
-			vrpBuilder.addVehicleType(createVehicleType(vehicleType));
-		}
+//		for(CarrierVehicleType vehicleType : carrierCapabilities.getVehicleTypes()){
+//			vrpBuilder.addVehicleType(createVehicleType(vehicleType));
+//		}
 		for(CarrierVehicle v : carrierCapabilities.getCarrierVehicles()){
 			Coord coordinate = null;
 			if(network != null) {
@@ -309,7 +303,7 @@ public class MatsimJspritFactory {
 				}
 				else log.warn("cannot find linkId " + service.getLocationLinkId());
 			}
-			vrpBuilder.addService(createService(service, coordinate));
+			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
 		for(CarrierShipment s : carrier.getShipments()) throw new IllegalStateException("this is not supported yet.");
@@ -345,9 +339,9 @@ public class MatsimJspritFactory {
 			fleetSize = FleetSize.FINITE;
 			vrpBuilder.setFleetSize(fleetSize);
 		}
-		for(CarrierVehicleType vehicleType : carrierCapabilities.getVehicleTypes()){
-			vrpBuilder.addVehicleType(createVehicleType(vehicleType));
-		}
+//		for(CarrierVehicleType vehicleType : carrierCapabilities.getVehicleTypes()){
+//			vrpBuilder.addVehicleType(createVehicleType(vehicleType));
+//		}
 		for(CarrierVehicle v : carrierCapabilities.getCarrierVehicles()){
 			Coord coordinate = null;
 			if(network != null) {
@@ -367,7 +361,7 @@ public class MatsimJspritFactory {
 				}
 				else coordinate = link.getCoord();
 			}
-			vrpBuilder.addService(createService(service, coordinate));
+			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
 		for(CarrierShipment s : carrier.getShipments()) throw new IllegalStateException("this is not supported yet.");

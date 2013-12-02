@@ -4,6 +4,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import jsprit.analysis.toolbox.SolutionPlotter;
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -23,7 +30,6 @@ import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -31,7 +37,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
@@ -40,13 +45,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
-
-import util.Solutions;
-import algorithms.VehicleRoutingAlgorithms;
-import analysis.SolutionPlotter;
-import basics.VehicleRoutingAlgorithm;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblemSolution;
 
 /**
  * Simple Sim
@@ -245,7 +243,7 @@ public class GridSim {
 				Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 				
 				//get best 
-				VehicleRoutingProblemSolution solution = Solutions.getBest(solutions);
+				VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
 				
 				SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
 				
@@ -311,7 +309,7 @@ public class GridSim {
 			Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 			
 			//get best 
-			VehicleRoutingProblemSolution solution = Solutions.getBest(solutions);
+			VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
 			
 			SolutionPlotter.plotSolutionAsPNG(vrp, solution, "input/freight/sol_"+System.currentTimeMillis()+".png", "sol");
 			

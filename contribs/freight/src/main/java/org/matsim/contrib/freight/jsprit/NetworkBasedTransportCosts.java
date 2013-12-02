@@ -13,11 +13,14 @@
 package org.matsim.contrib.freight.jsprit;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.cost.VehicleRoutingTransportCosts;
+import jsprit.core.problem.driver.Driver;
+import jsprit.core.problem.vehicle.Vehicle;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,14 +36,8 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-
-import basics.VehicleRoutingProblem;
-import basics.costs.VehicleRoutingTransportCosts;
-import basics.route.Driver;
-import basics.route.Vehicle;
 
 /**
  * This calculates transport-times and transport-costs to cover the distance from one location to another. 
@@ -78,7 +75,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		private VehicleType type;
 
-		public MatsimVehicleWrapper(basics.route.Vehicle vehicle) {
+		public MatsimVehicleWrapper(jsprit.core.problem.vehicle.Vehicle vehicle) {
 			this.id = makeId(vehicle.getId());
 			this.type = makeType(vehicle.getType().getTypeId(),vehicle.getType().getMaxVelocity());
 		}

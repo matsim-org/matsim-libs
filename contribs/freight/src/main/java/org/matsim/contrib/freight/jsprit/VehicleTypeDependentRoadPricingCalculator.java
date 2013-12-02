@@ -23,8 +23,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
-import basics.route.VehicleType;
-
 
 /**
  * Calculator that manages and calculates {@link basics.route.VehicleImpl.VehicleType} dependent {@link RoadPricingScheme}.

@@ -19,6 +19,12 @@
 
 package playground.jjoubert.freight;
 
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -36,11 +42,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import util.Solutions;
-import basics.VehicleRoutingAlgorithm;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblemSolution;
 
 public class SetupFreight {
 	static final Logger LOG = Logger.getLogger(SetupFreight.class); 
@@ -83,10 +84,10 @@ public class SetupFreight {
 			VehicleRoutingProblem vrp = vrpBuilder.build();
 			
 			/* Set up the VRP algorithm. */
-			VehicleRoutingAlgorithm algorithm = algorithms.VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, ALGORITHM);
+			VehicleRoutingAlgorithm algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, ALGORITHM);
 			
 			/* Solve the VRP instances, and create a plan from it. */
-			VehicleRoutingProblemSolution solution = Solutions.getBest(algorithm.searchSolutions());
+			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, solution);
 			NetworkRouter.routePlan(carrierPlan, vrpTransportCosts);
 			

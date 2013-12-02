@@ -2,6 +2,16 @@ package usecases.chessboard;
 
 import java.util.Collection;
 
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.cost.VehicleRoutingActivityCosts;
+import jsprit.core.problem.driver.Driver;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.problem.solution.route.activity.TourActivity;
+import jsprit.core.problem.vehicle.Vehicle;
+import jsprit.core.util.Solutions;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -15,16 +25,6 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.util.TravelTime;
-
-import util.Solutions;
-import algorithms.VehicleRoutingAlgorithms;
-import basics.VehicleRoutingAlgorithm;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblemSolution;
-import basics.costs.VehicleRoutingActivityCosts;
-import basics.route.Driver;
-import basics.route.TourActivity;
-import basics.route.Vehicle;
 
 public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 	
@@ -106,7 +106,7 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 				Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
 				
 				//get best 
-				VehicleRoutingProblemSolution solution = Solutions.getBest(solutions);
+				VehicleRoutingProblemSolution solution = Solutions.bestOf(solutions);
 				
 //				SolutionPlotter.plotSolutionAsPNG(vrp, solution, "output/sol_"+System.currentTimeMillis()+".png", "sol");
 				

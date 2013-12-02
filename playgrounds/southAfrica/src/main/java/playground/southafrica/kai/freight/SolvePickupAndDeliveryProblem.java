@@ -19,6 +19,13 @@
 
 package playground.southafrica.kai.freight;
 
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.box.SchrimpfFactory;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.VehicleRoutingProblem.Builder;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -28,13 +35,6 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.router.TimeAndSpaceTourRouter;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
-
-import util.Solutions;
-import algorithms.SchrimpfFactory;
-import basics.VehicleRoutingAlgorithm;
-import basics.VehicleRoutingProblem;
-import basics.VehicleRoutingProblem.Builder;
-import basics.VehicleRoutingProblemSolution;
 
 /**
  * This is an attempt to construct a second strategy which solves the pick-and-delivery problem using jsprig
@@ -79,7 +79,7 @@ public class SolvePickupAndDeliveryProblem implements GenericPlanStrategyModule<
 		VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 		
 		// get multiple jsprit solutions from the algorithm, and get the best one of those:
-		VehicleRoutingProblemSolution solution = Solutions.getBest(algorithm.searchSolutions());
+		VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 		
 		// convert the jsprit solutions back into the matsim data structure
 		CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;
