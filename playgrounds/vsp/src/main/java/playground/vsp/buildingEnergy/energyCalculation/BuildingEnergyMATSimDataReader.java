@@ -84,10 +84,10 @@ class BuildingEnergyMATSimDataReader {
 		this.tmax = tmax;
 	}
 	
-	void run(String net, String plans, String events, String homeType, String workType){
+	void run(String net, String plans, String events, String homeType, String workType, String runId){
 		BuildingEnergyPlansAnalyzer plansAna = new BuildingEnergyPlansAnalyzer(homeType, workType);
 		Scenario sc = prepareScenario(plans, net, plansAna);
-		this.trips = new SimpleTripAnalyzerModule(ConfigUtils.createConfig(), sc.getNetwork(), plansAna.getPopulation());
+		this.trips = new SimpleTripAnalyzerModule(ConfigUtils.createConfig(), sc.getNetwork(), plansAna.getPopulation(), runId);
 		this.trips.preProcessData();
 		log.warn("only persons with work- and home-Activities will be handled!");
 		this.populationStats = plansAna.getStats();

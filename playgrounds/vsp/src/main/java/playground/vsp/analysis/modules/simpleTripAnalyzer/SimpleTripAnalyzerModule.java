@@ -53,11 +53,13 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 	private Population p;
 	private Map<String, Map<Integer, Integer>> dist;
 	private Map<String, Map<Integer, Integer>> tt;
+	private String prefix;
 
-	public SimpleTripAnalyzerModule(Config c, Network net, Population p) {
+	public SimpleTripAnalyzerModule(Config c, Network net, Population p, String prefix) {
 		super("SimpleTripAnalyzer");
 		this.analyzer = new SimpleTripAnalyzer(c, net); 
 		this.p = p;
+		this.prefix = prefix;
 	}
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
@@ -86,9 +88,10 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 
 	@Override
 	public void writeResults(String outputFolder) {
-		analyzer.dumpData(new File(outputFolder).getAbsolutePath() + System.getProperty("file.separator"), null);
-		dumpData(this.dist, new File(outputFolder).getAbsolutePath() + System.getProperty("file.separator") + "distanceShare.csv.gz");
-		dumpData(this.tt, new File(outputFolder).getAbsolutePath() + System.getProperty("file.separator") + "ttShare.csv.gz");
+		String prefix = (this.prefix == null) ? "" : (this.prefix + ".");
+		analyzer.dumpData(new File(outputFolder).getAbsolutePath() + System.getProperty("file.separator"), prefix);
+		dumpData(this.dist, new File(outputFolder).getAbsolutePath() + System.getProperty("file.separator") + prefix + "distanceShare.csv.gz");
+		dumpData(this.tt, new File(outputFolder).getAbsolutePath() + System.getProperty("file.separator") + prefix + "ttShare.csv.gz");
 	}
 	
 	/**

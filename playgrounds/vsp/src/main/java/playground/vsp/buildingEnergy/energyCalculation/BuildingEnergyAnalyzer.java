@@ -153,7 +153,7 @@ public class BuildingEnergyAnalyzer {
 		String networkFile = getNetworkFileName(runId);
 		String eventsFile = getEventsFileName(runId, iter);
 		BuildingEnergyMATSimDataReader reader = new BuildingEnergyMATSimDataReader(timeBins, iter, tMax, actTypes);
-		reader.run(networkFile, plansFile, eventsFile, homeType, workType);
+		reader.run(networkFile, plansFile, eventsFile, homeType, workType, runId);
 		
 		run2type2RawOccupancy.put(runId, reader.getLinkActivityStats());
 		run2PopulationStats.put(runId, reader.getPStats());
