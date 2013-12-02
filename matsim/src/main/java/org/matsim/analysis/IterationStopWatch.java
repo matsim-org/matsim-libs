@@ -51,7 +51,7 @@ public class IterationStopWatch {
 	 * Time spent in operations which are not measured in detail.
 	 */
 	public static final String OPERATION_OTHER = "other";
-	
+
 	/** The current iteration number, or null if not yet initialized. */
 	private Integer iteration = null;
 
@@ -75,7 +75,7 @@ public class IterationStopWatch {
 
 	/** A formatter for dates, used when writing out the data. */
 	private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-	
+
 	/** Creates a new IterationStopWatch. */
 	public IterationStopWatch() {
 		this.iterations = new LinkedHashMap<Integer, Map<String,Long>>();
@@ -83,7 +83,7 @@ public class IterationStopWatch {
 		this.operations = new LinkedList<String>();
 		this.currentIterationValues = null;
 	}
-	
+
 	/**
 	 * Resets the stop watch, deleting all gathered values.
 	 */
@@ -120,11 +120,11 @@ public class IterationStopWatch {
 	 * @param identifier The name of the beginning operation.
 	 */
 	public void beginOperation(final String identifier) {
-		
+
 		if (identifier.equals(OPERATION_OTHER)) {
 			throw new RuntimeException("Identifier " + OPERATION_OTHER + " is reserved! Please use another one. Aborting!");
 		}
-		
+
 		String ident = "BEGIN " + identifier;
 		ensureIdentifier(ident);
 		this.currentIterationValues.put(ident, Long.valueOf(System.currentTimeMillis()));
@@ -159,10 +159,10 @@ public class IterationStopWatch {
 	 * @param filename The name of a file where to write the gathered data.
 	 */
 	public void writeTextFile(final String filename) {
-				
+
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename + ".txt");
-			
+
 			// print header
 			writer.write("Iteration");
 			for (String identifier : this.identifiers) {
@@ -175,7 +175,7 @@ public class IterationStopWatch {
 				writer.write(identifier);
 			}
 			writer.newLine();
-			
+
 			// print data
 			for (Map.Entry<Integer, Map<String, Long>> entry : this.iterations.entrySet()) {
 				Integer iteration = entry.getKey();
@@ -200,7 +200,7 @@ public class IterationStopWatch {
 						writer.write(Time.writeTime(diff));
 					}
 				}
-				
+
 				// finish
 				writer.newLine();
 			}
@@ -218,11 +218,11 @@ public class IterationStopWatch {
 	 * @param filename The name of a file where to write the gathered data.
 	 */
 	public void writeGraphFile(String filename) {
-		
+
 		int iterations = this.iterations.entrySet().size();
 		Map<String, double[]> arrayMap = new HashMap<String, double[]>();
 		for (String identifier : this.operations) arrayMap.put(identifier, new double[iterations]);
-		
+
 		int iter = 0;
 		for (Map<String, Long> data : this.iterations.values()) {
 			// durations of operations
@@ -233,31 +233,31 @@ public class IterationStopWatch {
 					double diff = (endTime.longValue() - startTime.longValue()) / 1000.0;
 					arrayMap.get(identifier)[iter] = diff;
 				} else arrayMap.get(identifier)[iter] = 0.0;
-			}	
+			}
 			iter++;
 		}
-						
-		String title = "Compuation time distribution per iteration";
+
+		String title = "Computation time distribution per iteration";
 		String xAxisLabel = "iteration";
-		String yAxisLabel = "time";
-		
+		String yAxisLabel = "seconds";
+
 		String[] categories = new String[this.iterations.size()];
 		int index = 0;
 		for (int iteration : this.iterations.keySet()) {
 			categories[index] = String.valueOf(iteration);
 			index++;
 		}
-		
+
 		StackedBarChart chart = new StackedBarChart(title, xAxisLabel, yAxisLabel, categories);
 		chart.addMatsimLogo();
-		
+
 		/*
 		 * Rotate x-axis labels by 90° which should allow more of them to be plotted before overlapping.
 		 * However, a more general solution that also is able to skip labels would be nice.
 		 * cdobler nov'13
 		 */
 		chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
-		
+
 		double[] iterationData = null;
 		double[] sumData = new double[iterations];
 		for (String operation : this.operations) {
@@ -279,10 +279,10 @@ public class IterationStopWatch {
 			}
 			chart.addSeries(OPERATION_OTHER, otherData);
 		}
-		
+
 		chart.saveAsPng(filename + ".png", 1024, 768);
 	}
-	
+
 	/**
 	 * Make sure the given identifier exists in our collection. If it is missing, insert it at the correct
 	 * place. "Correct" means that it tries to insert this identifier right after the last-requested identifier.
@@ -305,7 +305,7 @@ public class IterationStopWatch {
 	 *
 	 * @param identifier
 	 */
-	private void ensureOperation(final String identifier) {		
+	private void ensureOperation(final String identifier) {
 		int pos = this.operations.indexOf(identifier);
 		if (pos == -1) {
 			this.operations.add(this.nextOperationPosition, identifier);
