@@ -118,6 +118,8 @@ public class SimplisticRelocationAgent implements MobsimAgent, DriverAgent {
 	public void endLegAndComputeNextState(double now) {
 		destinationLinkId = null;
 		currentRoute = null;
+		// we want the agent to be handled by its manager
+		state = State.ACTIVITY;
 	}
 
 	@Override
