@@ -161,6 +161,7 @@ public class BuildingEnergyAnalyzer {
 			this.links = reader.getLinkIds();
 		}
 		log.info("writing trip-Data for agents of interest.");
+		reader.getTripsAnalysis().postProcessData();
 		reader.getTripsAnalysis().writeResults(outputPath);
 		log.info("finished (writing trip-Data for agents of interest).");
 		log.info("finished (running raw analysis for run " + runId + ", iteration " + iter + ").");

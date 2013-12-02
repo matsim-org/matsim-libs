@@ -351,7 +351,7 @@ class BuildingEnergyMATSimDataReader {
 					// this is not really necessary except for berlin-study and (maybe) it saves some memory
 					Person p = this.population.getFactory().createPerson(person.getId());
 					Plan plan =  this.population.getFactory().createPlan();
-					for(int ii = 0; i < pe.size(); i++){
+					for(int ii = 0; ii < pe.size(); ii++){
 						PlanElement element = pe.get(ii);
 						if(element instanceof Activity){
 							Activity aa = (Activity) element;
