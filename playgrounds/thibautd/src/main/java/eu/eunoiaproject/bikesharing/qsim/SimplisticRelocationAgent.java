@@ -23,8 +23,10 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
@@ -47,9 +49,13 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 
 	private State state = State.LEG;
 
+	private final EventsManager events;
+
 	public SimplisticRelocationAgent(
+			final EventsManager events,
 			final Id id,
 			final Id initialLinkId) {
+		this.events = events;
 		this.id = id;
 		this.currentLinkId = initialLinkId;
 	}
@@ -80,7 +86,8 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 			final Iterable<Id> route) {
 		this.destinationLinkId = destination.getLinkId();
 		this.currentRoute = route.iterator();
-		nextLinkId = null;
+		this.nextLinkId = null;
+		this.state = State.LEG;
 	}
 
 	// ///////////////////////////////////////////////////////////////////////
@@ -121,6 +128,14 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 		currentRoute = null;
 		// we want the agent to be handled by its manager
 		state = State.ACTIVITY;
+
+		// yes, the AGENT is responsible of throwing the arrival event.
+		events.processEvent(
+				new PersonArrivalEvent(
+					now,
+					getId(),
+					getDestinationLinkId(),
+					getMode() ) );
 	}
 
 	@Override
