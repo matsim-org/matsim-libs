@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.WeakHashMap;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -62,6 +64,9 @@ import org.matsim.vehicles.VehicleUtils;
  * @author thibautd
  */
 public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityHandler {
+	private static final Logger log =
+		Logger.getLogger(SimplisticRelocatorManagerEngine.class);
+
 	private final Random random;
 	private final BikeSharingManager facilities;
 	private final VehicleType vehicleType;
@@ -109,6 +114,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 		// for all "idle" (ie non-traveling) agents,
 		// handle the stations at the current link, and depart for a new random station.
 		for ( SimplisticRelocationAgent agent : currentIdleAgents ) {
+			if ( log.isTraceEnabled() ) log.trace( "handling idle agent "+agent.getId()+" at time "+time );
 			// send somewhere
 			final Id linkId = agent.getCurrentLinkId();
 			final Collection<? extends StatefulBikeSharingFacility> originFacilities =
@@ -116,8 +122,11 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 
 			if ( originFacilities != null ) {
 				for ( StatefulBikeSharingFacility facility : originFacilities ) {
+					if ( log.isTraceEnabled() ) log.trace( "handling facility "+facility );
 					final int differenceToDesired = (int)
 						(facility.getNumberOfBikes() - (facility.getCapacity() / 2d) );
+
+					if ( log.isTraceEnabled() ) log.trace( " difference to desired: "+differenceToDesired );
 
 					if ( differenceToDesired < 0 ) {
 						// need for additional bikes at station
@@ -176,6 +185,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 
 	@Override
 	public void onPrepareSim() {
+		if ( log.isTraceEnabled() ) log.trace( "preparing for sim" );
 		final QSim qSim = (QSim) internalInterface.getMobsim();
 
 		// could be done smarter by departing from a bike sharing station.
@@ -190,6 +200,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 
 			final SimplisticRelocationAgent agent =
 				new SimplisticRelocationAgent(
+						internalInterface.getMobsim().getEventsManager(),
 						agentId,
 						linkId );
 
@@ -204,6 +215,8 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 					linkId );
 
 		}
+
+		if ( log.isTraceEnabled() ) log.trace( "idle agents: "+idleAgents );
 	}
 
 	@Override
@@ -217,8 +230,10 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 	@Override
 	public boolean handleActivity(final MobsimAgent agent) {
 		if ( agents.contains( agent ) ) {
+			if ( log.isTraceEnabled() ) log.trace( "make agent"+agent.getId()+" idle " );
 			// "catch" our agents to "remove" them temporarily from the simulation
 			idleAgents.add( (SimplisticRelocationAgent) agent );
+			if ( log.isTraceEnabled() ) log.trace( "idle agents: "+idleAgents );
 			return true;
 		}
 		return false;
