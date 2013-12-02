@@ -124,24 +124,74 @@ public class TestMatsimTransformer {
 	}
 	
 	@Test
-	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_itIsMadeCorrectly(){
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_routeStartMustBe15(){
 		ScheduledTour sTour = getMatsimServiceTour();
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
-		
+		assertEquals(15.0, route.getStart().getEndTime(),0.01);
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_routeAndVehicleMustNotBeNull(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertNotNull(route);
 		assertNotNull(route.getVehicle());
-		
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_vehicleMustHaveTheCorrectId(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertEquals("matsimVehicle", route.getVehicle().getId());
-		assertEquals(15.0, route.getStart().getEndTime(),0.01);
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_earliestStartMustBe10(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertEquals(10.0, route.getStart().getTheoreticalEarliestOperationStartTime(),0.01);
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_latestStartMustBe20(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertEquals(20.0, route.getStart().getTheoreticalLatestOperationStartTime(),0.01);
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_earliestEndMustBe10(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertEquals(10.0, route.getEnd().getTheoreticalEarliestOperationStartTime(),0.01);
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_latestEndMustBe20(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertEquals(20.0, route.getEnd().getTheoreticalLatestOperationStartTime(),0.01);
-		
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_sizeOfTourMustBe2(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertEquals(2,route.getTourActivities().getActivities().size());
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_firstActIdMustBeCorrect(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertEquals("to1",route.getTourActivities().getActivities().get(0).getLocationId());
+	}
+	
+	@Test
+	public void whenTransforming_matsimScheduledTourWithServiceAct2vehicleRoute_secondActIdMustBeCorrect(){
+		ScheduledTour sTour = getMatsimServiceTour();
+		VehicleRoute route = MatsimJspritFactory.createRoute(sTour,null);
 		assertEquals("to2",route.getTourActivities().getActivities().get(1).getLocationId());
-		
 	}
 	
 	@Test
