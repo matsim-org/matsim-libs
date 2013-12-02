@@ -22,13 +22,16 @@ package eu.eunoiaproject.bikesharing.qsim;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -119,7 +122,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 			final List<? extends PlanElement> trip =
 				tripRouter.calcRoute(
 						TransportMode.car,
-						null,
+						new LinkIdFacility( agent.getCurrentLinkId() ),
 						destinationFacility,
 						time,
 						null );
@@ -184,6 +187,34 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 			return true;
 		}
 		return false;
+	}
+
+	private static class LinkIdFacility implements Facility {
+		private final Id linkId;
+
+		public LinkIdFacility(final Id linkId) {
+			this.linkId = linkId;
+		}
+
+		@Override
+		public Coord getCoord() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Id getId() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Map<String, Object> getCustomAttributes() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Id getLinkId() {
+			return linkId;
+		}
 	}
 }
 
