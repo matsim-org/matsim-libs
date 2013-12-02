@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -34,6 +35,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -42,13 +44,16 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
+import playground.vsp.analysis.modules.simpleTripAnalyzer.SimpleTripAnalyzerModule;
 import playground.vsp.buildingEnergy.linkOccupancy.LinkActivityOccupancyCounter;
 
 /**
@@ -67,6 +72,7 @@ class BuildingEnergyMATSimDataReader {
 	private HashMap<String, LinkOccupancyStats> type2OccupancyStats;
 	private PopulationStats populationStats;
 	private ArrayList<Id> links;
+	private SimpleTripAnalyzerModule trips;
 
 	BuildingEnergyMATSimDataReader(List<Integer> timeBins,
 							double td,
@@ -80,14 +86,21 @@ class BuildingEnergyMATSimDataReader {
 	
 	void run(String net, String plans, String events, String homeType, String workType){
 		BuildingEnergyPlansAnalyzer plansAna = new BuildingEnergyPlansAnalyzer(homeType, workType);
-		prepareScenario(plans, net, plansAna);
+		Scenario sc = prepareScenario(plans, net, plansAna);
+		this.trips = new SimpleTripAnalyzerModule(ConfigUtils.createConfig(), sc.getNetwork(), plansAna.getPopulation());
+		this.trips.preProcessData();
 		log.warn("only persons with work- and home-Activities will be handled!");
 		this.populationStats = plansAna.getStats();
 		this.type2OccupancyStats = new HashMap<String, LinkOccupancyStats>();
 		for(String s: activityTypes){
 			this.type2OccupancyStats.put(s, initOccupancyCounter(s, plansAna.getPopulation()));
 		}
-		parseEvents(events, homeType);
+		parseEvents(events, homeType, trips);
+		this.trips.postProcessData();
+	}
+	
+	SimpleTripAnalyzerModule getTripsAnalysis(){
+		return trips;
 	}
 	
 	PopulationStats getPStats(){
@@ -104,8 +117,9 @@ class BuildingEnergyMATSimDataReader {
 	
 	/**
 	 * @param events
+	 * @param trips 
 	 */
-	private void parseEvents(String events, String homeType) {
+	private void parseEvents(String events, String homeType, SimpleTripAnalyzerModule trips) {
 		EventsManager manager = EventsUtils.createEventsManager();
 		// create a filter and add the handler 
 		EventsFilter filter = new EventsFilter(this.populationStats.getHomeAndWorkAgentIds(), homeType);
@@ -114,7 +128,11 @@ class BuildingEnergyMATSimDataReader {
 				filter.addCounter(laoc);
 			}
 		}
+		
 		manager.addHandler(filter);
+		for(EventHandler handler :trips.getEventHandler()){
+			manager.addHandler(handler);
+		}
 		//handle events via filter
 		new MatsimEventsReader(manager).readFile(events);
 		//finish handler
@@ -221,7 +239,7 @@ class BuildingEnergyMATSimDataReader {
 	 * @param plansAna 
 	 * @return
 	 */
-	private void prepareScenario(String plansFile, String networkFile, BuildingEnergyPlansAnalyzer plansAna) {
+	private Scenario prepareScenario(String plansFile, String networkFile, BuildingEnergyPlansAnalyzer plansAna) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		plansAna.setPopulation(new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		new MatsimNetworkReader(sc).readFile(networkFile);
@@ -235,6 +253,7 @@ class BuildingEnergyMATSimDataReader {
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
 		new MatsimPopulationReader(sc).readFile(plansFile);
 		log.info("resulting population contains " + plansAna.getPopulation().getPersons().size() + " persons.");
+		return sc;
 	}
 
 	/**
@@ -329,19 +348,30 @@ class BuildingEnergyMATSimDataReader {
 				}
 				// we know everything we need to know, return
 				if(home && work){
-					// this is not really necessary but saves memory
+					// this is not really necessary except for berlin-study and (maybe) it saves some memory
 					Person p = this.population.getFactory().createPerson(person.getId());
 					Plan plan =  this.population.getFactory().createPlan();
-					Activity aa = (Activity) pe.get(0);
-					// this is a "hack", necessary for the berlin-scenario...
-					if(aa.getType().equals("not specified") && BuildingEnergyAnalyzer.berlin){
-						aa = this.population.getFactory().createActivityFromLinkId(homeType, aa.getLinkId());
-						if(warn){
-							log.warn("modifying activitytypes for berlin-scenario. Thrown only once...");
-							warn = false;
+					for(int ii = 0; i < pe.size(); i++){
+						PlanElement element = pe.get(ii);
+						if(element instanceof Activity){
+							Activity aa = (Activity) element;
+							// this is a "hack", necessary for the berlin-scenario...
+							if(aa.getType().equals("not specified") && BuildingEnergyAnalyzer.berlin){
+								Coord c = aa.getCoord();
+								aa = this.population.getFactory().createActivityFromLinkId(homeType, aa.getLinkId());
+								((ActivityImpl)aa).setCoord(c);
+								if(warn){
+									log.warn("modifying activitytypes for berlin-scenario. Thrown only once...");
+									warn = false;
+								}
+							}
+							plan.addActivity(aa);
+						}else{
+							Leg l = (Leg) element;
+							l = this.population.getFactory().createLeg(l.getMode());
+							plan.addLeg(l);
 						}
 					}
-					plan.addActivity(aa);
 					p.addPlan(plan);
 					this.population.addPerson(p);
 					this.home.remove(person.getId());

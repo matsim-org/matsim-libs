@@ -148,7 +148,7 @@ class BuildingEnergyAnalyzerMain {
 		OfficeEnergyConsumptionRuleImpl(double td, double baseLoadPerPerson, double additionalLoadPerPerson, double someCoefficient) {
 			this.td = td;
 			this.baseLoad = baseLoadPerPerson;
-			this. additional = additionalLoadPerPerson;
+			this.additional = additionalLoadPerPerson;
 			this.someCoefficient = someCoefficient;
 		}
 		

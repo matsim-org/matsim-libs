@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
+import playground.vsp.analysis.modules.simpleTripAnalyzer.SimpleTripAnalyzerModule;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyActivityProbabilityCalculator.ActivityProbabilities;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyAggregatedEnergyConsumptionCalculator.EnergyConsumption;
 import playground.vsp.buildingEnergy.energyCalculation.BuildingEnergyConsumptionRule.BuildingEnergyConsumptionRuleFactory;
@@ -153,11 +154,15 @@ public class BuildingEnergyAnalyzer {
 		String eventsFile = getEventsFileName(runId, iter);
 		BuildingEnergyMATSimDataReader reader = new BuildingEnergyMATSimDataReader(timeBins, iter, tMax, actTypes);
 		reader.run(networkFile, plansFile, eventsFile, homeType, workType);
+		
 		run2type2RawOccupancy.put(runId, reader.getLinkActivityStats());
 		run2PopulationStats.put(runId, reader.getPStats());
 		if(this.links == null){
 			this.links = reader.getLinkIds();
 		}
+		log.info("writing trip-Data for agents of interest.");
+		reader.getTripsAnalysis().writeResults(outputPath + runId);
+		log.info("finished (writing trip-Data for agents of interest).");
 		log.info("finished (running raw analysis for run " + runId + ", iteration " + iter + ").");
 	}
 
