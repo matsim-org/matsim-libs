@@ -22,7 +22,6 @@ package eu.eunoiaproject.bikesharing.qsim;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -36,7 +35,6 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
@@ -58,19 +56,9 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		// Get number of parallel Threads
-		final int numOfThreads = conf.getNumberOfThreads();
-		final QNetsimEngineFactory netsimEngFactory =
-			numOfThreads > 1 ?
-				new ParallelQNetsimEngineFactory() :
-				new DefaultQSimEngineFactory();
-
+		final QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
 	
-		final QSim qSim = new QSim(
-				sc,
-				numOfThreads > 1 ?
-					new SynchronizedEventsManagerImpl( eventsManager ) :
-					eventsManager );
+		final QSim qSim = new QSim( sc, eventsManager );
 
 		final ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
