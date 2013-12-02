@@ -19,10 +19,14 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.run;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 
 import eu.eunoiaproject.bikesharing.qsim.BikeSharingWithSimplisticRelocationQSimFactory;
+import eu.eunoiaproject.bikesharing.qsim.SimplisticRelocatorManagerEngine;
 import eu.eunoiaproject.bikesharing.router.BikeSharingTripRouterFactory;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingScenarioUtils;
 
@@ -36,10 +40,11 @@ public class RunBikeSharingSimulationWithSimplisticRelocator {
 		final Scenario sc = BikeSharingScenarioUtils.loadScenario( configFile );
 		final Controler controler = new Controler( sc );
 
+		if ( false ) Logger.getLogger( SimplisticRelocatorManagerEngine.class ).setLevel( Level.TRACE );
 		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc ) );
 		controler.setMobsimFactory(
 				new BikeSharingWithSimplisticRelocationQSimFactory(
-					3 ) );
+					10 ) );
 
 		controler.run();
 	}
