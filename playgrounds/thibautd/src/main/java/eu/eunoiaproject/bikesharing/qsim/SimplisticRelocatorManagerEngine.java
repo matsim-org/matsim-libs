@@ -87,31 +87,42 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 
 	@Override
 	public void doSimStep(final double time) {
+
+		// we need to reset the list of idle agents now,
+		// because of the stuff that can happen at calls
+		// to arrangeAgentNextStep
+		final List<SimplisticRelocationAgent> currentIdleAgents = 
+			new ArrayList<SimplisticRelocationAgent>(
+					idleAgents );
+		idleAgents.clear();
+
 		// for all "idle" (ie non-traveling) agents,
 		// handle the stations at the current link, and depart for a new random station.
-		for ( SimplisticRelocationAgent agent : idleAgents ) {
+		for ( SimplisticRelocationAgent agent : currentIdleAgents ) {
 			// send somewhere
 			final Id linkId = agent.getCurrentLinkId();
 			final Collection<? extends StatefulBikeSharingFacility> originFacilities =
 				facilities.getFacilitiesAtLinks().get( linkId );
 
-			for ( StatefulBikeSharingFacility facility : originFacilities ) {
-				final int differenceToDesired = (int)
-					(facility.getNumberOfBikes() - (facility.getCapacity() / 2d) );
+			if ( originFacilities != null ) {
+				for ( StatefulBikeSharingFacility facility : originFacilities ) {
+					final int differenceToDesired = (int)
+						(facility.getNumberOfBikes() - (facility.getCapacity() / 2d) );
 
-				if ( differenceToDesired < 0 ) {
-					// need for additional bikes at station
-					final int unLoaded = agent.unloadBikes( -differenceToDesired );
-					facilities.putBikes(
-							facility.getId(),
-							unLoaded );
-				}
-				if ( differenceToDesired > 0 ) {
-					// take bikes from station and load them in truck
-					facilities.takeBikes(
-							facility.getId(),
-							differenceToDesired );
-					agent.loadBikes( differenceToDesired );
+					if ( differenceToDesired < 0 ) {
+						// need for additional bikes at station
+						final int unLoaded = agent.unloadBikes( -differenceToDesired );
+						facilities.putBikes(
+								facility.getId(),
+								unLoaded );
+					}
+					if ( differenceToDesired > 0 ) {
+						// take bikes from station and load them in truck
+						facilities.takeBikes(
+								facility.getId(),
+								differenceToDesired );
+						agent.loadBikes( differenceToDesired );
+					}
 				}
 			}
 

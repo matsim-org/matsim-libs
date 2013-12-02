@@ -39,8 +39,9 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 
 	private final Id id;
 
-	private Id currentLinkId;
-	private Id destinationLinkId;
+	private Id currentLinkId = null;
+	private Id destinationLinkId = null;
+	private Id nextLinkId = null;
 	private Iterator<Id> currentRoute = null;
 	private int load = 0;
 
@@ -79,6 +80,7 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 			final Iterable<Id> route) {
 		this.destinationLinkId = destination.getLinkId();
 		this.currentRoute = route.iterator();
+		nextLinkId = null;
 	}
 
 	// ///////////////////////////////////////////////////////////////////////
@@ -160,12 +162,23 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 
 	@Override
 	public Id chooseNextLinkId() {
-		return currentRoute.next();
+		assert destinationLinkId != null;
+		if ( currentLinkId.equals( destinationLinkId ) ) return null;
+		while ( nextLinkId == null || nextLinkId.equals( currentLinkId ) ) {
+			nextLinkId = currentRoute.hasNext() ? currentRoute.next() : destinationLinkId;
+		}
+
+		return nextLinkId;
 	}
 
 	@Override
 	public void notifyMoveOverNode(final Id newLinkId) {
+		if ( !newLinkId.equals( nextLinkId ) ) {
+			throw new RuntimeException( "unexpected next link "+newLinkId+": expected "+nextLinkId  );
+		}
+
 		this.currentLinkId = newLinkId;
+		this.nextLinkId = null;
 	}
 }
 
