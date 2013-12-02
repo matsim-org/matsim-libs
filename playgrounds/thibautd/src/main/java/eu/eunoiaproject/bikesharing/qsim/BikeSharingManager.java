@@ -20,6 +20,7 @@
 package eu.eunoiaproject.bikesharing.qsim;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,6 +33,8 @@ import eu.eunoiaproject.bikesharing.qsim.BikeSharingManager.BikeSharingManagerLi
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacility;
 
+import playground.thibautd.utils.MapUtils;
+
 /**
  * Class responsible for adding and removing bikes from bike sharing facilities,
  * and notifying anybody is interested.
@@ -39,6 +42,7 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacility;
  */
 public class BikeSharingManager {
 	private final Map<Id, MutableStatefulBikeSharingFacility> facilities;
+	private final Map<Id, List<MutableStatefulBikeSharingFacility>> facilitiesAtLinks;
 	private final CompositeListener listener = new CompositeListener();
 
 	public BikeSharingManager( final BikeSharingFacilities input ) {
@@ -46,8 +50,19 @@ public class BikeSharingManager {
 			new LinkedHashMap<Id, MutableStatefulBikeSharingFacility>();
 		this.facilities = Collections.unmodifiableMap( map );
 
+		final Map<Id, List<MutableStatefulBikeSharingFacility>> linkMap =
+			new LinkedHashMap<Id, List<MutableStatefulBikeSharingFacility>>();
+		this.facilitiesAtLinks = Collections.unmodifiableMap( linkMap );
+
+
 		for ( BikeSharingFacility f : input.getFacilities().values() ) {
-			map.put( f.getId() , new MutableStatefulBikeSharingFacility( f ) );
+			final MutableStatefulBikeSharingFacility facility =
+				new MutableStatefulBikeSharingFacility( f );
+			map.put( f.getId() , facility );
+			MapUtils.getList(
+					f.getLinkId(),
+					linkMap ).add(
+						facility );
 		}
 	}
 
@@ -57,6 +72,10 @@ public class BikeSharingManager {
 
 	public Map<Id, ? extends StatefulBikeSharingFacility> getFacilities() {
 		return facilities;
+	}
+
+	public Map<Id, ? extends Collection< ? extends StatefulBikeSharingFacility >> getFacilitiesAtLinks() {
+		return facilitiesAtLinks;
 	}
 
 	public void takeBike( final Id facility ) {
