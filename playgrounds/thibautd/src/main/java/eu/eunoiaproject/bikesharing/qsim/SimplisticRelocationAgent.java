@@ -25,8 +25,7 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacility;
@@ -34,7 +33,7 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacility;
 /**
  * @author thibautd
  */
-public class SimplisticRelocationAgent implements MobsimAgent, DriverAgent {
+public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgent, DriverAgent*/ {
 	private static final Logger log =
 		Logger.getLogger(SimplisticRelocationAgent.class);
 
