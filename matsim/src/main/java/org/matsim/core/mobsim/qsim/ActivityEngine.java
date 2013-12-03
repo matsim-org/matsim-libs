@@ -36,7 +36,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	/**
 	 * Agents cannot be added directly to the activityEndsList since that would
-	 * not be thread-safe when within-day replanning is used. There, an agent's 
+	 * not be thread-safe when within-day replanning is used. There, an agent's
 	 * activity end time can be modified. As a result, the agent is located at
 	 * the wrong position in the activityEndsList until it is updated by using
 	 * rescheduleActivityEnd(...). However, if another agent is added to the list
@@ -56,7 +56,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
 	 */
-	private Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<AgentEntry>(500, new Comparator<AgentEntry>() {
+	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<AgentEntry>(500, new Comparator<AgentEntry>() {
 
 		@Override
 		public int compare(AgentEntry arg0, AgentEntry arg1) {
@@ -65,7 +65,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				// Both depart at the same time -> let the one with the larger id be first (=smaller)
 				//
 				// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
-				// to say that the agent with the larger ID should be "smaller" one in the comparison. 
+				// to say that the agent with the larger ID should be "smaller" one in the comparison.
 				// In practice, it seems
 				// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
 				// It is unclear why this convention is supposed to be helpful.
@@ -88,12 +88,11 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	@Override
 	public void doSimStep(double time) {
 		while (activityEndsList.peek() != null) {
-			MobsimAgent agent = activityEndsList.peek().agent;
 			if (activityEndsList.peek().activityEndTime <= time) {
-				activityEndsList.poll();
+				MobsimAgent agent = activityEndsList.poll().agent;
 				unregisterAgentAtActivityLocation(agent);
 				agent.endActivityAndComputeNextState(time);
-				internalInterface.arrangeNextAgentState(agent) ;
+				internalInterface.arrangeNextAgentState(agent);
 			} else {
 				return;
 			}
@@ -105,7 +104,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (AgentEntry entry : activityEndsList) {
 			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
-				// since we are at an activity, it is not plausible to assume that the agents know mode or destination 
+				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
 				EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));
@@ -114,6 +113,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		activityEndsList.clear();
 	}
 
+	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 	}
@@ -132,17 +132,17 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		} else {
 			// The agent commences an activity on this link.
 			activityEndsList.add(new AgentEntry(agent, agent.getActivityEndTime()));
-			internalInterface.registerAdditionalAgentOnLink(agent);			
+			internalInterface.registerAdditionalAgentOnLink(agent);
 		}
 		return true;
 	}
 
 	/**
-	 * For within-day replanning. Tells this engine that the activityEndTime the agent reports may have changed since 
+	 * For within-day replanning. Tells this engine that the activityEndTime the agent reports may have changed since
 	 * the agent was added to this engine through handleActivity.
 	 * May be merged with handleActivity, since this engine can know by itself if it was called the first time
 	 * or not.
-	 * 
+	 *
 	 * @param agent The agent.
 	 */
 	void rescheduleActivityEnd(final MobsimAgent agent) {
@@ -158,7 +158,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				// re-activate the agent
 				activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 				internalInterface.registerAdditionalAgentOnLink(agent);
-				((AgentCounter) internalInterface.getMobsim().getAgentCounter()).incLiving();				
+				((AgentCounter) internalInterface.getMobsim().getAgentCounter()).incLiving();
 			}
 		} else if (newActivityEndTime == Double.POSITIVE_INFINITY) {
 			/*
