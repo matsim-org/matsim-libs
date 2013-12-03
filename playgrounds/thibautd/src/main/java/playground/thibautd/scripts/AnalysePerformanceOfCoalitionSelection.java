@@ -63,7 +63,7 @@ public class AnalysePerformanceOfCoalitionSelection {
 		writer.write( SEP );
 		writer.write( "max_plans_per_size" );
 		writer.write( SEP );
-		writer.write( "duration_ms" );
+		writer.write( "duration_ns" );
 
 		final CoalitionSelector selector = new CoalitionSelector();
 
@@ -82,9 +82,9 @@ public class AnalysePerformanceOfCoalitionSelection {
 						groupSize,
 						maxPlansPerSize );
 
-			final long start = System.currentTimeMillis();
+			final long start = System.nanoTime();
 			selector.selectPlans( jps , group );
-			final long end = System.currentTimeMillis();
+			final long end = System.nanoTime();
 
 			writer.newLine();
 			writer.write( ""+groupSize );
