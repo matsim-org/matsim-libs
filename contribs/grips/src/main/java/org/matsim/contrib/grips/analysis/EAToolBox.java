@@ -96,7 +96,7 @@ public class EAToolBox extends AbstractToolBox
 	private Scenario sc;
 	private String configFile;
 	private Polygon areaPolygon;
-	private double cellSize = 200;
+	private double cellSize = 10;
 	private AbstractDataPanel graphPanel;
 	private JPanel controlPanel;
 	private JButton calcButton;
@@ -111,7 +111,7 @@ public class EAToolBox extends AbstractToolBox
 	private Mode mode = Mode.EVACUATION;
 	private KeyPanel keyPanel;
 	private JLabel gridSizeLabel;
-	private String cellSizeText = " cell size: ";
+	private String cellSizeText = " number of cells: ";
 	private boolean useCalculateButton = false;
 	private GeotoolsTransformation ctInverse;
 	
@@ -203,8 +203,8 @@ public class EAToolBox extends AbstractToolBox
 
 		JPanel gridSizeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		gridSizeSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		this.gridSizeSlider = new JSlider(SwingConstants.HORIZONTAL, 100, 600, (int) this.cellSize);
-		this.gridSizeSlider.setMinorTickSpacing(20);
+		this.gridSizeSlider = new JSlider(SwingConstants.HORIZONTAL, 10, 100, (int) this.cellSize);
+//		this.gridSizeSlider.setMinorTickSpacing(2);
 		this.gridSizeSlider.setPaintTicks(true);
 		this.gridSizeSlider.setSnapToTicks(true);
 		this.gridSizeSlider.addChangeListener(new ChangeListener()
@@ -213,7 +213,7 @@ public class EAToolBox extends AbstractToolBox
 			public void stateChanged(ChangeEvent e)
 			{
 				int value = ((JSlider) (e.getSource())).getValue();
-				value = value - (value % 20);
+//				value = value - (value % 10);
 				updateCellSize(value);
 			}
 		});
@@ -226,7 +226,6 @@ public class EAToolBox extends AbstractToolBox
 				if (!useCalculateButton)
 				{
 					int value = ((JSlider) (arg0.getSource())).getValue();
-					value = value - (value % 20);
 					updateCellSize(value);
 //					
 					EAToolBox.this.module.runCalculation();
@@ -256,7 +255,7 @@ public class EAToolBox extends AbstractToolBox
 
 		this.gridSizeSlider.setPreferredSize(new Dimension(220, 24));
 
-		gridSizeLabel = new JLabel(cellSizeText + "200m ", SwingConstants.RIGHT);
+		gridSizeLabel = new JLabel(cellSizeText + "10 ", SwingConstants.RIGHT);
 		gridSizeSelectionPanel.add(gridSizeLabel);
 		gridSizeSelectionPanel.add(this.gridSizeSlider);
 
@@ -375,7 +374,8 @@ public class EAToolBox extends AbstractToolBox
 	protected void updateCellSize(int value)
 	{
 		this.cellSize = (double)value;
-		this.gridSizeLabel.setText(cellSizeText + value + "m* ");
+		this.gridSizeLabel.setText(cellSizeText + value + " ");
+//		this.gridSizeLabel.setText(cellSizeText + value + "m* ");
 		this.module.setGridSize(value);
 
 	}

@@ -47,7 +47,7 @@ import org.matsim.contrib.grips.model.imagecontainer.BufferedImageContainer;
 import org.matsim.contrib.grips.populationselector.PopulationAreaSelector;
 import org.matsim.contrib.grips.roadclosureseditor.RoadClosuresEditor;
 import org.matsim.contrib.grips.scenariogenerator.MatsimNetworkGenerator;
-import org.matsim.contrib.grips.scenariogenerator.MatsimScenarioGenerator;
+import org.matsim.contrib.grips.simulation.SimulationComputation;
 import org.matsim.contrib.grips.view.DefaultWindow;
 import org.matsim.contrib.grips.view.TabButton;
 
@@ -76,7 +76,7 @@ public class ScenarioManager extends DefaultWindow
 		moduleChain.add(new MatsimNetworkGenerator(controller));
 		moduleChain.add(new RoadClosuresEditor(controller));
 		moduleChain.add(new EvacuationPTLinesEditor(controller));
-		moduleChain.add(new MatsimScenarioGenerator(controller));
+		moduleChain.add(new SimulationComputation(controller));
 		moduleChain.add(new EvacuationAnalysis(controller));
 		
 		controller.addModuleChain(moduleChain);

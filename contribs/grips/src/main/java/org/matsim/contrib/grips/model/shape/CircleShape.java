@@ -35,6 +35,11 @@ public class CircleShape extends Shape
 	
 	public CircleShape(int layerID, Point2D origin, Point2D destination)
 	{
+		this("",layerID,origin,destination);
+	}
+	
+	public CircleShape(String circleID, int layerID, Point2D origin, Point2D destination)
+	{
 		this.layerID = layerID;
 		this.origin = origin;
 		this.destination = destination;
@@ -46,7 +51,10 @@ public class CircleShape extends Shape
 		double y2 = destination.getY();
 		this.radius = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + .00001);
 		
-		this.id = (++Shape.currentNumberId) + "_circle";
+		if ((circleID == null) || (circleID.equals("")))
+			this.id = "circle_" + (++Shape.currentNumberId);
+		else
+			this.id = circleID;
 
 	}
 	

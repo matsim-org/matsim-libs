@@ -29,6 +29,13 @@ public class GermanLocale implements Locale
 	private String btCancel = "abbrechen"; 
 	private String btRun = "ausführen";
 	private String btRemove = "entfernen";
+	private String btClear = "zurücksetzen";
+	
+	private String popArea = "Gebiet";
+	
+	
+	private String btCircular = "Kreis";
+	private String btPolygonal = "Polygon";
 	
 	private String infoGripsFile = "Grips Konfiguration";
 	private String infoMatsimFile = "MATSim Konfiguration";
@@ -56,6 +63,8 @@ public class GermanLocale implements Locale
 						   "usage 2: " + "currentmodule.java"  + " -wms <url> -layer <layer name>\n" +
 				           "         startet das module und verwendet den über den Parameter angegebenen WMS-Layer\n\n";
 	
+	private String labelSelection = "Auswahlmodus";
+
 	
 	@Override
 	public String btOK()
@@ -192,6 +201,31 @@ public class GermanLocale implements Locale
 	@Override
 	public String getUsage() {
 		return usage;
+	}
+	
+	@Override
+	public String btCircular() {
+		return btCircular;
+	}
+
+	@Override
+	public String btPolygon() {
+		return btPolygonal;
+	}
+	
+	@Override
+	public String labelSelectionMode() {
+		return labelSelection;
+	}
+
+	@Override
+	public String btClear() {
+		return btClear;
+	}
+
+	@Override
+	public String popArea() {
+		return popArea;
 	}
 
 	

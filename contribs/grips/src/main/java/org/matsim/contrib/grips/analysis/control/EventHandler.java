@@ -89,11 +89,19 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private int k;
 	private int cellCount;
 	private boolean ignoreExitLink = true;
+	
+	private boolean useCellCount = true;
 
-	public EventHandler(String eventFilename, Scenario sc, double cellSize, Thread readerThread) {
+	public EventHandler(boolean useCellCount, String eventFilename, Scenario sc, double cellSize, Thread readerThread) {
+		this.useCellCount = useCellCount;
+		
+		if (useCellCount)
+			this.cellCount = (int)cellSize;
+		else
+			this.cellSize = cellSize;
+		
 		this.eventName = eventFilename;
 		this.network = sc.getNetwork();
-		this.cellSize = cellSize;
 		this.arrivalTimes = new ArrayList<Tuple<Double, Integer>>();
 		init();
 	}
@@ -144,7 +152,11 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 		this.cellTree = new QuadTree<Cell>(minX, minY, maxX, maxY);
 
+		if ((useCellCount) && (cellCount>0))
+			cellSize = (maxX-minX)/(double)cellCount;
+		
 		cellCount = 0;
+		
 		for (double x = minX; x <= maxX; x += cellSize) {
 			for (double y = minY; y <= maxY; y += cellSize) {
 				Cell cell = new Cell(new LinkedList<Event>());

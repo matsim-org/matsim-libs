@@ -67,10 +67,12 @@ public class EvacuationAnalysis extends AbstractModule {
 	private AbstractDataPanel graphPanel;
 	private KeyPanel keyPanel;
 	private Thread readerThread;
-	private double gridSize = 200;
 	private Mode mode;
 
 	private EAToolBox toolBox;
+	
+	private double gridSize = 10;
+	private boolean useCellCount = true;
 
 	public static void main(String[] args) {
 		// set up controller and image interface
@@ -234,7 +236,7 @@ public class EvacuationAnalysis extends AbstractModule {
 		EventsManager e = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(e);
 		this.readerThread = new Thread(new EventReaderThread(reader, eventFile.toString()), "readerthread");
-		this.eventHandler = new EventHandler(eventFile.getName(), this.controller.getScenario(), this.gridSize, this.readerThread);
+		this.eventHandler = new EventHandler(useCellCount, eventFile.getName(), this.controller.getScenario(), this.gridSize, this.readerThread);
 		e.addHandler(this.eventHandler);
 		this.readerThread.run();
 

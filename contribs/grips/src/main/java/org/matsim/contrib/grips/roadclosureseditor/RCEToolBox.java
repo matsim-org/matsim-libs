@@ -54,7 +54,7 @@ import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
 import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.shape.LineShape;
-import org.matsim.contrib.grips.scenariogenerator.MSGMask;
+import org.matsim.contrib.grips.simulation.SimulationMask;
 
 public class RCEToolBox extends AbstractToolBox
 {

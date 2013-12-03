@@ -21,10 +21,12 @@
 package org.matsim.contrib.grips.evacuationareaselector;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.matsim.contrib.grips.control.Controller;
@@ -32,6 +34,7 @@ import org.matsim.contrib.grips.control.ShapeFactory;
 import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
 import org.matsim.contrib.grips.model.Constants;
+import org.matsim.contrib.grips.model.SelectionModeSwitch;
 import org.matsim.contrib.grips.model.shape.PolygonShape;
 import org.matsim.contrib.grips.model.shape.Shape;
 
@@ -49,6 +52,10 @@ class EvacToolBox extends AbstractToolBox {
 	private static final long serialVersionUID = 1L;
 	private JButton openBtn;
 	private JButton saveButton;
+	private JButton clearButton;
+	
+	private SelectionModeSwitch modeSwitch;
+	
 
 	EvacToolBox(AbstractModule module, Controller controller) {
 		super(module, controller);
@@ -56,26 +63,42 @@ class EvacToolBox extends AbstractToolBox {
 		this.setLayout(new BorderLayout());
 
 		JPanel buttonPanel = new JPanel();
+		
+		JPanel tools = new JPanel(new GridLayout(2, 0));
+		
+		this.modeSwitch = new SelectionModeSwitch(controller);
+		
 
 		this.openBtn = new JButton(locale.btOpen());
 		this.saveButton = new JButton(locale.btSave());
 		this.saveButton.setEnabled(false);
+		
+		this.clearButton = new JButton(locale.btClear());
+		this.clearButton.setEnabled(false);
 
 		this.openBtn.addActionListener(this);
+		this.clearButton.addActionListener(this);
 		this.saveButton.addActionListener(this);
 
 		if (this.controller.isStandAlone())
 			buttonPanel.add(this.openBtn);
-
+		
+		buttonPanel.add(this.clearButton);
 		buttonPanel.add(this.saveButton);
+		
+		tools.add(this.modeSwitch);
+		tools.add(buttonPanel);
+		
+		this.add(tools, BorderLayout.SOUTH);
+		
 
-		this.add(buttonPanel, BorderLayout.SOUTH);
 
 	}
 
 	@Override
 	public void setGoalAchieved(boolean goalAchieved) {
 		this.saveButton.setEnabled(goalAchieved);
+		this.clearButton.setEnabled(goalAchieved);
 		super.setGoalAchieved(goalAchieved);
 	}
 
@@ -110,6 +133,11 @@ class EvacToolBox extends AbstractToolBox {
 
 				this.saveButton.setEnabled(false);
 			}
+		} else if (cmd.equals(locale.btClear())) {
+			this.controller.removeShape(Constants.ID_EVACAREAPOLY); 
+			this.controller.setInSelection(false);
+			this.setGoalAchieved(false);
+			this.controller.paintLayers();
 		}
 
 	}

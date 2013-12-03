@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.grips.scenariogenerator;
+package org.matsim.contrib.grips.simulation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -51,7 +51,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 
-public class MSGMask extends JPanel
+public class SimulationMask extends JPanel
 {
 	private static final long serialVersionUID = 1L;
 	private Controller controller;
@@ -64,7 +64,7 @@ public class MSGMask extends JPanel
 	private JLabel labelConfigName;
 	protected String configFile;
 
-	public MSGMask(Controller controller)
+	public SimulationMask(Controller controller)
 	{
 
 		this.labelConfigName = new JLabel("");
@@ -125,12 +125,12 @@ public class MSGMask extends JPanel
 				try
 				{
 					// System.setOut(SGMask.this.outputRedirect);
-					MSGMask.this.btRun.setEnabled(false);
+					SimulationMask.this.btRun.setEnabled(false);
 
 					
-					int a = JOptionPane.showConfirmDialog(MSGMask.this, locale.infoMatsimTime(), "", JOptionPane.WARNING_MESSAGE);
+					int a = JOptionPane.showConfirmDialog(SimulationMask.this, locale.infoMatsimTime(), "", JOptionPane.WARNING_MESSAGE);
 
-					MSGMask.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					SimulationMask.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					
 					if (a == JOptionPane.OK_OPTION)
 					{
@@ -141,17 +141,17 @@ public class MSGMask extends JPanel
 							@Override
 							protected String doInBackground()
 							{
-								Config config = MSGMask.this.controller.getScenario().getConfig();
+								Config config = SimulationMask.this.controller.getScenario().getConfig();
 	
 								config.setParam("controler", "firstIteration", textFirstIteration.getText());
 								config.setParam("controler", "lastIteration", textLastIteration.getText());
-								new ConfigWriter(config).write(MSGMask.this.configFile);
+								new ConfigWriter(config).write(SimulationMask.this.configFile);
 	
 								Controler matsimController = new Controler(config);
 								matsimController.setOverwriteFiles(true);
 								matsimController.run();
 	
-								MSGMask.this.controller.setGoalAchieved(true);
+								SimulationMask.this.controller.setGoalAchieved(true);
 								
 								return "";
 							}
@@ -159,8 +159,8 @@ public class MSGMask extends JPanel
 							@Override
 							protected void done()
 							{
-								MSGMask.this.setCursor(Cursor.getDefaultCursor());
-								MSGMask.this.btRun.setEnabled(true);
+								SimulationMask.this.setCursor(Cursor.getDefaultCursor());
+								SimulationMask.this.btRun.setEnabled(true);
 	
 							}
 						};
@@ -172,8 +172,8 @@ public class MSGMask extends JPanel
 					e2.printStackTrace();
 				} finally
 				{
-					MSGMask.this.btRun.setEnabled(true);
-					MSGMask.this.setCursor(Cursor.getDefaultCursor());
+					SimulationMask.this.btRun.setEnabled(true);
+					SimulationMask.this.setCursor(Cursor.getDefaultCursor());
 				}
 
 			}
@@ -237,10 +237,10 @@ public class MSGMask extends JPanel
 
 	public class LogAppender extends AppenderSkeleton
 	{
-		private MSGMask msgMask;
+		private SimulationMask msgMask;
 		private long n = 0;
 
-		public LogAppender(MSGMask msgMask)
+		public LogAppender(SimulationMask msgMask)
 		{
 			super();
 			this.msgMask = msgMask;

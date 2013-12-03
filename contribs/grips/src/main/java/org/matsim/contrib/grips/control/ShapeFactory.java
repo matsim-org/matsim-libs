@@ -22,13 +22,17 @@
 package org.matsim.contrib.grips.control;
 
 import java.awt.Color;
+import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.shape.BoxShape;
 import org.matsim.contrib.grips.model.shape.CircleShape;
 import org.matsim.contrib.grips.model.shape.LineShape;
+import org.matsim.contrib.grips.model.shape.PolygonShape;
+import org.matsim.contrib.grips.model.shape.Shape;
 import org.matsim.contrib.grips.model.shape.Shape.DrawMode;
 import org.matsim.contrib.grips.model.shape.ShapeStyle;
 
@@ -40,6 +44,7 @@ import org.matsim.contrib.grips.model.shape.ShapeStyle;
  */
 public class ShapeFactory
 {
+	
 
 	public static BoxShape getNetBoxShape(int shapeRendererId, Rectangle2D bbRect, boolean light)
 	{
@@ -73,10 +78,35 @@ public class ShapeFactory
 		return evacCircle;
 	}
 	
-	public static CircleShape getPopShape(int shapeRendererId, Point2D c0, Point2D c1)
+	public static Shape getEvacPoly(int id, List<Point2D> points) {
+		
+		if (points.size()==0)
+			return null;
+		
+		if (points.size()==1)
+		{
+			Point2D p1 = new Point2D.Double(points.get(0).getX()+0.00002,points.get(0).getY()+0.00002);
+			Point2D p2 = new Point2D.Double(points.get(0).getX()+0.00002,points.get(0).getY()-0.00002);
+			points.add(p1);
+			points.add(p2);
+			points.add(p2);
+		}
+		
+		
+		PolygonShape polygonShape = new PolygonShape(points, id);
+		polygonShape.setId(Constants.ID_EVACAREAPOLY);
+		polygonShape.setStyle(Constants.SHAPESTYLE_EVACAREA);
+		
+		return polygonShape;
+	}
+	
+	
+	
+	public static CircleShape getPopShape(String popAreaID, int shapeRendererId, Point2D c0, Point2D c1)
 	{
+		
 		//create circle shape, set id
-		CircleShape popCircle = new CircleShape(shapeRendererId, c0, c1);
+		CircleShape popCircle = new CircleShape(popAreaID, shapeRendererId, c0, c1);
 		
 		//set style
 		ShapeStyle style = Constants.SHAPESTYLE_POPAREA;
@@ -168,5 +198,7 @@ public class ShapeFactory
 		
 		return busStop;
 	}
+
+
 	
 }

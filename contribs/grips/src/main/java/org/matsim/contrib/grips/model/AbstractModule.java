@@ -75,6 +75,11 @@ public abstract class AbstractModule
 		{
 			controller.setActiveToolBox(getToolBox());
 			this.enabled = true;
+			
+			//add this module to the "chain"
+			ArrayList<AbstractModule> moduleChain = new ArrayList<AbstractModule>();
+			moduleChain.add(this);
+			controller.addModuleChain(moduleChain);
 		}
 		
 		this.controller.setActiveModuleType(this.moduleType);

@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.grips.model.locale;
 
+import javax.swing.Icon;
+
 
 public interface Locale
 {
@@ -52,5 +54,10 @@ public interface Locale
 	public String titlePopulation();
 	public String titleAreaID();
 	public String getUsage();
+	public String btCircular();
+	public String btPolygon();
+	public String labelSelectionMode();
+	public String btClear();
+	public String popArea();
 	
 }

@@ -47,6 +47,8 @@ public abstract class ToolConfig {
 	
 	//grid
 	public static final Color COLOR_GRID = new Color(0,0,0,150);
+	public static final Color COLOR_GRID_UTILIZATION = new Color(55,55,100,140);
+	public static final Color COLOR_CELL = new Color(205,205,255,100);
 	
 	public static Font FONT_DEFAULT = new Font( "SansSerif", Font.PLAIN, 12 );
 	public static Font FONT_DEFAULT_BOLD = new Font( "SansSerif", Font.BOLD, 12 );

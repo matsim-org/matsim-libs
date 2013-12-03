@@ -45,6 +45,8 @@ class PopEventListener extends AbstractListener {
 	private int offsetX;
 	private int offsetY;
 	private String currentCircleId;
+	private int currentPopAreaID = 0;
+
 
 	public PopEventListener(Controller controller) {
 		super(controller);
@@ -121,7 +123,8 @@ class PopEventListener extends AbstractListener {
 	}
 
 	public void setPopCircle(Point2D c0, Point2D c1) {
-		CircleShape popCircle = ShapeFactory.getPopShape(controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), c0, c1);
+		String popAreaID = controller.getLocale().popArea() + " " + (++currentPopAreaID);
+		CircleShape popCircle = ShapeFactory.getPopShape(popAreaID, controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), c0, c1);
 		this.currentCircleId = popCircle.getId();
 		controller.addShape(popCircle);
 		this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(popCircle);
@@ -137,7 +140,6 @@ class PopEventListener extends AbstractListener {
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		super.mouseMoved(e);
-		// controller.paintLayers();
 	}
 
 	@Override

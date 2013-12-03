@@ -30,6 +30,12 @@ public class EnglishLocale implements Locale
 	private String btCancel = "cancel"; 
 	private String btRun = "run";
 	private String btRemove = "remove";
+	private String btClear = "clear";
+	
+	private String popArea = "Area";
+	
+	private String btCircular = "circular";
+	private String btPolygonal = "polygonal";
 	
 	private String infoGripsFile = "Grips settings";
 	private String infoMatsimFile = "MATSim settings";
@@ -58,6 +64,7 @@ public class EnglishLocale implements Locale
 				           "         starts the editor and uses the given wms server to load a backgorund layer\n\n";
 	
 	
+	private String labelSelection = "Selection mode";
 	
 	@Override
 	public String btOK()
@@ -194,6 +201,31 @@ public class EnglishLocale implements Locale
 	@Override
 	public String getUsage() {
 		return usage;
+	}
+
+	@Override
+	public String btCircular() {
+		return btCircular;
+	}
+
+	@Override
+	public String btPolygon() {
+		return btPolygonal;
+	}
+
+	@Override
+	public String labelSelectionMode() {
+		return labelSelection;
+	}
+
+	@Override
+	public String btClear() {
+		return btClear;
+	}
+
+	@Override
+	public String popArea() {
+		return popArea;
 	}
 	
 }

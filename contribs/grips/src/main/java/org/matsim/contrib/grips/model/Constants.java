@@ -107,6 +107,7 @@ public class Constants
 	public static String ID_BUSSTOP_PREFIX = "busstop_";
 
 	public static String META_LINKID = "linkid";
+	
 
 
 	public static Color getModuleColor(ModuleType type)

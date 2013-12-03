@@ -73,6 +73,7 @@ class PopToolBox extends AbstractToolBox {
 	private String selectedAreaID = "-1";
 	protected boolean editing = false;
 
+
 	PopToolBox(AbstractModule module, final Controller controller) {
 		super(module, controller);
 
@@ -98,6 +99,9 @@ class PopToolBox extends AbstractToolBox {
 		areaTable.setSelectionBackground(Color.blue);
 		areaTable.setSelectionForeground(Color.white);
 		areaTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//		areaTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//		areaTable.getColumnModel().getColumn(0).setMinWidth(0);
+//		areaTable.getColumnModel().getColumn(0).setMaxWidth(0);
 
 		JPanel editAreaPanel = new JPanel(new GridLayout(0, 3));
 
@@ -324,6 +328,20 @@ class PopToolBox extends AbstractToolBox {
 
 		}
 
+	}
+
+	public int getPopAreaCount() {
+		
+		int popAreaCount = 0;
+		for (Shape shape : this.controller.getActiveShapes()) {
+			if (shape instanceof PolygonShape) {
+				String population = shape.getMetaData("population");
+				if (population != null) {
+					popAreaCount++;
+				}
+			}
+		}
+		return popAreaCount;
 	}
 
 }

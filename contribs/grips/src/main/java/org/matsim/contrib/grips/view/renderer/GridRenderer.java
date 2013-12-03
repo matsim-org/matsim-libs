@@ -95,12 +95,13 @@ public class GridRenderer extends AbstractRenderLayer {
 		// viewport
 		this.imageContainer.translate(-controller.getViewportBounds().x, -controller.getViewportBounds().y);
 
-		// draw utilization
-		if (mode.equals(Mode.UTILIZATION))
-			drawUtilization();
 
 		// draw the grid
 		drawGrid(mode, true);
+		
+		// draw utilization
+		if (mode.equals(Mode.UTILIZATION))
+			drawUtilization();
 
 		// viewport
 		this.imageContainer.translate(controller.getViewportBounds().x, controller.getViewportBounds().y);
@@ -219,9 +220,21 @@ public class GridRenderer extends AbstractRenderLayer {
 				}
 
 				// draw grid
-				this.imageContainer.setColor(ToolConfig.COLOR_GRID);
-				this.imageContainer.setLineThickness(2);
-				this.imageContainer.drawRect(gridX1, gridY1, gridX2 - gridX1, gridY2 - gridY1);
+				if (mode.equals(Mode.UTILIZATION))
+				{
+					this.imageContainer.setColor(ToolConfig.COLOR_GRID_UTILIZATION);
+					this.imageContainer.setLineThickness(2);
+					this.imageContainer.drawRect(gridX1, gridY1, gridX2 - gridX1, gridY2 - gridY1);
+					this.imageContainer.setColor(ToolConfig.COLOR_CELL);
+					this.imageContainer.fillRect(gridX1, gridY1, gridX2 - gridX1, gridY2 - gridY1);
+				}
+				else
+				{
+					this.imageContainer.setColor(ToolConfig.COLOR_GRID);
+					this.imageContainer.setLineThickness(2);
+					this.imageContainer.drawRect(gridX1, gridY1, gridX2 - gridX1, gridY2 - gridY1);
+					
+				}
 
 				if (drawToolTip && currentMousePosition != null) {
 					int mouseX = this.controller.getMousePosition().x;
@@ -306,6 +319,7 @@ public class GridRenderer extends AbstractRenderLayer {
 
 	public void setMode(Mode mode) {
 		this.mode = mode;
+		this.controller.paintLayers();
 
 	}
 

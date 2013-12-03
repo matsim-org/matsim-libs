@@ -21,18 +21,21 @@
 package org.matsim.contrib.grips.evacuationareaselector;
 
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.control.ShapeFactory;
 import org.matsim.contrib.grips.control.eventlistener.AbstractListener;
 import org.matsim.contrib.grips.model.Constants;
-import org.matsim.contrib.grips.model.MultiSelectionInterface;
 import org.matsim.contrib.grips.model.Constants.SelectionMode;
 import org.matsim.contrib.grips.model.shape.CircleShape;
+import org.matsim.contrib.grips.model.shape.LineShape;
 import org.matsim.contrib.grips.model.shape.PolygonShape;
 import org.matsim.contrib.grips.model.shape.Shape;
 
@@ -42,28 +45,28 @@ import org.matsim.contrib.grips.model.shape.Shape;
  * @author wdoering
  * 
  */
-class EvacEventListener extends AbstractListener implements MultiSelectionInterface {
+class EvacEventListener extends AbstractListener {
 	private Rectangle viewPortBounds;
 	private int border;
 	private int offsetX;
 	private int offsetY;
-	private SelectionMode selectionMode;
-	private boolean inSelection;
+	private ArrayList<Point2D> points;
 
 	public EvacEventListener(Controller controller) {
 		super(controller);
 		this.border = controller.getImageContainer().getBorderWidth();
 		this.offsetX = this.border;
 		this.offsetY = this.border;
-		this.selectionMode = SelectionMode.CIRCLE;
-		this.inSelection = false;
+		this.points = new ArrayList<Point2D>();
+		this.controller.setInSelection(false);
+		
 
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 		
-		if (this.selectionMode.equals(SelectionMode.CIRCLE))
+		if (this.controller.getSelectionMode().equals(SelectionMode.CIRCLE))
 		{
 		
 			if (e.getButton() == MouseEvent.BUTTON1) {
@@ -81,33 +84,48 @@ class EvacEventListener extends AbstractListener implements MultiSelectionInterf
 	
 			}
 		}
-		else if (this.selectionMode.equals(SelectionMode.POLYGONAL))
+		else if ((e.getButton() == e.BUTTON1) && (this.controller.getSelectionMode().equals(SelectionMode.POLYGONAL)))
 		{
-			if (this.inSelection)
+			Point2D point = this.controller.pixelToGeo(getGeoPoint(e.getPoint()));
+			
+			if (!this.controller.isInSelection())
 			{
-				
+				this.points.clear();
+				this.controller.setInSelection(true);
 			}
-			else
-			{
-				
-			}
+			points.add(point);
+			
+			setEvacPoly(points);
+			
+//			for (int i = 0; i < this.polygon.npoints; i++)
+//			{
+//			}
+			// repaint
+			controller.paintLayers();
 		}
 		super.mousePressed(e);
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (this.pressedButton == MouseEvent.BUTTON1) {
-			// get destination
-			this.controller.c1 = this.controller.pixelToGeo(getGeoPoint(e.getPoint()));
-
-			// update circle
-			CircleShape circle = (CircleShape) controller.getShapeById(Constants.ID_EVACAREAPOLY);
-			circle.setDestination(this.controller.c1);
-			this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(circle);
-
-			// repaint
-			controller.paintLayers();
+		if (this.controller.getSelectionMode().equals(SelectionMode.CIRCLE))
+		{
+			if (this.pressedButton == MouseEvent.BUTTON1) {
+				// get destination
+				this.controller.c1 = this.controller.pixelToGeo(getGeoPoint(e.getPoint()));
+	
+				// update circle
+				CircleShape circle = (CircleShape) controller.getShapeById(Constants.ID_EVACAREAPOLY);
+				circle.setDestination(this.controller.c1);
+				this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(circle);
+	
+				// repaint
+				controller.paintLayers();
+			}
+		}
+		else if (this.controller.getSelectionMode().equals(SelectionMode.POLYGONAL))
+		{
+			
 		}
 		super.mouseDragged(e);
 	}
@@ -117,14 +135,21 @@ class EvacEventListener extends AbstractListener implements MultiSelectionInterf
 		this.fixed = false;
 		if (this.pressedButton == MouseEvent.BUTTON1) {
 			Shape shape = controller.getShapeById(Constants.ID_EVACAREAPOLY);
-			if (shape instanceof CircleShape) {
+			if (shape instanceof CircleShape)
+			{
 				CircleShape circle = (CircleShape) shape;
 				PolygonShape polygon = this.controller.getShapeUtils().getPolygonFromCircle(circle);
 				this.controller.addShape(polygon);
 				this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(polygon);
 				controller.getActiveToolBox().setGoalAchieved(true);
-				controller.paintLayers();
 			}
+			else if (shape instanceof PolygonShape)
+			{
+				if (points.size()>4)
+					controller.getActiveToolBox().setGoalAchieved(true);
+			}
+			controller.paintLayers();
+				
 		}
 
 		super.mouseReleased(e);
@@ -142,6 +167,19 @@ class EvacEventListener extends AbstractListener implements MultiSelectionInterf
 
 	}
 	
+	public void setEvacPoly(ArrayList<Point2D> points) {
+		
+			
+		Shape evacPoly = ShapeFactory.getEvacPoly(controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), points);
+		controller.addShape(evacPoly);
+		
+		
+		this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(evacPoly);
+		
+		
+		
+	}
+	
 	
 
 	@Override
@@ -149,16 +187,10 @@ class EvacEventListener extends AbstractListener implements MultiSelectionInterf
 		super.mouseWheelMoved(e);
 		controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(true);
 	}
-
+	
 	@Override
-	public void setSelectionMode(SelectionMode selectionMode) {
-		this.selectionMode = selectionMode;
-		this.inSelection = false;
-		
+	public void keyPressed(KeyEvent e) {
+		super.keyPressed(e);
 	}
 
-	@Override
-	public SelectionMode getSelectionMode() {
-		return this.selectionMode;
-	}
 }

@@ -63,6 +63,7 @@ import org.matsim.contrib.grips.model.shape.LineShape;
 import org.matsim.contrib.grips.model.shape.PolygonShape;
 import org.matsim.contrib.grips.model.shape.Shape;
 import org.matsim.contrib.grips.model.shape.ShapeStyle;
+import org.matsim.contrib.grips.populationselector.PopAreaSelector;
 import org.matsim.contrib.grips.view.DefaultOpenDialog;
 import org.matsim.contrib.grips.view.DefaultRenderPanel;
 import org.matsim.contrib.grips.view.DefaultWindow;
@@ -128,6 +129,8 @@ public class Controller {
 	public Id linkID2;
 	private JPanel mainPanel;
 	private Rectangle mainPanelBounds;
+	private boolean inSelection;
+
 
 	private ShapeUtils shapeUtils;
 
@@ -374,7 +377,10 @@ public class Controller {
 	}
 
 	public boolean hasMapRenderer() {
-		return this.visualizer.hasMapRenderer();
+		if (this.visualizer!=null)
+			return this.visualizer.hasMapRenderer();
+		else
+			return false;
 	}
 
 	public String getCurrentOSMFile() {
@@ -576,8 +582,8 @@ public class Controller {
 	/**
 	 * Add a shape. Since no specific layer is given:
 	 * 
-	 * - scans for shape layers - creates a new shape layer, if no shape layer
-	 * found
+	 * - scans for shapes - creates a new shape, if no shape 
+	 * found or replaces the old shape with the same id
 	 * 
 	 * @param shape
 	 */
@@ -1117,6 +1123,24 @@ public class Controller {
 			return null;
 		else
 		return this.moduleChain.getPastModules(moduleType);
+	}
+	
+	public boolean isInSelection() {
+		return inSelection;
+	}
+	
+	public void setInSelection(boolean inSelection) {
+		this.inSelection = inSelection;
+	}
+
+	public int getPopAreaCount() {
+		
+		for (AbstractModule module : modules)
+		{
+			if (module instanceof PopAreaSelector)
+				return ((PopAreaSelector)module).getPopAreaCount();
+		}
+		return -1;
 	}
 
 }

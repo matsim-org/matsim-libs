@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.grips.scenariogenerator;
+package org.matsim.contrib.grips.simulation;
 
 import java.awt.image.BufferedImage;
 
@@ -30,9 +30,9 @@ import org.matsim.contrib.grips.model.imagecontainer.BufferedImageContainer;
 import org.matsim.contrib.grips.model.process.BasicProcess;
 import org.matsim.contrib.grips.view.DefaultWindow;
 
-public class MatsimScenarioGenerator extends AbstractModule {
+public class SimulationComputation extends AbstractModule {
 
-	private MSGMask msgMask;
+	private SimulationMask msgMask;
 	public static void main(String[] args) {
 		final Controller controller = new Controller();
 
@@ -45,7 +45,7 @@ public class MatsimScenarioGenerator extends AbstractModule {
 		controller.setStandAlone(true);
 
 		// instantiate evacuation area selector
-		MatsimScenarioGenerator scenario = new MatsimScenarioGenerator(controller);
+		SimulationComputation scenario = new SimulationComputation(controller);
 
 		// create default window for running this module standalone
 		DefaultWindow frame = new DefaultWindow(controller);
@@ -58,7 +58,7 @@ public class MatsimScenarioGenerator extends AbstractModule {
 		frame.requestFocus();
 	}
 
-	public MatsimScenarioGenerator(Controller controller) {
+	public SimulationComputation(Controller controller) {
 		super(controller.getLocale().moduleMatsimScenarioGenerator(), Constants.ModuleType.MATSIMSCENARIO, controller);
 
 		this.processList.add(new BasicProcess(this, this.controller) {
@@ -67,7 +67,7 @@ public class MatsimScenarioGenerator extends AbstractModule {
 				// in case this is only part of something bigger
 				controller.disableAllRenderLayers();
 
-				msgMask = new MSGMask(controller);
+				msgMask = new SimulationMask(controller);
 				this.controller.setMainPanel(msgMask, false);
 
 				this.controller.setToolBoxVisible(false);

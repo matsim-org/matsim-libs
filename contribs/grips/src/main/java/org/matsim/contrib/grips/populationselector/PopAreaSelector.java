@@ -130,6 +130,13 @@ public class PopAreaSelector extends AbstractModule
 		
 		return toolBox;
 	}
+
+	public int getPopAreaCount() {
+		if (this.toolBox!=null)
+			return ((PopToolBox)toolBox).getPopAreaCount();
+		else
+			return -1;
+	}
 	
 	
 	

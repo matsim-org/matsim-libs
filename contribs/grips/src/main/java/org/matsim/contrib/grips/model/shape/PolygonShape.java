@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.grips.model.shape;
 
+import java.awt.geom.Point2D;
+import java.util.List;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 
@@ -37,6 +43,25 @@ public class PolygonShape extends Shape
 
 	}
 	
+	public PolygonShape(List<Point2D> points, int layerID)
+	{
+		this.layerID = layerID;
+		
+		Coordinate[] coords = new Coordinate[points.size()+1];
+		for (int i = 0; i < points.size(); i++)
+			coords[i] = new Coordinate(points.get(i).getY(), points.get(i).getX());
+		
+		coords[coords.length - 1] = coords[0];
+
+		GeometryFactory geofac = new GeometryFactory();
+		LinearRing shell = geofac.createLinearRing(coords);
+		this.polygon = geofac.createPolygon(shell, null);
+		
+		this.id = (++Shape.currentNumberId) + "_poly";
+		
+		
+	}
+
 	public Polygon getPolygon()
 	{
 		return polygon;
