@@ -70,7 +70,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private static Logger log = Logger.getLogger(TransitQSimEngine.class);
 
-	private QSim qSim;
+	private final QSim qSim;
 
 	private TransitSchedule schedule = null;
 
@@ -83,7 +83,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	private AbstractTransitDriverFactory transitDriverFactory = new UmlaufDriverFactory();
 
 	private InternalInterface internalInterface = null ;
-	
+
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
@@ -136,11 +136,15 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	}
 
 	private UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
-		UmlaufCache umlaufCache = (UmlaufCache) scenario.getScenarioElement( UmlaufCache.ELEMENT_NAME );
+		UmlaufCache umlaufCache = (UmlaufCache) scenario.getScenarioElement(UmlaufCache.ELEMENT_NAME);
 		if (umlaufCache != null &&
 				umlaufCache.getTransitSchedule() == scenario.getTransitSchedule()) { // has someone put a new transitschedule into the scenario?
 			log.info("found pre-existing Umlaeufe in scenario, and the transit schedule is still the same, so using them.");
 			return umlaufCache;
+		}
+		if (umlaufCache != null) {
+			// removing scenario element, new one will be set below
+			scenario.removeScenarioElement(UmlaufCache.ELEMENT_NAME);
 		}
 
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder =
@@ -151,7 +155,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 						scenario.getConfig().planCalcScore());
 		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
 		umlaufCache = new UmlaufCache(scenario.getTransitSchedule(), umlaeufe);
-		scenario.addScenarioElement( UmlaufCache.ELEMENT_NAME , umlaufCache); // possibly overwriting the existing one
+		scenario.addScenarioElement(UmlaufCache.ELEMENT_NAME , umlaufCache);
 
 		return umlaufCache;
 	}
@@ -166,7 +170,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		Leg firstLeg = (Leg) driver.getNextPlanElement();
 		Id startLinkId = firstLeg.getRoute().getStartLinkId();
 		this.qSim.addParkedVehicle(veh, startLinkId);
-		this.qSim.insertAgentIntoMobsim(driver); 
+		this.qSim.insertAgentIntoMobsim(driver);
 		return driver;
 	}
 
@@ -187,7 +191,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 					driver.setVehicle(veh);
 					Id startLinkId = driver.getCurrentLeg().getRoute().getStartLinkId();
 					this.qSim.addParkedVehicle(veh, startLinkId);
-					this.qSim.insertAgentIntoMobsim(driver); 
+					this.qSim.insertAgentIntoMobsim(driver);
 					drivers.add(driver);
 				}
 			}
