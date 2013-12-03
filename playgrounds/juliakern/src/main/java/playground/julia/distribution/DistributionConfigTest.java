@@ -28,40 +28,37 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
 
-public class DistributionConfig implements DistributionConfiguration {
+public class DistributionConfigTest implements DistributionConfiguration{
 	
 	private final static String runDirectory1 = "input/sample/";
-	private final String netFile1 = runDirectory1 + "sample_network.xml.gz";
-	private final String munichShapeFile = runDirectory1 + "cityArea.shp";
+	private final String netFile1 = runDirectory1 + "test_network.xml";
+//	private final String munichShapeFile = runDirectory1 + "cityArea.shp";
 
-	private static String configFile1 = runDirectory1 + "sample_config.xml.gz";
+//	private static String configFile1 = runDirectory1 + "sample_config.xml.gz";
 //	private final String emissionFile1 = runDirectory1 + "basecase.sample.emission.events.xml";
 //	String plansFile1 = runDirectory1+"basecase.sample.plans.xml";
 //	String eventsFile1 = runDirectory1+"basecase.sample.events.xml";
 //	String outPathStub = "output/sample/basecase_30timebins_";
 	
-	private final String emissionFile1 = runDirectory1 + "compcase.sample.emission.events.xml";
-	String plansFile1 = runDirectory1+"compcase.sample.plans.xml";
-	String eventsFile1 = runDirectory1+"compcase.sample.events.xml";
-	String outPathStub = "output/sample/compcase_30timebins_16x12cells_";
+	private final String emissionFile1 = runDirectory1 + "test.emission.events.xml";
+	String plansFile1 = runDirectory1+"test_plans.xml";
+	String eventsFile1 = runDirectory1+"test.events.xml";
+	String outPathStub = "output/sample/test";
 
-	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
-	static double xMin = 4452550.25;
-	static double xMax = 4479483.33;
-	static double yMin = 5324955.00;
-	static double yMax = 5345696.81;
+//	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
+	static double xMin = .0;
+	static double xMax = 100.;
+	static double yMin = .0;
+	static double yMax = 100.;
 
 	final int noOfTimeBins = 30; //30
-	final int noOfXbins = 16; //160 
-	final int noOfYbins = 12; //120
+	final int noOfXbins = 10; //160 
+	final int noOfYbins = 10; //120
 	final WarmPollutant warmPollutant2analyze = WarmPollutant.NO2;
 	final ColdPollutant coldPollutant2analyze = ColdPollutant.NO2;
 		
@@ -72,20 +69,24 @@ public class DistributionConfig implements DistributionConfiguration {
 	private Scenario scenario;
 	private boolean storeResponsibilityEvents = true;
 	double timeBinSize;
+	Logger logger;
 	
 	/*
 	 * load scenario
 	 * calculate time bin size
 	 */
-	public DistributionConfig(Logger logger) {
+	public DistributionConfigTest(Logger logger) {
 		this.config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(this.config);
-		configReader.readFile(configFile1);
-		simulationEndTime = config.qsim().getEndTime();
+		//MatsimConfigReader configReader = new MatsimConfigReader(this.config);
+		//configReader.readFile(configFile1);
+		config.addCoreModules(); // TODO
+		//simulationEndTime = config.qsim().getEndTime();
+		simulationEndTime = 60*60*24;
 		timeBinSize = simulationEndTime/noOfTimeBins;
 		this.config.network().setInputFile(netFile1);
 		this.config.plans().setInputFile(plansFile1);
 		this.scenario = ScenarioUtils.loadScenario(config);
+		this.logger = logger;
 		logger.info("Simulation end time is: " + simulationEndTime / 3600 + " hours.");
 		logger.info("Aggregating emissions for " + (int) (simulationEndTime / 3600 / noOfTimeBins) + " hour time bins.");
 		
@@ -94,140 +95,76 @@ public class DistributionConfig implements DistributionConfiguration {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getSimulationEndTime()
-	 */
-	@Override
 	public Double getSimulationEndTime() {
 		return this.simulationEndTime;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#storeResponsibilityEvents()
-	 */
-	@Override
 	public boolean storeResponsibilityEvents() {
 		return storeResponsibilityEvents;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getLinks()
-	 */
-	@Override
 	public Map<Id, ? extends Link> getLinks() {
 		return this.scenario.getNetwork().getLinks();
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getMunichShapeFile()
-	 */
-	@Override
-	public String getMunichShapeFile() {
-		return munichShapeFile;
-	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getEventsFile()
-	 */
-	@Override
+
 	public String getEventsFile() {
 		return eventsFile1;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getEmissionFile()
-	 */
-	@Override
 	public String getEmissionFile() {
 		return emissionFile1;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getOutPathStub()
-	 */
-	@Override
 	public String getOutPathStub() {
 		return outPathStub;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getXmin()
-	 */
-	@Override
 	public double getXmin() {
 		return xMin;
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getXmax()
-	 */
-	@Override
 	public double getXmax() {
 		return xMax;
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getYmin()
-	 */
-	@Override
 	public double getYmin() {
 		return yMin;
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getYmax()
-	 */
-	@Override
 	public double getYmax() {
 		return yMax;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getNoOfTimeBins()
-	 */
-	@Override
 	public int getNoOfTimeBins() {
 		return noOfTimeBins;
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getNumberOfXBins()
-	 */
-	@Override
 	public int getNumberOfXBins(){
 		return noOfXbins;
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getNumberOfYBins()
-	 */
-	@Override
 	public int getNumberOfYBins(){
 		return noOfYbins;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getWarmPollutant2analyze()
-	 */
-	@Override
 	public WarmPollutant getWarmPollutant2analyze() {
 		return warmPollutant2analyze;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getColdPollutant2analyze()
-	 */
-	@Override
 	public ColdPollutant getColdPollutant2analyze() {
 		return coldPollutant2analyze;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.julia.distribution.DistributionConfiguration#getTimeBinSize()
-	 */
-	@Override
 	public Double getTimeBinSize() {
 		return timeBinSize;
+	}
+
+	@Override
+	public String getMunichShapeFile() {
+		logger.warn("getMunich used");
+		return null;
 	}
 
 }
