@@ -45,7 +45,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 
 	final private static Logger log = Logger.getLogger(ParallelQNetsimEngine.class);
 
-	private int numOfThreads;
+	private final int numOfThreads;
 	private Thread[] threads;
 	private QSimEngineRunner[] engines;
 
@@ -57,7 +57,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 
 	ParallelQNetsimEngine(final QSim sim) {
 		super(sim);
-		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
+		// (DepartureHandler does not need to be added here since it is added in the "super" c'tor)
 
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
@@ -76,7 +76,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	@Override
 	public void doSimStep(final double time) {
 		run(time);
-		
+
 		this.printSimLog(time);
 	}
 
@@ -147,8 +147,8 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	@Override
 	protected synchronized void activateLink(final QLinkInternalI link) {
 		/*
-		 * The ActivityEngine might activate links when inserting Agents into the mobsim. 
-		 * This only occurs before the onPrepareSim method of this class is called. 
+		 * The ActivityEngine might activate links when inserting Agents into the mobsim.
+		 * This only occurs before the onPrepareSim method of this class is called.
 		 */
 		if (isPrepared) log.warn("Links should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
 		super.activateLink(link);
@@ -198,7 +198,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 
 		// setup threads
 		for (int i = 0; i < this.numOfThreads; i++) {
-			QSimEngineRunner engine = new QSimEngineRunner(this.startBarrier, this.separationBarrier, 
+			QSimEngineRunner engine = new QSimEngineRunner(this.startBarrier, this.separationBarrier,
 					this.endBarrier);
 			Thread thread = new Thread(engine);
 			thread.setName("QSimEngineThread" + i);
@@ -219,8 +219,8 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	}
 
 	/*
-	 * Within the MoveThreads Links are only activated when a Vehicle is moved 
-	 * over a Node which is processed by that Thread. So we can assign each QLink 
+	 * Within the MoveThreads Links are only activated when a Vehicle is moved
+	 * over a Node which is processed by that Thread. So we can assign each QLink
 	 * to the Thread that handles its InNode.
 	 */
 	private void assignNetElementActivators() {
@@ -228,26 +228,26 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 		// only for statistics
 		int nodes[] = new int[this.engines.length];
 		int links[] = new int[this.engines.length];
-		
+
 		int roundRobin = 0;
 		for (QNode node : network.getNetsimNodes().values()) {
 			int i = roundRobin % this.numOfThreads;
 			node.setNetElementActivator(this.engines[i]);
 			nodes[i]++;
-			
+
 			// set activator for out links
 			for (Link outLink : node.getNode().getOutLinks().values()) {
 				AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
 				// (must be of this type to work.  kai, feb'12)
-				
+
 				// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 				qLink.setNetElementActivator(this.engines[i]);
 				links[i]++;
 			}
-			
+
 			roundRobin++;
 		}
-		
+
 		// print some statistics
 		for (int i = 0; i < this.engines.length; i++) {
 			log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to QSimEngineRunner #" + i);
