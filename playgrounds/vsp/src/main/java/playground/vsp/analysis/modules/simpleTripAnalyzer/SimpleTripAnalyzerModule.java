@@ -57,7 +57,7 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 
 	public SimpleTripAnalyzerModule(Config c, Network net, Population p, String prefix) {
 		super("SimpleTripAnalyzer");
-		this.analyzer = new SimpleTripAnalyzer(c, net); 
+		this.analyzer = new SimpleTripAnalyzer(c, net, p.getPersons().keySet()); 
 		this.p = p;
 		this.prefix = prefix;
 	}

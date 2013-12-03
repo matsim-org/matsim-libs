@@ -146,7 +146,7 @@ public abstract class BuildingEnergyRunnerMain {
 		private SimpleTripAnalyzer analyzer;
 		
 		MyControlerListener(Config c, Network net){
-			analyzer =  new SimpleTripAnalyzer(c, net);
+			analyzer =  new SimpleTripAnalyzer(c, net, null);
 		}
 		
 		@Override

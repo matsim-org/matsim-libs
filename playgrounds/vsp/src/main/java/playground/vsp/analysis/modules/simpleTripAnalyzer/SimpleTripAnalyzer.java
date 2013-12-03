@@ -21,21 +21,23 @@ package playground.vsp.analysis.modules.simpleTripAnalyzer;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -66,14 +68,16 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	private double distFactor;
 	private Map<Id, Traveller> traveller;
 	private Network net;
+	private Set<Id> pIds;
 	
-	public  SimpleTripAnalyzer(Config c, Network net) throws RuntimeException{
+	public  SimpleTripAnalyzer(Config c, Network net, Set<Id> pIds) throws RuntimeException{
 		if(c.scenario().isUseTransit() ){
 			throw new RuntimeException("This analysis is structured very simple. " +
 					"Thus, it does not allow physically simulated transit!");
 		}
 		distFactor = c.plansCalcRoute().getBeelineDistanceFactor();
 		this.net = net;
+		this.pIds = (pIds == null) ? new HashSet<Id>() : pIds;
 	}
 
 	@Override
@@ -83,6 +87,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
+		if(!pIds.contains(event.getPersonId())) return;
 		Traveller t = this.traveller.get(event.getPersonId());
 		if(t == null){
 			t = new Traveller(event.getPersonId());
