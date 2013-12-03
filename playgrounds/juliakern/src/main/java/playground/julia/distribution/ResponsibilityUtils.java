@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
+import playground.julia.toi.FirstSimulation;
+
 public class ResponsibilityUtils {
 
 	/*
@@ -131,6 +133,7 @@ public class ResponsibilityUtils {
 			// calculate responsibility events
 			// case distinction - number of time bins
 			if (firstTimeBin<lastTimeBin){
+				
 				//first bin
 				Double firstStartTime = startTime;
 				Double firstEndTime = firstTimeBin * timeBinSize;

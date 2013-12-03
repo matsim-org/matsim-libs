@@ -56,7 +56,8 @@ public class SpatialAveragingDistribution {
 		 * 
 		 */
 		
-		DistributionConfig distConfig = new DistributionConfig(logger);
+//		DistributionConfiguration distConfig = new DistributionConfig(logger);
+		DistributionConfiguration distConfig = new DistributionConfigTest(logger);
 		Double simulationEndTime = distConfig.getSimulationEndTime();
 		int noOfTimeBins = distConfig.getNoOfTimeBins();
 		Double timeBinSize = distConfig.getSimulationEndTime()/noOfTimeBins;
@@ -143,7 +144,7 @@ public class SpatialAveragingDistribution {
 		rew.closeFile();		
 	}
 
-	private void generateEmissions(String emissionFile, DistributionConfig distConfig) {
+	private void generateEmissions(String emissionFile, DistributionConfiguration distConfig) {
 				
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
@@ -155,6 +156,7 @@ public class SpatialAveragingDistribution {
 		
 		emissionReader.parse(emissionFile);
 
+		//TODO something wrong here, em per cell deleted???
 		emissionPerBin = generatedEmissionsHandler.getEmissionsPerCell();
 		emissionPerLink = generatedEmissionsHandler.getEmissionsPerLink();
 		
@@ -178,7 +180,7 @@ public class SpatialAveragingDistribution {
 		
 	}
 
-	private Map<Id, Integer> calculateYbins(DistributionConfig distConfig) {
+	private Map<Id, Integer> calculateYbins(DistributionConfiguration distConfig) {
 		Map<Id, Integer> link2ybin = new HashMap<Id, Integer>();
 		for(Id linkId: distConfig.getLinks().keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(distConfig.getLinks().get(linkId).getCoord().getY(), distConfig));
@@ -186,7 +188,7 @@ public class SpatialAveragingDistribution {
 		return link2ybin;
 	}
 
-	private Map<Id, Integer> calculateXbins(DistributionConfig distConfig) {
+	private Map<Id, Integer> calculateXbins(DistributionConfiguration distConfig) {
 		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
 		for(Id linkId: distConfig.getLinks().keySet()){
 			link2xbin.put(linkId, mapXCoordToBin(distConfig.getLinks().get(linkId).getCoord().getX(), distConfig));
@@ -194,7 +196,7 @@ public class SpatialAveragingDistribution {
 		return link2xbin;
 	}
 
-	private Integer mapYCoordToBin(double yCoord, DistributionConfig distConfig) {
+	private Integer mapYCoordToBin(double yCoord, DistributionConfiguration distConfig) {
 		double yMin = distConfig.getYmin();
 		double yMax = distConfig.getYmax();
 		if (yCoord <= yMin || yCoord >= yMax) return null; // yCoord is not in area of interest
@@ -202,7 +204,7 @@ public class SpatialAveragingDistribution {
 		return (int) relativePositionY; // returns the number of the bin [0..n-1]
 	}
 
-	private Integer mapXCoordToBin(double xCoord, DistributionConfig distConfig) {
+	private Integer mapXCoordToBin(double xCoord, DistributionConfiguration distConfig) {
 		double xMin = distConfig.getXmin();
 		double xMax = distConfig.getXmax();
 		if (xCoord <= xMin  || xCoord >= xMax) return null; // xCorrd is not in area of interest
