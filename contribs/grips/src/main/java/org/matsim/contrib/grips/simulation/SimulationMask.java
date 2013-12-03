@@ -78,9 +78,9 @@ public class SimulationMask extends JPanel
 		JLabel labelFirstIteration = new JLabel(" first iteration: ");
 		JLabel labelLastIteration = new JLabel(" last iteration: ");
 		JPanel itPanel = new JPanel(new GridLayout(5, 2));
-		itPanel.setPreferredSize(new Dimension(350, 150));
-		itPanel.setSize(new Dimension(350, 100));
-		itPanel.setMaximumSize(new Dimension(350, 150));
+		itPanel.setPreferredSize(new Dimension(550, 150));
+		itPanel.setSize(new Dimension(550, 100));
+		itPanel.setMaximumSize(new Dimension(550, 150));
 
 		JPanel centerPanel = new JPanel();
 		centerPanel.setBorder(new LineBorder(Color.darkGray, 4));
@@ -107,7 +107,7 @@ public class SimulationMask extends JPanel
 		JPanel infoPanel = new JPanel();
 		infoPanel.setSize(600, 200);
 
-		infoPanel.add(new JLabel(this.controller.getLocale().moduleMatsimScenarioGenerator()));
+//		infoPanel.add(new JLabel(this.controller.getLocale().moduleMatsimScenarioGenerator()));
 		itPanel.add(btRun);
 		itPanel.add(infoPanel);
 		

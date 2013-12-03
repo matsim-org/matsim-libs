@@ -199,6 +199,7 @@ public class EvacuationAnalysis extends AbstractModule {
 			}
 			else
 				this.toolBox.getOpenOTFVisBtn().setEnabled(true);
+			((EAToolBox) getToolBox()).setEventFileItems(eventFiles);
 		}
 		if ((graphPanel == null) || (keyPanel == null)) {
 			graphPanel = ((EAToolBox) getToolBox()).getGraphPanel();
@@ -224,7 +225,6 @@ public class EvacuationAnalysis extends AbstractModule {
 			graphPanel.updateData(data);
 			keyPanel.updateData(data);
 		}
-		((EAToolBox) getToolBox()).setEventFileItems(eventFiles);
 
 		((EAToolBox) getToolBox()).setFirstLoad(false);
 
@@ -287,7 +287,8 @@ public class EvacuationAnalysis extends AbstractModule {
 					if (currentFile.isDirectory())
 						directoriesToScan.push(currentFile);
 					else {
-						files.add(currentFile);
+						if (!files.contains(currentFile))
+							files.add(currentFile);
 					}
 				}
 			}
