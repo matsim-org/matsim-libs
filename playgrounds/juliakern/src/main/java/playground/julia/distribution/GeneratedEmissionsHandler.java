@@ -166,17 +166,18 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 			if(xDistance<4 && yDistance <4 && (totalDistance<4)){
 				Double distributionFactor = 0.0;
 				switch(totalDistance){
-				case 0: distributionFactor = dist0factor;
-				case 1: distributionFactor = dist1factor;
-				case 2: distributionFactor = dist2factor;
-				case 3: distributionFactor = dist3factor;
+					case 0: distributionFactor = dist0factor; break;
+					case 1: distributionFactor = dist1factor; break;
+					case 2: distributionFactor = dist2factor; break;
+					case 3: distributionFactor = dist3factor; break;
 				}
 				if (distributionFactor>0.0) {
 					EmPerLink epl = new EmPerLink(linkId, personId, value * distributionFactor, eventStartTime);
 					distributedEmissions.add(epl);
-					}
 				}
+				distributionFactor = 0.0;
 			}
+		}
 		}
 		return distributedEmissions;
 	}
@@ -203,13 +204,13 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		for(int xIndex = xBin-3; xIndex<=xBin+3; xIndex++){
 			for(int yIndex = yBin-3; yIndex <= yBin+3; yIndex++){
 				Double distributionFactor = 0.0;
-				int distance = Math.abs(xBin-xIndex+yBin-yIndex);
+				int distance = Math.abs(xBin-xIndex)+Math.abs(yBin-yIndex);
 				
 				switch(distance){
-				case 0: distributionFactor = dist0factor;
-				case 1: distributionFactor = dist1factor;
-				case 2: distributionFactor = dist2factor;
-				case 3: distributionFactor = dist3factor;
+				case 0: distributionFactor = dist0factor; break;
+				case 1: distributionFactor = dist1factor; break;
+				case 2: distributionFactor = dist2factor; break;
+				case 3: distributionFactor = dist3factor; break;
 				}
 				
 				if (distributionFactor>0.0) {

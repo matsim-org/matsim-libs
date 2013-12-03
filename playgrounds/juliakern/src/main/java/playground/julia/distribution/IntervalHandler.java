@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.xerces.dom3.as.ASElementDeclaration;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -90,8 +91,10 @@ LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 		// without emission values - store person id, time and x,y-cell
 		
 		for(Id personId: person2asevent.keySet()){
+			//TODO? sort by time?
 			for(ActivityStartEvent ase: person2asevent.get(personId)){
-				Double startOfActivity = ase.getTime();
+				Double startOfActivity = ase.getTime();				
+				
 				if (link2xbins.get(ase.getLinkId())!=null && link2ybins.get(ase.getLinkId())!=null) {
 					int xBin = link2xbins.get(ase.getLinkId());
 					int yBin = link2ybins.get(ase.getLinkId());
@@ -113,25 +116,45 @@ LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 					// do not remove act start events - iteration
 					// TODO sinnvoll? beschleunigt das entsprechend?
 					// hinterher auch act start loeschen?
-					person2aeevent.get(personId).remove(aee);
+					//person2aeevent.get(personId).remove(aee);
 				}
 				
+			}
+			if (person2aeevent.get(personId)!=null) {
+				// TODO rethink this!
+				// first activity might not have a start event but an end event
+				// get first activityEndEvent
+				Double firstActivityEndTime = Double.MAX_VALUE;
+				ActivityEndEvent firstAee = null;
+				for (ActivityEndEvent aee : person2aeevent.get(personId)) {
+					if (aee.getTime() < firstActivityEndTime) {
+						firstAee = aee;
+					}
+				}
+				int firstXBin = link2xbins.get(firstAee.getLinkId());
+				int firstYBin = link2ybins.get(firstAee.getLinkId());
+				EmActivity emFirst = new EmActivity(0.0, firstAee.getTime(),
+						personId, firstXBin, firstYBin, firstAee.getActType());
+				activities.add(emFirst);
 			}
 		}		
 	}
 
 	private ActivityEndEvent findCorrespondingActivityEndEvent(
 			ActivityStartEvent ase, ArrayList<ActivityEndEvent> arrayList) {
-		Double startTime = ase.getTime();
-		Double currTime = Double.MAX_VALUE;
-		ActivityEndEvent currEvent = null;
-		for(ActivityEndEvent event: arrayList){
-			if(event.getTime()<currTime && event.getTime()>startTime){
-				currTime = event.getTime();
-				currEvent = event;
+		if (arrayList !=null) {
+			Double startTime = ase.getTime();
+			Double currTime = Double.MAX_VALUE;
+			ActivityEndEvent currEvent = null;
+			for (ActivityEndEvent event : arrayList) {
+				if (event.getTime() < currTime && event.getTime() > startTime) {
+					currTime = event.getTime();
+					currEvent = event;
+				}
 			}
+			return currEvent;
 		}
-		return currEvent;
+		return null;
 	}
 
 	public void addCarTripsToTimetables(ArrayList<EmCarTrip> carTrips, Double simulationEndTime) {
