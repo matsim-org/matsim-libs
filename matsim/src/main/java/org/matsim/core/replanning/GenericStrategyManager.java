@@ -39,16 +39,16 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 /**
  * Notes:<ul>
  * <li> This version is now a bit more restrictive than the original strategy manager in terms of public methods and in terms of final methods.
- * Given subpopulations and pluggable worst plans remover, most situations where inheritance was needed should be gone.  
+ * Given subpopulations and pluggable worst plans remover, most situations where inheritance was needed should be gone.
  * Please engage in a discussion with the core team if you think this class should be more liberal. kai, nov'13
- * </ul>  
- * 
+ * </ul>
+ *
  * @author nagel (for the generic version)
  * @author rieser (for the original StrategyManager)
  *
  */
 public class GenericStrategyManager<T extends BasicPlan> implements MatsimManager {
-	
+
 	static class StrategyWeights<T extends BasicPlan> {
 		 final List<GenericPlanStrategy<T>> strategies = new ArrayList<GenericPlanStrategy<T>>();
 		 final List<GenericPlanStrategy<T>> unmodifiableStrategies =
@@ -61,7 +61,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 				new TreeMap<Integer, Map<GenericPlanStrategy<T>, Double>>();
 	}
 
-	private Map<String, StrategyWeights<T>> weightsPerSubpopulation =
+	private final Map<String, StrategyWeights<T>> weightsPerSubpopulation =
 		new HashMap<String, StrategyWeights<T>>();
 
 	private int maxPlansPerAgent = 0;
@@ -95,7 +95,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 		weights.weights.add(Double.valueOf(weight));
 		weights.totalWeights += weight;
 	}
-	
+
 	/**
 	 * removes the specified strategy from this manager for the specified subpopulation
 	 *
@@ -106,7 +106,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 */
 	final boolean removeStrategy(
 			final GenericPlanStrategy<T> strategy,
-			final String subpopulation) 
+			final String subpopulation)
 	{
 		final StrategyWeights<T> weights = getStrategyWeights( subpopulation );
 		int idx = weights.strategies.indexOf(strategy);
@@ -162,26 +162,26 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 *
 	 * @param population
 	 * @param iteration the current iteration we're handling
-	 * @param replanningContext 
+	 * @param replanningContext
 	 */
 	public final void run(
 			final Collection<HasPlansAndId<T>> persons,
-			ObjectAttributes subpopLookup, 
-			final int iteration, 
+			ObjectAttributes subpopLookup,
+			final int iteration,
 			final ReplanningContext replanningContext ) {
 		handleChangeRequests(iteration);
 		run(persons, subpopLookup, replanningContext);
 	}
-	
+
 	/**
 	 * Randomly chooses for each person of the population a strategy and uses that
 	 * strategy on the person.
 	 *
 	 * @param population
-	 * @param replanningContext 
+	 * @param replanningContext
 	 */
-	final void run( 
-			final Collection<HasPlansAndId<T>> persons, 
+	final void run(
+			final Collection<HasPlansAndId<T>> persons,
 			ObjectAttributes subPopLookup,
 			final ReplanningContext replanningContext) {
 
@@ -201,13 +201,13 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 			}
 
 			// ... choose the strategy to be used for this person (in evol comp lang this would be the choice of the mutation operator)
-			String subpopName = null ;
-			if ( subPopLookup != null ) {
-				subpopName = (String) subPopLookup.getAttribute( person.getId().toString(), this.subpopulationAttributeName ) ;
+			String subpopName = null;
+			if (this.subpopulationAttributeName != null) {
+				subpopName = (String) subPopLookup.getAttribute(person.getId().toString(), this.subpopulationAttributeName);
 			}
-			GenericPlanStrategy<T> strategy = this.chooseStrategy( person, subpopName ) ;
+			GenericPlanStrategy<T> strategy = this.chooseStrategy(person, subpopName);
 
-			if ( strategy==null ) {
+			if (strategy==null) {
 				throw new RuntimeException("No strategy found!");
 			}
 
@@ -245,7 +245,7 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * @param iteration
 	 */
 	final void handleChangeRequests(final int iteration) {
-		for ( int ii = 0 ; ii <= iteration ; ii++ ) { 
+		for ( int ii = 0 ; ii <= iteration ; ii++ ) {
 			// (playing back history for those installations which recreate the strategy manager in every iteration)
 			for ( Map.Entry<String, StrategyWeights<T>> wentry : weightsPerSubpopulation.entrySet() ) {
 				final String subpop = wentry.getKey();
@@ -313,8 +313,8 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 			weights.changeRequests.put(iter, iterationRequests);
 		}
 		iterationRequests.put(strategy, Double.valueOf(newWeight));
-		Logger.getLogger(this.getClass()).info( "added change request: " 
-				+ " iteration=" + iter + " newWeight=" + newWeight + " strategy=" + strategy.toString() ); 
+		Logger.getLogger(this.getClass()).info( "added change request: "
+				+ " iteration=" + iter + " newWeight=" + newWeight + " strategy=" + strategy.toString() );
 	}
 
 	/**
@@ -325,17 +325,17 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 * Thoughts about using the logit-type selectors with negative logit model scale parameter:<ul>
 	 * <li> Look at one agent.
 	 * <li> Assume she has the choice between <i>n</i> different plans (although fewer of them are in the MATSim choice set).
-	 * <li> (Continuous) fraction <i>f(i)</i> of plan <i>i</i> develops as (master equation) 
+	 * <li> (Continuous) fraction <i>f(i)</i> of plan <i>i</i> develops as (master equation)
 	 * <blockquote><i>
 	 * df(i)/dt = - p(i) * f(i) + 1/n
 	 * </i></blockquote>
 	 * where <i>p(i)</i> is from the removal selector, and <i>1/n</i> makes the assumption that each possible plan is (re-)inserted with equal probability
-	 * by the innovative modules. 
+	 * by the innovative modules.
 	 * <li> Steady state solution (<i>df/dt=0</i>) <i> f(i) = 1/n * 1/p(i) </i>.
 	 * <li> If <i> p(i) = e<sup>-b*U(i)</sup></i>, then <i> f(i) = e<sup>b*U(i)</sup> / n </i>.  Or in words:
 	 * <i><b> If you use a logit model with a minus in front of the beta for plans removal, the resulting steady state distribution is
-	 * the same logit model with normal beta.</b></i> 
-	 * 
+	 * the same logit model with normal beta.</b></i>
+	 *
 	 * </ul>
 	 * The implication seems to be: divide the user-configured beta by two, use one half for choice and the other for plans removal.
 	 * <p/>
