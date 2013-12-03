@@ -19,9 +19,6 @@
 
 package playground.thibautd.socnetsim.replanning.selectors.coalitionselector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.matsim.api.core.v01.Id;
@@ -34,42 +31,44 @@ import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
 
 final class PointingAgent {
 	private final Id id;
-	private final Collection<PlanRecord> records;
+	private final PlanRecord[] records;
 
-	private PlanRecord pointed = null;
-	private final Iterator<PlanRecord> pointedIterator;
+	private final MinHeap<PlanRecord> heap;
 
 	public PointingAgent(
 			final Person person,
 			final ReplanningGroup group,
 			final WeightCalculator weight) {
 		this.id = person.getId();
-		this.records = new ArrayList<PlanRecord>( person.getPlans().size() );
+		this.records = new PlanRecord[ person.getPlans().size() ];
+		this.heap = new BinaryMinHeap<PlanRecord>( records.length );
 
 		int i = 0;
 		for ( Plan p : person.getPlans() ) {
-			records.add(
+			records[ i ] =
 				new PlanRecord(
 						this,
 						p,
 						weight.getWeight(
 							p,
 							group ),
-						i++) );
+						i);
+			this.heap.add(
+					records[ i ],
+					// inverse priority: we want decreasing order
+					-records[ i ].getWeight() );
+			i++;
 		}
-
-		pointedIterator = new SortingIterator( records );
-		pointed = pointedIterator.next();
 	}
 
-	public Iterable<PlanRecord> getRecords() {
+	public PlanRecord[] getRecords() {
 		return records;
 	}
 
 	public Plan getPointedPlan() {
 		try {
-			while ( !pointed.isFeasible() ) {
-				pointed = pointedIterator.next();
+			while ( !heap.peek().isFeasible() ) {
+				heap.poll();
 			}
 		}
 		catch ( NoSuchElementException e ) {
@@ -78,37 +77,6 @@ final class PointingAgent {
 					e );
 		}
 
-		return pointed.getPlan();
-	}
-}
-
-class SortingIterator implements Iterator<PlanRecord> {
-	private final MinHeap<PlanRecord> heap;
-
-	public SortingIterator(final Collection<PlanRecord> records) {
-		this.heap = new BinaryMinHeap<PlanRecord>( records.size() );
-		for ( PlanRecord r : records ) {
-			this.heap.add(
-					r,
-					// inverse priority: we want decreasing order
-					-r.getWeight() );
-		}
-	}
-
-	@Override
-	public boolean hasNext() {
-		return !heap.isEmpty();
-	}
-
-	@Override
-	public PlanRecord next() {
-		final PlanRecord next = heap.poll();
-		if ( next == null ) throw new NoSuchElementException();
-		return next;
-	}
-
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException();
+		return heap.peek().getPlan();
 	}
 }
