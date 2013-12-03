@@ -74,6 +74,13 @@
 		<artifactId>otfvis</artifactId>
 		<version>0.6.0-SNAPSHOT</version>
 	</dependency>
+	
+	<dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-all</artifactId>
+		<version>1.9.5</version>
+		<scope>test</scope>
+	</dependency>
   	
   </dependencies>
   
