@@ -47,11 +47,11 @@ import playground.thibautd.utils.CollectionUtils;
  * @author thibautd
  */
 public class AnalysePerformanceOfCoalitionSelection {
-	private static final int N_TRIES = 1000;
+	private static final int N_TRIES = 10000;
 
 	private static final int MIN_GROUP_SIZE = 1;
-	private static final int MAX_GROUP_SIZE = 10;
-	private static final int MAX_MAX_PLANS_PER_SIZE = 5;
+	private static final int MAX_GROUP_SIZE = 50;
+	private static final int MAX_MAX_PLANS_PER_SIZE = 10;
 
 	private static final String SEP = "\t";
 
