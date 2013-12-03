@@ -64,22 +64,22 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
  * <li> QSim itself should have all basic functionality to execute a typical agent plan, i.e. activities and legs.  In this basic
  * version, all legs are teleported.
  * <li> In addition, there are "engines" that plug into QSim.  Those are time-step driven, as is QSim.  Many engines move
- * particles around, i.e. they execute the different modes.  Others are responsible for, e.g., time-variant networks or signals. 
+ * particles around, i.e. they execute the different modes.  Others are responsible for, e.g., time-variant networks or signals.
  * <li> A special engine is the netsim engine, which is the original "queue"
  * engine.  It is invoked by default, and it carries the "NetsimNetwork" for which there is a getter.
- * <li> Engines that move particles around need to be able to "end legs".  
+ * <li> Engines that move particles around need to be able to "end legs".
  * This used to be such that control went to the agents, which
  * reinserted themselves into QSim.  This has now been changed: The agents compute their next state, but the engines are
- * responsible for reinsertion into QSim.  For this, they obtain an "internal interface" during engine addition.  Naming 
+ * responsible for reinsertion into QSim.  For this, they obtain an "internal interface" during engine addition.  Naming
  * conventions will be adapted to this in the future.
  * <li> <i>A caveat is that drivers that move around other agents (such as TransitDriver, TaxicabDriver) need to become
  * "engines".</i>  Possibly, something that executes a leg is not really the same as an "engine", but this is what we have
  * for the time being.
  * <li> Engines that offer new modes also need to be registered as "DepartureHandler"s.
  *  * </ul>
- * Future plans include: pull the agent counter write methods back into QSim (no big deal, I hope); pull the actstart/end, 
+ * Future plans include: pull the agent counter write methods back into QSim (no big deal, I hope); pull the actstart/end,
  * agent departure/arrival back into QSim+engines; somewhat separate the teleportation engine and the activities engine from the
- * framework part of QSim. 
+ * framework part of QSim.
  * <p/>
  * @author dstrippgen
  * @author mrieser
@@ -100,13 +100,13 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private QNetsimEngine netEngine;
 
-	private Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
+	private final Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
 
-	private MobsimTimer simTimer;
+	private final MobsimTimer simTimer;
 
 	private TeleportationEngine teleportationEngine;
 
-	private WithinDayEngine withindayEngine = null; 
+	private WithinDayEngine withindayEngine = null;
 
 	private ActivityEngine activityEngine;
 
@@ -116,9 +116,9 @@ public final class QSim implements VisMobsim, Netsim {
 	private final Scenario scenario;
 	private final List<ActivityHandler> activityHandlers = new ArrayList<ActivityHandler>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
-	private AgentCounter agentCounter;
-	private Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
-	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
+	private final AgentCounter agentCounter;
+	private final Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
+	private final List<AgentSource> agentSources = new ArrayList<AgentSource>();
 	private TransitQSimEngine transitEngine;
 
 
@@ -159,9 +159,9 @@ public final class QSim implements VisMobsim, Netsim {
 	 * Constructs an instance of this simulation which does not do anything by itself, but accepts handlers for Activities and Legs.
 	 * Use this constructor if you want to plug together your very own simulation, i.e. you are writing some of the simulation
 	 * logic yourself.
-	 * 
+	 *
 	 * If you wish to use QSim as a product and run a simulation based on a Config file, rather use QSimFactory as your entry point.
-	 * 
+	 *
 	 */
 	public QSim(final Scenario sc, final EventsManager events) {
 		this.scenario = sc;
@@ -180,7 +180,7 @@ public final class QSim implements VisMobsim, Netsim {
 	public void run() {
 		// Teleportation must be last (default) departure handler, so add it
 		// only before running.
-		addDepartureHandler(this.teleportationEngine); 
+		addDepartureHandler(this.teleportationEngine);
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		// do iterations
@@ -247,7 +247,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	/**
 	 * Do one step of the simulation run.
-	 * 
+	 *
 	 * @param time
 	 *            the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
@@ -259,13 +259,13 @@ public final class QSim implements VisMobsim, Netsim {
 		 * the other engines simulate the sim step.
 		 */
 		if (withindayEngine != null) withindayEngine.doSimStep(time);
-		
+
 		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
-			
+
 			// withindayEngine.doSimStep(time) has already been called
 			if (mobsimEngine == this.withindayEngine) continue;
-			
+
 			mobsimEngine.doSimStep(time);
 		}
 
@@ -285,11 +285,11 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private void arrangeNextAgentAction(MobsimAgent agent) {
 		switch( agent.getState() ) {
-		case ACTIVITY: 
-			arrangeAgentActivity(agent); 
+		case ACTIVITY:
+			arrangeAgentActivity(agent);
 			break ;
-		case LEG: 
-			this.arrangeAgentDeparture(agent) ; 
+		case LEG:
+			this.arrangeAgentDeparture(agent) ;
 			break ;
 		case ABORT:
 			this.events.processEvent( new PersonStuckEvent(this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode())) ;
@@ -315,7 +315,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 * Informs the simulation that the specified agent wants to depart from its
 	 * current activity. The simulation can then put the agent onto its vehicle
 	 * on a link or teleport it to its destination.
-	 * 
+	 *
 	 * @param agent
 	 */
 	private void arrangeAgentDeparture(final MobsimAgent agent) {
@@ -329,6 +329,7 @@ public final class QSim implements VisMobsim, Netsim {
 				return;
 			}
 		}
+		log.warn("no departure handler wanted to handle the departure of agent " + agent.getId());
 
 	}
 
@@ -467,7 +468,7 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Adds the QueueSimulationListener instance given as parameters as listener
 	 * to this QueueSimulation instance.
-	 * 
+	 *
 	 * @param listeners
 	 */
 	@Override
@@ -508,7 +509,7 @@ public final class QSim implements VisMobsim, Netsim {
 				}
 				return positions;
 			}
-			
+
 		};
 	}
 
