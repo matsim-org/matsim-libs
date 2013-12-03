@@ -20,20 +20,24 @@
 package playground.thibautd.socnetsim.replanning.selectors.coalitionselector;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.router.priorityqueue.HasIndex;
 
-final class PlanRecord {
+final class PlanRecord implements HasIndex {
 	private final PointingAgent agent;
 	private final double weight;
 	private final Plan plan;
 	private boolean isFeasible = true;
+	private int index;
 
 	public PlanRecord(
 			final PointingAgent agent,
 			final Plan plan,
-			final double weight) {
+			final double weight,
+			final int index) {
 		this.agent = agent;
 		this.plan = plan;
 		this.weight = weight;
+		this.index = index;
 	}
 
 	public PointingAgent getAgent() {
@@ -55,5 +59,10 @@ final class PlanRecord {
 	public void setInfeasible() {
 		assert isFeasible;
 		isFeasible = false;
+	}
+
+	@Override
+	public int getArrayIndex() {
+		return index;
 	}
 }
