@@ -24,12 +24,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Stack;
 
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.core.controler.AbstractController;
@@ -76,12 +79,18 @@ public class IterationStopWatch {
 	/** A formatter for dates, used when writing out the data. */
 	private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
+	/** data structures to identify nested operations */
+	private Stack<String> currentMeasuredOperations;
+	private Map<String, List<String>> currentIterationChildren;
+	private Map<Integer, Map<String, List<String>>> children;
+	
 	/** Creates a new IterationStopWatch. */
 	public IterationStopWatch() {
-		this.iterations = new LinkedHashMap<Integer, Map<String,Long>>();
+		this.iterations = new LinkedHashMap<Integer, Map<String, Long>>();
 		this.identifiers = new LinkedList<String>();
 		this.operations = new LinkedList<String>();
 		this.currentIterationValues = null;
+		this.children = new LinkedHashMap<Integer, Map<String, List<String>>>();
 	}
 
 	/**
@@ -95,6 +104,9 @@ public class IterationStopWatch {
 		this.iterations.clear();
 		this.identifiers.clear();
 		this.operations.clear();
+		this.currentMeasuredOperations.clear();
+		this.currentIterationChildren.clear();
+		this.children.clear();
 	}
 
 	/**
@@ -111,6 +123,9 @@ public class IterationStopWatch {
 			this.iterations.put(this.iteration, this.currentIterationValues);
 			this.nextIdentifierPosition = 0;
 			this.nextOperationPosition = 0;
+			this.currentMeasuredOperations = new Stack<String>();
+			this.currentIterationChildren = new HashMap<String, List<String>>();
+			this.children.put(this.iteration, this.currentIterationChildren);
 		}
 	}
 
@@ -128,6 +143,17 @@ public class IterationStopWatch {
 		String ident = "BEGIN " + identifier;
 		ensureIdentifier(ident);
 		this.currentIterationValues.put(ident, Long.valueOf(System.currentTimeMillis()));
+		
+		this.currentIterationChildren.put(identifier, new ArrayList<String>());
+
+		// check whether this operation has a parent operation
+		if (this.currentMeasuredOperations.size() > 0) {
+			String parent = this.currentMeasuredOperations.peek();
+			this.currentIterationChildren.get(parent).add(identifier);
+		}
+		
+		// add ident to stack
+		this.currentMeasuredOperations.push(identifier);
 	}
 
 	/**
@@ -141,6 +167,9 @@ public class IterationStopWatch {
 		ensureIdentifier(ident);
 		ensureOperation(identifier);
 		this.currentIterationValues.put(ident, Long.valueOf(System.currentTimeMillis()));
+		
+		
+		this.currentMeasuredOperations.pop();
 	}
 
 	/**
@@ -207,8 +236,7 @@ public class IterationStopWatch {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -224,14 +252,30 @@ public class IterationStopWatch {
 		for (String identifier : this.operations) arrayMap.put(identifier, new double[iterations]);
 
 		int iter = 0;
-		for (Map<String, Long> data : this.iterations.values()) {
+		for(Entry<Integer, Map<String, Long>> entry : this.iterations.entrySet()) {
+			Map<String, Long> data = entry.getValue();
+			
+			// children map of current iteration
+			Map<String, List<String>> childrenMap = this.children.get(entry.getKey());
+
 			// durations of operations
 			for (String identifier : this.operations) {
 				Long startTime = data.get("BEGIN " + identifier);
 				Long endTime = data.get("END " + identifier);
 				if (startTime != null && endTime != null) {
-					double diff = (endTime.longValue() - startTime.longValue()) / 1000.0;
-					arrayMap.get(identifier)[iter] = diff;
+					double diff = (endTime.longValue() - startTime.longValue());
+
+					/*
+					 * If the operation has children, subtract their durations since they are
+					 * also included in the plot. Otherwise their duration would be counted twice.
+					 */
+					for (String child : childrenMap.get(identifier)) {
+						Long childStartTime = data.get("BEGIN " + child);
+						Long childEndTime = data.get("END " + child);
+						diff -= (childEndTime.longValue() - childStartTime.longValue());
+					}
+					
+					arrayMap.get(identifier)[iter] = diff / 1000.0;
 				} else arrayMap.get(identifier)[iter] = 0.0;
 			}
 			iter++;
@@ -259,7 +303,7 @@ public class IterationStopWatch {
 		chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 
 		double[] iterationData = null;
-		double[] sumData = new double[iterations];
+//		double[] sumData = new double[iterations];
 		for (String operation : this.operations) {
 			double[] data = arrayMap.get(operation);
 			if (operation.equals(AbstractController.OPERATION_ITERATION)) {
@@ -267,15 +311,15 @@ public class IterationStopWatch {
 				continue;
 			} else {
 				chart.addSeries(operation, data);
-				for (int i = 0; i < iterations; i++) {
-					sumData[i] += data[i];
-				}
+//				for (int i = 0; i < iterations; i++) {
+//					sumData[i] += data[i];
+//				}
 			}
 		}
 		if (iterationData != null) {
 			double[] otherData = new double[iterations];
 			for (int i = 0; i < iterations; i++) {
-				otherData[i] = iterationData[i] - sumData[i];
+				otherData[i] = iterationData[i];
 			}
 			chart.addSeries(OPERATION_OTHER, otherData);
 		}
