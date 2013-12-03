@@ -275,6 +275,46 @@ public class QSimTest {
 	}
 
 	/**
+	 * This test is mostly useful for manual debugging, because only a single agent is simulated
+	 * on a very simple network.
+	 * The agent ends its activity immediately, which is handled differently than agents staying
+	 * for some time at their first activity location.
+	 *
+	 * @author cdobler
+	 */
+	@Test
+	public void testSingleAgentImmediateDeparture() {
+		Fixture f = new Fixture();
+
+		// add a single person with leg from link1 to link3
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createAndAddPlan(true);
+		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
+		a1.setEndTime(0);
+		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
+		leg.setRoute(route);
+		plan.createAndAddActivity("w", f.link3.getId());
+		f.plans.addPerson(person);
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		LinkEnterEventCollector collector = new LinkEnterEventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		f.config.qsim().setEndTime(10*3600);
+		QSim sim = createQSim(f, events);
+		sim.run();
+
+		/* finish */
+		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
+		Assert.assertEquals("wrong time in first event.", 0.0*3600 + 1, collector.events.get(0).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in second event.", 0.0*3600 + 12, collector.events.get(1).getTime(), MatsimTestCase.EPSILON);
+	}
+	
+	/**
 	 * Simulates a single agent that has two activities on the same link. Tests if the simulation
 	 * correctly recognizes such cases.
 	 *

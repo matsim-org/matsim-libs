@@ -20,6 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -52,7 +54,8 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
 	private CyclicBarrier startBarrier;
 	private CyclicBarrier endBarrier;
-
+	
+	private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<QLinkInternalI>();
 	private boolean isPrepared = false;
 
 	ParallelQNetsimEngine(final QSim sim) {
@@ -148,16 +151,19 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	protected synchronized void activateLink(final QLinkInternalI link) {
 		/*
 		 * The ActivityEngine might activate links when inserting Agents into the mobsim.
-		 * This only occurs before the onPrepareSim method of this class is called.
+		 * This only occurs before the onPrepareSim method of this class is called. Links
+		 * containing such agents are activated when assigned to a QSimEngineRunner.
 		 */
-		if (isPrepared) log.warn("Links should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
-		super.activateLink(link);
+		if (isPrepared) {
+			throw new RuntimeException("Links should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
+		} else { 
+			linksToActivateInitially.add(link);
+		}
 	}
 
 	@Override
 	protected synchronized void activateNode(final QNode node) {
-		log.warn("Nodes should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
-		super.activateNode(node);
+		throw new RuntimeException("Nodes should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
 	}
 
 	@Override
@@ -242,7 +248,17 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 
 				// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 				qLink.setNetElementActivator(this.engines[i]);
+				
+				/*
+				 * If the QLink contains agents that end their activity in the first time
+				 * step, the link should be activated.
+				 */
+				if (linksToActivateInitially.remove(qLink)) {
+					this.engines[i].activateLink(qLink);					
+				}
+				
 				links[i]++;
+				
 			}
 
 			roundRobin++;
@@ -252,6 +268,8 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 		for (int i = 0; i < this.engines.length; i++) {
 			log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to QSimEngineRunner #" + i);
 		}
+		
+		this.linksToActivateInitially.clear();
 	}
 
 	/*
