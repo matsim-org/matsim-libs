@@ -12,7 +12,9 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.jsprit;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,13 +65,21 @@ import org.matsim.vehicles.VehicleTypeImpl;
  */
 public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
+	public interface InternalLeastCostPathCalculatorListener {
+		
+		public void startCalculation(long routerId);
+		
+		public void endCalculation(long routerId);
+		
+	}
+	
 	/**
 	 * This creates a matsim-vehicle {@link org.matsim.vehicles.Vehicle} from a matsim-freight-vehicle {@link CarrierVehicle} and jsprit-vehicle {@link basics.route.Vehicle}.
 	 * 
 	 * @author stefan schröder
 	 *
 	 */
-	public static class MatsimVehicleWrapper implements org.matsim.vehicles.Vehicle {
+	static class MatsimVehicleWrapper implements org.matsim.vehicles.Vehicle {
 
 		private Id id;
 		
@@ -223,38 +233,50 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		private TravelTime travelTime;
 		
-		private Map<Id,CarrierVehicleType> vehicleTypes = new HashMap<Id, CarrierVehicleType>();
+		private Map<String,VehicleTypeCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeCosts>();
 		
 		/**
 		 * Constructs travelDisutility according to the builder.
-		 * 
+		 * @param typeSpecificCosts TODO
 		 * @param builder
 		 */
-		private BaseVehicleTransportCosts(Collection<CarrierVehicleType> vehicleTypes, TravelTime travelTime){
+		private BaseVehicleTransportCosts(Map<String, VehicleTypeCosts> typeSpecificCosts, TravelTime travelTime){
 			this.travelTime = travelTime;
-			addTypes(vehicleTypes);
-		}
-
-		private void addTypes(Collection<CarrierVehicleType> vehicleTypes) {
-			for(CarrierVehicleType t : vehicleTypes){
-				this.vehicleTypes.put(t.getId(), t);
-			}
-			
+			this.typeSpecificCosts = typeSpecificCosts;
 		}
 
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, org.matsim.vehicles.Vehicle vehicle) {
-			CarrierVehicleType vehicleType = vehicleTypes.get(vehicle.getType().getId());
-			if(vehicleType == null) throw new IllegalStateException("type " + vehicleType + " is missing.");
+			VehicleTypeCosts typeCosts = typeSpecificCosts.get(vehicle.getType().getId().toString());
+			if(typeCosts == null) throw new IllegalStateException("type specific costs for " + vehicle.getType().getId().toString() + " are missing.");
 			double tt = travelTime.getLinkTravelTime(link, time, person, vehicle);
-			return vehicleType.getVehicleCostInformation().perDistanceUnit*link.getLength() + vehicleType.getVehicleCostInformation().perTimeUnit*tt;
+			return typeCosts.perMeter*link.getLength() + typeCosts.perSecond*tt;
 		}
 
 		@Override
 		public double getLinkMinimumTravelDisutility(Link link) {
-			throw new UnsupportedOperationException();
+			double minDisutility = Double.MAX_VALUE;
+			double free_tt = link.getLength()/link.getFreespeed();
+			for(VehicleTypeCosts c : typeSpecificCosts.values()){
+				double disu = c.perMeter*link.getLength() + c.perSecond*free_tt;
+				if(disu < minDisutility) minDisutility=disu;
+			}
+			return minDisutility;
 		}
 		
+	}
+	
+	private static class VehicleTypeCosts {
+		final double fix;
+		final double perMeter;
+		final double perSecond;
+		
+		VehicleTypeCosts(double fix, double perMeter, double perSecond) {
+			super();
+			this.fix = fix;
+			this.perMeter = perMeter;
+			this.perSecond = perSecond;
+		}
 	}
 	
 	/**
@@ -301,6 +323,12 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		
 		
+		public static Builder newInstance(Network network) {
+			return new Builder(network, Collections.EMPTY_LIST);
+		}
+
+
+
 		/**
 		 * By default it takes <code>link.getFreespeed();</code> to calculate the travelTime over that link.
 		 */
@@ -313,6 +341,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 					velocity = vehicle.getType().getMaximumVelocity();
 				}
 				else velocity = link.getFreespeed();
+				if(velocity <= 0.0) throw new IllegalStateException("velocity must be bigger than zero");
 				return link.getLength() / velocity;
 			}
 		};
@@ -335,9 +364,9 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		private boolean withToll = false;
 		
-		private Collection<CarrierVehicleType> vehicleTypes;
-		
 		private Network network;
+		
+		private Map<String,VehicleTypeCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeCosts>();
 		
 		/**
 		 * Creates the builder requiring {@link Network} and a collection of {@link CarrierVehicleType}.
@@ -346,8 +375,14 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		 * @param vehicleTypes must be all vehicleTypes and their assigned costInformation in the system.
 		 */
 		private Builder(Network network, Collection<CarrierVehicleType> vehicleTypes){
-			this.vehicleTypes = vehicleTypes;
 			this.network = network;
+			retrieveTypeSpecificCosts(vehicleTypes);
+		}
+
+		private void retrieveTypeSpecificCosts(Collection<CarrierVehicleType> vehicleTypes) {
+			for(CarrierVehicleType type : vehicleTypes){
+				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeCosts(type.getVehicleCostInformation().fix, type.getVehicleCostInformation().perDistanceUnit, type.getVehicleCostInformation().perTimeUnit));
+			}
 		}
 
 		/**
@@ -413,13 +448,25 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		 */
 		public NetworkBasedTransportCosts build(){
 			if(baseDisutility == null){
-				baseDisutility = new BaseVehicleTransportCosts(vehicleTypes, travelTime);
+				baseDisutility = new BaseVehicleTransportCosts(typeSpecificCosts, travelTime);
 			}
 			if(withToll){
 				finalDisutility = new VehicleTransportCostsIncludingToll(baseDisutility, roadPricingCalculator);
 			}
 			else finalDisutility = baseDisutility;
 			return new NetworkBasedTransportCosts(this);
+		}
+
+		/**
+		 * Adds type-specific costs. If typeId already exists, existing entry is overwritten.
+		 * 
+		 * @param typeId
+		 * @param fix
+		 * @param perSecond
+		 * @param perMeter
+		 */
+		public void addVehicleTypeSpecificCosts(String typeId, double fix, double perSecond, double perMeter) {
+			typeSpecificCosts.put(typeId, new VehicleTypeCosts(fix, perMeter, perSecond));
 		}
 
 	}
@@ -458,6 +505,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	
+	private Collection<InternalLeastCostPathCalculatorListener> listeners = new ArrayList<InternalLeastCostPathCalculatorListener>();
+	
 	private NetworkBasedTransportCosts(Builder builder) {
 		super();
 		this.travelDisutility = builder.finalDisutility;
@@ -494,6 +543,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			transportTime = data.transportTime;
 		}
 		else{
+			informStartCalc();
 			Id fromLinkId = makeId(fromId);
 			Id toLinkId = makeId(toId);
 			Link fromLink = network.getLinks().get(fromLinkId);
@@ -512,10 +562,18 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 				existingData = newData;
 			}
 			transportTime = existingData.transportTime;
+			informEndCalc();
 		}
 		return transportTime;
 	}
+	
+	private void informEndCalc(){
+		for(InternalLeastCostPathCalculatorListener l : listeners) l.endCalculation(Thread.currentThread().getId());
+	}
 
+	private void informStartCalc(){
+		for(InternalLeastCostPathCalculatorListener l : listeners) l.startCalculation(Thread.currentThread().getId());
+	}
 	/**
 	 * Gets the transport-costs.
 	 * 
@@ -546,6 +604,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			transportCost = data.transportCosts;
 		}
 		else{
+			informStartCalc();
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
 			Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime, null, matsimVehicle);
 //			if(path == null) return Double.MAX_VALUE;
@@ -559,8 +618,17 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 				existingData = newData;
 			}
 			transportCost = existingData.transportCosts;
+			informEndCalc();
 		}
 		return transportCost;
+	}
+
+	
+	/**
+	 * @return the listeners
+	 */
+	public Collection<InternalLeastCostPathCalculatorListener> getInternalListeners() {
+		return listeners;
 	}
 
 	/**
