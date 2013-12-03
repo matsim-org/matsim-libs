@@ -66,17 +66,14 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Grips scenario generator
- * Workflow:
- * GIS Metaformat --> ScenarioGenertor --> MATSim Szenario
- * - Wo wird entschied ob 10% oder 100% Scenario erzeugt wird?
+ * Grips scenario generator Workflow: GIS Metaformat --> ScenarioGenertor -->
+ * MATSim Szenario - Wo wird entschied ob 10% oder 100% Scenario erzeugt wird?
  * 
  * @author laemmel
- *
+ * 
  */
 @SuppressWarnings("deprecation")
 public class ScenarioGenerator {
-
 
 	private static final Logger log = Logger.getLogger(ScenarioGenerator.class);
 	protected static final boolean DEBUG = false;
@@ -100,9 +97,9 @@ public class ScenarioGenerator {
 
 	public void run() {
 		log.info("loading config file");
-		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "loading config file");
+		InfoEvent e = new InfoEvent(System.currentTimeMillis(),
+				"loading config file");
 		this.em.processEvent(e);
-
 
 		try {
 			this.c = ConfigUtils.createConfig();
@@ -113,20 +110,20 @@ public class ScenarioGenerator {
 
 			GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm);
 			parser.readFile(this.configFile);
-		} catch(Exception ee) {
-			//TODO for backwards compatibility should be remove soon
+		} catch (Exception ee) {
+			// TODO for backwards compatibility should be remove soon
 			log.warn("File is not a  grips config file. Guessing it is a common MATSim config file");
 			this.c = ConfigUtils.loadConfig(this.configFile);
 
 		}
 
 		this.c.global().setCoordinateSystem("EPSG:3395");
-		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		this.c.controler().setOutputDirectory(
+				getGripsConfig(this.c).getOutputDir() + "/output");
 
-		
 		QSimConfigGroup qsim = this.c.qsim();
-		qsim.setEndTime(30*3600);
-		
+		qsim.setEndTime(30 * 3600);
+
 		this.c.timeAllocationMutator().setMutationRange(0.);
 
 		this.sc = ScenarioUtils.createScenario(this.c);
@@ -148,7 +145,8 @@ public class ScenarioGenerator {
 		}
 
 		log.info("generating population file");
-		e = new InfoEvent(System.currentTimeMillis(), "generating population file");
+		e = new InfoEvent(System.currentTimeMillis(),
+				"generating population file");
 		this.em.processEvent(e);
 		generateAndSavePopulation(this.sc);
 
@@ -156,11 +154,11 @@ public class ScenarioGenerator {
 		e = new InfoEvent(System.currentTimeMillis(), "simulation config file");
 		this.em.processEvent(e);
 
-
 		this.c.otfVis().setMapOverlayMode(true);
 
-		this.c.controler().setLastIteration(100);
-		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		this.c.controler().setLastIteration(10);
+		this.c.controler().setOutputDirectory(
+				getGripsConfig(this.c).getOutputDir() + "/output");
 
 		this.c.strategy().setMaxAgentPlanMemorySize(3);
 
@@ -171,69 +169,79 @@ public class ScenarioGenerator {
 		this.c.strategy().addParam("Module_2", "ChangeExpBeta");
 		this.c.strategy().addParam("ModuleProbability_2", "0.9");
 
-
-
 		this.c.qsim().setRemoveStuckVehicles(false);
 
 		this.c.travelTimeCalculator().setTraveltimeBinSize(120);
-		this.c.travelTimeCalculator().setTravelTimeCalculatorType("TravelTimeCalculatorHashMap");
+		this.c.travelTimeCalculator().setTravelTimeCalculatorType(
+				"TravelTimeCalculatorHashMap");
 
-		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir() + "/config.xml";
+		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir()
+				+ "/config.xml";
 
 		new ConfigWriter(this.c).write(this.matsimConfigFile);
-		e = new InfoEvent(System.currentTimeMillis(), "scenario generation finished.");
+		e = new InfoEvent(System.currentTimeMillis(),
+				"scenario generation finished.");
 		this.em.processEvent(e);
 
 	}
-
 
 	protected void dumpNetworkAsShapeFile(Scenario sc) {
 
 		final Network network = sc.getNetwork();
 
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, sc.getConfig().global().getCoordinateSystem());
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(
+				network, sc.getConfig().global().getCoordinateSystem());
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
 		builder.setWidthCoefficient(0.5);
 		builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-		new Links2ESRIShape(network,getGripsConfig(this.c).getOutputDir()+"/links_ls.shp", builder).write();
+		new Links2ESRIShape(network, getGripsConfig(this.c).getOutputDir()
+				+ "/links_ls.shp", builder).write();
 
-		CoordinateReferenceSystem crs = MGC.getCRS(sc.getConfig().global().getCoordinateSystem());
+		CoordinateReferenceSystem crs = MGC.getCRS(sc.getConfig().global()
+				.getCoordinateSystem());
 		builder.setWidthCoefficient(0.003);
 		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
 		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
 		builder.setCoordinateReferenceSystem(crs);
-		new Links2ESRIShape(network,getGripsConfig(this.c).getOutputDir()+"/links_p.shp", builder).write();
+		new Links2ESRIShape(network, getGripsConfig(this.c).getOutputDir()
+				+ "/links_p.shp", builder).write();
 
 	}
 
 	@SuppressWarnings("unused")
 	private void generateAndSaveNetworkChangeEvents(Scenario sc) {
-		throw new RuntimeException("This has to be done during network generation. The reason is that at this stage the mapping between original link ids (e.g. from osm) to generated matsim link ids is forgotten!");
+		throw new RuntimeException(
+				"This has to be done during network generation. The reason is that at this stage the mapping between original link ids (e.g. from osm) to generated matsim link ids is forgotten!");
 
 	}
 
 	protected void generateAndSavePopulation(Scenario sc) {
-		// for now a simple ESRI shape file format is used to emulated the a more sophisticated not yet defined population meta format
+		// for now a simple ESRI shape file format is used to emulated the a
+		// more sophisticated not yet defined population meta format
 		GripsConfigModule gcm = getGripsConfig(sc.getConfig());
 		String gripsPopulationFile = gcm.getPopulationFileName();
-		new PopulationFromESRIShapeFileGenerator(sc, gripsPopulationFile, this.safeLinkId).run();
+		new PopulationFromESRIShapeFileGenerator(sc, gripsPopulationFile,
+				this.safeLinkId).run();
 
 		String outputPopulationFile = gcm.getOutputDir() + "/population.xml.gz";
-		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), gcm.getSampleSize()).write(outputPopulationFile);
+		new PopulationWriter(sc.getPopulation(), sc.getNetwork(),
+				gcm.getSampleSize()).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
 
 		sc.getConfig().qsim().setStorageCapFactor(gcm.getSampleSize());
 		sc.getConfig().qsim().setFlowCapFactor(gcm.getSampleSize());
 
 		ActivityParams pre = new ActivityParams("pre-evac");
-		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
-		// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
+		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when
+									// running a simulation one gets
+									// "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
+		// the reason is the double precision. see also comment in
+		// ActivityUtilityParameters.java (gl)
 		pre.setMinimalDuration(49);
 		pre.setClosingTime(49);
 		pre.setEarliestEndTime(49);
 		pre.setLatestStartTime(49);
 		pre.setOpeningTime(49);
-
 
 		ActivityParams post = new ActivityParams("post-evac");
 		post.setTypicalDuration(49); // dito
@@ -248,13 +256,16 @@ public class ScenarioGenerator {
 		sc.getConfig().planCalcScore().setLateArrival_utils_hr(0.);
 		sc.getConfig().planCalcScore().setPerforming_utils_hr(0.);
 
-		//		sc.getConfig().planCalcScore().addParam("activityPriority_0", "1");
-		//		sc.getConfig().planCalcScore().addParam("activityTypicalDuration_0", "00:00:49");
-		//		sc.getConfig().planCalcScore().addParam("activityMinimalDuration_0", "00:00:49");
-		//		sc.getConfig().planCalcScore().addParam("activityPriority_1", "1");
-		//		sc.getConfig().planCalcScore().addParam("activityTypicalDuration_1", "00:00:49");
-		//		sc.getConfig().planCalcScore().addParam("activityMinimalDuration_1", "00:00:49");
-
+		// sc.getConfig().planCalcScore().addParam("activityPriority_0", "1");
+		// sc.getConfig().planCalcScore().addParam("activityTypicalDuration_0",
+		// "00:00:49");
+		// sc.getConfig().planCalcScore().addParam("activityMinimalDuration_0",
+		// "00:00:49");
+		// sc.getConfig().planCalcScore().addParam("activityPriority_1", "1");
+		// sc.getConfig().planCalcScore().addParam("activityTypicalDuration_1",
+		// "00:00:49");
+		// sc.getConfig().planCalcScore().addParam("activityMinimalDuration_1",
+		// "00:00:49");
 
 	}
 
@@ -265,71 +276,79 @@ public class ScenarioGenerator {
 
 		// Step 1 raw network input
 		// for now grips network meta format is osm
-		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
-		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", this.c.global().getCoordinateSystem());
+		// Hamburg example UTM32N. In future coordinate transformation should be
+		// performed beforehand
+		CoordinateTransformation ct = new GeotoolsTransformation("WGS84",
+				this.c.global().getCoordinateSystem());
 
-		
 		if (gcm.getMainTrafficType().equals("vehicular")) {
-			OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, true);
+			OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct,
+					true);
 			reader.setKeepPaths(true);
 			reader.parse(gripsNetworkFile);
 		} else if (gcm.getMainTrafficType().equals("pedestrian")) {
 
-			OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, false);
+			OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct,
+					false);
 			reader.setKeepPaths(true);
 			reader.parse(gripsNetworkFile);
-			//capacity per lane and hour 1.3/m/s * 0.6 m * 3600s/h 
+			// capacity per lane and hour 1.3/m/s * 0.6 m * 3600s/h
 			double laneCap = 2808 * 2; // 2 lanes
 
-			//					reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
-			//					reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
-			reader.setHighwayDefaults(2, "trunk",         2,  1.34, 1., laneCap);
-			reader.setHighwayDefaults(2, "trunk_link",    2,  1.34, 1.0,laneCap);
-			reader.setHighwayDefaults(3, "primary",       2,  1.34, 1.0, laneCap);
-			reader.setHighwayDefaults(3, "primary_link",  2,  1.34, 1.0, laneCap);
-			reader.setHighwayDefaults(4, "secondary",     2,  1.34, 1.0, laneCap);
-			reader.setHighwayDefaults(5, "tertiary",      2,  1.34, 1.0,  laneCap);
-			reader.setHighwayDefaults(6, "minor",         2,  1.34, 1.0,  laneCap);
-			reader.setHighwayDefaults(6, "unclassified",  2,  1.34, 1.0,  laneCap);
-			reader.setHighwayDefaults(6, "residential",   2,  1.34, 1.0,  laneCap);
-			reader.setHighwayDefaults(6, "living_street", 2,  1.34, 1.0,  laneCap);
-			reader.setHighwayDefaults(6,"path",           2,  1.34, 1.0,  laneCap);
-			reader.setHighwayDefaults(6,"cycleway",       2,  1.34, 1.0,  laneCap);
-			reader.setHighwayDefaults(6,"footway",        2,  1.34, 1.0,  laneCap);
+			// reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0,
+			// 10000,true);
+			// reader.setHighwayDefaults(1, "motorway_link", 4, 5.0/3.6, 1.0,
+			// 10000,true);
+			reader.setHighwayDefaults(2, "trunk", 2, 1.34, 1., laneCap);
+			reader.setHighwayDefaults(2, "trunk_link", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(3, "primary", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(3, "primary_link", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(4, "secondary", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(5, "tertiary", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(6, "minor", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(6, "unclassified", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(6, "residential", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(6, "living_street", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(6, "cycleway", 2, 1.34, 1.0, laneCap);
+			reader.setHighwayDefaults(6, "footway", 2, 1.34, 1.0, laneCap);
 
 			// max density is set to 5.4 p/m^2
-			((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.6);
-			((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.31);
+			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
 			reader.setKeepPaths(true);
 			reader.parse(gripsNetworkFile);
-		}else if (gcm.getMainTrafficType().equals("mixed")) {
-			//TODO OSMReader for mixed
+		} else if (gcm.getMainTrafficType().equals("mixed")) {
+			// TODO OSMReader for mixed
 			log.warn("You are using an experimental feature. Only use this if you exactly know what are you doing!");
-			((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.6);
-			((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.31);
-			CustomizedOsmNetworkReader reader = new CustomizedOsmNetworkReader(sc.getNetwork(), ct, true);
-			reader.setHighwayDefaults(6,"path",           2,  1.34, 1.0,  1);
-			reader.setHighwayDefaults(6,"cycleway",       2,  1.34, 1.0,  1);
-			reader.setHighwayDefaults(6,"footway",        2,  1.34, 1.0,  1);
-			reader.setHighwayDefaults(6,"steps",        2,  1.34, 1.0,  1);
+			((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.6);
+			((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.31);
+			CustomizedOsmNetworkReader reader = new CustomizedOsmNetworkReader(
+					sc.getNetwork(), ct, true);
+			reader.setHighwayDefaults(6, "path", 2, 1.34, 1.0, 1);
+			reader.setHighwayDefaults(6, "cycleway", 2, 1.34, 1.0, 1);
+			reader.setHighwayDefaults(6, "footway", 2, 1.34, 1.0, 1);
+			reader.setHighwayDefaults(6, "steps", 2, 1.34, 1.0, 1);
 			reader.setKeepPaths(true);
 			reader.parse(gripsNetworkFile);
 		}
 
-
-
-
 		// Step 2 evacuation network generator
 		// 2a) read the evacuation area
-		// for now grips evacuation area meta format is ESRI Shape with no validation etc.
-		// TODO switch to gml by writing a  xsd + corresponding parser. may be geotools is our friend her? The xsd has to make sure that the evacuation area consists of one and only one
+		// for now grips evacuation area meta format is ESRI Shape with no
+		// validation etc.
+		// TODO switch to gml by writing a xsd + corresponding parser. may be
+		// geotools is our friend her? The xsd has to make sure that the
+		// evacuation area consists of one and only one
 		// polygon
 		@SuppressWarnings("rawtypes")
-		FeatureSource fs = ShapeFileReader.readDataFile(gcm.getEvacuationAreaFileName());
+		FeatureSource fs = ShapeFileReader.readDataFile(gcm
+				.getEvacuationAreaFileName());
 		SimpleFeature ft = null;
 		try {
 			ft = (SimpleFeature) fs.getFeatures().features().next();
-			FeatureTransformer.transform(ft,fs.getSchema().getCoordinateReferenceSystem(),this.c);
+			FeatureTransformer.transform(ft, fs.getSchema()
+					.getCoordinateReferenceSystem(), this.c);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-2);
@@ -350,16 +369,14 @@ public class ScenarioGenerator {
 		MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
 		Polygon p = (Polygon) mp.getGeometryN(0);
 		// 2b) generate network
-		new EvacuationNetworkGenerator(sc, p,this.safeLinkId).run();
+		new EvacuationNetworkGenerator(sc, p, this.safeLinkId).run();
 
-		String networkOutputFile = gcm.getOutputDir()+"/network.xml.gz";
-		//		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
-		//		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
+		String networkOutputFile = gcm.getOutputDir() + "/network.xml.gz";
+		// ((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(0.26);
+		// ((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.71);
 		new NetworkWriter(sc.getNetwork()).write(networkOutputFile);
 		sc.getConfig().network().setInputFile(networkOutputFile);
 	}
-
-
 
 	public GripsConfigModule getGripsConfig() {
 		Module m = this.c.getModule("grips");
@@ -371,8 +388,8 @@ public class ScenarioGenerator {
 		return gcm;
 	}
 
-
-	@Deprecated //call this w/o parameter
+	@Deprecated
+	// call this w/o parameter
 	public GripsConfigModule getGripsConfig(Config c) {
 
 		Module m = c.getModule("grips");
@@ -387,7 +404,5 @@ public class ScenarioGenerator {
 	public String getPathToMatsimConfigXML() {
 		return this.matsimConfigFile;
 	}
-
-
 
 }
