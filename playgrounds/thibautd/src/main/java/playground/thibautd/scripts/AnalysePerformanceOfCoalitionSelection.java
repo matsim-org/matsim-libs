@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -111,7 +110,7 @@ public class AnalysePerformanceOfCoalitionSelection {
 
 		for ( Person person : group.getPersons() ) {
 			for ( int i = 0; i < maxPlansPerSize; i++ ) {
-				final Plan plan = new PlanImpl( person );
+				final Plan plan = jps.getFactory().createIndividualPlan( person );
 				person.addPlan( plan );
 				plan.setScore( random.nextDouble() );
 			}
@@ -131,7 +130,7 @@ public class AnalysePerformanceOfCoalitionSelection {
 				final Map<Id, Plan> jp = new HashMap<Id, Plan>();
 				for ( Person person : personInJp ) {
 					for ( int i = 0; i < maxPlansPerSize; i++ ) {
-						final Plan plan = new PlanImpl( person );
+						final Plan plan = jps.getFactory().createIndividualPlan( person );
 						person.addPlan( plan );
 						plan.setScore( random.nextDouble() );
 						jp.put( person.getId() , plan );

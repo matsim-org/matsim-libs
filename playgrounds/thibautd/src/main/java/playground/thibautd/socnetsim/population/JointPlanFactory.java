@@ -55,8 +55,8 @@ public class JointPlanFactory implements MatsimFactory {
 			final boolean addAtIndividualLevel) {
 		JointPlan jointPlan = new JointPlan( plans );
 
-		if (addAtIndividualLevel) {
-			for (Plan plan : plans.values()) {
+		for (Plan plan : plans.values()) {
+			if (addAtIndividualLevel) {
 				final Person person = plan.getPerson();
 				if (person == null) {
 					throw new NullPointerException(
@@ -83,16 +83,20 @@ public class JointPlanFactory implements MatsimFactory {
 				addAtIndividualLevel );
 	}
 
-	private static Map<Id, Plan> cloneIndividualPlans(final JointPlan plan) {
+	private Map<Id, Plan> cloneIndividualPlans(final JointPlan plan) {
 		final Map<Id , Plan> plans = new LinkedHashMap<Id, Plan>();
 
 		for (Map.Entry<Id, Plan> indiv : plan.getIndividualPlans().entrySet()) {
-			final PlanImpl newPlan = new PlanImpl( indiv.getValue().getPerson() );
+			final PlanImpl newPlan = createIndividualPlan( indiv.getValue().getPerson() );
 			newPlan.copyFrom( indiv.getValue() );
 			plans.put( indiv.getKey() , newPlan );
 		}
 		
 		return plans;
+	}
+
+	public PlanImpl createIndividualPlan( final Person person) {
+		return new PlanWithCachedJointPlan( person );
 	}
 }
 

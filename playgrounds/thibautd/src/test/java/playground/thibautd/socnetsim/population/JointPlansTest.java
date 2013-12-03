@@ -25,6 +25,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -35,10 +36,19 @@ import org.matsim.core.population.PlanImpl;
  */
 public class JointPlansTest {
 	@Test
-	public void testExceptionAdd() throws Exception {
-		Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
-		Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
-		Plan p3 = new PlanImpl( new PersonImpl( new IdImpl( 3 ) ) );
+	public void testExceptionAddWithCache( ) throws Exception {
+		testExceptionAdd( true );
+	}
+
+	@Test
+	public void testExceptionAddWithoutCache( ) throws Exception {
+		testExceptionAdd( false );
+	}
+
+	private static void testExceptionAdd( final boolean withCache ) throws Exception {
+		Plan p1 = createPlan( new PersonImpl( new IdImpl( 1 ) ) , withCache );
+		Plan p2 = createPlan( new PersonImpl( new IdImpl( 2 ) ) , withCache );
+		Plan p3 = createPlan( new PersonImpl( new IdImpl( 3 ) ) , withCache );
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
 		jp1.put( p1.getPerson().getId() , p1 );
@@ -65,10 +75,20 @@ public class JointPlansTest {
 				gotException);
 	}
 
+
 	@Test
-	public void testExceptionRemove() throws Exception {
-		Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
-		Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
+	public void testExceptionRemoveWithCache( ) throws Exception {
+		testExceptionRemove( true );
+	}
+
+	@Test
+	public void testExceptionRemoveWithoutCache( ) throws Exception {
+		testExceptionRemove( false );
+	}
+
+	private static void testExceptionRemove( final boolean withCache ) throws Exception {
+		Plan p1 = createPlan( new PersonImpl( new IdImpl( 1 ) ) , withCache );
+		Plan p2 = createPlan( new PersonImpl( new IdImpl( 2 ) ) , withCache );
 
 		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
 		jp1.put( p1.getPerson().getId() , p1 );
@@ -97,91 +117,9 @@ public class JointPlansTest {
 				gotException);
 	}
 
-	//@Test
-	//public void testIsAdded() throws Exception {
-	//	Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
-	//	Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
-	//	Plan p3 = new PlanImpl( new PersonImpl( new IdImpl( 3 ) ) );
-	//	Plan p4 = new PlanImpl( new PersonImpl( new IdImpl( 4 ) ) );
-	//	Plan p5 = new PlanImpl( new PersonImpl( new IdImpl( 5 ) ) );
-
-	//	Map<Id, Plan> jpm1 = new HashMap<Id, Plan>();
-	//	jpm1.put( p1.getPerson().getId() , p1 );
-	//	jpm1.put( p2.getPerson().getId() , p2 );
-
-	//	Map<Id, Plan> jpm2 = new HashMap<Id, Plan>();
-	//	jpm2.put( p3.getPerson().getId() , p3 );
-	//	jpm2.put( p4.getPerson().getId() , p4 );
-	//	jpm2.put( p5.getPerson().getId() , p5 );
-
-	//	JointPlan jp1 = JointPlanFactory.createJointPlan( jpm1 );
-	//	JointPlan jp2 = JointPlanFactory.createJointPlan( jpm2 );
-
-	//	for (Plan p : jpm1.values()) {
-	//		Assert.assertEquals(
-	//				"unexpected joint plan",
-	//				JointPlanFactory.getPlanLinks().getJointPlan( p ),
-	//				jp1 );
-	//	}
-
-	//	for (Plan p : jpm2.values()) {
-	//		Assert.assertEquals(
-	//				"unexpected joint plan",
-	//				JointPlanFactory.getPlanLinks().getJointPlan( p ),
-	//				jp2 );
-	//	}
-	//}
-
-	//@Test
-	//@Ignore
-	//// this fails... come back to it in case of memory leaks
-	//// It may fail only because the assert is done while the GC is running...
-	//public void testForgetting() throws Exception {
-	//	WeakReference<JointPlan> refToJp;
-
-	//	{
-	//		Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
-	//		Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
-
-	//		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-	//		jp1.put( p1.getPerson().getId() , p1 );
-	//		jp1.put( p2.getPerson().getId() , p2 );
-
-	//		refToJp = new WeakReference<JointPlan>(
-	//				JointPlanFactory.createJointPlan( jp1 ) );
-	//	}
-
-	//	gc();
-	//	Assert.assertEquals(
-	//			"JointPlans did not forget",
-	//			null,
-	//			refToJp.get());
-	//}
-
-	//@Test
-	//public void testDoNotForgetTooEarly() throws Exception {
-	//	WeakReference<JointPlan> refToJp;
-
-	//	Plan p1 = new PlanImpl( new PersonImpl( new IdImpl( 1 ) ) );
-	//	Plan p2 = new PlanImpl( new PersonImpl( new IdImpl( 2 ) ) );
-
-	//	Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-	//	jp1.put( p1.getPerson().getId() , p1 );
-	//	jp1.put( p2.getPerson().getId() , p2 );
-
-	//	refToJp = new WeakReference<JointPlan>(
-	//			JointPlanFactory.createJointPlan( jp1 ) );
-
-	//	gc();
-	//	Assert.assertNotNull(
-	//			"JointPlans did forget while Plans are still referenced",
-	//			refToJp.get());
-	//}
-
-	//private static void gc() {
-	//	// trick to be sure the gc is run (need this to test the forgetting behavior)
-	//	WeakReference ref = new WeakReference<Object>( new Object() );
-	//	while (ref.get() != null) System.gc();
-	//}
+	private static Plan createPlan( final Person person , final boolean withCache ) {
+		if ( withCache ) return new PlanWithCachedJointPlan( person );
+		else return new PlanImpl( person );
+	}
 }
 

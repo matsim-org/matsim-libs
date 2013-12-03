@@ -146,7 +146,7 @@ public class GroupPlans {
 		}
 
 		for (Plan p : plans.getIndividualPlans()) {
-			PlanImpl newPlan = new PlanImpl( p.getPerson() );
+			PlanImpl newPlan = jointPlanFactory.createIndividualPlan( p.getPerson() );
 			newPlan.copyFrom( p );
 			p.getPerson().addPlan( newPlan );
 			ps.add( newPlan );

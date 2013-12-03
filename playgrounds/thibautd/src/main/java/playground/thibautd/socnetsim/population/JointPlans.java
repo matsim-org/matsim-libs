@@ -43,14 +43,26 @@ public class JointPlans implements MatsimToplevelContainer {
 	private final JointPlanFactory factory = new JointPlanFactory();
 	
 	public JointPlan getJointPlan(final Plan indivPlan) {
+		if ( indivPlan instanceof PlanWithCachedJointPlan ) {
+			return ((PlanWithCachedJointPlan) indivPlan).getJointPlan();
+		}
 		return planToJointPlan.get( indivPlan );
 	}
 
 	public void removeJointPlan(final JointPlan jointPlan) {
 		synchronized (jointPlan) {
 			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
-				final Object removed = planToJointPlan.remove( indivPlan );
-				if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan );
+				if ( indivPlan instanceof PlanWithCachedJointPlan ) {
+					final PlanWithCachedJointPlan withCache = (PlanWithCachedJointPlan) indivPlan;
+
+					if (withCache.getJointPlan() != jointPlan) throw new PlanLinkException( withCache.getJointPlan()+" differs from "+indivPlan );
+
+					withCache.resetJointPlan();
+				}
+				else {
+					final Object removed = planToJointPlan.remove( indivPlan );
+					if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan );
+				}
 			}
 		}
 	}
@@ -58,10 +70,22 @@ public class JointPlans implements MatsimToplevelContainer {
 	public void addJointPlan(final JointPlan jointPlan) {
 		synchronized (jointPlan) {
 			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
-				final Object removed = planToJointPlan.put( indivPlan , jointPlan );
-				if (removed != null && removed != jointPlan) {
-					throw new PlanLinkException( removed+" was associated to "+indivPlan+
-							" while trying to associate "+jointPlan );
+				if ( indivPlan instanceof PlanWithCachedJointPlan ) {
+					final PlanWithCachedJointPlan withCache = (PlanWithCachedJointPlan) indivPlan;
+
+					if ( withCache.getJointPlan() != null && withCache.getJointPlan() != jointPlan) {
+						throw new PlanLinkException( withCache.getJointPlan()+" was associated to "+indivPlan+
+								" while trying to associate "+jointPlan );
+					}
+
+					withCache.setJointPlan( jointPlan );
+				}
+				else {
+					final Object removed = planToJointPlan.put( indivPlan , jointPlan );
+					if (removed != null && removed != jointPlan) {
+						throw new PlanLinkException( removed+" was associated to "+indivPlan+
+								" while trying to associate "+jointPlan );
+					}
 				}
 			}
 		}
@@ -70,9 +94,16 @@ public class JointPlans implements MatsimToplevelContainer {
 	public boolean contains( final JointPlan jointPlan) {
 		synchronized (jointPlan) {
 			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
-				final Object removed = planToJointPlan.get( indivPlan );
-				if (removed != null && removed == jointPlan) {
-					return true;
+				if ( indivPlan instanceof PlanWithCachedJointPlan ) {
+					if ( ((PlanWithCachedJointPlan) indivPlan).getJointPlan() == jointPlan ) {
+						return true;
+					}
+				}
+				else {
+					final Object removed = planToJointPlan.get( indivPlan );
+					if (removed != null && removed == jointPlan) {
+						return true;
+					}
 				}
 			}
 			return false;
