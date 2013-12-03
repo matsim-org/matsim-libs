@@ -21,9 +21,7 @@ package playground.thibautd.socnetsim.population;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 
@@ -38,22 +36,12 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  * @author thibautd
  */
 public class JointPlans implements MatsimToplevelContainer {
-	private static final Logger log =
-		Logger.getLogger(JointPlans.class);
-
 	public static final String ELEMENT_NAME = "jointPlans";
 
 	private final Map<Plan, JointPlan> planToJointPlan = new ConcurrentHashMap<Plan, JointPlan>();
 
-	private final static AtomicInteger instanceCount = new AtomicInteger( 0 );
 	private final JointPlanFactory factory = new JointPlanFactory();
 	
-	public JointPlans() {
-		if (instanceCount.incrementAndGet() > 1) {
-			log.warn( "there are several instances of JointPlans. Did you expect it?" );
-		}
-	}
-
 	public JointPlan getJointPlan(final Plan indivPlan) {
 		return planToJointPlan.get( indivPlan );
 	}
