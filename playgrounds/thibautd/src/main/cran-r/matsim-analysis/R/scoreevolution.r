@@ -10,20 +10,18 @@ plot.score.evolution <-
 			 ylab="Score",
 			 bty="n",
 			 the.lines=dataset$groupId == group,
-			 ylim=c(min( min[ the.lines ] ) , max( max[ the.lines ] )),
+			 ylim=c(min( dataset$min[ the.lines ] ) , max( dataset$max[ the.lines ] )),
 			 ...) {
-	attach( dataset )
-	plot( iter[ the.lines ] , max[ the.lines ] , type="l" , col=col.max ,
+	plot( dataset$iter[ the.lines ] , dataset$max[ the.lines ] , type="l" , col=col.max ,
 		 xlab=xlab, ylab=ylab,
 		 ylim=ylim,
 		 bty=bty,
 		 ... )
-	lines( iter[ the.lines ] , min[ the.lines ] , col=col.min , ... )
-	lines( iter[ the.lines ] , exec[ the.lines ] , col=col.exec , ... )
+	lines( dataset$iter[ the.lines ] , dataset$min[ the.lines ] , col=col.min , ... )
+	lines( dataset$iter[ the.lines ] , dataset$exec[ the.lines ] , col=col.exec , ... )
 	legend( legend.pos ,
 		   c( "avg. min" , "avg. executed" , "avg. max") ,
 		   col=c(col.min, col.exec, col.max ),
 		   box.lty=0,
 		   lty=1 )
-	detach()
 }
