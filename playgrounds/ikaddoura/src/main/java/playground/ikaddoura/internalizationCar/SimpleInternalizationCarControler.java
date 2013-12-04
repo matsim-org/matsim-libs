@@ -39,15 +39,19 @@ public class SimpleInternalizationCarControler {
 	private static final Logger log = Logger.getLogger(SimpleInternalizationCarControler.class);
 	
 	static String configFile;
+	static boolean internalization;
 			
 	public static void main(String[] args) throws IOException {
 				
 		if (args.length > 0) {
 			configFile = args[0];		
-			log.info("configFile: "+ configFile);
-			
+			log.info("first argument (config file): "+ configFile);
+			internalization = Boolean.parseBoolean(args[1]);
+			log.info("second argument (enabling internalization: true/false): "+ internalization);
+
 		} else {
 			configFile = "../../runs-svn/internalizationCar/input/config_internalizationCar.xml";
+			internalization = true;
 		}
 		
 		SimpleInternalizationCarControler main = new SimpleInternalizationCarControler();
@@ -58,10 +62,17 @@ public class SimpleInternalizationCarControler {
 		
 		Controler controler = new Controler(configFile);
 
-		TollHandler tollHandler = new TollHandler(controler.getScenario());
-		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-		controler.addControlerListener(new InternalizationCarControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler ));
+		if (internalization) {
+			
+			log.info("Internalization of congestion effects is enabled.");
+			TollHandler tollHandler = new TollHandler(controler.getScenario());
+			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			controler.addControlerListener(new InternalizationCarControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler ));
+		
+		} else {
+			log.info("Internalization of congestion effects is disabled.");
+		}
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
