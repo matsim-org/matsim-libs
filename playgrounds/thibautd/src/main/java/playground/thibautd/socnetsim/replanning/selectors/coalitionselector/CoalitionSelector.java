@@ -45,6 +45,7 @@ import playground.thibautd.utils.MapUtils;
  * @author thibautd
  */
 public class CoalitionSelector implements GroupLevelPlanSelector {
+	private final ConflictSolver conflictSolver = new LeastPointedPlanPruningConflictSolver();
 	private final WeightCalculator weight;
 
 	public CoalitionSelector() {
@@ -99,7 +100,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 		}
 	}
 
-	private static void doIteration(
+	private void doIteration(
 			final JointPlans jointPlans,
 			final Map<Id, PointingAgent> agents,
 			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan,
@@ -133,7 +134,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			}
 		}
 
-		markLeastPointedJointPlanAsInfeasible(
+		conflictSolver.attemptToSolveConflicts(
 				recordsPerJointPlan );
 	}
 
@@ -156,33 +157,6 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 		agents.remove( id );
 	}
 
-	private static void markLeastPointedJointPlanAsInfeasible(
-			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan) {
-		int minPoint = Integer.MAX_VALUE;
-		Map.Entry<JointPlan , Collection<PlanRecord>> toMark = null;
-		for ( Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {
-			final JointPlan jointPlan = entry.getKey();
-			final Collection<PlanRecord> records = entry.getValue();
-
-			int nPoint = 0;
-			for ( PlanRecord r : records ) {
-				if ( jointPlan.getIndividualPlan( r.getPlan().getPerson().getId() ) == r.getPlan() ) nPoint++;
-			}
-
-			if ( nPoint > 1 && nPoint < minPoint ) {
-				minPoint = nPoint;
-				toMark = entry;
-			}
-		}
-
-		if ( toMark == null ) {
-			throw new RuntimeException( "could not find least pointed joint plan in "+recordsPerJointPlan );
-		}
-
-		for ( PlanRecord r : toMark.getValue() ) r.setInfeasible();
-		recordsPerJointPlan.remove( toMark.getKey() );
-	}
-
 	private static boolean areAllPlansPointed(
 			final Collection<PlanRecord> records) {
 		for ( PlanRecord record : records ) {
@@ -192,6 +166,10 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			}
 		}
 		return true;
+	}
+
+	public static interface ConflictSolver {
+		public void attemptToSolveConflicts( Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan );
 	}
 }
 
