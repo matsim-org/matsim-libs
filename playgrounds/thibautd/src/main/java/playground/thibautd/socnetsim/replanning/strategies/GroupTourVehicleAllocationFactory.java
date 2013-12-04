@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.TransportMode;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
@@ -32,13 +32,16 @@ import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleTo
 /**
  * @author thibautd
  */
-public class GroupTourVehicleAllocationFactory implements GroupPlanStrategyFactory {
+public class GroupTourVehicleAllocationFactory extends AbstractConfigurableSelectionStrategy {
+
+	public GroupTourVehicleAllocationFactory(
+			final GroupPlanStrategyFactoryRegistry factoryRegistry) {
+		super(factoryRegistry);
+	}
 
 	@Override
 	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy =
-				GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy(
-					registry.getIncompatiblePlansIdentifierFactory());
+		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(

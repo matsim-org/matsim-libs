@@ -24,7 +24,7 @@ import org.matsim.core.router.CompositeStageActivityTypes;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
@@ -33,13 +33,16 @@ import playground.thibautd.socnetsim.sharedvehicles.replanning.OptimizeVehicleAl
 /**
  * @author thibautd
  */
-public class GroupOptimizingTourVehicleAllocationFactory implements GroupPlanStrategyFactory {
+public class GroupOptimizingTourVehicleAllocationFactory extends AbstractConfigurableSelectionStrategy {
+
+	public GroupOptimizingTourVehicleAllocationFactory(
+			GroupPlanStrategyFactoryRegistry factoryRegistry) {
+		super(factoryRegistry);
+	}
 
 	@Override
 	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy =
-				GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy(
-					registry.getIncompatiblePlansIdentifierFactory());
+		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 
 		final CompositeStageActivityTypes stageActs = new CompositeStageActivityTypes();
 		stageActs.addActivityTypes( registry.getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes() );

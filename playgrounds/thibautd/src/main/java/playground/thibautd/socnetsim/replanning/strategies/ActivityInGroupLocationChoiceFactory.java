@@ -22,20 +22,24 @@ package playground.thibautd.socnetsim.replanning.strategies;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.modules.MutateActivityLocationsToLocationsOfOthersModule;
 
 /**
  * @author thibautd
  */
-public class ActivityInGroupLocationChoiceFactory implements GroupPlanStrategyFactory {
+public class ActivityInGroupLocationChoiceFactory extends AbstractConfigurableSelectionStrategy {
+
+	public ActivityInGroupLocationChoiceFactory(
+			GroupPlanStrategyFactoryRegistry factoryRegistry) {
+		super(factoryRegistry);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public GroupPlanStrategy createStrategy( final ControllerRegistry registry ) {
-		final GroupPlanStrategy strategy =
-				GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy(
-					registry.getIncompatiblePlansIdentifierFactory());
+		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 
 		final GroupReplanningConfigGroup configGroup = (GroupReplanningConfigGroup)
 				registry.getScenario().getConfig().getModule(

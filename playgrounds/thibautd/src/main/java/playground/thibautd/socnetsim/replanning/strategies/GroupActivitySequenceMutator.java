@@ -23,20 +23,24 @@ import playground.thibautd.replanning.ActivitySequenceMutatorModule;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
 
 /**
  * @author thibautd 
  */
-public class GroupActivitySequenceMutator implements GroupPlanStrategyFactory {
+public class GroupActivitySequenceMutator extends AbstractConfigurableSelectionStrategy {
+
+	public GroupActivitySequenceMutator(
+			GroupPlanStrategyFactoryRegistry factoryRegistry) {
+		super(factoryRegistry);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy =
-				GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy(
-					registry.getIncompatiblePlansIdentifierFactory());
+		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(

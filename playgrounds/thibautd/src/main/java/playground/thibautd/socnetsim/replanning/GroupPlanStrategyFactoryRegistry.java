@@ -51,6 +51,7 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupTourVehicleAlloc
 import playground.thibautd.socnetsim.replanning.strategies.GroupWeightedSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
+import playground.thibautd.socnetsim.replanning.strategies.RandomGroupPlanSelectorStrategyFactory;
 
 /**
  * @author thibautd
@@ -65,34 +66,34 @@ public class GroupPlanStrategyFactoryRegistry {
 		// ---------------------------------------------------------------------
 		addFactory(
 				"ReRoute",
-				new GroupReRouteFactory() );
+				new GroupReRouteFactory( this ) );
 		addFactory(
 				"TimeAllocationMutator",
-				new GroupTimeAllocationMutatorFactory( 1 ) );
+				new GroupTimeAllocationMutatorFactory( this , 1 ) );
 		addFactory(
 				"CliqueJointTripMutator",
-				new CliqueJointTripMutatorFactory( ) );
+				new CliqueJointTripMutatorFactory( this ) );
 		addFactory(
 				"SubtourModeChoice",
-				new GroupSubtourModeChoiceFactory() );
+				new GroupSubtourModeChoiceFactory( this ) );
 		addFactory(
 				"TourVehicleAllocation",
-				new GroupTourVehicleAllocationFactory() );
+				new GroupTourVehicleAllocationFactory( this ) );
 		addFactory(
 				"PlanVehicleAllocation",
-				new GroupPlanVehicleAllocationFactory() );
+				new GroupPlanVehicleAllocationFactory( this ) );
 		addFactory(
 				"OptimizingTourVehicleAllocation",
-				new GroupOptimizingTourVehicleAllocationFactory() );
+				new GroupOptimizingTourVehicleAllocationFactory( this ) );
 		addFactory(
 				"RandomJointPlanRecomposer",
 				new GroupRandomJointPlanRecomposerFactory() );
 		addFactory(
 				"ActivityInGroupLocationChoice",
-				new ActivityInGroupLocationChoiceFactory() );
+				new ActivityInGroupLocationChoiceFactory( this ) );
 		addFactory(
 				"ActivitySequenceMutator",
-				new GroupActivitySequenceMutator() );
+				new GroupActivitySequenceMutator( this ) );
 
 		// selectors
 		addSelectorAndStrategyFactory(
@@ -121,6 +122,9 @@ public class GroupPlanStrategyFactoryRegistry {
 				"CoalitionSelectExpBeta_LeastAverageConflictResolution",
 				new CoalitionExpBetaFactory(
 					new LeastAverageWeightJointPlanPruningConflictSolver() ) );
+		addSelectorAndStrategyFactory(
+				"RandomSelection",
+				new RandomGroupPlanSelectorStrategyFactory() );
 
 		// default removers
 		// ---------------------------------------------------------------------

@@ -27,7 +27,7 @@ import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.JointPlanBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
@@ -39,13 +39,17 @@ import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleTo
 /**
  * @author thibautd
  */
-public class CliqueJointTripMutatorFactory implements GroupPlanStrategyFactory {
+public class CliqueJointTripMutatorFactory extends AbstractConfigurableSelectionStrategy {
+
+	public CliqueJointTripMutatorFactory(
+			GroupPlanStrategyFactoryRegistry factoryRegistry) {
+		super(factoryRegistry);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy =
-				GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy(
-					registry.getIncompatiblePlansIdentifierFactory());
+		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 		
 		final Config config = registry.getScenario().getConfig();
 

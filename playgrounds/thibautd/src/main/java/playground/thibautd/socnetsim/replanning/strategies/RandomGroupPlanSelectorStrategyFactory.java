@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupReRouteFactory.java
+ * RandomGroupPlanSelectorStrategyFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,44 +19,23 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
-import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createReRouteModule;
-import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule;
-import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createSynchronizerModule;
+import org.matsim.core.gbl.MatsimRandom;
+
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
+import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
 
 /**
  * @author thibautd
  */
-public class GroupReRouteFactory extends AbstractConfigurableSelectionStrategy {
-	public GroupReRouteFactory(GroupPlanStrategyFactoryRegistry factoryRegistry) {
-		super(factoryRegistry);
-	}
+public class RandomGroupPlanSelectorStrategyFactory extends NonInnovativeStrategyFactory {
 
 	@Override
-	public GroupPlanStrategy createStrategy(
-			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = instantiateStrategy( registry );
-	
-		strategy.addStrategyModule(
-				createReRouteModule(
-					registry.getScenario().getConfig(),
-					registry.getPlanRoutingAlgorithmFactory(),
-					registry.getTripRouterFactory() ) );
-
-		strategy.addStrategyModule(
-				createRecomposeJointPlansModule(
-					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier()));
-
-		strategy.addStrategyModule(
-				createSynchronizerModule(
-					registry.getScenario().getConfig(),
-					registry.getTripRouterFactory() ) );
-
-		return strategy;
+	public GroupLevelPlanSelector createSelector(ControllerRegistry registry) {
+		return new RandomGroupLevelSelector(
+			MatsimRandom.getLocalInstance(),
+			registry.getIncompatiblePlansIdentifierFactory() );
 	}
 }
 

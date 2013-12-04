@@ -85,6 +85,7 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	private String locationChoiceActivityType = "leisure";
 	private String weightAttribute = null;
 	private String selectorForRemoval = "MinimumSum";
+	private String selectorForModification = "RandomSelection";
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -213,6 +214,16 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	@StringSetter( "weightAttributeName" )
 	public void setWeightAttributeName(String weightAttribute) {
 		this.weightAttribute = weightAttribute;
+	}
+
+	@StringGetter( "selectorForModification" )
+	public String getSelectorForModification() {
+		return this.selectorForModification;
+	}
+
+	@StringSetter( "selectorForModification" )
+	public void setSelectorForModification(String selectorForModification) {
+		this.selectorForModification = selectorForModification;
 	}
 }
 

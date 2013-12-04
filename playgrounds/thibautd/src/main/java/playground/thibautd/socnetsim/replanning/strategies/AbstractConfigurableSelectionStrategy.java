@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupPlanVehicleAllocationFactory.java
+ * AbstractConfigurableSelectionStrategy.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,50 +20,29 @@
 package playground.thibautd.socnetsim.replanning.strategies;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
-import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
-import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
-import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 
 /**
  * @author thibautd
  */
-public class GroupPlanVehicleAllocationFactory extends AbstractConfigurableSelectionStrategy {
+public abstract class AbstractConfigurableSelectionStrategy implements GroupPlanStrategyFactory {
+	private final GroupPlanStrategyFactoryRegistry factoryRegistry;
 
-	public GroupPlanVehicleAllocationFactory(
-			GroupPlanStrategyFactoryRegistry factoryRegistry) {
-		super(factoryRegistry);
+	public AbstractConfigurableSelectionStrategy( final GroupPlanStrategyFactoryRegistry factoryRegistry ) {
+		this.factoryRegistry = factoryRegistry;
 	}
 
-	@Override
-	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = instantiateStrategy( registry );
+	protected final GroupPlanStrategy instantiateStrategy( final ControllerRegistry registry ) {
+		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
+			registry.getScenario().getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
-		strategy.addStrategyModule(
-				new AllocateVehicleToPlansInGroupPlanModule(
-					registry.getScenario().getConfig().global().getNumberOfThreads(),
-					(VehicleRessources) registry.getScenario().getScenarioElement(
-						VehicleRessources.ELEMENT_NAME ),
-					SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
-					false,
-					false));
-
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier()));
-
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createReRouteModule(
-					registry.getScenario().getConfig(),
-					registry.getPlanRoutingAlgorithmFactory(),
-					registry.getTripRouterFactory() ) );
-
-		return strategy;
-
+		return new GroupPlanStrategy(
+				factoryRegistry.createSelector(
+					conf.getSelectorForModification(),
+					registry ) );
 	}
 }
 

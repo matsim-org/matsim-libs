@@ -32,26 +32,27 @@ import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
 
-public class GroupTimeAllocationMutatorFactory implements GroupPlanStrategyFactory {
+public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelectionStrategy {
 	private static final Logger log =
 		Logger.getLogger(GroupTimeAllocationMutatorFactory.class);
 
 	private final double maxTemp;
 
-	public  GroupTimeAllocationMutatorFactory(final double maxTemp) {
+	public  GroupTimeAllocationMutatorFactory(
+			final GroupPlanStrategyFactoryRegistry factoryRegistry,
+			final double maxTemp) {
+		super( factoryRegistry );
 		this.maxTemp = maxTemp;
 	}
 
 	@Override
 	public GroupPlanStrategy createStrategy(
 			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy =
-				GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy(
-					registry.getIncompatiblePlansIdentifierFactory());
+		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 		final Config config = registry.getScenario().getConfig();
 		final TripRouterFactoryInternal tripRouterFactory = registry.getTripRouterFactory();
 		final PlanRoutingAlgorithmFactory planRouterFactory = registry.getPlanRoutingAlgorithmFactory();

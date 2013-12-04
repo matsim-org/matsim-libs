@@ -23,7 +23,7 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
@@ -33,13 +33,17 @@ import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleTo
 /**
  * @author thibautd
  */
-public class GroupSubtourModeChoiceFactory implements GroupPlanStrategyFactory {
+public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelectionStrategy {
+
+	public GroupSubtourModeChoiceFactory(
+			GroupPlanStrategyFactoryRegistry factoryRegistry) {
+		super(factoryRegistry);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy =
-				GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy(
-					registry.getIncompatiblePlansIdentifierFactory());
+		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 
 		// Why the hell did I put this here???
 		//strategy.addStrategyModule(

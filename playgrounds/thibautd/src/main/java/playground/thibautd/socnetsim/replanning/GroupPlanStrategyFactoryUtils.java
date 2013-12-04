@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
@@ -42,21 +41,19 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
-import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
 
 /**
  * @author thibautd
  */
 public class GroupPlanStrategyFactoryUtils {
 
-	public static GroupPlanStrategy createRandomSelectingStrategy(
-			final IncompatiblePlansIdentifierFactory fact) {
-		return new GroupPlanStrategy(
-				new RandomGroupLevelSelector(
-					MatsimRandom.getLocalInstance(),
-					fact) );
-	}
+	//public static GroupPlanStrategy createRandomSelectingStrategy(
+	//		final IncompatiblePlansIdentifierFactory fact) {
+	//	return new GroupPlanStrategy(
+	//			new RandomGroupLevelSelector(
+	//				MatsimRandom.getLocalInstance(),
+	//				fact) );
+	//}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// standard modules
