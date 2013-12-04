@@ -40,7 +40,9 @@ import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
+import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 import playground.southafrica.freight.digicore.utils.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
@@ -139,8 +141,13 @@ public class ActivityAnalyser {
 			break;
 		case 2:
 			runActivitiesWithFacilityIdAnalysis(vehicleFiles, output);
-		default:
 			break;
+		case 3:
+			runMinorActivityDurationAnalysis(vehicleFiles, output);
+			break;
+		default:
+			LOG.error("Cannot resolve '" + analysis + " to a valid analysis.");
+			throw new IllegalArgumentException("Invalid analysis parameter.");
 		}
 	}
 
@@ -283,4 +290,85 @@ public class ActivityAnalyser {
 		LOG.info("Done performing analysis on the percentage of activities with facility Ids.");
 	}
 	
+	
+	public void runMinorActivityDurationAnalysis(List<File> vehicles, String output){
+		LOG.info("Performing analysis on the minor activity durations (" + vehicles.size() + " vehicle files)");
+		Counter counter = new Counter("   vehicles completed # ");
+		List<Future<List<Double>>> listOfJobs = new ArrayList<Future<List<Double>>>();
+		
+		/* Set up the callable class. */
+		class ActivityDurationAnalysesCallable implements Callable<List<Double>>{
+			private File vehicleFile;
+			private Counter counter;
+			
+			public ActivityDurationAnalysesCallable(File vehicle, Counter counter) {
+				this.vehicleFile = vehicle;
+				this.counter = counter;
+			}
+			
+			@Override
+			public List<Double> call() throws Exception {
+				List<Double> list = new ArrayList<Double>();
+				DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
+				dvr.parse(this.vehicleFile.getAbsolutePath());
+				DigicoreVehicle vehicle = dvr.getVehicle();
+				for(DigicoreChain chain : vehicle.getChains()){
+					for(DigicoreActivity activity : chain.getMinorActivities()){
+						list.add(activity.getDuration());
+					}
+				}
+				return list;
+			}
+		}
+
+		/* Execute the multi-threaded analysis. */
+		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		for(File file : vehicles){
+			Callable<List<Double>> job = new ActivityDurationAnalysesCallable(file, counter); 
+			Future<List<Double>> result = threadExecutor.submit(job);
+			listOfJobs.add(result);	
+		}
+		
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
+		}
+		counter.printCounter();
+		
+		/* Consolidate the output */
+		List<Double> list = new ArrayList<Double>();
+		for(Future<List<Double>> job : listOfJobs){
+			List<Double> jobList = null;
+			try {
+				jobList = job.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not get the results to consolidate from the multi-threaded run.");
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not get the results to consolidate from the multi-threaded run.");
+			}
+			list.addAll(jobList);
+		}
+		
+		/* Write the output to file. */
+		BufferedWriter bw = IOUtils.getBufferedWriter(output);
+		try{
+			for(Double d : list){
+				bw.write(String.format("%.4f\n", d));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + output);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + output);
+			}
+		}
+
+		LOG.info("Done performing analysis on the percentage of activities with facility Ids.");
+	}
+
 }
