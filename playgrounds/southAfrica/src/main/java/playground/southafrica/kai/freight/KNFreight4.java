@@ -114,27 +114,9 @@ public class KNFreight4 {
 
 	public static void main(String[] args) {
 		
-		// ### config stuff: ###
+		// ### config stuff: ###	
 
-		Config config = ConfigUtils.createConfig() ;
-		
-		if ((args == null) || (args.length == 0)) {
-			config.controler().setOutputDirectory("/Users/nagel/freight-kairuns/output/");
-		} else {
-			System.out.println( "args[0]:" + args[0] );
-			config.controler().setOutputDirectory( args[0]+"/" );
-		}
-		config.controler().setLastIteration(0);
-		
-		config.network().setInputFile(NETFILENAME);
-		if ( addingCongestion ) {
-			config.network().setTimeVariantNetwork(true);
-		}
-		
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
-		
-		config.vspExperimental().addParam( VspExperimentalConfigGroup.VspExperimentalConfigKey.vspDefaultsCheckingLevel, 
-				VspExperimentalConfigGroup.WARN);
+		Config config = createConfig(args);
 
 		// ### scenario stuff: ###
 		
@@ -178,6 +160,30 @@ public class KNFreight4 {
 
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "output_carriers.xml.gz") ;
 
+	}
+
+
+	public static Config createConfig(String[] args) {
+		Config config = ConfigUtils.createConfig() ;
+		
+		if ((args == null) || (args.length == 0)) {
+			config.controler().setOutputDirectory("/Users/nagel/freight-kairuns/output/");
+		} else {
+			System.out.println( "args[0]:" + args[0] );
+			config.controler().setOutputDirectory( args[0]+"/" );
+		}
+		config.controler().setLastIteration(0);
+		
+		config.network().setInputFile(NETFILENAME);
+		if ( addingCongestion ) {
+			config.network().setTimeVariantNetwork(true);
+		}
+		
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		
+		config.vspExperimental().addParam( VspExperimentalConfigGroup.VspExperimentalConfigKey.vspDefaultsCheckingLevel, 
+				VspExperimentalConfigGroup.WARN);
+		return config;
 	}
 
 
