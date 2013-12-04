@@ -342,17 +342,17 @@ public class ChoiceSet {
 		
 		for (int index = 0; index < nrElements; index++)  {
 			ScoredAlternative sa = list.get(index);
-			totalScore += sa.getScore() + this.getOffset(list, nrElements);
+			totalScore += this.handleScore(sa.getScore());
 		}
 		return totalScore;
 	}
 	
 	/*
-	 * TODO: correct for the case where the smallest score is negative -> set to 0.0 at the moment!
+	 * TODO: We have not a linear scale here, but alternatives with negative scores are very bad anyway.
 	 */
-	private double getOffset(ArrayList<ScoredAlternative> list, int nrElements) {
-		double smallestScore = list.get(nrElements - 1).getScore();
-		return Math.min(smallestScore, 0.0) * (-1.0); // if smallest score is negative, then add offsets!
+	private double handleScore(double score) {
+		if (score < 0.0) return 1.0/score;
+		else return score;
 	}
 	
 	/*
@@ -372,7 +372,7 @@ public class ChoiceSet {
 		double sumScore = 0.0;
 		for (int index = 0; index < nrElements; index++)  {
 			ScoredAlternative sa = list.get(index);
-			sumScore += (sa.getScore() + this.getOffset(list, nrElements)) / totalScore;				
+			sumScore += (this.handleScore(sa.getScore())) / totalScore;				
 			mapNormalized.put(sumScore , sa.getAlternativeId());	
 		}
 		return mapNormalized;
