@@ -351,7 +351,7 @@ public class ChoiceSet {
 	 * TODO: We have not a linear scale here, but alternatives with negative scores are very bad anyway.
 	 */
 	private double handleScore(double score) {
-		if (score < 0.0) return 1.0/score;
+		if (score < 0.0) return -1.0/score;
 		else return score;
 	}
 	
