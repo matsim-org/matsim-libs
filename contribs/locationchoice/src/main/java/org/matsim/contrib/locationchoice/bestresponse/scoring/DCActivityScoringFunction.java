@@ -225,8 +225,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		boolean foundAct = false;
 		
 		if (act.getType().equals("pt interaction") || act.getType().equals("home")) {
-			double [] ot = {0.0, Double.MAX_VALUE};
-			return ot;
+			return openInterval;
 		} // pt interaction and home always open
 		
 		ActivityFacility facility = this.facilities.getFacilities().get(act.getFacilityId());		
