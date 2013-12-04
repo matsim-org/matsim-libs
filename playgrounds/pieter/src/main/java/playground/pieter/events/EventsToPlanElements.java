@@ -191,7 +191,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		try {
 			linkWriter = new PostgresqlCSVWriter("LINKWRITER",
 					"" + schemaName + ".matsim_link_traffic" + suffix,
-					new DataBaseAdmin(connectionProperties), 100000, columns);
+					new DataBaseAdmin(connectionProperties), 1000, columns);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
@@ -816,7 +816,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 									new Integer((int) trip.getStartTime()),
 									new Integer((int) trip.getEndTime()),
 									new Integer((int) trip.getDistance()),
-									trip.getMode(), trip.getLine(),
+									trip.getMode().trim(), trip.getLine(),
 									trip.getRoute(), trip.getBoardingStop(),
 									trip.getAlightingStop(),
 									new Double(Math.random()) };

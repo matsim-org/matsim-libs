@@ -230,7 +230,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 		try {
 			linkWriter = new PostgresqlCSVWriter("LINKWRITER",
 					"" + schemaName + ".matsim_link_traffic" + suffix,
-					new DataBaseAdmin(connectionProperties), 100000, columns);
+					new DataBaseAdmin(connectionProperties), 1000, columns);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {

@@ -13,7 +13,7 @@ import javax.management.timer.Timer;
 
 import org.matsim.api.core.v01.Coord;
 
-public class HITSTrip implements Serializable{
+public class HITSTrip extends HITSElement implements Serializable{
 	HITSPerson person;
 	String h1_hhid;
 	int pax_id;
@@ -49,29 +49,29 @@ public class HITSTrip implements Serializable{
 	public HITSTrip(ResultSet trs, Connection conn, DateFormat dfm, HITSPerson person) {
 		try {
 			this.person = person;
-			this.h1_hhid = trs.getString("h1_hhid");
+			this.h1_hhid = getTrimmedStringFromResultSet(trs,"h1_hhid");
 			this.pax_id = trs.getInt("pax_id");
 			this.trip_id = trs.getInt("trip_id");
 			this.p13d_origpcode = trs.getInt("p13d_origpcode");
 			this.t2_destpcode = trs.getInt("t2_destpcode");
 			this.t3_starttime_24h = (Date) trs.getObject("t3_starttime_24h");
 			this.t4_endtime_24h = (Date) trs.getObject("t4_endtime_24h");
-			this.t5_placetype = trs.getString("t5_placetype");
-			this.t6_purpose = trs.getString("t6_purpose");
+			this.t5_placetype = getTrimmedStringFromResultSet(trs,"t5_placetype");
+			this.t6_purpose = getTrimmedStringFromResultSet(trs,"t6_purpose");
 			this.t22_lastwlktime = trs.getInt("t22_lastwlktime");
 			this.t23_tripfreq = trs.getInt("t23_tripfreq");
 			this.t24_compjtime = trs.getInt("t24_compjtime");
 			this.t25_estjtime = trs.getInt("t25_estjtime");
-			this.t27_flextimetyp = trs.getString("t27_flextimetyp");
-			this.p28a_fastrbypt = trs.getString("p28a_fastrbypt");
-			this.p28b_cheaprbypt = trs.getString("p28b_cheaprbypt");
-			this.p28c_easrtoacc = trs.getString("p28c_easrtoacc");
-			this.p28d_needntpark = trs.getString("p28d_needntpark");
-			this.p28e_lessstress = trs.getString("p28e_lessstress");
-			this.p28f_othrmmbrusecar = trs.getString("p28f_othrmmbrusecar");
-			this.p28g_opconly = trs.getString("p28g_opconly");
-			this.p28h_envfrndly = trs.getString("p28h_envfrndly");
-			this.p28i_othrreasnchck = trs.getString("p28i_othrreasnchck");
+			this.t27_flextimetyp = getTrimmedStringFromResultSet(trs,"t27_flextimetyp");
+			this.p28a_fastrbypt = getTrimmedStringFromResultSet(trs,"p28a_fastrbypt");
+			this.p28b_cheaprbypt = getTrimmedStringFromResultSet(trs,"p28b_cheaprbypt");
+			this.p28c_easrtoacc = getTrimmedStringFromResultSet(trs,"p28c_easrtoacc");
+			this.p28d_needntpark = getTrimmedStringFromResultSet(trs,"p28d_needntpark");
+			this.p28e_lessstress = getTrimmedStringFromResultSet(trs,"p28e_lessstress");
+			this.p28f_othrmmbrusecar = getTrimmedStringFromResultSet(trs,"p28f_othrmmbrusecar");
+			this.p28g_opconly = getTrimmedStringFromResultSet(trs,"p28g_opconly");
+			this.p28h_envfrndly = getTrimmedStringFromResultSet(trs,"p28h_envfrndly");
+			this.p28i_othrreasnchck = getTrimmedStringFromResultSet(trs,"p28i_othrreasnchck");
 			this.tripfactorsstgfinal = trs.getDouble("tripfactorsstgfinal");
 			this.dfm = dfm;
 		} catch (SQLException e) {
@@ -111,7 +111,7 @@ public class HITSTrip implements Serializable{
 					"t19_parkfee,"+
 					"t19a_parkftyp,"+
 					"t20_parkreimb"+
-					" from hits.hitsshort where " +
+					" from d_hits.hitsshort where " +
 					"h1_hhid = '"+ this.h1_hhid +
 					"' and pax_id = " + this.pax_id + 
 					" and trip_id = " + this.trip_id + ";");
@@ -326,19 +326,19 @@ public class HITSTrip implements Serializable{
 		}
 		
 //				calculate modal distance for comparison with ezlink
-		Coord startCoord = HITSAnalyser.getZip2Coord(this.p13d_origpcode);
-		Coord endCoord = HITSAnalyser.getZip2Coord(this.t2_destpcode);
+		Coord startCoord = HITSAnalyserPostgresqlSummary.getZip2Coord(this.p13d_origpcode);
+		Coord endCoord = HITSAnalyserPostgresqlSummary.getZip2Coord(this.t2_destpcode);
 		if(startCoord != null && endCoord != null){
 			if(trainTripSwitch && !busTripSwitch){
-				this.trainDistance = HITSAnalyser.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
+				this.trainDistance = HITSAnalyserPostgresqlSummary.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
 			}else if(busTripSwitch && !trainTripSwitch){
-				this.busDistance = HITSAnalyser.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
+				this.busDistance = HITSAnalyserPostgresqlSummary.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
 			}else if(busTripSwitch && trainTripSwitch){
-				this.busTrainDistance = HITSAnalyser.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
+				this.busTrainDistance = HITSAnalyserPostgresqlSummary.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
 			}else {
-				this.freeSpeedCarJourneyDistance = HITSAnalyser.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
+				this.freeSpeedCarJourneyDistance = HITSAnalyserPostgresqlSummary.getCarFreeSpeedShortestPathTimeAndDistance(startCoord, endCoord).distance;
 			}
-			this.straightLineDistance = HITSAnalyser.getStraightLineDistance(startCoord, endCoord);
+			this.straightLineDistance = HITSAnalyserPostgresqlSummary.getStraightLineDistance(startCoord, endCoord);
 			
 		}
 		

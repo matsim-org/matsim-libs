@@ -559,7 +559,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 			networkFileName = networkFileName.replaceAll(":", "");
 			densityWriter
 					.addComment(String
-							.format("Link outflow and density in veh per lane km for network %s from events file %s, created on %s. Bin size is %s",
+							.format("Link outflow and occupancy for network %s from events file %s, created on %s. Bin size is %s",
 									networkFileName, eventsFileName, formattedDate, binSizeComponent.getText()));
 
 		}
@@ -593,9 +593,9 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 					args[argsIndex] = avgOccup == null ? 0 : new Double(avgOccup[i]);
 					flowSum += (Double)args[argsIndex++];
 				}
-//				if(flowSum>0){
-//					densityWriter.addLine(args);					
-//				}
+				if(flowSum>0){
+					densityWriter.addLine(args);					
+				}
 			}
 
 		}

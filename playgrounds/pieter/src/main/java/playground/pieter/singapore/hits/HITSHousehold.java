@@ -5,7 +5,7 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
 
-public class HITSHousehold implements Serializable{
+public class HITSHousehold extends HITSElement implements Serializable{
 	/**
 	 * 
 	 */
@@ -47,15 +47,15 @@ public class HITSHousehold implements Serializable{
 	public HITSHousehold(ResultSet hrs, Connection sqlConn, DateFormat dfm) {
 
 		try {
-			this.h1_hhid = hrs.getString("h1_hhid");
+			this.h1_hhid = getTrimmedStringFromResultSet(hrs,"h1_hhid");
 			this.h1_pcode = hrs.getInt("h1_pcode");
-			this.h2_dwell = hrs.getString("h2_dwell");
-			this.h3_ethnic = hrs.getString("h3_ethnic");
-			this.h3a_other = hrs.getString("h3a_other");
+			this.h2_dwell = getTrimmedStringFromResultSet(hrs,"h2_dwell");
+			this.h3_ethnic = getTrimmedStringFromResultSet(hrs,"h3_ethnic");
+			this.h3a_other = getTrimmedStringFromResultSet(hrs,"h3a_other");
 			this.h4_totpax = hrs.getInt("h4_totpax");
-			this.h4c_eligible = hrs.getString("h4c_eligible");
-			this.h4d_nereason = hrs.getString("h4d_nereason");
-			this.h5_vehavail = hrs.getString("h5_vehavail");
+			this.h4c_eligible = getTrimmedStringFromResultSet(hrs,"h4c_eligible");
+			this.h4d_nereason = getTrimmedStringFromResultSet(hrs,"h4d_nereason");
+			this.h5_vehavail = getTrimmedStringFromResultSet(hrs,"h5_vehavail");
 			this.xqty_carncom = hrs.getInt("xqty_carncom");
 			this.xqty_carnind = hrs.getInt("xqty_carnind");
 			this.xqty_carnrent = hrs.getInt("xqty_carnrent");
@@ -85,7 +85,7 @@ public class HITSHousehold implements Serializable{
 		String sqlQuery;
 		try {
 			ps = conn.createStatement();
-			sqlQuery = "select " +
+			sqlQuery = "select distinct " +
 			"h1_hhid,"+
 			"pax_id,"+
 			"p1_age,"+
@@ -120,7 +120,7 @@ public class HITSHousehold implements Serializable{
 			"p31_spendschshtlbus,"+
 			"p32_ptreimb "+
 
-			"from hits.hitsshort where h1_hhid = '"+ this.h1_hhid +"' group by h1_hhid, pax_id;";
+			"from d_hits.hitsshort where h1_hhid = '"+ this.h1_hhid +"';";
 			ps.executeQuery(sqlQuery );
 			ResultSet prs = ps.getResultSet();
 			while (prs.next()) {

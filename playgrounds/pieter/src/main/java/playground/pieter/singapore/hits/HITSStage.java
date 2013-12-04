@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Coord;
 import com.sun.xml.bind.v2.runtime.RuntimeUtil.ToStringAdapter;
 
 
-public class HITSStage implements Serializable {
+public class HITSStage extends HITSElement implements Serializable {
 	/**
 	 * 
 	 */
@@ -47,25 +47,25 @@ public class HITSStage implements Serializable {
 		try {
 			this.trip = trip;
 			this.msno_main = srs.getInt("msno_main");
-			this.h1_hhid = srs.getString("h1_hhid");
+			this.h1_hhid = getTrimmedStringFromResultSet(srs,"h1_hhid");
 			this.pax_id = srs.getInt("pax_id");
 			this.trip_id = srs.getInt("trip_id");
 			this.stage_id = srs.getInt("stage_id");
-			this.t10_mode = srs.getString("t10_mode");
+			this.t10_mode = getTrimmedStringFromResultSet(srs,"t10_mode");
 			this.t10a_walktime = srs.getInt("t10a_walktime");
-			this.t10i_modeother = srs.getString("t10i_modeother");
-			this.t11_boardsvcstn = srs.getString("t11_boardsvcstn");
-			this.t12_alightstn = srs.getString("t12_alightstn");
+			this.t10i_modeother = getTrimmedStringFromResultSet(srs,"t10i_modeother");
+			this.t11_boardsvcstn = getTrimmedStringFromResultSet(srs,"t11_boardsvcstn");
+			this.t12_alightstn = getTrimmedStringFromResultSet(srs,"t12_alightstn");
 			this.t12a_paxinveh = srs.getInt("t12a_paxinveh");
 			this.t13_waittime = srs.getInt("t13_waittime");
 			this.t14_invehtime = srs.getInt("t14_invehtime");
 			this.t15_taxifare = srs.getInt("t15_taxifare");
-			this.t16_taxireimb = srs.getString("t16_taxireimb");
+			this.t16_taxireimb = getTrimmedStringFromResultSet(srs,"t16_taxireimb");
 			this.t17_erpcost = srs.getInt("t17_erpcost");
-			this.t18_erpreimb = srs.getString("t18_erpreimb");
+			this.t18_erpreimb = getTrimmedStringFromResultSet(srs,"t18_erpreimb");
 			this.t19_parkfee = srs.getInt("t19_parkfee");
-			this.t19a_parkftyp = srs.getString("t19a_parkftyp");
-			this.t20_parkreimb = srs.getString("t20_parkreimb");
+			this.t19a_parkftyp = getTrimmedStringFromResultSet(srs,"t19a_parkftyp");
+			this.t20_parkreimb = getTrimmedStringFromResultSet(srs,"t20_parkreimb");
 			this.stageDuration = t10a_walktime + t13_waittime + t14_invehtime;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

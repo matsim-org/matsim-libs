@@ -32,7 +32,7 @@ public class HITSData implements Serializable{
 		
 		try {
 			Statement hs = conn.createStatement ();
-			hs.executeQuery ("select  " +
+			hs.executeQuery ("select distinct " +
 					"h1_hhid,"+
 					"h1_pcode,"+
 					"h2_dwell,"+
@@ -57,7 +57,7 @@ public class HITSData implements Serializable{
 					"xqty_motoind,"+
 					"xqty_taxi,"+
 					"h8_bikeqty "+
-					"from hits.hitsshort group by h1_hhid" +
+					"from d_hits.hitsshort" +
 					(this.limited ? " limit 300" : "") +
 					";");
 			ResultSet hrs = hs.getResultSet ();

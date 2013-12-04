@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 import javax.management.timer.Timer;
 
-public class HITSPerson implements Serializable{
+public class HITSPerson extends HITSElement implements Serializable{
 	static HashMap<String, Integer> actSwitcher;
 	static {
 		HITSPerson.actSwitcher = new HashMap<String, Integer>();
@@ -78,40 +78,40 @@ public class HITSPerson implements Serializable{
 		
 	}
 	public HITSPerson(ResultSet prs, Connection conn, DateFormat dfm, HITSHousehold hh) {
-
+		
 		try {
 			this.household = hh;
-			this.h1_hhid = prs.getString("h1_hhid");
+			this.h1_hhid = getTrimmedStringFromResultSet(prs,"h1_hhid");
 			this.pax_id = prs.getInt("pax_id");
 			this.pax_idx = h1_hhid + "_" + pax_id;
-			this.p1_age = prs.getString("p1_age");
-			this.p2_gender = prs.getString("p2_gender");
-			this.p3c_nolic = prs.getString("p3c_nolic");
-			this.p3_car_lic = prs.getString("p3_car_lic");
-			this.p3a_moto_lic = prs.getString("p3a_moto_lic");
-			this.p3b_vanbus_lic = prs.getString("p3b_vanbus_lic");
-			this.p4_mobility = prs.getString("p4_mobility");
-			this.p4a_aids = prs.getString("p4a_aids");
-			this.p4b_aidsoth = prs.getString("p4b_aidsoth");
-			this.p5a_edu = prs.getString("p5a_edu");
-			this.p5_econactivity = prs.getString("p5_econactivity");
-			this.p5i_econactoth = prs.getString("p5i_econactoth");
-			this.p6_occup = prs.getString("p6_occup");
-			this.p6i_occupoth = prs.getString("p6i_occupoth");
-			this.p6a_fixedwkpl = prs.getString("p6a_fixedwkpl");
+			this.p1_age = getTrimmedStringFromResultSet(prs,"p1_age");
+			this.p2_gender = getTrimmedStringFromResultSet(prs,"p2_gender");
+			this.p3c_nolic = getTrimmedStringFromResultSet(prs,"p3c_nolic");
+			this.p3_car_lic = getTrimmedStringFromResultSet(prs,"p3_car_lic");
+			this.p3a_moto_lic = getTrimmedStringFromResultSet(prs,"p3a_moto_lic");
+			this.p3b_vanbus_lic = getTrimmedStringFromResultSet(prs,"p3b_vanbus_lic");
+			this.p4_mobility = getTrimmedStringFromResultSet(prs,"p4_mobility");
+			this.p4a_aids = getTrimmedStringFromResultSet(prs,"p4a_aids");
+			this.p4b_aidsoth = getTrimmedStringFromResultSet(prs,"p4b_aidsoth");
+			this.p5a_edu = getTrimmedStringFromResultSet(prs,"p5a_edu");
+			this.p5_econactivity = getTrimmedStringFromResultSet(prs,"p5_econactivity");
+			this.p5i_econactoth = getTrimmedStringFromResultSet(prs,"p5i_econactoth");
+			this.p6_occup = getTrimmedStringFromResultSet(prs,"p6_occup");
+			this.p6i_occupoth = getTrimmedStringFromResultSet(prs,"p6i_occupoth");
+			this.p6a_fixedwkpl = getTrimmedStringFromResultSet(prs,"p6a_fixedwkpl");
 			this.p6c_fwkplpcode = prs.getInt("p6c_fwkplpcode");
-			this.p7_workhrs = prs.getString("p7_workhrs");
-			this.p8_income = prs.getString("p8_income");
-			this.p9_day = prs.getString("p9_day");
+			this.p7_workhrs = getTrimmedStringFromResultSet(prs,"p7_workhrs");
+			this.p8_income = getTrimmedStringFromResultSet(prs,"p8_income");
+			this.p9_day = getTrimmedStringFromResultSet(prs,"p9_day");
 			this.p9_date = (Date) prs.getObject("p9_date");
-			this.p10_maketrip = prs.getString("p10_maketrip");
-			this.p11_notripreason = prs.getString("p11_notripreason");
-			this.p11a_notripreasoth = prs.getString("p11a_notripreasoth");
-			this.p12_lasttravelday = prs.getString("p12_lasttravelday");
-			this.p13_1sttriporig_home = prs.getString("p13_1sttriporig_home");
+			this.p10_maketrip = getTrimmedStringFromResultSet(prs,"p10_maketrip");
+			this.p11_notripreason = getTrimmedStringFromResultSet(prs,"p11_notripreason");
+			this.p11a_notripreasoth = getTrimmedStringFromResultSet(prs,"p11a_notripreasoth");
+			this.p12_lasttravelday = getTrimmedStringFromResultSet(prs,"p12_lasttravelday");
+			this.p13_1sttriporig_home = getTrimmedStringFromResultSet(prs,"p13_1sttriporig_home");
 			this.p13b_1storigpcode = prs.getInt("p13b_1storigpcode");
 			this.p14_1sttripstarttime = prs.getInt("p14_1sttripstarttime");
-			this.p29_futrptuse = prs.getString("p29_futrptuse");
+			this.p29_futrptuse = getTrimmedStringFromResultSet(prs,"p29_futrptuse");
 			this.p30_spendpt = prs.getDouble("p30_spendpt");
 			this.p31_spendschshtlbus = prs.getDouble("p31_spendschshtlbus");
 			this.p32_ptreimb = prs.getInt("p32_ptreimb");
@@ -156,7 +156,7 @@ public class HITSPerson implements Serializable{
 					"p28h_envfrndly,"+
 					"p28i_othrreasnchck, "+
 					"tripfactorsstgfinal "+
-					" from hits.hitsshort where " +
+					" from d_hits.hitsshort where " +
 					"h1_hhid = '"+ this.h1_hhid +
 					"' and pax_id = " + this.pax_id + " and trip_id is not null;");
 			ResultSet trs = ts.getResultSet();

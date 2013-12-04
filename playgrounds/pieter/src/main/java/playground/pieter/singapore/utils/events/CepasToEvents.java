@@ -1656,11 +1656,11 @@ public class CepasToEvents {
 				// vehicles++;
 				// continue;
 				// }
-//				 if (!ptVehicle.vehicleId.toString().equals("155_1_8801"))
+//				 if (!ptVehicle.vehicleId.toString().equals("853C_1_923"))
 //				 continue;
 				if (alreadyCompletedVehicles.contains(ptVehicle.vehicleId.toString()))
 					continue;
-				if (ptVehicle.possibleMatsimRoutes == null){
+				if (ptVehicle.possibleMatsimRoutes==null || ptVehicle.possibleMatsimRoutes.size()<1){
 					// TODO: if we don't have this transit line in the schedule,
 					// ignore
 					System.err.printf("The vehicle with id %s has no possible Matsim route, not firing events for it\n", ptVehicle.vehicleId,
@@ -1777,26 +1777,26 @@ public class CepasToEvents {
 		} catch (SQLException se) {
 
 			String query = String
-					.format("create table %s_board_alight_preprocess as select * from (select card_id, boarding_stop_stn as stop_id, "
-							+ "(EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as event_time,"
-							+ "\'boarding\' as type,"
-							+ "srvc_number, direction, bus_reg_num"
-							+ " from %s "
-							+ " union "
-							+ "select card_id, alighting_stop_stn as stop_id, "
-							+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_time))::INT AS event_time,"
-							+ "\'alighting\' as type, "
-							+ "srvc_number, direction, bus_reg_num"
-							+ " from %s "
-							+ " ) as prequery where event_time is not null order by srvc_number, direction, bus_reg_num, event_time;"
-							+ "alter table %s_board_alight_preprocess add column idx serial;"
-							+ "alter table %s_board_alight_preprocess add column deltatime int;"
-
-					, tripTableName, tripTableName, tripTableName, tripTableName);
-			dba.executeStatement(query);
-			query = String
+//					.format("create table %s_board_alight_preprocess as select * from (select card_id, boarding_stop_stn as stop_id, "
+//							+ "(EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as event_time,"
+//							+ "\'boarding\' as type,"
+//							+ "srvc_number, direction, bus_reg_num"
+//							+ " from %s "
+//							+ " union "
+//							+ "select card_id, alighting_stop_stn as stop_id, "
+//							+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_duration))::INT AS event_time,"
+//							+ "\'alighting\' as type, "
+//							+ "srvc_number, direction, bus_reg_num"
+//							+ " from %s "
+//							+ " ) as prequery where event_time is not null order by srvc_number, direction, bus_reg_num, event_time;"
+//							+ "alter table %s_board_alight_preprocess add column idx serial;"
+//							+ "alter table %s_board_alight_preprocess add column deltatime int;"
+//
+//					, tripTableName, tripTableName, tripTableName, tripTableName,tripTableName);
+//			dba.executeStatement(query);
+//			query = String
 					.format("create table %s_passenger_preprocess as select card_id, boarding_stop_stn, alighting_stop_stn, (EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as boarding_time,"
-							+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_time))::INT AS alighting_time, "
+							+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_duration))::INT AS alighting_time, "
 							+ "srvc_number, direction, bus_reg_num"
 							+ " from %s order by srvc_number, direction, bus_reg_num, boarding_time, alighting_time;"
 							+ "alter table %s_passenger_preprocess add column idx serial;", tripTableName,
@@ -1882,12 +1882,12 @@ public class CepasToEvents {
 	// static methods
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException,
 			ClassNotFoundException, IOException, SQLException, NoConnectionException {
-		String databaseProperties = "f:/data/matsim2postgres.properties";
-		String transitSchedule = "f:\\data\\sing2.2\\input\\transit\\transitSchedule.xml";
-		String networkFile = "f:\\data\\sing2.2\\input\\network\\network100by4TL.xml.gz";
-		String outputEventsPath = "f:\\data\\sing2.2\\cepasevents";
-		String tripTableName = "a_lta_ezlink_week.trips11042011";
-		String stopLookupTableName = "d_ezlink2events.matsim2ezlink_stop_lookup";
+		String databaseProperties = args[0];
+		String transitSchedule = args[1];
+		String networkFile  = args[2];
+		String outputEventsPath  = args[3];
+		String tripTableName  = args[4];
+		String stopLookupTableName  = args[5];
 		MatsimRandom.reset(12345678L);
 		CepasToEvents cepasToEvents = new CepasToEvents(databaseProperties, transitSchedule, networkFile,
 				outputEventsPath, tripTableName, stopLookupTableName);
@@ -1896,6 +1896,8 @@ public class CepasToEvents {
 
 	private void checkForExistingfiles(String inputEventsPath) {
 		File f = new File(inputEventsPath);
+		if(f.list() == null)
+			f.mkdir();
 		ArrayList<String> tempFileNames = new ArrayList<String>(Arrays.asList(f.list()));
 		ArrayList<String> removeFiles = new ArrayList<String>();
 		for (String fileName : tempFileNames) {
