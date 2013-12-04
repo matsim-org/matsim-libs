@@ -88,7 +88,7 @@ public class KS2010SolutionTXTParser10 {
 			log.info("parsing line: " + line);
 			this.parseKreuzungLine(line);
 		}
-		if (line.startsWith("Strasse ")){
+		else if (line.startsWith("Strasse ")){
 			log.info("parsing line: " + line);
 			this.parseStrasseLine(line);
 		}
