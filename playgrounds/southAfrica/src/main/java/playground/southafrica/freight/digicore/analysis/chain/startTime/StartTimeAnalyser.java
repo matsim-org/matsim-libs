@@ -30,6 +30,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
@@ -56,11 +57,13 @@ public class StartTimeAnalyser {
 		String outputFile = args[1];
 		
 		List<File> vehicleFiles = FileUtils.sampleFiles(new File(xmlFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+		Counter counter = new Counter("   vehicles # ");
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
 			bw.write("startTime,numberOfActivites,distance,duration");
 			bw.newLine();
+			
 
 			for(File f : vehicleFiles){
 				DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
@@ -77,6 +80,7 @@ public class StartTimeAnalyser {
 					bw.write(String.format("%.0f", chain.getLastMajorActivity().getStartTime() - chain.getFirstMajorActivity().getEndTime() ) );
 					bw.newLine();
 				}
+				counter.incCounter();
 			}
 			
 		} catch (IOException e) {
@@ -90,6 +94,7 @@ public class StartTimeAnalyser {
 				throw new RuntimeException("Cannot close " + outputFile);
 			}
 		}
+		counter.printCounter();
 		
 		Header.printFooter();
 	}

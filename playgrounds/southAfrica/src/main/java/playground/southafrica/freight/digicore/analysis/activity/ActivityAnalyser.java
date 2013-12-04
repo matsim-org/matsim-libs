@@ -317,6 +317,7 @@ public class ActivityAnalyser {
 						list.add(activity.getDuration());
 					}
 				}
+				counter.incCounter();
 				return list;
 			}
 		}
