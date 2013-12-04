@@ -349,10 +349,11 @@ public class ChoiceSet {
 	
 	/*
 	 * TODO: We have not a linear scale here, but alternatives with negative scores are very bad anyway.
+	 * A score of -1 is converted to 1 here. That is way regular positive scores get an offset of 1.
 	 */
 	private double handleScore(double score) {
 		if (score < 0.0) return -1.0/score;
-		else return score;
+		else return (score + 1.0);
 	}
 	
 	/*
