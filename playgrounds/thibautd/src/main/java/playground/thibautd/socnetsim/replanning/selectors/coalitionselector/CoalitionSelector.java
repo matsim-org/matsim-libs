@@ -45,7 +45,7 @@ import playground.thibautd.utils.MapUtils;
  * @author thibautd
  */
 public class CoalitionSelector implements GroupLevelPlanSelector {
-	private final ConflictSolver conflictSolver = new LeastPointedPlanPruningConflictSolver();
+	private final ConflictSolver conflictSolver;
 	private final WeightCalculator weight;
 
 	public CoalitionSelector() {
@@ -53,8 +53,16 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 	}
 
 	public CoalitionSelector(final WeightCalculator weight) {
-		this.weight = weight;
+		this( weight ,  new LeastPointedPlanPruningConflictSolver() );
 	}
+
+	public CoalitionSelector(
+			final WeightCalculator weight,
+			final ConflictSolver conflictSolver) {
+		this.weight = weight;
+		this.conflictSolver = conflictSolver;
+	}
+
 
 	@Override
 	public GroupPlans selectPlans(
