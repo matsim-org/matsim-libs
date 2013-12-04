@@ -64,12 +64,12 @@ public class NormalDayChainCounts {
 		vehicleFiles = FileUtils.sampleFiles(new File(inputfolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
 		abnormalDays = DigicoreUtils.readDayOfYear(abnormalDaysFile);		
 		
-		analyseNormalDayVehicleCounts(outputFile);
+		analyseNormalWeekdayVehicleCounts(outputFile);
 		
 		Header.printFooter();
 	}
 	
-	public static void analyseNormalDayVehicleCounts(String output){
+	public static void analyseNormalWeekdayVehicleCounts(String output){
 		Map<Id, Integer> map = new TreeMap<Id, Integer>();
 		Counter counter = new Counter("   vehicles # ");
 		
@@ -81,13 +81,18 @@ public class NormalDayChainCounts {
 			for(DigicoreChain chain : vehicle.getChains()){
 				int dayOfYear = chain.getFirstMajorActivity().getEndTimeGregorianCalendar().get(Calendar.DAY_OF_YEAR);
 				if(!abnormalDays.contains(dayOfYear)){
-					Id dayId = new IdImpl(dayOfYear);
 					
-					if(!map.containsKey(dayId)){
-						map.put(dayId, new Integer(1));
-					} else{
-						int oldValue = map.get(dayId);
-						map.put(dayId, oldValue + 1);
+					/* Check that it is a weekday */
+					int dayOfWeek = chain.getFirstMajorActivity().getEndTimeGregorianCalendar().get(Calendar.DAY_OF_WEEK);
+					if(dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY){
+						Id dayId = new IdImpl(dayOfYear);
+						
+						if(!map.containsKey(dayId)){
+							map.put(dayId, new Integer(1));
+						} else{
+							int oldValue = map.get(dayId);
+							map.put(dayId, oldValue + 1);
+						}
 					}
 				}
 			}
