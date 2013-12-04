@@ -30,6 +30,8 @@ import playground.thibautd.socnetsim.replanning.removers.MinimumSumSelectorFacto
 import playground.thibautd.socnetsim.replanning.removers.MinimumWeightedSumSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.ParetoMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.WhoIsTheBossMinSelectorFactory;
+import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastAverageWeightJointPlanPruningConflictSolver;
+import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastPointedPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.replanning.strategies.ActivityInGroupLocationChoiceFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CliqueJointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
@@ -69,13 +71,21 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory( "ActivityInGroupLocationChoice" , new ActivityInGroupLocationChoiceFactory() );
 		addFactory( "ActivitySequenceMutator" , new GroupActivitySequenceMutator() );
 
+		// selectors
 		addFactory( "SelectExpBeta" , new GroupSelectExpBetaFactory() );
 		addFactory( "WeightedSelectExpBeta" , new GroupWeightedSelectExpBetaFactory() );
 		addFactory( "WhoIsTheBossSelectExpBeta" , new GroupWhoIsTheBossSelectExpBetaFactory() );
 		addFactory( "MinSelectExpBeta" , new GroupMinSelectExpBetaFactory() );
 		addFactory( "MinLossSelectExpBeta" , new GroupMinLossSelectExpBetaFactory() );
 		addFactory( "ParetoSelectExpBeta" , new ParetoExpBetaFactory() );
-		addFactory( "CoalitionSelectExpBeta" , new CoalitionExpBetaFactory() );
+		addFactory(
+				"CoalitionSelectExpBeta_LeastPointedConflictResolution",
+				new CoalitionExpBetaFactory(
+					new LeastPointedPlanPruningConflictSolver() ) );
+		addFactory(
+				"CoalitionSelectExpBeta_LeastAverageConflictResolution",
+				new CoalitionExpBetaFactory(
+					new LeastAverageWeightJointPlanPruningConflictSolver() ) );
 
 		// default removers
 		// ---------------------------------------------------------------------
