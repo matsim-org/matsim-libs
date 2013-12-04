@@ -161,7 +161,7 @@ public class MarginalCongestionHandlerV2 implements
 			}
 						
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
+			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 		}	
 	}
 
@@ -182,8 +182,8 @@ public class MarginalCongestionHandlerV2 implements
 			trackMarginalDelay(event);
 
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			linkInfo.setLastLeavingAgent(event.getPersonId());
-			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
+			linkInfo.setLastLeavingAgent(event.getVehicleId());
+			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getVehicleId());
 		}
 	}
 	
@@ -193,7 +193,7 @@ public class MarginalCongestionHandlerV2 implements
 	
 	private void calculateCongestion(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-		double totalDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
+		double totalDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		
 //		System.out.println(event.toString());
 //		System.out.println("free travel time: " + linkInfo.getFreeTravelTime() + " // marginal flow delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
@@ -248,7 +248,7 @@ public class MarginalCongestionHandlerV2 implements
 			if (delayToPayFor > linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
 				
 //				System.out.println("	Person " + id.toString() + " --> Marginal delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec() + " linkLeaveTime: " + linkInfo.getPersonId2linkLeaveTime().get(id));
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getPersonId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId());
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getVehicleId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId());
 				this.events.processEvent(congestionEvent);	
 				
 				delayToPayFor = delayToPayFor - linkInfo.getMarginalDelayPerLeavingVehicle_sec();
@@ -257,7 +257,7 @@ public class MarginalCongestionHandlerV2 implements
 				if (delayToPayFor > 0) {
 					
 //					System.out.println("	Person " + id + " --> Marginal delay: " + delayToPayFor + " linkLeaveTime: " + linkInfo.getPersonId2linkLeaveTime().get(id));
-					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getPersonId(), delayToPayFor, event.getLinkId());
+					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getVehicleId(), delayToPayFor, event.getLinkId());
 					this.events.processEvent(congestionEvent);
 					
 					delayToPayFor = 0;
@@ -281,7 +281,7 @@ public class MarginalCongestionHandlerV2 implements
 			log.warn("An agent is delayed due to storage congestion on link " + event.getLinkId() + " but no agent left the link before. " +
 					"That is, storage congestion appears due to agents departing on that link. In this version, these delays are not internalized.");
 		} else {
-			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getPersonId(), remainingDelay, event.getLinkId());
+			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getVehicleId(), remainingDelay, event.getLinkId());
 			this.events.processEvent(congestionEvent);
 		}
 	}
@@ -309,14 +309,18 @@ public class MarginalCongestionHandlerV2 implements
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		// start tracking delays caused by that agent leaving the link	
-		if (linkInfo.getLeavingAgents().contains(event.getPersonId())){
-			throw new RuntimeException(" Person already in List (leavingAgents). Aborting...");
+		if (linkInfo.getLeavingAgents().contains(event.getVehicleId())){
+			throw new RuntimeException(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in List 'leavingAgents'). Aborting...");
 		}
-		if (linkInfo.getPersonId2linkLeaveTime().containsKey(event.getPersonId())){
-			throw new RuntimeException(" Person already in Map (personId2linkLeaveTime). Aborting...");
+		if (linkInfo.getPersonId2linkLeaveTime().containsKey(event.getVehicleId())){
+			log.warn(" Map 'personId2linkLeaveTime' at time step " + event.getTime());
+			for (Id id : linkInfo.getPersonId2linkLeaveTime().keySet()) {
+				log.warn(id + " // " + linkInfo.getPersonId2linkLeaveTime().get(id));
+			}
+			throw new RuntimeException(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in Map 'personId2linkLeaveTime'). Aborting...");
 		}
-		linkInfo.getLeavingAgents().add(event.getPersonId());
-		linkInfo.getPersonId2linkLeaveTime().put(event.getPersonId(), event.getTime());
+		linkInfo.getLeavingAgents().add(event.getVehicleId());
+		linkInfo.getPersonId2linkLeaveTime().put(event.getVehicleId(), event.getTime());
 	}
 
 	private void collectLinkInfos(Id linkId) {
