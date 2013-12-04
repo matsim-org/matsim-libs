@@ -90,15 +90,16 @@ public class RunUtils {
 
 		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
 
-		strategyRegistry.setExtraPlanRemoverFactory(
-				factories.getRemoverFactory(
-					weights.getSelectorForRemoval() ) );
+		strategyRegistry.setExtraPlanRemover(
+				factories.createRemover(
+					weights.getSelectorForRemoval(),
+					controllerRegistry ) );
 
 		for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {
 			strategyRegistry.addStrategy(
-					factories.getFactory(
-						set.getStrategyName() ).createStrategy(
-							controllerRegistry ),
+					factories.createStrategy(
+						set.getStrategyName(),
+						controllerRegistry ),
 					set.getWeight(),
 					set.isInnovative() ?
 						weights.getDisableInnovationAfterIter() :

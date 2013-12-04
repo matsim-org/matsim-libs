@@ -271,9 +271,7 @@ public class RunCliquesWithModularStrategies {
 		// create strategy manager
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
-					strategyRegistry,
-					strategyRegistry.getExtraPlanRemoverFactory().createRemover(
-						controllerRegistry ) );
+					strategyRegistry );
 
 		// create controler
 		final ImmutableJointController controller =

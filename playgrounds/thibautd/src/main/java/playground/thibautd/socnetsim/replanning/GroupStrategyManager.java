@@ -47,15 +47,12 @@ public class GroupStrategyManager {
 
 	private final GroupStrategyRegistry registry;
 
-	private final ExtraPlanRemover remover;
 	private final Random random;
 
 	public GroupStrategyManager(
-			final GroupStrategyRegistry registry,
-			final ExtraPlanRemover remover) {
+			final GroupStrategyRegistry registry ) {
 		this.registry = registry;
 		this.random = MatsimRandom.getLocalInstance();
-		this.remover = remover;
 	}
 
 	public final void run(
@@ -68,7 +65,7 @@ public class GroupStrategyManager {
 		final Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
 			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
 		for (ReplanningGroup g : groups) {
-			remover.removePlansInGroup(
+			registry.getExtraPlanRemover().removePlansInGroup(
 					jointPlans,
 					g );
 

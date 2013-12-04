@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 public final class GroupStrategyRegistry {
 	private static final Logger log = Logger.getLogger( GroupStrategyRegistry.class );
 
-	private ExtraPlanRemoverFactory removerFactory = null;
+	private ExtraPlanRemover remover = null;
 	private final List<GroupPlanStrategy> strategies = new ArrayList<GroupPlanStrategy>();
 	private final List<Double> weights = new ArrayList<Double>();
 	private final List<Integer> lastIters = new ArrayList<Integer>();
@@ -75,19 +75,19 @@ public final class GroupStrategyRegistry {
 		return sum;
 	}
 
-	public ExtraPlanRemoverFactory getExtraPlanRemoverFactory() {
-		if ( this.removerFactory == null ) {
+	public ExtraPlanRemover getExtraPlanRemover() {
+		if ( this.remover == null ) {
 			throw new IllegalStateException( "no removal selector factory defined" );
 		}
-		return this.removerFactory;
+		return this.remover;
 	}
 
-	public void setExtraPlanRemoverFactory(
-			final ExtraPlanRemoverFactory removerFactory) {
-		if ( this.removerFactory != null ) {
-			throw new IllegalStateException( "already removal selector "+this.removerFactory );
+	public void setExtraPlanRemover(
+			final ExtraPlanRemover remover) {
+		if ( this.remover != null ) {
+			throw new IllegalStateException( "already removal selector "+this.remover );
 		}
-		this.removerFactory = removerFactory;
+		this.remover = remover;
 	}
 }
 

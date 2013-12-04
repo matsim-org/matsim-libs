@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.replanning;
 import java.util.HashMap;
 import java.util.Map;
 
+import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.removers.CoalitionMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.LexicographicRemoverFactory;
 import playground.thibautd.socnetsim.replanning.removers.MinimumSumOfMinimumLossSelectorFactory;
@@ -32,6 +33,7 @@ import playground.thibautd.socnetsim.replanning.removers.ParetoMinSelectorFactor
 import playground.thibautd.socnetsim.replanning.removers.WhoIsTheBossMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastAverageWeightJointPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastPointedPlanPruningConflictSolver;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.strategies.ActivityInGroupLocationChoiceFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CliqueJointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
@@ -149,7 +151,9 @@ public class GroupPlanStrategyFactoryRegistry {
 
 	}
 
-	public GroupPlanStrategyFactory getFactory( final String name ) {
+	public GroupPlanStrategy createStrategy(
+			final String name,
+			final ControllerRegistry registry) {
 		final GroupPlanStrategyFactory f = factories.get( name );
 
 		if ( f == null ) {
@@ -157,7 +161,7 @@ public class GroupPlanStrategyFactoryRegistry {
 					" is not known. Known names are "+factories.keySet() );
 		}
 
-		return f;
+		return f.createStrategy( registry );
 	}
 
 	public void addFactory(
@@ -188,7 +192,22 @@ public class GroupPlanStrategyFactoryRegistry {
 		addSelectorFactory( name , f );
 	}
 
-	public ExtraPlanRemoverFactory getRemoverFactory( final String name ) {
+	public GroupLevelPlanSelector createSelector(
+			final String name,
+			final ControllerRegistry registry) {
+		final GroupLevelPlanSelectorFactory f = selectorFactories.get( name );
+
+		if ( f == null ) {
+			throw new IllegalArgumentException( "remover factory "+name+
+					" is not known. Known names are "+selectors.keySet() );
+		}
+
+		return f.createSelector( registry );
+	}
+
+	public ExtraPlanRemover createRemover(
+			final String name,
+			final ControllerRegistry registry) {
 		final ExtraPlanRemoverFactory f = selectors.get( name );
 
 		if ( f == null ) {
@@ -196,7 +215,7 @@ public class GroupPlanStrategyFactoryRegistry {
 					" is not known. Known names are "+selectors.keySet() );
 		}
 
-		return f;
+		return f.createRemover( registry );
 	}
 
 	public void addRemoverFactory(
