@@ -60,24 +60,56 @@ public class GroupPlanStrategyFactoryRegistry {
 	public GroupPlanStrategyFactoryRegistry() {
 		// default factories
 		// ---------------------------------------------------------------------
-		addFactory( "ReRoute" , new GroupReRouteFactory() );
-		addFactory( "TimeAllocationMutator" , new GroupTimeAllocationMutatorFactory( 1 ) );
-		addFactory( "CliqueJointTripMutator" , new CliqueJointTripMutatorFactory( ) );
-		addFactory( "SubtourModeChoice" , new GroupSubtourModeChoiceFactory() );
-		addFactory( "TourVehicleAllocation" , new GroupTourVehicleAllocationFactory() );
-		addFactory( "PlanVehicleAllocation" , new GroupPlanVehicleAllocationFactory() );
-		addFactory( "OptimizingTourVehicleAllocation" , new GroupOptimizingTourVehicleAllocationFactory() );
-		addFactory( "RandomJointPlanRecomposer" , new GroupRandomJointPlanRecomposerFactory() );
-		addFactory( "ActivityInGroupLocationChoice" , new ActivityInGroupLocationChoiceFactory() );
-		addFactory( "ActivitySequenceMutator" , new GroupActivitySequenceMutator() );
+		addFactory(
+				"ReRoute",
+				new GroupReRouteFactory() );
+		addFactory(
+				"TimeAllocationMutator",
+				new GroupTimeAllocationMutatorFactory( 1 ) );
+		addFactory(
+				"CliqueJointTripMutator",
+				new CliqueJointTripMutatorFactory( ) );
+		addFactory(
+				"SubtourModeChoice",
+				new GroupSubtourModeChoiceFactory() );
+		addFactory(
+				"TourVehicleAllocation",
+				new GroupTourVehicleAllocationFactory() );
+		addFactory(
+				"PlanVehicleAllocation",
+				new GroupPlanVehicleAllocationFactory() );
+		addFactory(
+				"OptimizingTourVehicleAllocation",
+				new GroupOptimizingTourVehicleAllocationFactory() );
+		addFactory(
+				"RandomJointPlanRecomposer",
+				new GroupRandomJointPlanRecomposerFactory() );
+		addFactory(
+				"ActivityInGroupLocationChoice",
+				new ActivityInGroupLocationChoiceFactory() );
+		addFactory(
+				"ActivitySequenceMutator",
+				new GroupActivitySequenceMutator() );
 
 		// selectors
-		addFactory( "SelectExpBeta" , new GroupSelectExpBetaFactory() );
-		addFactory( "WeightedSelectExpBeta" , new GroupWeightedSelectExpBetaFactory() );
-		addFactory( "WhoIsTheBossSelectExpBeta" , new GroupWhoIsTheBossSelectExpBetaFactory() );
-		addFactory( "MinSelectExpBeta" , new GroupMinSelectExpBetaFactory() );
-		addFactory( "MinLossSelectExpBeta" , new GroupMinLossSelectExpBetaFactory() );
-		addFactory( "ParetoSelectExpBeta" , new ParetoExpBetaFactory() );
+		addFactory(
+				"SelectExpBeta",
+				new GroupSelectExpBetaFactory() );
+		addFactory(
+				"WeightedSelectExpBeta",
+				new GroupWeightedSelectExpBetaFactory() );
+		addFactory(
+				"WhoIsTheBossSelectExpBeta",
+				new GroupWhoIsTheBossSelectExpBetaFactory() );
+		addFactory(
+				"MinSelectExpBeta",
+				new GroupMinSelectExpBetaFactory() );
+		addFactory(
+				"MinLossSelectExpBeta",
+				new GroupMinLossSelectExpBetaFactory() );
+		addFactory(
+				"ParetoSelectExpBeta",
+				new ParetoExpBetaFactory() );
 		addFactory(
 				"CoalitionSelectExpBeta_LeastPointedConflictResolution",
 				new CoalitionExpBetaFactory(
