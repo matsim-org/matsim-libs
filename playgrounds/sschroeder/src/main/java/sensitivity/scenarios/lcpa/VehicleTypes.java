@@ -1,4 +1,4 @@
-package sensitivity.scenarios;
+package sensitivity.scenarios.lcpa;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,8 +32,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import sensitivity.scenarios.StopAlgoCompTime;
 
-public class ScenarioRun {
+
+public class VehicleTypes {
 	
 	static class StopRouting implements InternalLeastCostPathCalculatorListener {
 
@@ -80,7 +82,7 @@ public class ScenarioRun {
 
 		NetworkBasedTransportCosts.Builder costBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
 		addVehicleTypeSpecificCosts(costBuilder,builder.getAddedVehicles());
-		costBuilder.setThreadSafeLeastCostPathCalculatorFactory(LCPARouterFactories.getAStarEuclideanFactory());
+		costBuilder.setThreadSafeLeastCostPathCalculatorFactory(LCPAFactories.getAStarEuclideanFactory());
 		NetworkBasedTransportCosts routingCosts = costBuilder.build();
 		routingCosts.getInternalListeners().add(stopRouting);
 		builder.setRoutingCost(routingCosts);

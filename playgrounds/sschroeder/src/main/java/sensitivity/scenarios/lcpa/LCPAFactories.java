@@ -1,4 +1,4 @@
-package sensitivity.scenarios;
+package sensitivity.scenarios.lcpa;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ import org.matsim.core.router.util.TravelTime;
  * @author stefan
  *
  */
-public class LCPARouterFactories {
+public class LCPAFactories {
 	
 	static class MyAStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 
