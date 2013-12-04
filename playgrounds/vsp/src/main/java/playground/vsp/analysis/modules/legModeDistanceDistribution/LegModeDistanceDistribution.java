@@ -20,6 +20,7 @@
 package playground.vsp.analysis.modules.legModeDistanceDistribution;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -132,6 +133,10 @@ public class LegModeDistanceDistribution extends AbstractAnalyisModule{
 
 	@Override
 	public void writeResults(String outputFolder) {
+		
+		File outputFolderFile = new File(outputFolder);
+		outputFolderFile.mkdirs();
+		
 		String outFile = outputFolder + "legModeDistanceDistribution.txt";
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
