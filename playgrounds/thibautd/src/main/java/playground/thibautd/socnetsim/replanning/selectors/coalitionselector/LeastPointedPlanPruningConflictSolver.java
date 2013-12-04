@@ -36,15 +36,14 @@ public class LeastPointedPlanPruningConflictSolver implements ConflictSolver {
 		int minPoint = Integer.MAX_VALUE;
 		Map.Entry<JointPlan , Collection<PlanRecord>> toMark = null;
 		for ( Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {
-			final JointPlan jointPlan = entry.getKey();
 			final Collection<PlanRecord> records = entry.getValue();
 
 			int nPoint = 0;
 			for ( PlanRecord r : records ) {
-				if ( jointPlan.getIndividualPlan( r.getPlan().getPerson().getId() ) == r.getPlan() ) nPoint++;
+				if ( r.getAgent().getPointedPlan() == r.getPlan()  ) nPoint++;
 			}
 
-			if ( nPoint > 1 && nPoint < minPoint ) {
+			if ( nPoint > 0 && nPoint < minPoint ) {
 				minPoint = nPoint;
 				toMark = entry;
 			}
