@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -112,6 +113,42 @@ public class PopulationWriterHandlerImplV5Test {
 			Assert.assertEquals("wrong link in route at position " + i, routeLinkIds.get(i), nr.getLinkIds().get(i));
 		}
 		return nr;
+	}
+	
+	@Test
+	public void testWriteGenericRouteRoute() {
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.util.loadConfig(null));
+		String startLinkId = "1";
+		String endLinkId = "4";
+		Id idFrom = scenario.createId(startLinkId);
+		Id idTo = scenario.createId(endLinkId);
+		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population pop = tmpScenario.getPopulation();
+		PopulationFactory pb = pop.getFactory();
+		PersonImpl person = (PersonImpl) pb.createPerson(new IdImpl(1));
+		PlanImpl plan = (PlanImpl) pb.createPlan();
+		plan.setPerson(person);
+		plan.addActivity(pb.createActivityFromLinkId("h", idFrom));
+		Leg leg = pb.createLeg(TransportMode.walk);
+		GenericRouteImpl route = new GenericRouteImpl(idFrom, idTo);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+		plan.addActivity(pb.createActivityFromLinkId("h", scenario.createId("2")));
+		person.addPlan(plan);
+		pop.addPerson(person);
+
+		String filename = this.util.getOutputDirectory() + "population.xml";
+		new PopulationWriter(pop, null).writeV5(filename);
+
+		Population pop2 = scenario.getPopulation();
+		PopulationReaderMatsimV5 popReader = new PopulationReaderMatsimV5(scenario);
+		popReader.readFile(filename);
+		Person person2 = pop2.getPersons().get(new IdImpl(1));
+		Leg leg2 = (Leg) person2.getPlans().get(0).getPlanElements().get(1);
+		Route route2 = leg2.getRoute();
+		Assert.assertTrue("read route is of class " + route2.getClass().getCanonicalName(), route2 instanceof GenericRouteImpl);
+		Assert.assertEquals("wrong start link", startLinkId, route2.getStartLinkId().toString());
+		Assert.assertEquals("wrong end link", endLinkId, route2.getEndLinkId().toString());
 	}
 
 	private static final class RouteInterceptingPopulationReader extends MatsimXmlParser implements PopulationReader {

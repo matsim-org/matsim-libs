@@ -250,8 +250,19 @@ import org.matsim.core.utils.misc.Time;
 	private void startGenericRoute(final GenericRoute route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 		out.write("type=\"");
-		out.write( route.getRouteType() );
-		out.write("\">");
+		out.write(route.getRouteType());
+		out.write("\"");
+		if (route.getStartLinkId() != null) {
+			out.write(" start_link=\"");
+			out.write(route.getStartLinkId().toString());
+			out.write("\"");
+		}
+		if (route.getEndLinkId() != null) {
+			out.write(" end_link=\"");
+			out.write(route.getEndLinkId().toString());
+			out.write("\"");
+		}
+		out.write(">");
 		String rd = route.getRouteDescription();
 		if (rd != null) {
 			out.write(rd);

@@ -20,11 +20,7 @@
 
 package org.matsim.core.replanning;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -34,15 +30,9 @@ import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
 
 public class ReRoutingTest extends MatsimTestCase {
 
@@ -110,53 +100,12 @@ public class ReRoutingTest extends MatsimTestCase {
 	}
 	
 	private void evaluate() {
-		String inputEvents = getClassInputDirectory() + "0.events.txt.gz";
-		String outputEvents = getOutputDirectory() + "ITERS/it.0/0.events.txt.gz";
-		assertTrue("different event files", EventsFileComparator.compare(inputEvents, outputEvents) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
-		
-		
 		final String originalFileName = getInputDirectory() + "1.plans.xml.gz";
 		long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
 		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
 		long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName);
-
-		// commenting out the following; when there are many differences, this takes forever.  kai, oct'24
-//		if ( revisedCheckSum != originalCheckSum ) {
-//			System.out.flush() ;
-//			log.warn("checksums are not the same; making explicit comparison. When the difference is large, this may take forever ...") ;
-//			System.err.flush() ;
-//
-//			List<String> original = fileToLines(originalFileName);
-//			List<String> revised  = fileToLines(revisedFileName);
-//
-//			Patch patch = DiffUtils.diff(original, revised);
-//
-//			for (Delta delta: patch.getDeltas()) {
-//				System.out.flush() ;
-//				System.err.println(delta.getOriginal());
-//				System.err.println(delta.getRevised());
-//				System.err.flush() ;
-//			}
-//
-//		}
 		assertEquals("different plans files", originalCheckSum, revisedCheckSum);
 	}
-	
-	// Helper method for get the file content
-	private static List<String> fileToLines(String filename) {
-		List<String> lines = new LinkedList<String>();
-		String line = "";
-		try {
-			BufferedReader in = IOUtils.getBufferedReader(filename);
-			while ((line = in.readLine()) != null) {
-				lines.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return lines;
-	}
-
 
 	static public class TestControler extends Controler {
 

@@ -74,7 +74,9 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private final static String ATTR_LEG_DEPTIME = "dep_time";
 	private final static String ATTR_LEG_TRAVTIME = "trav_time";
 	private final static String ATTR_LEG_ARRTIME = "arr_time";
-
+	private static final String ATTR_ROUTE_STARTLINK = "start_link";
+	private static final String ATTR_ROUTE_ENDLINK = "end_link";
+	
 	private final static String VALUE_YES = "yes";
 	private final static String VALUE_NO = "no";
 	private final static String VALUE_UNDEF = "undef";
@@ -217,11 +219,15 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		}
 		if (this.routeDescription != null) {
 			Id startLinkId = null;
-			if (this.prevAct.getLinkId() != null) {
+			if (this.currRoute.getStartLinkId() != null) {
+				startLinkId = this.currRoute.getStartLinkId();
+			} else if (this.prevAct.getLinkId() != null) {
 				startLinkId = this.prevAct.getLinkId();
 			}
 			Id endLinkId = null;
-			if (this.curract.getLinkId() != null) {
+			if (this.currRoute.getEndLinkId() != null) {
+				endLinkId = this.currRoute.getEndLinkId();
+			} else if (this.curract.getLinkId() != null) {
 				endLinkId = this.curract.getLinkId();
 			}
 			if (this.currRoute instanceof GenericRoute) {
@@ -255,7 +261,13 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(this.currleg.getMode(), null, null);
+		String startLinkId = atts.getValue(ATTR_ROUTE_STARTLINK);
+		String endLinkId = atts.getValue(ATTR_ROUTE_ENDLINK);
+		
+		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(
+				this.currleg.getMode(), 
+				startLinkId == null ? null : this.scenario.createId(startLinkId), 
+				endLinkId == null ? null : this.scenario.createId(endLinkId));
 		this.currleg.setRoute(this.currRoute);
 
 		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
