@@ -52,11 +52,16 @@ final class PointingAgent {
 						weight.getWeight(
 							p,
 							group ),
+						// this is used by the binary heap to be efficient:
+						// it asks the user to set the index of the element in the
+						// internal array by himself.
 						i);
-			this.heap.add(
+			final boolean added =
+				this.heap.add(
 					records[ i ],
 					// inverse priority: we want decreasing order
 					-records[ i ].getWeight() );
+			if ( !added ) throw new RuntimeException();
 			i++;
 		}
 	}

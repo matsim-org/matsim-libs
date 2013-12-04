@@ -75,7 +75,6 @@ public class JointPlansTest {
 				gotException);
 	}
 
-
 	@Test
 	public void testExceptionRemoveWithCache( ) throws Exception {
 		testExceptionRemove( true );

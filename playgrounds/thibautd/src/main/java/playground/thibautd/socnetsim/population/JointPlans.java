@@ -29,9 +29,11 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  * Stores links between individual plans,
  * as defined by joint plans.
  * <br>
- * It uses internally a WeakHashMap, so that if an indivudal plan is not "strongly"
- * referenced anywhere, the mapping will be automatically forgotten at the next
- * garbage collection.
+ * Using the {@link JointPlanFactory} to create instances of individual
+ * plans will allow to cache the JointPlan in the Plan instance,
+ * avoiding expensive Map lookups.
+ * Howerver, <b>this makes the behavior when using several JointPlan containers
+ * ill-defined!</b>
  *
  * @author thibautd
  */
