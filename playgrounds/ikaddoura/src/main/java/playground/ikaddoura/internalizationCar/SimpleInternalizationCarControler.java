@@ -47,7 +47,7 @@ public class SimpleInternalizationCarControler {
 			log.info("configFile: "+ configFile);
 			
 		} else {
-			configFile = "/Users/Ihab/Desktop/cottbus_input/config.xml";
+			configFile = "../../runs-svn/internalizationCar/input/config_internalizationCar.xml";
 		}
 		
 		SimpleInternalizationCarControler main = new SimpleInternalizationCarControler();

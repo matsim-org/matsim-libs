@@ -54,7 +54,7 @@ import org.matsim.core.scenario.ScenarioImpl;
  * 3) The proportion of flow delay is deducted.
  * 4) The remaining delay leads back to the storage capacity of downstream links.
  * 
- * In this version the causing agent for a delay due to the storage capacity is assumed to be the agent who caused the spill-back at the bottleneck link.
+ * In this version the causing agent for a delay resulting from the storage capacity is assumed to be the agent who caused the spill-back at the bottleneck link.
  * That is, the affected agent keeps the delay caused by the storage capacity constraint until he/she reaches the bottleneck link and (hopefully) identifies there the agent who is causing the spill-backs.
  *  
  * TODO: Adjust for other modes than car and mixed modes. (Adjust for different effective cell sizes than 7.5 meters.)
@@ -149,6 +149,7 @@ public class MarginalCongestionHandlerV3 implements
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		System.out.println(event.toString());
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 //			log.warn("Not tested for pt.");
 		
@@ -204,9 +205,11 @@ public class MarginalCongestionHandlerV3 implements
 		}
 		
 //		System.out.println(event.toString());
-//		System.out.println("free travel time: " + linkInfo.getFreeTravelTime() + " // marginal flow delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
-//		System.out.println("relevant agents (previously leaving the link): " + linkInfo.getLeavingAgents());
-//		System.out.println("total delay: " + totalDelay);
+		System.out.println("time = " + event.getTime() + ": " + event.getVehicleId() + " leaves link " + event.getLinkId());
+		System.out.println("free speed leave time: " + linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId()) + " // marginal flow delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
+		System.out.println("delay on this link: " + delayOnThisLink);
+		System.out.println("delay on this link + delays on previous links: " + totalDelayWithDelaysOnPreviousLinks);
+		System.out.println("relevant agents previously leaving link " +  event.getLinkId() + ": " + linkInfo.getLeavingAgents());
 		
 		if (totalDelayWithDelaysOnPreviousLinks < -1.0) {
 			throw new RuntimeException("Aborting...");
