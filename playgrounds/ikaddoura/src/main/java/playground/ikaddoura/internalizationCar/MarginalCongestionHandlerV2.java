@@ -310,14 +310,16 @@ public class MarginalCongestionHandlerV2 implements
 		
 		// start tracking delays caused by that agent leaving the link	
 		if (linkInfo.getPersonId2linkLeaveTime().containsKey(event.getVehicleId())){
+//			throw new RuntimeException(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in Map 'personId2linkLeaveTime'). Aborting...");
+			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in Map 'personId2linkLeaveTime'). Aborting...");
 			log.warn(" Map 'personId2linkLeaveTime' at time step " + event.getTime());
 			for (Id id : linkInfo.getPersonId2linkLeaveTime().keySet()) {
 				log.warn(id + " // " + linkInfo.getPersonId2linkLeaveTime().get(id));
 			}
-			throw new RuntimeException(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in Map 'personId2linkLeaveTime'). Aborting...");
 		}
 		if (linkInfo.getLeavingAgents().contains(event.getVehicleId())){
-			throw new RuntimeException(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in List 'leavingAgents'). Aborting...");
+//			throw new RuntimeException(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in List 'leavingAgents'). Aborting...");
+			log.warn(event.getVehicleId() + " is already being tracked for link " + event.getLinkId() + " (in List 'leavingAgents'). Aborting...");
 		}
 		linkInfo.getLeavingAgents().add(event.getVehicleId());
 		linkInfo.getPersonId2linkLeaveTime().put(event.getVehicleId(), event.getTime());
