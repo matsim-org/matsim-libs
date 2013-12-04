@@ -41,7 +41,7 @@ import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.Coal
 public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 
 	@Test
-	public void testPruneBiggestPlanWithHigherSum() throws Exception {
+	public void testPruneBiggestPlanWithHigherSum() {
 		final JointPlans jointPlans = new JointPlans();
 
 		// two joint plans, biggest has a higher total weight,

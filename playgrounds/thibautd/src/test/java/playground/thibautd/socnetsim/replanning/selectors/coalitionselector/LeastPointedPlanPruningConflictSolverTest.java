@@ -40,7 +40,7 @@ import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.Coal
 public class LeastPointedPlanPruningConflictSolverTest {
 
 	@Test
-	public void testPruneSmallestJointPlan() throws Exception {
+	public void testPruneSmallestJointPlan() {
 		final JointPlans jointPlans = new JointPlans();
 		final Map<Id, Plan> smallJp = new HashMap<Id, Plan>();
 		final Map<Id, Plan> bigJp = new HashMap<Id, Plan>();
