@@ -54,6 +54,7 @@ import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
  * @author thibautd
  */
 public class GroupPlanStrategyFactoryRegistry {
+	private final Map<String, GroupLevelPlanSelectorFactory> selectorFactories = new HashMap<String, GroupLevelPlanSelectorFactory>();
 	private final Map<String, GroupPlanStrategyFactory> factories = new HashMap<String, GroupPlanStrategyFactory>();
 	private final Map<String, ExtraPlanRemoverFactory> selectors = new HashMap<String, ExtraPlanRemoverFactory>();
 
@@ -92,29 +93,29 @@ public class GroupPlanStrategyFactoryRegistry {
 				new GroupActivitySequenceMutator() );
 
 		// selectors
-		addFactory(
+		addSelectorAndStrategyFactory(
 				"SelectExpBeta",
 				new GroupSelectExpBetaFactory() );
-		addFactory(
+		addSelectorAndStrategyFactory(
 				"WeightedSelectExpBeta",
 				new GroupWeightedSelectExpBetaFactory() );
-		addFactory(
+		addSelectorAndStrategyFactory(
 				"WhoIsTheBossSelectExpBeta",
 				new GroupWhoIsTheBossSelectExpBetaFactory() );
-		addFactory(
+		addSelectorAndStrategyFactory(
 				"MinSelectExpBeta",
 				new GroupMinSelectExpBetaFactory() );
-		addFactory(
+		addSelectorAndStrategyFactory(
 				"MinLossSelectExpBeta",
 				new GroupMinLossSelectExpBetaFactory() );
-		addFactory(
+		addSelectorAndStrategyFactory(
 				"ParetoSelectExpBeta",
 				new ParetoExpBetaFactory() );
-		addFactory(
+		addSelectorAndStrategyFactory(
 				"CoalitionSelectExpBeta_LeastPointedConflictResolution",
 				new CoalitionExpBetaFactory(
 					new LeastPointedPlanPruningConflictSolver() ) );
-		addFactory(
+		addSelectorAndStrategyFactory(
 				"CoalitionSelectExpBeta_LeastAverageConflictResolution",
 				new CoalitionExpBetaFactory(
 					new LeastAverageWeightJointPlanPruningConflictSolver() ) );
@@ -167,6 +168,24 @@ public class GroupPlanStrategyFactoryRegistry {
 		if ( old != null ) {
 			throw new IllegalArgumentException( "strategy "+name+" already known. Replacing factory is unsafe. Consider using another name for "+f );
 		}
+	}
+
+	public void addSelectorFactory(
+			final String name,
+			final GroupLevelPlanSelectorFactory f) {
+		final GroupLevelPlanSelectorFactory old = selectorFactories.put( name , f );
+
+		if ( old != null ) {
+			throw new IllegalArgumentException( "selector "+name+" already known. Replacing factory is unsafe. Consider using another name for "+f );
+		}
+	}
+
+	public <T extends GroupLevelPlanSelectorFactory & GroupPlanStrategyFactory> void
+			addSelectorAndStrategyFactory(
+				final String name,
+				final T f) {
+		addFactory( name , f );
+		addSelectorFactory( name , f );
 	}
 
 	public ExtraPlanRemoverFactory getRemoverFactory( final String name ) {

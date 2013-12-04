@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupWhoIsTheBossSelectExpBetaFactory.java
+ * PlanSelectorFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.strategies;
-
-import org.matsim.core.gbl.MatsimRandom;
+package playground.thibautd.socnetsim.replanning;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
-import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 
 /**
  * @author thibautd
  */
-public class GroupWhoIsTheBossSelectExpBetaFactory extends NonInnovativeStrategyFactory {
-
-	@Override
-	public GroupLevelPlanSelector createSelector(final ControllerRegistry registry) {
-		return
-				 new WhoIsTheBossSelector(
-					 MatsimRandom.getLocalInstance(),
-					 registry.getIncompatiblePlansIdentifierFactory() ,
-					 new LogitWeight(
-						MatsimRandom.getLocalInstance(),
-						registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()) );
-	}
+public interface GroupLevelPlanSelectorFactory {
+	public GroupLevelPlanSelector createSelector( final ControllerRegistry registry );
 }
 

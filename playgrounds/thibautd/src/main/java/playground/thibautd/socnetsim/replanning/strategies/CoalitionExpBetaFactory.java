@@ -22,16 +22,16 @@ package playground.thibautd.socnetsim.replanning.strategies;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
 
 /**
  * @author thibautd
  */
-public class CoalitionExpBetaFactory implements GroupPlanStrategyFactory {
+public class CoalitionExpBetaFactory extends NonInnovativeStrategyFactory  {
 	private final ConflictSolver conflictSolver;
 
 	public CoalitionExpBetaFactory(
@@ -40,14 +40,13 @@ public class CoalitionExpBetaFactory implements GroupPlanStrategyFactory {
 	}
 
 	@Override
-	public GroupPlanStrategy createStrategy(
+	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry registry) {
-		return new GroupPlanStrategy(
-				new CoalitionSelector(
-					new LogitWeight(
-						MatsimRandom.getLocalInstance(),
-						registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()),
-					conflictSolver) );
+		return new CoalitionSelector(
+				new LogitWeight(
+					MatsimRandom.getLocalInstance(),
+					registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()),
+				conflictSolver);
 	}
 }
 

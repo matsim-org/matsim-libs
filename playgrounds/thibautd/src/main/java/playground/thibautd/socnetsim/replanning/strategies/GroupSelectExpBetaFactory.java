@@ -22,23 +22,22 @@ package playground.thibautd.socnetsim.replanning.strategies;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 
 /**
  * @author thibautd
  */
-public class GroupSelectExpBetaFactory implements GroupPlanStrategyFactory {
+public class GroupSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
 	@Override
-	public GroupPlanStrategy createStrategy(
+	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry registry) {
-		return new GroupPlanStrategy(
-				new LogitSumSelector(
-					MatsimRandom.getLocalInstance(),
-					registry.getIncompatiblePlansIdentifierFactory(),
-					registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()) );
+		return new LogitSumSelector(
+			MatsimRandom.getLocalInstance(),
+			registry.getIncompatiblePlansIdentifierFactory(),
+			registry.getScenario().getConfig().planCalcScore().getBrainExpBeta());
 	}
 }
 

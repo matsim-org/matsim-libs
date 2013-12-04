@@ -22,8 +22,8 @@ package playground.thibautd.socnetsim.replanning.strategies;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
@@ -32,20 +32,18 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
 /**
  * @author thibautd
  */
-public class GroupMinLossSelectExpBetaFactory implements GroupPlanStrategyFactory {
+public class GroupMinLossSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
 	@Override
-	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		return new GroupPlanStrategy(
-				 new HighestWeightSelector(
-					 registry.getIncompatiblePlansIdentifierFactory() ,
-					 new LogitWeight(
-						new LowestScoreOfJointPlanWeight(
-							new LossWeight(),
-							registry.getJointPlans() ),
-						MatsimRandom.getLocalInstance(),
-						registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()) ));
-
+	public GroupLevelPlanSelector createSelector(final ControllerRegistry registry) {
+		return new HighestWeightSelector(
+			 registry.getIncompatiblePlansIdentifierFactory() ,
+			 new LogitWeight(
+				new LowestScoreOfJointPlanWeight(
+					new LossWeight(),
+					registry.getJointPlans() ),
+				MatsimRandom.getLocalInstance(),
+				registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()) );
 	}
 }
 

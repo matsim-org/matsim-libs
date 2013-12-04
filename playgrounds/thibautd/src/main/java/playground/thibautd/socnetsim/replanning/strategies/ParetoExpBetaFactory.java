@@ -22,8 +22,8 @@ package playground.thibautd.socnetsim.replanning.strategies;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
 import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
@@ -31,18 +31,18 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
 /**
  * @author thibautd
  */
-public class ParetoExpBetaFactory implements GroupPlanStrategyFactory {
+public class ParetoExpBetaFactory extends NonInnovativeStrategyFactory {
 
 	@Override
-	public GroupPlanStrategy createStrategy(
+	public GroupLevelPlanSelector createSelector(
 			final ControllerRegistry registry) {
-		return new GroupPlanStrategy(
+		return 
 				new HighestWeightSelector(
 						registry.getIncompatiblePlansIdentifierFactory(),
 						new ParetoWeight(
 							new LogitWeight(
 								MatsimRandom.getLocalInstance(),
-								registry.getScenario().getConfig().planCalcScore().getBrainExpBeta())) ));
+								registry.getScenario().getConfig().planCalcScore().getBrainExpBeta())) );
 	}
 }
 
