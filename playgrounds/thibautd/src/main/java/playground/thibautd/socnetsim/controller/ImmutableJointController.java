@@ -26,13 +26,13 @@ import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ReplanningListener;
 
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 
 /**
  * A simple controler for the process with joint plans.
@@ -87,10 +87,10 @@ public final class ImmutableJointController extends AbstractController {
 					getControlerIO());
 		this.addControlerListener(dumpDataAtEnd);
 		
-		this.addControlerListener( new PlansScoring(
+		this.addControlerListener(
+				new UniformlyInternalizingPlansScoring(
 					registry.getScenario(),
 					registry.getEvents(),
-					getControlerIO(),
 					registry.getScoringFunctionFactory()) );
 
 		if (replanner == null) throw new NullPointerException();
