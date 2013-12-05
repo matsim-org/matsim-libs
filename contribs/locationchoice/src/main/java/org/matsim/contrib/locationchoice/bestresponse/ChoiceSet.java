@@ -71,9 +71,7 @@ public class ChoiceSet {
 		}
 		return stb.toString() ;
 	}
-	
-//	private static int wrnCnt = 0 ;
-		
+			
 	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario) {
 		this.approximationLevel = approximationLevel;
 		this.network = scenario.getNetwork();
@@ -335,46 +333,88 @@ public class ChoiceSet {
 		return mapTmp;
 	}
 	
-	private double getTotalScore(ArrayList<ScoredAlternative> list) {
-		double totalScore = 0.0;
-		
-		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
-		
-		for (int index = 0; index < nrElements; index++)  {
-			ScoredAlternative sa = list.get(index);
-			totalScore += this.handleScore(sa.getScore());
-		}
-		return totalScore;
-	}
+//	private double getTotalScore(ArrayList<ScoredAlternative> list) {
+//		double totalScore = 0.0;
+//		
+//		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
+//		
+//		for (int index = 0; index < nrElements; index++)  {
+//			ScoredAlternative sa = list.get(index);
+//			totalScore += sa.getScore() + this.getOffset(list, nrElements);
+//		}
+//		return totalScore;
+//	}
+	
+
+//	private double getOffset(ArrayList<ScoredAlternative> list, int nrElements) {
+//		double smallestScore = list.get(nrElements - 1).getScore();
+//		return Math.min(smallestScore, 0.0) * (-1.0); // if smallest score is negative, then add offsets!
+//	}
 	
 	/*
-	 * TODO: We have not a linear scale here, but alternatives with negative scores are very bad anyway.
-	 * A score of -1 is converted to 1 here. That is way regular positive scores get an offset of 1.
+	 * We can have three cases here:
+	 * 1. All scores positive
+	 * 2. All scores negative
+	 * 3. Mixed scores, negative and positive ones
+	 * 
+	 * 1: This case is easy, just scale by total score and sum up for the ids, and then do the weighted random draw.
+	 * 
+	 * 2: Adding an offset (minimal negative score) seems not the best idea in this case. 
+	 *  The preference order is maintained (to be proofed) but the ratios change a lot (to be proofed).
+	 *  Is it better to apply -1/score? Are the ratios more reasonable? 
+	 *  I have a clear intuition for uniform distributions here, 
+	 *  i.e., that an option with score=4.0 should be chosen around 4 times more often than an option with score=1.0.
+	 *  I can think of an array of length 5 with 4 elements of option 1 and 1 element of option 2.
+	 *  But I am missing that intuition for negative scores and mixed scores. What about scores 1.0 and -3.0?
+	 *  
+	 * 3: This is the most difficult case. We could do -1/score for negative scores but then we have a problem if the user comes up
+	 * 	with all positive scores between 0.0 and 1.0.
+	 * 
+	 *  A very efficient but also very simple solution would be to fix the number of alternatives and assign fixed probabilities.
+	 *  Anyway, the question is, if the differences (ratios) between the k best alternatives have a significant meaning. If not, we
+	 *  can get rid of this fancy overly complex Schnick-Snack. 
+	 *  Should not be too much of a problem to test, say max. 10 fixed alternatives with fixed probabilities, for example.
+	 *  
+	 *  anhorni, dec 2013 
+	 * 
 	 */
-	private double handleScore(double score) {
-		if (score < 0.0) return -1.0/score;
-		else return (score + 1.0);
-	}
+//	private TreeMap<Double,Id> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
+//		/* 
+//		 * list is given here in descending order -> see compareTo in ScoredAlternative
+//		 */		
+//		Collections.sort(list);
+//		double totalScore = this.getTotalScore(list);
+//		
+//		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
+//		
+//		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
+//		double sumScore = 0.0;
+//		for (int index = 0; index < nrElements; index++)  {
+//			ScoredAlternative sa = list.get(index);
+//			sumScore += (sa.getScore() + this.getOffset(list, nrElements)) / totalScore;				
+//			mapNormalized.put(sumScore , sa.getAlternativeId());	
+//		}
+//		return mapNormalized;
+//	}
+	
 	
 	/*
-	 * Use offsets to only have positive scores for normalization.
-	 * I do not scale/transform with exp() due to numerical problems.
+	 * Use approximation to golden ratio (contains sqrt) with specified number of alternatives 
+	 * (more than around 5 makes no sense actually)
 	 */
+	
 	private TreeMap<Double,Id> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
 		/* 
 		 * list is given here in descending order -> see compareTo in ScoredAlternative
 		 */		
-		Collections.sort(list);
-		double totalScore = this.getTotalScore(list);
-		
+		Collections.sort(list);		
 		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
 		
 		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
-		double sumScore = 0.0;
 		for (int index = 0; index < nrElements; index++)  {
-			ScoredAlternative sa = list.get(index);
-			sumScore += (this.handleScore(sa.getScore())) / totalScore;				
-			mapNormalized.put(sumScore , sa.getAlternativeId());	
+			double indexNormalized = 1.0 - Math.pow(0.4, (index + 1));
+			ScoredAlternative sa = list.get(index);				
+			mapNormalized.put(indexNormalized , sa.getAlternativeId());	
 		}
 		return mapNormalized;
 	}
