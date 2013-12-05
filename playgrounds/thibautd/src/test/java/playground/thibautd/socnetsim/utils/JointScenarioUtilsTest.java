@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.utils;
 
+import java.io.File;
+
+import org.apache.log4j.Logger;
+
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
@@ -46,6 +50,9 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
  * @author thibautd
  */
 public class JointScenarioUtilsTest {
+	private static final Logger log =
+		Logger.getLogger(JointScenarioUtilsTest.class);
+
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -53,6 +60,13 @@ public class JointScenarioUtilsTest {
 	public void testJointTripsImport() throws Exception {
 		final Population dumpedPopulation = createPopulation();
 		final String popFile = utils.getOutputDirectory()+"/pop.xml";
+
+		if ( new File( popFile ).exists() ) {
+			throw new RuntimeException( "file "+popFile+" seems to exist!?" );
+		}
+		else {
+			log.info( "file "+popFile+" does not exist. Test should work as expected" );
+		}
 
 		new PopulationWriter( dumpedPopulation , null ).write( popFile );
 		final Config config = JointScenarioUtils.loadConfig( null );
