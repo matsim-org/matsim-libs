@@ -107,8 +107,8 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected)");
 			bw.newLine();
 			for (Integer it : this.it2userBenefits_selected.keySet()){
-				bw.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum
-						+ ";" + this.it2userBenefits_selected.get(it) + ";" + this.it2invalidPersons_selected.get(it) + ";" + this.it2invalidPlans_selected
+				bw.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum.get(it)
+						+ ";" + this.it2userBenefits_selected.get(it) + ";" + this.it2invalidPersons_selected.get(it) + ";" + this.it2invalidPlans_selected.get(it)
 						+ ";" + this.it2tollSum.get(it)
 						+ ";" + (this.it2userBenefits_logsum.get(it) + this.it2tollSum.get(it))
 						+ ";" + (this.it2userBenefits_selected.get(it) + this.it2tollSum.get(it))
