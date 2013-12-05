@@ -33,6 +33,7 @@ import playground.thibautd.utils.MapUtils;
  * @author thibautd
  */
 public class SocialNetwork {
+	public static final String ELEMENT_NAME = "SocialNetwork";
 	private final Counter tieCounter = new Counter( "SocialNetwork: (Monodirectional) Tie # " );
 	private final Map<Id, Set<Id>> map = new HashMap<Id, Set<Id>>();
 

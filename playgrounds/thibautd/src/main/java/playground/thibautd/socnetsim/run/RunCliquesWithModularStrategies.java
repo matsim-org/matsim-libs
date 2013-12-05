@@ -150,6 +150,8 @@ public class RunCliquesWithModularStrategies {
 			FixedGroupsIdentifierFileParser.readCliquesFile(
 					cliquesConf.getInputFile() );
 
+		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , toSocialNetwork( cliques ) );
+
 		final PlanLinkIdentifier planLinkIdentifier =
 			linkIdentifier( weights.getSynchronize() );
 
@@ -292,7 +294,8 @@ public class RunCliquesWithModularStrategies {
 							scoringFunctionConf,
 							scenario.getPopulation() ),
 						scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
-						toSocialNetwork( cliques ) );
+						(SocialNetwork) scenario.getScenarioElement(
+							SocialNetwork.ELEMENT_NAME ));
 			controllerRegistry.getEvents().addHandler( socialScorer );
 			controller.addControlerListener( socialScorer );
 		}
