@@ -45,30 +45,28 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	createLayout(table, true, null);
     }
 
-    
     private void clearTable() {
 	table.setModel(new DefaultTableModel());
 	setTitle(tr("Links/Nodes"));
     }
-    
+
     private void paintTable(NetworkLayer layer) {
- 	title(layer);
- 	table.setModel(tableModels.get(layer));
-     }
-    
-    
+	title(layer);
+	table.setModel(tableModels.get(layer));
+    }
+
     private void createTableModel(NetworkLayer layer) {
-   	Object[][] data = new Object[0][6];
-   	MATSimTableModel model = new MATSimTableModel(data, columnNames);
-   	tableModels.put(layer, model);
+	Object[][] data = new Object[0][6];
+	MATSimTableModel model = new MATSimTableModel(data, columnNames);
+	tableModels.put(layer, model);
 
-   	Network network = (layer).getMatsimNetwork();
-   	for (Link link : network.getLinks().values()) {
-   	    addLink(layer, link);
-   	}
+	Network network = (layer).getMatsimNetwork();
+	for (Link link : network.getLinks().values()) {
+	    addLink(layer, link);
+	}
 
-       }
-    
+    }
+
     public void addLink(NetworkLayer layer, Link link) {
 
 	Object[] linkInfo = new Object[6];
@@ -88,12 +86,12 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	title(layer);
 	tableModels.get(layer).removeLinkEntry(link);
     }
-    
+
     private void title(NetworkLayer layer) {
-   	setTitle(tr("Links: {0} / Nodes: {1}", layer.getMatsimNetwork()
-   		.getLinks().size(), layer.getMatsimNetwork().getNodes().size()));
-       }
-    
+	setTitle(tr("Links: {0} / Nodes: {1}", layer.getMatsimNetwork()
+		.getLinks().size(), layer.getMatsimNetwork().getNodes().size()));
+    }
+
     @Override
     public void activeLayerChange(Layer oldLayer, Layer newLayer) {
 	if (newLayer instanceof NetworkLayer) {
@@ -143,7 +141,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
     }
 
     private class MATSimTableModel extends DefaultTableModel {
-	
+
 	public MATSimTableModel(Object[][] data, String[] columnNames) {
 	    super(data, columnNames);
 	}
