@@ -69,6 +69,7 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 		tollHandler.setLinkId2timeBin2avgToll();
 		
 		// write out toll informations
+		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollstats.csv");
 	}
 
 }

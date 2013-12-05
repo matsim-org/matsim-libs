@@ -22,6 +22,10 @@
  */
 package playground.ikaddoura.internalizationCar;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -241,5 +245,38 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 		}
 		
 		return avgToll;
+	}
+
+	public void writeTollStats(String fileName) {
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write("link;total toll (per day);leaving agents (per day)");
+			bw.newLine();
+			
+			for (Id linkId : this.linkId2timeBin2tollSum.keySet()){
+				double totalToll = 0.;
+				int leavingAgents = 0;
+				
+				for (Double tollSum_timeBin : this.linkId2timeBin2tollSum.get(linkId).values()){
+					totalToll = totalToll + tollSum_timeBin;
+				}
+				
+				for (Integer leavingAgents_timeBin : this.linkId2timeBin2leavingAgents.get(linkId).values()){
+					leavingAgents = leavingAgents + leavingAgents_timeBin;
+				}
+				
+				bw.write(linkId + ";" + totalToll + ";" + leavingAgents);
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }
