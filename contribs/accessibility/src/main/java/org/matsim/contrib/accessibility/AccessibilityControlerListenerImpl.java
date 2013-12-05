@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -37,26 +38,32 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.utils.LeastCostPathTree;
 
 /**
- * improvements aug'12
- * - accessibility calculation of unified for cell- and zone-base approach
- * - large computing savings due reduction of "least cost path tree" execution:
+ * improvements aug'12<ul>
+ * <li> accessibility calculation of unified for cell- and zone-base approach
+ * <li> large computing savings due reduction of "least cost path tree" execution:
  *   In a pre-processing step all nearest nodes of measuring points (origins) are determined. 
  *   The "least cost path tree" for measuring points with the same nearest node are now only executed once. 
  *   Only the cost calculations from the measuring point to the network is done individually.
- *   
- * improvements nov'12
- * - bug fixed aggregatedOpportunities method for compound cost factors like time and distance    
+ * </ul><p/>  
+ * improvements nov'12<ul>
+ * <li> bug fixed aggregatedOpportunities method for compound cost factors like time and distance    
+ * </ul><p/>
+ * improvements jan'13<ul>
+ * <li> added pt for accessibility calculation
+ * </ul><p/>
  * 
- * improvements jan'13
- * - added pt for accessibility calculation
- * 
- * improvements june'13
- * - take "main" (reference to matsim4urbansim) out
- * - aggregation of opportunities adjusted to handle facilities
- * - zones are taken out
- * - replaced 
+ * improvements june'13<ul>
+ * <li> take "main" (reference to matsim4urbansim) out
+ * <li> aggregation of opportunities adjusted to handle facilities
+ * <li> zones are taken out
+ * <li> replaced [[??]]
+ * </ul> 
+ * <p/> 
+ * Design comments:<ul>
+ * <li> yyyy This class is quite brittle, since it does not use a central disutility object, but produces its own.  Should be changed.
+ * </ul>
  *     
- * @author thomas
+ * @author thomas, knagel
  *
  */
 public abstract class AccessibilityControlerListenerImpl {
@@ -143,6 +150,19 @@ public abstract class AccessibilityControlerListenerImpl {
 		AccessibilityConfigGroup moduleAPCM = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config);
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
+		
+		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {
+			log.error( "marginal utility of distance for car different from zero but not used in accessibility computations");
+		}
+		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0. ) {
+			log.error( "marginal utility of distance for pt different from zero but not used in accessibility computations");
+		}
+		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceCostRate() != 0. ) {
+			log.error( "monetary distance cost rate for bike different from zero but not used in accessibility computations");
+		}
+		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceCostRate() != 0. ) {
+			log.error( "monetary distance cost rate for walk different from zero but not used in accessibility computations");
+		}
 		
 		useRawSum			= moduleAPCM.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
