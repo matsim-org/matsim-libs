@@ -130,9 +130,9 @@ In this situation, we have the following (linearized) modifications of the utili
 t$. $\betaperf$ is typically positive, so the contribution is
 positive.
 
-\item The following activity is shortened by deltaLtime; the (linearized)  utility change is $- \betaperf \cdot \Delta t$. $\betaperf$ is  typically positive, so the contribution is negative (and exactly cancels  the previous contribution).
+\item The following activity is shortened by $\Delta t$; the (linearized)  utility change is $- \betaperf \cdot \Delta t$. $\betaperf$ is  typically positive, so the contribution is negative (and exactly cancels  the previous contribution).
 
-\item Arriving late is increased by deltaLtime; the (exact) utility change  is $\beta_{late} \cdot \Delta t$. $\beta_{late}$ is typically negative, so  the contribution is negative.
+\item Arriving late is increased by $\Delta t$; the (exact) utility change  is $\beta_{late} \cdot \Delta t$. $\beta_{late}$ is typically negative, so  the contribution is negative.
 
 \end{itemize}
 
@@ -294,9 +294,11 @@ This  was, as said, never tried, since activity dropping was never   systematica
 
 ---
 
-To make matters worse, there is currently the  convention that  negative values of U are set to zero. This is done  since we need  useable values for negative durations (since they may  happen at the  "stitching together" of the last to the first activity of a  day), and  if we give those a "very negative" score, then the utl at t=0  cannot be  even smaller than this.
+\st{To make matters worse, there is currently the  convention that  negative values of U are set to zero. This is done  since we need  useable values for negative durations (since they may  happen at the  "stitching together" of the last to the first activity of a  day), and  if we give those a "very negative" score, then the utl at t=0  cannot be  even smaller than this.}
 
-This has, however, the  unfortunate consequence that the ``drift  direction'' of the adaptive  algorithm, once an activity duration has  gone below $t_0$, goes to zero  duration.
+\st{This has, however, the  unfortunate consequence that the ``drift  direction'' of the adaptive  algorithm, once an activity duration has  gone below $t_0$, goes to zero  duration.}
+
+The above was modified in nov'13, see \url{https://matsim.atlassian.net/browse/MATSIM-191}.  It now takes the slope at $t=t_0$ and extends it with that slope to the left.
 
 \section{Outlook}
 
