@@ -111,53 +111,22 @@ public abstract class AccessibilityControlerListenerImpl {
 	private double logitScaleParameter;
 	private double inverseOfLogitScaleParameter;
 	private double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
-	private double betaCarTTPower;
-	private double betaCarLnTT;
 	private double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
-	private double betaCarTDPower;
-	private double betaCarLnTD;
 	private double betaCarTMC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	private double betaCarTMCPower;
-	private double betaCarLnTMC;
 	private double betaBikeTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-	private double betaBikeTTPower;
-	private double betaBikeLnTT;
 	private double betaBikeTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateBike doesn't exist: 
-	private double betaBikeTDPower;
-	private double betaBikeLnTD;
 	private double betaBikeTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	private double betaBikeTMCPower;
-	private double betaBikeLnTMC;
 	private double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-	private double betaWalkTTPower;
-	private double betaWalkLnTT;
 	private double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
-	private double betaWalkTDPower;
-	private double betaWalkLnTD;
 	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	private double betaWalkTMCPower;
-	private double betaWalkLnTMC;
 	private double betaPtTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
-//	private double betaPtTTPower;
-//	private double betaPtLnTT;
 	private double betaPtTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
-//	private double betaPtTDPower;
-//	private double betaPtLnTD;
-//	private double betaPtTMC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-//	private double betaPtTMCPower;
-//	private double betaPtLnTMC;
 	
 	private double constCar;
 	private double constBike;
 	private double constWalk;
 	private double constPt;
 
-//	private double VijCarTT, VijCarTTPower, VijCarLnTT, VijCarTD, VijCarTDPower, VijCarLnTD, VijCarTMC, VijCarTMCPower, VijCarLnTMC,
-//		   VijWalkTT, VijWalkTTPower, VijWalkLnTT, VijWalkTD, VijWalkTDPower, VijWalkLnTD, VijWalkTMC, VijWalkTMCPower, VijWalkLnTMC,
-//		   VijBikeTT, VijBikeTTPower, VijBikeLnTT, VijBikeTD, VijBikeTDPower, VijBikeLnTD, VijBikeTMC, VijBikeTMCPower, VijBikeLnTMC,
-//		   VijFreeTT, VijFreeTTPower, VijFreeLnTT, VijFreeTD, VijFreeTDPower, VijFreeLnTD, VijFreeTC, VijFreeTCPower, VijFreeLnTC,
-//		   VijPtTT, VijPtTTPower, VijPtLnTT, VijPtTD, VijPtTDPower, VijPtLnTD, VijPtTMC, VijPtTMCPower, VijPtLnTMC;
-	
 	private double depatureTime;
 	private double bikeSpeedMeterPerHour = -1;
 	private double walkSpeedMeterPerHour = -1;
@@ -218,32 +187,14 @@ public abstract class AccessibilityControlerListenerImpl {
 		log.info("Bike speed (meter/h): " + this.bikeSpeedMeterPerHour + " ("+this.bikeSpeedMeterPerHour/3600. +" meter/s)");
 		log.info("Depature time (in seconds): " + depatureTime);
 		log.info("Beta Car Travel Time: " + betaCarTT );
-		log.info("Beta Car Travel Time Power2: " + betaCarTTPower );
-		log.info("Beta Car Ln Travel Time: " + betaCarLnTT );
 		log.info("Beta Car Travel Distance: " + betaCarTD );
-		log.info("Beta Car Travel Distance Power2: " + betaCarTDPower );
-		log.info("Beta Car Ln Travel Distance: " + betaCarLnTD );
 		log.info("Beta Car Travel Monetary Cost: " + betaCarTMC );
-		log.info("Beta Car Travel Monetary Cost Power2: " + betaCarTMCPower );
-		log.info("Beta Car Ln Travel Monetary Cost: " + betaCarLnTMC );
 		log.info("Beta Bike Travel Time: " + betaBikeTT );
-		log.info("Beta Bike Travel Time Power2: " + betaBikeTTPower );
-		log.info("Beta Bike Ln Travel Time: " + betaBikeLnTT );
 		log.info("Beta Bike Travel Distance: " + betaBikeTD );
-		log.info("Beta Bike Travel Distance Power2: " + betaBikeTDPower );
-		log.info("Beta Bike Ln Travel Distance: " + betaBikeLnTD );
 		log.info("Beta Bike Travel Monetary Cost: " + betaBikeTMC );
-		log.info("Beta Bike Travel Monetary Cost Power2: " + betaBikeTMCPower );
-		log.info("Beta Bike Ln Travel Monetary Cost: " + betaBikeLnTMC );
 		log.info("Beta Walk Travel Time: " + betaWalkTT );
-		log.info("Beta Walk Travel Time Power2: " + betaWalkTTPower );
-		log.info("Beta Walk Ln Travel Time: " + betaWalkLnTT );
 		log.info("Beta Walk Travel Distance: " + betaWalkTD );
-		log.info("Beta Walk Travel Distance Power2: " + betaWalkTDPower );
-		log.info("Beta Walk Ln Travel Distance: " + betaWalkLnTD );
 		log.info("Beta Walk Travel Monetary Cost: " + betaWalkTMC );
-		log.info("Beta Walk Travel Monetary Cost Power2: " + betaWalkTMCPower );
-		log.info("Beta Walk Ln Travel Monetary Cost: " + betaWalkLnTMC );
 	}
 	
 	/**
