@@ -105,7 +105,7 @@ public class SpatialAveragingWelfare {
 		
 		Config config = scenario.getConfig();
 		Population pop = scenario.getPopulation();
-		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
+		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM, false);
 		ubc.calculateUtility_money(pop);
 		Map<Id, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
 		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
@@ -129,7 +129,7 @@ public class SpatialAveragingWelfare {
 			
 			Config config2 = scenario2.getConfig();
 			Population pop2 = scenario2.getPopulation();
-			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM);
+			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM, false);
 			ubc2.calculateUtility_money(pop2);
 			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
 			logger.info("There were " + ubc2.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");

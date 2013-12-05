@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
 
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -57,8 +56,15 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 
 	private final ScenarioImpl scenario;
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
+	
 	private Map<Integer, Double> it2userBenefits_logsum = new HashMap<Integer, Double>();
+	private Map<Integer, Integer> it2invalidPersons_logsum = new HashMap<Integer, Integer>();
+	private Map<Integer, Integer> it2invalidPlans_logsum = new HashMap<Integer, Integer>();
+
 	private Map<Integer, Double> it2userBenefits_selected = new HashMap<Integer, Double>();
+	private Map<Integer, Integer> it2invalidPersons_selected = new HashMap<Integer, Integer>();
+	private Map<Integer, Integer> it2invalidPlans_selected = new HashMap<Integer, Integer>();
+	
 	private Map<Integer, Double> it2tollSum = new HashMap<Integer, Double>();
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
@@ -77,17 +83,15 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 
 	private void writeAnalysis(IterationEndsEvent event) {
 		
-		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM);
+		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);
 		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getPopulation()));
+		this.it2invalidPersons_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
+		this.it2invalidPlans_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getInvalidPlans());
 
-//		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.SELECTED);		
-//		this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getPopulation()));
-
-		double scoreSum_selected = 0.;
-		for (Person person : event.getControler().getPopulation().getPersons().values()) {
-			scoreSum_selected = scoreSum_selected + person.getSelectedPlan().getScore();
-		}
-		this.it2userBenefits_selected.put(event.getIteration(), scoreSum_selected);
+		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.SELECTED, false);		
+		this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getPopulation()));
+		this.it2invalidPersons_selected.put(event.getIteration(), userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
+		this.it2invalidPlans_selected.put(event.getIteration(), userBenefitsCalculator_selected.getInvalidPlans());
 
 		double tollSum = this.moneyHandler.getSumOfMonetaryAmounts();
 		this.it2tollSum.put(event.getIteration(), (-1) * tollSum);
@@ -97,11 +101,14 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 			
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Iteration;User Benefits (LogSum);User Benefits (Selected);Total Monetary Payments;Welfare (LogSum);Welfare (Selected)");
+			bw.write("Iteration;" +
+					"User Benefits (LogSum);Number of Invalid Persons (LogSum);Number of Invalid Plans (LogSum);" +
+					"User Benefits (Selected);Number of Invalid Persons (Selected);Number of Invalid Plans (Selected);" +
+					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected)");
 			bw.newLine();
 			for (Integer it : this.it2userBenefits_selected.keySet()){
-				bw.write(it + ";" + this.it2userBenefits_logsum.get(it)
-						+ ";" + this.it2userBenefits_selected.get(it) 
+				bw.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum
+						+ ";" + this.it2userBenefits_selected.get(it) + ";" + this.it2invalidPersons_selected.get(it) + ";" + this.it2invalidPlans_selected
 						+ ";" + this.it2tollSum.get(it)
 						+ ";" + (this.it2userBenefits_logsum.get(it) + this.it2tollSum.get(it))
 						+ ";" + (this.it2userBenefits_selected.get(it) + this.it2tollSum.get(it))

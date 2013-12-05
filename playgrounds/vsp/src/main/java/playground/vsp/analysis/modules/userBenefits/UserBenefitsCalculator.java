@@ -45,15 +45,21 @@ public class UserBenefitsCalculator {
 	private int minusScore = 0;
 	private int personsWithoutValidPlanScore = 0;
 	private final int maxWarnCnt = 3;
+	private final boolean considerAllPlans;
 	private final Map<Id, Double> personId2Utility = new HashMap<Id, Double>();
 	private final Map<Id, Double> personId2MonetizedUtility = new HashMap<Id, Double>();
 
 
-	public UserBenefitsCalculator(Config config, WelfareMeasure wm) {
+	public UserBenefitsCalculator(Config config, WelfareMeasure wm, boolean considerAllPlans) {
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
 		this.betaLogit = pcs.getBrainExpBeta();
 		this.marginalUtlOfMoney = pcs.getMarginalUtilityOfMoney();
 		this.welfareMeasure = wm;
+		this.considerAllPlans = considerAllPlans;
+		
+		if (considerAllPlans) {
+			logger.warn("All plans are considered for the calculation of user benefits. For an economic interpretation invalid plans (score <= 0.0 or score == null) should not be considered.");
+		}
 	}
 
 	public void reset() {
@@ -99,7 +105,12 @@ public class UserBenefitsCalculator {
 		
 		if(this.welfareMeasure.equals(WelfareMeasure.LOGSUM)){
 			for(Plan plan : person.getPlans()){
-				boolean shouldBeConsidered = testScore(plan, person.getId());
+				boolean shouldBeConsidered;
+				if(this.considerAllPlans) {
+					shouldBeConsidered = true;
+				} else {
+					shouldBeConsidered = testScore(plan, person.getId());
+				}
 				if(shouldBeConsidered){
 					/* Benjamins version: */
 //					double expScoreOfPlan = Math.exp(betaLogit * plan.getScore());
@@ -108,7 +119,7 @@ public class UserBenefitsCalculator {
 					double expScoreOfPlan = Math.exp(betaLogit * (plan.getScore() - bestScore));
 					
 					sumOfExpScore += expScoreOfPlan;
-				} else{
+				} else {
 					// plan is not considered
 				}
 			}
@@ -128,7 +139,12 @@ public class UserBenefitsCalculator {
 
 		} else if(this.welfareMeasure.equals(WelfareMeasure.SELECTED)){
 			Plan selectedPlan = person.getSelectedPlan();
-			boolean shouldBeConsidered = testScore(selectedPlan, person.getId());
+			boolean shouldBeConsidered;
+			if(this.considerAllPlans) {
+				shouldBeConsidered = true;
+			} else {
+				shouldBeConsidered = testScore(selectedPlan, person.getId());
+			}
 			if(shouldBeConsidered){
 				utilityOfPerson_utils = selectedPlan.getScore();
 			} else {
@@ -156,7 +172,7 @@ public class UserBenefitsCalculator {
 			minusScore++;
 			if(minusScore <= maxWarnCnt) {
 				logger.warn("Score for person " + personId + " is " + plan.getScore() 
-						+ ". A negative score cannot be used for utility calculation.");
+						+ ". A score <= 0.0 cannot be used for utility calculation.");
 				if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 			}
 			return false;
@@ -179,6 +195,11 @@ public class UserBenefitsCalculator {
 
 	public int getPersonsWithoutValidPlanCnt() {
 		return personsWithoutValidPlanScore;
+	}
+	
+	public int getInvalidPlans() {
+		int invalidPlans = this.minusScore + this.nullScore;
+		return invalidPlans;
 	}
 	
 	public Map<Id, Double> getPersonId2Utility() {

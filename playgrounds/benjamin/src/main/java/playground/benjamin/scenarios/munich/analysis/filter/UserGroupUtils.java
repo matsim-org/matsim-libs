@@ -106,7 +106,7 @@ public class UserGroupUtils {
 		Map<UserGroup, Double> userGroup2Logsum = new HashMap<UserGroup, Double>();
 
 		Config config = scenario.getConfig();
-		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
+		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM, false);
 		
 		for(UserGroup userGroup : UserGroup.values()){
 			Population userGroupPop = personFilter.getPopulation(scenario.getPopulation(), userGroup);

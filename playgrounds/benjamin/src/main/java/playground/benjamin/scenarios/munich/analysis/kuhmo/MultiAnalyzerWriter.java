@@ -63,7 +63,7 @@ public class MultiAnalyzerWriter {
 		File file = new File(fileName);
 		
 		Config config = ConfigUtils.loadConfig(configFile);
-		UserBenefitsCalculator userBenefitsCalculator = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
+		UserBenefitsCalculator userBenefitsCalculator = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM, false);
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));

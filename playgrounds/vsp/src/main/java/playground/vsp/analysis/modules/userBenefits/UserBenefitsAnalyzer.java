@@ -62,7 +62,7 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
 		
-		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM);
+		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);
 		this.userWelfareCalculator.reset();
 	}
 	
