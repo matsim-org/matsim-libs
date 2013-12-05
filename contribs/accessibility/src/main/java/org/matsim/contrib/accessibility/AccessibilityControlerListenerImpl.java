@@ -457,17 +457,19 @@ public abstract class AccessibilityControlerListenerImpl {
 					
 					// travel times and distances for pseudo pt
 					if(this.usePtGrid){
-						double ptTravelTime_h		= Double.MAX_VALUE;	// travel time with pt
-						double ptTotalWalkTime_h	= Double.MAX_VALUE;	// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location
-						double ptTravelDistance_meter=Double.MAX_VALUE; // total travel distance including walking and pt distance from/to origin/destination location
-						double ptTotalWalkDistance_meter=Double.MAX_VALUE;// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location
-						if(ptMatrix != null){
-							ptTravelTime_h 			= ptMatrix.getPtTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
-							ptTotalWalkTime_h		= ptMatrix.getTotalWalkTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
-							
-							ptTotalWalkDistance_meter=ptMatrix.getTotalWalkTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
-							ptTravelDistance_meter  = ptMatrix.getPtTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
+						if ( ptMatrix==null ) {
+							throw new RuntimeException( "pt accessibility does only work when a PtMatrix is provided.  Provide such a matrix, or switch off "
+									+ "the pt accessibility computation, or extend the Java code so that it works for this situation.") ;
 						}
+						// travel time with pt:
+						double ptTravelTime_h	 = ptMatrix.getPtTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
+						// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
+						double ptTotalWalkTime_h =ptMatrix.getTotalWalkTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
+						// total travel distance including walking and pt distance from/to origin/destination location:
+						double ptTravelDistance_meter=ptMatrix.getTotalWalkTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
+						// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
+						double ptTotalWalkDistance_meter=ptMatrix.getPtTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
+
 						double ptDisutility = constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD);					
 						double expVijPt = Math.exp(this.logitScaleParameter * ptDisutility);
 						double expVhkPt = expVijPt * sumExpVjkWalk;
