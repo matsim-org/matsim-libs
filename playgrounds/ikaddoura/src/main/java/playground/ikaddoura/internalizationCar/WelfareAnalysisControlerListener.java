@@ -56,6 +56,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 
 	private final ScenarioImpl scenario;
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
+	private TripAnalysisHandler tripAnalysisHandler = new TripAnalysisHandler();
 	
 	private Map<Integer, Double> it2userBenefits_logsum = new HashMap<Integer, Double>();
 	private Map<Integer, Integer> it2invalidPersons_logsum = new HashMap<Integer, Integer>();
@@ -66,6 +67,8 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	private Map<Integer, Integer> it2invalidPlans_selected = new HashMap<Integer, Integer>();
 	
 	private Map<Integer, Double> it2tollSum = new HashMap<Integer, Double>();
+	private Map<Integer, Integer> it2stuckEvents = new HashMap<Integer, Integer>();
+	private Map<Integer, Double> it2totalTravelTime = new HashMap<Integer, Double>();
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
@@ -74,6 +77,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		event.getControler().getEvents().addHandler(moneyHandler);
+		event.getControler().getEvents().addHandler(tripAnalysisHandler);
 	}
 
 	@Override
@@ -95,6 +99,8 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 
 		double tollSum = this.moneyHandler.getSumOfMonetaryAmounts();
 		this.it2tollSum.put(event.getIteration(), (-1) * tollSum);
+		this.it2stuckEvents.put(event.getIteration(), this.tripAnalysisHandler.getAgentStuckEvents());
+		this.it2totalTravelTime.put(event.getIteration(), this.tripAnalysisHandler.getTotalTravelTime());
 		
 		String fileName = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.csv";
 		File file = new File(fileName);
@@ -104,7 +110,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 			bw.write("Iteration;" +
 					"User Benefits (LogSum);Number of Invalid Persons (LogSum);Number of Invalid Plans (LogSum);" +
 					"User Benefits (Selected);Number of Invalid Persons (Selected);Number of Invalid Plans (Selected);" +
-					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected)");
+					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time (sec);Number of Agent Stuck Events");
 			bw.newLine();
 			for (Integer it : this.it2userBenefits_selected.keySet()){
 				bw.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum.get(it)
@@ -112,6 +118,8 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 						+ ";" + this.it2tollSum.get(it)
 						+ ";" + (this.it2userBenefits_logsum.get(it) + this.it2tollSum.get(it))
 						+ ";" + (this.it2userBenefits_selected.get(it) + this.it2tollSum.get(it))
+						+ ";" + this.it2totalTravelTime.get(it)
+						+ ";" + this.it2stuckEvents.get(it)
 						);
 				bw.newLine();
 			}

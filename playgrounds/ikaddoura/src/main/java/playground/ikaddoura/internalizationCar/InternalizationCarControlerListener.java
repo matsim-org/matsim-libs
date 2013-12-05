@@ -68,6 +68,7 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 		log.info("Set average tolls for each link Id and 15 min time bin.");
 		tollHandler.setLinkId2timeBin2avgToll();
 		
+		// write out toll informations
 	}
 
 }
