@@ -86,6 +86,7 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	private String weightAttribute = null;
 	private String selectorForRemoval = "MinimumSum";
 	private String selectorForModification = "RandomSelection";
+	private double internalizationRatio = 0;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -225,5 +226,16 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	public void setSelectorForModification(String selectorForModification) {
 		this.selectorForModification = selectorForModification;
 	}
+
+	@StringGetter( "internalizationRatio" )
+	public double getInternalizationRatio() {
+		return this.internalizationRatio;
+	}
+
+	@StringSetter( "internalizationRatio" )
+	public void setInternalizationRatio(double internalizationRatio) {
+		this.internalizationRatio = internalizationRatio;
+	}
+
 }
 
