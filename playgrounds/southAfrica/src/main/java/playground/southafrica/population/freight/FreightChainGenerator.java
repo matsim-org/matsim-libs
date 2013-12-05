@@ -22,6 +22,8 @@
  */
 package playground.southafrica.population.freight;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -31,11 +33,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
@@ -49,6 +54,8 @@ import playground.southafrica.utilities.Header;
 public class FreightChainGenerator {
 	private final static Logger LOG = Logger.getLogger(FreightChainGenerator.class);
 	private final static int MAX_CHAIN_LENGTH = 20;
+	private final static Random RANDOM = MatsimRandom.getRandom();
+	private final static Double AVERAGE_SPEED = 50.0/3.6;
 	
 	private static Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
@@ -88,6 +95,7 @@ public class FreightChainGenerator {
 			
 			/* Set up the plan. */
 			PlanImpl plan = (PlanImpl) pf.createPlan();
+			double cumulativeSeconds = 0.0;
 			
 			/* Generate the first activity. */
 			Id previousId = new IdImpl("source");
@@ -96,6 +104,8 @@ public class FreightChainGenerator {
 			Coord coord = network.getPathDependentNode(currentId).getCoord();
 			ActivityImpl activity = new ActivityImpl("major", coord);
 			activity.setFacilityId(new IdImpl(currentId.toString()));
+			activity.setEndTime(ChainStartTime.getStartTimeInSeconds(RANDOM.nextDouble()));
+			cumulativeSeconds += activity.getEndTime();
 			plan.addActivity(activity);
 			
 			/* Generate the consecutive activities until the next vertex Id is
@@ -127,6 +137,18 @@ public class FreightChainGenerator {
 				Coord thisCoord = network.getPathDependentNode(currentId).getCoord();
 				ActivityImpl thisActivity = new ActivityImpl(activityType, thisCoord);
 				thisActivity.setFacilityId(currentId);
+					/* Update the travel time */
+				Coord previousCoord = network.getPathDependentNode(previousId).getCoord();
+				cumulativeSeconds += CoordUtils.calcDistance(thisCoord, previousCoord) / AVERAGE_SPEED;
+					/* Update the end time. */
+				double duration = ActivityDuration.getDurationInSeconds(RANDOM.nextDouble());
+				cumulativeSeconds += duration;
+				// FIXME Is right right i.t.o. last major activity?
+				if(activityType.equalsIgnoreCase("minor")){
+					thisActivity.setMaximumDuration(duration);
+					thisActivity.setEndTime(cumulativeSeconds);
+				}
+				
 				plan.addActivity(thisActivity);
 				
 			}

@@ -42,7 +42,7 @@ public class ActivityDuration {
 	 * @param random a random value in the range [0; 1].
 	 * @return a start time (in seconds) within the range [00:00; 23:59].
 	 */
-	public static double getStartTimeInSeconds(double random){
+	public static double getDurationInSeconds(double random){
 		if(random < 0.0 && random > 1.0){
 			throw new IllegalArgumentException("Given random number must be in the range [0; 1].");
 		}
@@ -63,6 +63,8 @@ public class ActivityDuration {
 				} else{
 					duration = new Double( durations[index-1] + MatsimRandom.getRandom().nextDouble()*(durations[index] - durations[index-1]) );
 				}
+			} else{
+				index++;
 			}
 		} while (duration == null);
 		return duration;
