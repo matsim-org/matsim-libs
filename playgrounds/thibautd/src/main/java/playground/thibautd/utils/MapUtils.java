@@ -171,5 +171,15 @@ public class MapUtils {
 			}
 		}
 	}
+
+	public static <K,V> Collection<V> get(
+			final Iterable<K> keys,
+			final Map<K, V> map ) {
+		final List<V> coll = new ArrayList<V>();
+
+		for ( K k : keys ) coll.add( map.get( k ) );
+
+		return coll;
+	}
 }
 
