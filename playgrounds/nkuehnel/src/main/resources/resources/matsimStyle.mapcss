@@ -14,9 +14,18 @@ meta[lang=de]
 
 canvas {
   default-points: false;
+  background-color: white;
 }
 
 node {
+  symbol-size:5;
+  symbol-shape: triangle;
+  symbol-stroke-color: yellow;
+  symbol-fill-color: yellow;
+}
+
+
+node[id]:connection {
   symbol-size:5;
   symbol-shape: square;
   symbol-stroke-color: #5091BE;
@@ -24,15 +33,8 @@ node {
 }
 
 
-node:connection {
-  symbol-fill-color: white;
-}
-
-
-
-
-way[capacity][freespeed][permlanes]  { z-index: 1; color: #FFFFFF; width: 1 ; casing-color: #5091BE; casing-width: 3; casing-dashes: 3;}
-way[capacity>0][freespeed>0][permlanes>0]  {z-index: 1; color: #5091BE; width: 1 ; casing-color: #5091BE; casing-width: 1;  casing-dashes: 0;}
+node[id]<way[capacity][freespeed][permlanes][id]  { z-index: 1; color: #FFFFFF; width: 1 ; casing-color: #5091BE; casing-width: 3; casing-dashes: 3; offset:2; text: id; text-color: #5091BE; font-size: 12; text-offset-y: 12; }
+node[id]<way[capacity>0][freespeed>0][permlanes>0][id]  {z-index: 1; color: #5091BE; width: 1 ; casing-color: #5091BE; casing-width: 1;  casing-dashes: 0;}
 
 
 

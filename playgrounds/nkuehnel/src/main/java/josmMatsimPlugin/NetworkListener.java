@@ -16,6 +16,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
@@ -27,6 +28,7 @@ import org.openstreetmap.josm.data.osm.event.PrimitivesRemovedEvent;
 import org.openstreetmap.josm.data.osm.event.RelationMembersChangedEvent;
 import org.openstreetmap.josm.data.osm.event.TagsChangedEvent;
 import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
+import org.openstreetmap.josm.data.osm.visitor.paint.MapPaintSettings;
 
 public class NetworkListener implements DataSetListener
 {
@@ -64,8 +66,6 @@ public class NetworkListener implements DataSetListener
 				moved.getNode().getCoor().lon(), moved.getNode().getCoor()
 						.lat()));
 		network.getNodes().get(id).getCoord().setXY(temp.getX(), temp.getY());
-
-		MATSimPlugin.toggleDialog.updateTable(layer);
 	}
 	
 
@@ -79,7 +79,6 @@ public class NetworkListener implements DataSetListener
 	@Override
 	public void primitivesAdded(PrimitivesAddedEvent added)
 	{
-		// added.getDataset().clearSelection();
 		System.out.println(added.wasIncomplete());
 		for (OsmPrimitive primitive : added.getPrimitives())
 		{
@@ -113,12 +112,12 @@ public class NetworkListener implements DataSetListener
 					for (Link link : links)
 					{
 						network.addLink(link);
+						MATSimPlugin.toggleDialog.addLink(layer, link);
 					}
 				}
 			}
 
 		}
-		MATSimPlugin.toggleDialog.updateTable(layer);
 	}
 
 	private List<Link> enterWay2Links(Way way)
@@ -190,12 +189,12 @@ public class NetworkListener implements DataSetListener
 				for (Link link : links)
 				{
 					network.removeLink(link.getId());
+					MATSimPlugin.toggleDialog.removeLink(layer, link);
 					System.out.println("link removed!");
 				}
 			}
 		}
 		System.out.println("have links: " + network.getLinks().size());
-		MATSimPlugin.toggleDialog.updateTable(layer);
 	}
 
 	@Override
@@ -217,11 +216,13 @@ public class NetworkListener implements DataSetListener
 				for (Link link : oldLinks) {
 					System.out.println("remove because tag changed.");
 					Link removedLink = network.removeLink(link.getId());
+					MATSimPlugin.toggleDialog.removeLink(layer, removedLink);
 					System.out.println(removedLink);
 				}
 				for (Link link : newLinks) {
 					System.out.println("add because tag changed.");
 					network.addLink(link);
+					MATSimPlugin.toggleDialog.addLink(layer, link);
 				}
 			} else if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				org.openstreetmap.josm.data.osm.Node node = (org.openstreetmap.josm.data.osm.Node) primitive;
@@ -238,14 +239,13 @@ public class NetworkListener implements DataSetListener
 
 		System.out.println("have links: " + network.getLinks().size());
 
-		MATSimPlugin.toggleDialog.updateTable(layer);
 	}
 
 	@Override
 	public void wayNodesChanged(WayNodesChangedEvent changed)
 	{
 		System.out.println("waychange " + changed.getChangedWay().getUniqueId());
-
 	}
+	
 
 }

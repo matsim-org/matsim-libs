@@ -1,16 +1,12 @@
 package josmMatsimPlugin;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
-import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
@@ -18,19 +14,14 @@ import javax.swing.JSeparator;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.MapView;
-import org.openstreetmap.josm.gui.mappaint.MapPaintStyles;
-import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSStyleSource;
-import org.openstreetmap.josm.gui.mappaint.xml.XmlStyleSource;
 import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
-import org.openstreetmap.josm.gui.preferences.SourceEntry;
-import org.openstreetmap.josm.plugins.Plugin;
-import org.openstreetmap.josm.plugins.PluginInformation;
-import org.openstreetmap.josm.tools.ImageProvider;
 import org.openstreetmap.josm.gui.tagging.TaggingPreset;
 import org.openstreetmap.josm.gui.tagging.TaggingPresetMenu;
 import org.openstreetmap.josm.gui.tagging.TaggingPresetReader;
 import org.openstreetmap.josm.gui.tagging.TaggingPresetSeparator;
 import org.openstreetmap.josm.gui.tagging.ac.AutoCompletionManager;
+import org.openstreetmap.josm.plugins.Plugin;
+import org.openstreetmap.josm.plugins.PluginInformation;
 import org.xml.sax.SAXException;
 
 /**
@@ -66,6 +57,7 @@ public class MATSimPlugin extends Plugin {
 		Main.toolbar.register(tp);
 	    }
 	}
+	
 
 	AutoCompletionManager.cachePresets(tps);
 	HashMap<TaggingPresetMenu, JMenu> submenus = new HashMap<TaggingPresetMenu, JMenu>();
@@ -99,15 +91,17 @@ public class MATSimPlugin extends Plugin {
 	    Main.map.addToggleDialog(toggleDialog);
 	    MapView.addLayerChangeListener(toggleDialog);
 
-	    URL url = getPluginResourceClassLoader().getResource(
-		    "resources/matsimStyle.mapcss");
-
-	    MapCSSStyleSource style = new MapCSSStyleSource(url.getPath(),
-		    "matsim_style", "MATSim style");
+//	    URL url = getPluginResourceClassLoader().getResource(
+//		    "resources/matsimStyle.mapcss");
+//
+//	    MapCSSStyleSource style = new MapCSSStyleSource(url.getPath(),
+//		    "matsim_style", "MATSim style");
+//	    
+//	    if (!MapPaintStyles.getStyles().getStyleSources().contains(style)) {
+//		MapPaintStyles.addStyle(style);
+//	    }
 	    
-	    if (!MapPaintStyles.getStyles().getStyleSources().contains(style)) {
-		MapPaintStyles.addStyle(style);
-	    }
+	    
 	}
     }
 
