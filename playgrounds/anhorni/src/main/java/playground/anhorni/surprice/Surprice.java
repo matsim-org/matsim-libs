@@ -38,17 +38,17 @@ public class Surprice {
      
     // time disutility
     private static double hs = 1.0 / 3600.0; // scaling from hour to seconds
-	public static double beta_TT_car_com = -6.0 * hs;
+	public static double beta_TT_car_com = -3.0 * hs;
 	public static double beta_TT_car_shp = -3.0 * hs;	
-	public static double beta_TT_car_lei = -1.0 * hs;
+	public static double beta_TT_car_lei = -3.0 * hs;
 	
-	public static double beta_TT_pt_com = -6.0 * hs;		
+	public static double beta_TT_pt_com = -3.0 * hs;		
 	public static double beta_TT_pt_shp = -3.0 * hs;
-	public static double beta_TT_pt_lei = -1.0 * hs;
+	public static double beta_TT_pt_lei = -3.0 * hs;
 	
-	public static double beta_TT_bike_com = -6.0 * hs;
+	public static double beta_TT_bike_com = -3.0 * hs;
 	public static double beta_TT_bike_shp = -3.0 * hs;
-	public static double beta_TT_bike_lei = -1.0 * hs;
+	public static double beta_TT_bike_lei = -3.0 * hs;
 	
 	public static double beta_TT_walk_com = -0.5 * hs;
 	public static double beta_TT_walk_shp = -0.5 * hs;
