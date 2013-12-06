@@ -110,7 +110,7 @@ public abstract class ConfigUtils {
 	}
 
 	public static Id createAvailableStrategyId(Config config) {
-		long maxStrategyId = 1;
+		long maxStrategyId = 0;
 		Iterator<StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
 		while(iterator.hasNext()){
 			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
