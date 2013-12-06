@@ -37,11 +37,11 @@ import playground.thibautd.utils.MapUtils;
 final class IncompatiblePlanRecords {
 	private final Set<Id> allIncompatibilityGroupIds;
 
+	private final Map<Id, Collection<PlanRecord>> plansPerGroup = new HashMap<Id, Collection<PlanRecord>>();
+
 	public IncompatiblePlanRecords(
 			final IncompatiblePlansIdentifier identifier,
 			final Map<Id, PersonRecord> personRecords) {
-		final Map<Id, Collection<PlanRecord>> plansPerGroup = new HashMap<Id, Collection<PlanRecord>>();
-
 		final HashSet<Id> ids = new HashSet<Id>();
 		this.allIncompatibilityGroupIds = Collections.unmodifiableSet( ids );
 		for ( PersonRecord person : personRecords.values() ) {
@@ -51,16 +51,6 @@ final class IncompatiblePlanRecords {
 					ids.add( group );
 				}
 				plan.setIncompatibilityGroups( identifyGroups( identifier , plan ) );
-			}
-		}
-
-		for ( PersonRecord person : personRecords.values() ) {
-			for ( PlanRecord plan : person.plans ) {
-				assert plan.person == person;
-				plan.setIncompatiblePlans(
-						calcIncompatiblePlans(
-							plansPerGroup,
-							plan));
 			}
 		}
 	}
@@ -78,6 +68,13 @@ final class IncompatiblePlanRecords {
 	}
 
 	public Collection<PlanRecord> getIncompatiblePlans( final PlanRecord record ) {
+		if ( record.getIncompatiblePlans() == null ) {
+			record.setIncompatiblePlans(
+					calcIncompatiblePlans(
+						plansPerGroup,
+						record));
+		}
+
 		return record.getIncompatiblePlans();
 	}
 
