@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -310,12 +311,18 @@ final class SelectorUtils {
 		return copy;
 	}
 
+	// "heuristic" sorting (leading to first looking at very constrained agents)
+	// may lead to better pruning, but implies computing incompatible
+	// plans for all plans, which is expensive.
+	// Not sorting at all should be OK for determinism, as a LinkedHashMap is used in the selector
+	private static boolean HEURISTIC_SORT = false;
 	public static List<PersonRecord> toSortedList(
 			final IncompatiblePlanRecords incompatibleRecords,
 			final Map<Id, PersonRecord> personRecords) {
 		final List<PersonRecord> list = new ArrayList<PersonRecord>( personRecords.values() );
 
-		Collections.sort(
+		if ( HEURISTIC_SORT ) {
+			Collections.sort(
 				list,
 				new Comparator<PersonRecord>() {
 					@Override
@@ -339,6 +346,9 @@ final class SelectorUtils {
 						return c;
 					}
 				});
+		}
+		else assert personRecords instanceof LinkedHashMap;
+
 		return list;
 	}
 
