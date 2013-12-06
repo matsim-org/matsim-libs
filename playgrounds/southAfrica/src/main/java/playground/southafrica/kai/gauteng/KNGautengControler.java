@@ -193,6 +193,8 @@ public class KNGautengControler {
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
+		config.scenario().setUseVehicles(true);
+		
 		TollFactorI tollFactor = new SanralTollFactorOLD() ;
 		
 		Map<SanralTollVehicleType,Double> cnt = new HashMap<SanralTollVehicleType,Double>() ;
@@ -207,25 +209,23 @@ public class KNGautengControler {
 			log.info( String.format( "type: %30s; cnt: %8.0f", type.toString() , cnt.get(type) ) );
 		}
 		
-//		ObjectAttributes pAttribs = scenario.getPopulation().getPersonAttributes() ;
-//		String ATTR_NAME = config.plans().getSubpopulationAttributeName() ;
-//		
-//		VehicleType truckVehType = new VehicleTypeImpl(new IdImpl("truck") ) ;
-//		truckVehType.setLength(20.); 
-//		truckVehType.setMaximumVelocity( 100./3.6);
-//		
-//		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles() ;
-//
-//		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-//			String attrib = (String) pAttribs.getAttribute(person.getId().toString(), ATTR_NAME ) ;
+		ObjectAttributes pAttribs = scenario.getPopulation().getPersonAttributes() ;
+		String ATTR_NAME = config.plans().getSubpopulationAttributeName() ;
+		
+		VehicleType truckVehType = new VehicleTypeImpl(new IdImpl("truck") ) ;
+		truckVehType.setLength(20.); 
+		truckVehType.setMaximumVelocity( 100./3.6);
+		
+		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles() ;
+
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			String attrib = (String) pAttribs.getAttribute(person.getId().toString(), ATTR_NAME ) ;
 //			if ( attrib.equals("commercial") ) {
-//				Id vehicleId = person.getId() ;
-//				final Vehicle truck = VehicleUtils.getFactory().createVehicle(vehicleId, truckVehType );
-//				vehicles.getVehicles().put(vehicleId, truck) ;
+				Id vehicleId = person.getId() ;
+				final Vehicle truck = VehicleUtils.getFactory().createVehicle(vehicleId, truckVehType );
+				vehicles.getVehicles().put(vehicleId, truck) ;
 //			}
-//		}
-//		
-//		config.scenario().setUseVehicles(true);
+		}
 		
 		// CONSTRUCT UTILITY OF MONEY:
 		UtilityOfMoneyI personSpecificUtilityOfMoney ;
