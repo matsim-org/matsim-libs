@@ -46,6 +46,8 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	@Override
 	public void reset(int iteration) {
 		this.personId2departureTime.clear();
+		this.travelTimeSum = 0.;
+		this.agentStuckEvents = 0;
 	}
 
 	@Override
