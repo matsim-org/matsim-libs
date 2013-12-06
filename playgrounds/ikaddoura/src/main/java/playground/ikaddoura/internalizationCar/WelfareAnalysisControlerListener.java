@@ -28,18 +28,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.charts.LineChart;
+import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
@@ -58,17 +60,17 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
 	private TripAnalysisHandler tripAnalysisHandler = new TripAnalysisHandler();
 	
-	private Map<Integer, Double> it2userBenefits_logsum = new HashMap<Integer, Double>();
-	private Map<Integer, Integer> it2invalidPersons_logsum = new HashMap<Integer, Integer>();
-	private Map<Integer, Integer> it2invalidPlans_logsum = new HashMap<Integer, Integer>();
+	private Map<Integer, Double> it2userBenefits_logsum = new TreeMap<Integer, Double>();
+	private Map<Integer, Integer> it2invalidPersons_logsum = new TreeMap<Integer, Integer>();
+	private Map<Integer, Integer> it2invalidPlans_logsum = new TreeMap<Integer, Integer>();
 
-	private Map<Integer, Double> it2userBenefits_selected = new HashMap<Integer, Double>();
-	private Map<Integer, Integer> it2invalidPersons_selected = new HashMap<Integer, Integer>();
-	private Map<Integer, Integer> it2invalidPlans_selected = new HashMap<Integer, Integer>();
+	private Map<Integer, Double> it2userBenefits_selected = new TreeMap<Integer, Double>();
+	private Map<Integer, Integer> it2invalidPersons_selected = new TreeMap<Integer, Integer>();
+	private Map<Integer, Integer> it2invalidPlans_selected = new TreeMap<Integer, Integer>();
 	
-	private Map<Integer, Double> it2tollSum = new HashMap<Integer, Double>();
-	private Map<Integer, Integer> it2stuckEvents = new HashMap<Integer, Integer>();
-	private Map<Integer, Double> it2totalTravelTime = new HashMap<Integer, Double>();
+	private Map<Integer, Double> it2tollSum = new TreeMap<Integer, Double>();
+	private Map<Integer, Integer> it2stuckEvents = new TreeMap<Integer, Integer>();
+	private Map<Integer, Double> it2totalTravelTime = new TreeMap<Integer, Double>();
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
@@ -133,66 +135,59 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		
 		// ##################################################
 		
-		String[] xValues = new String[this.it2tollSum.size()];
-		int cc = 0;
-		for (Integer xValue : it2tollSum.keySet()){
-			xValues[cc] = xValue.toString();
-			cc++;
+		writeGraph("userBenefits_selected", "Monetary Units", it2userBenefits_selected);
+		writeGraph("userBenefits_logsum", "Monetary Units", it2userBenefits_logsum);
+		writeGraph("tollSum", "Monetary Units", it2tollSum);
+		writeGraph("totalTravelTime", "Seconds", it2totalTravelTime);
+		writeGraphSum("welfare_logsum", "Monetary Units", it2userBenefits_logsum, it2tollSum);
+		writeGraphSum("welfare_selected", "Monetary Units", it2userBenefits_selected, it2tollSum);		
+	}
+
+	private void writeGraphSum(String name, String yLabel, Map<Integer, Double> it2Double1, Map<Integer, Double> it2Double2) {
+		
+		XYLineChart chart = new XYLineChart(name, "Iteration", yLabel);
+
+		double[] xValues = new double[it2Double1.size()];
+		double[] yValues = new double[it2Double1.size()];
+		int counter = 0;
+		for (Integer iteration : it2Double1.keySet()){
+			xValues[counter] = iteration.doubleValue();
+			yValues[counter] = (it2Double1.get(iteration)) + (it2Double2.get(iteration));
+			counter++;
 		}
 		
-		LineChart chart = new LineChart("Welfare analysis", "Iteration", "Monetary Units", xValues);
-	    
-		// selected
-		double[] yWerte1 = new double[this.it2userBenefits_selected.size()];
-		int counter1 = 0;
-		for (Integer iteration : it2userBenefits_selected.keySet()){
-			xValues[counter1] = iteration.toString();
-			yWerte1[counter1] = it2userBenefits_selected.get(iteration);
-			counter1++;
-		}
-		chart.addSeries("User benefits (selected)", yWerte1);
+		chart.addSeries(name, xValues, yValues);
 		
-		// logsum
-		double[] yWerte2 = new double[this.it2userBenefits_logsum.size()];
-		int counter2 = 0;
-		for (Integer iteration : it2userBenefits_logsum.keySet()){
-			xValues[counter2] = iteration.toString();
-			yWerte2[counter2] = it2userBenefits_logsum.get(iteration);
-			counter2++;
-		}
-		chart.addSeries("User benefits (logsum)", yWerte2);
+		XYPlot plot = chart.getChart().getXYPlot(); 
+		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
+		axis.setAutoRange(true);
+		axis.setAutoRangeIncludesZero(false);
 		
-		// toll sum
-		double[] yWerte3 = new double[this.it2tollSum.size()];
-		int counter3 = 0;
-		for (Integer iteration : it2tollSum.keySet()){
-			xValues[counter3] = iteration.toString();
-			yWerte3[counter3] = it2tollSum.get(iteration);
-			counter3++;
+		String outputFile = this.scenario.getConfig().controler().getOutputDirectory() + "/" + name + ".png";
+		chart.saveAsPng(outputFile, 1000, 800); // File Export
+	}
+
+	private void writeGraph(String name, String yLabel, Map<Integer, Double> it2Double) {
+
+		XYLineChart chart = new XYLineChart(name, "Iteration", yLabel);
+
+		double[] xValues = new double[it2Double.size()];
+		double[] yValues = new double[it2Double.size()];
+		int counter = 0;
+		for (Integer iteration : it2Double.keySet()){
+			xValues[counter] = iteration.doubleValue();
+			yValues[counter] = it2Double.get(iteration);
+			counter++;
 		}
-		chart.addSeries("Toll sum", yWerte3);
 		
-		// welfare logsum
-		double[] yWerte4 = new double[this.it2tollSum.size()];
-		int counter4 = 0;
-		for (Integer iteration : it2tollSum.keySet()){
-			xValues[counter4] = iteration.toString();
-			yWerte4[counter4] = (it2userBenefits_logsum.get(iteration) + it2tollSum.get(iteration));
-			counter4++;
-		}
-		chart.addSeries("Welfare (logsum)", yWerte4);
+		chart.addSeries(name, xValues, yValues);
 		
-		// welfare selected
-		double[] yWerte5 = new double[this.it2tollSum.size()];
-		int counter5 = 0;
-		for (Integer iteration : it2tollSum.keySet()){
-			xValues[counter5] = iteration.toString();
-			yWerte5[counter5] = (it2userBenefits_selected.get(iteration) + it2tollSum.get(iteration));
-			counter5++;
-		}
-		chart.addSeries("Welfare (selected)", yWerte5);
+		XYPlot plot = chart.getChart().getXYPlot(); 
+		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
+		axis.setAutoRange(true);
+		axis.setAutoRangeIncludesZero(false);
 		
-		String outputFile = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.png";
+		String outputFile = this.scenario.getConfig().controler().getOutputDirectory() + "/" + name + ".png";
 		chart.saveAsPng(outputFile, 1000, 800); // File Export
 	}
 
