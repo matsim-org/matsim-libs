@@ -74,12 +74,11 @@ public class GroupStrategyManager {
 
 		final Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
 			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
+		if ( stopWatch != null ) stopWatch.beginOperation( "remove plans alloc strategy" );
 		for (ReplanningGroup g : groups) {
-			if ( stopWatch != null ) stopWatch.beginOperation( "remove plans" );
 			registry.getExtraPlanRemover().removePlansInGroup(
 					jointPlans,
 					g );
-			if ( stopWatch != null ) stopWatch.endOperation( "remove plans" );
 
 			final GroupPlanStrategy strategy = registry.chooseStrategy( iteration , random.nextDouble() );
 			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
@@ -92,6 +91,7 @@ public class GroupStrategyManager {
 			logAlloc( g , strategy );
 			alloc.add( g );
 		}
+		if ( stopWatch != null ) stopWatch.endOperation( "remove plans alloc strategy" );
 
 		for (Map.Entry<GroupPlanStrategy, List<ReplanningGroup>> e : strategyAllocations.entrySet()) {
 			final GroupPlanStrategy strategy = e.getKey();
