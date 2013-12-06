@@ -54,26 +54,16 @@ public class MyCarrierSimulation {
 		String initialPlanAlgorithm = args[4];
 		String algorithm = args[5];
 
-		config = ConfigUtils.loadConfig(configFile);
-		//		config.addCoreModules();
-		//		config.controler().setFirstIteration(0);
-		//		config.controler().setLastIteration(1);
-		//		config.addQSimConfigGroup(new QSimConfigGroup());
-		//		config.getQSimConfigGroup().setStartTime(0);
-		//		config.getQSimConfigGroup().setEndTime(144000);
-		//		config.getQSimConfigGroup().setSnapshotStyle("queue");
-		//		config.getQSimConfigGroup().setSnapshotPeriod(10);
-		//		
-		//		config.controler().setMobsim("qsim");
-		//		List<String> snap = new ArrayList<String>();
-		//		snap.add("otfvis");
-		//		config.controler().setSnapshotFormat(snap);
-
-
-		//Read network
-		scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-
+		//config = ConfigUtils.loadConfig(configFile);
+				config = ConfigUtils.createConfig();
+				config.controler().setOutputDirectory("./output/");
+				config.controler().setLastIteration(1);
+				config.controler().setWriteEventsInterval(1);
+				
+				//Read network
+				config.network().setInputFile(networkFile);
+				scenario = ScenarioUtils.loadScenario(config);
+				//new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		//read carriers and their capabilities
 		Carriers carriers = new Carriers();
@@ -140,7 +130,7 @@ public class MyCarrierSimulation {
 					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
 					strategy.addStrategyModule(module);
 					mgr.addStrategy(strategy, null, 1.);
-//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
+					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
 					// you should add the above line. kai
 				}
 				{
@@ -148,7 +138,7 @@ public class MyCarrierSimulation {
 					GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
 					strategy.addStrategyModule(module);
 					mgr.addStrategy(strategy, null, 0. );
-//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
+					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
 					// you should add the above line. kai
 				}
 				{
