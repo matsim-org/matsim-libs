@@ -268,6 +268,10 @@ public class GenericStrategyManager<T extends BasicPlan> implements MatsimManage
 	 */
 	final GenericPlanStrategy<T> chooseStrategy(final HasPlansAndId<T> person, final String subpopulation) {
 		final StrategyWeights<T> weights = weightsPerSubpopulation.get( subpopulation );
+		if(weights == null){
+			throw new RuntimeException("no weights container for subpopulation = " + subpopulation);
+		}
+		
 		double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;
 
 		double sum = 0.0;
