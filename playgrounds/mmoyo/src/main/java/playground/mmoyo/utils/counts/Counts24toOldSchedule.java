@@ -115,7 +115,7 @@ public class Counts24toOldSchedule {
 								//create or invoke the count and sum its volume
 								Count count = counts.getCounts().get(stopFacilityId);
 								if(count == null){
-									count = counts.createCount(stopFacilityId, stopFacilityId.toString());
+									count = counts.createAndAddCount(stopFacilityId, stopFacilityId.toString());
 									count.setCoord(stop.getStopFacility().getCoord());
 									count.createVolume(1, 0.0);
 								}

@@ -165,7 +165,7 @@ public class BoardAlightEventHandler implements
 
 	private void increase(Counts counts, Id stopId, Double time){
 		//create a new count
-		Count count = counts.createCount(stopId, stopId.toString());
+		Count count = counts.createAndAddCount(stopId, stopId.toString());
 		if(count == null){
 			//or get the old one if there is one
 			count = counts.getCount(stopId);

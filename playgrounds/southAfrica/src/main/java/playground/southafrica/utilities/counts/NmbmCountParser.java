@@ -563,11 +563,11 @@ public class NmbmCountParser {
 	private void addCounts(String station, String[] lanes, String suffix){
 		List<Id> idToRemove = new ArrayList<Id>();
 		Id dummyLinkId = new IdImpl("dummy" + dummyCounter++);
-		Count count_light = counts_light.createCount(dummyLinkId, station + suffix);
-		Count count_short = counts_short.createCount(dummyLinkId, station + suffix);
-		Count count_medium = counts_medium.createCount(dummyLinkId, station + suffix);
-		Count count_long = counts_long.createCount(dummyLinkId, station + suffix);
-		Count count_total = counts_total.createCount(dummyLinkId, station + suffix);
+		Count count_light = counts_light.createAndAddCount(dummyLinkId, station + suffix);
+		Count count_short = counts_short.createAndAddCount(dummyLinkId, station + suffix);
+		Count count_medium = counts_medium.createAndAddCount(dummyLinkId, station + suffix);
+		Count count_long = counts_long.createAndAddCount(dummyLinkId, station + suffix);
+		Count count_total = counts_total.createAndAddCount(dummyLinkId, station + suffix);
 		for(int hour = 1; hour <= 24; hour++){
 			/* Aggregate the vehicle counts for the different lanes. */
 			double light = 0.0;

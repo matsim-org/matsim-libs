@@ -108,7 +108,7 @@ public class CountsCutter {
 			Id linkId = entry.getKey();
 			Count originalCount = entry.getValue();
 			int idx = i % fragmentsNo;
-			Count count = countsArray[idx].createCount(linkId, originalCount
+			Count count = countsArray[idx].createAndAddCount(linkId, originalCount
 					.getCsId());
 			countsCounter[idx]++;
 			count.setCoord(net.getLinks().get(linkId).getCoord());

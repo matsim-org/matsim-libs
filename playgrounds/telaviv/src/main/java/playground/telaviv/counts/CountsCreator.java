@@ -122,7 +122,7 @@ public class CountsCreator {
 			else link = searchLink(emme2Count, fromNode, toNode);
 
 			if (link != null) {
-				Count count = counts.createCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
+				Count count = counts.createAndAddCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
 
 				count.createVolume(6, emme2Count.volau);
 				count.createVolume(7, emme2Count.volau);

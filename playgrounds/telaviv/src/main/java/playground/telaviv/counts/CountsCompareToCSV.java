@@ -110,7 +110,7 @@ public class CountsCompareToCSV {
 		counts.setYear(2012);
 		
 		for (List<Line> lines : countsMap.values()) {
-			Count count = counts.createCount(new IdImpl(lines.get(0).Link_Id), "");
+			Count count = counts.createAndAddCount(new IdImpl(lines.get(0).Link_Id), "");
 			
 			for (Line line : lines) {
 				count.createVolume(Integer.valueOf(line.Hour), Double.valueOf(line.MATSIM_Volumes));

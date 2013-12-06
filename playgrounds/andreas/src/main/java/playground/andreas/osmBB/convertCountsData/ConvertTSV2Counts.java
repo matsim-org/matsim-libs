@@ -63,7 +63,7 @@ public class ConvertTSV2Counts {
 
 
 		for (CountStationDataBox countStation : countStationsMap.values()) {
-			counts.createCount(new IdImpl(countStation.getShortName()), countStation.getShortName());
+			counts.createAndAddCount(new IdImpl(countStation.getShortName()), countStation.getShortName());
 			counts.getCount(new IdImpl(countStation.getShortName())).setCoord(countStation.getCoord());
 			String filename = workingDir + "Wochenübersicht_" + countStation.getShortName() + ".tsv";
 			ReadCountDataForWeek.readCountDataForWeek(filename, counts.getCount(new IdImpl(countStation.getShortName())), startTag);

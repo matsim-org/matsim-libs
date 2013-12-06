@@ -36,7 +36,7 @@ public class Counts {
 	 * @param stationName some additional identifier for humans, e.g. the original name/id of the counting station
 	 * @return the created Count object, or null if it could not be created (maybe because it already exists)
 	 */
-	public final Count createCount(final Id linkId, final String stationName) {
+	public final Count createAndAddCount(final Id linkId, final String stationName) {
 		// check id string for uniqueness
 		if (this.counts.containsKey(linkId)) {
 			return null;

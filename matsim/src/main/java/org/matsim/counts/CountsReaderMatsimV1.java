@@ -72,7 +72,7 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startCount(final Attributes meta) {
 		String locId = meta.getValue("loc_id");
-		this.currcount = this.counts.createCount(new IdImpl(locId), meta.getValue("cs_id"));
+		this.currcount = this.counts.createAndAddCount(new IdImpl(locId), meta.getValue("cs_id"));
 		if (this.currcount == null) {
 			log.warn("There is already a counts object for location " + locId +
 					". The counts for loc_id=" + locId + ", cs_id=" + meta.getValue("cs_id") + " will be ignored.");

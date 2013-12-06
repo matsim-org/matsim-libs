@@ -63,7 +63,7 @@ public class NetworkThinner {
 		}
 		for (Count c : countsToRemap) {
 			counts.getCounts().remove(c.getLocId());
-			Count newCount = counts.createCount(newLink.getId(),c.getCsId());
+			Count newCount = counts.createAndAddCount(newLink.getId(),c.getCsId());
 			if (newCount != null) {
 				newCount.setCoord(c.getCoord());
 				newCount.getVolumes().clear();

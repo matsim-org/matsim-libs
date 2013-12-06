@@ -386,7 +386,7 @@ public class MyCountingStationParser {
 						Count c = null;
 						if(!cs.getCounts().containsKey(new IdImpl(entryName))){
 							//							log.warn("Multiple entries for station " + entryName + " in " + name);
-							c = cs.createCount(new IdImpl(entryName), entryName);
+							c = cs.createAndAddCount(new IdImpl(entryName), entryName);
 						} 
 						c = cs.getCount(new IdImpl(entryName));
 						for(Id hourName : cMap.get(cId).keySet()){

@@ -72,7 +72,7 @@ public class ImportCounts {
 					Id linkId = new IdImpl(rss.getString(5));
 					Count count = counts.getCounts().get(linkId);
 					if (count == null) {
-						count = counts.createCount(linkId, messstelle+richtung);
+						count = counts.createAndAddCount(linkId, messstelle+richtung);
 					}
 					count.createVolume(h, sum);
 				}

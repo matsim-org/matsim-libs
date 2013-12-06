@@ -90,7 +90,7 @@ public class CountsWithUpdatedNetwork {
 		for (Tuple<Id, Id> correl : correlations) {
 			Id oldCountLinkId = correl.getFirst();
 			Count oldCount = tmpCountsMap.remove(oldCountLinkId);
-			Count newCount = counts.createCount(correl.getSecond(),
+			Count newCount = counts.createAndAddCount(correl.getSecond(),
 					oldCountLinkId.toString());
 			newCount.setCoord(oldCount.getCoord());
 			for (Volume v : oldCount.getVolumes().values())

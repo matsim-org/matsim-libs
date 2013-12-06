@@ -106,7 +106,7 @@ public class CountsConverter {
 
 						if (hasValidVolume) {
 							Count count = counts
-									.createCount(link.getId(), null);
+									.createAndAddCount(link.getId(), null);
 							count.setCoord(link.getCoord());
 							for (int j = 0; j < cvs.size(); j++) {
 								double volume = cvs.get(j).doubleValue();

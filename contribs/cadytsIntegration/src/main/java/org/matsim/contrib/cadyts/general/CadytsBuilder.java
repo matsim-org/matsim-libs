@@ -22,7 +22,7 @@ package org.matsim.contrib.cadyts.general;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
@@ -43,11 +43,11 @@ public final class CadytsBuilder {
 		// private Constructor, should not be instantiated
 	}
 
-	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Scenario sc, final Counts occupCounts, LookUp<T> lookUp ) {
-		CadytsConfigGroup cadytsPtConfig = (CadytsConfigGroup) sc.getConfig().getModule(CadytsConfigGroup.GROUP_NAME);
+	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Config config, final Counts occupCounts, LookUp<T> lookUp ) {
+		CadytsConfigGroup cadytsConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME);
 
 		//get timeBinSize_s and validate it
-		int timeBinSize_s = cadytsPtConfig.getTimeBinSize();
+		int timeBinSize_s = cadytsConfig.getTimeBinSize();
 		if ((Time.MIDNIGHT % timeBinSize_s)!= 0 ){
 			throw new RuntimeException("Cadyts requires a divisor of 86400 as time bin size value .");
 		}
@@ -61,20 +61,20 @@ public final class CadytsBuilder {
 		}
 		
 		AnalyticalCalibrator<T> matsimCalibrator = new AnalyticalCalibrator<T>(
-				sc.getConfig().controler().getOutputDirectory() + "/cadyts.log",
+				config.controler().getOutputDirectory() + "/cadyts.log",
 				MatsimRandom.getLocalInstance().nextLong(),timeBinSize_s
 				 ) ;
 
-		matsimCalibrator.setRegressionInertia(cadytsPtConfig.getRegressionInertia()) ;
-		matsimCalibrator.setMinStddev(cadytsPtConfig.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
-		matsimCalibrator.setFreezeIteration(cadytsPtConfig.getFreezeIteration());
-		matsimCalibrator.setPreparatoryIterations(cadytsPtConfig.getPreparatoryIterations());
-		matsimCalibrator.setVarianceScale(cadytsPtConfig.getVarianceScale());
-		matsimCalibrator.setBruteForce(cadytsPtConfig.useBruteForce());
-		matsimCalibrator.setStatisticsFile(sc.getConfig().controler().getOutputDirectory() + "/calibration-stats.txt");
+		matsimCalibrator.setRegressionInertia(cadytsConfig.getRegressionInertia()) ;
+		matsimCalibrator.setMinStddev(cadytsConfig.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
+		matsimCalibrator.setFreezeIteration(cadytsConfig.getFreezeIteration());
+		matsimCalibrator.setPreparatoryIterations(cadytsConfig.getPreparatoryIterations());
+		matsimCalibrator.setVarianceScale(cadytsConfig.getVarianceScale());
+		matsimCalibrator.setBruteForce(cadytsConfig.useBruteForce());
+		matsimCalibrator.setStatisticsFile(config.controler().getOutputDirectory() + "/calibration-stats.txt");
 
-		int arStartTime_s = cadytsPtConfig.getStartTime(); 
-		int arEndTime_s = cadytsPtConfig.getEndTime() ;
+		int arStartTime_s = cadytsConfig.getStartTime(); 
+		int arEndTime_s = cadytsConfig.getEndTime() ;
 		// (this version gets directly the startTime and endTime directly in seconds from the cadytsPtConfig) 
 		
 		

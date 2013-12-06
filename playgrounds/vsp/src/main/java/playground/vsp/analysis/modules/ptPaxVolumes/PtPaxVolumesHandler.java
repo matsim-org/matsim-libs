@@ -140,7 +140,7 @@ public class PtPaxVolumesHandler implements LinkEnterEventHandler,
 			if(counts == null){
 				counts = new Counts();
 			}
-			c = counts.createCount(v.getLineId(), v.getLineId().toString());
+			c = counts.createAndAddCount(v.getLineId(), v.getLineId().toString());
 			if(c == null){
 				c = counts.getCount(v.getLineId());
 			}

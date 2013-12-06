@@ -698,7 +698,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 *         lik) a null value is returned.
 	 */
 	public Count addCountingStation(Link link, String stationName) {
-		Count c = counts.createCount(link.getId(), stationName);
+		Count c = counts.createAndAddCount(link.getId(), stationName);
 		return c;
 	}
 

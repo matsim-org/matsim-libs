@@ -81,7 +81,7 @@ public class TabularCountReader implements TabularFileHandler {
 		}else{
 			//for each station
 			Id id =  new IdImpl(row[0]);
-			counts.createCount(id, row[1]); //id of station  with index 0     ,   //name of station with index 1
+			counts.createAndAddCount(id, row[1]); //id of station  with index 0     ,   //name of station with index 1
 			Count count = counts.getCount(id);
 			count.setCoord(this.transitSchedule.getFacilities().get(new IdImpl(row[0])).getCoord());  // look up the coordinate of the stop facility and set it to the count
 

@@ -165,7 +165,7 @@ public class LinkStatsAnalyser {
 
 
 		for (Id linkId: this.selectedLinks) {
-			Count count = counts.createCount(new IdImpl(linkId.toString()), "-");
+			Count count = counts.createAndAddCount(new IdImpl(linkId.toString()), "-");
 			double linkVolumes []=this.linkStats0.getAvgLinkVolumes(linkId);
 
 			for (int i=0; i<24; i++) {

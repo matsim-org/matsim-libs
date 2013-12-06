@@ -107,7 +107,7 @@ CadytsContextI<T> {
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.occupCounts, new TransitStopFacilityLookUp(scenario) );
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) );
 
 	}
 

@@ -142,7 +142,7 @@ public abstract class AbstractResizeLinksByCount {
 					break;
 				}
 				if(!(outLink == null)){
-					newCount = tempCounts.createCount(outLink, oldCount.getCsId());
+					newCount = tempCounts.createAndAddCount(outLink, oldCount.getCsId());
 					newCount.setCoord(oldCount.getCoord());
 					for(Entry<Integer, Volume> ee : oldCount.getVolumes().entrySet()){
 						newCount.createVolume(ee.getKey().intValue(), ee.getValue().getValue());
@@ -196,7 +196,7 @@ public abstract class AbstractResizeLinksByCount {
 		
 		Count temp ;
 		for(Count c : this.origCounts.getCounts().values()){
-			temp = rescaledCounts.createCount(c.getLocId(), c.getCsId());
+			temp = rescaledCounts.createAndAddCount(c.getLocId(), c.getCsId());
 			temp.setCoord(c.getCoord());
 			for(Entry<Integer, Volume> ee : c.getVolumes().entrySet()){
 				temp.createVolume(ee.getKey().intValue(), ee.getValue().getValue() * this.scaleFactor);

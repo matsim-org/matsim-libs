@@ -117,7 +117,7 @@ public class TransitRouteContainer {
 	
 	private void increase(Counts counts, Id stopId, Double time, double increaseBy){
 		//create a new count
-		Count count = counts.createCount(stopId, stopId.toString());
+		Count count = counts.createAndAddCount(stopId, stopId.toString());
 		if(count == null){
 			//or get the old one if there is one
 			count = counts.getCount(stopId);
@@ -137,7 +137,7 @@ public class TransitRouteContainer {
 	
 	private void set(Counts counts, Id stopIndexId, Double time, double value){
 		//create a new count
-		Count count = counts.createCount(stopIndexId, stopIndexId.toString());
+		Count count = counts.createAndAddCount(stopIndexId, stopIndexId.toString());
 		if(count == null){
 			//or get the old one if there is one
 			count = counts.getCount(stopIndexId);
@@ -157,7 +157,7 @@ public class TransitRouteContainer {
 	
 	private void create(Counts counts, Id stopIndexId, Id stationName, Double time, double value){
 		//create a new count
-		Count count = counts.createCount(stopIndexId, stationName.toString());
+		Count count = counts.createAndAddCount(stopIndexId, stationName.toString());
 //		if(count == null){
 //			//or get the old one if there is one
 //			count = counts.getCount(stopIndexId);

@@ -124,7 +124,7 @@ public class CountsCreatorV2 {
 			if (link != null) {
 				Count count = counts.getCount(link.getId());
 				
-				if (count == null) count = counts.createCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
+				if (count == null) count = counts.createAndAddCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
 				
 				count.createVolume(emme2Count.hour, emme2Count.value);
 				

@@ -172,8 +172,8 @@ public class Compare2PTCounts extends Events2PTCounts{
 		for (StopCountBox stopCountBox : stopCounts1.values()) {
 
 			Id stopId = new IdImpl(stopCountBox.stopId.toString().split("\\.")[0]);
-			alightCounts.createCount(stopId, stopCountBox.realName);
-			boardCounts.createCount(stopId, stopCountBox.realName);
+			alightCounts.createAndAddCount(stopId, stopCountBox.realName);
+			boardCounts.createAndAddCount(stopId, stopCountBox.realName);
 
 			alightCounts.getCount(stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
 			boardCounts.getCount(stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
@@ -188,8 +188,8 @@ public class Compare2PTCounts extends Events2PTCounts{
 		for (StopCountBox stopCountBox : stopCounts2.values()) {
 
 			Id stopId = new IdImpl(stopCountBox.stopId.toString().split("\\.")[0]);
-			alightCounts.createCount(stopId, stopCountBox.realName);
-			boardCounts.createCount(stopId, stopCountBox.realName);
+			alightCounts.createAndAddCount(stopId, stopCountBox.realName);
+			boardCounts.createAndAddCount(stopId, stopCountBox.realName);
 
 			alightCounts.getCount(stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
 			boardCounts.getCount(stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
@@ -250,8 +250,8 @@ public class Compare2PTCounts extends Events2PTCounts{
 		for (Entry<Id, Map<Id, StopCountBox>> lineEntry : line2StopCountMap2.entrySet()) {
 			for (StopCountBox stopCountBox : lineEntry.getValue().values()) {
 
-				alightCounts.createCount(stopCountBox.stopId, stopCountBox.realName);
-				boardCounts.createCount(stopCountBox.stopId, stopCountBox.realName);
+				alightCounts.createAndAddCount(stopCountBox.stopId, stopCountBox.realName);
+				boardCounts.createAndAddCount(stopCountBox.stopId, stopCountBox.realName);
 
 				alightCounts.getCount(stopCountBox.stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
 				boardCounts.getCount(stopCountBox.stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());

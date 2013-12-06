@@ -137,7 +137,7 @@ public class CountsCreatorV3 {
 			else link = searchLink(emme2Count, fromNode, toNode);
 
 			if (link != null) {
-				Count count = countsAll.createCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
+				Count count = countsAll.createAndAddCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
 
 				/* 
 				 * Periods:

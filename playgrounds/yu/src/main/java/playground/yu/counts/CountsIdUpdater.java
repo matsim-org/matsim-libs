@@ -78,7 +78,7 @@ public class CountsIdUpdater {
 						+ oldCountId.toString() + "\tnewCountId\t"
 						+ newLinkId.toString());
 				Count oldCount = oldCounts.getCount(oldCountId);
-				Count newCount = newCounts.createCount(newLinkId, oldCount
+				Count newCount = newCounts.createAndAddCount(newLinkId, oldCount
 						.getCsId());
 				if (newCount == null) {
 					System.out.println("Man should merge count data between "

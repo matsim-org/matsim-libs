@@ -389,7 +389,7 @@ public class PTCountsNetworkSimplifier {
 					} else {
 						// create new count with correct locId and migrate data
 						if(linkToBlock != null){
-							this.outCounts.createCount(linkToBlock.getId(), oldCount.getCsId());
+							this.outCounts.createAndAddCount(linkToBlock.getId(), oldCount.getCsId());
 							Count newCount = this.outCounts.getCount(linkToBlock.getId());
 							newCount.setCoord(oldCount.getCoord());
 							for (Volume volume : oldCount.getVolumes().values()) {

@@ -80,7 +80,7 @@ public class CountsFileGenerator {
 		while(line!=null) {
 			String[] parts = line.split(SEPARATOR);
 			for(String mode:MODES) {
-				Count count = allCounts.get(mode).createCount(new IdImpl(parts[2]), parts[0]+SEPARATOR+parts[1]);
+				Count count = allCounts.get(mode).createAndAddCount(new IdImpl(parts[2]), parts[0]+SEPARATOR+parts[1]);
 				count.setCoord(new CoordImpl(Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
 			}
 			line = readerLinks.readLine();
@@ -128,7 +128,7 @@ public class CountsFileGenerator {
 						writerLinks.close();
 						aCounts = new HashMap<String, Count>();
 						for(String mode:MODES) {
-							Count count = allCounts.get(mode).createCount(selected.getId(), code+SEPARATOR+movement);
+							Count count = allCounts.get(mode).createAndAddCount(selected.getId(), code+SEPARATOR+movement);
 							aCounts.put(mode,count);
 							count.setCoord(location);
 						}

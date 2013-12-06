@@ -65,14 +65,14 @@ public class Converter {
 			return;
 		}
 		
-		Count count0 = counts.createCount(locId1, countStation.getId());		
+		Count count0 = counts.createAndAddCount(locId1, countStation.getId());		
 		if (count0 != null) {
 			for (int i = 0; i < 24; i++) {
 				count0.createVolume(i+1, countStation.getLink1().getAggregator().getAvg()[i]);
 			}
 		}
 		
-		Count count1 = counts.createCount(locId2, countStation.getId());
+		Count count1 = counts.createAndAddCount(locId2, countStation.getId());
 		if (count1 != null) {
 			for (int i = 0; i < 24; i++) {
 				count1.createVolume(i+1, countStation.getLink2().getAggregator().getAvg()[i]);

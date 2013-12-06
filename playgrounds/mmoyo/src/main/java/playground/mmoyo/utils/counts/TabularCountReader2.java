@@ -45,7 +45,7 @@ public class TabularCountReader2 implements TabularFileHandler {
 			String strStop =row[0];
 			Id stopId =  new IdImpl(strStop);
 			String  str_cs_id= row[1];
-			counts.createCount(stopId, str_cs_id);
+			counts.createAndAddCount(stopId, str_cs_id);
 			Count count = counts.getCount(stopId);
 			Coord coord = new CoordImpl(row[2], row[3]);
 			count.setCoord(coord); 

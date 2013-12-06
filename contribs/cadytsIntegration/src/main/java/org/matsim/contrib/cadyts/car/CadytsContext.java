@@ -106,7 +106,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		event.getControler().getEvents().addHandler(ptStep);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/);
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/);
 	}
 	
 	@Override

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * CountsTest.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.counts;
-
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.testcases.MatsimTestCase;
-
-public class CountsTest extends MatsimTestCase {
-
-	public void testGetCounts() {
-		final Counts counts = new Counts();
-		counts.createAndAddCount(new IdImpl(0), "1");
-		assertEquals("Getting counts failed", 1, counts.getCounts().size());
-	}
-}
+/**
+ * @author nagel
+ *
+ */
+package playground.kai.usecases.cadyts4freightchains;

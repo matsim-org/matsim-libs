@@ -67,7 +67,7 @@ public class TransitVehicleVolumeHandler implements TransitDriverStartsEventHand
 		if(this.vehId2mode.containsKey(event.getVehicleId())){
 			//create the count
 			Count count = this.mode2Counts.get(vehId2mode.get(event.getVehicleId())).
-					createCount(event.getLinkId(), event.getLinkId().toString());
+					createAndAddCount(event.getLinkId(), event.getLinkId().toString());
 			if(count == null){
 				//or get the old one if there is one
 				count = this.mode2Counts.get(vehId2mode.

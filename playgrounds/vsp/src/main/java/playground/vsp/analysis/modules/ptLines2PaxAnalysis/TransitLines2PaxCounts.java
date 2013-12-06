@@ -76,11 +76,11 @@ public class TransitLines2PaxCounts {
 				TransitRouteStop s = tr.getStops().get(ii);
 				Id stopFacilId = s.getStopFacility().getId();
 				if (this.boarding.getCounts().get(stopFacilId)==null) {
-					this.boarding.createCount(stopFacilId, stopFacilId.toString());
-					this.alighting.createCount(stopFacilId, stopFacilId.toString());
-					this.capacity.createCount(stopFacilId, stopFacilId.toString());
-					this.totalPax.createCount(stopFacilId, stopFacilId.toString());
-					this.occupancy.createCount(stopFacilId, stopFacilId.toString());
+					this.boarding.createAndAddCount(stopFacilId, stopFacilId.toString());
+					this.alighting.createAndAddCount(stopFacilId, stopFacilId.toString());
+					this.capacity.createAndAddCount(stopFacilId, stopFacilId.toString());
+					this.totalPax.createAndAddCount(stopFacilId, stopFacilId.toString());
+					this.occupancy.createAndAddCount(stopFacilId, stopFacilId.toString());
 				}
 			}
 		}	

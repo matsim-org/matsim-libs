@@ -74,7 +74,7 @@ public class CountsHr_2_24 {
 			
 			//create counts if it does not exist
 			if(!outCounts.getCounts().keySet().contains(newId)){
-				Count newCount = outCounts.createCount(newId, count.getCsId());
+				Count newCount = outCounts.createAndAddCount(newId, count.getCsId());
 				newCount.createVolume(1, 0);
 				newCount.setCoord(count.getCoord());
 			}

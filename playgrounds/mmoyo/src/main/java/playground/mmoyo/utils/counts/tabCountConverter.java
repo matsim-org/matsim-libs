@@ -80,7 +80,7 @@ public class tabCountConverter {
 			Id countZoneId = new IdImpl(entry.getKey());
 			TransitStopFacility stopZone = trstopToZoneStopMap.get(countZoneId);
 			if(stopZone!=null){
-				Count count = counts.createCount(countZoneId, "");
+				Count count = counts.createAndAddCount(countZoneId, "");
 				//System.out.println(countZoneId);
 				if(stopZone.getName()!=null){
 					count.setCsId(stopZone.getName());	
