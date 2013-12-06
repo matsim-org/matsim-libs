@@ -19,6 +19,165 @@ This section contains information that pertains to the so-called ``Charypar-Nage
 
 In many situations, it should be sufficient to just read Sec.~\ref{sec:quickstart-kn}.  However, if you are working on departure time choice, or related issues such as peak hour pricing, you need to read on beyond that.
 
+\vfill\eject
+
+\section{Illustration}
+
+Synthetic travelers normally receive rewards (positive utility) for performing activities, and penalties (negative utility) for traveling.
+
+\begin{figure}[h]
+\centerline{%
+\includegraphics[width=0.6\hsize]{figures/scoringFunction/scoring-example-wo-marginal}
+}
+\caption{Example of scoring function.}
+\label{fig:scoring-example-wo-marginal}
+\end{figure}
+
+Fig.~\ref{fig:scoring-example-wo-marginal} provides an example of a typical scoring function.  
+%
+Time increases to the right. 
+%
+The agent first is at home, then travels to the workplace, then travels to lunch, etc.
+%
+The workplace opening time is different from the time span during which the agent is at the workplace.
+%
+The distance of the blue dots to the zero line is what the synthetic persons receive at the end of each stage:
+\begin{itemize}
+\item a positive utility from the ``home'' activity
+\item a negative utility from travelling to work
+\item ``nothing'' from waiting until the workplace opens
+\item a positive utility from the ``work'' activity
+\item a negative utility from travelling to lunch
+\item etc.
+\end{itemize}
+
+One can observe the following:
+\begin{itemize}
+\item extending an activity increases the utility
+\item however, the \emph{marginal} increase of utility \emph{de}creases with increasing utility duration
+\item ``doing nothing'' brings neither reward nor penalty
+\item travelling incurrs negative utility
+\end{itemize}
+
+%% If one looks at the slopes (marginal utilities) at the actual activity durations (Fig.
+
+%% \begin{figure}[h]
+%% \centerline{%
+%% \includegraphics[width=0.6\hsize]{figures/scoringFunction/scoring-example}
+%% }
+%% \caption{Example of scoring function.}
+%% \label{fig:scoring-example}
+%% \end{figure}
+
+\section{Mathematical version}
+
+The mathematical version of the scoring function is
+\[
+V = \sum_i ( V^{perf}_i + V^{late}_i) + \sum_j V^{leg}_j \ .
+\]
+
+\subsection{Performing activities}
+
+The (normally positive) reward of performing activity $i$ is
+\[
+V^{perf}_i = \beta_{perf} \cdot t_{typ,i} \cdot \ln( t_{perf} / t_{0,i} ) 
+%
+\qquad \mbox{ for } \qquad
+%
+t_{perf} \ge t_{0,i} \ ,
+\]
+where
+\begin{itemize}
+
+\item
+$t_{perf}$ is how long the agent performed the activity, 
+
+\item $t_{typ,i}$ is its typical duration (e.g.\ 8~hours for ``work'', 12~hours for ``home''), and
+
+\item $\beta_{perf}$ is a slope.
+
+\item  $t_{0,i}$ is more confusing than it looks, and has less influence than one may think, and therefore we ignore it for the time being.
+
+\end{itemize}
+
+\subsection{Arriving late}
+
+The (normally negative) penalty of arriving late is
+\[
+V^{late}_i = \beta_{late} \cdot t_{late} \ ,
+\]
+where $t_{late}$ is the amount of time the agent arrived late, and $\beta_{late}$ is a (normally negative) slope.
+
+\subsection{Traveling}
+
+The (normally negative) penalty of traveling is
+\[
+V^{leg}_j = \beta_{trav,mode} \cdot t_{trav} 
+%
++ \beta_m \cdot m_{trav}
+%
++ (\beta_{dist,mode} + \beta_m \cdot \gamma_{dist,mode}) \cdot d_{trav}
+%
++ V_{transfer}
+\]
+where
+\begin{itemize}
+\item $t_{trav}$ is the time spent traveling
+\item $\beta_{trav,mode}$ is a (normally negative or zero, see below) slope
+\item $m_{trav}$ is the change of the monetary position caused by the travel (normally negative, e.g.\ a toll or a fare)
+\item $\beta_m$ is a (normally positive) slope; this is the marginal utility of money
+\item $d_{trav}$ is the distance of the leg
+\item $\beta_{dist,mode}$ is a (normally negative) slope
+\item $\gamma_{dist,mode}$ is a (normally negative) distance cost rate
+\item $V_{transfer}$ is a transfer penalty e.g.\ incurred in public transit systems
+\end{itemize}
+The negative effects of distance can be included both directly as a marginal disutility and indirectly as a distance cost rate.  The first is presumably more applicable for a mode with mostly physical exercise, such as walk, whereas the latter is presumably more applicable for a mechanical mode, such as car.  Bicycle may incur both.
+
+The notation deliberately uses ``leg'' and not trip, since this allows to decompose a trip into multiple legs, all with separate scoring contributions.
+
+\subsection{Utility of time as a resource (opportunity cost of time)}
+
+Most utility-based models in travel behavior research, such as typical logit mode choice models, use partial utility functions: These utility functions do not describe the full utility of the person, but just those parts that are affected by the choice.
+
+Since MATSim gives a score/utility to the full day, this does not work in the same way any more.  It most importantly shows up with time, where reducing the time spent traveling does not only lead to a reduction of the penalty of traveling, but also (barring opening time constraints) to an extension of the activity following the travel.
+
+The first effect is described marginally by
+\[
+- \frac{\partial}{\partial t_{trav}} V^{leg} = - \beta_{trav,mode} \ ,
+\]
+the minus steps from the fact that we are \emph{reducing} the travel time.
+
+The second effect is described marginally by
+\[
+\frac{\partial}{\partial t_{perf}} V^{perf}_i
+%
+= \beta_{perf} \cdot t_{typ,i} \cdot \frac{1}{t_{perf}}
+%
+\approx \beta_{perf} \ ,
+\]
+where the approximation holds when the actual activity duration $t_{perf}$ is close to its typical duration, $t_{typ,i}$.  This is also the justification why $t_{typ,i}$ is called the typcical duration, and $\beta_{perf}$ the marginal utility of performing.
+
+The marginal utility of travel time savings needs to consider both:
+\[
+mUTTS 
+%
+= \left( \beta_{perf} \cdot \frac{t_{typ,i}}{t_{perf}} - \beta_{trav,mode} \right)
+%
+\approx \beta_{perf} - \beta_{trav,mode} \ .
+\]
+In consequence, $\beta_{trav,mode}$ \myemph{is only an offset to the marginal utility of time as a resource}.  If travelling is considered more pleasant than ``doing nothing'', it may actually be positive.  Even when it is positive, the overall marginal utility of travel time ($= -mUTTS$) can still remain negative.
+
+The better known (marginal) value of travel time savings is obtained by dividing these values by the marginal utility of money:
+\[
+VTTS = \frac{mUTTS}{\beta_m} 
+%
+= \frac{\left( \beta_{perf} \cdot \frac{t_{typ,i}}{t_{perf}} - \beta_{trav,mode} \right)}{\beta_m}
+%
+\approx \frac{\beta_{perf} - \beta_{trav,mode}}{\beta_m} \ .
+\]
+
+
+
 \section{Calibration of the scoring function}
 
 \subsection{Quickstart by kn}
@@ -29,7 +188,7 @@ In many situations, it should be sufficient to just read Sec.~\ref{sec:quickstar
 A possible approach is as follows (status \today, this may change):
 \begin{enumerate}
 
-\item Set $\beta_{scale} \equiv$ \verb$BrainExpBeta$ to $1.0$.  (This will eventually become the default.)
+\item Set $\beta_{scale} \equiv$ \verb$BrainExpBeta$ to $1.0$.  (This is the default.)
 
 This is normally a positive value.
 
@@ -47,9 +206,9 @@ This is normally a positive value (since performing an activity for more time no
 
 \item Set $\beta_{tt,car} \equiv$ \verb$traveling$ to $0.0$.
 
-\myemph{It is important to understand this:}  Even if this value is set to zero, traveling by car will be implicitly punished by the so-called opportunity cost of time: If you are traveling by car, you cannot perform an activity, and thus you are (marginally) losing $\betaperf$.
+\myemph{It is important to understand this:}  Even if this value is set to zero, traveling by car will be implicitly punished by the so-called opportunity cost of time: If you are traveling by car, you cannot perform an activity, and thus you are (marginally) losing $\betaperf$.  Sometimes also called the ``utility of time as a resource''.
 
-\item Set all other marginal utilities of travel time by mode relative to the car value.
+\item Set all other marginal utilities of travel time by mode \myemph{relative to the car value}.
 
 E.g.\ if your logit model says something like $... -6/h \cdot tt_{car} - 7/h \cdot tt_{pt}$, then $\betaperf = 6$, $\beta_{tt,car} = 0$, and $\beta_{tt,pt} = -1$.
 
@@ -222,17 +381,17 @@ As a next step, an infrastructure to compare MATSim simulations with  real world
 
 The  so-called "Charypar-Nagel scoring function" is used in many  MATSim  studies. It is called that way because there is an ancient paper   where this scoring function was introduced.
 
-It uses a logarithmic utility of time for activities: $U = \beta \cdot t_x \cdot  \ln(x/t_0)$ . I sometimes call $t_x$ the ``typical duration''.
+It uses a logarithmic utility of time for activities: $U = \beta \cdot t_{typ} \cdot  \ln(x/t_0)$ . I sometimes call $t_{typ}$ the ``typical duration''.
 
 The first derivative of U is beta at the typical duration:
 \begin{itemize}
 	\item 
 $\displaystyle
-\frac{dU}{dx} = \beta \cdot t_x / x
+\frac{dU}{dx} = \beta \cdot t_{typ} / x
 $
 	\item 
 $\displaystyle
-\left. \frac{dU}{dx}\right|_{x=t_x} = \beta
+\left. \frac{dU}{dx}\right|_{x=t_{typ}} = \beta
 $
 \end{itemize}
 
@@ -242,35 +401,35 @@ The second derivative of U at the typical duration is
 \begin{itemize}
 	\item 
 $\displaystyle
-\frac{d^2U}{dx^2} = - \beta \cdot t_x / x^2
+\frac{d^2U}{dx^2} = - \beta \cdot t_{typ} / x^2
 $
 	\item 
 $\displaystyle
-\left. \frac{d^2U}{dx^2} \right|_{x=t_x} = - \beta / t_x
+\left. \frac{d^2U}{dx^2} \right|_{x=t_{typ}} = - \beta / t_{typ}
 $
 \end{itemize}
 
-An  important consequence of this is that there is no separate  free  parameter to calibrate the curvature (= 2nd derivative) at the  typical  duration: $\beta$ needs to be the same across all activities, and  $t_x$ is  given by (*).
+An  important consequence of this is that there is no separate  free  parameter to calibrate the curvature (= 2nd derivative) at the  typical  duration: $\beta$ needs to be the same across all activities, and  $t_{typ}$ is  given by (*).
 
 A second consequence is that $t_0$ is largely  irrelevant. It  shifts the function up and down, i.e.\ it determines how  much you lose  if you drop an activity completely.
 
-In the  original paper (and in most of MATSim), $t_0$ is set to $t_x \cdot   \exp(-10h/t_x)$ . This has the (intended) consequence that all  activities  have the same utility contribution at their typical  duration:
+In the  original paper (and in most of MATSim), $t_0$ is set to $t_{typ} \cdot   \exp(-10h/t_{typ})$ . This has the (intended) consequence that all  activities  have the same utility contribution at their typical  duration:
 \[
-U = \beta \cdot t_x \cdot \ln( x / t_x / \exp(-10h/t_x) ) 
+U = \beta \cdot t_{typ} \cdot \ln( x / t_{typ} / \exp(-10h/t_{typ}) ) 
 %
-= \beta \cdot t_x \cdot [ \ln( x/t_x ) + 10h/t_x ]
+= \beta \cdot t_{typ} \cdot [ \ln( x/t_{typ} ) + 10h/t_{typ} ]
 \]
-which   is, at $x=t_x$,
+which   is, at $x=t_{typ}$,
 \[
-= \beta \cdot t_x \cdot [ 0 + 10h/t_x ] = \beta \cdot  10h \ . 
+= \beta \cdot t_{typ} \cdot [ 0 + 10h/t_{typ} ] = \beta \cdot  10h \ . 
 \]
 With  our usual $\beta = 6Eu/h$, this results in $60Eu$ per  activity.
 
 The slope at $U=0$, i.e.\ at $x=t_0$, is
 \[
-(\beta \cdot t_x / t_x) \cdot \exp( 10h/t_x) = \beta \cdot \exp( 10h/t_x )
+(\beta \cdot t_{typ} / t_{typ}) \cdot \exp( 10h/t_{typ}) = \beta \cdot \exp( 10h/t_{typ} )
 \]
-which \emph{de}creases with increasing $t_x$. This means that activities with larger typical duration are \emph{easier} to drop completely.
+which \emph{de}creases with increasing $t_{typ}$. This means that activities with larger typical duration are \emph{easier} to drop completely.
 
 In the end, this makes sense: Since the additional score of any activity is the same, the score \emph{per time} is smallest for activities with long typical durations. Therefore, it makes sense to drop them first.
 
@@ -280,13 +439,13 @@ Overall, therefore: \myemph{In my opinion, the current utility function does not
 
 ---
 
-An  alternative, never tested since activity dropping was never  tested with  this utl fct, would be to recognize that $U'(t_0) = \beta \cdot  t_x / t_0$ ,  i.e.\ \emph{increasing} \emph{slope} with \emph{decreasing}  $t_0$.  That is, high priority activities should have $t_0$ such that  $t_x/t_0$ is  large (large slope = hard to drop). Activities of the  same priority  should have $t_0$ such that $t_x/t_0$ is the same between  those activities.  Overall, something like
+An  alternative, never tested since activity dropping was never  tested with  this utl fct, would be to recognize that $U'(t_0) = \beta \cdot  t_{typ} / t_0$ ,  i.e.\ \emph{increasing} \emph{slope} with \emph{decreasing}  $t_0$.  That is, high priority activities should have $t_0$ such that  $t_{typ}/t_0$ is  large (large slope = hard to drop). Activities of the  same priority  should have $t_0$ such that $t_{typ}/t_0$ is the same between  those activities.  Overall, something like
 \[
-weight \propto t_x/t_0
+weight \propto t_{typ}/t_0
 \]
 or
 \[
-t_0 \propto t_x/weight
+t_0 \propto t_{typ}/weight
 \]
 where large weight implies a large importance of the activity.
 
@@ -313,13 +472,13 @@ In  my view, a polynomial of second degree would be worth trying.\footnote{%
 %
 As  usual,  there are several ways to set this up. One way is to  expand around the  typical duration:
 \[
-U(t_x + \epsilon) = U(t_x) + \epsilon \cdot U'(t_x) + \epsilon^2 * U''(t_x)/2
+U(t_{typ} + \epsilon) = U(t_{typ}) + \epsilon \cdot U'(t_{typ}) + \epsilon^2 * U''(t_{typ})/2
 \]
 or
 \[
-U(x) = U(t_x) + (x-t_x) \cdot U'(t_x) + (x-t_x)^2 * U''(t_x)/2
+U(x) = U(t_{typ}) + (x-t_{typ}) \cdot U'(t_{typ}) + (x-t_{typ})^2 * U''(t_{typ})/2
 \]
-with $t_x =$ typical duration, $U'(t_x) = \beta =$ marg utl at typ dur, $U''(t_x) =$  curvature at typ dur (``priority''), and $U(t\_x) =$ ``base value of act'' (which could be something like $\beta \cdot t_x$ ).
+with $t_{typ} =$ typical duration, $U'(t_{typ}) = \beta =$ marg utl at typ dur, $U''(t_{typ}) =$  curvature at typ dur (``priority''), and $U(t\_x) =$ ``base value of act'' (which could be something like $\beta \cdot t_{typ}$ ).
 \\
 ---
 \\
@@ -334,7 +493,7 @@ U'(x) = - 2 a x + a c
 prio = U'(x=0) = a c , i.e.\ c = prio/a .
 \]
 \[
-\beta = U'(x=t_x) = - 2 a t_x + prio \hbox{, i.e.\ } a = (prio - \beta)/2t_x
+\beta = U'(x=t_{typ}) = - 2 a t_{typ} + prio \hbox{, i.e.\ } a = (prio - \beta)/2t_{typ}
 \]
 }
 

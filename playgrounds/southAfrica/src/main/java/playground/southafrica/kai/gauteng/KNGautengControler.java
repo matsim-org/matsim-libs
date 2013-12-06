@@ -27,10 +27,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.PlanStrategyRegistrar.Names;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -38,12 +36,17 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactorOLD;
-import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
-import playground.southafrica.gauteng.routing.PersonSpecificTravelDisutilityInclTollFactory;
+import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.scoring.PersonSpecificUoMScoringFunctionFactory;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
@@ -203,6 +206,26 @@ public class KNGautengControler {
 		for ( SanralTollVehicleType type : SanralTollVehicleType.values() ) {
 			log.info( String.format( "type: %30s; cnt: %8.0f", type.toString() , cnt.get(type) ) );
 		}
+		
+//		ObjectAttributes pAttribs = scenario.getPopulation().getPersonAttributes() ;
+//		String ATTR_NAME = config.plans().getSubpopulationAttributeName() ;
+//		
+//		VehicleType truckVehType = new VehicleTypeImpl(new IdImpl("truck") ) ;
+//		truckVehType.setLength(20.); 
+//		truckVehType.setMaximumVelocity( 100./3.6);
+//		
+//		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles() ;
+//
+//		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+//			String attrib = (String) pAttribs.getAttribute(person.getId().toString(), ATTR_NAME ) ;
+//			if ( attrib.equals("commercial") ) {
+//				Id vehicleId = person.getId() ;
+//				final Vehicle truck = VehicleUtils.getFactory().createVehicle(vehicleId, truckVehType );
+//				vehicles.getVehicles().put(vehicleId, truck) ;
+//			}
+//		}
+//		
+//		config.scenario().setUseVehicles(true);
 		
 		// CONSTRUCT UTILITY OF MONEY:
 		UtilityOfMoneyI personSpecificUtilityOfMoney ;
