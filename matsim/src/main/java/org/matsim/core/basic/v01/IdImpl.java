@@ -57,6 +57,10 @@ public class IdImpl implements Id, Serializable {
 		 * same character sequence. However equals() can return false even if
 		 * other.toString() equals this.id (in case other is not of type IdImpl)!
 		 * joh aug09
+		 * 
+		 * This does not seem to be true anymore (jwjoubert Dec'13). I added a
+		 * test trying to duplicate the above inconsistency, and could not 
+		 * recreate it anymore.
 		 */
 		if (!(other instanceof IdImpl)) return false;
 		if (other == this) return true;
