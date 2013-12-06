@@ -100,11 +100,11 @@ public class MATSimPlugin extends Plugin {
 //	    MapCSSStyleSource style = new MapCSSStyleSource(url.getPath(),
 //		    "matsim_style", "MATSim style");
 	    
-	    MATSimStyleSource style = new MATSimStyleSource(null, "MATSimStyle", "MATSimStyle");
-	    
-	    if (!MapPaintStyles.getStyles().getStyleSources().contains(style)) {
-		MapPaintStyles.addStyle(style);
-	    }
+//	    MATSimStyleSource style = new MATSimStyleSource(null, "MATSimStyle", "MATSimStyle");
+//	    
+//	    if (!MapPaintStyles.getStyles().getStyleSources().contains(style)) {
+//		MapPaintStyles.addStyle(style);
+//	    }
 	    
 	}
     }
