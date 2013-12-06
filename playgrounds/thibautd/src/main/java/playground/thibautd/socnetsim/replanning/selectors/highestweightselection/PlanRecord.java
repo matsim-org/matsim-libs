@@ -21,7 +21,9 @@ package playground.thibautd.socnetsim.replanning.selectors.highestweightselectio
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -44,6 +46,7 @@ final class PlanRecord {
 	boolean isStillFeasible = true;
 
 	private Collection<PlanRecord> incompatiblePlans = null;
+	private Set<Id> incompatibilityGroups = null;
 
 	public PlanRecord(
 			final Plan plan,
@@ -69,5 +72,14 @@ final class PlanRecord {
 	public void setIncompatiblePlans(final Collection<PlanRecord> incompatiblePlans) {
 		if ( this.incompatiblePlans != null ) throw new IllegalStateException();
 		this.incompatiblePlans = incompatiblePlans;
+	}
+
+	public Set<Id> getIncompatibilityGroups() {
+		return this.incompatibilityGroups;
+	}
+
+	public void setIncompatibilityGroups(final Set<Id> incompatibilityGroups) {
+		if ( this.incompatibilityGroups != null ) throw new IllegalStateException();
+		this.incompatibilityGroups = incompatibilityGroups;
 	}
 }

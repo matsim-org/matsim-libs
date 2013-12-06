@@ -36,12 +36,10 @@ import playground.thibautd.utils.MapUtils;
  */
 final class IncompatiblePlanRecords {
 	private final Set<Id> allIncompatibilityGroupIds;
-	private final IncompatiblePlansIdentifier identifier;
 
 	public IncompatiblePlanRecords(
 			final IncompatiblePlansIdentifier identifier,
 			final Map<Id, PersonRecord> personRecords) {
-		this.identifier = identifier;
 		final Map<Id, Collection<PlanRecord>> plansPerGroup = new HashMap<Id, Collection<PlanRecord>>();
 
 		final HashSet<Id> ids = new HashSet<Id>();
@@ -52,6 +50,7 @@ final class IncompatiblePlanRecords {
 					MapUtils.getCollection( group , plansPerGroup ).add( plan );
 					ids.add( group );
 				}
+				plan.setIncompatibilityGroups( identifyGroups( identifier , plan ) );
 			}
 		}
 
@@ -60,7 +59,6 @@ final class IncompatiblePlanRecords {
 				assert plan.person == person;
 				plan.setIncompatiblePlans(
 						calcIncompatiblePlans(
-							identifier,
 							plansPerGroup,
 							plan));
 			}
@@ -84,14 +82,13 @@ final class IncompatiblePlanRecords {
 	}
 
 	private static Collection<PlanRecord> calcIncompatiblePlans(
-			final IncompatiblePlansIdentifier identifier,
 			final Map<Id, Collection<PlanRecord>> plansPerGroup,
 			final PlanRecord record) {
 		final Collection<PlanRecord> incompatible = new HashSet<PlanRecord>();
 
 		addLinkedPlansOfOtherPlansOfPerson( incompatible , record );
 		addLinkedPlansOfPartners( incompatible , record );
-		addIncompatiblePlans( incompatible , plansPerGroup , record , identifier );
+		addIncompatiblePlans( incompatible , plansPerGroup , record );
 
 		return incompatible;
 	}
@@ -99,9 +96,8 @@ final class IncompatiblePlanRecords {
 	private static void addIncompatiblePlans(
 			final Collection<PlanRecord> incompatible,
 			final Map<Id, Collection<PlanRecord>> plansPerGroup,
-			final PlanRecord record,
-			final IncompatiblePlansIdentifier identifier) {
-		for ( Id group : identifyGroups( identifier , record ) ) {
+			final PlanRecord record) {
+		for ( Id group : record.getIncompatibilityGroups()  ) {
 			incompatible.addAll( plansPerGroup.get( group ) );
 		}
 	}
@@ -133,7 +129,7 @@ final class IncompatiblePlanRecords {
 	}
 
 	public Set<Id> getIncompatibilityGroups(final PlanRecord pr) {
-		return identifyGroups( identifier , pr );
+		return pr.getIncompatibilityGroups();
 	}
 }
 
