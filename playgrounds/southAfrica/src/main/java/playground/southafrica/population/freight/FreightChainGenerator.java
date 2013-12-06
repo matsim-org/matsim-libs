@@ -38,9 +38,15 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
@@ -69,7 +75,7 @@ public class FreightChainGenerator {
 		int numberOfPlans = Integer.parseInt(args[1]);
 		String populationPrefix = args[2];
 		String outputPlansFile = args[3];
-//		String networkFile = args[4];
+		String attributeFile = args[4];
 		
 		/* Read the path-dependent complex network. */
 		DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
@@ -81,6 +87,9 @@ public class FreightChainGenerator {
 		
 		/* Write the population to file. */
 		new PopulationWriter(sc.getPopulation(), null).write(outputPlansFile);
+		
+		/* Write the person attributes to file. */
+		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(attributeFile);
 		
 		Header.printFooter();
 	}
@@ -156,6 +165,9 @@ public class FreightChainGenerator {
 			/* Add the plan to the person, and the person to the population. */
 			vehicle.addPlan(plan);
 			sc.getPopulation().addPerson(vehicle);
+			
+			/* Indicate the subpopulation. */
+			sc.getPopulation().getPersonAttributes().putAttribute(vehicle.getId().toString(), sc.getConfig().plans().getSubpopulationAttributeName(), "commercial");
 		}
 	}
 	
