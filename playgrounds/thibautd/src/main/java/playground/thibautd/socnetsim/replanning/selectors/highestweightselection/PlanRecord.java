@@ -43,6 +43,8 @@ final class PlanRecord {
 	// true if all partners are still unallocated
 	boolean isStillFeasible = true;
 
+	private Collection<PlanRecord> incompatiblePlans = null;
+
 	public PlanRecord(
 			final Plan plan,
 			final JointPlan jointPlan,
@@ -58,5 +60,14 @@ final class PlanRecord {
 			" linkedWith:"+(jointPlan == null ? "[]" : jointPlan.getIndividualPlans().keySet())+
 			" weight="+avgJointPlanWeight+
 			" isFeasible="+isStillFeasible+"}";
+	}
+
+	public Collection<PlanRecord> getIncompatiblePlans() {
+		return this.incompatiblePlans;
+	}
+
+	public void setIncompatiblePlans(final Collection<PlanRecord> incompatiblePlans) {
+		if ( this.incompatiblePlans != null ) throw new IllegalStateException();
+		this.incompatiblePlans = incompatiblePlans;
 	}
 }

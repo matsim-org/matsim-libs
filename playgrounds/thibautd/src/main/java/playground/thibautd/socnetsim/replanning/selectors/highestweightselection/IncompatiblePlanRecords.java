@@ -37,8 +37,6 @@ import playground.thibautd.utils.MapUtils;
 final class IncompatiblePlanRecords {
 	private final Set<Id> allIncompatibilityGroupIds;
 	private final IncompatiblePlansIdentifier identifier;
-	private final Map<PlanRecord, Collection<PlanRecord>> cachedIncompatiblePlans =
-		new HashMap<PlanRecord, Collection<PlanRecord>>();
 
 	public IncompatiblePlanRecords(
 			final IncompatiblePlansIdentifier identifier,
@@ -59,8 +57,8 @@ final class IncompatiblePlanRecords {
 
 		for ( PersonRecord person : personRecords.values() ) {
 			for ( PlanRecord plan : person.plans ) {
-				cachedIncompatiblePlans.put(
-						plan,
+				assert plan.person == person;
+				plan.setIncompatiblePlans(
 						calcIncompatiblePlans(
 							identifier,
 							plansPerGroup,
@@ -82,7 +80,7 @@ final class IncompatiblePlanRecords {
 	}
 
 	public Collection<PlanRecord> getIncompatiblePlans( final PlanRecord record ) {
-		return cachedIncompatiblePlans.get( record );
+		return record.getIncompatiblePlans();
 	}
 
 	private static Collection<PlanRecord> calcIncompatiblePlans(
