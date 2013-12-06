@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -44,6 +45,15 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 public class GroupStrategyManager {
 	private static final Logger log =
 		Logger.getLogger(GroupStrategyManager.class);
+
+	// unfortunately, the stopwatch is initilized at the contruction
+	// of abstract controler, and we need to build this thing before
+	// construction the Controller...
+	// So the only way to get the stop watch is via a getter or as a parameter.
+	private IterationStopWatch stopWatch = null;
+	public void setStopWatch(final IterationStopWatch sw) {
+		this.stopWatch = sw;
+	}
 
 	private final GroupStrategyRegistry registry;
 
@@ -65,9 +75,11 @@ public class GroupStrategyManager {
 		final Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
 			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
 		for (ReplanningGroup g : groups) {
+			if ( stopWatch != null ) stopWatch.beginOperation( "remove plans" );
 			registry.getExtraPlanRemover().removePlansInGroup(
 					jointPlans,
 					g );
+			if ( stopWatch != null ) stopWatch.endOperation( "remove plans" );
 
 			final GroupPlanStrategy strategy = registry.chooseStrategy( iteration , random.nextDouble() );
 			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
@@ -85,10 +97,12 @@ public class GroupStrategyManager {
 			final GroupPlanStrategy strategy = e.getKey();
 			final List<ReplanningGroup> toHandle = e.getValue();
 			log.info( "passing "+toHandle.size()+" groups to strategy "+strategy );
+			if ( stopWatch != null ) stopWatch.beginOperation( "strategy "+strategy );
 			strategy.run(
 					controllerRegistry.createReplanningContext( iteration ),
 					jointPlans,
 					toHandle );
+			if ( stopWatch != null ) stopWatch.endOperation( "strategy "+strategy );
 			log.info( "strategy "+strategy+" finished" );
 		}
 	}

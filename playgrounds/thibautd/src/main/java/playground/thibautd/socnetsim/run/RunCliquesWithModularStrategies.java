@@ -283,6 +283,8 @@ public class RunCliquesWithModularStrategies {
 						controllerRegistry,
 						strategyManager));
 
+		strategyManager.setStopWatch( controller.stopwatch );
+
 		if ( scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() > 0 ) {
 			log.info( "add scorer for being together" );
 			final FireMoneyEventsForUtilityOfBeingTogether socialScorer =
