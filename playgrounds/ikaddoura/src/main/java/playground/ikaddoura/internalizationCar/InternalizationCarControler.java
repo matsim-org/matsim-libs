@@ -56,6 +56,7 @@ public class InternalizationCarControler {
 	
 	private void runBaseCase(String configFile) {
 		Controler controler = new Controler(configFile);
+		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.setOverwriteFiles(true);
 		controler.run();
