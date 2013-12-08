@@ -72,16 +72,18 @@ import utilities.misc.DynamicData;
  */
 public class CadytsFreightChainTest {
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+//	@Rule
+//	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+//	@Test
 	public final void testCalibrationAsScoring() throws IOException {
 		final double beta=30. ;
 		final int lastIteration = 20 ;
 
-		String inputDir = this.utils.getClassInputDirectory();
-		String outputDir = this.utils.getOutputDirectory();
+//		String inputDir = this.utils.getClassInputDirectory();
+//		String outputDir = this.utils.getOutputDirectory();
+		String inputDir = null ;
+		String outputDir = null ;
 
 		final Config config = createTestConfig(inputDir, outputDir);
 
