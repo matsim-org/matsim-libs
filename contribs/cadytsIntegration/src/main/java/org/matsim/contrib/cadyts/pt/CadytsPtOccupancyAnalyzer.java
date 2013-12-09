@@ -259,5 +259,38 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 //		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 //		reader.parse(eventFileName);
 //	}
+	
+	@Override
+	public String toString() {
+		final StringBuffer stringBuffer2 = new StringBuffer();
+		final String STOPID = "stopId: ";
+		final String VALUES = "; values:";
+		final char TAB = '\t';
+		final char RETURN = '\n';
+
+		for (Id stopId : this.getOccupancyStopIds()) { // Only occupancy!
+			StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append(STOPID);
+			stringBuffer.append(stopId);
+			stringBuffer.append(VALUES);
+
+			boolean hasValues = false; // only prints stops with volumes > 0
+			@SuppressWarnings("deprecation")
+			int[] values = this.getOccupancyVolumesForStop(stopId);
+
+			for (int ii = 0; ii < values.length; ii++) {
+				hasValues = hasValues || (values[ii] > 0);
+
+				stringBuffer.append(TAB);
+				stringBuffer.append(values[ii]);
+			}
+			stringBuffer.append(RETURN);
+			if (hasValues)
+				stringBuffer2.append(stringBuffer.toString());
+
+		}
+		return stringBuffer2.toString();
+	}
+
 
 }

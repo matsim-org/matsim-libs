@@ -34,6 +34,7 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
+import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -49,6 +50,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -86,13 +88,13 @@ public class CadytsIntegrationTest {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		final Controler controler = new Controler(scenario);
-		final CadytsContext context = new CadytsContext( config ) ;
+		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
 		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				return new PlanStrategyImpl(new CadytsPlanChanger(scenario2, context));
+				return new PlanStrategyImpl(new CadytsPlanChanger<TransitStopFacility>(scenario2, context));
 			}} ) ;
 		
 		controler.setCreateGraphs(false);
@@ -140,19 +142,15 @@ public class CadytsIntegrationTest {
 		controler.setDumpDataAtEnd(true);
 		controler.setOverwriteFiles(true) ;
 		
-		final CadytsContext cContext = new CadytsContext( config ) ;
+		final CadytsPtContext cContext = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(cContext) ;
 		
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, cContext);
-				planSelector.setCadytsWeight(0.) ;
-				// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
-				// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
-				// kai, may'13
+			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
 				return new PlanStrategyImpl(planSelector);
-			}
+			} 
 		} ) ;
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
@@ -165,7 +163,7 @@ public class CadytsIntegrationTest {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring scoringFunction = new CadytsScoring(plan,config, cContext);
+				final CadytsScoring<TransitStopFacility> scoringFunction = new CadytsScoring<TransitStopFacility>(plan,config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(beta*30.) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 
@@ -303,13 +301,13 @@ public class CadytsIntegrationTest {
 		controler.setDumpDataAtEnd(true);
 		controler.setOverwriteFiles(true) ;
 		
-		final CadytsContext context = new CadytsContext( config ) ;
+		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
 		
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger( scenario2, context);
+				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>( scenario2, context);
 				planSelector.setCadytsWeight(beta*30.) ;
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;
@@ -450,7 +448,7 @@ public class CadytsIntegrationTest {
 		// ---
 		
 		final Controler controler = new Controler(config);
-		final CadytsContext context = new CadytsContext( config ) ;
+		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
 		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {

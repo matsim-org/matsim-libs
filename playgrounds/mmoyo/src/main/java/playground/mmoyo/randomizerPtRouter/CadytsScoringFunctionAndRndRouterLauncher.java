@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.pt.CadytsContext;
+import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -116,7 +116,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		//create cadyts context
 		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		config.addModule(ccc) ;
-		final CadytsContext cContext = new CadytsContext( config ) ;
+		final CadytsPtContext cContext = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(cContext) ;
 		
 		//set cadyts as strategy for plan selector

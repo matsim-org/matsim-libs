@@ -22,7 +22,7 @@ package playground.mmoyo.randomizerPtRouter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
-import org.matsim.contrib.cadyts.pt.CadytsContext;
+import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -110,7 +110,7 @@ public class RndPtRouterLauncher {
 		
 		//add cadytsContext as ctrListener
 		final double beta = 30. ;
-		final CadytsContext context = new CadytsContext(config) ;
+		final CadytsPtContext context = new CadytsPtContext(config, controler.getEvents()) ;
 		controler.addControlerListener(context) ;
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			@Override

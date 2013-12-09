@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test ;
 import org.junit.Rule;
+import org.junit.Ignore ;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -80,6 +81,7 @@ public class CadytsFreightChainTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
+	@Ignore
 	public final void testCalibrationAsScoring() throws IOException {
 		final double beta=30. ;
 		final int lastIteration = 20 ;
@@ -216,9 +218,9 @@ public class CadytsFreightChainTest {
 //		config.planCalcScore().addActivityParams(params);
 		
 		CadytsConfigGroup cadytsConfig = new CadytsConfigGroup() ;
-//		cadytsConfig.setTimeBinSize(3600) ;
-//		cadytsConfig.setStartTime(0);
-//		cadytsConfig.setEndTime(3600);
+		cadytsConfig.setTimeBinSize(3600) ;
+		cadytsConfig.setStartTime(0);
+		cadytsConfig.setEndTime(3600);
 		config.addModule(cadytsConfig);
 		
 		return config;
