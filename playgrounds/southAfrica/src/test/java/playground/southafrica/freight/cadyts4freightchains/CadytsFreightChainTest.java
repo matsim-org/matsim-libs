@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.kai.cadyts4freightchains;
+package playground.southafrica.freight.cadyts4freightchains;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +65,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.southafrica.freight.cadyts4freightchains.CadytsFreightChainsContext;
+import playground.southafrica.freight.cadyts4freightchains.Item;
 import utilities.io.tabularfileparser.TabularFileParser;
 import utilities.misc.DynamicData;
 

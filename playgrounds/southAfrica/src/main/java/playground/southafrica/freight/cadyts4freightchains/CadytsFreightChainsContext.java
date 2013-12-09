@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.kai.cadyts4freightchains;
+package playground.southafrica.freight.cadyts4freightchains;
 
 import java.io.IOException;
 import java.util.HashMap;
