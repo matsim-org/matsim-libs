@@ -22,7 +22,14 @@
  */
 package playground.southafrica.population.freight;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -30,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -38,15 +46,10 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
@@ -63,7 +66,9 @@ public class FreightChainGenerator {
 	private final static Random RANDOM = MatsimRandom.getRandom();
 	private final static Double AVERAGE_SPEED = 50.0/3.6;
 	
-	private static Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private PathDependentNetwork complexNetwork;
+	
+	private Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	/**
 	 * @param args
@@ -71,36 +76,111 @@ public class FreightChainGenerator {
 	public static void main(String[] args) {
 		Header.printHeader(FreightChainGenerator.class.toString(), args);
 		
+		/* Parse all the arguments. */
 		String complexNetworkFile = args[0];
 		int numberOfPlans = Integer.parseInt(args[1]);
 		String populationPrefix = args[2];
 		String outputPlansFile = args[3];
 		String attributeFile = args[4];
+		int numberOfThreads = Integer.parseInt(args[5]);
 		
 		/* Read the path-dependent complex network. */
 		DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
 		nr.parse(complexNetworkFile);
-		PathDependentNetwork network = nr.getPathDependentNetwork();
-		network.writeNetworkStatisticsToConsole();
+		PathDependentNetwork pathDependentNetwork = nr.getPathDependentNetwork();
+		pathDependentNetwork.writeNetworkStatisticsToConsole();
 		
-		generateFreightAgentPlans(network, populationPrefix, numberOfPlans);
+		/* Set up the freight chain generator. */
+		FreightChainGenerator fcg = new FreightChainGenerator(pathDependentNetwork);
+		fcg.generateFreightAgentPlans(pathDependentNetwork, populationPrefix, numberOfPlans, numberOfThreads);
 		
 		/* Write the population to file. */
-		new PopulationWriter(sc.getPopulation(), null).write(outputPlansFile);
+		new PopulationWriter(fcg.getScenario().getPopulation(), null).write(outputPlansFile);
 		
 		/* Write the person attributes to file. */
-		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(attributeFile);
+		new ObjectAttributesXmlWriter(fcg.getScenario().getPopulation().getPersonAttributes()).writeFile(attributeFile);
 		
 		Header.printFooter();
 	}
 	
 	
-	private static void generateFreightAgentPlans(PathDependentNetwork network, String prefix, int numberOfPlans){
+	public FreightChainGenerator(PathDependentNetwork network) {
+		this.complexNetwork = network;
+	}
+	
+	
+	private void generateFreightAgentPlans(PathDependentNetwork network, String prefix, int numberOfPlans, int numberOfThreads){
 		LOG.info("Creating a population of " + numberOfPlans + " freight activity chains...");
-		PopulationFactory pf = sc.getPopulation().getFactory();
 		
+		/* Set up the multithreaded infrastructure. */
+		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		List<Future<Plan>> listOfJobs = new ArrayList<Future<Plan>>();
+		
+		LOG.info("Creating plans using multi-threaded infrastructure.");
+		Counter counter = new Counter("   plans # ");
 		for(int i = 0; i < numberOfPlans; i++){
-			Person vehicle = new PersonImpl( new IdImpl(prefix + "_" + i) );
+			DigicorePlanGenerator job = new DigicorePlanGenerator(this.complexNetwork, counter);
+			Future<Plan> submit = threadExecutor.submit(job);
+			listOfJobs.add(submit);
+		}
+		counter.printCounter();
+
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
+		}
+
+		/* Aggregate the output plans. */
+		try {
+			int i = 0;
+			for(Future<Plan> job : listOfJobs){
+				Person vehicle = new PersonImpl( new IdImpl(prefix + "_" + i++) );
+				Plan plan;
+				plan = job.get();
+
+				/* Add the plan to the person, and the person to the population. */
+				vehicle.addPlan(plan);
+				sc.getPopulation().addPerson(vehicle);
+
+				/* Indicate the subpopulation. */
+				sc.getPopulation().getPersonAttributes().putAttribute(vehicle.getId().toString(), sc.getConfig().plans().getSubpopulationAttributeName(), "commercial");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not aggregate multi-threaded plan output.");
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not aggregate multi-threaded plan output.");
+		}
+	}
+
+
+	
+	public Scenario getScenario(){
+		return this.sc;
+	}
+	
+	
+	/**
+	 * A private class the generate {@link Plan}s in a multi-threaded manner. 
+	 *
+	 * @author jwjoubert
+	 */
+	private class DigicorePlanGenerator implements Callable<Plan>{
+		private final PathDependentNetwork network;
+		private final Counter counter;
+		
+		/**
+		 * @param network a path-dependent complex network as generated by the code
+		 * 	      {@link PathDependentNetwork}.
+		 */
+		public DigicorePlanGenerator(PathDependentNetwork network, Counter counter) {
+			this.network = network;
+			this.counter = counter;
+		}
+
+		@Override
+		public Plan call() throws Exception {
+			PopulationFactory pf = sc.getPopulation().getFactory();
 			
 			/* Set up the plan. */
 			PlanImpl plan = (PlanImpl) pf.createPlan();
@@ -161,14 +241,10 @@ public class FreightChainGenerator {
 				plan.addActivity(thisActivity);
 				
 			}
-			
-			/* Add the plan to the person, and the person to the population. */
-			vehicle.addPlan(plan);
-			sc.getPopulation().addPerson(vehicle);
-			
-			/* Indicate the subpopulation. */
-			sc.getPopulation().getPersonAttributes().putAttribute(vehicle.getId().toString(), sc.getConfig().plans().getSubpopulationAttributeName(), "commercial");
+			counter.incCounter();
+			return plan;
 		}
+		
 	}
 	
 	
