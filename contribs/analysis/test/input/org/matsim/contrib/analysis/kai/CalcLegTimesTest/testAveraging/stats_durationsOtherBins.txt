@@ -6,4 +6,5 @@ act4---act5	1	0	0	0	0	0	| 1.0
 zz_mode_undefined	1	2	1	0	0	0	| 600.25
 zzzzzzz_all	1	2	1	0	0	0	| 600.25
 
+control statistics: average ttime = 600.25
 
