@@ -381,6 +381,9 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		Coord coord;
 		PointType point;
 		for (CountSimComparison csc : countSimComparisonList) {
+			
+			// yyyy going via the link does not seem that helpful when the count in fact has a coordinate! kai, dec'13
+			
 			linkid = csc.getId();
 			link = this.network.getLinks().get(linkid);
 

@@ -188,8 +188,8 @@ public class CadytsIntegrationTest {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
 		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -328,8 +328,8 @@ public class CadytsIntegrationTest {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
 		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -424,6 +424,7 @@ public class CadytsIntegrationTest {
 	public final void testCalibrationTwo() throws IOException {
 		// yyyy I cannot fully certify that this test is doing something reasonable, since simCountComparisonOccupancy.txt and 
 		// cadytsSimCountComparisonOccupancy.txt are returning different results.  kai, feb'13
+		// There is a comment in CadytsContext that the "cadyts" version may be wrong for time bins different from one your. kai, dec'13
 		
 		final double beta = 30. ;
 		final int lastIteration = 20 ;
@@ -476,8 +477,8 @@ public class CadytsIntegrationTest {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
 		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -715,27 +716,20 @@ public class CadytsIntegrationTest {
 		config.ptCounts().setOccupancyCountsFileName(inputDir + "counts/counts_occupancy.xml") ;
 		config.ptCounts().setBoardCountsFileName(inputDir + "counts/counts_boarding.xml") ;
 		config.ptCounts().setAlightCountsFileName(inputDir + "counts/counts_alighting.xml") ;
-		config.ptCounts().setDistanceFilter(30000.) ; // why?
-		config.ptCounts().setDistanceFilterCenterNode("7") ; // why?
+//		config.ptCounts().setDistanceFilter(30000.) ; // why?
+//		config.ptCounts().setDistanceFilterCenterNode("7") ; // why?
 		config.ptCounts().setOutputFormat("txt");
 		config.ptCounts().setCountsScaleFactor(1.) ;
 		// ---
 		return config;
 	}
 
-	
-	private static class DummyMobsim implements Mobsim {
-		public DummyMobsim() {
-		}
-		@Override
-		public void run() {
-		}
-	}
-
 	private static class DummyMobsimFactory implements MobsimFactory {
 		@Override
 		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-			return new DummyMobsim();
+			return new Mobsim() {
+				@Override public void run() { }
+			} ;
 		}
 	}
 

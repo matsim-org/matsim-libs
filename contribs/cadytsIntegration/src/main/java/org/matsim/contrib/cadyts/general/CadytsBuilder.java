@@ -20,8 +20,8 @@
 package org.matsim.contrib.cadyts.general;
 
 import java.util.Map;
-import org.apache.log4j.*;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
@@ -75,48 +75,41 @@ public final class CadytsBuilder {
 		matsimCalibrator.setBruteForce(cadytsConfig.useBruteForce());
 		matsimCalibrator.setStatisticsFile(config.controler().getOutputDirectory() + "/calibration-stats.txt");
 		
-		matsimCalibrator.setCountFirstLink(true); // yyyyyy
-		matsimCalibrator.setDebugMode(true);
-		matsimCalibrator.setBruteForce(true);
-
-		int arStartTime_s = cadytsConfig.getStartTime(); 
-		int arEndTime_s = cadytsConfig.getEndTime() ;
-		// (this version gets directly the startTime and endTime directly in seconds from the cadytsPtConfig) 
-		
-		
 		int multiple = timeBinSize_s / 3600 ; // e.g. "3" when timeBinSize_s = 3*3600 = 10800
-		
-		log.warn( " adding measurements ...") ;
 
+		// If I remember correctly, the following is trying to get around the fact that the counts time bins are fixed at hourly, but we want to
+		// be able to be more flexible.  As a first step, time bins which are multiples from 1 hour are allowed, say "3".  In order to get a somewhat
+		// meaningful connection to the counts format, it will add up all entries from the corresponding 3 hours before giving this to cadyts, i.e.
+		// you may keep a higher resolution counts file but tell cadyts to work on longer time intervals. kai, dec'13
+
+		// yyyy However, it seems that some of this did not work: We are using "hourly" counts, and dividing the multi-hour values by
+		// the number of hours. ???????
+		
 		//add counts data into calibrator
+		int numberOfAddedMeasurements = 0 ;
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
-			log.warn( " adding measurements 2 ...") ;
 			T item = lookUp.lookUp(entry.getKey()) ;
 			int timeBinIndex = 0 ; // starting with zero which is different from the counts file!!!
 			int startTimeOfBin_s = -1 ;
-			double val_passager_h = -1 ;
+			double count = -1 ;
 			for (Volume volume : entry.getValue().getVolumes().values()){
-				log.warn( " adding measurements 3 ...") ;
 				if ( timeBinIndex%multiple == 0 ) {
 					startTimeOfBin_s = (volume.getHourOfDayStartingWithOne()-1)*3600 ;
-					val_passager_h = 0 ;
+					count = 0 ;
 				}
-				val_passager_h += volume.getValue() ;
+				count += volume.getValue() ;
 				if ( ! ( (timeBinIndex%multiple) == (multiple-1) ) ) {
 					log.warn( " NOT adding measurement: timeBinIndex: " + timeBinIndex + "; multiple: " + multiple ) ;
 				} else {
-					log.warn( " adding measurements 4 ...") ;
 					int endTimeOfBin_s   = volume.getHourOfDayStartingWithOne()*3600 - 1 ;
-					if ( !( startTimeOfBin_s >= arStartTime_s && endTimeOfBin_s <= arEndTime_s) ) {
-						log.warn( " NOT adding measurement: arStratTime_s: " + arStartTime_s + "; startTimeOfBin_s: " + startTimeOfBin_s +
-								"; endTimeOfBin_s: " + endTimeOfBin_s + "; arEndTime_s: " + arEndTime_s );
+					if ( !( cadytsConfig.getStartTime() <= startTimeOfBin_s && endTimeOfBin_s <= cadytsConfig.getEndTime()) ) {
+						log.warn( " NOT adding measurement: cadytsConfigStartTime: " + cadytsConfig.getStartTime() + "; startTimeOfBin_s: " + startTimeOfBin_s +
+								"; endTimeOfBin_s: " + endTimeOfBin_s + "; cadytsConfigEndTime: " + cadytsConfig.getEndTime() );
 					} else { //add volumes for each bin to calibrator
-						double val = val_passager_h/multiple ;
-						log.warn( "adding measurement: item: " + item.toString() + "; starttime: " + startTimeOfBin_s 
-								+ "; endTime: " + endTimeOfBin_s + "; val: " + val ) ;
-						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, val, 
-								SingleLinkMeasurement.TYPE.FLOW_VEH_H);
-//								SingleLinkMeasurement.TYPE.COUNT_VEH);
+						numberOfAddedMeasurements++ ;
+						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, count/multiple, SingleLinkMeasurement.TYPE.FLOW_VEH_H);
+//						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, count, SingleLinkMeasurement.TYPE.COUNT_VEH );
+
 						// changed this from FLOW_VEH_H to COUNT_VEH on 30/jul/2012 since this is no longer "hourly".  
 						// kai/manuel, jul'12
 						// Despite the above comment, I am finding this with FLOW_VEH_H.  Why?  kai, feb'13
@@ -127,6 +120,9 @@ public final class CadytsBuilder {
 				}
 				timeBinIndex++ ;
 			}
+		}
+		if ( numberOfAddedMeasurements==0 ) {
+			throw new RuntimeException("no measurement was added; cadyts will not work.  Throwing runtime exception ... ") ;
 		}
 		
 		return matsimCalibrator;

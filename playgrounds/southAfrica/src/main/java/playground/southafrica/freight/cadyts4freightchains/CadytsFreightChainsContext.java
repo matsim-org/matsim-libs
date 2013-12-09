@@ -84,10 +84,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 			cadyts.demand.PlanBuilder<Item> planBuilder = new cadyts.demand.PlanBuilder<Item>() ;
 			int time = 0 ; // there is no time here but we need to set something 
 			final Item item = getCorrectItemFromPlan(plan);
-//			log.warn( " adding item with id " + item.getId() );
-			planBuilder.addTurn( item, time+1 );
-			planBuilder.addTurn( item, time+2 );
-			planBuilder.addTurn( item, time+3 );
+			planBuilder.addTurn( item, time);
 			// (the meaning of this is that this plan contributes one counts unit to this item)
 
 			return planBuilder.getResult();

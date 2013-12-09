@@ -44,9 +44,11 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -72,8 +74,8 @@ CadytsContextI<T> {
 	private AnalyticalCalibrator<TransitStopFacility> calibrator = null;
 	private SimResultsContainerImpl simResults;
 	private final Counts occupCounts = new Counts();
-	private final Counts boardCounts = new Counts();
-	private final Counts alightCounts = new Counts();
+//	private final Counts boardCounts = new Counts();
+//	private final Counts alightCounts = new Counts();
 	private CadytsPtOccupancyAnalyzer cadytsPtOccupAnalyzer;
 	private PtPlanToPlanStepBasedOnEvents<T> ptStep ;
 
@@ -201,23 +203,23 @@ CadytsContextI<T> {
 				controler.stopwatch.beginOperation("compare with pt counts");
 
 				Network network = controler.getNetwork();
-				CadytsPtCountsComparisonAlgorithm ccaBoard = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.boardCounts,
-						network, config.ptCounts().getCountsScaleFactor());
-				CadytsPtCountsComparisonAlgorithm ccaAlight = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.alightCounts,
-						network, config.ptCounts().getCountsScaleFactor());
+//				CadytsPtCountsComparisonAlgorithm ccaBoard = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.boardCounts,
+//						network, config.ptCounts().getCountsScaleFactor());
+//				CadytsPtCountsComparisonAlgorithm ccaAlight = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.alightCounts,
+//						network, config.ptCounts().getCountsScaleFactor());
 				CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.occupCounts,
 						network, config.ptCounts().getCountsScaleFactor());
 
 				Double distanceFilter = ptCountsConfig.getDistanceFilter();
 				String distanceFilterCenterNodeId  = ptCountsConfig.getDistanceFilterCenterNode();
 				if ((distanceFilter != null) && (distanceFilterCenterNodeId != null)) {
-					ccaBoard.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
-					ccaAlight.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+//					ccaBoard.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+//					ccaAlight.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
 					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
 				}
 
-				ccaBoard.calculateComparison();
-				ccaAlight.calculateComparison();
+//				ccaBoard.calculateComparison();
+//				ccaAlight.calculateComparison();
 				ccaOccupancy.calculateComparison();
 
 				String outputFormat = ptCountsConfig.getOutputFormat();
@@ -225,22 +227,26 @@ CadytsContextI<T> {
 					OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
 
 					String filename = ctlIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
-					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(),
-							ccaAlight.getComparison(), ccaOccupancy.getComparison(), TransformationFactory.getCoordinateTransformation(config
-									.global().getCoordinateSystem(), TransformationFactory.WGS84), this.boardCounts, this.alightCounts,
+					final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(config
+							.global().getCoordinateSystem(), TransformationFactory.WGS84);
+					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(null,
+							null, ccaOccupancy.getComparison(), coordTransform, null, null, 
 									this.occupCounts);
-
+					
+//					CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), network, coordTransform) ;
+					// will not work since "network" contains the wrong information.
+					
 					kmlWriter.setIterationNumber(iter);
 					kmlWriter.writeFile(filename);
 				}
 				
 				if (outputFormat.contains("txt") || outputFormat.contains("all")) {
 					//  As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
-					//  As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
+					//  yyyyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
 					//  See near beginning of method.  kai, feb'13 
 					OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
-					ccaBoard.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareBoarding.txt"));
-					ccaAlight.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareAlighting.txt"));
+//					ccaBoard.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareBoarding.txt"));
+//					ccaAlight.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareAlighting.txt"));
 					ccaOccupancy.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
 				}
 

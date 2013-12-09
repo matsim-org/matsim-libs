@@ -58,6 +58,7 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.NetworkFeatureFactory;
 
+@Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13
 public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	/**
 	 * constant for the name of the stops
@@ -137,6 +138,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 * @param network
 	 * @param coordTransform
 	 */
+	@Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13
 	public PtCountSimComparisonKMLWriter(
 			final List<CountSimComparison> boardCountSimCompList,
 			final List<CountSimComparison> alightCountSimCompList,
@@ -237,6 +239,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 * @param filename
 	 */
 	@Override
+	@Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13
 	public void writeFile(final String filename) {
 
 		// init kml
@@ -327,15 +330,15 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 			this.mainFolder.getAbstractFeatureGroup().add(
 					kmlObjectFactory.createFolder(subfolder));
 
-			writeStopData(this.boardCountComparisonFilter
-					.getCountsForHour(Integer.valueOf(h)), subfolder,
-					PtCountsType.Boarding);
-			writeStopData(this.alightCountComparisonFilter
-					.getCountsForHour(Integer.valueOf(h)), subfolder,
-					PtCountsType.Alighting);
-			writeStopData(this.occupancyCountComparisonFilter
-					.getCountsForHour(Integer.valueOf(h)), subfolder,
-					PtCountsType.Occupancy);
+			if ( this.boardCountComparisonFilter != null ) {
+				writeStopData(this.boardCountComparisonFilter.getCountsForHour(Integer.valueOf(h)), subfolder,PtCountsType.Boarding);
+			}
+			if ( this.alightCountComparisonFilter != null ) {
+				writeStopData(this.alightCountComparisonFilter.getCountsForHour(Integer.valueOf(h)), subfolder,PtCountsType.Alighting);
+			}
+			if ( this.occupancyCountComparisonFilter != null ) {
+				writeStopData(this.occupancyCountComparisonFilter.getCountsForHour(Integer.valueOf(h)), subfolder, PtCountsType.Occupancy);
+			}
 		}
 		finish();
 	}
@@ -446,6 +449,10 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 			default:
 				count = this.occupancyCounts.getCount(stopid);
 			}
+			// yyyy If I see this correctly, the above only works because it relies on the convention that the id in the CountSimComparison
+			// data structure is not the link id, as the documentation implies, but in fact the stopId.  We need to stay away from such
+			// things.  kai, dec'13
+			// (Actually, it seems to be locId = location id in the original design, so it might be a mis-documentation in the javadoc.???)
 
 			coord = this.coordTransform.transform(count.getCoord());
 			relativeError = csc.calculateRelativeError();
