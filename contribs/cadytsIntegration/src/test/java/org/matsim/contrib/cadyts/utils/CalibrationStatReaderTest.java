@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.matsim.contrib.cadyts.pt.CadytsIntegrationTest;
 import org.matsim.testcases.MatsimTestUtils;
 
-import utilities.io.tabularfileparser.TabularFileParser;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 
 public class CalibrationStatReaderTest {
 

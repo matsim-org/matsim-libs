@@ -42,7 +42,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -65,9 +64,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import utilities.io.tabularfileparser.TabularFileParser;
-import utilities.misc.DynamicData;
 import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
 
 public class CadytsIntegrationTest {
 	

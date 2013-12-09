@@ -22,7 +22,8 @@ package org.matsim.contrib.cadyts.general;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.basic.v01.IdImpl;
 
-import utilities.misc.DynamicDataXMLFileIO;
+import cadyts.utilities.misc.DynamicDataXMLFileIO;
+
 
 /**
  * Enables cadyts to persist the cost offsets to file.
