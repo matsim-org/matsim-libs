@@ -43,34 +43,47 @@ public class PopulationFromSightings {
 	private static Random rnd = MatsimRandom.getRandom();
 	
 	public static void readSampleWithOneRandomPointForEachSightingInNewCell(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
+		
+		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
+			Id personId = sightingsPerPerson.getKey();
+			List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
+			Person person = scenario.getPopulation().getFactory().createPerson(personId);
+			Plan plan = createPlanWithEndTimeAtLastSighting(scenario, zones,
+					sightingsForThisPerson);
+			person.addPlan(plan);
+			scenario.getPopulation().addPerson(person);
+		}
+	}
+
+
+
+	public static Plan createPlanWithEndTimeAtLastSighting(Scenario scenario,
+			LinkToZoneResolver zones, List<Sighting> sightingsForThisPerson) {
+		Plan plan = scenario.getPopulation().getFactory().createPlan();
+		boolean first = true;
 		Map<Activity, String> cellsOfSightings;
 		cellsOfSightings = new HashMap<Activity, String>();
-		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
-			for (Sighting sighting : sightingsPerPerson.getValue()) {
-				String zoneId = sighting.getCellTowerId();
-				Activity activity = createActivityInZone(scenario, zones,
-						zoneId);
-				cellsOfSightings.put(activity, zoneId);
-				activity.setEndTime(sighting.getTime());
-				Id personId = sightingsPerPerson.getKey();
-				Person person = scenario.getPopulation().getPersons().get(personId);
-				if (person == null) {
-					person = scenario.getPopulation().getFactory().createPerson(personId);
-					person.addPlan(scenario.getPopulation().getFactory().createPlan());
-					person.getSelectedPlan().addActivity(activity);
-					scenario.getPopulation().addPerson(person);
+		for (Sighting sighting : sightingsForThisPerson) {
+			String zoneId = sighting.getCellTowerId();
+			Activity activity = createActivityInZone(scenario, zones,
+					zoneId);
+			cellsOfSightings.put(activity, zoneId);
+			activity.setEndTime(sighting.getTime());
+			if (first) {
+				plan.addActivity(activity);
+				first = false;
+			} else {
+				Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
+				if ( !(zoneId.equals(cellsOfSightings.get(lastActivity))) ) {
+					Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
+					plan.addLeg(leg);
+					plan.addActivity(activity);
 				} else {
-					Activity lastActivity = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
-					if ( !(zoneId.equals(cellsOfSightings.get(lastActivity))) ) {
-						Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
-						person.getSelectedPlan().addLeg(leg);
-						person.getSelectedPlan().addActivity(activity);
-					} else {
-						lastActivity.setEndTime(sighting.getTime());
-					}
+					lastActivity.setEndTime(sighting.getTime());
 				}
 			}
 		}
+		return plan;
 	}
 
 

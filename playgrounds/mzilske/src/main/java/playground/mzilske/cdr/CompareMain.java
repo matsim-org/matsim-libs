@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.axis.utils.NetworkUtils;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -27,11 +28,37 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
+
+import com.telmomenezes.jfastemd.Feature;
+import com.telmomenezes.jfastemd.JFastEMD;
+import com.telmomenezes.jfastemd.Signature;
+
 import d4d.Sighting;
 
 public class CompareMain {
+
+	private static class VolumeOnLinkFeature implements Feature {
+
+		final Link link;
+		final int hour;
+
+		public VolumeOnLinkFeature(Link link, int i) {
+			this.link = link;
+			this.hour = i;
+		}
+
+		@Override
+		public double groundDist(Feature f) {
+			VolumeOnLinkFeature other = (VolumeOnLinkFeature) f;
+			double spacialDistance = CoordUtils.calcDistance(link.getCoord(), other.link.getCoord());
+			int temporalDistance = Math.abs(hour - other.hour);
+			return (0.0 * spacialDistance) + (2.0 * temporalDistance);
+		}
+
+	}
 
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
@@ -67,6 +94,7 @@ public class CompareMain {
 
 		dumpVolumesCompareAllDay(scenario.getNetwork(), volumesAnalyzer1, volumesAnalyzer2);
 		dumpVolumesCompareTimebins(scenario.getNetwork(), volumesAnalyzer1, volumesAnalyzer2);
+		dumpVolumesCompareEMD(scenario.getNetwork(), volumesAnalyzer1, volumesAnalyzer2);
 	}
 
 	CompareMain(Scenario scenario, EventsManager events) {
@@ -149,6 +177,44 @@ public class CompareMain {
 			}
 		}
 		System.out.println(Math.sqrt(squares));
+	}
+	
+	public static void dumpVolumesCompareEMD(final Network network, VolumesAnalyzer volumesAnalyzer1, VolumesAnalyzer volumesAnalyzer2) {
+		Signature signature1 = makeSignature(network, volumesAnalyzer1);
+		Signature signature2 = makeSignature(network, volumesAnalyzer2);
+		double emd = JFastEMD.distance(signature1, signature2, -1.0);
+		System.out.println(emd);
+	}
+
+	private static Signature makeSignature(Network network, VolumesAnalyzer volumesAnalyzer) {
+		int n = 0;
+		for (Link link : network.getLinks().values()) {
+			int[] volumesForLink = getVolumesForLink(volumesAnalyzer, link);
+			for (int i=0; i<volumesForLink.length;++i) {
+				if (volumesForLink[i] != 0) {
+					++n;
+				}
+			}
+		}
+		Feature[] features = new Feature[n];
+		double[] weights = new double[n];
+		n = 0;
+		for (Link link : network.getLinks().values()) {
+			int[] volumesForLink = getVolumesForLink(volumesAnalyzer, link);
+			for (int i=0; i<volumesForLink.length;++i) {
+				if (volumesForLink[i] != 0) {
+					Feature feature = new VolumeOnLinkFeature(link, i);
+					features[n] = feature;
+					weights[n] = volumesForLink[i];
+					++n;
+				}
+			}
+		}
+		Signature signature = new Signature();
+		signature.setFeatures(features);
+		signature.setNumberOfFeatures(n);
+		signature.setWeights(weights);
+		return signature;
 	}
 
 	public static VolumesAnalyzer runSimulationFromSightings(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings) {

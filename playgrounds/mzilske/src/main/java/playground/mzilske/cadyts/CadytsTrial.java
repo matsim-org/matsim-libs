@@ -62,7 +62,9 @@ public class CadytsTrial {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				return new PlanStrategyImpl(new CadytsPlanChanger(scenario2,context));
+				CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,context);
+				planSelector.setCadytsWeight(10000000);
+				return new PlanStrategyImpl(planSelector);
 			}} ) ;
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(true);

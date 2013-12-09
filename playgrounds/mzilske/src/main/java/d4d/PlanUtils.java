@@ -26,7 +26,7 @@ public class PlanUtils {
 				if (route instanceof NetworkRoute) {
 					lastLinkId = route.getEndLinkId();
 				} else if (route instanceof GenericRoute) {
-					route.setStartLinkId(lastLinkId);
+					((GenericRoute) route).setStartLinkId(lastLinkId);
 					lastLinkId = null;
 				}
 			}
