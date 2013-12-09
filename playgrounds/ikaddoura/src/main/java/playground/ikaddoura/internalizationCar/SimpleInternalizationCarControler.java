@@ -44,8 +44,10 @@ public class SimpleInternalizationCarControler {
 	public static void main(String[] args) throws IOException {
 				
 		if (args.length > 0) {
+			
 			configFile = args[0];		
 			log.info("first argument (config file): "+ configFile);
+			
 			internalization = Boolean.parseBoolean(args[1]);
 			log.info("second argument (enabling internalization: true/false): "+ internalization);
 

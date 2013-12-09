@@ -25,7 +25,9 @@ package playground.ikaddoura.internalizationCar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -38,22 +40,48 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
  *
  */
 public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
+	
+	private final static Logger log = Logger.getLogger(TripAnalysisHandler.class);
 
 	private Map<Id, Double> personId2departureTime = new HashMap<Id, Double>();
-	private double travelTimeSum = 0.;
+	private double totalTravelTimeAllModes = 0.;
+	private double totalTravelTimeCarMode = 0.;
 	private int agentStuckEvents = 0;
+	private int carLegs = 0;
+	private int ptLegs = 0;
+	private int walkLegs = 0;
 	
 	@Override
 	public void reset(int iteration) {
 		this.personId2departureTime.clear();
-		this.travelTimeSum = 0.;
+		this.totalTravelTimeAllModes = 0.;
+		this.totalTravelTimeCarMode = 0.;
 		this.agentStuckEvents = 0;
+		this.carLegs = 0;
+		this.ptLegs = 0;
+		this.walkLegs = 0;
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		double travelTime = event.getTime() - this.personId2departureTime.get(event.getPersonId());
-		travelTimeSum = travelTimeSum + travelTime;
+		
+		totalTravelTimeAllModes = totalTravelTimeAllModes + travelTime;
+		
+		if (event.getLegMode().toString().equals(TransportMode.car)) {
+			totalTravelTimeCarMode = totalTravelTimeCarMode + travelTime;
+			this.carLegs++;
+			
+		} else if (event.getLegMode().toString().equals(TransportMode.pt)) {
+			this.ptLegs++;
+	
+		} else if (event.getLegMode().toString().equals(TransportMode.walk)) {
+			this.walkLegs++;
+		
+		} else {
+			log.warn("Unknown mode. This analysis only allows for 'car', 'pt' and 'walk'. For the simulated public transport, e.g. 'transit_walk' this analysis has to be revised.");
+		}
+	
 	}
 
 	@Override
@@ -66,12 +94,28 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 		agentStuckEvents++;
 	}
 
-	public double getTotalTravelTime() {
-		return travelTimeSum;
+	public double getTotalTravelTimeAllModes() {
+		return totalTravelTimeAllModes;
 	}
 
+	public double getTotalTravelTimeCarMode() {
+		return totalTravelTimeCarMode;
+	}
+	
 	public int getAgentStuckEvents() {
 		return agentStuckEvents;
+	}
+
+	public int getCarLegs() {
+		return carLegs;
+	}
+
+	public int getPtLegs() {
+		return ptLegs;
+	}
+
+	public int getWalkLegs() {
+		return walkLegs;
 	}
 	
 }

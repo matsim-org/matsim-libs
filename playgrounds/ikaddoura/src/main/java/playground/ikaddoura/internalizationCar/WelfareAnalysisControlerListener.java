@@ -70,7 +70,13 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	
 	private Map<Integer, Double> it2tollSum = new TreeMap<Integer, Double>();
 	private Map<Integer, Integer> it2stuckEvents = new TreeMap<Integer, Integer>();
-	private Map<Integer, Double> it2totalTravelTime = new TreeMap<Integer, Double>();
+	private Map<Integer, Double> it2totalTravelTimeAllModes = new TreeMap<Integer, Double>();
+	private Map<Integer, Double> it2totalTravelTimeCarMode = new TreeMap<Integer, Double>();
+	
+	private Map<Integer, Double> it2carLegs = new TreeMap<Integer, Double>();
+	private Map<Integer, Double> it2ptLegs = new TreeMap<Integer, Double>();
+	private Map<Integer, Double> it2walkLegs = new TreeMap<Integer, Double>();
+
 	
 	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
@@ -102,8 +108,12 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		double tollSum = this.moneyHandler.getSumOfMonetaryAmounts();
 		this.it2tollSum.put(event.getIteration(), (-1) * tollSum);
 		this.it2stuckEvents.put(event.getIteration(), this.tripAnalysisHandler.getAgentStuckEvents());
-		this.it2totalTravelTime.put(event.getIteration(), this.tripAnalysisHandler.getTotalTravelTime());
-		
+		this.it2totalTravelTimeAllModes.put(event.getIteration(), this.tripAnalysisHandler.getTotalTravelTimeAllModes());
+		this.it2totalTravelTimeCarMode.put(event.getIteration(), this.tripAnalysisHandler.getTotalTravelTimeCarMode());
+		this.it2carLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getCarLegs());
+		this.it2ptLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getPtLegs());
+		this.it2walkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getWalkLegs());
+						
 		String fileName = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.csv";
 		File file = new File(fileName);
 			
@@ -112,7 +122,8 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 			bw.write("Iteration;" +
 					"User Benefits (LogSum);Number of Invalid Persons (LogSum);Number of Invalid Plans (LogSum);" +
 					"User Benefits (Selected);Number of Invalid Persons (Selected);Number of Invalid Plans (Selected);" +
-					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time (sec);Number of Agent Stuck Events");
+					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time All Modes (sec);Total Travel Time Car Mode (sec);Number of Agent Stuck Events;" +
+					"Car Trips;Pt Trips;Walk Trips");
 			bw.newLine();
 			for (Integer it : this.it2userBenefits_selected.keySet()){
 				bw.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum.get(it)
@@ -120,8 +131,12 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 						+ ";" + this.it2tollSum.get(it)
 						+ ";" + (this.it2userBenefits_logsum.get(it) + this.it2tollSum.get(it))
 						+ ";" + (this.it2userBenefits_selected.get(it) + this.it2tollSum.get(it))
-						+ ";" + this.it2totalTravelTime.get(it)
+						+ ";" + this.it2totalTravelTimeAllModes.get(it)
+						+ ";" + this.it2totalTravelTimeCarMode.get(it)
 						+ ";" + this.it2stuckEvents.get(it)
+						+ ";" + this.it2carLegs.get(it)
+						+ ";" + this.it2ptLegs.get(it)
+						+ ";" + this.it2walkLegs.get(it)
 						);
 				bw.newLine();
 			}
@@ -138,7 +153,12 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		writeGraph("userBenefits_selected", "Monetary Units", it2userBenefits_selected);
 		writeGraph("userBenefits_logsum", "Monetary Units", it2userBenefits_logsum);
 		writeGraph("tollSum", "Monetary Units", it2tollSum);
-		writeGraph("totalTravelTime", "Seconds", it2totalTravelTime);
+		writeGraph("totalTravelTimeAllModes", "Seconds", it2totalTravelTimeAllModes);
+		writeGraph("totalTravelTimeCarMode", "Seconds", it2totalTravelTimeCarMode);
+		writeGraph("carTrips", "Number of Car Trips", it2carLegs);
+		writeGraph("ptTrips", "Number of Pt Trips", it2ptLegs);
+		writeGraph("walkTrips", "Number of Walk Trips", it2walkLegs);
+
 		writeGraphSum("welfare_logsum", "Monetary Units", it2userBenefits_logsum, it2tollSum);
 		writeGraphSum("welfare_selected", "Monetary Units", it2userBenefits_selected, it2tollSum);		
 	}
