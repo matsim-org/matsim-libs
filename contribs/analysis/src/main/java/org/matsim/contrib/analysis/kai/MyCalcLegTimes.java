@@ -77,6 +77,9 @@ public class MyCalcLegTimes implements PersonDepartureEventHandler, PersonArriva
 	// container that contains the sum (to write averages):
 	private final Map<StatType,Map<String,Double>> sumsContainer = new TreeMap<StatType,Map<String,Double>>() ;
 
+	private double controlStatisticsSum;
+	private double controlStatisticsCnt;
+
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
 //	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
@@ -100,7 +103,8 @@ public class MyCalcLegTimes implements PersonDepartureEventHandler, PersonArriva
 						
 			// define the bin boundaries:
 			if ( type==StatType.duration ) {
-				double[] dataBoundariesTmp = {0., 300., 600., 900., 1200., 1500., 1800., 2100., 2400., 2700., 3000., 3300., 3600.} ;
+				double[] dataBoundariesTmp = {0., 300., 600., 900., 1200., 1500., 1800., 2100., 2400., 2700., 3000., 3300., 3600., 
+						3900., 4200., 4500., 4800., 5100., 5400., 5700., 6000., 6300., 6600., 6900., 7200.} ;
 				dataBoundaries.put( type, dataBoundariesTmp ) ;
 			} else if ( type==StatType.durationsOtherBins ) {
 				double[] dataBoundariesTmp = {0., 300., 900., 1800., 2700., 3600.} ;
@@ -147,6 +151,9 @@ public class MyCalcLegTimes implements PersonDepartureEventHandler, PersonArriva
 		Person agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {
 			double travTime = event.getTime() - depTime;
+			controlStatisticsSum += travTime ;
+			controlStatisticsCnt ++ ; 
+			
 			int legNr = this.agentLegs.get(event.getPersonId());
 			Plan plan = agent.getSelectedPlan();
 			int index = (legNr - 1) * 2;
@@ -239,6 +246,9 @@ public class MyCalcLegTimes implements PersonDepartureEventHandler, PersonArriva
 			this.legStatsContainer.get(type).clear() ;
 			this.sumsContainer.get(type).clear() ;
 		}
+		
+		controlStatisticsSum = 0. ;
+		controlStatisticsCnt = 0. ;
 
 	}
 
@@ -305,9 +315,23 @@ public class MyCalcLegTimes implements PersonDepartureEventHandler, PersonArriva
 			
 			if ( first ) { // means there was no data
 				out.write("no legs, therefore no data") ;
+				out.write("\n");
 			}
 			
-			out.write("\n");
+			
+			switch( statType ) {
+			case duration:
+			case durationsOtherBins:
+				out.write("control statistics: average ttime = " + (controlStatisticsSum/controlStatisticsCnt) ) ;
+				out.write("\n");
+				out.write("\n");
+				break;
+			case beelineDistance:
+				break;
+			default:
+				break;
+			}
+			
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} finally {
