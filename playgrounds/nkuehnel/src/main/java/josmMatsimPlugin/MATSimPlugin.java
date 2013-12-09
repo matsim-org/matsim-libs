@@ -13,6 +13,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.osm.visitor.paint.MapRendererFactory;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.MapView;
 import org.openstreetmap.josm.gui.mappaint.MapPaintStyles;
@@ -81,6 +82,10 @@ public class MATSimPlugin extends Plugin {
 		m.add(mi);
 	    }
 	}
+	
+	MapRendererFactory factory = MapRendererFactory.getInstance();
+	factory.register(MapRenderer.class, "My map renderer", "This is is a fast map renderer");
+	factory.activate(MapRenderer.class);
 
     }
 
@@ -93,19 +98,6 @@ public class MATSimPlugin extends Plugin {
 	    toggleDialog = new MATSimToggleDialog();
 	    Main.map.addToggleDialog(toggleDialog);
 	    MapView.addLayerChangeListener(toggleDialog);
-
-//	    URL url = getPluginResourceClassLoader().getResource(
-//		    "resources/matsimStyle.mapcss");
-//
-//	    MapCSSStyleSource style = new MapCSSStyleSource(url.getPath(),
-//		    "matsim_style", "MATSim style");
-	    
-//	    MATSimStyleSource style = new MATSimStyleSource(null, "MATSimStyle", "MATSimStyle");
-//	    
-//	    if (!MapPaintStyles.getStyles().getStyleSources().contains(style)) {
-//		MapPaintStyles.addStyle(style);
-//	    }
-	    
 	}
     }
 
