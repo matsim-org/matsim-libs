@@ -106,6 +106,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                                             routeConfigGroup.getBeelineDistanceFactor())));
             if ( old != null ) {
                 log.error( "inconsistent router configuration for mode "+mainMode );
+                log.error( "One situation which triggers this warning: setting both speed and speedFactor for a mode (this used to be possible)." );
                 throw new RuntimeException( "there was already a module set when trying to set teleporting module for mode "+mainMode+
                         ": "+old );
             }

@@ -49,6 +49,10 @@ public class Count {
 	 * @return the {@link Count}ing station's {@link Volume}.
 	 */
 	public final Volume createVolume(final int h, final double val) {
+		if ( h < 1 ) {
+			throw new RuntimeException( "counts start at 1, not at 0.  If you have a use case where you need to go below one, "
+					+ "let us know and we think about it, but so far we had numerous debugging sessions because someone inserted counts at 0.") ;
+		}
 		// overkill?
 		Volume v = new Volume(h,val);
 		this.volumes.put(Integer.valueOf(h), v);
