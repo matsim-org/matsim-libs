@@ -123,11 +123,11 @@ public class FreightChainGenerator {
 			Future<Plan> submit = threadExecutor.submit(job);
 			listOfJobs.add(submit);
 		}
-		counter.printCounter();
 
 		threadExecutor.shutdown();
 		while(!threadExecutor.isTerminated()){
 		}
+		counter.printCounter();
 
 		/* Aggregate the output plans. */
 		try {
