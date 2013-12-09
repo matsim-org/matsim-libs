@@ -20,6 +20,7 @@
 package org.matsim.contrib.cadyts.general;
 
 import java.util.Map;
+import org.apache.log4j.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
@@ -38,6 +39,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
  * @author mrieser
  */
 public final class CadytsBuilder {
+	private static Logger log = Logger.getLogger( CadytsBuilder.class ) ;
 
 	private CadytsBuilder() {
 		// private Constructor, should not be instantiated
@@ -72,6 +74,10 @@ public final class CadytsBuilder {
 		matsimCalibrator.setVarianceScale(cadytsConfig.getVarianceScale());
 		matsimCalibrator.setBruteForce(cadytsConfig.useBruteForce());
 		matsimCalibrator.setStatisticsFile(config.controler().getOutputDirectory() + "/calibration-stats.txt");
+		
+		matsimCalibrator.setCountFirstLink(true); // yyyyyy
+		matsimCalibrator.setDebugMode(true);
+		matsimCalibrator.setBruteForce(true);
 
 		int arStartTime_s = cadytsConfig.getStartTime(); 
 		int arEndTime_s = cadytsConfig.getEndTime() ;
@@ -79,23 +85,35 @@ public final class CadytsBuilder {
 		
 		
 		int multiple = timeBinSize_s / 3600 ; // e.g. "3" when timeBinSize_s = 3*3600 = 10800
+		
+		log.warn( " adding measurements ...") ;
 
 		//add counts data into calibrator
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
+			log.warn( " adding measurements 2 ...") ;
 			T item = lookUp.lookUp(entry.getKey()) ;
 			int timeBinIndex = 0 ; // starting with zero which is different from the counts file!!!
 			int startTimeOfBin_s = -1 ;
 			double val_passager_h = -1 ;
 			for (Volume volume : entry.getValue().getVolumes().values()){
+				log.warn( " adding measurements 3 ...") ;
 				if ( timeBinIndex%multiple == 0 ) {
 					startTimeOfBin_s = (volume.getHourOfDayStartingWithOne()-1)*3600 ;
 					val_passager_h = 0 ;
 				}
 				val_passager_h += volume.getValue() ;
-				if ( (timeBinIndex%multiple) == (multiple-1) ) {
+				if ( ! ( (timeBinIndex%multiple) == (multiple-1) ) ) {
+					log.warn( " NOT adding measurement: timeBinIndex: " + timeBinIndex + "; multiple: " + multiple ) ;
+				} else {
+					log.warn( " adding measurements 4 ...") ;
 					int endTimeOfBin_s   = volume.getHourOfDayStartingWithOne()*3600 - 1 ;
-					if (startTimeOfBin_s >= arStartTime_s && endTimeOfBin_s <= arEndTime_s) {    //add volumes for each bin to calibrator
+					if ( !( startTimeOfBin_s >= arStartTime_s && endTimeOfBin_s <= arEndTime_s) ) {
+						log.warn( " NOT adding measurement: arStratTime_s: " + arStartTime_s + "; startTimeOfBin_s: " + startTimeOfBin_s +
+								"; endTimeOfBin_s: " + endTimeOfBin_s + "; arEndTime_s: " + arEndTime_s );
+					} else { //add volumes for each bin to calibrator
 						double val = val_passager_h/multiple ;
+						log.warn( "adding measurement: item: " + item.toString() + "; starttime: " + startTimeOfBin_s 
+								+ "; endTime: " + endTimeOfBin_s + "; val: " + val ) ;
 						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, val, 
 								SingleLinkMeasurement.TYPE.FLOW_VEH_H);
 //								SingleLinkMeasurement.TYPE.COUNT_VEH);
@@ -110,7 +128,7 @@ public final class CadytsBuilder {
 				timeBinIndex++ ;
 			}
 		}
-
+		
 		return matsimCalibrator;
 	}
 }

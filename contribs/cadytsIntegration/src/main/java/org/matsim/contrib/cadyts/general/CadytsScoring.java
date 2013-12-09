@@ -34,7 +34,7 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
  * @author nagel
  *
  */
-public class CadytsScoring<T> implements ArbitraryEventScoring {
+public class CadytsScoring<T> implements ArbitraryEventScoring , org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CadytsScoring.class);
 
@@ -55,7 +55,12 @@ public class CadytsScoring<T> implements ArbitraryEventScoring {
 	@Override
 	public void finish() {
 		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(plan);
+		log.warn( " currentPlanSteps.size: " + currentPlanSteps.size() + "; steps:") ;
+		for ( int ii=0 ; ii< currentPlanSteps.size() ; ii++ ) {
+			log.warn( " step: " + ii + "; entry: " + currentPlanSteps.getStep(ii)) ;
+		}
 		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
+		log.warn( "cadytsCorrection: " + currentPlanCadytsCorrection );
 		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection ;
 	}
 

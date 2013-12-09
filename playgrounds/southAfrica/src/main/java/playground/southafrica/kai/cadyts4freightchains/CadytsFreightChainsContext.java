@@ -18,10 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.cadyts4freightchains;
+package playground.southafrica.kai.cadyts4freightchains;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -35,22 +36,18 @@ import org.matsim.contrib.cadyts.general.LookUp;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.demand.Plan;
-import cadyts.demand.PlanBuilder;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
 
-class Item implements Identifiable {
+class Item implements Identifiable, Comparable<Item> {
 	private final Id id;
-	private double cnt = 0. ;
 	Item( Id id ) {
 		this.id = id ;
 	}
@@ -58,109 +55,103 @@ class Item implements Identifiable {
 	public Id getId() {
 		return this.id ;
 	}
-	double getCnt() {
-		return this.cnt ;
+	@Override
+	public int compareTo(Item o) {
+		return id.toString().compareTo( o.getId().toString() ) ;
 	}
-	void incCnt() {
-		cnt++ ;
+	@Override
+	public String toString() {
+		return this.id.toString() ;
 	}
 }
 /**
- * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
- * select plans that better match to given occupancy counts.
  */
-class CadytsFreightChainsContext implements CadytsContextI<Item>, IterationEndsListener {
+class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimListener, IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(CadytsFreightChainsContext.class);
 
 	private final static String LINKOFFSET_FILENAME = "linkCostOffsets.xml";
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 
-	private final PlansTranslator<Item> plansTranslator ;
+	/** 
+	 * this is the method which is able to tell cadyts in which way a particular plan contributes to measurements.  Essentially, it
+	 * follows the plan and registers every time the plan touches a measurement.  Here, there is only one measurement,
+	 * so this is boring (and overkill).
+	 */
+	private final PlansTranslator<Item> plansTranslator = new PlansTranslator<Item>() {
+		@Override
+		public cadyts.demand.Plan<Item> getPlanSteps(org.matsim.api.core.v01.population.Plan plan) {
+			cadyts.demand.PlanBuilder<Item> planBuilder = new cadyts.demand.PlanBuilder<Item>() ;
+			int time = 0 ; // there is no time here but we need to set something 
+			final Item item = getCorrectItemFromPlan(plan);
+//			log.warn( " adding item with id " + item.getId() );
+			planBuilder.addTurn( item, time+1 );
+			planBuilder.addTurn( item, time+2 );
+			planBuilder.addTurn( item, time+3 );
+			// (the meaning of this is that this plan contributes one counts unit to this item)
+
+			return planBuilder.getResult();
+		}
+	} ;
 
 	private final AnalyticalCalibrator<Item> calibrator;
-	private final SimResults<Item> simResults;
+
+	private final SimResultsImpl<Item> simResults ;
 
 	private final Map<Id,Item> itemContainer = new HashMap<Id,Item>() ;
 
-	private final LookUp<Item> lookUp;
+	private final LookUp<Item> lookUp = new LookUp<Item>() {
+		@Override
+		public Item lookUp(Id id) {
+			return itemContainer.get(id) ;
+		}
+	};
 
-	CadytsFreightChainsContext( Config config ) {
+	CadytsFreightChainsContext( Config config, List<Integer> nChainsOfLength ) {
 		// define and register the observations:
 		Counts counts = new Counts() ;
-		for ( int ii=0 ; ii< 20 ; ii++ ) {
+		for ( int ii=0 ; ii<nChainsOfLength.size() ; ii++ ) {
 			Id id = new IdImpl(ii) ;
-
 			Count count = counts.createAndAddCount( id, "chain_of_length_" + Integer.toString(ii) ) ;
-			count.createVolume(0, ii ) ; // fill with real values!
+			int time = 1 ; // dummy
+			long cnt = nChainsOfLength.get(ii) ;
+			count.createVolume(time, cnt ) ;
 
 			// also produce the "items" since we don't have any objects in the simulation to which we can attach the count values:
 			itemContainer.put( id, new Item( id ) ) ;
 		}
 
-		// need to be able to find the items based on the ids (possibly, LookUp should be replaced by a regular map)
-		this.lookUp = new LookUp<Item>() {
-			@Override
-			public Item lookUp(Id id) {
-				return itemContainer.get(id) ;
-			}
-		};
-
 		// build the calibrator. This is a static method, and in consequence has no side effects
 		this.calibrator = CadytsBuilder.buildCalibrator(config, counts , lookUp );
-
-		// prepare the container into which to put results:
-		this.simResults = new SimResults<Item>(){
-			private static final long serialVersionUID = 1L;
-			@Override
-			public double getSimValue(Item item, int time1, int time2, TYPE arg3) {
-				switch( arg3 ) {
-				case COUNT_VEH:
-					return item.getCnt() ;
-					// (we can either put results into the simResults, or attach them to item.  here we are doing the latter)
-				default:
-					throw new RuntimeException("not implemented") ;
-				}
-			}
-		} ;
 		
-		// this is the method which is able to tell cadyts in which way a particular plan contributes to measurements.  Essentially, it
-		// follows the plan and registers every time the plan touches a measurement.  Here, there is only one measurement,
-		// so this is boring (and overkill).
-		this.plansTranslator = new PlansTranslator<Item>() {
-			@Override
-			public Plan<Item> getPlanSteps(org.matsim.api.core.v01.population.Plan plan) {
-				Item item = getCorrectItemFromPlan(plan);
-				
-				PlanBuilder<Item> planBuilder = new PlanBuilder<Item>() ;
-				int time = 0 ; // there is no time here but we need to set something 
-				planBuilder.addEntry( item, time );
-				// (the meaning of this is that this plan contributes one counts unit to this item)
-				
-				return planBuilder.getResult();
-			}
-
-		} ;
-
+		// prepare the sim results container:
+		this.simResults = new SimResultsImpl<Item>( itemContainer.values() ) ;
 	}
 
 	private Item getCorrectItemFromPlan(org.matsim.api.core.v01.population.Plan plan) {
 		int numberOfActs = PopulationUtils.getActivities(plan, null ).size();
-		return itemContainer.get( new IdImpl(numberOfActs) );
+		final Item item = itemContainer.get( new IdImpl(numberOfActs) );
+		if ( item==null ) {
+			log.error("don't have a prepared item for numberOfActs=" + numberOfActs );
+			throw new RuntimeException("error") ;
+		}
+		return item;
+	}
+	@Override
+	public void notifyBeforeMobsim(final BeforeMobsimEvent event ) {
+		this.simResults.reset() ;
 	}
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		// since we have not constructed the output _during_ the mobsim, we need to do it now:
-		for ( Person person : event.getControler().getScenario().getPopulation().getPersons().values() ) {
-			Item item = getCorrectItemFromPlan( person.getSelectedPlan() ) ;
-			item.incCnt() ;
-		}
-		// (the sim results are now in the items, which means that SimResults will return them)
-		// yyyy this is overall not the right way; simResults should store this.
-
 		String analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
 		this.calibrator.setFlowAnalysisFile(analysisFilepath);
 
+		// since we have not constructed the output _during_ the mobsim, we need to do it now:
+		for ( Person person : event.getControler().getScenario().getPopulation().getPersons().values() ) {
+			Item item = getCorrectItemFromPlan( person.getSelectedPlan() ) ;
+			this.simResults.incCnt(item);
+		}
+		log.warn( "simResults for cadyts:\n" + this.simResults.toString() ) ;
 		this.calibrator.afterNetworkLoading(this.simResults);
 		
 		// write some output
@@ -168,7 +159,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, IterationEndsL
 		try {
 			new CadytsCostOffsetsXMLFileIO<Item>( this.lookUp ).write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
-			log.error("Could not write link cost offsets!", e);
+			log.error("Could not write link cost offsets.  Continuing anyway ...", e);
 		}
 	}
 

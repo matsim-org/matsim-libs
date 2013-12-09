@@ -20,4 +20,4 @@
  * @author nagel
  *
  */
-package playground.kai.usecases.cadyts4freightchains;
+package playground.southafrica.kai.cadyts4freightchains;

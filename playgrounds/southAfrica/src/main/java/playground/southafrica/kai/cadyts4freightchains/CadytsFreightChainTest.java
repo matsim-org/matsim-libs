@@ -18,10 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.cadyts4freightchains;
+package playground.southafrica.kai.cadyts4freightchains;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test ;
+import org.junit.Rule;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,6 +43,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -55,9 +62,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.MatsimCountsReader;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import utilities.io.tabularfileparser.TabularFileParser;
 import utilities.misc.DynamicData;
@@ -66,21 +72,20 @@ import utilities.misc.DynamicData;
  * @author nagel
  */
 public class CadytsFreightChainTest {
+	Logger log = Logger.getLogger( CadytsFreightChainTest.class ) ;
 
-//	@Rule
-//	public MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-//	@Test
+	@Test
 	public final void testCalibrationAsScoring() throws IOException {
 		final double beta=30. ;
 		final int lastIteration = 20 ;
 
-//		String inputDir = this.utils.getClassInputDirectory();
-//		String outputDir = this.utils.getOutputDirectory();
-		String inputDir = null ;
-		String outputDir = null ;
+		String outputDir = this.utils.getOutputDirectory();
+		IOUtils.createDirectory(outputDir) ;
 
-		final Config config = createTestConfig(inputDir, outputDir);
+		final Config config = createTestConfig(outputDir);
 
 		config.controler().setLastIteration(lastIteration);
 
@@ -101,14 +106,23 @@ public class CadytsFreightChainTest {
 		final Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
 
-		final CadytsFreightChainsContext cContext = new CadytsFreightChainsContext(config);
+		List<Integer> nChainsOfLength = new ArrayList<Integer>() ;
+		for ( int ii=0 ; ii<=6 ; ii++ ) {
+			nChainsOfLength.add(0) ;
+		}
+		int tmp = 5 ;
+		nChainsOfLength.set(4, tmp ) ;
+		nChainsOfLength.set(5, scenario.getPopulation().getPersons().size() - tmp ) ;
+		
+		
+		final CadytsFreightChainsContext cContext = new CadytsFreightChainsContext(config, nChainsOfLength );
 		controler.addControlerListener(cContext);
 
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy createPlanStrategy(Scenario sc, EventsManager eventsManager) {
 				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Item>(
-						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
+						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 			}
 		} ) ;
 
@@ -116,7 +130,8 @@ public class CadytsFreightChainTest {
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
 				SumScoringFunction sum = new SumScoringFunction() ;
-				return sum ; // dummy
+				sum.addScoringFunction( new CadytsScoring<Item>(plan, config, cContext) ); 
+				return sum ; 
 			}
 		}) ;
 		
@@ -124,59 +139,17 @@ public class CadytsFreightChainTest {
 
 		controler.run();
 
+		Assert.assertNotNull("config is null" , controler.getConfig());
 
-		//scenario data  test
-//		Assert.assertNotNull("config is null" , controler.getConfig());
-//		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
-//		Assert.assertEquals("Different number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
-//
-//		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
-//
-//		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size(), 5);
-//		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().counts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-//
-//		//counts
-//		Assert.assertEquals("Count file is wrong.", controler.getScenario().getConfig().counts().getCountsFileName(), inputDir + "counts5.xml");
-//
-//		Counts occupCounts = new Counts();
-//
-//		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().counts().getCountsFileName());
-//
-//		Count count =  occupCounts.getCount(new IdImpl(19));
-//		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
-//		Assert.assertEquals("CsId is wrong.", count.getCsId() , "link_19");
-//		Assert.assertEquals("Volume of hour 6 is wrong", count.getVolume(7).getValue(), 5.0 , MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 5.0 , MatsimTestUtils.EPSILON);
+		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
+		
+		for ( Person person : controler.getScenario().getPopulation().getPersons().values() ) {
+			log.warn( " person with id: " + person.getId() ) ;
+			for ( Plan plan : person.getPlans() ) {
+				log.warn( " score: " + plan.getScore() + "; plan: " + plan ) ;
+			}
+		}
 
-		// test resulting simulation volumes
-		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".countscompare.txt";
-//		CountsReaderCar reader = new CountsReaderCar(outCounts);
-//		double[] simValues;
-//		double[] realValues;
-//
-//		Id locId11 = new IdImpl(11);
-//		simValues = reader.getSimulatedValues(locId11);
-//		realValues= reader.getRealValues(locId11);
-//		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValues[6], MatsimTestUtils.EPSILON);
-//
-//		Id locId12 = new IdImpl("12");
-//		simValues = reader.getSimulatedValues(locId12);
-//		realValues= reader.getRealValues(locId12);
-//		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Volume of hour 6 is wrong", 0.0, realValues[6] , MatsimTestUtils.EPSILON);
-//
-//		Id locId19 = new IdImpl("19");
-//		simValues = reader.getSimulatedValues(locId19);
-//		realValues= reader.getRealValues(locId19);
-//		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
-//
-//		Id locId21 = new IdImpl("21");
-//		simValues = reader.getSimulatedValues(locId21);
-//		realValues= reader.getRealValues(locId21);
-//		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, simValues[6], MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
 
 		// test calibration statistics
 		String testCalibStatPath = outputDir + "calibration-stats.txt";
@@ -186,7 +159,7 @@ public class CadytsFreightChainTest {
 		CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(lastIteration);
 		// Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
 		// Assert.assertEquals("different Count_ll_pred_err",  "0.01836234363152515" , outStatData.getCount_ll_pred_err() );
-//		Assert.assertEquals("different Link_lambda_avg", "3.2261421242498865E-5", outStatData.getLink_lambda_avg() );
+		Assert.assertEquals("different Link_lambda_avg", "3.2261421242498865E-5", outStatData.getLink_lambda_avg() );
 		//			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
 		//			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
 		//			Assert.assertEquals("different Link_lambda_stddev", "1.261054219517188E-9", outStatData.getLink_lambda_stddev());
@@ -232,14 +205,18 @@ public class CadytsFreightChainTest {
 
 
 
-	private static Config createTestConfig(String inputDir, String outputDir) {
+	private static Config createTestConfig(String outputDir) {
 		Config config = ConfigUtils.createConfig() ;
+		
+		config.controler().setOutputDirectory(outputDir);
 		
 //		ActivityParams params = new ActivityParams("minor") ;
 //		config.planCalcScore().addActivityParams(params);
 		
 		CadytsConfigGroup cadytsConfig = new CadytsConfigGroup() ;
-		cadytsConfig.setTimeBinSize(24*3600) ;
+//		cadytsConfig.setTimeBinSize(3600) ;
+//		cadytsConfig.setStartTime(0);
+//		cadytsConfig.setEndTime(3600);
 		config.addModule(cadytsConfig);
 		
 		return config;
