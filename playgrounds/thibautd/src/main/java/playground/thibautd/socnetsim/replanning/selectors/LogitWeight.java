@@ -60,16 +60,21 @@ public class LogitWeight implements WeightCalculator {
 		double choice = random.nextDouble();
 
 		double value = Math.log( choice );
-		if (value == Double.MIN_VALUE) {
-			LogitSumSelector.log.warn( "underflow 1 for choice "+choice );
-		}
+		checkDouble( value );
 
 		value = Math.log( -value );
-		if (value == Double.MIN_VALUE) {
-			LogitSumSelector.log.warn( "underflow 2 for choice "+choice );
-		}
+		checkDouble( value );
 
-		return -value / scaleParameter;
+		value = -value / scaleParameter;
+		checkDouble( value );
+
+		return value;
+	}
+
+	private static void checkDouble( final double value ) {
+		if ( Double.isInfinite( value ) || Double.isNaN( value ) || Double.MIN_VALUE == value ) {
+			throw new RuntimeException( "problematic value "+value );
+		}
 	}
 
 	public void setScaleParameter(final double scaleParameter) {
