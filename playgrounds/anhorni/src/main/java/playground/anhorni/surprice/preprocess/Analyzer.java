@@ -69,7 +69,7 @@ public class Analyzer {
 	public void writeHeader(String outPath) {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/summary.txt", true)); 
-			bufferedWriter.write("day\tsum\th\tw\ts\tl\te\to");
+			bufferedWriter.write("day\tsum\th\tw\ts\tl\te");
 			bufferedWriter.newLine();			
 		    bufferedWriter.flush();
 		    bufferedWriter.close();
