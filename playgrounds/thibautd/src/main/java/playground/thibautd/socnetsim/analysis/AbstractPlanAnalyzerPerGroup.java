@@ -21,10 +21,8 @@ package playground.thibautd.socnetsim.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -225,7 +223,9 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 	}
 
 	private static final class History {
-		private final List<Integer> iterationNumbers = new ArrayList<Integer>();
+		private int currentIter = Integer.MIN_VALUE;
+
+		private int[] iterationNumbers = new int[0];
 
 		private double[] sumsAverages = new double[0];
 		private int[] countsAverages = new int[0];
@@ -241,15 +241,11 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 
 
 		public void notifyIteration(final int iteration) {
-			if (iterationNumbers.contains( iteration )) {
-				if ( iterationNumbers.indexOf( iteration ) != iterationNumbers.size() - 1 ) {
-					throw new IllegalArgumentException(
-							iteration+" is not the last element of "+iterationNumbers );
-				}
-				return;
-			}
+			if ( currentIter == iteration ) return;
 
-			iterationNumbers.add( iteration );
+			currentIter = iteration;
+			iterationNumbers = Arrays.copyOf( iterationNumbers , iterationNumbers.length + 1 );
+			iterationNumbers[ iterationNumbers.length - 1 ] = currentIter;
 
 			sumsAverages = Arrays.copyOf( sumsAverages , sumsAverages.length + 1 );
 			countsAverages = Arrays.copyOf( countsAverages , countsAverages.length + 1 );
@@ -337,10 +333,10 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 		}
 
 		public double[] getIterations() {
-			final double[] iters = new double[ iterationNumbers.size() ];
+			final double[] iters = new double[ iterationNumbers.length ];
 			
 			int i=0;
-			for (Integer d : iterationNumbers) iters[ i++ ] = d;
+			for (int d : iterationNumbers) iters[ i++ ] = d;
 
 			return iters;
 		}
