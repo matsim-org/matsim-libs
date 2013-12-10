@@ -90,7 +90,6 @@ CadytsContextI<TransitStopFacility> {
 
 		// === prepare the structure which extracts the measurements from the simulation:
 		// since there is already some other method, we just need to write a wrapper.
-		
 		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedItems(), cadytsConfig.getTimeBinSize() );
 		events.addHandler(this.cadytsPtOccupAnalyzer);
 
@@ -119,6 +118,7 @@ CadytsContextI<TransitStopFacility> {
 				return cadytsPtOccupAnalyzer.toString() ;
 			}
 		} ;
+		// === end wrapper ===
 
 	}
 
@@ -206,52 +206,54 @@ CadytsContextI<TransitStopFacility> {
 
 
 		PtCountsConfigGroup ptCountsConfig = config.ptCounts();
-		if (ptCountsConfig.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration. kai,oct'10
-			Controler controler = event.getControler();
-			int iter = event.getIteration();
-
-			controler.stopwatch.beginOperation("compare with pt counts");
-
-			Network network = controler.getNetwork();
-			CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer, this.occupCounts,
-					network, config.ptCounts().getCountsScaleFactor());
-
-			Double distanceFilter = ptCountsConfig.getDistanceFilter();
-			String distanceFilterCenterNodeId  = ptCountsConfig.getDistanceFilterCenterNode();
-			if ((distanceFilter != null) && (distanceFilterCenterNodeId != null)) {
-				ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
-			}
-
-			ccaOccupancy.calculateComparison();
-
-			String outputFormat = ptCountsConfig.getOutputFormat();
-			if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-				OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
-
-				String filename = ctlIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
-				final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(config
-						.global().getCoordinateSystem(), TransformationFactory.WGS84);
-				PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(null,
-						null, ccaOccupancy.getComparison(), coordTransform, null, null, 
-						this.occupCounts);
-
-				//					CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), network, coordTransform) ;
-				// will not work since "network" contains the wrong information.
-
-				kmlWriter.setIterationNumber(iter);
-				kmlWriter.writeFile(filename);
-			}
-
-			if (outputFormat.contains("txt") || outputFormat.contains("all")) {
-				//  As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
-				//  yyyyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
-				//  See near beginning of method.  kai, feb'13 
-				OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
-				ccaOccupancy.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
-			}
-
-			controler.stopwatch.endOperation("compare with pt counts");
+		if (ptCountsConfig.getOccupancyCountsFileName() == null) { // yyyy this check should reasonably also be done in isActiveInThisIteration. kai,oct'10
+			log.warn("generateAndWriteCountsComparisons() does not work since occupancy counts file name not given ") ;
+			return ;
 		}
+		Controler controler = event.getControler();
+		int iter = event.getIteration();
+
+		controler.stopwatch.beginOperation("compare with pt counts");
+
+		Network network = controler.getNetwork();
+		CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer,
+				this.occupCounts, network, config.ptCounts().getCountsScaleFactor());
+
+		Double distanceFilter = ptCountsConfig.getDistanceFilter();
+		String distanceFilterCenterNodeId  = ptCountsConfig.getDistanceFilterCenterNode();
+		if ((distanceFilter != null) && (distanceFilterCenterNodeId != null)) {
+			ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+		}
+
+		ccaOccupancy.calculateComparison();
+
+		String outputFormat = ptCountsConfig.getOutputFormat();
+		if (outputFormat.contains("kml") || outputFormat.contains("all")) {
+			OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
+
+			String filename = ctlIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
+			final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(config
+					.global().getCoordinateSystem(), TransformationFactory.WGS84);
+			PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(null,
+					null, ccaOccupancy.getComparison(), coordTransform, null, null, 
+					this.occupCounts);
+
+			//					CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(ccaOccupancy.getComparison(), network, coordTransform) ;
+			// will not work since "network" contains the wrong information.
+
+			kmlWriter.setIterationNumber(iter);
+			kmlWriter.writeFile(filename);
+		}
+
+		if (outputFormat.contains("txt") || outputFormat.contains("all")) {
+			//  As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
+			//  yyyyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
+			//  See near beginning of method.  kai, feb'13 
+			OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
+			ccaOccupancy.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
+		}
+
+		controler.stopwatch.endOperation("compare with pt counts");
 	}
 
 	public AnalyticalCalibrator<TransitStopFacility> getCalibrator() {

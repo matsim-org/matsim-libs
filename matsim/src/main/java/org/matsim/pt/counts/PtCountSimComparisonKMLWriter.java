@@ -155,7 +155,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 		this.alightCounts = alightCounts;
 		this.occupancyCounts = occupancyCounts;
 	}
-
+	
 	/**
 	 * This method initializes the styles for the different icons used.
 	 */

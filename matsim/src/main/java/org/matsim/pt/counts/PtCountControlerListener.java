@@ -20,6 +20,11 @@
 
 package org.matsim.pt.counts;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -34,6 +39,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.config.PtCountsConfigGroup;
@@ -108,51 +114,68 @@ BeforeMobsimListener, AfterMobsimListener  {
 	private boolean isActiveInThisIteration( int iter , Controler controler ) {
         return iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0 && iter >= controler.getFirstIteration();
     }
+	
+	private static enum CountType { Boarding, Alighting, Occupancy } ;
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
+		// yy someone should re-write this using code re-use instead of calling everything thrice.
+		// yy and maybe even better, just generalize the car counts infrastructure. kai, dec'13
+		
 		PtCountsConfigGroup ptCounts = this.config.ptCounts() ;
 		if (ptCounts.getAlightCountsFileName() != null) { // yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10
 			Controler controler = event.getControler();
 			int iter = event.getIteration();
 			if ( isActiveInThisIteration( iter, controler ) ) {
 
-//				if ( this.config.ptCounts().getPtCountsInterval() != 10 )
-//					log.warn("yyyy This may not work when the pt counts interval is different from 10 because I think I changed things at two "
-//							+ "places but I can't find the other one any more :-(.  (May just be inefficient.)  kai, oct'10" ) ;
-
 				controler.stopwatch.beginOperation(OPERATION_COMPAREPTCOUNTS);
 
 				double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
 				Network network = controler.getNetwork();
-				PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.occupancyAnalyzer, this.boardCounts, network, countsScaleFactor);
-				PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.occupancyAnalyzer, this.alightCounts, network, countsScaleFactor);
-				PtCountsComparisonAlgorithm ccaOccupancy = new PtOccupancyCountComparisonAlgorithm(this.occupancyAnalyzer, this.occupancyCounts, network, countsScaleFactor);
+				
+				Map<CountType,PtCountsComparisonAlgorithm> cca = new HashMap<CountType,PtCountsComparisonAlgorithm>() ;
+				if (ptCounts.getBoardCountsFileName() != null) {
+					cca.put( CountType.Boarding, new PtBoardCountComparisonAlgorithm(this.occupancyAnalyzer, this.boardCounts, network, countsScaleFactor) ) ;
+				}
+				if (ptCounts.getAlightCountsFileName() != null) { 
+					// yyyy this check should reasonably also be done in isActiveInThisIteration.  kai, oct'10
+					// ?? kai, dec'13
+					cca.put( CountType.Alighting, new PtAlightCountComparisonAlgorithm(this.occupancyAnalyzer, this.alightCounts, network, countsScaleFactor) ) ;
+				}
+				if (ptCounts.getOccupancyCountsFileName() != null) {
+					cca.put( CountType.Occupancy, new PtOccupancyCountComparisonAlgorithm(this.occupancyAnalyzer, this.occupancyCounts, network, countsScaleFactor) ) ;
+				}
 
 				String distanceFilterStr = this.config.findParam(MODULE_NAME, "distanceFilter");
 				String distanceFilterCenterNodeId = this.config.findParam(MODULE_NAME, "distanceFilterCenterNode");
-				if ((distanceFilterStr != null)
-						&& (distanceFilterCenterNodeId != null)) {
+				if ((distanceFilterStr != null) && (distanceFilterCenterNodeId != null)) {
 					Double distanceFilter = Double.valueOf(distanceFilterStr);
-					ccaBoard.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
-					ccaAlight.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
-					ccaOccupancy.setDistanceFilter(distanceFilter, distanceFilterCenterNodeId);
+					for ( PtCountsComparisonAlgorithm algo : cca.values() ) {
+						algo.setDistanceFilter( distanceFilter, distanceFilterCenterNodeId ) ;
+					}
 				}
-
-				ccaBoard.setCountsScaleFactor(countsScaleFactor);
-				ccaAlight.setCountsScaleFactor(countsScaleFactor);
-				ccaOccupancy.setCountsScaleFactor(countsScaleFactor);
-
-				ccaBoard.run();
-				ccaAlight.run();
-				ccaOccupancy.run();
+				for ( PtCountsComparisonAlgorithm algo : cca.values() ) {
+					algo.setCountsScaleFactor(countsScaleFactor);
+					algo.run();
+				}
 
 				String outputFormat = this.config.findParam(MODULE_NAME, "outputformat");
 				if (outputFormat.contains("kml") || outputFormat.contains("all")) {
 					OutputDirectoryHierarchy ctlIO=controler.getControlerIO();
 
 					String filename = ctlIO.getIterationFilename(iter, "ptcountscompare.kmz");
-					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaBoard.getComparison(), ccaAlight.getComparison(), ccaOccupancy.getComparison(),
+					
+					// yy would be good to also just pass a collection/a map but we ain't there. kai, dec'13
+					Map< CountType, List<CountSimComparison> > comparisons = new HashMap< CountType, List<CountSimComparison> > () ;
+					for ( CountType countType : CountType.values()  ) {
+						if ( cca.get( countType ) != null ) {
+							comparisons.put( countType, cca.get(countType).getComparison() ) ;
+						}
+					}
+					// the following should work since comparisons.get(...) for material that does not exist should return null, which should be a valid 
+					// parameter.  kai, dec'13
+					PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(comparisons.get(CountType.Boarding), 
+							comparisons.get(CountType.Alighting), comparisons.get(CountType.Occupancy),
 							TransformationFactory.getCoordinateTransformation(this.config.global().getCoordinateSystem(),TransformationFactory.WGS84),
 							this.boardCounts, this.alightCounts,occupancyCounts);
 
@@ -162,14 +185,9 @@ BeforeMobsimListener, AfterMobsimListener  {
 				if (outputFormat.contains("txt") || outputFormat.contains("all")) {
 					OutputDirectoryHierarchy ctlIO=controler.getControlerIO();
 					
-					if (ccaBoard != null) {
-						ccaBoard.write(ctlIO.getIterationFilename(iter, "simCountCompareBoarding.txt"));
-					}
-					if (ccaAlight != null) {
-						ccaAlight.write(ctlIO.getIterationFilename(iter, "simCountCompareAlighting.txt"));
-					}
-					if (ccaOccupancy != null) {
-						ccaOccupancy.write(ctlIO.getIterationFilename(iter,	"simCountCompareOccupancy.txt"));
+					for ( Entry<CountType,PtCountsComparisonAlgorithm> entry : cca.entrySet() ) {
+						PtCountsComparisonAlgorithm algo = entry.getValue() ;
+						algo.write( ctlIO.getIterationFilename(iter, "simCountCompare" + entry.getKey().toString() + ".txt") ) ;
 					}
 				}
 
