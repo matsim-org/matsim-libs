@@ -70,6 +70,7 @@ import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
@@ -78,6 +79,7 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFi
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
@@ -268,7 +270,21 @@ public class RunCliquesWithModularStrategies {
 
 		// init strategies
 		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
-		RunUtils.loadStrategyRegistryFromGroupStrategyConfigGroup( strategyRegistry , controllerRegistry );
+		final AnnealingCoalitionExpBetaFactory annealingSelectorFactory =
+			new AnnealingCoalitionExpBetaFactory(
+				10000, // TODO pass by config
+				config.planCalcScore().getBrainExpBeta(),
+				config.controler().getFirstIteration(),
+				weights.getDisableInnovationAfterIter() );
+
+		{
+			final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
+			factories.addSelectorFactory( "AnnealingCoalitionExpBeta" , annealingSelectorFactory );
+			RunUtils.loadStrategyRegistryFromGroupStrategyConfigGroup(
+					factories,
+					strategyRegistry,
+					controllerRegistry );
+		}
 
 		// create strategy manager
 		final GroupStrategyManager strategyManager =
@@ -282,6 +298,7 @@ public class RunCliquesWithModularStrategies {
 					new GroupReplanningListenner(
 						controllerRegistry,
 						strategyManager));
+		controller.addControlerListener( annealingSelectorFactory );
 
 		strategyManager.setStopWatch( controller.stopwatch );
 

@@ -83,12 +83,11 @@ public class RunUtils {
 	}
 
 	public static void loadStrategyRegistryFromGroupStrategyConfigGroup(
+			final GroupPlanStrategyFactoryRegistry factories, 
 			final GroupStrategyRegistry strategyRegistry,
 			final ControllerRegistry controllerRegistry) {
 		final Config config = controllerRegistry.getScenario().getConfig();
 		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup) config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-
-		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
 
 		strategyRegistry.setExtraPlanRemover(
 				factories.createRemover(
