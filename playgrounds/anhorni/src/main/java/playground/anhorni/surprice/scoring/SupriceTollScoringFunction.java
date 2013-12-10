@@ -19,10 +19,13 @@
 
 package playground.anhorni.surprice.scoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import playground.anhorni.surprice.analysis.Analyzer;
 
 public class SupriceTollScoringFunction implements MoneyScoring, BasicScoring {
 
@@ -49,13 +52,14 @@ public class SupriceTollScoringFunction implements MoneyScoring, BasicScoring {
 
 	@Override
 	public void addMoney(final double amount) {
-		this.score -= amount * this.dudm;
+		//this.score -= amount * this.dudm;
+		this.score = amount * this.dudm; // amount comes negative!
 		
 		double prevVal = 0.0;
 		if (this.person.getCustomAttributes().get(day + ".tollScore") != null) {
 			prevVal = (Double)this.person.getCustomAttributes().get(day + ".tollScore");
 		}		
-		this.person.getCustomAttributes().put(day + ".tollScore", prevVal - amount * this.dudm);
+		this.person.getCustomAttributes().put(day + ".tollScore", prevVal + amount * this.dudm);
 	}
 
 	@Override
