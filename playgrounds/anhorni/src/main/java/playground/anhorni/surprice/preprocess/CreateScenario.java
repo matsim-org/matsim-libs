@@ -546,11 +546,12 @@ public class CreateScenario {
 		// create marginal utility of money		
 		log.info("creating preferences");
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {	
-			double offset = (0.5 - random.nextDouble()) * 0.5; // -0.25 .. 0.25
-			double nullOffset = 0.25;
-			double totalOffset = offset + nullOffset;
-			double dudm = (Double)(this.incomes.getAttribute(person.getId().toString(), "income")) + totalOffset;
-			double dudmNormalized = dudm / 1.5;
+			//double offset = (0.5 - random.nextDouble()) * 0.5; // -0.25 .. 0.25
+			//double nullOffset = 0.25;
+			//double totalOffset = offset + nullOffset;
+			//double dudm = (Double)(this.incomes.getAttribute(person.getId().toString(), "income")) + totalOffset;
+			//double dudmNormalized = dudm / 1.5;
+			double dudmNormalized = 1.1 - (Double)(this.incomes.getAttribute(person.getId().toString(), "income"));
 			this.preferences.putAttribute(person.getId().toString(), "dudm", dudmNormalized);
 		}
 		this.writePreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
