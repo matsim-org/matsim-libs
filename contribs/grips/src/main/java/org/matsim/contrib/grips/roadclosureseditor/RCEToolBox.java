@@ -56,8 +56,7 @@ import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.shape.LineShape;
 import org.matsim.contrib.grips.simulation.SimulationMask;
 
-public class RCEToolBox extends AbstractToolBox
-{
+public class RCEToolBox extends AbstractToolBox {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField blockFieldLink1hh;
@@ -81,8 +80,7 @@ public class RCEToolBox extends AbstractToolBox
 	private Id currentLinkId2 = null;
 	private HashMap<Id, String> roadClosures;
 
-	public RCEToolBox(AbstractModule module, Controller controller)
-	{
+	public RCEToolBox(AbstractModule module, Controller controller) {
 		super(module, controller);
 
 		this.setLayout(new BorderLayout());
@@ -92,10 +90,10 @@ public class RCEToolBox extends AbstractToolBox
 
 		this.blockPanel = new JPanel(new GridLayout(18, 2));
 
-		this.blockFieldLink1hh = new JTextField("--");
-		this.blockFieldLink1mm = new JTextField("--");
-		this.blockFieldLink2hh = new JTextField("--");
-		this.blockFieldLink2mm = new JTextField("--");
+		this.blockFieldLink1hh = new JTextField("0");
+		this.blockFieldLink1mm = new JTextField("0");
+		this.blockFieldLink2hh = new JTextField("0");
+		this.blockFieldLink2mm = new JTextField("0");
 		this.blockButtonOK = new JButton(locale.btOK());
 
 		this.blockPanel.setSize(new Dimension(200, 200));
@@ -115,50 +113,38 @@ public class RCEToolBox extends AbstractToolBox
 
 		this.roadClosures = new HashMap<Id, String>();
 
-		this.blockButtonOK.addActionListener(new ActionListener()
-		{
-
+		this.blockButtonOK.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				updateRoadClosure();
-
 			}
 		});
 
-		this.cbLink1.addActionListener(new ActionListener()
-		{
+		this.cbLink1.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				RCEToolBox.this.saveLink1 = !RCEToolBox.this.saveLink1;
 
-				if (RCEToolBox.this.saveLink1)
-				{
+				if (RCEToolBox.this.saveLink1) {
 					RCEToolBox.this.blockFieldLink1hh.setEnabled(true);
 					RCEToolBox.this.blockFieldLink1mm.setEnabled(true);
 
-				} else
-				{
+				} else {
 					RCEToolBox.this.blockFieldLink1hh.setEnabled(false);
 					RCEToolBox.this.blockFieldLink1mm.setEnabled(false);
 				}
 			}
 		});
 
-		this.cbLink2.addActionListener(new ActionListener()
-		{
+		this.cbLink2.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				RCEToolBox.this.saveLink2 = !RCEToolBox.this.saveLink2;
 
-				if (RCEToolBox.this.saveLink2)
-				{
+				if (RCEToolBox.this.saveLink2) {
 					RCEToolBox.this.blockFieldLink2hh.setEnabled(true);
 					RCEToolBox.this.blockFieldLink2mm.setEnabled(true);
-				} else
-				{
+				} else {
 					RCEToolBox.this.blockFieldLink2hh.setEnabled(false);
 					RCEToolBox.this.blockFieldLink2mm.setEnabled(false);
 				}
@@ -215,7 +201,7 @@ public class RCEToolBox extends AbstractToolBox
 		this.add(this.blockPanel, BorderLayout.CENTER);
 
 		this.openBtn = new JButton(locale.btOpen());
-		
+
 		if (this.controller.isStandAlone())
 			panel.add(this.openBtn);
 
@@ -230,19 +216,16 @@ public class RCEToolBox extends AbstractToolBox
 
 	}
 
-	class TypeHour implements KeyListener
-	{
+	class TypeHour implements KeyListener {
 
 		@Override
-		public void keyTyped(KeyEvent e)
-		{
+		public void keyTyped(KeyEvent e) {
 			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
 				e.consume();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e)
-		{
+		public void keyReleased(KeyEvent e) {
 
 			JTextField src = (JTextField) e.getSource();
 
@@ -254,18 +237,15 @@ public class RCEToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e)
-		{
+		public void keyPressed(KeyEvent e) {
 
 		}
 	}
 
-	class CheckHour implements FocusListener
-	{
+	class CheckHour implements FocusListener {
 
 		@Override
-		public void focusGained(FocusEvent e)
-		{
+		public void focusGained(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			src.setSelectionStart(0);
 			src.setSelectionEnd(src.getText().length());
@@ -273,8 +253,7 @@ public class RCEToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void focusLost(FocusEvent e)
-		{
+		public void focusLost(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			String text = src.getText();
 
@@ -287,12 +266,10 @@ public class RCEToolBox extends AbstractToolBox
 
 	}
 
-	class CheckMinute implements FocusListener
-	{
+	class CheckMinute implements FocusListener {
 
 		@Override
-		public void focusGained(FocusEvent e)
-		{
+		public void focusGained(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 			src.setSelectionStart(0);
 			src.setSelectionEnd(src.getText().length());
@@ -300,8 +277,7 @@ public class RCEToolBox extends AbstractToolBox
 		}
 
 		@Override
-		public void focusLost(FocusEvent e)
-		{
+		public void focusLost(FocusEvent e) {
 			JTextField src = (JTextField) e.getSource();
 
 			String text = src.getText();
@@ -315,53 +291,54 @@ public class RCEToolBox extends AbstractToolBox
 
 	}
 
-	class TypeMinute implements KeyListener
-	{
+	class TypeMinute implements KeyListener {
 
 		@Override
-		public void keyTyped(KeyEvent e)
-		{
+		public void keyTyped(KeyEvent e) {
 			if (!Character.toString(e.getKeyChar()).matches("[0-9]"))
 				e.consume();
 		}
 
 		@Override
-		public void keyReleased(KeyEvent e)
-		{
+		public void keyReleased(KeyEvent e) {
 		}
 
 		@Override
-		public void keyPressed(KeyEvent e)
-		{
+		public void keyPressed(KeyEvent e) {
 		}
 	}
 
-	public void updateRoadClosure()
-	{
+	public void updateRoadClosure() {
 		String shapeID;
-		int secondaryLayerID = this.controller.getVisualizer().getSecondaryShapeRenderLayer().getId();
+		int secondaryLayerID = this.controller.getVisualizer()
+				.getSecondaryShapeRenderLayer().getId();
 
-		if ((this.currentLinkId1 != null))
-		{
-			if (this.cbLink1.isSelected())
-			{
-				if (this.roadClosures.get(this.currentLinkId1) == null)
-				{
-					Link link = this.controller.getScenario().getNetwork().getLinks().get(currentLinkId1);
-					Point2D c0 = this.controller.coordToPoint(link.getFromNode().getCoord());
-					Point2D c1 = this.controller.coordToPoint(link.getToNode().getCoord());
-					LineShape shape = ShapeFactory.getRoadClosureShape(secondaryLayerID, currentLinkId1.toString(), c0, c1);
+		if ((this.currentLinkId1 != null)) {
+			if (this.cbLink1.isSelected()) {
+				if (this.roadClosures.get(this.currentLinkId1) == null) {
+					Link link = this.controller.getScenario().getNetwork()
+							.getLinks().get(currentLinkId1);
+					Point2D c0 = this.controller.coordToPoint(link
+							.getFromNode().getCoord());
+					Point2D c1 = this.controller.coordToPoint(link.getToNode()
+							.getCoord());
+					LineShape shape = ShapeFactory
+							.getRoadClosureShape(secondaryLayerID,
+									currentLinkId1.toString(), c0, c1);
 					this.controller.addShape(shape);
-					this.controller.getVisualizer().getSecondaryShapeRenderLayer().updatePixelCoordinates(shape);
+					this.controller.getVisualizer()
+							.getSecondaryShapeRenderLayer()
+							.updatePixelCoordinates(shape);
 				}
-				this.roadClosures.put(this.currentLinkId1, this.blockFieldLink1hh.getText() + ":" + this.blockFieldLink1mm.getText());
+				this.roadClosures.put(this.currentLinkId1,
+						this.blockFieldLink1hh.getText() + ":"
+								+ this.blockFieldLink1mm.getText());
 
-			} else
-			{
-				shapeID = Constants.ID_ROADCLOSURE_PREFIX + currentLinkId1.toString();
-				
-				if (this.roadClosures.get(this.currentLinkId1) != null)
-				{
+			} else {
+				shapeID = Constants.ID_ROADCLOSURE_PREFIX
+						+ currentLinkId1.toString();
+
+				if (this.roadClosures.get(this.currentLinkId1) != null) {
 					this.controller.removeShape(shapeID);
 				}
 
@@ -370,26 +347,31 @@ public class RCEToolBox extends AbstractToolBox
 
 		}
 
-		if ((this.currentLinkId2 != null))
-		{
-			if (this.cbLink2.isSelected())
-			{
-				if (this.roadClosures.get(this.currentLinkId2) == null)
-				{
-					Link link = this.controller.getScenario().getNetwork().getLinks().get(currentLinkId2);
-					Point2D c0 = this.controller.coordToPoint(link.getFromNode().getCoord());
-					Point2D c1 = this.controller.coordToPoint(link.getToNode().getCoord());
-					LineShape shape = ShapeFactory.getRoadClosureShape(secondaryLayerID, currentLinkId2.toString(), c1, c0);
+		if ((this.currentLinkId2 != null)) {
+			if (this.cbLink2.isSelected()) {
+				if (this.roadClosures.get(this.currentLinkId2) == null) {
+					Link link = this.controller.getScenario().getNetwork()
+							.getLinks().get(currentLinkId2);
+					Point2D c0 = this.controller.coordToPoint(link
+							.getFromNode().getCoord());
+					Point2D c1 = this.controller.coordToPoint(link.getToNode()
+							.getCoord());
+					LineShape shape = ShapeFactory
+							.getRoadClosureShape(secondaryLayerID,
+									currentLinkId2.toString(), c1, c0);
 					this.controller.addShape(shape);
-					this.controller.getVisualizer().getSecondaryShapeRenderLayer().updatePixelCoordinates(shape);
+					this.controller.getVisualizer()
+							.getSecondaryShapeRenderLayer()
+							.updatePixelCoordinates(shape);
 				}
 
-				this.roadClosures.put(this.currentLinkId2, this.blockFieldLink2hh.getText() + ":" + this.blockFieldLink2mm.getText());
-			} else
-			{
-				shapeID = Constants.ID_ROADCLOSURE_PREFIX + currentLinkId2.toString();
-				if (this.roadClosures.get(this.currentLinkId2) != null)
-				{
+				this.roadClosures.put(this.currentLinkId2,
+						this.blockFieldLink2hh.getText() + ":"
+								+ this.blockFieldLink2mm.getText());
+			} else {
+				shapeID = Constants.ID_ROADCLOSURE_PREFIX
+						+ currentLinkId2.toString();
+				if (this.roadClosures.get(this.currentLinkId2) != null) {
 					this.controller.removeShape(shapeID);
 				}
 
@@ -401,14 +383,11 @@ public class RCEToolBox extends AbstractToolBox
 		this.saveButton.setEnabled(this.roadClosures.size() > 0);
 
 	}
-	
 
 	@Override
-	public void updateMask()
-	{
+	public void updateMask() {
 
-		if (this.controller.isEditMode())
-		{
+		if (this.controller.isEditMode()) {
 			this.cbLink1.setEnabled(true);
 			this.cbLink2.setEnabled(true);
 			this.blockButtonOK.setEnabled(true);
@@ -416,19 +395,18 @@ public class RCEToolBox extends AbstractToolBox
 			setLink1Id(this.controller.getTempLinkId(0));
 			setLink2Id(this.controller.getTempLinkId(1));
 
-		} else
-		{
+		} else {
 			this.cbLink1.setEnabled(false);
 			this.cbLink2.setEnabled(false);
 			this.blockButtonOK.setEnabled(false);
 
-			this.blockFieldLink1hh.setText("--");
-			this.blockFieldLink1mm.setText("--");
+			this.blockFieldLink1hh.setText("0");
+			this.blockFieldLink1mm.setText("0");
 			this.blockFieldLink1hh.setEnabled(false);
 			this.blockFieldLink1mm.setEnabled(false);
 
-			this.blockFieldLink2hh.setText("--");
-			this.blockFieldLink2mm.setText("--");
+			this.blockFieldLink2hh.setText("0");
+			this.blockFieldLink2mm.setText("0");
 			this.blockFieldLink2hh.setEnabled(false);
 			this.blockFieldLink2mm.setEnabled(false);
 
@@ -444,41 +422,33 @@ public class RCEToolBox extends AbstractToolBox
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		if (e.getActionCommand() == locale.btOpen())
-		{
+	public void actionPerformed(ActionEvent e) {
+		if (e.getActionCommand() == locale.btOpen()) {
 			final JFileChooser fc = new JFileChooser();
-			fc.setFileFilter(new FileFilter()
-			{
+			fc.setFileFilter(new FileFilter() {
 
 				@Override
-				public String getDescription()
-				{
+				public String getDescription() {
 					return "MATSim config file";
 				}
 
 				@Override
-				public boolean accept(File f)
-				{
-					if (f.isDirectory())
-					{
+				public boolean accept(File f) {
+					if (f.isDirectory()) {
 						return true;
 					}
-					if (f.getName().endsWith("xml"))
-					{
+					if (f.getName().endsWith("xml")) {
 						return true;
 					}
 					return false;
 				}
 			});
 
-		} else if (e.getActionCommand() == locale.btSave())
-		{
-			if (this.roadClosures.size() > 0)
-			{
-				boolean saved = ConfigIO.saveRoadClosures(controller, roadClosures);
-				//TODO add confirmation dialog?
+		} else if (e.getActionCommand() == locale.btSave()) {
+			if (this.roadClosures.size() > 0) {
+				boolean saved = ConfigIO.saveRoadClosures(controller,
+						roadClosures);
+				// TODO add confirmation dialog?
 
 			}
 		}
@@ -490,26 +460,24 @@ public class RCEToolBox extends AbstractToolBox
 	 * 
 	 * @param id
 	 */
-	public void setLink1Id(Id id)
-	{
-		if (id != null)
-		{
+	public void setLink1Id(Id id) {
+		if (id != null) {
 			this.cbLink1.setText(id.toString());
 			this.currentLinkId1 = id;
 
-			if (this.roadClosures.containsKey(id))
-			{
+			if (this.roadClosures.containsKey(id)) {
 				this.cbLink1.setSelected(true);
 				this.blockFieldLink1hh.setEnabled(true);
 				this.blockFieldLink1mm.setEnabled(true);
 
-				this.blockFieldLink1hh.setText(this.roadClosures.get(id).substring(0, 2));
-				this.blockFieldLink1mm.setText(this.roadClosures.get(id).substring(3, 5));
+				this.blockFieldLink1hh.setText(this.roadClosures.get(id)
+						.substring(0, 2));
+				this.blockFieldLink1mm.setText(this.roadClosures.get(id)
+						.substring(3, 5));
 
 				this.saveLink1 = true;
 			}
-		} else
-		{
+		} else {
 			this.blockFieldLink1hh.setText("--");
 			this.blockFieldLink1mm.setText("--");
 			this.blockFieldLink1hh.setEnabled(false);
@@ -526,26 +494,24 @@ public class RCEToolBox extends AbstractToolBox
 	 * 
 	 * @param id
 	 */
-	public void setLink2Id(Id id)
-	{
-		if (id != null)
-		{
+	public void setLink2Id(Id id) {
+		if (id != null) {
 			this.cbLink2.setText(id.toString());
 			this.currentLinkId2 = id;
 
-			if (this.roadClosures.containsKey(id))
-			{
+			if (this.roadClosures.containsKey(id)) {
 				this.cbLink2.setSelected(true);
 				this.blockFieldLink2hh.setEnabled(true);
 				this.blockFieldLink2mm.setEnabled(true);
 
-				this.blockFieldLink2hh.setText(this.roadClosures.get(id).substring(0, 2));
-				this.blockFieldLink2mm.setText(this.roadClosures.get(id).substring(3, 5));
+				this.blockFieldLink2hh.setText(this.roadClosures.get(id)
+						.substring(0, 2));
+				this.blockFieldLink2mm.setText(this.roadClosures.get(id)
+						.substring(3, 5));
 
 				this.saveLink2 = true;
 			}
-		} else
-		{
+		} else {
 			this.blockFieldLink2hh.setText("--");
 			this.blockFieldLink2mm.setText("--");
 			this.blockFieldLink2hh.setEnabled(false);
