@@ -148,7 +148,12 @@ public class CadytsIntegrationTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
+				 final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario, cContext);
+				 planSelector.setCadytsWeight(0.) ;
+				 // weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
+				 // would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
+				 // kai, may'13
+				 //				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
 				return new PlanStrategyImpl(planSelector);
 			} 
 		} ) ;
