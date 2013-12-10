@@ -58,7 +58,7 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 	
 	/*
 	 * link travel disutility is only used for routing and not mode choice (!) in a toll scenario. 
-	 * For routing only, the trip constants can (luckily) be neglected.
+	 * For routing only, the trip constants can (luckily) be neglected. They are added by SurpriceTravelDisutilityIncludingToll
 	 */
 
 	@Override
