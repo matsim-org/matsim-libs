@@ -44,6 +44,8 @@ import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+
 class Item implements Identifiable, Comparable<Item> {
 	private final Id id;
 	Item( Id id ) {
