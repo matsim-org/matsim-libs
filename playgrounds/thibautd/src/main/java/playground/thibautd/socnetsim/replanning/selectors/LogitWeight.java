@@ -28,7 +28,9 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 public class LogitWeight implements WeightCalculator {
 	private final WeightCalculator baseWeight;
 	private final Random random;
-	private final double scaleParameter;
+
+	// this needs to be modifiable to use "annealing"
+	private double scaleParameter;
 	
 	public LogitWeight(
 			final Random random,
@@ -68,5 +70,9 @@ public class LogitWeight implements WeightCalculator {
 		}
 
 		return -value / scaleParameter;
+	}
+
+	public void setScaleParameter(final double scaleParameter) {
+		this.scaleParameter = scaleParameter;
 	}
 }
