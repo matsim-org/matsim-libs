@@ -272,7 +272,8 @@ public class RunCliquesWithModularStrategies {
 		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
 		final AnnealingCoalitionExpBetaFactory annealingSelectorFactory =
 			new AnnealingCoalitionExpBetaFactory(
-				10000, // TODO pass by config
+				Double.MIN_VALUE, // TODO pass by config
+				//0.01,
 				config.planCalcScore().getBrainExpBeta(),
 				config.controler().getFirstIteration(),
 				weights.getDisableInnovationAfterIter() );
