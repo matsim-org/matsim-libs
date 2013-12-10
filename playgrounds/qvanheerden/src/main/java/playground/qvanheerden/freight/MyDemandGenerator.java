@@ -20,7 +20,6 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
-import utilities.misc.Triple;
 
 public class MyDemandGenerator {
 	public static Logger log = Logger.getLogger(MyDemandGenerator.class);

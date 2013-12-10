@@ -66,10 +66,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
 import playground.southafrica.freight.cadyts4freightchains.CadytsFreightChainsContext;
 import playground.southafrica.freight.cadyts4freightchains.Item;
-import utilities.io.tabularfileparser.TabularFileParser;
-import utilities.misc.DynamicData;
 
 /**
  * @author nagel

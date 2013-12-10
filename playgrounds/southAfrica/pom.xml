@@ -82,5 +82,10 @@
   			<artifactId>jts</artifactId>
   			<version>1.13</version>
 		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>cadytsIntegration</artifactId>
+			<version>0.6.0-SNAPSHOT</version>
+		</dependency>
   </dependencies>
 </project>

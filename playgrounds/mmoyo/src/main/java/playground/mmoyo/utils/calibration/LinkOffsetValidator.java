@@ -6,9 +6,9 @@ import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import cadyts.utilities.misc.DynamicData;
 import playground.mmoyo.analysis.counts.reader.CountsReader;
 import playground.mmoyo.utils.DataLoader;
-import utilities.misc.DynamicData;
 
 public class LinkOffsetValidator {
 	final static String SEP = " ";

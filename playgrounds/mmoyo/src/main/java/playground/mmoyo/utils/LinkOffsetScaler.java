@@ -8,7 +8,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
 
-import utilities.misc.DynamicData;
+import cadyts.utilities.misc.DynamicData;
 
 public class LinkOffsetScaler {
 
