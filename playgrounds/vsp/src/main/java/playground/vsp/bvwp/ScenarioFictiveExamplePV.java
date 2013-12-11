@@ -1,13 +1,17 @@
 package playground.vsp.bvwp;
 
+import junit.framework.Assert;
+
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.vsp.bvwp.Values.Attribute;
-import playground.vsp.bvwp.Values.DemandSegment;
-import playground.vsp.bvwp.Values.Mode;
+import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
+import playground.vsp.bvwp.MultiDimensionalArray.Mode;
+import static playground.vsp.bvwp.Key.*;
+
 
 /**
- * @author Ihab
+ * @author Ihab, Kai
  *
  */
 
@@ -22,30 +26,26 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 		nullfall.setValuesForODRelation(new IdImpl("BC"), nullfallForOD ) ;
 		{
 			// construct values for the road mode for this OD relation:
-			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
+			Mode mode = Mode.ROAD ;
 			{
 				// passenger traffic:
-				Attributes pvValuesRoad = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
-				pvValuesRoad.setByEntry( Attribute.XX, 3000. ) ; // number of persons
-				pvValuesRoad.setByEntry( Attribute.km, 38. ) ;
-				pvValuesRoad.setByEntry( Attribute.hrs, 0.45 ) ;
+				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 3000. ) ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.km), 38. ) ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 0.45 ) ;
 			}			
-			
+		}
+		{
 			// construct values for the rail mode for this OD relation:
-			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
+			Mode mode = Mode.RAIL ;
 			{
 				// passenger traffic:
-				Attributes pvValuesRail = railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
-				pvValuesRail.setByEntry( Attribute.XX, 2000. ) ; // number of persons
-				pvValuesRail.setByEntry( Attribute.km, 41. ) ;
-				pvValuesRail.setByEntry( Attribute.hrs, 0.43 ) ; 
+				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 2000. ) ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.km), 41. ) ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 0.43 ) ;
 				// (yyyyyy: I think this should be _larger_ than for road for a convincing example.  kai, feb'12) 
 			}			
-			
-//			
-//			// rail values are just a copy of the road values:
-//			ValuesForAMode railValues = roadValues.createDeepCopy() ;
-//			nullfallForOD.setValuesForMode( Mode.rail, railValues ) ;
 		}
 		
 		// return the base case:
@@ -59,16 +59,17 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
 		// we are now looking at one specific OD relation (for this scenario, there is only one!)
-		Values planfallForOD = planfall.getByODRelation(new IdImpl("BC")) ;
+		Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("BC")) ;
+		Assert.assertNotNull(planfallValuesForOD) ;
 		{
 			// modify the travel times for the rail mode:
-			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry( Attribute.hrs, -0.1 ) ;
+			DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
+			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.1 ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry( Attribute.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry(Attribute.XX, -delta ) ;
+			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), delta ) ;
+			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -delta ) ;
 		}
 		return planfall;
 	}

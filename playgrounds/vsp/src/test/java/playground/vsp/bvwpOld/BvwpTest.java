@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UtilityChangesBVWP2003.java
+ * CalcLegTimesTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,40 +18,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.vsp.bvwp;
-
-import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+package playground.vsp.bvwpOld;
 
 
+import org.matsim.testcases.MatsimTestCase;
 
-/**
- * @author Ihab
- *
- */
-class UtilityChangesBVWP2003 extends UtilityChanges {
+import playground.vsp.bvwpOld.EconomicValues;
+import playground.vsp.bvwpOld.ScenarioForEvalData;
+import playground.vsp.bvwpOld.ScenarioForTest1;
+import playground.vsp.bvwpOld.UtilityChangesRuleOfHalf;
+import playground.vsp.bvwpOld.Values;
 
 
-	@Override
-	UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
-		UtlChangesData utlChanges = new UtlChangesData() ;
-
-		if ( deltaAmount > 0 ) {
-			// wir sind aufnehmend; es zaehlt der Planfall:
-			utlChanges.utl = quantityPlanfall * margUtl ;
-		} else {
-			utlChanges.utl = -quantityNullfall * margUtl ;
-		}
-
-		return utlChanges;
+public class BvwpTest extends MatsimTestCase {
+	
+	public void testOne() {
+		
+		Values economicValues = EconomicValues.createEconomicValuesForTest1();
+		
+		ScenarioForEvalData nullfall = ScenarioForTest1.createNullfallForTest();
+		
+		ScenarioForEvalData planfall = ScenarioForTest1.createPlanfallForTest(nullfall);
+		
+		new UtilityChangesRuleOfHalf().computeAndPrintResults(economicValues, nullfall, planfall) ;
+		
 	}
 
 	@Override
-	double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
-		return 0;
+	protected void setUp() throws Exception {
+		super.setUp();
+
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
 	}
 
 }

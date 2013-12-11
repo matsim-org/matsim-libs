@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
+
 class ScenarioForEvalData {
 		private Map<Id,Values> values = new TreeMap<Id,Values>();
 		ScenarioForEvalData() {
@@ -51,5 +52,15 @@ class ScenarioForEvalData {
 		}
 		Set<Id> getAllRelations() {
 			return Collections.unmodifiableSet(values.keySet()) ;
+		}
+		
+		public String toString() {
+			StringBuilder strb = new StringBuilder() ;
+			for ( Id id : values.keySet() ) {
+				strb.append( id + ": ") ;
+				Values vals = this.getByODRelation(id) ;
+				strb.append( vals.toString() ) ;
+			}
+			return strb.toString() ;
 		}
 	}

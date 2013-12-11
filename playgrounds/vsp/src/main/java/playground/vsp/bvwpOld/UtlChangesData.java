@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UtilityChangesBVWP2003.java
+ * UtlChanges.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,41 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.vsp.bvwpOld;
 
-/**
- * 
- */
-package playground.vsp.bvwp;
-
-import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
-
-
-
-/**
- * @author Ihab
- *
- */
-class UtilityChangesBVWP2003 extends UtilityChanges {
-
-
-	@Override
-	UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
-
-		UtlChangesData utlChanges = new UtlChangesData() ;
-
-		if ( deltaAmount > 0 ) {
-			// wir sind aufnehmend; es zaehlt der Planfall:
-			utlChanges.utl = quantityPlanfall * margUtl ;
-		} else {
-			utlChanges.utl = -quantityNullfall * margUtl ;
-		}
-
-		return utlChanges;
-	}
-
-	@Override
-	double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
-		return 0;
-	}
-
+@Deprecated
+public class UtlChangesData {
+	double utl ;
 }

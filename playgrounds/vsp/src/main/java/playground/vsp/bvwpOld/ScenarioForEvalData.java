@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UtilityChangesBVWP2003.java
+ * ValuesByODRelation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,41 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.vsp.bvwpOld;
 
-/**
- * 
- */
-package playground.vsp.bvwp;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
-import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import org.matsim.api.core.v01.Id;
 
-
-
-/**
- * @author Ihab
- *
- */
-class UtilityChangesBVWP2003 extends UtilityChanges {
-
-
-	@Override
-	UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
-
-		UtlChangesData utlChanges = new UtlChangesData() ;
-
-		if ( deltaAmount > 0 ) {
-			// wir sind aufnehmend; es zaehlt der Planfall:
-			utlChanges.utl = quantityPlanfall * margUtl ;
-		} else {
-			utlChanges.utl = -quantityNullfall * margUtl ;
+class ScenarioForEvalData {
+		private Map<Id,Values> values = new TreeMap<Id,Values>();
+		ScenarioForEvalData() {
+//			for ( Id id : values.keySet() ) {
+//				Values vals = new Values() ;
+//				values.put( id, vals ) ;
+//			}
 		}
-
-		return utlChanges;
+		ScenarioForEvalData createDeepCopy() {
+			ScenarioForEvalData nnn = new ScenarioForEvalData() ;
+			for ( Id id : values.keySet() ) {
+				Values oldValues = this.getByODRelation(id) ;
+				Values newValues = oldValues.createDeepCopy() ;
+				nnn.values.put( id, newValues ) ;
+			}
+			return nnn ;
+		}
+		Values getByODRelation( Id id ) {
+			return values.get(id) ;
+		}
+		void setValuesForODRelation( Id id , Values tmp ) {
+			values.put( id, tmp ) ;
+		}
+		Set<Id> getAllRelations() {
+			return Collections.unmodifiableSet(values.keySet()) ;
+		}
 	}
-
-	@Override
-	double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
-		return 0;
-	}
-
-}

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.vsp.bvwp;
 
-@Deprecated
 public class UtlChangesData {
 	double utl ;
 }

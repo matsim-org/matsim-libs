@@ -21,9 +21,9 @@
 /**
  * 
  */
-package playground.vsp.bvwp;
+package playground.vsp.bvwpOld;
 
-import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwpOld.Values.Attribute;
 
 
 
@@ -31,6 +31,7 @@ import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
  * @author Ihab
  *
  */
+@Deprecated
 class UtilityChangesBVWP2015 extends UtilityChanges {
 
 
@@ -56,7 +57,9 @@ class UtilityChangesBVWP2015 extends UtilityChanges {
 	}
 
 	@Override
-	double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
+	double computeImplicitUtility(Attributes econValues,
+			Attributes quantitiesNullfall,
+			Attributes quantitiesPlanfall) {
 		double sum = 0. ;
 		for ( Attribute attribute : Attribute.values() ) {
 			if ( attribute != Attribute.XX && attribute != Attribute.costOfProduction ) {

@@ -1,141 +1,54 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * Values.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
 package playground.vsp.bvwp;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Map.Entry;
 
-import playground.vsp.bvwp.Values.Attribute;
-import playground.vsp.bvwp.Values.DemandSegment;
+import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
+import playground.vsp.bvwp.MultiDimensionalArray.Mode;
+import static playground.vsp.bvwp.Key.*;
 
-@Deprecated
+/**
+ * @author nagel
+ *
+ */
 class Values {
-	/**
-	 * Design thoughts:<ul>
-	 * <li> yyyy rename to "ODAttribute".  "Mengen" sind vielleicht nicht wirklich "Attribute" im Sinne der BVWP-Nomenklatur,
-	 * aber abgesehen davon spricht eigentlich nichts dagegen.  kai,benjamin, sep'12
-	 * </ul>
-	 */
-	enum Attribute { XX, km, hrs, priceUser, costOfProduction, excess_hrs }
+	private Map<Key,Double> m = new HashMap<Key,Double>() ;
+	Double get( Key key ) {
+		return m.get( key);
+	}
+	Double put( Key key, Double value ){
+		return m.put( key,  value) ;
+	}
+	Double inc( Key key, double value ) {
+		value += m.get(key); 
+		return m.put( key, value ) ;
+	}
+	Values createDeepCopy() {
+		Values n = new Values() ;
+		for ( Entry<Key,Double> entry : m.entrySet() ) {
+			n.put( entry.getKey() , entry.getValue() ) ;
+		}
+		return n ;
+	}
 
 	/**
-	 * Design thoughts:<ul>
-	 * <li> yyyy rename to "DemandSegment".  But refactoring does not seem to work.  Try with other eclipse (this one was
-	 * Galileo).  kai/benjamin, sep'12
-	 *</ul>
+	 * Convenience class, not strictly necessary:
 	 */
-	enum DemandSegment { GV, PV_NON_COMMERCIAL, PV_COMMERCIAL }
-
-	enum Mode { road, rail }
+	Attributes getAttributes( Mode mode, DemandSegment segm ) {
+		Attributes attrs = new Attributes() ;
+		for ( Attribute attr : Attribute.values() ) {
+			attrs.addEntry( attr, this.get( makeKey( mode, segm, attr) ) ) ;
+		}
+		return attrs ;
+	}
 	
-	Map<Mode,ValuesForAMode> valuesByMode = new TreeMap<Mode,ValuesForAMode>() ;
-	Values() {
-		for ( Mode mode : Mode.values() ) {
-			ValuesForAMode vals = new ValuesForAMode() ;
-			valuesByMode.put( mode, vals ) ;
-		}
-	}
-	Values createDeepCopy( ) {
-		Values planfall = new Values() ;
-		for ( Mode mode : Mode.values() ) {
-			ValuesForAMode oldValues = this.getByMode(mode) ;
-			ValuesForAMode newValues = oldValues.createDeepCopy() ;
-			planfall.valuesByMode.put( mode, newValues ) ;
-		}
-		return planfall ; 
-	}
-	ValuesForAMode getByMode( Mode mode ) {
-			return valuesByMode.get(mode) ;
-	}
-	void setValuesForMode( Mode mode, ValuesForAMode values ) {
-		valuesByMode.put( mode, values ) ;
-	}
-	@Override
 	public String toString() {
-		StringBuilder str = new StringBuilder() ;
-		for ( Mode mode : Mode.values() ) {
-			ValuesForAMode valForMode = this.getByMode(mode) ;
-			for ( DemandSegment demandSegment : DemandSegment.values() ) {
-				str.append( "--> " + mode + "; " + demandSegment + " : " ) ;
-				Attributes valByDemandSegment = valForMode.getByDemandSegment(demandSegment);
-				for ( Attribute attribute : Attribute.values() ) {
-					str.append( attribute.toString() + ": " + valByDemandSegment.getByEntry(attribute) + "; " ) ;
-				}
-				str.append( "\n" ) ;
-			}
-			
+		StringBuilder strb = new StringBuilder() ;
+		for ( Entry<Key,Double> entry : m.entrySet() ) {
+			strb.append( "\n\t" + entry.getKey().toString() + "=" + entry.getValue() ) ;
 		}
-		return str.toString() ;
+		return strb.toString();
 	}
-}
-
-@Deprecated
-class ValuesForAMode {
-	Map<DemandSegment,Attributes> valuesByType = new TreeMap<DemandSegment,Attributes>() ;
-	ValuesForAMode createDeepCopy( ) {
-		ValuesForAMode planfall = new ValuesForAMode() ;
-		for ( DemandSegment mode : DemandSegment.values() ) {
-			Attributes old = this.getByDemandSegment(mode) ;
-			Attributes tmp2 = old.createDeepCopy() ;
-			planfall.valuesByType.put( mode, tmp2 ) ;
-		}
-		return planfall ; 
-	}
-	ValuesForAMode() {
-		for ( DemandSegment mode : DemandSegment.values() ) {
-			Attributes vals = new Attributes() ;
-			valuesByType.put( mode, vals ) ;
-		}
-	}
-	Attributes getByDemandSegment( DemandSegment demandSegment ) {
-			return valuesByType.get(demandSegment) ;
-	}
-	void setValuesForType( DemandSegment demandSegment, Attributes values ) {
-		valuesByType.put( demandSegment, values ) ;
-	}
-}
-
-@Deprecated
-class Attributes {
-	Map<Attribute,Double> quantities = new TreeMap<Attribute,Double>() ;
-	Attributes() {
-		for ( Attribute attribute : Attribute.values() ) {
-			this.setByEntry( attribute, 0. ) ;
-		}
-	}
-	double getByEntry( Attribute attribute ) {
-		return quantities.get(attribute) ;
-	}
-	void setByEntry( Attribute attribute, double dbl ) {
-		quantities.put( attribute, dbl ) ;
-	}
-	void incByEntry( Attribute attribute, double dbl ) {
-		double tmp = quantities.get( attribute ) ;
-		quantities.put( attribute, tmp + dbl ) ;
-	}
-	Attributes createDeepCopy() {
-		Attributes newValues = new Attributes() ;
-		for ( Attribute attribute : Attribute.values() ) {
-			newValues.setByEntry( attribute, this.getByEntry(attribute) ) ;
-		}
-		return newValues ;
-	}
-	
 }

@@ -21,9 +21,9 @@
 /**
  * 
  */
-package playground.vsp.bvwp;
+package playground.vsp.bvwpOld;
 
-import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwpOld.Values.Attribute;
 
 
 
@@ -31,7 +31,8 @@ import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
  * @author Ihab
  *
  */
-class UtilityChangesBVWP2015 extends UtilityChanges {
+@Deprecated
+class UtilityChangesBVWP2010 extends UtilityChanges {
 
 
 	@Override
@@ -40,9 +41,13 @@ class UtilityChangesBVWP2015 extends UtilityChanges {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 
-		if ( attribute.equals(Attribute.priceUser) ) {
-			// (Nutzerpreis hat keine Auswirkungen auf Resourcenverzehr!)
-			utlChanges.utl = 0. ;
+		if ( attribute.equals(Attribute.hrs) ) {
+			if ( deltaAmount > 0 ) {
+				// wir sind aufnehmend; es gilt die RoH
+				utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
+			} else {
+				utlChanges.utl = 0. ;
+			}
 		} else {
 			if ( deltaAmount > 0 ) {
 				// wir sind aufnehmend; es zaehlt der Planfall:
@@ -56,18 +61,10 @@ class UtilityChangesBVWP2015 extends UtilityChanges {
 	}
 
 	@Override
-	double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
-		double sum = 0. ;
-		for ( Attribute attribute : Attribute.values() ) {
-			if ( attribute != Attribute.XX && attribute != Attribute.costOfProduction ) {
-				final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);
-				final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
-				final double margUtl = econValues.getByEntry(attribute) ;
-
-				sum += - margUtl * (quantityPlanfall+quantityNullfall)/2. ;
-			}
-		}
-		return sum ;
+	double computeImplicitUtility(Attributes econValues,
+			Attributes quantitiesNullfall,
+			Attributes quantitiesPlanfall) {
+		return 0 ;
 	}
 
 }

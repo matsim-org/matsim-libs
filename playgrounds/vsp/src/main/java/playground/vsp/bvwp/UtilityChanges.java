@@ -1,24 +1,23 @@
 package playground.vsp.bvwp;
 
+import static playground.vsp.bvwp.Key.makeKey;
+
 import org.matsim.api.core.v01.Id;
 
-import playground.vsp.bvwp.Values.Attribute;
-import playground.vsp.bvwp.Values.DemandSegment;
-import playground.vsp.bvwp.Values.Mode;
-
+import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
+import playground.vsp.bvwp.MultiDimensionalArray.Mode;
 
 /**
  * Class that provides services.  To be maintained by ``programmers''.
  * 
  * @author nagel
  */
-@Deprecated
 abstract class UtilityChanges {
-	private static final String FMT_STRING = "%16s || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f ||\n";
 	UtilityChanges() {
 		System.out.println("Setting utility computation method to " + this.getClass() ) ;
 	}
-	
+
 	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall ) {
 		Html html = new Html() ;
 		computeAndPrintResults(economicValues,nullfall,planfall,html) ;
@@ -27,165 +26,150 @@ abstract class UtilityChanges {
 	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, Html html ) {
 		// (GK-GK') * x + 0.5 * (GK-GK') (x'-x) =
 		// 0.5 * (GK-GK') (x+x') = 0.5 * ( GK*x + GK*x' - GK'*x - GK'*x' )
-		
+
 		// yyyy these two can't be here if html is initialized in user code!
 		html.beginHtml() ;
 		html.beginBody() ;
+		html.beginTable() ;
+
 
 		double utils = 0. ;
 		double utilsUserFromRoH = 0. ;
 		double operatorProfit = 0. ;
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
+			Utils.initializeOutputTables(html);				
+			
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Values planfallForODRelation = planfall.getByODRelation(id) ;
-			for ( DemandSegment demandSegment : DemandSegment.values() ) { // for all types (e.g. PV or GV)
+			for ( DemandSegment segm : DemandSegment.values() ) { // for all types (e.g. PV or GV)
 
-				Mode improvedMode = autodetectImprovingMode(
-						nullfallForODRelation, planfallForODRelation,
-						demandSegment);
+				Mode improvedMode = autodetectImprovingMode( nullfallForODRelation, planfallForODRelation, segm);
 
 				if ( improvedMode == null ) {
 					continue ; // means that in the demand segment, nothing has changed; goto next demand segment
 				}
 
-				Attributes econValuesImprovedMode = economicValues.getByMode(improvedMode).getByDemandSegment(demandSegment) ;
-				Attributes attributesNullfallImprovedMode = nullfallForODRelation.getByMode(improvedMode).getByDemandSegment(demandSegment) ;
-				Attributes attributesPlanfallImprovedMode = planfallForODRelation.getByMode(improvedMode).getByDemandSegment(demandSegment) ;
-
-				System.out.printf( "%16s || %16s | %16s || %16s | %16s || %16s | %16s || %16s | %16s ||\n",
-						"Attribut",
-						"Attribut Nullf.", "... mal Menge",
-						"Attribut Planf.", "... mal Menge",
-						"Attribut Diff", "... mal Menge",
-						"Nutzen Diff", "... mal Menge") ;
+				Attributes econValuesReceiving = economicValues.getAttributes(improvedMode, segm) ;
+				Attributes attributesNullfallReceiving = nullfallForODRelation.getAttributes(improvedMode, segm) ;
+				Attributes attributesPlanfallReceiving = planfallForODRelation.getAttributes(improvedMode, segm) ;
 				
-				html.beginTable() ;
-				html.beginTableRow() ;
-				html.write("Attribut") ; html.nextTableEntry() ; 
-				html.write("Attribut Nullfall") ; html.nextTableEntry() ;
-				html.write("... mal Menge") ; html.nextTableEntry() ;
-				html.write("Attribut Planfall") ; html.nextTableEntry() ;
-				html.write("... mal Menge") ; html.nextTableEntry() ;
-				html.write("Attribut Diff") ; html.nextTableEntry() ;
-				html.write("... mal Menge") ; html.nextTableEntry() ;
-				html.write("Nutzen Diff") ; html.nextTableEntry() ;
-				html.write("... mal Menge") ; 
-				html.endTableRow() ;
+				double sumSent = 0. ;
 
 				for ( Mode mode : Mode.values() ) { // for all modes
-					Attributes econValues = economicValues.getByMode(mode).getByDemandSegment(demandSegment) ;
-					Attributes attributesNullfall = nullfallForODRelation.getByMode(mode).getByDemandSegment(demandSegment) ;
-					Attributes attributesPlanfall = planfallForODRelation.getByMode(mode).getByDemandSegment(demandSegment) ;
-					final double amountNullfall = attributesNullfall.getByEntry(Attribute.XX);
-					final double amountPlanfall = attributesPlanfall.getByEntry(Attribute.XX);
 
-					if ( amountPlanfall!=0. || amountNullfall!=0. ) {
+					Attributes econValues = economicValues.getAttributes(mode, segm) ;
+					Attributes attributesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
+					Attributes attributesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
+
+					final Key key = makeKey(mode, segm, Attribute.XX);
+					System.out.println( "key: " + key.toString() );
+					System.out.flush(); 
+					final double amountNullfall = nullfallForODRelation.get( key) ;
+					final double amountPlanfall = planfallForODRelation.get( key) ;
+					final double deltaAmounts = amountPlanfall - amountNullfall ;
+
+					System.out.flush();
+					System.err.println(" amountPlanfall: " + amountPlanfall + " amountNullfall: " + amountNullfall );
+					System.err.flush() ;
+
+					if ( amountPlanfall==0. && amountNullfall==0. ) {
 						// (suppress output if this (relation,mode,demand_segment) is never used)
-
-						if ( mode==improvedMode ) {
-							// yyyy pull "improved mode" forwards in pgm flow
-							// Altnutzer:
-
-							double amountAltnutzer = amountNullfall ;
-
-							System.out.printf("%16s; %16s; %16s; verbleibender Verkehr: %16.1f Personen/Tonnen\n", 
-									id, mode, demandSegment, amountAltnutzer );
-							
-							html.beginTableMulticolumnRow() ;
-							html.write( id + "; " + demandSegment + "; " + mode + "; verbleibender Verkehr: " + amountAltnutzer + " Personen/Tonnen") ;
-							html.endTableRow() ;
-
-							utils = computeAndPrintValuesForAltnutzer(utils,
-									econValues, attributesNullfall,
-									attributesPlanfall, amountAltnutzer, html);
-
-						} else {
-
-							final double deltaAmounts = amountPlanfall - amountNullfall ;
-
-							// abgebend:
-
-							System.out.printf("%16s; %16s; %16s; wechselnder Verkehr: %16.1f Personen/Tonnen\n", 
-									id, mode, demandSegment, deltaAmounts ) ;
-							html.beginTableMulticolumnRow() ;
-							html.write( id + "; " + demandSegment + "; " + mode + "; wechselnder Verkehr: " + deltaAmounts + " Personen/Tonnen") ;
-							html.endTableRow();
-							utils = computeAndPrintGivingOrReceiving(utils, econValues, attributesNullfall,
-									attributesPlanfall, deltaAmounts, html);
-							
-							// jetzt Rechnung für aufnehmend:
-							
-							System.out.printf("%16s; %16s; %16s; " +
-									"wechselnder Verkehr: %16.1f Personen/Tonnen\n", 
-									id, improvedMode, demandSegment, -deltaAmounts ) ;
-							html.beginTableMulticolumnRow() ;
-							html.write( id + "; " + demandSegment + "; " + mode + "; wechselnder Verkehr: " + (-deltaAmounts) + " Personen/Tonnen") ;
-							html.endTableRow();
-
-							utils = computeAndPrintGivingOrReceiving(utils, econValuesImprovedMode,
-									attributesNullfallImprovedMode, attributesPlanfallImprovedMode, -deltaAmounts, html);
-
-							// implicit utl:
-							utils = computeAndPrintImplicitUtl(utils,
-									econValuesImprovedMode, attributesNullfallImprovedMode,attributesPlanfallImprovedMode,
-									econValues, attributesNullfall,attributesPlanfall, deltaAmounts, html);
-						}
+						continue ;
 					}
 
-					// compute user gains according to RoH: improvement * <x>
-					if ( amountPlanfall >= amountNullfall ) {
-						final double averageOfXX = (amountPlanfall + amountNullfall)/2. ;
-						for ( Attribute attribute : Attribute.values() ) {
-							if ( attribute!=Attribute.XX && attribute!=Attribute.costOfProduction ) {
-								final double improvementOfAttribute = attributesPlanfall.getByEntry(attribute) - attributesNullfall.getByEntry(attribute);
-								utilsUserFromRoH += improvementOfAttribute * averageOfXX * econValues.getByEntry(attribute);
-							}
-						}
+					System.out.flush();
+					System.err.println(" mode: " + mode + " improvedMode: " + improvedMode );
+					System.err.flush() ;
+
+					if ( mode.equals(improvedMode) ) {
+						// Altnutzer:
+						double amountAltnutzer = amountNullfall ;
+						System.out.flush();
+						System.err.println("writing verbleibend:");
+						System.err.flush() ;
+						Utils.writeSubHeaderVerbleibend(html, id, segm, mode, amountAltnutzer);
+						utils += computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
+					} else {
+						sumSent += Math.abs( deltaAmounts ) ;
 					}
+
+					Utils.writeSubHeaderWechselnd(html, id, segm, mode, deltaAmounts);
 					
-					// (operator profit also for operator that looses) 
-					final double revenueNullfall = attributesNullfall.getByEntry(Attribute.priceUser) * amountNullfall ;
-					final double revenuePlanfall = attributesPlanfall.getByEntry(Attribute.priceUser) * amountPlanfall ;
-					final double operatorCostNullfall = attributesNullfall.getByEntry(Attribute.costOfProduction) * amountNullfall ;
-					final double operatorCostPlanfall = attributesPlanfall.getByEntry(Attribute.costOfProduction) * amountPlanfall ;
-					operatorProfit +=  -(revenueNullfall - operatorCostNullfall) + (revenuePlanfall - operatorCostPlanfall) ;
-					
-					
-				} // mode				
+					utils += computeAndPrintGivingOrReceiving(econValues, attributesNullfall, attributesPlanfall, html);
+
+					if ( mode != improvedMode ) {
+						// compute implicit uti completely on the side of the giving modes:
+						utils += computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
+								econValues, attributesNullfall, attributesPlanfall, html);
+					}
+
+					// roh etc. stuff (for comparison):
+					utilsUserFromRoH = computeUserBenefit(utilsUserFromRoH, econValues, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
+					operatorProfit = computeOperatorProfit(operatorProfit, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
+
+				} // mode			
+				
+				final double amountNullfallRcv = nullfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
+				final double amountPlanfallRcv = planfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
+				final double deltaAmountsRcv = amountPlanfallRcv - amountNullfallRcv ;
+				final double amountInduced = deltaAmountsRcv - sumSent ;
+				System.out.println( " amount induced: " + amountInduced ) ;
+				
+				final double implUtlInducedPerItem = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
+				final double implUtlInduced = implUtlInducedPerItem * amountInduced ;
+				
+				
+				if ( implUtlInduced != 0. ) {
+					Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "impl utl ind");
+					Utils.writePartialSum(html, implUtlInduced );
+				}
+				
+				utils += implUtlInduced ;
+				
 
 			} // demand segment
 		} // relation
-		System.out.printf("%182s\n", "----------------" ) ;
-		System.out.printf("bvwp benefit: %167.1f\n", utils ) ;
-		System.out.printf("%182s\n", "================" ) ;
-		//		System.out.printf("utl gain: %161.1f\n", utils ) ;
 
-		html.beginTableMulticolumnRow() ;
-		html.write("Summe") ;
-		html.endTableRow() ;
-		
-		html.bvwpTableRow("Summe", "", "", "", "", "", "", "", Double.toString(utils) ) ;
+		Utils.writeSum(html, utils);
 
-		System.out.printf("RoH: utl gain users: %16.1f ; operator profit gain: %16.1f ; sum: %16.1f\n", 
-				utilsUserFromRoH, operatorProfit, utilsUserFromRoH+operatorProfit ) ; 
-		
-		html.beginTableMulticolumnRow() ;
-		html.write("Zum Vergleich: RoH-Rechnung") ;
-		html.endTableRow() ;
-
-		html.beginTableMulticolumnRow() ;
-		html.write("RoH: utl gain users: " + utilsUserFromRoH + "; operator profit gain: " + operatorProfit
-				+ "; sum: " + (utilsUserFromRoH+operatorProfit) ) ;
-		html.endTableRow() ;
-		
-		html.endTable() ;
-
-//		html.endBody() ;
-//		html.endHtml() ;
+		Utils.writeRohAndEndOutput(html, utilsUserFromRoH, operatorProfit);
 	}
 
-	private double computeAndPrintGivingOrReceiving(double utils, Attributes econValues,
-			Attributes attributesNullfall, Attributes attributesPlanfall, final double deltaAmounts, Html html) {
+	private double computeUserBenefit(double utilsUserFromRoH, Attributes econValues, Attributes attributesNullfall,
+			Attributes attributesPlanfall, final double amountNullfall, final double amountPlanfall) {
+		// compute user gains according to RoH: improvement * <x>
+		if ( amountPlanfall >= amountNullfall ) {
+			final double averageOfXX = (amountPlanfall + amountNullfall)/2. ;
+			for ( Attribute attribute : Attribute.values() ) {
+				if ( attribute!=Attribute.XX && attribute!=Attribute.costOfProduction ) {
+					final double improvementOfAttribute = attributesPlanfall.getByEntry(attribute) - attributesNullfall.getByEntry(attribute);
+					utilsUserFromRoH += improvementOfAttribute * averageOfXX * econValues.getByEntry(attribute);
+				}
+			}
+		}
+		return utilsUserFromRoH;
+	}
+
+	private double computeOperatorProfit(double operatorProfit, Attributes attributesNullfall, Attributes attributesPlanfall,
+			final double amountNullfall, final double amountPlanfall) {
+		{
+		// (operator profit also for operator that looses) 
+		final double revenueNullfall = attributesNullfall.getByEntry(Attribute.priceUser) * amountNullfall ;
+		final double revenuePlanfall = attributesPlanfall.getByEntry(Attribute.priceUser) * amountPlanfall ;
+		final double operatorCostNullfall = attributesNullfall.getByEntry(Attribute.costOfProduction) * amountNullfall ;
+		final double operatorCostPlanfall = attributesPlanfall.getByEntry(Attribute.costOfProduction) * amountPlanfall ;
+		operatorProfit +=  -(revenueNullfall - operatorCostNullfall) + (revenuePlanfall - operatorCostPlanfall) ;
+		}
+		return operatorProfit;
+	}
+
+	private double computeAndPrintGivingOrReceiving(Attributes econValues, Attributes attributesNullfall,
+			Attributes attributesPlanfall, Html html) {
+		
+		double utils = 0. ;
+
+		final double deltaAmounts = attributesPlanfall.getByEntry(Attribute.XX) - attributesNullfall.getByEntry(Attribute.XX) ;
+
 		for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
 			if ( attribute != Attribute.XX && attribute != Attribute.priceUser ) {
 				final double attributeValuePlanfall = attributesPlanfall.getByEntry(attribute);
@@ -196,112 +180,71 @@ abstract class UtilityChanges {
 				final double utlChange = utlChangesPerItem.utl * Math.abs(deltaAmounts);
 				utils += utlChange ;
 
-
+				if ( utlChange==0. ) {
+					continue ;
+				}
 				if ( deltaAmounts > 0 ) {
 					// wir sind aufnehmend; utl gains should be negative
-					System.out.printf(FMT_STRING,attribute,
-							attributeValueNullfall, 0., 
-							attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-							attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-							utlChangesPerItem.utl , utlChange
-					) ;
-					html.bvwpTableRow(attribute.toString(),
-							attributeValueNullfall, 0., 
-							attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-							attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-							utlChangesPerItem.utl , utlChange) ;
+					Utils.writeAufnehmendRow(html, deltaAmounts, attribute, attributeValuePlanfall, utlChangesPerItem, utlChange);
 				} else {
 					// wir sind abgebend; utl gains should be positive
-					System.out.printf(FMT_STRING, attribute,
-							attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-							attributeValuePlanfall, 0., 
-							-attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-							// (selbst wenn sich das abgebende System ändert, so ist unser Gewinn dennoch basierend auf dem
-							// Nullfall)
-							utlChangesPerItem.utl , utlChange
-					) ;
-					html.bvwpTableRow(attribute.toString(),
-							attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-							attributeValuePlanfall, 0., 
-							-attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-							// (selbst wenn sich das abgebende System ändert, so ist unser Gewinn dennoch basierend auf dem
-							// Nullfall)
-							utlChangesPerItem.utl , utlChange) ;
+					Utils.writeAbgebendRow(html, deltaAmounts, attribute, attributeValuePlanfall, attributeValueNullfall,
+							utlChangesPerItem, utlChange);
 				}
 
 			}
 		}
-		return utils;
-	}
-
-	private double computeAndPrintImplicitUtl(double utils,
-			Attributes econValuesImprovedMode, Attributes attributesNullfallImprovedMode,
-			Attributes attributesPlanfallImprovedMode,
-			Attributes econValues,
-			Attributes attributesNullfall,
-			Attributes attributesPlanfall,
-			final double deltaAmounts, Html html) {
-		// implicit utility:
-		final double implicitUtlImprovedMode = this.computeImplicitUtility(econValuesImprovedMode, 
-				attributesNullfallImprovedMode, attributesPlanfallImprovedMode) ;
-
-		final double implicitUtl = this.computeImplicitUtility(econValues, attributesNullfall, attributesPlanfall) ;
-
-		if ( implicitUtl != 0. || implicitUtlImprovedMode != 0. ) {
-			final double implicitUtlSum = implicitUtl - implicitUtlImprovedMode ;
-			final double implicitUtlOverall = implicitUtlSum * deltaAmounts;
-			System.out.printf(FMT_STRING,
-					"implic. utl abg.",
-					0.,0.,
-					0.,0.,
-					0.,0.,
-					implicitUtl, implicitUtl*deltaAmounts 
-			) ;
-			System.out.printf(FMT_STRING,
-					"implic. utl auf.",
-					0.,0.,
-					0.,0.,
-					0.,0.,
-					implicitUtlImprovedMode, -implicitUtlImprovedMode*deltaAmounts 
-			) ;
-			System.out.printf(FMT_STRING,
-					"implicit utl",
-					0.,0.,
-					0.,0.,
-					0.,0.,
-					implicitUtlSum, implicitUtlOverall 
-			) ;
-			html.bvwpTableRow(					"implicit utl",
-					0.,0.,
-					0.,0.,
-					0.,0.,
-					implicitUtlSum, implicitUtlOverall 
-			) ;
-			utils += implicitUtlOverall ;
-
+		if ( utils != 0. ) {
+			Utils.writePartialSum(html, utils);
 		}
 		return utils;
 	}
 
-	private static Mode autodetectImprovingMode(Values nullfallForODRelation,
-			Values planfallForODRelation, DemandSegment demandSegment) {
+	private double computeAndPrintImplicitUtl(Attributes econValuesReceiving, Attributes attributesNullfallReceiving, Attributes attributesPlanfallReceiving, 
+			Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Html html) {
+
+		final double deltaAmounts = attributesPlanfall.getByEntry(Attribute.XX) - attributesNullfall.getByEntry(Attribute.XX ) ;
+		// negative, since this is never called for the receiving mode
+
+		final double implicitUtlPerItem = this.computeImplicitUtilityPerItem(econValues, attributesNullfall, attributesPlanfall) ;
+		// probably positive
+		
+		final double implicitUtlOverall = - implicitUtlPerItem * Math.abs(deltaAmounts) ;
+		if ( implicitUtlOverall != 0. ) {
+			Utils.writeImplicitUtl(html, implicitUtlPerItem, implicitUtlOverall, "implicit utl frm");
+		}
+
+		final double implicitUtlPerItemReceiving = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
+		// probably positive
+		
+		final double implicitUtlOverallReceiving = implicitUtlPerItemReceiving * Math.abs(deltaAmounts) ;
+		if ( implicitUtlOverallReceiving != 0. ) {
+			Utils.writeImplicitUtl( html, implicitUtlPerItemReceiving, implicitUtlOverallReceiving, "implicit utl to" ) ;
+		}
+		
+		double util = implicitUtlOverall + implicitUtlOverallReceiving ;
+		
+		if ( util != 0. ) {
+			Utils.writePartialSum(html, util);
+		}
+
+		return util ;
+	}
+
+	private static Mode autodetectImprovingMode(Values nullfallForODRelation, Values planfallForODRelation, DemandSegment segm) {
 		// go through modes and determine the improved mode
 		Mode improvedMode = null ;
 		for ( Mode mode : Mode.values() ) { // for all modes
-			ValuesForAMode quantitiesNullfallByMode = nullfallForODRelation.getByMode(mode) ;
-			ValuesForAMode quantitiesPlanfallByMode = planfallForODRelation.getByMode(mode) ;
-			Attributes quantitiesNullfall = quantitiesNullfallByMode.getByDemandSegment(demandSegment) ;
-			Attributes quantitiesPlanfall = quantitiesPlanfallByMode.getByDemandSegment(demandSegment) ;
+			Attributes quantitiesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
+			Attributes quantitiesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
 			for ( Attribute attribute : Attribute.values() ) {
 				final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
 				final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);
-				if ( attribute==Attribute.XX ) {
-					if ( quantityPlanfall > quantityNullfall ) {
+				if ( attribute==Attribute.XX &&  quantityPlanfall > quantityNullfall ) {
 						improvedMode = mode ;
 						break ;
-					}
 				}
-				if ( quantityPlanfall < quantityNullfall ) {
+				if ( attribute!=Attribute.XX && quantityPlanfall < quantityNullfall ) {
 					improvedMode = mode ;
 					break ;
 				}
@@ -310,47 +253,40 @@ abstract class UtilityChanges {
 		return improvedMode;
 	}
 
-	private double computeAndPrintValuesForAltnutzer(double utils,
-			Attributes econValues,
+	private double computeAndPrintValuesForAltnutzer( Attributes econValues,
 			Attributes quantitiesNullfall,
 			Attributes quantitiesPlanfall, double amountAltnutzer, Html html) {
 
+		double utils = 0. ;
+		
 		for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
 			if ( attribute != Attribute.XX && attribute != Attribute.priceUser ) {
-				// yyyy not so great: if policy measure = price change, then RoH and resource consumption are
+				// not so great: if policy measure = price change, then RoH and resource consumption are
 				// different here.  kai/benjamin, sep'12
+				// Aber ist das nicht richtig: Eine Preisänderung bewirkt nur eine Veränderung der Einnahme-Aufteilung; roh geht (z.B.) hoch,
+				// producer surplus geht runter, vw'lich keine Änderung.  kai, oct'13
 
 				double deltaQuantities = quantitiesPlanfall.getByEntry(attribute)-quantitiesNullfall.getByEntry(attribute) ;
 				final double utlChangePerItem = deltaQuantities * econValues.getByEntry(attribute);
 				final double utlChange = utlChangePerItem * amountAltnutzer;
-				System.out.printf(FMT_STRING,
-						attribute,
-						quantitiesNullfall.getByEntry(attribute), 
-						quantitiesNullfall.getByEntry(attribute) * amountAltnutzer,
-						quantitiesPlanfall.getByEntry(attribute), 
-						quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
-						deltaQuantities , deltaQuantities * amountAltnutzer ,
-						utlChangePerItem , 
-						utlChange
-				) ;
-				html.bvwpTableRow(
-						attribute.toString(),
-						quantitiesNullfall.getByEntry(attribute), 
-						quantitiesNullfall.getByEntry(attribute) * amountAltnutzer,
-						quantitiesPlanfall.getByEntry(attribute), 
-						quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
-						deltaQuantities , deltaQuantities * amountAltnutzer ,
-						utlChangePerItem , 
-						utlChange
-				) ;
+				if ( utlChange == 0. ) {
+					continue ;
+				}
+
+				Utils.writeAltnutzerRow(quantitiesNullfall, quantitiesPlanfall, amountAltnutzer, html, attribute, deltaQuantities,
+						utlChangePerItem, utlChange);
 				utils += utlChange ;
 
 			}
 		}
+		if ( utils != 0. ) {
+			Utils.writePartialSum(html, utils);
+		}
 		return utils;
 	}
+
 	abstract UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, 
 			double quantityNullfall, double quantityPlanfall, double econVal);
-	abstract double computeImplicitUtility(Attributes econValues, Attributes quantitiesNullfall, 
+	abstract double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, 
 			Attributes quantitiesPlanfall) ;
 }
