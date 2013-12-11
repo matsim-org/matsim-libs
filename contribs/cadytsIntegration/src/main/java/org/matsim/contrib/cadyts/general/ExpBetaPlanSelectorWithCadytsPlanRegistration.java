@@ -1,0 +1,34 @@
+/**
+ * 
+ */
+package org.matsim.contrib.cadyts.general;
+
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelector;
+
+/**
+ * @author nagel
+ *
+ */
+public final class ExpBetaPlanSelectorWithCadytsPlanRegistration<T> implements PlanSelector {
+
+	private final PlanSelector delegate ;
+	private final CadytsContextI<T> cContext;
+	
+	public ExpBetaPlanSelectorWithCadytsPlanRegistration(double beta, CadytsContextI<T> cContext ) {
+		delegate = new ExpBetaPlanSelector( beta ) ;
+		this.cContext = cContext ;
+	}
+	
+
+	@Override
+	public Plan selectPlan(HasPlansAndId<Plan> person) {
+		Plan selectedPlan = delegate.selectPlan(person) ;
+		cadyts.demand.Plan<T> cadytsPlan = cContext.getPlansTranslator().getPlanSteps( selectedPlan ) ;
+		cContext.getCalibrator().addToDemand(cadytsPlan) ;
+		return selectedPlan ;
+	}
+	
+}

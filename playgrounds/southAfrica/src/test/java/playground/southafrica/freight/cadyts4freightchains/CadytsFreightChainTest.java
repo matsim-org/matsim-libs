@@ -46,6 +46,7 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
+import org.matsim.contrib.cadyts.general.ExpBetaPlanSelectorWithCadytsPlanRegistration;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -81,10 +82,10 @@ public class CadytsFreightChainTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Ignore
+//	@Ignore
 	public final void testCalibrationAsScoring() throws IOException {
-		final double beta=30. ;
-		final int lastIteration = 20 ;
+		final double beta=1. ;
+		final int lastIteration = 50 ;
 
 		String outputDir = this.utils.getOutputDirectory();
 		IOUtils.createDirectory(outputDir) ;
@@ -115,9 +116,8 @@ public class CadytsFreightChainTest {
 			nChainsOfLength.add(0) ;
 		}
 		int tmp = 5 ;
-		nChainsOfLength.set(4, tmp ) ;
-		nChainsOfLength.set(5, scenario.getPopulation().getPersons().size() - tmp ) ;
-		
+		nChainsOfLength.set(4, tmp ) ; // meaning "tmp" chains of lengths 4
+		nChainsOfLength.set(5, scenario.getPopulation().getPersons().size() - tmp ) ; // meaning all the other chains should be length 5
 		
 		final CadytsFreightChainsContext cContext = new CadytsFreightChainsContext(config, nChainsOfLength );
 		controler.addControlerListener(cContext);
@@ -125,7 +125,7 @@ public class CadytsFreightChainTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario sc, EventsManager eventsManager) {
-				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Item>(
+				return new PlanStrategyImpl(new ExpBetaPlanSelectorWithCadytsPlanRegistration<Item>(
 						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 			}
 		} ) ;
@@ -134,7 +134,7 @@ public class CadytsFreightChainTest {
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
 				SumScoringFunction sum = new SumScoringFunction() ;
-				sum.addScoringFunction( new CadytsScoring<Item>(plan, config, cContext) ); 
+				sum.addScoringFunction( new CadytsScoring<Item>(plan, config, cContext, 1000.) ); 
 				return sum ; 
 			}
 		}) ;
@@ -147,9 +147,9 @@ public class CadytsFreightChainTest {
 
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
 		
-		for ( Person person : controler.getScenario().getPopulation().getPersons().values() ) {
-			log.warn( " person with id: " + person.getId() ) ;
-			for ( Plan plan : person.getPlans() ) {
+		for ( Person driver : controler.getScenario().getPopulation().getPersons().values() ) {
+			log.warn( " person with id: " + driver.getId() ) ;
+			for ( Plan plan : driver.getPlans() ) {
 				log.warn( " score: " + plan.getScore() + "; plan: " + plan ) ;
 			}
 		}
