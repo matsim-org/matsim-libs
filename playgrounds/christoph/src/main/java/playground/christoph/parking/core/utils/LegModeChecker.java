@@ -22,11 +22,9 @@ package playground.christoph.parking.core.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -34,11 +32,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -145,8 +143,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				 * Get position of the car. We assume that the car is located at
 				 * the coordinate of the home location of an agent.
 				 */
-				Map<Id, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
-				Coord carCoord = facilities.get(firstActivity.getFacilityId()).getCoord();
+				Coord carCoord = getActivityCoord(firstActivity);
 				
 				/*
 				 * Where does the first car trip start?
@@ -172,9 +169,10 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 						newPlan.addLeg(leg);
 						newPlan.addActivity(nextActivity);
 						
-						if (previousActivity.getLinkId()==null || nextActivity.getLinkId()==null){
-							ActivityFacility prevActivityFacility = facilities.get(previousActivity.getFacilityId());
-							ActivityFacility nextActivityFacility = facilities.get(nextActivity.getFacilityId());
+						if (previousActivity.getLinkId() == null || nextActivity.getLinkId() == null) {
+							ActivityFacilities facilities = scenario.getActivityFacilities();
+							ActivityFacility prevActivityFacility = facilities.getFacilities().get(previousActivity.getFacilityId());
+							ActivityFacility nextActivityFacility = facilities.getFacilities().get(nextActivity.getFacilityId());
 							
 							((ActivityImpl) previousActivity).setLinkId(prevActivityFacility.getLinkId());
 							((ActivityImpl) nextActivity).setLinkId(nextActivityFacility.getLinkId());
@@ -206,8 +204,10 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
 				Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
 				
-				Coord previousCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(previousActivity.getFacilityId()).getCoord();
-				Coord nextCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(nextActivity.getFacilityId()).getCoord();
+//				Coord previousCoord = scenario.getActivityFacilities().getFacilities().get(previousActivity.getFacilityId()).getCoord();
+//				Coord nextCoord = scenario.getActivityFacilities().getFacilities().get(nextActivity.getFacilityId()).getCoord();
+				Coord previousCoord = getActivityCoord(previousActivity);
+				Coord nextCoord = getActivityCoord(nextActivity);
 				
 				/*
 				 * Check the distance to the car. 
@@ -238,6 +238,15 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 					carCoord = nextCoord;
 				}
 			}
+		}
+	}
+	
+	private Coord getActivityCoord(Activity activity) {
+		
+		if (activity.getFacilityId() != null) {
+			return scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
+		} else {
+			return scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
 		}
 	}
 }

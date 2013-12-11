@@ -35,7 +35,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.christoph.parking.core.mobsim.ParkingInfrastructure.ParkingFacility;
+import playground.christoph.parking.core.mobsim.ParkingFacility;
 import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;

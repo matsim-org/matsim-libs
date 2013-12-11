@@ -29,14 +29,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.MultimodalQSimFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityOption;
@@ -76,7 +78,7 @@ import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFa
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 
-public class WithinDayParkingControlerListener implements StartupListener, ReplanningListener {
+public class WithinDayParkingControlerListener implements StartupListener, ReplanningListener, IterationEndsListener {
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -174,7 +176,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		this.checkModeChains(event.getControler(), this.multiModalControlerListener.getMultiModalTravelTimes());
+//		this.checkModeChains(event.getControler(), this.multiModalControlerListener.getMultiModalTravelTimes());
 		
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = 
 				new TripRouterFactoryBuilderWithDefaults().createDefaultLeastCostPathCalculatorFactory(event.getControler().getScenario());
@@ -206,13 +208,18 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		ParkingCostCalculatorImpl parkingCostCalculator = new ParkingCostCalculatorImpl(this.initParkingTypes());
 		this.parkingInfrastructure = new ParkingInfrastructure(this.scenario, parkingCostCalculator);
 		
-		this.parkingAgentsTracker = new ParkingAgentsTracker(this.scenario, parkingInfrastructure, searchRadius);
+		this.parkingAgentsTracker = new ParkingAgentsTracker(this.scenario, parkingInfrastructure, 
+				this.withinDayControlerListener.getMobsimDataProvider() , searchRadius);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		event.getControler().getEvents().addHandler(this.parkingAgentsTracker);
 		
-		// replace the WithinDayQSimFactory which has been set by the withinDayControlerListener.
+		/*
+		 * Replace the WithinDayQSimFactory which has been set by the withinDayControlerListener.
+		 * Then, wrap a MultimodalQSimFactory around it to also use the multi-modal simulation.
+		 */
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, 
 				this.withinDayControlerListener.getWithinDayEngine(), this.parkingAgentsTracker);
+		mobsimFactory = new MultimodalQSimFactory(this.multiModalControlerListener.getMultiModalTravelTimes(), mobsimFactory);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		
 		this.initIdentifiers();
@@ -221,14 +228,20 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		/*
-		 * During the replanning the mode chain of the agents' selected plans
-		 * might have been changed. Therefore, we have to ensure that the 
-		 * chains are still valid.
-		 */
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			legModeChecker.run(person.getSelectedPlan());
-		}
+//		/*
+//		 * During the replanning the mode chain of the agents' selected plans
+//		 * might have been changed. Therefore, we have to ensure that the 
+//		 * chains are still valid.
+//		 */
+//		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+//			legModeChecker.run(person.getSelectedPlan());
+//		}
+	}
+	
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		this.parkingInfrastructure.printStatistics();
+		this.parkingInfrastructure.resetParkingFacilityForNewIteration();
 	}
 	
 	private HashMap<String, HashSet<Id>> initParkingTypes() {
@@ -237,15 +250,15 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 
 		HashSet<Id> streetParking = new HashSet<Id>();
 		HashSet<Id> garageParking = new HashSet<Id>();
-		parkingTypes.put("streetParking", streetParking);
-		parkingTypes.put("garageParking", garageParking);
+		parkingTypes.put(ParkingTypes.STREETPARKING, streetParking);
+		parkingTypes.put(ParkingTypes.GARAGEPARKING, garageParking);
 		
 		for (ActivityFacility facility : ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().values()) {
 
 			// if the facility offers a parking activity
-			ActivityOption activityOption = facility.getActivityOptions().get("parking");
+			ActivityOption activityOption = facility.getActivityOptions().get(ParkingTypes.PARKING);
 			if (activityOption != null) {
-				if (MatsimRandom.getRandom().nextBoolean()){
+				if (MatsimRandom.getRandom().nextBoolean()) {
 					streetParking.add(facility.getId());
 				} else {
 					garageParking.add(facility.getId());

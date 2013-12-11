@@ -82,16 +82,17 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
-		
+
 		/*
 		 * If a parking has been selected, set it as destination and adapt the
 		 * current leg, the next activity and the next leg. Otherwise just add
 		 * another link to the current leg.
 		 */
-		Id parkingFacilityId = parkingAgentsTracker.getSelectedParking(withinDayAgent.getId());
-
+		Id parkingFacilityId = this.parkingAgentsTracker.getSelectedParking(withinDayAgent.getId());
+//		Id parkingFacilityId = this.parkOnLink(withinDayAgent);
+		
 		// if no parking facility has been set, the agent has to continue its search
-		if (parkingFacilityId == null) {			
+		if (parkingFacilityId == null) {
 //			this.randomParkingSearch.applySearchStrategy(withinDayAgent, this.time);
 //			this.nearestAvailableParkingSearch.applySearchStrategy(withinDayAgent, time);
 			
@@ -161,9 +162,12 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		// if only the parking facility changed but not the link where it is located
 		else if (parkingFacilityWasChanged) {
 			relocateParkingActivity(parkingActivity, parkingFacility);
-		} 
+		}
 		// parking was not change, therefore we do not have to adapt anything in the agent's plan
-		else return;
+		else {
+//			cutRoute(route, routeIndex);
+			return;
+		}
 		
 		/*
 		 * Check whether there are further car legs. If yes, the location of the
@@ -251,8 +255,6 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 			Leg walkLegToNextParkingActivity = (Leg) plan.getPlanElements().get(nextCarLegIndex - 2);
 			ActivityImpl nextParkingActivity = (ActivityImpl) plan.getPlanElements().get(nextCarLegIndex - 1);
 			Leg nextCarLeg = (Leg) plan.getPlanElements().get(nextCarLegIndex);
-			ActivityImpl nextNextparkingActivity = (ActivityImpl) plan.getPlanElements().get(nextCarLegIndex + 1);
-			Leg walkLegFromNextParkingActivity = (Leg) plan.getPlanElements().get(nextCarLegIndex + 2);
 			
 			/*
 			 * If the parking was relocated to another link
@@ -273,21 +275,23 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 			// If the parking facility was not relocated, we do not have to adapt anything here.
 			else return false;
 			
-			boolean removeNextCarLeg = (nextParkingActivity.getLinkId().equals(nextNextparkingActivity.getLinkId()));
-			// The next car leg can be removed if it starts and ends on the same link.
-			if (removeNextCarLeg) {				
-				// create a new walk leg
-				Activity previousActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex - 3);
-				Activity nextActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex + 3);
-				createNewWalkRoute(previousActivity, walkLegFromNextParkingActivity, nextActivity, plan.getPerson());
-
-				plan.getPlanElements().remove(walkLegToNextParkingActivity);
-				plan.getPlanElements().remove(nextParkingActivity);
-				plan.getPlanElements().remove(nextCarLeg);
-				plan.getPlanElements().remove(nextNextparkingActivity);
-
-				return true;
-			}
+//			ActivityImpl nextNextparkingActivity = (ActivityImpl) plan.getPlanElements().get(nextCarLegIndex + 1);
+//			Leg walkLegFromNextParkingActivity = (Leg) plan.getPlanElements().get(nextCarLegIndex + 2);
+//			boolean removeNextCarLeg = (nextParkingActivity.getLinkId().equals(nextNextparkingActivity.getLinkId()));
+//			// The next car leg can be removed if it starts and ends on the same link.
+//			if (removeNextCarLeg) {				
+//				// create a new walk leg
+//				Activity previousActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex - 3);
+//				Activity nextActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex + 3);
+//				createNewWalkRoute(previousActivity, walkLegFromNextParkingActivity, nextActivity, plan.getPerson());
+//
+//				plan.getPlanElements().remove(walkLegToNextParkingActivity);
+//				plan.getPlanElements().remove(nextParkingActivity);
+//				plan.getPlanElements().remove(nextCarLeg);
+//				plan.getPlanElements().remove(nextNextparkingActivity);
+//
+//				return true;
+//			}
 			return false;
 			
 		} else return false;

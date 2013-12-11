@@ -35,35 +35,33 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 
 public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler,
-		ActivityStartEventHandler, ActivityEndEventHandler, MobsimInitializedListener, MobsimAfterSimStepListener,
+		ActivityStartEventHandler, ActivityEndEventHandler, MobsimAfterSimStepListener,
 		MobsimEngine {
 
 	private static final Logger log = Logger.getLogger(ParkingAgentsTracker.class);
@@ -72,6 +70,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	
 	protected final Scenario scenario;
 	protected final ParkingInfrastructure parkingInfrastructure;
+	protected final MobsimDataProvider mobsimDataProvider;
 	private final double distance;
 	private final WithinDayAgentUtils withinDayAgentUtils;
 
@@ -80,7 +79,6 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	private final Set<Id> linkEnteredAgents;
 	private final Set<Id> lastTimeStepsLinkEnteredAgents;
 	private final Map<Id, ActivityFacility> nextActivityFacilityMap;
-	protected final Map<Id, MobsimAgent> agents;
 	private final Map<Id, Id> selectedParkingsMap;
 	private final Set<Id> recentlyArrivedDrivers;
 	private final Map<Id, Id> recentlyDepartingDrivers;
@@ -96,9 +94,11 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	 *            defines in which distance to the destination of a car trip an
 	 *            agent starts its parking search
 	 */
-	public ParkingAgentsTracker(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance) {
+	public ParkingAgentsTracker(Scenario scenario, ParkingInfrastructure parkingInfrastructure, 
+			MobsimDataProvider mobsimDataProvider, double distance) {
 		this.scenario = scenario;
 		this.parkingInfrastructure = parkingInfrastructure;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.distance = distance;
 
 		this.carLegAgents = new HashSet<Id>();
@@ -110,19 +110,11 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 		this.recentlyArrivedDrivers = new HashSet<Id>();
 		this.recentlyDepartingDrivers = new HashMap<Id, Id>();
 		this.recentlyWaitingDrivers = new HashSet<Id>();
-		this.agents = new HashMap<Id, MobsimAgent>();
 		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 
 	public Set<Id> getSearchingAgents() {
 		return Collections.unmodifiableSet(this.searchingAgents);
-	}
-
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
-			this.agents.put(agent.getId(), agent);
-		}
 	}
 
 	/*
@@ -144,7 +136,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 		 * anymore.
 		 */
 		for (Id agentId : this.recentlyWaitingDrivers) {
-			MobsimAgent agent = this.agents.get(agentId);
+			MobsimAgent agent = this.mobsimDataProvider.getAgent(agentId);
 			Activity parkingActivity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 			parkingActivity.setEndTime(Time.UNDEFINED_TIME);
 			parkingActivity.setMaximumDuration(Time.UNDEFINED_TIME);
@@ -159,7 +151,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 		 */
 		Collection<Id> parkedAgentIds = this.parkingInfrastructure.waitingToParking();
 		for (Id agentId : parkedAgentIds) {
-			MobsimAgent agent = this.agents.get(agentId);
+			MobsimAgent agent = this.mobsimDataProvider.getAgent(agentId);
 			Activity parkingActivity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 			parkingActivity.setEndTime(e.getSimulationTime() + 180);
 			parkingActivity.setMaximumDuration(parkingActivity.getEndTime() - parkingActivity.getStartTime());
@@ -177,7 +169,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 
 	public void setSelectedParking(Id agentId, Id parkingFacilityId, boolean reserveAsWaiting) {
 		
-		selectedParkingsMap.put(agentId, parkingFacilityId);
+		this.selectedParkingsMap.put(agentId, parkingFacilityId);
 		
 //		Id vehicleId = this.parkingInfrastructure.getVehicleId(agents.get(agentId).getSelectedPlan().getPerson());
 		Id vehicleId = agentId;	// so far, this is true...
@@ -190,7 +182,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	}
 
 	public Id getSelectedParking(Id agentId) {
-		return selectedParkingsMap.get(agentId);
+		return this.selectedParkingsMap.get(agentId);
 	}
 
 	@Override
@@ -296,7 +288,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	 */
 	private Activity getNextNonParkingActivity(Id agentId) {
 
-		MobsimAgent agent = this.agents.get(agentId);
+		MobsimAgent agent = this.mobsimDataProvider.getAgent(agentId);
 		Plan executedPlan = ((PlanAgent) agent).getSelectedPlan();
 		int planElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		
@@ -314,7 +306,6 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 
 	@Override
 	public void reset(int iteration) {
-		this.agents.clear();
 		this.carLegAgents.clear();
 		this.searchingAgents.clear();
 		this.linkEnteredAgents.clear();

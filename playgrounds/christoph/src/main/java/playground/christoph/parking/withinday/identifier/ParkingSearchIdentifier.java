@@ -29,6 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
+import playground.christoph.parking.ParkingTypes;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 
@@ -56,53 +57,67 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier {
 		Set<MobsimAgent> identifiedAgents = new HashSet<MobsimAgent>();
 		
 		for (Id agentId : linkEnteredAgents) {
-			MobsimAgent agent = this.mobsimDataProvider.getAgent(agentId);
 			
 			/*
 			 * If the agent has not selected a parking facility yet.
 			 */
-			if (requiresReplanning(agent)) {
-				
-				Id linkId = agent.getCurrentLinkId();
-				boolean foundParking = false;
-				
-				List<Id> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId, "streetParking");
-				if (facilityIds != null && facilityIds.size() > 0) {
-					Id facilityId = facilityIds.get(0);
-
-					/*
-					 * If the agent accepts the parking, select it.
-					 * The parkingAgentsTracker then reserves the parking lot.
-					 */
-					if (acceptParking(agent, facilityId)) { 
-						this.parkingAgentsTracker.setSelectedParking(agentId, facilityId, false);
-						foundParking = true;
-					}
-				}
-				
-				// else: check whether the agent is also willing to wait for a free parking
-				
-				if (!foundParking) {
-					facilityIds = parkingInfrastructure.getFreeWaitingFacilitiesOnLink(linkId, "streetParking");
-					if (facilityIds != null && facilityIds.size() > 0) {
-						Id facilityId = facilityIds.get(0);
-
-						/*
-						 * If the agent accepts the parking, select it.
-						 * The parkingAgentsTracker then reserves the parking lot.
-						 */
-						if (acceptParking(agent, facilityId) && isWillingToWaitForParking(agent, facilityId)) { 
-							this.parkingAgentsTracker.setSelectedParking(agentId, facilityId, true);
-							foundParking = true;
-						}
-					}
-				}
+			if (requiresReplanning(agentId)) {
+				MobsimAgent agent = this.mobsimDataProvider.getAgent(agentId);
+				parkOnLink(agent);				
 				
 				identifiedAgents.add(agent);
 			}
 		}
 		
 		return identifiedAgents;
+	}
+	
+	/**
+	 * @param agent
+	 * @return true if a parking facility is attached to the agent's current link where
+	 * 	the agent is going to park or false if the agent has to continue its search.
+	 * 
+	 * At the moment, this cannot be moved to the ParkingSearchReplanner since the order
+	 * in which parking lots are selected and reserved would not be deterministic anymore!
+	 */
+	private boolean parkOnLink(MobsimAgent agent) {
+				
+		Id agentId = agent.getId();
+		Id linkId = agent.getCurrentLinkId();
+	
+		List<Id> facilityIds = parkingInfrastructure.getFreeParkingFacilitiesOnLink(linkId, ParkingTypes.PARKING);
+		if (facilityIds != null && facilityIds.size() > 0) {
+			Id facilityId = facilityIds.get(0);
+
+			/*
+			 * If the agent accepts the parking, select it.
+			 * The parkingAgentsTracker then reserves the parking lot.
+			 */
+			if (acceptParking(agent, facilityId)) { 
+				this.parkingAgentsTracker.setSelectedParking(agentId, facilityId, false);
+				return true;
+			}
+		}
+		
+		// else: check whether the agent is also willing to wait for a free parking
+		else {
+			facilityIds = parkingInfrastructure.getFreeWaitingFacilitiesOnLink(linkId, ParkingTypes.PARKING);
+			if (facilityIds != null && facilityIds.size() > 0) {
+				Id facilityId = facilityIds.get(0);
+
+				/*
+				 * If the agent accepts the parking, select it.
+				 * The parkingAgentsTracker then reserves the parking lot.
+				 */
+				if (acceptParking(agent, facilityId) && isWillingToWaitForParking(agent, facilityId)) { 
+					this.parkingAgentsTracker.setSelectedParking(agentId, facilityId, true);
+					return true;
+				}
+			}
+		}
+		
+		// no parking was found on this link, therefore return null
+		return false;
 	}
 	
 	private boolean acceptParking(MobsimAgent agent, Id facilityId) {
@@ -119,8 +134,8 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier {
 	 * If no parking is selected for the current agent, the agent requires
 	 * a replanning.
 	 */
-	private boolean requiresReplanning(MobsimAgent agent) {
-		return parkingAgentsTracker.getSelectedParking(agent.getId()) == null;
+	private boolean requiresReplanning(Id agentId) {
+		return parkingAgentsTracker.getSelectedParking(agentId) == null;
 	}
 
 }

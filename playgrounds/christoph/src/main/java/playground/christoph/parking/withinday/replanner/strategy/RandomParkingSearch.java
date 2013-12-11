@@ -54,29 +54,29 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		/*
 		 * Set seed in random number generator to create deterministic results.
 		 * We need the time here since otherwise an agent would always make
-		 * the same decision at a crossing.
+		 * the same decision at an intersection.
 		 */
 		Id currentLinkId = agent.getCurrentLinkId();
-		random.setSeed(currentLinkId.hashCode() + agent.getId().hashCode() + (long) time);
 		
 		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
 
 		Link currentLink = this.network.getLinks().get(currentLinkId);
 
 		int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
-
+		
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		
 		Id startLink = route.getStartLinkId();
-		List<Id> links = new ArrayList<Id>(route.getLinkIds()); // create a copy that can be modified
+		List<Id> links = null;
 		Id endLink = route.getEndLinkId();
-		
-		// check whether the car is at the routes start link
+			
+		// check whether the car is at the route's start link
 		if (routeIndex == 0) {
 			
 			// if the route ends at the same link
 			if (startLink.equals(endLink)) {
-				Link l = randomNextLink(currentLink);
+				Link l = randomNextLink(currentLink, agent, time);
+				links  = new ArrayList<Id>(route.getLinkIds()); // create a copy that can be modified
 				links.add(l.getId());
 				
 				log.warn("Car trip ends as the same link as it started - this should not happen since " + 
@@ -86,22 +86,25 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 			}
 		}
 		// end link
-		else if (routeIndex == links.size() + 1) {
+		else if (routeIndex == route.getLinkIds().size() + 1) {
+			links  = new ArrayList<Id>(route.getLinkIds()); // create a copy that can be modified
 			links.add(endLink);
-			endLink = randomNextLink(currentLink).getId();
+			endLink = randomNextLink(currentLink, agent, time).getId();
 		}
 		// link in between
 		else {
 			// nothing to do here since more links available in the route
+			return;
 		}
 		
 		// update agent's route
 		route.setLinkIds(startLink, links, endLink);
 	}
 
-	private Link randomNextLink(Link link) {
+	private Link randomNextLink(Link link, MobsimAgent agent, double time) {
 		List<Link> links = new ArrayList<Link>(link.getToNode().getOutLinks().values());
 
+		random.setSeed(link.getId().hashCode() + agent.getId().hashCode() + (long) time);
 		int i = random.nextInt(links.size());
 		return links.get(i);
 	}

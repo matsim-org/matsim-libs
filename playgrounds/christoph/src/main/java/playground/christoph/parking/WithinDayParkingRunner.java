@@ -21,6 +21,11 @@
 package playground.christoph.parking;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
@@ -30,8 +35,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
-public class WithinDayParkingRunner {
+import playground.christoph.parking.core.facilities.OtherFacilityCreator;
+import playground.christoph.parking.core.facilities.ParkingFacilityCreator;
 
+public class WithinDayParkingRunner {
+	
 	public static void main(String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -49,8 +57,32 @@ public class WithinDayParkingRunner {
 				 * convert it to multi-modal.
 				 */
 				if (!NetworkUtils.isMultimodal(scenario.getNetwork())) {
+					String simulatedModes = multiModalConfigGroup.getSimulatedModes();
+					// ensure that multi-modal network includes ride and pt links
+					multiModalConfigGroup.setSimulatedModes(simulatedModes + ",ride,pt");
 					new MultiModalNetworkCreator(multiModalConfigGroup).run(scenario.getNetwork());
-				}				
+					multiModalConfigGroup.setSimulatedModes(simulatedModes);
+				}
+				
+				// drop routes and convert ride to car legs
+				for (Person person : scenario.getPopulation().getPersons().values()) {
+					for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
+						if (planElement instanceof Leg) {
+							Leg leg = (Leg) planElement;
+							leg.setRoute(null);
+							if (leg.getMode().equals(TransportMode.ride)) leg.setMode(TransportMode.car);
+						}
+					}
+				}
+			}
+
+			OtherFacilityCreator.createParkings(scenario);
+			
+			int i = 0;
+			int mod = 3;
+			for (Link link : scenario.getNetwork().getLinks().values()) {
+				if (i++ % mod == 0) ParkingFacilityCreator.createParkings(scenario, link, ParkingTypes.PARKING);
+//				if (i++ % mod == 0) ParkingFacilityCreator.createParkings(scenario, link, ParkingTypes.PARKING, 1000.0);
 			}
 			
 			Controler controler = new Controler(scenario);
@@ -71,7 +103,6 @@ public class WithinDayParkingRunner {
 			controler.run();
 			
 			System.exit(0);			
-		}
-		
+		}		
 	}
 }

@@ -41,8 +41,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
+import playground.christoph.parking.core.mobsim.ParkingFacility;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
-import playground.christoph.parking.core.mobsim.ParkingInfrastructure.ParkingFacility;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 
 public class ParkingInfrastructure_v2 extends ParkingInfrastructure {

@@ -24,6 +24,7 @@ import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.christoph.parking.ParkingTypes;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 
 public class ParkingCostCalculatorImpl implements ParkingCostCalculator {
@@ -37,9 +38,9 @@ public class ParkingCostCalculatorImpl implements ParkingCostCalculator {
 	@Override
 	public Double getParkingCost(Id parkingFacilityId, Id vehicleId, Id driverId, double arrivalTime, double parkingDuration) {
 		
-		if (parkingTypes.get("streetParking").contains(parkingFacilityId)) {
+		if (parkingTypes.get(ParkingTypes.STREETPARKING).contains(parkingFacilityId)) {
 			return 1.0 * parkingDuration/3600;
-		} else if(parkingTypes.get("garageParking").contains(parkingFacilityId)) {
+		} else if(parkingTypes.get(ParkingTypes.GARAGEPARKING).contains(parkingFacilityId)) {
 			return 2.0 * parkingDuration/3600;
 		}
 		

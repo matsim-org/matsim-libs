@@ -26,8 +26,6 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
@@ -46,7 +44,7 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Ite
 	}
 	
 	public ParkingAgentsTracker_v2(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance, Controler controler) {
-		super(scenario, parkingInfrastructure, distance);
+		super(scenario, parkingInfrastructure, null, distance);
 		this.controler = controler;
 	}
 	
@@ -60,13 +58,13 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Ite
 		firstCarDepartureTimeOfDay=new DoubleValueHashMap<Id>();
 	}
 
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		super.notifyMobsimInitialized(e);
-		for (MobsimAgent agent : this.agents.values()){
-			getParkingStrategyManager().prepareStrategiesForNewIteration(agent, controler.getIterationNumber());
-		}
-	}
+//	@Override
+//	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+//		super.notifyMobsimInitialized(e);
+//		for (MobsimAgent agent : this.agents.values()){
+//			getParkingStrategyManager().prepareStrategiesForNewIteration(agent, controler.getIterationNumber());
+//		}
+//	}
 
 	public ParkingStrategyManager getParkingStrategyManager() {
 		return parkingStrategyManager;

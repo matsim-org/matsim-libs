@@ -79,7 +79,7 @@ public class ParkingRouter {
 			TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 			this.travelDisutilities.put(mode, travelDisutility);
 			MyMultiNodeDijkstra modeDijsktra = (MyMultiNodeDijkstra) new MyFastDijkstraFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime); 
-			this.dijkstras.put(mode, modeDijsktra); 
+			this.dijkstras.put(mode, modeDijsktra);
 		}
 	}
 

@@ -59,11 +59,22 @@ public class NearestAvailableParkingSearch implements ParkingSearchStrategy {
 		Id currentLinkId = agent.getCurrentLinkId();
 		Link currentLink = this.network.getLinks().get(currentLinkId);
 		
+		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
+		NetworkRoute route = (NetworkRoute) leg.getRoute();
+		int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+		
+		// check whether the car is at the route's start link
+		if (routeIndex < route.getLinkIds().size() + 1) {
+			// nothing to do here since more links available in the route
+			return;
+		} else if (routeIndex == 0 && !route.getStartLinkId().equals(route.getEndLinkId())) {
+			// nothing to do here since more links available in the route
+			return;
+		}
+		
 		ActivityFacility parkingFacility = this.parkingInfrastructure.getClosestFreeParkingFacility(currentLink.getCoord());
 		Id endLinkId = parkingFacility.getLinkId();
 		
-		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
-		NetworkRoute route = (NetworkRoute) leg.getRoute();	
 		
 		Person person = ((PlanAgent) agent).getSelectedPlan().getPerson();
 		Vehicle vehicle = null;

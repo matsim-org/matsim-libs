@@ -67,7 +67,7 @@ public class ParkingAgentSource implements AgentSource {
 	@Override
 	public void insertAgentsIntoMobsim() {
 		
-		parkingInfrastructure.resetParkingFacilityForNewIteration();
+//		parkingInfrastructure.resetParkingFacilityForNewIteration();
 		
 		PlanAlgorithm insertParkingActivities = new InsertParkingActivities(scenario, this.parkingInfrastructure);
 		
@@ -79,7 +79,7 @@ public class ParkingAgentSource implements AgentSource {
 			
 			// Create agent...
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
-					
+			
 			// ... and then insert parking activities into its plan.
 			insertParkingActivities.run(((PlanAgent) agent).getSelectedPlan());
 			

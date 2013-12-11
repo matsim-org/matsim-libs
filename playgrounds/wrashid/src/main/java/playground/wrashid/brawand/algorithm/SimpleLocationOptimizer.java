@@ -8,7 +8,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.christoph.parking.core.mobsim.ParkingInfrastructure.ParkingFacility;
 
 public class SimpleLocationOptimizer {
 
