@@ -2,18 +2,28 @@ package josmMatsimPlugin;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.visitor.paint.StyledMapRenderer;
 import org.openstreetmap.josm.gui.NavigatableComponent;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.gui.mappaint.LabelCompositionStrategy;
+import org.openstreetmap.josm.gui.mappaint.TextElement;
 
 public class MapRenderer extends StyledMapRenderer {
+    private final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
+    private final CompositionStrategy STRATEGY = new CompositionStrategy();
+    private final Color MATSIMCOLOR = new Color(80, 145, 190);
 
     public MapRenderer(Graphics2D arg0, NavigatableComponent arg1, boolean arg2) {
 	super(arg0, arg1, arg2);
@@ -39,12 +49,14 @@ public class MapRenderer extends StyledMapRenderer {
 	Layer layer = Main.main.getActiveLayer();
 	Id id = new IdImpl(way.getUniqueId());
 	if (layer instanceof NetworkLayer) {
-	    if (((NetworkLayer) layer).getMatsimNetwork().getLinks()
-		    .containsKey(id)) {
-		Color matsimColor = new Color(80, 145, 190);
-		super.drawWay(way, matsimColor, line, dashes, dashedColor,
-			offset, showOrientation, showHeadArrowOnly, showOneway,
+	    Network network = ((NetworkLayer) layer).getMatsimNetwork();
+	    if (network.getLinks().containsKey(id)) {
+		Link link = network.getLinks().get(id);
+		super.drawWay(way, MATSIMCOLOR, line, dashes, dashedColor,
+			calculateOffset(network, link, 1), showOrientation, showHeadArrowOnly, showOneway,
 			onewayReversed);
+		
+		drawTextOnPath(way, new TextElement(STRATEGY, FONT, 0, calculateOffset(network, link, 10), MATSIMCOLOR, 0.f, null));
 	    } else
 		super.drawWay(way, color, line, dashes, dashedColor, offset,
 			showOrientation, showHeadArrowOnly, showOneway,
@@ -53,6 +65,29 @@ public class MapRenderer extends StyledMapRenderer {
 	    super.drawWay(way, color, line, dashes, dashedColor, offset,
 		    showOrientation, showHeadArrowOnly, showOneway,
 		    onewayReversed);
+    }
+    
+    private int calculateOffset(Network network, Link link, int offset) {
+	int offsetCopy = offset;
+	for (Link link2: network.getLinks().values()) {
+	    if (link2.getFromNode().equals(link.getToNode()) && link2.getToNode().equals(link.getFromNode())) {
+		if (Long.parseLong(link.getToNode().getId().toString()) < Long.parseLong(link.getFromNode().getId().toString())) {
+		    offsetCopy *=-1;
+		}
+		break;
+	    }
+	}
+	return offsetCopy;
+    }
+    
+    private class CompositionStrategy extends LabelCompositionStrategy {
 
+	@Override
+	public String compose(OsmPrimitive prim) {
+	    Layer layer = Main.main.getActiveLayer();
+		Id id = new IdImpl(prim.getUniqueId());
+		return ((LinkImpl) ((NetworkLayer) layer).getMatsimNetwork().getLinks().get(id)).getOrigId();
+	}
+	
     }
 }
