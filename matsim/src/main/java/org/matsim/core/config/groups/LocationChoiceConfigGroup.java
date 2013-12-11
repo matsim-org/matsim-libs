@@ -270,8 +270,8 @@ public class LocationChoiceConfigGroup extends Module {
 						return ;
 					}
 				}
-				log.warn("define algorithm: 'localSearchRecursive', 'localSearchSingleAct', 'random', 'bestResponse'. Setting to default value 'random' now");
-				setAlgorithm(Algotype.random) ;
+				log.warn("define algorithm: 'localSearchRecursive', 'localSearchSingleAct', 'random', 'bestResponse'. Setting to default value 'bestResponse' now");
+				setAlgorithm(Algotype.bestResponse) ;
 //			}
 		} else if (TT_APPROX_LEVEL.equals(key)) {
 			if (!(value.equals("0") || value.equals("1") || value.equals("2"))) {
