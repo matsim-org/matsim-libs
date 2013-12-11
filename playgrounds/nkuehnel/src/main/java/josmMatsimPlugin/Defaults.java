@@ -12,13 +12,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
- * Stores the default values for highways that are used when exporting a network
- * from OSM-data.
+ * Stores the default values
  * 
  * @author nkuehnel
  * 
  */
 public class Defaults {
+    protected static boolean renderMatsim = true;
+    protected static boolean showIds = false;
     protected static Map<String, OsmHighwayDefaults> defaults = new HashMap<String, OsmHighwayDefaults>();
     protected static boolean cleanNet = true;
     protected static boolean keepPaths = false;

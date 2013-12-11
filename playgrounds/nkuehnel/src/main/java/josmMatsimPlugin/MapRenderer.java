@@ -46,48 +46,62 @@ public class MapRenderer extends StyledMapRenderer {
 	    boolean showOrientation, boolean showHeadArrowOnly,
 	    boolean showOneway, boolean onewayReversed) {
 
-	Layer layer = Main.main.getActiveLayer();
-	Id id = new IdImpl(way.getUniqueId());
-	if (layer instanceof NetworkLayer) {
-	    Network network = ((NetworkLayer) layer).getMatsimNetwork();
-	    if (network.getLinks().containsKey(id)) {
-		Link link = network.getLinks().get(id);
-		super.drawWay(way, MATSIMCOLOR, line, dashes, dashedColor,
-			calculateOffset(network, link, 1), showOrientation, showHeadArrowOnly, showOneway,
-			onewayReversed);
-		
-		drawTextOnPath(way, new TextElement(STRATEGY, FONT, 0, calculateOffset(network, link, 10), MATSIMCOLOR, 0.f, null));
-	    } else
-		super.drawWay(way, color, line, dashes, dashedColor, offset,
-			showOrientation, showHeadArrowOnly, showOneway,
-			onewayReversed);
-	} else
-	    super.drawWay(way, color, line, dashes, dashedColor, offset,
-		    showOrientation, showHeadArrowOnly, showOneway,
-		    onewayReversed);
+	if(Defaults.renderMatsim) {
+	    Layer layer = Main.main.getActiveLayer();
+	    Id id = new IdImpl(way.getUniqueId());
+	    if (layer instanceof NetworkLayer) {
+		  Network network = ((NetworkLayer) layer).getMatsimNetwork();
+		  if (network.getLinks().containsKey(id)) {
+		      Link link = network.getLinks().get(id);
+		      super.drawWay(way, MATSIMCOLOR, line, dashes, dashedColor, 
+			      wayOffset(network, link), showOrientation,
+				showHeadArrowOnly, showOneway, onewayReversed);
+			if(Defaults.showIds) {
+			drawTextOnPath(way, new TextElement(STRATEGY, FONT, 0,
+				textOffset(network, link), MATSIMCOLOR, 0.f, null));
+			}
+		  }
+		  return;
+	    }
+	}
+	super.drawWay(way, color, line, dashes, dashedColor, offset, showOrientation, showHeadArrowOnly, showOneway, onewayReversed);
+	    
     }
-    
-    private int calculateOffset(Network network, Link link, int offset) {
-	int offsetCopy = offset;
-	for (Link link2: network.getLinks().values()) {
-	    if (link2.getFromNode().equals(link.getToNode()) && link2.getToNode().equals(link.getFromNode())) {
-		if (Long.parseLong(link.getToNode().getId().toString()) < Long.parseLong(link.getFromNode().getId().toString())) {
-		    offsetCopy *=-1;
+
+    private float wayOffset(Network network, Link link) {
+	for (Link link2 : network.getLinks().values()) {
+	    if (link2.getFromNode().equals(link.getToNode())
+		    && link2.getToNode().equals(link.getFromNode())) {
+		return 1.5f;
+	    }
+	}
+	return 0.f;
+    }
+
+    private int textOffset(Network network, Link link) {
+	int offset = 10;
+	for (Link link2 : network.getLinks().values()) {
+	    if (link2.getFromNode().equals(link.getToNode())
+		    && link2.getToNode().equals(link.getFromNode())) {
+		if (Long.parseLong(link.getToNode().getId().toString()) < Long
+			.parseLong(link.getFromNode().getId().toString())) {
+		    offset *= -1;
 		}
 		break;
 	    }
 	}
-	return offsetCopy;
+	return offset;
     }
-    
+
     private class CompositionStrategy extends LabelCompositionStrategy {
 
 	@Override
 	public String compose(OsmPrimitive prim) {
 	    Layer layer = Main.main.getActiveLayer();
-		Id id = new IdImpl(prim.getUniqueId());
-		return ((LinkImpl) ((NetworkLayer) layer).getMatsimNetwork().getLinks().get(id)).getOrigId();
+	    Id id = new IdImpl(prim.getUniqueId());
+	    return ((LinkImpl) ((NetworkLayer) layer).getMatsimNetwork()
+		    .getLinks().get(id)).getOrigId();
 	}
-	
+
     }
 }

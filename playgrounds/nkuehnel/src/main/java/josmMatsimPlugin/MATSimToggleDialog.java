@@ -2,11 +2,20 @@ package josmMatsimPlugin;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -26,6 +35,9 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	LayerChangeListener, SelectionChangedListener {
     private JTable table;
     private Map<Layer, MATSimTableModel> tableModels = new HashMap<Layer, MATSimTableModel>();
+    protected final static JRadioButton renderMatsim = new JRadioButton(
+	    "Activate MATSim Renderer");
+    protected final static JRadioButton showIds = new JRadioButton("Show Ids");
 
     private String[] columnNames = { "id", "internal-id", "length",
 	    "freespeed", "capacity", "permlanes" };
@@ -33,16 +45,38 @@ public class MATSimToggleDialog extends ToggleDialog implements
     public MATSimToggleDialog() {
 	super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true);
 	DataSet.addSelectionListener(this);
-	table = new JTable();
 
+	table = new JTable();
 	table.setDefaultRenderer(Object.class, new MATSimTableRenderer());
 	table.setEnabled(false);
 	table.setAutoCreateRowSorter(true);
-
 	Object[][] data = new Object[0][6];
-
 	table.setModel(new DefaultTableModel(data, columnNames));
-	createLayout(table, true, null);
+
+	JScrollPane tableContainer = new JScrollPane(table);
+
+	JPanel overview = new JPanel(new BorderLayout());
+	overview.add(tableContainer, BorderLayout.CENTER);
+
+	JPanel options = new JPanel(new GridBagLayout());
+	GridBagConstraints cOptions = new GridBagConstraints();
+
+	showIds.addActionListener(new ShowIdsListener());
+	renderMatsim.addActionListener(new RenderMatsimListener());
+	
+	showIds.setSelected(true);
+	renderMatsim.setSelected(true);
+
+	cOptions.gridx = 0;
+	cOptions.gridy = 0;
+	options.add(renderMatsim, cOptions);
+	cOptions.gridx = 1;
+	options.add(showIds, cOptions);
+
+	JTabbedPane pane = new JTabbedPane(JTabbedPane.TOP);
+	pane.addTab("Overview", overview);
+	pane.addTab("Options", options);
+	createLayout(pane, false, null);
     }
 
     private void clearTable() {
@@ -113,9 +147,9 @@ public class MATSimToggleDialog extends ToggleDialog implements
     }
 
     @Override
-    public void selectionChanged(Collection<? extends OsmPrimitive> arg0) {
+    public void selectionChanged(Collection<? extends OsmPrimitive> primitives) {
 	table.clearSelection();
-	for (OsmPrimitive prim : arg0) {
+	for (OsmPrimitive prim : primitives) {
 	    if (prim instanceof Way) {
 		String id = String.valueOf(prim.getUniqueId());
 		for (int i = 0; i < table.getRowCount(); i++) {
@@ -125,7 +159,23 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		}
 	    }
 	}
+
     }
+
+    // private void checkReverseSelection(Link link) {
+    //
+    // if (lastSelection.equals(link)) {
+    // for (Link link2 : currentLayer.getMatsimNetwork().getLinks().values()) {
+    // if (link2.getFromNode().equals(link.getToNode())
+    // && link2.getToNode().equals(link.getFromNode())) {
+    // System.out.println("selection reversed!");
+    // this.lastSelection = null;
+    // currentLayer.data.setSelected(currentLayer.data.getPrimitiveById(Long.parseLong(link2.getId().toString()),
+    // OsmPrimitiveType.WAY));
+    // }
+    // }
+    // }
+    // }
 
     private class MATSimTableRenderer extends DefaultTableCellRenderer {
 	@Override
@@ -152,6 +202,29 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		if (id.equalsIgnoreCase(this.getValueAt(i, 1).toString())) {
 		    this.removeRow(i);
 		}
+	    }
+	}
+    }
+
+    private class ShowIdsListener implements ActionListener {
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+	    if (!showIds.isSelected()) {
+		Defaults.showIds = false;
+	    } else
+		Defaults.showIds = true;
+	}
+    }
+
+    private class RenderMatsimListener implements ActionListener {
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+	    if (!renderMatsim.isSelected()) {
+		Defaults.renderMatsim = false;
+		showIds.setEnabled(false);
+	    } else {
+		Defaults.renderMatsim = true;
+		showIds.setEnabled(true);
 	    }
 	}
     }
