@@ -84,7 +84,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String randomSeed = "221177";
 	private String epsilonDistribution = "gumbel";
 	private String epsilonScaleFactors = "null";
-	private String probChoiceSetSize = "10";	
+	private String probChoiceSetSize = "5";	
 	private String pkValuesFile = "null";
 	private String fkValuesFile = "null";
 	private String pBetasFile = "null";
@@ -312,7 +312,7 @@ public class LocationChoiceConfigGroup extends Module {
 			}
 		} else if (PROBCHOICESETSIZE.equals(key)) {
 			if (value.length() == 0) {
-				log.warn("define size of canditate set for probabilistic choice. Set to default value '10' now");
+				log.warn("define size of canditate set for probabilistic choice. Set to default value '5' now");
 			}
 			else {
 				setProbChoiceSetSize(value);
