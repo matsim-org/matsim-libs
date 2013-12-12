@@ -259,7 +259,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 					new PersonStuckEvent(
 						internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
 						veh.getDriver().getId(),
-						veh.getCurrentLink().getId(),
+						veh.getDriver().getCurrentLinkId(),
 						veh.getDriver().getMode()));
 			internalInterface.getMobsim().getAgentCounter().incLost();
 			internalInterface.getMobsim().getAgentCounter().decLiving();
