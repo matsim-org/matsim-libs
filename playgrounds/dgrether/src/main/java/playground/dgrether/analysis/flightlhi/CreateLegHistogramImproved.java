@@ -90,13 +90,14 @@ public class CreateLegHistogramImproved {
 //			new Tuple<String, Integer>("1869", 600),
 //			new Tuple<String, Integer>("1870", 600),
 
-			new Tuple<String, Integer>("1876", 600),
-			new Tuple<String, Integer>("1877", 600),
-			new Tuple<String, Integer>("1878", 600),
-			new Tuple<String, Integer>("1879", 600),
-			new Tuple<String, Integer>("1880", 600),
-			new Tuple<String, Integer>("1881", 600),
-				
+//			new Tuple<String, Integer>("1876", 600), //2009 data worst plan selector
+//			new Tuple<String, Integer>("1877", 600),
+//			new Tuple<String, Integer>("1878", 600),
+//			new Tuple<String, Integer>("1879", 600),
+//			new Tuple<String, Integer>("1880", 600),
+//			new Tuple<String, Integer>("1881", 600),
+
+
 				
 //			new Tuple<String, Integer>("1882", 600), //path size mode choice 2011 daten
 //			new Tuple<String, Integer>("1883", 600),
@@ -104,6 +105,27 @@ public class CreateLegHistogramImproved {
 //			new Tuple<String, Integer>("1885", 600),
 //			new Tuple<String, Integer>("1886", 600),
 
+//				new Tuple<String, Integer>("1887", 600), //2009 data worst plan selector
+//				new Tuple<String, Integer>("1888", 600),
+//				new Tuple<String, Integer>("1889", 600),
+//				new Tuple<String, Integer>("1890", 600),
+//				new Tuple<String, Integer>("1891", 600),
+//				new Tuple<String, Integer>("1892", 600)
+
+				
+//			new Tuple<String, Integer>("1893", 600), //path size mode choice 2009 daten
+//			new Tuple<String, Integer>("1894", 600),
+//			new Tuple<String, Integer>("1895", 600),
+//			new Tuple<String, Integer>("1896", 600),
+//			new Tuple<String, Integer>("1897", 600),
+
+			new Tuple<String, Integer>("1903", 600), //mode choice 2009 daten, no psl
+			new Tuple<String, Integer>("1904", 600),
+			new Tuple<String, Integer>("1905", 600),
+			new Tuple<String, Integer>("1906", 600),
+			new Tuple<String, Integer>("1907", 600),
+
+				
 		};
 
 		String vehiclesFile = "/home/dgrether/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/flight_transit_vehicles.xml";
