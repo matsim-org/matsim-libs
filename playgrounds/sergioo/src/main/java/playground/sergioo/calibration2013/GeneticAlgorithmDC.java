@@ -46,8 +46,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -56,11 +56,10 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImplFactory;
 
 //import com.imsl.stat.KolmogorovTwoSample;
+
 
 
 

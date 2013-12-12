@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -38,14 +37,12 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -53,9 +50,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
@@ -67,12 +61,11 @@ import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime
 import playground.sergioo.typesPopulation2013.population.MatsimPopulationReader;
 
 public class GeneticAlgorithmMode {
-
-	private static ReplanningContext context;
-	private static ReRoute module;
+	
 	private static int NUM_PARAMETERS = 11;
-	private static double[] limits = {100, 200, 500, 1000, 2000, 5000};
+	public static double[] limits = {100, 200, 500, 1000, 2000, 5000};
 	private static SortedMap<Double, int[]> distancesHits = createMap();
+	private static RouterManager routerManager;
 	
 	private static class ParametersArray {
 		
@@ -114,12 +107,10 @@ public class GeneticAlgorithmMode {
 			scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(this.parameters[k++]);
 		}
 		private void calculateScore(final Scenario scenario) {
-			module.prepareReplanning(context);
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
-			Collection<PlanImpl> copiedPlansCar = new ArrayList<PlanImpl>();
-			Collection<PlanImpl> copiedPlansPT = new ArrayList<PlanImpl>();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				Person copyPerson = new PersonImpl(person.getId());
+				PersonImpl copyPerson = new PersonImpl(person.getId());
+				copyPerson.setCarAvail(((PersonImpl)person).getCarAvail());
 				PlanImpl copyPlan = new PlanImpl(copyPerson);
 				copyPlan.copyFrom(person.getSelectedPlan());
 				copyPerson.addPlan(copyPlan);
@@ -127,102 +118,9 @@ public class GeneticAlgorithmMode {
 				for(PlanElement planElement:copyPlan.getPlanElements())
 					if(planElement instanceof Leg)
 						((Leg)planElement).setMode("car");
-				module.handlePlan(copyPlan);
-				copiedPlansCar.add(copyPlan);
-				copyPerson = new PersonImpl(person.getId());
-				copyPlan = new PlanImpl(copyPerson);
-				copyPlan.copyFrom(person.getSelectedPlan());
-				copyPerson.addPlan(copyPlan);
-				transitActsRemover.run(copyPlan);
-				for(PlanElement planElement:copyPlan.getPlanElements())
-					if(planElement instanceof Leg)
-						((Leg)planElement).setMode("pt");
-				module.handlePlan(copyPlan);
-				copiedPlansPT.add(copyPlan);
+				routerManager.addPlan(copyPlan);
 			}
-			module.finishReplanning();
-			SortedMap<Double, int[]> distanceDist = new TreeMap<Double, int[]>();
-			for(PlanImpl plan:copiedPlansCar)
-				for(PlanElement planElement:plan.getPlanElements())
-					if(planElement instanceof Leg)
-						if(!((Leg) planElement).getMode().equals("car"))
-							try {
-								throw new Exception();
-							} catch (Exception e) {
-								e.printStackTrace();
-								System.exit(0);
-							}
-						else {
-							double distance = RouteUtils.calcDistance((NetworkRoute) ((Leg) planElement).getRoute(), scenario.getNetwork());
-							boolean in = false;
-							LIMITS:
-							for(double limit:limits)
-								if(distance<limit) {
-									int[] nums = distanceDist.get(limit);
-									if(nums == null) {
-										nums = new int[2];
-										distanceDist.put(limit, nums);
-									}
-									nums[0]++;
-									in = true;
-									break LIMITS;
-								}
-							if(!in) {
-								int[] nums = distanceDist.get(Double.POSITIVE_INFINITY);
-								if(nums == null) {
-									nums = new int[2];
-									distanceDist.put(Double.POSITIVE_INFINITY, nums);
-								}
-								nums[0]++;
-							}
-						}
-			double distance = 0;
-			for(PlanImpl plan:copiedPlansPT)
-				for(PlanElement planElement:plan.getPlanElements())
-					if(planElement instanceof Leg)
-						if(((Leg) planElement).getMode().equals("car"))
-							try {
-								throw new Exception();
-							} catch (Exception e) {
-								e.printStackTrace();
-								System.exit(0);
-							}
-						else if(((Leg) planElement).getMode().equals("pt")) {
-							String[] parts = ((GenericRoute)((Leg) planElement).getRoute()).getRouteDescription().split("===");
-							NetworkRoute lineRoute = scenario.getTransitSchedule().getTransitLines().get(new IdImpl(parts[2])).getRoutes().get(new IdImpl(parts[3])).getRoute();
-							distance += RouteUtils.calcDistance(lineRoute.getSubRoute(scenario.getTransitSchedule().getFacilities().get(new IdImpl(parts[1])).getLinkId(),
-									scenario.getTransitSchedule().getFacilities().get(new IdImpl(parts[4])).getLinkId()), scenario.getNetwork());
-						}
-						else {
-							Link start = scenario.getNetwork().getLinks().get(((Leg) planElement).getRoute().getStartLinkId());
-							Link end = scenario.getNetwork().getLinks().get(((Leg) planElement).getRoute().getEndLinkId());
-							distance += CoordUtils.calcDistance(start.getCoord(), end.getCoord());
-						}
-					else if(!((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-						boolean in = false;
-						LIMITS:
-						for(double limit:limits)
-							if(distance<limit) {
-								int[] nums = distanceDist.get(limit);
-								if(nums == null) {
-									nums = new int[2];
-									distanceDist.put(limit, nums);
-								}
-								nums[1]++;
-								in = true;
-								break LIMITS;
-							}
-						if(!in) {
-							int[] nums = distanceDist.get(Double.POSITIVE_INFINITY);
-							if(nums == null) {
-								nums = new int[2];
-								distanceDist.put(Double.POSITIVE_INFINITY, nums);
-							}
-							nums[1]++;
-						}
-						distance = 0;
-					}
-
+			SortedMap<Double, int[]> distanceDist = routerManager.getDistribution();
 			score = compare(distanceDist, distancesHits);
 		}
 		public double compare(SortedMap<Double, int[]> sim, SortedMap<Double, int[]> hits) {
@@ -307,6 +205,9 @@ public class GeneticAlgorithmMode {
 
 	public static void main(String[] args) throws IOException {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
+		scenario.getConfig().planCalcScore().setConstantCar(10);
+		scenario.getConfig().planCalcScore().setMarginalUtlOfDistanceWalk(10);
+		scenario.getConfig().planCalcScore().setMonetaryDistanceCostRatePt(10);
 		new MatsimPopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		new MatsimNetworkReader(scenario).readFile(args[3]);
@@ -333,11 +234,13 @@ public class GeneticAlgorithmMode {
 		events.addHandler(waitTimeCalculator);
 		final StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
 		events.addHandler(stopStopTimeCalculator);
-		new MatsimEventsReader(events).readFile(args[5]);
+		if(!args[5].equals("NO"))
+			new MatsimEventsReader(events).readFile(args[5]);
+		routerManager = new RouterManager(scenario.getConfig().global().getNumberOfThreads(), scenario, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		final TravelDisutilityFactory factory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		final TransitRouterFactory transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		context = new ReplanningContext() {
+		ReplanningContext context = new ReplanningContext() {
 			@Override
 			public TravelDisutility getTravelDisutility() {
 				return disutility;
@@ -359,7 +262,7 @@ public class GeneticAlgorithmMode {
 				return new TripRouterFactoryImpl(scenario, factory, travelTimeCalculator.getLinkTravelTimes(), new DijkstraFactory(), transitRouterFactory).instantiateAndConfigureTripRouter();
 			}
 		};
-		module = new ReRoute(scenario);
+		ReRoute module = new ReRoute(scenario);
 		int numIterations = new Integer(args[6]);
 		int maxElements = new Integer(args[7]);
 		NavigableSet<ParametersArray> memory = new TreeSet<ParametersArray>(new Comparator<ParametersArray>() {
