@@ -19,6 +19,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -48,9 +49,12 @@ public class PopulationFromSightings {
 			Id personId = sightingsPerPerson.getKey();
 			List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
 			Person person = scenario.getPopulation().getFactory().createPerson(personId);
-			Plan plan = createPlanWithEndTimeAtLastSighting(scenario, zones,
+			Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
 					sightingsForThisPerson);
-			person.addPlan(plan);
+			person.addPlan(plan1);
+			Plan plan2 = createPlanWithEndTimeAtNextSightingElsewhere(scenario, zones,
+					sightingsForThisPerson);
+			person.addPlan(plan2);
 			scenario.getPopulation().addPerson(person);
 		}
 	}
@@ -86,6 +90,40 @@ public class PopulationFromSightings {
 		return plan;
 	}
 
+
+	public static Plan createPlanWithEndTimeAtNextSightingElsewhere(Scenario scenario,
+			LinkToZoneResolver zones, List<Sighting> sightingsForThisPerson) {
+		Plan plan = scenario.getPopulation().getFactory().createPlan();
+		boolean first = true;
+		Map<Activity, String> cellsOfSightings;
+		cellsOfSightings = new HashMap<Activity, String>();
+		for (Sighting sighting : sightingsForThisPerson) {
+			String zoneId = sighting.getCellTowerId();
+			Activity activity = createActivityInZone(scenario, zones,
+					zoneId);
+			cellsOfSightings.put(activity, zoneId);
+			activity.setEndTime(sighting.getTime());
+			if (first) {
+				plan.addActivity(activity);
+				first = false;
+			} else {
+				Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
+				if ( !(zoneId.equals(cellsOfSightings.get(lastActivity))) ) {
+					Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
+					plan.addLeg(leg);
+					plan.addActivity(activity);
+					TripRouter tripRouter = new TripRouter();
+					tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), (NetworkImpl) scenario.getNetwork(), new FreeSpeedTravelTime()));
+					List<? extends PlanElement> route = tripRouter.calcRoute("unknown", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
+					double travelTime = ((Leg) route.get(0)).getTravelTime();
+					lastActivity.setEndTime(sighting.getTime() - travelTime);
+				} else {
+					lastActivity.setEndTime(sighting.getTime());
+				}
+			}
+		}
+		return plan;
+	}
 
 	
 	public static Activity createActivityInZone(Scenario scenario, LinkToZoneResolver zones, String zoneId) {

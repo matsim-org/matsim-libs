@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.axis.utils.NetworkUtils;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -15,20 +14,28 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
 
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 
@@ -62,7 +69,7 @@ public class CompareMain {
 
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
-	private static final int dailyRate = 100;
+	private static final int dailyRate = 0;
 	private CallProcessTicker ticker;
 	private CallProcess callProcess;
 	private VolumesAnalyzer volumesAnalyzer1;
@@ -89,12 +96,29 @@ public class CompareMain {
 
 		List<Sighting> sightings = callProcess.getSightings();
 
-		VolumesAnalyzer volumesAnalyzer2 = runSimulationFromSightings(scenario.getNetwork(), linkToZoneResolver, sightings);
+
+		Counts counts = volumesToCounts(volumesAnalyzer1);
+		VolumesAnalyzer volumesAnalyzer2 = runSimulationFromSightings(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
 		
 
 		dumpVolumesCompareAllDay(scenario.getNetwork(), volumesAnalyzer1, volumesAnalyzer2);
 		dumpVolumesCompareTimebins(scenario.getNetwork(), volumesAnalyzer1, volumesAnalyzer2);
 		dumpVolumesCompareEMD(scenario.getNetwork(), volumesAnalyzer1, volumesAnalyzer2);
+	}
+
+	private Counts volumesToCounts(VolumesAnalyzer volumesAnalyzer) {
+		Counts counts = new Counts();
+		Network network = scenario.getNetwork();
+		for (Link link : network.getLinks().values()) {
+			Count count = counts.createAndAddCount(link.getId(), link.getId().toString());
+			int[] volumesForLink = getVolumesForLink(volumesAnalyzer, link);
+			int h = 1;
+			for (int v : volumesForLink) {
+				count.createVolume(h, v);
+				++h;
+			}
+		}
+		return counts;
 	}
 
 	CompareMain(Scenario scenario, EventsManager events) {
@@ -217,7 +241,7 @@ public class CompareMain {
 		return signature;
 	}
 
-	public static VolumesAnalyzer runSimulationFromSightings(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings) {
+	public static VolumesAnalyzer runSimulationFromSightings(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, Counts counts) {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		// sighting.setOpeningTime(0.0);
@@ -229,11 +253,19 @@ public class CompareMain {
 		config.planCalcScore().setTravelingOther_utils_hr(-6);
 		config.planCalcScore().setConstantCar(0);
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
-		config.controler().setLastIteration(0);
+		config.planCalcScore().setWriteExperiencedPlans(true);
+		config.controler().setLastIteration(20);
 		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(100);
 		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
+		
+		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+		stratSets.setModuleName("ccc") ;
+		stratSets.setProbability(1.) ;
+		config.strategy().addStrategySettings(stratSets) ;
+		
+		
 		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario2.setNetwork(network);
 
@@ -257,8 +289,18 @@ public class CompareMain {
 		PopulationFromSightings.readSampleWithOneRandomPointForEachSightingInNewCell(scenario2, linkToZoneResolver, allSightings);
 		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
 
+		final CadytsContext context = new CadytsContext(config, counts) ;
 		Controler controler = new Controler(scenario2);
 		controler.setOverwriteFiles(true);
+		controler.addControlerListener(context);
+		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+				CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,context);
+				planSelector.setCadytsWeight(10000000);
+				return new PlanStrategyImpl(planSelector);
+			}} ) ;
+		controler.setCreateGraphs(false);
 		controler.run();
 		return controler.getVolumes();
 	}

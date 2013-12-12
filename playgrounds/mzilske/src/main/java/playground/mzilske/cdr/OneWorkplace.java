@@ -36,10 +36,12 @@ public class OneWorkplace {
 		config.planCalcScore().addActivityParams(homeParams);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
+		config.planCalcScore().setWriteExperiencedPlans(true);
 		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(100);
 		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
+		tmp.setEndTime(24*60*60);
 		scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
 		Population population = scenario.getPopulation();
@@ -74,7 +76,7 @@ public class OneWorkplace {
 
 	private Activity createWork(IdImpl idImpl) {
 		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("work", idImpl);
-		act.setEndTime(9 * 60 * 60);
+		act.setEndTime(13 * 60 * 60);
 		return act;
 	}
 

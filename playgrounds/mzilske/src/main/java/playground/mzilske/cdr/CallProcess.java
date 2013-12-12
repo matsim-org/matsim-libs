@@ -18,7 +18,7 @@ import org.matsim.core.mobsim.framework.Steppable;
 import d4d.Sighting;
 
 public class CallProcess implements ActivityStartEventHandler, ActivityEndEventHandler, Steppable {
-	
+
 	public class CallingAgent {
 
 		public int nCalls;
@@ -26,9 +26,9 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 	}
 
 	private Population population;
-	
+
 	private Map<Id, CallingAgent> agents = new HashMap<Id, CallingAgent>();
-	
+
 	private final int dailyRate;
 	private final double secondlyProbability;
 
@@ -37,7 +37,9 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 	List<Sighting> sightings = new ArrayList<Sighting>();
 
 	final private ZoneTracker zoneTracker;
-	
+
+	private double lastTime;
+
 	public CallProcess(EventsManager events, Population population, final ZoneTracker zoneTracker, int dailyRate) {
 		this.population = population;
 		this.eventsManager = events;
@@ -56,15 +58,37 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 		for (Person p : population.getPersons().values()) {
 			System.out.println(agents.get(p.getId()).nCalls);
 		}
+		handleNight();
 	}
 
 	public void doSimStep(double time) {
+		if (time == 0.0) {
+			handleMorning();
+		}
 		for (Person p : population.getPersons().values()) {
 			CallingAgent agent = agents.get(p.getId());
 			if (Math.random() < secondlyProbability) { // Let's make a call!
 				agent.nCalls++;
 				call(time, p.getId());
 			}
+		}
+		lastTime = time;
+	}
+
+	private void handleNight() {
+		for (Person p : population.getPersons().values()) {
+			CallingAgent agent = agents.get(p.getId());
+			agent.nCalls++;
+			call(lastTime, p.getId());
+			System.out.println("pups");
+		}
+	}
+
+	private void handleMorning() {
+		for (Person p : population.getPersons().values()) {
+			CallingAgent agent = agents.get(p.getId());
+			agent.nCalls++;
+			call(0.0, p.getId());
 		}
 	}
 
@@ -87,17 +111,21 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		// call(event.getTime(), event.getPersonId());
+		if (Integer.parseInt(event.getPersonId().toString()) % 2 == 0) {
+			call(event.getTime(), event.getPersonId());
+		}
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		// call(event.getTime(), event.getPersonId());
+		if (Integer.parseInt(event.getPersonId().toString()) % 2 == 1) {
+			call(event.getTime(), event.getPersonId());
+		}
 	}
 
 }
