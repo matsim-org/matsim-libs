@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -57,6 +58,22 @@ public class CompareEventsUtils {
 	private static final Logger log =
 		Logger.getLogger(CompareEventsUtils.class);
 
+	public static void testEventsSimilarToQsim(
+			final Scenario scenario,
+			final PlanAlgorithm planRouter,
+			final MobsimFactory qSimFactory,
+			final MobsimFactory pseudoSimFactory,
+			final TravelTimeCalculator travelTime ) {
+		testEventsSimilarToQsim(
+				scenario,
+				planRouter,
+				qSimFactory,
+				null,
+				pseudoSimFactory,
+				null,
+				travelTime );
+	}
+
 	/**
 	 * public to test specific implementations of the factory from the
 	 * respective packages
@@ -65,7 +82,9 @@ public class CompareEventsUtils {
 			final Scenario scenario,
 			final PlanAlgorithm planRouter,
 			final MobsimFactory qSimFactory,
+			final String eventsFileQSim,
 			final MobsimFactory pseudoSimFactory,
+			final String eventsFilePSim,
 			final TravelTimeCalculator travelTime ) {
 
 		final EventsManager events = EventsUtils.createEventsManager();
@@ -75,28 +94,69 @@ public class CompareEventsUtils {
 
 		events.addHandler( travelTime );
 
+
 		new PersonPrepareForSim(
 				planRouter,
 				scenario).run( scenario.getPopulation() );
 
+		long timeQSim, timePSim;
 
-		log.info( "running reference simulation..." );
-		final long startQSim = System.currentTimeMillis();
-		qSimFactory.createMobsim(
-					scenario,
-					events).run();
-		final long timeQSim = System.currentTimeMillis() - startQSim;
-		log.info( "running reference simulation... DONE" );
+		/* scope for qSim */ {
+			final EventWriterXML writer = 
+				eventsFileQSim != null ?
+					new EventWriterXML( eventsFileQSim ) :
+					null;
+
+			try {
+				log.info( "running reference simulation..." );
+				if ( writer != null ) events.addHandler( writer );
+				final long startQSim = System.currentTimeMillis();
+				qSimFactory.createMobsim(
+							scenario,
+							events).run();
+				timeQSim = System.currentTimeMillis() - startQSim;
+				if ( writer != null ) {
+					events.removeHandler( writer );
+				}
+				log.info( "running reference simulation... DONE" );
+			}
+			catch ( Error e ) {
+				throw e;
+			}
+			finally {
+				if (writer != null) writer.closeFile();
+			}
+		}
 
 		handler.startCompare();
 
-		log.info( "running tested simulation..." );
-		final long startPSim = System.currentTimeMillis();
-		pseudoSimFactory.createMobsim(
-					scenario,
-					events).run();
-		final long timePSim = System.currentTimeMillis() - startPSim;
-		log.info( "running tested simulation... DONE" );
+
+		/* scope for pSim */ {
+			final EventWriterXML writer = 
+				eventsFilePSim != null ?
+					new EventWriterXML( eventsFilePSim ) :
+					null;
+
+			try {
+				log.info( "running tested simulation..." );
+				if ( writer != null ) events.addHandler( writer );
+				final long startPSim = System.currentTimeMillis();
+				pseudoSimFactory.createMobsim(
+							scenario,
+							events).run();
+				timePSim = System.currentTimeMillis() - startPSim;
+				if ( writer != null ) {
+					events.removeHandler( writer );
+				}
+				log.info( "running tested simulation... DONE" );
+			}
+			catch ( Error e ) {
+				throw e;
+			}
+			finally {
+				if (writer != null) writer.closeFile();
+			}
+		}
 
 		handler.assertNoMoreStoredEvents();
 
