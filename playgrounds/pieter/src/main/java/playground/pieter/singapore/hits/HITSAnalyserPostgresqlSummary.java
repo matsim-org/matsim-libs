@@ -85,12 +85,12 @@ import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.postgresql.PostgresType;
 import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
 import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
-import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWS;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
-import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
 import playground.singapore.travelsummary.travelcomponents.Activity;
 import playground.singapore.travelsummary.travelcomponents.Journey;
 import playground.singapore.travelsummary.travelcomponents.Transfer;
@@ -130,8 +130,8 @@ public class HITSAnalyserPostgresqlSummary {
 	private static Dijkstra carCongestedDijkstra;
 	private static TransitRouterVariableImpl transitRouter;
 	private static Scenario scenario;
-	private static TransitRouterNetworkTravelTimeAndDisutilityWW transitTravelFunction;
-	private static TransitRouterNetworkWW transitRouterNetwork;
+	private static TransitRouterNetworkTravelTimeAndDisutilityWS transitTravelFunction;
+	private static playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW transitRouterNetwork;
 	private static MyTransitRouterConfig transitRouterConfig;
 	private static HashSet<TransitLine> mrtLines;
 	private static HashSet<TransitLine> lrtLines;
@@ -140,40 +140,36 @@ public class HITSAnalyserPostgresqlSummary {
 	private static HashMap<String, Coord> mrtCoords;
 	private static HashMap<String, Coord> lrtCoords;
 	public static boolean freeSpeedRouting;
-	private static String eventsFileName;
+	private static String transitEventsFileName;
 	private static String plansFileName;
+	private static String carEventsFileName;
 
 	static void createRouters(String[] args, boolean fSR) {
 		freeSpeedRouting = fSR;
 		scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
-		if (!freeSpeedRouting) {
-			plansFileName = args[2];
-			(new MatsimPopulationReader(scenario)).readFile(plansFileName);
-		}
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		double startTime = new Double(args[5]), endTime = new Double(args[6]), binSize = new Double(args[7]);
-		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(scenario.getPopulation(),
-				scenario.getTransitSchedule(), (int) binSize, (int) (endTime - startTime));
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
-				scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(scenario.getTransitSchedule(), (int) binSize,
+				(int) (endTime - startTime));
+		StopStopTimeCalculator stopStopTime = new StopStopTimeCalculator(scenario.getTransitSchedule(),
+				scenario.getConfig());
 		System.out.println("Loading events");
 		if (!freeSpeedRouting) {
-			eventsFileName = args[4];
+			transitEventsFileName = args[2];
 			EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
-			eventsManager.addHandler(waitTimeCalculator);
-			eventsManager.addHandler(travelTimeCalculator);
-			(new MatsimEventsReader(eventsManager)).readFile(args[4]);
+			eventsManager.addHandler(stopStopTime);
+			(new MatsimEventsReader(eventsManager)).readFile(transitEventsFileName);
 		}
 		transitRouterConfig = new MyTransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig()
 				.plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());
 		transitRouterNetwork = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(),
 				scenario.getTransitSchedule(), transitRouterConfig.beelineWalkConnectionDistance);
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
-		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW(transitRouterConfig,
-				scenario.getNetwork(), transitRouterNetwork, travelTimeCalculator.getLinkTravelTimes(),
-				waitTimeCalculator.getWaitTimes(), scenario.getConfig().travelTimeCalculator(), startTime, endTime,
-				preparedTransitSchedule);
+
+		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWS(transitRouterConfig,
+				transitRouterNetwork, waitTimeCalculator.getWaitTimes(), stopStopTime.getStopStopTimes(), scenario
+						.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), preparedTransitSchedule);
 		transitRouter = new TransitRouterVariableImpl(transitRouterConfig, transitTravelFunction, transitRouterNetwork,
 				scenario.getNetwork());
 
@@ -216,13 +212,18 @@ public class HITSAnalyserPostgresqlSummary {
 		}
 
 		// now for car
-
+		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
+				scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		if (!freeSpeedRouting) {
+			carEventsFileName = args[4];
+			EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
+			eventsManager.addHandler(travelTimeCalculator);
+			(new MatsimEventsReader(eventsManager)).readFile(carEventsFileName);
+		}
 		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutilityFactory()
-				.createTravelDisutility(travelTimeCalculator
-						.getLinkTravelTimes(), scenario.getConfig()
-						.planCalcScore());
-		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(),
-				travelDisutility, travelTimeCalculator.getLinkTravelTimes());
+				.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(), travelDisutility,
+				travelTimeCalculator.getLinkTravelTimes());
 		HashSet<String> modeSet = new HashSet<String>();
 		modeSet.add("car");
 		carCongestedDijkstra.setModeRestriction(modeSet);
@@ -281,7 +282,7 @@ public class HITSAnalyserPostgresqlSummary {
 		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS", actTableName, actDBA, 10000, columns);
 		if (!freeSpeedRouting) {
 			activityWriter.addComment(String.format("HITS activities, routed using events file %s and plans file %s",
-					eventsFileName, plansFileName, formattedDate));
+					transitEventsFileName, plansFileName, formattedDate));
 		}
 
 		String journeyTableName = "m_calibration.hits_journeys" + postScript;
@@ -307,7 +308,7 @@ public class HITSAnalyserPostgresqlSummary {
 				columns);
 		if (!freeSpeedRouting) {
 			journeyWriter.addComment(String.format(
-					"HITS journeys, routed using events file %s and plans file %s on %s", eventsFileName,
+					"HITS journeys, routed using events file %s and plans file %s on %s", transitEventsFileName,
 					plansFileName, formattedDate));
 		}
 
@@ -327,7 +328,7 @@ public class HITSAnalyserPostgresqlSummary {
 		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS", tripTableName, tripDBA, 10000, columns);
 		if (!freeSpeedRouting) {
 			tripWriter.addComment(String.format("HITS trips, routed using events file %s and plans file %s",
-					eventsFileName, plansFileName, formattedDate));
+					transitEventsFileName, plansFileName, formattedDate));
 		}
 
 		String transferTableName = "m_calibration.hits_transfers" + postScript;
@@ -346,7 +347,7 @@ public class HITSAnalyserPostgresqlSummary {
 				columns);
 		if (!freeSpeedRouting) {
 			transferWriter.addComment(String.format(
-					"HITS transfers, routed using events file %s and plans file %s on %s", eventsFileName,
+					"HITS transfers, routed using events file %s and plans file %s on %s", transitEventsFileName,
 					plansFileName, formattedDate));
 		}
 
@@ -590,7 +591,7 @@ public class HITSAnalyserPostgresqlSummary {
 	}
 
 	private void compileAlternativeTravellerChains(String mode, double searchradius) {
-
+		int actsCount = 0, journeysCount = 0, transfersCount = 0, tripsCount = 0;
 		System.out.println("Starting alternative summary: " + new java.util.Date());
 		ArrayList<HITSPerson> persons = this.getHitsData().getPersons();
 		this.chains = new HashMap<String, TravellerChain>();
@@ -620,9 +621,11 @@ public class HITSAnalyserPostgresqlSummary {
 				}
 				if (t.trip_id == 1) {
 					Activity home = chain.addActivity();
+					actsCount++;
 					home.setEndTime(startTime);
 					home.setFacility(new IdImpl(t.p13d_origpcode));
 					home.setStartTime(Math.min(startTime, 0));
+					home.setCoord(origCoord);
 					home.setType("home");
 				} else {
 					// get the last activity created
@@ -635,6 +638,7 @@ public class HITSAnalyserPostgresqlSummary {
 				}
 
 				Journey journey = chain.addJourney();
+				journeysCount++;
 				journey.setCarJourney(mode.equals("car"));
 				journey.setTrip_idx(t.h1_hhid + "_" + t.pax_id + "_" + t.trip_id);
 				journey.setStartTime(startTime);
@@ -642,6 +646,7 @@ public class HITSAnalyserPostgresqlSummary {
 				journey.setEndTime(endTime);
 				// create the next activity
 				Activity act = chain.addActivity();
+				actsCount++;
 				act.setFacility(new IdImpl(t.t2_destpcode));
 				act.setStartTime(endTime);
 				act.setType(t.t6_purpose);
@@ -653,15 +658,13 @@ public class HITSAnalyserPostgresqlSummary {
 					TimeAndDistance carTimeDistance = HITSAnalyserPostgresqlSummary
 							.getCarCongestedShortestPathDistance(origCoord, destCoord, getValidStartTime(startTime));
 					Trip trip = journey.addTrip();
+					tripsCount++;
 					trip.setStartTime(startTime);
 					trip.setEndTime(startTime + carTimeDistance.time);
 					trip.setDistance(carTimeDistance.distance);
 					journey.setCarDistance(carTimeDistance.distance);
 					trip.setMode("car");
-				}
-				// route transit-only trips using the transit router
-
-				else {
+				} else {
 					Coord orig = origCoord;
 					Coord dest = destCoord;
 					Path path = null;
@@ -716,6 +719,7 @@ public class HITSAnalyserPostgresqlSummary {
 							if (!inVehicle) {
 								inVehicle = true;
 								Trip trip = journey.addTrip();
+								tripsCount++;
 								trip.setStartTime(linkStartTime);
 								trip.setBoardingStop(journey.getWaits().getLast().getStopId());
 								trip.setLine(transitLink.getLine().getId());
@@ -728,7 +732,7 @@ public class HITSAnalyserPostgresqlSummary {
 									Transfer transfer = journey.getPossibleTransfer();
 									transfer.setToTrip(trip);
 									transfer.setEndTime(linkStartTime);
-									journey.addTransfer(transfer);
+									journey.addTransfer(transfer); transfersCount++;
 									journey.setPossibleTransfer(null);
 								}
 								substage_id++;
@@ -804,12 +808,16 @@ public class HITSAnalyserPostgresqlSummary {
 
 				}
 			}
+//			System.out.print(chain);
+//			System.exit(0);
 		}
+		System.err.printf("\n\na: %d j: %d, t: %d x: %d\n\n",actsCount,journeysCount,tripsCount,transfersCount);
 
 	}
 
 	private void compileTravellerChains(double busSearchradius, double mrtSearchRadius) {
 		System.out.println("Starting summary : " + new java.util.Date());
+		int actsCount = 0, journeysCount = 0, transfersCount = 0, tripsCount = 0;
 		ArrayList<HITSPerson> persons = this.getHitsData().getPersons();
 		this.chains = new HashMap<String, TravellerChain>();
 		PERSONS: for (HITSPerson p : persons) {
@@ -838,6 +846,7 @@ public class HITSAnalyserPostgresqlSummary {
 				}
 				if (t.trip_id == 1) {
 					Activity home = chain.addActivity();
+					actsCount++;
 					home.setEndTime(startTime);
 					home.setFacility(new IdImpl(t.p13d_origpcode));
 					home.setStartTime(Math.min(startTime, 0));
@@ -859,6 +868,7 @@ public class HITSAnalyserPostgresqlSummary {
 				// .equals("carDrv")))
 				// continue;
 				Journey journey = chain.addJourney();
+				journeysCount++;
 				try {
 					journey.setCarJourney(t.mainmode.equals("carDrv"));
 				} catch (NullPointerException ne) {
@@ -870,6 +880,7 @@ public class HITSAnalyserPostgresqlSummary {
 				journey.setEndTime(endTime);
 				// create the next activity
 				Activity act = chain.addActivity();
+				actsCount++;
 				act.setFacility(new IdImpl(t.t2_destpcode));
 				act.setStartTime(endTime);
 				act.setType(t.t6_purpose);
@@ -878,6 +889,7 @@ public class HITSAnalyserPostgresqlSummary {
 					TimeAndDistance carTimeDistance = HITSAnalyserPostgresqlSummary
 							.getCarCongestedShortestPathDistance(origCoord, destCoord, getValidStartTime(startTime));
 					Trip trip = journey.addTrip();
+					tripsCount++;
 					trip.setStartTime(startTime);
 					trip.setEndTime(startTime + carTimeDistance.time);
 					trip.setDistance(carTimeDistance.distance);
@@ -1025,6 +1037,7 @@ public class HITSAnalyserPostgresqlSummary {
 								if (!inVehicle) {
 									inVehicle = true;
 									Trip trip = journey.addTrip();
+									tripsCount++;
 									trip.setStartTime(linkStartTime);
 									trip.setBoardingStop(journey.getWaits().getLast().getStopId());
 									trip.setLine(transitLink.getLine().getId());
@@ -1037,6 +1050,7 @@ public class HITSAnalyserPostgresqlSummary {
 										transfer.setToTrip(trip);
 										transfer.setEndTime(linkStartTime);
 										journey.addTransfer(transfer);
+										transfersCount++; transfersCount++;
 										journey.setPossibleTransfer(null);
 									}
 									substage_id++;
@@ -1114,6 +1128,7 @@ public class HITSAnalyserPostgresqlSummary {
 				}
 			}
 		}
+		System.out.printf("a: %d j: %d, t: %d x: %d",actsCount,journeysCount,tripsCount,transfersCount);
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -1164,9 +1179,9 @@ public class HITSAnalyserPostgresqlSummary {
 		// System.out.println("wrote trip summary");
 		// hp.jointTripSummary();
 		// System.out.println("wrote joint trip summary");
-		// hp.compileTravellerChains(100, 100);
+//		hp.compileTravellerChains(100, 100);
 		hp.compileAlternativeTravellerChains("car", 400);
-		hp.writeSimulationResultsToSQL(new File("data/matsim2postgres.properties"), "_car");
+		hp.writeSimulationResultsToSQL(new File("data/matsim2postgres.properties"), "_caralt");
 		System.out.println("exiting...");
 		System.out.println(new java.util.Date());
 	}
