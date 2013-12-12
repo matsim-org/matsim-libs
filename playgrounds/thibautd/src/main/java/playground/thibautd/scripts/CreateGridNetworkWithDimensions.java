@@ -49,7 +49,20 @@ public class CreateGridNetworkWithDimensions {
 		final int height = Integer.valueOf( args[ 1 ] ).intValue();
 		final String outFile = args[ 2 ];
 
+		final Network network = createNetwork( width , height );
+		new NetworkWriter( network ).write( outFile );
+	}
+
+	public static Network createNetwork(final int width, final int height) {
 		final Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork();
+		createNetwork( network , width , height );
+		return network;
+	}
+
+	public static void createNetwork(
+			final Network network,
+			final int width,
+			final int height) {
 		List<Node> lastHorizontalLine = Collections.emptyList();
 
 		final UniqueIdFactory nodeIdFactory = new UniqueIdFactory( "" );
@@ -64,8 +77,6 @@ public class CreateGridNetworkWithDimensions {
 
 			lastHorizontalLine = newHorizontalLine;
 		}
-
-		new NetworkWriter( network ).write( outFile );
 	}
 
 	private static List<Link> linkLines(
