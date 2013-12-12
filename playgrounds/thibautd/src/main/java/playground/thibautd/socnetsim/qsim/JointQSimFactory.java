@@ -39,6 +39,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
+import playground.thibautd.mobsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
 
@@ -92,13 +93,14 @@ public class JointQSimFactory implements MobsimFactory {
             qSim.addAgentSource(transitEngine);
             qSim.addMobsimEngine(transitEngine);
         }
-        
+
 		final PassengerUnboardingAgentFactory passAgentFactory =
 					new PassengerUnboardingAgentFactory(
 						sc.getConfig().scenario().isUseTransit() ?
 							new TransitAgentFactory(qSim) :
 							new DefaultAgentFactory(qSim) ,
-						netsimEngine);
+						new NetsimWrappingQVehicleProvider(
+							netsimEngine) );
         final AgentSource agentSource =
 			new PopulationAgentSourceWithVehicles(
 					sc.getPopulation(),

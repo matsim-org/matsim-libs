@@ -24,18 +24,19 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+
+import playground.thibautd.mobsim.QVehicleProvider;
 
 class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngine {
 	private final AgentFactory delegate;
-	private final QNetsimEngine netsimEngine;
+	private final QVehicleProvider vehicleProvider;
 	private InternalInterface internalInterface = null;
 
 	public PassengerUnboardingAgentFactory(
 			final AgentFactory delegate,
-			final QNetsimEngine netsimEngine) {
+			final QVehicleProvider vehicleProvider) {
 		this.delegate = delegate;
-		this.netsimEngine = netsimEngine;
+		this.vehicleProvider = vehicleProvider;
 	}
 
 	@Override
@@ -43,7 +44,7 @@ class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngine {
 		if ( internalInterface == null ) throw new IllegalStateException( "no internal interface" );
 		return new PassengerUnboardingDriverAgent(
 				delegate.createMobsimAgentFromPerson( p ),
-				netsimEngine,
+				vehicleProvider,
 				internalInterface);
 	}
 

@@ -38,13 +38,13 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.thibautd.mobsim.QVehicleProvider;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.utils.IdentifiableCollectionsUtils;
@@ -53,20 +53,20 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	private final MobsimDriverAgent delegate;
 	private final PTPassengerAgent ptDelegate;
 	private final PlanAgent planDelegate;
-	private final QNetsimEngine netsimEngine;
+	private final QVehicleProvider vehicleProvider;
 	private final InternalInterface internalInterface;
 
 	private final List<PassengerAgent> passengersToBoard = new ArrayList<PassengerAgent>();
 
 	public PassengerUnboardingDriverAgent(
 			final MobsimAgent delegate,
-			final QNetsimEngine netsimEngine,
+			final QVehicleProvider vehicleProvider,
 			final InternalInterface internalInterface) {
 		if ( delegate == null ) throw new IllegalArgumentException( "delegate cannot be null" );
 		this.delegate = (MobsimDriverAgent) delegate;
 		this.ptDelegate = delegate instanceof PTPassengerAgent ? (PTPassengerAgent) delegate : null;
 		this.planDelegate = (PlanAgent) delegate;
-		this.netsimEngine = netsimEngine;
+		this.vehicleProvider = vehicleProvider;
 		this.internalInterface = internalInterface;
 	}
 
@@ -92,7 +92,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 				assert passengersToBoard.isEmpty();
 			}
 
-			final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
+			final MobsimVehicle vehicle = vehicleProvider.getVehicles().get( delegate.getPlannedVehicleId() );
 			final Id linkId = delegate.getCurrentLinkId();
 			final Collection<PassengerAgent> passengersToUnboard = new ArrayList<PassengerAgent>();
 			assert vehicle != null;
@@ -129,7 +129,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	}
 
 	private void boardPassengers() {
-		final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
+		final MobsimVehicle vehicle = vehicleProvider.getVehicles().get( delegate.getPlannedVehicleId() );
 		final EventsManager events = internalInterface.getMobsim().getEventsManager();
 		for ( PassengerAgent passenger : passengersToBoard ) {
 			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() ) : passenger+" is at "+passenger.getCurrentLinkId()+" instead of "+getCurrentLinkId()+" for driver "+this;
