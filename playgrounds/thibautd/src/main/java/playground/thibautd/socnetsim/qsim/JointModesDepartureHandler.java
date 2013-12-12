@@ -38,6 +38,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
+import playground.thibautd.mobsim.NetsimWrappingQVehicleProvider;
+import playground.thibautd.mobsim.QVehicleProvider;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
@@ -50,7 +52,9 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 	private static final Logger log =
 		Logger.getLogger(JointModesDepartureHandler.class);
 
-	private final QNetsimEngine netsimEngine;
+	private final QVehicleProvider vehicleProvider;
+	private final DepartureHandler departureHandler;
+
 	private final PassengersWaitingPerDriver passengersWaitingPerDriver = new PassengersWaitingPerDriver();
 	// map driverId -> driver info
 	private final Map<Id , WaitingDriver> waitingDrivers =
@@ -58,7 +62,15 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 	
 	public JointModesDepartureHandler(
 			final QNetsimEngine netsimEngine) {
-		this.netsimEngine = netsimEngine;
+		this( new NetsimWrappingQVehicleProvider( netsimEngine ),
+				netsimEngine.getDepartureHandler() );
+	}
+
+	public JointModesDepartureHandler(
+			final QVehicleProvider vehicleProvider,
+			final DepartureHandler departureHandler) {
+		this.vehicleProvider = vehicleProvider;
+		this.departureHandler = departureHandler;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -87,7 +99,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			return true;
 		}
 
-		return netsimEngine.getDepartureHandler().handleDeparture( now , agent , linkId );
+		return departureHandler.handleDeparture( now , agent , linkId );
 	}
 
 	private void handleDriverDeparture(
@@ -99,7 +111,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		final Id driverId = agent.getId();
 		final Collection<Id> passengerIds = getPassengerIds( agent );
 		final Id vehicleId = getVehicleId( agent );
-		final MobsimVehicle vehicle = netsimEngine.getVehicles().get( vehicleId );
+		final MobsimVehicle vehicle = vehicleProvider.getVehicles().get( vehicleId );
 
 		final Map<Id, PassengerAgent> passengersWaiting =
 			passengersWaitingPerDriver.getPassengersWaitingDriverAtLink(
@@ -147,7 +159,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			assert IdentifiableCollectionsUtils.containsAll( passengerIds , vehicle.getPassengers() ) :
 				passengerIds+" does not contains all of "+vehicle.getPassengers()+" with present passengers "+presentPassengers;
 			final boolean handled =
-				netsimEngine.getDepartureHandler().handleDeparture(
+				departureHandler.handleDeparture(
 						now,
 						agent,
 						linkId );
