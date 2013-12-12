@@ -19,20 +19,29 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim.pseudoqsimengine;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 
 /**
  * @author thibautd
  */
 public class RunTest {
+	private static final Logger log =
+		Logger.getLogger(RunTest.class);
+
 	public static void main(final String[] args) {
 		final String configFile = args[ 0 ];
 		final String qSimEventsFile = args[ 1 ];
@@ -49,13 +58,31 @@ public class RunTest {
 					config.travelTimeCalculator());
 		events.addHandler( travelTime );
 
+		new PersonPrepareForSim(
+				new PlanRouter(
+					new TripRouterFactoryBuilderWithDefaults().build(
+						scenario ).instantiateAndConfigureTripRouter(
+							new RoutingContextImpl(
+								new TravelTimeAndDistanceBasedTravelDisutility(
+									travelTime.getLinkTravelTimes(),
+									config.planCalcScore() ),
+								travelTime.getLinkTravelTimes() ) )
+				),
+				scenario).run( scenario.getPopulation() );
+
+
+		long timeQSim, timePSim;
 		/* scope of writer */ {
 			final EventWriterXML writer = new EventWriterXML( qSimEventsFile );
 			events.addHandler( writer );
 
+			log.info( "running actual simulation..." );
+			timeQSim = -System.currentTimeMillis();
 			new QSimFactory().createMobsim(
 						scenario,
 						events).run();
+			timeQSim += System.currentTimeMillis();
+			log.info( "running actual simulation... DONE" );
 
 			writer.closeFile();
 			events.removeHandler( writer );
@@ -65,14 +92,21 @@ public class RunTest {
 			final EventWriterXML writer = new EventWriterXML( pSimEventsFile );
 			events.addHandler( writer );
 
+			log.info( "running pseudo simulation..." );
+			timePSim = -System.currentTimeMillis();
 			new QSimWithPseudoEngineFactory(
 						travelTime.getLinkTravelTimes()
 					).createMobsim(
 						scenario,
 						events).run();
+			timePSim += System.currentTimeMillis();
+			log.info( "running pseudo simulation... DONE" );
 
 			writer.closeFile();
 		}
+
+		log.info( "actual simulation took "+timeQSim+" ms." );
+		log.info( "pseudo simulation took "+timePSim+" ms." );
 	}
 }
 
