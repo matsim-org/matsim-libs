@@ -83,11 +83,11 @@ public class JointPseudoSimFactory implements MobsimFactory {
 
 		final PseudoQsimEngine pseudoEngine =
 			new PseudoQsimEngine(
-					sc.getConfig().qsim().getMainModes(),
+					conf.getMainModes(),
 					travelTime,
 					sc.getNetwork() );
-		qSim.addMobsimEngine( pseudoEngine );
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
+		qSim.addMobsimEngine( pseudoEngine );
 
 		final JointModesDepartureHandler jointDepHandler =
 			new JointModesDepartureHandler(
