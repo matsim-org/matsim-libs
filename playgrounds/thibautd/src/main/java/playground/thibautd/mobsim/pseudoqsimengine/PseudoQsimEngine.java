@@ -26,6 +26,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -95,6 +96,13 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 						event.vehicle.getId() ) );
 
 				agent.notifyMoveOverNode( nextLinkId );
+
+				eventsManager.processEvent(
+					new LinkEnterEvent(
+						time,
+						agent.getId(),
+						nextLinkId,
+						event.vehicle.getId() ) );
 
 				arrivalQueue.add(
 						calcArrival(
@@ -200,7 +208,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 						linkId ) );
 
 			eventsManager.processEvent(
-					new LinkEnterEvent(
+					new Wait2LinkEvent(
 						now,
 						agent.getId(),
 						linkId,
@@ -233,7 +241,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 					network.getLinks().get( linkId ),
 					now,
 					((HasPerson) vehicle.getDriver()).getPerson(),
-					null );
+					vehicle.getVehicle() );
 		return new InternalArrivalEvent(
 				now + travelTime,
 				linkId,
