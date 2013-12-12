@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.Id;
@@ -60,6 +62,9 @@ import playground.thibautd.mobsim.QVehicleProvider;
  * @author thibautd
  */
 public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicleProvider {
+	private static final Logger log =
+		Logger.getLogger(PseudoQsimEngine.class);
+
 	private final Collection<String> transportModes;
 	private final TravelTime travelTimeCalculator;
 	private final Network network;
@@ -151,6 +156,9 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		if ( ! (agent instanceof AbstractTransitDriver) ) { 	
 			if (linkId.equals(agent.getDestinationLinkId())) {
 				if ( agent.chooseNextLinkId() == null ) {
+					if ( log.isTraceEnabled() ) {
+						log.info( "handling case startLink == endLink for agent "+agent );
+					}
 					assert vehicle.getDriver() == null;
                     vehicle.setDriver(agent);
                     agent.setVehicle(vehicle);
