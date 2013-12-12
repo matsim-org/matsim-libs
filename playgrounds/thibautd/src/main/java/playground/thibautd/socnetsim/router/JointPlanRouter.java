@@ -47,7 +47,7 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
 public class JointPlanRouter implements PlanAlgorithm {
 	private final PlanRouter delegate;
 	
-	JointPlanRouter(
+	public JointPlanRouter(
 			final TripRouter routingHandler,
 			final ActivityFacilities facilities ) {
 		delegate = new PlanRouter( routingHandler , facilities );
