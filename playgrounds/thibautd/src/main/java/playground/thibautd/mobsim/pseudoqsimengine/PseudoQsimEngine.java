@@ -46,6 +46,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleUtils;
 
+import playground.thibautd.mobsim.QVehicleProvider;
+
 /**
  * An engine aimed at replacing the QnetsimEngine for a "PSim" like behavior.
  * The advantage compared to the PSim is that the rest of the QSim architecture
@@ -57,7 +59,7 @@ import org.matsim.vehicles.VehicleUtils;
  * It does NOT allow to reuse special QLink implementations, for obvious reasons
  * @author thibautd
  */
-public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
+public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicleProvider {
 	private final Collection<String> transportModes;
 	private final TravelTime travelTimeCalculator;
 	private final Network network;
@@ -252,6 +254,11 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 
 	@Override
 	public void onPrepareSim() {}
+
+	@Override
+	public Map<Id, ? extends QVehicle> getVehicles() {
+		return vehicles;
+	}
 
 	@Override
 	public void afterSim() {
