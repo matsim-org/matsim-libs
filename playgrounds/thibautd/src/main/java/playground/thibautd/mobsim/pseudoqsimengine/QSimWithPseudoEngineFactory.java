@@ -62,13 +62,13 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		final PseudoQsimEngine netsimEngine =
+		final PseudoQsimEngine pseudoEngine =
 			new PseudoQsimEngine(
 					sc.getConfig().qsim().getMainModes(),
 					travelTime,
 					sc.getNetwork() );
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine);
+		qSim.addMobsimEngine(pseudoEngine);
+		qSim.addDepartureHandler(pseudoEngine);
 
 		qSim.addMobsimEngine( new DefaultQSimEngineFactory().createQSimEngine( qSim ) );
 
