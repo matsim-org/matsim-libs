@@ -27,9 +27,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -49,7 +51,7 @@ import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.utils.IdentifiableCollectionsUtils;
 
-class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent, PTPassengerAgent {
+class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent, PTPassengerAgent, HasPerson {
 	private final MobsimDriverAgent delegate;
 	private final PTPassengerAgent ptDelegate;
 	private final PlanAgent planDelegate;
@@ -290,5 +292,10 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	public double getWeight() {
 		if ( ptDelegate == null ) throw new UnsupportedOperationException( delegate.getClass().getName()+" do not provide PTPassengerAgent" );
 		return ptDelegate.getWeight();
+	}
+
+	@Override
+	public Person getPerson() {
+		return ((HasPerson) delegate).getPerson();
 	}
 }
