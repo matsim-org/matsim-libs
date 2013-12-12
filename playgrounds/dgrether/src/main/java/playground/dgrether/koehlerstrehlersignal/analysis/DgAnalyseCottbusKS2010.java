@@ -19,13 +19,16 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.analysis;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
@@ -34,7 +37,10 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -44,6 +50,7 @@ import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
@@ -85,6 +92,7 @@ public class DgAnalyseCottbusKS2010 {
 		String name;
 		Envelope envelope;
 		Network network;
+		boolean createPersonDiff = false;
 	}
 
 	static class RunInfo {
@@ -121,6 +129,7 @@ public class DgAnalyseCottbusKS2010 {
 		Double deltaSpeedKmH;
 		Double delayPercent;
 		Double distancePercent;
+		public Set<Id> seenPersonIds;
 	}
 
 	static class Results {
@@ -227,8 +236,9 @@ public class DgAnalyseCottbusKS2010 {
 			analyseResult(baseResult);
 			compareWithBaseCaseResult(r, baseResult);
 			
-			if (! r.runInfo.baseCase) {
-				this.createAndWriteSimSimComparison(baseResult, r);
+			if (! r.runInfo.baseCase && r.extent.createPersonDiff) {
+//				this.createAndWritePersonDiff(baseResult, r);
+//				this.createAndWriteSimSimComparison(baseResult, r);
 				log.warn("sim sim compare currently disabled");
 			}
 
@@ -237,6 +247,47 @@ public class DgAnalyseCottbusKS2010 {
 		}
 	}
 
+	private void createAndWritePersonDiff(Result baseResult, Result r) {
+		Set<Id> allPersonIds = new HashSet<Id>();
+		allPersonIds.addAll(baseResult.seenPersonIds);
+		allPersonIds.addAll(r.seenPersonIds);
+		Set<Id> disattractedPersonsIds = new HashSet<Id>();
+		Set<Id> attractedPersonsIds = new HashSet<Id>();
+		for (Id id : allPersonIds) {
+			if (baseResult.seenPersonIds.contains(id) && ! r.seenPersonIds.contains(id)) {
+				disattractedPersonsIds.add(id);
+			}
+			if (! baseResult.seenPersonIds.contains(id) && r.seenPersonIds.contains(id)) {
+				attractedPersonsIds.add(id);
+			}
+		}
+		
+		Network n = baseResult.runLoader.getNetwork();
+		Population pop = baseResult.runLoader.getPopulation();
+		String outDir = "/media/data/work/repos/shared-svn/projects/cottbus/cb2ks2010/diffs/";
+		File out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/");
+		Population newPop = this.getFilteredPopulation(pop, disattractedPersonsIds);
+		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, Cottbus2KS2010.CRS, out.getAbsolutePath());
+		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_disattracted_acts");
+
+		out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_attracted/");
+		newPop = this.getFilteredPopulation(pop, attractedPersonsIds);
+		sps = new DgSelectedPlans2ESRIShape(newPop, n, Cottbus2KS2010.CRS, out.getAbsolutePath());
+		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_attracted_acts");
+	}
+	
+	private Population getFilteredPopulation(Population pop, Set<Id> personIdsOfInterest){
+		Population newPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+		for (Person person : pop.getPersons().values()) {
+			if (personIdsOfInterest.contains(person.getId())) {
+				newPop.addPerson(person);
+			}
+		}
+		return newPop;
+	}
+	
+	
+	
 	private void writeLhi(Result result){
 		CategoryHistogramWriter writer2 = new CategoryHistogramWriter();
 		String baseFilename = result.runLoader.getIterationFilename(result.runInfo.iteration, "leg_histogram_improved");
@@ -332,7 +383,7 @@ public class DgAnalyseCottbusKS2010 {
 					result.totalDelay = totalDelay.getTotalDelay();
 					result.distanceMeter = avgTtSpeed.getDistanceMeter();
 					result.noTrips = avgTtSpeed.getNumberOfTrips();
-
+					result.seenPersonIds = avgTtSpeed.getSeenPersonIds();
 					log.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfPersons());
 				}
 			}
@@ -461,7 +512,7 @@ public class DgAnalyseCottbusKS2010 {
 
 		ri = new RunInfo();
 		ri.runId = "1910";
-		ri.iteration = 2000;
+		ri.iteration = 1900;
 		ri.baseCase = true;
 		ri.remark  = "base case 1712 it 2000, routes only";
 		ri.remark = "base case";
@@ -469,26 +520,125 @@ public class DgAnalyseCottbusKS2010 {
 		//
 		ri = new RunInfo();
 		ri.runId = "1911";
-		ri.iteration = 2000;
+		ri.iteration = 1900;
 		ri.remark = "continue 1712, com > 10, routes only";
 		ri.remark = "optimization, commodities > 10";
 		l.add(ri);
 		//
 		ri = new RunInfo();
 		ri.runId = "1912";
-		ri.iteration = 2000;
+		ri.iteration = 1900;
 		ri.remark  = "continue 1712, com > 50, routes only";
 		ri.remark = "optimization, commodities > 50";
 		l.add(ri);
 		//
 		ri = new RunInfo();
 		ri.runId = "1913";
-		ri.iteration = 2000;
+		ri.iteration = 1900;
 		ri.remark  = "continue 1712, sylvia, routes only";
 		ri.remark = "traffic-actuated control";
 		l.add(ri);
 	}
 
+	private static void add1712BaseCaseRoutesOnlyRuns5Percent(List<RunInfo> l){
+		RunInfo ri = null;
+//		ri = new RunInfo();
+//		ri.runId = "1712";
+//		ri.remark = "base case";
+////		ri.baseCase  = true;
+//		ri.iteration = 1000;
+//		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1918";
+		ri.iteration = 1900;
+		ri.baseCase = true;
+		ri.remark  = "base case 1712 it 2000, routes only";
+		ri.remark = "no change";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1919";
+		ri.iteration = 1900;
+		ri.remark = "continue 1712, com > 10, routes only";
+		ri.remark = "optimization, commodities $\\geq$ 10";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1920";
+		ri.iteration = 1900;
+		ri.remark  = "continue 1712, com > 50, routes only";
+		ri.remark = "optimization, commodities $\\geq$ 50";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1921";
+		ri.iteration = 1900;
+		ri.remark  = "continue 1712, sylvia, routes only";
+		ri.remark = "traffic-actuated control";
+		l.add(ri);
+	}
+
+	
+	private static void add1930BaseCase(List<RunInfo> l){
+		RunInfo ri = null;
+
+		ri = new RunInfo();
+		ri.runId = "1722";
+		ri.iteration = 1000;
+		ri.baseCase = true;
+		ri.remark  = "base case 1722 it 2000, routes only";
+		ri.remark = "no change";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1930";
+		ri.iteration = 1000;
+		ri.remark = "random offsets";
+		l.add(ri);
+	}
+
+	
+	private static void add1712BaseCaseRoutesOnlyRunsBeta20(List<RunInfo> l){
+		RunInfo ri = null;
+//		ri = new RunInfo();
+//		ri.runId = "1712";
+//		ri.remark = "base case";
+////		ri.baseCase  = true;
+//		ri.iteration = 1000;
+//		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1914";
+		ri.iteration = 1500;
+		ri.baseCase = true;
+		ri.remark  = "base case 1712 it 2000, routes only";
+		ri.remark = "base case";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1915";
+		ri.iteration = 1500;
+		ri.remark = "continue 1712, com > 10, routes only";
+		ri.remark = "optimization, commodities $\\geq$ 10";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1916";
+		ri.iteration = 1500;
+		ri.remark  = "continue 1712, com > 50, routes only";
+		ri.remark = "optimization, commodities $\\geq$ 50";
+		l.add(ri);
+		//
+		ri = new RunInfo();
+		ri.runId = "1917";
+		ri.iteration = 1500;
+		ri.remark  = "continue 1712, sylvia, routes only";
+		ri.remark = "traffic-actuated control";
+		l.add(ri);
+	}
+
+	
 	private static void add1712BaseCaseNoChoice(List<RunInfo> l){
 		RunInfo ri = null;
 //		ri = new RunInfo();
@@ -811,6 +961,9 @@ public class DgAnalyseCottbusKS2010 {
 		return env;
 	}
 
+	/**
+	 * In this method one can compose spatial extends that are used for analysis.
+	 */
 	public static List<Extent> createExtentList(){
 		List<Extent> l = new ArrayList<Extent>();
 		String filterFeatureFilename = DgPaths.REPOS
@@ -882,7 +1035,6 @@ public class DgAnalyseCottbusKS2010 {
 		nfm.addLinkFilter(lf);
 		e.network = nfm.applyFilters();
 //		l.add(e);
-
 		
 		String cityNetwork = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -891,10 +1043,19 @@ public class DgAnalyseCottbusKS2010 {
 		e = new Extent();
 		e.name = "city";
 		e.network = sc2.getNetwork();
-		l.add(e);
+//		l.add(e);
 
 		e = new Extent();
+		e.name = "city_w_hole";
+		for (Link link : scSignalsBoundingBox.getNetwork().getLinks().values()) {
+			sc2.getNetwork().getLinks().remove(link.getId()); // this only works if unmodifiable collection in NetworkImpl is removed temporarily
+		}
+		e.network = sc2.getNetwork();
+		l.add(e);
+		
+		e = new Extent();
 		e.name = "all";
+		e.createPersonDiff = true;
 		l.add(e);
 		return l;
 	}
@@ -940,9 +1101,14 @@ public class DgAnalyseCottbusKS2010 {
 //		add1740vs1745BaseCaseAnalysis(l);
 //		add1712BaseCaseAnalysis(l);
 		
-		add1712BaseCaseNoChoice(l);
+//		add1712BaseCaseNoChoice(l);
+
 //		add1712BaseCaseRoutesOnlyRuns(l);
-//		add1712BaseCaseRoutesTimesRuns(l);
+		add1930BaseCase(l);
+//		add1712BaseCaseRoutesOnlyRuns5Percent(l);
+
+		//		add1712BaseCaseRoutesOnlyRunsBeta20(l);
+		//		add1712BaseCaseRoutesTimesRuns(l);
 
 				//		add1722BaseCaseAnalysis(l);
 
@@ -968,7 +1134,7 @@ public class DgAnalyseCottbusKS2010 {
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2013-09-29_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2013-11-11_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 //		System.exit(0);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();

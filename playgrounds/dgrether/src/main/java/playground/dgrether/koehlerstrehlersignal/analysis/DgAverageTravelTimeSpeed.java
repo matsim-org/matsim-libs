@@ -105,6 +105,10 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 		return this.seenPersonIds.size();
 	}
 	
+	public Set<Id> getSeenPersonIds(){
+		return this.seenPersonIds;
+	}
+	
 	public double getDistanceMeter(){
 		return this.sumDistance;
 	}

@@ -56,7 +56,9 @@ public class Cottbus2KS2010 {
 
 	public static final String LANES_FILENAME = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/lanes.xml";
 
-	public static final String POPULTATION_FILENAME = DgPaths.REPOS + "runs-svn/run1722/1722.output_plans.xml.gz";
+	public static final String POPULTATION_FILENAME = DgPaths.REPOS + "runs-svn/run1712/1712.output_plans.xml.gz";
+
+//	public static final String POPULTATION_FILENAME = DgPaths.REPOS + "runs-svn/run1722/1722.output_plans.xml.gz";
 
 	public static final CoordinateReferenceSystem CRS = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 
@@ -75,7 +77,7 @@ public class Cottbus2KS2010 {
 		double minCommodityFlow = 10.0;
 		//		String name = "run run1722 output plans between 05:30 and 09:30";
 		String name = "run run1722 output plans between 13:30 and 18:30";
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-09-09_test/";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-11-20_test/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_" + Double.toString(startTime) + ".xml";
 				
