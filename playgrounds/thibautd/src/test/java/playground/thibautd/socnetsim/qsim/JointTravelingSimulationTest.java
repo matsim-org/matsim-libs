@@ -282,12 +282,31 @@ public class JointTravelingSimulationTest {
 	}
 
 	@Test
-	public void testNumberOfEnterLeaveVehicle() throws Exception {
+	public void testNumberOfEnterLeaveVehicle() {
+		testNumberOfEnterLeaveVehicle( RouteType.normal );
+	}
+
+	@Test
+	public void testNumberOfEnterLeaveVehicleEverythingAtOrigin() {
+		testNumberOfEnterLeaveVehicle( RouteType.everythingAtOrigin );
+	}
+
+	@Test
+	public void testNumberOfEnterLeaveVehiclePuAtDo() {
+		testNumberOfEnterLeaveVehicle( RouteType.puAtDo );
+	}
+
+	@Test
+	public void testNumberOfEnterLeaveVehiclePuAtDoFullCycle() {
+		testNumberOfEnterLeaveVehicle( RouteType.puAtDoFullCycle );
+	}
+
+	private void testNumberOfEnterLeaveVehicle(final RouteType routeType) {
 		final Random random = new Random( 1234 );
 
 		for (int i=0; i < 50; i++) {
 			log.info( "random test scenario "+i );
-			final Scenario sc = createTestScenario( createFixture( false , RouteType.normal ) , random );
+			final Scenario sc = createTestScenario( createFixture( false , routeType ) , random );
 			final EventsManager events = EventsUtils.createEventsManager();
 
 			final AtomicInteger enterCount = new AtomicInteger( 0 );
