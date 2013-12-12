@@ -115,6 +115,12 @@ public class M2KS2010Converter {
 		Set<Id> commoditiesToRemove = new HashSet<Id>();
 		double totalFlow = 0.0;
 		for (DgCommodity com : commodities.getCommodities().values()){
+			if (com.getSourceNodeId().equals(com.getDrainNodeId())) {
+				log.warn("commodity : " + com.getId() + " flow: " + com.getFlow() + " has same start and drain node: " + com.getSourceNodeId());
+			}
+		}
+		
+		for (DgCommodity com : commodities.getCommodities().values()){
 			totalFlow += com.getFlow();
 			if (com.getFlow() < minCommodityFlow){
 				commoditiesToRemove.add(com.getId());
@@ -124,6 +130,7 @@ public class M2KS2010Converter {
 			removedCommodities.add(commodities.getCommodities().remove(id));
 			log.info("Removed commodity id " + id + " because flow is less than " + minCommodityFlow);
 		}
+		
 		
 		// convert the KS2010 network back to the matsim format for debugging and visualization
 		Network newMatsimNetwork = new DgKSNet2MatsimNet().convertNetwork(ksNet);
