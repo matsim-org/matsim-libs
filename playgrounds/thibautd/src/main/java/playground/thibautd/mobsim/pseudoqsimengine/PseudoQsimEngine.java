@@ -160,15 +160,17 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 						log.info( "handling case startLink == endLink for agent "+agent );
 					}
 					assert vehicle.getDriver() == null;
-                    vehicle.setDriver(agent);
-                    agent.setVehicle(vehicle);
+					// do NOT do that! the agent is NOT removed from the vehicle after it!
+                    //vehicle.setDriver(agent);
+                    //agent.setVehicle(vehicle);
 
-					final EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
-					eventsManager.processEvent(
-							new PersonEntersVehicleEvent(
-								now,
-								agent.getId(),
-								vehicleId) );
+					// the QNetsimEngine does not bother to generate an event...
+					//final EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
+					//eventsManager.processEvent(
+					//		new PersonEntersVehicleEvent(
+					//			now,
+					//			agent.getId(),
+					//			vehicleId) );
 
 					magent.endLegAndComputeNextState(now) ;
 					this.internalInterface.arrangeNextAgentState(magent) ;

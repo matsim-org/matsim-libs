@@ -89,18 +89,20 @@ public class PSeudoQSimCompareEventsTest {
 			final Plan plan = sc.getPopulation().getFactory().createPlan();
 			person.addPlan( plan );
 
-			final Activity firstActivity = 
-					sc.getPopulation().getFactory().createActivityFromLinkId(
-						"h",
-						linkIds.get(
-							random.nextInt(
-								linkIds.size() ) ) );
+			for ( int j=0; j<3; j++ ) {
+				final Activity firstActivity = 
+						sc.getPopulation().getFactory().createActivityFromLinkId(
+							"h",
+							linkIds.get(
+								random.nextInt(
+									linkIds.size() ) ) );
 
-			// everybody leaves at the same time, to have some congestion
-			firstActivity.setEndTime( 10 );
-			plan.addActivity( firstActivity );
+				// everybody leaves at the same time, to have some congestion
+				firstActivity.setEndTime( j * 10 );
+				plan.addActivity( firstActivity );
 
-			plan.addLeg( sc.getPopulation().getFactory().createLeg( TransportMode.car ) );
+				plan.addLeg( sc.getPopulation().getFactory().createLeg( TransportMode.car ) );
+			}
 
 			plan.addActivity(
 					sc.getPopulation().getFactory().createActivityFromLinkId(
@@ -109,6 +111,36 @@ public class PSeudoQSimCompareEventsTest {
 							random.nextInt(
 								linkIds.size() ) ) ) );
 
+		}
+
+		/* make sure at least one agent has a zero-length trip */ {
+			final Person person = sc.getPopulation().getFactory().createPerson( new IdImpl( "jojo" ) );
+			sc.getPopulation().addPerson( person );
+
+			final Plan plan = sc.getPopulation().getFactory().createPlan();
+			person.addPlan( plan );
+
+			final Id linkId =
+						linkIds.get(
+							random.nextInt(
+								linkIds.size() ) );
+			for ( int j=0; j<3; j++ ) {
+				final Activity firstActivity = 
+						sc.getPopulation().getFactory().createActivityFromLinkId(
+							"h",
+							linkId );
+
+				// everybody leaves at the same time, to have some congestion
+				firstActivity.setEndTime( j * 10 );
+				plan.addActivity( firstActivity );
+
+				plan.addLeg( sc.getPopulation().getFactory().createLeg( TransportMode.car ) );
+			}
+
+			plan.addActivity(
+					sc.getPopulation().getFactory().createActivityFromLinkId(
+						"h",
+						linkId ) );
 		}
 		return sc;
 	}
