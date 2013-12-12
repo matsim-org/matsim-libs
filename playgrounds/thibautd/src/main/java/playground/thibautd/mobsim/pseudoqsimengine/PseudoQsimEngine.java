@@ -149,6 +149,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 		if ( ! (agent instanceof AbstractTransitDriver) ) { 	
 			if (linkId.equals(agent.getDestinationLinkId())) {
 				if ( agent.chooseNextLinkId() == null ) {
+					assert vehicle.getDriver() == null;
                     vehicle.setDriver(agent);
                     agent.setVehicle(vehicle);
 
@@ -189,6 +190,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			//}
 		}
 		else {
+			assert vehicle.getDriver() == null;
 			vehicle.setDriver(agent);
 			agent.setVehicle(vehicle) ;
 
