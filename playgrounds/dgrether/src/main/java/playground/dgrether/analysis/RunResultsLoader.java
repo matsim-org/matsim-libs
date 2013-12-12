@@ -30,16 +30,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-
-import playground.dgrether.signalsystems.utils.DgScenarioUtils;
 
 
 /**
@@ -107,6 +104,7 @@ public class RunResultsLoader {
 		Config c = ConfigUtils.createConfig(); 
 		c.plans().setInputFile(path);
 		Scenario sc = ScenarioUtils.createScenario(c);
+		((ScenarioImpl) sc).setNetwork(this.network);
 		MatsimPopulationReader pr= new MatsimPopulationReader(sc);
 		pr.readFile(path);
 		return sc.getPopulation();
