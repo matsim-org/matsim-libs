@@ -42,8 +42,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
-
-import playground.thibautd.utils.MapUtils;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * An engine aimed at replacing the QnetsimEngine for a "PSim" like behavior.
@@ -63,7 +62,6 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 
 	private final Queue<InternalArrivalEvent> arrivalQueue = new PriorityQueue<InternalArrivalEvent>();
 	private final Map<Id, QVehicle> vehicles = new HashMap<Id, QVehicle>();
-	private static final MapUtils.Factory<QVehicle> vehicleFactory = new MapUtils.DefaultFactory<QVehicle>( QVehicle.class );
 
 	private InternalInterface internalInterface = null;
 	
@@ -134,11 +132,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 		// TODO: insert vehicles at beginning and track them on links
 		// (NetsimEngine like).
 		// The problem is that currently only the NetsimEngine can do that.
-		final QVehicle vehicle =
-			MapUtils.getArbitraryObject(
-					vehicleId,
-					vehicles,
-					vehicleFactory );
+		final QVehicle vehicle = getVehicle( vehicleId );
 
 		// Treat the situation where startLink == endLink.
 		// Transit vehicles do this differently than others, because there could be a stop on it.
@@ -213,6 +207,20 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 		}
 
 		return true;
+	}
+
+	private QVehicle getVehicle(final Id id) {
+		QVehicle v = vehicles.get( id );
+
+		if ( v == null ) {
+			v = new QVehicle(
+				VehicleUtils.getFactory().createVehicle(
+					id,
+					VehicleUtils.getDefaultVehicleType() ) );
+			vehicles.put( id , v );
+		}
+
+		return v;
 	}
 
 	private InternalArrivalEvent calcArrival(
