@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -244,7 +245,17 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 
 	@Override
 	public void afterSim() {
-		throw new RuntimeException( "TODO: stuck agents" );
+		for (InternalArrivalEvent event : arrivalQueue) {
+			final QVehicle veh = event.vehicle;
+			internalInterface.getMobsim().getEventsManager().processEvent(
+					new PersonStuckEvent(
+						internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+						veh.getDriver().getId(),
+						veh.getCurrentLink().getId(),
+						veh.getDriver().getMode()));
+			internalInterface.getMobsim().getAgentCounter().incLost();
+			internalInterface.getMobsim().getAgentCounter().decLiving();
+		}
 	}
 
 	@Override
