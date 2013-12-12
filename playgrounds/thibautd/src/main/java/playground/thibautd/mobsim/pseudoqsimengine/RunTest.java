@@ -44,8 +44,8 @@ public class RunTest {
 
 	public static void main(final String[] args) {
 		final String configFile = args[ 0 ];
-		final String qSimEventsFile = args[ 1 ];
-		final String pSimEventsFile = args[ 2 ];
+		final String qSimEventsFile = args.length > 1 ? args[ 1 ] : null;
+		final String pSimEventsFile = args.length > 2 ? args[ 2 ] : null;
 
 		final Config config = ConfigUtils.loadConfig( configFile );
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -73,8 +73,11 @@ public class RunTest {
 
 		long timeQSim, timePSim;
 		/* scope of writer */ {
-			final EventWriterXML writer = new EventWriterXML( qSimEventsFile );
-			events.addHandler( writer );
+			final EventWriterXML writer =
+				qSimEventsFile != null ?
+					new EventWriterXML( qSimEventsFile ) :
+					null;
+			if (writer != null) events.addHandler( writer );
 
 			log.info( "running actual simulation..." );
 			timeQSim = -System.currentTimeMillis();
@@ -84,13 +87,16 @@ public class RunTest {
 			timeQSim += System.currentTimeMillis();
 			log.info( "running actual simulation... DONE" );
 
-			writer.closeFile();
-			events.removeHandler( writer );
+			if (writer != null) writer.closeFile();
+			if (writer != null) events.removeHandler( writer );
 		}
 
 		/* scope of writer */ {
-			final EventWriterXML writer = new EventWriterXML( pSimEventsFile );
-			events.addHandler( writer );
+			final EventWriterXML writer =
+				pSimEventsFile != null ?
+					new EventWriterXML( pSimEventsFile ) :
+					null;
+			if (writer != null) events.addHandler( writer );
 
 			log.info( "running pseudo simulation..." );
 			timePSim = -System.currentTimeMillis();
@@ -102,7 +108,7 @@ public class RunTest {
 			timePSim += System.currentTimeMillis();
 			log.info( "running pseudo simulation... DONE" );
 
-			writer.closeFile();
+			if (writer != null) writer.closeFile();
 		}
 
 		log.info( "actual simulation took "+timeQSim+" ms." );
