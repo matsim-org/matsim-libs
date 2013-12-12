@@ -25,8 +25,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 /**
  * @author thibautd
@@ -34,22 +35,44 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 public class RunTest {
 	public static void main(final String[] args) {
 		final String configFile = args[ 0 ];
-		final String eventsFile = args[ 1 ];
+		final String qSimEventsFile = args[ 1 ];
+		final String pSimEventsFile = args[ 2 ];
 
 		final Config config = ConfigUtils.loadConfig( configFile );
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		final EventsManager events = EventsUtils.createEventsManager();
-		final EventWriterXML writer = new EventWriterXML( eventsFile );
-		events.addHandler( writer );
 
-		new QSimWithPseudoEngineFactory(
-					new FreeSpeedTravelTime()
-				).createMobsim(
-					scenario,
-					events).run();
+		final TravelTimeCalculator travelTime =
+			new TravelTimeCalculator(
+					scenario.getNetwork(),
+					config.travelTimeCalculator());
+		events.addHandler( travelTime );
 
-		writer.closeFile();
+		/* scope of writer */ {
+			final EventWriterXML writer = new EventWriterXML( qSimEventsFile );
+			events.addHandler( writer );
+
+			new QSimFactory().createMobsim(
+						scenario,
+						events).run();
+
+			writer.closeFile();
+			events.removeHandler( writer );
+		}
+
+		/* scope of writer */ {
+			final EventWriterXML writer = new EventWriterXML( pSimEventsFile );
+			events.addHandler( writer );
+
+			new QSimWithPseudoEngineFactory(
+						travelTime.getLinkTravelTimes()
+					).createMobsim(
+						scenario,
+						events).run();
+
+			writer.closeFile();
+		}
 	}
 }
 
