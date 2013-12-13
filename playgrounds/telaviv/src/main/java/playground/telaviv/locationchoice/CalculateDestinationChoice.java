@@ -272,7 +272,7 @@ public class CalculateDestinationChoice {
 //		7605,7403,0.480184
 	}
 	
-	private int getTimeSlotIndex(final double time) {
+	public int getTimeSlotIndex(final double time) {
 		int slice = ((int) time)/this.binSize;
 		if (slice >= this.numSlots) slice = this.numSlots - 1;
 		return slice;
@@ -493,5 +493,9 @@ public class CalculateDestinationChoice {
 		
 //		return logSumModeChoice * Math.log(Math.exp(betaDriverTime) * travelTime);
 		return logSumModeChoice * betaDriverTime * travelTime;
+	}
+
+	public double[][][][] getVtod() {
+		return vtod;
 	}
 }

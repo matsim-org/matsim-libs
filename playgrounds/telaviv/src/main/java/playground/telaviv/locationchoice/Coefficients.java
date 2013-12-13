@@ -20,10 +20,15 @@
 
 package playground.telaviv.locationchoice;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /*
  * Some constants for the location choice modules.
  */
 public class Coefficients {
+	
+	public static ArrayList<String> types = new ArrayList<String>(Arrays.asList("Shop", "Other", "Work", "Education")); // added by anhorni
 
 	// Zonal Indicators						Shop	Other		Work		Education
 	public double[] metroCult 		= new double[]{	0.75,	 1.34,		 0.0,		 0.0};
