@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -36,6 +38,9 @@ import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
  * @author thibautd
  */
 public class GroupReplanningListennerWithPSimLoop implements ReplanningListener {
+	private static final Logger log =
+		Logger.getLogger(GroupReplanningListennerWithPSimLoop.class);
+
 	private final GroupStrategyManager mainStrategyManager;
 	private final GroupStrategyManager innovativeStrategyManager;
 	private final ControllerRegistry registry;
@@ -79,7 +84,9 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 					events,
 					registry.getScoringFunctionFactory());
 
+		log.info( "### start inner loop" );
 		for ( int i=0; i < nIters; i++ ) {
+			log.info( "### inner loop: start iteration "+i );
 			scoring.notifyIterationStarts( new IterationStartsEvent( null , i ) );
 
 			innovativeStrategyManager.run(
@@ -92,6 +99,7 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 
 			scoring.notifyScoring( new ScoringEvent( null , i ) );
 			scoring.notifyIterationEnds( new IterationEndsEvent( null , i ) );
+			log.info( "### inner loop: end iteration "+i );
 		}
 	}
 
