@@ -218,6 +218,25 @@ public class CompareEventsUtils {
 					storedEvent.getClass(),
 					event.getClass() );
 
+			if ( event instanceof LinkEnterEvent ) {
+				Assert.assertEquals(
+						"unexpected entered link id person "+personId,
+						((LinkEnterEvent) storedEvent).getLinkId(),
+						((LinkEnterEvent) event).getLinkId() );
+			}
+			if ( event instanceof LinkLeaveEvent ) {
+				Assert.assertEquals(
+						"unexpected left link id person "+personId,
+						((LinkLeaveEvent) storedEvent).getLinkId(),
+						((LinkLeaveEvent) event).getLinkId() );
+			}
+			if ( event instanceof Wait2LinkEvent ) {
+				Assert.assertEquals(
+						"unexpected wait link id person "+personId,
+						((Wait2LinkEvent) storedEvent).getLinkId(),
+						((Wait2LinkEvent) event).getLinkId() );
+			}
+
 			// difficult to know what precision to ask...
 			//Assert.assertEquals(
 			//		"unexpected event time for "+event.getEventType(),
