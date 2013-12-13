@@ -68,11 +68,13 @@ import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
+import playground.thibautd.socnetsim.replanning.GroupReplanningListennerWithPSimLoop;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
@@ -361,7 +363,42 @@ public class RunCliquesWithModularStrategies {
 			return controller;
 		}
 
-		throw new RuntimeException( "controller with PSim not yet implemented" );
+		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
+
+		final GroupStrategyRegistry mainStrategyRegistry = new GroupStrategyRegistry();
+		RunUtils.loadStrategyRegistryWithNonInnovativeStrategiesOnly(
+				factories,
+				mainStrategyRegistry,
+				controllerRegistry );
+
+		final GroupStrategyManager mainStrategyManager =
+			new GroupStrategyManager( 
+					mainStrategyRegistry );
+
+		final GroupStrategyRegistry innovativeStrategyRegistry = new GroupStrategyRegistry();
+		RunUtils.loadStrategyRegistryWithInnovativeStrategiesOnly(
+				factories,
+				innovativeStrategyRegistry,
+				controllerRegistry );
+
+		final GroupStrategyManager innovativeStrategyManager =
+			new GroupStrategyManager( 
+					innovativeStrategyRegistry );
+
+		// create controler
+		final ImmutableJointController controller =
+			new ImmutableJointController(
+					controllerRegistry,
+					new GroupReplanningListennerWithPSimLoop(
+						controllerRegistry,
+						mainStrategyManager,
+						innovativeStrategyManager,
+						new JointPseudoSimFactory( 
+							controllerRegistry.getTravelTime()) ));
+
+		//mainStrategyManager.setStopWatch( controller.stopwatch );
+
+		return controller;
 	}
 
 	private static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(

@@ -106,6 +106,53 @@ public class RunUtils {
 		}
 	}
 
+	public static void loadStrategyRegistryWithInnovativeStrategiesOnly(
+			final GroupPlanStrategyFactoryRegistry factories, 
+			final GroupStrategyRegistry strategyRegistry,
+			final ControllerRegistry controllerRegistry) {
+		loadStrategyRegistry(
+				true,
+				factories,
+				strategyRegistry,
+				controllerRegistry );
+	}
+
+	public static void loadStrategyRegistryWithNonInnovativeStrategiesOnly(
+			final GroupPlanStrategyFactoryRegistry factories, 
+			final GroupStrategyRegistry strategyRegistry,
+			final ControllerRegistry controllerRegistry) {
+		loadStrategyRegistry(
+				false,
+				factories,
+				strategyRegistry,
+				controllerRegistry );
+	}
+
+	private static void loadStrategyRegistry(
+			final boolean innovativeness,
+			final GroupPlanStrategyFactoryRegistry factories, 
+			final GroupStrategyRegistry strategyRegistry,
+			final ControllerRegistry controllerRegistry) {
+		final Config config = controllerRegistry.getScenario().getConfig();
+		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup) config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+
+		strategyRegistry.setExtraPlanRemover(
+				factories.createRemover(
+					weights.getSelectorForRemoval(),
+					controllerRegistry ) );
+
+		for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {
+			if ( set.isInnovative() == innovativeness ) {
+				strategyRegistry.addStrategy(
+						factories.createStrategy(
+							set.getStrategyName(),
+							controllerRegistry ),
+						set.getWeight(),
+						-1 );
+			}
+		}
+	}
+
 	public static void loadDefaultAnalysis(
 			final int graphWriteInterval,
 			final FixedGroupsIdentifier cliques,
