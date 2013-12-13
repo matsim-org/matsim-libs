@@ -111,7 +111,7 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		final Id driverId = agent.getId();
 		final Collection<Id> passengerIds = getPassengerIds( agent );
 		final Id vehicleId = getVehicleId( agent );
-		final MobsimVehicle vehicle = vehicleProvider.getVehicles().get( vehicleId );
+		final MobsimVehicle vehicle = vehicleProvider.getVehicle( vehicleId );
 
 		final Map<Id, PassengerAgent> passengersWaiting =
 			passengersWaitingPerDriver.getPassengersWaitingDriverAtLink(

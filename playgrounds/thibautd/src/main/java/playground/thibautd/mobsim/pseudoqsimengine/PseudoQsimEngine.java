@@ -234,7 +234,8 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		return true;
 	}
 
-	private QVehicle getVehicle(final Id id) {
+	@Override
+	public QVehicle getVehicle(final Id id) {
 		QVehicle v = vehicles.get( id );
 
 		if ( v == null ) {
@@ -266,12 +267,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 
 	@Override
 	public void onPrepareSim() {}
-
-	@Override
-	public Map<Id, ? extends QVehicle> getVehicles() {
-		return vehicles;
-	}
-
+	
 	@Override
 	public void afterSim() {
 		for (InternalArrivalEvent event : arrivalQueue) {

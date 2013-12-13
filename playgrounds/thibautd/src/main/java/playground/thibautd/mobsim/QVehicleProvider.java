@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
@@ -28,6 +26,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
  * @author thibautd
  */
 public interface QVehicleProvider {
-	public Map<Id, ? extends QVehicle> getVehicles();
+	public QVehicle getVehicle( Id vehicleId );
 }
 

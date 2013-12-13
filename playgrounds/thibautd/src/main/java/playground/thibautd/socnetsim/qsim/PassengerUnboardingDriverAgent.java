@@ -94,7 +94,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 				assert passengersToBoard.isEmpty();
 			}
 
-			final MobsimVehicle vehicle = vehicleProvider.getVehicles().get( delegate.getPlannedVehicleId() );
+			final MobsimVehicle vehicle = vehicleProvider.getVehicle( delegate.getPlannedVehicleId() );
 			final Id linkId = delegate.getCurrentLinkId();
 			final Collection<PassengerAgent> passengersToUnboard = new ArrayList<PassengerAgent>();
 			assert vehicle != null;
@@ -131,7 +131,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	}
 
 	private void boardPassengers() {
-		final MobsimVehicle vehicle = vehicleProvider.getVehicles().get( delegate.getPlannedVehicleId() );
+		final MobsimVehicle vehicle = vehicleProvider.getVehicle( delegate.getPlannedVehicleId() );
 		final EventsManager events = internalInterface.getMobsim().getEventsManager();
 		for ( PassengerAgent passenger : passengersToBoard ) {
 			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() ) : passenger+" is at "+passenger.getCurrentLinkId()+" instead of "+getCurrentLinkId()+" for driver "+this;
