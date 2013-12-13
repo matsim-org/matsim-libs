@@ -103,7 +103,7 @@ public class JointPseudoSimTest {
 				new JointQSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
 				new JointPseudoSimFactory(
-					travelTime.getLinkTravelTimes() ),
+					travelTime ),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/pSimEvent.xml" : null,
 				travelTime );
 	}

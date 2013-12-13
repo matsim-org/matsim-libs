@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.thibautd.mobsim.pseudoqsimengine.PseudoQsimEngine;
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -51,10 +51,10 @@ public class JointPseudoSimFactory implements MobsimFactory {
 	private static final Logger log =
 		Logger.getLogger(JointPseudoSimFactory.class);
 
-	private final TravelTime travelTime;
+	private final TravelTimeCalculator travelTime;
 
 	public JointPseudoSimFactory(
-			final TravelTime travelTime) {
+			final TravelTimeCalculator travelTime) {
 		this.travelTime = travelTime;
 	}
 
@@ -84,7 +84,7 @@ public class JointPseudoSimFactory implements MobsimFactory {
 		final PseudoQsimEngine pseudoEngine =
 			new PseudoQsimEngine(
 					conf.getMainModes(),
-					travelTime,
+					travelTime.getLinkTravelTimes(),
 					sc.getNetwork() );
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
 		qSim.addMobsimEngine( pseudoEngine );
