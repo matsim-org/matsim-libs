@@ -114,8 +114,8 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 				arrivalQueue.add(
 						calcArrival(
 							time,
-							event.vehicle,
-							nextLinkId) );
+							nextLinkId,
+							event.vehicle) );
 			}
 			else {
 				eventsManager.processEvent(
@@ -216,10 +216,12 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 			//vehicle.setCurrentLink( linkId );
 
 			arrivalQueue.add(
-					calcArrival(
+					// do not travel on first link
+					// calcArrival(
+					new InternalArrivalEvent(
 						now,
-						vehicle,
-						linkId ) );
+						linkId,
+						vehicle) );
 
 			eventsManager.processEvent(
 					new Wait2LinkEvent(
@@ -248,8 +250,8 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 
 	private InternalArrivalEvent calcArrival(
 			final double now,
-			final QVehicle vehicle,
-			final Id linkId) {
+			final Id linkId,
+			final QVehicle vehicle) {
 		final double travelTime =
 			travelTimeCalculator.getLinkTravelTime(
 					network.getLinks().get( linkId ),
