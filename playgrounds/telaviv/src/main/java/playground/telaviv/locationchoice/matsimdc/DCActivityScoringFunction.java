@@ -40,6 +40,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.telaviv.locationchoice.CalculateDestinationChoice;
+import playground.telaviv.zones.ZoneMapping;
+
 public class DCActivityScoringFunction extends org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityScoringFunction {
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
 	private TelAvivDestinationScoring destinationChoiceScoring;	
@@ -53,9 +56,9 @@ public class DCActivityScoringFunction extends org.matsim.contrib.locationchoice
 	private List<ScoringPenalty> penalty = null;
 		
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, 
-			DestinationChoiceBestResponseContext dcContext) {
+			DestinationChoiceBestResponseContext dcContext, ZoneMapping zoneMapping, CalculateDestinationChoice dcCalculator) {
 		super(plan, facilityPenalties, dcContext);
-		this.destinationChoiceScoring = new TelAvivDestinationScoring(dcContext);
+		this.destinationChoiceScoring = new TelAvivDestinationScoring(dcContext, zoneMapping, dcCalculator);
 		this.plan = plan;
 		this.params = dcContext.getParams();
 		this.converter = dcContext.getConverter();

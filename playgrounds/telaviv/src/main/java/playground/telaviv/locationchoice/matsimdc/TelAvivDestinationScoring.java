@@ -19,20 +19,52 @@
 
 package playground.telaviv.locationchoice.matsimdc;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.opengis.feature.simple.SimpleFeature;
 
+import playground.telaviv.locationchoice.CalculateDestinationChoice;
+import playground.telaviv.locationchoice.Coefficients;
+import playground.telaviv.zones.Emme2Zone;
+import playground.telaviv.zones.ZoneMapping;
 
 public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring { 
-	private DestinationChoiceBestResponseContext dcContext;
+	private CalculateDestinationChoice dcCalculator;
+	Map<Integer, Emme2Zone> zones;
 		
-	public TelAvivDestinationScoring(DestinationChoiceBestResponseContext dcContext) {
-		super(dcContext);
-		this.dcContext = dcContext;
+	public TelAvivDestinationScoring(DestinationChoiceBestResponseContext dcContext, ZoneMapping zoneMapping, CalculateDestinationChoice dcCalculator) {
+		super(dcContext);	
+		this.zones = zoneMapping.getParsedZones();
+		this.dcCalculator = dcCalculator;
 	}
 	
 	public double getZonalScore(PlanImpl plan, ActivityImpl act) {
-		return 0.0;
+		Activity previousActivity = plan.getPreviousActivity(plan.getPreviousLeg(act));
+		int fromZoneIndex = this.getZoneIndex(previousActivity.getLinkId());
+		int toZoneIndex = this.getZoneIndex(act.getLinkId());
+		
+		double utility = this.dcCalculator.getVtod()
+				[Coefficients.types.indexOf(act.getType())] // type
+						[fromZoneIndex] // origin
+								[toZoneIndex] // destination
+										[this.dcCalculator.getTimeSlotIndex(plan.getPreviousLeg(act).getDepartureTime())]; //time bin
+		
+		return utility;
+	}
+	
+	// could be speed up: search for fromZone and toZone at the same time
+	private int getZoneIndex(Id linkId) {
+		int index = 0;
+		for (Emme2Zone zone : this.zones.values()) {
+			if (zone.linkIds.contains(linkId)) return index;
+			index++;
+		}
+		return -1;
+		
 	}
 }

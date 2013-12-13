@@ -31,29 +31,59 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
+import playground.telaviv.locationchoice.CalculateDestinationChoice;
+import playground.telaviv.zones.ZoneMapping;
 
 public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 	private final Controler controler;
-	private DestinationChoiceBestResponseContext lcContext;
-	private Config config;
+	private DestinationChoiceBestResponseContext dcContext;
+	private Config config;	
+	private int iteration = -1;
+	private ZoneMapping zoneMapping;
+	private CalculateDestinationChoice dcCalculator;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
-	public DCScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext lcContext) {
+	public DCScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext dcContext) {
 		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
-		this.lcContext = lcContext;
+		this.dcContext = dcContext;
 		this.config = config;
 		log.info("creating DCScoringFunctionFactory");
 	}
+	
+	private void checkInitialization() {
+		// should not play a role here when iteration number is exactly set. 
+		if (this.iteration != this.controler.getIterationNumber()) {
+			this.iteration = this.controler.getIterationNumber();
+			this.zoneMapping = new ZoneMapping(this.dcContext.getScenario(), TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
+			this.dcCalculator = new CalculateDestinationChoice(this.dcContext.getScenario());
+			this.dcCalculator.calculateConstantFactors();
+			
+			// actually not necessary here:
+			this.dcCalculator.calculateDynamicFactors(
+					new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.dcContext.getScenario().getNetwork(), 
+							this.dcContext.getScenario().getConfig().travelTimeCalculator()).getLinkTravelTimes());
+					
+			this.dcCalculator.calculateTotalFactors();			
+		}
+	}
 		
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {		
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		
+		this.checkInitialization();
+		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		CharyparNagelActivityScoring scoringFunction = new DCActivityScoringFunction(
 					(PlanImpl)plan, 
-					this.lcContext.getFacilityPenalties(), 
-					lcContext);
+					this.dcContext.getFacilityPenalties(), 
+					dcContext,
+					this.zoneMapping,
+					this.dcCalculator);
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
