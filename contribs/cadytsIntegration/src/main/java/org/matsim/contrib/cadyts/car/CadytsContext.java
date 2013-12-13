@@ -59,7 +59,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 	
 	private final double countsScaleFactor;
-	private final Counts counts = new Counts();
+	private final Counts counts;
 	private final boolean writeAnalysisFile;
 	private final CadytsConfigGroup cadytsConfig;
 	
@@ -76,8 +76,27 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		// addModule() also initializes the config group with the values read from the config file
 		cadytsConfig.setWriteAnalysisFile(true);
 		
+		this.counts = new Counts();
 		String occupancyCountsFilename = config.counts().getCountsFileName();
 		new MatsimCountsReader(this.counts).readFile(occupancyCountsFilename);
+		
+		Set<Id> countedLinks = new TreeSet<Id>();
+		for (Id id : this.counts.getCounts().keySet()) countedLinks.add(id);
+		
+		cadytsConfig.setCalibratedItems(countedLinks);
+		
+		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
+	}
+	
+	public CadytsContext(Config config, Counts counts) {
+		this.countsScaleFactor = config.counts().getCountsScaleFactor();
+		
+		this.cadytsConfig = new CadytsConfigGroup();
+		config.addModule(cadytsConfig);
+		// addModule() also initializes the config group with the values read from the config file
+		cadytsConfig.setWriteAnalysisFile(true);
+		
+		this.counts = counts;
 		
 		Set<Id> countedLinks = new TreeSet<Id>();
 		for (Id id : this.counts.getCounts().keySet()) countedLinks.add(id);
