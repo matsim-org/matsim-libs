@@ -48,7 +48,8 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	// use the factory
 	/*package*/ ParallelMultiModalSimEngine(Netsim sim, Map<String, TravelTime> multiModalTravelTimes) {
 		super(sim, multiModalTravelTimes);
-		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sim.getScenario().getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+		MultiModalConfigGroup multiModalConfigGroup = 
+				(MultiModalConfigGroup) sim.getScenario().getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
 	}
 	
@@ -57,7 +58,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		super.setInternalInterface(internalInterface);
 		
 		/*
-		 * If the engines have already been created, hand the internalinterface
+		 * If the engines have already been created, hand the internalInterface
 		 * over to them.
 		 */
 		if (this.engines != null) {
@@ -198,6 +199,12 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 					separationBarrier, endBarrier, this.getMobsim(), multiModalTravelTimes, this);
 
 			engine.setInternalInterface(this.internalInterface);
+			
+			/*
+			 * The idea that each thread could have its own instance of a EventsManager.
+			 * If this is realized, here something like eventsManager.getInstance() could be added.
+			 */
+//			engine.setEventsManager(eventsManager);
 			
 			Thread thread = new Thread(engine);
 			thread.setName("MultiModalSimEngineRunner" + i);

@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -53,6 +54,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	private static final int INFO_PERIOD = 3600;
 	
 	/*package*/ Mobsim qSim;
+	/*package*/ EventsManager eventsManager;
 	/*package*/ Map<String, TravelTime> multiModalTravelTimes;
 	/*package*/ Collection<MultiModalQLinkExtension> activeLinks;
 	/*package*/ Collection<MultiModalQNodeExtension> activeNodes;
@@ -69,6 +71,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 
 	/*package*/ MultiModalSimEngine(Mobsim qSim, Map<String, TravelTime> multiModalTravelTimes) {
 		this.qSim = qSim;
+		this.eventsManager = qSim.getEventsManager();
 
 		/*
 		 * This is the collection of active nodes. This needs to be thread-safe since in the
@@ -94,6 +97,10 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		return qSim;
 	}
 
+	/*package*/ EventsManager getEventsManager() {
+		return this.eventsManager;
+	}
+	
 	@Override
 	public void onPrepareSim() {
 		

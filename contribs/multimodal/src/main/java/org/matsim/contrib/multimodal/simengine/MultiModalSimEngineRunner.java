@@ -25,6 +25,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.router.util.TravelTime;
@@ -50,6 +51,10 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 		this.multiModalSimEngine = multiModalSimEngine;
 	}
 
+	/*package*/ void setEventsManager(EventsManager eventsManager) {
+		this.eventsManager = eventsManager;
+	}
+	
 	/*
 	 * Changed behavior:
 	 * Nothing to do here - everything is handled by the ParallelMultiModalSimEngine.
