@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.replanning;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -46,6 +47,8 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 	private final ControllerRegistry registry;
 	private final MobsimFactory pSimFactory;
 
+	private IterationStopWatch stopWatch = null;
+
 	public GroupReplanningListennerWithPSimLoop(
 			final ControllerRegistry registry,
 			final GroupStrategyManager mainStrategyManager,
@@ -62,7 +65,7 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 		final PseudoSimConfigGroup config = getConfigGroup();
 
 		if ( event.getIteration() % config.getPeriod() == 0 ) {
-			doInnerLoop();
+			doInnerLoop( event );
 		}
 
 		mainStrategyManager.run(
@@ -70,7 +73,7 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 				registry );
 	}
 
-	private void doInnerLoop() {
+	private void doInnerLoop(final ReplanningEvent event) {
 		final int nIters = getConfigGroup().getNPSimIters();
 
 		// XXX Uuuuuuuuuuuuuuuglyyyyyyyyyyyyyyyyyyyy
@@ -85,27 +88,35 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 					registry.getScoringFunctionFactory());
 
 		log.info( "### start inner loop" );
+		if ( stopWatch != null ) stopWatch.beginOperation( "Inner PSim loop" );
 		for ( int i=0; i < nIters; i++ ) {
-			log.info( "### inner loop: start iteration "+i );
+			log.info( "### inner loop: start iteration "+event.getIteration()+"."+i );
 			scoring.notifyIterationStarts( new IterationStartsEvent( null , i ) );
 
 			innovativeStrategyManager.run(
 					i, // what makes sense here???
 					registry );
 
+			if ( stopWatch != null ) stopWatch.beginOperation( "PSim iter "+i );
 			pSimFactory.createMobsim(
 					registry.getScenario(),
 					events ).run();
+			if ( stopWatch != null ) stopWatch.endOperation( "PSim iter "+i );
 
 			scoring.notifyScoring( new ScoringEvent( null , i ) );
 			scoring.notifyIterationEnds( new IterationEndsEvent( null , i ) );
-			log.info( "### inner loop: end iteration "+i );
+			log.info( "### inner loop: end iteration "+event.getIteration()+"."+i );
 		}
+		if ( stopWatch != null ) stopWatch.endOperation( "Inner PSim loop" );
 	}
 
 	private PseudoSimConfigGroup getConfigGroup() {
 		return (PseudoSimConfigGroup)
 			registry.getScenario().getConfig().getModule(
 					PseudoSimConfigGroup.GROUP_NAME );
+	}
+
+	public void setStopWatch(final IterationStopWatch stopWatch) {
+		this.stopWatch = stopWatch;
 	}
 }

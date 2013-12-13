@@ -386,17 +386,19 @@ public class RunCliquesWithModularStrategies {
 					innovativeStrategyRegistry );
 
 		// create controler
-		final ImmutableJointController controller =
-			new ImmutableJointController(
-					controllerRegistry,
+		final GroupReplanningListennerWithPSimLoop listenner =
 					new GroupReplanningListennerWithPSimLoop(
 						controllerRegistry,
 						mainStrategyManager,
 						innovativeStrategyManager,
 						new JointPseudoSimFactory( 
-							controllerRegistry.getTravelTime()) ));
+							controllerRegistry.getTravelTime()) );
+		final ImmutableJointController controller =
+			new ImmutableJointController(
+					controllerRegistry,
+					listenner );
 
-		//mainStrategyManager.setStopWatch( controller.stopwatch );
+		listenner.setStopWatch( controller.stopwatch );
 
 		return controller;
 	}
