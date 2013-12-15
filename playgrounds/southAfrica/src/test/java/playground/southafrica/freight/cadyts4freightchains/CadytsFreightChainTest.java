@@ -47,6 +47,7 @@ import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanSelectorWithCadytsPlanRegistration;
+import org.matsim.contrib.cadyts.general.PlanSelectionByCadyts;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -67,6 +68,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
 import playground.southafrica.freight.cadyts4freightchains.CadytsFreightChainsContext;
@@ -82,10 +84,10 @@ public class CadytsFreightChainTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-//	@Ignore
+	@Ignore
 	public final void testCalibrationAsScoring() throws IOException {
 		final double beta=1. ;
-		final int lastIteration = 50 ;
+		final int lastIteration = 100 ;
 
 		String outputDir = this.utils.getOutputDirectory();
 		IOUtils.createDirectory(outputDir) ;
@@ -115,9 +117,9 @@ public class CadytsFreightChainTest {
 		for ( int ii=0 ; ii<=6 ; ii++ ) {
 			nChainsOfLength.add(0) ;
 		}
-		int tmp = 5 ;
-		nChainsOfLength.set(4, tmp ) ; // meaning "tmp" chains of lengths 4
-		nChainsOfLength.set(5, scenario.getPopulation().getPersons().size() - tmp ) ; // meaning all the other chains should be length 5
+		int nChainsOfLength4 = 5 ;
+		nChainsOfLength.set(4, nChainsOfLength4 ) ; 
+		nChainsOfLength.set(5, scenario.getPopulation().getPersons().size() - nChainsOfLength4 ) ; // meaning all the other chains should be length 5
 		
 		final CadytsFreightChainsContext cContext = new CadytsFreightChainsContext(config, nChainsOfLength );
 		controler.addControlerListener(cContext);
@@ -125,8 +127,12 @@ public class CadytsFreightChainTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario sc, EventsManager eventsManager) {
-				return new PlanStrategyImpl(new ExpBetaPlanSelectorWithCadytsPlanRegistration<Item>(
-						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
+//				return new PlanStrategyImpl(new ExpBetaPlanSelectorWithCadytsPlanRegistration<Item>(
+//						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
+//				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Item>(
+//						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
+				return new PlanStrategyImpl( new PlanSelectionByCadyts<Item>(
+						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext) ) ;
 			}
 		} ) ;
 
@@ -134,7 +140,9 @@ public class CadytsFreightChainTest {
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
 				SumScoringFunction sum = new SumScoringFunction() ;
-				sum.addScoringFunction( new CadytsScoring<Item>(plan, config, cContext, 1000.) ); 
+				final CadytsScoring<Item> cadytsScoring = new CadytsScoring<Item>(plan, config, cContext );
+				cadytsScoring.setWeightOfCadytsCorrection(100.);
+				sum.addScoringFunction( cadytsScoring ); 
 				return sum ; 
 			}
 		}) ;
@@ -221,6 +229,11 @@ public class CadytsFreightChainTest {
 		cadytsConfig.setTimeBinSize(3600) ;
 		cadytsConfig.setStartTime(0);
 		cadytsConfig.setEndTime(3600);
+
+//		cadytsConfig.setUseBruteForce(true);
+		// makes a difference with PlanSelectionByCadyts.  Does not make a difference with the other ways to do this.  kai, dec'13
+
+		cadytsConfig.setMinFlowStddev_vehPerHour(1.);
 		config.addModule(cadytsConfig);
 		
 		return config;
