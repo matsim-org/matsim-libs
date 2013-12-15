@@ -69,10 +69,15 @@ public final class CadytsBuilder {
 
 		matsimCalibrator.setRegressionInertia(cadytsConfig.getRegressionInertia()) ;
 		matsimCalibrator.setMinStddev(cadytsConfig.getMinFlowStddev_vehPerHour(), TYPE.FLOW_VEH_H);
+		matsimCalibrator.setMinStddev(cadytsConfig.getMinFlowStddev_vehPerHour(), TYPE.COUNT_VEH);
 		matsimCalibrator.setFreezeIteration(cadytsConfig.getFreezeIteration());
 		matsimCalibrator.setPreparatoryIterations(cadytsConfig.getPreparatoryIterations());
 		matsimCalibrator.setVarianceScale(cadytsConfig.getVarianceScale());
+
 		matsimCalibrator.setBruteForce(cadytsConfig.useBruteForce());
+		// I don't think this has an influence on any of the variants we are using. (Has an influence only when plan choice is left
+		// completely to cadyts, rather than just taking the score offsets.) kai, dec'13
+		
 		matsimCalibrator.setStatisticsFile(config.controler().getOutputDirectory() + "/calibration-stats.txt");
 		
 		int multiple = timeBinSize_s / 3600 ; // e.g. "3" when timeBinSize_s = 3*3600 = 10800
@@ -84,6 +89,10 @@ public final class CadytsBuilder {
 
 		// yyyy However, it seems that some of this did not work: We are using "hourly" counts, and dividing the multi-hour values by
 		// the number of hours. ???????
+		
+		// yyyyyy I am currently of the opinion that the multi-hour version should be decoupled from the counts format.  There is a
+		// cadyts file format which allows setting mult-hour measurements, and that seems a lot more direct than trying to use a file
+		// format/data structure which is really not meant for this.  kai, dec'13
 		
 		//add counts data into calibrator
 		int numberOfAddedMeasurements = 0 ;
