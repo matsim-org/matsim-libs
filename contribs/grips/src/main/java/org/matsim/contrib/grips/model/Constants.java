@@ -41,19 +41,18 @@ public class Constants
 	//set language
 	private static Locale locale = new EnglishLocale();
 	
-	public static enum ModuleType { EVACUATION, POPULATION, BUSSTOPS, ROADCLOSURE, ANALYSIS, MATSIMSCENARIO, GRIPSSCENARIO };
+	public static enum ModuleType {
+		EVACUATION, POPULATION, BUSSTOPS, ROADCLOSURE, ANALYSIS, MATSIMSCENARIO, SCENARIOXML, GRIPSSCENARIO
+	};
 	public static enum LayerType { SLIPPYMAP, SHAPE, LINES, INFO, MISC };
 	public static enum Mode { EVACUATION, UTILIZATION, CLEARING };
 	public static enum SelectionMode { POLYGONAL, CIRCLE };
 	public enum Unit { TIME, PEOPLE }
-	
-
 
 	public static String DEFAULT_MATSIM_CONFIG_DESTINATION = "/output/config.xml";
 	public static final String DEFAULT_MATSIM_CONFIG_FILE = "config.xml";
 
 	public static final String COLOR_PREFIX = "color_";
-
 	
 	public static String DESC_OSM_BOUNDINGBOX = "osm bounding box"; 
 	
@@ -92,6 +91,8 @@ public class Constants
 	public static Color MENU_COLOR_PTLINES = new Color (0,200,0);
 	public static Color MENU_COLOR_ANALYSIS= new Color (0,120,120);
 	public static Color MENU_COLOR_MATSIMSCENARIO = new Color (55,100,100);
+	public static Color MENU_COLOR_SCENARIOXML = new Color (55,100,100);
+	
 	
 	public static ShapeStyle SHAPESTYLE_EVACAREA = new ShapeStyle(COLOR_EVACAREA_FILL, COLOR_EVACAREA_CONTOUR, 4, DrawMode.FILL_WITH_CONTOUR);
 	public static ShapeStyle SHAPESTYLE_POPAREA = new ShapeStyle(COLOR_POPAREA_FILL, COLOR_POPAREA_CONTOUR, 4, DrawMode.FILL_WITH_CONTOUR);
@@ -107,8 +108,6 @@ public class Constants
 	public static String ID_BUSSTOP_PREFIX = "busstop_";
 
 	public static String META_LINKID = "linkid";
-	
-
 
 	public static Color getModuleColor(ModuleType type)
 	{
@@ -121,8 +120,8 @@ public class Constants
 			case BUSSTOPS : return MENU_COLOR_PTLINES; 
 			case ANALYSIS : return MENU_COLOR_ANALYSIS; 
 			case MATSIMSCENARIO : return MENU_COLOR_MATSIMSCENARIO; 
+			case SCENARIOXML : return MENU_COLOR_SCENARIOXML; 
 		}
-		
 		return null;
 	}
 
@@ -140,6 +139,7 @@ public class Constants
 			case BUSSTOPS :       img = IMG_ICON_BUSSTOPS; break;
 			case ANALYSIS :       img = IMG_ICON_ANALYSIS; break;
 			case MATSIMSCENARIO : img = IMG_ICON_MATSIMSCENARIO; break;
+			case SCENARIOXML : 	  img = IMG_ICON_SCENARIOXML; break;
 		}
 		
 		return MatsimResource.getAsImage("grips/" + img);
@@ -159,6 +159,7 @@ public class Constants
 	public static String IMG_ICON_BUSSTOPS = "BUSSTOPS.png";
 	public static String IMG_ICON_ANALYSIS = "ANALYSIS.png";
 	public static String IMG_ICON_MATSIMSCENARIO = "MATSIMSCENARIO.png";
+	public static String IMG_ICON_SCENARIOXML = "SCENARIOXML.png";
 	
 	public static int FRAME_MIN_WIDTH = 200;
 	public static int FRAME_MIN_HEIGHT = 200;
