@@ -65,6 +65,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 
@@ -187,7 +188,13 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		
 		// we can use the TripRouterFactory that has been initialized by the MultiModalControlerListener
 		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactoryWrapper);
-				
+		
+		/*
+		 * Since we use the multi-modal simulation, we have to ensure that the travel
+		 * time collector only takes car trips into account.
+		 */
+		this.withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(CollectionUtils.stringToSet(TransportMode.car));
+		
 		/*
 		 * notifyStartup has to be called after the WithinDayTripRouterFactory has been set.
 		 * After this call, the setters cannot be called anymore.
