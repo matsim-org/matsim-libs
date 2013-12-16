@@ -30,7 +30,7 @@ public class TwoRunAnalyzer {
 	private ScenarioImpl scenario1 = null; 
 	
 	private SupriceBoxPlot boxPlotCS = new SupriceBoxPlot("Weekly CS", "Income", "CS", 0.0, 0.0);
-	private SupriceBoxPlot boxPlotScoreDiff = new SupriceBoxPlot("Weekly CS", "Income", "ScoreDiff", 0.0, 0.0);
+	private SupriceBoxPlot boxPlotScoreDiff = new SupriceBoxPlot("Weekly ScoreDiff", "Income", "ScoreDiff", 0.0, 0.0);
 	
 	public static void main(String[] args) {
 		if (args.length != 4) {
@@ -80,8 +80,8 @@ public class TwoRunAnalyzer {
 				}
 				weekScores0.putAttribute(person.getId().toString(), "score." + day, bestScore);
 				
-				bestPlan = person.getSelectedPlan();
-				bestScore = bestPlan.getScore();
+				bestPlan = null;
+				bestScore = Double.MIN_VALUE;
 				for (Plan plan : this.scenario1.getPopulation().getPersons().get(person.getId()).getPlans()) {
 					if (plan.getScore() > bestScore) {
 						bestPlan = plan;
