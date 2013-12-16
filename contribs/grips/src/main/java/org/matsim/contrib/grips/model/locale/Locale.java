@@ -59,5 +59,6 @@ public interface Locale
 	public String labelSelectionMode();
 	public String btClear();
 	public String popArea();
+	public String moduleScenarioXml();
 	
 }

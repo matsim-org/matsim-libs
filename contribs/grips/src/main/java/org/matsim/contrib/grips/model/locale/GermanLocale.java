@@ -52,6 +52,7 @@ public class GermanLocale implements Locale
 	private String modulePTLEditor 				 = "Bushaltestellen";
 	private String moduleMatsimScenarioGenerator = "MATSim Scenario";
 	private String moduleEvacuationAnalysis 	 = "Analyse";
+	private String moduleScenarioXml 			 = "Grips Szenario";
 	
 	private String titlePopAreas = "Populationsgebiete";
 	private String titleAreaID = "ID";
@@ -130,6 +131,12 @@ public class GermanLocale implements Locale
 	public String btRemove()
 	{
 		return btRemove;
+	}
+
+	@Override
+	public String moduleScenarioXml()
+	{
+		return moduleScenarioXml;
 	}
 
 	@Override
@@ -228,5 +235,4 @@ public class GermanLocale implements Locale
 		return popArea;
 	}
 
-	
 }

@@ -21,6 +21,7 @@
 package org.matsim.contrib.grips.scenariogenerator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -43,8 +44,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.model.Constants;
 
-public class SGMask extends JPanel
-{
+public class SGMask extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private Controller controller;
 	private JButton btRun;
@@ -54,18 +54,18 @@ public class SGMask extends JPanel
 	private Logger root;
 
 	@SuppressWarnings("resource")
-	public SGMask(MatsimNetworkGenerator scenariogen, Controller controller)
-	{
+	public SGMask(MatsimNetworkGenerator scenariogen, Controller controller) {
 		new Interceptor(this, System.out);
 		this.scenarioGeneratorMask = scenariogen;
 
 		this.controller = controller;
-		int width = this.controller.getParentComponent().getWidth(); 
-		int height = this.controller.getParentComponent().getHeight(); 
-		
+		int width = this.controller.getParentComponent().getWidth();
+		int height = this.controller.getParentComponent().getHeight();
+
 		this.setLayout(new BorderLayout());
 		this.textOutput = new JTextArea();
-		this.textOutput.setPreferredSize(new Dimension(width - 20,(int)(height/1.5)));
+		this.textOutput.setPreferredSize(new Dimension(width - 20,
+				(int) (height / 1.5)));
 		this.btRun = new JButton(this.controller.getLocale().btRun());
 		this.btRun.setEnabled(false);
 
@@ -74,6 +74,8 @@ public class SGMask extends JPanel
 
 		infoPanel.add(new JScrollPane(this.textOutput));
 		this.textOutput.setEnabled(false);
+		this.textOutput.setDisabledTextColor(Color.BLACK);
+
 		buttonPanel.add(btRun);
 		this.add(infoPanel, BorderLayout.NORTH);
 		this.add(buttonPanel, BorderLayout.CENTER);
@@ -81,57 +83,55 @@ public class SGMask extends JPanel
 		root = Logger.getRootLogger();
 		logAppender = new LogAppender(this);
 		root.addAppender(logAppender);
-		
 
-		
-		this.btRun.addActionListener(new ActionListener()
-		{
+		this.btRun.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
+			public void actionPerformed(ActionEvent e) {
+				try {
 					SGMask.this.btRun.setEnabled(false);
-					SGMask.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					SGMask.this.setCursor(Cursor
+							.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-					SwingWorker<String, Void> worker = new SwingWorker<String, Void>()
-					{
+					SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
 
 						@Override
-						protected String doInBackground()
-						{
-							ScenarioGenerator scengen = new org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator(SGMask.this.controller.getGripsFile());
+						protected String doInBackground() {
+							ScenarioGenerator scengen = new org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator(
+									SGMask.this.controller.getGripsFile());
 							scengen.run();
 							return "";
 						}
 
 						@Override
-						protected void done()
-						{
+						protected void done() {
 							SGMask.this.setCursor(Cursor.getDefaultCursor());
 							SGMask.this.btRun.setEnabled(true);
-							SGMask.this.scenarioGeneratorMask.setMainGoalAchieved(true);
-							SGMask.this.controller.setGoalAchieved(SGMask.this.scenarioGeneratorMask.isMainGoalAchieved());
-							
-							SGMask.this.root.removeAppender(SGMask.this.logAppender);
-							
+							SGMask.this.scenarioGeneratorMask
+									.setMainGoalAchieved(true);
+							SGMask.this.controller
+									.setGoalAchieved(SGMask.this.scenarioGeneratorMask
+											.isMainGoalAchieved());
+
+							SGMask.this.root
+									.removeAppender(SGMask.this.logAppender);
 
 							if (!SGMask.this.controller.isStandAlone())
-								SGMask.this.controller.openMastimConfig(new File(SGMask.this.controller.getGripsConfigModule().getOutputDir() + Constants.DEFAULT_MATSIM_CONFIG_FILE));
-							
+								SGMask.this.controller
+										.openMastimConfig(new File(
+												SGMask.this.controller
+														.getGripsConfigModule()
+														.getOutputDir()
+														+ Constants.DEFAULT_MATSIM_CONFIG_FILE));
 
 						}
 					};
-					
+
 					worker.execute();
 
-					
-				} catch (Exception e2)
-				{
+				} catch (Exception e2) {
 					e2.printStackTrace();
-				} finally
-				{
+				} finally {
 				}
 
 			}
@@ -139,80 +139,69 @@ public class SGMask extends JPanel
 
 	}
 
-	private class Interceptor extends PrintStream
-	{
+	private class Interceptor extends PrintStream {
 		SGMask mask;
 
-		public Interceptor(SGMask mask, OutputStream out)
-		{
+		public Interceptor(SGMask mask, OutputStream out) {
 			super(out, true);
 			this.mask = mask;
 		}
 
 		@Override
-		public void print(String s)
-		{
+		public void print(String s) {
 			mask.textOutput.append(s + "\r\n");
 		}
 
 		@Override
-		public void println(String x)
-		{
+		public void println(String x) {
 			mask.textOutput.append(x + "\r\n");
 		}
 
 	}
-	
-	public class LogAppender extends AppenderSkeleton
-	{
+
+	public class LogAppender extends AppenderSkeleton {
 		private SGMask sgMask;
 		private long n = 0;
 
-		public LogAppender(SGMask sgMask)
-		{
+		public LogAppender(SGMask sgMask) {
 			super();
 			this.sgMask = sgMask;
 		}
 
 		@Override
-		protected void append(LoggingEvent loggingEvent)
-		{
-			
+		protected void append(LoggingEvent loggingEvent) {
+
 			this.sgMask.textOutput.append(loggingEvent.getMessage() + "\r\n");
 			this.sgMask.textOutput.selectAll();
-			
-			if (++n>20)
-			{
-				Element root = this.sgMask.textOutput.getDocument().getDefaultRootElement();
+
+			if (++n > 20) {
+				Element root = this.sgMask.textOutput.getDocument()
+						.getDefaultRootElement();
 				Element first = root.getElement(0);
-				try
-				{
-					this.sgMask.textOutput.getDocument().remove(first.getStartOffset(), first.getEndOffset());
-				} catch (BadLocationException e)
-				{
+				try {
+					this.sgMask.textOutput.getDocument().remove(
+							first.getStartOffset(), first.getEndOffset());
+				} catch (BadLocationException e) {
 					e.printStackTrace();
 				}
 			}
 		}
 
 		@Override
-		public void close()
-		{
+		public void close() {
 
 		}
 
 		@Override
-		public boolean requiresLayout()
-		{
+		public boolean requiresLayout() {
 			return false;
 		}
 
 	}
 
-	public void enableRunButton(boolean toggle)
-	{
+	public void enableRunButton(boolean toggle) {
 		this.btRun.setEnabled(toggle);
-		
+
 	}
 
 }

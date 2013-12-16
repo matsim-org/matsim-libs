@@ -46,7 +46,7 @@ public abstract class ToolConfig {
 	public static Color COLOR_DISABLED_TRANSPARENT = new Color(150,150,150,80);
 	
 	//grid
-	public static final Color COLOR_GRID = new Color(0,0,0,150);
+	public static final Color COLOR_GRID = Color.GRAY; // new Color(0,0,0,150);
 	public static final Color COLOR_GRID_UTILIZATION = new Color(55,55,100,140);
 	public static final Color COLOR_CELL = new Color(205,205,255,100);
 	

@@ -880,7 +880,14 @@ public class Controller {
 			this.matsimConfigFile = file.getAbsolutePath();
 			file.getParent();
 
-			this.matsimConfig = ConfigUtils.loadConfig(this.matsimConfigFile);
+			try{
+				this.matsimConfig = ConfigUtils.loadConfig(this.matsimConfigFile);
+			}
+			catch(org.matsim.core.utils.io.UncheckedIOException e)
+			{
+				e.printStackTrace();
+				//TODO check if MATSim or GRIPS config!
+			}
 			this.scenario = ScenarioUtils.loadScenario(this.matsimConfig);
 
 			this.targetCoordinateSystem = matsimConfig.global().getCoordinateSystem();

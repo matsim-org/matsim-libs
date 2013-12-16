@@ -75,6 +75,7 @@ public class SimulationMask extends JPanel
 		//
 		this.textOutput = new JTextArea(20, 20);
 		this.textOutput.setEnabled(false);
+		this.textOutput.setDisabledTextColor(Color.BLACK);
 		JLabel labelFirstIteration = new JLabel(" first iteration: ");
 		JLabel labelLastIteration = new JLabel(" last iteration: ");
 		JPanel itPanel = new JPanel(new GridLayout(5, 2));

@@ -71,10 +71,11 @@ public class RCEToolBox extends AbstractToolBox {
 	private JPanel panelLink1;
 	private JPanel panelLink2;
 	private JButton openBtn;
-	private JButton saveButton;
+	private JButton saveBtn;
 
 	private boolean saveLink1;
 	private boolean saveLink2;
+	private boolean blockButtonOkClicked;
 
 	private Id currentLinkId1 = null;
 	private Id currentLinkId2 = null;
@@ -117,6 +118,8 @@ public class RCEToolBox extends AbstractToolBox {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				updateRoadClosure();
+				blockButtonOkClicked = true;
+				saveBtn.setEnabled(true);
 			}
 		});
 
@@ -205,15 +208,14 @@ public class RCEToolBox extends AbstractToolBox {
 		if (this.controller.isStandAlone())
 			panel.add(this.openBtn);
 
-		this.saveButton = new JButton(locale.btSave());
-		this.saveButton.setEnabled(false);
-		this.saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
-		panel.add(this.saveButton);
+		this.saveBtn = new JButton(locale.btSave());
+		this.saveBtn.setEnabled(false); 
+		this.saveBtn.setHorizontalAlignment(SwingConstants.RIGHT);
+		panel.add(this.saveBtn);
 		// this.add(this.compositePanel, BorderLayout.CENTER);
 
 		this.openBtn.addActionListener(this);
-		this.saveButton.addActionListener(this);
-
+		this.saveBtn.addActionListener(this);
 	}
 
 	class TypeHour implements KeyListener {
@@ -380,7 +382,9 @@ public class RCEToolBox extends AbstractToolBox {
 		}
 
 		this.controller.paintLayers();
-		this.saveButton.setEnabled(this.roadClosures.size() > 0);
+		// only enable Save Button if OK was clicked before
+		boolean enableSave = blockButtonOkClicked && (this.roadClosures.size() > 0) ;
+		this.saveBtn.setEnabled(enableSave);
 
 	}
 

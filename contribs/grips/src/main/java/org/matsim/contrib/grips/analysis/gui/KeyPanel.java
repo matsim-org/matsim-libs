@@ -134,7 +134,7 @@ public class KeyPanel extends AbstractDataPanel
 	
 	public static String getReadableTime(double value, Unit unit) {
 		if (unit.equals(Unit.PEOPLE))
-			return " " + (int) value + " people";
+			return " " + (int) value + " agents";
 
 		double minutes = 0;
 		double hours = 0;

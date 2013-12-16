@@ -231,7 +231,7 @@ public class GridRenderer extends AbstractRenderLayer {
 				else
 				{
 					this.imageContainer.setColor(ToolConfig.COLOR_GRID);
-					this.imageContainer.setLineThickness(2);
+					this.imageContainer.setLineThickness(1);
 					this.imageContainer.drawRect(gridX1, gridY1, gridX2 - gridX1, gridY2 - gridY1);
 					
 				}

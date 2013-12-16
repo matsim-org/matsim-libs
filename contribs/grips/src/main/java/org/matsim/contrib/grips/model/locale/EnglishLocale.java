@@ -52,6 +52,7 @@ public class EnglishLocale implements Locale
 	private String modulePTLEditor 				 = "bus stops";
 	private String moduleMatsimScenarioGenerator = "MATSim scenario";
 	private String moduleEvacuationAnalysis 	 = "analysis";
+	private String moduleScenarioXml			 = "scenario";
 	
 	private String titlePopAreas = "population areas";
 	private String titleAreaID = "ID";
@@ -130,6 +131,12 @@ public class EnglishLocale implements Locale
 	public String btRemove()
 	{
 		return btRemove;
+	}
+
+	@Override
+	public String moduleScenarioXml()
+	{
+		return moduleScenarioXml;
 	}
 
 	@Override
@@ -227,5 +234,6 @@ public class EnglishLocale implements Locale
 	public String popArea() {
 		return popArea;
 	}
+
 	
 }

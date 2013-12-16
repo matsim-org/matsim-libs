@@ -84,9 +84,10 @@ public class ShapeRenderer extends AbstractRenderLayer
 					int y = ((CircleShape)shape).getPixelOrigin().y;
 					int radius = ((CircleShape)shape).getPixelRadius();
 					
+					//TODO
 					//fill shape (if style is not just to draw the contour)
-					if (!shape.getDrawMode().equals(DrawMode.CONTOUR))
-						this.imageContainer.fillCircle(x-radius/2,y-radius/2,radius,radius);
+//					if (!shape.getDrawMode().equals(DrawMode.CONTOUR))
+//						this.imageContainer.fillCircle(x-radius/2,y-radius/2,radius,radius);
 					
 					//draw contour
 					if (!shape.getDrawMode().equals(DrawMode.FILL))
@@ -131,11 +132,11 @@ public class ShapeRenderer extends AbstractRenderLayer
 					if (!shape.getDrawMode().equals(DrawMode.CONTOUR))
 						this.imageContainer.fillPolygon(pixelPolygon);
 					
-					if (!shape.getDrawMode().equals(DrawMode.FILL))
-					{
-						this.imageContainer.setColor(shape.getContourColor());
-						this.imageContainer.drawPolygon(pixelPolygon);
-					}
+//					if (!shape.getDrawMode().equals(DrawMode.FILL))
+//					{
+//						this.imageContainer.setColor(shape.getContourColor());
+//						this.imageContainer.drawPolygon(pixelPolygon);
+//					}
 				}
 				else if (shape instanceof LineShape)
 				{
