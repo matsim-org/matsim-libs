@@ -254,7 +254,7 @@ public class CompareMain {
 		config.planCalcScore().setConstantCar(0);
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setLastIteration(20);
+		config.controler().setLastIteration(0);
 		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(100);
 		tmp.setStorageCapFactor(100);
