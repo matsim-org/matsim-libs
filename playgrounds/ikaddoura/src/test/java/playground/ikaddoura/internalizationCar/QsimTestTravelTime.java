@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -88,6 +89,7 @@ public class QsimTestTravelTime {
 	
 	// the travel time on single links is tested,
 	// the length and the velocity are varied
+	@Ignore
 	@Test
 	public final void testTravelTimeLK(){
 		
