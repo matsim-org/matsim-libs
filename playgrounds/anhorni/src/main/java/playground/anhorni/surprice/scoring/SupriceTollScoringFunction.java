@@ -53,7 +53,7 @@ public class SupriceTollScoringFunction implements MoneyScoring, BasicScoring {
 	@Override
 	public void addMoney(final double amount) {
 		//this.score -= amount * this.dudm;
-		this.score = amount * this.dudm; // amount comes negative!
+		this.score = this.score + amount * this.dudm; // amount comes negative!
 		
 		double prevVal = 0.0;
 		if (this.person.getCustomAttributes().get(day + ".tollScore") != null) {
