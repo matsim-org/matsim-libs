@@ -79,6 +79,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 
 	private final CyclicBarrier startBarrier;
 	private final CyclicBarrier endBarrier;
+	private final CyclicBarrier finalBarrier;
 	private final TripHandlingRunnable[] runnables;
 	private final Thread[] threads;
 
@@ -103,6 +104,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		log.info( "initializing "+getClass().getName()+" with "+nThreads+" threads" );
 		this.startBarrier = new CyclicBarrier( nThreads + 1 );
 		this.endBarrier = new CyclicBarrier( nThreads + 1 );
+		this.finalBarrier = new CyclicBarrier( nThreads + 1 );
 		this.runnables = new TripHandlingRunnable[ nThreads ];
 		this.threads = new Thread[ nThreads ];
 		for ( int i = 0; i < nThreads; i++ ) {
@@ -274,9 +276,11 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 			// stop thread
 			r.stopRun();
 		}
+
 		try {
 			startBarrier.await();
 			endBarrier.await();
+			finalBarrier.await();
 		}
 		catch (InterruptedException e) {
 			throw new RuntimeException();
@@ -286,7 +290,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		}
 
 		for ( TripHandlingRunnable r : runnables ) {
-			assert r.isFinished;
+			assert r.isFinished : r.isRunning;
 			r.afterSim();
 		}
 	}
@@ -402,6 +406,12 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 					}
 					endBarrier.await();
 				}
+
+				isFinished = true;
+				// just to make sure we wait for all threads to be finished before cleanup
+				// otherwise, in tests, assert isFinished may fail, just because cleanup starts
+				// before changing the value.
+				finalBarrier.await();
 			}
 			catch (InterruptedException e) {
 				throw new RuntimeException( e );
@@ -409,7 +419,6 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 			catch (BrokenBarrierException e) {
 				throw new RuntimeException( e );
 			}
-			isFinished = true;
 		}
 	}
 }
