@@ -108,7 +108,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		this.runnables = new TripHandlingRunnable[ nThreads ];
 		this.threads = new Thread[ nThreads ];
 		for ( int i = 0; i < nThreads; i++ ) {
-			this.runnables[ i ] = new TripHandlingRunnable();
+			this.runnables[ i ] = new TripHandlingRunnable( i );
 			this.threads[ i ] = new Thread( this.runnables[ i ] );
 			this.threads[ i ].setName( "PseudoQSimThread."+i );
 			this.threads[ i ].start();
@@ -272,15 +272,24 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 	
 	@Override
 	public void afterSim() {
-		for ( TripHandlingRunnable r : runnables ) {
-			// stop thread
-			r.stopRun();
-		}
-
 		try {
+			if ( log.isTraceEnabled() ) log.trace( "call start barrier..." );
 			startBarrier.await();
+			if ( log.isTraceEnabled() ) log.trace( "call start barrier... DONE" );
+
+			for ( TripHandlingRunnable r : runnables ) {
+				// stop thread
+				if ( log.isTraceEnabled() ) log.trace( "stopping runnable "+r );
+				r.stopRun();
+			}
+
+			if ( log.isTraceEnabled() ) log.trace( "call end barrier..." );
 			endBarrier.await();
+			if ( log.isTraceEnabled() ) log.trace( "call end barrier... DONE" );
+
+			if ( log.isTraceEnabled() ) log.trace( "call final barrier..." );
 			finalBarrier.await();
+			if ( log.isTraceEnabled() ) log.trace( "call final barrier... DONE" );
 		}
 		catch (InterruptedException e) {
 			throw new RuntimeException();
@@ -291,7 +300,12 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 
 		for ( TripHandlingRunnable r : runnables ) {
 			assert r.isFinished : r.isRunning;
+			if ( log.isTraceEnabled() ) log.trace( "clean runnable "+r );
 			r.afterSim();
+		}
+
+		for ( Thread t : threads ) {
+			assert t.getState().equals( Thread.State.TERMINATED );
 		}
 	}
 
@@ -327,6 +341,17 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		private boolean isFinished = false;
 		private double time = Double.NaN;
 
+		private final int instanceNr;
+
+		public TripHandlingRunnable(final int nr) {
+			this.instanceNr = nr;
+		}
+
+		@Override
+		public String toString() {
+			return "TripHandlingRunnable."+instanceNr;
+		}
+
 		public void addArrivalEvent(final InternalArrivalEvent event) {
 			arrivalQueue.add( event );
 		}
@@ -357,7 +382,9 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		public void run() {
 			try {
 				while ( isRunning ) {
+					if (log.isTraceEnabled()) log.trace( this+" starts waiting for start" );
 					startBarrier.await();
+					if (log.isTraceEnabled()) log.trace( this+" ends waiting for start" );
 					assert !Double.isNaN( time );
 					// TODO: handle transit drivers their own way.
 					while ( !arrivalQueue.isEmpty() &&
@@ -404,14 +431,18 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 							internalInterface.arrangeNextAgentState( agent );
 						}
 					}
+					if (log.isTraceEnabled()) log.trace( this+" starts waiting for end" );
 					endBarrier.await();
+					if (log.isTraceEnabled()) log.trace( this+" ends waiting for end" );
 				}
 
 				isFinished = true;
 				// just to make sure we wait for all threads to be finished before cleanup
 				// otherwise, in tests, assert isFinished may fail, just because cleanup starts
 				// before changing the value.
+				if (log.isTraceEnabled()) log.trace( this+" starts final waiting" );
 				finalBarrier.await();
+				if (log.isTraceEnabled()) log.trace( this+" ends final waiting" );
 			}
 			catch (InterruptedException e) {
 				throw new RuntimeException( e );

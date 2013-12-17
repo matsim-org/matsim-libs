@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
@@ -55,9 +54,9 @@ public class PSeudoQSimCompareEventsTest {
 		testEventsSimilarToQsim( 1 );
 	}
 
-	@Ignore( "hangs on build server" )
 	@Test
 	public void testEventsSimilarToQsimParallel() {
+		//Logger.getLogger( "playground.thibautd.mobsim.pseudoqsimengine" ).setLevel( Level.TRACE );
 		testEventsSimilarToQsim( 15 );
 	}
 
