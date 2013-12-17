@@ -26,7 +26,7 @@ import playground.michalm.taxi.model.TaxiRequest;
 
 public class TaxiDropoffDriveTask
     extends DriveTaskImpl
-    implements TaxiTask
+    implements TaxiTaskWithRequest
 {
     private final TaxiRequest request;
 
@@ -34,12 +34,21 @@ public class TaxiDropoffDriveTask
     public TaxiDropoffDriveTask(int beginTime, int endTime, Arc arc, TaxiRequest request)
     {
         super(beginTime, endTime, arc);
-        this.request = request;
 
         if (request.getFromVertex() != arc.getFromVertex()
                 && request.getToVertex() != arc.getToVertex()) {
             throw new IllegalArgumentException();
         }
+
+        this.request = request;
+        request.setDropoffDriveTask(this);
+    }
+
+
+    @Override
+    public void removeFromRequest()
+    {
+        request.setDropoffDriveTask(null);
     }
 
 

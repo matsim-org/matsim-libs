@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.tsp;
+package org.matsim.contrib.dvrp.examples.dapp;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 
@@ -25,24 +25,24 @@ import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
 import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.DeliveryRequest;
+import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.impl.DeliveryTaskImpl;
 
 
 /**
  * @author michalm
  */
-public class TSPOptimizer
+public class DAPPOptimizer
     implements VrpOptimizer
 {
     private final VrpData data;
     private final Vehicle vehicle;//we have only one vehicle
-    private final Schedule<AbstractTask> schedule;
+    private final Schedule<AbstractTask> schedule;// the vehicle's schedule
 
 
     @SuppressWarnings("unchecked")
-    public TSPOptimizer(VrpData data)
+    public DAPPOptimizer(VrpData data)
     {
         this.data = data;
         vehicle = data.getVehicles().get(0);
@@ -55,8 +55,9 @@ public class TSPOptimizer
     @Override
     public void init()
     {
-        schedule.addTask(new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getDepot()
-                .getVertex()));
+        //just wait (and be ready) till the end of the vehicle's time window (T1)
+        schedule.addTask(new StayTaskImpl(vehicle.getT0(), Schedules.getActualT1(schedule), vehicle
+                .getDepot().getVertex()));
     }
 
 
@@ -68,32 +69,30 @@ public class TSPOptimizer
 
         switch (lastTask.getStatus()) {
             case PLANNED:
-                schedule.removeLastPlannedTask();// remove waiting
+                schedule.removeLastTask();// remove waiting
                 break;
 
             case STARTED:
-                lastTask.setEndTime(currentTime);// shortening waiting
+                lastTask.setEndTime(currentTime);// shorten waiting
                 break;
 
-            case PERFORMED:
             default:
                 throw new IllegalStateException();
         }
 
-        int t0;
-        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
-            t0 = currentTime;
-        }
-        else {
-            t0 = Schedules.getLastTask(schedule).getEndTime();
-        }
-
-        //TODO
         DeliveryRequest req = (DeliveryRequest)request;
+        int t0 = Schedules.getLastTask(schedule).getEndTime();
 
-        Arc arc = data.getVrpGraph().getArc(req.getToVertex(), null);
-        schedule.addTask(new DriveTaskImpl(t0, arc.getTimeOnDeparture(t0), arc));
+        Arc arc = data.getVrpGraph().getArc(lastTask.getVertex(), req.getToVertex());
+        int t1 = t0 + arc.getTimeOnDeparture(t0);
+        schedule.addTask(new DriveTaskImpl(t0, t1, arc));
 
+        int t2 = t1 + 120;// 2 minutes for deliverying a pizza
+        schedule.addTask(new DeliveryTaskImpl(t1, t2, req));
+
+        //just wait (and be ready) till the end of the vehicle's time window (T1)
+        int t3 = Schedules.getActualT1(schedule);
+        schedule.addTask(new StayTaskImpl(t2, t3, req.getToVertex(), "wait"));
     }
 
 

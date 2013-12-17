@@ -25,10 +25,10 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.Request.RequestStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.model.*;
+import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.*;
 
 
@@ -46,7 +46,7 @@ public abstract class AbstractTaxiOptimizer
     implements VrpOptimizer
 {
     protected final VrpData data;
-    protected Queue<TaxiRequest> unplannedRequestQueue;
+    protected final Queue<TaxiRequest> unplannedRequestQueue;
 
 
     public AbstractTaxiOptimizer(VrpData data)
@@ -140,13 +140,13 @@ public abstract class AbstractTaxiOptimizer
         while (!unplannedRequestQueue.isEmpty()) {
             TaxiRequest req = unplannedRequestQueue.peek();
 
-            if (req.getStatus() != RequestStatus.UNPLANNED) {
+            if (req.getStatus() != TaxiRequestStatus.UNPLANNED) {
                 throw new IllegalStateException();
             }
 
             scheduleRequest(req);// means: try to schedule
-
-            if (req.getStatus() == RequestStatus.UNPLANNED) {
+            
+            if (req.getStatus() == TaxiRequestStatus.UNPLANNED) {
                 return;// no taxi available
             }
             else {

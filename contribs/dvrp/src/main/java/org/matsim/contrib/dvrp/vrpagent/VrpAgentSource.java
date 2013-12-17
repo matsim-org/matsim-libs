@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.network.MatsimVertex;
 import org.matsim.contrib.dvrp.data.schedule.VrpSchedulePlanFactory;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.ActionCreator;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -38,7 +38,7 @@ import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 public class VrpAgentSource
     implements AgentSource
 {
-    private final ActionCreator nextActionCreator;
+    private final DynActionCreator nextActionCreator;
 
     private final MatsimVrpData data;
     private final VrpSimEngine vrpSimEngine;
@@ -47,14 +47,14 @@ public class VrpAgentSource
     private final boolean isAgentWithPlan;
 
 
-    public VrpAgentSource(ActionCreator nextActionCreator, MatsimVrpData data,
+    public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpData data,
             VrpSimEngine vrpSimEngine, boolean onlineVehicleTracker)
     {
         this(nextActionCreator, data, vrpSimEngine, onlineVehicleTracker, false);
     }
 
 
-    public VrpAgentSource(ActionCreator nextActionCreator, MatsimVrpData data,
+    public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpData data,
             VrpSimEngine vrpSimEngine, boolean onlineVehicleTracker, boolean isAgentWithPlan)
     {
         this.nextActionCreator = nextActionCreator;
@@ -73,11 +73,11 @@ public class VrpAgentSource
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
         for (Vehicle vrpVeh : vehicles) {
-            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(nextActionCreator,
+            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(vrpSimEngine, nextActionCreator,
                     (VrpAgentVehicle)vrpVeh);
 
             if (onlineVehicleTracker) {
-                vrpAgentLogic.enableOnlineTracking(vrpSimEngine, data.getMatsimVrpGraph());
+                vrpAgentLogic.enableOnlineTracking(data.getMatsimVrpGraph());
             }
 
             vrpSimEngine.addAgentLogic(vrpAgentLogic);

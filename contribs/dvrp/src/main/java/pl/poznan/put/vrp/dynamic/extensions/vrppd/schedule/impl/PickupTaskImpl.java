@@ -50,4 +50,11 @@ public class PickupTaskImpl
     {
         return request;
     }
+    
+    
+    @Override
+    public void removeFromRequest()
+    {
+        request.setPickupTask(null);
+    }
 }

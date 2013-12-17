@@ -155,20 +155,20 @@ public class ScheduleImpl<T extends AbstractTask>
 
 
     @Override
-    public void removeLastPlannedTask()
+    public void removeLastTask()
     {
-        removePlannedTask(tasks.size() - 1);
+        removeTaskImpl(tasks.size() - 1);
     }
 
 
     @Override
-    public void removePlannedTask(int taskIdx)
+    public void removeTask(T task)
     {
-        removePlannedTaskImpl(taskIdx);
+        removeTaskImpl(task.getTaskIdx());
     }
 
 
-    private void removePlannedTaskImpl(int taskIdx)
+    private void removeTaskImpl(int taskIdx)
     {
         failIfUnplanned();
         failIfCompleted();
@@ -179,7 +179,7 @@ public class ScheduleImpl<T extends AbstractTask>
             throw new IllegalStateException();
         }
 
-        removeTaskImpl(taskIdx);
+        tasks.remove(taskIdx);
 
         for (int i = taskIdx; i < tasks.size(); i++) {
             tasks.get(i).taskIdx = i;
@@ -188,35 +188,6 @@ public class ScheduleImpl<T extends AbstractTask>
         if (tasks.size() == 0) {
             status = ScheduleStatus.UNPLANNED;
         }
-    }
-
-
-    @Override
-    public void removeAllPlannedTasks()
-    {
-        failIfUnplanned();
-        failIfCompleted();
-
-        // only PLANNED schedule (currentTask == NULL) or STARTED schedule (currentTask != NULL)
-
-        int currentIdx = (status == ScheduleStatus.PLANNED) ? -1 : currentTask.taskIdx;
-
-        for (int i = tasks.size() - 1; i > currentIdx; i--) {
-            removeTaskImpl(i);
-        }
-
-        if (currentIdx == -1) {// all tasks removed
-            status = ScheduleStatus.UNPLANNED;
-        }
-    }
-
-
-    private void removeTaskImpl(int taskIdx)
-    {
-        AbstractTask task = tasks.remove(taskIdx);
-        task.schedule = null;
-        task.status = null;
-        task.taskIdx = -1;
     }
 
 

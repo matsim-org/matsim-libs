@@ -35,7 +35,7 @@ import org.matsim.contrib.dvrp.data.network.router.*;
 import org.matsim.contrib.dvrp.data.network.shortestpath.MatsimArcFactories;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.ActionCreator;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -239,12 +239,12 @@ public class VrpLauncherUtils
 
 
     public static void initAgentSources(QSim qSim, MatsimVrpData data, VrpSimEngine vrpSimEngine,
-            ActionCreator actionCreator, boolean onlineVehicleTracker)
+            DynActionCreator actionCreator, boolean onlineVehicleTracker)
     {
-        qSim.addAgentSource(new PopulationAgentSource(data.getScenario().getPopulation(),
-                new DefaultAgentFactory(qSim), qSim));
         qSim.addAgentSource(new VrpAgentSource(actionCreator, data, vrpSimEngine,
                 onlineVehicleTracker));
+        qSim.addAgentSource(new PopulationAgentSource(data.getScenario().getPopulation(),
+                new DefaultAgentFactory(qSim), qSim));
     }
 
 

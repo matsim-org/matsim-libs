@@ -33,10 +33,10 @@ public interface VrpOptimizer
      * cancellation etc. See:
      * {@link org.matsim.contrib.dvrp.VrpSimEngine#requestSubmitted(Request, double)}
      */
-    //return boolean? ("has anything change?" true/false)
+    //return boolean? ("has anything changed?" true/false)
     void requestSubmitted(Request request);
 
 
-    //return boolean? ("has anything change?" true/false)
+    //return boolean? ("has anything changed?" true/false)
     void nextTask(Schedule<? extends Task> schedule);
 }

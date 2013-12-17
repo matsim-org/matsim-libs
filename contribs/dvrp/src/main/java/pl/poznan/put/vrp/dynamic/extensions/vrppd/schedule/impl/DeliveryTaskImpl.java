@@ -33,8 +33,16 @@ public class DeliveryTaskImpl
 
     public DeliveryTaskImpl(int beginTime, int endTime, DeliveryRequest request)
     {
-        super(beginTime, endTime, request.getToVertex());
+        this(beginTime, endTime, request, "delivery");
+    }
+    
+    
+    public DeliveryTaskImpl(int beginTime, int endTime, DeliveryRequest request, String name)
+    {
+        super(beginTime, endTime, request.getToVertex(), name);
         this.request = request;
+        
+        this.request.setDeliveryTask(this);
     }
 
 
@@ -49,5 +57,12 @@ public class DeliveryTaskImpl
     public DeliveryRequest getRequest()
     {
         return request;
+    }
+
+
+    @Override
+    public void removeFromRequest()
+    {
+        request.setDeliveryTask(null);
     }
 }

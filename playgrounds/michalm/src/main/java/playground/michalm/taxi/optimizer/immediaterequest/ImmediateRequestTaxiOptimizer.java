@@ -76,7 +76,7 @@ public abstract class ImmediateRequestTaxiOptimizer
     private final boolean destinationKnown;
     private final boolean minimizePickupTripTime;
     private final int pickupDuration;
-    private final int dropoffDuration = 60;
+    private final int dropoffDuration = 1;//TODO
 
 
     public ImmediateRequestTaxiOptimizer(VrpData data, boolean destinationKnown,
@@ -199,7 +199,7 @@ public abstract class ImmediateRequestTaxiOptimizer
             switch (lastTask.getStatus()) {
                 case PLANNED:
                     if (lastTask.getBeginTime() == best.t1) { // waiting for 0 seconds!!!
-                        bestSched.removeLastPlannedTask();// remove WaitTask
+                        bestSched.removeLastTask();// remove WaitTask
                     }
                     else {
                         // TODO actually this WAIT task will not be performed
@@ -293,7 +293,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
         // addWaitTime at the end (even 0-second WAIT)
         int tEnd = Math.max(t5, Schedules.getActualT1(schedule));
-        schedule.addTask(new TaxiWaitStayTask(t4, tEnd, reqToVertex));
+        schedule.addTask(new TaxiWaitStayTask(t5, tEnd, reqToVertex));
     }
 
 
@@ -350,7 +350,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                         // if this is not the last task then some other task must have been added
                         // at time <= t
                         // THEREFORE: task.endTime() <= t, and so it can be removed
-                        schedule.removePlannedTask(task.getTaskIdx());
+                        schedule.removeTask(task);
                         i--;
                     }
 

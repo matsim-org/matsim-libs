@@ -24,30 +24,7 @@ package pl.poznan.put.vrp.dynamic.data.model;
  */
 public interface Request
 {
-    public enum RequestStatus
-    {
-        INACTIVE("I"), // invisible to the dispatcher (ARTIFICIAL STATE!)
-        UNPLANNED("U"), // submitted by the CUSTOMER and received by the DISPATCHER
-        PLANNED("P"), // planned - included into one of the routes
-        STARTED("S"), // vehicle starts serving
-        PERFORMED("PE"), //
-        REJECTED("R"), // rejected by the DISPATCHER
-        CANCELLED("C");// canceled by the CUSTOMER
-
-        public final String shortName;
-
-
-        private RequestStatus(String shortName)
-        {
-            this.shortName = shortName;
-        }
-    };
-
-
     int getId();
-
-
-    RequestStatus getStatus();// based on: serveTask.getStatus();
 
 
     Customer getCustomer();
@@ -63,7 +40,4 @@ public interface Request
 
 
     int getSubmissionTime();
-
-
-    void setStatus(RequestStatus status);
 }

@@ -31,24 +31,26 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 public class VrpAgentLogic
     implements DynAgentLogic
 {
-    public interface ActionCreator
+    public interface DynActionCreator
     {
         DynAction createAction(Task task, double now);
     }
 
 
-    private final ActionCreator actionCreator;
+    private final VrpSimEngine vrpSimEngine;
+    private final DynActionCreator dynActionCreator;
     private final VrpAgentVehicle vrpVehicle;
     private DynAgent agent;
 
-    private VrpSimEngine vrpSimEngine;
     private boolean onlineVehicleTracker;
     private MatsimVrpGraph graph;
 
 
-    public VrpAgentLogic(ActionCreator actionCreator, VrpAgentVehicle vrpVehicle)
+    public VrpAgentLogic(VrpSimEngine vrpSimEngine, DynActionCreator dynActionCreator,
+            VrpAgentVehicle vrpVehicle)
     {
-        this.actionCreator = actionCreator;
+        this.vrpSimEngine = vrpSimEngine;
+        this.dynActionCreator = dynActionCreator;
 
         this.vrpVehicle = vrpVehicle;
         this.vrpVehicle.setAgentLogic(this);
@@ -89,7 +91,7 @@ public class VrpAgentLogic
         }
 
         Task task = schedule.getCurrentTask();
-        DynAction action = actionCreator.createAction(task, now);
+        DynAction action = dynActionCreator.createAction(task, now);
 
         if (onlineVehicleTracker && task.getType() == TaskType.DRIVE) {
             ((VrpDynLeg)action).initOnlineVehicleTracker((DriveTask)task, graph, vrpSimEngine);
@@ -133,18 +135,16 @@ public class VrpAgentLogic
     }
 
 
-    public void enableOnlineTracking(VrpSimEngine vrpSimEngine, MatsimVrpGraph graph)
+    public void enableOnlineTracking(MatsimVrpGraph graph)
     {
         onlineVehicleTracker = true;
-        this.vrpSimEngine = vrpSimEngine;
         this.graph = graph;
     }
 
 
-    public void disableOnlineTracking(VrpSimEngine vrpSimEngine, MatsimVrpGraph graph)
+    public void disableOnlineTracking()
     {
         onlineVehicleTracker = false;
-        vrpSimEngine = null;
         graph = null;
     }
 }

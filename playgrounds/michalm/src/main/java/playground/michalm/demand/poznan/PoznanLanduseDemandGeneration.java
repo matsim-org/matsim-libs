@@ -318,6 +318,7 @@ public class PoznanLanduseDemandGeneration
             double coeff = prtShare / (putShare + prtShare) / PEOPLE_PER_VEHICLE;
 
             if (prtCoeffs.put(pair, coeff) != null) {
+                scanner.close();
                 throw new RuntimeException("Pair respecified: " + pair);
             }
         }

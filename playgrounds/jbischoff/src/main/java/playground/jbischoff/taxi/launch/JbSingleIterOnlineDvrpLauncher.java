@@ -32,11 +32,12 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.Request.RequestStatus;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
 import playground.jbischoff.taxi.evaluation.ScheduleChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.RunningVehicleRegister;
+import playground.michalm.taxi.model.*;
+import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.util.gis.Schedules2GIS;
 /**
@@ -201,7 +202,8 @@ import playground.michalm.util.gis.Schedules2GIS;
         
         // check if all reqs have been served
         for (Request r : data.getVrpData().getRequests()) {
-            if (r.getStatus() != RequestStatus.PERFORMED) {
+            TaxiRequest tr = (TaxiRequest)r;
+            if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
                 throw new IllegalStateException();
             }
         }

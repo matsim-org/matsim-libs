@@ -123,13 +123,10 @@ public interface Schedule<T extends Task>
     void addTask(int taskIdx, T task);
 
 
-    void removeAllPlannedTasks();
+    void removeLastTask();
 
 
-    void removeLastPlannedTask();
-
-
-    void removePlannedTask(int taskIdx);
+    void removeTask(T task);
 
 
     T nextTask();// sets the next task as the current one, updates this schedule status

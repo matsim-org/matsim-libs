@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.tsp;
+package org.matsim.contrib.dvrp.examples.dapp;
 
 import java.util.List;
 
@@ -30,15 +30,15 @@ import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.DeliveryRequest;
 import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl.DeliveryRequestImpl;
 
 
-public class TSPRequestCreator
+public class DAPPRequestCreator
     implements RequestCreator
 {
-    public static final String MODE = "call_salesman";
+    public static final String MODE = "dial_a_pizza";
 
     private final VrpData vrpData;
 
 
-    public TSPRequestCreator(VrpData vrpData)
+    public DAPPRequestCreator(VrpData vrpData)
     {
         this.vrpData = vrpData;
     }

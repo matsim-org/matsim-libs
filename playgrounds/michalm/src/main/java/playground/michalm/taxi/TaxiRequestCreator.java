@@ -33,7 +33,6 @@ public class TaxiRequestCreator
     implements RequestCreator
 {
     public static final String MODE = "taxi";
-    public static final int DURATION = 120;
 
     private final VrpData vrpData;
 

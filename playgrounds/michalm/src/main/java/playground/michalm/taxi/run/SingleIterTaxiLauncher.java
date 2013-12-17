@@ -40,11 +40,12 @@ import org.matsim.vis.otfvis.*;
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.Request.RequestStatus;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
 import playground.michalm.RunningVehicleRegister;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
+import playground.michalm.taxi.model.*;
+import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
@@ -159,6 +160,8 @@ import playground.michalm.util.gis.Schedules2GIS;
             String value = scanner.next();
             params.put(key, value);
         }
+        scanner.close();
+
 
         dirName = params.get("dirName") + '/';
         netFileName = dirName + params.get("netFileName");
@@ -210,7 +213,7 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, graph, depotsFileName);
 
-        MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
+        data = new MatsimVrpData(vrpData, scenario);
 
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(vrpData,
                 destinationKnown, minimizePickupTripTime, pickupDuration);
@@ -269,7 +272,8 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         // check if all reqs have been served
         for (Request r : data.getVrpData().getRequests()) {
-            if (r.getStatus() != RequestStatus.PERFORMED) {
+            TaxiRequest tr = (TaxiRequest)r;
+            if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
                 throw new IllegalStateException();
             }
         }

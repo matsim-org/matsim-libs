@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.tsp;
+package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 
-import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.DynAction;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
-public class TSPActionCreator
-    implements VrpAgentLogic.ActionCreator
+public class ServeRequestTask
+    extends StayTaskImpl
 {
-    @Override
-    public DynAction createAction(Task task, double now)
+    private final Request request;
+
+
+    public ServeRequestTask(int beginTime, int endTime, Vertex vertex, Request request)
     {
-        return new VrpDynLeg((DriveTask)task);
+        super(beginTime, endTime, vertex);
+        this.request = request;
+    }
+
+
+    public Request getRequest()
+    {
+        return request;
     }
 }

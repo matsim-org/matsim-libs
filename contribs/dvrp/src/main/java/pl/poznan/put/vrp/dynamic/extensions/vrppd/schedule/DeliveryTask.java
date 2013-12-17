@@ -26,5 +26,5 @@ public interface DeliveryTask
     extends VRPPDTask
 {
     @Override
-    public DeliveryRequest getRequest();
+    DeliveryRequest getRequest();
 }

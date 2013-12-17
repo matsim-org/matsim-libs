@@ -22,12 +22,34 @@ package playground.michalm.taxi.model;
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
 import pl.poznan.put.vrp.dynamic.data.model.impl.AbstractRequest;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 import playground.michalm.taxi.schedule.*;
 
 
 public class TaxiRequest
     extends AbstractRequest
 {
+    public enum TaxiRequestStatus
+    {
+        //INACTIVE("I"), // invisible to the dispatcher (ARTIFICIAL STATE!)
+        UNPLANNED("U"), // submitted by the CUSTOMER and received by the DISPATCHER
+        PLANNED("P"), // planned - included into one of the routes
+        STARTED("S"), // vehicle starts serving
+        PERFORMED("PE"), //
+        //REJECTED("R"), // rejected by the DISPATCHER
+        //CANCELLED("C"),
+        ;// canceled by the CUSTOMER
+
+        public final String shortName;
+
+
+        private TaxiRequestStatus(String shortName)
+        {
+            this.shortName = shortName;
+        }
+    };
+
+
     private final Vertex fromVertex;
     private final Vertex toVertex;
 
@@ -103,5 +125,23 @@ public class TaxiRequest
     public void setDropoffStayTask(TaxiDropoffStayTask dropoffStayTask)
     {
         this.dropoffStayTask = dropoffStayTask;
+    }
+
+
+    public TaxiRequestStatus getStatus()
+    {
+        if (pickupDriveTask == null) {
+            return TaxiRequestStatus.UNPLANNED;
+        }
+
+        if (pickupDriveTask.getStatus() == TaskStatus.PLANNED) {
+            return TaxiRequestStatus.PLANNED;
+        }
+
+        if (dropoffStayTask != null && dropoffStayTask.getStatus() == TaskStatus.PERFORMED) {
+            return TaxiRequestStatus.PERFORMED;
+        }
+
+        return TaxiRequestStatus.STARTED;
     }
 }

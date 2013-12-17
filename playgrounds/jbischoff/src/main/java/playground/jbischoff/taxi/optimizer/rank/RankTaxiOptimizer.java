@@ -229,7 +229,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 			case PLANNED:
 				if (lastTask.getBeginTime() == best.t1) { // waiting for 0
 															// seconds!!!
-					bestSched.removeLastPlannedTask();// remove WaitTask
+					bestSched.removeLastTask();// remove WaitTask
 				} else {
 					// TODO actually this WAIT task will not be performed
 					// so maybe we can remove it right now?
@@ -424,7 +424,7 @@ public abstract class RankTaxiOptimizer extends AbstractTaxiOptimizer {
 					// have been added
 					// at time <= t
 					// THEREFORE: task.endTime() <= t, and so it can be removed
-					schedule.removePlannedTask(task.getTaskIdx());
+					schedule.removeTask(task);
 					i--;
 				}
 

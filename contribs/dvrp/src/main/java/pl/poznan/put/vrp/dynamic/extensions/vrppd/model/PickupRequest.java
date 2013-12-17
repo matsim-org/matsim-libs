@@ -30,4 +30,7 @@ public interface PickupRequest
 
 
     PickupTask getPickupTask();
+    
+    
+    void setPickupTask(PickupTask pickupTask);
 }

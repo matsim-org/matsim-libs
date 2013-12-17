@@ -152,7 +152,7 @@ public class RESTaxiOptimizer
             case COMPLETED:
                 break;
 
-            case PLANNED:// at time 0 taxi agents should start WAIT (before first taxi call)
+            case PLANNED:// at time 0, taxi agents should start WAIT (before first taxi call)
                 // therefore PLANNED->STARTED happens at the very beginning of time step 0
             default:
                 throw new IllegalStateException();
@@ -168,12 +168,16 @@ public class RESTaxiOptimizer
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
             TaxiTask task = tasks.get(i);
 
-            if (task.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
-                TaxiRequest req = ((TaxiPickupStayTask)task).getRequest();
-                unplannedRequestQueue.add(req);
-            }
+            schedule.removeTask(task);
 
-            schedule.removePlannedTask(i);
+            if (task instanceof TaxiTaskWithRequest) {
+                TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
+                taskWithReq.removeFromRequest();
+
+                if (task.getTaxiTaskType() == TaxiTaskType.PICKUP_DRIVE) {
+                    unplannedRequestQueue.add(taskWithReq.getRequest());
+                }
+            }
         }
     }
 }

@@ -30,4 +30,7 @@ public interface DeliveryRequest
 
 
     DeliveryTask getDeliveryTask();
+
+
+    void setDeliveryTask(DeliveryTask deliveryTask);
 }

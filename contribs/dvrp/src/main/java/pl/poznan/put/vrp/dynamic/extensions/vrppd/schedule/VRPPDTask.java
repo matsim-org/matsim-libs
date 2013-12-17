@@ -36,4 +36,7 @@ public interface VRPPDTask
 
 
     VRPPDRequest getRequest();
+
+
+    void removeFromRequest();
 }

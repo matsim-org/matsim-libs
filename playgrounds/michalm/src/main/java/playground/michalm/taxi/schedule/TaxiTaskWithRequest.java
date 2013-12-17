@@ -17,27 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.schedule.impl;
+package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.model.Request;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import playground.michalm.taxi.model.TaxiRequest;
 
 
-public class SingleRequestTask
-    extends StayTaskImpl
+public interface TaxiTaskWithRequest
+    extends TaxiTask
 {
-    private final Request request;
-
-
-    public SingleRequestTask(int beginTime, int endTime, Vertex vertex, Request request)
-    {
-        super(beginTime, endTime, vertex);
-        this.request = request;
-    }
-
-
-    public Request getRequest()
-    {
-        return request;
-    }
+    TaxiRequest getRequest();
+    
+    //called (when removing a task) in order to update the request-2-task assignment 
+    void removeFromRequest();
 }

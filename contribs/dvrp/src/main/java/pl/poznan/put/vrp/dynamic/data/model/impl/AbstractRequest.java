@@ -39,8 +39,6 @@ public abstract class AbstractRequest
 
     private final int submissionTime;
 
-    private RequestStatus status = RequestStatus.INACTIVE;
-
 
     public AbstractRequest(int id, Customer customer, int quantity, int t0, int t1,
             int submissionTime)
@@ -93,19 +91,6 @@ public abstract class AbstractRequest
     public int getSubmissionTime()
     {
         return submissionTime;
-    }
-
-
-    @Override
-    public RequestStatus getStatus()
-    {
-        return status;
-    }
-
-
-    public void setStatus(RequestStatus status)
-    {
-        this.status = status;
     }
 
 

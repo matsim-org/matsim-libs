@@ -89,6 +89,7 @@ public class TaxiOptimizerWithPreassignment
         for (int i = 0; i < reqIdToVehMapping.length; i++) {
             reqIdToVehMapping[i] = vehicles.get(scanner.nextInt());
         }
+        scanner.close();
 
         return new TaxiOptimizerWithPreassignment(data, pickupDuration, reqIdToVehMapping);
     }

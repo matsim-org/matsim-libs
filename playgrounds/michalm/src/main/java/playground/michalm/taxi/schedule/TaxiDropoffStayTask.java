@@ -25,7 +25,7 @@ import playground.michalm.taxi.model.TaxiRequest;
 
 public class TaxiDropoffStayTask
     extends StayTaskImpl
-    implements TaxiTask
+    implements TaxiTaskWithRequest
 {
     private final TaxiRequest request;
 
@@ -33,7 +33,16 @@ public class TaxiDropoffStayTask
     public TaxiDropoffStayTask(int beginTime, int endTime, TaxiRequest request)
     {
         super(beginTime, endTime, request.getToVertex());
+
         this.request = request;
+        request.setDropoffStayTask(this);
+    }
+
+
+    @Override
+    public void removeFromRequest()
+    {
+        request.setDropoffStayTask(null);
     }
 
 

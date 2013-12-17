@@ -28,12 +28,20 @@ public class StayTaskImpl
     implements StayTask
 {
     private final Vertex vertex;
+    private final String name;
 
 
     public StayTaskImpl(int beginTime, int endTime, Vertex vertex)
     {
+        this(beginTime, endTime, vertex, null);
+    }
+
+
+    public StayTaskImpl(int beginTime, int endTime, Vertex vertex, String name)
+    {
         super(beginTime, endTime);
         this.vertex = vertex;
+        this.name = name;
     }
 
 
@@ -49,11 +57,17 @@ public class StayTaskImpl
     {
         return vertex;
     }
+    
+    
+    public String getName()
+    {
+        return name;
+    }
 
 
     @Override
     public String toString()
     {
-        return "S(@" + vertex.getId() + ")" + commonToString();
+        return "S(" + (name != null ?  name : "") + "@" + vertex.getId() + ")" + commonToString();
     }
 }

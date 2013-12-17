@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<!DOCTYPE depots SYSTEM "http://www.man.poznan.pl/~michalm/matsim/depots_v1.dtd">
+
+
+<depots>
+	<depot linkId="215">
+		<vehicles>
+			<vehicle name="pizzaman_1" t0="0" t1="4000"/>
+		</vehicles>
+	</depot>
+</depots>
