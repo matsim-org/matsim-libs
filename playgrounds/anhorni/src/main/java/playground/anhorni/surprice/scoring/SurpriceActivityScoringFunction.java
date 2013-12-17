@@ -141,6 +141,10 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 			openInterval[0] = 6.0 * h; openInterval[1] = 22.0 * h;
 		} else if (act.getType().equals("education")) { 
 			openInterval[0] = 8.0 * h; openInterval[1] = 22.0 * h;
+		} if (act.getType().equals("shop")) { 
+			openInterval[0] = 7.0 * h; openInterval[1] = 19.5 * h;
+		} else if (act.getType().equals("leisure")) { 
+			openInterval[0] = 8.0 * h; openInterval[1] = 23.0 * h;
 		}
 		
 		if (this.day.equals("sun")) {
@@ -155,13 +159,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 			} else if (act.getType().equals("leisure")) {
 				openInterval[0] = 8.5 * h; openInterval[1] = 24.0 * h;
 			} 
-		} else {
-			 if (act.getType().equals("shop")) { 
-				openInterval[0] = 8.5 * h; openInterval[1] = 19.0 * h;
-			} else if (act.getType().equals("leisure")) {
-				openInterval[0] = 8.5 * h; openInterval[1] = 22.0 * h;
-			} 
-		}	
+		} 	
 		return openInterval;
 	}
 	
