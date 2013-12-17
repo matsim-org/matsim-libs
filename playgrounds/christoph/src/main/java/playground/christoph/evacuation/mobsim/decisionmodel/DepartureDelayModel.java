@@ -27,7 +27,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -57,8 +56,8 @@ public class DepartureDelayModel implements HouseholdDecisionModel {
 	private double sigma;	// use as default 600
 	private final double upperLimit = 0.999999;
 	
-	public DepartureDelayModel(DeterministicRNG rng, DecisionDataProvider decisionDataProvider, double sigma) {
-		this.rng = rng;
+	public DepartureDelayModel(DecisionDataProvider decisionDataProvider, double sigma, long rngInitialValue) {
+		this.rng = new DeterministicRNG(rngInitialValue);
 		this.decisionDataProvider = decisionDataProvider;
 		this.sigma = sigma;
 	}

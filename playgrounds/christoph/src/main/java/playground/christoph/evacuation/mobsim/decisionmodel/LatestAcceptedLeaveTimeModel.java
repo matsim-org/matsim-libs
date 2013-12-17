@@ -25,7 +25,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -57,10 +56,10 @@ public class LatestAcceptedLeaveTimeModel implements HouseholdDecisionModel {
 //	private final Random random;
 	private final DeterministicRNG rng;
 	
-	public LatestAcceptedLeaveTimeModel(DecisionDataProvider decisionDataProvider) {
+	public LatestAcceptedLeaveTimeModel(DecisionDataProvider decisionDataProvider, long rngInitialValue) {
 		this.decisionDataProvider = decisionDataProvider;
 //		this.random = MatsimRandom.getLocalInstance();
-		this.rng = new DeterministicRNG(123984);
+		this.rng = new DeterministicRNG(rngInitialValue);
 	}
 	
 	/*

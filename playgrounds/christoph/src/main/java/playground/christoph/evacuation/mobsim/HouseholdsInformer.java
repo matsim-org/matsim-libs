@@ -55,19 +55,15 @@ public class HouseholdsInformer implements MobsimEngine {
 	/*package*/ final Households households;
 	/*package*/ final PriorityBlockingQueue<Tuple<Id, Double>> informationTime;
 	/*package*/ final double sigma;
-	/*package*/ final int rngInitialValue;
-
-//	/*package*/ int rngInitialValue = 132456;
-	/*package*/ DeterministicRNG rng;
+	/*package*/ final DeterministicRNG rng;
 	
-	public HouseholdsInformer(Households households, double sigma, int rngInitialValue) {
+	public HouseholdsInformer(Households households, double sigma, long rngInitialValue) {
 		
 		this.households = households;
 		this.sigma = sigma;
-		this.rngInitialValue = rngInitialValue;
+		this.rng = new DeterministicRNG(rngInitialValue);
 
 		this.informationTime = new PriorityBlockingQueue<Tuple<Id, Double>>(500, new InformationTimeComparator());
-
 		/*
 		 * We ignore households with 0 members. Therefore we cannot use
 		 * households.getHouseholds().size()
@@ -118,7 +114,6 @@ public class HouseholdsInformer implements MobsimEngine {
 	 */
 	@Override
 	public void onPrepareSim() {
-		this.rng = new DeterministicRNG(rngInitialValue);
 		this.informationTime.clear();
 		selectInformationTimes(households);
 	}

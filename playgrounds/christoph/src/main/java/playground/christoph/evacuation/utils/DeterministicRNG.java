@@ -22,10 +22,12 @@ package playground.christoph.evacuation.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 
 public class DeterministicRNG {
 
@@ -76,15 +78,23 @@ public class DeterministicRNG {
 		return Math.abs(value);
 	}
 	
-	
 	public static void main(String[] args) {
 		DeterministicRNG rng = new DeterministicRNG(122456);
+		Random random = MatsimRandom.getLocalInstance();
 				
 		Gbl.startMeasurement();
 		double sum = 0.0;
-		int iters = 10000000;
+		int iters = 100000000;
 		for (int i = 0; i < iters; i++) {
 			sum += rng.hashCodeToRandomDouble(i);
+		}
+		System.out.println(sum/iters);
+		Gbl.printElapsedTime();
+		
+		Gbl.startMeasurement();
+		sum = 0.0;
+		for (int i = 0; i < iters; i++) {
+			sum += random.nextDouble();
 		}
 		System.out.println(sum/iters);
 		Gbl.printElapsedTime();

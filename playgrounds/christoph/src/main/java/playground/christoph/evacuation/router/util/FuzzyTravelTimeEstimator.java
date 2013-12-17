@@ -67,13 +67,14 @@ public class FuzzyTravelTimeEstimator implements TravelTime {
 	private ThreadLocal<Boolean> fromLinkIsObservedCache;
 
 	/* package */FuzzyTravelTimeEstimator(Scenario scenario, TravelTime travelTime, AgentsTracker agentsTracker,
-			MobsimDataProvider mobsimDataProvider, DistanceFuzzyFactorProvider distanceFuzzyFactorProvider) {
+			MobsimDataProvider mobsimDataProvider, DistanceFuzzyFactorProvider distanceFuzzyFactorProvider,
+			long rngInitialValue) {
 		this.scenario = scenario;
 		this.travelTime = travelTime;
 		this.agentsTracker = agentsTracker;
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.distanceFuzzyFactorProvider = distanceFuzzyFactorProvider;
-		this.rng = new DeterministicRNG(213456);
+		this.rng = new DeterministicRNG(rngInitialValue);
 
 		this.pIdCache = new ThreadLocal<Id>();
 		this.pIdHashCodeCache = new ThreadLocal<Integer>();

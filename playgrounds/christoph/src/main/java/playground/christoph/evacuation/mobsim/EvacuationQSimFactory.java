@@ -63,8 +63,6 @@ public class EvacuationQSimFactory implements MobsimFactory {
     private final JointDepartureOrganizer jointDepartureOrganizer;
     private final Map<String, TravelTime> multiModalTravelTimes;
     
-    private int householdsInformerRNG = 132456;
-    
     public EvacuationQSimFactory(WithinDayEngine withinDayEngine, ObjectAttributes householdObjectAttributes,
     		JointDepartureOrganizer jointDepartureOrganizer, Map<String, TravelTime> multiModalTravelTimes) {
     	this.withinDayEngine = withinDayEngine;
@@ -119,9 +117,11 @@ public class EvacuationQSimFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 		
-		qSim.addMobsimEngine(new HouseholdsInformer(((ScenarioImpl) sc).getHouseholds(), EvacuationConfig.informAgentsRayleighSigma, this.householdsInformerRNG));
+		qSim.addMobsimEngine(new HouseholdsInformer(((ScenarioImpl) sc).getHouseholds(), EvacuationConfig.informAgentsRayleighSigma, 
+				EvacuationConfig.householdsInformerRandomSeed + EvacuationConfig.deterministicRNGOffset));
 		// increase initial value in case additional iterations will be performed
-		this.householdsInformerRNG++;
+//		this.householdsInformerRNG++;
+//		EvacuationConfig.householdsInformerRandomSeed++;
 		
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim, this.householdObjectAttributes);

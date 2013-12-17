@@ -79,6 +79,19 @@ public class EvacuationConfig {
 	public static double duringLegReroutingShare = 1.00;
 	
 	/*
+	 * Several classes use a DeterministicRNG object which produces random numbers
+	 * ~ 40% faster than java's default random number generator. Moreover, it is easier
+	 * to ensure that always the same random numbers are generated, even if other
+	 * pieces of the code have changed.
+	 */
+	public static long deterministicRNGOffset = 0;
+	
+	public static long householdsInformerRandomSeed = 132456;
+	public static long departureDelayRandomSeed = 123654;
+	public static long fuzzyTravelTimeEstimatorRandomSeed = 213456;
+	public static long latestAcceptedLeaveTimeRandomSeed = 123984;
+	
+	/*
 	 * This parameter is ignored if EvacuationDecisionBehaviour is not set to SHARE!
 	 */
 	public static double householdParticipationShare = 1.00;	

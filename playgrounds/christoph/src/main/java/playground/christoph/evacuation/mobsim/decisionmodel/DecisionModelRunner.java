@@ -36,7 +36,6 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
-import playground.christoph.evacuation.utils.DeterministicRNG;
 
 /**
  * 
@@ -68,8 +67,10 @@ public class DecisionModelRunner implements BeforeMobsimListener, MobsimBeforeSi
 		this.panicModel = new PanicModel(this.decisionDataProvider, EvacuationConfig.panicShare);
 		this.pickupModel = new PickupModel(this.decisionDataProvider);
 		this.evacuationDecisionModel = new EvacuationDecisionModel(this.scenario, MatsimRandom.getLocalInstance(), this.decisionDataProvider);
-		this.latestAcceptedLeaveTimeModel = new LatestAcceptedLeaveTimeModel(this.decisionDataProvider);
-		this.departureDelayModel = new DepartureDelayModel(new DeterministicRNG(123654), decisionDataProvider, 600.0);
+		this.latestAcceptedLeaveTimeModel = new LatestAcceptedLeaveTimeModel(this.decisionDataProvider,
+				EvacuationConfig.latestAcceptedLeaveTimeRandomSeed + EvacuationConfig.deterministicRNGOffset);
+		this.departureDelayModel = new DepartureDelayModel(decisionDataProvider, 600.0, 
+				EvacuationConfig.departureDelayRandomSeed + EvacuationConfig.deterministicRNGOffset);
 	}
 	
 	public DecisionDataProvider getDecisionDataProvider() {

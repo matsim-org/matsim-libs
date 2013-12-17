@@ -274,7 +274,8 @@ public class EvacuationControlerListener implements StartupListener {
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
 		this.decisionDataGrabber = new DecisionDataGrabber(scenario, this.coordAnalyzer.createInstance(), 
-				this.householdsTracker, ((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes());		
+				this.householdsTracker, ((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes());
+		
 		this.decisionModelRunner = new DecisionModelRunner(scenario, this.decisionDataGrabber, this.informedHouseholdsTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.decisionModelRunner);
 		this.fixedOrderControlerListener.addControlerListener(this.decisionModelRunner);
