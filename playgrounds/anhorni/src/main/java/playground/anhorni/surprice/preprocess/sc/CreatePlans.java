@@ -97,7 +97,11 @@ public class CreatePlans {
 			
 			((PlanImpl) plan).createAndAddLeg("car");
 						
-			ActivityImpl act = ((PlanImpl) plan).createAndAddActivity("work");
+			ActivityImpl act;
+			
+			if (rnd.nextBoolean()) act = ((PlanImpl) plan).createAndAddActivity("work");
+			else act = ((PlanImpl) plan).createAndAddActivity("leisure");
+			
 			act.setStartTime(6.0 * 3600.0 + 100.0 + 1.0 * offset);
 			
 			act.setFacilityId(new IdImpl(2));
