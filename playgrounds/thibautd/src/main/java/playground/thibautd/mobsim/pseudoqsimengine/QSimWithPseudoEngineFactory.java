@@ -35,6 +35,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.thibautd.mobsim.PseudoSimConfigGroup;
+
 /**
  * @author thibautd
  */
@@ -62,8 +64,13 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
+		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
+			sc.getConfig().getModule( PseudoSimConfigGroup.GROUP_NAME );
 		final PseudoQsimEngine pseudoEngine =
 			new PseudoQsimEngine(
+					pSimConf != null ?
+						pSimConf.getNThreads() :
+						1,
 					sc.getConfig().qsim().getMainModes(),
 					travelTime,
 					sc.getNetwork() );

@@ -30,6 +30,7 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 	private boolean isUsePSimAtAll = false;
 	private int nPSimIters = 5;
 	private int period = 3;
+	private int nThreads = 1;
 
 	public PseudoSimConfigGroup() {
 		super( GROUP_NAME );
@@ -63,6 +64,16 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 	@StringSetter( "period" )
 	public void setPeriod(int period) {
 		this.period = period;
+	}
+
+	@StringGetter( "nThreads" )
+	public int getNThreads() {
+		return this.nThreads;
+	}
+
+	@StringSetter( "nThreads" )
+	public void setNThreads(int nThreads) {
+		this.nThreads = nThreads;
 	}
 }
 

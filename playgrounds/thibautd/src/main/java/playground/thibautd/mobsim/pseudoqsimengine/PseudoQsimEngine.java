@@ -100,6 +100,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		this.travelTimeCalculator = travelTimeCalculator;
 		this.network = network;
 
+		log.info( "initializing "+getClass().getName()+" with "+nThreads+" threads" );
 		this.startBarrier = new CyclicBarrier( nThreads + 1 );
 		this.endBarrier = new CyclicBarrier( nThreads + 1 );
 		this.runnables = new TripHandlingRunnable[ nThreads ];

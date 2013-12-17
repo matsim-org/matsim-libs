@@ -42,6 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.thibautd.mobsim.CompareEventsUtils;
+import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.scripts.CreateGridNetworkWithDimensions;
 
 /**
@@ -50,7 +51,20 @@ import playground.thibautd.scripts.CreateGridNetworkWithDimensions;
 public class PSeudoQSimCompareEventsTest {
 	@Test
 	public void testEventsSimilarToQsim() {
+		testEventsSimilarToQsim( 1 );
+	}
+
+	@Test
+	public void testEventsSimilarToQsimParallel() {
+		testEventsSimilarToQsim( 15 );
+	}
+
+	private void testEventsSimilarToQsim(final int nThreads) {
 		final Scenario scenario = createTestScenario();
+
+		final PseudoSimConfigGroup conf = new PseudoSimConfigGroup();
+		conf.setNThreads( nThreads );
+		scenario.getConfig().addModule( conf );
 
 		final TravelTimeCalculator travelTime =
 			new TravelTimeCalculator(
@@ -58,7 +72,7 @@ public class PSeudoQSimCompareEventsTest {
 					scenario.getConfig().travelTimeCalculator());
 
 		CompareEventsUtils.testEventsSimilarToQsim(
-				createTestScenario(),
+				scenario,
 				new PlanRouter(
 					new TripRouterFactoryBuilderWithDefaults().build(
 						scenario ).instantiateAndConfigureTripRouter(
