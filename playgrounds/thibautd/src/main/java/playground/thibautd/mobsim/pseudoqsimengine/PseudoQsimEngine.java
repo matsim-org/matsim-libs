@@ -303,10 +303,6 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 			if ( log.isTraceEnabled() ) log.trace( "clean runnable "+r );
 			r.afterSim();
 		}
-
-		for ( Thread t : threads ) {
-			assert t.getState().equals( Thread.State.TERMINATED );
-		}
 	}
 
 	@Override
