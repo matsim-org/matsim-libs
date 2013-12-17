@@ -20,10 +20,13 @@
 package playground.thibautd.mobsim.pseudoqsimengine;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -36,6 +39,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -69,66 +73,59 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 	private final TravelTime travelTimeCalculator;
 	private final Network network;
 
-	private final Queue<InternalArrivalEvent> arrivalQueue = new PriorityQueue<InternalArrivalEvent>();
-	private final Map<Id, QVehicle> vehicles = new HashMap<Id, QVehicle>();
+	private final Map<Id, QVehicle> vehicles = new ConcurrentHashMap<Id, QVehicle>();
 
 	private InternalInterface internalInterface = null;
-	
+
+	private final CyclicBarrier startBarrier;
+	private final CyclicBarrier endBarrier;
+	private final TripHandlingRunnable[] runnables;
+	private final Thread[] threads;
+
+	private final Random random;
+
 	public PseudoQsimEngine(
+			final Collection<String> transportModes,
+			final TravelTime travelTimeCalculator,
+			final Network network) {
+		this( 1 , transportModes , travelTimeCalculator , network );
+	}
+
+	public PseudoQsimEngine(
+			final int nThreads,
 			final Collection<String> transportModes,
 			final TravelTime travelTimeCalculator,
 			final Network network) {
 		this.transportModes = transportModes;
 		this.travelTimeCalculator = travelTimeCalculator;
 		this.network = network;
+
+		this.startBarrier = new CyclicBarrier( nThreads + 1 );
+		this.endBarrier = new CyclicBarrier( nThreads + 1 );
+		this.runnables = new TripHandlingRunnable[ nThreads ];
+		this.threads = new Thread[ nThreads ];
+		for ( int i = 0; i < nThreads; i++ ) {
+			this.runnables[ i ] = new TripHandlingRunnable();
+			this.threads[ i ] = new Thread( this.runnables[ i ] );
+			this.threads[ i ].start();
+		}
+
+		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override
 	public void doSimStep(final double time) {
-		// TODO: handle transit drivers their own way.
-		while ( !arrivalQueue.isEmpty() &&
-				arrivalQueue.peek().time <= time ) {
-			final InternalArrivalEvent event = arrivalQueue.poll();
-			final MobsimDriverAgent agent = event.vehicle.getDriver();
-			final Id nextLinkId = agent.chooseNextLinkId();
+		for ( TripHandlingRunnable r : runnables ) r.setTime( time );
 
-			final EventsManager eventsManager =
-				internalInterface.getMobsim().getEventsManager();
-			if ( nextLinkId != null ) {
-				eventsManager.processEvent(
-					new LinkLeaveEvent(
-						time,
-						agent.getId(),
-						event.linkId,
-						event.vehicle.getId() ) );
-
-				agent.notifyMoveOverNode( nextLinkId );
-
-				eventsManager.processEvent(
-					new LinkEnterEvent(
-						time,
-						agent.getId(),
-						nextLinkId,
-						event.vehicle.getId() ) );
-
-				arrivalQueue.add(
-						calcArrival(
-							time,
-							nextLinkId,
-							event.vehicle) );
-			}
-			else {
-				eventsManager.processEvent(
-						new PersonLeavesVehicleEvent(
-							time,
-							agent.getId(),
-							event.vehicle.getId()));
-				// reset vehicles driver
-				event.vehicle.setDriver(null);
-
-				agent.endLegAndComputeNextState( time );
-				internalInterface.arrangeNextAgentState( agent );
-			}
+		try {
+			startBarrier.await();
+			endBarrier.await();
+		}
+		catch (InterruptedException e) {
+			throw new RuntimeException( e );
+		}
+		catch (BrokenBarrierException e) {
+			throw new RuntimeException( e );
 		}
 	}
 
@@ -215,7 +212,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 
 			//vehicle.setCurrentLink( linkId );
 
-			arrivalQueue.add(
+			runnables[ random.nextInt( runnables.length ) ].addArrivalEvent(
 					// do not travel on first link
 					// calcArrival(
 					new InternalArrivalEvent(
@@ -270,16 +267,8 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 	
 	@Override
 	public void afterSim() {
-		for (InternalArrivalEvent event : arrivalQueue) {
-			final QVehicle veh = event.vehicle;
-			internalInterface.getMobsim().getEventsManager().processEvent(
-					new PersonStuckEvent(
-						internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-						veh.getDriver().getId(),
-						veh.getDriver().getCurrentLinkId(),
-						veh.getDriver().getMode()));
-			internalInterface.getMobsim().getAgentCounter().incLost();
-			internalInterface.getMobsim().getAgentCounter().decLiving();
+		for ( TripHandlingRunnable r : runnables ) {
+			r.afterSim();
 		}
 	}
 
@@ -305,6 +294,96 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		@Override
 		public int compareTo(final InternalArrivalEvent o) {
 			return Double.compare( time , o.time );
+		}
+	}
+
+	private class TripHandlingRunnable implements Runnable {
+		private final Queue<InternalArrivalEvent> arrivalQueue = new PriorityQueue<InternalArrivalEvent>();
+
+		private double time = Double.NaN;
+
+		public void addArrivalEvent(final InternalArrivalEvent event) {
+			arrivalQueue.add( event );
+		}
+
+		public void setTime( double time ) {
+			this.time = time;
+		}
+
+		public void afterSim() {
+			for (InternalArrivalEvent event : arrivalQueue) {
+				final QVehicle veh = event.vehicle;
+				internalInterface.getMobsim().getEventsManager().processEvent(
+						new PersonStuckEvent(
+							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+							veh.getDriver().getId(),
+							veh.getDriver().getCurrentLinkId(),
+							veh.getDriver().getMode()));
+				internalInterface.getMobsim().getAgentCounter().incLost();
+				internalInterface.getMobsim().getAgentCounter().decLiving();
+			}
+		}
+
+		@Override
+		public void run() {
+			try {
+				while (true) {
+					startBarrier.await();
+					assert !Double.isNaN( time );
+					// TODO: handle transit drivers their own way.
+					while ( !arrivalQueue.isEmpty() &&
+							arrivalQueue.peek().time <= time ) {
+						final InternalArrivalEvent event = arrivalQueue.poll();
+						final MobsimDriverAgent agent = event.vehicle.getDriver();
+						final Id nextLinkId = agent.chooseNextLinkId();
+
+						final EventsManager eventsManager =
+							internalInterface.getMobsim().getEventsManager();
+						if ( nextLinkId != null ) {
+							eventsManager.processEvent(
+								new LinkLeaveEvent(
+									time,
+									agent.getId(),
+									event.linkId,
+									event.vehicle.getId() ) );
+
+							agent.notifyMoveOverNode( nextLinkId );
+
+							eventsManager.processEvent(
+								new LinkEnterEvent(
+									time,
+									agent.getId(),
+									nextLinkId,
+									event.vehicle.getId() ) );
+
+							arrivalQueue.add(
+									calcArrival(
+										time,
+										nextLinkId,
+										event.vehicle) );
+						}
+						else {
+							eventsManager.processEvent(
+									new PersonLeavesVehicleEvent(
+										time,
+										agent.getId(),
+										event.vehicle.getId()));
+							// reset vehicles driver
+							event.vehicle.setDriver(null);
+
+							agent.endLegAndComputeNextState( time );
+							internalInterface.arrangeNextAgentState( agent );
+						}
+					}
+					endBarrier.await();
+				}
+			}
+			catch (InterruptedException e) {
+				throw new RuntimeException( e );
+			}
+			catch (BrokenBarrierException e) {
+				throw new RuntimeException( e );
+			}
 		}
 	}
 }
