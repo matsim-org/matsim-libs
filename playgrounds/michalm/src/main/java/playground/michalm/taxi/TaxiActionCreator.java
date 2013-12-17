@@ -41,7 +41,7 @@ public class TaxiActionCreator
 
 
     @Override
-    public DynAction createAction(Task task, double now)
+    public DynAction createAction(final Task task, double now)
     {
         TaxiTask tt = (TaxiTask)task;
 
@@ -52,18 +52,26 @@ public class TaxiActionCreator
                 return new VrpDynLeg((DriveTask)task);
 
             case PICKUP_STAY:
-                TaxiPickupStayTask pst = (TaxiPickupStayTask)task;
+                final TaxiPickupStayTask pst = (TaxiPickupStayTask)task;
 
-                //TODO maybe at the end of the stay task?
-                PassengerHandlingUtils.pickUpPassenger(vrpSimEngine, task, pst.getRequest(), now);
-                return new VrpActivity("ServeTask" + pst.getRequest().getId(), pst);
+                return new VrpActivity("ServeTask" + pst.getRequest().getId(), pst) {
+                    public void endAction(double now)
+                    {
+                        PassengerHandlingUtils.pickUpPassenger(vrpSimEngine, task,
+                                pst.getRequest(), now);
+                    }
+                };
 
             case DROPOFF_STAY:
-                TaxiDropoffStayTask dst = (TaxiDropoffStayTask)task;
-                
-                //TODO maybe at the end of the stay task?
-                PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, dst, dst.getRequest(), now);
-                return new VrpActivity("ServeTask" + dst.getRequest().getId(), dst);
+                final TaxiDropoffStayTask dst = (TaxiDropoffStayTask)task;
+
+                return new VrpActivity("ServeTask" + dst.getRequest().getId(), dst) {
+                    public void endAction(double now)
+                    {
+                        PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, dst,
+                                dst.getRequest(), now);
+                    }
+                };
 
             case WAIT_STAY:
                 return new VrpActivity("WaitTask", (TaxiWaitStayTask)task);
