@@ -27,7 +27,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
-import playground.anhorni.surprice.scoring.SurpriceTravelDisutilityFactoryImpl;
 import playground.anhorni.surprice.warmstart.AdaptNextDay;
 
 public class DayControler extends Controler {
