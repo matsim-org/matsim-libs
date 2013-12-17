@@ -23,6 +23,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
 
@@ -34,14 +35,16 @@ public class SurpriceTravelDisutilityFactoryImpl implements TravelDisutilityFact
 	
 	private String day;
 	private AgentMemories memories;
+	private  ObjectAttributes preferences;
 	
-	public SurpriceTravelDisutilityFactoryImpl(String day, AgentMemories memories) {
+	public SurpriceTravelDisutilityFactoryImpl(String day, AgentMemories memories,  ObjectAttributes preferences) {
 		this.day = day;
 		this.memories = memories;
+		this.preferences = preferences;
 	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new SurpriceTravelDisutility(timeCalculator, cnScoringGroup, this.day, this.memories);
+		return new SurpriceTravelDisutility(timeCalculator, cnScoringGroup, this.day, this.memories, this.preferences);
 	}
 }

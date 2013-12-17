@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
 
 import playground.anhorni.surprice.scoring.Params;
@@ -44,17 +44,18 @@ import playground.anhorni.surprice.scoring.Params;
 public class SurpriceTravelDisutility implements TravelDisutility {
 
 	protected final TravelTime timeCalculator;
-	private double dudm;
 	private String day;
 	private AgentMemories memories;
+	private ObjectAttributes preferences;
 	
 	private final static Logger log = Logger.getLogger(SurpriceTravelDisutility.class);
 	
 	public SurpriceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, 
-			String day, AgentMemories memories) {
+			String day, AgentMemories memories, ObjectAttributes preferences) {
 		this.day = day;
 		this.memories = memories;
 		this.timeCalculator = timeCalculator;
+		this.preferences = preferences;
 	}
 	
 	/*
@@ -64,7 +65,7 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		// get mode and purpose
+		double dudm = (Double)this.preferences.getAttribute(person.getId().toString(), "dudm");
 		String mode = null;;
 		String purpose = "undef";
 		LegImpl leg = null;

@@ -52,7 +52,7 @@ public class DayControler extends Controler {
 	} 
 				
 	protected void setUp() {
-		SurpriceTravelDisutilityFactoryImpl travelDisutilityFactory = new SurpriceTravelDisutilityFactoryImpl(this.day, this.memories);
+		SurpriceTravelDisutilityFactoryImpl travelDisutilityFactory = new SurpriceTravelDisutilityFactoryImpl(this.day, this.memories, this.preferences);
 		this.setTravelDisutilityFactory(travelDisutilityFactory);
 		super.setUp();	
 	}
