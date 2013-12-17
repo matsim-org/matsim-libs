@@ -108,6 +108,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		for ( int i = 0; i < nThreads; i++ ) {
 			this.runnables[ i ] = new TripHandlingRunnable();
 			this.threads[ i ] = new Thread( this.runnables[ i ] );
+			this.threads[ i ].setName( "PseudoQSimThread."+i );
 			this.threads[ i ].start();
 		}
 
