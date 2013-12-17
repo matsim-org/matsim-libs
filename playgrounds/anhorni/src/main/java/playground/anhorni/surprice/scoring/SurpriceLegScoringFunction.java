@@ -20,13 +20,11 @@
 
 package playground.anhorni.surprice.scoring;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -57,10 +55,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private AgentMemory memory;
     private double dudm;
     
-    private int legCnt = 0;
-    
-    private final static Logger log = Logger.getLogger(SurpriceLegScoringFunction.class);
-        
+    private int legCnt = -1;        
     
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, AgentMemory memory, 
     		String day, PersonImpl person, double dudm) {
@@ -81,7 +76,7 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		this.person.getCustomAttributes().put(day + ".legScore", null);
 		this.person.getCustomAttributes().put(day + ".legMonetaryCosts", null);
 		this.person.getCustomAttributes().put(day + ".legScoreLag", null);
-		this.legCnt = 0;
+		this.legCnt = -1;
 	}
 
 	@Override
@@ -103,20 +98,17 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
 		String purpose = "undef";
-		this.legCnt++;
-		int actIndex = 0;
-		for (PlanElement pe : ((PlanImpl)this.person.getSelectedPlan()).getPlanElements()) {			
-			if (pe instanceof Activity && actIndex == this.legCnt) {		
-				if (actIndex == this.legCnt) {
-					Activity act = (Activity)pe;
-					purpose = act.getType();
-					break;
-				}
-				else {
-					actIndex++;
-				}
-			}
-		} // let's just hope that works
+		this.legCnt +=2;
+		int actlegIndex = 0;
+		for (PlanElement pe : ((PlanImpl)this.person.getSelectedPlan()).getPlanElements()) {	
+			if (pe instanceof Activity && actlegIndex == this.legCnt + 1) {	
+				Activity act = (Activity)pe;
+				purpose = act.getType();
+				break;
+			} 
+			actlegIndex++;
+		}
+			 // let's just hope that works
 		Params params = new Params();
 		params.setParams(purpose, leg.getMode(), this.memory, this.day, departureTime);
 				
