@@ -23,8 +23,8 @@ import java.util.Collection;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 
@@ -212,7 +212,8 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 
 			//vehicle.setCurrentLink( linkId );
 
-			runnables[ random.nextInt( runnables.length ) ].addArrivalEvent(
+			final TripHandlingRunnable runnable = runnables[ random.nextInt( runnables.length ) ];
+			runnable.addArrivalEvent(
 					// do not travel on first link
 					// calcArrival(
 					new InternalArrivalEvent(
@@ -298,7 +299,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 	}
 
 	private class TripHandlingRunnable implements Runnable {
-		private final Queue<InternalArrivalEvent> arrivalQueue = new PriorityQueue<InternalArrivalEvent>();
+		private final Queue<InternalArrivalEvent> arrivalQueue = new PriorityBlockingQueue<InternalArrivalEvent>();
 
 		private double time = Double.NaN;
 
