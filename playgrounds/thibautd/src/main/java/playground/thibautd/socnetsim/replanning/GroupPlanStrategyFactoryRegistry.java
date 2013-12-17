@@ -53,6 +53,7 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupWeightedSelectEx
 import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomGroupPlanSelectorStrategyFactory;
+import playground.thibautd.socnetsim.replanning.strategies.RandomSumGroupPlanSelectorStrategyFactory;
 
 /**
  * @author thibautd
@@ -134,6 +135,9 @@ public class GroupPlanStrategyFactoryRegistry {
 		addSelectorAndStrategyFactory(
 				"RandomSelection",
 				new RandomGroupPlanSelectorStrategyFactory() );
+		addSelectorAndStrategyFactory(
+				"RandomSumSelection",
+				new RandomSumGroupPlanSelectorStrategyFactory() );
 
 		// default removers
 		// ---------------------------------------------------------------------
