@@ -26,7 +26,7 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
 
 /**
  * @author thibautd

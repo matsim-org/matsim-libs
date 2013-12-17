@@ -24,7 +24,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
 
 /**
  * @author thibautd

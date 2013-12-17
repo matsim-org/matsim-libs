@@ -177,7 +177,7 @@ final class SelectorUtils {
 		return false;
 	}
 
-	private static boolean remainsPossible(
+	public static boolean remainsPossible(
 			final List<PlanRecord> plans) {
 		for ( PlanRecord p : plans ) {
 			if ( p.isStillFeasible ) return true;
@@ -185,7 +185,7 @@ final class SelectorUtils {
 		return false;
 	}
 
-	private static void add(
+	public static void add(
 			final GroupPlans constructedPlan,
 			final PlanRecord r) {
 		if ( r.jointPlan == null ) {
