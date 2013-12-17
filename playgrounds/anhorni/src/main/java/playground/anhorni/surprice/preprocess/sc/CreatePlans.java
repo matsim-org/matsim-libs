@@ -118,7 +118,8 @@ public class CreatePlans {
 			}
 			((PersonImpl)person).createDesires("desires");
 			((PersonImpl)person).getDesires().putActivityDuration("home", 8.0 * 3600.0);	
-			((PersonImpl)person).getDesires().putActivityDuration("work", 8.0 * 3600.0);	
+			((PersonImpl)person).getDesires().putActivityDuration("work", 8.0 * 3600.0);
+			((PersonImpl)person).getDesires().putActivityDuration("leisure", 8.0 * 3600.0);
 		}
 		this.write(outPath);
 	}
