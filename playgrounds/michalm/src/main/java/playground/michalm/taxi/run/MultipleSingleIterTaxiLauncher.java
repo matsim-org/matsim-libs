@@ -72,6 +72,7 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
         SummaryStatistics taxiOverTime = new SummaryStatistics();
         SummaryStatistics passengerWaitTime = new SummaryStatistics();
         SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
+        SummaryStatistics computationTime = new SummaryStatistics();
 
         boolean warmup = false;
 
@@ -105,10 +106,12 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
         }
 
         for (int i = 0; i < runs; i++) {
+            long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             launcher.go(false);
             TaxiEvaluation evaluation = (TaxiEvaluation)new TaxiEvaluator()
                     .evaluateVrp(launcher.data.getVrpData());
+            long t1 = System.currentTimeMillis();
 
             taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
             taxiDeliveryDriveTime.addValue(evaluation.getTaxiDropoffDriveTime());
@@ -118,11 +121,12 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
             taxiOverTime.addValue(evaluation.getTaxiOverTime());
             passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
             maxPassengerWaitTime.addValue(evaluation.getMaxPassengerWaitTime());
+            computationTime.addValue(t1-t0);
         }
 
-        pw.println(configIdx + "\t" + TaxiEvaluation.HEADER);
+        pw.println(configIdx + "\t" + TaxiEvaluation.HEADER + "\tcomputationT");
 
-        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 taxiPickupDriveTime.getMean(),//
                 taxiDeliveryDriveTime.getMean(),//
                 taxiServiceTime.getMean(),//
@@ -130,8 +134,9 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
                 taxiWaitTime.getMean(),//
                 taxiOverTime.getMean(),//
                 passengerWaitTime.getMean(),//
-                maxPassengerWaitTime.getMean());
-        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+                maxPassengerWaitTime.getMean(),//
+                computationTime.getMean());
+        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
                 (int)taxiPickupDriveTime.getMin(),//
                 (int)taxiDeliveryDriveTime.getMin(),//
                 (int)taxiServiceTime.getMin(),//
@@ -139,8 +144,9 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
                 (int)taxiWaitTime.getMin(),//
                 (int)taxiOverTime.getMin(),//
                 (int)passengerWaitTime.getMin(),//
-                (int)maxPassengerWaitTime.getMin());
-        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+                (int)maxPassengerWaitTime.getMin(),//
+                (int)computationTime.getMin());
+        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
                 (int)taxiPickupDriveTime.getMax(),//
                 (int)taxiDeliveryDriveTime.getMax(),//
                 (int)taxiServiceTime.getMax(),//
@@ -148,8 +154,9 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
                 (int)taxiWaitTime.getMax(),//
                 (int)taxiOverTime.getMax(),//
                 (int)passengerWaitTime.getMax(),//
-                (int)maxPassengerWaitTime.getMax());
-        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
+                (int)maxPassengerWaitTime.getMax(),//
+                (int)computationTime.getMax());
+        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
                 taxiPickupDriveTime.getStandardDeviation(),//
                 taxiDeliveryDriveTime.getStandardDeviation(),//
                 taxiServiceTime.getStandardDeviation(),//
@@ -157,7 +164,9 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
                 taxiWaitTime.getStandardDeviation(),//
                 taxiOverTime.getStandardDeviation(),//
                 passengerWaitTime.getStandardDeviation(),//
-                maxPassengerWaitTime.getStandardDeviation());
+                maxPassengerWaitTime.getStandardDeviation(),//
+                computationTime.getStandardDeviation());
+
 
         // the endTime of the simulation??? --- time of last served request
 
