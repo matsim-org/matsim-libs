@@ -270,6 +270,22 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 	@Override
 	public void afterSim() {
 		for ( TripHandlingRunnable r : runnables ) {
+			// stop thread
+			r.stopRun();
+		}
+		try {
+			startBarrier.await();
+			endBarrier.await();
+		}
+		catch (InterruptedException e) {
+			throw new RuntimeException();
+		}
+		catch (BrokenBarrierException e) {
+			throw new RuntimeException();
+		}
+
+		for ( TripHandlingRunnable r : runnables ) {
+			assert r.isFinished;
 			r.afterSim();
 		}
 	}
@@ -302,6 +318,8 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 	private class TripHandlingRunnable implements Runnable {
 		private final Queue<InternalArrivalEvent> arrivalQueue = new PriorityBlockingQueue<InternalArrivalEvent>();
 
+		private boolean isRunning = true;
+		private boolean isFinished = false;
 		private double time = Double.NaN;
 
 		public void addArrivalEvent(final InternalArrivalEvent event) {
@@ -310,6 +328,10 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 
 		public void setTime( double time ) {
 			this.time = time;
+		}
+
+		public void stopRun() {
+			isRunning = false;
 		}
 
 		public void afterSim() {
@@ -329,7 +351,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		@Override
 		public void run() {
 			try {
-				while (true) {
+				while ( isRunning ) {
 					startBarrier.await();
 					assert !Double.isNaN( time );
 					// TODO: handle transit drivers their own way.
@@ -386,6 +408,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 			catch (BrokenBarrierException e) {
 				throw new RuntimeException( e );
 			}
+			isFinished = true;
 		}
 	}
 }
