@@ -81,27 +81,29 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 		// why not all?
 		// TravelDisutilityIncludingToll is ready to handle all 4 schemes
 		// how is link pricing handled?
-		if (RoadPricingScheme.TOLL_TYPE_LINK.equals(this.scheme.getType()) ||
-				RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scheme.getType()) ||
-				RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || 
-				RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
-			final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
-			// area-toll requires a regular TravelCost, no toll-specific one.
-			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
-
-				@Override
-				public TravelDisutility createTravelDisutility(
-						TravelTime timeCalculator,
-						PlanCalcScoreConfigGroup cnScoringGroup) {
-					return new SurpriceTravelDisutilityIncludingToll(
-							previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), 
-							RoadPricing.this.scheme,
-							RoadPricing.this.preferences);
-				}
-				
-			};
-			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
-		}
+		
+// did somehow not work:
+//		if (RoadPricingScheme.TOLL_TYPE_LINK.equals(this.scheme.getType()) ||
+//				RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scheme.getType()) ||
+//				RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || 
+//				RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
+//			final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
+//			// area-toll requires a regular TravelCost, no toll-specific one.
+//			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
+//
+//				@Override
+//				public TravelDisutility createTravelDisutility(
+//						TravelTime timeCalculator,
+//						PlanCalcScoreConfigGroup cnScoringGroup) {
+//					return new SurpriceTravelDisutilityIncludingToll(
+//							previousTravelCostCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup), 
+//							RoadPricing.this.scheme,
+//							RoadPricing.this.preferences);
+//				}
+//				
+//			};
+//			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
+//		}
 
 		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.cattl);

@@ -20,12 +20,13 @@
 package playground.anhorni.surprice;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-
 
 /**
  * @author anhorni
@@ -36,15 +37,25 @@ public class SurpriceTravelDisutilityFactoryImpl implements TravelDisutilityFact
 	private String day;
 	private AgentMemories memories;
 	private  ObjectAttributes preferences;
+	private Controler controler;
 	
-	public SurpriceTravelDisutilityFactoryImpl(String day, AgentMemories memories,  ObjectAttributes preferences) {
+	public SurpriceTravelDisutilityFactoryImpl(String day, AgentMemories memories,  ObjectAttributes preferences, Controler controler) {
 		this.day = day;
 		this.memories = memories;
 		this.preferences = preferences;
+		this.controler = controler;
 	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new SurpriceTravelDisutility(timeCalculator, cnScoringGroup, this.day, this.memories, this.preferences);
+		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
+		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
+		try {
+			rpReader.parse(controler.getConfig().roadpricing().getTollLinksFile());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return new SurpriceTravelDisutility(timeCalculator, cnScoringGroup, this.day, this.memories, this.preferences, scheme,
+				Boolean.parseBoolean(this.controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing")));
 	}
 }
