@@ -143,7 +143,7 @@ ReplanningListener, IterationEndsListener {
 		Controler controler = event.getControler();
 		carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getNetwork(), carrierScoringFunctionFactory);
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
-		mobsimFactory.setWithinDayActivityReScheduling(withinDayReSchedulingEnabled);
+		mobsimFactory.setPhysicallyEnforceTimeWindowBeginnings(withinDayReSchedulingEnabled);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		controler.getEvents().addHandler(carrierAgentTracker);
 	}

@@ -28,6 +28,7 @@ import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
 import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scoring.ScoringFunction;
 
 /**
  * This keeps track of all carrierAgents during simulation.
@@ -53,7 +54,8 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	private void createCarrierAgents(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, carrierScoringFunctionFactory);
+			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
+			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, carrierScoringFunction);
 			carrierAgents.add(carrierAgent);
 		}
 	}

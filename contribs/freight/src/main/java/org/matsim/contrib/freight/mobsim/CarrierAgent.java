@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -25,7 +24,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.FreightConstants;
@@ -55,7 +53,7 @@ import org.matsim.vehicles.VehicleUtils;
  * @author mzilske, sschroeder
  *
  */
-class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler{
+class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler {
 
 	/**
 	 * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.
@@ -65,9 +63,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	 * @author mzilske, sschroeder
 	 *
 	 */
-	static class CarrierDriverAgent {
-
-		private static Logger logger = Logger.getLogger(CarrierDriverAgent.class);
+	class CarrierDriverAgent {
 
 		private LegImpl currentLeg;
 
@@ -77,19 +73,13 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		private final Id driverId;
 
-		private final CarrierAgent carrierAgent;
-
 		private final ScheduledTour scheduledTour;
-
-		private ScoringFunction scoringFunction;
 
 		private int activityCounter = 1;
 
-		CarrierDriverAgent(CarrierAgent carrierAgent, Id driverId, ScheduledTour tour, ScoringFunction scoringFunction) {
+		CarrierDriverAgent(Id driverId, ScheduledTour tour) {
 			this.driverId = driverId;
 			this.scheduledTour = tour;
-			this.carrierAgent = carrierAgent;
-			this.scoringFunction = scoringFunction;
 			new HashMap<Integer, CarrierShipment>();
 		}
 
@@ -172,12 +162,12 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			Tour tour = this.scheduledTour.getTour();
 			if (FreightConstants.PICKUP.equals(activityType)) {
 				Pickup tourElement = (Pickup) tour.getTourElements().get(activityCounter);
-				carrierAgent.notifyPickup(driverId, tourElement.getShipment(),time);
+				notifyPickup(driverId, tourElement.getShipment(),time);
 				//				logger.info("pickup occured");
 				activityCounter += 2;
 			} else if (FreightConstants.DELIVERY.equals(activityType)) {
 				Delivery tourElement = (Delivery) tour.getTourElements().get(activityCounter);
-				carrierAgent.notifyDelivery(driverId,tourElement.getShipment(), time);
+				notifyDelivery(driverId,tourElement.getShipment(), time);
 				activityCounter += 2;
 			}
 		}
@@ -198,8 +188,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 	}
 
-	private static Logger logger = Logger.getLogger(CarrierAgent.class);
-
 	private final Id id;
 
 	private final Carrier carrier;
@@ -214,14 +202,14 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private Map<Id, ScheduledTour> driverTourMap = new HashMap<Id, ScheduledTour>();
 
-	private ScoringFunction scoringFunction;
+	private final ScoringFunction scoringFunction;
 
-	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, CarrierScoringFunctionFactory scoringFunctionFactory) {
+	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, ScoringFunction carrierScoringFunction) {
 		this.tracker = carrierAgentTracker;
 		this.carrier = carrier;
 		this.id = carrier.getId();
-		assert scoringFunctionFactory != null : "scoringFunctionFactory is null. this must not be.";
-		this.scoringFunction = scoringFunctionFactory.createScoringFunction(carrier);
+		assert carrierScoringFunction != null : "scoringFunctionFactory is null. this must not be.";
+		this.scoringFunction = carrierScoringFunction;
 	}
 
 	public Id getId() {
@@ -250,7 +238,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
-			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(this, driverId, scheduledTour, scoringFunction);
+			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(driverId, scheduledTour);
 			Plan plan = new PlanImpl();
 			Activity startActivity = new ActivityImpl(FreightConstants.START,scheduledTour.getVehicle().getLocation());
 			startActivity.setEndTime(scheduledTour.getDeparture());

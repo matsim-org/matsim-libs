@@ -38,7 +38,6 @@ public class ActivityDurationUtils {
 	
 	public static double calculateDepartureTime(Activity act, double now, ActivityDurationInterpretation activityDurationInterpretation) {
 		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
-			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
 			return Double.POSITIVE_INFINITY ;
 		} else {
 			double departure = 0;

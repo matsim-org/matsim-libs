@@ -50,7 +50,7 @@ public class Visualiser {
 		});
 		
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
-		mobsimFactory.setWithinDayActivityReScheduling(true);
+		mobsimFactory.setPhysicallyEnforceTimeWindowBeginnings(true);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		Mobsim mobsim = mobsimFactory.createMobsim(scenario, events);
@@ -76,7 +76,7 @@ public class Visualiser {
 		});
 		
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
-		mobsimFactory.setWithinDayActivityReScheduling(true);
+		mobsimFactory.setPhysicallyEnforceTimeWindowBeginnings(true);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);

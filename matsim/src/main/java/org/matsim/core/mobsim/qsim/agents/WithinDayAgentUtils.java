@@ -54,7 +54,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
  */
 public class WithinDayAgentUtils {
 
-	public final Integer getCurrentPlanElementIndex(MobsimAgent agent) {
+	public static final Integer getCurrentPlanElementIndex(MobsimAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) {
 			return ((PersonDriverAgentImpl) agent).currentPlanElementIndex;			
 		} else {
@@ -63,7 +63,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 
-	public final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
+	public static final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) {
 			return ((PersonDriverAgentImpl) agent).currentLinkIdIndex;			
 		} else {
@@ -72,7 +72,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 
-	public final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {
+	public static final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {
 		if (agent instanceof PersonDriverAgentImpl) {
 			((PersonDriverAgentImpl) agent).calculateAndSetDepartureTime(act);			
 		} else {
@@ -81,7 +81,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 
-	public final void resetCaches(MobsimAgent agent) {
+	public static final void resetCaches(MobsimAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) {
 			((PersonDriverAgentImpl) agent).resetCaches();			
 		} else {
@@ -90,7 +90,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 	
-	public final Leg getCurrentLeg(MobsimAgent agent) {
+	public static final Leg getCurrentLeg(MobsimAgent agent) {
 		if (agent instanceof PlanAgent) {
 			PlanElement currentPlanElement = ((PlanAgent) agent).getCurrentPlanElement();
 			if (!(currentPlanElement instanceof Leg)) {
@@ -103,7 +103,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 	
-	public final Plan getSelectedPlan(MobsimAgent agent) {
+	public static final Plan getSelectedPlan(MobsimAgent agent) {
 		if (agent instanceof PlanAgent) {
 			return ((PlanAgent) agent).getSelectedPlan();
 		} else {
@@ -112,7 +112,7 @@ public class WithinDayAgentUtils {
 		}
 	}
 	
-	public final PlanElement getCurrentPlanElement(MobsimAgent agent) {
+	public static final PlanElement getCurrentPlanElement(MobsimAgent agent) {
 		if (agent instanceof PlanAgent) {
 			return ((PlanAgent) agent).getCurrentPlanElement();
 		} else {
