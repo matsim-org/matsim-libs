@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!DOCTYPE depots SYSTEM "http://www.man.poznan.pl/~michalm/matsim/depots_v1.dtd">
+<!DOCTYPE depots SYSTEM "http://matsim.org/files/dtd/depots_v1.dtd">
 
 
 <depots>
