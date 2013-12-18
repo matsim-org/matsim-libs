@@ -46,7 +46,6 @@ public class LinkCongestionInfo {
 	private List<Id> leavingAgents = new ArrayList<Id>();
 	private Map<Id, Double> personId2freeSpeedLeaveTime = new HashMap<Id, Double>();
 	private Id lastLeavingAgent;
-	private boolean booleanTravelTimeIsAnInteger;
 	
 	public Id getLinkId() {
 		return linkId;
