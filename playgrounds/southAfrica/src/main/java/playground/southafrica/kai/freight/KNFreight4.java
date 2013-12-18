@@ -43,6 +43,7 @@ import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.contrib.freight.mobsim.FreightActivity;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.config.Config;
@@ -316,32 +317,47 @@ public class KNFreight4 {
 						// no penalty for everything that is before the first act (people don't work)
 					}
 					@Override
-					public void handleActivity(Activity act) {
-						// deduct score for the time spent at the facility:
-						final double actStartTime = act.getStartTime();
-						final double actEndTime = act.getEndTime();
-						score -= (actEndTime - actStartTime) * this.margUtlOfTime_s ;
-	
-						CarrierService matchedService = null ;
-						for ( CarrierService service : carrier.getServices() ) {
-							if ( act.getLinkId().equals( service.getLocationLinkId() ) ) {
-								matchedService = service ;
-								break ;
+					public void handleActivity(Activity activity) {
+						
+						if (activity instanceof FreightActivity) {
+							FreightActivity act = (FreightActivity) activity;
+							// deduct score for the time spent at the facility:
+							final double actStartTime = act.getStartTime();
+							final double actEndTime = act.getEndTime();
+							score -= (actEndTime - actStartTime) * this.margUtlOfTime_s ;
+		
+							/*
+							CarrierService matchedService = null ;
+							for ( CarrierService service : carrier.getServices() ) {
+								if ( act.getLinkId().equals( service.getLocationLinkId() ) ) {
+									matchedService = service ;
+									break ;
+								}
+								// yy would be more efficient with a pre-fabricated lookup table. kai, nov'13
+								// yyyyyy there may be multiple services on the same link, which which case this will not function correctly. kai, nov'13
 							}
-							// yy would be more efficient with a pre-fabricated lookup table. kai, nov'13
-							// yyyyyy there may be multiple services on the same link, which which case this will not function correctly. kai, nov'13
+							
+							final double windowStartTime = matchedService.getServiceStartTimeWindow().getStart();
+							final double windowEndTime = matchedService.getServiceStartTimeWindow().getEnd();
+							*/
+							
+							// fixed that for you. :) michaz
+							final double windowStartTime = act.getTimeWindow().getStart();
+							final double windowEndTime = act.getTimeWindow().getEnd();
+							
+							final double penalty = 18/3600. ; // per second!
+							if ( actStartTime < windowStartTime ) {
+								score -= penalty * ( windowStartTime - actStartTime ) ;
+								// mobsim could let them wait ... but this is also not implemented for regular activities. kai, nov'13
+							}
+							if ( windowEndTime < actEndTime ) {
+								score -= penalty * ( actEndTime - windowEndTime ) ;
+							}
+							// (note: provide penalties that work with a gradient to help the evol algo. kai, nov'13)
+							
 						}
-						final double windowStartTime = matchedService.getServiceStartTimeWindow().getStart();
-						final double windowEndTime = matchedService.getServiceStartTimeWindow().getEnd();
-						final double penalty = 18/3600. ; // per second!
-						if ( actStartTime < windowStartTime ) {
-							score -= penalty * ( windowStartTime - actStartTime ) ;
-							// mobsim could let them wait ... but this is also not implemented for regular activities. kai, nov'13
-						}
-						if ( windowEndTime < actEndTime ) {
-							score -= penalty * ( actEndTime - windowEndTime ) ;
-						}
-						// (note: provide penalties that work with a gradient to help the evol algo. kai, nov'13)
+						
+						
 						
 					}
 					@Override
