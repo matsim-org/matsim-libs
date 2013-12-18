@@ -103,7 +103,7 @@ final class RunFreight {
 		};
 
 		CarrierControlerListener carrierControlerListener = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory);
-		carrierControlerListener.setEnableWithinDayActivityReScheduling(false);
+		carrierControlerListener.setPhysicallyEnforceTimeWindowBeginnings(false);
 
 		controler.addControlerListener(carrierControlerListener);
 		controler.run();

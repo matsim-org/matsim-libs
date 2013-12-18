@@ -78,7 +78,7 @@ ReplanningListener, IterationEndsListener {
 
 	private static Logger logger = Logger.getLogger(CarrierControlerListener.class);
 
-	private boolean withinDayReSchedulingEnabled = false;
+	private boolean physicallyEnforceTimeWindowBeginnings = false;
 
 	private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 
@@ -131,8 +131,8 @@ ReplanningListener, IterationEndsListener {
 		return carrierPlanStrategyManagerFactory;
 	}
 
-	public void setEnableWithinDayActivityReScheduling(boolean enableWithinDayReScheduling) {
-		this.withinDayReSchedulingEnabled = enableWithinDayReScheduling;
+	public void setPhysicallyEnforceTimeWindowBeginnings(boolean enableWithinDayReScheduling) {
+		this.physicallyEnforceTimeWindowBeginnings = enableWithinDayReScheduling;
 	}
 
 	@Override
@@ -143,7 +143,7 @@ ReplanningListener, IterationEndsListener {
 		Controler controler = event.getControler();
 		carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getNetwork(), carrierScoringFunctionFactory);
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
-		mobsimFactory.setPhysicallyEnforceTimeWindowBeginnings(withinDayReSchedulingEnabled);
+		mobsimFactory.setPhysicallyEnforceTimeWindowBeginnings(physicallyEnforceTimeWindowBeginnings);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		controler.getEvents().addHandler(carrierAgentTracker);
 	}

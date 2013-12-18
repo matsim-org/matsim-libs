@@ -150,7 +150,7 @@ public class KNFreight4 {
 		ctrl.setOverwriteFiles(true);
 		{
 			CarrierControlerListener listener = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
-			listener.setEnableWithinDayActivityReScheduling(usingWithinDayReScheduling);
+			listener.setPhysicallyEnforceTimeWindowBeginnings(usingWithinDayReScheduling);
 			ctrl.addControlerListener(listener) ;
 		}
 		

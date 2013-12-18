@@ -112,7 +112,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 	
 	public void testScoringInSecondsWithWithinDayRescheduling(){
 		CarrierControlerListener carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(), new TimeScoringFunctionFactoryForTests(controler.getNetwork()));
-		carrierControler.setEnableWithinDayActivityReScheduling(true);
+		carrierControler.setPhysicallyEnforceTimeWindowBeginnings(true);
 		controler.addControlerListener(carrierControler);
 		controler.setOverwriteFiles(true);
 		controler.run();	
