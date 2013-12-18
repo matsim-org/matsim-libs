@@ -40,8 +40,8 @@ import org.matsim.counts.CountSimComparison;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.eventsfilter.FeatureNetworkLinkCenterCoordFilter;
+import playground.dgrether.koehlerstrehlersignal.analysis.TtDelayPerLink;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 
@@ -70,6 +70,15 @@ public class TtSimSimTrafficAnalyser {
 		return va;
 	}
 	
+	private TtDelayPerLink calculateDelay(Network network, String eventsFile){
+		TtDelayPerLink delayPerLink = new TtDelayPerLink(network);
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(delayPerLink);
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(eventsFile);
+		return delayPerLink;
+	}
+	
 	public void runAnalysis(String networkFile, String eventsFileCounts, String eventsFileSim, String srs, String outfile) {
 		Network network = this.loadNetwork(networkFile);
 		VolumesAnalyzer vaCounts = loadVolumes(network, eventsFileCounts);
@@ -82,7 +91,10 @@ public class TtSimSimTrafficAnalyser {
 		SimSimAnalysis countsAnalysis = new SimSimAnalysis();
 		Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap = countsAnalysis.createCountSimComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
 		
-		new SimSimMorningShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile + ".shp", countSimLinkLeaveCompMap);
+		Map<Id, Double> delayPerLink1 = calculateDelay(network, eventsFileCounts).getDelayPerLink();
+		Map<Id, Double> delayPerLink2 = calculateDelay(network, eventsFileSim).getDelayPerLink();
+		
+		new SimSimMorningShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile + ".shp", countSimLinkLeaveCompMap, delayPerLink1, delayPerLink2);
 	}
 
 
@@ -118,9 +130,9 @@ public class TtSimSimTrafficAnalyser {
 //			String runNr2 = "1748"; // sylvia
 			
 			String runNr1 = "1910"; // base case (based on 1712), changes in routes only
-//			String runNr2 = "1911"; // commodities > 10
+			String runNr2 = "1911"; // commodities > 10
 //			String runNr2 = "1912"; // commodities > 50
-			String runNr2 = "1913"; // sylvia
+//			String runNr2 = "1913"; // sylvia
 			
 			net = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/"+runNr1+".output_network.xml.gz";
 			eventsFileCountValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/ITERS/it.2000/"+runNr1+".2000.events.xml.gz";

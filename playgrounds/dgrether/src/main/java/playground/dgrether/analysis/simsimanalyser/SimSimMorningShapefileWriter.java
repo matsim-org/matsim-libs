@@ -61,16 +61,16 @@ public class SimSimMorningShapefileWriter {
 		this.crs = crs;
 	}
 
-	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap){
-		this.writeShape(outfile, countSimLinkLeaveCompMap, "sim", "count");
+	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap, Map<Id, Double> delayPerLink1, Map<Id, Double> delayPerLink2){
+		this.writeShape(outfile, countSimLinkLeaveCompMap, delayPerLink1, delayPerLink2, "sim", "count");
 	}
 
-	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap, String runId, String runId2) {
+	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap, Map<Id, Double> delayPerLink1, Map<Id, Double> delayPerLink2, String runId, String runId2) {
 		PolygonFeatureFactory factory = createFeatureType(this.crs, runId, runId2);
 		GeometryFactory geofac = new GeometryFactory();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		for (Link link : this.network.getLinks().values()) {
-			features.add(this.createFeature(link, geofac, factory, countSimLinkLeaveCompMap.get(link.getId())));
+			features.add(this.createFeature(link, geofac, factory, countSimLinkLeaveCompMap.get(link.getId()), delayPerLink1.get(link.getId()), delayPerLink2.get(link.getId())));
 		}
 		ShapeFileWriter.writeGeometries(features, outfile);
 	}
@@ -89,6 +89,10 @@ public class SimSimMorningShapefileWriter {
 		builder.addAttribute("lanes", Double.class);
 		builder.addAttribute("visWidth", Double.class);
 		builder.addAttribute("type", String.class);
+		
+		// total delay caused by the link in run1 and run2
+		builder.addAttribute("delay1", Double.class);
+		builder.addAttribute("delay2", Double.class);
 		
 		// absolute flow values of run1
 		for (int i = firstHour; i < lastHour; i++){
@@ -121,9 +125,9 @@ public class SimSimMorningShapefileWriter {
 		return builder.create();
 	}
 	
-	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, List<CountSimComparison> countSimLinkLeaveComparisonList) {
+	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, List<CountSimComparison> countSimLinkLeaveComparisonList, Double linkDelay1, Double linkDelay2) {
 		Coordinate[] coords = PolygonFeatureGenerator.createPolygonCoordsForLink(link, 20.0);
-		Object [] attribs = new Object[8+5*(numberOfHours+1)+1];
+		Object [] attribs = new Object[10+5*(numberOfHours+1)+1];
 		attribs[0] = link.getId().toString();
 		attribs[1] = link.getFromNode().getId().toString();
 		attribs[2] = link.getToNode().getId().toString();
@@ -133,7 +137,11 @@ public class SimSimMorningShapefileWriter {
 		attribs[6] = link.getNumberOfLanes();
 		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = ((LinkImpl) link).getType();
-		int i = 9;
+		// total delay caused by the link
+		attribs[9] = linkDelay1;
+		attribs[10] = linkDelay2;
+		
+		int i = 11;
 		
 		double sumAbsLinkLeaveDif = 0.0;
 		double absLinkLeaveDif = 0.0;
@@ -157,12 +165,12 @@ public class SimSimMorningShapefileWriter {
 				i++;
 			}
 		}
-		attribs[8+numberOfHours+1] = sumAbsLinkLeaveRun1;
-		attribs[8+2*(numberOfHours+1)] = sumAbsLinkLeaveRun2;
-		attribs[8+3*(numberOfHours+1)] = sumAbsLinkLeaveDif; // C: meanAbsLinkLeaveDif = sumAbsLinkLeaveDif/5
+		attribs[10+numberOfHours+1] = sumAbsLinkLeaveRun1;
+		attribs[10+2*(numberOfHours+1)] = sumAbsLinkLeaveRun2;
+		attribs[10+3*(numberOfHours+1)] = sumAbsLinkLeaveDif; // C: meanAbsLinkLeaveDif = sumAbsLinkLeaveDif/5
 		// mean (error/capacity) in percent per hour, i.e flow difference of the morning peak divided by the maximal link capacity in this time period
-		attribs[8+4*(numberOfHours+1)] = (sumAbsLinkLeaveDif/(link.getCapacity()*5))*100;
-		attribs[8+5*(numberOfHours+1)] = sumAbsLinkLeaveDif*link.getLength(); // alternative: meanAbsLinkLeaveDif*link.getLength();
+		attribs[10+4*(numberOfHours+1)] = (sumAbsLinkLeaveDif/(link.getCapacity()*5))*100;
+		attribs[10+5*(numberOfHours+1)] = sumAbsLinkLeaveDif*link.getLength(); // alternative: meanAbsLinkLeaveDif*link.getLength();
 		
 		return factory.createPolygon(coords, attribs, link.getId().toString());
 	}
