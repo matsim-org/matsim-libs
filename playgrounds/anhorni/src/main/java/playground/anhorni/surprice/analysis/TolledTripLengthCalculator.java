@@ -67,7 +67,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, Person
 		// getting the (monetary? generalized?) cost of the link
 		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getPersonId() );
 		
-		if (cost != null) {
+		if (cost != null && cost.amount > 0.0) {
 			// i.e. if there is a toll on the link
 			
 			Link link = this.network.getLinks().get(event.getLinkId());
@@ -96,7 +96,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, Person
 		
 		// get the accumulated "tolled" length from the agent
 		Double length = this.agentDistance.get(event.getPersonId());
-		if (length != null) {
+		if (length != null && Double.valueOf(length) > 0.0) {
 			// if this is not zero, accumulate it into some global accumulated length ...
 			this.sumLength += length.doubleValue();
 			

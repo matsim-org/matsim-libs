@@ -30,6 +30,8 @@ public class Surprice {
 	public static final String SURPRICE_RUN = "surprice_run";
 	public static final String SURPRICE_PREPROCESS = "surprice_preprocess";
 	
+	public static int numberOfIncomeCategories = 2;
+	
 	// -------------------------------------------------
 	// betas and constants need to be negative!!!			
 	public static double constant_car = -3.0;

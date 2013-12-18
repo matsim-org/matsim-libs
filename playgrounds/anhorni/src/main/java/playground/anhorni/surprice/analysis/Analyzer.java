@@ -160,15 +160,15 @@ public class Analyzer {
 	private void analyzeDay(String eventsfile, String day, Config config, 
 			ArrayList<Double> utilitiesRelative, ArrayList<Double> utilitiesAbsolute) {
 		
-		this.utilityBins = new Bins(1, 9, day + ".utilitiesPerIncome");
-		this.ttBins = new Bins(1, 9, day + ".ttPerIncome");
-		this.tdBins = new Bins(1, 9, day + ".tdPerIncome");
-		this.tolltdBins = new Bins(1, 9, day + ".tolltdPerIncome");	
+		this.utilityBins = new Bins(1, Surprice.numberOfIncomeCategories, day + ".utilitiesPerIncome");
+		this.ttBins = new Bins(1, Surprice.numberOfIncomeCategories, day + ".ttPerIncome");
+		this.tdBins = new Bins(1, Surprice.numberOfIncomeCategories, day + ".tdPerIncome");
+		this.tolltdBins = new Bins(1, Surprice.numberOfIncomeCategories, day + ".tolltdPerIncome");	
 		
-		this.modeBins.put("car", new Bins(1, 9, day + ".carPerIncome"));
-		this.modeBins.put("pt", new Bins(1, 9, day + ".ptPerIncome"));
-		this.modeBins.put("bike", new Bins(1, 9, day + ".bikePerIncome"));
-		this.modeBins.put("walk", new Bins(1, 9, day + ".walkPerIncome"));
+		this.modeBins.put("car", new Bins(1, Surprice.numberOfIncomeCategories, day + ".carPerIncome"));
+		this.modeBins.put("pt", new Bins(1, Surprice.numberOfIncomeCategories, day + ".ptPerIncome"));
+		this.modeBins.put("bike", new Bins(1, Surprice.numberOfIncomeCategories, day + ".bikePerIncome"));
+		this.modeBins.put("walk", new Bins(1, Surprice.numberOfIncomeCategories, day + ".walkPerIncome"));
 		
 		log.info("	analyzing travel distances ...");
 		TravelDistanceCalculator tdCalculator = new TravelDistanceCalculator(this.scenario.getNetwork(), this.tdBins, this.incomes, day);			
@@ -215,13 +215,15 @@ public class Analyzer {
 		
 		this.computeModesPerIncome();
 				
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < Surprice.numberOfIncomeCategories; i++) {
 			this.boxPlotTravelTimesCarPerIncome.addValuesPerCategory(ttCalculator.getCarPerIncome().get(i), Integer.toString(i), "tt");
 			if (ttCalculator.getPTPerIncome().size() > 0) {
 				this.boxPlotTravelTimesPtPerIncome.addValuesPerCategory(ttCalculator.getPTPerIncome().get(i), Integer.toString(i), "tt");
 			}
 			this.boxPlotTravelDistancesCarPerIncome.addValuesPerCategory(tdCalculator.getCar().get(i), Integer.toString(i), "tt");
-			this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistancesPerIncome().get(i), Integer.toString(i), "tt");
+			if (tollCalculator.getTollDistancesPerIncome().get(i) != null) {
+				this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistancesPerIncome().get(i), Integer.toString(i), "tt");
+			}
 		}		
 		this.writeDaily(day, ttCalculator, tollCalculator);
 	}
@@ -253,7 +255,7 @@ public class Analyzer {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary_tt.txt")); 
 			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\tCV\n");			
-			for (int i = 0; i < 9; i++) {
+			for (int i = 0; i < Surprice.numberOfIncomeCategories; i++) {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(ttCalculator.getTTPerIncome().get(i))) + "\t";
 				line += formatter.format(Utils.median(ttCalculator.getTTPerIncome().get(i))) + "\t";
@@ -271,7 +273,7 @@ public class Analyzer {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary_cartt.txt")); 
 			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\tCV\n");			
-			for (int i = 0; i < 9; i++) {
+			for (int i = 0; i < Surprice.numberOfIncomeCategories; i++) {
 				String line = i + "\t";
 				line += formatter.format(Utils.mean(ttCalculator.getCarPerIncome().get(i))) + "\t";
 				line += formatter.format(Utils.median(ttCalculator.getCarPerIncome().get(i))) + "\t";
@@ -289,13 +291,18 @@ public class Analyzer {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outPath + "/" + day + "/" + day + ".summary_tolltd.txt")); 
 			bufferedWriter.write("incClass\tavg\tmedian\tstdDev\tCV\n");
-			for (int i = 0; i < 9; i++) {
+			for (int i = 0; i < Surprice.numberOfIncomeCategories; i++) {
 				String line = i + "\t";
-				line += formatter.format(Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
-				line += formatter.format(Utils.median(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
-				line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
-				line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)) /
-						Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i))) + "\n";
+				if (tollCalculator.getTollDistancesPerIncome().get(i) != null) {
+					line += formatter.format(Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
+					line += formatter.format(Utils.median(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
+					line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)))  + "\t";
+					line += formatter.format(Utils.getStdDev(tollCalculator.getTollDistancesPerIncome().get(i)) /
+							Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i))) + "\n";
+				}
+				else {
+					line += "----------------------";
+				}
 				bufferedWriter.append(line);
 			}			
 			bufferedWriter.flush();
