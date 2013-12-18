@@ -60,8 +60,9 @@ public class MapRenderer extends StyledMapRenderer {
 			drawTextOnPath(way, new TextElement(STRATEGY, FONT, 0,
 				textOffset(network, link), MATSIMCOLOR, 0.f, null));
 			}
+			return;
 		  }
-		  return;
+		  
 	    }
 	}
 	super.drawWay(way, color, line, dashes, dashedColor, offset, showOrientation, showHeadArrowOnly, showOneway, onewayReversed);
