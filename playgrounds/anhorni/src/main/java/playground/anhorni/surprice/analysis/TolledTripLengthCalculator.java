@@ -41,7 +41,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class TolledTripLengthCalculator implements LinkEnterEventHandler, PersonArrivalEventHandler {
 	private double sumLength = 0.0;
-	private double sumLengthIncomeWeighted = 0.0;
 	private int cntTrips = 0;
 	private RoadPricingScheme scheme = null;
 	private Network network = null;
@@ -103,8 +102,6 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, Person
 			double income = (Double)this.incomes.getAttribute(event.getPersonId().toString(), "income") * 8.0;
 			this.tolltdBins.addVal(income, length.doubleValue());
 			
-			this.sumLengthIncomeWeighted += length.doubleValue() * income;
-			
 			if (this.tollDistancesAgents.get(event.getPersonId()) == null) {
 				this.tollDistancesAgents.put(event.getPersonId(), 0.0);
 			}
@@ -138,10 +135,6 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, Person
 //		log.warn("NOTE: The result of this calculation has been changed from 'av over all trips' to 'av over tolled trips'.  kai/benjamin, apr'10") ;
 		// commenting this out.  kai, mar'12
 		return (this.sumLength / this.cntTrips);
-	}
-
-	public double getSumLengthIncomeWeighted() {
-		return this.sumLengthIncomeWeighted / (this.getAverageTripLength() * this.cntTrips);
 	}
 
 	public TreeMap<Integer, ArrayList<Double>> getTollDistancesPerIncome() {

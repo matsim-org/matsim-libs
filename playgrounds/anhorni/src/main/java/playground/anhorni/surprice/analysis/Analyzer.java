@@ -60,11 +60,7 @@ public class Analyzer {
 	private double tolltdAvg[] = new double[8];
 	private double utilitiesAvg[] = new double[8];
 	private double nTripsAvg[] = new double[8];
-	 
-	private double tdSumIncomeWeighted[] = new double[8]; 
-	private double tolltdSumIncomeWeighted[] = new double[8];
-	private double ttSumIncomeWeighted[] = new double[8];
-	
+	 	
 	private TreeMap<String, Bins> modeBins = new TreeMap<String, Bins>();
 	
 	private Bins utilityBins;
@@ -112,8 +108,8 @@ public class Analyzer {
 		log.info("incomes file: " + incomesFile);
 		this.incomes = new ObjectAttributes();
 			
-		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(this.incomes);
-		preferencesReader.parse(incomesFile);
+		ObjectAttributesXmlReader incomesReader = new ObjectAttributesXmlReader(this.incomes);
+		incomesReader.parse(incomesFile);
 		
 		this.config = ConfigUtils.loadConfig(configFile);
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
@@ -176,7 +172,6 @@ public class Analyzer {
 			tdCalculator.run(person.getSelectedPlan());
 		}
 		this.tdAvg[Surprice.days.indexOf(day)] = tdCalculator.getAverageTripLength();
-		this.tdSumIncomeWeighted[Surprice.days.indexOf(day)] = tdCalculator.getLenghtIncomeWeighted();
 		this.boxPlotTravelDistancesCar.addValuesPerCategory(tdCalculator.getTravelDistances(), day, "Travel Distances Car");
 		
 		log.info("	analyzing utilities ...");
@@ -205,9 +200,7 @@ public class Analyzer {
 		
 		new MatsimEventsReader(events).readFile(eventsfile);				
 		this.ttAvg[Surprice.days.indexOf(day)] = ttCalculator.getAverageTripDuration();
-		this.ttSumIncomeWeighted[Surprice.days.indexOf(day)] = ttCalculator.getSumTripDurationsIncomeWeighted();
 		this.tolltdAvg[Surprice.days.indexOf(day)] = tollCalculator.getAverageTripLength();	
-		this.tolltdSumIncomeWeighted[Surprice.days.indexOf(day)] = tollCalculator.getSumLengthIncomeWeighted();
 		this.boxPlotTravelTimes.addValuesPerCategory(ttCalculator.getTravelTimes(), day, "Travel Times");
 		this.tolltdPerAgent = tollCalculator.getTollDistancesAgents();
 		this.ttPerAgent = ttCalculator.getTTPerAgent();
@@ -242,16 +235,16 @@ public class Analyzer {
 			bins.plotBinnedDistribution(outPath + "/" + day + "/", "income", "");
 		}
 		this.boxPlotTravelTimesCarPerIncome.createChart();
-		this.boxPlotTravelTimesCarPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".ttCarPerIncome.png", 800, 600);
+		this.boxPlotTravelTimesCarPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".ttCarPerIncome_BP.png", 800, 600);
 		
 		this.boxPlotTravelTimesPtPerIncome.createChart();
-		this.boxPlotTravelTimesPtPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".ttPtPerIncome.png", 800, 600);
+		this.boxPlotTravelTimesPtPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".ttPtPerIncome_BP.png", 800, 600);
 		
 		this.boxPlotTravelDistancesCarPerIncome.createChart();
-		this.boxPlotTravelDistancesCarPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tdCarPerIncome.png", 800, 600);
+		this.boxPlotTravelDistancesCarPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tdCarPerIncome_BP.png", 800, 600);
 				
 		this.boxPlotTravelDistancesTolledPerIncome.createChart();
-		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tolltdPerIncome.png", 800, 600);
+		this.boxPlotTravelDistancesTolledPerIncome.saveAsPng(outPath + "/" + day + "/" + day + ".tolltdPerIncome_BP.png", 800, 600);
 		
 		this.writeAgents(day);
 		
@@ -305,7 +298,7 @@ public class Analyzer {
 							Utils.mean(tollCalculator.getTollDistancesPerIncome().get(i))) + "\n";
 				}
 				else {
-					line += "----------------------";
+					line += "------- no values ---------------";
 				}
 				bufferedWriter.append(line);
 			}			
@@ -388,7 +381,6 @@ public class Analyzer {
 		}
 	}
 	
-	
 			
 	private void write() {		
 		this.writePlots();		
@@ -454,44 +446,7 @@ public class Analyzer {
 			}	
 			line += formatter.format(avgUtility) + "\n";
 			bufferedWriter.append(line);
-			bufferedWriter.newLine();
-			
-// income weighted 
-			
-			bufferedWriter.write("ttIncomeWeighted\tmon\ttue\twed\tthu\tfri\tsat\tsun\tavg\n");
-			line = "ttIW\t";
-			double avgTTIW = 0.0;
-			for (String day : Surprice.days) {	
-				double tt = this.ttSumIncomeWeighted[Surprice.days.indexOf(day)];
-				line += formatter.format(tt) + "\t";			
-				avgTTIW += tt / Surprice.days.size();
-			}	
-			line += formatter.format(avgTTIW) + "\n";
-			bufferedWriter.append(line);
-			bufferedWriter.newLine();
-			
-			bufferedWriter.write("tdIW\tmon\ttue\twed\tthu\tfri\tsat\tsun\tavg\n");
-			line = "tdIW\t";
-			double avgTDIW = 0.0;
-			for (String day : Surprice.days) {	
-				double td = this.tdSumIncomeWeighted[Surprice.days.indexOf(day)];
-				line += formatter.format(td) + "\t";			
-				avgTDIW += td / Surprice.days.size();
-			}	
-			line += formatter.format(avgTDIW) + "\n";
-			bufferedWriter.append(line);
-			bufferedWriter.newLine();
-			
-			bufferedWriter.write("tolltdIW\tmon\ttue\twed\tthu\tfri\tsat\tsun\tavg\n");
-			line = "tolltdIW\t";
-			double avgTollTDIW = 0.0;
-			for (String day : Surprice.days) {	
-				double tolltd = this.tolltdSumIncomeWeighted[Surprice.days.indexOf(day)];
-				line += formatter.format(tolltd) + "\t";			
-				avgTollTDIW += tolltd / Surprice.days.size();
-			}	
-			line += formatter.format(avgTollTDIW) + "\n";
-			bufferedWriter.append(line);		
+			bufferedWriter.newLine();	
 		    bufferedWriter.flush();
 		    bufferedWriter.close();
 		} 
