@@ -165,7 +165,12 @@ public class MarginalCongestionHandlerV3 implements
 			}
 						
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
+			
+			if(linkInfo.getBooleanTravelTimeIsAnInteger() == false){
+				linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime());
+			}else{
+				linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
+			}
 		}	
 	}
 
@@ -325,6 +330,11 @@ public class MarginalCongestionHandlerV3 implements
 		Link link = network.getLinks().get(linkId);
 		linkInfo.setLinkId(link.getId());
 		linkInfo.setFreeTravelTime(Math.ceil(link.getLength() / link.getFreespeed()));
+		if(((link.getLength() / link.getFreespeed()) - (Math.ceil(link.getLength() / link.getFreespeed()))) == 0){
+			linkInfo.setBooleanTravelTimeIsAnInteger(true);
+		}else{
+			linkInfo.setBooleanTravelTimeIsAnInteger(false);
+		}
 		
 		double flowCapacity_hour = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
 		double marginalDelay_sec = Math.floor((1 / (flowCapacity_hour / this.scenario.getNetwork().getCapacityPeriod()) ) );

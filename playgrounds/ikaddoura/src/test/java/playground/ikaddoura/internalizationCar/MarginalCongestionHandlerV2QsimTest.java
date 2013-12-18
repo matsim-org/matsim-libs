@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -217,9 +219,8 @@ public class MarginalCongestionHandlerV2QsimTest {
 				
 				if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
 					Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
-				
 				} else if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-					Assert.assertEquals("wrong delay.", 58.0, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 59.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				} 
 				
 			} else if (event.getTime() == 170.0) {
@@ -313,7 +314,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			System.out.println("test_flowCongestion12: "+event.toString());
 		
 			if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent1.toString())) {
-				Assert.assertEquals("wrong delay.", 49.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("wrong delay.", 50.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			}else if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
 				Assert.assertEquals("wrong delay.", 30.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			}
@@ -347,7 +348,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			}
 			
 		});
-		
+
 		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
 				
 		QSim sim = createQSim(sc, events);
@@ -357,19 +358,19 @@ public class MarginalCongestionHandlerV2QsimTest {
 		
 		for (MarginalCongestionEvent event : congestionEvents) {
 			if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-				Assert.assertEquals("wrong delay.", 7.0, event.getDelay(), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("wrong delay.", 8.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			} else if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
-					Assert.assertEquals("wrong delay.", 34.0, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 35.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			} else if (event.getCapacityConstraint().toString().equals("storageCapacity") && event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
 					Assert.assertEquals("wrong delay.", 3.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			} else if (event.getCapacityConstraint().toString().equals("flowCapacity") && event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
-					Assert.assertEquals("wrong delay.", 58.0, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 59.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			} else if (event.getCapacityConstraint().toString().equals("storageCapacity") && event.getCausingAgentId().toString().equals(this.testAgent4.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
 					Assert.assertEquals("wrong delay.", 40.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			} else if (event.getCapacityConstraint().toString().equals("flowCapacity") && event.getCausingAgentId().toString().equals(this.testAgent4.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
-					Assert.assertEquals("wrong delay.", 58.0, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 59.0, event.getDelay(), MatsimTestUtils.EPSILON);
 			} else if (event.getCausingAgentId().toString().equals(this.testAgent5.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent6.toString())) {
-					Assert.assertEquals("wrong delay.", 27.0, event.getDelay(), MatsimTestUtils.EPSILON);		
+					Assert.assertEquals("wrong delay.", 28.0, event.getDelay(), MatsimTestUtils.EPSILON);		
 			}
 		}
 	
@@ -398,51 +399,50 @@ public class MarginalCongestionHandlerV2QsimTest {
 			@Override
 			public void handleEvent(MarginalCongestionEvent event) {
 				congestionEvents.add(event);
-				System.out.println(event.toString());
+//				System.out.println(event.toString());
 			}	
 		});
-			
 				
 		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
 						
 		QSim sim = createQSim(sc, events);
 		sim.run();
 			
-		System.out.println("test_Clearing: "+events.toString());
+//		System.out.println("test_Clearing: "+events.toString());
 						
 		for (MarginalCongestionEvent event : congestionEvents) {
 				
 			if (event.getTime() == 212.0) {
 				if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-						Assert.assertEquals("wrong delay.", 39.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 40.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				} else if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
 						Assert.assertEquals("wrong delay.", 36.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				}
 			}
 			else if (event.getTime() == 272.0) {
 				if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
-						Assert.assertEquals("wrong delay.", 58.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 59.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				} else if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
 						Assert.assertEquals("wrong delay.", 11.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				}
 			}
 			else if (event.getTime() == 332.0) {
 				if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
-						Assert.assertEquals("wrong delay.", 58.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 59.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				} else if (event.getCausingAgentId().toString().equals(this.testAgent4.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
 							Assert.assertEquals("wrong delay.", 70.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				}
 			}
 			else if (event.getTime() == 392.0) {
 				if (event.getCausingAgentId().toString().equals(this.testAgent4.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
-					Assert.assertEquals("wrong delay.", 58.0, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 59.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				} else if (event.getCausingAgentId().toString().equals(this.testAgent5.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent6.toString())) {
 						Assert.assertEquals("wrong delay.", 129.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				}
 			}
 			else if (event.getTime() == 452.0) {
 				if (event.getCausingAgentId().toString().equals(this.testAgent5.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent6.toString())) {
-						Assert.assertEquals("wrong delay.", 58.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 59.0, event.getDelay(), MatsimTestUtils.EPSILON);
 				} 
 			}
 			
@@ -490,7 +490,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			
 				if (event.getTime() == 233.0) {
 					if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-						Assert.assertEquals("wrong delay.", 65.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 66.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent4.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
 						Assert.assertEquals("wrong delay.", 22.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					}
@@ -499,7 +499,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 					if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
 						Assert.assertEquals("wrong delay.", 80.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
-						Assert.assertEquals("wrong delay.", 50.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 51.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					}
 				}
 				else if (event.getTime() == 393.0) {
@@ -508,7 +508,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
 						Assert.assertEquals("wrong delay.", 80.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
-						Assert.assertEquals("wrong delay.", 35.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 36.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					}
 				}
 				else if (event.getTime() == 473.0) {
@@ -517,7 +517,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
 						Assert.assertEquals("wrong delay.", 80.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
-						Assert.assertEquals("wrong delay.", 78.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 79.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					}
 				}
 				
@@ -589,21 +589,19 @@ public class MarginalCongestionHandlerV2QsimTest {
 				}
 					
 			});
-			
+
 			events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
 						
 			QSim sim = createQSim(sc, events);
 			sim.run();
-			
-			System.out.println("teststorageCapacity_reached: "+events.toString());
 						
 			for (MarginalCongestionEvent event : congestionEvents) {
 				
-				System.out.println("teststorageCapacity_reached: "+event.toString());
-				
 				if (event.getTime() == 233.0) {
 					if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-						Assert.assertEquals("wrong delay.", 77.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 70.0, event.getDelay(), MatsimTestUtils.EPSILON);
+					} else if (event.getCausingAgentId().toString().equals(this.testAgent4.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
+						Assert.assertEquals("wrong delay.", 33.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					}
 				}
 				
@@ -611,7 +609,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 					if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
 						Assert.assertEquals("wrong delay.", 80.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
-						Assert.assertEquals("wrong delay.", 76.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 59.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					}
 				}
 				
@@ -621,7 +619,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
 						Assert.assertEquals("wrong delay.", 80.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent4.toString())) {
-						Assert.assertEquals("wrong delay.", 75.0, event.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("wrong delay.", 48.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					}
 				}
 				else if (event.getTime() == 473.0) {
@@ -630,10 +628,8 @@ public class MarginalCongestionHandlerV2QsimTest {
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent3.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
 						Assert.assertEquals("wrong delay.", 80.0, event.getDelay(), MatsimTestUtils.EPSILON);
 					} else if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
-						Assert.assertEquals("wrong delay.", 80.0, event.getDelay(), MatsimTestUtils.EPSILON);
-					} else if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent5.toString())) {
-						Assert.assertEquals("wrong delay.", 60.0, event.getDelay(), MatsimTestUtils.EPSILON);
-					}
+						Assert.assertEquals("wrong delay.", 79.0, event.getDelay(), MatsimTestUtils.EPSILON);
+					} 
 				}
 			Assert.assertEquals("wrong number of congestion events" , 10, congestionEvents.size());
 			
@@ -1374,12 +1370,13 @@ public class MarginalCongestionHandlerV2QsimTest {
 		route4.setLinkIds(linkId1, linkIds4, linkId4);
 		leg_1_4.setRoute(route4);
 
-		// leg: 3,4
-		Leg leg_3_4 = popFactory.createLeg("car");
-		List<Id> linkIds34 = new ArrayList<Id>();
-		NetworkRoute route34 = (NetworkRoute) routeFactory.createRoute(linkId3, linkId4);
-		route34.setLinkIds(linkId3, linkIds34, linkId4);
-		leg_3_4.setRoute(route34);		
+		// leg: 2,4
+		Leg leg_2_4 = popFactory.createLeg("car");
+		List<Id> linkIds24 = new ArrayList<Id>();
+		linkIds24.add(linkId3);
+		NetworkRoute route24 = (NetworkRoute) routeFactory.createRoute(linkId2, linkId4);
+		route24.setLinkIds(linkId2, linkIds24, linkId4);
+		leg_2_4.setRoute(route24);		
 		
 		// ################################################################
 		// first agent (1 --> 4)
@@ -1394,13 +1391,13 @@ public class MarginalCongestionHandlerV2QsimTest {
 		population.addPerson(person1);
 
 		// ################################################################
-		// second agent (3 --> 4)		
+		// second agent (2 --> 4)		
 		Person person2 = popFactory.createPerson(testAgent2);
 		Plan plan2 = popFactory.createPlan();
-		Activity act2 = popFactory.createActivityFromLinkId("home", linkId3);
-		act2.setEndTime(155);
+		Activity act2 = popFactory.createActivityFromLinkId("home", linkId2);
+		act2.setEndTime(161);
 		plan2.addActivity(act2);
-		plan2.addLeg(leg_3_4);
+		plan2.addLeg(leg_2_4);
 		plan2.addActivity(lastActLink4);	
 		person2.addPlan(plan2);
 		population.addPerson(person2);
@@ -1409,10 +1406,10 @@ public class MarginalCongestionHandlerV2QsimTest {
 		// third agent (3 --> 4)		
 		Person person3 = popFactory.createPerson(testAgent3);
 		Plan plan3 = popFactory.createPlan();
-		Activity act3 = popFactory.createActivityFromLinkId("home", linkId3);
-		act3.setEndTime(156);
+		Activity act3 = popFactory.createActivityFromLinkId("home", linkId2);
+		act3.setEndTime(172);
 		plan3.addActivity(act3);
-		plan3.addLeg(leg_3_4);
+		plan3.addLeg(leg_2_4);
 		plan3.addActivity(lastActLink4);	
 		person3.addPlan(plan3);
 		population.addPerson(person3);
@@ -1421,10 +1418,10 @@ public class MarginalCongestionHandlerV2QsimTest {
 		// fourth agent (3 --> 4)		
 		Person person4 = popFactory.createPerson(testAgent4);
 		Plan plan4 = popFactory.createPlan();
-		Activity act4 = popFactory.createActivityFromLinkId("home", linkId3);				
-		act4.setEndTime(157);
+		Activity act4 = popFactory.createActivityFromLinkId("home", linkId2);				
+		act4.setEndTime(183);
 		plan4.addActivity(act4);
-		plan4.addLeg(leg_3_4);
+		plan4.addLeg(leg_2_4);
 		plan4.addActivity(lastActLink4);	
 		person4.addPlan(plan4);
 		population.addPerson(person4);
@@ -1434,7 +1431,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 		Person person5 = popFactory.createPerson(testAgent5);
 		Plan plan5 = popFactory.createPlan();
 		Activity act5 = popFactory.createActivityFromLinkId("home", linkId1);				
-		act5.setEndTime(119);
+		act5.setEndTime(148);
 		plan5.addActivity(act5);
 		plan5.addLeg(leg_1_4);
 		plan5.addActivity(lastActLink4);	
@@ -1752,10 +1749,10 @@ public class MarginalCongestionHandlerV2QsimTest {
 		link2.setNumberOfLanes(100);
 		link2.setLength(500);
 		
-		// link meant to reach storage capacity: space for three cars, one car every 60 sec
+		// link meant to reach storage capacity: space for three cars, one car every 80 sec
 		link3.setAllowedModes(modes);
 		link3.setCapacity(45);
-		link3.setFreespeed(500);
+		link3.setFreespeed(25);
 		link3.setNumberOfLanes(1);
 		link3.setLength(22.5);
 		

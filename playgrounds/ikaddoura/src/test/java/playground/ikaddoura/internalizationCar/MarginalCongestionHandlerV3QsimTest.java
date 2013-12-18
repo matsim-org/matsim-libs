@@ -32,6 +32,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -112,20 +114,19 @@ public class MarginalCongestionHandlerV3QsimTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 						
-//		for (MarginalCongestionEvent event : congestionEvents) {
-//		
-//			System.out.println(events.toString());
-//			
-//			if (event.getTime() == 160.0) {
-//				
-//				if (event.getCausingAgentId().toString().equals(this.testAgent2.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) {
-//					Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
-//				
-//				} else if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {
-//					Assert.assertEquals("wrong delay.", 58.0, event.getDelay(), MatsimTestUtils.EPSILON);
-//				}
-//			}
-//		}
+		for (MarginalCongestionEvent event : congestionEvents) {
+		
+			System.out.println(event.toString());
+			
+			if (event.getCausingAgentId().toString().equals(this.testAgent1.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent2.toString())) {				
+				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+			} else if ((event.getCausingAgentId().toString().equals(this.testAgent2.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 116.0)) {
+				Assert.assertEquals("wrong delay.", 10.0, event.getDelay(), MatsimTestUtils.EPSILON);
+			} else if ((event.getCausingAgentId().toString().equals(this.testAgent1.toString())) && (event.getAffectedAgentId().toString().equals(this.testAgent3.toString())) && (event.getTime() == 126.0)) {
+				Assert.assertEquals("wrong delay.", 9.0, event.getDelay(), MatsimTestUtils.EPSILON);
+			}
+		}
+		
 	}
 	
 	// ################################################################################################################################

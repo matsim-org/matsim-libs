@@ -99,18 +99,6 @@ public class QsimTestTravelTime {
 		final List<LinkEnterEvent> linkEnterEvents = new ArrayList<LinkEnterEvent>();
 //		final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
 		
-//		events.addHandler( new MarginalCongestionEventHandler() {
-//
-//			@Override
-//			public void reset(int iteration) {				
-//			}
-//
-//			@Override
-//			public void handleEvent(MarginalCongestionEvent event) {
-//				System.out.println(event.toString());
-//			}	
-//		});
-		
 		events.addHandler( new LinkEnterEventHandler() {
 
 			@Override

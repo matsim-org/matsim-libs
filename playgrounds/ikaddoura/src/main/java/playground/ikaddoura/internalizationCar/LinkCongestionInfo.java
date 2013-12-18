@@ -46,7 +46,7 @@ public class LinkCongestionInfo {
 	private List<Id> leavingAgents = new ArrayList<Id>();
 	private Map<Id, Double> personId2freeSpeedLeaveTime = new HashMap<Id, Double>();
 	private Id lastLeavingAgent;
-	
+	private boolean booleanTravelTimeIsAnInteger;
 	
 	public Id getLinkId() {
 		return linkId;
@@ -90,6 +90,12 @@ public class LinkCongestionInfo {
 	}
 	public void setLastLeavingAgent(Id lastLeavingAgent) {
 		this.lastLeavingAgent = lastLeavingAgent;
+	}
+	public void setBooleanTravelTimeIsAnInteger(boolean booleanTravelTimeIsAnInteger) {
+		this.booleanTravelTimeIsAnInteger = booleanTravelTimeIsAnInteger;
+	}
+	public boolean getBooleanTravelTimeIsAnInteger() {
+		return booleanTravelTimeIsAnInteger;
 	}
 		
 }
