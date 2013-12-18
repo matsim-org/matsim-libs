@@ -49,7 +49,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	private String[] columnNames = { "id", "internal-id", "length",
 			"freespeed", "capacity", "permlanes" };
 
-	private boolean reverse = true;
 
 	public MATSimToggleDialog() {
 		super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true);
@@ -168,61 +167,9 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				}
 			}
 		}
-		System.out.println("changed");
-		Layer layer = Main.map.mapView.getActiveLayer();
-		if (layer instanceof NetworkLayer) {
-			System.out.println("is networklayer");
-			Network network = ((NetworkLayer) layer).getMatsimNetwork();
-			for (OsmPrimitive prim : primitives) {
-				if (prim instanceof Way) {
-					Id id = new IdImpl(prim.getUniqueId());
-					if (network.getLinks().containsKey(id)) {
-						System.out.println("corresponding link found");
-						Link link = network.getLinks().get(id);
-						for (Link link2 : network.getLinks().values()) {
-							if (link.getFromNode().equals(link2.getToNode())
-									&& link.getToNode().equals(
-											link2.getFromNode())) {
-								System.out.println("reversed link found");
-								Id id2 = link2.getId();
-								Way way = (Way) ((NetworkLayer) layer).data
-										.getPrimitiveById(
-												Long.parseLong(id2.toString()),
-												OsmPrimitiveType.WAY);
-								if (!((NetworkLayer) layer).data
-										.getAllSelected().contains(way)) {
-									List<Way> selection = new ArrayList<Way>();
-									selection.add(way);
-									selection.add((Way) prim);
-									((NetworkLayer) layer).data
-											.setSelected(selection);
-									System.out.println("selection expanded "
-											+ way.getUniqueId() + " "
-											+ selection.size());
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 
 	}
 
-	// private void checkReverseSelection(Link link) {
-	//
-	// if (lastSelection.equals(link)) {
-	// for (Link link2 : currentLayer.getMatsimNetwork().getLinks().values()) {
-	// if (link2.getFromNode().equals(link.getToNode())
-	// && link2.getToNode().equals(link.getFromNode())) {
-	// System.out.println("selection reversed!");
-	// this.lastSelection = null;
-	// currentLayer.data.setSelected(currentLayer.data.getPrimitiveById(Long.parseLong(link2.getId().toString()),
-	// OsmPrimitiveType.WAY));
-	// }
-	// }
-	// }
-	// }
 
 	private class MATSimTableRenderer extends DefaultTableCellRenderer {
 		@Override
