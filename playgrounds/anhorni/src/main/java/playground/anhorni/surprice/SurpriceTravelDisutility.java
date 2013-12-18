@@ -113,7 +113,7 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 		double tmpScore = beta_TT * travelTime + beta_TD * distance;
 		tmpScore += dudm * (distanceCostFactor * distance);
 		
-		if (doRoadPricing) tmpScore += dudm * this.tollCostHandler.getTollCost(link, time, person); // toll disutility
+		if (doRoadPricing) tmpScore += - dudm * this.tollCostHandler.getTollCost(link, time, person); // toll disutility		
 		return (tmpScore * -1.0); // disutility needs to be positive!
 	}
 
