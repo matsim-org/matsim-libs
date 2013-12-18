@@ -117,36 +117,35 @@ public class MultiModalQNodeExtension {
 	  // Queue related movement code
 	  // ////////////////////////////////////////////////////////////////////
 	  /**
-	   * @param personAgent
+	   * @param mobsimAgent
 	   * @param now
 	   * @return <code>true</code> if the agent was successfully moved over the node, <code>false</code>
 	   * otherwise (e.g. in case where the next link is jammed - not yet implemented)
 	   */
-	protected boolean moveAgentOverNode(final MobsimAgent personAgent, final double now) {
+	protected boolean moveAgentOverNode(final MobsimAgent mobsimAgent, final double now) {
 		
-		Id currentLinkId = personAgent.getCurrentLinkId();
-		Id nextLinkId = ((MobsimDriverAgent) personAgent).chooseNextLinkId();
+		Id currentLinkId = mobsimAgent.getCurrentLinkId();
+		Id nextLinkId = ((MobsimDriverAgent) mobsimAgent).chooseNextLinkId();
 		
 		Link currentLink = this.simEngine.getMultiModalQLinkExtension(currentLinkId).getLink();
 		
 		if (nextLinkId != null) {
 			Link nextLink = this.simEngine.getMultiModalQLinkExtension(nextLinkId).getLink();
 			
-			this.checkNextLinkSemantics(currentLink, nextLink, personAgent);
+			this.checkNextLinkSemantics(currentLink, nextLink, mobsimAgent);
 			
 			// move Agent over the Node
-			((MobsimDriverAgent)personAgent).notifyMoveOverNode(nextLinkId);
-			simEngine.getMultiModalQLinkExtension(nextLinkId).addAgentFromIntersection(personAgent, now);
+			((MobsimDriverAgent)mobsimAgent).notifyMoveOverNode(nextLinkId);
+			simEngine.getMultiModalQLinkExtension(nextLinkId).addAgentFromIntersection(mobsimAgent, now);
 		}
 		// --> nextLink == null
-		else
-		{
-			this.simEngine.getMobsim().getAgentCounter().decLiving();
-			this.simEngine.getMobsim().getAgentCounter().incLost();
-			log.error(
-					"Agent has no or wrong route! agentId=" + personAgent.getId()
+		else {
+			log.error("Agent has no or wrong route! agentId=" + mobsimAgent.getId()
 					+ " currentLink=" + currentLink.getId().toString()
-					+ ". The agent is removed from the simulation.");			
+					+ ". The agent is removed from the simulation.");
+			
+			mobsimAgent.abort(now);
+			this.simEngine.internalInterface.arrangeNextAgentState(mobsimAgent);
 		}
 		return true;
 	}
