@@ -91,11 +91,5 @@ public class LinkCongestionInfo {
 	public void setLastLeavingAgent(Id lastLeavingAgent) {
 		this.lastLeavingAgent = lastLeavingAgent;
 	}
-	public void setBooleanTravelTimeIsAnInteger(boolean booleanTravelTimeIsAnInteger) {
-		this.booleanTravelTimeIsAnInteger = booleanTravelTimeIsAnInteger;
-	}
-	public boolean getBooleanTravelTimeIsAnInteger() {
-		return booleanTravelTimeIsAnInteger;
-	}
 		
 }
