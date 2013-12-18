@@ -223,6 +223,10 @@ public class Analyzer {
 			this.boxPlotTravelDistancesCarPerIncome.addValuesPerCategory(tdCalculator.getCar().get(i), Integer.toString(i), "tt");
 			if (tollCalculator.getTollDistancesPerIncome().get(i) != null) {
 				this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(tollCalculator.getTollDistancesPerIncome().get(i), Integer.toString(i), "tt");
+			} else {
+				ArrayList<Double> zeroArray = new ArrayList<Double>();
+				zeroArray.add(0.0);
+				this.boxPlotTravelDistancesTolledPerIncome.addValuesPerCategory(zeroArray, Integer.toString(i), "tt");
 			}
 		}		
 		this.writeDaily(day, ttCalculator, tollCalculator);
