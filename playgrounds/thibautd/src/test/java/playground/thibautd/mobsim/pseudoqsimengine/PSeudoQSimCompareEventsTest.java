@@ -101,6 +101,7 @@ public class PSeudoQSimCompareEventsTest {
 	private void testEventsSimilarToQsim(
 			final boolean useTransit,
 			final int nThreads) {
+		utils.getOutputDirectory(); // intended side effect: delete content
 		final Scenario scenario = createTestScenario( useTransit );
 
 		final PseudoSimConfigGroup conf = new PseudoSimConfigGroup();
