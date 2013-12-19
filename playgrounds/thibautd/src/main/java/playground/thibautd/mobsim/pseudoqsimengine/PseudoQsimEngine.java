@@ -47,8 +47,10 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.thibautd.mobsim.QVehicleProvider;
 
@@ -403,47 +405,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 					// TODO: handle transit drivers their own way.
 					while ( !arrivalQueue.isEmpty() &&
 							arrivalQueue.peek().time <= time ) {
-						final InternalArrivalEvent event = arrivalQueue.poll();
-						final MobsimDriverAgent agent = event.vehicle.getDriver();
-						final Id nextLinkId = agent.chooseNextLinkId();
-
-						final EventsManager eventsManager =
-							internalInterface.getMobsim().getEventsManager();
-						if ( nextLinkId != null ) {
-							eventsManager.processEvent(
-								new LinkLeaveEvent(
-									time,
-									agent.getId(),
-									event.linkId,
-									event.vehicle.getId() ) );
-
-							agent.notifyMoveOverNode( nextLinkId );
-
-							eventsManager.processEvent(
-								new LinkEnterEvent(
-									time,
-									agent.getId(),
-									nextLinkId,
-									event.vehicle.getId() ) );
-
-							arrivalQueue.add(
-									calcArrival(
-										time,
-										nextLinkId,
-										event.vehicle) );
-						}
-						else {
-							eventsManager.processEvent(
-									new PersonLeavesVehicleEvent(
-										time,
-										agent.getId(),
-										event.vehicle.getId()));
-							// reset vehicles driver
-							event.vehicle.setDriver(null);
-
-							agent.endLegAndComputeNextState( time );
-							internalInterface.arrangeNextAgentState( agent );
-						}
+						handleEvent( arrivalQueue.poll() );
 					}
 					if (log.isTraceEnabled()) log.trace( this+" starts waiting for end" );
 					endBarrier.await();
@@ -463,6 +425,68 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			}
 			catch (BrokenBarrierException e) {
 				throw new UncheckedBrokenBarrierException( e );
+			}
+		}
+
+		private final void handleEvent(final InternalArrivalEvent event) {
+			final MobsimDriverAgent agent = event.vehicle.getDriver();
+
+			final EventsManager eventsManager =
+				internalInterface.getMobsim().getEventsManager();
+
+			if ( agent instanceof TransitDriverAgent ) {
+				final TransitDriverAgent transitDriver = (TransitDriverAgent) agent;
+				final TransitStopFacility stop = transitDriver.getNextTransitStop();
+
+				if ((stop != null) && (stop.getLinkId().equals( event.linkId ) ) ) {
+					final double delay = transitDriver.handleTransitStop( stop , time );
+					if ( delay > 0 ) {
+						arrivalQueue.add(
+								new InternalArrivalEvent(
+									time + delay,
+									event.linkId,
+									event.vehicle) );
+						return;
+					}
+				}
+			}
+
+			final Id nextLinkId = agent.chooseNextLinkId();
+
+			if ( nextLinkId != null ) {
+				eventsManager.processEvent(
+					new LinkLeaveEvent(
+						time,
+						agent.getId(),
+						event.linkId,
+						event.vehicle.getId() ) );
+
+				agent.notifyMoveOverNode( nextLinkId );
+
+				eventsManager.processEvent(
+					new LinkEnterEvent(
+						time,
+						agent.getId(),
+						nextLinkId,
+						event.vehicle.getId() ) );
+
+				arrivalQueue.add(
+						calcArrival(
+							time,
+							nextLinkId,
+							event.vehicle) );
+			}
+			else {
+				eventsManager.processEvent(
+						new PersonLeavesVehicleEvent(
+							time,
+							agent.getId(),
+							event.vehicle.getId()));
+				// reset vehicles driver
+				event.vehicle.setDriver(null);
+
+				agent.endLegAndComputeNextState( time );
+				internalInterface.arrangeNextAgentState( agent );
 			}
 		}
 	}
