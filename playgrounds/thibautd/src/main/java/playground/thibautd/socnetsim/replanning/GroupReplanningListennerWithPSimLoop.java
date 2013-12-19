@@ -28,6 +28,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 
@@ -41,6 +43,8 @@ import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 public class GroupReplanningListennerWithPSimLoop implements ReplanningListener {
 	private static final Logger log =
 		Logger.getLogger(GroupReplanningListennerWithPSimLoop.class);
+
+	private OutputDirectoryHierarchy controlerIO = null;
 
 	private final GroupStrategyManager mainStrategyManager;
 	private final GroupStrategyManager innovativeStrategyManager;
@@ -59,6 +63,7 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 		this.innovativeStrategyManager = innovativeStrategyManager;
 		this.pSimFactory = pSimFactory;
 	}
+
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
@@ -88,20 +93,41 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 					registry.getScoringFunctionFactory());
 
 		log.info( "### start inner loop" );
+		final PseudoSimConfigGroup pSimConfig = (PseudoSimConfigGroup)
+			registry.getScenario().getConfig().getModule(
+					PseudoSimConfigGroup.GROUP_NAME );
 		if ( stopWatch != null ) stopWatch.beginOperation( "Inner PSim loop" );
 		for ( int i=0; i < nIters; i++ ) {
 			log.info( "### inner loop: start iteration "+event.getIteration()+"."+i );
 			scoring.notifyIterationStarts( new IterationStartsEvent( null , i ) );
 
+			final EventWriterXML writer =
+				controlerIO != null && pSimConfig.isDumpEvents() ?
+					new EventWriterXML(
+							controlerIO.getIterationFilename( 
+								event.getIteration(),
+								"pSim."+i+".events.xml.gz" ) ) :
+					null;
+
+			if ( writer != null ) events.addHandler( writer );
+
 			innovativeStrategyManager.run(
 					i, // what makes sense here???
 					registry );
 
-			if ( stopWatch != null ) stopWatch.beginOperation( "PSim iter "+i );
-			pSimFactory.createMobsim(
-					registry.getScenario(),
-					events ).run();
-			if ( stopWatch != null ) stopWatch.endOperation( "PSim iter "+i );
+			try {
+				if ( stopWatch != null ) stopWatch.beginOperation( "PSim iter "+i );
+				pSimFactory.createMobsim(
+						registry.getScenario(),
+						events ).run();
+				if ( stopWatch != null ) stopWatch.endOperation( "PSim iter "+i );
+			}
+			finally {
+				if ( writer != null ) {
+					events.removeHandler( writer );
+					writer.closeFile();
+				}
+			}
 
 			scoring.notifyScoring( new ScoringEvent( null , i ) );
 			scoring.notifyIterationEnds( new IterationEndsEvent( null , i ) );
@@ -114,6 +140,11 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 		return (PseudoSimConfigGroup)
 			registry.getScenario().getConfig().getModule(
 					PseudoSimConfigGroup.GROUP_NAME );
+	}
+
+	public void setOutputDirectoryHierarchy(
+			final OutputDirectoryHierarchy controlerIO) {
+		this.controlerIO = controlerIO;
 	}
 
 	public void setStopWatch(final IterationStopWatch stopWatch) {

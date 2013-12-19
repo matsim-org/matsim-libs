@@ -31,6 +31,7 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 	private int nPSimIters = 5;
 	private int period = 3;
 	private int nThreads = 1;
+	private boolean dumpEvents = false;
 
 	public PseudoSimConfigGroup() {
 		super( GROUP_NAME );
@@ -74,6 +75,16 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 	@StringSetter( "nThreads" )
 	public void setNThreads(int nThreads) {
 		this.nThreads = nThreads;
+	}
+
+	@StringGetter( "dumpEvents" )
+	public boolean isDumpEvents() {
+		return this.dumpEvents;
+	}
+
+	@StringSetter( "dumpEvents" )
+	public void setDumpEvents(boolean dumpEvents) {
+		this.dumpEvents = dumpEvents;
 	}
 }
 

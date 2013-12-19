@@ -399,6 +399,7 @@ public class RunCliquesWithModularStrategies {
 					listenner );
 
 		listenner.setStopWatch( controller.stopwatch );
+		listenner.setOutputDirectoryHierarchy( controller.getControlerIO() );
 
 		return controller;
 	}
