@@ -119,7 +119,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 					@Override
 					public double getScore() {
 						final int nNonPerfActs = TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ).size() - actCount;
-						assert nNonPerfActs >= 0;
+						assert nNonPerfActs >= 0 : nNonPerfActs+" < 0 for plan "+plan;
 						return nNonPerfActs * UTIL_OF_NOT_PERF;
 					}
 
