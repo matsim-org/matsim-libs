@@ -83,6 +83,8 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 	private final TripHandlingRunnable[] runnables;
 	private final Thread[] threads;
 
+	private Throwable crashCause = null;
+
 	private final Random random;
 
 	public PseudoQsimEngine(
@@ -123,6 +125,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 					}
 					log.error( "thread "+t.getName()+" threw exception. Aborting." , e );
 
+					PseudoQsimEngine.this.crashCause = e;
 					for ( TripHandlingRunnable r : runnables ) r.stopRun();
 
 					startBarrier.makeBroken();
@@ -150,10 +153,11 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			startBarrier.await();
 			endBarrier.await();
 		}
-		catch (InterruptedException e) {
-			throw new RuntimeException( e );
-		}
-		catch (BrokenBarrierException e) {
+		catch (Exception e) {
+			if ( crashCause != null ) {
+				if ( crashCause instanceof RuntimeException ) throw (RuntimeException) crashCause;
+				if ( crashCause instanceof Error ) throw (Error) crashCause;
+			}
 			throw new RuntimeException( e );
 		}
 	}
