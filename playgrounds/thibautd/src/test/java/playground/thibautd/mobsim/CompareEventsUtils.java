@@ -33,15 +33,23 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsUtils;
@@ -164,11 +172,15 @@ public class CompareEventsUtils {
 		log.info( "tested simulation took "+timePSim+" ms." );
 	}
 
-	private static class EventStreamComparator implements LinkEnterEventHandler,
-			LinkLeaveEventHandler, Wait2LinkEventHandler, PersonEntersVehicleEventHandler,
-			PersonLeavesVehicleEventHandler, BasicEventHandler {
+	private static class EventStreamComparator implements
+			LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler,
+			PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
+			TransitDriverStartsEventHandler, AgentWaitingForPtEventHandler,
+			VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler,
+			BasicEventHandler {
 		private boolean store = true;
 		private final Map< Id , Queue<Event> > eventsPerPerson = new HashMap<Id, Queue<Event>>();
+		private final Map< Id , Queue<Event> > eventsPerVehicle = new HashMap<Id, Queue<Event>>();
 
 		@Override
 		public void reset(int iteration) {
@@ -189,50 +201,51 @@ public class CompareEventsUtils {
 		}
 
 		private void handleEvent(
-				final Id personId,
+				final Map< Id, Queue<Event> > eventsMap,
+				final Id queueId,
 				final Event event) {
 			if ( store ) {
-				Queue<Event> queue = eventsPerPerson.get( personId ); 
+				Queue<Event> queue = eventsMap.get( queueId ); 
 				if ( queue == null ) {
 					queue = new ArrayDeque<Event>();
-					eventsPerPerson.put( personId , queue );
+					eventsMap.put( queueId , queue );
 				}
 				queue.add( event );
 				return;
 			}
 
-			final Queue<Event> queue = eventsPerPerson.get( personId ); 
+			final Queue<Event> queue = eventsMap.get( queueId ); 
 			Assert.assertFalse(
-					"no more stored events for person "+personId,
+					"no more stored events for id "+queueId,
 					queue.isEmpty() );
 
 			final Event storedEvent = queue.poll();
 
 			if ( log.isTraceEnabled() ) {
-				log.trace( "person "+personId+": compare stored event "+
+				log.trace( "person "+queueId+": compare stored event "+
 						storedEvent+" with event "+event );
 			}
 
 			Assert.assertEquals(
-					"unexpected event type for person "+personId,
+					"unexpected event type for id "+queueId,
 					storedEvent.getClass(),
 					event.getClass() );
 
 			if ( event instanceof LinkEnterEvent ) {
 				Assert.assertEquals(
-						"unexpected entered link id person "+personId,
+						"unexpected entered link id person "+queueId,
 						((LinkEnterEvent) storedEvent).getLinkId(),
 						((LinkEnterEvent) event).getLinkId() );
 			}
 			if ( event instanceof LinkLeaveEvent ) {
 				Assert.assertEquals(
-						"unexpected left link id person "+personId,
+						"unexpected left link id person "+queueId,
 						((LinkLeaveEvent) storedEvent).getLinkId(),
 						((LinkLeaveEvent) event).getLinkId() );
 			}
 			if ( event instanceof Wait2LinkEvent ) {
 				Assert.assertEquals(
-						"unexpected wait link id person "+personId,
+						"unexpected wait link id person "+queueId,
 						((Wait2LinkEvent) storedEvent).getLinkId(),
 						((Wait2LinkEvent) event).getLinkId() );
 			}
@@ -250,6 +263,7 @@ public class CompareEventsUtils {
 		public void handleEvent(final Event event) {
 			if ( event instanceof HasPersonId ) {
 				handleEvent(
+						eventsPerPerson,
 						((HasPersonId) event).getPersonId(),
 						event );
 			}
@@ -258,6 +272,7 @@ public class CompareEventsUtils {
 		@Override
 		public void handleEvent(final PersonLeavesVehicleEvent event) {
 			handleEvent(
+				eventsPerPerson,
 				event.getPersonId(),
 				event );
 		}
@@ -265,6 +280,7 @@ public class CompareEventsUtils {
 		@Override
 		public void handleEvent(final PersonEntersVehicleEvent event) {
 			handleEvent(
+				eventsPerPerson,
 				event.getPersonId(),
 				event );
 		}
@@ -272,6 +288,7 @@ public class CompareEventsUtils {
 		@Override
 		public void handleEvent(final Wait2LinkEvent event) {
 			handleEvent(
+				eventsPerPerson,
 				event.getPersonId(),
 				event );
 		}
@@ -279,6 +296,7 @@ public class CompareEventsUtils {
 		@Override
 		public void handleEvent(final LinkLeaveEvent event) {
 			handleEvent(
+				eventsPerPerson,
 				event.getPersonId(),
 				event );
 		}
@@ -286,7 +304,40 @@ public class CompareEventsUtils {
 		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			handleEvent(
+				eventsPerPerson,
 				event.getPersonId(),
+				event );
+		}
+
+		@Override
+		public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
+			handleEvent(
+				eventsPerVehicle,
+				event.getVehicleId(),
+				event );
+		}
+
+		@Override
+		public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
+			handleEvent(
+				eventsPerVehicle,
+				event.getVehicleId(),
+				event );
+		}
+
+		@Override
+		public void handleEvent(final AgentWaitingForPtEvent event) {
+			handleEvent(
+				eventsPerPerson,
+				event.getPersonId(),
+				event );
+		}
+
+		@Override
+		public void handleEvent(final TransitDriverStartsEvent event) {
+			handleEvent(
+				eventsPerVehicle,
+				event.getVehicleId(),
 				event );
 		}
 	}

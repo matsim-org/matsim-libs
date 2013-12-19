@@ -30,7 +30,10 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -87,18 +90,19 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 		final TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 
-		//AgentFactory agentFactory;
+		final AgentFactory agentFactory = 
+				sc.getConfig().scenario().isUseTransit() ?
+					new TransitAgentFactory( qSim ) :
+					new DefaultAgentFactory( qSim );
+
 		if (sc.getConfig().scenario().isUseTransit()) {
-			throw new RuntimeException();
-			//agentFactory = new TransitAgentFactory(qSim);
-			//TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			//transitEngine.setUseUmlaeufe(true);
-			//transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			//qSim.addDepartureHandler(transitEngine);
-			//qSim.addAgentSource(transitEngine);
-			//qSim.addMobsimEngine(transitEngine);
+			final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+			transitEngine.setUseUmlaeufe(true);
+			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			qSim.addDepartureHandler(transitEngine);
+			qSim.addAgentSource(transitEngine);
+			qSim.addMobsimEngine(transitEngine);
 		}
-		final AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 
 		if (sc.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
