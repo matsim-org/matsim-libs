@@ -88,14 +88,6 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 	private final Random random;
 
 	public PseudoQsimEngine(
-			final Collection<String> transportModes,
-			final TravelTime travelTimeCalculator,
-			final Network network,
-			final QVehicleProvider vehicles) {
-		this( 1 , transportModes , travelTimeCalculator , network , vehicles );
-	}
-
-	public PseudoQsimEngine(
 			final int nThreads,
 			final Collection<String> transportModes,
 			final TravelTime travelTimeCalculator,

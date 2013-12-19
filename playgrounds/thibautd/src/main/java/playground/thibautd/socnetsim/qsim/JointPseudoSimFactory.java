@@ -42,6 +42,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.thibautd.mobsim.NetsimWrappingQVehicleProvider;
+import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.mobsim.QVehicleProvider;
 import playground.thibautd.mobsim.pseudoqsimengine.PseudoQsimEngine;
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -92,8 +93,13 @@ public class JointPseudoSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
+		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
+			sc.getConfig().getModule( PseudoSimConfigGroup.GROUP_NAME );
 		final PseudoQsimEngine pseudoEngine =
 			new PseudoQsimEngine(
+					pSimConf != null ?
+						pSimConf.getNThreads() :
+						1,
 					conf.getMainModes(),
 					travelTime.getLinkTravelTimes(),
 					sc.getNetwork(),
