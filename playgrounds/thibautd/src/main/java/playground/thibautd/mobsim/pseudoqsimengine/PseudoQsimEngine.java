@@ -21,10 +21,8 @@ package playground.thibautd.mobsim.pseudoqsimengine;
 
 import java.util.Collection;
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 
@@ -50,8 +48,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vehicles.VehicleUtils;
-
 import playground.thibautd.mobsim.QVehicleProvider;
 
 /**
@@ -65,7 +61,7 @@ import playground.thibautd.mobsim.QVehicleProvider;
  * It does NOT allow to reuse special QLink implementations, for obvious reasons
  * @author thibautd
  */
-public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicleProvider {
+public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 	private static final Logger log =
 		Logger.getLogger(PseudoQsimEngine.class);
 
@@ -73,7 +69,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 	private final TravelTime travelTimeCalculator;
 	private final Network network;
 
-	private final Map<Id, QVehicle> vehicles = new ConcurrentHashMap<Id, QVehicle>();
+	private final QVehicleProvider vehicleProvider;
 
 	private InternalInterface internalInterface = null;
 
@@ -88,15 +84,18 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 	public PseudoQsimEngine(
 			final Collection<String> transportModes,
 			final TravelTime travelTimeCalculator,
-			final Network network) {
-		this( 1 , transportModes , travelTimeCalculator , network );
+			final Network network,
+			final QVehicleProvider vehicles) {
+		this( 1 , transportModes , travelTimeCalculator , network , vehicles );
 	}
 
 	public PseudoQsimEngine(
 			final int nThreads,
 			final Collection<String> transportModes,
 			final TravelTime travelTimeCalculator,
-			final Network network) {
+			final Network network,
+			final QVehicleProvider vehicles) {
+		this.vehicleProvider = vehicles;
 		this.transportModes = transportModes;
 		this.travelTimeCalculator = travelTimeCalculator;
 		this.network = network;
@@ -236,19 +235,8 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler, QVehicl
 		return true;
 	}
 
-	@Override
 	public QVehicle getVehicle(final Id id) {
-		QVehicle v = vehicles.get( id );
-
-		if ( v == null ) {
-			v = new QVehicle(
-				VehicleUtils.getFactory().createVehicle(
-					id,
-					VehicleUtils.getDefaultVehicleType() ) );
-			vehicles.put( id , v );
-		}
-
-		return v;
+		return vehicleProvider.getVehicle( id );
 	}
 
 	private InternalArrivalEvent calcArrival(

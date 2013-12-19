@@ -19,26 +19,27 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim.pseudoqsimengine;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.thibautd.mobsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.mobsim.PseudoSimConfigGroup;
 
 /**
@@ -72,6 +73,8 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
+		final QNetsimEngine netsim = new DefaultQSimEngineFactory().createQSimEngine( qSim );
+
 		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
 			sc.getConfig().getModule( PseudoSimConfigGroup.GROUP_NAME );
 		final PseudoQsimEngine pseudoEngine =
@@ -81,11 +84,13 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 						1,
 					sc.getConfig().qsim().getMainModes(),
 					travelTime,
-					sc.getNetwork() );
+					sc.getNetwork(),
+					new NetsimWrappingQVehicleProvider(
+						netsim ) );
 		qSim.addMobsimEngine(pseudoEngine);
 		qSim.addDepartureHandler(pseudoEngine);
 
-		qSim.addMobsimEngine( new DefaultQSimEngineFactory().createQSimEngine( qSim ) );
+		qSim.addMobsimEngine( netsim );
 
 		final TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
@@ -109,15 +114,10 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 		}
 
 		final AgentSource agentSource =
-			new AgentSource() {
-				@Override
-				public void insertAgentsIntoMobsim() {
-					for (Person p : sc.getPopulation().getPersons().values()) {
-						final MobsimAgent agent = agentFactory.createMobsimAgentFromPerson(p);
-						qSim.insertAgentIntoMobsim(agent);
-					}
-				}
-			};
+			new PopulationAgentSource(
+					sc.getPopulation(),
+					agentFactory,
+					qSim);
 		qSim.addAgentSource(agentSource);
 
 		return qSim;

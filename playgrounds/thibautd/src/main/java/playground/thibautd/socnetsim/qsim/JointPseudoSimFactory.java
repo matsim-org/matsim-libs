@@ -41,6 +41,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+import playground.thibautd.mobsim.NetsimWrappingQVehicleProvider;
+import playground.thibautd.mobsim.QVehicleProvider;
 import playground.thibautd.mobsim.pseudoqsimengine.PseudoQsimEngine;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
@@ -81,6 +83,10 @@ public class JointPseudoSimFactory implements MobsimFactory {
 					sc,
 					new SynchronizedEventsManagerImpl(
 						eventsManager ) );
+		
+		final QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
+		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
+		final QVehicleProvider vehicles = new NetsimWrappingQVehicleProvider( netsimEngine );
 
 		final ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine( activityEngine );
@@ -90,13 +96,14 @@ public class JointPseudoSimFactory implements MobsimFactory {
 			new PseudoQsimEngine(
 					conf.getMainModes(),
 					travelTime.getLinkTravelTimes(),
-					sc.getNetwork() );
+					sc.getNetwork(),
+					vehicles);
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
 		qSim.addMobsimEngine( pseudoEngine );
 
 		final JointModesDepartureHandler jointDepHandler =
 			new JointModesDepartureHandler(
-					pseudoEngine,
+					vehicles,
 					pseudoEngine );
 		qSim.addDepartureHandler( jointDepHandler );
 		qSim.addMobsimEngine( jointDepHandler );
@@ -118,7 +125,7 @@ public class JointPseudoSimFactory implements MobsimFactory {
 						sc.getConfig().scenario().isUseTransit() ?
 							new TransitAgentFactory(qSim) :
 							new DefaultAgentFactory(qSim) ,
-						pseudoEngine );
+						vehicles );
         final AgentSource agentSource =
 			new PopulationAgentSourceWithVehicles(
 					sc.getPopulation(),
@@ -128,8 +135,6 @@ public class JointPseudoSimFactory implements MobsimFactory {
         qSim.addAgentSource(agentSource);
 
 		// add  at the end: this must just provide the "service network" functionnality
-		final QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
-		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
 		qSim.addMobsimEngine( netsimEngine );
 
         return qSim;
