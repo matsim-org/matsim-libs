@@ -254,8 +254,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 						linkId,
 						vehicleId) );
 
-			final TripHandlingRunnable runnable = runnables[ random.nextInt( runnables.length ) ];
-			runnable.addArrivalEvent(
+			chooseRunnable().addArrivalEvent(
 					// do not travel on first link
 					// calcArrival(
 					new InternalArrivalEvent(
@@ -265,6 +264,10 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 		}
 
 		return true;
+	}
+
+	private TripHandlingRunnable chooseRunnable() {
+		return runnables[ random.nextInt( runnables.length ) ];
 	}
 
 	public QVehicle getVehicle(final Id id) {
