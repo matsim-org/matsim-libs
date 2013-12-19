@@ -48,6 +48,10 @@ public class PassengerHandlingUtils
     {
         Id currentLinkId = passenger.getCurrentLinkId();
 
+        if (passenger.getId().toString().equals("0031495")) {
+            System.err.println("aaaa");
+        }
+
         if (currentLinkId != driver.getCurrentLinkId()) {
             throw new IllegalStateException("Passenger and vehicle on different links!");
         }
@@ -88,6 +92,10 @@ public class PassengerHandlingUtils
     public static void dropOffPassenger(VrpSimEngine vrpSimEngine, DriverAgent driver,
             MobsimAgent passenger, double now)
     {
+        if (passenger.getId().toString().equals("0031495")) {
+            System.err.println("aaaa");
+        }
+
         if (passenger instanceof PassengerAgent) {
             PassengerAgent passengerAgent = (PassengerAgent)passenger;
             MobsimVehicle mobVehicle = driver.getVehicle();

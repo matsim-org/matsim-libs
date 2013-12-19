@@ -17,86 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model.impl;
+package playground.michalm.taxi.optimizer.immediaterequest;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import playground.michalm.taxi.model.TaxiRequest;
 
 
-/**
- * @author michalm
- */
-public abstract class AbstractRequest
-    implements Request
+public interface VehicleFinder
 {
-    private final int id;
-
-    private final Customer customer;
-
-    private final int quantity;
-
-    private final int t0;// earliest start time
-    private final int t1;// latest start time
-
-    private final int submissionTime;
-
-
-    public AbstractRequest(int id, Customer customer, int quantity, int t0, int t1,
-            int submissionTime)
-    {
-        this.id = id;
-        this.customer = customer;
-        this.quantity = quantity;
-        this.t0 = t0;
-        this.t1 = t1;
-        this.submissionTime = submissionTime;
-    }
-
-
-    @Override
-    public int getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public Customer getCustomer()
-    {
-        return customer;
-    }
-
-
-    @Override
-    public int getQuantity()
-    {
-        return quantity;
-    }
-
-
-    @Override
-    public int getT0()
-    {
-        return t0;
-    }
-
-
-    @Override
-    public int getT1()
-    {
-        return t1;
-    }
-
-
-    @Override
-    public int getSubmissionTime()
-    {
-        return submissionTime;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Request_" + id + " [S=(" + t0 + ", ???, " + t1 + "), F=???]";
-    }
+    public Vehicle findVehicle(TaxiRequest req);
 }

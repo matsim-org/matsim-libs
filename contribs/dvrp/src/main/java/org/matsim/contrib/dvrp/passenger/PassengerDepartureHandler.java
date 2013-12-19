@@ -53,6 +53,10 @@ public class PassengerDepartureHandler
     {
         if (agent.getMode().equals(mode)) {
             vrpSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
+            
+            if (agent.getId().toString().equals("0031495")) {
+                System.out.println("aaa");
+            }
 
             MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
             MatsimVertex fromVertex = vrpGraph.getVertex(linkId);

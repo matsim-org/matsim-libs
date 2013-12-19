@@ -29,6 +29,7 @@ import playground.michalm.taxi.schedule.*;
 
 
 public class IdleVehicleFinder
+    implements VehicleFinder
 {
     private final VrpData data;
     private final boolean straightLineDistance;
@@ -41,13 +42,14 @@ public class IdleVehicleFinder
     }
 
 
-    public Vehicle findClosestVehicle(TaxiRequest req)
+    @Override
+    public Vehicle findVehicle(TaxiRequest req)
     {
         Vehicle bestVeh = null;
         double bestDistance = Double.MAX_VALUE;
 
         for (Vehicle veh : data.getVehicles()) {
-            double distance = calculateDistance(req, veh);
+            double distance = calculateDistance(req, veh, data, straightLineDistance);
 
             if (distance < bestDistance) {
                 bestVeh = veh;
@@ -59,11 +61,12 @@ public class IdleVehicleFinder
     }
 
 
-    private double calculateDistance(TaxiRequest req, Vehicle veh)
+    public static double calculateDistance(TaxiRequest req, Vehicle veh, VrpData data,
+            boolean straightLineDistance)
     {
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         int time = data.getTime();
-        Vertex departVertex;
+        Vertex fromVertex;
 
         if (!TaxiUtils.isIdle(sched, time, true)) {
             return Double.MAX_VALUE;
@@ -73,7 +76,7 @@ public class IdleVehicleFinder
 
         switch (currentTask.getTaxiTaskType()) {
             case WAIT_STAY:
-                departVertex = ((StayTask)currentTask).getVertex();
+                fromVertex = ((StayTask)currentTask).getVertex();
                 break;
 
             case CRUISE_DRIVE:
@@ -83,21 +86,17 @@ public class IdleVehicleFinder
                 throw new IllegalStateException();
         }
 
-        return distance(departVertex, req.getFromVertex(), time);
-    }
+        Vertex toVertex = req.getFromVertex();
 
-
-    private double distance(Vertex fromVertex, Vertex toVertex, int departTime)
-    {
         if (straightLineDistance) {
             double deltaX = toVertex.getX() - fromVertex.getX();
             double deltaY = toVertex.getY() - fromVertex.getY();
 
-            // this is a SQUARED distance!!! (to avoid unnecessary Math.sqrt() call)
+            // this is a SQUARED distance!!! (to avoid unnecessary Math.sqrt() calls)
             return deltaX * deltaX + deltaY * deltaY;
         }
         else {
-            return data.getVrpGraph().getArc(fromVertex, toVertex).getCostOnDeparture(departTime);
+            return data.getVrpGraph().getArc(fromVertex, toVertex).getCostOnDeparture(time);
         }
     }
 }

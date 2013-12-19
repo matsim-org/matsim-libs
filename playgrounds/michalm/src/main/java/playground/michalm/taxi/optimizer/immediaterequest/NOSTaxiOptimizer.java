@@ -32,21 +32,29 @@ import playground.michalm.taxi.schedule.TaxiTask;
 public class NOSTaxiOptimizer
     extends ImmediateRequestTaxiOptimizer
 {
-    private final IdleVehicleFinder idleVehicleFinder;
+    private final VehicleFinder idleVehicleFinder;
 
 
     public NOSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
             int pickupDuration, boolean straightLineDistance)
     {
+        this(data, destinationKnown, minimizePickupTripTime, pickupDuration, new IdleVehicleFinder(
+                data, straightLineDistance));
+    }
+
+
+    public NOSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
+            int pickupDuration, VehicleFinder idleVehicleFinder)
+    {
         super(data, destinationKnown, minimizePickupTripTime, pickupDuration);
-        idleVehicleFinder = new IdleVehicleFinder(data, straightLineDistance);
+        this.idleVehicleFinder = idleVehicleFinder;
     }
 
 
     @Override
     protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
     {
-        Vehicle veh = idleVehicleFinder.findClosestVehicle(req);
+        Vehicle veh = idleVehicleFinder.findVehicle(req);
 
         if (veh == null) {
             return VehicleDrive.NO_VEHICLE_DRIVE_FOUND;

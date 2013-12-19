@@ -17,54 +17,85 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl;
+package pl.poznan.put.vrp.dynamic.data.model.impl;
 
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
-import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.PickupRequest;
-import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.PickupTask;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 
 
-public class PickupRequestImpl
-    extends RequestImpl
-    implements PickupRequest
+/**
+ * @author michalm
+ */
+public class RequestImpl
+    implements Request
 {
-    private final Vertex fromVertex;
-    private PickupTask pickupTask;
+    private final int id;
+
+    private final Customer customer;
+
+    private final int quantity;
+
+    private final int t0;// earliest start time
+    private final int t1;// latest start time
+
+    private final int submissionTime;
 
 
-    public PickupRequestImpl(int id, Customer customer, int quantity, int t0, int t1,
-            int submissionTime, Vertex fromVertex)
+    public RequestImpl(int id, Customer customer, int quantity, int t0, int t1, int submissionTime)
     {
-        super(id, customer, quantity, t0, t1, submissionTime);
-        this.fromVertex = fromVertex;
+        this.id = id;
+        this.customer = customer;
+        this.quantity = quantity;
+        this.t0 = t0;
+        this.t1 = t1;
+        this.submissionTime = submissionTime;
     }
 
 
     @Override
-    public RequestType getRequestType()
+    public int getId()
     {
-        return RequestType.PICKUP;
+        return id;
     }
 
 
     @Override
-    public Vertex getFromVertex()
+    public Customer getCustomer()
     {
-        return fromVertex;
+        return customer;
     }
 
 
     @Override
-    public PickupTask getPickupTask()
+    public int getQuantity()
     {
-        return pickupTask;
+        return quantity;
     }
 
 
-    public void setPickupTask(PickupTask pickupTask)
+    @Override
+    public int getT0()
     {
-        this.pickupTask = pickupTask;
+        return t0;
+    }
+
+
+    @Override
+    public int getT1()
+    {
+        return t1;
+    }
+
+
+    @Override
+    public int getSubmissionTime()
+    {
+        return submissionTime;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "Request_" + id + " [S=(" + t0 + ", ???, " + t1 + "), F=???]";
     }
 }

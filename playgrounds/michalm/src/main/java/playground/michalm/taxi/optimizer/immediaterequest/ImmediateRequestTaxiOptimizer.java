@@ -53,7 +53,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 {
     protected static class VehicleDrive
     {
-        protected static final VehicleDrive NO_VEHICLE_DRIVE_FOUND = new VehicleDrive(null, null,
+        public static final VehicleDrive NO_VEHICLE_DRIVE_FOUND = new VehicleDrive(null, null,
                 Integer.MAX_VALUE / 2, Integer.MAX_VALUE);
 
         private final Vehicle vehicle;
@@ -225,7 +225,8 @@ public abstract class ImmediateRequestTaxiOptimizer
         bestSched.addTask(new TaxiPickupStayTask(best.t2, t3, req));
 
         if (destinationKnown) {
-            appendDeliveryAndWaitTasksAfterServeTask(bestSched);
+            appendDropoffAfterPickup(bestSched);
+            appendWaitAfterDropoff(bestSched);
         }
     }
 
@@ -260,7 +261,8 @@ public abstract class ImmediateRequestTaxiOptimizer
 
         if (!destinationKnown) {
             if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
-                appendDeliveryAndWaitTasksAfterServeTask(schedule);
+                appendDropoffAfterPickup(schedule);
+                appendWaitAfterDropoff(schedule);
                 return true;
             }
         }
@@ -274,15 +276,15 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule<TaxiTask> schedule)
+    protected void appendDropoffAfterPickup(Schedule<TaxiTask> schedule)
     {
-        TaxiPickupStayTask serveTask = (TaxiPickupStayTask)Schedules.getLastTask(schedule);
+        TaxiPickupStayTask pickupStayTask = (TaxiPickupStayTask)Schedules.getLastTask(schedule);
 
         // add DELIVERY after SERVE
-        TaxiRequest req = ((TaxiPickupStayTask)serveTask).getRequest();
+        TaxiRequest req = ((TaxiPickupStayTask)pickupStayTask).getRequest();
         Vertex reqFromVertex = req.getFromVertex();
         Vertex reqToVertex = req.getToVertex();
-        int t3 = serveTask.getEndTime();
+        int t3 = pickupStayTask.getEndTime();
 
         Arc arc = data.getVrpGraph().getArc(reqFromVertex, reqToVertex);
         int t4 = t3 + arc.getTimeOnDeparture(t3);
@@ -290,10 +292,19 @@ public abstract class ImmediateRequestTaxiOptimizer
 
         int t5 = t4 + dropoffDuration;
         schedule.addTask(new TaxiDropoffStayTask(t4, t5, req));
+    }
+
+
+    protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+    {
+        TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules.getLastTask(schedule);
 
         // addWaitTime at the end (even 0-second WAIT)
+        int t5 = dropoffStayTask.getEndTime();
         int tEnd = Math.max(t5, Schedules.getActualT1(schedule));
-        schedule.addTask(new TaxiWaitStayTask(t5, tEnd, reqToVertex));
+        Vertex vertex = dropoffStayTask.getVertex();
+
+        schedule.addTask(new TaxiWaitStayTask(t5, tEnd, vertex));
     }
 
 
@@ -358,7 +369,8 @@ public abstract class ImmediateRequestTaxiOptimizer
                 }
 
                 case PICKUP_DRIVE:
-                case DROPOFF_DRIVE: {
+                case DROPOFF_DRIVE:
+                case CRUISE_DRIVE: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
                     t += ((DriveTask)task).getArc().getTimeOnDeparture(t);

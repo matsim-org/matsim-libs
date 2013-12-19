@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
+import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
 
 /*package*/class MultipleSingleIterTaxiLauncher
@@ -109,8 +109,8 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             launcher.go(false);
-            TaxiEvaluation evaluation = (TaxiEvaluation)new TaxiEvaluator()
-                    .evaluateVrp(launcher.data.getVrpData());
+            TaxiStats evaluation = (TaxiStats)new TaxiStatsCalculator()
+                    .calculateStats(launcher.data.getVrpData());
             long t1 = System.currentTimeMillis();
 
             taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
@@ -124,7 +124,7 @@ import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
             computationTime.addValue(t1-t0);
         }
 
-        pw.println(configIdx + "\t" + TaxiEvaluation.HEADER + "\tcomputationT");
+        pw.println(configIdx + "\t" + TaxiStats.HEADER + "\tcomputationT");
 
         pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 taxiPickupDriveTime.getMean(),//

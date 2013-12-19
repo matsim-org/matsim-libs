@@ -27,11 +27,11 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.taxi.schedule.*;
 
 
-public class TaxiEvaluator
+public class TaxiStatsCalculator
 {
-    public TaxiEvaluation evaluateVrp(VrpData data)
+    public TaxiStats calculateStats(VrpData data)
     {
-        TaxiEvaluation evaluation = new TaxiEvaluation();
+        TaxiStats evaluation = new TaxiStats();
 
         for (Vehicle v : data.getVehicles()) {
             evaluateSchedule(data, TaxiSchedules.getSchedule(v), evaluation);
@@ -41,7 +41,7 @@ public class TaxiEvaluator
     }
 
 
-    private void evaluateSchedule(VrpData data, Schedule<TaxiTask> schedule, TaxiEvaluation eval)
+    private void evaluateSchedule(VrpData data, Schedule<TaxiTask> schedule, TaxiStats eval)
     {
         if (schedule.getStatus().isUnplanned()) {
             return;// do not evaluate - the vehicle is unused
@@ -97,7 +97,7 @@ public class TaxiEvaluator
     }
 
 
-    public static class TaxiEvaluation
+    public static class TaxiStats
     {
         public static final String HEADER = "PickupDriveT\t" //
                 + "DeliveryDriveT\t"//

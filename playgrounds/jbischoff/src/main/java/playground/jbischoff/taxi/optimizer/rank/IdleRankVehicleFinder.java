@@ -26,12 +26,11 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
-import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.schedule.TaxiSchedules;
 /**
  * 
  * 
@@ -41,6 +40,7 @@ import playground.michalm.taxi.schedule.*;
  */
 
 public class IdleRankVehicleFinder
+    implements VehicleFinder
 {
     private final VrpData data;
     private final boolean straightLineDistance;
@@ -80,9 +80,8 @@ public class IdleRankVehicleFinder
 	}
     
     
-    public Vehicle findClosestVehicle(TaxiRequest req)
-    
-    
+	@Override
+    public Vehicle findVehicle(TaxiRequest req)
     {
     	
     	if(this.useChargeOverTime) {
@@ -181,7 +180,8 @@ public class IdleRankVehicleFinder
     private Vehicle findClosestFIFOVehicle(TaxiRequest req){
         Collections.shuffle(data.getVehicles(),rnd);
     	  Vehicle bestVeh = null;
-          double bestDistance = 1e9;
+//          double bestDistance = Double.MAX_VALUE;
+          double bestDistance = Double.MAX_VALUE/2;
           for (Vehicle veh : data.getVehicles()) {
           	if (this.IsElectric)
           		if (!this.hasEnoughCapacityForTask(veh)) continue;
@@ -207,49 +207,9 @@ public class IdleRankVehicleFinder
 
           return bestVeh;
     }
-  
-
-    private double calculateDistance(TaxiRequest req, Vehicle veh)
-    {
-        Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
-        int time = data.getTime();
-        Vertex departVertex;
-
-        if (!TaxiUtils.isIdle(sched, time, true)) {
-            return Double.MAX_VALUE;
-        }
-
-        TaxiTask currentTask = sched.getCurrentTask();
-
-        switch (currentTask.getTaxiTaskType()) {
-            case WAIT_STAY:
-                departVertex = ((StayTask)currentTask).getVertex();
-                break;
-
-            case CRUISE_DRIVE:// only CRUISE possible
-                throw new IllegalStateException();// currently, no support for vehicle diversion
-
-            default:
-                throw new IllegalStateException();
-        }
-
-        return distance(departVertex, req.getFromVertex(), time);
+    
+    
+    private double calculateDistance(TaxiRequest req, Vehicle veh){
+        return IdleVehicleFinder.calculateDistance(req, veh, data, straightLineDistance);
     }
-
-
-    private double distance(Vertex fromVertex, Vertex toVertex, int departTime)
-    {
-        if (straightLineDistance) {
-            double deltaX = toVertex.getX() - fromVertex.getX();
-            double deltaY = toVertex.getY() - fromVertex.getY();
-
-            // this is a SQUARED distance!!! (to avoid unnecessary Math.sqrt() call)
-            return deltaX * deltaX + deltaY * deltaY;
-        }
-        else {
-        	System.out.println("using free flow dist");
-            return data.getVrpGraph().getArc(fromVertex, toVertex).getCostOnDeparture(departTime);
-        }
-    }
-
 }

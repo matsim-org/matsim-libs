@@ -20,14 +20,14 @@
 package playground.michalm.taxi.model;
 
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
-import pl.poznan.put.vrp.dynamic.data.model.impl.AbstractRequest;
+import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 import playground.michalm.taxi.schedule.*;
 
 
 public class TaxiRequest
-    extends AbstractRequest
+    extends RequestImpl
 {
     public enum TaxiRequestStatus
     {

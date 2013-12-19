@@ -68,7 +68,7 @@ public class DAPPLauncher
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
         MatsimVrpGraph graph = VrpLauncherUtils.initMatsimVrpGraph(scenario,
-                TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility, depotsFileName);
+                TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility);
 
         VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, graph, depotsFileName);
         MatsimVrpData data = new MatsimVrpData(vrpData, scenario);

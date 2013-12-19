@@ -162,7 +162,6 @@ import playground.michalm.util.gis.Schedules2GIS;
         }
         scanner.close();
 
-
         dirName = params.get("dirName") + '/';
         netFileName = dirName + params.get("netFileName");
 
@@ -209,7 +208,7 @@ import playground.michalm.util.gis.Schedules2GIS;
                 algorithmConfig.tdisSource, travelTime);
 
         MatsimVrpGraph graph = VrpLauncherUtils.initMatsimVrpGraph(scenario,
-                algorithmConfig.ttimeSource, travelTime, travelDisutility, depotsFileName);
+                algorithmConfig.ttimeSource, travelTime, travelDisutility);
 
         VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, graph, depotsFileName);
 
@@ -362,7 +361,7 @@ import playground.michalm.util.gis.Schedules2GIS;
     /*package*/void generateOutput()
     {
         PrintWriter pw = new PrintWriter(System.out);
-        new TaxiEvaluator().evaluateVrp(data.getVrpData()).print(pw);
+        new TaxiStatsCalculator().calculateStats(data.getVrpData()).print(pw);
         pw.flush();
 
         if (vrpOutFiles) {

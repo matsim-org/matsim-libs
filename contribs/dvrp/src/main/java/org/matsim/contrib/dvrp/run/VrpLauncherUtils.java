@@ -61,9 +61,9 @@ public class VrpLauncherUtils
         EVENTS_24_H("24H", 24 * 60 * 60), // based on eventsFileName, with 24-hour time interval
         EVENTS_15_MIN("15M", 15 * 60); // based on eventsFileName, with 15-minute time interval
 
-        /*package*/final String shortcut;
-        /*package*/final int travelTimeBinSize;
-        /*package*/final int numSlots;
+        public final String shortcut;
+        public final int travelTimeBinSize;
+        public final int numSlots;
 
 
         private TravelTimeSource(String shortcut, int travelTimeBinSize)
@@ -179,8 +179,7 @@ public class VrpLauncherUtils
 
 
     public static MatsimVrpGraph initMatsimVrpGraph(Scenario scenario,
-            TravelTimeSource ttimeSource, TravelTime travelTime, TravelDisutility travelDisutility,
-            String depotsFileName)
+            TravelTimeSource ttimeSource, TravelTime travelTime, TravelDisutility travelDisutility)
     {
         Network network = scenario.getNetwork();
         TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
@@ -222,8 +221,7 @@ public class VrpLauncherUtils
         qSim.addMobsimEngine(netsimEngine);
         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-        TeleportationEngine teleportationEngine = new TeleportationEngine();
-        qSim.addMobsimEngine(teleportationEngine);
+        qSim.addMobsimEngine(new TeleportationEngine());
 
         return qSim;
     }

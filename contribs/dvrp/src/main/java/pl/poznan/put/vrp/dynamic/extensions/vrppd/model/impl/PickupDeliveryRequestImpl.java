@@ -20,14 +20,14 @@
 package pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl;
 
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
-import pl.poznan.put.vrp.dynamic.data.model.impl.AbstractRequest;
+import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.PickupDeliveryRequest;
 import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.*;
 
 
 public class PickupDeliveryRequestImpl
-    extends AbstractRequest
+    extends RequestImpl
     implements PickupDeliveryRequest
 {
     private final Vertex fromVertex;

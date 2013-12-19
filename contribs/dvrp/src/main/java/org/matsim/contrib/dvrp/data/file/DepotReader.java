@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.data.file;
 
-import java.util.*;
+import java.util.Stack;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
@@ -42,8 +42,6 @@ public class DepotReader
     private Scenario scenario;
     private VrpData data;
     private MatsimVrpGraph graph;
-
-    private List<Id> depotLinks = new ArrayList<Id>();
 
     private Depot currentDepot;
 
@@ -94,7 +92,6 @@ public class DepotReader
 
         currentDepot = new DepotImpl(id, name, vertex);
         data.addDepot(currentDepot);
-        depotLinks.add(linkId);
     }
 
 
@@ -127,11 +124,5 @@ public class DepotReader
         else {
             return defaultValue;
         }
-    }
-
-
-    public List<Id> getDepotLinks()
-    {
-        return depotLinks;
     }
 }

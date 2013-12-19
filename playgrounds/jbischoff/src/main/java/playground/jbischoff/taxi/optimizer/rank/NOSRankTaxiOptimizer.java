@@ -21,129 +21,195 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
 
+import org.matsim.core.basic.v01.IdImpl;
+
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
-import playground.jbischoff.taxi.rank.BackToRankTask;
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.optimizer.immediaterequest.NOSTaxiOptimizer;
 import playground.michalm.taxi.schedule.*;
 
+
 /**
- * 
- * 
- * 
  * @author jbischoff
- * 
  */
 
-public class NOSRankTaxiOptimizer extends RankTaxiOptimizer {
-	private IdleRankVehicleFinder idleVehicleFinder;
-	private boolean rankmode;
+public class NOSRankTaxiOptimizer
+    extends NOSTaxiOptimizer
+{
+    private IdleRankVehicleFinder idleVehicleFinder;
 
-	public NOSRankTaxiOptimizer(VrpData data, boolean destinationKnown,
-			boolean straightLineDistance) {
-		super(data, destinationKnown);
-		idleVehicleFinder = new IdleRankVehicleFinder(data,
-				straightLineDistance);
+    private boolean idleRankMode;
+    private boolean rankmode;
 
-	}
+    private final List<Integer> shortTimeIdlers;
 
-	public void setRankMode(boolean rankMode) {
-		this.rankmode = rankMode;
-	}
+    private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
 
-	public void addDepotArrivalCharger(	DepotArrivalDepartureCharger depotArrivalDepartureCharger) {
-		super.addDepotArrivalCharger(depotArrivalDepartureCharger);
-		this.idleVehicleFinder.addDepotArrivalCharger(this.depotArrivalDepartureCharger);
-	}
 
-	@Override
-	protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles) {
-
-		Vehicle veh = idleVehicleFinder.findClosestVehicle(req);
-
-		if (veh == null) {
-			// System.out.println("No car found");
-			return VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
-		}
-
-		return super.findBestVehicle(req, Arrays.asList(veh));
-	}
-
-	@Override
-	protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
-			boolean scheduleUpdated) {
-		return false;
-	}
-
-	@Override
-    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
+    public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(VrpData data,
+            boolean destinationKnown, boolean minimizePickupTripTime, int pickupDuration,
+            boolean straightLineDistance)
     {
-        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-            return false;
+        return new NOSRankTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
+                pickupDuration, new IdleRankVehicleFinder(data, straightLineDistance));
+    }
+
+
+    private NOSRankTaxiOptimizer(VrpData data, boolean destinationKnown,
+            boolean minimizePickupTripTime, int pickupDuration, IdleRankVehicleFinder vehicleFinder)
+    {
+        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, vehicleFinder);
+        this.idleVehicleFinder = vehicleFinder;
+        this.shortTimeIdlers = new ArrayList<Integer>();
+    }
+
+
+    public void setRankMode(boolean rankMode)
+    {
+        this.rankmode = rankMode;
+    }
+
+
+    public void setDepotArrivalCharger(DepotArrivalDepartureCharger depotArrivalDepartureCharger)
+    {
+        this.depotArrivalDepartureCharger = depotArrivalDepartureCharger;
+        this.idleVehicleFinder.addDepotArrivalCharger(this.depotArrivalDepartureCharger);
+    }
+
+
+    @Override
+    protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+    {
+        if (this.rankmode) {
+            TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules.getLastTask(schedule);
+
+            Vertex vertex = dropoffStayTask.getVertex();
+            Vertex depotVertex = schedule.getVehicle().getDepot().getVertex();
+
+            if (vertex != depotVertex) {
+                int t5 = dropoffStayTask.getEndTime();
+                Arc arc = data.getVrpGraph().getArc(vertex, depotVertex);
+                int t6 = arc.getTimeOnDeparture(t5);
+                schedule.addTask(new TaxiCruiseDriveTask(t5, t6, arc));
+
+                int tEnd = Math.max(t6, Schedules.getActualT1(schedule));
+                schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle()
+                        .getDepot().getVertex()));
+            }
+            else {
+                super.appendWaitAfterDropoff(schedule);
+            }
         }
-
-        if (unplannedRequestQueue.isEmpty()) {
-            return false;
-        }
-
-        TaxiTask tt = schedule.getCurrentTask();
-        switch (tt.getTaxiTaskType()) {
-            case WAIT_STAY:
-            case CRUISE_DRIVE:////////????????
-                return true;
-
-            default:
-                return false;
+        else {
+            super.appendWaitAfterDropoff(schedule);
         }
     }
 
-	@Override
-	protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule<TaxiTask> schedule) {
-	    TaxiPickupStayTask serveTask = (TaxiPickupStayTask) Schedules.getLastTask(schedule);
 
-		// add DELIVERY after SERVE
-		TaxiRequest req = ((TaxiPickupStayTask) serveTask).getRequest();
-		Vertex reqFromVertex = req.getFromVertex();
-		Vertex reqToVertex = req.getToVertex();
-		int t3 = serveTask.getEndTime();
+    public void setIdleRankMode(boolean b)
+    {
+        this.idleRankMode = b;
+    }
 
-		if (reqFromVertex == reqToVertex) {
-			// Delivery cannot be skipped otherwise the passenger will never
-			// exit the taxi
-			throw new IllegalStateException("Unsupported!!!!!!");
-		}
 
-		Arc arc = data.getVrpGraph().getArc(reqFromVertex, reqToVertex);
-		int startIdling = t3 + arc.getTimeOnDeparture(t3);
-		schedule.addTask(new TaxiPickupDriveTask(t3, startIdling, arc, req));
-		// addWaitTime at the end (even 0-second WAIT)
-		int tEnd = Math.max(startIdling, Schedules.getActualT1(schedule));
-		int startWaiting = startIdling;
-		if (this.rankmode) {
+    public void doSimStep(double time)
+    {
+        if (time % 60. == 0.) {
+            checkWaitingVehiclesBatteryState();
+            if (this.idleRankMode)
+                updateIdlers();
+        }
+        if (this.idleRankMode)
+            if (time % 60. == 5.) {
+                sendIdlingTaxisToRank();
+            }
+    }
 
-			if (reqToVertex != schedule.getVehicle().getDepot().getVertex()) {
-				Arc darc = data.getVrpGraph().getArc(reqToVertex,
-						schedule.getVehicle().getDepot().getVertex());
-				startWaiting = startIdling
-						+ darc.getTimeOnDeparture(startIdling);
-				schedule.addTask(new BackToRankTask(startIdling, startWaiting,
-						darc));
-				schedule.addTask(new TaxiWaitStayTask(startWaiting, tEnd, schedule
-						.getVehicle().getDepot().getVertex()));
 
-			} else {
-				schedule.addTask(new TaxiWaitStayTask(startIdling, tEnd,
-						reqToVertex));
-			}
-		}
+    private void checkWaitingVehiclesBatteryState()
+    {
+        for (Vehicle veh : data.getVehicles()) {
+            Task last = Schedules.getLastTask(veh.getSchedule());
+            if (last instanceof TaxiWaitStayTask) {
+                TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
+                if (!lastw.getVertex().equals(veh.getDepot().getVertex())) {
+                    if (this.depotArrivalDepartureCharger.needsToReturnToRank(new IdImpl(veh
+                            .getName()))) {
+                        scheduleRankReturn(veh);
+                    }
+                }
+            }
+        }
+    }
 
-		else {
-			schedule.addTask(new TaxiWaitStayTask(startIdling, tEnd, reqToVertex));
-		}
-	}
 
+    protected void scheduleRankReturn(Vehicle veh)
+    {
+
+        @SuppressWarnings("unchecked")
+        Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
+        int currentTime = data.getTime();
+        int oldendtime;
+        TaxiWaitStayTask lastTask = (TaxiWaitStayTask)Schedules.getLastTask(sched);// only WAIT
+
+        switch (lastTask.getStatus()) {
+            case PLANNED:
+                return;
+
+            case STARTED:
+                oldendtime = lastTask.getEndTime();
+                lastTask.setEndTime(currentTime);// shortening the WAIT task
+
+                break;
+
+            case PERFORMED:
+                throw new IllegalStateException();
+            default:
+                throw new IllegalStateException();
+        }
+
+        Vertex lastVertex = lastTask.getVertex();
+
+        if (veh.getDepot().getVertex() != lastVertex) {// not a loop
+            Arc darc = data.getVrpGraph().getArc(lastVertex, veh.getDepot().getVertex());
+            int arrivalTime = darc.getTimeOnDeparture(currentTime) + currentTime;
+
+            sched.addTask(new TaxiCruiseDriveTask(currentTime, arrivalTime, darc));
+            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldendtime, veh.getDepot().getVertex()));
+            // System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:"
+            // +oldendtime);
+        }
+
+    }
+
+
+    public void updateIdlers()
+    {
+        this.shortTimeIdlers.clear();
+        for (Vehicle veh : data.getVehicles()) {
+            Task last = Schedules.getLastTask(veh.getSchedule());
+            if (last instanceof TaxiWaitStayTask) {
+                TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
+                if (!lastw.getVertex().equals(veh.getDepot().getVertex())) {
+                    this.shortTimeIdlers.add(veh.getId());
+                }
+            }
+        }
+    }
+
+
+    public void sendIdlingTaxisToRank()
+    {
+        for (Vehicle veh : data.getVehicles()) {
+            if (shortTimeIdlers.contains(veh.getId())) {
+                Task last = Schedules.getLastTask(veh.getSchedule());
+                if (last instanceof TaxiWaitStayTask) {
+                    scheduleRankReturn(veh);
+                }
+            }
+        }
+    }
 }
