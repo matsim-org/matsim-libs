@@ -20,13 +20,12 @@
 
 package playground.dziemke.other;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
 public class StandardController {
-	private final static Logger log = Logger.getLogger(StandardController.class);
+	//private final static Logger log = Logger.getLogger(StandardController.class);
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]) ;

@@ -92,7 +92,7 @@ public class DemandGeneratorTwoPersonsSinglePlan implements Runnable{
 				   + "======================" + "\n");
 		
 		int householdIdCounter = 1;
-		Random random = new Random();
+		//Random random = new Random();
 		
 		for (int i = 0; i<this.commuterRelations.size(); i++){
         	int quantity = this.commuterRelations.get(i).getQuantity();

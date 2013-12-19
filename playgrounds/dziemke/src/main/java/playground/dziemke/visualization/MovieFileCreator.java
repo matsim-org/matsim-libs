@@ -3,7 +3,6 @@ package playground.dziemke.visualization;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
@@ -28,7 +27,6 @@ public class MovieFileCreator {
 		// Initiating conversion				
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		//scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		scenario.getConfig().setQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		OTFEvent2MVI.convert(scenario, eventFile, mviFile, snapshotPeriod);
 		
