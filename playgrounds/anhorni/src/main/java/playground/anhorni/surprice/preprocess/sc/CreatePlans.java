@@ -110,7 +110,7 @@ public class CreatePlans {
 			
 			
 			if (rnd.nextBoolean()) {
-				incomes.putAttribute(person.getId().toString(), "income", new Double(1.0));
+				incomes.putAttribute(person.getId().toString(), "income", new Double(0.2));
 				preferences.putAttribute(person.getId().toString(), "dudm", new Double(0.1));
 			} else {
 				incomes.putAttribute(person.getId().toString(), "income",new Double(0.1));
