@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
@@ -202,7 +203,9 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			//}
 		}
 		else {
-			assert vehicle.getDriver() == null;
+			// agent not null occurs in transit.
+			assert vehicle.getDriver() == null || vehicle.getDriver().getId().equals( magent.getId() ) :
+				vehicle.getId()+" has non-null driver "+vehicle.getDriver().getId();
 			vehicle.setDriver(agent);
 			agent.setVehicle(vehicle) ;
 
@@ -243,11 +246,15 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			final double now,
 			final Id linkId,
 			final QVehicle vehicle) {
+		final Person person =
+			vehicle.getDriver() instanceof HasPerson ?
+					((HasPerson) vehicle.getDriver()).getPerson() :
+					null;
 		final double travelTime =
 			travelTimeCalculator.getLinkTravelTime(
 					network.getLinks().get( linkId ),
 					now,
-					((HasPerson) vehicle.getDriver()).getPerson(),
+					person,
 					vehicle.getVehicle() );
 		return new InternalArrivalEvent(
 				now + travelTime,
