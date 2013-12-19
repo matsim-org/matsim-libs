@@ -264,7 +264,7 @@ public class PSeudoQSimCompareEventsTest {
 			stops.add( factory.createTransitRouteStop(
 						createStop(
 							factory,
-							new IdImpl( "line."+i+".o" ),
+							new IdImpl( "line-"+i+"-o" ),
 							sc.getNetwork().getLinks().get( originLinkId ) ),
 						0,
 						0));
@@ -277,7 +277,7 @@ public class PSeudoQSimCompareEventsTest {
 				stops.add( factory.createTransitRouteStop(
 							createStop(
 								factory,
-								new IdImpl( "line."+i+"."+l.getId() ),
+								new IdImpl( "line-"+i+"-"+l.getId() ),
 								l),
 							time,
 							0));
@@ -290,7 +290,7 @@ public class PSeudoQSimCompareEventsTest {
 			stops.add( factory.createTransitRouteStop(
 						createStop(
 							factory,
-							new IdImpl( "line."+i+".d" ),
+							new IdImpl( "line-"+i+"-d" ),
 							sc.getNetwork().getLinks().get( destinationLinkId ) ),
 						time,
 						0));
@@ -301,7 +301,7 @@ public class PSeudoQSimCompareEventsTest {
 
 			final TransitRoute transitRoute =
 					factory.createTransitRoute(
-						new IdImpl( "line."+i+".route" ),
+						new IdImpl( "line-"+i+"-route" ),
 						route,
 						stops,
 						"pt" );
@@ -311,7 +311,7 @@ public class PSeudoQSimCompareEventsTest {
 			for ( double depTime = 0 ; depTime <= 12 * 3600; depTime += 20 * 60 ) {
 				final Departure dep =
 						factory.createDeparture(
-							new IdImpl( "line."+i+"."+depTime ),
+							new IdImpl( "line-"+i+"-"+depTime ),
 							depTime );
 				dep.setVehicleId( new IdImpl( "veh-"+dep.getId() ) );
 				vehicles.getVehicles().put(
