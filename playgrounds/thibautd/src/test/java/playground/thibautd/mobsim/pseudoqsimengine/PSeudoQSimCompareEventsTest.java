@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
@@ -57,6 +58,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehicleType;
@@ -68,6 +70,11 @@ import playground.thibautd.scripts.CreateGridNetworkWithDimensions;
  * @author thibautd
  */
 public class PSeudoQSimCompareEventsTest {
+	private static final boolean DUMP_EVENTS = false;
+
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testEventsSimilarToQsim() {
 		testEventsSimilarToQsim( false , 1 );
@@ -116,8 +123,10 @@ public class PSeudoQSimCompareEventsTest {
 									scenario.getConfig().planCalcScore() ),
 								travelTime.getLinkTravelTimes() ) ) ),
 				new QSimFactory(),
+				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
 				new QSimWithPseudoEngineFactory(
 					travelTime.getLinkTravelTimes() ),
+				DUMP_EVENTS ? utils.getOutputDirectory()+"/pSimEvent.xml" : null,
 				travelTime );
 	}
 
@@ -126,18 +135,20 @@ public class PSeudoQSimCompareEventsTest {
 		if ( useTransit ) {
 			config.scenario().setUseTransit( true );
 			config.scenario().setUseVehicles( true );
+
+			config.qsim().setEndTime( 30 * 3600 );
 		}
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		CreateGridNetworkWithDimensions.createNetwork(
 				sc.getNetwork(),
-				2,
-				10 );
+				20,
+				20 );
 		if ( useTransit ) createSchedule( sc );
 
 		final Random random = new Random( 1234 );
 		final List<Id> linkIds = new ArrayList<Id>( sc.getNetwork().getLinks().keySet() );
 		for ( String mode : new String[]{ TransportMode.car , TransportMode.pt } ) {
-			for ( int i = 0; i < 20; i++ ) {
+			for ( int i = 0; i < 2000; i++ ) {
 				final Person person = sc.getPopulation().getFactory().createPerson( new IdImpl( mode+"."+i ) );
 				sc.getPopulation().addPerson( person );
 
@@ -240,7 +251,7 @@ public class PSeudoQSimCompareEventsTest {
 
 		final List<Id> linkIds = new ArrayList<Id>( sc.getNetwork().getLinks().keySet() );
 		final Random random = new Random( 987 );
-		for ( int i=0; i < 10; i++ ) {
+		for ( int i=0; i < 100; i++ ) {
 			final Id originLinkId = linkIds.get( random.nextInt( linkIds.size() ) );
 			final Id destinationLinkId = linkIds.get( random.nextInt( linkIds.size() ) );
 
