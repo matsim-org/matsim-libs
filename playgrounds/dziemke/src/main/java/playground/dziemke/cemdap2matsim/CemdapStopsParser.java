@@ -49,18 +49,23 @@ public class CemdapStopsParser {
 
 	private final static Logger log = Logger.getLogger(CemdapStopsParser.class);
 
-//	private final Random r = MatsimRandom.getRandom();
+	//private final Random r = MatsimRandom.getRandom();
 	private final Coord DEFAULT_COORD = new CoordImpl(-1.0,-1.0);
-
-	private static final int HID = 0;
-	private static final int PID = 1;
+	
+	
+	// cemdap stop file columns
+	private static final int HH_ID = 0;
+	private static final int P_ID = 1;
+	//private static final int TOUR_ID = 2;
+	//private static final int STOP_ID = 3;
 	private static final int ACT_TYPE = 4;
-	private static final int START_TT = 5;
-//	private static final int TT = 6;
+	private static final int START_TT_TO_STOP = 5;
+	//private static final int TT_TO_STOP = 6;
 	private static final int STOP_DUR = 7;
-	private static final int STOP_ID = 8;
-	private static final int ORIG_ID = 9;
-	private static final int ACT_TYPE_PREV = 11;
+	private static final int STOP_LOC_ID = 8;
+	private static final int ORIG_ZONE_ID = 9;
+	//private static final int TRIP_DIST = 10;
+	private static final int ACT_TYPE_PREV_STOP = 11;
 		
 	private static final int TIME_OFFSET = 3*3600;
 	public static final String ZONE = "zone";
@@ -68,34 +73,127 @@ public class CemdapStopsParser {
 
 	public CemdapStopsParser() {
 	}
-	
 
-	private final String transformActType(int actTypeNo) {
-		switch (actTypeNo) {
+	
+	// parse method
+	public final void parse(String cemdapStopsFile, int planNumber, Scenario scenario, ObjectAttributes personObjectAttributes, boolean stayHomePlan) {
+		Population population = scenario.getPopulation();
+		int lineCount = 0;
+
+		try {
+			BufferedReader bufferedReader = IOUtils.getBufferedReader(cemdapStopsFile);
+			String currentLine = bufferedReader.readLine();
+
+			// data
+			while ((currentLine = bufferedReader.readLine()) != null) {
+				String[] entries = currentLine.split("\t", -1);
+				lineCount++;
+				
+				if (lineCount % 1000000 == 0) {
+					log.info("line "+lineCount+": "+population.getPersons().size()+" persons stored so far.");
+					Gbl.printMemoryUsage();
+				}
+				
+				Integer householdId = Integer.parseInt(entries[HH_ID]);
+				Integer personId = Integer.parseInt(entries[P_ID]);
+				Id agentId = scenario.createId(householdId+"_"+personId);
+		
+				// create a person if a person with that agentId does not already exist
+				Person person = population.getPersons().get(agentId);
+				if (person == null) {
+					person = population.getFactory().createPerson(agentId);
+					population.addPerson(person);
+				}
+
+				// create a new plan if plan with current plan number does not already exist
+				if (person.getPlans().size() <= planNumber ) {
+					person.addPlan(population.getFactory().createPlan());
+				}
+
+				// get plan with current number and write information from cemdap stops file to it
+				Plan plan = person.getPlans().get(planNumber);				
+				int departureTime = Integer.parseInt(entries[START_TT_TO_STOP])*60 + TIME_OFFSET;
+				
+				// if plan is empty, create a home activity and add it to the plan
+				if (plan.getPlanElements().isEmpty()) {
+					String zoneId = entries[ORIG_ZONE_ID].trim();
+					
+					personObjectAttributes.putAttribute(agentId.toString(),ZONE+"0",zoneId);
+					
+					String activityType = transformActType(Integer.parseInt(entries[ACT_TYPE_PREV_STOP]));
+					
+					Activity firstActivity = population.getFactory().createActivityFromCoord(activityType,DEFAULT_COORD);
+					firstActivity.setEndTime(departureTime);
+					plan.addActivity(firstActivity);
+				}
+				
+				
+				if (stayHomePlan == false) {
+					// add a leg to the plan
+					Leg leg = population.getFactory().createLeg(TransportMode.car);
+					leg.setDepartureTime(departureTime);
+					plan.addLeg(leg);
+					
+					// add an activity to the plan
+					String zoneId = entries[STOP_LOC_ID];
+				
+					int actIndex = plan.getPlanElements().size()/2;
+					personObjectAttributes.putAttribute(agentId.toString(),ZONE+actIndex,zoneId);
+					
+					String activityType = transformActType(Integer.parseInt(entries[ACT_TYPE]));
+					Activity activity = population.getFactory().createActivityFromCoord(activityType,DEFAULT_COORD);
+					int activityDuration = Integer.parseInt(entries[STOP_DUR])*60;
+					
+					activity.setEndTime(departureTime + activityDuration);
+					plan.addActivity(activity);
+				}
+
+			}
+		} catch (IOException e) {
+			log.error(e);
+			//Gbl.errorMsg(e);
+		}
+		log.info(lineCount+" lines parsed.");
+		log.info(population.getPersons().size()+" persons stored.");
+		// cleanUp(population);
+		cleanUp(population, planNumber);
+		log.info(population.getPersons().size()+" persons remaining.");
+	}
+	
+	
+	private final String transformActType(int activityTypeNumber) {
+		switch (activityTypeNumber) {
 		case 0: return "shop";
 		case 1: return "other";
 		case 2: return "other";
 		case 3: return "leis";
 		case 4: return "other";
 		case 5: return "leis";
-		case 6: return "leis";
-		case 7: return "other";
+		//case 6: return "leis";
+		case 6: return "home";
+		//case 7: return "other";
+		case 7: return "work";
 		case 8: return "work";
 		case 9: return "other";
 		case 10: return "other";
 		case 11: return "other";
-		case 12: return "home";
-		case 13: return "work";
-		case 14: return "home";
-		case 15: return "educ";
+		//case 12: return "home";
+		case 12: return "leis";
+		//case 13: return "work";
+		case 13: return "home";
+		//case 14: return "home";
+		case 14: return "educ";
+		//case 15: return "educ";
+		case 15: return "leis";
 		case 16: return "leis";
 		case 17: return "work";
 		case 18: return "home";
 		case 19: return "educ";
-		case 20: return "leis";
-		case 21: return "leis";
+		//case 20: return "leis";
+		//case 21: return "leis";
 		default:
-				log.error(new IllegalArgumentException("actTypeNo="+actTypeNo+" not allowed."));
+			log.error(new IllegalArgumentException("actTypeNo="+activityTypeNumber+" not allowed."));
+			//Gbl.errorMsg(new IllegalArgumentException("activityTypeNumber="+activityTypeNumber+" is not allowed."));
 			return null;
 		}
 	}
@@ -122,136 +220,5 @@ public class CemdapStopsParser {
 			population.getPersons().remove(pid);
 		}
 		log.info("in total "+pidsToRemove.size()+" removed from the population.");
-	}
-	
-	
-	// parse method
-	public final void parse(String cemdapStopsFile, int planNumber, Scenario scenario, ObjectAttributes personObjectAttributes, double fraction) {
-//	public final void parse(String cemdapStopsFile, int planNumber, Scenario scenario, Map<String,SimpleFeature> features, double fraction) {	
-		Population population = scenario.getPopulation();
-		int lineCount = 0;
-
-		try {
-			BufferedReader br = IOUtils.getBufferedReader(cemdapStopsFile);
-			String currentLine = br.readLine();
-			
-//			Id currentPid = null;
-//			boolean storePerson = false;
-
-			// data
-			while ((currentLine = br.readLine()) != null) {
-				String[] entries = currentLine.split("\t", -1);
-				lineCount++;
-				
-				if (lineCount % 1000000 == 0) {
-					log.info("line "+lineCount+": "+population.getPersons().size()+" persons stored so far.");
-					Gbl.printMemoryUsage();
-				}
-				
-				// household id / person id
-				Integer hid = Integer.parseInt(entries[HID]);
-				Integer id = Integer.parseInt(entries[PID]);
-				Id pid = scenario.createId(hid+"_"+id);
-				
-				
-				// what is this method actually doing?
-//				if (!pid.equals(currentPid)) {
-//					currentPid = pid;
-//					if (r.nextDouble() < fraction) {
-//						storePerson = true;
-//					} else {
-//						storePerson = false;
-//					}
-//				}
-//				if (!storePerson) {
-//					continue;
-//				}
-				
-				
-				// creates a person with a plan if a person with that pid does not already exist
-				Person person = population.getPersons().get(pid);
-				if (person == null) {
-					person = population.getFactory().createPerson(pid);
-					population.addPerson(person);
-					person.addPlan(population.getFactory().createPlan());
-				}
-
-				
-				// new
-				if (planNumber != 0 && person.getPlans().size() <= planNumber ) {
-					person.addPlan(population.getFactory().createPlan());
-				}
-				//
-				
-				
-//				Plan plan = person.getSelectedPlan();
-				Plan plan = person.getPlans().get(planNumber);
-				
-				
-				int depTime = Integer.parseInt(entries[START_TT])*60 + TIME_OFFSET;
-				// int arrTime = Integer.parseInt(entries[TT])*60 + TIME_OFFSET;
-				
-
-				if (plan.getPlanElements().isEmpty()) {
-					String zoneId = entries[ORIG_ID].trim();
-					// String zoneId = entries[STOP_ID].trim();
-					
-					// new
-//					SimpleFeature zone = features.get(zoneId);
-//					Coord coordFirst = UCSBUtils.getRandomCoordinate(zone);
-					//
-					
-					personObjectAttributes.putAttribute(pid.toString(),ZONE+"0",zoneId);
-					
-					String actType = transformActType(Integer.parseInt(entries[ACT_TYPE_PREV]));
-					
-					Activity firstActivity = population.getFactory().createActivityFromCoord(actType,DEFAULT_COORD);
-//					Activity firstActivity = population.getFactory().createActivityFromCoord(actType,coordFirst);
-					
-					// kai: only end time // firstActivity.setStartTime(0);
-					firstActivity.setEndTime(depTime);
-					
-					// kai: only end time // firstActivity.setMaximumDuration(depTime);
-					plan.addActivity(firstActivity);
-				}
-				
-				// if needed apply here a method transformMode
-				Leg leg = population.getFactory().createLeg(TransportMode.car);
-				leg.setDepartureTime(depTime);
-				plan.addLeg(leg);
-				
-				String zoneId = entries[STOP_ID];
-			
-				int actIndex = plan.getPlanElements().size()/2;
-				personObjectAttributes.putAttribute(pid.toString(),ZONE+actIndex,zoneId);
-				
-				
-				// new
-//				String zoneId = entries[STOP_ID].trim();
-//				SimpleFeature zone = features.get(zoneId);
-//				Coord coord = UCSBUtils.getRandomCoordinate(zone);
-				//
-				
-				
-				String actType = transformActType(Integer.parseInt(entries[ACT_TYPE]));
-				Activity activity = population.getFactory().createActivityFromCoord(actType,DEFAULT_COORD);
-//				Activity activity = population.getFactory().createActivityFromCoord(actType,coord);
-				int actDur = Integer.parseInt(entries[STOP_DUR])*60;
-				
-				// kai: only end time // activity.setStartTime(depTime);
-				activity.setEndTime(depTime+actDur);
-				
-				// kai: only end time // activity.setMaximumDuration(actDur);
-				plan.addActivity(activity);
-
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		log.info(lineCount+" lines parsed.");
-		log.info(population.getPersons().size()+" persons stored.");
-		// cleanUp(population);
-		cleanUp(population, planNumber);
-		log.info(population.getPersons().size()+" persons remaining.");
 	}
 }

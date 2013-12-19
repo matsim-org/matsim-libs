@@ -51,8 +51,8 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-public class CadytsControllerBerlin {
-	private final static Logger log = Logger.getLogger(CadytsControllerBerlin.class);
+public class CadytsControllerBerlinOld {
+	private final static Logger log = Logger.getLogger(CadytsControllerBerlinOld.class);
 	
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.createConfig();
@@ -62,73 +62,55 @@ public class CadytsControllerBerlin {
 		config.global().setCoordinateSystem("GK4");
 		
 		// network
-		String inputNetworkFile = "D:/Workspace/container/demand/input/iv_counts/network.xml";
+		String inputNetworkFile = "D:/Workspace/berlin/counts/iv_counts/network.xml";
 		config.network().setInputFile(inputNetworkFile);
 		
 		// plans
-		String inputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/24/plans.xml.gz";
-		//String inputPlansFile = "D:/Workspace/container/demand/input/hwh/population3.xml";
-		//String inputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/24/plansSelection10.xml.gz";
+		String inputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/16/plans.xml.gz";
 		config.plans().setInputFile(inputPlansFile);			
 		
 		// simulation
-//		config.addQSimConfigGroup(new QSimConfigGroup());
-//		//config.getQSimConfigGroup().setFlowCapFactor(0.01);
-//		config.getQSimConfigGroup().setFlowCapFactor(0.02);
-//		config.getQSimConfigGroup().setStorageCapFactor(0.02);
-//		//config.getQSimConfigGroup().setStorageCapFactor(0.05);
-//		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
-		
 		config.addModule( new SimulationConfigGroup() );
 		//config.simulation().setStartTime(0);
 		//config.simulation().setEndTime(0);
 		//config.simulation().setSnapshotPeriod(60);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.02);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.01);
 		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(0.02);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setRemoveStuckVehicles(false);
-		
 						
 		// counts
-		String countsFileName = "D:/Workspace/container/demand/input/iv_counts/vmz_di-do.xml";
+		String countsFileName = "D:/Workspace/berlin/counts/iv_counts/vmz_di-do.xml";
 		config.counts().setCountsFileName(countsFileName);
 		config.counts().setCountsScaleFactor(100);
 		config.counts().setOutputFormat("all");
-		
-		// vsp experimental
-		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 				
 		// controller
-		String runId = "run_id";
+		String runId = "run_88";
 		String outputDirectory = "D:/Workspace/container/demand/output/" + runId + "/";
-		//String outputDirectory = "D:/Workspace/container/demand/output/beeline/" + runId + "/";
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(150);
-		//config.controler().setLastIteration(0);
 		Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.xml));
 		config.controler().setEventsFileFormats(eventsFileFormats);
-		config.controler().setMobsim("qsim");
+		config.controler().setMobsim("queueSimulation");
+		// KAI: change to QSim
 		config.controler().setWritePlansInterval(50);
-		//config.controler().setWritePlansInterval(10);
 		config.controler().setWriteEventsInterval(50);
-		//config.controler().setWriteEventsInterval(10);
+		//Set<String> snapshotFormat = Collections.emptySet();
 		Set<String> snapshotFormat = new HashSet<String>();
 		//snapshotFormat.add("otfvis");
 		config.controler().setSnapshotFormat(snapshotFormat);
 				
 		// strategy
-//		StrategySettings strategySettings1 = new StrategySettings(new IdImpl(2));
+//		StrategySettings strategySettings1 = new StrategySettings(new IdImpl(1));
 //		strategySettings1.setModuleName("ChangeExpBeta");
-//		strategySettings1.setProbability(1.0);
+//		strategySettings1.setProbability(0.9);
 //		config.strategy().addStrategySettings(strategySettings1);
 		
 		StrategySettings strategySettings2 = new StrategySettings(new IdImpl(1));
 		strategySettings2.setModuleName("ReRoute");
-		//strategySettings2.setProbability(1.0);
-		strategySettings2.setProbability(0.5);
-		strategySettings2.setDisableAfter(90);
-		//strategySettings2.setDisableAfter(150);
+		strategySettings2.setProbability(1.0);
+		strategySettings2.setDisableAfter(30);
 		config.strategy().addStrategySettings(strategySettings2);
 		
 		StrategySettings strategySetinngs3 = new StrategySettings(new IdImpl(2));
@@ -136,8 +118,7 @@ public class CadytsControllerBerlin {
 		strategySetinngs3.setProbability(1.0) ;
 		config.strategy().addStrategySettings(strategySetinngs3);
 		
-		config.strategy().setMaxAgentPlanMemorySize(10);
-		//config.strategy().setMaxAgentPlanMemorySize(5);
+		config.strategy().setMaxAgentPlanMemorySize(5);
 		
 		// planCalcScore
 		ActivityParams homeActivity = new ActivityParams("home");
@@ -160,10 +141,6 @@ public class CadytsControllerBerlin {
 		otherActivity.setTypicalDuration(0.5*60*60);
 		config.planCalcScore().addActivityParams(otherActivity);
 		
-		// ActivityParams educActivity = new ActivityParams("educ");
-		// educActivity.setTypicalDuration(9*60*60);
-		// config.planCalcScore().addActivityParams(educActivity);
-		
 		// start controller
 		final Controler controler = new Controler(config);
 		
@@ -173,10 +150,7 @@ public class CadytsControllerBerlin {
 		controler.addControlerListener(cContext);
 		
 		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00");
-		//controler.getConfig().getModule("cadytsCar").addParam("startTime", "04:00:00");
 		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
-		//controler.getConfig().getModule("cadytsCar").addParam("useBruteForce", "true");
-		//controler.getConfig().getModule("cadytsCar").addParam("minFlowStddevVehH", "8");
 		
 		// old plan strategy
 //		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
@@ -193,11 +167,10 @@ public class CadytsControllerBerlin {
 		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				//return new PlanStrategyImpl(new CadytsExtendedExpBetaPlanChanger(
 				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration(
 						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 			}
-		});
+		} ) ;
 		
 		// scoring function
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
@@ -206,23 +179,28 @@ public class CadytsControllerBerlin {
 			public ScoringFunction createNewScoringFunction(Plan plan) {
 				
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				// outcommenting following lines until return statement -> set scoring to zero
-				// outcommenting following three lines -> cadyts-only scoring
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				//final CadytsCarScoring scoringFunction = new CadytsCarScoring(plan, config, cContext);
 				final CadytsScoring scoringFunction = new CadytsScoring(plan, config, cContext);
-				final double cadytsScoringWeight = 10.0;
-				//final double cadytsScoringWeight = 0.0;
+				final double cadytsScoringWeight = 20.0;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 
 				return scoringFunctionAccumulator;
 			}
 		}) ;
-
+		
+		// zero scoring function
+//		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+//			@Override
+//			public ScoringFunction createNewScoringFunction(Plan plan) {
+//				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+//				return scoringFunctionAccumulator;
+//			}
+//		});
+		
 		controler.run();
 	}
 }

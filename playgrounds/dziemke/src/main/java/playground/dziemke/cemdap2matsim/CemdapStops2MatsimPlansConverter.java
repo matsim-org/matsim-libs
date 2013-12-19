@@ -20,12 +20,12 @@
 
 package playground.dziemke.cemdap2matsim;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
@@ -36,152 +36,95 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
-
 
 
 /**
  * @author dziemke
- * @see balmermi: UCSBStops2PlansConverter.java
- *
+ * based on "ucsb\demand\UCSBStops2PlansConverter.java"
  */
 public class CemdapStops2MatsimPlansConverter {
-
-	private final static Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
-	private static boolean multiplePlans = true;
-	private static boolean addStayHomePlan = false;
-
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
+	private static final Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
+	
+	// Parameters
+	private static int numberOfFirstFileLocation = 59;
+	private static int numberOfPlans = 3;
+	private static boolean addStayHomePlan = true;
+	
+	// Input and output
+	private static String outputDirectory = "D:/Workspace/container/demand/input/cemdap2matsim/24n/";
+	private static String tazShapeFile = "D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
+	private static String networkFile = "D:/Workspace/container/demand/input/iv_counts/network-base_ext.xml";
+	
 	public static void main(String[] args) throws IOException {
-		String cemdapStopsFile = "D:/Workspace/CEMDAP_Test_Version/Output/36/stops.out1";
-		String cemdapStopsFile2 = "D:/Workspace/CEMDAP_Test_Version/Output/37/stops.out1";
-		String cemdapStopsFile3 = "D:/Workspace/CEMDAP_Test_Version/Output/38/stops.out1";
-				
-		String tazShapeFile = "D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
-		String networkFile = "D:/Workspace/berlin/counts/iv_counts/network-base_ext.xml";
-		
-		Double popFraction = 1.0;
-		String outputBase = "D:/Workspace/container/demand/input/cemdap2matsim/16";
-
-		
-		// print input parameters
-		log.info("cemdapStopsFile: "+cemdapStopsFile);
-		log.info("cemdapStopsFile2: "+cemdapStopsFile2);
-		log.info("cemdapStopsFile3: "+cemdapStopsFile3);
-				
-		log.info("tazShapeFile: "+tazShapeFile);
-		log.info("networkFile: "+networkFile);
-		log.info("popFraction: "+popFraction);
-		log.info("outputBase: "+outputBase);
-
-				
+		// find respective stops file
+		Map<Integer, String> cemdapStopFilesMap = new HashMap<Integer, String>();
+		for (int i=0; i<numberOfPlans; i++) {
+			int numberOfCurrentInputFile = numberOfFirstFileLocation + i;
+			String cemdapStopsFile = "D:/Workspace/cemdap/Output/" + numberOfCurrentInputFile + "/stops.out1";
+			cemdapStopFilesMap.put(i, cemdapStopsFile);
+		}
+	
+		// create ObjectAttrubutes for each agent
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		ObjectAttributes personObjectAttributes = new ObjectAttributes();
-		ObjectAttributes personObjectAttributes2 = new ObjectAttributes();
-		ObjectAttributes personObjectAttributes3 = new ObjectAttributes();
-				
+		Map<Integer, ObjectAttributes> personObjectAttributesMap = new HashMap<Integer, ObjectAttributes>();
+		for (int i=0; i<numberOfPlans; i++) {
+			ObjectAttributes personObjectAttributes = new ObjectAttributes();
+			personObjectAttributesMap.put(i, personObjectAttributes);
+		}
 		
-		log.info("parsing network data...");
+		// read in network
 		new NetworkReaderMatsimV1(scenario).parse(networkFile);
-		log.info("done. (parsing)");
-
-				
-		log.info("reading "+tazShapeFile+" file for cemdap...");
+		
+		// write all (geographic) features of planning area to a map
 		Map<String,SimpleFeature> cemdapTazFeatures = new HashMap<String, SimpleFeature>();
 		for (SimpleFeature feature: ShapeFileReader.getAllFeatures(tazShapeFile)) {
 			Integer schluessel = Integer.parseInt((String) feature.getAttribute("NR"));
 			String id = schluessel.toString();
 			cemdapTazFeatures.put(id,feature);
 		}
-		log.info(cemdapTazFeatures.size()+" features stored.");
-		log.info("done. (reading)");
-		
-		
-		// ----------- START FIRST PLAN ---------------
-		log.info("parsing "+cemdapStopsFile+" file...");
-		int planNumber = 0;
-		new CemdapStopsParser().parse(cemdapStopsFile, planNumber, scenario, personObjectAttributes, popFraction);
-		log.info("done. (parsing)");
-		
-		log.info("assigning coordinates to activities...");
-		new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes, cemdapTazFeatures);
-		log.info("done. (assigning)");
-		// ----------- END FIRST PLAN ---------------
-		
-		
-		if (multiplePlans == true) {
-			// ----------- START Second PLAN ---------------
-			log.info("parsing "+cemdapStopsFile2+" file...");
-			planNumber = 1;
-			new CemdapStopsParser().parse(cemdapStopsFile2, planNumber, scenario, personObjectAttributes2, popFraction);
-			log.info("done. (parsing)");
-	
-			log.info("assigning coordinates to activities...");
-			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes2, cemdapTazFeatures);
-			log.info("done. (assigning)");
-			// ----------- END SECOND PLAN ---------------
-			
-			
-			// ----------- START THIRD PLAN ---------------
-			log.info("parsing "+cemdapStopsFile3+" file...");
-			planNumber = 2;
-			new CemdapStopsParser().parse(cemdapStopsFile3, planNumber, scenario, personObjectAttributes3, popFraction);
-			log.info("done. (parsing)");
-	
-			log.info("assigning coordinates to activities...");
-			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes3, cemdapTazFeatures);
-			log.info("done. (assigning)");
-			// ----------- END THIRD PLAN ---------------
+
+		// parse cemdap stops file
+		for (int i=0; i<numberOfPlans; i++) {
+			new CemdapStopsParser().parse(cemdapStopFilesMap.get(i), i, scenario, personObjectAttributesMap.get(i), false);
+			new Feature2Coord().assignCoords(scenario, i, personObjectAttributesMap.get(i), cemdapTazFeatures);
 		}
-		
-		
+				
+		// if applicable, add a stay-home plan
 		if (addStayHomePlan == true) {
-			// ----------- START STAY HOME PLAN ---------------
-			log.info("parsing "+cemdapStopsFile+" file...");
-			// for now planNumber is hard-coded... should be changed later to provide more flexibility
-			planNumber = 3;
-			new CreateStayHomePlan().create(cemdapStopsFile, planNumber, scenario, personObjectAttributes, popFraction);
-			log.info("done. (creating stay-home plan)");
-	
-			log.info("assigning coordinates to activities...");
-			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes, cemdapTazFeatures);
-			log.info("done. (assigning)");
-			// ----------- END STAY HOME PLAN ---------------
+			int planNumber = numberOfPlans;
+			new CemdapStopsParser().parse(cemdapStopFilesMap.get(0), planNumber, scenario, personObjectAttributesMap.get(0), true);
+			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributesMap.get(0), cemdapTazFeatures);
 		}
 			
-		
-		// new
-		log.info("checking number of plans...");
+		// check if number of plans that each agent has is correct
 		int counter = 0;
+		int expectedNumberOfPlans;
+		if (addStayHomePlan == true) {
+			expectedNumberOfPlans = numberOfPlans + 1;
+		} else {
+			expectedNumberOfPlans = numberOfPlans;
+		}
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			if (person.getPlans().size() < 4) {
-				log.warn("Person with ID=" + person.getId() + " has less than 4 plans");
+			if (person.getPlans().size() < expectedNumberOfPlans) {
+				log.warn("Person with ID=" + person.getId() + " has less than " + expectedNumberOfPlans + " plans");
 			}
-			if (person.getPlans().size() > 4) {
-				log.warn("Person with ID=" + person.getId() + " has more than 4 plans");
+			if (person.getPlans().size() > expectedNumberOfPlans) {
+				log.warn("Person with ID=" + person.getId() + " has more than " + expectedNumberOfPlans + " plans");
 				}
-			if (person.getPlans().size() == 4) {
+			if (person.getPlans().size() == expectedNumberOfPlans) {
 				counter++;
 			}
 		}
-		log.info(counter + "persons have 4 plans.");
-		//
+		log.info(counter + " persons have " + expectedNumberOfPlans + " plans.");
 		
-		
-		log.info("assigning activities to links...");
+		// assign activities to links
 		new XY2Links((ScenarioImpl)scenario).run(scenario.getPopulation());
-		log.info("done. (assigning)");
 		
-
-		log.info("writing data to "+outputBase+"...");
-		new PopulationWriter(scenario.getPopulation(), null).write(outputBase+"/plans.xml.gz");
-//		new ObjectAttributesXmlWriter(personObjectAttributes).writeFile(outputBase+"/personObjectAttributes.xml.gz");
-//		new ObjectAttributesXmlWriter(personObjectAttributes2).writeFile(outputBase+"/personObjectAttributes2.xml.gz");
-		log.info("done. (writing)");
+		// write population file
+		new File(outputDirectory).mkdir();
+		new PopulationWriter(scenario.getPopulation(), null).write(outputDirectory + "plans.xml.gz");
+		//new ObjectAttributesXmlWriter(personObjectAttributesMap.get(0)).writeFile(outputBase+"personObjectAttributes0.xml.gz");
 	}
 
 }
