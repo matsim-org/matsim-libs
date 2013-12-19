@@ -10,29 +10,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.SelectionChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
-import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
@@ -42,12 +39,11 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		LayerChangeListener, SelectionChangedListener {
 	private JTable table;
 	private Map<Layer, MATSimTableModel> tableModels = new HashMap<Layer, MATSimTableModel>();
-	protected final static JRadioButton renderMatsim = new JRadioButton(
+	protected final static JCheckBox renderMatsim = new JCheckBox(
 			"Activate MATSim Renderer");
-	protected final static JRadioButton showIds = new JRadioButton("Show Ids");
+	protected final static JCheckBox showIds = new JCheckBox("Show Ids");
 
-	private String[] columnNames = { "id", "internal-id", "length",
-			"freespeed", "capacity", "permlanes" };
+
 
 
 	public MATSimToggleDialog() {
@@ -58,8 +54,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		table.setDefaultRenderer(Object.class, new MATSimTableRenderer());
 		table.setEnabled(false);
 		table.setAutoCreateRowSorter(true);
-		Object[][] data = new Object[0][6];
-		table.setModel(new DefaultTableModel(data, columnNames));
 
 		JScrollPane tableContainer = new JScrollPane(table);
 
@@ -72,8 +66,8 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		showIds.addActionListener(new ShowIdsListener());
 		renderMatsim.addActionListener(new RenderMatsimListener());
 
-		showIds.setSelected(true);
-		renderMatsim.setSelected(true);
+		showIds.setSelected(Defaults.showIds);
+		renderMatsim.setSelected(Defaults.renderMatsim);
 
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
@@ -98,48 +92,23 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	}
 
 	private void createTableModel(NetworkLayer layer) {
-		Object[][] data = new Object[0][6];
-		MATSimTableModel model = new MATSimTableModel(data, columnNames);
+		MATSimTableModel model = new MATSimTableModel(layer.getMatsimNetwork());
 		tableModels.put(layer, model);
-
-		Network network = (layer).getMatsimNetwork();
-		for (Link link : network.getLinks().values()) {
-			addLink(layer, link);
-		}
-
 	}
 
-	public void addLink(NetworkLayer layer, Link link) {
-
-		Object[] linkInfo = new Object[6];
-		String id = ((LinkImpl) link).getOrigId();
-		linkInfo[0] = id;
-		linkInfo[1] = link.getId().toString();
-		linkInfo[2] = link.getLength();
-		linkInfo[3] = link.getFreespeed();
-		linkInfo[4] = link.getCapacity();
-		linkInfo[5] = link.getNumberOfLanes();
-
-		tableModels.get(layer).addRow(linkInfo);
-		title(layer);
-	}
-
-	public void removeLink(NetworkLayer layer, Link link) {
-		title(layer);
-		tableModels.get(layer).removeLinkEntry(link);
-	}
-
-	private void title(NetworkLayer layer) {
+	public void title(NetworkLayer layer) {
 		setTitle(tr("Links: {0} / Nodes: {1}", layer.getMatsimNetwork()
 				.getLinks().size(), layer.getMatsimNetwork().getNodes().size()));
+		tableModels.get(layer).networkChanged();
 	}
 
 	@Override
 	public void activeLayerChange(Layer oldLayer, Layer newLayer) {
 		if (newLayer instanceof NetworkLayer) {
 			paintTable((NetworkLayer) newLayer);
-		} else
+		} else {
 			clearTable();
+		}
 	}
 
 	@Override
@@ -184,19 +153,75 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		}
 	}
 
-	private class MATSimTableModel extends DefaultTableModel {
+	private class MATSimTableModel extends AbstractTableModel {
+		
+		private String[] columnNames = { "id", "internal-id", "length",
+				"freespeed", "capacity", "permlanes" };
 
-		public MATSimTableModel(Object[][] data, String[] columnNames) {
-			super(data, columnNames);
+		private Network network;
+
+		private ArrayList<Id> links;
+
+		MATSimTableModel(Network network) {
+			this.network = network;
+			this.links = new ArrayList<Id>(network.getLinks().keySet());
+		}
+		
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			if (columnIndex == 0) {
+				return String.class;
+			} else if (columnIndex == 1) {
+				return String.class;
+			} else if (columnIndex == 2) {
+				return Double.class;
+			} else if (columnIndex == 3) {
+				return Double.class;
+			} else if (columnIndex == 4) {
+				return Double.class;
+			} else if (columnIndex == 5) {
+				return Double.class;
+			}
+			throw new RuntimeException();
 		}
 
-		protected void removeLinkEntry(Link link) {
-			String id = link.getId().toString();
-			for (int i = 0; i < this.getRowCount(); i++) {
-				if (id.equalsIgnoreCase(this.getValueAt(i, 1).toString())) {
-					this.removeRow(i);
-				}
+		@Override
+		public String getColumnName(int column) {
+			return columnNames[column];
+		}
+
+		public void networkChanged() {
+			this.links = new ArrayList<Id>(network.getLinks().keySet());
+			fireTableDataChanged();
+		}
+
+		@Override
+		public int getColumnCount() {
+			return columnNames.length;
+		}
+
+		@Override
+		public int getRowCount() {
+			return network.getLinks().size();
+		}
+
+		@Override
+		public Object getValueAt(int arg0, int arg1) {
+			Link link = network.getLinks().get(links.get(arg0));
+			if (arg1 == 0) {
+				return ((LinkImpl) link).getOrigId();
+			} else if (arg1 == 1) {
+				return link.getId().toString();
+			} else if (arg1 == 2) {
+				return link.getLength();
+			} else if (arg1 == 3) {
+				return link.getFreespeed();
+			} else if (arg1 == 4) {
+				return link.getCapacity();
+			} else if (arg1 == 5) {
+				return link.getNumberOfLanes();
 			}
+			throw new RuntimeException();
 		}
 	}
 
@@ -205,8 +230,10 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		public void actionPerformed(ActionEvent arg0) {
 			if (!showIds.isSelected()) {
 				Defaults.showIds = false;
-			} else
+			} else {
 				Defaults.showIds = true;
+			}
+			Main.map.mapView.repaint();
 		}
 	}
 
@@ -220,6 +247,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				Defaults.renderMatsim = true;
 				showIds.setEnabled(true);
 			}
+			Main.map.mapView.repaint();
 		}
 	}
 

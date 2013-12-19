@@ -99,7 +99,7 @@ public class MATSimPlugin extends Plugin {
 			toggleDialog = new MATSimToggleDialog();
 			Main.map.addToggleDialog(toggleDialog);
 			MapView.addLayerChangeListener(toggleDialog);
-			JOptionPane.showMessageDialog(Main.main.parent, "Hint:\nUse the middle mouse button when selecting\nto cycle through overlapping ways.");
+//			JOptionPane.showMessageDialog(Main.main.parent, "Hint:\nUse the middle mouse button when selecting\nto cycle through overlapping ways.");
 		}
 	}
 
