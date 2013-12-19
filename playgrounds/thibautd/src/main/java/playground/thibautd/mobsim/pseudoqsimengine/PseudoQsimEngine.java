@@ -19,22 +19,22 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim.pseudoqsimengine;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Collection;
+import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.Queue;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -49,6 +49,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
+
 import playground.thibautd.mobsim.QVehicleProvider;
 
 /**
@@ -74,9 +75,9 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 
 	private InternalInterface internalInterface = null;
 
-	private final CyclicBarrier startBarrier;
-	private final CyclicBarrier endBarrier;
-	private final CyclicBarrier finalBarrier;
+	private final BreakableCyclicBarrier startBarrier;
+	private final BreakableCyclicBarrier endBarrier;
+	private final BreakableCyclicBarrier finalBarrier;
 	private final TripHandlingRunnable[] runnables;
 	private final Thread[] threads;
 
@@ -102,15 +103,37 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 		this.network = network;
 
 		log.info( "initializing "+getClass().getName()+" with "+nThreads+" threads" );
-		this.startBarrier = new CyclicBarrier( nThreads + 1 );
-		this.endBarrier = new CyclicBarrier( nThreads + 1 );
-		this.finalBarrier = new CyclicBarrier( nThreads + 1 );
+		this.startBarrier = new BreakableCyclicBarrier( nThreads + 1 );
+		this.endBarrier = new BreakableCyclicBarrier( nThreads + 1 );
+		this.finalBarrier = new BreakableCyclicBarrier( nThreads + 1 );
 		this.runnables = new TripHandlingRunnable[ nThreads ];
 		this.threads = new Thread[ nThreads ];
+
+		final UncaughtExceptionHandler exceptionHandler =
+			new UncaughtExceptionHandler() {
+				@Override
+				public void uncaughtException(
+						final Thread t,
+						final Throwable e) {
+					if ( e instanceof UncheckedBrokenBarrierException ) {
+						// this is a result of the "reset" below: ignore to avoid spamming the user
+						return;
+					}
+					log.error( "thread "+t.getName()+" threw exception. Aborting." , e );
+
+					for ( TripHandlingRunnable r : runnables ) r.stopRun();
+
+					startBarrier.makeBroken();
+					endBarrier.makeBroken();
+					finalBarrier.makeBroken();
+				}
+			};
 		for ( int i = 0; i < nThreads; i++ ) {
 			this.runnables[ i ] = new TripHandlingRunnable( i );
 			this.threads[ i ] = new Thread( this.runnables[ i ] );
 			this.threads[ i ].setName( "PseudoQSimThread."+i );
+			this.threads[ i ].setUncaughtExceptionHandler(
+					exceptionHandler );
 			this.threads[ i ].start();
 		}
 
@@ -439,9 +462,34 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 				throw new RuntimeException( e );
 			}
 			catch (BrokenBarrierException e) {
-				throw new RuntimeException( e );
+				throw new UncheckedBrokenBarrierException( e );
 			}
 		}
+	}
+
+	private static class BreakableCyclicBarrier {
+		private boolean broken = false;
+		private CyclicBarrier barrier;
+
+		public BreakableCyclicBarrier(final int n) {
+			this.barrier = new CyclicBarrier( n );
+		}
+
+		public void makeBroken() {
+			this.broken = true;
+			barrier.reset();
+		}
+
+		public int await() throws InterruptedException, BrokenBarrierException {
+			if (broken) throw new BrokenBarrierException();
+			return barrier.await();
+		}
+	}
+
+	private static class UncheckedBrokenBarrierException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		public UncheckedBrokenBarrierException(final Throwable t) { super( t ); }
 	}
 }
 
