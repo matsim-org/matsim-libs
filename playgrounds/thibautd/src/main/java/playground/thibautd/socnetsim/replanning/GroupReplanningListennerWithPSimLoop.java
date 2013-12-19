@@ -99,7 +99,6 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 		if ( stopWatch != null ) stopWatch.beginOperation( "Inner PSim loop" );
 		for ( int i=0; i < nIters; i++ ) {
 			log.info( "### inner loop: start iteration "+event.getIteration()+"."+i );
-			scoring.notifyIterationStarts( new IterationStartsEvent( null , i ) );
 
 			final EventWriterXML writer =
 				controlerIO != null && pSimConfig.isDumpEvents() ?
@@ -114,6 +113,11 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 			innovativeStrategyManager.run(
 					i, // what makes sense here???
 					registry );
+
+			// iteration starts *after* replanning.
+			// This is important, as the plan selected at this stage will
+			// be use to construct the scoring function
+			scoring.notifyIterationStarts( new IterationStartsEvent( null , i ) );
 
 			try {
 				if ( stopWatch != null ) stopWatch.beginOperation( "PSim iter "+i );
