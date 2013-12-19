@@ -15,14 +15,23 @@ import java.util.Random;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.dziemke.demand.CommuterFileReader;
 import playground.dziemke.demand.CommuterRelation;
-import playground.dziemke.demand.PendlerMatrixReader;
 
 public class DemandGeneratorTwoPersonsSinglePlan implements Runnable{
   
-	private double scalingFactor = 0.01;
-	private double carMarketShare = 0.67;
-	private double fullyEmployedShare = 1.29;
+//	private double scalingFactor = 0.01;
+//	private double carMarketShare = 0.67;
+//	private double fullyEmployedShare = 1.29;
+	
+	double scalingFactor = 0.01;
+	double carShareBE = 0.67;
+	double carShareBB = 0.67;
+	double socialSecurityFactor = 1.29;
+	double expansionFactor = 2.0;
+	
+	// Gemeindeschluessel of Berlin is 11000000
+	Integer planningAreaId = 11000000;
 	
 	private String commuterFileIn = "D:/Workspace/container/demand/input/B2009Ge.csv";
 	private String commuterFileOut = "D:/Workspace/container/demand/input/B2009Ga.csv";
@@ -35,9 +44,12 @@ public class DemandGeneratorTwoPersonsSinglePlan implements Runnable{
 	private String outputFileHouseholds = new String("D:/Workspace/container/demand/input/cemdap_berlin/testingTwo/households.dat");
 	
 	
-	private PendlerMatrixReader pendlerMatrixReader = new PendlerMatrixReader(shapeFileMunicipalities, commuterFileIn, 
-			commuterFileOut, scalingFactor, carMarketShare, fullyEmployedShare);
-	private List <CommuterRelation> commuterRelations = pendlerMatrixReader.getCommuterRelations();
+	CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn, carShareBB,	commuterFileOut, 
+			carShareBE, scalingFactor * socialSecurityFactor * expansionFactor, planningAreaId.toString());
+	List<CommuterRelation> commuterRelations = commuterFileReader.getCommuterRelations();
+//	private PendlerMatrixReader pendlerMatrixReader = new PendlerMatrixReader(shapeFileMunicipalities, commuterFileIn, 
+//			commuterFileOut, scalingFactor, carMarketShare, fullyEmployedShare);
+//	private List <CommuterRelation> commuterRelations = pendlerMatrixReader.getCommuterRelations();
 	
 	private Map <Integer, String> lors = new HashMap <Integer, String>();
 		

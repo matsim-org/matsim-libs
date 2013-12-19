@@ -29,11 +29,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -42,24 +40,23 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
-public class ZoneFilesGenerator {
+public class ZoneLOSGenerator {
 
 	private Map <Integer, Zone> zonesMap = new HashMap <Integer, Zone>();
 	private Map <String, Zone2Zone> zone2ZoneMap = new HashMap <String, Zone2Zone>();
 
 	// private String shapeFile = new String("D:/Workspace/container/demand/input/gemeinden/gemeindenLOR_proj.shp");
-	// changed to following on 2013-03-23
-	// IDs unaffected by this
-	// distance calculation only affected slightly by this
-	private String shapeFile = new String("D:/Workspace/container/demand/input/gemeinden/gemeindenLOR_DHDN_GK4.shp");
+	// changed to "gemeindenLOR_DHDN_GK4.shp" before producing "cemdap_berlin/02" (on 2013-03-23)
+	// IDs are unaffected by this change, distance calculation is affected slightly
+	private String shapeFile = new String("D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp");
 	
-	private String outputFileZone2Zone = new String("D:/Workspace/container/demand/input/cemdap_berlin/03/zone2zone.dat");
-	private String outputFileZones = new String("D:/Workspace/container/demand/input/cemdap_berlin/03/zones.dat");
-	private String outputFileLosOffPkAM = new String("D:/Workspace/container/demand/input/cemdap_berlin/03/losoffpkam.dat");
+	private String outputFileZone2Zone = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/zone2zone.dat");
+	private String outputFileZones = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/zones.dat");
+	private String outputFileLosOffPkAM = new String("D:/Workspace/container/demand/input/cemdap_berlin/18/losoffpkam.dat");
 	
 	
 	public static void main(String[] args) {
-		ZoneFilesGenerator zoneFilesGenerator = new ZoneFilesGenerator();
+		ZoneLOSGenerator zoneFilesGenerator = new ZoneLOSGenerator();
 		zoneFilesGenerator.run();
 	}
 
@@ -79,8 +76,10 @@ public class ZoneFilesGenerator {
 			Integer key = Integer.parseInt((String) feature.getAttribute("NR"));
 			Geometry geo = (Geometry) feature.getDefaultGeometry();
 			
-			// could be improved by using "Schwerpunkt" instead of random point in feature
-			Point point = getRandomPointInFeature(new Random(), geo);
+			// Point point = getRandomPointInFeature(new Random(), geo);
+			// switched to centroid instead of a random point before producing "cemdap_berlin/16" (on 2013-10-14)
+			// 1) makes more sense, 2) eliminates randomness
+			Point point = geo.getCentroid();
 			Coordinate coordinate = point.getCoordinate();
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
@@ -88,18 +87,6 @@ public class ZoneFilesGenerator {
 			Zone zone = new Zone(key, coord);
 			zonesMap.put(key, zone);
 		}
-	}
-	
-	
-	private static Point getRandomPointInFeature(Random rnd, Geometry g) {
-		Point p = null;
-		double x, y;
-		do {
-			x = g.getEnvelopeInternal().getMinX() + rnd.nextDouble() * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
-			y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
-			p = MGC.xy2Point(x, y);
-		} while (!g.contains(p));
-		return p;
 	}
 	
 	
@@ -117,8 +104,10 @@ public class ZoneFilesGenerator {
 				double temp = 0.0;
 				
 				if (keySource == keySink) {
-					// placeholder value; later use seemthing more meaningful
-					distance = 3.0;
+					// placeholder value; later use something more meaningful
+					//TODO needs conceptual revision 
+					distance = 1.72;
+					//distance = 3.0;
 				} else {
 					// Coordinates appear to be in "DHDN_GK4"
 					// has Rechts- and Hochwert in meter
@@ -167,6 +156,7 @@ public class ZoneFilesGenerator {
     				int sink = this.zone2ZoneMap.get(keySource + "_" + keySink).getSink();
     				double distance = this.zone2ZoneMap.get(keySource + "_" + keySink).getDistance();
     				
+    				// altogether this creates 4 columns = number in query file
     				bufferedWriterZone2Zone.write(source + "\t" + sink + "\t" + 0  + "\t" + distance );
         			bufferedWriterZone2Zone.newLine();
         		}
@@ -201,6 +191,7 @@ public class ZoneFilesGenerator {
     		
     		for (Integer keySource : this.zonesMap.keySet()) {
     			
+    			// altogether this creates 45 columns = number in query file
     			bufferedWriterZones.write(keySource + "\t" + 0 + "\t" + 0  + "\t" + 0
     					+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0
     					+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0
@@ -251,18 +242,21 @@ public class ZoneFilesGenerator {
     				
     				double distance = this.zone2ZoneMap.get(keySource + "_" + keySink).getDistance();
     				
+    				//TODO need conceptual revision
     				double driveAloneIVTT = distance * 1.2;
     				// round to two decimal places
 					temp = driveAloneIVTT * 100;
     				temp = Math.round(temp);
     				driveAloneIVTT = temp / 100;
     				
+    				//TODO needs conceptual revision
     				double driveAloneCost = distance / 15.0;
     				// round to two decimal places
 					temp = driveAloneCost * 100;
     				temp = Math.round(temp);
     				driveAloneCost = temp / 100;
-    				    				
+    				
+    				// altogether this creates 14 columns = number in query file
     				bufferedWriterLos.write(source + "\t" + sink + "\t" + inSameZone  + "\t" + 0
     						+ "\t" + distance + "\t" + driveAloneIVTT + "\t" + 3.1
     						+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + driveAloneCost

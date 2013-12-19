@@ -20,78 +20,55 @@
 package playground.dziemke.other;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
+public class Zone2ZoneSampleFileAnalyzer {
 
-public class FileModifier {
-
-	// specify in- and output files and number of last column that stays unchanged
-	// start counting column with 1 (not with 0).
-	private static String inputFile = new String("D:/Workspace/container/demand/input/cemdap_samples/losoffpkam.dat");
-	private static String outputFile = new String("D:/Workspace/container/demand/input/cemdap_samples_reduced/losoffpkam.dat");
-	
-	private static int numberOfLastUnchangedColumn = 2; 
-	
+	private static String inputFile = new String("D:/Workspace/cemdap/CEMDAP_Sample_Data/zone2zone.dat");
 	
 	public static void main(String[] args) {
+		int lineCount = 0;
+		int interiorCount = 0;
+		
+		double aggregateInteriorDistance = 0;
+		
 		FileReader fileReader;
 		BufferedReader bufferedReader;
 				
-		BufferedWriter bufferedWriter = null;
-		
 		try {
 			fileReader = new FileReader(inputFile);
 			bufferedReader = new BufferedReader(fileReader);
-					
-			File output = new File(outputFile);
-    		FileWriter fileWriter = new FileWriter(output);
-    		bufferedWriter = new BufferedWriter(fileWriter);
 			
 			String line = null;
-						
 			
 			while ((line = bufferedReader.readLine()) != null) {
+				lineCount++;
+				
 				String[] entry = line.split("\t");
 				
-				// (re-)write original entries
-				for (int i=0; i<numberOfLastUnchangedColumn; i++) {
-					bufferedWriter.write(entry[i] + "\t" );
-				}
+				int origin = Integer.parseInt(entry[0]);
+				int destination = Integer.parseInt(entry[1]);
+				double distance = Double.parseDouble(entry[3]);
 				
-				//	write zeros
-				for (int i=numberOfLastUnchangedColumn; i<entry.length-1; i++) {
-					bufferedWriter.write(0 + "\t");
+				if (origin == destination) {
+					interiorCount++;
+					aggregateInteriorDistance = aggregateInteriorDistance + distance;
 				}
-				// write last entry without tab split
-				bufferedWriter.write("0");				
-        		bufferedWriter.newLine();
-        			
 			}
-		
 			
 		} catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
-        } finally {
-            //Close the BufferedWriter
-            try {
-                if (bufferedWriter != null) {
-                    // bufferedWriter.flush();
-                    bufferedWriter.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
         }
-		System.out.println("Fertig.");	
 		
-	}
-}
-	
+		double averageInteriorDistance = aggregateInteriorDistance/interiorCount;
 
+		System.out.println("lineCount: " + lineCount);
+		System.out.println("interiorCount: " + interiorCount);
+		System.out.println("averageInteriorDistance: " + averageInteriorDistance);
+	}
+
+}

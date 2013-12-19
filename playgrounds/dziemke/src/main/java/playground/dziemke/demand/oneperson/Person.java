@@ -6,23 +6,31 @@ public class Person {
 	private int householdId;
 	// private int personId;
 	private String personId;
-	private int employed = 1;
+	//private int employed = 1;
+	private int employed;
+	//private int student;
 	private int student = 0;
 	private int driversLicence = 1;	
 	private int locationOfWork;
-	private int locationOfSchool = -99;
-	private int female = 1;
+	//private int locationOfSchool = -99;
+	private int locationOfSchool;
+	//private int female = 1;
+	private int sex;
 	private int age;
-	private int parent = 1;
+	//private int parent = 1;
+	private int parent = 0;
 			
 	
 	// public Person(int personId, int householdId, int locationOfWork, int age) {
-	public Person(String personId, int householdId, int employed, int locationOfWork, int age) {
+	public Person(String personId, int householdId, int employed, int student, int locationOfWork, int locationOfSchool, int sex, int age) {
 		this.personId = personId;
 		this.householdId = householdId;
 		this.employed = employed;
+		this.student = student;
 		this.locationOfWork = locationOfWork;
+		this.locationOfSchool = locationOfSchool;
 		this.age = age;
+		this.sex = sex;
 	}
 
 	public int getHouseholdId() {
@@ -83,12 +91,12 @@ public class Person {
 		this.locationOfSchool = locationOfSchool;
 	}
 	
-	public int getFemale() {
-		return this.female;
+	public int getSex() {
+		return this.sex;
 	}
 
-	public void setFemale(int female) {
-		this.female = female;
+	public void setSex(int sex) {
+		this.sex = sex;
 	}
 	
 	public int getAge() {
@@ -98,7 +106,7 @@ public class Person {
 	public void setAge(int age) {
 		this.age = age;
 	}
-		
+	
 	public int getParent() {
 		return this.parent;
 	}

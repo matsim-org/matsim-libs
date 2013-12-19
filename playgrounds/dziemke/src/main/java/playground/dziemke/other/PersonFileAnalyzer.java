@@ -20,78 +20,87 @@
 package playground.dziemke.other;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 
-public class FileModifier {
+public class PersonFileAnalyzer {
 
-	// specify in- and output files and number of last column that stays unchanged
-	// start counting column with 1 (not with 0).
-	private static String inputFile = new String("D:/Workspace/container/demand/input/cemdap_samples/losoffpkam.dat");
-	private static String outputFile = new String("D:/Workspace/container/demand/input/cemdap_samples_reduced/losoffpkam.dat");
-	
-	private static int numberOfLastUnchangedColumn = 2; 
-	
+
+	private static String inputFile = new String("D:/Workspace/container/demand/input/cemdap_berlin/19/persons1.dat");
 	
 	public static void main(String[] args) {
+		int lineCount = 0;
+		
+		int aggregateEmployed = 0;
+		int aggregateStudent = 0;
+		int aggregateLicense = 0;
+		int noWorkTSZ = 0;
+		int noSchTSZ = 0;
+		int aggregateFemale = 0;
+		int aggregateAge = 0;
+		int aggregateParent = 0;
+		
 		FileReader fileReader;
 		BufferedReader bufferedReader;
 				
-		BufferedWriter bufferedWriter = null;
-		
 		try {
 			fileReader = new FileReader(inputFile);
 			bufferedReader = new BufferedReader(fileReader);
-					
-			File output = new File(outputFile);
-    		FileWriter fileWriter = new FileWriter(output);
-    		bufferedWriter = new BufferedWriter(fileWriter);
 			
 			String line = null;
-						
 			
 			while ((line = bufferedReader.readLine()) != null) {
+				lineCount++;
+				
 				String[] entry = line.split("\t");
 				
-				// (re-)write original entries
-				for (int i=0; i<numberOfLastUnchangedColumn; i++) {
-					bufferedWriter.write(entry[i] + "\t" );
+				int employed = Integer. parseInt(entry[2]);
+				int student = Integer. parseInt(entry[3]);
+				int license = Integer. parseInt(entry[4]);
+				int workTSZ = Integer. parseInt(entry[5]);
+				int schTSZ = Integer. parseInt(entry[6]);
+				int female = Integer. parseInt(entry[7]);
+				int age = Integer. parseInt(entry[8]);
+				int parent = Integer. parseInt(entry[9]);
+				
+				aggregateEmployed = aggregateEmployed + employed;
+				aggregateStudent = aggregateStudent + student;
+				aggregateLicense = aggregateLicense + license;
+				
+				if (workTSZ == -99) {
+					noWorkTSZ++;
 				}
 				
-				//	write zeros
-				for (int i=numberOfLastUnchangedColumn; i<entry.length-1; i++) {
-					bufferedWriter.write(0 + "\t");
+				if (schTSZ == -99) {
+					noSchTSZ++;
 				}
-				// write last entry without tab split
-				bufferedWriter.write("0");				
-        		bufferedWriter.newLine();
-        			
+				
+				aggregateFemale = aggregateFemale + female;
+				aggregateAge = aggregateAge + age;
+				aggregateParent = aggregateParent + parent;
 			}
-		
 			
 		} catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
-        } finally {
-            //Close the BufferedWriter
-            try {
-                if (bufferedWriter != null) {
-                    // bufferedWriter.flush();
-                    bufferedWriter.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
         }
-		System.out.println("Fertig.");	
 		
+		double averageAge = aggregateAge/lineCount;
+				
+		System.out.println("Line Count: " + lineCount);
+		System.out.println("Empoloyed: " + aggregateEmployed);
+		System.out.println("Student: " + aggregateStudent);
+		System.out.println("License: " + aggregateLicense);
+		System.out.println("NoWorkTSZ: " + noWorkTSZ);
+		System.out.println("NoSchTSZ: " + noSchTSZ);
+		System.out.println("Female: " + aggregateFemale);
+		System.out.println("Average Age: " + averageAge);
+		System.out.println("Parent: " + aggregateParent);		
 	}
+
 }
 	
 
