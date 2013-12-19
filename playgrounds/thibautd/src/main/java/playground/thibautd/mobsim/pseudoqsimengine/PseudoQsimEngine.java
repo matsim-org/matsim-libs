@@ -247,6 +247,13 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 
 			//vehicle.setCurrentLink( linkId );
 
+			eventsManager.processEvent(
+					new Wait2LinkEvent(
+						now,
+						agent.getId(),
+						linkId,
+						vehicleId) );
+
 			final TripHandlingRunnable runnable = runnables[ random.nextInt( runnables.length ) ];
 			runnable.addArrivalEvent(
 					// do not travel on first link
@@ -255,13 +262,6 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 						now,
 						linkId,
 						vehicle) );
-
-			eventsManager.processEvent(
-					new Wait2LinkEvent(
-						now,
-						agent.getId(),
-						linkId,
-						vehicleId) );
 		}
 
 		return true;
