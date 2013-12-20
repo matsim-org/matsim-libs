@@ -20,8 +20,7 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -45,16 +44,13 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	
 	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
-		
-		Map<Id, MobsimAgent> activityEndingAgents = new LinkedHashMap<Id, MobsimAgent>(activityReplanningMap.getActivityEndingAgents(time));
-
-		// apply filter to remove agents that should not be replanned
-		this.applyFilters(activityEndingAgents.keySet(), time);
-		
-		// create set of agents to be replanned 
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
-		for (MobsimAgent mobsimAgent : activityEndingAgents.values()) agentsToReplan.add(mobsimAgent);
-		
+
+		for (Entry<Id, MobsimAgent> entry : this.activityReplanningMap.getActivityEndingAgents(time).entrySet()) {
+			Id agentId = entry.getKey();
+			if (this.applyFilters(agentId, time)) agentsToReplan.add(entry.getValue());
+		}
+			
 		/*
 		 * Here was lots of additional code that identified agents which ended their activity, then
 		 * performed a leg starting and ending on the same link and then performed an activity with

@@ -54,11 +54,17 @@ public class TransportModeFilter implements AgentFilter {
 		
 		while (iter.hasNext()) {
 			Id id = iter.next();
-			MobsimAgent agent = this.agents.get(id);
-			
-			if (!(agent.getState() == MobsimAgent.State.LEG)) iter.remove();
-			if (!(modes.contains(agent.getMode()))) iter.remove();			
+			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
 	}
 
+	@Override
+	public boolean applyAgentFilter(Id id, double time) {
+		MobsimAgent agent = this.agents.get(id);
+		
+		if (!(agent.getState() == MobsimAgent.State.LEG)) return false;
+		if (!(modes.contains(agent.getMode()))) return false;
+		
+		return true;
+	}
 }

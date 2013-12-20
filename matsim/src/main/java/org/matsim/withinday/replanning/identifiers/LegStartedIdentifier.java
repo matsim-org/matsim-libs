@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -44,17 +43,18 @@ public class LegStartedIdentifier extends DuringLegIdentifier {
 	}
 	
 	@Override
-	public Set<MobsimAgent> getAgentsToReplan(double time) {
-		Set<Id> legStartedAgents = new HashSet<Id>(this.linkReplanningMap.getLegStartedAgents());
+	public Set<MobsimAgent> getAgentsToReplan(double time) {		
 		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
-
-		// apply filter to remove agents that should not be replanned
-		this.applyFilters(legStartedAgents, time);
-		
-		// create set of PlanBasedWithinDayAgent
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
-		for (Id id : legStartedAgents) agentsToReplan.add(mapping.get(id));
 
+		/*
+		 * Identify those leg performing agents that should be replanned.
+		 * Add them to a set of MobsimAgents.
+		 */
+		for (Id agentId : this.linkReplanningMap.getLegStartedAgents()) {
+			if (this.applyFilters(agentId, time)) agentsToReplan.add(mapping.get(agentId));
+		}
+		
 		return agentsToReplan;
 	}
 

@@ -50,10 +50,15 @@ public class EarliestLinkExitTimeFilter implements AgentFilter {
 		while (iter.hasNext()) {
 			Id id = iter.next();
 			
-			Double earliestLinkExitTime = this.earliestLinkExitTimeProvider.getEarliestLinkExitTime(id);
-			if (earliestLinkExitTime == null) iter.remove();
-			else if (earliestLinkExitTime <= time) iter.remove();		
+			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
 	}
-
+	
+	@Override
+	public boolean applyAgentFilter(Id id, double time) {
+		Double earliestLinkExitTime = this.earliestLinkExitTimeProvider.getEarliestLinkExitTime(id);
+		if (earliestLinkExitTime == null) return false;
+		else if (earliestLinkExitTime <= time) return false;
+		else return true;
+	}
 }

@@ -20,10 +20,7 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -44,23 +41,16 @@ public class InitialIdentifierImpl extends InitialIdentifier {
 	
 	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
-		
-		Collection<MobsimAgent> mobsimAgents = new LinkedHashSet<MobsimAgent>(this.mobsimDataProvider.getAgents().values()); 
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 
 		/*
 		 * Apply filter to remove agents that should not be replanned.
-		 * We need a workaround since applyFilters expects Ids and not Agents.
 		 */
-		Set<Id> agentIds = new HashSet<Id>();
-		for (MobsimAgent agent : mobsimAgents) agentIds.add(agent.getId());
-		this.applyFilters(agentIds, time);
-		Iterator<MobsimAgent> iter = mobsimAgents.iterator();
-		while (iter.hasNext()) {
-			MobsimAgent agent = iter.next();
-			if (agentIds.contains(agent.getId())) agentsToReplan.add(agent);
+		for (Entry<Id, MobsimAgent> entry : this.mobsimDataProvider.getAgents().entrySet()) {
+			Id agentId = entry.getKey();
+			if (this.applyFilters(agentId, time))  agentsToReplan.add(entry.getValue());
 		}
-
+		
 		return agentsToReplan;
 	}
 

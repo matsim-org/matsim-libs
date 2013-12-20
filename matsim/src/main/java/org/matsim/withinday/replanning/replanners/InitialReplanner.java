@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
@@ -44,7 +45,7 @@ public class InitialReplanner extends WithinDayInitialReplanner {
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
-		this.planRouter.run(this.withinDayAgentUtils.getSelectedPlan(withinDayAgent));
+		this.planRouter.run(WithinDayAgentUtils.getSelectedPlan(withinDayAgent));
 		return true;
 	}
 }

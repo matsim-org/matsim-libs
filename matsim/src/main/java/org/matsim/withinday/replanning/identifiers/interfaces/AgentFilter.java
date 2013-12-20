@@ -34,4 +34,9 @@ public interface AgentFilter {
 	 * Agents that do not match the filter criteria are removed from the set.
 	 */
 	public void applyAgentFilter(Set<Id> set, double time);
+
+	/**
+	 * Returns true if the agent matches the filter criteria, otherwise returns false.
+	 */
+	public boolean applyAgentFilter(Id id, double time);
 }

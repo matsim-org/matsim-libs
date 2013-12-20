@@ -51,10 +51,15 @@ public class LinkFilter implements AgentFilter {
 		
 		while (iter.hasNext()) {
 			Id id = iter.next();
-			MobsimAgent agent = this.agents.get(id);
-			
-			if (!(links.contains(agent.getCurrentLinkId()))) iter.remove();			
+			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
 	}
 
+	@Override
+	public boolean applyAgentFilter(Id id, double time) {
+		MobsimAgent agent = this.agents.get(id);
+		
+		if (!(links.contains(agent.getCurrentLinkId()))) return false;
+		else return true;
+	}
 }

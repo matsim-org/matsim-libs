@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
@@ -64,7 +65,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
 
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -72,7 +73,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		/*
 		 *  Get the index of the current PlanElement
 		 */
-		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		/*
 		 * Search next leg in the agent's plan

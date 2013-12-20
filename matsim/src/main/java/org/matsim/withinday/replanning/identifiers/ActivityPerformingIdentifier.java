@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -45,15 +44,16 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 	
 	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
-		Set<Id> activityPerformingAgents = new HashSet<Id>(activityReplanningMap.getActivityPerformingAgents());
 		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
-
-		// apply filter to remove agents that should not be replanned
-		this.applyFilters(activityPerformingAgents, time);
-		
-		// create set of agents to be replanned
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
-		for (Id id : activityPerformingAgents) agentsToReplan.add(mapping.get(id));
+
+		/*
+		 * Identify those activity performing agents that should be replanned.
+		 * Add them to a set of MobsimAgents.
+		 */
+		for (Id agentId : this.activityReplanningMap.getActivityPerformingAgents()) {
+			if (this.applyFilters(agentId, time)) agentsToReplan.add(mapping.get(agentId));
+		}
 				
 		return agentsToReplan;
 	}

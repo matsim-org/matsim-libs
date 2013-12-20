@@ -51,18 +51,25 @@ public class ActivityStartingFilter implements AgentFilter {
 		while (iter.hasNext()) {
 			Id id = iter.next();
 		
-			MobsimAgent agent = this.agents.get(id);
-			// check whether the agent is performing a leg
-			if (!(agent.getState() == MobsimAgent.State.LEG)) iter.remove();
-			
-			/*
-			 * Check whether the agent ends its leg on the current link. If
-			 * yes, remove the agent from the set.
-			 */
-			DriverAgent driver = (DriverAgent) agent;
-			Id nextLinkId = driver.chooseNextLinkId();
-			if (nextLinkId == null) iter.remove();
+			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
+	}
+	
+	@Override
+	public boolean applyAgentFilter(Id id, double time) {
+		MobsimAgent agent = this.agents.get(id);
+		// check whether the agent is performing a leg
+		if (!(agent.getState() == MobsimAgent.State.LEG)) return false;
+		
+		/*
+		 * Check whether the agent ends its leg on the current link. If
+		 * yes, remove the agent from the set.
+		 */
+		DriverAgent driver = (DriverAgent) agent;
+		Id nextLinkId = driver.chooseNextLinkId();
+		if (nextLinkId == null) return false;
+		
+		return true;
 	}
 	
 }

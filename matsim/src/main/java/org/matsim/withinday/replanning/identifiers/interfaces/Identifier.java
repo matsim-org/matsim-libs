@@ -55,6 +55,13 @@ public abstract class Identifier {
 		for (AgentFilter agentFilter : agentFilters) agentFilter.applyAgentFilter(set, time);
 	}
 	
+	public final boolean applyFilters(Id id, double time) {
+		for (AgentFilter agentFilter : agentFilters) {
+			if(!agentFilter.applyAgentFilter(id, time)) return false;
+		}
+		return true;
+	}
+	
 	public final void setIdentifierFactory(IdentifierFactory factory) {
 		this.identifierFactory = factory;
 	}

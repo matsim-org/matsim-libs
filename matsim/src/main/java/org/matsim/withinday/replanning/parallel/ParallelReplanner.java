@@ -74,6 +74,8 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	protected CyclicBarrier betweenReplannerBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
 	
+	protected boolean simIsRunning = false;
+	
 	public ParallelReplanner(int numOfThreads, EventsManager eventsManager) {
 		this.setNumberOfThreads(numOfThreads);
 		this.eventsManager = eventsManager;
@@ -146,6 +148,8 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 			replanningThread.start();
 		}
 
+		this.simIsRunning = true;
+		
 		/*
 		 * After initialization the threads are waiting at the
 		 * TimeStepEndBarrier. We trigger this Barrier once so
@@ -198,6 +202,8 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 
 	public final void afterSim() {
 
+		this.simIsRunning = false;
+		
 		if (this.hadException.get()) {
 			throw new RuntimeException("Exception while replanning. " +
 					"Cannot guarantee that all replanning operations have been fully processed.");
@@ -240,6 +246,27 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	
 	public final void addWithinDayReplannerFactory(T factory) {
 		this.replannerFactories.add(factory);
+		
+		/*
+		 * This is necessary for timed within-day replanners. They are added while the
+		 * simulation is already running. Theirfore, now Queue<ReplanningTask> is created
+		 * in the onPrepare() method.
+		 * cdobler, dec'13
+		 */
+		if (simIsRunning) {
+			if (shareReplannerQueue) {
+				Queue<ReplanningTask> queue = new LinkedBlockingQueue<ReplanningTask>();
+				for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
+					WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+					replanningRunnable.addWithinDayReplanner(newInstance, queue);
+				}
+			} else {
+				for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
+					WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+					replanningRunnable.addWithinDayReplanner(newInstance, new LinkedList<ReplanningTask>());
+				}
+			}						
+		}
 	}
 
 	public final void removeWithinDayReplannerFactory(T factory) {

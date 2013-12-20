@@ -43,10 +43,16 @@ public class CollectionAgentFilter implements AgentFilter {
 		
 		while (iter.hasNext()) {
 			Id id = iter.next();
-			if (!includedAgents.contains(id)) iter.remove();
+			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
 	}
-
+	
+	@Override
+	public boolean applyAgentFilter(Id id, double time) {
+		if (!includedAgents.contains(id)) return false;
+		else return true;
+	}
+	
 	public Collection<Id> getIncludedAgents() {
 		return Collections.unmodifiableSet(this.includedAgents);
 	}

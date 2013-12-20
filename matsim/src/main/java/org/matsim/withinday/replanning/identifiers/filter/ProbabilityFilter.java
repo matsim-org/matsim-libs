@@ -43,15 +43,21 @@ public class ProbabilityFilter implements AgentFilter {
 		Iterator<Id> iter = set.iterator();
 		
 		while (iter.hasNext()) {
-			iter.next();
+			Id id = iter.next();
 			
-			/*
-			 * Based on a random number it is decided whether an agent should 
-			 * do a replanning or not.
-			 * number > replanningProbability: no replanning
-			 */
-			double rand = random.nextDouble();
-			if (rand > replanningProbability) iter.remove();
+			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
+	}
+	
+	@Override
+	public boolean applyAgentFilter(Id id, double time) {
+		/*
+		 * Based on a random number it is decided whether an agent should 
+		 * do a replanning or not.
+		 * number > replanningProbability: no replanning
+		 */
+		double rand = random.nextDouble();
+		if (rand > replanningProbability) return false;
+		else return true;
 	}
 }
