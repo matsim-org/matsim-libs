@@ -45,6 +45,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -66,6 +67,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -210,33 +212,31 @@ public class DreieckNmodes {
 	}
 	
 	//CONFIGURATION: static variables used for aggregating configuration options
-	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public static double length = 333.33;//in m, length of one the triangle sides.
-	public static int NETWORK_CAPACITY = 2700;//in PCU/h
-	public static boolean PASSING_ALLOWED = true;
-	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_test_4.txt";
-	private static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_test_4.xml";
+	public final static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
+	public final static double length = 444.44;//in m, length of one the triangle sides.
+	public final static int NETWORK_CAPACITY = 2700;//in PCU/h
+	public final static double END_TIME = 14*3600;
+	public final static boolean PASSING_ALLOWED = true;
+	private final static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_grid_expansion1.txt";
+	private final static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_expansion1.xml";
 	
-	private static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
-	public static int NUMBER_OF_MEMORIZED_FLOWS = 10;
-	public static int NUMBER_OF_MODES = 4;
-	public static String[] NAMES= {"bicycles","motorbikes","cars", "trucks"};	//identification of the different modes
-	public static Double[] Probabilities = {1/4., 1/4., 1/4., 1/4.}; //modal split
-	public static Double[] Pcus = {0.25, 0.25, 1., 3.}; 			//PCUs of the different possible modes
-	public static Double[] Speeds = {4.17, 16.67, 16.67, 10.};		//maximum velocities of the vehicle types, in m/s
-	private static Integer[] MaxAgentDistribution = {600,600,150,50};
-	private static Integer[] Steps = {100,100,30,10};
+	private final static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
+	public final static int NUMBER_OF_MEMORIZED_FLOWS = 10;
+	public final static int NUMBER_OF_MODES = 3/*4*/;
+	public final static String[] NAMES= {"bicycles","motorbikes","cars"/*, "trucks"*/};	//identification of the different modes
+	public final static Double[] Probabilities = {0.15, 0.25, 0.6/*, 0.25*/}; //modal split
+	public final static Double[] Pcus = {0.25, 0.25, 1./*, 3.*/}; 			//PCUs of the different possible modes
+	public final static Double[] Speeds = {4.17, 16.67, 16.67/*, 10.*/};		//maximum velocities of the vehicle types, in m/s
+	private final static Integer[] MaxAgentDistribution = {800,800,200/*,50*/};
+	private final static Integer[] Steps = {40,40,5/*,10*/};
 	
 	private PrintStream writer;
 	private Scenario scenario;
 	private static FundamentalDiagramsNmodes funfunfun;
 	private Map<Id, ModeData> modesData;
-	private int networkCapacity;//the capacity all links of the network will have
 		
 	
 	public DreieckNmodes(int networkCapacity){
-		this.networkCapacity = networkCapacity;
-		
 		//Checking that configuration data has the appropriate size:
 		if (NAMES.length != NUMBER_OF_MODES){	throw new RuntimeException("There should be "+NUMBER_OF_MODES+" names for the different modes. Check your static variable NAMES!");}
 		if (Probabilities.length != NUMBER_OF_MODES){ throw new RuntimeException("There should be "+NUMBER_OF_MODES+" probabilities for the different modes. Check your static variable Probabilities!");}
@@ -255,6 +255,8 @@ public class DreieckNmodes {
 		// this may lead to abort during execution.  In such cases, please fix the configuration.  if necessary, talk
 		// to me (kn).
 		this.scenario = ScenarioUtils.createScenario(config);
+		ConfigWriter cWriter = new ConfigWriter(config);
+		cWriter.write("Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\config.xml");
 		
 		//Initializing modeData objects//TODO: should be initialized when instancing FundamentalDiagrams, no workaround still found
 		//Need to be currently initialized at this point to initialize output and modified QSim
@@ -276,6 +278,7 @@ public class DreieckNmodes {
 		DreieckNmodes dreieck = new DreieckNmodes(NETWORK_CAPACITY);
 		dreieck.fillNetworkData();
 		dreieck.openFile(OUTPUT_DIR);
+		//dreieck.parametricRunAccordingToGivenModalSplit();
 		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
 		//dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
 		dreieck.closeFile();
@@ -294,14 +297,70 @@ public class DreieckNmodes {
 		}
 	}
 	
+	private void parametricRunAccordingToGivenModalSplit(){
+		//NB: Due to the strict programming here, in some cases (numbers in Pcu or Probabilities prime to each other),
+		//NB: this might give out only a few cases, which is not very interesting.
+		//NB: Might be therefore useful to implement a more "permissive" programming.
+		
+		//Creating minimal configuration respecting modal split and integer agent numbers
+		List<Double> pcus = Arrays.asList(DreieckNmodes.Pcus);
+		List<Integer> minSteps = new ArrayList<Integer>();
+		for (double prob : Arrays.asList(DreieckNmodes.Probabilities)){
+			minSteps.add(new Integer((int) (prob*100)));
+		}
+		int multiplier = 1;
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+			double pcu = pcus.get(i); 
+			if ((pcu>1) && ((minSteps.get(i))%pcu != 0)){
+				double ppcm = ppcm((int) pcu, minSteps.get(i));
+				multiplier *= ppcm/minSteps.get(i);
+			}
+		}
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+			minSteps.set(i, (int) (minSteps.get(i)*multiplier/DreieckNmodes.Pcus[i]));
+		}
+		int pgcd = pgcd(minSteps);
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+			minSteps.set(i, minSteps.get(i)/pgcd);
+		}
+		
+		//Deducing all possible points to run by multiplying smallest configuration until reaching max storage capacity
+		int iterationStep = 0;
+		int maxPCUcount = (int) (0.150 * DreieckNmodes.length * 3) ;
+		double pcuPerAgent = 0.;
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+			iterationStep += minSteps.get(i);
+			pcuPerAgent += DreieckNmodes.Probabilities[i] * DreieckNmodes.Pcus[i];
+		}
+		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
+		int numberOfPoints = (int) ((maxPCUcount/pcuPerAgent)/iterationStep) + 20;//TODO still nowhere near the expected number of points
+		for (int m=0; m<numberOfPoints; m++){
+			List<Integer> pointToRun = new ArrayList<Integer>();
+			for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+				pointToRun.add(minSteps.get(i)*m);
+			}
+			System.out.println(pointToRun);
+			pointsToRun.add(pointToRun);//Could run directly here, not done for better code overview
+		}
+		System.out.println(pointsToRun);
+		//Effective iteration over all points 
+		for ( int i=0; i<pointsToRun.size(); i++){
+			List<Integer> pointToRun = pointsToRun.get(i);
+			System.out.println("Going into run "+pointToRun);
+			this.singleRun(pointToRun);
+		}
+	}
+	
 	private List<List<Integer>> createPointsToRun(List<Integer> maxValues, List<Integer> steps) {
 		//calculate number of points and creating starting point:
 		int numberOfPoints = 1; 
-		Integer[] startingPoint = new Integer[maxValues.size()];
-		for (int i=0; i<maxValues.size(); i++){
-			numberOfPoints *=  ( (maxValues.get(i).intValue() / steps.get(i).intValue()) + 1);
-			startingPoint[i] = new Integer(0);
-		}
+		//TODO: set this back. Integer[] startingPoint = new Integer[maxValues.size()];
+		//for (int i=0; i<maxValues.size(); i++){
+		//	numberOfPoints *=  ( (maxValues.get(i).intValue() / steps.get(i).intValue()) + 1);
+		//	startingPoint[i] = new Integer(0);
+		//}
+		Integer[] startingPoint = {120,520,0};
+		numberOfPoints = 13920;
 		//Actually going through the n-dimensional grid
 		BinaryAdditionModule iterationModule = new BinaryAdditionModule(maxValues, steps, startingPoint);
 		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
@@ -364,7 +423,7 @@ public class DreieckNmodes {
 
 	private void fillNetworkData(){
 		Network network = scenario.getNetwork();
-		int capMax = 100*networkCapacity;
+		int capMax = 100*DreieckNmodes.NETWORK_CAPACITY;
 		
 		//NODES
 		//nodes of the triangle base
@@ -424,7 +483,7 @@ public class DreieckNmodes {
 			Node to = network.getNodes().get(idTo);
 			
 			Link link = this.scenario.getNetwork().getFactory().createLink(idFrom, from, to);
-			link.setCapacity(this.networkCapacity);
+			link.setCapacity(DreieckNmodes.NETWORK_CAPACITY);
 			link.setFreespeed(DreieckNmodes.FREESPEED/3.6);
 			link.setLength(calculateLength(from,to));
 			link.setNumberOfLanes(1.);
@@ -445,8 +504,8 @@ public class DreieckNmodes {
 		network.addLink(endLink);
 		
 		//check with .xml and Visualizer
-		//NetworkWriter writer = new NetworkWriter(network);
-		//writer.write("./output/dreieck_network.xml");
+		NetworkWriter writer = new NetworkWriter(network);
+		writer.write("./output/dreieck_network.xml");
 	}
 	
 	private void createWantedPopulation(List<Integer> agentDistribution, int sekundenAbstand){
@@ -473,7 +532,7 @@ public class DreieckNmodes {
 			int j=0; int sum=0;
 			while (!(modeFound)){
 				sum += agentDistribution.get(j);
-				if (i<sum){
+				if (sum>i){
 					transportMode = DreieckNmodes.NAMES[j];
 					modeFound = true;
 					//System.out.println("A "+DreieckNmodes.NAMES[j]+" was made.");
@@ -651,4 +710,28 @@ public class DreieckNmodes {
 		}
 		return str;
 	}//*/
+	
+	private static int ppcm(int n1, int n2){
+		int n1n2 = n1*n2;
+		int rest = n1%n2;
+		while (rest != 0){
+			n1 = n2;
+			n2 = rest;
+			rest = n1%n2;
+		}
+		return n1n2/n2;
+	}
+	
+	private static int pgcd(List<Integer> list){
+		int i, x, y, pgcd;
+		
+		x = list.get(0);
+		pgcd = 1;
+		for (i = 1; i < list.size(); i++){
+		    y = list.get(i);
+		    pgcd = x*y/ppcm(x, y);
+		    x = pgcd;
+		}
+		return pgcd;
+	}
 }

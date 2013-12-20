@@ -39,8 +39,8 @@ import org.matsim.vehicles.VehicleType;
 public class ModeData {
 	
 	private Id modeId;
-	private VehicleType vehicleType;//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
-									//		So far programmed to contain also global data, i.e. data without a specific vehicleType (ssix, 30.09.13)
+	private VehicleType vehicleType=null;//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
+									     //	     So far programmed to contain also global data, i.e. data without a specific vehicleType (ssix, 30.09.13)
 	public int numberOfAgents;
 	//private int numberOfDrivingAgents;//dynamic variable counting live agents on the track
 	private double permanentDensity;
@@ -203,7 +203,7 @@ public class ModeData {
 			relativeDeviances += Math.pow( ((this.lastXFlows.get(i).doubleValue() - averageFlow) / averageFlow) , 2);
 		}
 		relativeDeviances /= DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS;//Taking away dependence on list size.
-		if (relativeDeviances < 0.000001){//TODO Here a VERY empirical factor
+		if (relativeDeviances < 0.000001){TO DO Here a VERY empirical factor
 			this.flowStability = true;
 			System.out.println("Reaching a certain flow stability in mode: "+modeId);
 		} else {
@@ -304,11 +304,13 @@ public class ModeData {
 	}
 	
 	public void saveDynamicVariables(){
-		this.permanentDensity = this.numberOfAgents / (DreieckNmodes.length*3) *1000;
+		//NB: Should not be called upon a modeData without a vehicleType, as this.vehicleType will be null and will throw an exception.
+		this.permanentDensity = this.numberOfAgents / (DreieckNmodes.length*3) *1000 * this.vehicleType.getPcuEquivalents();
 		this.permanentAverageVelocity = this.getActualAverageVelocity();
 		System.out.println("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
 		//this.permanentFlow = this.getActualFlow();
-		this.permanentFlow = this.getActualFlow900();
+		this.permanentFlow = /*this.getActualFlow900();*///Done: Sliding average instead of taking just the last value (seen to be sometimes farther from the average than expected)
+							   this.getSlidingAverageLastXFlows900();
 		System.out.println("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);	
 	}
 	
@@ -346,6 +348,12 @@ public class ModeData {
 		return nowFlow*4;
 	}
 	
+	public double getSlidingAverageLastXFlows900(){
+		double average = 0;
+		for (double flow : this.lastXFlows900){ average += flow; }
+		return average / DreieckNmodes.NUMBER_OF_MEMORIZED_FLOWS;
+	}
+	
 	public boolean isSpeedStable(){
 		return this.speedStability;
 	}
@@ -361,13 +369,25 @@ public class ModeData {
 	public double getPermanentDensity(){
 		return this.permanentDensity;
 	}
-	
+
+	public void setPermanentDensity(double permanentDensity) {
+		this.permanentDensity = permanentDensity;
+	}
+
 	public double getPermanentAverageVelocity(){
 		return this.permanentAverageVelocity;
 	}
 	
+	public void setPermanentAverageVelocity(double permanentAverageVelocity) {
+		this.permanentAverageVelocity = permanentAverageVelocity;
+	}
+
 	public double getPermanentFlow(){
 		return this.permanentFlow;
+	}
+	
+	public void setPermanentFlow(double permanentFlow) {
+		this.permanentFlow = permanentFlow;
 	}
 
 	public int getNumberOfDrivingAgents() {

@@ -46,13 +46,10 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 	private Map<Id, ModeData> modesData;
 	private ModeData globalData;
 	
-	public static Id studiedMeasuringPointLinkId = new IdImpl(0);
-	
-	
+	public final static Id studiedMeasuringPointLinkId = new IdImpl(0);
+		
 	private boolean permanentRegime;
-	//private double permanentDensity;
-	//private double permanentAverageVelocity;
-	//private double permanentFlow;
+
 	
 	public FundamentalDiagramsNmodes(Scenario sc, Map<Id, ModeData> modesData){
 		this.scenario =  sc;
@@ -135,10 +132,17 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 						if ( /*this.globalData.isSpeedStable() &&*/ this.globalData.isFlowStable() ){
 							//log.info("Global permanent regime attained");
 							System.out.println("Global permanent regime attained");
-							this.globalData.saveDynamicVariables();
 							for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
 								this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).saveDynamicVariables();
 							}
+							this.globalData.setPermanentAverageVelocity(this.globalData.getActualAverageVelocity());
+							//this.permanentFlow = this.getActualFlow();
+							this.globalData.setPermanentFlow(this.globalData.getActualFlow900());
+							double globalDensity = 0.;
+							for (ModeData mode : this.modesData.values()){
+								globalDensity += mode.getPermanentDensity();
+							}
+							this.globalData.setPermanentDensity(globalDensity);
 							this.permanentRegime = true;
 							//How to: end simulation immediately? => solved by granting the mobsim agents access to permanentRegime
 							//and making them exit the simulation as soon as permanentRegime is true.
