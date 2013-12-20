@@ -106,7 +106,7 @@ import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.ReplanningTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
@@ -797,7 +797,7 @@ public final class MarathonRunner implements StartupListener,
 		 * During Activity Replanners
 		 */
 		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
-				(SwissPTTravelTime) this.ptTravelTime, this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				(SwissPTTravelTimeCalculator) this.ptTravelTime, this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(), endActivityAndEvacuateReplannerFactory);
 		this.marathonEndActivityAndEvacuateReplannerFactory.addIdentifier(this.affectedActivityPerformingIdentifier);
 		this.withinDayControlerListener.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.marathonEndActivityAndEvacuateReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);

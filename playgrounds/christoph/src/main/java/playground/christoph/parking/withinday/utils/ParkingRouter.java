@@ -45,7 +45,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.MyFastDijkstraFactory;
+import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -78,7 +78,7 @@ public class ParkingRouter {
 			TravelTime travelTime = entry.getValue();
 			TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 			this.travelDisutilities.put(mode, travelDisutility);
-			MyMultiNodeDijkstra modeDijsktra = (MyMultiNodeDijkstra) new MyFastDijkstraFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime); 
+			MyMultiNodeDijkstra modeDijsktra = (MyMultiNodeDijkstra) new FastMultiNodeDijkstraFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime); 
 			this.dijkstras.put(mode, modeDijsktra);
 		}
 	}

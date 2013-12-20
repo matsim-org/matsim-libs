@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -108,16 +109,16 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		 * and has been accepted. Now ensure that the agent's plan is still valid.
 		 */
 		else {
-			Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+			Leg leg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
 
-			int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+			int routeIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			
 			updateAgentsPlan(withinDayAgent, parkingFacilityId, route, routeIndex);
 		}
 
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 		return true;
 	}
 	
@@ -129,7 +130,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		ActivityImpl parkingActivity = (ActivityImpl) ((PlanAgent) withinDayAgent).getNextPlanElement();
 		ActivityFacility parkingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(parkingFacilityId);
 		
-		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		
 		// check whether the walk leg from the parking to the actual facility has to be updated
 		boolean parkingFacilityWasChanged = false;

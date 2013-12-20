@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
@@ -102,7 +103,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 
 	private void adaptPassenger(MobsimAgent agent, RideToRidePassengerContext context) {
 
-		Plan plan = this.withinDayAgentUtils.getSelectedPlan(agent);
+		Plan plan = WithinDayAgentUtils.getSelectedPlan(agent);
 		Leg rideLeg = context.rideLeg;
 		Route route = rideLeg.getRoute();
 		
@@ -164,7 +165,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 	
 	private void adaptDriver(RideToRidePassengerContext context) {
 		
-		Plan plan = this.withinDayAgentUtils.getSelectedPlan(context.carLegAgent);
+		Plan plan = WithinDayAgentUtils.getSelectedPlan(context.carLegAgent);
 		Leg rideLeg = context.rideLeg;
 		Leg carLeg = context.carLeg;
 		NetworkRoute route = (NetworkRoute) carLeg.getRoute();
@@ -248,7 +249,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 	
 	private void rideToNonCar(MobsimAgent agent, RideToRidePassengerContext context) {
 		
-		Plan plan = this.withinDayAgentUtils.getSelectedPlan(agent);
+		Plan plan = WithinDayAgentUtils.getSelectedPlan(agent);
 		Leg rideLeg = context.rideLeg;
 		Route route = rideLeg.getRoute();
 		
