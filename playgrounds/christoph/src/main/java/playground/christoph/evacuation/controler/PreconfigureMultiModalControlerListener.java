@@ -22,9 +22,10 @@ package playground.christoph.evacuation.controler;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
-import org.matsim.contrib.multimodal.router.util.PersonalizedTravelTimeFactory;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+
+import playground.christoph.evacuation.trafficmonitoring.EvacuationPTTravelTimeFactory;
 
 /**
  * Configures the MultiModalControlerListener with additional TravelTimeFactories.
@@ -46,7 +47,13 @@ public class PreconfigureMultiModalControlerListener implements StartupListener 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		this.multiModalControlerListener.addAdditionalTravelTimeFactory(TransportMode.pt, new PersonalizedTravelTimeFactory());
+		/*
+		 * For ride, we could/should use travel times from the TravelTimeCollector - 
+		 * which is not initialized at this point in time.
+		 */
+//		this.multiModalControlerListener.addAdditionalTravelTimeFactory(TransportMode.pt, new PersonalizedTravelTimeFactory());
+		this.multiModalControlerListener.addAdditionalTravelTimeFactory(TransportMode.pt, 
+				new EvacuationPTTravelTimeFactory(TransportMode.pt, event.getControler().getConfig().plansCalcRoute()));
 	}
 	
 }

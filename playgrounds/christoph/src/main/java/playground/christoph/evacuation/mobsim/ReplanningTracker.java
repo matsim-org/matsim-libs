@@ -51,6 +51,10 @@ public class ReplanningTracker implements ReplanningEventHandler, PersonInformat
 		return this.replannedAgents.contains(agentId);
 	}
 
+	public boolean allAgentsInitiallyReplanned() {
+		return this.replannedAgents.size() == this.informedAgentsTracker.totalAgents;
+	}
+	
 	public Set<Id> getInformedButNotInitiallyReplannedAgents() {
 		return this.informedButNotInitiallyReplannedAgents;
 	}

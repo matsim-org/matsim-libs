@@ -22,6 +22,7 @@ package playground.christoph.evacuation.pt;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,22 +30,27 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.TransitTravelDisutility;
 
 /**
+ * TODO: make this a real TransitRouter. So far, calcRoute(...) is not implemented.
+ * 
  * @author cdobler
  */
-public class EvacuationTransitRouter {
+public class EvacuationTransitRouter implements TransitRouter {
 
 	/*
 	 * Factor to increase a beeline distance. We assume that
@@ -82,6 +88,12 @@ public class EvacuationTransitRouter {
 	
 	public TransitRouterNetwork getTransitRouterNetwork() {
 		return this.routerNetwork;
+	}
+	
+
+	@Override
+	public List<Leg> calcRoute(Coord fromCoord, Coord toCoord, double departureTime, Person person) {
+		throw new RuntimeException("This is not supported so far.");
 	}
 	
 	public Path calcPath(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
@@ -194,6 +206,7 @@ public class EvacuationTransitRouter {
 	
 	private static class DummyLink implements Link {
 
+		private final static Id id = new IdImpl("dummyLink");
 		private final double length;
 		private final Node fromNode;
 		private final Node toNode;
@@ -208,7 +221,7 @@ public class EvacuationTransitRouter {
 		public Coord getCoord() { return null; }
 
 		@Override
-		public Id getId() { return null; }
+		public Id getId() { return id; }
 
 		@Override
 		public boolean setFromNode(Node node) { return false; }
@@ -296,4 +309,5 @@ public class EvacuationTransitRouter {
 		@Override
 		public Map<Id, ? extends Link> getOutLinks() { return null; }
 	}
+
 }

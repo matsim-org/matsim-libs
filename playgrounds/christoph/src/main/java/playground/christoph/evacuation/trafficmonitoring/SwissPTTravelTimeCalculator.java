@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PTTravelTimeEvacuationInitializer.java
+ * SwissPTTravelTimeCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,39 +20,15 @@
 
 package playground.christoph.evacuation.trafficmonitoring;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.collections.Tuple;
 
-import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
-import playground.christoph.evacuation.pt.EvacuationTransitRouterFactory;
+public interface SwissPTTravelTimeCalculator {
 
-public class PTTravelTimeEvacuationFactory implements TravelTimeFactory {
+	public void setPersonSpeed(Id personId, double speed);
 
-	static final Logger log = Logger.getLogger(PTTravelTimeEvacuationFactory.class);
-	
-	private final EvacuationTransitRouterFactory evacuationRouterFactory;
-	private final InformedAgentsTracker informedAgentsTracker;
-	private final TravelTime ptTravelTime;
-	private final Map<Id, Double> agentSpeedMap;
-	
-	public PTTravelTimeEvacuationFactory(Scenario scenario, TravelTime ptTravelTime,
-			EvacuationTransitRouterFactory evacuationRouterFactory, InformedAgentsTracker informedAgentsTracker) {
-		this.ptTravelTime = ptTravelTime;
-		this.evacuationRouterFactory = evacuationRouterFactory;
-		this.informedAgentsTracker = informedAgentsTracker;
-		
-		this.agentSpeedMap = new ConcurrentHashMap<Id, Double>();
-	}
-
-	@Override
-	public SwissPTTravelTime createTravelTime() {
-		return new PTTravelTimeEvacuation(evacuationRouterFactory, agentSpeedMap, ptTravelTime, informedAgentsTracker);
-	}
-
+	public Tuple<Double, Coord> calcSwissPtTravelTime(Activity fromAct, Activity toAct, double depTime, Person person);
 }

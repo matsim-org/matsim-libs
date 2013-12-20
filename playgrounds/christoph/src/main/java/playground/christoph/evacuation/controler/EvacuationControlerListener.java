@@ -37,7 +37,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.MissedJointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
@@ -56,7 +57,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
@@ -67,11 +67,13 @@ import org.matsim.withinday.replanning.identifiers.filter.ActivityStartingFilter
 import org.matsim.withinday.replanning.identifiers.filter.EarliestLinkExitTimeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.ProbabilityFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -104,15 +106,20 @@ import playground.christoph.evacuation.router.RandomCompassRouterFactory;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
+import playground.christoph.evacuation.trafficmonitoring.EvacuationPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeEvacuationCalculator;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.DropOffAgentReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
@@ -181,19 +188,16 @@ public class EvacuationControlerListener implements StartupListener {
 	private WithinDayDuringLegReplannerFactory pickupAgentsReplannerFactory;
 	private WithinDayDuringLegReplannerFactory duringLegRerouteReplannerFactory;
 	
+	private InitialReplanningRemover initialReplanningRemover;
+	
 	/*
 	 * WithinDayTripRouter Stuff
 	 */
 	private Map<String, TravelTime> withinDayTravelTimes;
+	private EvacuationTransitRouterFactory evacuationTransitRouterFactory;
 	private TripRouterFactory withinDayTripRouterFactory;
 	private LeastCostPathCalculatorFactory withinDayLeastCostPathCalculatorFactory;
 	private TravelDisutilityFactory withinDayTravelDisutilityFactory;
-	
-	/*
-	 * Replanners that are used to adapt agent's plans for the first time. They can be disabled
-	 * after all agents have been informed and have adapted their plans.
-	 */
-	private List<WithinDayReplannerFactory<?>> initialReplannerFactories;
 	
 	/*
 	 * Data
@@ -213,27 +217,24 @@ public class EvacuationControlerListener implements StartupListener {
 		// register FixedOrderControlerListener
 		event.getControler().addControlerListener(this.fixedOrderControlerListener);
 		
-		// load household object attributes
-//		this.householdObjectAttributes = new ObjectAttributes();
-//		new ObjectAttributesXmlReader(this.householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
-		
 		this.initGeographyStuff(event.getControler().getScenario());
 		
 		this.initDataGrabbersAndProviders(event.getControler());
 		
 		this.initAnalysisStuff(event.getControler());
 		
-//		this.initReplanningStuff(event.getControler());
+		this.initReplanningStuff(event.getControler());
 		
 		/*
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
 		Scenario scenario = event.getControler().getScenario();
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.withinDayControlerListener.getWithinDayEngine(), 
+		EvacuationQSimFactory mobsimFactory = new EvacuationQSimFactory(this.withinDayControlerListener.getWithinDayEngine(), 
 				((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes(), this.jointDepartureOrganizer, 
 				this.multiModalControlerListener.getMultiModalTravelTimes());
 		event.getControler().setMobsimFactory(mobsimFactory);
+		event.getControler().addControlerListener(mobsimFactory);	// only to write some files for debugging
 	}
 
 	private void initGeographyStuff(Scenario scenario) {
@@ -290,7 +291,7 @@ public class EvacuationControlerListener implements StartupListener {
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.linkEnteredProvider);
 		
 		// workaround
-//		scenario.getConfig().scenario().setUseTransit(false);
+		scenario.getConfig().scenario().setUseTransit(false);
 		
 		this.initWithinDayTravelTimes(controler);
 		
@@ -371,8 +372,8 @@ public class EvacuationControlerListener implements StartupListener {
 		Scenario scenario = controler.getScenario();
 		
 		this.withinDayTravelTimes = new HashMap<String, TravelTime>();
-		withinDayTravelTimes.putAll(this.multiModalControlerListener.getMultiModalTravelTimes());
-		withinDayTravelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
+		this.withinDayTravelTimes.putAll(this.multiModalControlerListener.getMultiModalTravelTimes());
+		this.withinDayTravelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
 		
 		/*
 		 * If fuzzy travel times should be used, wrap each TravelTime into a
@@ -393,6 +394,11 @@ public class EvacuationControlerListener implements StartupListener {
 	}
 	
 	private void initReplanningStuff(Controler controler) {
+		
+		this.initialReplanningRemover = new InitialReplanningRemover(this.withinDayControlerListener.getWithinDayEngine(), 
+				this.replanningTracker);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.initialReplanningRemover);
+		
 		this.initWithinDayTripRouterFactory(controler);
 		this.initIdentifiers(controler);
 		this.initReplanners(controler);
@@ -416,19 +422,18 @@ public class EvacuationControlerListener implements StartupListener {
 		this.withinDayLeastCostPathCalculatorFactory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, 
 				this.decisionModelRunner.getDecisionDataProvider());
 		
-		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
+//		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
 		new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse(EvacuationConfig.transitRouterFile);
 		
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
-		EvacuationTransitRouterFactory evacuationTransitRouterFactory = 
-				new EvacuationTransitRouterFactory(config, this.withinDayTravelTimes.get(TransportMode.walk), 
-						routerNetwork, transitRouterConfig);
+		this.evacuationTransitRouterFactory = new EvacuationTransitRouterFactory(config, 
+				this.withinDayTravelTimes.get(TransportMode.walk), routerNetwork, transitRouterConfig);
 		
 		// TODO: EvacuationTransitRouterFactory is not a TransitRouterFactory so far!
 		this.withinDayTripRouterFactory = new EvacuationTripRouterFactory(scenario, this.withinDayTravelTimes, 
-				this.withinDayTravelDisutilityFactory, this.withinDayLeastCostPathCalculatorFactory, null);		
+				this.withinDayTravelDisutilityFactory, this.withinDayLeastCostPathCalculatorFactory, evacuationTransitRouterFactory);		
 	}
 	
 	private void initIdentifiers(Controler controler) {
@@ -506,6 +511,13 @@ public class EvacuationControlerListener implements StartupListener {
 		duringLegFactory.addAgentFilterFactory(nonPTLegAgentsFilterFactory);
 		duringLegFactory.addAgentFilterFactory(new ProbabilityFilterFactory(EvacuationConfig.duringLegReroutingShare));
 		this.duringLegRerouteIdentifier = duringLegFactory.createIdentifier();
+		
+		this.initialReplanningRemover.addIdentifier(this.joinedHouseholdsIdentifier);
+		this.initialReplanningRemover.addIdentifier(this.activityPerformingIdentifier);
+		this.initialReplanningRemover.addIdentifier(this.legPerformingIdentifier);
+		this.initialReplanningRemover.addIdentifier(this.agentsToDropOffIdentifier);
+		this.initialReplanningRemover.addIdentifier(this.agentsToPickupIdentifier);
+		this.initialReplanningRemover.addIdentifier(this.duringLegRerouteIdentifier);
 	}
 	
 	/*
@@ -523,18 +535,21 @@ public class EvacuationControlerListener implements StartupListener {
 				this.withinDayTravelTimes.get(TransportMode.car), scenario.getConfig().planCalcScore()); 
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayTravelTimes.get(TransportMode.car));
 		
+		EvacuationPTTravelTime ptTravelTime = (EvacuationPTTravelTime) this.withinDayTravelTimes.get(TransportMode.pt);
+		PTTravelTimeEvacuationCalculator ptTravelTimeEvacuation = new PTTravelTimeEvacuationCalculator(this.evacuationTransitRouterFactory,
+				ptTravelTime, this.informedHouseholdsTracker);
+		
 		/*
 		 * During Activity Replanners
 		 */
-//		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(scenario, 
-//				withinDayEngine, decisionDataProvider, this.modeAvailabilityChecker, 
-//				(SwissPTTravelTime) ptTravelTime, tripRouterFactory, routingContext);
-//		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
-//		withinDayEngine.addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(scenario, 
+				withinDayEngine, decisionDataProvider, this.modeAvailabilityChecker, 
+				ptTravelTimeEvacuation, tripRouterFactory, routingContext);
+		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
+		withinDayEngine.addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-//		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(scenario, withinDayEngine, 
-//				decisionDataProvider,
-//				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (SwissPTTravelTime) this.ptTravelTime, tripRouterFactory, routingContext);
+//		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(scenario, withinDayEngine, decisionDataProvider,
+//				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, ptTravelTimeEvacuation, tripRouterFactory, routingContext);
 //		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
 //		withinDayEngine.addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
@@ -546,24 +561,78 @@ public class EvacuationControlerListener implements StartupListener {
 		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		withinDayEngine.addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
-		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
-		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
-		withinDayEngine.addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-		
-		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(scenario, withinDayEngine);
-		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
-		withinDayEngine.addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-		
-		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
-		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-		withinDayEngine.addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-		
-		
+//		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
+//		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
+//		withinDayEngine.addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+//		
+//		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(scenario, withinDayEngine);
+//		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
+//		withinDayEngine.addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+//		
+//		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
+//		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
+//		withinDayEngine.addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+				
 		/*
 		 * Collect Replanners that can be disabled after all agents have been informed.
 		 */
-		this.initialReplannerFactories = new ArrayList<WithinDayReplannerFactory<?>>();
-		this.initialReplannerFactories.add(this.currentActivityToMeetingPointReplannerFactory);
-		this.initialReplannerFactories.add(this.currentLegToMeetingPointReplannerFactory);
+		this.initialReplanningRemover.addInitialReplannerFactory(this.currentActivityToMeetingPointReplannerFactory);
+		this.initialReplanningRemover.addInitialReplannerFactory(this.currentLegToMeetingPointReplannerFactory);
+	}
+	/*
+	 * This is a workaround... find a better solution...
+	 */
+	private static class InitialReplanningRemover implements MobsimAfterSimStepListener {
+
+		/*
+		 * Replanners that are used to adapt agent's plans for the first time. They can be disabled
+		 * after all agents have been informed and have adapted their plans.
+		 */
+		private final List<WithinDayReplannerFactory<?>> initialReplannerFactories = new ArrayList<WithinDayReplannerFactory<?>>();
+		private final List<Identifier> identifiers = new ArrayList<Identifier>();
+		
+		private final WithinDayEngine withinDayEngine; 
+		private final ReplanningTracker replanningTracker;
+			
+		public InitialReplanningRemover(WithinDayEngine withinDayEngine, ReplanningTracker replanningTracker) {
+			this.withinDayEngine = withinDayEngine;
+			this.replanningTracker = replanningTracker;
+		}
+		
+		public void addIdentifier(Identifier identifier) {
+			this.identifiers.add(identifier);
+		}
+		
+		public void addInitialReplannerFactory(WithinDayReplannerFactory<?> factory) {
+			this.initialReplannerFactories.add(factory);
+		}
+		
+		@Override
+		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+			if (this.replanningTracker.allAgentsInitiallyReplanned()) {
+				for (WithinDayReplannerFactory<?> factory : this.initialReplannerFactories) {
+					if (factory instanceof WithinDayDuringActivityReplannerFactory) {
+						this.withinDayEngine.removeDuringActivityReplannerFactory((WithinDayDuringActivityReplannerFactory) factory);
+					} else if(factory instanceof WithinDayDuringLegReplannerFactory) {
+						this.withinDayEngine.removeDuringLegReplannerFactory((WithinDayDuringLegReplannerFactory) factory);
+					} 
+				}
+				log.info("Disabled " + this.initialReplannerFactories.size() + " initial within-day replanners.");
+
+				int removedAgentFilters = 0;
+				for (Identifier identifier : this.identifiers) {
+					List<AgentFilter> filtersToRemove = new ArrayList<AgentFilter>();
+					for (AgentFilter agentFilter : identifier.getAgentFilters()) {
+						if (agentFilter instanceof InformedAgentsFilter) filtersToRemove.add(agentFilter);
+					}
+					for (AgentFilter agentFilter : filtersToRemove) {
+						identifier.removeAgentFilter(agentFilter);
+						removedAgentFilters++;
+					}
+				}
+				log.info("Disabled " + removedAgentFilters + " initial within-day filters.");
+			}
+		}
+		
 	}
 }

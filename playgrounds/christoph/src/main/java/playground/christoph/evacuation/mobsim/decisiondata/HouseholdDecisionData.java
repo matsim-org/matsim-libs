@@ -78,7 +78,8 @@ public class HouseholdDecisionData {
 	private double householdDirectEvacuationTime = Double.MAX_VALUE;
 	
 	/*
-	 * Time when a
+	 * Time that a household waits after having met at its meeting point
+	 * before leaving.
 	 */
 	private double departureTimeDelay = Double.MAX_VALUE;
 	

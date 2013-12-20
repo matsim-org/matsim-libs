@@ -30,6 +30,8 @@ import org.matsim.contrib.multimodal.simengine.MultiModalSimEngine;
 import org.matsim.contrib.multimodal.simengine.MultiModalSimEngineFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.SimStepParallelEventsManagerImpl;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -52,9 +54,13 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import playground.christoph.evacuation.config.EvacuationConfig;
 
 /**
+ * Registering this as an IterationStartsListener is optional. It allows 
+ * EvacuationPopulationAgentSource writing the agent -> vehicle and 
+ * vehicle -> link mappings to files.
+ * 
  * @author cdobler
  */
-public class EvacuationQSimFactory implements MobsimFactory {
+public class EvacuationQSimFactory implements MobsimFactory, IterationStartsListener {
 
     private final static Logger log = Logger.getLogger(EvacuationQSimFactory.class);
     
@@ -62,6 +68,9 @@ public class EvacuationQSimFactory implements MobsimFactory {
     private final ObjectAttributes householdObjectAttributes;
     private final JointDepartureOrganizer jointDepartureOrganizer;
     private final Map<String, TravelTime> multiModalTravelTimes;
+    
+    private String agentsVehiclesFile = null;
+	private String parkedVehiclesFile = null;
     
     public EvacuationQSimFactory(WithinDayEngine withinDayEngine, ObjectAttributes householdObjectAttributes,
     		JointDepartureOrganizer jointDepartureOrganizer, Map<String, TravelTime> multiModalTravelTimes) {
@@ -124,12 +133,26 @@ public class EvacuationQSimFactory implements MobsimFactory {
 //		EvacuationConfig.householdsInformerRandomSeed++;
 		
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
-        AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim, this.householdObjectAttributes);
+        AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim, this.householdObjectAttributes, 
+        		this.agentsVehiclesFile, this.parkedVehiclesFile);
         qSim.addAgentSource(agentSource);
         
         qSim.addMobsimEngine(withinDayEngine);
         
         return qSim;
     }
+
+    /*
+     * This is optional to allow EvacuationPopulationAgentSource writing the
+     * agent -> vehicle and vehicle -> link mappings to files.
+     */
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		int iteration = event.getIteration();
+		this.agentsVehiclesFile = event.getControler().getControlerIO().getIterationFilename(iteration, 
+				EvacuationPopulationAgentSource.agentsVehiclesFileName);
+		this.parkedVehiclesFile = event.getControler().getControlerIO().getIterationFilename(iteration, 
+				EvacuationPopulationAgentSource.parkedVehiclesFileName);
+	}
 
 }

@@ -121,7 +121,7 @@ import playground.christoph.evacuation.router.RandomCompassRouterFactory;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
@@ -768,12 +768,12 @@ public class EvacuationControler extends WithinDayController implements
 		 * During Activity Replanners
 		 */
 		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getWithinDayEngine(), this.decisionDataProvider, 
-				this.modeAvailabilityChecker, (SwissPTTravelTime) ptTravelTime, tripRouterFactory, routingContext);
+				this.modeAvailabilityChecker, (SwissPTTravelTimeCalculator) ptTravelTime, tripRouterFactory, routingContext);
 		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
 		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getWithinDayEngine(), decisionDataProvider,
-				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (SwissPTTravelTime) this.ptTravelTime, tripRouterFactory, routingContext);
+				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (SwissPTTravelTimeCalculator) this.ptTravelTime, tripRouterFactory, routingContext);
 		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
 		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 

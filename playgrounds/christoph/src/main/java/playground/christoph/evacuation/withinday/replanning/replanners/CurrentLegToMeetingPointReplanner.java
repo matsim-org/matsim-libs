@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -59,17 +60,17 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
-
+		
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
-		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 1);
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 1);
 		
 		/*
 		 * Create new Activity at the meeting point.
@@ -121,7 +122,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 			 */
 			if (currentLinkIndex == 0) currentLinkIndex++;
 
-			Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+			Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
 			
 			// new Route for current Leg
 			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, 
@@ -136,7 +137,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 //		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}

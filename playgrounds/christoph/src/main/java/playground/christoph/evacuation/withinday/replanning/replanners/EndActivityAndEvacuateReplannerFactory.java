@@ -27,17 +27,17 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 
 public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private final Scenario scenario;
-	private final SwissPTTravelTime ptTravelTime;
+	private final SwissPTTravelTimeCalculator ptTravelTime;
 	private final TripRouterFactory tripRouterFactory;
 	private final RoutingContext routingContext;
 	
 	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			SwissPTTravelTime ptTravelTime, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+			SwissPTTravelTimeCalculator ptTravelTime, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.ptTravelTime = ptTravelTime;

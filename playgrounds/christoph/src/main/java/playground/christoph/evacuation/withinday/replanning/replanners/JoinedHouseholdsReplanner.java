@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -43,7 +44,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 
 /**
@@ -59,12 +60,12 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 	
 	private final DecisionDataProvider decisionDataProvider;
 	private final JoinedHouseholdsIdentifier identifier;
-	private final SwissPTTravelTime ptTravelTime;
+	private final SwissPTTravelTimeCalculator ptTravelTime;
 	private final TripRouter tripRouter;
 	
 	public JoinedHouseholdsReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
 			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
-			SwissPTTravelTime ptTravelTime, TripRouter tripRouter) {
+			SwissPTTravelTimeCalculator ptTravelTime, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;
 		this.identifier = identifier;
@@ -78,7 +79,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -88,7 +89,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		/*
 		 *  Get the current PlanElement and check if it is an Activity
 		 */
-		PlanElement currentPlanElement = this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
+		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 		if (currentPlanElement instanceof Activity) {
 			currentActivity = (Activity) currentPlanElement;
 		} else return false;
@@ -189,6 +190,9 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		
 		meetingActivity.setStartTime(legToMeeting.getDepartureTime() + legToMeeting.getTravelTime());
 		
+		// mark agent as departed
+		this.identifier.incPerformedDepartures(householdId);
+		
 		/*
 		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
@@ -196,7 +200,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
-		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
 		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 		return true;
 	}

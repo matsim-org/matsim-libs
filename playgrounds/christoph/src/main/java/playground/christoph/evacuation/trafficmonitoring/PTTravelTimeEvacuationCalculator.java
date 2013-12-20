@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PTTravelTimeEvacuation.java
+ * PTTravelTimeEvacuationCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,28 +20,23 @@
 
 package playground.christoph.evacuation.trafficmonitoring;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
 import playground.christoph.evacuation.pt.EvacuationTransitRouter;
 import playground.christoph.evacuation.pt.EvacuationTransitRouterFactory;
 
-public class PTTravelTimeEvacuation implements SwissPTTravelTime {
+public class PTTravelTimeEvacuationCalculator implements SwissPTTravelTimeCalculator {
 
-	private final static Logger log = Logger.getLogger(PTTravelTimeEvacuation.class);
+	private final static Logger log = Logger.getLogger(PTTravelTimeEvacuationCalculator.class);
 	
 	/*
 	 * Before the evacuation has started, agents use another travel disutility
@@ -49,50 +44,27 @@ public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 	 */
 //	private final TransitRouter router;	// before evacuation has started
 	private final EvacuationTransitRouterFactory evacuationRouterFactory;	// after evacuation has started
-	private final Map<Id, Double> agentSpeedMap;
-	private final TravelTime ptTravelTime;
+	private final EvacuationPTTravelTime ptTravelTime;
 	private final InformedAgentsTracker informedAgentsTracker;
 	
 	private final ThreadLocal<EvacuationTransitRouter> evacuationRouters;
-	private final ThreadLocal<Double> personSpeed;
 	
 	/*
 	 * So far we use/need a simple travel time object to calculate pt travel times
 	 * for trips that are performed before the evacuation has started.
 	 */
-	public PTTravelTimeEvacuation(EvacuationTransitRouterFactory evacuationRouterFactory,
-			Map<Id, Double> agentSpeedMap, TravelTime ptTravelTime, InformedAgentsTracker informedAgentsTracker) {
+	public PTTravelTimeEvacuationCalculator(EvacuationTransitRouterFactory evacuationRouterFactory,
+			EvacuationPTTravelTime ptTravelTime, InformedAgentsTracker informedAgentsTracker) {
 		this.evacuationRouterFactory = evacuationRouterFactory;
-		this.agentSpeedMap = agentSpeedMap;
 		this.ptTravelTime = ptTravelTime;
 		this.informedAgentsTracker = informedAgentsTracker;
 		
 		this.evacuationRouters = new ThreadLocal<EvacuationTransitRouter>();
-		this.personSpeed = new ThreadLocal<Double>();
-	}
-	
-	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		setPerson(person);
-		if (this.personSpeed.get() != null) {
-			return link.getLength() / this.personSpeed.get();
-		} else return ptTravelTime.getLinkTravelTime(link, time, person, vehicle);
-	}
-
-	private void setPerson(Person person) {
-		/*
-		 * If no speed value for the person is set in the map, the 
-		 * agent performs the PT trip before the evacuation starts. 
-		 * Therefore use the simple PT travel time calculator, which
-		 * is done when personSpeed contains a null value.
-		 */
-		Double personSpeed = agentSpeedMap.get(person.getId());
-		this.personSpeed.set(personSpeed);	
 	}
 
 	@Override
 	public void setPersonSpeed(Id personId, double speed) {
-		this.agentSpeedMap.put(personId, speed);
+		this.ptTravelTime.setPersonSpeed(personId, speed);
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -75,13 +76,13 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
-		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(currentPlanElementIndex + 1);
 		
 		// If it is not a car Leg we don't replan it.
@@ -118,7 +119,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			
 			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
 			
-			int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+			int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 			// new Route for current Leg
 			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, rescueActivity.getLinkId(), currentLinkIndex, scenario.getNetwork(), tripRouter);
@@ -132,7 +133,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}

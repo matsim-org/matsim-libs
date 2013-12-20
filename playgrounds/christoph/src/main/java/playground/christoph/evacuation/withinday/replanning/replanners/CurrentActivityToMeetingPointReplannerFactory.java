@@ -28,7 +28,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
 public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuringActivityReplannerFactory {
@@ -36,14 +36,14 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 	private final Scenario scenario;
 	private final DecisionDataProvider decisionDataProvider; 
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
-	private final SwissPTTravelTime ptTravelTime;
+	private final SwissPTTravelTimeCalculator ptTravelTime;
 	private final TripRouterFactory tripRouterFactory;
 	private final RoutingContext routingContext;
 	
 	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, 
 			WithinDayEngine withinDayEngine, DecisionDataProvider decisionDataProvider, 
 			ModeAvailabilityChecker modeAvailabilityChecker,
-			SwissPTTravelTime ptTravelTime,
+			SwissPTTravelTimeCalculator ptTravelTime,
 			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;

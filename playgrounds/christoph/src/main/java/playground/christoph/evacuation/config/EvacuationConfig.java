@@ -209,5 +209,11 @@ public class EvacuationConfig {
 		log.info("Evacuation decision:\t" + evacuationDecisionBehaviour.toString());
 		log.info("use transit router:\t" + useTransitRouter);
 		log.info("transit router network file:\t" + transitRouterFile);
+		
+		log.info("offset for DeterministicRNG instances:\t" + deterministicRNGOffset);
+		log.info("random seed for HouseholdsInformer instances:\t" + householdsInformerRandomSeed);
+		log.info("random seed for DepartureDelayModel instances:\t" + departureDelayRandomSeed);
+		log.info("random seed for FuzzyTravelTimeEstimator instances:\t" + fuzzyTravelTimeEstimatorRandomSeed);
+		log.info("random seed for LatestAcceptedLeaveTimeModel instances:\t" + latestAcceptedLeaveTimeRandomSeed);
 	}
 }

@@ -50,8 +50,8 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -64,12 +64,12 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
+import playground.christoph.evacuation.pt.TransitRouterImplFactory;
 import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
@@ -277,8 +277,8 @@ public class PrepareEvacuationScenarioListener {
 			Config config = scenario.getConfig();
 	        TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(),
 	        		config.transitRouter(), config.vspExperimental());
-	        throw new RuntimeException("This feature is not yet implemented in TransitRouterImplFactory!");
-//	        transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
+//	        throw new RuntimeException("This feature is not yet implemented in TransitRouterImplFactory!");
+	        transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
 		}
 		
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);

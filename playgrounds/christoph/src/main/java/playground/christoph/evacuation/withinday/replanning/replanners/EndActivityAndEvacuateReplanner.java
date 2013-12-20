@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -41,17 +42,17 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
 import playground.christoph.evacuation.controler.EvacuationConstants;
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 
 public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityReplanner {
 	
 	private static final Logger log = Logger.getLogger(EndActivityAndEvacuateReplanner.class);
 	
-	private final SwissPTTravelTime ptTravelTime;
+	private final SwissPTTravelTimeCalculator ptTravelTime;
 	private final TripRouter tripRouter;
 	
 	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
-			SwissPTTravelTime ptTravelTime, TripRouter tripRouter) {
+			SwissPTTravelTimeCalculator ptTravelTime, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.ptTravelTime = ptTravelTime;
 		this.tripRouter = tripRouter;
@@ -63,7 +64,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -71,13 +72,13 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// check whether the agent is performing an activity
 		if (!withinDayAgent.getState().equals(State.ACTIVITY)) return false;
 		
-		Activity currentActivity = (Activity) this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
+		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 		
 		// Set the end time of the current activity to the current time.
 		currentActivity.setEndTime(this.time);
 		
 		// get the index of the currently performed activity in the selected plan
-		int currentActivityIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		int currentActivityIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		// identify the TransportMode for the rescueLeg
 		String transportMode = identifyTransportMode(currentActivityIndex, executedPlan);
@@ -161,7 +162,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
-		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
 		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 		return true;
 	}

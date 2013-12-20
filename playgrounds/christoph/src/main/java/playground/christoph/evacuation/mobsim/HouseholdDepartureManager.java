@@ -26,6 +26,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -138,7 +139,8 @@ public class HouseholdDepartureManager {
 	}
 
 	/*
-	 * Handle all households which have recently been informed and/or joined.
+	 * Handle all households which have recently been informed and are already joined or
+	 * were already informed and have just joined.
 	 */
 	private void handleHouseholds(Set<Id> householdsToHandle, double time) {
 
@@ -166,7 +168,7 @@ public class HouseholdDepartureManager {
 					else if (participating == Participating.FALSE) householdParticipates = false;
 					else throw new RuntimeException("Households participation state is undefined: " + householdId.toString());
 					
-					if (!facilityIsSecure && householdParticipates) {																											
+					if (!facilityIsSecure && householdParticipates) {
 						HouseholdDeparture householdDeparture = createHouseholdDeparture(time, hdd, householdPosition.getPositionId());
 						this.scheduledHouseholdDepartures.put(householdId, householdDeparture);
 						this.plannedDeparturesQueue.add(householdDeparture);
@@ -181,22 +183,30 @@ public class HouseholdDepartureManager {
 		}
 	}
 	
+	// TODO: does this stuff make sense?
 	private void updateHouseholds(Set<Id> handledHouseholds, double time) {
 		
 		// get all households which have been updated in the last time step
 		Set<Id> updatedHouseholds = this.householdsTracker.getHouseholdsUpdatedInLastTimeStep();
-		
+
 		for (Id householdId : updatedHouseholds) {
 			
 			// ignore households which have been handled
 			if (handledHouseholds.contains(householdId)) continue;
 			
+//			// ignore households which have joined in the last time step
+//			if (this.householdsTracker.getHouseholdsJoinedInLastTimeStep().contains(householdId)) continue;
+			
 			HouseholdDeparture scheduledDeparture = this.scheduledHouseholdDepartures.get(householdId);
 			if (scheduledDeparture != null) {
-				throw new RuntimeException("State of household " + householdId.toString() + " has changed at " +
-						" time " + time + "This seems to be unwanted behaviour since there is a scheduled household " +
+//				throw new RuntimeException("State of household " + householdId.toString() + " has changed at " +
+//						"time " + time + ". This seems to be unwanted behaviour since there is a scheduled household " +
+//						"departure (scheduled departure time " + scheduledDeparture.departureTime +
+//						") which has not been performed. Aborting.");
+				log.warn("State of household " + householdId.toString() + " has changed at " +
+						"time " + time + ". This seems to be unwanted behaviour since there is a scheduled household " +
 						"departure (scheduled departure time " + scheduledDeparture.departureTime +
-						") which has not been performed. Aborting.");
+						") which has not been performed.");
 			}
 		}
 	}
@@ -206,8 +216,10 @@ public class HouseholdDepartureManager {
 	 */
 	private void checkDepartureQueues(double time) {
 		
-		while (true) {
-			HouseholdDeparture householdDeparture = this.plannedDeparturesQueue.peek();
+		HouseholdDeparture householdDeparture = null;
+		while ((householdDeparture = this.plannedDeparturesQueue.peek()) != null) {
+//		while (true) {
+//			HouseholdDeparture householdDeparture = this.plannedDeparturesQueue.peek();
 			
 			if (householdDeparture.departureTime < time) {
 				log.warn("Household " + householdDeparture.householdId + " missed its departure time!" + 
@@ -218,12 +230,13 @@ public class HouseholdDepartureManager {
 			} else break;
 		}
 		
-		while (true) {
-			HouseholdDeparture householdDeparture = this.handledDeparturesQueue.peek();
+		while ((householdDeparture = this.handledDeparturesQueue.peek()) != null) {
+//		while (true) {
+//			HouseholdDeparture householdDeparture = this.handledDeparturesQueue.peek();
 			
 			if (householdDeparture.departureTime > time) {
 				log.warn("Household " + householdDeparture.householdId + " should not have departed yet!" + 
-						". Simulation time: " + time +
+						" Simulation time: " + time +
 						", expected departure time: " + householdDeparture.departureTime);
 				this.handledDeparturesQueue.poll();
 			} else if (householdDeparture.getExpectedDepartures() != householdDeparture.getPerformedDepartures()) {
@@ -326,7 +339,7 @@ public class HouseholdDepartureManager {
 		private final Id facilityId;
 		private final double departureTime;
 		private final int expectedDepartures;
-		private int performedDepartures = 0;
+		private AtomicInteger performedDepartures = new AtomicInteger(0);
 		
 		public HouseholdDeparture(Id householdId, Id facilityId, double departureTime, int expectedDepartures) {
 			this.householdId = householdId;
@@ -356,11 +369,11 @@ public class HouseholdDepartureManager {
 		}
 		
 		public void incPerformedDepartures() {
-			this.performedDepartures++;
+			this.performedDepartures.incrementAndGet();
 		}
 		
 		public int getPerformedDepartures() {
-			return this.performedDepartures;
+			return this.performedDepartures.get();
 		}
 		
 		@Override

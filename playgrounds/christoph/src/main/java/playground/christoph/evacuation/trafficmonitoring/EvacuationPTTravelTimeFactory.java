@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SwissPTTravelTime.java
+ * EvacuationPTTravelTimeFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,16 +20,34 @@
 
 package playground.christoph.evacuation.trafficmonitoring;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.router.util.TravelTimeFactory;
 
-public interface SwissPTTravelTime extends TravelTime {
+public class EvacuationPTTravelTimeFactory implements TravelTimeFactory {
 
-	public void setPersonSpeed(Id personId, double speed);
+	private final String mode;
+	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	
+	public EvacuationPTTravelTimeFactory(String mode, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
 
-	public Tuple<Double, Coord> calcSwissPtTravelTime(Activity fromAct, Activity toAct, double depTime, Person person);
+		this.mode = mode;
+		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
+		
+		Double speed = plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(mode);
+		Double speedFactor = plansCalcRouteConfigGroup.getTeleportedModeFreespeedFactors().get(mode);
+		
+		if (speed != null && speedFactor != null) {
+			throw new RuntimeException("Speed as well as speed factor was found for mode " + mode + 
+					"!  Don't know which should be used. Aborting.");
+		} else if (speed == null && speedFactor == null) {
+			throw new RuntimeException("Neither speed nor speed factor was found for mode " + mode + "! Aborting.");
+		}
+	}
+
+	@Override
+	public TravelTime createTravelTime() {
+		return new EvacuationPTTravelTime(this.mode, this.plansCalcRouteConfigGroup);
+	}
+	
 }

@@ -136,6 +136,7 @@ public class CreateEvacuationAreaSubScenario {
 		transportModes.add(TransportMode.car);
 		transportModes.add(TransportMode.pt);
 		transportModes.add(TransportMode.walk);
+		transportModes.add(TransportMode.ride);
 		
 		NetworkFactory networkFactory = subNetwork.getFactory();
 		Coord exitNode1Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0); 

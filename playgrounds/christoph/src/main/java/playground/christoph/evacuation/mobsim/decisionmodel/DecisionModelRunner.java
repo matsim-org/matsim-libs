@@ -99,6 +99,9 @@ public class DecisionModelRunner implements BeforeMobsimListener, MobsimBeforeSi
 		/*
 		 * EvacuationDecisionModel and LatestAcceptedLeaveTimeModel have to be run during the 
 		 * simulation when a household is informed.
+		 * 
+		 * DepartureDelayModel could be run here, but might be extended and then could only be
+		 * run during the simulation.
 		 */
 	}
 	
@@ -110,6 +113,7 @@ public class DecisionModelRunner implements BeforeMobsimListener, MobsimBeforeSi
 			
 			this.evacuationDecisionModel.runModel(household);
 			this.latestAcceptedLeaveTimeModel.runModel(household);
+			this.departureDelayModel.runModel(household);
 		}
 	}
 	

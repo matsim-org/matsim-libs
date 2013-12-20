@@ -31,6 +31,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 
@@ -39,7 +40,7 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 /**
  * @author cdobler
  */
-public class EvacuationTransitRouterFactory {
+public class EvacuationTransitRouterFactory implements TransitRouterFactory {
 
 	static final Logger log = Logger.getLogger(EvacuationTransitRouterFactory.class);
 	
@@ -68,6 +69,7 @@ public class EvacuationTransitRouterFactory {
 		identifyExitNodes();
 	}
 
+	@Override
 	public EvacuationTransitRouter createTransitRouter() {
 		return new EvacuationTransitRouter(this.config, this.routerConfig, this.routerNetwork, this.ttCalculator, 
 				this.ttCalculator, this.exitNodes, this.walkTravelTime);

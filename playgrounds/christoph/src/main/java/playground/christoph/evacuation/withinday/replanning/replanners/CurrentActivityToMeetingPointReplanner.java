@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -45,7 +46,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 
 public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActivityReplanner {
@@ -54,12 +55,12 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	
 	protected final DecisionDataProvider decisionDataProvider;
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
-	protected final SwissPTTravelTime ptTravelTime;
+	protected final SwissPTTravelTimeCalculator ptTravelTime;
 	protected final TripRouter tripRouter;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
 			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
-			ModeAvailabilityChecker modeAvailabilityChecker, SwissPTTravelTime ptTravelTime,
+			ModeAvailabilityChecker modeAvailabilityChecker, SwissPTTravelTimeCalculator ptTravelTime,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;
@@ -74,7 +75,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -85,12 +86,12 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		/*
 		 *  Get the current PlanElement and check if it is an Activity
 		 */
-		PlanElement currentPlanElement = this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
+		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 		if (currentPlanElement instanceof Activity) {
 			currentActivity = (Activity) currentPlanElement;
 			
 			// get the index of the currently performed activity in the selected plan
-			currentActivityIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+			currentActivityIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		} else return false;
 				
 		/*
@@ -195,7 +196,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
 		 */
-		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
 		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 		return true;
 	}

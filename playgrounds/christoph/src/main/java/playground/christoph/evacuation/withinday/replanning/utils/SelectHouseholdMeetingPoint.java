@@ -38,7 +38,6 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.router.RoutingContext;
@@ -199,7 +198,64 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 		
 		if (time >= EvacuationConfig.evacuationTime) {
 			try {
-				if (informedHouseholdsTracker.allHouseholdsInformed()) {
+				// set current Time
+				for (Runnable runnable : this.runnables) {
+					((SelectHouseholdMeetingPointRunner) runnable).setTime(time);
+				}
+				
+				// If no household was informed in the current time step, we don't have to trigger the runners.
+				if (this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep().size() == 0) {
+//						log.info("No households informed in the current timestep.");
+					return;
+				}
+				
+				// assign households to threads
+				int roundRobin = 0;
+				
+				Households households = ((ScenarioImpl) scenario).getHouseholds();
+				for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
+					
+					Household household = households.getHouseholds().get(householdId);
+					
+					((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
+					roundRobin++;
+				}
+				
+				/*
+				 * Reach the start barrier to trigger the threads.
+				 */
+				this.startBarrier.await();
+				
+				this.endBarrier.await();
+				
+				/*
+				 * Calculate statistics
+				 * 
+				 * Previously this was executed between startBarrier.await() and endBarrier.await().
+				 * However, this seems to be not thread-safe. Therefore I moved it below the 
+				 * endBarrier.await() line. cdobler, jun'12.
+				 */
+				for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
+					
+					HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
+					
+					Id homeFacilityId = hdd.getHomeFacilityId();
+					Id meetingPointFacilityId = hdd.getMeetingPointFacilityId();
+					
+					if (homeFacilityId.equals(meetingPointFacilityId)) meetAtHome++;
+					else meetAtRescue++;
+					
+					ActivityFacility meetingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(meetingPointFacilityId);
+					if (this.coordAnalyzer.isFacilityAffected(meetingFacility)) meetInsecure++;
+					else meetSecure++;
+				}
+				
+				/*
+				 * Check whether all households have been informed and handled. If yes,
+				 * do not execute the code from this method anymore.
+				 */
+				boolean terminate = (informedHouseholdsTracker.allHouseholdsInformed());
+				if (terminate) {
 					/*
 					 * Inform the threads that no further meeting points have to be
 					 * selected. Then reach the start barrier to trigger the threads.
@@ -207,67 +263,86 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 					 */
 					this.allMeetingsPointsSelected.set(true);
 					this.startBarrier.await();
-						
+					
 					/*
 					 * Finally, print some statistics.
 					 */
 					log.info("Households meet at home facility:   " + meetAtHome);
 					log.info("Households meet at rescue facility: " + meetAtRescue);
 					log.info("Households meet at secure place:   " + meetSecure);
-					log.info("Households meet at insecure place: " + meetInsecure);
-				} else {
-					// set current Time
-					for (Runnable runnable : this.runnables) {
-						((SelectHouseholdMeetingPointRunner) runnable).setTime(time);
-					}
-					
-					// If no household was informed in the current time step, we don't have to trigger the runners.
-					if (this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep().size() == 0) {
-//						log.info("No households informed in the current timestep.");
-						return;
-					}
-					
-					// assign households to threads
-					int roundRobin = 0;
-					
-					Households households = ((ScenarioImpl) scenario).getHouseholds();
-					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
-						
-						Household household = households.getHouseholds().get(householdId);
-													
-						((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
-						roundRobin++;
-					}
-					
-					/*
-					 * Reach the start barrier to trigger the threads.
-					 */
-					this.startBarrier.await();
-					
-					this.endBarrier.await();
-										
-					/*
-					 * Calculate statistics
-					 * 
-					 * Previously this was executed between startBarrier.await() and endBarrier.await().
-					 * However, this seems to be not thread-safe. Therefore I moved it below the 
-					 * endBarrier.await() line. cdobler, jun'12.
-					 */
-					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
-																		
-						HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
-
-						Id homeFacilityId = hdd.getHomeFacilityId();
-						Id meetingPointFacilityId = hdd.getMeetingPointFacilityId();
-						
-						if (homeFacilityId.equals(meetingPointFacilityId)) meetAtHome++;
-						else meetAtRescue++;
-						
-						ActivityFacility meetingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(meetingPointFacilityId);
-						if (this.coordAnalyzer.isFacilityAffected(meetingFacility)) meetInsecure++;
-						else meetSecure++;
-					}
-				}		
+					log.info("Households meet at insecure place: " + meetInsecure);					
+				}
+	
+			
+//				if (informedHouseholdsTracker.allHouseholdsInformed()) {
+//					/*
+//					 * Inform the threads that no further meeting points have to be
+//					 * selected. Then reach the start barrier to trigger the threads.
+//					 * As as result, the threads will terminate.
+//					 */
+//					this.allMeetingsPointsSelected.set(true);
+//					this.startBarrier.await();
+//						
+//					/*
+//					 * Finally, print some statistics.
+//					 */
+//					log.info("Households meet at home facility:   " + meetAtHome);
+//					log.info("Households meet at rescue facility: " + meetAtRescue);
+//					log.info("Households meet at secure place:   " + meetSecure);
+//					log.info("Households meet at insecure place: " + meetInsecure);
+//				} else {
+//					// set current Time
+//					for (Runnable runnable : this.runnables) {
+//						((SelectHouseholdMeetingPointRunner) runnable).setTime(time);
+//					}
+//					
+//					// If no household was informed in the current time step, we don't have to trigger the runners.
+//					if (this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep().size() == 0) {
+////						log.info("No households informed in the current timestep.");
+//						return;
+//					}
+//					
+//					// assign households to threads
+//					int roundRobin = 0;
+//					
+//					Households households = ((ScenarioImpl) scenario).getHouseholds();
+//					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
+//						
+//						Household household = households.getHouseholds().get(householdId);
+//													
+//						((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
+//						roundRobin++;
+//					}
+//					
+//					/*
+//					 * Reach the start barrier to trigger the threads.
+//					 */
+//					this.startBarrier.await();
+//					
+//					this.endBarrier.await();
+//					
+//					/*
+//					 * Calculate statistics
+//					 * 
+//					 * Previously this was executed between startBarrier.await() and endBarrier.await().
+//					 * However, this seems to be not thread-safe. Therefore I moved it below the 
+//					 * endBarrier.await() line. cdobler, jun'12.
+//					 */
+//					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
+//																		
+//						HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
+//
+//						Id homeFacilityId = hdd.getHomeFacilityId();
+//						Id meetingPointFacilityId = hdd.getMeetingPointFacilityId();
+//						
+//						if (homeFacilityId.equals(meetingPointFacilityId)) meetAtHome++;
+//						else meetAtRescue++;
+//						
+//						ActivityFacility meetingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(meetingPointFacilityId);
+//						if (this.coordAnalyzer.isFacilityAffected(meetingFacility)) meetInsecure++;
+//						else meetSecure++;
+//					}
+//				}		
 			} catch (InterruptedException ex) {
 				throw new RuntimeException(ex);
 			} catch (BrokenBarrierException ex) {
@@ -295,7 +370,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 
 		TravelTime travelTime = this.travelTimes.get(TransportMode.car);
 		TravelDisutility travelDisutility = this.disutilityFactory.createTravelDisutility(travelTime, this.scenario.getConfig().planCalcScore());
-		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
+		RoutingContext toHomeRoutingContext = new RoutingContextImpl(travelDisutility, travelTime);
 
 		// use a TravelTimeWrapper that returns a travel time of 1.0 second for exit links
 		TravelTime fromHomeTravelTime = new TravelTimeWrapper(travelTime);
@@ -305,10 +380,10 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 		for (int i = 0; i < this.numOfThreads; i++) {
 			
 			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, 
-					toHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(routingContext), 
-					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(fromHomeRoutingContext), 
 					coordAnalyzer.createInstance(), mobsimDataProvider, modeAvailabilityChecker.createInstance(), 
-					decisionDataProvider, startBarrier, endBarrier, allMeetingsPointsSelected);
+					decisionDataProvider, startBarrier, endBarrier, allMeetingsPointsSelected,
+					toHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(toHomeRoutingContext), 
+					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(fromHomeRoutingContext));
 			runner.setTime(Time.UNDEFINED_TIME);
 			runnables[i] = runner; 
 					

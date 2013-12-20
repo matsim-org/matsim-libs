@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
@@ -81,7 +80,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final DecisionDataProvider decisionDataProvider;
 	private final TripRouter toHomeFacilityRouter;
-	private final TripRouter evacuationRouter;
+	private TripRouter evacuationRouter;
 	
 	private final List<Household> householdsToCheck;
 	private double time;
@@ -90,13 +89,17 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final CyclicBarrier endBarrier;
 	private final AtomicBoolean allMeetingsPointsSelected;
 	private final Random random;
-	private final WithinDayAgentUtils withinDayAgentUtils;
 	
-	public SelectHouseholdMeetingPointRunner(Scenario scenario, TripRouter toHomeFacilityRouter, 
-			TripRouter fromHomeFacilityRouter, CoordAnalyzer coordAnalyzer, MobsimDataProvider mobsimDataProvider, 
+	public SelectHouseholdMeetingPointRunner(Scenario scenario, CoordAnalyzer coordAnalyzer, MobsimDataProvider mobsimDataProvider, 
 			ModeAvailabilityChecker modeAvailabilityChecker, DecisionDataProvider decisionDataProvider, 
-			CyclicBarrier startBarrier, CyclicBarrier endBarrier, AtomicBoolean allMeetingsPointsSelected) {
+			CyclicBarrier startBarrier, CyclicBarrier endBarrier, AtomicBoolean allMeetingsPointsSelected,
+			TripRouter toHomeFacilityRouter, TripRouter fromHomeFacilityRouter) {
 		this.scenario = scenario;
+		
+		this.toHomeFacilityRouter = toHomeFacilityRouter;
+		this.evacuationRouter = fromHomeFacilityRouter;
+
+		
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.coordAnalyzer = coordAnalyzer;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
@@ -106,10 +109,8 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		this.endBarrier = endBarrier;
 		this.allMeetingsPointsSelected = allMeetingsPointsSelected;
 		
+		
 		this.random = MatsimRandom.getLocalInstance();
-		this.toHomeFacilityRouter = toHomeFacilityRouter;
-		this.evacuationRouter = fromHomeFacilityRouter;
-		this.withinDayAgentUtils = new WithinDayAgentUtils();
 		
 		this.householdsToCheck = new ArrayList<Household>();
 	}
@@ -181,11 +182,11 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 					 * evacuate united which is preferred by them. Households might be even willing to accept
 					 * longer evacuation times if this allows them to meet at home.
 					 */
-					calculateHouseholdMemberTimes(household, time);
+					calculateHouseholdMemberTimes(household, hdd, time);
 //					calculateLatestAcceptedLeaveTime(household);
 					
 					calculateHouseholdReturnHomeTime(household);
-					calculateEvacuationTimeFromHome(household, hdd.getHouseholdReturnHomeTime());
+					calculateEvacuationTimeFromHome(household, hdd, hdd.getHouseholdReturnHomeTime());
 					calculateHouseholdDirectEvacuationTime(household);
 					
 					selectHouseholdMeetingPoint(household);
@@ -323,21 +324,20 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	/*
 	 * Calculates (estimates) the time until all members of a household have returned home.
 	 */
-	private void calculateHouseholdMemberTimes(Household household, double time) {
+	private void calculateHouseholdMemberTimes(Household household, HouseholdDecisionData hdd, double time) {
 		
-		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId());
 		for (Id personId : household.getMemberIds()) {
-			PersonDecisionData pdd = this.decisionDataProvider.getPersonDecisionData(personId);
-			calculateAgentTimes(pdd, personId, hdd.getHomeLinkId(), hdd.getHomeFacilityId(), time);
+			calculateAgentTimes(personId, hdd.getHomeLinkId(), hdd.getHomeFacilityId(), time);
 		}
 	}
 	
 	/*
 	 * Calculates (estimates) the time until a person has returned home.
 	 */
-	private void calculateAgentTimes(PersonDecisionData pdd, Id personId, Id homeLinkId, Id homeFacilityId, double time) {
+	private void calculateAgentTimes(Id personId, Id homeLinkId, Id homeFacilityId, double time) {
 
-		AgentPosition agentPosition = this.decisionDataProvider.getPersonDecisionData(personId).getAgentPosition();
+		PersonDecisionData pdd = this.decisionDataProvider.getPersonDecisionData(personId);
+		AgentPosition agentPosition = pdd.getAgentPosition();
 		Position positionType = agentPosition.getPositionType();
 		
 		/*
@@ -373,12 +373,12 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			// get the index of the currently performed activity in the selected plan
 			MobsimAgent mobsimAgent = this.mobsimDataProvider.getAgent(personId);
 			
-			Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(mobsimAgent);
+			Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(mobsimAgent);
 			
 			if(!mobsimAgent.getState().equals(State.ACTIVITY)) {
 				throw new RuntimeException("Expected agent to perform an activity but this is not true. Aborting!");
 			}
-			int currentActivityIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(mobsimAgent);
+			int currentActivityIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(mobsimAgent);
 			
 			Id possibleVehicleId = getVehicleId(executedPlan);
 			mode = this.modeAvailabilityChecker.identifyTransportMode(currentActivityIndex, executedPlan, possibleVehicleId);
@@ -435,8 +435,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	/*
 	 * Calculates (estimates) a households evacuation time from home to a rescue facility.
 	 */
-	private void calculateEvacuationTimeFromHome(Household household, double departureTime) {
-		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId());
+	private void calculateEvacuationTimeFromHome(Household household, HouseholdDecisionData hdd, double departureTime) {
 		
 		/*
 		 * Get all vehicles that are already located at the home facility.

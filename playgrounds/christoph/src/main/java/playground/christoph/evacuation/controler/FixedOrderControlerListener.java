@@ -23,6 +23,7 @@ package playground.christoph.evacuation.controler;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -49,6 +50,8 @@ import org.matsim.core.controler.listener.StartupListener;
 public class FixedOrderControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, 
 		AfterMobsimListener, ScoringListener, ReplanningListener, IterationEndsListener, ShutdownListener {
 
+	private final static Logger log = Logger.getLogger(FixedOrderControlerListener.class);
+	
 	private List<StartupListener> startUpListeners;
 	private List<IterationStartsListener> iterationStartsListeners;
 	private List<BeforeMobsimListener> beforeMobsimListeners;
@@ -126,6 +129,7 @@ public class FixedOrderControlerListener implements StartupListener, IterationSt
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		for (StartupListener listener : this.startUpListeners) {
+			log.info("\t" + "calling notifyStartup on " + listener.getClass().getCanonicalName());
 			listener.notifyStartup(event);
 		}
 	}
@@ -133,6 +137,7 @@ public class FixedOrderControlerListener implements StartupListener, IterationSt
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		for (IterationStartsListener listener : this.iterationStartsListeners) {
+			log.info("\t" + "calling notifyIterationStarts on " + listener.getClass().getCanonicalName());
 			listener.notifyIterationStarts(event);
 		}
 	}
@@ -140,6 +145,7 @@ public class FixedOrderControlerListener implements StartupListener, IterationSt
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		for (BeforeMobsimListener listener : this.beforeMobsimListeners) {
+			log.info("\t" + "calling notifyBeforeMobsim on " + listener.getClass().getCanonicalName());
 			listener.notifyBeforeMobsim(event);
 		}
 	}
@@ -147,6 +153,7 @@ public class FixedOrderControlerListener implements StartupListener, IterationSt
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		for (AfterMobsimListener listener : this.afterMobsimListeners) {
+			log.info("\t" + "calling notifyAfterMobsim on " + listener.getClass().getCanonicalName());
 			listener.notifyAfterMobsim(event);
 		}
 	}
@@ -154,6 +161,7 @@ public class FixedOrderControlerListener implements StartupListener, IterationSt
 	@Override
 	public void notifyScoring(ScoringEvent event) {
 		for (ScoringListener listener : this.scoringListeners) {
+			log.info("\t" + "calling notifyScoring on " + listener.getClass().getCanonicalName());
 			listener.notifyScoring(event);
 		}
 	}
@@ -161,6 +169,7 @@ public class FixedOrderControlerListener implements StartupListener, IterationSt
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
 		for (ReplanningListener listener : this.replanningListeners) {
+			log.info("\t" + "calling notifyReplanning on " + listener.getClass().getCanonicalName());
 			listener.notifyReplanning(event);
 		}
 	}
@@ -168,6 +177,7 @@ public class FixedOrderControlerListener implements StartupListener, IterationSt
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		for (IterationEndsListener listener : this.iterationEndsListeners) {
+			log.info("\t" + "calling notifyIterationEnds on " + listener.getClass().getCanonicalName());
 			listener.notifyIterationEnds(event);
 		}
 	}
@@ -175,6 +185,7 @@ public class FixedOrderControlerListener implements StartupListener, IterationSt
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		for (ShutdownListener listener : this.shutDownListeners) {
+			log.info("\t" + "calling notifyShutdown on " + listener.getClass().getCanonicalName());
 			listener.notifyShutdown(event);
 		}
 	}

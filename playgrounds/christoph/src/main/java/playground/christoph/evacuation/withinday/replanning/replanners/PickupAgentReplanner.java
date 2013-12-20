@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
@@ -78,15 +79,15 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 	
 	private boolean replanDriver(MobsimAgent withinDayAgent) {
 		
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 		
-		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
-		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
-		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
 		NetworkRoute currentRoute = (NetworkRoute) currentLeg.getRoute();
 		Id currentVehicleId = currentRoute.getVehicleId();
 		List<Id> subRoute;
@@ -150,22 +151,22 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		executedPlan.getPlanElements().add(currentLegIndex + 2, carLeg);
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}
 	
 	private boolean replanPassenger(MobsimAgent withinDayAgent) {
 		
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 		
-		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
-		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
-		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
 		
 		/*
 		 * Create new pickup activity.
@@ -204,7 +205,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		currentLeg.setTravelTime(this.time - currentLeg.getDepartureTime());	
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}

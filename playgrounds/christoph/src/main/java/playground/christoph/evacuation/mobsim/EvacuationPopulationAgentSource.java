@@ -20,6 +20,9 @@
 
 package playground.christoph.evacuation.mobsim;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +38,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
@@ -49,51 +53,107 @@ public class EvacuationPopulationAgentSource implements AgentSource {
 
 	private static Logger log = Logger.getLogger(EvacuationPopulationAgentSource.class);
 	
+	public static String parkedVehiclesFileName = "parkedVehiclesFile.xml.gz";
+	public static String agentsVehiclesFileName = "agentsVehiclesFile.xml.gz";
+	
     private final Scenario scenario;
     private final ObjectAttributes householdObjectAttributes;
     private final AgentFactory agentFactory;
 	private final QSim qsim;
-
+	private final String agentsVehiclesFile;
+	private final String parkedVehiclesFile;
+	
     public EvacuationPopulationAgentSource(Scenario scenario, AgentFactory agentFactory, QSim qsim, 
-    		ObjectAttributes householdObjectAttributes) {
+    		ObjectAttributes householdObjectAttributes, String agentsVehiclesFile, String parkedVehiclesFile) {
         this.scenario = scenario;
         this.agentFactory = agentFactory;
         this.qsim = qsim;
         this.householdObjectAttributes = householdObjectAttributes;
+        this.agentsVehiclesFile = agentsVehiclesFile;
+        this.parkedVehiclesFile = parkedVehiclesFile;
     }
 	
 	@Override
 	public void insertAgentsIntoMobsim() {
 		
-        Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
-        
-        for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
-        	
-        	for (Id personId : household.getMemberIds()) {
-        		Person p = scenario.getPopulation().getPersons().get(personId);
-        		MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
-        		qsim.insertAgentIntoMobsim(agent);
-    			
-    			checkVehicleId(p.getSelectedPlan());
-        	}
-
-        	// get household's home facility
-			String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), EvacuationConstants.HOUSEHOLD_HOMEFACILITYID).toString();
-			Id homeFacilityId = this.scenario.createId(homeFacilityIdString);
-			ActivityFacility homeFacility = this.scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
-        	        	
-        	// get id of link where the home facility is attached to the network
-        	Id homeLinkId = homeFacility.getLinkId();       	
-        	
-        	// add vehicles to QSim
-        	for (Id vehicleId : household.getVehicleIds()) {
-        		Vehicle veh = vehicles.getVehicles().get(vehicleId);
-        		qsim.createAndParkVehicleOnLink(veh, homeLinkId);
-        	}
-        }
+		try {
+			BufferedWriter agentsWriter = null;
+			BufferedWriter parkedWriter = null;
+			if (this.agentsVehiclesFile != null) {
+				agentsWriter = IOUtils.getBufferedWriter(this.agentsVehiclesFile);
+				agentsWriter.write("agentId");
+				agentsWriter.write("\t");
+				agentsWriter.write("vehicleId");
+				agentsWriter.write("\n");
+			}
+			if (this.parkedVehiclesFile != null) {
+				parkedWriter = IOUtils.getBufferedWriter(this.parkedVehiclesFile);
+				parkedWriter.write("vehicleId");
+				parkedWriter.write("\t");
+				parkedWriter.write("linkId");
+				parkedWriter.write("\n");
+			}
+			
+			Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
+			
+			for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
+				
+				// get household's home facility
+				String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), EvacuationConstants.HOUSEHOLD_HOMEFACILITYID).toString();
+				Id homeFacilityId = this.scenario.createId(homeFacilityIdString);
+				ActivityFacility homeFacility = this.scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
+				
+				// get id of link where the home facility is attached to the network
+				Id homeLinkId = homeFacility.getLinkId();       	
+				
+				// add vehicles to QSim
+				for (Id vehicleId : household.getVehicleIds()) {
+					Vehicle veh = vehicles.getVehicles().get(vehicleId);
+					qsim.createAndParkVehicleOnLink(veh, homeLinkId);
+					
+					if (parkedWriter != null) {
+						parkedWriter.write(vehicleId.toString());
+						parkedWriter.write("\t");
+						parkedWriter.write(homeLinkId.toString());
+						parkedWriter.write("\n");
+					}
+				}
+				
+				/*
+				 * Agents have to be added after the vehicles to the qsim since they could
+				 * depart immediately after insertion, if the end time of their first activity
+				 * is <= the simulation start time.
+				 */
+				for (Id personId : household.getMemberIds()) {
+					Person p = scenario.getPopulation().getPersons().get(personId);
+					MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
+					qsim.insertAgentIntoMobsim(agent);
+					
+					Id agentsVehicleId = checkVehicleId(p.getSelectedPlan());
+					if (agentsWriter != null) {
+						agentsWriter.write(agent.getId().toString());
+						agentsWriter.write("\t");
+						if (agentsVehicleId != null) agentsWriter.write(agentsVehicleId.toString());
+						else agentsWriter.write("null");
+						agentsWriter.write("\n");
+					}
+				}
+			}
+			if (agentsWriter != null) {
+				agentsWriter.flush();
+				agentsWriter.close();
+			}
+			if (parkedWriter != null) {
+				parkedWriter.flush();
+				parkedWriter.close();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
-	private void checkVehicleId(Plan plan) {
+	private Id checkVehicleId(Plan plan) {
+		Id agentsVehicleId = null;
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
@@ -104,9 +164,16 @@ public class EvacuationPopulationAgentSource implements AgentSource {
 						log.warn("Person " + plan.getPerson().getId().toString() + ": Vehicle Id is null!");
 					} else if(!vehicleId.toString().contains("_veh")) {
 						log.warn("Person " + plan.getPerson().getId().toString() + " has an unexpected vehicle Id: " + vehicleId.toString());
+					} else {
+						if (agentsVehicleId == null) agentsVehicleId = vehicleId;
+						else if (!vehicleId.equals(agentsVehicleId)) {
+							log.warn("Person " + plan.getPerson().getId().toString() + " used different vehicles. Ids: " + vehicleId.toString() +
+									" and " + agentsVehicleId.toString());
+						}
 					}
 				}
 			}
 		}
+		return agentsVehicleId;
 	}
 }

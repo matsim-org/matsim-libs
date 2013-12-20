@@ -28,7 +28,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 
 public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityReplannerFactory {
@@ -36,13 +36,13 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	private final Scenario scenario;
 	private final DecisionDataProvider decisionDataProvider;
 	private final JoinedHouseholdsIdentifier identifier;
-	private final SwissPTTravelTime ptTravelTime;
+	private final SwissPTTravelTimeCalculator ptTravelTime;
 	private final TripRouterFactory tripRouterFactory;
 	private final RoutingContext routingContext;
 	
 	public JoinedHouseholdsReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
 			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
-			SwissPTTravelTime ptTravelTime, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+			SwissPTTravelTimeCalculator ptTravelTime, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.decisionDataProvider = decisionDataProvider;

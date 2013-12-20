@@ -98,10 +98,12 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier {
 		HouseholdDeparture householdDeparture = null;
 		Queue<HouseholdDeparture> plannedDeparturesQueue = this.householdDepartureManager.getPlannedDeparturesQueue();
 		Queue<HouseholdDeparture> handledDeparturesQueue = this.householdDepartureManager.getHandledDeparturesQueue();
-		while(true) {
-			householdDeparture = plannedDeparturesQueue.peek();
+		
+		while ((householdDeparture = plannedDeparturesQueue.peek()) != null) {
+//		while(true) {
+//			householdDeparture = plannedDeparturesQueue.peek();
 			Id householdId = householdDeparture.getHouseholdId();
-						
+			
 			/*
 			 * If the household departs in the current time step.
 			 */
@@ -159,6 +161,10 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier {
 			
 			this.jointDepartureOrganizer.createJointDeparture(linkId, vehicleId, driverId, passengerIds);			
 		}
+	}
+	
+	public void incPerformedDepartures(Id householdId) {
+		this.householdDepartureManager.getScheduledHouseholdDepartures().get(householdId).incPerformedDepartures();
 	}
 	
 	/**

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -79,15 +80,15 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 	
 	private boolean replanDriver(MobsimAgent withinDayAgent) {
 		
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 		
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 		
-		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
-		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
-		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
 		NetworkRoute currentRoute = (NetworkRoute) currentLeg.getRoute();
 		Id currentVehicleId = currentRoute.getVehicleId();
 		List<Id> subRoute;
@@ -153,20 +154,20 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		executedPlan.getPlanElements().add(currentLegIndex + 2, carLeg);
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}
 	
 	private boolean replanPassenger(MobsimAgent withinDayAgent) {
 		
-		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = WithinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 		
-		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
-		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
 		
 		/*
 		 * Get agent's current link from the vehicle since the agent's
@@ -213,7 +214,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 				scenario.getNetwork(), tripRouter); 
 				
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}
