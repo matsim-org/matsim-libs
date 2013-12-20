@@ -2,9 +2,7 @@ package playground.dziemke.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 
 import org.apache.log4j.Logger;
 
@@ -24,16 +22,12 @@ public class MoveAndRenameLegHistogram {
 		String inputFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iterationNumber
 				+ "/" + runId + "." + iterationNumber + ".legHistogram_all.png";
 		String outputDirectory = "D:/VSP/Masterarbeit/Images/" + runId + "/";
-		String outputFileName = "legHistogram.png";
+		String outputFile = outputDirectory + "legHistogram.png";
 		
 		// Copy the file
-		Path inputPath = Paths.get(inputFile);
-		Path outputPath = Paths.get(outputDirectory + outputFileName);
-				
 		new File(outputDirectory).mkdir();
-
-		Files.copy(inputPath, outputPath);
+		//TODO Copy the file
 		
-		log.info("Done creating the copied file " + outputDirectory + outputFileName + ".");
+		log.info("Done creating the copied file " + outputFile + ".");
 	}
 }
