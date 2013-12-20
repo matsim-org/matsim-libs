@@ -81,7 +81,8 @@ public class CreatePlans {
 	}
 	
 	public void run(String outPath) {
-		for (int i = 0; i < 500; i++) {
+		int nbrPersons = 500;
+		for (int i = 0; i < nbrPersons; i++) {
 			PersonImpl person = new PersonImpl(new IdImpl(i));
 			this.scenario.getPopulation().addPerson(person);
 			person.createAndAddPlan(true);
@@ -99,7 +100,7 @@ public class CreatePlans {
 						
 			ActivityImpl act;
 			
-			if (rnd.nextBoolean()) act = ((PlanImpl) plan).createAndAddActivity("work");
+			if (i < nbrPersons/2.0) act = ((PlanImpl) plan).createAndAddActivity("work");
 			else act = ((PlanImpl) plan).createAndAddActivity("leisure");
 			
 			act.setStartTime(6.0 * 3600.0 + 100.0 + 1.0 * offset);
