@@ -593,6 +593,8 @@ public class EvacuationControlerListener implements StartupListener {
 		
 		private final WithinDayEngine withinDayEngine; 
 		private final ReplanningTracker replanningTracker;
+		
+		private boolean disabled = false;
 			
 		public InitialReplanningRemover(WithinDayEngine withinDayEngine, ReplanningTracker replanningTracker) {
 			this.withinDayEngine = withinDayEngine;
@@ -609,7 +611,7 @@ public class EvacuationControlerListener implements StartupListener {
 		
 		@Override
 		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
-			if (this.replanningTracker.allAgentsInitiallyReplanned()) {
+			if (!disabled && this.replanningTracker.allAgentsInitiallyReplanned()) {
 				for (WithinDayReplannerFactory<?> factory : this.initialReplannerFactories) {
 					if (factory instanceof WithinDayDuringActivityReplannerFactory) {
 						this.withinDayEngine.removeDuringActivityReplannerFactory((WithinDayDuringActivityReplannerFactory) factory);
@@ -631,6 +633,8 @@ public class EvacuationControlerListener implements StartupListener {
 					}
 				}
 				log.info("Disabled " + removedAgentFilters + " initial within-day filters.");
+				
+				this.disabled = true;
 			}
 		}
 		
