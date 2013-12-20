@@ -381,7 +381,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                 }
                 case PICKUP_STAY: {
                     task.setBeginTime(t);// t == taxi's arrival time
-                    int t0 = ((TaxiPickupDriveTask)task).getRequest().getT0();// t0 == passenger's departure time
+                    int t0 = ((TaxiPickupStayTask)task).getRequest().getT0();// t0 == passenger's departure time
                     t = Math.max(t, t0) + pickupDuration; // the true pickup starts at max(t, t0)
                     task.setEndTime(t);
                     
