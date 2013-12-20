@@ -438,7 +438,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 				final TransitStopFacility stop = transitDriver.getNextTransitStop();
 
 				if ((stop != null) && (stop.getLinkId().equals( event.linkId ) ) ) {
-					final double delay = transitDriver.handleTransitStop( stop , time );
+					final double delay = handleTransitStop( transitDriver , stop , time );
 					if ( delay > 0 ) {
 						arrivalQueue.add(
 								new InternalArrivalEvent(
@@ -488,6 +488,15 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 				internalInterface.arrangeNextAgentState( agent );
 			}
 		}
+	}
+
+	// for thread safety: handle transit stop implies some not-thread-safe
+	// passenger queue management.
+	private static synchronized double handleTransitStop(
+			final TransitDriverAgent transitDriver,
+			final TransitStopFacility stop,
+			final double time) {
+		return transitDriver.handleTransitStop( stop , time );
 	}
 
 	private static class BreakableCyclicBarrier {
