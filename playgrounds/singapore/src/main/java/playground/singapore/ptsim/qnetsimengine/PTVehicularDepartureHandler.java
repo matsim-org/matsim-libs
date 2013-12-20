@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.pt.UmlaufDriver;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 class PTVehicularDepartureHandler implements DepartureHandler {
@@ -68,7 +68,7 @@ class PTVehicularDepartureHandler implements DepartureHandler {
 	}
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id linkId) {
-		if ( ! (agent instanceof UmlaufDriver) ) {
+		if ( ! (agent instanceof TransitDriverAgentImpl) ) {
 			// (UmlaufDriver somehow is different. kai, dec'11)
 			if (linkId.equals(agent.getDestinationLinkId())) {
 				if ( agent.chooseNextLinkId() == null ) {

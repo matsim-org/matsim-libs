@@ -46,7 +46,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
+import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
@@ -175,7 +175,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 		// Treat the situation where startLink == endLink.
 		// Transit vehicles do this differently than others, because there could be a stop on it.
 		// Other vehicles _do not_ traverse their only link but arrive right away.
-		if ( ! (agent instanceof AbstractTransitDriver) ) { 	
+		if ( ! (agent instanceof AbstractTransitDriverAgent) ) { 	
 			if (linkId.equals(agent.getDestinationLinkId())) {
 				if ( agent.chooseNextLinkId() == null ) {
 					if ( log.isTraceEnabled() ) {

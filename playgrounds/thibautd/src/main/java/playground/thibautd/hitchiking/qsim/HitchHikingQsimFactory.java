@@ -118,7 +118,6 @@ public class HitchHikingQsimFactory implements MobsimFactory {
 
         if (sc.getConfig().scenario().isUseTransit()) {
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);

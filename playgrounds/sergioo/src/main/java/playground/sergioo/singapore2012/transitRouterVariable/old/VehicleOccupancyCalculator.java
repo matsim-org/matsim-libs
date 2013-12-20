@@ -10,7 +10,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
+import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.utils.collections.Tuple;
@@ -81,7 +81,7 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 	public void handleEvent(TransitDriverStartsEvent event) {
 		if(ptVehicles.isEmpty())
 			for(MobsimAgent mobsimAgent:transitQSimEngine.getPtDrivers())
-				this.ptVehicles.put(((AbstractTransitDriver)mobsimAgent).getVehicle().getId(), ((AbstractTransitDriver)mobsimAgent).getVehicle());
+				this.ptVehicles.put(((AbstractTransitDriverAgent)mobsimAgent).getVehicle().getId(), ((AbstractTransitDriverAgent)mobsimAgent).getVehicle());
 		linesRoutesOfVehicle.put(event.getVehicleId(), new Tuple<Id, Id>(event.getTransitLineId(), event.getTransitRouteId()));
 	}
 

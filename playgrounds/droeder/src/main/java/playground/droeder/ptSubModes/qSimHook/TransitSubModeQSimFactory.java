@@ -94,7 +94,6 @@ public class TransitSubModeQSimFactory implements MobsimFactory {
 			agentFactory = new TransitSubModeAgentFactory(qSim, this.routeOnSameMode);
 			TransitQSimEngine transitEngine = new TransitSubModeQSimEngine(qSim);
 			//###############################
-			transitEngine.setUseUmlaeufe(true);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
 			qSim.addAgentSource(transitEngine);

@@ -79,7 +79,6 @@ public class PassivePlanningAgendaFactory implements MobsimFactory {
 		if(sc.getConfig().scenario().isUseTransit()) {
 			agentFactory = new PassivePlannerTransitAgendaAgentFactory(qSim, passivePlannerManager, personHouseholdMapping);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setUseUmlaeufe(true);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
 			qSim.addAgentSource(transitEngine);

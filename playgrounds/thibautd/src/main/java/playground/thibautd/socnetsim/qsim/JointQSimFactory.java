@@ -87,7 +87,6 @@ public class JointQSimFactory implements MobsimFactory {
 
         if (sc.getConfig().scenario().isUseTransit()) {
             final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);

@@ -84,7 +84,6 @@ public class PQSimFactory implements MobsimFactory {
         if (sc.getConfig().scenario().isUseTransit()) {
             agentFactory = new PTransitAgentFactory(qSim, ((PConfigGroup) sc.getConfig().getModule(PConfigGroup.GROUP_NAME)).getPassengersBoardEveryLine());
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);

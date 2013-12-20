@@ -77,7 +77,6 @@ public class TransitControler extends Controler {
         QSim qSim = qSim1;
         AgentFactory agentFactory = new TransitAgentFactory(qSim);
         TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-        transitEngine.setUseUmlaeufe(true);
         transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
         qSim.addDepartureHandler(transitEngine);
         qSim.addAgentSource(transitEngine);

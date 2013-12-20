@@ -63,7 +63,6 @@ public class TransitLiveSimMain {
         AgentFactory agentFactory;
             agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);
@@ -71,7 +70,6 @@ public class TransitLiveSimMain {
         PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
         qSim.addAgentSource(agentSource);
         QSim sim = qSim;
-		transitEngine.setUseUmlaeufe(true);
 		
 		
 		

@@ -31,7 +31,6 @@ public class TransitQSimEngineFactory implements MobsimEngineFactory {
 	@Override
 	public MobsimEngine createMobsimSimEngine(Netsim sim) {
 		TransitQSimEngine transitEngine = new TransitQSimEngine((QSim) sim);
-		transitEngine.setUseUmlaeufe(true);
 		transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 		return transitEngine;
 	}

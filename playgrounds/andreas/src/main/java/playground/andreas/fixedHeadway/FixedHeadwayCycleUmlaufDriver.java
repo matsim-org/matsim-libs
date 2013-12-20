@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.mobsim.qsim.pt.UmlaufDriver;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 
@@ -15,7 +15,7 @@ import org.matsim.pt.Umlauf;
  * @author aneumann
  *
  */
-public class FixedHeadwayCycleUmlaufDriver extends UmlaufDriver {
+public class FixedHeadwayCycleUmlaufDriver extends TransitDriverAgentImpl {
 	
 	private final static Logger log = Logger.getLogger(FixedHeadwayCycleUmlaufDriver.class);
 	
