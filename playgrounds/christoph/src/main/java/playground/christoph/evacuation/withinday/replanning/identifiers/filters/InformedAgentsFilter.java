@@ -58,7 +58,7 @@ public class InformedAgentsFilter implements AgentFilter {
 		 * Either no agents are filtered (FilterType.NotInitialReplanning)
 		 * or all agents are filtered (FilterType.InitialReplanning).
 		 */
-		if (informedAgentsTracker.allAgentsInformed()) {
+		if (this.informedAgentsTracker.allAgentsInformed() && this.replanningTracker.allAgentsInitiallyReplanned()) {
 			if (filterType == FilterType.InitialReplanning)	set.clear();
 			return;
 		}
@@ -101,75 +101,11 @@ public class InformedAgentsFilter implements AgentFilter {
 				if (!alreadyInitiallyReplannedAgents.contains(agentId)) iter.remove();
 			}			
 		}
-		
-//		Set<Id> initialReplanningRequiringAgents = informedAgentsTracker.getAgentsRequiringInitialReplanning();
-//		Set<Id> informedAgents = informedAgentsTracker.getInformedAgents();
-//		Set<Id> notInformedAgents = informedAgentsTracker.getNotInformedAgents();
-//		
-//		/*
-//		 * 6 possible combinations
-//		 * - set < informed agents < not informed agents
-//		 * - informed agents < set < not informed agents
-//		 * - informed agents < not informed agents < set
-//		 * - set < not informed agents < informed agents
-//		 * - not informed agents < set < informed agents
-//		 * - not informed agents < informed agents < set
-//		 */
-//		if (informedAgents.size() < notInformedAgents.size()) {
-//			
-//			// set < informed agents < not informed agents
-//			if (set.size() < informedAgents.size()) {
-//				Iterator<Id> iter = set.iterator();
-//				while (iter.hasNext()) {
-//					Id agentId = iter.next();
-//
-//					// if the agent is not informed or requires an initial replanning, remove it from the set
-//					if (!informedAgents.contains(agentId) || initialReplanningRequiringAgents.contains(agentId)) iter.remove();
-//				}
-//			} else {				
-//				// informed agents < set < not informed agents				
-//				if (set.size() < notInformedAgents.size()) {
-//					Set<Id> agents = new HashSet<Id>();
-//					for (Id agentId : informedAgents) {
-//						if (!this.informedAgentsTracker.agentRequiresInitialReplanning(agentId) && set.contains(agentId)) agents.add(agentId);
-//					}
-//					set.clear();
-//					set.addAll(agents);
-//				} 
-//				// informed agents < not informed agents < set
-//				else {
-//					Set<Id> agents = new HashSet<Id>();
-//					for (Id agentId : informedAgents) {
-//						if (!this.informedAgentsTracker.agentRequiresInitialReplanning(agentId) && set.contains(agentId)) agents.add(agentId);
-//					}
-//					set.clear();
-//					set.addAll(agents);
-//				}
-//			}
-//		} 
-//		// not informed agents < informed agents
-//		else {	
-//			// set < not informed agents < informed agents
-//			if (set.size() < notInformedAgents.size()) {
-//				Iterator<Id> iter = set.iterator();
-//				while (iter.hasNext()) {
-//					Id agentId = iter.next();
-//					// if the agent is not informed or requires an initial replanning, remove it from the set
-//					if (notInformedAgents.contains(agentId) || initialReplanningRequiringAgents.contains(agentId)) iter.remove();
-//				}
-//			} else {
-//				// not informed agents < set < informed agents
-//				if (set.size() < informedAgents.size()) {
-//					set.removeAll(notInformedAgents);
-//					set.removeAll(initialReplanningRequiringAgents);
-//				}
-//				// not informed agents < informed agents < set
-//				else {
-//					set.removeAll(notInformedAgents);
-//					set.removeAll(initialReplanningRequiringAgents);
-//				}
-//			}
-//		}
+	}
+	
+	/*package*/ boolean applyNotInitialReplanningFilter(Id id) {
+		if (this.replanningTracker.hasAgentBeenInitiallyReplanned(id)) return true;
+		else return false;
 	}
 	
 	/**
@@ -195,6 +131,39 @@ public class InformedAgentsFilter implements AgentFilter {
 				Id agentId = iter.next();
 				if (!initialReplanningRequiringAgents.contains(agentId)) iter.remove();
 			}			
+		}
+	}
+	
+	/*package*/ boolean applyInitialReplanningFilter(Id id) {
+		final Set<Id> initialReplanningRequiringAgents = this.replanningTracker.getInformedButNotInitiallyReplannedAgents();
+		if (initialReplanningRequiringAgents.contains(id)) return true;
+		else return false;
+	}
+	
+	@Override
+	public boolean applyAgentFilter(Id id, double time) {
+		/*
+		 * If all agents have been informed, filtering can be shortened.
+		 * Either no agents are filtered (FilterType.NotInitialReplanning)
+		 * or all agents are filtered (FilterType.InitialReplanning).
+		 */
+		if (this.informedAgentsTracker.allAgentsInformed() && this.replanningTracker.allAgentsInitiallyReplanned()) {
+			if (filterType == FilterType.InitialReplanning)	return false;
+		}
+		
+		// keep only agents that need an initial replanning
+		if (filterType == FilterType.InitialReplanning) {
+			if (!applyInitialReplanningFilter(id)) return false;
+			else return true;
+		} 
+		// only agents which do not need an initial replanning are kept
+		else if(filterType == FilterType.NotInitialReplanning) {
+			if (!applyNotInitialReplanningFilter(id)) return false;
+			else return true;
+		}
+		else { 
+			// this should never happen...
+			throw new RuntimeException("Unknown filter type: " + filterType);
 		}
 	}
 }

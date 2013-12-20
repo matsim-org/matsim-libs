@@ -69,30 +69,36 @@ public class AffectedAgentsFilter implements AgentFilter {
 		
 		Iterator<Id> iter = set.iterator();
 		while (iter.hasNext()) {
-			Id agentId = iter.next();
-			AgentPosition agentPosition = this.agentsTracker.getAgentPosition(agentId);
-			Position positionType = agentPosition.getPositionType();
-
-			boolean affected = false;
-			if (positionType == Position.LINK) {
-				Id linkId = agentPosition.getPositionId();
-				Link link = this.scenario.getNetwork().getLinks().get(linkId);
-				affected = this.coordAnalyzer.isLinkAffected(link);
-			} else if (positionType == Position.FACILITY) {
-				Id facilityId = agentPosition.getPositionId();
-				Facility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId);
-				affected = this.coordAnalyzer.isFacilityAffected(facility);
-			} else if (positionType == Position.VEHICLE) {
-				Id linkId = this.mobsimDataProvider.getVehicle(agentPosition.getPositionId()).getCurrentLink().getId();
-				Link link = this.scenario.getNetwork().getLinks().get(linkId);
-				affected = this.coordAnalyzer.isLinkAffected(link);
-			} else {
-				log.warn("Agent's position is undefined! Id: " + agentId);
-			}
-			
-			// apply filter
-			if (filterType == FilterType.Affected && !affected) iter.remove();
-			else if (filterType == FilterType.NotAffected && affected) iter.remove();
+			Id id = iter.next();
+			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
+	}
+	
+	@Override
+	public boolean applyAgentFilter(Id id, double time) {
+		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(id);
+		Position positionType = agentPosition.getPositionType();
+
+		boolean affected = false;
+		if (positionType == Position.LINK) {
+			Id linkId = agentPosition.getPositionId();
+			Link link = this.scenario.getNetwork().getLinks().get(linkId);
+			affected = this.coordAnalyzer.isLinkAffected(link);
+		} else if (positionType == Position.FACILITY) {
+			Id facilityId = agentPosition.getPositionId();
+			Facility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId);
+			affected = this.coordAnalyzer.isFacilityAffected(facility);
+		} else if (positionType == Position.VEHICLE) {
+			Id linkId = this.mobsimDataProvider.getVehicle(agentPosition.getPositionId()).getCurrentLink().getId();
+			Link link = this.scenario.getNetwork().getLinks().get(linkId);
+			affected = this.coordAnalyzer.isLinkAffected(link);
+		} else {
+			log.warn("Agent's position is undefined! Id: " + id);
+		}
+		
+		// apply filter
+		if (filterType == FilterType.Affected && !affected) return false;
+		else if (filterType == FilterType.NotAffected && affected) return false;
+		return true;
 	}
 }
