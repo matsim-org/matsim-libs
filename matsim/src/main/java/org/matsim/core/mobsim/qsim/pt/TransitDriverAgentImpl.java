@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,7 +49,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 /**
  * @author michaz
  */
-public class UmlaufDriver extends AbstractTransitDriver {
+public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 	private static class PlanBuilder {
 
@@ -88,7 +89,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	private TransitRoute transitRoute;
 	private Departure departure;
 	
-	public UmlaufDriver(Umlauf umlauf,
+	public TransitDriverAgentImpl(Umlauf umlauf,
 			String transportMode,
 			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
 		super(internalInterface, thisAgentTracker);

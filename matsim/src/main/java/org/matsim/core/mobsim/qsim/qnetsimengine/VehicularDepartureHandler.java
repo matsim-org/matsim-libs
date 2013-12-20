@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
+import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 
 class VehicularDepartureHandler implements DepartureHandler {
 
@@ -70,7 +70,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 		// Treat the situation where startLink == endLink.
 		// Transit vehicles do this differently than others, because there could be a stop on it.
 		// Other vehicles _do not_ traverse their only link but arrive right away.
-		if ( ! (agent instanceof AbstractTransitDriver) ) { 	
+		if ( ! (agent instanceof AbstractTransitDriverAgent) ) { 	
 			if (linkId.equals(agent.getDestinationLinkId())) {
 				if ( agent.chooseNextLinkId() == null ) {
 

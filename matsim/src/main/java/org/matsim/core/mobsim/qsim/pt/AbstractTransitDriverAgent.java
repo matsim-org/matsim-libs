@@ -46,9 +46,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanAgent {
+public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
-	private static final Logger log = Logger.getLogger(AbstractTransitDriver.class);
+	private static final Logger log = Logger.getLogger(AbstractTransitDriverAgent.class);
 
 	private TransitVehicle vehicle = null;
 
@@ -58,9 +58,9 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
 	private InternalInterface internalInterface;
-	
+
 	private final PassengerAccessEgressImpl accessEgress;
-	
+
 	/* package */ MobsimAgent.State state = MobsimAgent.State.ACTIVITY ; 
 	// yy not so great: implicit instantiation at activity.  kai, nov'11
 	@Override
@@ -77,7 +77,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	@Override
 	public abstract double getActivityEndTime();
 
-	public AbstractTransitDriver(InternalInterface internalInterface, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriverAgent(InternalInterface internalInterface, TransitStopAgentTracker agentTracker2) {
 		super();
 		this.internalInterface = internalInterface;
 		accessEgress = new PassengerAccessEgressImpl(this.internalInterface, agentTracker2);
@@ -118,7 +118,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		assertAllStopsServed();
 		return null;
 	}
-	
+
 	@Override
 	public final void abort( final double now ) {
 		this.state = MobsimAgent.State.ABORT ;
@@ -152,10 +152,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	@Override
 	public double handleTransitStop(final TransitStopFacility stop, final double now) {
 		// yy can't make this final because of tests.  kai, oct'12
-		
+
 		assertExpectedStop(stop);
 		processEventVehicleArrives(stop, now);
-		
+
 		TransitRoute route = this.getTransitRoute();
 		List<TransitRouteStop> stopsToCome = route.getStops().subList(stopIterator.nextIndex(), route.getStops().size());
 		/*
@@ -163,7 +163,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		 * If a stopTime greater than 1.0 is used, this method is not necessarily triggered by the qsim, so (de-)boarding will not happen. Dg, 10-2012
 		 */
 		double stopTime = this.accessEgress.calculateStopTimeAndTriggerBoarding(getTransitRoute(), getTransitLine(), this.vehicle, stop, stopsToCome, now);
-		
+
 		if(stopTime == 0.0){
 			stopTime = longerStopTimeIfWeAreAheadOfSchedule(now, stopTime);
 		}
@@ -174,13 +174,18 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 
 	protected final void sendTransitDriverStartsEvent(final double now) {
-		// check if "Wenden"
-		if(getTransitLine() == null){
-			this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
-					this.vehicle.getId(), new IdImpl("Wenden"), new IdImpl("Wenden"), new IdImpl("Wenden")));
-		} else {
-			this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
-					this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
+		// A test initializes this Agent without internalInterface. 
+		// Actually, I am not sure if agents should send Events (or just be reactive, so they can be
+		// tested / exercised as a unit, without a QSim.  michaz
+		if (internalInterface != null) { 
+			// check if "Wenden"
+			if(getTransitLine() == null){
+				this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+						this.vehicle.getId(), new IdImpl("Wenden"), new IdImpl("Wenden"), new IdImpl("Wenden")));
+			} else {
+				this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+						this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
+			}
 		}
 	}
 
@@ -258,7 +263,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		}
 		return false;
 	}
-	
+
 	private void depart(final double now) {
 		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 		double delay = now - this.getDeparture().getDepartureTime();
@@ -292,14 +297,14 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 			throw e;
 		}
 	}
-	
+
 	private void assertVehicleIsEmpty() {
 		if (this.vehicle.getPassengers().size() > 0) {
 			RuntimeException e = new RuntimeException("Transit vehicle is at last stop but still contains passengers that did not leave the vehicle!");
 			log.error("Transit vehicle must be empty after last stop! vehicle-id = " + this.vehicle.getVehicle().getId(), e);
 			for (PassengerAgent agent : this.vehicle.getPassengers()) {
 				if (agent instanceof PersonDriverAgentImpl) {
-				log.error("Agent is still in transit vehicle: agent-id = " + ((PersonDriverAgentImpl) agent).getPerson().getId());
+					log.error("Agent is still in transit vehicle: agent-id = " + ((PersonDriverAgentImpl) agent).getPerson().getId());
 				}
 			}
 			throw e;
@@ -315,7 +320,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	public Id getId() {
 		return this.dummyPerson.getId() ;
 	}
-	
+
 	/**
 	 * for junit tests in same package
 	 */
@@ -355,7 +360,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 
 		@Override
 		public Id getVehicleId() {
-			return AbstractTransitDriver.this.vehicle.getVehicle().getId();
+			return AbstractTransitDriverAgent.this.vehicle.getVehicle().getId();
 		}
 
 		@Override

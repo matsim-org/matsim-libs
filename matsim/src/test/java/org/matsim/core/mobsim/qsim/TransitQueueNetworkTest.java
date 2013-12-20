@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -48,10 +49,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandler;
-import org.matsim.core.mobsim.qsim.pt.TransitDriver;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
@@ -1041,6 +1042,8 @@ public class TransitQueueNetworkTest extends TestCase {
             }
             TransitRoute tRoute = builder.createTransitRoute(id1, netRoute, stops, TransportMode.pt);
             Departure dep = builder.createDeparture(id1, 100);
+            tRoute.addDeparture(dep);
+            tLine.addRoute(tRoute);
 			QSim qSim1 = new QSim(scenario, EventsUtils.createEventsManager());
 			ActivityEngine activityEngine = new ActivityEngine();
 			qSim1.addMobsimEngine(activityEngine);
@@ -1055,7 +1058,6 @@ public class TransitQueueNetworkTest extends TestCase {
             QSim qSim = qSim1;
             AgentFactory agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);
@@ -1084,7 +1086,7 @@ public class TransitQueueNetworkTest extends TestCase {
             capacity.setStandingRoom(Integer.valueOf(0));
             vehicleType.setCapacity(capacity);
 
-            TransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, transitEngine );
+            FakeTransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, transitEngine );
             this.transitVehicle = new TransitQVehicle(new VehicleImpl(tDriver.getId(), vehicleType));
 
 //            this.qlink1.addParkedVehicle(this.transitVehicle);
@@ -1148,17 +1150,17 @@ public class TransitQueueNetworkTest extends TestCase {
     }
 
     /**
-     * A simple extension of {@link TransitDriver} that ignores the fact
+     * A simple extension of {@link TransitDriverAgentImpl} that ignores the fact
      * when there are still people in the vehicle after the last stop is
      * handled.
      *
      * @author mrieser
      */
-    private static class FakeTransitDriver extends TransitDriver {
+    private static class FakeTransitDriver extends TransitDriverAgentImpl {
 
         public FakeTransitDriver(final TransitLine line, final TransitRoute route, final Departure departure,
                                  final TransitStopAgentTracker agentTracker, final TransitQSimEngine trEngine) {
-            super(line, route, departure, agentTracker, trEngine.getInternalInterface());
+            super(new SingletonUmlaufBuilderImpl(Collections.singleton(line)).build().get(0), TransportMode.car, agentTracker, trEngine.getInternalInterface());
         }
 
         @Override

@@ -110,7 +110,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.walk, null, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.walk, null, trEngine.getInternalInterface());
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
@@ -163,7 +163,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, null, null);
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, null, null);
 		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestCase.EPSILON);
 	}
 
@@ -193,7 +193,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -244,7 +244,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -319,7 +319,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -380,7 +380,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.walk, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.walk, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -420,7 +420,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -471,7 +471,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -521,7 +521,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);

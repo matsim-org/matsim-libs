@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -47,6 +48,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.SingletonUmlaufBuilderImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -105,12 +107,15 @@ public class TransitDriverTest {
 		route.setLinkIds(link1.getId(), linkIds, link5.getId());
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, null);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, null, null);
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("T1"));
 		vehType.setCapacity(new VehicleCapacityImpl());
 		vehType.getCapacity().setSeats(5);
 		driver.setVehicle(new TransitQVehicle(new VehicleImpl(new IdImpl("V1"), vehType)));
 
+		driver.endActivityAndComputeNextState(0.0);
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
 		List<Id> expectedLinkIds = route.getLinkIds();
@@ -148,7 +153,9 @@ public class TransitDriverTest {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		double depTime = 9876.5;
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, null);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, null, null);
 		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestCase.EPSILON);
 	}
 
@@ -171,12 +178,14 @@ public class TransitDriverTest {
 
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -214,6 +223,8 @@ public class TransitDriverTest {
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 
 		final Config config = ConfigUtils.createConfig() ;
@@ -235,7 +246,7 @@ public class TransitDriverTest {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -314,6 +325,8 @@ public class TransitDriverTest {
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
@@ -327,7 +340,7 @@ public class TransitDriverTest {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -374,6 +387,8 @@ public class TransitDriverTest {
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
@@ -386,7 +401,7 @@ public class TransitDriverTest {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -423,6 +438,8 @@ public class TransitDriverTest {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		double departureTime = 9876.0;
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), departureTime);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
@@ -435,7 +452,7 @@ public class TransitDriverTest {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -471,6 +488,8 @@ public class TransitDriverTest {
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
@@ -482,7 +501,7 @@ public class TransitDriverTest {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -527,6 +546,8 @@ public class TransitDriverTest {
 		NetworkRoute route = new LinkNetworkRouteImpl(new IdImpl(1), new IdImpl(2));
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		tRoute.addDeparture(dep);
+		tLine.addRoute(tRoute);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
@@ -538,7 +559,7 @@ public class TransitDriverTest {
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 		
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine.getInternalInterface());
+		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(new SingletonUmlaufBuilderImpl(Collections.singleton(tLine)).build().get(0), TransportMode.car, tracker, trEngine.getInternalInterface());
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);

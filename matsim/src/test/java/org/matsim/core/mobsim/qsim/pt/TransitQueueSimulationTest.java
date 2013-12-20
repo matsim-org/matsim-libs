@@ -69,6 +69,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.SingletonUmlaufBuilderImpl;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -303,7 +304,6 @@ public class TransitQueueSimulationTest {
         QSim qSim = qSim1;
         AgentFactory agentFactory = new TransitAgentFactory(qSim);
         TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-        transitEngine.setUseUmlaeufe(true);
         transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
         qSim.addDepartureHandler(transitEngine);
         qSim.addAgentSource(transitEngine);
@@ -568,7 +568,6 @@ public class TransitQueueSimulationTest {
             QSim qSim1 = qSim2;
             AgentFactory agentFactory = new TransitAgentFactory(qSim1);
             final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim1);
-            transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim1.addDepartureHandler(transitEngine);
             qSim1.addAgentSource(transitEngine);
@@ -594,7 +593,7 @@ public class TransitQueueSimulationTest {
                     veh.setStopHandler(new SimpleTransitStopHandler());
                     TestHandleStopSimulation.this.driver.setVehicle(veh);
                     TestHandleStopSimulation.this.departure.setVehicleId(veh.getVehicle().getId());
-                    qSim.addParkedVehicle(veh, TestHandleStopSimulation.this.driver.getCurrentLeg().getRoute().getStartLinkId() );
+                    qSim.addParkedVehicle(veh, route.getRoute().getStartLinkId());
                     qSim.insertAgentIntoMobsim(TestHandleStopSimulation.this.driver); 
                 }
             });
@@ -617,13 +616,13 @@ public class TransitQueueSimulationTest {
 
     }
 
-    protected static class SpyDriver extends TransitDriver {
+    protected static class SpyDriver extends TransitDriverAgentImpl {
 
         public final List<SpyHandleStopData> spyData = new ArrayList<SpyHandleStopData>();
 
         public SpyDriver(final TransitLine line, final TransitRoute route, final Departure departure,
                          final TransitStopAgentTracker agentTracker, final TransitQSimEngine trEngine) {
-            super(line, route, departure, agentTracker, trEngine.getInternalInterface());
+            super(new SingletonUmlaufBuilderImpl(Collections.singleton(line)).build().get(0), TransportMode.car, agentTracker, trEngine.getInternalInterface());
         }
 
         @Override
