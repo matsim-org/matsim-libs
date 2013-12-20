@@ -81,13 +81,13 @@ public class CreatePlans {
 	}
 	
 	public void run(String outPath) {
-		for (int i = 0; i < 300; i++) {
+		for (int i = 0; i < 2; i++) {
 			PersonImpl person = new PersonImpl(new IdImpl(i));
 			this.scenario.getPopulation().addPerson(person);
 			person.createAndAddPlan(true);
 			Plan plan = person.getSelectedPlan();
 			
-			int offset = rnd.nextInt(600);
+			int offset = 1; //rnd.nextInt(600);
 			ActivityImpl homeAct = ((PlanImpl) plan).createAndAddActivity("home");
 			homeAct.setEndTime(6.0 * 3600.0 + offset);
 			
@@ -100,7 +100,7 @@ public class CreatePlans {
 			ActivityImpl act;
 			
 			if (rnd.nextBoolean()) act = ((PlanImpl) plan).createAndAddActivity("work");
-			else act = ((PlanImpl) plan).createAndAddActivity("leisure");
+			else act = ((PlanImpl) plan).createAndAddActivity("work");
 			
 			act.setStartTime(6.0 * 3600.0 + 100.0 + 1.0 * offset);
 			
@@ -109,7 +109,7 @@ public class CreatePlans {
 			act.setLinkId(new IdImpl(5));
 			
 			
-			if (rnd.nextBoolean()) {
+			if (i % 2 == 0) {
 				incomes.putAttribute(person.getId().toString(), "income", new Double(0.2));
 				preferences.putAttribute(person.getId().toString(), "dudm", new Double(0.1));
 			} else {
