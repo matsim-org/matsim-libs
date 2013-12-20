@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehicleLoadListener;
 import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehicleLoadListener.VehicleLoad;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
+import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.PassengerAccessEgress;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandler;
@@ -96,11 +96,11 @@ class WagonSimTransitStopHandler implements TransitStopHandler{
 	private boolean freeCapacity(TransitStopFacility stop, double now,
 			List<PTPassengerAgent> enteringPassengers, MobsimVehicle vehicle) {
 		int i = -1;
-		for(TransitRouteStop s: ((AbstractTransitDriver) vehicle.getDriver()).getTransitRoute().getStops()){
+		for(TransitRouteStop s: ((AbstractTransitDriverAgent) vehicle.getDriver()).getTransitRoute().getStops()){
 			if(s.getStopFacility().getId().equals(stop.getId())){
 				// this assumes each stop is served only once. I think it will not work when one stop is served twice 
 				// (except for the last where only people leave).
-				i = ((AbstractTransitDriver) vehicle.getDriver()).getTransitRoute().getStops().indexOf(s);
+				i = ((AbstractTransitDriverAgent) vehicle.getDriver()).getTransitRoute().getStops().indexOf(s);
 				break;
 			}
 		}

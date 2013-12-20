@@ -106,7 +106,6 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		// use an own TransitStopHandlerFactory here
 		AgentFactory agentFactory = new TransitAgentFactory(qSim);
 		TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-		transitEngine.setUseUmlaeufe(true);
 		// use an own transitStopHandler.
 		transitEngine.setTransitStopHandlerFactory(new WagonSimTransitStopHandlerFactory(vehicleLoadListener, 
 				sc.getPopulation().getPersonAttributes(), 
