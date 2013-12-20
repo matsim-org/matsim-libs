@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;

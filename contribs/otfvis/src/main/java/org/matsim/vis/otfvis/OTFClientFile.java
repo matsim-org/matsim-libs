@@ -24,7 +24,6 @@ import java.awt.BorderLayout;
 
 import javax.swing.SwingUtilities;
 
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;

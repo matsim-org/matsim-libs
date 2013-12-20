@@ -35,6 +35,7 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
@@ -69,7 +70,7 @@ public class FourWaysVis {
 		scenario.getConfig().signalSystems().setSignalControlFile(signalControlFile);
 		scenario.getConfig().scenario().setUseSignalSystems(true);
 		
-		scenario.getConfig().otfVis().setAgentSize(130.0f);
+		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(130.0f);
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();

@@ -4,7 +4,6 @@ package playground.mzilske.vbb;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -15,6 +14,8 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import d4d.AltPopulationReaderMatsimV5;
 
@@ -33,8 +34,8 @@ public class Run {
 		config.qsim().setSnapshotStyle("queue");
 		config.qsim().setSnapshotPeriod(1);
 		config.qsim().setRemoveStuckVehicles(false);
-		config.otfVis().setColoringScheme(ColoringScheme.gtfs);
-		config.otfVis().setDrawTransitFacilities(false);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme(ColoringScheme.gtfs);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawTransitFacilities(false);
 		config.transitRouter().setMaxBeelineWalkConnectionDistance(1.0);
 		
 		config.network().setInputFile("/Users/zilske/gtfs-bvg/network.xml");

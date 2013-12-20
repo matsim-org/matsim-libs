@@ -26,10 +26,11 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -52,7 +53,7 @@ public final class JXMapOTFVisClient {
 	
 
 	public static void run(final Config config, final OTFServer server, final WMSService wms) {
-		final TileFactory tf = new MyWMSTileFactory(wms, config.otfVis().getMaximumZoom());
+		final TileFactory tf = new MyWMSTileFactory(wms, ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getMaximumZoom());
 		run(config, server, tf);
 	}
 
@@ -78,7 +79,7 @@ public final class JXMapOTFVisClient {
 				OTFClientQuadTree clientQ = servQ.convertToClient(server, connect);
 				clientQ.getConstData();
 
-				final OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, config.otfVis());
+				final OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class));
 				otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver("settings"));
 				
 				otfClient.show();

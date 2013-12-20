@@ -22,8 +22,8 @@ package org.matsim.vis.otfvis.interfaces;
 
 import java.util.Collection;
 
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 

@@ -117,4 +117,26 @@ public abstract class ConfigUtils {
 		}
 		return new IdImpl(maxStrategyId + 1 );
 	}
+
+	/**
+	 * This is a refactoring device to remove former core config groups from the Config.
+	 * Instructions: If you want to remove e.g. Config.vspExperimental(), replace that
+	 * method with
+	 * ConfigUtils.addOrGetModule(this, VspExperimentalConfigGroup.GROUP_NAME, VspExperimentalConfigGroup.class)
+	 * and then hit Refactor/Inline.
+	 */
+	public static <T extends Module> T addOrGetModule(Config config, String groupName, Class<T> moduleClass) {
+		Module module = config.getModule(groupName);
+		if (module == null || module.getClass() == Module.class) {
+			try {
+				module = moduleClass.newInstance();
+				config.addModule(module);
+			} catch (InstantiationException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return moduleClass.cast(module);
+	}
 }

@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -84,7 +85,7 @@ public class OneTaxiLauncher
         EventsManager events = qSim.getEventsManager();
 
         if (otfVis) { // OFTVis visualization
-            scenario.getConfig().otfVis().setDrawNonMovingItems(true);
+            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true);
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);

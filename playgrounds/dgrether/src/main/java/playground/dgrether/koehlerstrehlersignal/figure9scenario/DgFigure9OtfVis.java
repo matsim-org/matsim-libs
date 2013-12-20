@@ -22,6 +22,7 @@ package playground.dgrether.koehlerstrehlersignal.figure9scenario;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -31,6 +32,7 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.DgOTFVis;
@@ -46,7 +48,7 @@ public class DgFigure9OtfVis {
 		String conf = "/media/data/work/repos/shared-svn/studies/dgrether/koehlerStrehler2010/scenario5/config_signals_coordinated.xml";
 		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
 		Scenario scenario = loader.loadScenario();
-		scenario.getConfig().otfVis().setAgentSize(40.0f);
+		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(40.0f);
 		
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();

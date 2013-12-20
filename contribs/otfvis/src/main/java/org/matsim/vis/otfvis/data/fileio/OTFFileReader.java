@@ -31,11 +31,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;

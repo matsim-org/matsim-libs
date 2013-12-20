@@ -13,7 +13,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -34,6 +33,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 class KNPatnaControler {
@@ -150,7 +150,7 @@ class KNPatnaControler {
 			
 			if ( useOTFVis ) {
 				// otfvis configuration.  There is more you can do here than via file!
-				final OTFVisConfigGroup otfVisConfig = qSim.getScenario().getConfig().otfVis();
+				final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 				otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
 				//				otfVisConfig.setShowParking(true) ; // this does not really work
 

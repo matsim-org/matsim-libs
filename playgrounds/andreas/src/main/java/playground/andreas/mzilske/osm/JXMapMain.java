@@ -29,6 +29,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class JXMapMain {
@@ -37,7 +38,7 @@ public class JXMapMain {
 	public static void main(String[] args) {
 		String filename = "/Users/zilske/Documents/osm-bayarea/network-4.xml";
 		Config config = ConfigUtils.createConfig();
-		config.otfVis().setMaximumZoom(17);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setMaximumZoom(17);
 		config.global().setCoordinateSystem("EPSG:32710");
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(filename);

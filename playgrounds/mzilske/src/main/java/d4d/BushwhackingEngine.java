@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -26,6 +27,7 @@ import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparato
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -174,7 +176,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 
 	@Override
 	public void onPrepareSim() {
-		this.doVisualizeTeleportedAgents = internalInterface.getMobsim().getScenario().getConfig().otfVis().isShowTeleportedAgents();
+		this.doVisualizeTeleportedAgents = ConfigUtils.addOrGetModule(internalInterface.getMobsim().getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isShowTeleportedAgents();
 		for (MobsimAgent agent : ((VisMobsim) internalInterface.getMobsim()).getAgents()) {
 			agents.put(agent.getId(), agent);
 		}

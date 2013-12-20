@@ -33,6 +33,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -44,6 +45,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.sergioo.ptsim2013.QSim;
 import playground.sergioo.ptsim2013.qnetsimengine.PTVehicularDepartureHandler.VehicleBehavior;
@@ -164,7 +166,7 @@ public class PTQNetsimEngine extends NetElementActivator implements MobsimEngine
 			network = new QNetwork(sim.getScenario().getNetwork(), new PTQNetworkFactory());
 		}
 
-		network.getLinkWidthCalculator().setLinkWidth(sim.getScenario().getConfig().otfVis().getLinkWidth());
+		network.getLinkWidthCalculator().setLinkWidth(ConfigUtils.addOrGetModule(sim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getLinkWidth());
 		network.initialize(this);
 	}
 

@@ -57,6 +57,7 @@ import org.matsim.utils.gis.matsim2esri.network.LanesBasedWidthCalculator;
 import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -154,7 +155,7 @@ public class ScenarioGenerator {
 		e = new InfoEvent(System.currentTimeMillis(), "simulation config file");
 		this.em.processEvent(e);
 
-		this.c.otfVis().setMapOverlayMode(true);
+		ConfigUtils.addOrGetModule(this.c, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setMapOverlayMode(true);
 
 		this.c.controler().setLastIteration(10);
 		this.c.controler().setOutputDirectory(

@@ -12,8 +12,8 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 

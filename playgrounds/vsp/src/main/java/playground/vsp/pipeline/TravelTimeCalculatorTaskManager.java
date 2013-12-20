@@ -1,7 +1,7 @@
 package playground.vsp.pipeline;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 
 public class TravelTimeCalculatorTaskManager extends TaskManager {

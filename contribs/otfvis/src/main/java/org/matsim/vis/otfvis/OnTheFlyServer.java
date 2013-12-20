@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.collections.QuadTree;
@@ -295,10 +295,10 @@ public class OnTheFlyServer implements OTFLiveServer {
 			return quad;
 		} else {
 			Config config = this.scenario.getConfig();
-			this.setShowNonMovingItems(config.otfVis().isDrawNonMovingItems());
+			this.setShowNonMovingItems(ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isDrawNonMovingItems());
 			String scenarioCRS = config.global().getCoordinateSystem();
-			int maxZoom = config.otfVis().getMaximumZoom();
-			if (config.otfVis().isMapOverlayMode()) {
+			int maxZoom = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getMaximumZoom();
+			if (ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isMapOverlayMode()) {
 				// Transform everything from network coordinates first to WGS84 and then to standard mercator projection as used by OSM tiles and Geoserver.
 				// The user needs to know the maximum zoom level they would like to use beforehand.
 				// The coordinates are transformed so that one unit is one pixel in the maximum zoom level.
@@ -318,7 +318,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 			}
 			if (this.visMobsim != null) {
 				quad = new LiveServerQuadTree(this.visMobsim.getVisNetwork());
-				if (config.otfVis().isShowTeleportedAgents()) {
+				if (ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isShowTeleportedAgents()) {
 					OTFAgentsListHandler.Writer teleportationWriter;
 					teleportationWriter = new OTFAgentsListHandler.Writer();
 					teleportationWriter.setSrc(this.visMobsim.getNonNetworkAgentSnapshots());
@@ -422,7 +422,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	@Override
 	public OTFVisConfigGroup getOTFVisConfig() {
-		OTFVisConfigGroup otfVisConfig = this.scenario.getConfig().otfVis();
+		OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(this.scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 		if (otfVisConfig == null) {
 			otfVisConfig = new OTFVisConfigGroup();
 		}

@@ -18,13 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.config;
+package org.matsim.core.config.groups;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.CountsConfigGroup;
 
 /**
  * @author nagel

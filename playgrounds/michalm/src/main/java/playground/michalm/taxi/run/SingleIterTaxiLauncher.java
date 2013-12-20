@@ -30,12 +30,13 @@ import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vis.otfvis.*;
+import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
@@ -254,7 +255,7 @@ import playground.michalm.util.gis.Schedules2GIS;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
-            scenario.getConfig().otfVis().setColoringScheme(ColoringScheme.taxicab);
+            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme(ColoringScheme.taxicab);
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);

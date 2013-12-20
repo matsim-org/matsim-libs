@@ -22,6 +22,7 @@ package org.matsim.core.trafficmonitoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 
 /**
  * @author dgrether

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis;
 
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 
 

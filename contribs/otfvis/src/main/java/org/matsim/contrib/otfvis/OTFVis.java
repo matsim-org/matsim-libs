@@ -62,6 +62,7 @@ import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisMobsimListener;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -216,11 +217,11 @@ public class OTFVis {
 		}
 
 		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
-			config.otfVis().setScaleQuadTreeRect(true);
+			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);
 		} else if (config.scenario().isUseSignalSystems()) {
-			config.otfVis().setScaleQuadTreeRect(true);
+			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
 			events.addHandler(signalTracker);
 			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);

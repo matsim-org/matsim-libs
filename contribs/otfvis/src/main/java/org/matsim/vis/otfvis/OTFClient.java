@@ -45,7 +45,6 @@ import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;

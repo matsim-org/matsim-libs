@@ -41,7 +41,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 /**

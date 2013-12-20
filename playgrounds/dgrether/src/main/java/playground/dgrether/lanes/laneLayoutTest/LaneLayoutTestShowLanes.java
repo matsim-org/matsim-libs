@@ -29,6 +29,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.utils.LogOutputEventHandler;
@@ -50,7 +51,7 @@ public class LaneLayoutTestShowLanes {
 		config.plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
 		config.scenario().setUseLanes(true);
 //		config.otfVis().setLinkWidth(150.0f);
-		config.otfVis().setDrawLinkIds(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawLinkIds(true);
 		config.qsim().setNodeOffset(30);
 		config.qsim().setSnapshotStyle("queue");
 

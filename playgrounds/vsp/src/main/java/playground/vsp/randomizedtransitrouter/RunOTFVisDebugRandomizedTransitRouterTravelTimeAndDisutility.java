@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
@@ -48,11 +49,11 @@ public class RunOTFVisDebugRandomizedTransitRouterTravelTimeAndDisutility {
 
 		config.planCalcScore().setWriteExperiencedPlans(true) ;
 
-		config.otfVis().setDrawTransitFacilities(true) ; // this DOES work
-		config.otfVis().setDrawTransitFacilityIds(false);
-		config.otfVis().setShowTeleportedAgents(true) ;
-		config.otfVis().setDrawNonMovingItems(true);
-		config.otfVis().setScaleQuadTreeRect(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawTransitFacilities(true) ; // this DOES work
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawTransitFacilityIds(false);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		

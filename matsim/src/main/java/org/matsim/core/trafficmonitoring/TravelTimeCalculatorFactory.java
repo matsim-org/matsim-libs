@@ -21,6 +21,7 @@ package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 
 public interface TravelTimeCalculatorFactory extends MatsimFactory {
 

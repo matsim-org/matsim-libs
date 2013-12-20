@@ -21,6 +21,7 @@ package playground.dgrether.signalsystems.roedergershenson;
 
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -34,6 +35,7 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9Runner;
@@ -53,7 +55,7 @@ public class DgGershensonRoederLiveVisStarter {
 		String conf = DgFigure9Runner.signalsConfigFileGershenson;
 		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(conf);
 		ScenarioImpl scenario = (ScenarioImpl) loader.loadScenario();
-		scenario.getConfig().otfVis().setAgentSize(40.0f);
+		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(40.0f);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , events);
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();

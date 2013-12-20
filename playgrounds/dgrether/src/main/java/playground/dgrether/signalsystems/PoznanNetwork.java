@@ -63,6 +63,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.dgrether.DgOTFVis;
 import playground.dgrether.lanes.LanesConsistencyChecker;
@@ -580,7 +581,7 @@ public class PoznanNetwork
         config.qsim().setSnapshotStyle("queue");
         config.scenario().setUseLanes(true);
         config.scenario().setUseSignalSystems(true);
-        config.otfVis().setAgentSize(70.0f);
+        ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setAgentSize(70.0f);
         config.qsim().setNodeOffset(30);
         config.signalSystems().setUseAmbertimes(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);

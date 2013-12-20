@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.trafficmonitoring;
+package org.matsim.core.config.groups;
 
 import java.util.Locale;
 import java.util.Map;

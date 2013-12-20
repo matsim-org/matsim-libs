@@ -42,6 +42,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -70,6 +71,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
@@ -374,10 +376,10 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 
-		config.otfVis().setEffectiveLaneWidth(1.) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setEffectiveLaneWidth(1.) ;
 		config.qsim().setLinkWidth((float)1.) ;
-		config.otfVis().setShowTeleportedAgents(true) ;
-		config.otfVis().setDrawNonMovingItems(true) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true) ;
 
 		return config;
 	}

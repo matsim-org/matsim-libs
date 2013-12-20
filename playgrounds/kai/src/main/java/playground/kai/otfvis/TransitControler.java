@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutilityControlerListener;
@@ -86,7 +87,7 @@ public class TransitControler {
 
 			if ( useOTFVis ) {
 				// otfvis configuration.  There is more you can do here than via file!
-				final OTFVisConfigGroup otfVisConfig = qSim.getScenario().getConfig().otfVis();
+				final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 				otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
 				//				otfVisConfig.setShowParking(true) ; // this does not really work
 				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;

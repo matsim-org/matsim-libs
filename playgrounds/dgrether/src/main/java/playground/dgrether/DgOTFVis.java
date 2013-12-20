@@ -18,6 +18,7 @@ import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.utils.DgOTFVisUtils;
@@ -71,7 +72,7 @@ public class DgOTFVis {
 	
 	public void playAndRouteConfig(String config){
 		Config cc = ConfigUtils.loadConfig(config);
-		cc.otfVis().setMapOverlayMode(true);
+		ConfigUtils.addOrGetModule(cc, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setMapOverlayMode(true);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(cc);
 		DgOTFVisUtils.preparePopulation4Simulation(sc);
 		this.playScenario(sc);

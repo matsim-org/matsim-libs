@@ -33,7 +33,7 @@ import java.util.Vector;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQuery.Type;

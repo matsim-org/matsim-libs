@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PtCountsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -42,7 +43,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
-import org.matsim.pt.config.PtCountsConfigGroup;
 
 public class PtCountControlerListener implements StartupListener, IterationEndsListener,
 BeforeMobsimListener, AfterMobsimListener  {

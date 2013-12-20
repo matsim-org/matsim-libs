@@ -29,7 +29,7 @@ import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
@@ -91,21 +91,21 @@ public class OTFClientLive {
 				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
 				clientQuadTree.getConstData();
 				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
-				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, config.otfVis());
+				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class));
 				OTFQueryControl queryControl = new OTFQueryControl(server, hostControlBar, visconf);
 				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
 				queryControl.setQueryTextField(queryControlBar.getTextField());
 				otfClient.getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
 				otfClient.addDrawerAndInitialize(mainDrawer, saver);
-				if (config.otfVis().isMapOverlayMode()) {
+				if (ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isMapOverlayMode()) {
 					TileFactory tf;
-					if (config.otfVis().getMapBaseURL().isEmpty()) {
+					if (ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getMapBaseURL().isEmpty()) {
 						assertZoomLevel17(config);
 						tf = osmTileFactory();
 					} else {
-						WMSService wms = new WMSService(config.otfVis().getMapBaseURL(), config.otfVis().getMapLayer());
-						tf = new OTFVisWMSTileFactory(wms, config.otfVis().getMaximumZoom());
+						WMSService wms = new WMSService(ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getMapBaseURL(), ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getMapLayer());
+						tf = new OTFVisWMSTileFactory(wms, ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getMaximumZoom());
 					}
 					otfClient.addMapViewer(tf);
 				}
@@ -115,7 +115,7 @@ public class OTFClientLive {
 	}
 	
 	private static void assertZoomLevel17(Config config) {
-		if(config.otfVis().getMaximumZoom() != 17) {
+		if(ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).getMaximumZoom() != 17) {
 			throw new RuntimeException("The OSM layer only works with maximumZoomLevel = 17. Please adjust your config.");
 		}
 	}

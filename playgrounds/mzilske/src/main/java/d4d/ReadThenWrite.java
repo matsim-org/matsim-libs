@@ -7,6 +7,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class ReadThenWrite {
 
@@ -14,7 +15,7 @@ public class ReadThenWrite {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setLastIteration(0);
 		config.global().setCoordinateSystem("EPSG:3395");
-		config.otfVis().setShowTeleportedAgents(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true);
 		config.controler().setWriteEventsInterval(0);
 		config.network().setInputFile("/Users/zilske/d4d/output/network.xml");
 		config.plans().setInputFile("/Users/zilske/d4d/output/population.xml");

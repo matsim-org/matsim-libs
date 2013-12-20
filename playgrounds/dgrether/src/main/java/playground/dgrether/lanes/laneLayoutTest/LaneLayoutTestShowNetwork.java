@@ -29,6 +29,7 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
@@ -45,8 +46,8 @@ public class LaneLayoutTestShowNetwork {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().network().setInputFile(LaneLayoutTestFileNames.NETWORK);
 		sc.getConfig().plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
-		sc.getConfig().otfVis().setDrawLinkIds(true);
-		sc.getConfig().otfVis().setDrawNonMovingItems(true);
+		ConfigUtils.addOrGetModule(sc.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawLinkIds(true);
+		ConfigUtils.addOrGetModule(sc.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true);
 		sc.getConfig().qsim().setSnapshotStyle("queue");
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);

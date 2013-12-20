@@ -21,7 +21,9 @@ package playground.dgrether;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.lanes.MixedLaneTestFixture;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 
 /**
@@ -34,7 +36,7 @@ public class TestTestMain {
 		MixedLaneTestFixture fixture = new MixedLaneTestFixture();
 		fixture.create2PersonPopulation();
 		Scenario scenario = fixture.sc;
-		scenario.getConfig().otfVis().setScaleQuadTreeRect(true);
+		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 		scenario.getConfig().qsim().setNodeOffset(10.0);
 		scenario.getConfig().qsim().setSnapshotStyle("queue");
 		OTFVis.playScenario(scenario);

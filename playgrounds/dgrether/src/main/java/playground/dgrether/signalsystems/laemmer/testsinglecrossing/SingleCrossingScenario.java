@@ -32,6 +32,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalController;
@@ -343,8 +344,8 @@ public class SingleCrossingScenario {
 		qsim.setSnapshotStyle("queue");
 		qsim.setStuckTime(1000.0);
 		config.qsim().setNodeOffset(20.0);
-		config.otfVis().setShowTeleportedAgents(true);
-		config.otfVis().setDrawNonMovingItems(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true);
 		return config;
 	}
 	

@@ -24,14 +24,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class TransitControler {
@@ -43,7 +44,7 @@ public class TransitControler {
 		new MatsimConfigReader(config).readFile(args[0]);
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.otfVis().setColoringScheme( OTFVisConfigGroup.ColoringScheme.bvg ) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme( OTFVisConfigGroup.ColoringScheme.bvg ) ;
 		
 		Controler tc = new Controler(config) ;
 		
@@ -66,7 +67,7 @@ public class TransitControler {
 //			this.events.addHandler(new LogOutputEventHandler());
 
 			if ( useOTFVis ) {
-				final OTFVisConfigGroup otfVisConfig = simulation.getScenario().getConfig().otfVis();
+				final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(simulation.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 				otfVisConfig.setDrawTransitFacilities(false) ;
 				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, simulation);
 				OTFClientLive.run(sc.getConfig(), server);

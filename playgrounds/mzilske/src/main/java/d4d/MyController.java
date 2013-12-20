@@ -66,6 +66,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -325,7 +326,7 @@ public class MyController extends AbstractController {
 		
 		qSim.addMobsimEngine(new SightingsEngine(sightings, agentLocator));
 
-		config.otfVis().setMapOverlayMode(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setMapOverlayMode(true);
 		// config.otfVis().setMapBaseUrl("http://localhost:8080/geoserver/wms?service=WMS&");
 		// config.otfVis().setMapBaseUrl("http://localhost:8080/geoserver/wms?service=WMS&");
 		// config.otfVis().setMapLayer("mz:clipped");
@@ -350,7 +351,7 @@ public class MyController extends AbstractController {
 		config.controler().setLastIteration(500);
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
-		config.otfVis().setShowTeleportedAgents(false);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(false);
 		config.controler().setWriteSnapshotsInterval(5);
 		config.qsim().setStorageCapFactor(0.01);
 		config.qsim().setFlowCapFactor(0.01);

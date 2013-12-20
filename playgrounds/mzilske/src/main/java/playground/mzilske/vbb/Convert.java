@@ -5,13 +5,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 public class Convert {
 	
@@ -31,8 +32,8 @@ public class Convert {
 		scenario.getConfig().qsim().setSnapshotStyle("queue");
 		scenario.getConfig().qsim().setSnapshotPeriod(1);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(false);
-		scenario.getConfig().otfVis().setColoringScheme(ColoringScheme.gtfs);
-		scenario.getConfig().otfVis().setDrawTransitFacilities(false);
+		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme(ColoringScheme.gtfs);
+		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawTransitFacilities(false);
 		scenario.getConfig().transitRouter().setMaxBeelineWalkConnectionDistance(1.0);
 //		for (TransitStopFacility facility : scenario.getTransitSchedule().getFacilities().values()) {
 //			if (scenario.getNetwork().getLinks().get(facility.getId()) == null) {

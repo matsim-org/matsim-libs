@@ -37,7 +37,7 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author dgrether

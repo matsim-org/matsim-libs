@@ -28,6 +28,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author michaz
@@ -40,7 +41,7 @@ public class T5_LiveVisTeleport {
 		Config config = ConfigUtils.loadConfig(configFile);
 		List<String> emptyList = Collections.emptyList();
 		config.qsim().setMainModes(emptyList);
-		config.otfVis().setShowTeleportedAgents(true);
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		OTFVis.playScenario(scenario);
 	}

@@ -36,11 +36,11 @@ import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PtCountsConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
@@ -48,12 +48,11 @@ import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
-import org.matsim.pt.config.PtCountsConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -98,11 +97,11 @@ public class Config {
 	private VspExperimentalConfigGroup vspExperimentalGroup = null;
 	private TimeAllocationMutatorConfigGroup timeAllocationMutator = null;
 	private SubtourModeChoiceConfigGroup subtourModeChoice = null;
+	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
+	private PtCountsConfigGroup ptCounts = null;
 
 	// config groups that are elsewhere:
 	private OTFVisConfigGroup otfVis = null;
-	private PtCountsConfigGroup ptCounts = null;
-	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
@@ -481,11 +480,7 @@ public class Config {
 		return this.vspExperimentalGroup;
 	}
 
-	public OTFVisConfigGroup otfVis() {
-		return this.otfVis;
-	}
-
-    public QSimConfigGroup qsim() {
+	public QSimConfigGroup qsim() {
 		return this.qSimConfigGroup;
 	}
 

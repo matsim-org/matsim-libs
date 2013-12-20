@@ -40,7 +40,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
 
