@@ -17,25 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.dapp;
+package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.contrib.dvrp.VrpSimEngine;
-import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
+import org.matsim.contrib.dvrp.passenger.PassengerHandlingUtils;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.DeliveryTask;
 
 
-public class DAPPActionCreator
+public class OneTaxiActionCreator
     implements VrpAgentLogic.DynActionCreator
 {
     private final VrpSimEngine vrpSimEngine;
 
 
-    public DAPPActionCreator(VrpSimEngine vrpSimEngine)
+    public OneTaxiActionCreator(VrpSimEngine vrpSimEngine)
     {
         this.vrpSimEngine = vrpSimEngine;
     }
@@ -48,29 +46,34 @@ public class DAPPActionCreator
             case DRIVE:
                 return new VrpDynLeg((DriveTask)task);
 
-            case STAY://Delivery or waiting
-                if (task instanceof DeliveryTask) {
-                    return new VrpActivity("StayTask", (StayTask)task) {
-                        
-                        //after leg="dial_a_pizza" ends (== the pizza arrives) we need to get back home and start eating it
-                        @Override
-                        public void endAction(double now)
-                        {
-                            DeliveryTask dt = (DeliveryTask)task;
-                            MobsimAgent passenger = PassengerCustomer.getPassenger(dt.getRequest());
-                            passenger.notifyArrivalOnLinkByNonNetworkMode(passenger
-                                    .getDestinationLinkId());
-                            passenger.endLegAndComputeNextState(now);
-                            vrpSimEngine.getInternalInterface().arrangeNextAgentState(passenger);
+            case STAY:
+                if (task instanceof OneTaxiServeTask) { //PICKUP or DROPOFF
+                    final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
+                    final OneTaxiRequest request = serveTask.getRequest();
 
-                            System.out.println("Pizza delivered to customer: " + passenger.getId() + " at time: " + (int)now);
-                        }
-                    };
+                    if (serveTask.isPickup()) {
+                        return new VrpActivity("ServeTask" + request.getId(), serveTask) {
+                            public void endAction(double now)
+                            {
+                                PassengerHandlingUtils.pickUpPassenger(vrpSimEngine, serveTask,
+                                        request, now);
+                            }
+                        };
+
+                    }
+                    else {
+                        return new VrpActivity("ServeTask" + request.getId(), serveTask) {
+                            public void endAction(double now)
+                            {
+                                PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, serveTask,
+                                        request, now);
+                            }
+                        };
+                    }
                 }
-                else {
+                else { //WAIT
                     return new VrpActivity("StayTask", (StayTask)task);
                 }
-
         }
 
         throw new RuntimeException();

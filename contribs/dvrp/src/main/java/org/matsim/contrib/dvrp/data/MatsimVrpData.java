@@ -35,7 +35,11 @@ public class MatsimVrpData
     private final VrpData vrpData;
     private final Scenario scenario;
 
-    private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>();
+    //all mobsim agents
+    private final Map<Id, MobsimAgent> mobsimAgents = new HashMap<Id, MobsimAgent>();
+    
+    //TODO this is not very general -- some VRPs may be about commodities, not persons
+    //passenger agents --> customers
     private final Map<Id, PassengerCustomer> customersByAgentId = new HashMap<Id, PassengerCustomer>();
 
     private final String coordSystem;
@@ -79,9 +83,9 @@ public class MatsimVrpData
     }
 
 
-    public Map<Id, MobsimAgent> getAgents()
+    public Map<Id, MobsimAgent> getMobsimAgents()
     {
-        return agents;
+        return mobsimAgents;
     }
 
 

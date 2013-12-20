@@ -17,43 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
-import playground.michalm.taxi.schedule.TaxiTask;
+import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public class OneTaxiRequest
+    extends RequestImpl
+    implements PassengerRequest
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
+    private final Vertex fromVertex;
+    private final Vertex toVertex;
 
 
-    public OTSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            int pickupDuration, int dropoffDuration, TaxiOptimizationPolicy optimizationPolicy)
+    public OneTaxiRequest(int id, Customer customer, Vertex fromVertex, Vertex toVertex, int time)
     {
-        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
-        this.optimizationPolicy = optimizationPolicy;
+        //I want a taxi now: t0 == t1 == submissionTime
+        super(id, customer, 1, time, time, time);
+        this.fromVertex = fromVertex;
+        this.toVertex = toVertex;
     }
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
+    public Vertex getFromVertex()
     {
-        if (!scheduleUpdated) {// no changes
-            return false;
-        }
-
-        return optimizationPolicy.shouldOptimize(schedule.getCurrentTask());
+        return fromVertex;
     }
 
 
     @Override
-    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
+    public Vertex getToVertex()
     {
-        return false;
+        return toVertex;
+    }
+
+
+    @Override
+    public MobsimAgent getPassengerAgent()
+    {
+        return ((PassengerCustomer)getCustomer()).getPassengerAgent();
     }
 }

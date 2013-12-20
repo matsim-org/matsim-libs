@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
@@ -26,19 +28,17 @@ import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
-import pl.poznan.put.vrp.dynamic.data.model.Request;
-
 
 public class PassengerDepartureHandler
     implements DepartureHandler
 {
     private final String mode;
-    private final RequestCreator requestCreator;
+    private final PassengerRequestCreator requestCreator;
     private final MatsimVrpData data;
     private final VrpSimEngine vrpSimEngine;
 
 
-    public PassengerDepartureHandler(String mode, RequestCreator requestCreator,
+    public PassengerDepartureHandler(String mode, PassengerRequestCreator requestCreator,
             VrpSimEngine vrpSimEngine, MatsimVrpData data)
     {
         this.mode = mode;
@@ -49,40 +49,36 @@ public class PassengerDepartureHandler
 
 
     @Override
-    public boolean handleDeparture(double now, MobsimAgent agent, Id linkId)
+    public boolean handleDeparture(double now, MobsimAgent passengerAgent, Id fromLinkId)
     {
-        if (agent.getMode().equals(mode)) {
-            vrpSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
-            
-            if (agent.getId().toString().equals("0031495")) {
-                System.out.println("aaa");
-            }
-
-            MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
-            MatsimVertex fromVertex = vrpGraph.getVertex(linkId);
-            Id toLinkId = agent.getDestinationLinkId();
-            MatsimVertex toVertex = vrpGraph.getVertex(toLinkId);
-
-            boolean submitted = false;
-
-            //TODO this "submitted?" check works only for up to 1 advanced request per customer
-            for (Request req : data.getVrpData().getRequests()) {
-                if ( ((PassengerCustomer)req.getCustomer()).getPassenger() == agent) {
-                    submitted = true;
-                }
-            }
-
-            if (!submitted) {
-                PassengerCustomer customer = PassengerCustomer.getOrCreatePassengerCustomer(data,
-                        agent);
-                Request request = requestCreator.createRequest(customer, fromVertex, toVertex, now);
-                vrpSimEngine.requestSubmitted(request, now);
-            }
-
-            return true;
-        }
-        else {
+        if (!passengerAgent.getMode().equals(mode)) {
             return false;
         }
+
+        vrpSimEngine.getInternalInterface().registerAdditionalAgentOnLink(passengerAgent);
+        Id toLinkId = passengerAgent.getDestinationLinkId();
+
+        MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
+        MatsimVertex fromVertex = vrpGraph.getVertex(fromLinkId);
+        MatsimVertex toVertex = vrpGraph.getVertex(toLinkId);
+
+        PassengerCustomer customer = PassengerCustomer
+                .getOrCreatePassengerCustomer(data, passengerAgent);
+        List<PassengerRequest> submittedReqs = customer.getRequests();
+
+        for (PassengerRequest r : submittedReqs) {
+            if (r.getFromVertex() == fromVertex && r.getToVertex() == toVertex && r.getT0() <= now
+                    && r.getT1() + 1 >= now) {
+                //This is it! This is an advance request, so do not resubmit a duplicate!
+                return true;
+            }
+        }
+
+        PassengerRequest request = requestCreator
+                .createRequest(customer, fromVertex, toVertex, now);
+        submittedReqs.add(request);
+        vrpSimEngine.requestSubmitted(request, now);
+
+        return true;
     }
 }

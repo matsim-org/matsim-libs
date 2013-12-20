@@ -22,7 +22,7 @@ package playground.michalm.taxi;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.data.network.MatsimVertex;
-import org.matsim.contrib.dvrp.passenger.RequestCreator;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
@@ -30,7 +30,7 @@ import playground.michalm.taxi.model.TaxiRequest;
 
 
 public class TaxiRequestCreator
-    implements RequestCreator
+    implements PassengerRequestCreator
 {
     public static final String MODE = "taxi";
 

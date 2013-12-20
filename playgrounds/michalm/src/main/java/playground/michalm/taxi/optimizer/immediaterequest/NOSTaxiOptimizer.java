@@ -36,17 +36,17 @@ public class NOSTaxiOptimizer
 
 
     public NOSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            int pickupDuration, boolean straightLineDistance)
+            int pickupDuration, int dropoffDuration, boolean straightLineDistance)
     {
-        this(data, destinationKnown, minimizePickupTripTime, pickupDuration, new IdleVehicleFinder(
-                data, straightLineDistance));
+        this(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration,
+                new IdleVehicleFinder(data, straightLineDistance));
     }
 
 
     public NOSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            int pickupDuration, VehicleFinder idleVehicleFinder)
+            int pickupDuration, int dropoffDuration, VehicleFinder idleVehicleFinder)
     {
-        super(data, destinationKnown, minimizePickupTripTime, pickupDuration);
+        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
         this.idleVehicleFinder = idleVehicleFinder;
     }
 

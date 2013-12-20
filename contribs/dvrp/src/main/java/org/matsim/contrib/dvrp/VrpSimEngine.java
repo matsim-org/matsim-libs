@@ -77,7 +77,7 @@ public class VrpSimEngine
         int time = (int)qsim.getSimTimer().getTimeOfDay();
         data.getVrpData().setTime(time);
 
-        Map<Id, MobsimAgent> agents = data.getAgents();
+        Map<Id, MobsimAgent> agents = data.getMobsimAgents();
         for (MobsimAgent mobsimAgent : qsim.getAgents()) {
             agents.put(mobsimAgent.getId(), mobsimAgent);
         }

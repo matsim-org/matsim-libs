@@ -39,7 +39,7 @@ public class VrpData
 
     private VrpGraph vrpGraph;
 
-    private VrpDataParameters parameters;// TODO or properties
+    private VrpDataParameters parameters;
 
 
     public List<Depot> getDepots()

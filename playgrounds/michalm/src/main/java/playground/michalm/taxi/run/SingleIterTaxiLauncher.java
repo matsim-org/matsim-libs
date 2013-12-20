@@ -77,6 +77,7 @@ import playground.michalm.util.gis.Schedules2GIS;
     /*package*/boolean onlineVehicleTracker;
     /*package*/boolean minimizePickupTripTime;
     /*package*/int pickupDuration;
+    /*package*/int dropoffDuration;
 
     /*package*/LegHistogram legHistogram;
     /*package*/MatsimVrpData data;
@@ -125,6 +126,7 @@ import playground.michalm.util.gis.Schedules2GIS;
         onlineVehicleTracker = true;
         minimizePickupTripTime = false;
         pickupDuration = 120;
+        dropoffDuration = 60;
 
         otfVis = !true;
 
@@ -179,6 +181,7 @@ import playground.michalm.util.gis.Schedules2GIS;
         onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
         minimizePickupTripTime = Boolean.valueOf(params.get("minimizePickupTripTime"));
         pickupDuration = Integer.valueOf(params.get("pickupDuration"));
+        dropoffDuration = Integer.valueOf(params.get("dropoffDuration"));
 
         otfVis = Boolean.valueOf(params.get("otfVis"));
 
@@ -215,7 +218,7 @@ import playground.michalm.util.gis.Schedules2GIS;
         data = new MatsimVrpData(vrpData, scenario);
 
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(vrpData,
-                destinationKnown, minimizePickupTripTime, pickupDuration);
+                destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
 

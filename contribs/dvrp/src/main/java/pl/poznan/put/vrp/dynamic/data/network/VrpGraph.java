@@ -36,7 +36,7 @@ public interface VrpGraph
     void addVertex(Vertex v);
 
 
-    Arc getArc(Vertex vertexFrom, Vertex vertexTo);
+    Arc getArc(Vertex fromVertex, Vertex toVertex);
 
 
     /**

@@ -5,7 +5,7 @@
 <depots>
 	<depot linkId="215">
 		<vehicles>
-			<vehicle name="pizzaman_1" t0="0" t1="4000"/>
+			<vehicle name="one" t0="0" t1="8000"/>
 		</vehicles>
 	</depot>
 </depots>

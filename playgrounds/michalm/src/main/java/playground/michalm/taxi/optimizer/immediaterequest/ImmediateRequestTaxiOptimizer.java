@@ -76,16 +76,17 @@ public abstract class ImmediateRequestTaxiOptimizer
     private final boolean destinationKnown;
     private final boolean minimizePickupTripTime;
     private final int pickupDuration;
-    private final int dropoffDuration = 1;//TODO
+    private final int dropoffDuration;
 
 
     public ImmediateRequestTaxiOptimizer(VrpData data, boolean destinationKnown,
-            boolean minimizePickupTripTime, int pickupDuration)
+            boolean minimizePickupTripTime, int pickupDuration, int dropoffDuration)
     {
         super(data);
         this.destinationKnown = destinationKnown;
         this.minimizePickupTripTime = minimizePickupTripTime;
         this.pickupDuration = pickupDuration;
+        this.dropoffDuration = dropoffDuration;
     }
 
 
@@ -378,11 +379,18 @@ public abstract class ImmediateRequestTaxiOptimizer
 
                     break;
                 }
-                case PICKUP_STAY:
+                case PICKUP_STAY: {
+                    task.setBeginTime(t);// t == taxi's arrival time
+                    int t0 = ((TaxiPickupDriveTask)task).getRequest().getT0();// t0 == passenger's departure time
+                    t = Math.max(t, t0) + pickupDuration; // the true pickup starts at max(t, t0)
+                    task.setEndTime(t);
+                    
+                    break;
+                }
                 case DROPOFF_STAY: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
-                    t += pickupDuration;
+                    t += dropoffDuration;
                     task.setEndTime(t);
 
                     break;

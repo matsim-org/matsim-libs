@@ -187,7 +187,7 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         data = new MatsimVrpData(vrpData, scenario);
 
-        NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(vrpData, true ,false, 120, true);
+        NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(vrpData, true ,false, 120, 60, true);
         
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
 

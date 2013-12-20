@@ -34,11 +34,14 @@ public class PassengerCustomer
     private final int id;
     private final MobsimAgent passenger;
 
+    private List<PassengerRequest> requests;
+
 
     public PassengerCustomer(int id, MobsimAgent passenger)
     {
         this.id = id;
         this.passenger = passenger;
+        this.requests = new ArrayList<PassengerRequest>();
     }
 
 
@@ -56,15 +59,15 @@ public class PassengerCustomer
     }
 
 
-    public MobsimAgent getPassenger()
+    public MobsimAgent getPassengerAgent()
     {
         return passenger;
     }
 
 
-    public static MobsimAgent getPassenger(Request request)
+    public List<PassengerRequest> getRequests()
     {
-        return ((PassengerCustomer)request.getCustomer()).getPassenger();
+        return requests;
     }
 
 

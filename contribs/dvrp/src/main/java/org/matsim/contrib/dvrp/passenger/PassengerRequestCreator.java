@@ -17,43 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package org.matsim.contrib.dvrp.passenger;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
-import playground.michalm.taxi.schedule.TaxiTask;
+import org.matsim.contrib.dvrp.data.network.MatsimVertex;
+
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
 
 
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public interface PassengerRequestCreator
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
-
-
-    public OTSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            int pickupDuration, int dropoffDuration, TaxiOptimizationPolicy optimizationPolicy)
-    {
-        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
-        this.optimizationPolicy = optimizationPolicy;
-    }
-
-
-    @Override
-    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
-    {
-        if (!scheduleUpdated) {// no changes
-            return false;
-        }
-
-        return optimizationPolicy.shouldOptimize(schedule.getCurrentTask());
-    }
-
-
-    @Override
-    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
-    {
-        return false;
-    }
+    PassengerRequest createRequest(Customer customer, MatsimVertex fromVertex,
+            MatsimVertex toVertex, double now);
 }

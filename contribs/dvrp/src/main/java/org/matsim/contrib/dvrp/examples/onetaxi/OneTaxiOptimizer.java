@@ -17,23 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.dapp;
+package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
-import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.DeliveryRequest;
-import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.impl.DeliveryTaskImpl;
 
 
 /**
  * @author michalm
  */
-public class DAPPOptimizer
+public class OneTaxiOptimizer
     implements VrpOptimizer
 {
     private final VrpData data;
@@ -42,7 +40,7 @@ public class DAPPOptimizer
 
 
     @SuppressWarnings("unchecked")
-    public DAPPOptimizer(VrpData data)
+    public OneTaxiOptimizer(VrpData data)
     {
         this.data = data;
         vehicle = data.getVehicles().get(0);
@@ -80,19 +78,28 @@ public class DAPPOptimizer
                 throw new IllegalStateException();
         }
 
-        DeliveryRequest req = (DeliveryRequest)request;
+        OneTaxiRequest req = (OneTaxiRequest)request;
+        Vertex fromVertex = req.getFromVertex();
+        Vertex toVertex = req.getToVertex();
         int t0 = Schedules.getLastTask(schedule).getEndTime();
 
-        Arc arc = data.getVrpGraph().getArc(lastTask.getVertex(), req.getToVertex());
-        int t1 = t0 + arc.getTimeOnDeparture(t0);
-        schedule.addTask(new DriveTaskImpl(t0, t1, arc));
+        Arc pickupArc = data.getVrpGraph().getArc(lastTask.getVertex(), fromVertex);
+        int t1 = t0 + pickupArc.getTimeOnDeparture(t0);
+        schedule.addTask(new DriveTaskImpl(t0, t1, pickupArc));
 
-        int t2 = t1 + 120;// 2 minutes for deliverying a pizza
-        schedule.addTask(new DeliveryTaskImpl(t1, t2, req));
+        int t2 = t1 + 120;// 2 minutes for picking up the passenger
+        schedule.addTask(new OneTaxiServeTask(t1, t2, fromVertex, "pickup", req));
+
+        Arc deliveryArc = data.getVrpGraph().getArc(fromVertex, toVertex);
+        int t3 = t2 + deliveryArc.getTimeOnDeparture(t2);
+        schedule.addTask(new DriveTaskImpl(t2, t3, deliveryArc));
+
+        int t4 = t3 + 60;// 1 minute for dropping off the passenger
+        schedule.addTask(new OneTaxiServeTask(t3, t4, toVertex, "dropoff", req));
 
         //just wait (and be ready) till the end of the vehicle's time window (T1)
-        int t3 = Schedules.getActualT1(schedule);
-        schedule.addTask(new StayTaskImpl(t2, t3, req.getToVertex(), "wait"));
+        int tEnd = Schedules.getActualT1(schedule);
+        schedule.addTask(new StayTaskImpl(t4, tEnd, toVertex, "wait"));
     }
 
 

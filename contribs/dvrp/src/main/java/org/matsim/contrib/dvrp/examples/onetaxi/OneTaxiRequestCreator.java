@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.passenger;
+package org.matsim.contrib.dvrp.examples.onetaxi;
+
+import java.util.List;
 
 import org.matsim.contrib.dvrp.data.network.MatsimVertex;
+import org.matsim.contrib.dvrp.passenger.*;
 
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 
 
-public interface RequestCreator
+public class OneTaxiRequestCreator
+    implements PassengerRequestCreator
 {
-    Request createRequest(Customer customer, MatsimVertex fromVertex, MatsimVertex toVertex,
-            double now);
+    public static final String MODE = "taxi";
+
+    private final VrpData vrpData;
+
+
+    public OneTaxiRequestCreator(VrpData vrpData)
+    {
+        this.vrpData = vrpData;
+    }
+
+
+    @Override
+    public PassengerRequest createRequest(Customer customer, MatsimVertex fromVertex,
+            MatsimVertex toVertex, double now)
+    {
+        List<Request> requests = vrpData.getRequests();
+
+        int id = requests.size();
+        OneTaxiRequest request = new OneTaxiRequest(id, customer, fromVertex, toVertex, (int)now);
+
+        requests.add(request);
+        return request;
+    }
 }

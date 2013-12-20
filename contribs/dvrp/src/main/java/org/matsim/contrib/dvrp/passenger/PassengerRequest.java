@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,46 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.dapp;
+package org.matsim.contrib.dvrp.passenger;
 
-import java.util.List;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
-import org.matsim.contrib.dvrp.data.network.MatsimVertex;
-import org.matsim.contrib.dvrp.passenger.RequestCreator;
-
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.DeliveryRequest;
-import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl.DeliveryRequestImpl;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
-public class DAPPRequestCreator
-    implements RequestCreator
+public interface PassengerRequest
+    extends Request
 {
-    public static final String MODE = "dial_a_pizza";
-
-    private final VrpData vrpData;
+    Vertex getFromVertex();
 
 
-    public DAPPRequestCreator(VrpData vrpData)
-    {
-        this.vrpData = vrpData;
-    }
+    Vertex getToVertex();
 
 
-    @Override
-    public DeliveryRequest createRequest(Customer customer, MatsimVertex fromVertex,
-            MatsimVertex toVertex, double startTime)
-    {
-        List<Request> requests = vrpData.getRequests();
-
-        int id = requests.size();
-        int t0 = (int)startTime;
-        int t1 = t0; // no time window
-        DeliveryRequest request = new DeliveryRequestImpl(id, customer, 1, t0, t1,
-                vrpData.getTime(), toVertex);
-
-        requests.add(request);
-        return request;
-    }
+    MobsimAgent getPassengerAgent();
 }

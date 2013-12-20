@@ -44,7 +44,6 @@ public class ScheduleImpl<T extends AbstractTask>
     {
         this.vehicle = vehicle;
 
-        //TODO what about LinkedList??
         tasks = new ArrayList<T>();
         unmodifiableTasks = (List)Collections.unmodifiableList(tasks);
 

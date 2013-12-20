@@ -17,43 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
-import playground.michalm.taxi.schedule.TaxiTask;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 
 
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public class OneTaxiServeTask
+    extends StayTaskImpl
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
+    private OneTaxiRequest request;
 
 
-    public OTSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            int pickupDuration, int dropoffDuration, TaxiOptimizationPolicy optimizationPolicy)
+    public OneTaxiServeTask(int beginTime, int endTime, Vertex vertex, String name,
+            OneTaxiRequest request)
     {
-        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
-        this.optimizationPolicy = optimizationPolicy;
+        super(beginTime, endTime, vertex, name);
+        this.request = request;
     }
 
 
-    @Override
-    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
+    public OneTaxiRequest getRequest()
     {
-        if (!scheduleUpdated) {// no changes
-            return false;
-        }
-
-        return optimizationPolicy.shouldOptimize(schedule.getCurrentTask());
+        return request;
     }
 
 
-    @Override
-    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
+    //pickup or dropoff
+    public boolean isPickup()
     {
-        return false;
+        return getVertex() == request.getFromVertex();
     }
 }

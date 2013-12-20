@@ -94,9 +94,9 @@ public class FixedSizeVrpGraph
 
 
     @Override
-    public Arc getArc(Vertex vertexFrom, Vertex vertexTo)
+    public Arc getArc(Vertex fromVertex, Vertex toVertex)
     {
-        return arcs[vertexFrom.getId()][vertexTo.getId()];
+        return arcs[fromVertex.getId()][toVertex.getId()];
     }
 
 

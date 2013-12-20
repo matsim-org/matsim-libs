@@ -17,9 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.dapp;
+package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import java.io.*;
+import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
@@ -38,7 +38,7 @@ import org.matsim.vis.otfvis.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 
 
-public class DAPPLauncher
+public class OneTaxiLauncher
 {
     /*package*/final String dirName;
     /*package*/final String netFileName;
@@ -49,13 +49,13 @@ public class DAPPLauncher
     /*package*/final Scenario scenario;
 
 
-    /*package*/public DAPPLauncher()
+    /*package*/public OneTaxiLauncher()
     {
         dirName = "./src/main/resources/";
         netFileName = dirName + "network.xml";
-        plansFileName = dirName + "pizza_eater_population.xml";
-        depotsFileName = dirName + "1_depot_1_pizzaman.xml";
-        
+        plansFileName = dirName + "population.xml";
+        depotsFileName = dirName + "1_depot_1_taxi.xml";
+
         otfVis = true;//or false -- turning ON/OFF visualization
 
         scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
@@ -72,14 +72,14 @@ public class DAPPLauncher
 
         VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, graph, depotsFileName);
         MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
-        DAPPOptimizer optimizer = new DAPPOptimizer(vrpData);
+        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(vrpData);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
         VrpSimEngine vrpSimEngine = VrpLauncherUtils.initVrpSimEngine(qSim, data, optimizer);
-        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new DAPPActionCreator(
+        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new OneTaxiActionCreator(
                 vrpSimEngine), false);
-        VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new DAPPRequestCreator(
-                vrpData), DAPPRequestCreator.MODE);
+        VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new OneTaxiRequestCreator(
+                vrpData), OneTaxiRequestCreator.MODE);
 
         EventsManager events = qSim.getEventsManager();
 
@@ -98,7 +98,7 @@ public class DAPPLauncher
     public static void main(String... args)
         throws IOException
     {
-        DAPPLauncher launcher = new DAPPLauncher();
+        OneTaxiLauncher launcher = new OneTaxiLauncher();
         launcher.go();
     }
 }

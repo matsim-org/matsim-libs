@@ -83,27 +83,27 @@ public class GrowingVrpGraph
 
 
     @Override
-    public Arc getArc(Vertex vertexFrom, Vertex vertexTo)
+    public Arc getArc(Vertex fromVertex, Vertex toVertex)
     {
-        int fromIdx = vertexFrom.getId();
-        int toIdx = vertexTo.getId();
+        int fromIdx = fromVertex.getId();
+        int toIdx = toVertex.getId();
 
-        Map<Integer, Arc> arcsFromVertexFrom = arcs.get(fromIdx);
+        Map<Integer, Arc> fromVertexOutgoingArcs = arcs.get(fromIdx);
 
         Arc arc;
 
-        if (arcsFromVertexFrom == null) {
-            arcsFromVertexFrom = new HashMap<Integer, Arc>();
-            arcs.set(fromIdx, arcsFromVertexFrom);
+        if (fromVertexOutgoingArcs == null) {
+            fromVertexOutgoingArcs = new HashMap<Integer, Arc>();
+            arcs.set(fromIdx, fromVertexOutgoingArcs);
             arc = null;
         }
         else {
-            arc = arcsFromVertexFrom.get(toIdx);// autoboxing: toIdx
+            arc = fromVertexOutgoingArcs.get(toIdx);// autoboxing: toIdx
         }
 
         if (arc == null) {
-            arc = arcFactory.createArc(vertexFrom, vertexTo);
-            arcsFromVertexFrom.put(vertexTo.getId(), arc);
+            arc = arcFactory.createArc(fromVertex, toVertex);
+            fromVertexOutgoingArcs.put(toVertex.getId(), arc);
         }
 
         return arc;

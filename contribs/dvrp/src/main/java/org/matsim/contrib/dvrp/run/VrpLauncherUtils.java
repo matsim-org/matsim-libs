@@ -247,7 +247,7 @@ public class VrpLauncherUtils
 
 
     public static void initDepartureHandler(QSim qSim, MatsimVrpData data,
-            VrpSimEngine vrpSimEngine, RequestCreator requestCreator, String mode)
+            VrpSimEngine vrpSimEngine, PassengerRequestCreator requestCreator, String mode)
     {
         qSim.addDepartureHandler(new PassengerDepartureHandler(mode, requestCreator, vrpSimEngine,
                 data));

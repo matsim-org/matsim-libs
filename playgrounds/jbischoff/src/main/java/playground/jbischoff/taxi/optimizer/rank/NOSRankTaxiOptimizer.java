@@ -51,17 +51,20 @@ public class NOSRankTaxiOptimizer
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(VrpData data,
             boolean destinationKnown, boolean minimizePickupTripTime, int pickupDuration,
-            boolean straightLineDistance)
+            int dropoffDuration, boolean straightLineDistance)
     {
         return new NOSRankTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
-                pickupDuration, new IdleRankVehicleFinder(data, straightLineDistance));
+                pickupDuration, dropoffDuration, new IdleRankVehicleFinder(data,
+                        straightLineDistance));
     }
 
 
     private NOSRankTaxiOptimizer(VrpData data, boolean destinationKnown,
-            boolean minimizePickupTripTime, int pickupDuration, IdleRankVehicleFinder vehicleFinder)
+            boolean minimizePickupTripTime, int pickupDuration, int dropoffDuration,
+            IdleRankVehicleFinder vehicleFinder)
     {
-        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, vehicleFinder);
+        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration,
+                vehicleFinder);
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Integer>();
     }
@@ -84,7 +87,8 @@ public class NOSRankTaxiOptimizer
     protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
     {
         if (this.rankmode) {
-            TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules.getLastTask(schedule);
+            TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules
+                    .getLastTask(schedule);
 
             Vertex vertex = dropoffStayTask.getVertex();
             Vertex depotVertex = schedule.getVehicle().getDepot().getVertex();
@@ -96,8 +100,8 @@ public class NOSRankTaxiOptimizer
                 schedule.addTask(new TaxiCruiseDriveTask(t5, t6, arc));
 
                 int tEnd = Math.max(t6, Schedules.getActualT1(schedule));
-                schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle()
-                        .getDepot().getVertex()));
+                schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getDepot()
+                        .getVertex()));
             }
             else {
                 super.appendWaitAfterDropoff(schedule);

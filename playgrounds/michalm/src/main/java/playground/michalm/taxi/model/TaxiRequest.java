@@ -19,6 +19,9 @@
 
 package playground.michalm.taxi.model;
 
+import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
 import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
@@ -28,6 +31,7 @@ import playground.michalm.taxi.schedule.*;
 
 public class TaxiRequest
     extends RequestImpl
+    implements PassengerRequest
 {
     public enum TaxiRequestStatus
     {
@@ -68,15 +72,24 @@ public class TaxiRequest
     }
 
 
+    @Override
     public Vertex getFromVertex()
     {
         return fromVertex;
     }
 
 
+    @Override
     public Vertex getToVertex()
     {
         return toVertex;
+    }
+
+
+    @Override
+    public MobsimAgent getPassengerAgent()
+    {
+        return ((PassengerCustomer)getCustomer()).getPassengerAgent();
     }
 
 

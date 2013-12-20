@@ -28,17 +28,17 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.model.Request;
 
-
+//TODO this class is not finished yet
 public class PassengerCallHandler
     implements ActivityStartEventHandler
 {
     private final String type;
-    private final RequestCreator requestCreator;
+    private final PassengerRequestCreator requestCreator;
     private final MatsimVrpData data;
     private final VrpSimEngine vrpSimEngine;
 
 
-    public PassengerCallHandler(String type, RequestCreator requestCreator,
+    public PassengerCallHandler(String type, PassengerRequestCreator requestCreator,
             VrpSimEngine vrpSimEngine, MatsimVrpData data)
     {
         this.type = type;
@@ -58,7 +58,7 @@ public class PassengerCallHandler
         MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
         MatsimVertex vertex = vrpGraph.getVertex(event.getLinkId());
 
-        MobsimAgent passenger = data.getAgents().get(event.getPersonId());
+        MobsimAgent passenger = data.getMobsimAgents().get(event.getPersonId());
 
         double serveTime = passenger.getActivityEndTime();//TODO is this the best idea???
         //can we get the serveTime in any other way?

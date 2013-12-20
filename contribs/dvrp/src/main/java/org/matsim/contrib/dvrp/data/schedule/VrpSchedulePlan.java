@@ -169,7 +169,7 @@ public class VrpSchedulePlan
     @Override
     public boolean isSelected()
     {
-        return true;// TODO ???
+        return true;
     }
 
 

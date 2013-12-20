@@ -28,18 +28,16 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
-import pl.poznan.put.vrp.dynamic.data.model.Request;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task;
 
 
 public class PassengerHandlingUtils
 {
-    public static void pickUpPassenger(VrpSimEngine vrpSimEngine, Task task, Request request,
-            double now)
+    public static void pickUpPassenger(VrpSimEngine vrpSimEngine, Task task,
+            PassengerRequest request, double now)
     {
-        MobsimAgent passenger = PassengerCustomer.getPassenger(request);
         DriverAgent driver = VrpAgentVehicle.getAgent(task);
-        pickUpPassenger(vrpSimEngine, driver, passenger, now);
+        pickUpPassenger(vrpSimEngine, driver, request.getPassengerAgent(), now);
     }
 
 
@@ -47,10 +45,6 @@ public class PassengerHandlingUtils
             MobsimAgent passenger, double now)
     {
         Id currentLinkId = passenger.getCurrentLinkId();
-
-        if (passenger.getId().toString().equals("0031495")) {
-            System.err.println("aaaa");
-        }
 
         if (currentLinkId != driver.getCurrentLinkId()) {
             throw new IllegalStateException("Passenger and vehicle on different links!");
@@ -80,22 +74,18 @@ public class PassengerHandlingUtils
     }
 
 
-    public static void dropOffPassenger(VrpSimEngine vrpSimEngine, Task task, Request request,
-            double now)
+    public static void dropOffPassenger(VrpSimEngine vrpSimEngine, Task task,
+            PassengerRequest request, double now)
     {
-        MobsimAgent passenger = PassengerCustomer.getPassenger(request);
         DriverAgent driver = VrpAgentVehicle.getAgent(task);
-        PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, driver, passenger, now);
+        PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, driver, request.getPassengerAgent(),
+                now);
     }
 
 
     public static void dropOffPassenger(VrpSimEngine vrpSimEngine, DriverAgent driver,
             MobsimAgent passenger, double now)
     {
-        if (passenger.getId().toString().equals("0031495")) {
-            System.err.println("aaaa");
-        }
-
         if (passenger instanceof PassengerAgent) {
             PassengerAgent passengerAgent = (PassengerAgent)passenger;
             MobsimVehicle mobVehicle = driver.getVehicle();
