@@ -52,7 +52,6 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -100,8 +99,6 @@ public class Config {
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
 	private PtCountsConfigGroup ptCounts = null;
 
-	// config groups that are elsewhere:
-	private OTFVisConfigGroup otfVis = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
@@ -181,21 +178,7 @@ public class Config {
 
 		this.vspExperimentalGroup = new VspExperimentalConfigGroup();
 		this.modules.put(VspExperimentalConfigGroup.GROUP_NAME, this.vspExperimentalGroup);
-
-//		if ( ! this.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel).
-//				equalsIgnoreCase(VspExperimentalConfigGroup.IGNORE) ) {
-			this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
-			// (I deliberately put this here, rather into the Controler where the standard consistency checker is added,
-			// because at this point my intuition is that one should assume that this is _always_ added ... and not just
-			// in one specific execution path but not in another.  kai, may'11)
-			// (I disabled the "IGNORE" check, since in some execution paths it was not added although the setting was different
-			// from "IGNORE".  I presume this happens because first an empty config is loaded, with having this on "IGNORE",
-			// thus ignoring this consistency checker, and then never getting back to the issue.  kai, nov'13)
-//		}
-
-		this.otfVis = new OTFVisConfigGroup();
-		this.modules.put(OTFVisConfigGroup.GROUP_NAME, this.otfVis);
-
+		
 		this.ptCounts = new PtCountsConfigGroup();
 		this.modules.put(PtCountsConfigGroup.GROUP_NAME, this.ptCounts);
 
@@ -210,6 +193,8 @@ public class Config {
 
 		this.subtourModeChoice = new SubtourModeChoiceConfigGroup();
 		this.modules.put( SubtourModeChoiceConfigGroup.GROUP_NAME , this.subtourModeChoice );
+		
+		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 	}
 
 	/**
