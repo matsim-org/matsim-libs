@@ -1,3 +1,13 @@
+/* *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.qvanheerden.freight;
 
 import org.matsim.api.core.v01.Scenario;
@@ -5,7 +15,6 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -13,11 +22,11 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
+import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
@@ -59,7 +68,7 @@ public class MyCarrierSimulation {
 				config.controler().setOutputDirectory("./output/");
 				config.controler().setLastIteration(1);
 				config.controler().setWriteEventsInterval(1);
-				
+
 				//Read network
 				config.network().setInputFile(networkFile);
 				scenario = ScenarioUtils.loadScenario(config);
@@ -90,42 +99,42 @@ public class MyCarrierSimulation {
 //			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;
 //
 //			NetworkRouter.routePlan(newPlan,netBasedCosts) ;
-//			// (maybe not optimal, but since re-routing is a matsim strategy, 
+//			// (maybe not optimal, but since re-routing is a matsim strategy,
 //			// certainly ok as initial solution)
 //			carrier.setSelectedPlan(newPlan) ;
 //
 //		}
-		
+
 		//get replan strategy and scoring function factory
 		MyCarrierSimulation mcs = new MyCarrierSimulation();
 		CarrierPlanStrategyManagerFactory stratManFactory = mcs.createReplanStrategyFactory();
 		CarrierScoringFunctionFactory scoringFactory = mcs.createScoringFactory();
-		
-		
+
+
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
-		
+
 		CarrierControlerListener carrierController = new CarrierControlerListener(carriers, stratManFactory, scoringFactory);
-		carrierController.setEnableWithinDayActivityReScheduling(false);
+//		carrierController.setEnableWithinDayActivityReScheduling(false); // FIXME commented out, as it's not compiling
 		controler.addControlerListener(carrierController);
 		controler.run();
 
 		Header.printFooter();
 
 	}
-	
+
 	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(){
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			@Override
 			public GenericStrategyManager<CarrierPlan> createStrategyManager(Controler controler) {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
-				TravelDisutility travelCosts = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
+				TravelDisutility travelCosts = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(
 						travelTimes , config.planCalcScore() );
-				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
+				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(),
 						travelCosts, travelTimes) ;
 				GenericStrategyManager<CarrierPlan> mgr = new GenericStrategyManager<CarrierPlan>() ;
-				{	
+				{
 					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new RandomPlanSelector<CarrierPlan>()) ;
 					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
 					strategy.addStrategyModule(module);
@@ -143,7 +152,7 @@ public class MyCarrierSimulation {
 				}
 				{
 					// the strategy to solve the pickup-and-delivery problem during the iterations is gone for the time being.  enough other
-					// things to figure out, I think.  kai 
+					// things to figure out, I think.  kai
 				}
 				{
 					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
@@ -153,7 +162,7 @@ public class MyCarrierSimulation {
 			}
 		};
 		return stratManFactory;
-		
+
 	}
 
 	public CarrierScoringFunctionFactory createScoringFactory(){
@@ -163,7 +172,7 @@ public class MyCarrierSimulation {
 			public ScoringFunction createScoringFunction(Carrier carrier) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 				// yyyyyy I am almost sure that we better use separate scoring functions for carriers. kai, oct'13
-				final LegScoring legScoringFunction = new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), 
+				final LegScoring legScoringFunction = new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()),
 						scenario.getNetwork() );
 				sum.addScoringFunction(legScoringFunction ) ;
 				final MoneyScoring moneyScoringFunction = new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore()) );
@@ -172,8 +181,8 @@ public class MyCarrierSimulation {
 			}
 
 		};
-		
+
 		return scoringFunctionFactory;
 	}
-	
+
 }
