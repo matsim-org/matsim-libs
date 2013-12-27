@@ -37,7 +37,7 @@ public class PerceivedPersonalSpaceApproach implements SpaceDependentSpeed {
 	 * @see playground.gregor.sim2d_v4.simulation.physics.algorithms.SpaceDependentSpeed#computePersonalSpace(playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent)
 	 */
 	@Override
-	public double computePersonalSpace(Sim2DAgent agent, List<Sim2DAgent> neighbors) {
+	public double computeSpaceDependentSpeed(Sim2DAgent agent, List<Sim2DAgent> neighbors) {
 
 		List<LineSegment> obs = agent.getPSec().getObstacles();
 

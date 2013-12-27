@@ -72,6 +72,11 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 	}
 
 	private LinkInfo createLinkInfo(Id currentLinkId) {
+		
+//		if (currentLinkId.toString().equals("l9")){
+//			System.out.println("got you!");
+//		}
+		
 		LinkInfo li = new LinkInfo();
 		Link l = this.net.getLinks().get(currentLinkId);
 		Coord from = l.getFromNode().getCoord();
@@ -119,13 +124,17 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			
 			double fdx = fl.x1-fl.x0;
 			double fdy = fl.y1-fl.y0;
-			double w = Math.sqrt(fdx*fdx + fdy*fdy)/4; //TODO repair! (visibility intersection or something ??) [gl April '13] 
+			double ll = Math.sqrt(fdx*fdx + fdy*fdy); 
+			fdx /= ll;
+			fdy /= ll;
+			fdx *= .4;
+			fdy *= .4;
 			
 			targetLine = new LineSegment();
-			targetLine.x0 = seg.x1 - w*li.dy;
-			targetLine.y0 = seg.y1 + w*li.dx;
-			targetLine.x1 = seg.x1 + w*li.dy;
-			targetLine.y1 = seg.y1 - w*li.dx;			
+			targetLine.x0 = fl.x1 - fdx;
+			targetLine.y0 = fl.y1 - fdy;
+			targetLine.x1 = fl.x0 + fdx;
+			targetLine.y1 = fl.y0 + fdy;			
 			
 		} else {
 //			//HACK July '13 [gl]

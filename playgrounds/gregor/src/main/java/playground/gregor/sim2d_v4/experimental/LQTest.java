@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VoronoiCell.java
+ * LQTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,77 +18,60 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.cgal;
+package playground.gregor.sim2d_v4.experimental;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import be.humphreys.simplevoronoi.GraphEdge;
+import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD;
+import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD.Quad;
+import playground.gregor.sim2d_v4.cgal.TwoDObject;
 
-public class VoronoiCell {
+import com.vividsolutions.jts.geom.Envelope;
 
-	private double area = 0;
-	private final int idx;
-	private final VoronoiCenter c;
-	private final List<VoronoiCenter> neighbors = new ArrayList<VoronoiCenter>();
-	private final List<GraphEdge> edges = new ArrayList<GraphEdge>();
-	private boolean isClosed = false;
+public class LQTest {
 
-	
-	public VoronoiCell(VoronoiCenter c, int idx) {
-		this.c = c;
-		this.idx = idx;
-	}
-
-	
-	public int getIdx() {
-		return this.idx;
-	}
-	
-	public double getPointX() {
-		return this.c.getXLocation();
-	}
-	public double getPointY() {
-		return this.c.getYLocation();
-	}
-	
-	public double getArea() {
-		return this.area;
-	}
-	
-	/*package*/ void incrementAreaBy(double incr) {
-		this.area += incr;
-	}
-	
-	public void addNeighbor(VoronoiCenter n) {
-		this.neighbors.add(n);
-	}
-	
-	public List<VoronoiCenter> getNeighbors() {
-		return this.neighbors;
-	}
-	
-	public VoronoiCenter getVoronoiCenter(){
-		return this.c;
-	}
-
-
-	public void addGraphEdge(GraphEdge ed) {
-		this.edges .add(ed);
+	public static void main(String [] args) {
+		Envelope e = new Envelope(0,8,0,8);
+		List<TwoDObject> objs = new ArrayList<TwoDObject>();
+		objs.add(new Obj(2,6));
+		objs.add(new Obj(4.2,7.1));
+		objs.add(new Obj(4.2,6.2));
+		objs.add(new Obj(4.2,4.2));
+		objs.add(new Obj(4.2,3.8));
+		objs.add(new Obj(6.2,3.8));
+		LinearQuadTreeLD qt = new LinearQuadTreeLD(objs, e,null);
+		
+		Envelope q = new Envelope(3,5,3,5);
+		System.out.println();
+		List<Quad> resp = qt.query(q);
+		for (Quad quad : resp) {
+			System.out.println(quad);
+		}
+		
 		
 	}
+	
+	private static final class Obj implements TwoDObject {
 
+		double x;
+		double y;
+		
+		public Obj(double x, double y) {
+			this.x = x;
+			this.y = y;
+		}
 
-	public List<GraphEdge> getGraphEdges() {
-		return this.edges;
-	}
+		@Override
+		public double getXLocation() {
+			return this.x;
+		}
 
-
-	public void setIsClosed(boolean b) {
-		this.isClosed = b;
+		@Override
+		public double getYLocation() {
+			return this.y;
+		}
+		
 	}
 	
-	public boolean isClosed() {
-		return this.isClosed;
-	}
 }

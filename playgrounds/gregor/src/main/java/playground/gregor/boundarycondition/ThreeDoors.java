@@ -82,7 +82,7 @@ public class ThreeDoors {
 
 	private static final int nrAgents = 2000;
 
-	public static final double SEPC_FLOW =0.2;//1.2;
+	public static final double SEPC_FLOW =0.8;//1.2;
 
 	public static void main(String [] args) {
 		Config c = ConfigUtils.createConfig();
@@ -459,7 +459,30 @@ public class ThreeDoors {
 			l.setAllowedModes(modes);
 			net.addLink(l);
 		}
-		
+//		IdImpl id4 = new IdImpl("l4");
+//		{
+//			Link l = fac.createLink(id4, n0, n3);
+//			double flow = width *SEPC_FLOW;
+//			l.setFreespeed(1.34);
+//			l.setLength(1);
+//			l.setCapacity(flow);;
+//			Set<String> modes = new HashSet<String>();
+//			modes.add("walk2d");modes.add("walk");modes.add("car");
+//			l.setAllowedModes(modes);
+//			net.addLink(l);
+//		}
+//		IdImpl id4Rev = new IdImpl("l4_rev");
+//		{
+//			Link l = fac.createLink(id4Rev, n3, n0);
+//			double flow = width *SEPC_FLOW;
+//			l.setFreespeed(1.34);
+//			l.setLength(1);
+//			l.setCapacity(flow);;
+//			Set<String> modes = new HashSet<String>();
+//			modes.add("walk2d");modes.add("walk");modes.add("car");
+//			l.setAllowedModes(modes);
+//			net.addLink(l);
+//		}
 		net.setCapacityPeriod(1);
 		env.setNetwork(net);
 		
@@ -489,6 +512,8 @@ public class ThreeDoors {
 			sec.addRelatedLinkId(id2Rev);
 			sec.addRelatedLinkId(id3);
 			sec.addRelatedLinkId(id3Rev);
+//			sec.addRelatedLinkId(id4);
+//			sec.addRelatedLinkId(id4Rev);
 		}
 		
 

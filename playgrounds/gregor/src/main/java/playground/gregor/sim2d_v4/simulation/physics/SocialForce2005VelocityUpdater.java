@@ -28,36 +28,40 @@ import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.FNDDependentSpeed;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.SpaceDependentSpeed;
 
 /**
- * Social force model according to: D. Helbing, I. Farkas, T. Vicsek,
- * Nature 407, 487-490 (2000)
+ * Social force model according to: D. Helbing, L. Buzna, A. Johansson,
+ * T. Werner, Transportation Science 39(1), 1-24 (2005)
  * @author laemmel
  *
  */
-public class SocialForceVelocityUpdater implements VelocityUpdater {
+public class SocialForce2005VelocityUpdater implements VelocityUpdater {
 
 	//Helbing constants
-//	private final double v0 = 1.34f; //desired velocity
-	private final double m = 80;//70 + (MatsimRandom.getRandom().nextDouble()*20); //mass
+	private final double v0 = 1.3 * MatsimRandom.getRandom().nextGaussian()*0.3; //desired velocity
+	private final double m = 1;//70 + (MatsimRandom.getRandom().nextDouble()*20); //mass
 	private final double tau = 1; //acceleration time
-	private final double A = 2000; // ??
-	private final double B = .08; // ??
-	private final double k = 1.2 * 100000;
-	private final double kappa = 2.4 * 100000;
+	private final double Aw = 5; //repulsion of walls
+	private final double Bw = .1; //walls
+	
+	private final double A1 = 3; //direction dependent repulsion
+	private final double B1 = .2; //direction dependent repulsion
+	private final double A2 = 3; //direction independent repulsion
+	private final double B2 = .2; //direction independent repulsion
+	
+	private final double lamda = 0.75;//
+	
+//	private final double k = 1.2f * 100000;
+//	private final double kappa = 2.4f * 100000;
 //	private final double r
 	@Deprecated //move to Sim2DAgent [gl April'13]
-	private final double vmx = 1.3*1.34;//1.5f;
+	private final double vmx = 1.5f;
 
 	//additional constants
 	private final double CUTOFF_DIST = 20f;
 
-	//rotation direction for tangential force
-	private final int dir = 1-(2*MatsimRandom.getRandom().nextInt(2));
 
 	private final Neighbors ncalc;
 	private final Obstacles ocalc = new Obstacles();
@@ -66,9 +70,7 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	private final double dT;
 	private final Sim2DAgent agent;
 	
-	private final SpaceDependentSpeed sds = new FNDDependentSpeed();
-	
-	public SocialForceVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
+	public SocialForce2005VelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dd = dd;
 		this.agent = agent;
@@ -82,12 +84,9 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	public void updateVelocity() {
 
 		
-//		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors(time);
 		List<Sim2DAgent> neighbors = this.ncalc.getNeighbors();
 		List<LineSegment> obstacles = this.ocalc.computeObstacles(this.agent);
 
-//		this.sds.computeSpaceDependentSpeed(this.agent, neighbors);
-		
 		double v0 = this.agent.getV0();
 		
 		double[] v = this.agent.getVelocity();
@@ -95,8 +94,6 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 		double desiredDVx = v0 * e0[0] - v[0];
 		double desiredDVy = v0 * e0[1] - v[1];
 
-//		desiredDVx *= e0[2];
-//		desiredDVy *= e0[2];
 		
 		desiredDVx /= this.tau;
 		desiredDVy /= this.tau;
@@ -112,32 +109,35 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 			double nx = pos[0] - nPos[0];
 			double ny = pos[1] - nPos[1];
 			double dist = Math.sqrt(nx * nx  + ny * ny);
-//			if (dist > this.CUTOFF_DIST) {
-//				continue;
-//			}
+			if (dist > this.CUTOFF_DIST) {
+				continue;
+			}
 			nx /= dist;
 			ny /= dist;
 
 			double r = this.agent.getRadius() + neighbor.getRadius();
 
-			double exp = Math.exp((r-dist)/this.B);
+			double exp = Math.exp((r-dist)/this.B2);
 
-			if (dist < r) {
-				double overlap = (r-dist);
-				exp += this.k * overlap;
+			double cosPhi = CGAL.dot(-nx, -ny, e0[0], e0[1]);
+			double exp2 = Math.exp((r-dist)/this.B1)*(this.lamda+(1-this.lamda)*(1+cosPhi)/2);
+			
+//			if (dist < r) {
+//				double overlap = (r-dist);
+//				exp += this.k * overlap;
+//
+//				double tx = -ny;
+//				double ty = nx;
+//				double[] nv = neighbor.getVelocity();
+//				double dvx = nv[0] - v[0];
+//				double dvy = nv[1] - v[1];
+//				double dv = dvx*tx + dvy*ty;
+//				fnx += this.kappa * overlap * dv * tx;
+//				fny += this.kappa * overlap * dv * ty;
+//			}
 
-				double tx = -ny*this.dir;
-				double ty = nx*this.dir;
-				double[] nv = neighbor.getVelocity();
-				double dvx = nv[0] - v[0];
-				double dvy = nv[1] - v[1];
-				double dv = dvx*tx + dvy*ty;
-				fnx += this.kappa * overlap * dv * tx;
-				fny += this.kappa * overlap * dv * ty;
-			}
-
-			fnx += this.A * exp * nx;
-			fny += this.A * exp * ny;
+			fnx += this.A2 * exp * nx + this.A1 * exp2 * nx;
+			fny += this.A2 * exp * ny + this.A1 * exp2 * ny;
 		}
 
 		//obstacles
@@ -172,28 +172,28 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 				}
 			}
 
-//			//here we can optimize to avoid the sqrt if 0 <= r <= 1!
-//			if (dist > this.CUTOFF_DIST) {
-//				continue;
-//			}
-
-			double radius = this.agent.getRadius(); 
-			double exp = Math.exp((radius-dist)/this.B);
-			
-
-			if (dist < radius &&  r >=0 && r <= 1) {
-				double overlap = (radius-dist);
-				exp += this.k * overlap;
-
-				double tx = -ny*this.dir;
-				double ty = nx*this.dir;
-				double dv = v[0]*tx + v[1]*ty;
-				fnx -= this.kappa * overlap * dv * tx;
-				fny -= this.kappa * overlap * dv * ty;
+			//here we can optimize to avoid the sqrt if 0 <= r <= 1!
+			if (dist > this.CUTOFF_DIST) {
+				continue;
 			}
 
-			fwx += this.A * exp * nx;
-			fwy += this.A * exp * ny;
+			double radius = this.agent.getRadius(); 
+			double exp = Math.exp((radius-dist)/this.Bw);
+			
+
+//			if (dist < radius &&  r >=0 && r <= 1) {
+//				double overlap = (radius-dist);
+//				exp += this.k * overlap;
+//
+//				double tx = -ny;
+//				double ty = nx;
+//				double dv = v[0]*tx + v[1]*ty;
+//				fnx += this.kappa * overlap * dv * tx;
+//				fny += this.kappa * overlap * dv * ty;
+//			}
+
+			fwx += this.Aw * exp * nx;
+			fwy += this.Aw * exp * ny;
 		}
 
 		double dvx = desiredDVx + fnx/this.m + fwx/this.m;

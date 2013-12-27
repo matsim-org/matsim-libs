@@ -20,19 +20,17 @@
 
 package playground.gregor.sim2d_v4.scenario;
 
-import java.util.HashSet;
-import java.util.Set;
 
 public abstract class TransportMode {
 
-	public static String walk = org.matsim.api.core.v01.TransportMode.walk;
+//	public static String walk = org.matsim.api.core.v01.TransportMode.walk;
 	public static String walk2d = "walk2d";
-	public static Set<String> transportModes;
-	static {
-		transportModes = new HashSet<String>();
-		transportModes.add(walk);
-		transportModes.add(walk2d);
-		
-	}
+//	public static Set<String> transportModes;
+//	static {
+//		transportModes = new HashSet<String>();
+//		transportModes.add(walk);
+//		transportModes.add(walk2d);
+//		
+//	}
 	
 }

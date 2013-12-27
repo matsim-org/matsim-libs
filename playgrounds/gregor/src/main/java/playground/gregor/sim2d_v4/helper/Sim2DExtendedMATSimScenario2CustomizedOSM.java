@@ -265,9 +265,7 @@ public class Sim2DExtendedMATSimScenario2CustomizedOSM {
 				bf.append("' />\n");
 				bf.append("\t<tag k='m_type' v='sim2d_section' />\n");
 				bf.append("\t<tag k='level' v='0' />\n");
-				bf.append("\t<tag k='id' v='");
-				bf.append(w.matsimId);
-				bf.append("' />\n");
+
 				bf.append("\t<tag k='neighbors' v='");
 				for ( Id n : w.neighbors) {
 					bf.append(n.toString() + " ");
@@ -287,6 +285,9 @@ public class Sim2DExtendedMATSimScenario2CustomizedOSM {
 				bf.append(Double.toString(w.mWidth));
 				bf.append("' />\n");
 			}
+			bf.append("\t<tag k='id' v='");
+			bf.append(w.matsimId);
+			bf.append("' />\n");
 			bf.append("</way>\n");
 		}
 
@@ -300,6 +301,8 @@ public class Sim2DExtendedMATSimScenario2CustomizedOSM {
 			bf.append(Double.toString(n.lat));
 			bf.append("' lon='");
 			bf.append(Double.toString(n.lon));
+			bf.append("' id='");
+			bf.append(n.matsimId);
 			bf.append("' />\n");
 		}
 		for (OSMNode n : this.coordinates.values()) {
@@ -309,6 +312,8 @@ public class Sim2DExtendedMATSimScenario2CustomizedOSM {
 			bf.append(Double.toString(n.lat));
 			bf.append("' lon='");
 			bf.append(Double.toString(n.lon));
+			bf.append("' id='");
+			bf.append(n.matsimId);
 			bf.append("' />\n");
 		}
 

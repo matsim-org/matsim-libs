@@ -158,6 +158,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 		
 		double v0 = this.agent.getV0();
 		double freeSpeed = v0;
+//		this.ps.computeSpaceDependentSpeed(this.agent, neighbors);
 		
 //		if (voronoiApproach) {
 //			double x = this.agent.getPos()[0];

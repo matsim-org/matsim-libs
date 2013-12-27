@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VoronoiCell.java
+ * FNDDependentSpeed.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,77 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.cgal;
+package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import be.humphreys.simplevoronoi.GraphEdge;
+import playground.gregor.sim2d_v4.cgal.VoronoiCell;
+import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
-public class VoronoiCell {
+public class FNDDependentSpeed implements SpaceDependentSpeed {
 
-	private double area = 0;
-	private final int idx;
-	private final VoronoiCenter c;
-	private final List<VoronoiCenter> neighbors = new ArrayList<VoronoiCenter>();
-	private final List<GraphEdge> edges = new ArrayList<GraphEdge>();
-	private boolean isClosed = false;
-
-	
-	public VoronoiCell(VoronoiCenter c, int idx) {
-		this.c = c;
-		this.idx = idx;
-	}
-
-	
-	public int getIdx() {
-		return this.idx;
-	}
-	
-	public double getPointX() {
-		return this.c.getXLocation();
-	}
-	public double getPointY() {
-		return this.c.getYLocation();
-	}
-	
-	public double getArea() {
-		return this.area;
-	}
-	
-	/*package*/ void incrementAreaBy(double incr) {
-		this.area += incr;
-	}
-	
-	public void addNeighbor(VoronoiCenter n) {
-		this.neighbors.add(n);
-	}
-	
-	public List<VoronoiCenter> getNeighbors() {
-		return this.neighbors;
-	}
-	
-	public VoronoiCenter getVoronoiCenter(){
-		return this.c;
-	}
-
-
-	public void addGraphEdge(GraphEdge ed) {
-		this.edges .add(ed);
+	@Override
+	public double computeSpaceDependentSpeed(Sim2DAgent agent,
+			List<Sim2DAgent> neighbors) {
 		
+		VoronoiCell cell = agent.getVoronoiCell();
+		if (cell != null && cell.isClosed()) {
+			double v = 1.34 *(1-Math.exp(-1.913*(cell.getArea()-1/5.4)));
+			agent.setDesiredSpeed(v);
+		} else {
+			agent.setDesiredSpeed(1.34);
+		}
+		
+		return 0;
 	}
 
-
-	public List<GraphEdge> getGraphEdges() {
-		return this.edges;
-	}
-
-
-	public void setIsClosed(boolean b) {
-		this.isClosed = b;
-	}
-	
-	public boolean isClosed() {
-		return this.isClosed;
-	}
 }

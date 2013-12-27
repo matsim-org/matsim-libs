@@ -28,7 +28,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
@@ -36,7 +35,7 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class KDTreeNeighbors implements Neighbors {
+public class AllSectionsKDTreeNeighbors implements Neighbors {
 
 
 	private double sqRange = 10;
@@ -52,7 +51,7 @@ public class KDTreeNeighbors implements Neighbors {
 	//	private double updateIntervall;
 	//	private double timeAfterLastUpdate = Double.POSITIVE_INFINITY;
 
-	public KDTreeNeighbors(Sim2DAgent agent, Sim2DConfig conf) {
+	public AllSectionsKDTreeNeighbors(Sim2DAgent agent, Sim2DConfig conf) {
 		this.agent = agent;
 		//		this.dT = conf.getTimeStepSize();
 		//		this.updateIntervall = this.dT;
@@ -72,18 +71,15 @@ public class KDTreeNeighbors implements Neighbors {
 
 
 		//agents from neighboring sections
-		LineSegment[] openings = psec.getOpenings();
-		for (int i = 0; i < openings.length; i++) {
-			LineSegment opening = openings[i];
-			PhysicalSim2DSection qSec = psec.getNeighbor(opening);
-			if (qSec == null) {
+		for (PhysicalSim2DSection qSec : psec.getPhysicalEnvironment().getPhysicalSim2DSections()) {
+			if (qSec == psec) {
 				continue;
 			}
 
 			twoDTreeRange = this.range;
 			e = new Envelope(this.agent.getPos()[0]-twoDTreeRange,this.agent.getPos()[0]+twoDTreeRange,this.agent.getPos()[1]-twoDTreeRange,this.agent.getPos()[1]+twoDTreeRange);
 			List<Sim2DAgent> tmp = qSec.getAgents(e);
-			this.agentsNeigh.put(opening, tmp);
+			this.agentsNeigh.put(qSec.getOpenings()[0], tmp);
 			//agents from neighboring sections need to check visibility
 		}
 	}
@@ -176,9 +172,9 @@ public class KDTreeNeighbors implements Neighbors {
 			//agents from neighboring sections need to check visibility
 			for (Sim2DAgent b : agents) {
 				double[] bPos = b.getPos();
-				if (!visible(aPos,bPos,opening)) {
-					continue;
-				}
+//				if (!visible(aPos,bPos,opening)) {
+//					continue;
+//				}
 				double xDiff = aPos[0] - bPos[0];
 				double yDiff = aPos[1] - bPos[1];
 				double sqRange = xDiff*xDiff + yDiff*yDiff;
@@ -227,11 +223,6 @@ public class KDTreeNeighbors implements Neighbors {
 
 	}
 
-	private boolean visible(double[] aPos, double[] bPos, LineSegment opening) {
-		double l0 = CGAL.isLeftOfLine( opening.x0, opening.y0,aPos[0], aPos[1],bPos[0], bPos[1]);
-		double l1 = CGAL.isLeftOfLine( opening.x1, opening.y1,aPos[0], aPos[1],bPos[0], bPos[1]);
-		return l0*l1 < 0;
-	}
 
 	public void setRangeAndMaxNrOfNeighbors(double range, int nrNeighbors) {
 		this.sqRange = range*range;

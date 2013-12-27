@@ -26,6 +26,6 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
 public interface SpaceDependentSpeed {
 
-	public abstract double computePersonalSpace(Sim2DAgent agent, List<Sim2DAgent> neighbors);
+	public abstract double computeSpaceDependentSpeed(Sim2DAgent agent, List<Sim2DAgent> neighbors);
 
 }

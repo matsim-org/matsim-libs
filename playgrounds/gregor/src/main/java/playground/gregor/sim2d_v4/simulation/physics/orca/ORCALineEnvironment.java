@@ -67,8 +67,8 @@ public class ORCALineEnvironment implements ORCALine {
 		
 //		GuiDebugger.addVector(0, 0, xpBpA0, ypBpA0);
 //		GuiDebugger.addVector(0, 0, xpBpA1, ypBpA1);
-		
-		double rATau = (orcaAgent.getRadius())/tau;
+		double r = orcaAgent.getRadius();
+		double rATau = (r)/tau;
 		
 		double dxpBpA = xpBpA1-xpBpA0;
 		double dypBpA = ypBpA1-ypBpA0;
@@ -99,13 +99,13 @@ public class ORCALineEnvironment implements ORCALine {
 			
 			this.directionX = -yn;
 			this.directionY = xn;
-			double dist = CGAL.signDistPointLine(posX, posY, seg.x0, seg.y0, seg.dx, seg.dy)-.19; 
+			double dist = CGAL.signDistPointLine(posX, posY, seg.x0, seg.y0, seg.dx, seg.dy)-r; 
 			if (dist < 0) {
 				this.pointX += -(dist-0.1) * this.directionY;
 				this.pointY += +(dist-0.1) * this.directionX;
 				
 				if (penetrationCnt < 10) {
-					log.warn("Agent: " + orcaAgent + " is penetrating all wall. This is a bug! As a workaround ORCALine has been moved inward! Needs to be fixed! [GL August '13]");
+					log.warn("Agent: " + orcaAgent + " is penetrating a wall. This is a bug! As a workaround ORCALine has been moved inward! Needs to be fixed! [GL August '13]");
 					penetrationCnt++;
 					if (penetrationCnt == 10) {
 						log.warn(Gbl.FUTURE_SUPPRESSED);

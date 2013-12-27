@@ -158,6 +158,9 @@ public class PhysicalSim2DSection {
 				mv = true;
 			} else {
 				mv = agent.move(dx, dy,time);
+//				if (agent.getId().toString().equals("b66") && agent.getCurrentLinkId().toString().equals("l9")){
+//					System.out.println("got you!");
+//				}
 			}
 			if (mv) {
 				for (int i = 0; i < this.numOpenings; i++) {
@@ -169,6 +172,9 @@ public class PhysicalSim2DSection {
 						double l3 = CGAL.isLeftOfLine(opening.x1, opening.y1,oldX,oldY,newXPosX,newXPosY);
 						if (l2*l3 < 0 && leftOfOpening*l1 < 0) {
 							PhysicalSim2DSection nextSection = this.neighbors.get(opening);
+//							if (nextSection instanceof TransitionAreaII) {
+//								System.out.println("got you!!");
+//							}
 							if (nextSection == null) {//agent was pushed out of the sim2d environment
 								if  (agent.hasLeft2DSim()) {
 									it.remove();
@@ -190,6 +196,9 @@ public class PhysicalSim2DSection {
 	protected void updateAgent(Sim2DAgent agent, double time) {
 		//		agent.calcNeighbors(this);
 		//		agent.setObstacles(this.obstacles);
+//		if (agent.getId().toString().equals("b66")){
+//			System.out.println("got you!");
+//		}
 		agent.updateVelocity();
 
 	}

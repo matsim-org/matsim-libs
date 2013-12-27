@@ -115,8 +115,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		
 			Sim2DAgent agent = this.agentBuilder.buildAgent(veh,this.spawnX+MatsimRandom.getRandom().nextDouble()-.5,this.spawnY+MatsimRandom.getRandom().nextDouble()-.5, this.ta.getPhysicalEnvironment());
 			agent.setDesiredSpeed(this.getLink().getFreespeed());
-			int v = this.qPred.getAllNonParkedVehicles().size();
-			this.ta.addAgentTransitionBuffer(agent,v/this.area);
+//			int v = this.qPred.getAllNonParkedVehicles().size();
+			this.ta.addAgentTransitionBuffer(agent,0);
 			double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(
 					new LinkEnterEvent(now, veh.getDriver().getId(),

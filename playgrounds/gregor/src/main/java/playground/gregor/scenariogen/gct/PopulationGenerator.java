@@ -66,6 +66,7 @@ public class PopulationGenerator {
 		ArrayList<Link> counters = computeCounter(sc);
 		
 		int numPers = 375000;
+//		int numPers = 75000;
 
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
@@ -103,7 +104,7 @@ public class PopulationGenerator {
 			}
 			double time;
 			do {
-				double offset = MatsimRandom.getRandom().nextGaussian()*3600;
+				double offset = MatsimRandom.getRandom().nextGaussian()*3600;//3600;
 				time = 9*3600+offset;
 			}while (time < 6*3600 || time > 18*3600);
 //			if (time > 8*3600) {
@@ -158,6 +159,9 @@ public class PopulationGenerator {
 
 			Activity act2 = fac.createActivityFromLinkId("origin", l.getId());
 			plan.addActivity(act2);
+			if (i%1000 == 0) {
+				System.out.println(i);
+			}
 		}
 
 

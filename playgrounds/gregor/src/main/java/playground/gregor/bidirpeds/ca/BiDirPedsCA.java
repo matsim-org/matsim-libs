@@ -41,12 +41,12 @@ public class BiDirPedsCA {
 
 	private final double maxSpeed = 1.5;
 	private final double L = .19;
-	private final double w = .51;
+	private final double w = .21;
 	private final double z = this.w/this.L; 
 
 
 	private final double minCellTravelTime = this.L/this.maxSpeed;
-	private final double conflictDelay = 0.53;//0.5+this.minCellTravelTime;
+	private final double conflictDelay = 0.9;//0.5+this.minCellTravelTime;
 
 	private static final int CELLS = 30; //(int) (1000/.19);
 
@@ -60,8 +60,8 @@ public class BiDirPedsCA {
 	private String fileName;
 
 
-	private static final double WARMUP_TIME = 200;
-	private static final double MAX_TIME = WARMUP_TIME+500;
+	private static final double WARMUP_TIME = 10;
+	private static final double MAX_TIME = WARMUP_TIME+10;
 
 	private static final boolean VISUALIZE = true;
 
@@ -79,7 +79,7 @@ public class BiDirPedsCA {
 		for (double rho1 = 0.075; rho1 <= 1; rho1 += 0.025) {
 			idx1++;
 			int idx2 = 0;
-			for (double rho2 = 0.75; rho2 <= 1; rho2 += 0.025) {
+			for (double rho2 = rho1; rho2 <= 1; rho2 += 0.025) {
 				idx2++;
 				double rho = rho1+rho2;
 				if (rho > 1) {
@@ -248,7 +248,7 @@ public class BiDirPedsCA {
 					}
 				}
 				if (VISUALIZE){// || SAVE_DAT) {
-					System.exit(0);
+//					System.exit(0);
 				}
 				
 			}
@@ -291,6 +291,7 @@ public class BiDirPedsCA {
 			this.tmpCells[i].ped = curr.ped;
 			this.tmpCells[i].lastEnter = curr.lastEnter;
 			this.tmpCells[i].lastExit = curr.lastExit;
+			
 			return Double.POSITIVE_INFINITY; 
 		}
 
@@ -332,7 +333,11 @@ public class BiDirPedsCA {
 		nextTmp.lastEnter = time;
 		nextTmp.ped = ped;
 		Cell currTmp = this.tmpCells[i];
-		currTmp.lastExit = time;
+		if (next.ped == null){
+			currTmp.lastExit = time;
+		} else {
+			currTmp.lastExit = 0;
+		}
 		return time + this.minCellTravelTime;
 	}
 

@@ -29,7 +29,7 @@ public class LineSegment {
 	public double dy;//normalized!!
 
 	public boolean equalInverse(LineSegment other) {
-		if (this.x0 == other.x1 && this.x1 == other.x0 && this.y0 == other.y1 && this.y1 == other.y0) {
+		if (Math.abs(this.x0 - other.x1)<CGAL.EPSILON && Math.abs(this.x1 - other.x0)<CGAL.EPSILON && Math.abs(this.y0 - other.y1)<CGAL.EPSILON && Math.abs(this.y1 - other.y0)<CGAL.EPSILON) {
 			return true;
 		}
 		return false;

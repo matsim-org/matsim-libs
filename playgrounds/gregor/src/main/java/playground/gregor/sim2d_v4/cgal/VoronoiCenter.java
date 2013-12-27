@@ -20,6 +20,7 @@
 
 package playground.gregor.sim2d_v4.cgal;
 
+//TODO make VOronoiCenter generic?? [GL, Nov.'13]
 public interface VoronoiCenter extends TwoDObject{
 	
 	public void setVoronoiCell(VoronoiCell cell);

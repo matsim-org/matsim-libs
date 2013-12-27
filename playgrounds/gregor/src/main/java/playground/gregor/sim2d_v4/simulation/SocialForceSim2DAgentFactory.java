@@ -26,10 +26,12 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.SocialForce2005VelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.SocialForceVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.KDTreeNeighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.NearestPointAtTargetLine;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.PathAndDrivingDirection;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.VDNeighbors;
 
 public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
@@ -54,10 +56,13 @@ public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
 		} else {
 
 			KDTreeNeighbors nn = new KDTreeNeighbors(agent, this.conf);
-			nn.setRangeAndMaxNrOfNeighbors(8, 5);			
-			SocialForceVelocityUpdater vu = new SocialForceVelocityUpdater(new NearestPointAtTargetLine(agent, ls), nn, this.conf, agent);
+			nn.setRangeAndMaxNrOfNeighbors(20, 32);			
+//			SocialForceVelocityUpdater vu = new SocialForceVelocityUpdater(new NearestPoixxxntAtTargetLine(agent, ls), nn, this.conf, agent);
+//			SocialForceVelocityUpdater vu = new SocialForceVelocityUpdater(new PathAndDrivingDirection(agent, ls), nn, this.conf, agent);
+			SocialForce2005VelocityUpdater vu = new SocialForce2005VelocityUpdater(new PathAndDrivingDirection(agent, ls), nn, this.conf, agent);
 			agent.setVelocityUpdater(vu);
 		}
+		
 		
 		return agent;
 	}

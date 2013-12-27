@@ -61,21 +61,22 @@ public class EventsBasedVisDebugger extends PApplet {
 	//	ZoomPan zoomer;
 	private final TileMap tileMap;
 
-	private KeyControl keyControl;
+	private Control keyControl;
 
 	double time;	
 	
 	int dummy = 0;
 	
-//	private final FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/", "png", 5);
-	private final FrameSaver fs = null;
+	private final FrameSaver fs;
+//	private final FrameSaver fs = null;
 	private String it;
-	public EventsBasedVisDebugger(Scenario sc) {
-
+	public EventsBasedVisDebugger(Scenario sc,FrameSaver fs) {
+		this.fs = fs;
 		computeOffsets(sc);
 		this.fr = new JFrame();
 //				this.fr.setSize(1024,788);
 		this.fr.setSize(1280,740);
+//		this.fr.setSize(720,740);
 		JPanel compositePanel = new JPanel();
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
 
@@ -125,6 +126,7 @@ public class EventsBasedVisDebugger extends PApplet {
 	public void setup() {
 //				size(1024,768);
 		size(1280,720);
+//		size(720,720);
 		background(0);
 
 	}
@@ -172,9 +174,6 @@ public class EventsBasedVisDebugger extends PApplet {
 
 		synchronized (this.additionalDrawers) {
 			for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
-				if (d instanceof VoronoiDiagramDrawer) {
-					continue;
-				}
 				d.draw(this);
 			}
 		}
@@ -228,19 +227,6 @@ public class EventsBasedVisDebugger extends PApplet {
 			}
 		}
 
-		synchronized (this.additionalDrawers) {
-			for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
-				if (d instanceof VoronoiDiagramDrawer) {
-					
-					d.draw(this);
-				}
-			}
-		}
-
-		//		System.out.println(this.zoomer.getDispToCoord(new PVector(this.width/2, this.height/2)));
-		//		popMatrix();
-		//draw non transformable stuff here ...
-		//		popMatrix();
 
 		popMatrix();
 		if (recording) {
@@ -358,7 +344,8 @@ public class EventsBasedVisDebugger extends PApplet {
 			fill(255,0);
 		}
 		//		stroke(c.r,c.g,c.b,c.a);
-		stroke(0,0,0,128);;
+//		stroke(0,0,0,128);;
+		stroke(0,(float) (255*this.zoomer.getZoomScale()/100)+32);
 		ellipseMode(RADIUS);
 		ellipse(c.x,c.y,c.rr,c.rr);
 	}
@@ -375,6 +362,7 @@ public class EventsBasedVisDebugger extends PApplet {
 //		stroke(p.r,p.g,p.b,p.a);
 //		strokeWeight(.5f);
 		stroke(0);
+//		stroke(0,0);
 		beginShape();
 		for (int i = 0; i < p.x.length; i++) {
 			vertex(p.x[i],p.y[i]);
@@ -407,7 +395,11 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 		
 		stroke(0,255);
-		fill(r.r,r.g,r.b,r.a);
+		if (r.fill){
+			fill(r.r,r.g,r.b,r.a);
+		} else {
+			fill(0,0);
+		}
 		rect(r.tx,r.ty,r.sx,r.sy);
 	}
 	
@@ -608,7 +600,7 @@ public class EventsBasedVisDebugger extends PApplet {
 
 
 	/*package*/ void update(double time) {
-		if (this.fs != null) {
+		if (this.fs != null && this.fs.incrSkipped()) {
 			this.fs.await();
 		}
 		this.time = time;
@@ -683,8 +675,9 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 	}
 
-	public void addKeyControl(KeyControl keyControl) {
+	public void addKeyControl(Control keyControl) {
 		this.addKeyListener(keyControl);
+		this.addMouseWheelListener(keyControl);
 		this.keyControl = keyControl;
 	}
 

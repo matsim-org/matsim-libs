@@ -158,7 +158,7 @@ public class ScenarioGenerator {
 
 
 		QSimConfigGroup qsim = sc.getConfig().qsim();
-		qsim.setEndTime(4*3600);
+		qsim.setEndTime(41*60);
 		//		qsim.setMainModes(Arrays.asList(new String[]{"walk"}));
 		//		Collection<String> modes =  qsim.getMainMode();
 		//		modes.add("walk");
@@ -174,8 +174,8 @@ public class ScenarioGenerator {
 		new NetworkWriter(sc.getNetwork()).write(c.network().getInputFile());
 
 		createPopulation(sc);
-		createPopulation2(sc);
-		createPopulationIV(sc);
+//		createPopulation2(sc);
+//		createPopulationIV(sc);
 		//		createPopulationV(sc);
 
 		Population pop = sc.getPopulation();
@@ -290,7 +290,7 @@ public class ScenarioGenerator {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(new IdImpl("d"+i));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;

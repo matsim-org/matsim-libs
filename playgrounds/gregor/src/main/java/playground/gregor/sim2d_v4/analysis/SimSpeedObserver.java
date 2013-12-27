@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.events.debug;
+package playground.gregor.sim2d_v4.analysis;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,7 +43,7 @@ public class SimSpeedObserver implements LinkEnterEventHandler {
 			return;
 		}
 			try {
-				BufferedWriter bf = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/gct_TRB/small_single/runtime.txt")));
+				BufferedWriter bf = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/gct_TRB/small_single/runtime2.txt")));
 				for (Tuple<Double, Long> t : this.times) {
 					bf.append(t.getFirst() + " " + t.getSecond()+"\n");
 				}

@@ -30,7 +30,6 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
-import playground.gregor.sim2d_v4.events.debug.ForceReDrawEvent;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
@@ -157,10 +156,10 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 		this.transitionBufferSize = transitionBufferSize;
 
 
-		//debug
-		for (LineSegment s : this.bounds) {
-			this.penv.getEventsManager().processEvent(new LineEvent(0, s, true,255,0,0,255,0));
-		}
+//		//debug
+//		for (LineSegment s : this.bounds) {
+//			this.penv.getEventsManager().processEvent(new LineEvent(0, s, true,255,0,0,255,0));
+//		}
 	}
 
 	@Override
@@ -220,14 +219,43 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 			}
 			updateAgent(agent, time);
 		}
+		
+		debug();
 
 	}
 
 
 
+	private void debug() {
+		if (this.agents.size() < 2) {
+			return;
+		}
+		double [] x;
+		double [] y;
+		x = new double[this.agents.size()];
+		y = new double[this.agents.size()];
+
+
+		int i = 0;
+		for (; i < this.agents.size(); i++) {
+			x[i] = this.agents.get(i).getPos()[0];
+			y[i] = this.agents.get(i).getPos()[1];
+		}
+		Voronoi v = new Voronoi(.001);//TODO
+
+		LinkedList<GraphEdge> vd = (LinkedList<GraphEdge>) v.generateVoronoi(x, y, this.minX, this.maxX, this.minY, this.maxY);//TODO
+		if (vd.size() == 0) { //no space left
+			//				System.out.println("full");
+			return;
+		}
+		debug(vd);
+		
+	}
+
 	private void handleTransitionBuffer() {
 		Iterator<Sim2DAgent> it = this.transitionBuffer.iterator();
 		//		debug(time);
+		
 		while (it.hasNext()) {
 			this.currrentDMin = Double.POSITIVE_INFINITY;
 			Sim2DAgent a = it.next();
@@ -252,7 +280,6 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 			Voronoi v = new Voronoi(.6);//TODO
 
 			LinkedList<GraphEdge> vd = (LinkedList<GraphEdge>) v.generateVoronoi(x, y, this.minX, this.maxX, this.minY, this.maxY);//TODO
-
 			if (vd.size() == 0) { //no space left
 				//				System.out.println("full");
 				return;
@@ -449,10 +476,11 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 					break;
 				}
 			}
-			//			debug(vd, x, y, time);
+//						debug(vd);
 			//			System.out.println();
 		}
 
+		
 
 
 	}
@@ -500,7 +528,10 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 		return 0;
 	}
 
-	private void debug(LinkedList<GraphEdge> vd, double time) {
+	private void debug(LinkedList<GraphEdge> vd) {
+		if (vd == null) {
+			return;
+		}
 		////		for (Sim2DAgent a : this.agents) {
 		////			a.reDrawAgent(time);
 		////		}
@@ -532,7 +563,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 			s.x1 = ge.x2;
 			s.y0 = ge.y1;
 			s.y1 = ge.y2;
-						this.penv.getEventsManager().processEvent(new LineEvent(0, s, false,0,0,0,255,0,.05,.05));
+			this.penv.getEventsManager().processEvent(new LineEvent(0, s, false,255,255,255,255,50,.05,.05));
 		}
 
 		//		this.penv.getEventsManager().processEvent(new RectEvent(0,this.x1,this.y3-5,5,5,true));
@@ -550,22 +581,22 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 		//			this.penv.getEventsManager().processEvent(new LineEvent(0, s, false,0,0,0,255,0,.05,.05));
 		//		}
 
-		for (Sim2DAgent a : this.agents) {
-			a.reDrawAgent(time);
-		}
+//		for (Sim2DAgent a : this.agents) {
+//			a.reDrawAgent(time);
+//		}
+//
+//		for (LineSegment o : getOpenings()) {
+//			PhysicalSim2DSection n = getNeighbor(o);
+//			if (n == null) {
+//				continue;
+//			}
+//			for (Sim2DAgent a : n.agents) {
+//				a.reDrawAgent(time);
+//			} 
+//		}
 
-		for (LineSegment o : getOpenings()) {
-			PhysicalSim2DSection n = getNeighbor(o);
-			if (n == null) {
-				continue;
-			}
-			for (Sim2DAgent a : n.agents) {
-				a.reDrawAgent(time);
-			} 
-		}
-
-		this.penv.getEventsManager().processEvent(new ForceReDrawEvent(time));
-		System.out.println("done.");
+//		this.penv.getEventsManager().processEvent(new ForceReDrawEvent(time));
+//		System.out.println("done.");
 
 	}
 

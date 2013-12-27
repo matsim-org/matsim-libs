@@ -39,7 +39,7 @@ public class Sim2DAgent implements VoronoiCenter {
 	
 	//testing only
 	@Deprecated
-	private final double vCoeff = 1+Math.min(Math.max(-0.25, MatsimRandom.getRandom().nextGaussian()*.1),.25);
+	private final double vCoeff = 1;//1+Math.min(Math.max(-0.25, MatsimRandom.getRandom().nextGaussian()*.1),.25);
 	
 //	private final double vStd
 	
@@ -54,7 +54,7 @@ public class Sim2DAgent implements VoronoiCenter {
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
 
-	private final double r = .19;//MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius//.25; //0.19; //MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius
+	private final double r;
 	
 	private final double height = 1.72 + MatsimRandom.getRandom().nextGaussian()*0.1; //TODO find a meaningful value here [gl April '13]
 	
@@ -81,6 +81,7 @@ public class Sim2DAgent implements VoronoiCenter {
 	private final Id id;
 	
 	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
+		this.r = MatsimRandom.getRandom().nextDouble()*.1 + 0.25;//.25;//.19;//MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius//.25; //0.19; //MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius
 		this.pos[0] = spawnX;
 		this.pos[1] = spawnY;
 		this.veh = veh;
@@ -90,6 +91,22 @@ public class Sim2DAgent implements VoronoiCenter {
 		this.ls = ls;
 		this.pEnv = pEnv;
 		this.vu = new SimpleVelocityUpdater(this, ls, sc);
+	}
+
+	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX,
+			double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv,
+			double radius) {
+		this.pos[0] = spawnX;
+		this.pos[1] = spawnY;
+		this.r = radius;
+		this.veh = veh;
+		this.driver = veh.getDriver();
+		this.id = this.driver.getId();
+		this.sc = sc;
+		this.ls = ls;
+		this.pEnv = pEnv;
+		this.vu = new SimpleVelocityUpdater(this, ls, sc);
+		
 	}
 
 	public void setVelocityUpdater(VelocityUpdater vu) {
@@ -139,7 +156,8 @@ public class Sim2DAgent implements VoronoiCenter {
 		this.pos[0] += dx;
 		this.pos[1] += dy;
 		if (this.emitPosEvents) {
-			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time);
+//			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time,this);
+			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1],time);
 			this.pEnv.getEventsManager().processEvent(e);
 		}
 		return true;
@@ -237,7 +255,7 @@ public class Sim2DAgent implements VoronoiCenter {
 	
 	@Override
 	public String toString() {
-		return "id: " + this.driver.getId() + " sec:" + this.currentPSec.getId() + " link:" + this.getCurrentLinkId() + " pos:" + this.pos[0] + ":" + this.pos[1] ;
+		return "id: " + this.driver.getId() + " sec:" + this.currentPSec.getId() + " link:" + this.getCurrentLinkId() + " pos:" + ((int)(this.pos[0]*100+.5))/100. + ":" + ((int)(this.pos[1]*100+.5))/100. ;
 	}
 	
 	//DEBUG

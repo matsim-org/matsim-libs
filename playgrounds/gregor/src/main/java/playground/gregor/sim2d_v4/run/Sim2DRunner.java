@@ -29,17 +29,19 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimInfoBoxDrawer;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.VoronoiDiagramDrawer;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.VoronoiFNDDrawer;
+import playground.gregor.sim2d_v4.experimental.VDTester;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class Sim2DRunner implements IterationStartsListener{
 
@@ -62,9 +64,9 @@ public class Sim2DRunner implements IterationStartsListener{
 //		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
 		sim2dsc.connect(sc);
 		
-
-//		c.qsim().setEndTime(30*3600);
-		c.qsim().setEndTime(5*60);
+		c.qsim().setEndTime(120);
+//		c.qsim().setEndTime(23*3600);
+//		c.qsim().setEndTime(41*60);//+30*60);
 
 
 		//offsets needed to convert to doubles later in program
@@ -84,11 +86,40 @@ public class Sim2DRunner implements IterationStartsListener{
 
 		controller.setOverwriteFiles(true);
 		
+//		controller.getEvents().addHandler(new SimSpeedObserver());
 
 		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
 		controller.addMobsimFactory("hybridQ2D", factory);
 
+		
+//		ShapeFileReader sr = new ShapeFileReader();
+//		sr.readFileAndInitialize("/Users/laemmel/devel/gct/analysis/measurement_areas.shp");
+//		
+//		for (SimpleFeature a : sr.getFeatureSet()) {
+//			FlowAreaAnalysis fa = new FlowAreaAnalysis((Geometry)a.getDefaultGeometry(), "/Users/laemmel/devel/gct_TRB/small_single/fnd"+a.getID(),controller.getEvents());
+//			controller.getEvents().addHandler(fa);
+//		}
+//		CrossSectionFlowAnalysis cr = new CrossSectionFlowAnalysis(new IdImpl("sim2d_0_rev_-3499"), new IdImpl("sim2d_0_-3499"), "/Users/laemmel/devel/gct_TRB/small_single/flow", 5);
+//		controller.getEvents().addHandler(cr);
+		
+		
+//		FlowAnalysis fa1 = new FlowAnalysis(new Envelope(-8235101, -8235088, 4948062,4948069),"/Users/laemmel/devel/gct_TRB/small_single/fnd01.txt");
+//		FlowAnalysis fa2 = new FlowAnalysis(new Envelope(-8235077.88, -8235076.36, 4948033.56,4948034.37),"/Users/laemmel/devel/gct_TRB/small_single/fnd02.txt");
+//		FlowAnalysis fa3 = new FlowAnalysis(new Envelope(-8235139, -8235136, 4947984,4947985),"/Users/laemmel/devel/gct_TRB/small_single/fnd03.txt");
+//		
+//		
+//		
+//		controller.getEvents().addHandler(fa1);
+//		controller.getEvents().addHandler(fa2);
+//		controller.getEvents().addHandler(fa3);
 		if (args[2].equals("true")) {
+			
+//			VDPath vdp = new VDPath(controller.getEvents());
+//			controller.getEvents().addHandler(vdp);
+			
+//			QuadTreePath qdp = new QuadTreePath(controller.getEvents());
+//			controller.getEvents().addHandler(qdp);
+			
 //			Sim2DRunner runner = new Sim2DRunner();
 //			runner.test = new EventBasedVisDebuggerEngine(sc);
 //
@@ -109,19 +140,22 @@ public class Sim2DRunner implements IterationStartsListener{
 //			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 3);
 //			runner.visDebugger.setFrameSaver(fs);
 			
+			
 			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
 			InfoBox iBox = new InfoBox(dbg,sc);
 //			SeeCasino iCasion = new SeeCasino();
 //			LinkFNDDrawer fnd = new LinkFNDDrawer(sc);
-			VoronoiDiagramDrawer v = new VoronoiDiagramDrawer();
-			VoronoiFNDDrawer vFND = new VoronoiFNDDrawer(0);
-			VoronoiFNDDrawer vFND1 = new VoronoiFNDDrawer(10);
+//			VoronoiDiagramDrawer v = new VoronoiDiagramDrawer();
+//			VoronoiFNDDrawer vFND = new VoronoiFNDDrawer(new Envelope(-3,3,-197.5,-192.5));
+//			VoronoiFNDDrawer vFND1 = new VoronoiFNDDrawer(10);
 			dbg.addAdditionalDrawer(iBox);
-//			dbg.addAdditionalDrawer(new Branding());
+			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 			QSimInfoBoxDrawer qDbg2 = new QSimInfoBoxDrawer(sc);
+			
 			dbg.addAdditionalDrawer(qDbg);
 			dbg.addAdditionalDrawer(qDbg2);
+			
 //			dbg.addAdditionalDrawer(vFND);
 //			dbg.addAdditionalDrawer(vFND1);
 //			dbg.addAdditionalDrawer(fnd);;
@@ -131,6 +165,9 @@ public class Sim2DRunner implements IterationStartsListener{
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
 			controller.getEvents().addHandler(qDbg2);
+//			VDTester vdt = new VDTester(new Envelope(-2.5,2.5,-50,-40),controller.getEvents());
+//			controller.getEvents().addHandler(vdt);
+//			controller.addControlerListener(vdt);
 //			controller.getEvents().addHandler(vFND);
 //			controller.getEvents().addHandler(vFND1);
 //			controller.getEvents().addHandler(fnd);
@@ -138,6 +175,11 @@ public class Sim2DRunner implements IterationStartsListener{
 //			controller.getEvents().addHandler(v);
 			
 		}
+		
+		VDTester vdt = new VDTester(new Envelope(-2.5,2.5,-27.5,-22.5),controller.getEvents());
+//		VDTester vdt = new VDTester(new Envelope(19,21,-1,1),controller.getEvents());
+		controller.getEvents().addHandler(vdt);
+		controller.addControlerListener(vdt);
 
 		
 //		controller.setCreateGraphs(false);

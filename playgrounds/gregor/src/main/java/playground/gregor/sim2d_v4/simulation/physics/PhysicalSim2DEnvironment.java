@@ -21,6 +21,7 @@
 package playground.gregor.sim2d_v4.simulation.physics;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,13 +36,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.VoronoiDiagramCells;
-import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
@@ -53,7 +55,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class PhysicalSim2DEnvironment {
+public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 
 	private static final Logger log = Logger.getLogger(PhysicalSim2DEnvironment.class);
 
@@ -81,7 +83,7 @@ public class PhysicalSim2DEnvironment {
 	
 	//EXPERIMENTAL multi threading stuff
 	private final Poison poison = new Poison();
-	private final int numOfThreads = 3; 
+	private final int numOfThreads = 4; 
 	private final CyclicBarrier kdSync = new CyclicBarrier(this.numOfThreads);
 	private final CyclicBarrier cb = new CyclicBarrier(this.numOfThreads+1);
 	private final List<PhysicalSim2DSectionUpdaterThread> threads = new ArrayList<PhysicalSim2DEnvironment.PhysicalSim2DSectionUpdaterThread>();
@@ -101,10 +103,11 @@ public class PhysicalSim2DEnvironment {
 		this.sim2dsc = sim2dsc;
 		this.eventsManager = eventsManager;
 		if (Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
-			this.vd = new VoronoiDiagramCells<Sim2DAgent>(env.getEnvelope());
+			this.vd = new VoronoiDiagramCells<Sim2DAgent>(env.getEnvelope(),eventsManager);
 		}
 		init();
 	}
+	
 
 	private void init() {
 		for (int i = 0; i < this.numOfThreads; i++) {
@@ -134,7 +137,11 @@ public class PhysicalSim2DEnvironment {
 	public PhysicalSim2DSection getPhysicalSim2DSectionAssociatedWithLinkId(Id id) {
 		return this.linkIdPsecsMapping.get(id);
 	}
-
+	
+	public Collection<PhysicalSim2DSection> getPhysicalSim2DSections(){
+		return this.psecs.values();
+	}
+	
 	public void doSimStep(double time) {
 		//EXPERIMENTAL [GL Oct'13]
 		if (Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
@@ -211,6 +218,7 @@ public class PhysicalSim2DEnvironment {
 		}
 
 		if (opening == null) {
+			double width = 8;
 			double x0 = hiResLink.getLink().getToNode().getCoord().getX();
 			double y0 = hiResLink.getLink().getToNode().getCoord().getY();
 			double dx = x0 -cx;
@@ -219,10 +227,10 @@ public class PhysicalSim2DEnvironment {
 			dx /= length;
 			dy /= length;
 			opening = new LineSegment();
-			opening.x0 = (cx+x0)/2 + dy*DEP_BOX_WIDTH/2; //should be capacity dependent [GL July '13]
-			opening.y0 = (cy+y0)/2 - dx*DEP_BOX_WIDTH/2;
-			opening.x1 = (cx+x0)/2 - dy*DEP_BOX_WIDTH/2;
-			opening.y1 = (cy+y0)/2 + dx*DEP_BOX_WIDTH/2;
+			opening.x0 = (cx+x0)/2 + dy*width/2; //should be capacity dependent [GL July '13]
+			opening.y0 = (cy+y0)/2 - dx*width/2;
+			opening.x1 = (cx+x0)/2 - dy*width/2;
+			opening.y1 = (cy+y0)/2 + dx*width/2;
 			opening.dx = +dy;
 			opening.dy = -dx;
 		}
@@ -274,10 +282,10 @@ public class PhysicalSim2DEnvironment {
 		psec.putNeighbor(opening, ta);
 		hiResLink.createDepartureBox(ta,spawnX,spawnY);
 
-		//DEBUG
-		for ( LineSegment bo : ta.getObstacles()) {
-			this.eventsManager.processEvent(new LineEvent(0,bo,true,0,0,0,255,0));
-		}
+//		//DEBUG
+//		for ( LineSegment bo : ta.getObstacles()) {
+//			this.eventsManager.processEvent(new LineEvent(0,bo,true,0,0,0,255,0));0
+//		}
 		//		} else {
 		//			TransitionArea ta = new TransitionArea(s,this.sim2dsc,this,(int) flowCap+1);
 		//			this.psecs.put(s.getId(),ta);
@@ -340,7 +348,9 @@ public class PhysicalSim2DEnvironment {
 					} catch (BrokenBarrierException e) {
 						e.printStackTrace();
 					}
-				} else {
+				} else if (sec instanceof Kill){
+					break;
+				}else {
 					sec.prepare();
 					secs.add(sec);
 				}
@@ -375,4 +385,21 @@ public class PhysicalSim2DEnvironment {
 //		}
 		
 	}
+	private static class Kill extends PhysicalSim2DSection {
+
+//		public Poison(Section sec, Sim2DScenario sim2dsc,
+//				PhysicalSim2DEnvironment penv) {
+//			super(sec, sim2dsc, penv);
+//		}
+		
+	}
+
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+		for (PhysicalSim2DSectionUpdaterThread t : this.threads) {
+			t.offer(new Kill());
+		}
+	}
+
 }

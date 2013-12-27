@@ -30,7 +30,7 @@ public class FrameSaver {
 	private final CyclicBarrier barrier = new CyclicBarrier(2);
 	private final String path;
 	private final String extension;
-	private final int frameSkip;
+	private int frameSkip;
 	private int skiped;
 
 	public FrameSaver(String path, String extension, int frameSkip) {
@@ -40,7 +40,7 @@ public class FrameSaver {
 		this.skiped = frameSkip;
 	}
 	
-//	public boolean skipNext() {
+//	public boolean wouldskipNext() {
 //		if (this.skiped == this.frameSkip) {
 //			return true;
 //		}
@@ -48,12 +48,13 @@ public class FrameSaver {
 //		return false;
 //	}
 	
+	
+	
 	public void saveFrame(PApplet p, String identifier) {
-		if (this.skiped != this.frameSkip) {
-			this.skiped++;
-			this.await();
+		if (this.skiped < this.frameSkip) {
 			return;
 		}
+//		this.await();
 		this.skiped = 0;
 		StringBuffer bf = new StringBuffer();
 		bf.append(this.path);
@@ -65,6 +66,13 @@ public class FrameSaver {
 		this.await();
 	}
 	
+	public boolean incrSkipped() {
+		this.skiped++;
+		return this.skiped >= this.frameSkip;
+	}
+
+	
+	
 	public void await() {
 		try {
 			this.barrier.await();
@@ -74,5 +82,11 @@ public class FrameSaver {
 			e.printStackTrace();
 		}
 	}
+	
+	public void setSkip(int round) {
+		this.frameSkip = round;
+		
+	}
+	
 
 }
