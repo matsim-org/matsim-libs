@@ -17,22 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package playground.michalm.taxi.run;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
+
+import playground.michalm.taxi.TaxiData;
+import playground.michalm.taxi.file.TaxiRankReader;
 
 
-public interface TaxiTask
-    extends Task
+public class TaxiLauncherUtils
 {
-    static enum TaxiTaskType
+    public static TaxiData initTaxiData(Scenario scenario, MatsimVrpGraph graph,
+            String ranksFileName, EnergyConsumptionModel ecm)
     {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
-
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
+        TaxiData taxiData = new TaxiData();
+        taxiData.setVrpGraph(graph);
+        new TaxiRankReader(scenario, taxiData, ecm).readFile(ranksFileName);
+        return taxiData;
     }
-
-
-    TaxiTaskType getTaxiTaskType();
 }

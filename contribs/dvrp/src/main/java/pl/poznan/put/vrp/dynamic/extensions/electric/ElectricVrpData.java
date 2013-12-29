@@ -17,22 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import java.util.List;
+
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 
 
-public interface TaxiTask
-    extends Task
+public interface ElectricVrpData
+    extends VrpData
 {
-    static enum TaxiTaskType
-    {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
-
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
-    }
+    List<Charger> getChargers();
 
 
-    TaxiTaskType getTaxiTaskType();
+    void addCharger(Charger charger);
 }

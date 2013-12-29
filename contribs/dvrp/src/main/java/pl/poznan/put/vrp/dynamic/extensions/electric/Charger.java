@@ -17,22 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import pl.poznan.put.vrp.dynamic.data.model.Localizable;
+import pl.poznan.put.vrp.dynamic.data.schedule.StayTask;
 
 
-public interface TaxiTask
-    extends Task
+public interface Charger
+    extends Localizable
 {
-    static enum TaxiTaskType
-    {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
-
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
-    }
+    int getId();
 
 
-    TaxiTaskType getTaxiTaskType();
+    String getName();
+
+
+    double getPowerInWatts();
+
+
+    ChargingSchedule<? extends StayTask> getSchedule();
 }

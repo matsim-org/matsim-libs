@@ -19,20 +19,30 @@
 
 package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 
 
-public interface TaxiTask
-    extends Task
+public class TaxiChargeStayTask
+    extends StayTaskImpl
+    implements TaxiTask
 {
-    static enum TaxiTaskType
+    public TaxiChargeStayTask(int beginTime, int endTime, Vertex vertex)
     {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
-
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
+        super(beginTime, endTime, vertex);
     }
 
 
-    TaxiTaskType getTaxiTaskType();
+    @Override
+    public TaxiTaskType getTaxiTaskType()
+    {
+        return TaxiTaskType.CHARGE_STAY;
+    }
+
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+    }
 }

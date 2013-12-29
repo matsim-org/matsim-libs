@@ -17,22 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
-
-
-public interface TaxiTask
-    extends Task
+public class BatteryImpl
+    implements Battery
 {
-    static enum TaxiTaskType
-    {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
+    private double chargeInJoules;
 
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
+    private final double capacityInJoules;
+
+
+    public BatteryImpl(double chargeInJoules, double capacityInJoules)
+    {
+        this.chargeInJoules = chargeInJoules;
+        this.capacityInJoules = capacityInJoules;
     }
 
 
-    TaxiTaskType getTaxiTaskType();
+    @Override
+    public double getChargeInJoules()
+    {
+        return chargeInJoules;
+    }
+
+
+    @Override
+    public double getCapacityInJoules()
+    {
+        return capacityInJoules;
+    }
+
+
+    @Override
+    public void setChargeInJoules(double chargeInJoules)
+    {
+        this.chargeInJoules = chargeInJoules;
+    }
 }

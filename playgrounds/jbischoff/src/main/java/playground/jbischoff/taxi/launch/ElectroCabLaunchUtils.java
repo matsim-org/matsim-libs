@@ -34,10 +34,10 @@ import org.matsim.core.mobsim.qsim.QSim;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
-import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
+import playground.michalm.taxi.model.*;
 
 
 /**
@@ -70,8 +70,6 @@ public class ElectroCabLaunchUtils
 
         EventHandlerGroup handlerGroup = new EventHandlerGroup();
 
-        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
-
         HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> elvehicles = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
 
         travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
@@ -80,7 +78,7 @@ public class ElectroCabLaunchUtils
 
             for (Vehicle v : data.getVrpData().getVehicles()) {
                 Id aid = new IdImpl(v.getName());
-                elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm, 20 * 1000 * 3600));
+                elvehicles.put(aid, ((VrpAgentElectricTaxi)v).getElectricVehicle());
                 travelDistanceEvaluator.addAgent(aid);
             }
         }

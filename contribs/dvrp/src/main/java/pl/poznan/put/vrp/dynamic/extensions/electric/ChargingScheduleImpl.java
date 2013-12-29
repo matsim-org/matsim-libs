@@ -17,22 +17,66 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import java.util.*;
 
 
-public interface TaxiTask
-    extends Task
+
+public class ChargingScheduleImpl<T extends ChargeTask>
+    implements ChargingSchedule<T>
 {
-    static enum TaxiTaskType
-    {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
+    private final Charger chargingStation;
 
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
+    private final List<T> tasks;
+    private final List<T> unmodifiableTasks;
+
+    private T currentTask;
+
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public ChargingScheduleImpl(Charger chargingStation)
+    {
+        this.chargingStation = chargingStation;
+
+        tasks = new ArrayList<T>();
+        unmodifiableTasks = (List)Collections.unmodifiableList(tasks);
+
+        currentTask = null;
     }
 
 
-    TaxiTaskType getTaxiTaskType();
+    @Override
+    public Charger getCharger()
+    {
+        return chargingStation;
+    }
+
+
+    @Override
+    public List<T> getTasks()
+    {
+        return unmodifiableTasks;
+    }
+
+
+    @Override
+    public void addTask(T task)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public void removeTask(T task)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public T getCurrentTask()
+    {
+        return currentTask;
+    }
 }

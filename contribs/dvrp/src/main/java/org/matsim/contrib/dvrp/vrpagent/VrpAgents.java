@@ -17,22 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package org.matsim.contrib.dvrp.vrpagent;
+
+import org.matsim.contrib.dynagent.DynAgent;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.Task;
 
-
-public interface TaxiTask
-    extends Task
+public class VrpAgents
 {
-    static enum TaxiTaskType
+    public static DynAgent getAgent(Task task)
     {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
-
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
+        VrpAgentVehicle vehicle = (VrpAgentVehicle)task.getSchedule().getVehicle();
+        return vehicle.getAgentLogic().getDynAgent();
     }
-
-
-    TaxiTaskType getTaxiTaskType();
 }

@@ -33,7 +33,7 @@ public interface Vehicle
     String getName();
 
 
-    Depot getDepot();
+    Depot getDepot();// TODO or just Localizable getStartLocation()?? and getEndLocation()??
 
 
     int getCapacity();
@@ -51,7 +51,4 @@ public interface Vehicle
 
 
     Schedule<? extends Task> getSchedule();
-
-
-    void resetSchedule();
 }

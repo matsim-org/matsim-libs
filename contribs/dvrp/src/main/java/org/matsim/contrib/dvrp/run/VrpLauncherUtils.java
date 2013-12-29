@@ -48,7 +48,7 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.*;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
+import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
@@ -201,7 +201,7 @@ public class VrpLauncherUtils
 
     public static VrpData initVrpData(Scenario scenario, MatsimVrpGraph graph, String depotsFileName)
     {
-        VrpData vrpData = new VrpData();
+        VrpData vrpData = new VrpDataImpl();
         vrpData.setVrpGraph(graph);
         new DepotReader(scenario, vrpData).readFile(depotsFileName);
         return vrpData;

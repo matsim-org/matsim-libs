@@ -29,6 +29,8 @@ import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.*;
@@ -40,8 +42,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Request;
 import playground.michalm.RunningVehicleRegister;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
@@ -58,7 +58,7 @@ import playground.michalm.util.gis.Schedules2GIS;
     /*package*/final String netFileName;
     /*package*/final String plansFileName;
     /*package*/final String taxiCustomersFileName;
-    /*package*/final String depotsFileName;
+    /*package*/final String ranksFileName;
 
     /*package*/final boolean vrpOutFiles;
     /*package*/final String vrpOutDirName;
@@ -98,7 +98,7 @@ import playground.michalm.util.gis.Schedules2GIS;
         taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
-        depotsFileName = dirName + "depots-5_taxis-50.xml";
+        ranksFileName = dirName + "depots-5_taxis-50.xml";
         // depotsFileName = dirName + "depots-5_taxis-150.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
@@ -172,7 +172,7 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         taxiCustomersFileName = dirName + params.get("taxiCustomersFileName");
 
-        depotsFileName = dirName + params.get("depotsFileName");
+        ranksFileName = dirName + params.get("depotsFileName");
 
         eventsFileName = dirName + params.get("eventsFileName");
 
@@ -214,11 +214,13 @@ import playground.michalm.util.gis.Schedules2GIS;
         MatsimVrpGraph graph = VrpLauncherUtils.initMatsimVrpGraph(scenario,
                 algorithmConfig.ttimeSource, travelTime, travelDisutility);
 
-        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, graph, depotsFileName);
+        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-        data = new MatsimVrpData(vrpData, scenario);
+        TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, graph, ranksFileName, ecm);
 
-        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(vrpData,
+        data = new MatsimVrpData(taxiData, scenario);
+
+        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiData,
                 destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
@@ -229,7 +231,7 @@ import playground.michalm.util.gis.Schedules2GIS;
                 vrpSimEngine), onlineVehicleTracker);
 
         VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new TaxiRequestCreator(
-                vrpData), TaxiRequestCreator.MODE);
+                taxiData), TaxiRequestCreator.MODE);
 
         EventsManager events = qSim.getEventsManager();
 
@@ -274,9 +276,8 @@ import playground.michalm.util.gis.Schedules2GIS;
         }
 
         // check if all reqs have been served
-        for (Request r : data.getVrpData().getRequests()) {
-            TaxiRequest tr = (TaxiRequest)r;
-            if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
+        for (TaxiRequest r : taxiData.getTaxiRequests()) {
+            if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
                 throw new IllegalStateException();
             }
         }

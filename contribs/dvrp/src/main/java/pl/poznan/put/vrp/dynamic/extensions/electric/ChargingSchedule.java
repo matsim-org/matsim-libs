@@ -17,22 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import java.util.List;
 
 
-public interface TaxiTask
-    extends Task
+public interface ChargingSchedule<T extends ChargeTask>
 {
-    static enum TaxiTaskType
-    {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
-
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
-    }
+    Charger getCharger();
 
 
-    TaxiTaskType getTaxiTaskType();
+    //tasks are time-ordered
+    List<T> getTasks();// unmodifiableList
+
+
+    //may fail if there the task overlaps with at least one of the already scheduled ones
+    void addTask(T task);
+
+
+    void removeTask(T task);
+
+
+    /**
+     * @return null if no vehicle is being charged now
+     */
+    T getCurrentTask();
 }

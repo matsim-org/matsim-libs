@@ -41,8 +41,8 @@ public class TaxiRequest
         STARTED("S"), // vehicle starts serving
         PERFORMED("PE"), //
         //REJECTED("R"), // rejected by the DISPATCHER
-        //CANCELLED("C"),
-        ;// canceled by the CUSTOMER
+        //CANCELLED("C"), // canceled by the CUSTOMER
+        ;
 
         public final String shortName;
 

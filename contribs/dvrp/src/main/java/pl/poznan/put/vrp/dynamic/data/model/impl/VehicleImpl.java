@@ -40,7 +40,7 @@ public class VehicleImpl
     // max time outside the depot
     private final int timeLimit;
 
-    private Schedule<? extends AbstractTask> schedule;
+    private final Schedule<? extends AbstractTask> schedule;
 
 
     public VehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1, int timeLimit)
@@ -110,13 +110,6 @@ public class VehicleImpl
     public Schedule<? extends AbstractTask> getSchedule()
     {
         return schedule;
-    }
-
-
-    @Override
-    public void resetSchedule()
-    {
-        schedule = new ScheduleImpl<AbstractTask>(this);
     }
 
 

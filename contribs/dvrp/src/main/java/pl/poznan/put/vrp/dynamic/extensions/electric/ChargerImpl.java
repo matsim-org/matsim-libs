@@ -17,22 +17,64 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
-public interface TaxiTask
-    extends Task
+public class ChargerImpl
+    implements Charger
 {
-    static enum TaxiTaskType
-    {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
+    private final int id;
+    private final String name;
+    private final double powerInWatts;
+    private final Vertex vertex;
 
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
+    private final ChargingSchedule<? extends ChargeTask> schedule;
+
+
+    public ChargerImpl(int id, String name, double powerInWatts, Vertex vertex)
+    {
+        this.id = id;
+        this.name = name;
+        this.powerInWatts = powerInWatts;
+        this.vertex = vertex;
+
+        schedule = new ChargingScheduleImpl<ChargeTask>(this);
     }
 
 
-    TaxiTaskType getTaxiTaskType();
+    @Override
+    public int getId()
+    {
+        return id;
+    }
+
+
+    @Override
+    public String getName()
+    {
+        return name;
+    }
+
+
+    @Override
+    public double getPowerInWatts()
+    {
+        return powerInWatts;
+    }
+
+
+    @Override
+    public Vertex getVertex()
+    {
+        return vertex;
+    }
+
+
+    @Override
+    public ChargingSchedule<? extends ChargeTask> getSchedule()
+    {
+        return schedule;
+    }
 }

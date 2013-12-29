@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,41 +19,14 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dynagent.DynAgent;
-
-import pl.poznan.put.vrp.dynamic.data.model.Depot;
-import pl.poznan.put.vrp.dynamic.data.model.impl.VehicleImpl;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 
 
-public class VrpAgentVehicle
-    extends VehicleImpl
+public interface VrpAgentVehicle
+    extends Vehicle
 {
-    private VrpAgentLogic agentLogic;
+    public abstract VrpAgentLogic getAgentLogic();
 
 
-    public VrpAgentVehicle(int id, String name, Depot depot, int capacity, int t0, int t1,
-            int timeLimit)
-    {
-        super(id, name, depot, capacity, t0, t1, timeLimit);
-    }
-
-
-    public VrpAgentLogic getAgentLogic()
-    {
-        return agentLogic;
-    }
-
-
-    public void setAgentLogic(VrpAgentLogic agentLogic)
-    {
-        this.agentLogic = agentLogic;
-    }
-
-
-    public static DynAgent getAgent(Task task)
-    {
-        VrpAgentVehicle vehicle = (VrpAgentVehicle)task.getSchedule().getVehicle();
-        return vehicle.getAgentLogic().getDynAgent();
-    }
+    public abstract void setAgentLogic(VrpAgentLogic agentLogic);
 }

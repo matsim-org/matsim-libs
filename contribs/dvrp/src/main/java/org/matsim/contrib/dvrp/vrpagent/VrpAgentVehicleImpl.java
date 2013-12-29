@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package org.matsim.contrib.dvrp.vrpagent;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import pl.poznan.put.vrp.dynamic.data.model.Depot;
+import pl.poznan.put.vrp.dynamic.data.model.impl.VehicleImpl;
 
 
-public interface TaxiTask
-    extends Task
+public class VrpAgentVehicleImpl
+    extends VehicleImpl
+    implements VrpAgentVehicle
 {
-    static enum TaxiTaskType
-    {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
+    private VrpAgentLogic agentLogic;
 
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
+
+    public VrpAgentVehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1,
+            int timeLimit)
+    {
+        super(id, name, depot, capacity, t0, t1, timeLimit);
     }
 
 
-    TaxiTaskType getTaxiTaskType();
+    @Override
+    public VrpAgentLogic getAgentLogic()
+    {
+        return agentLogic;
+    }
+
+
+    @Override
+    public void setAgentLogic(VrpAgentLogic agentLogic)
+    {
+        this.agentLogic = agentLogic;
+    }
 }

@@ -1,0 +1,98 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.michalm.taxi.model;
+
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
+import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
+
+import pl.poznan.put.vrp.dynamic.data.model.Depot;
+import pl.poznan.put.vrp.dynamic.extensions.electric.*;
+
+
+public class VrpAgentElectricTaxi
+    extends VrpAgentVehicleImpl
+    implements ElectricVehicle
+{
+    private class ElectricTaxi
+        extends BatteryElectricVehicle
+    {
+        private ElectricTaxi(EnergyConsumptionModel ecm)
+        {
+            electricDriveEnergyConsumptionModel = ecm;
+        }
+
+
+        @Override
+        public void useBattery(double energyConsumptionInJoule)
+        {
+            super.useBattery(energyConsumptionInJoule);
+            battery.setChargeInJoules(socInJoules);
+        }
+
+
+        @Override
+        public void chargeBattery(double energyChargeInJoule)
+        {
+            super.chargeBattery(energyChargeInJoule);
+            battery.setChargeInJoules(socInJoules);
+        }
+
+
+        private void batteryChanged()
+        {
+            usableBatteryCapacityInJoules = battery.getCapacityInJoules();
+            socInJoules = battery.getChargeInJoules();
+        }
+    }
+
+
+    private final ElectricTaxi electricTaxi;
+    private Battery battery;
+
+
+    public VrpAgentElectricTaxi(int id, String name, Depot startingRank, int t0, int t1,
+            EnergyConsumptionModel ecm)
+    {
+        super(id, name, startingRank, 4, t0, t1, t1 - t0);
+        electricTaxi = new ElectricTaxi(ecm);
+    }
+
+
+    public BatteryElectricVehicle getElectricVehicle()
+    {
+        return electricTaxi;
+    }
+
+
+    @Override
+    public Battery getBattery()
+    {
+        return battery;
+    }
+
+
+    @Override
+    public void setBattery(Battery battery)
+    {
+        this.battery = battery;
+        electricTaxi.batteryChanged();
+    }
+}

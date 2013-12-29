@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicle;
+import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -36,7 +36,7 @@ public class PassengerHandlingUtils
     public static void pickUpPassenger(VrpSimEngine vrpSimEngine, Task task,
             PassengerRequest request, double now)
     {
-        DriverAgent driver = VrpAgentVehicle.getAgent(task);
+        DriverAgent driver = VrpAgents.getAgent(task);
         pickUpPassenger(vrpSimEngine, driver, request.getPassengerAgent(), now);
     }
 
@@ -77,7 +77,7 @@ public class PassengerHandlingUtils
     public static void dropOffPassenger(VrpSimEngine vrpSimEngine, Task task,
             PassengerRequest request, double now)
     {
-        DriverAgent driver = VrpAgentVehicle.getAgent(task);
+        DriverAgent driver = VrpAgents.getAgent(task);
         PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, driver, request.getPassengerAgent(),
                 now);
     }

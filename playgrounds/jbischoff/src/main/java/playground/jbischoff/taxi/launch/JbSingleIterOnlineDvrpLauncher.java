@@ -31,6 +31,8 @@ import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -48,6 +50,7 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.run.TaxiLauncherUtils;
 import playground.michalm.util.gis.Schedules2GIS;
 /**
  * 
@@ -166,8 +169,6 @@ import playground.michalm.util.gis.Schedules2GIS;
         
 
         
-    	ElectroCabLaunchUtils olutils = new ElectroCabLaunchUtils();
-    	
     	if (scenario == null) System.out.println("scen");
     	if (ttimeSource == null) System.out.println("ttsource");
     	if (tdisSource == null) System.out.println("tcostSource");
@@ -183,7 +184,9 @@ import playground.michalm.util.gis.Schedules2GIS;
         MatsimVrpGraph graph = VrpLauncherUtils.initMatsimVrpGraph(scenario, ttimeSource,
                 travelTime, travelDisutility);
 
-        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, graph, depotsFileName);
+        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
+
+        VrpData vrpData = TaxiLauncherUtils.initTaxiData(scenario, graph, depotsFileName, ecm);
 
         data = new MatsimVrpData(vrpData, scenario);
 
@@ -191,6 +194,8 @@ import playground.michalm.util.gis.Schedules2GIS;
         
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
 
+        ElectroCabLaunchUtils olutils = new ElectroCabLaunchUtils();
+        
         VrpSimEngine vrpSimEngine = olutils.initVrpSimEngine(qSim, data, optimizer);
 
         VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new TaxiActionCreator(vrpSimEngine), false);

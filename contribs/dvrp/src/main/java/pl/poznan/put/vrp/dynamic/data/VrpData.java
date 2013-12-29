@@ -19,123 +19,53 @@
 
 package pl.poznan.put.vrp.dynamic.data;
 
-import java.util.*;
+import java.util.List;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
 
 
-/**
- * @author michalm
- */
-public class VrpData
+public interface VrpData
+
 {
-    private final List<Depot> depots = new ArrayList<Depot>();
-    private final List<Customer> customers = new ArrayList<Customer>();
-    private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
-    private final List<Request> requests = new ArrayList<Request>();
-
-    private int time;
-
-    private VrpGraph vrpGraph;
-
-    private VrpDataParameters parameters;
+    List<Depot> getDepots();
 
 
-    public List<Depot> getDepots()
-    {
-        return depots;
-    }
+    List<Customer> getCustomers();
 
 
-    public List<Customer> getCustomers()
-    {
-        return customers;
-    }
+    List<Vehicle> getVehicles();
 
 
-    public List<Vehicle> getVehicles()
-    {
-        return vehicles;
-    }
+    List<Request> getRequests();
 
 
-    public List<Request> getRequests()
-    {
-        return requests;
-    }
+    int getTime();
 
 
-    public int getTime()
-    {
-        return time;
-    }
+    VrpGraph getVrpGraph();
 
 
-    public VrpGraph getVrpGraph()
-    {
-        return vrpGraph;
-    }
+    VrpDataParameters getParameters();
 
 
-    public void setVrpGraph(VrpGraph vrpGraph)
-    {
-        this.vrpGraph = vrpGraph;
-    }
+    void addDepot(Depot depot);
 
 
-    public VrpDataParameters getParameters()
-    {
-        return parameters;
-    }
+    void addCustomer(Customer customer);
 
 
-    // SETTERS
-
-    public void addDepot(Depot depot)
-    {
-        depots.add(depot);
-    }
+    void addVehicle(Vehicle vehicle);
 
 
-    public void addCustomer(Customer customer)
-    {
-        customers.add(customer);
-    }
+    void addRequest(Request request);
 
 
-    public void addVehicle(Vehicle vehicle)
-    {
-        vehicles.add(vehicle);
-    }
+    void setTime(int time);
 
 
-    public void addRequest(Request request)
-    {
-        requests.add(request);
-    }
+    void setVrpGraph(VrpGraph vrpGraph);
 
 
-    public void setTime(int time)
-    {
-        this.time = time;
-    }
-
-
-    public void setParameters(VrpDataParameters parameters)
-    {
-        this.parameters = parameters;
-    }
-
-
-    public void removeAllRequests()
-    {
-        // Reset schedules
-        for (Vehicle v : vehicles) {
-            v.resetSchedule();
-        }
-
-        // remove all existing requests
-        requests.clear();
-    }
+    void setParameters(VrpDataParameters parameters);
 }

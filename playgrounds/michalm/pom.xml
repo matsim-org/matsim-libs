@@ -82,6 +82,13 @@
 			<scope>compile</scope>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>transEnergySim</artifactId>
+			<version>0.6.0-SNAPSHOT</version>
+		</dependency>
+		
+		
   		<!-- ============== standard option ============== -->
 		<dependency>
 			<groupId>pl.poznan.put.michalm</groupId>

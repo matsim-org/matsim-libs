@@ -17,22 +17,58 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package playground.michalm.taxi;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import java.util.*;
+
+import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
+
+import pl.poznan.put.vrp.dynamic.data.VrpDataImpl;
+import pl.poznan.put.vrp.dynamic.extensions.electric.*;
+import playground.michalm.taxi.model.*;
 
 
-public interface TaxiTask
-    extends Task
+public class TaxiData
+    extends VrpDataImpl
+    implements ElectricVrpData
 {
-    static enum TaxiTaskType
-    {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, CHARGE_STAY, WAIT_STAY;
+    private final List<Charger> chargers = new ArrayList<Charger>();
 
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, CHARGE, WAIT;
+
+    public List<Charger> getChargers()
+    {
+        return chargers;
     }
 
 
-    TaxiTaskType getTaxiTaskType();
+    public void addCharger(Charger charger)
+    {
+        chargers.add(charger);
+    }
+
+
+    public List<VrpAgentElectricTaxi> getElectricTaxis()
+    {
+        return convertList(getVehicles());
+    }
+
+
+    public List<TaxiRequest> getTaxiRequests()
+    {
+        return convertList(getRequests());
+    }
+
+
+    public List<PassengerCustomer> getPassengerCustomers()
+    {
+        return convertList(getCustomers());
+    }
+
+
+    //casts List of supertype S to List of type T
+    @SuppressWarnings("unchecked")
+    private static <S, T> List<T> convertList(List<S> list)
+    {
+        return (List<T>)list;
+    }
 }
