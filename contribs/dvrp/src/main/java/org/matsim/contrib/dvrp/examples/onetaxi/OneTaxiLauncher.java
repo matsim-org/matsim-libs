@@ -78,14 +78,15 @@ public class OneTaxiLauncher
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
         VrpSimEngine vrpSimEngine = VrpLauncherUtils.initVrpSimEngine(qSim, data, optimizer);
         VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new OneTaxiActionCreator(
-                vrpSimEngine), false);
+                vrpSimEngine));
         VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new OneTaxiRequestCreator(
                 vrpData), OneTaxiRequestCreator.MODE);
 
         EventsManager events = qSim.getEventsManager();
 
         if (otfVis) { // OFTVis visualization
-            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true);
+            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME,
+                    OTFVisConfigGroup.class).setDrawNonMovingItems(true);
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);

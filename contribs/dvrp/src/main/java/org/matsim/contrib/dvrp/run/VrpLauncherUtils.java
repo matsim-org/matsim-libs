@@ -237,10 +237,9 @@ public class VrpLauncherUtils
 
 
     public static void initAgentSources(QSim qSim, MatsimVrpData data, VrpSimEngine vrpSimEngine,
-            DynActionCreator actionCreator, boolean onlineVehicleTracker)
+            DynActionCreator actionCreator)
     {
-        qSim.addAgentSource(new VrpAgentSource(actionCreator, data, vrpSimEngine,
-                onlineVehicleTracker));
+        qSim.addAgentSource(new VrpAgentSource(actionCreator, data, vrpSimEngine));
         qSim.addAgentSource(new PopulationAgentSource(data.getScenario().getPopulation(),
                 new DefaultAgentFactory(qSim), qSim));
     }

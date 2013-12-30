@@ -198,7 +198,8 @@ import playground.michalm.util.gis.Schedules2GIS;
         
         VrpSimEngine vrpSimEngine = olutils.initVrpSimEngine(qSim, data, optimizer);
 
-        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new TaxiActionCreator(vrpSimEngine), false);
+        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine,
+                TaxiActionCreator.createCreatorWithOfflineVehicleTracker(vrpSimEngine));
 
         VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new TaxiRequestCreator(
                 vrpData), TaxiRequestCreator.MODE);

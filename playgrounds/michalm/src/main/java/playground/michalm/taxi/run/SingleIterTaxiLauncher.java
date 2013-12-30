@@ -227,8 +227,11 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         VrpSimEngine vrpSimEngine = VrpLauncherUtils.initVrpSimEngine(qSim, data, optimizer);
 
-        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new TaxiActionCreator(
-                vrpSimEngine), onlineVehicleTracker);
+        TaxiActionCreator actionCreator = onlineVehicleTracker ? //
+                TaxiActionCreator.createCreatorWithOnlineVehicleTracker(vrpSimEngine, graph) : //
+                TaxiActionCreator.createCreatorWithOfflineVehicleTracker(vrpSimEngine);
+
+        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, actionCreator);
 
         VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new TaxiRequestCreator(
                 taxiData), TaxiRequestCreator.MODE);
@@ -257,7 +260,8 @@ import playground.michalm.util.gis.Schedules2GIS;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
-            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme(ColoringScheme.taxicab);
+            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME,
+                    OTFVisConfigGroup.class).setColoringScheme(ColoringScheme.taxicab);
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);

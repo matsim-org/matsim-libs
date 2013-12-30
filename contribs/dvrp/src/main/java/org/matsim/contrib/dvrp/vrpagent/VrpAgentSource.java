@@ -43,25 +43,23 @@ public class VrpAgentSource
     private final MatsimVrpData data;
     private final VrpSimEngine vrpSimEngine;
 
-    private final boolean onlineVehicleTracker;
     private final boolean isAgentWithPlan;
 
 
     public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpData data,
-            VrpSimEngine vrpSimEngine, boolean onlineVehicleTracker)
+            VrpSimEngine vrpSimEngine)
     {
-        this(nextActionCreator, data, vrpSimEngine, onlineVehicleTracker, false);
+        this(nextActionCreator, data, vrpSimEngine, false);
     }
 
 
     public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpData data,
-            VrpSimEngine vrpSimEngine, boolean onlineVehicleTracker, boolean isAgentWithPlan)
+            VrpSimEngine vrpSimEngine, boolean isAgentWithPlan)
     {
         this.nextActionCreator = nextActionCreator;
         this.data = data;
         this.vrpSimEngine = vrpSimEngine;
 
-        this.onlineVehicleTracker = onlineVehicleTracker;
         this.isAgentWithPlan = isAgentWithPlan;
     }
 
@@ -75,10 +73,6 @@ public class VrpAgentSource
         for (Vehicle vrpVeh : vehicles) {
             VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(vrpSimEngine, nextActionCreator,
                     (VrpAgentVehicle)vrpVeh);
-
-            if (onlineVehicleTracker) {
-                vrpAgentLogic.enableOnlineTracking(data.getMatsimVrpGraph());
-            }
 
             vrpSimEngine.addAgentLogic(vrpAgentLogic);
 

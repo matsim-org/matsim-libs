@@ -20,12 +20,10 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.VrpSimEngine;
-import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
 import org.matsim.contrib.dynagent.*;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 
 
 public class VrpAgentLogic
@@ -41,9 +39,6 @@ public class VrpAgentLogic
     private final DynActionCreator dynActionCreator;
     private final VrpAgentVehicle vrpVehicle;
     private DynAgent agent;
-
-    private boolean onlineVehicleTracker;
-    private MatsimVrpGraph graph;
 
 
     public VrpAgentLogic(VrpSimEngine vrpSimEngine, DynActionCreator dynActionCreator,
@@ -93,10 +88,6 @@ public class VrpAgentLogic
         Task task = schedule.getCurrentTask();
         DynAction action = dynActionCreator.createAction(task, now);
 
-        if (onlineVehicleTracker && task.getType() == TaskType.DRIVE) {
-            ((VrpDynLeg)action).initOnlineVehicleTracker((DriveTask)task, graph, vrpSimEngine);
-        }
-
         return action;
     }
 
@@ -132,19 +123,5 @@ public class VrpAgentLogic
     public void actionPossiblyChanged()
     {
         agent.update();
-    }
-
-
-    public void enableOnlineTracking(MatsimVrpGraph graph)
-    {
-        onlineVehicleTracker = true;
-        this.graph = graph;
-    }
-
-
-    public void disableOnlineTracking()
-    {
-        onlineVehicleTracker = false;
-        graph = null;
     }
 }

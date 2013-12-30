@@ -20,6 +20,7 @@
 package playground.michalm.taxi;
 
 import org.matsim.contrib.dvrp.VrpSimEngine;
+import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
 import org.matsim.contrib.dvrp.passenger.PassengerHandlingUtils;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
@@ -31,12 +32,29 @@ import playground.michalm.taxi.schedule.*;
 public class TaxiActionCreator
     implements VrpAgentLogic.DynActionCreator
 {
+    public static TaxiActionCreator createCreatorWithOfflineVehicleTracker(VrpSimEngine vrpSimEngine)
+    {
+        return new TaxiActionCreator(vrpSimEngine, null);
+    }
+
+
+    public static TaxiActionCreator createCreatorWithOnlineVehicleTracker(
+            VrpSimEngine vrpSimEngine, MatsimVrpGraph graph)
+    {
+        return new TaxiActionCreator(vrpSimEngine, graph);
+    }
+
+
     private final VrpSimEngine vrpSimEngine;
+    private final MatsimVrpGraph graph;
+    private final boolean onlineVehicleTracker;
 
 
-    public TaxiActionCreator(VrpSimEngine vrpSimEngine)
+    private TaxiActionCreator(VrpSimEngine vrpSimEngine, MatsimVrpGraph graph)
     {
         this.vrpSimEngine = vrpSimEngine;
+        this.graph = graph;
+        onlineVehicleTracker = graph != null;
     }
 
 
@@ -49,7 +67,13 @@ public class TaxiActionCreator
             case PICKUP_DRIVE:
             case DROPOFF_DRIVE:
             case CRUISE_DRIVE:
-                return new VrpDynLeg((DriveTask)task);
+                if (onlineVehicleTracker) {
+                    return VrpDynLeg.createLegWithOnlineVehicleTracker((DriveTask)task, graph,
+                            vrpSimEngine);
+                }
+                else {
+                    return VrpDynLeg.createLegWithOfflineVehicleTracker((DriveTask)task);
+                }
 
             case PICKUP_STAY:
                 final TaxiPickupStayTask pst = (TaxiPickupStayTask)task;

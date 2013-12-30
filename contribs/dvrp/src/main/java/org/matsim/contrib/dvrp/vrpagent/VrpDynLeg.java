@@ -36,39 +36,51 @@ import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 public class VrpDynLeg
     implements DynLeg
 {
+    public static VrpDynLeg createLegWithOfflineVehicleTracker(DriveTask driveTask)
+    {
+        return new VrpDynLeg(driveTask);
+    }
+
+
+    public static VrpDynLeg createLegWithOnlineVehicleTracker(DriveTask driveTask,
+            MatsimVrpGraph graph, VrpSimEngine vrpSimEngine)
+    {
+        return new VrpDynLeg(driveTask, graph, vrpSimEngine);
+    }
+
+
     private final ShortestPath shortestPath;
 
     private final Id destinationLinkId;
     private final int destinationLinkIdx;
 
-    private final int beginTime;
-
     private int currentLinkIdx = 0;
 
-    private OnlineVehicleTracker onlineVehicleTracker;
+    private final OnlineVehicleTracker onlineVehicleTracker;
 
 
-    public VrpDynLeg(DriveTask driveTask)
+    //DriveTask with OfflineVehicleTrakcer
+    private VrpDynLeg(DriveTask driveTask)
     {
-        beginTime = driveTask.getBeginTime();
-
         MatsimArc arc = (MatsimArc)driveTask.getArc();
         destinationLinkId = arc.getToVertex().getLink().getId();
-        shortestPath = arc.getShortestPath(beginTime);
+        shortestPath = arc.getShortestPath(driveTask.getBeginTime());
         destinationLinkIdx = shortestPath.linkIds.length - 1;
+
+        onlineVehicleTracker = null;//offlineVehicleTracker is used in DriveTask by default 
     }
 
 
-    public void initOnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph graph,
-            VrpSimEngine vrpSimEngine)
+    //DriveTask with OnlineVehicleTrakcer; the tracker notifies VrpSimEngine of new positions
+    private VrpDynLeg(DriveTask driveTask, MatsimVrpGraph graph, VrpSimEngine vrpSimEngine)
     {
-        if (onlineVehicleTracker == null) {
-            onlineVehicleTracker = new OnlineVehicleTracker(driveTask, graph, vrpSimEngine);
-            driveTask.setVehicleTracker(onlineVehicleTracker);
-        }
-        else {
-            throw new IllegalStateException();
-        }
+        MatsimArc arc = (MatsimArc)driveTask.getArc();
+        destinationLinkId = arc.getToVertex().getLink().getId();
+        shortestPath = arc.getShortestPath(driveTask.getBeginTime());
+        destinationLinkIdx = shortestPath.linkIds.length - 1;
+
+        onlineVehicleTracker = new OnlineVehicleTracker(driveTask, graph, vrpSimEngine);
+        driveTask.setVehicleTracker(onlineVehicleTracker);
     }
 
 
@@ -120,10 +132,10 @@ public class VrpDynLeg
         private final MatsimVrpGraph vrpGraph;
         private final VrpSimEngine vrpSimEngine;
 
-        private int timeAtLastNode = beginTime;
-        private int delayAtLastNode = 0;
+        private int timeAtLastNode;
+        private int delayAtLastNode;
 
-        private int expectedLinkTravelTime = shortestPath.accLinkTravelTimes[0];
+        private int expectedLinkTravelTime;
 
 
         public OnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph vrpGraph,
@@ -132,6 +144,11 @@ public class VrpDynLeg
             this.driveTask = driveTask;
             this.vrpGraph = vrpGraph;
             this.vrpSimEngine = vrpSimEngine;
+
+            timeAtLastNode = driveTask.getBeginTime();
+            delayAtLastNode = 0;
+
+            expectedLinkTravelTime = shortestPath.accLinkTravelTimes[0];
         }
 
 
@@ -140,9 +157,10 @@ public class VrpDynLeg
             timeAtLastNode = time;
 
             int expectedTimeEnRoute = shortestPath.accLinkTravelTimes[currentLinkIdx - 1];
-            int actualTimeEnRoute = timeAtLastNode - beginTime;
+            int actualTimeEnRoute = timeAtLastNode - driveTask.getBeginTime();
 
             delayAtLastNode = actualTimeEnRoute - expectedTimeEnRoute;
+
             expectedLinkTravelTime = shortestPath.accLinkTravelTimes[currentLinkIdx]
                     - expectedTimeEnRoute;
 
