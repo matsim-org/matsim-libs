@@ -43,16 +43,16 @@ public class RouteChartUtils
 {
     public static JFreeChart chartRoutes(VrpData data)
     {
-        VertexDataset nData = new VertexDataset();
-        nData.addSeries("Depot", VertexSources.createFromLocalizables(data.getDepots()));
+        LinkDataset lData = new LinkDataset();
+        lData.addSeries("Depot", LinkSources.createFromLocalizables(data.getDepots()));
 
         List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
             Schedule<?> schedule = vehicles.get(i).getSchedule();
-            nData.addSeries(Integer.toString(i), VertexSources.createVertexSource(schedule));
+            lData.addSeries(Integer.toString(i), LinkSources.createLinkSource(schedule));
         }
 
-        JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", nData,
+        JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", lData,
                 PlotOrientation.VERTICAL, true, true, false);
 
         XYPlot plot = (XYPlot)chart.getPlot();
@@ -71,7 +71,7 @@ public class RouteChartUtils
         renderer.setBaseItemLabelGenerator(new XYItemLabelGenerator() {
             public String generateLabel(XYDataset dataset, int series, int item)
             {
-                return ((VertexDataset)dataset).getText(series, item);
+                return ((LinkDataset)dataset).getText(series, item);
             }
         });
 
@@ -87,13 +87,13 @@ public class RouteChartUtils
 
     public static JFreeChart chartRoutesByStatus(VrpData data)
     {
-        VertexDataset nData = new VertexDataset();
-        nData.addSeries("Depot", VertexSources.createFromLocalizables(data.getDepots()));
+        LinkDataset nData = new LinkDataset();
+        nData.addSeries("Depot", LinkSources.createFromLocalizables(data.getDepots()));
 
         List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
             Schedule<?> schedule = vehicles.get(i).getSchedule();
-            Map<TaskStatus, VertexSource> vsByStatus = createVertexSourceByStatus(schedule);
+            Map<TaskStatus, LinkSource> vsByStatus = createLinkSourceByStatus(schedule);
             nData.addSeries(i + "-PR", vsByStatus.get(TaskStatus.PERFORMED));
             nData.addSeries(i + "-ST", vsByStatus.get(TaskStatus.STARTED));
             nData.addSeries(i + "-PL", vsByStatus.get(TaskStatus.PLANNED));
@@ -153,7 +153,7 @@ public class RouteChartUtils
     }
 
 
-    private static Map<TaskStatus, VertexSource> createVertexSourceByStatus(
+    private static Map<TaskStatus, LinkSource> createLinkSourceByStatus(
             Schedule<? extends Task> schedule)
     {
         Iterator<DriveTask> taskIter = Schedules.createDriveTaskIter(schedule);
@@ -171,16 +171,16 @@ public class RouteChartUtils
             taskListByStatus.get(t.getStatus()).add(t);
         }
 
-        // creating VertexSources
-        Map<TaskStatus, VertexSource> vertexSourceByStatus = new EnumMap<TaskStatus, VertexSource>(
+        // creating LinkSources
+        Map<TaskStatus, LinkSource> linkSourceByStatus = new EnumMap<TaskStatus, LinkSource>(
                 TaskStatus.class);
 
         for (TaskStatus ts : TaskStatus.values()) {
-            vertexSourceByStatus.put(ts,
-                    VertexSources.createFromDriveTasks(taskListByStatus.get(ts)));
+            linkSourceByStatus.put(ts,
+                    LinkSources.createFromDriveTasks(taskListByStatus.get(ts)));
         }
 
-        return vertexSourceByStatus;
+        return linkSourceByStatus;
     }
 
 
@@ -197,7 +197,7 @@ public class RouteChartUtils
                 return null;
             }
 
-            return ((VertexDataset)dataset).getText(series, item);
+            return ((LinkDataset)dataset).getText(series, item);
         }
     }
 }

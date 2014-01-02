@@ -20,12 +20,12 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.VrpSimEngine;
-import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.contrib.dvrp.data.network.MatsimArc;
 import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
 import org.matsim.contrib.dynagent.DynLeg;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 
@@ -43,9 +43,9 @@ public class VrpDynLeg
 
 
     public static VrpDynLeg createLegWithOnlineVehicleTracker(DriveTask driveTask,
-            MatsimVrpGraph graph, VrpSimEngine vrpSimEngine)
+            VrpSimEngine vrpSimEngine)
     {
-        return new VrpDynLeg(driveTask, graph, vrpSimEngine);
+        return new VrpDynLeg(driveTask, vrpSimEngine);
     }
 
 
@@ -63,7 +63,7 @@ public class VrpDynLeg
     private VrpDynLeg(DriveTask driveTask)
     {
         MatsimArc arc = (MatsimArc)driveTask.getArc();
-        destinationLinkId = arc.getToVertex().getLink().getId();
+        destinationLinkId = arc.getToLink().getId();
         shortestPath = arc.getShortestPath(driveTask.getBeginTime());
         destinationLinkIdx = shortestPath.links.length - 1;
 
@@ -72,14 +72,14 @@ public class VrpDynLeg
 
 
     //DriveTask with OnlineVehicleTrakcer; the tracker notifies VrpSimEngine of new positions
-    private VrpDynLeg(DriveTask driveTask, MatsimVrpGraph graph, VrpSimEngine vrpSimEngine)
+    private VrpDynLeg(DriveTask driveTask, VrpSimEngine vrpSimEngine)
     {
         MatsimArc arc = (MatsimArc)driveTask.getArc();
-        destinationLinkId = arc.getToVertex().getLink().getId();
+        destinationLinkId = arc.getToLink().getId();
         shortestPath = arc.getShortestPath(driveTask.getBeginTime());
         destinationLinkIdx = shortestPath.links.length - 1;
 
-        onlineVehicleTracker = new OnlineVehicleTracker(driveTask, graph, vrpSimEngine);
+        onlineVehicleTracker = new OnlineVehicleTracker(driveTask, vrpSimEngine);
         driveTask.setVehicleTracker(onlineVehicleTracker);
     }
 
@@ -129,7 +129,6 @@ public class VrpDynLeg
         implements VehicleTracker
     {
         private final DriveTask driveTask;
-        private final MatsimVrpGraph vrpGraph;
         private final VrpSimEngine vrpSimEngine;
 
         private int timeAtLastNode;
@@ -138,11 +137,9 @@ public class VrpDynLeg
         private int expectedLinkTravelTime;
 
 
-        public OnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph vrpGraph,
-                VrpSimEngine vrpSimEngine)
+        public OnlineVehicleTracker(DriveTask driveTask, VrpSimEngine vrpSimEngine)
         {
             this.driveTask = driveTask;
-            this.vrpGraph = vrpGraph;
             this.vrpSimEngine = vrpSimEngine;
 
             timeAtLastNode = driveTask.getBeginTime();
@@ -191,32 +188,25 @@ public class VrpDynLeg
 
 
         @Override
-        public Vertex getLastPosition()
+        public Link getLink()
         {
             if (currentLinkIdx == 0) {
                 return null;//the vehicle is at the very beginning (before the first node)
             }
 
-            return vrpGraph.getVertex(shortestPath.links[currentLinkIdx - 1].getId());
+            return shortestPath.links[currentLinkIdx - 1];
         }
 
 
         @Override
-        public int getLastPositionTime()
+        public int getLinkEnterTime()
         {
             return timeAtLastNode;
         }
 
 
         @Override
-        public Vertex predictNextPosition(int currentTime)
-        {
-            return vrpGraph.getVertex(shortestPath.links[currentLinkIdx].getId());
-        }
-
-
-        @Override
-        public int predictNextPositionTime(int currentTime)
+        public int predictLinkExitTime(int currentTime)
         {
             int predictedTimeAtNextNode = timeAtLastNode
                     + Math.max(currentTime - timeAtLastNode, expectedLinkTravelTime);
@@ -230,7 +220,7 @@ public class VrpDynLeg
             int predictedTimeFromNextNode = shortestPath.accLinkTravelTimes[destinationLinkIdx]
                     - shortestPath.accLinkTravelTimes[currentLinkIdx];
 
-            return predictNextPositionTime(currentTime) + predictedTimeFromNextNode;
+            return predictLinkExitTime(currentTime) + predictedTimeFromNextNode;
         }
 
 

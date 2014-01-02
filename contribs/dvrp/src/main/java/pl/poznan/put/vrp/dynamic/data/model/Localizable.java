@@ -19,10 +19,10 @@
 
 package pl.poznan.put.vrp.dynamic.data.model;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
 
 
 public interface Localizable
 {
-    Vertex getVertex();
+    Link getLink();
 }

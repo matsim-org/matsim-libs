@@ -19,7 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.network.impl;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
@@ -33,10 +34,10 @@ public class InterpolatedArc
     private double[] costsOnDeparture;
 
 
-    public InterpolatedArc(Vertex fromVertex, Vertex toVertex, TimeDiscretizer timeDiscretizer,
+    public InterpolatedArc(Link fromLink, Link toLink, TimeDiscretizer timeDiscretizer,
             int[] timesOnDeparture, double[] costsOnDeparture)
     {
-        super(fromVertex, toVertex);
+        super(fromLink, toLink);
         if (timeDiscretizer.getIntervalCount() != timesOnDeparture.length
                 || timesOnDeparture.length != costsOnDeparture.length) {
             throw new IllegalArgumentException();

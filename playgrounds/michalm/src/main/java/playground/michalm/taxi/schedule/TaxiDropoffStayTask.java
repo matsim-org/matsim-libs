@@ -32,7 +32,7 @@ public class TaxiDropoffStayTask
 
     public TaxiDropoffStayTask(int beginTime, int endTime, TaxiRequest request)
     {
-        super(beginTime, endTime, request.getToVertex());
+        super(beginTime, endTime, request.getToLink());
 
         this.request = request;
         request.setDropoffStayTask(this);

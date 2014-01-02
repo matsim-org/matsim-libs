@@ -19,42 +19,42 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
 import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
 public class OneTaxiRequest
     extends RequestImpl
     implements PassengerRequest
 {
-    private final Vertex fromVertex;
-    private final Vertex toVertex;
+    private final Link fromLink;
+    private final Link toLink;
 
 
-    public OneTaxiRequest(int id, Customer customer, Vertex fromVertex, Vertex toVertex, int time)
+    public OneTaxiRequest(int id, Customer customer, Link fromLink, Link toLink, int time)
     {
         //I want a taxi now: t0 == t1 == submissionTime
         super(id, customer, 1, time, time, time);
-        this.fromVertex = fromVertex;
-        this.toVertex = toVertex;
+        this.fromLink = fromLink;
+        this.toLink = toLink;
     }
 
 
     @Override
-    public Vertex getFromVertex()
+    public Link getFromLink()
     {
-        return fromVertex;
+        return fromLink;
     }
 
 
     @Override
-    public Vertex getToVertex()
+    public Link getToLink()
     {
-        return toVertex;
+        return toLink;
     }
 
 

@@ -21,11 +21,12 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.immediaterequest.NOSTaxiOptimizer;
@@ -90,18 +91,18 @@ public class NOSRankTaxiOptimizer
             TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules
                     .getLastTask(schedule);
 
-            Vertex vertex = dropoffStayTask.getVertex();
-            Vertex depotVertex = schedule.getVehicle().getDepot().getVertex();
+            Link link = dropoffStayTask.getLink();
+            Link depotLink = schedule.getVehicle().getDepot().getLink();
 
-            if (vertex != depotVertex) {
+            if (link != depotLink) {
                 int t5 = dropoffStayTask.getEndTime();
-                Arc arc = data.getVrpGraph().getArc(vertex, depotVertex);
+                Arc arc = data.getVrpGraph().getArc(link, depotLink);
                 int t6 = arc.getTimeOnDeparture(t5);
                 schedule.addTask(new TaxiCruiseDriveTask(t5, t6, arc));
 
                 int tEnd = Math.max(t6, Schedules.getActualT1(schedule));
                 schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getDepot()
-                        .getVertex()));
+                        .getLink()));
             }
             else {
                 super.appendWaitAfterDropoff(schedule);
@@ -139,7 +140,7 @@ public class NOSRankTaxiOptimizer
             Task last = Schedules.getLastTask(veh.getSchedule());
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
-                if (!lastw.getVertex().equals(veh.getDepot().getVertex())) {
+                if (!lastw.getLink().equals(veh.getDepot().getLink())) {
                     if (this.depotArrivalDepartureCharger.needsToReturnToRank(new IdImpl(veh
                             .getName()))) {
                         scheduleRankReturn(veh);
@@ -175,14 +176,14 @@ public class NOSRankTaxiOptimizer
                 throw new IllegalStateException();
         }
 
-        Vertex lastVertex = lastTask.getVertex();
+        Link lastLink = lastTask.getLink();
 
-        if (veh.getDepot().getVertex() != lastVertex) {// not a loop
-            Arc darc = data.getVrpGraph().getArc(lastVertex, veh.getDepot().getVertex());
+        if (veh.getDepot().getLink() != lastLink) {// not a loop
+            Arc darc = data.getVrpGraph().getArc(lastLink, veh.getDepot().getLink());
             int arrivalTime = darc.getTimeOnDeparture(currentTime) + currentTime;
 
             sched.addTask(new TaxiCruiseDriveTask(currentTime, arrivalTime, darc));
-            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldendtime, veh.getDepot().getVertex()));
+            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldendtime, veh.getDepot().getLink()));
             // System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:"
             // +oldendtime);
         }
@@ -197,7 +198,7 @@ public class NOSRankTaxiOptimizer
             Task last = Schedules.getLastTask(veh.getSchedule());
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
-                if (!lastw.getVertex().equals(veh.getDepot().getVertex())) {
+                if (!lastw.getLink().equals(veh.getDepot().getLink())) {
                     this.shortTimeIdlers.add(veh.getId());
                 }
             }

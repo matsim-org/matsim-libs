@@ -27,11 +27,5 @@ import pl.poznan.put.vrp.dynamic.data.network.Arc;
 public interface MatsimArc
     extends Arc
 {
-    MatsimVertex getFromVertex();
-
-
-    MatsimVertex getToVertex();
-
-
     ShortestPath getShortestPath(int departTime);
 }

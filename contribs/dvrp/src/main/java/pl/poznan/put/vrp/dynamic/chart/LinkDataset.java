@@ -23,26 +23,25 @@ import java.util.*;
 
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.xy.*;
-
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
  * @author michalm
  */
 @SuppressWarnings("serial")
-public class VertexDataset
+public class LinkDataset
     extends AbstractXYDataset
     implements XYDataset
 {
     private List<Comparable<String>> seriesKeys;
-    private List<VertexSource> seriesList;
+    private List<LinkSource> seriesList;
 
 
-    public VertexDataset()
+    public LinkDataset()
     {
         seriesKeys = new ArrayList<Comparable<String>>();
-        seriesList = new ArrayList<VertexSource>();
+        seriesList = new ArrayList<LinkSource>();
     }
 
 
@@ -77,7 +76,7 @@ public class VertexDataset
     @Override
     public double getXValue(int series, int item)
     {
-        return getItem(series, item).getX();
+        return getItem(series, item).getCoord().getX();
     }
 
 
@@ -91,23 +90,23 @@ public class VertexDataset
     @Override
     public double getYValue(int series, int item)
     {
-        return getItem(series, item).getY();
+        return getItem(series, item).getCoord().getY();
     }
 
 
     public String getText(int series, int item)
     {
-        return (getItem(series, item).getId() + 1) + "";
+        return getItem(series, item).getId().toString();
     }
 
 
-    public Vertex getItem(int series, int item)
+    public Link getItem(int series, int item)
     {
-        return seriesList.get(series).getVertex(item);
+        return seriesList.get(series).getLink(item);
     }
 
 
-    public void addSeries(String seriesKey, VertexSource data)
+    public void addSeries(String seriesKey, LinkSource data)
     {
         if (seriesKey == null) {
             throw new IllegalArgumentException("The 'seriesKey' cannot be null.");

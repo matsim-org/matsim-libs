@@ -24,7 +24,6 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.MatsimVertex;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
@@ -101,7 +100,7 @@ public class ElectroCabLaunchUtils
 
         List<Id> depotLinkIds = new ArrayList<Id>();
         for (Depot d : data.getVrpData().getDepots()) {
-            depotLinkIds.add( ((MatsimVertex)d.getVertex()).getLink().getId());
+            depotLinkIds.add(d.getLink().getId());
         }
 
         depotArrivalDepartureCharger.setDepotLocations(depotLinkIds);

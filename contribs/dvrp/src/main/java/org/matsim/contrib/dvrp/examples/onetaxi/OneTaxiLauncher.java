@@ -24,7 +24,6 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
 import org.matsim.contrib.dvrp.data.network.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -37,6 +36,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
+import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
 
 
 public class OneTaxiLauncher
@@ -68,7 +68,7 @@ public class OneTaxiLauncher
         TravelTime travelTime = new FreeSpeedTravelTime();
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
-        MatsimVrpGraph graph = VrpLauncherUtils.initMatsimVrpGraph(scenario,
+        VrpGraph graph = VrpLauncherUtils.initVrpGraph(scenario,
                 TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility);
 
         VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, graph, depotsFileName);

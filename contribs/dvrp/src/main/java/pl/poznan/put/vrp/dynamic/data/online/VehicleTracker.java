@@ -19,7 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.online;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 
 
@@ -28,16 +29,13 @@ public interface VehicleTracker
     DriveTask getDriveTask();
 
 
-    Vertex getLastPosition();
+    Link getLink();
 
 
-    int getLastPositionTime();
+    int getLinkEnterTime();
 
 
-    Vertex predictNextPosition(int currentTime);
-
-
-    int predictNextPositionTime(int currentTime);
+    int predictLinkExitTime(int currentTime);
 
 
     int predictEndTime(int currentTime);

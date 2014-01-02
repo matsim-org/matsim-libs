@@ -19,31 +19,31 @@
 
 package pl.poznan.put.vrp.dynamic.data.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
 
 
 public class Tasks
 {
-    public static Vertex getBeginVertex(Task task)
+    public static Link getBeginLink(Task task)
     {
         switch (task.getType()) {
             case DRIVE:
-                return ((DriveTask)task).getArc().getFromVertex();
+                return ((DriveTask)task).getArc().getFromLink();
             case STAY:
-                return ((StayTask)task).getVertex();
+                return ((StayTask)task).getLink();
             default:
                 throw new IllegalStateException("Only: DRIVE or STAY");
         }
     }
 
 
-    public static Vertex getEndVertex(Task task)
+    public static Link getEndLink(Task task)
     {
         switch (task.getType()) {
             case DRIVE:
-                return ((DriveTask)task).getArc().getToVertex();
+                return ((DriveTask)task).getArc().getToLink();
             case STAY:
-                return ((StayTask)task).getVertex();
+                return ((StayTask)task).getLink();
             default:
                 throw new IllegalStateException("Only: DRIVE or STAY");
         }

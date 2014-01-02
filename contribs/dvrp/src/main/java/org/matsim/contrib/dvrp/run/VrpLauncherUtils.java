@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.io.*;
+import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.file.DepotReader;
-import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.data.network.router.*;
 import org.matsim.contrib.dvrp.data.network.shortestpath.MatsimArcFactories;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -49,7 +48,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
+import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.impl.GrowingVrpGraph;
 import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
@@ -178,8 +178,8 @@ public class VrpLauncherUtils
     }
 
 
-    public static MatsimVrpGraph initMatsimVrpGraph(Scenario scenario,
-            TravelTimeSource ttimeSource, TravelTime travelTime, TravelDisutility travelDisutility)
+    public static VrpGraph initVrpGraph(Scenario scenario, TravelTimeSource ttimeSource,
+            TravelTime travelTime, TravelDisutility travelDisutility)
     {
         Network network = scenario.getNetwork();
         TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
@@ -187,19 +187,11 @@ public class VrpLauncherUtils
         ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network, travelTime,
                 travelDisutility, timeDiscretizer, false);
 
-        MatsimVrpGraph graph;
-        try {
-            graph = MatsimVrpGraphCreator.create(network, arcFactory, false);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return graph;
+        return new GrowingVrpGraph(arcFactory);
     }
 
 
-    public static VrpData initVrpData(Scenario scenario, MatsimVrpGraph graph, String depotsFileName)
+    public static VrpData initVrpData(Scenario scenario, VrpGraph graph, String depotsFileName)
     {
         VrpData vrpData = new VrpDataImpl();
         vrpData.setVrpGraph(graph);

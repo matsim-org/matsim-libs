@@ -21,12 +21,13 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.data.network.impl.VertexTimePair;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import pl.poznan.put.vrp.dynamic.data.network.impl.LinkTimePair;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
@@ -123,14 +124,14 @@ public abstract class ImmediateRequestTaxiOptimizer
             }
 
             // status = UNPLANNED/PLANNED/STARTED
-            VertexTimePair departure = calculateDeparture(schedule, currentTime);
+            LinkTimePair departure = calculateDeparture(schedule, currentTime);
 
             if (departure == null) {
                 continue;
             }
 
             int t1 = departure.getTime();
-            Arc arc = data.getVrpGraph().getArc(departure.getVertex(), req.getFromVertex());
+            Arc arc = data.getVrpGraph().getArc(departure.getLink(), req.getFromLink());
             int t2 = t1 + arc.getTimeOnDeparture(departure.getTime());
 
             if (minimizePickupTripTime) {
@@ -151,17 +152,17 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    protected VertexTimePair calculateDeparture(Schedule<TaxiTask> schedule, int currentTime)
+    protected LinkTimePair calculateDeparture(Schedule<TaxiTask> schedule, int currentTime)
     {
-        Vertex vertex;
+        Link link;
         int time;
 
         switch (schedule.getStatus()) {
             case UNPLANNED:
                 Vehicle vehicle = schedule.getVehicle();
-                vertex = vehicle.getDepot().getVertex();
+                link = vehicle.getDepot().getLink();
                 time = Math.max(vehicle.getT0(), currentTime);
-                return new VertexTimePair(vertex, time);
+                return new LinkTimePair(link, time);
 
             case PLANNED:
             case STARTED:
@@ -169,9 +170,9 @@ public abstract class ImmediateRequestTaxiOptimizer
 
                 switch (lastTask.getTaxiTaskType()) {
                     case WAIT_STAY:
-                        vertex = ((StayTask)lastTask).getVertex();
+                        link = ((StayTask)lastTask).getLink();
                         time = Math.max(lastTask.getBeginTime(), currentTime);
-                        return new VertexTimePair(vertex, time);
+                        return new LinkTimePair(link, time);
 
                     case PICKUP_STAY:
                         if (!destinationKnown) {
@@ -283,11 +284,11 @@ public abstract class ImmediateRequestTaxiOptimizer
 
         // add DELIVERY after SERVE
         TaxiRequest req = ((TaxiPickupStayTask)pickupStayTask).getRequest();
-        Vertex reqFromVertex = req.getFromVertex();
-        Vertex reqToVertex = req.getToVertex();
+        Link reqFromLink = req.getFromLink();
+        Link reqToLink = req.getToLink();
         int t3 = pickupStayTask.getEndTime();
 
-        Arc arc = data.getVrpGraph().getArc(reqFromVertex, reqToVertex);
+        Arc arc = data.getVrpGraph().getArc(reqFromLink, reqToLink);
         int t4 = t3 + arc.getTimeOnDeparture(t3);
         schedule.addTask(new TaxiDropoffDriveTask(t3, t4, arc, req));
 
@@ -303,9 +304,9 @@ public abstract class ImmediateRequestTaxiOptimizer
         // addWaitTime at the end (even 0-second WAIT)
         int t5 = dropoffStayTask.getEndTime();
         int tEnd = Math.max(t5, Schedules.getActualT1(schedule));
-        Vertex vertex = dropoffStayTask.getVertex();
+        Link link = dropoffStayTask.getLink();
 
-        schedule.addTask(new TaxiWaitStayTask(t5, tEnd, vertex));
+        schedule.addTask(new TaxiWaitStayTask(t5, tEnd, link));
     }
 
 
@@ -384,7 +385,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                     int t0 = ((TaxiPickupStayTask)task).getRequest().getT0();// t0 == passenger's departure time
                     t = Math.max(t, t0) + pickupDuration; // the true pickup starts at max(t, t0)
                     task.setEndTime(t);
-                    
+
                     break;
                 }
                 case DROPOFF_STAY: {

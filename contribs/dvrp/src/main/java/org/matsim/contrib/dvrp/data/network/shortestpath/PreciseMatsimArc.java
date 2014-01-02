@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.dvrp.data.network.shortestpath;
 
-import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.network.AbstractMatsimArc;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
 
@@ -30,10 +31,10 @@ public class PreciseMatsimArc
     private final ShortestPathCalculator shortestPathCalculator;
 
 
-    public PreciseMatsimArc(MatsimVertex fromVertex, MatsimVertex toVertex,
+    public PreciseMatsimArc(Link fromLink, Link toLink,
             ShortestPathCalculator shortestPathCalculator)
     {
-        super(fromVertex, toVertex);
+        super(fromLink, toLink);
         this.shortestPathCalculator = shortestPathCalculator;
     }
 
@@ -41,8 +42,7 @@ public class PreciseMatsimArc
     @Override
     public ShortestPath getShortestPath(int departTime)
     {
-        return shortestPathCalculator.calculateShortestPath(fromVertex.getLink(),
-                toVertex.getLink(), departTime);
+        return shortestPathCalculator.calculateShortestPath(fromLink, toLink, departTime);
     }
 
 
@@ -59,10 +59,9 @@ public class PreciseMatsimArc
 
 
         @Override
-        public Arc createArc(Vertex fromVertex, Vertex toVertex)
+        public Arc createArc(Link fromLink, Link toLink)
         {
-            return new PreciseMatsimArc((MatsimVertex)fromVertex, (MatsimVertex)toVertex,
-                    shortestPathCalculator);
+            return new PreciseMatsimArc(fromLink, toLink, shortestPathCalculator);
         }
     }
 

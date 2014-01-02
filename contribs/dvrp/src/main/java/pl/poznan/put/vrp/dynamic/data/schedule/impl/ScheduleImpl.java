@@ -21,8 +21,9 @@ package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 
@@ -103,8 +104,8 @@ public class ScheduleImpl<T extends AbstractTask>
     {
         int beginTime = task.getBeginTime();
         int endTime = task.getEndTime();
-        Vertex beginVertex = Tasks.getBeginVertex(task);
-        Vertex endVertex = Tasks.getEndVertex(task);
+        Link beginLink = Tasks.getBeginLink(task);
+        Link endLink = Tasks.getEndLink(task);
 
         failIfCompleted();
 
@@ -129,12 +130,12 @@ public class ScheduleImpl<T extends AbstractTask>
                 throw new IllegalArgumentException();
             }
 
-            if (Tasks.getEndVertex(previousTask) != beginVertex) {
+            if (Tasks.getEndLink(previousTask) != beginLink) {
                 throw new IllegalArgumentException();
             }
         }
         else { // taskIdx == 0
-            if (vehicle.getDepot().getVertex() != beginVertex) {
+            if (vehicle.getDepot().getLink() != beginLink) {
                 throw new IllegalArgumentException();
             }
         }
@@ -146,7 +147,7 @@ public class ScheduleImpl<T extends AbstractTask>
                 throw new IllegalArgumentException();
             }
 
-            if (Tasks.getBeginVertex(nextTask) != endVertex) {
+            if (Tasks.getBeginLink(nextTask) != endLink) {
                 throw new IllegalArgumentException();
             }
         }

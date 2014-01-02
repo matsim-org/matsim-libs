@@ -19,8 +19,9 @@
 
 package pl.poznan.put.vrp.dynamic.data.model.impl;
 
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.model.Depot;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
 public class DepotImpl
@@ -28,14 +29,14 @@ public class DepotImpl
 {
     private final int id;
     private final String name;
-    private final Vertex vertex;
+    private final Link link;
 
 
-    public DepotImpl(int id, String name, Vertex vertex)
+    public DepotImpl(int id, String name, Link link)
     {
         this.id = id;
         this.name = name;
-        this.vertex = vertex;
+        this.link = link;
     }
 
 
@@ -54,9 +55,9 @@ public class DepotImpl
 
 
     @Override
-    public Vertex getVertex()
+    public Link getLink()
     {
-        return vertex;
+        return link;
     }
 
 

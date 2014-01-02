@@ -21,8 +21,9 @@ package pl.poznan.put.vrp.dynamic.data.schedule;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 
@@ -108,22 +109,22 @@ public class Schedules
     }
 
 
-    public static <T extends Task> Vertex getLastVertexInSchedule(Schedule<T> schedule)
+    public static <T extends Task> Link getLastLinkInSchedule(Schedule<T> schedule)
     {
         List<T> tasks = schedule.getTasks();
 
         if (tasks.size() == 0) {
-            return schedule.getVehicle().getDepot().getVertex();
+            return schedule.getVehicle().getDepot().getLink();
         }
 
         Task task = tasks.get(tasks.size() - 1);
 
         switch (task.getType()) {
             case DRIVE:
-                return ((DriveTask)task).getArc().getToVertex();
+                return ((DriveTask)task).getArc().getToLink();
 
             case STAY:
-                return ((StayTask)task).getVertex();
+                return ((StayTask)task).getLink();
 
             default:
                 throw new IllegalStateException();

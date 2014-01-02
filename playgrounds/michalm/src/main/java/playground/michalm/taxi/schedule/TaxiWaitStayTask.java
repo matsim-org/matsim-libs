@@ -19,7 +19,8 @@
 
 package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 
 
@@ -27,9 +28,9 @@ public class TaxiWaitStayTask
     extends StayTaskImpl
     implements TaxiTask
 {
-    public TaxiWaitStayTask(int beginTime, int endTime, Vertex vertex)
+    public TaxiWaitStayTask(int beginTime, int endTime, Link link)
     {
-        super(beginTime, endTime, vertex);
+        super(beginTime, endTime, link);
     }
 
 

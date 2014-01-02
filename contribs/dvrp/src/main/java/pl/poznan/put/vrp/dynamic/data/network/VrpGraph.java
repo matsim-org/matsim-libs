@@ -19,24 +19,14 @@
 
 package pl.poznan.put.vrp.dynamic.data.network;
 
-import java.util.*;
+import java.util.Iterator;
+
+import org.matsim.api.core.v01.network.Link;
 
 
 public interface VrpGraph
 {
-    int getVertexCount();
-
-
-    Vertex getVertex(int id);
-
-
-    List<Vertex> getVertices();
-
-
-    void addVertex(Vertex v);
-
-
-    Arc getArc(Vertex fromVertex, Vertex toVertex);
+    Arc getArc(Link fromLink, Link toLink);
 
 
     /**

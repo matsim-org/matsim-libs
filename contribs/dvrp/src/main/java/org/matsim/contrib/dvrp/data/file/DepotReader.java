@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.dvrp.data.file;
 
-import java.util.Stack;
+import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -30,7 +30,6 @@ import org.xml.sax.Attributes;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Depot;
 import pl.poznan.put.vrp.dynamic.data.model.impl.DepotImpl;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
 public class DepotReader
@@ -41,7 +40,7 @@ public class DepotReader
 
     private Scenario scenario;
     private VrpData data;
-    private MatsimVrpGraph graph;
+    private Map<Id, ? extends Link> links;
 
     private Depot currentDepot;
 
@@ -50,8 +49,7 @@ public class DepotReader
     {
         this.scenario = scenario;
         this.data = data;
-
-        graph = (MatsimVrpGraph)data.getVrpGraph();
+        this.links = scenario.getNetwork().getLinks();
     }
 
 
@@ -88,9 +86,9 @@ public class DepotReader
         }
 
         Id linkId = scenario.createId(atts.getValue("linkId"));
-        Vertex vertex = graph.getVertex(linkId);
+        Link link = links.get(linkId);
 
-        currentDepot = new DepotImpl(id, name, vertex);
+        currentDepot = new DepotImpl(id, name, link);
         data.addDepot(currentDepot);
     }
 

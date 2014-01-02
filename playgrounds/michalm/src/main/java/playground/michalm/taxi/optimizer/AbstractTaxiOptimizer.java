@@ -76,7 +76,7 @@ public abstract class AbstractTaxiOptimizer
         for (Vehicle veh : data.getVehicles()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
             schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getDepot()
-                    .getVertex()));
+                    .getLink()));
         }
     }
 

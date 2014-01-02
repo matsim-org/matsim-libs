@@ -19,19 +19,19 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.model.Request;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
 public interface PassengerRequest
     extends Request
 {
-    Vertex getFromVertex();
+    Link getFromLink();
 
 
-    Vertex getToVertex();
+    Link getToLink();
 
 
     MobsimAgent getPassengerAgent();

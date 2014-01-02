@@ -26,7 +26,6 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -43,7 +42,8 @@ import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Request;
-import playground.jbischoff.taxi.optimizer.rank.*;
+import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
+import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.RunningVehicleRegister;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
@@ -181,7 +181,7 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource, travelTime);
         
-        MatsimVrpGraph graph = VrpLauncherUtils.initMatsimVrpGraph(scenario, ttimeSource,
+        VrpGraph graph = VrpLauncherUtils.initVrpGraph(scenario, ttimeSource,
                 travelTime, travelDisutility);
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
@@ -198,8 +198,8 @@ import playground.michalm.util.gis.Schedules2GIS;
         
         VrpSimEngine vrpSimEngine = olutils.initVrpSimEngine(qSim, data, optimizer);
 
-        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine,
-                TaxiActionCreator.createCreatorWithOfflineVehicleTracker(vrpSimEngine));
+        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new TaxiActionCreator(
+                vrpSimEngine, false));
 
         VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new TaxiRequestCreator(
                 vrpData), TaxiRequestCreator.MODE);

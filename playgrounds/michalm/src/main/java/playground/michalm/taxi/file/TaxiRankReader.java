@@ -22,14 +22,13 @@ package playground.michalm.taxi.file;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import pl.poznan.put.vrp.dynamic.data.model.Depot;
 import pl.poznan.put.vrp.dynamic.data.model.impl.DepotImpl;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.extensions.electric.*;
 import playground.michalm.taxi.TaxiData;
 import playground.michalm.taxi.model.VrpAgentElectricTaxi;
@@ -44,7 +43,6 @@ public class TaxiRankReader
 
     private final Scenario scenario;
     private final TaxiData data;
-    private final MatsimVrpGraph graph;
     private final EnergyConsumptionModel ecm;
 
     private Depot currentRank;
@@ -55,8 +53,6 @@ public class TaxiRankReader
         this.scenario = scenario;
         this.data = data;
         this.ecm = ecm;
-
-        graph = (MatsimVrpGraph)data.getVrpGraph();
     }
 
 
@@ -96,9 +92,9 @@ public class TaxiRankReader
         }
 
         Id linkId = scenario.createId(atts.getValue("linkId"));
-        Vertex vertex = graph.getVertex(linkId);
+        Link link = scenario.getNetwork().getLinks().get(linkId);
 
-        currentRank = new DepotImpl(id, name, vertex);
+        currentRank = new DepotImpl(id, name, link);
         data.addDepot(currentRank);
     }
 
@@ -135,7 +131,7 @@ public class TaxiRankReader
 
         double powerInJoules = getDouble(atts, "power_kW", 20) * 1000;
 
-        data.addCharger(new ChargerImpl(id, name, powerInJoules, currentRank.getVertex()));
+        data.addCharger(new ChargerImpl(id, name, powerInJoules, currentRank.getLink()));
     }
 
 

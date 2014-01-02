@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.dvrp.data.network.shortestpath;
 
-import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.network.AbstractMatsimArc;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
@@ -37,10 +38,10 @@ public class SparseDiscreteMatsimArc
     private ShortestPath[] shortestPaths = null;// lazy initialization
 
 
-    public SparseDiscreteMatsimArc(MatsimVertex fromVertex, MatsimVertex toVertex,
+    public SparseDiscreteMatsimArc(Link fromLink, Link toLink,
             ShortestPathCalculator shortestPathCalculator, TimeDiscretizer timeDiscretizer)
     {
-        super(fromVertex, toVertex);
+        super(fromLink, toLink);
         this.shortestPathCalculator = shortestPathCalculator;
         this.timeDiscretizer = timeDiscretizer;
     }
@@ -60,7 +61,7 @@ public class SparseDiscreteMatsimArc
         // loads necessary data on demand
         if (shortestPath == null) {
             shortestPath = shortestPaths[idx] = shortestPathCalculator.calculateShortestPath(
-                    fromVertex, toVertex, timeDiscretizer.getTime(idx));
+                    fromLink, toLink, timeDiscretizer.getTime(idx));
         }
 
         return shortestPath;
@@ -83,10 +84,10 @@ public class SparseDiscreteMatsimArc
 
 
         @Override
-        public Arc createArc(Vertex fromVertex, Vertex toVertex)
+        public Arc createArc(Link fromLink, Link toLink)
         {
-            return new SparseDiscreteMatsimArc((MatsimVertex)fromVertex, (MatsimVertex)toVertex,
-                    shortestPathCalculator, timeDiscretizer);
+            return new SparseDiscreteMatsimArc(fromLink, toLink, shortestPathCalculator,
+                    timeDiscretizer);
         }
     }
 }

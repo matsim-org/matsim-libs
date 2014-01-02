@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
@@ -58,16 +58,16 @@ public class PassengerDepartureHandler
         vrpSimEngine.getInternalInterface().registerAdditionalAgentOnLink(passengerAgent);
         Id toLinkId = passengerAgent.getDestinationLinkId();
 
-        MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
-        MatsimVertex fromVertex = vrpGraph.getVertex(fromLinkId);
-        MatsimVertex toVertex = vrpGraph.getVertex(toLinkId);
+        Map<Id, ? extends Link> links = data.getScenario().getNetwork().getLinks();
+        Link fromLink = links.get(fromLinkId);
+        Link toLink = links.get(toLinkId);
 
-        PassengerCustomer customer = PassengerCustomer
-                .getOrCreatePassengerCustomer(data, passengerAgent);
+        PassengerCustomer customer = PassengerCustomer.getOrCreatePassengerCustomer(data,
+                passengerAgent);
         List<PassengerRequest> submittedReqs = customer.getRequests();
 
         for (PassengerRequest r : submittedReqs) {
-            if (r.getFromVertex() == fromVertex && r.getToVertex() == toVertex && r.getT0() <= now
+            if (r.getFromLink() == fromLink && r.getToLink() == toLink && r.getT0() <= now
                     && r.getT1() + 1 >= now) {
                 //This is it! This is an advance request, so do not resubmit a duplicate!
                 return true;
@@ -75,7 +75,7 @@ public class PassengerDepartureHandler
         }
 
         PassengerRequest request = requestCreator
-                .createRequest(customer, fromVertex, toVertex, now);
+                .createRequest(customer, fromLink, toLink, now);
         submittedReqs.add(request);
         vrpSimEngine.requestSubmitted(request, now);
 

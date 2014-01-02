@@ -19,33 +19,35 @@
 
 package pl.poznan.put.vrp.dynamic.data.network.impl;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import org.matsim.api.core.v01.network.Link;
+
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
 
 
 public abstract class AbstractArc
     implements Arc
 {
-    protected final Vertex fromVertex;
-    protected final Vertex toVertex;
+    protected final Link fromLink;
+    protected final Link toLink;
 
 
-    public AbstractArc(Vertex fromVertex, Vertex toVertex)
+    public AbstractArc(Link fromLink, Link toLink)
     {
-        this.fromVertex = fromVertex;
-        this.toVertex = toVertex;
+        this.fromLink = fromLink;
+        this.toLink = toLink;
     }
 
 
     @Override
-    public Vertex getFromVertex()
+    public Link getFromLink()
     {
-        return fromVertex;
+        return fromLink;
     }
 
 
     @Override
-    public Vertex getToVertex()
+    public Link getToLink()
     {
-        return toVertex;
+        return toLink;
     }
 }

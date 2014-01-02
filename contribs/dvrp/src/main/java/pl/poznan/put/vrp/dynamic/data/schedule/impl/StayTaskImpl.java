@@ -19,7 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.schedule.StayTask;
 
 
@@ -27,20 +28,20 @@ public class StayTaskImpl
     extends AbstractTask
     implements StayTask
 {
-    private final Vertex vertex;
+    private final Link link;
     private final String name;
 
 
-    public StayTaskImpl(int beginTime, int endTime, Vertex vertex)
+    public StayTaskImpl(int beginTime, int endTime, Link link)
     {
-        this(beginTime, endTime, vertex, null);
+        this(beginTime, endTime, link, null);
     }
 
 
-    public StayTaskImpl(int beginTime, int endTime, Vertex vertex, String name)
+    public StayTaskImpl(int beginTime, int endTime, Link link, String name)
     {
         super(beginTime, endTime);
-        this.vertex = vertex;
+        this.link = link;
         this.name = name;
     }
 
@@ -53,12 +54,12 @@ public class StayTaskImpl
 
 
     @Override
-    public Vertex getVertex()
+    public Link getLink()
     {
-        return vertex;
+        return link;
     }
-    
-    
+
+
     public String getName()
     {
         return name;
@@ -68,6 +69,6 @@ public class StayTaskImpl
     @Override
     public String toString()
     {
-        return "S(" + (name != null ?  name : "") + "@" + vertex.getId() + ")" + commonToString();
+        return "S(" + (name != null ? name : "") + "@" + link.getId() + ")" + commonToString();
     }
 }

@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.data;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
 import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -74,12 +73,6 @@ public class MatsimVrpData
     public String getCoordSystem()
     {
         return coordSystem;
-    }
-
-
-    public MatsimVrpGraph getMatsimVrpGraph()
-    {
-        return (MatsimVrpGraph)vrpData.getVrpGraph();
     }
 
 

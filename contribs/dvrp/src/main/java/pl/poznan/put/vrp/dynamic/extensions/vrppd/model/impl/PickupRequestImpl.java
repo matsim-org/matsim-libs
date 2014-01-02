@@ -19,9 +19,10 @@
 
 package pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl;
 
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
 import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.extensions.vrppd.model.PickupRequest;
 import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.PickupTask;
 
@@ -30,15 +31,15 @@ public class PickupRequestImpl
     extends RequestImpl
     implements PickupRequest
 {
-    private final Vertex fromVertex;
+    private final Link fromLink;
     private PickupTask pickupTask;
 
 
     public PickupRequestImpl(int id, Customer customer, int quantity, int t0, int t1,
-            int submissionTime, Vertex fromVertex)
+            int submissionTime, Link fromLink)
     {
         super(id, customer, quantity, t0, t1, submissionTime);
-        this.fromVertex = fromVertex;
+        this.fromLink = fromLink;
     }
 
 
@@ -50,9 +51,9 @@ public class PickupRequestImpl
 
 
     @Override
-    public Vertex getFromVertex()
+    public Link getFromLink()
     {
-        return fromVertex;
+        return fromLink;
     }
 
 

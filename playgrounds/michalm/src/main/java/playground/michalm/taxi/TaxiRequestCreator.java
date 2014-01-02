@@ -21,7 +21,7 @@ package playground.michalm.taxi;
 
 import java.util.List;
 
-import org.matsim.contrib.dvrp.data.network.MatsimVertex;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -44,13 +44,13 @@ public class TaxiRequestCreator
 
 
     @Override
-    public TaxiRequest createRequest(Customer customer, MatsimVertex fromVertex,
-            MatsimVertex toVertex, double now)
+    public TaxiRequest createRequest(Customer customer, Link fromLink,
+            Link toLink, double now)
     {
         List<Request> requests = vrpData.getRequests();
 
         int id = requests.size();
-        TaxiRequest request = new TaxiRequest(id, customer, fromVertex, toVertex, (int)now,
+        TaxiRequest request = new TaxiRequest(id, customer, fromLink, toLink, (int)now,
                 (int)now);
         requests.add(request);
 

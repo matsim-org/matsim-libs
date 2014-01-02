@@ -20,7 +20,9 @@
 package pl.poznan.put.vrp.dynamic.data.network.impl;
 
 import java.util.*;
-import java.util.Map.Entry;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
 
@@ -30,80 +32,39 @@ import com.google.common.collect.Iterators;
 public class GrowingVrpGraph
     implements VrpGraph
 {
-    private final List<Vertex> vertices;
-    private final List<Vertex> unmodifiableVertices;
-
     private final ArcFactory arcFactory;
-    private final List<Map<Integer, Arc>> arcs;// fromVertex->toVertex->Arc
+    private final HashMap<Id, Map<Id, Arc>> arcs;// fromLink.id->toLink.id->Arc
 
-
-    // TODO: Map<Integer, Arc> ==> Map<Vertex, Arc> ???
 
     public GrowingVrpGraph(ArcFactory arcFactory)
     {
-        vertices = new ArrayList<Vertex>();
-        unmodifiableVertices = Collections.unmodifiableList(vertices);
-
         this.arcFactory = arcFactory;
-        arcs = new ArrayList<Map<Integer, Arc>>();
+        arcs = new HashMap<Id, Map<Id, Arc>>();
     }
 
 
     @Override
-    public int getVertexCount()
+    public Arc getArc(Link fromLink, Link toLink)
     {
-        return vertices.size();
-    }
+        Id fromId = fromLink.getId();
+        Id toId = toLink.getId();
 
-
-    @Override
-    public Vertex getVertex(int id)
-    {
-        return vertices.get(id);
-    }
-
-
-    @Override
-    public List<Vertex> getVertices()
-    {
-        return unmodifiableVertices;
-    }
-
-
-    @Override
-    public void addVertex(Vertex v)
-    {
-        if (v.getId() != vertices.size()) {
-            throw new RuntimeException("ID must be equal to the list position");
-        }
-
-        vertices.add(v);
-        arcs.add(null);
-    }
-
-
-    @Override
-    public Arc getArc(Vertex fromVertex, Vertex toVertex)
-    {
-        int fromIdx = fromVertex.getId();
-        int toIdx = toVertex.getId();
-
-        Map<Integer, Arc> fromVertexOutgoingArcs = arcs.get(fromIdx);
+        Map<Id, Arc> fromLinkOutgoingArcs = arcs.get(fromId);
 
         Arc arc;
 
-        if (fromVertexOutgoingArcs == null) {
-            fromVertexOutgoingArcs = new HashMap<Integer, Arc>();
-            arcs.set(fromIdx, fromVertexOutgoingArcs);
+        if (fromLinkOutgoingArcs == null) {
+            fromLinkOutgoingArcs = new HashMap<Id, Arc>();
+            arcs.put(fromId, fromLinkOutgoingArcs);
             arc = null;
         }
         else {
-            arc = fromVertexOutgoingArcs.get(toIdx);// autoboxing: toIdx
+            arc = fromLinkOutgoingArcs.get(toId);
         }
 
         if (arc == null) {
-            arc = arcFactory.createArc(fromVertex, toVertex);
-            fromVertexOutgoingArcs.put(toVertex.getId(), arc);
+            arc = arcFactory.createArc(fromLink, toLink);
+            fromLinkOutgoingArcs.put(toLink.getId(), arc);
         }
 
         return arc;
@@ -120,57 +81,57 @@ public class GrowingVrpGraph
     private class GrowingVrpGraphArcIterator
         implements Iterator<Arc>
     {
-        private int fromVertexId;
-        private Iterator<Entry<Integer, Arc>> entryIter;
-        private Entry<Integer, Arc> nextEntry;
+        private Iterator<Map<Id, Arc>> outerIter;
+        private Iterator<Arc> innerIter;
+        private Arc nextArc;
 
 
         public GrowingVrpGraphArcIterator()
         {
-            fromVertexId = -1;
-            entryIter = Iterators.emptyIterator();
-            updateNextEntry();
+            outerIter = arcs.values().iterator();
+            innerIter = Iterators.emptyIterator();
+            updateNextArc();
         }
 
 
         @Override
         public Arc next()
         {
-            if (nextEntry == null) {
+            if (nextArc == null) {
                 throw new NoSuchElementException();
             }
 
-            Arc currentArc = nextEntry.getValue();
-            updateNextEntry();
+            Arc currentArc = nextArc;
+            updateNextArc();
             return currentArc;
         }
 
 
-        private void updateNextEntry()
+        private void updateNextArc()
         {
-            if (entryIter.hasNext()) {
-                nextEntry = entryIter.next();
+            if (innerIter.hasNext()) {
+                nextArc = innerIter.next();
                 return;
             }
 
-            while (++fromVertexId < vertices.size()) {
-                Map<Integer, Arc> arcRow = arcs.get(fromVertexId);
+            while (outerIter.hasNext()) {
+                Map<Id, Arc> arcRow = outerIter.next();
 
                 if (arcRow != null) {
-                    entryIter = arcRow.entrySet().iterator();
-                    nextEntry = entryIter.next(); // always at least one entry inside a row
+                    innerIter = arcRow.values().iterator();
+                    nextArc = innerIter.next(); // always at least one entry inside a row
                     return;
                 }
             }
 
-            nextEntry = null;
+            nextArc = null;
         }
 
 
         @Override
         public boolean hasNext()
         {
-            return nextEntry != null;
+            return nextArc != null;
         }
 
 

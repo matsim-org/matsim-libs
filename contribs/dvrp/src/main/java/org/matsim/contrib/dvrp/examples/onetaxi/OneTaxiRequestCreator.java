@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import java.util.List;
 
-import org.matsim.contrib.dvrp.data.network.MatsimVertex;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.passenger.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -43,13 +43,13 @@ public class OneTaxiRequestCreator
 
 
     @Override
-    public PassengerRequest createRequest(Customer customer, MatsimVertex fromVertex,
-            MatsimVertex toVertex, double now)
+    public PassengerRequest createRequest(Customer customer, Link fromLink, Link toLink,
+            double now)
     {
         List<Request> requests = vrpData.getRequests();
 
         int id = requests.size();
-        OneTaxiRequest request = new OneTaxiRequest(id, customer, fromVertex, toVertex, (int)now);
+        OneTaxiRequest request = new OneTaxiRequest(id, customer, fromLink, toLink, (int)now);
 
         requests.add(request);
         return request;

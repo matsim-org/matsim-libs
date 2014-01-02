@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.data.network;
 
+import org.matsim.api.core.v01.network.Link;
+
 /**
  * TODO The current implementation is simplistic; the class will be re-implemented in the future.
  * 
@@ -27,28 +29,28 @@ package org.matsim.contrib.dvrp.data.network;
 public abstract class AbstractMatsimArc
     implements MatsimArc
 {
-    protected final MatsimVertex fromVertex;
-    protected final MatsimVertex toVertex;
+    protected final Link fromLink;
+    protected final Link toLink;
 
 
-    public AbstractMatsimArc(MatsimVertex fromVertex, MatsimVertex toVertex)
+    public AbstractMatsimArc(Link fromLink, Link toLink)
     {
-        this.fromVertex = fromVertex;
-        this.toVertex = toVertex;
+        this.fromLink = fromLink;
+        this.toLink = toLink;
     }
 
 
     @Override
-    public MatsimVertex getFromVertex()
+    public Link getFromLink()
     {
-        return fromVertex;
+        return fromLink;
     }
 
 
     @Override
-    public MatsimVertex getToVertex()
+    public Link getToLink()
     {
-        return toVertex;
+        return toLink;
     }
 
 

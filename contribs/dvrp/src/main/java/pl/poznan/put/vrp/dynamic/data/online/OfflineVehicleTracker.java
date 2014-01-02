@@ -19,7 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.online;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 
 
@@ -45,28 +46,20 @@ public class OfflineVehicleTracker
 
 
     @Override
-    public Vertex getLastPosition()
+    public Link getLink()
     {
-        return driveTask.getArc().getFromVertex();
+        return driveTask.getArc().getFromLink();
     }
 
 
     @Override
-    public int getLastPositionTime()
+    public int getLinkEnterTime()
     {
         return driveTask.getBeginTime();
     }
 
-
     @Override
-    public Vertex predictNextPosition(int currentTime)
-    {
-        return driveTask.getArc().getToVertex();
-    }
-
-
-    @Override
-    public int predictNextPositionTime(int currentTime)
+    public int predictLinkExitTime(int currentTime)
     {
         return predictEndTime(currentTime);
     }

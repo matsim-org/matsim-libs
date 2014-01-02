@@ -17,18 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network;
+package pl.poznan.put.vrp.dynamic.chart;
 
-public interface VertexBuilder
+import org.matsim.api.core.v01.network.Link;
+
+
+public interface LinkSource
 {
-    VertexBuilder setName(String name);
+    int getCount();
 
 
-    VertexBuilder setX(double x);
-
-
-    VertexBuilder setY(double y);
-
-
-    Vertex build();
+    Link getLink(int item);
 }

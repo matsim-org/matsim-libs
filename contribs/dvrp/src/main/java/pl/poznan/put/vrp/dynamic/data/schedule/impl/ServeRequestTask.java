@@ -19,8 +19,9 @@
 
 package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.model.Request;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
 public class ServeRequestTask
@@ -29,9 +30,9 @@ public class ServeRequestTask
     private final Request request;
 
 
-    public ServeRequestTask(int beginTime, int endTime, Vertex vertex, Request request)
+    public ServeRequestTask(int beginTime, int endTime, Link link, Request request)
     {
-        super(beginTime, endTime, vertex);
+        super(beginTime, endTime, link);
         this.request = request;
     }
 

@@ -71,7 +71,7 @@ public class DriveTaskImpl
     @Override
     public String toString()
     {
-        return "D(@" + arc.getFromVertex().getId() + "->@" + arc.getToVertex().getId() + ")"
+        return "D(@" + arc.getFromLink().getId() + "->@" + arc.getToLink().getId() + ")"
                 + commonToString();
     }
 }

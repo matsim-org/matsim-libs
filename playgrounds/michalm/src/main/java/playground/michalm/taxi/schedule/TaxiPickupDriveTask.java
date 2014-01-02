@@ -35,7 +35,7 @@ public class TaxiPickupDriveTask
     {
         super(beginTime, endTime, arc);
 
-        if (request.getFromVertex() != arc.getToVertex()) {
+        if (request.getFromLink() != arc.getToLink()) {
             throw new IllegalArgumentException();
         }
 

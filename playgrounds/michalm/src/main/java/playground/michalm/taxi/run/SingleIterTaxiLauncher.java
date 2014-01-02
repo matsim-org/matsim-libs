@@ -26,7 +26,6 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
@@ -42,6 +41,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
+import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
 import playground.michalm.RunningVehicleRegister;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
@@ -211,8 +211,8 @@ import playground.michalm.util.gis.Schedules2GIS;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
                 algorithmConfig.tdisSource, travelTime);
 
-        MatsimVrpGraph graph = VrpLauncherUtils.initMatsimVrpGraph(scenario,
-                algorithmConfig.ttimeSource, travelTime, travelDisutility);
+        VrpGraph graph = VrpLauncherUtils.initVrpGraph(scenario, algorithmConfig.ttimeSource,
+                travelTime, travelDisutility);
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
@@ -227,9 +227,7 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         VrpSimEngine vrpSimEngine = VrpLauncherUtils.initVrpSimEngine(qSim, data, optimizer);
 
-        TaxiActionCreator actionCreator = onlineVehicleTracker ? //
-                TaxiActionCreator.createCreatorWithOnlineVehicleTracker(vrpSimEngine, graph) : //
-                TaxiActionCreator.createCreatorWithOfflineVehicleTracker(vrpSimEngine);
+        TaxiActionCreator actionCreator = new TaxiActionCreator(vrpSimEngine, onlineVehicleTracker);
 
         VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, actionCreator);
 
@@ -317,12 +315,12 @@ import playground.michalm.util.gis.Schedules2GIS;
         // int aPrioriEstimation = arc.getTimeOnDeparture(beginTime);
         //
         // int aPosterioriEstimation = shortestPathCalculator.calculateShortestPath(arc
-        // .getFromVertex().getLink(), arc.getToVertex().getLink(), beginTime).travelTime;
+        // .getFromLink(), arc.getToLink(), beginTime).travelTime;
         //
         // if (aPosterioriEstimation != 0) {
         // if ( (actualDuration - aPosterioriEstimation) / aPosterioriEstimation > 1) {
         // ShortestPath sp = shortestPathCalculator.calculateShortestPath(arc
-        // .getFromVertex().getLink(), arc.getToVertex().getLink(),
+        // .getFromLink(), arc.getToLink(),
         // beginTime);
         //
         // System.out.println(v.getId() + " : " + (beginTime / 3600) + " : "
@@ -332,7 +330,7 @@ import playground.michalm.util.gis.Schedules2GIS;
         // else {
         // if (actualDuration > 1) {
         // ShortestPath sp = shortestPathCalculator.calculateShortestPath(arc
-        // .getFromVertex().getLink(), arc.getToVertex().getLink(),
+        // .getFromLink(), arc.getToLink(),
         // beginTime);
         //
         // System.out.println("0==" + v.getId() + " : " + (beginTime / 3600)

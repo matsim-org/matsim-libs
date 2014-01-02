@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,53 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network;
+package pl.poznan.put.vrp.dynamic.data.network.impl;
 
-import java.util.*;
+import org.matsim.api.core.v01.network.Link;
 
-import org.matsim.api.core.v01.Id;
-
-import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.data.network.impl.GrowingVrpGraph;
+import pl.poznan.put.vrp.dynamic.data.model.Localizable;
 
 
-/**
- * It consists of ShortestPathsArcs with ShortestPath of any type (Sparse, Full or other) - type of
- * the ShortestPath depends on the given ArcBuilder.
- * 
- * @author michalm
- */
-public class GrowingMatsimVrpGraph
-    extends GrowingVrpGraph
-    implements MatsimVrpGraph
+public class LinkTimePair
+    implements Localizable
 {
-    private final Map<Id, MatsimVertex> linkIdToVertex;
+    private final Link link;
+    private final int time;
 
 
-    public GrowingMatsimVrpGraph(ArcFactory arcFactory)
+    public LinkTimePair(Link link, int time)
     {
-        super(arcFactory);
-        linkIdToVertex = new LinkedHashMap<Id, MatsimVertex>();
+        this.link = link;
+        this.time = time;
     }
 
 
     @Override
-    public MatsimVertex getVertex(Id linkId)
+    public Link getLink()
     {
-        return linkIdToVertex.get(linkId);
+        return link;
     }
 
 
-    @Override
-    public void addVertex(Vertex vertex)
+    public int getTime()
     {
-        MatsimVertex mVertex = (MatsimVertex)vertex;
-        Id linkId = mVertex.getLink().getId();
-
-        if (linkIdToVertex.put(linkId, mVertex) != null) {
-            throw new RuntimeException("Duplicated vertex for link=" + linkId);
-        }
-
-        super.addVertex(mVertex);
+        return time;
     }
 }

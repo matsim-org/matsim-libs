@@ -19,9 +19,11 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
@@ -66,7 +68,7 @@ public class IdleVehicleFinder
     {
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         int time = data.getTime();
-        Vertex fromVertex;
+        Link fromLink;
 
         if (!TaxiUtils.isIdle(sched, time, true)) {
             return Double.MAX_VALUE;
@@ -76,7 +78,7 @@ public class IdleVehicleFinder
 
         switch (currentTask.getTaxiTaskType()) {
             case WAIT_STAY:
-                fromVertex = ((StayTask)currentTask).getVertex();
+                fromLink = ((StayTask)currentTask).getLink();
                 break;
 
             case CRUISE_DRIVE:
@@ -86,17 +88,20 @@ public class IdleVehicleFinder
                 throw new IllegalStateException();
         }
 
-        Vertex toVertex = req.getFromVertex();
+        Link toLink = req.getFromLink();
 
         if (straightLineDistance) {
-            double deltaX = toVertex.getX() - fromVertex.getX();
-            double deltaY = toVertex.getY() - fromVertex.getY();
+            Coord fromCoord = fromLink.getCoord();
+            Coord toCoord = toLink.getCoord();
+
+            double deltaX = toCoord.getX() - fromCoord.getX();
+            double deltaY = toCoord.getY() - fromCoord.getY();
 
             // this is a SQUARED distance!!! (to avoid unnecessary Math.sqrt() calls)
             return deltaX * deltaX + deltaY * deltaY;
         }
         else {
-            return data.getVrpGraph().getArc(fromVertex, toVertex).getCostOnDeparture(time);
+            return data.getVrpGraph().getArc(fromLink, toLink).getCostOnDeparture(time);
         }
     }
 }

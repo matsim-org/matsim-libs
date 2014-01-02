@@ -19,18 +19,19 @@
 
 package pl.poznan.put.vrp.dynamic.extensions.vrppd.model;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.extensions.vrppd.schedule.PickupTask;
 
 
 public interface PickupRequest
     extends VRPPDRequest
 {
-    Vertex getFromVertex();
+    Link getFromLink();
 
 
     PickupTask getPickupTask();
-    
-    
+
+
     void setPickupTask(PickupTask pickupTask);
 }

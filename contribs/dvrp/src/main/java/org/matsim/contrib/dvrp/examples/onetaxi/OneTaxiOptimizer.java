@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -55,7 +56,7 @@ public class OneTaxiOptimizer
     {
         //just wait (and be ready) till the end of the vehicle's time window (T1)
         schedule.addTask(new StayTaskImpl(vehicle.getT0(), Schedules.getActualT1(schedule), vehicle
-                .getDepot().getVertex()));
+                .getDepot().getLink()));
     }
 
 
@@ -79,27 +80,27 @@ public class OneTaxiOptimizer
         }
 
         OneTaxiRequest req = (OneTaxiRequest)request;
-        Vertex fromVertex = req.getFromVertex();
-        Vertex toVertex = req.getToVertex();
+        Link fromLink = req.getFromLink();
+        Link toLink = req.getToLink();
         int t0 = Schedules.getLastTask(schedule).getEndTime();
 
-        Arc pickupArc = data.getVrpGraph().getArc(lastTask.getVertex(), fromVertex);
+        Arc pickupArc = data.getVrpGraph().getArc(lastTask.getLink(), fromLink);
         int t1 = t0 + pickupArc.getTimeOnDeparture(t0);
         schedule.addTask(new DriveTaskImpl(t0, t1, pickupArc));
 
         int t2 = t1 + 120;// 2 minutes for picking up the passenger
-        schedule.addTask(new OneTaxiServeTask(t1, t2, fromVertex, "pickup", req));
+        schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
-        Arc deliveryArc = data.getVrpGraph().getArc(fromVertex, toVertex);
+        Arc deliveryArc = data.getVrpGraph().getArc(fromLink, toLink);
         int t3 = t2 + deliveryArc.getTimeOnDeparture(t2);
         schedule.addTask(new DriveTaskImpl(t2, t3, deliveryArc));
 
         int t4 = t3 + 60;// 1 minute for dropping off the passenger
-        schedule.addTask(new OneTaxiServeTask(t3, t4, toVertex, "dropoff", req));
+        schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, "dropoff", req));
 
         //just wait (and be ready) till the end of the vehicle's time window (T1)
         int tEnd = Schedules.getActualT1(schedule);
-        schedule.addTask(new StayTaskImpl(t4, tEnd, toVertex, "wait"));
+        schedule.addTask(new StayTaskImpl(t4, tEnd, toLink, "wait"));
     }
 
 

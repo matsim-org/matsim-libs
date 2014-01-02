@@ -21,9 +21,10 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.schedule.*;
@@ -134,16 +135,16 @@ public class RESTaxiOptimizer
 
                 int tEnd = Schedules.getActualT1(schedule);
                 int scheduleEndTime = schedule.getEndTime();
-                Vertex lastVertex = Schedules.getLastVertexInSchedule(schedule);
+                Link lastLink = Schedules.getLastLinkInSchedule(schedule);
 
                 if (scheduleEndTime < tEnd) {
-                    schedule.addTask(new TaxiWaitStayTask(scheduleEndTime, tEnd, lastVertex));
+                    schedule.addTask(new TaxiWaitStayTask(scheduleEndTime, tEnd, lastLink));
                 }
                 else {
                     // may happen that the previous task ends after tEnd!!!!!!!!!!
                     // just a hack to comply with the assumptions, i.e. lastTask is WAIT_TASK
                     schedule.addTask(new TaxiWaitStayTask(scheduleEndTime, scheduleEndTime,
-                            lastVertex));
+                            lastLink));
                 }
                 break;
 

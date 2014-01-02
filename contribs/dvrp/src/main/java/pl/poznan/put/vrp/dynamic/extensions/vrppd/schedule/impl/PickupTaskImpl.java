@@ -33,7 +33,7 @@ public class PickupTaskImpl
 
     public PickupTaskImpl(int beginTime, int endTime, PickupRequest request)
     {
-        super(beginTime, endTime, request.getFromVertex());
+        super(beginTime, endTime, request.getFromLink());
         this.request = request;
     }
 

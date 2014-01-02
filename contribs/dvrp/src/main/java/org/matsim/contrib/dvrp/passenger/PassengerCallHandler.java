@@ -21,9 +21,9 @@ package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.model.Request;
@@ -55,8 +55,8 @@ public class PassengerCallHandler
             return;
         }
 
-        MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
-        MatsimVertex vertex = vrpGraph.getVertex(event.getLinkId());
+        Network network = data.getScenario().getNetwork();
+        Link link = network.getLinks().get(event.getLinkId());
 
         MobsimAgent passenger = data.getMobsimAgents().get(event.getPersonId());
 
@@ -66,7 +66,7 @@ public class PassengerCallHandler
 
         PassengerCustomer customer = PassengerCustomer
                 .getOrCreatePassengerCustomer(data, passenger);
-        Request request = requestCreator.createRequest(customer, vertex, null, serveTime);
+        Request request = requestCreator.createRequest(customer, link, null, serveTime);
 
         vrpSimEngine.requestSubmitted(request, event.getTime());
     }

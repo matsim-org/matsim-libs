@@ -24,7 +24,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.MatsimVertex;
 import org.matsim.contrib.dvrp.data.schedule.VrpSchedulePlanFactory;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.*;
@@ -77,7 +76,7 @@ public class VrpAgentSource
             vrpSimEngine.addAgentLogic(vrpAgentLogic);
 
             Id id = data.getScenario().createId(vrpVeh.getName());
-            Id startLinkId = ((MatsimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
+            Id startLinkId = vrpVeh.getDepot().getLink().getId();
 
             DynAgent taxiAgent = new DynAgent(id, startLinkId, vrpSimEngine.getInternalInterface(),
                     vrpAgentLogic);

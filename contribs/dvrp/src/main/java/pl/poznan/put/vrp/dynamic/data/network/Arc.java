@@ -19,12 +19,15 @@
 
 package pl.poznan.put.vrp.dynamic.data.network;
 
+import org.matsim.api.core.v01.network.Link;
+
+
 public interface Arc
 {
-    Vertex getFromVertex();
+    Link getFromLink();
 
 
-    Vertex getToVertex();
+    Link getToLink();
 
 
     /**

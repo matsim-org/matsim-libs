@@ -19,7 +19,10 @@
 
 package pl.poznan.put.vrp.dynamic.data.network;
 
+import org.matsim.api.core.v01.network.Link;
+
+
 public interface ArcFactory
 {
-    Arc createArc(Vertex fromVertex, Vertex toVertex);
+    Arc createArc(Link fromLink, Link toLink);
 }

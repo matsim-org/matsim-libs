@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
 
 
@@ -29,10 +30,10 @@ public class OneTaxiServeTask
     private OneTaxiRequest request;
 
 
-    public OneTaxiServeTask(int beginTime, int endTime, Vertex vertex, String name,
+    public OneTaxiServeTask(int beginTime, int endTime, Link link, String name,
             OneTaxiRequest request)
     {
-        super(beginTime, endTime, vertex, name);
+        super(beginTime, endTime, link, name);
         this.request = request;
     }
 
@@ -46,6 +47,6 @@ public class OneTaxiServeTask
     //pickup or dropoff
     public boolean isPickup()
     {
-        return getVertex() == request.getFromVertex();
+        return getLink() == request.getFromLink();
     }
 }

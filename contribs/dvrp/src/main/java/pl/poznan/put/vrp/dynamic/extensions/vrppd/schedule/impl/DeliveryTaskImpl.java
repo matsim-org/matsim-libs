@@ -39,7 +39,7 @@ public class DeliveryTaskImpl
     
     public DeliveryTaskImpl(int beginTime, int endTime, DeliveryRequest request, String name)
     {
-        super(beginTime, endTime, request.getToVertex(), name);
+        super(beginTime, endTime, request.getToLink(), name);
         this.request = request;
         
         this.request.setDeliveryTask(this);

@@ -32,7 +32,7 @@ public class TaxiPickupStayTask
 
     public TaxiPickupStayTask(int beginTime, int endTime, TaxiRequest request)
     {
-        super(beginTime, endTime, request.getFromVertex());
+        super(beginTime, endTime, request.getFromLink());
 
         this.request = request;
         request.setPickupStayTask(this);

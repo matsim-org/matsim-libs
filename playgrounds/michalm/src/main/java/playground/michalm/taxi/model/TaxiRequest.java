@@ -19,12 +19,12 @@
 
 package playground.michalm.taxi.model;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
 import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
 import playground.michalm.taxi.schedule.*;
 
@@ -54,8 +54,8 @@ public class TaxiRequest
     };
 
 
-    private final Vertex fromVertex;
-    private final Vertex toVertex;
+    private final Link fromLink;
+    private final Link toLink;
 
     private TaxiPickupDriveTask pickupDriveTask;
     private TaxiPickupStayTask pickupStayTask;
@@ -63,26 +63,26 @@ public class TaxiRequest
     private TaxiDropoffStayTask dropoffStayTask;
 
 
-    public TaxiRequest(int id, Customer customer, Vertex fromVertex, Vertex toVertex, int t0,
+    public TaxiRequest(int id, Customer customer, Link fromLink, Link toLink, int t0,
             int submissionTime)
     {
         super(id, customer, 1, t0, t0, submissionTime);
-        this.fromVertex = fromVertex;
-        this.toVertex = toVertex;
+        this.fromLink = fromLink;
+        this.toLink = toLink;
     }
 
 
     @Override
-    public Vertex getFromVertex()
+    public Link getFromLink()
     {
-        return fromVertex;
+        return fromLink;
     }
 
 
     @Override
-    public Vertex getToVertex()
+    public Link getToLink()
     {
-        return toVertex;
+        return toLink;
     }
 
 

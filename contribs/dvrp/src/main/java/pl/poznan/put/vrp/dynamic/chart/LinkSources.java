@@ -21,22 +21,23 @@ package pl.poznan.put.vrp.dynamic.chart;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
+
 import pl.poznan.put.vrp.dynamic.data.model.Localizable;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 import com.google.common.collect.Lists;
 
 
-public class VertexSources
+public class LinkSources
 {
-    public static abstract class AbstractVertexSource<T>
-        implements VertexSource
+    public static abstract class AbstractLinkSource<T>
+        implements LinkSource
     {
         private List<T> list;
 
 
-        public AbstractVertexSource(List<T> list)
+        public AbstractLinkSource(List<T> list)
         {
             this.list = list;
         }
@@ -50,20 +51,20 @@ public class VertexSources
 
 
         @Override
-        public Vertex getVertex(int index)
+        public Link getLink(int index)
         {
-            return getVertex(list.get(index));
+            return getLink(list.get(index));
         }
 
 
-        protected abstract Vertex getVertex(T item);
+        protected abstract Link getLink(T item);
     }
 
 
-    public static VertexSource createFromVertices(final List<Vertex> vertices)
+    public static LinkSource createFromLinks(final List<Link> links)
     {
-        return new AbstractVertexSource<Vertex>(vertices) {
-            protected Vertex getVertex(Vertex item)
+        return new AbstractLinkSource<Link>(links) {
+            protected Link getLink(Link item)
             {
                 return item;
             };
@@ -71,31 +72,31 @@ public class VertexSources
     }
 
 
-    public static <T extends Localizable> VertexSource createFromLocalizables(
+    public static <T extends Localizable> LinkSource createFromLocalizables(
             final List<T> localizables)
     {
-        return new AbstractVertexSource<T>(localizables) {
-            protected Vertex getVertex(T item)
+        return new AbstractLinkSource<T>(localizables) {
+            protected Link getLink(T item)
             {
-                return item.getVertex();
+                return item.getLink();
             };
         };
     }
 
 
-    // n DriveTasks -> n+1 Vertices
-    public static VertexSource createFromDriveTasks(final List<DriveTask> tasks)
+    // n DriveTasks -> n+1 Links
+    public static LinkSource createFromDriveTasks(final List<DriveTask> tasks)
     {
-        return new VertexSource() {
+        return new LinkSource() {
 
             @Override
-            public Vertex getVertex(int item)
+            public Link getLink(int item)
             {
                 if (item == 0) {
-                    return tasks.get(0).getArc().getFromVertex();
+                    return tasks.get(0).getArc().getFromLink();
                 }
 
-                return tasks.get(item - 1).getArc().getToVertex();
+                return tasks.get(item - 1).getArc().getToLink();
             }
 
 
@@ -109,10 +110,10 @@ public class VertexSources
     }
 
 
-    // Schedule -> n DriveTasks -> n+1 Vertices
-    public static VertexSource createVertexSource(Schedule<?> schedule)
+    // Schedule -> n DriveTasks -> n+1 Links
+    public static LinkSource createLinkSource(Schedule<?> schedule)
     {
         List<DriveTask> tasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
-        return VertexSources.createFromDriveTasks(tasks);
+        return LinkSources.createFromDriveTasks(tasks);
     }
 }

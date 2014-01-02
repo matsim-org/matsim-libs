@@ -65,17 +65,17 @@ public class VrpSchedulePlan
 
     private void init()
     {
-        MatsimVertex depotVertex = (MatsimVertex)vehicle.getDepot().getVertex();
+        Link depotLink = vehicle.getDepot().getLink();
 
         Schedule<?> schedule = vehicle.getSchedule();
 
         if (schedule.getStatus().isUnplanned()) {// vehicle stays at the depot
-            addActivity(depotVertex, -1, "RtU");
+            addActivity(depotLink, -1, "RtU");
             return;
         }
 
         // Depot - before schedule.getBeginTime()
-        addActivity(depotVertex, schedule.getBeginTime(), "RtP");
+        addActivity(depotLink, schedule.getBeginTime(), "RtP");
 
         for (Task t : schedule.getTasks()) {
             switch (t.getType()) {
@@ -86,7 +86,7 @@ public class VrpSchedulePlan
 
                 case STAY:
                     StayTask wt = (StayTask)t;
-                    addActivity((MatsimVertex)wt.getVertex(), wt.getEndTime(), "S");
+                    addActivity(wt.getLink(), wt.getEndTime(), "S");
                     break;
 
                 default:
@@ -95,7 +95,7 @@ public class VrpSchedulePlan
         }
 
         // Depot - after schedule.getEndTime()
-        addActivity(depotVertex, -1, "RtC");
+        addActivity(depotLink, -1, "RtC");
     }
 
 
@@ -107,8 +107,8 @@ public class VrpSchedulePlan
 
         leg.setDepartureTime(departureTime);
 
-        Link fromLink = arc.getFromVertex().getLink();
-        Link toLink = arc.getToVertex().getLink();
+        Link fromLink = arc.getFromLink();
+        Link toLink = arc.getToLink();
 
         Link[] links = path.links;
 
@@ -145,11 +145,9 @@ public class VrpSchedulePlan
     }
 
 
-    private void addActivity(MatsimVertex vertex, int endTime, String type)
+    private void addActivity(Link link, int endTime, String type)
     {
-        // Activity act = populFactory.createActivityFromLinkId("service",
-        // vertex.getLink().getId());
-        Activity act = new ActivityImpl(type, vertex.getCoord(), vertex.getLink().getId());
+        Activity act = new ActivityImpl(type, link.getCoord(), link.getId());
 
         if (endTime != -1) {
             act.setEndTime(endTime);

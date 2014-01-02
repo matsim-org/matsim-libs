@@ -21,15 +21,13 @@ package playground.michalm.util.gis;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import pl.poznan.put.vrp.dynamic.data.model.Localizable;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 
 // taken from org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape
@@ -53,18 +51,18 @@ public class Localizables2GIS<T extends Localizable>
         Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
         for (Localizable localizable : localizables) {
-            features.add(getFeature(localizable.getVertex()));
+            features.add(getFeature(localizable.getLink()));
         }
 
         ShapeFileWriter.writeGeometries(features, filename);
     }
 
 
-    private SimpleFeature getFeature(Vertex vertex)
+    private SimpleFeature getFeature(Link link)
     {
         try {
-            return this.factory.createPoint(new Coordinate(vertex.getX(), vertex.getY()),
-                    new Object[] { vertex.getId(), vertex.getName() }, null);
+            return this.factory.createPoint(link.getCoord(), new Object[] { link.getId() },
+                    link.getId().toString());
         }
         catch (IllegalArgumentException e) {
             throw new RuntimeException(e);

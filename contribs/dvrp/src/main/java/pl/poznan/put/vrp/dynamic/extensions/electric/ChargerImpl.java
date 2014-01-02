@@ -19,7 +19,7 @@
 
 package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import org.matsim.api.core.v01.network.Link;
 
 
 public class ChargerImpl
@@ -28,17 +28,17 @@ public class ChargerImpl
     private final int id;
     private final String name;
     private final double powerInWatts;
-    private final Vertex vertex;
+    private final Link link;
 
     private final ChargingSchedule<? extends ChargeTask> schedule;
 
 
-    public ChargerImpl(int id, String name, double powerInWatts, Vertex vertex)
+    public ChargerImpl(int id, String name, double powerInWatts, Link link)
     {
         this.id = id;
         this.name = name;
         this.powerInWatts = powerInWatts;
-        this.vertex = vertex;
+        this.link = link;
 
         schedule = new ChargingScheduleImpl<ChargeTask>(this);
     }
@@ -66,9 +66,9 @@ public class ChargerImpl
 
 
     @Override
-    public Vertex getVertex()
+    public Link getLink()
     {
-        return vertex;
+        return link;
     }
 
 
