@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.dvrp.data.network.shortestpath;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.network.MatsimVertex;
 import org.matsim.core.router.util.*;
@@ -59,24 +58,24 @@ public class ShortestPathCalculator
                     departureTime, null, null);
 
             int count = path.links.size();
-            Id[] ids = new Id[count + 2];
+            Link[] links = new Link[count + 2];
             int[] accLinkTravelTimes = new int[count + 2];
 
-            ids[0] = fromLink.getId();
+            links[0] = fromLink;
             double accTT = 1.;//we start at the end of fromLink
             //actually, in QSim, it usually takes 1 second to move over the first node
             //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
             //otherwise it may take even much longer)
             accLinkTravelTimes[0] = (int)accTT;
 
-            for (int i = 0; i < count; i++) {
-                Link link = path.links.get(i);
-                ids[i + 1] = link.getId();
+            for (int i = 1; i <= count; i++) {
+                Link link = path.links.get(i - 1);
+                links[i] = link;
                 accTT += travelTime.getLinkTravelTime(link, departureTime + accTT, null, null);
-                accLinkTravelTimes[i + 1] = (int)accTT;
+                accLinkTravelTimes[i] = (int)accTT;
             }
 
-            ids[count + 1] = toLink.getId();
+            links[count + 1] = toLink;
             int toLinkEnterTime = departureTime + (int)accTT;
             accTT += travelTime.getLinkTravelTime(toLink, toLinkEnterTime, null, null);
             accLinkTravelTimes[count + 1] = (int)accTT;
@@ -84,10 +83,10 @@ public class ShortestPathCalculator
             double cost = path.travelCost
                     + travelDisutility.getLinkTravelDisutility(toLink, toLinkEnterTime, null, null);
 
-            return new ShortestPath((int)accTT, cost, ids, accLinkTravelTimes);
+            return new ShortestPath((int)accTT, cost, links, accLinkTravelTimes);
         }
         else {
-            return new ShortestPath(0, 0, new Id[] { fromLink.getId() }, new int[] { 0 });
+            return new ShortestPath(0, 0, new Link[] { fromLink }, new int[] { 0 });
         }
     }
 }

@@ -22,35 +22,34 @@ package pl.poznan.put.vrp.dynamic.extensions.electric;
 public class BatteryImpl
     implements Battery
 {
-    private double chargeInJoules;
+    private final double capacity;
+    private double energy;
 
-    private final double capacityInJoules;
 
-
-    public BatteryImpl(double chargeInJoules, double capacityInJoules)
+    public BatteryImpl(double energy, double capacity)
     {
-        this.chargeInJoules = chargeInJoules;
-        this.capacityInJoules = capacityInJoules;
+        this.energy = energy;
+        this.capacity = capacity;
     }
 
 
     @Override
-    public double getChargeInJoules()
+    public double getCapacity()
     {
-        return chargeInJoules;
+        return capacity;
     }
 
 
     @Override
-    public double getCapacityInJoules()
+    public double getEnergy()
     {
-        return capacityInJoules;
+        return energy;
     }
 
 
     @Override
-    public void setChargeInJoules(double chargeInJoules)
+    public void setEnergy(double energy)
     {
-        this.chargeInJoules = chargeInJoules;
+        this.energy = energy;
     }
 }

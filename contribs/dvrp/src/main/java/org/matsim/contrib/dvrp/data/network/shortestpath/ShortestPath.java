@@ -19,22 +19,22 @@
 
 package org.matsim.contrib.dvrp.data.network.shortestpath;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 
 public class ShortestPath
 {
     public final int travelTime;
     public final double travelCost;
-    public final Id[] linkIds;
+    public final Link[] links;
     public final int[] accLinkTravelTimes;//accumulated link travel times
 
 
-    public ShortestPath(int travelTime, double travelCost, Id[] linkIds, int[] accLinkTravelTimes)
+    public ShortestPath(int travelTime, double travelCost, Link[] links, int[] accLinkTravelTimes)
     {
         this.travelTime = travelTime;
         this.travelCost = travelCost;
-        this.linkIds = linkIds;
+        this.links = links;
         this.accLinkTravelTimes = accLinkTravelTimes;
     }
 }

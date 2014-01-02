@@ -22,7 +22,7 @@ package playground.michalm.util.gis;
 import java.io.File;
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.network.MatsimArc;
@@ -40,14 +40,12 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class Schedules2GIS
 {
     private final List<Vehicle> vehicles;
-    private final MatsimVrpData data;
     private final PolylineFeatureFactory factory;
 
 
     public Schedules2GIS(List<Vehicle> vehicles, MatsimVrpData data)
     {
         this.vehicles = vehicles;
-        this.data = data;
 
         factory = new PolylineFeatureFactory.Builder().//
                 setCrs(MGC.getCRS(data.getCoordSystem())).//
@@ -95,18 +93,16 @@ public class Schedules2GIS
         MatsimArc arc = (MatsimArc)driveTask.getArc();
         ShortestPath path = arc.getShortestPath(driveTask.getBeginTime());
 
-        Id[] ids = path.linkIds;
+        Link[] links = path.links;
 
-        if (ids.length == 1) {
+        if (links.length == 1) {
             return null;
         }
 
         List<Coordinate> coordList = new ArrayList<Coordinate>();
-        Map<Id, ? extends Link> linksMap = data.getScenario().getNetwork().getLinks();
 
-        for (Id l : path.linkIds) {
-            Link link = linksMap.get(l);
-            Coord c = link.getToNode().getCoord();
+        for (Link l : path.links) {
+            Coord c = l.getToNode().getCoord();
             coordList.add(new Coordinate(c.getX(), c.getY()));
         }
 

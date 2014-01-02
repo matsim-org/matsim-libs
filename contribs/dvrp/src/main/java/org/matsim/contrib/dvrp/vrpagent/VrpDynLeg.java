@@ -65,7 +65,7 @@ public class VrpDynLeg
         MatsimArc arc = (MatsimArc)driveTask.getArc();
         destinationLinkId = arc.getToVertex().getLink().getId();
         shortestPath = arc.getShortestPath(driveTask.getBeginTime());
-        destinationLinkIdx = shortestPath.linkIds.length - 1;
+        destinationLinkIdx = shortestPath.links.length - 1;
 
         onlineVehicleTracker = null;//offlineVehicleTracker is used in DriveTask by default 
     }
@@ -77,7 +77,7 @@ public class VrpDynLeg
         MatsimArc arc = (MatsimArc)driveTask.getArc();
         destinationLinkId = arc.getToVertex().getLink().getId();
         shortestPath = arc.getShortestPath(driveTask.getBeginTime());
-        destinationLinkIdx = shortestPath.linkIds.length - 1;
+        destinationLinkIdx = shortestPath.links.length - 1;
 
         onlineVehicleTracker = new OnlineVehicleTracker(driveTask, graph, vrpSimEngine);
         driveTask.setVehicleTracker(onlineVehicleTracker);
@@ -98,7 +98,7 @@ public class VrpDynLeg
     @Override
     public Id getCurrentLinkId()
     {
-        return shortestPath.linkIds[currentLinkIdx];
+        return shortestPath.links[currentLinkIdx].getId();
     }
 
 
@@ -109,7 +109,7 @@ public class VrpDynLeg
             return null;
         }
 
-        return shortestPath.linkIds[currentLinkIdx + 1];
+        return shortestPath.links[currentLinkIdx + 1].getId();
     }
 
 
@@ -197,7 +197,7 @@ public class VrpDynLeg
                 return null;//the vehicle is at the very beginning (before the first node)
             }
 
-            return vrpGraph.getVertex(shortestPath.linkIds[currentLinkIdx - 1]);
+            return vrpGraph.getVertex(shortestPath.links[currentLinkIdx - 1].getId());
         }
 
 
@@ -211,7 +211,7 @@ public class VrpDynLeg
         @Override
         public Vertex predictNextPosition(int currentTime)
         {
-            return vrpGraph.getVertex(shortestPath.linkIds[currentLinkIdx]);
+            return vrpGraph.getVertex(shortestPath.links[currentLinkIdx].getId());
         }
 
 

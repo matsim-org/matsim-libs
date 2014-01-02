@@ -110,18 +110,18 @@ public class VrpSchedulePlan
         Link fromLink = arc.getFromVertex().getLink();
         Link toLink = arc.getToVertex().getLink();
 
-        Id[] linkIds = path.linkIds;
+        Link[] links = path.links;
 
         NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl)populFactory).createRoute(
                 TransportMode.car, fromLink.getId(), toLink.getId());
 
-        if (linkIds.length > 1) {// means: fromLink != toLink
+        if (links.length > 1) {// means: fromLink != toLink
 
             // all except the first and last ones (== fromLink and toLink)
-            ArrayList<Id> linkIdList = new ArrayList<Id>(linkIds.length - 1);
+            ArrayList<Id> linkIdList = new ArrayList<Id>(links.length - 1);
 
-            for (int i = 1; i < linkIds.length - 1; i++) {
-                linkIdList.add(linkIds[i]);
+            for (int i = 1; i < links.length - 1; i++) {
+                linkIdList.add(links[i].getId());
             }
 
             netRoute.setLinkIds(fromLink.getId(), linkIdList, toLink.getId());

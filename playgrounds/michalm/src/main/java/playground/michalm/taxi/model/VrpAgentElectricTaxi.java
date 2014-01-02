@@ -20,7 +20,6 @@
 package playground.michalm.taxi.model;
 
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
-import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 import pl.poznan.put.vrp.dynamic.data.model.Depot;
@@ -31,54 +30,15 @@ public class VrpAgentElectricTaxi
     extends VrpAgentVehicleImpl
     implements ElectricVehicle
 {
-    private class ElectricTaxi
-        extends BatteryElectricVehicle
-    {
-        private ElectricTaxi(EnergyConsumptionModel ecm)
-        {
-            electricDriveEnergyConsumptionModel = ecm;
-        }
-
-
-        @Override
-        public void useBattery(double energyConsumptionInJoule)
-        {
-            super.useBattery(energyConsumptionInJoule);
-            battery.setChargeInJoules(socInJoules);
-        }
-
-
-        @Override
-        public void chargeBattery(double energyChargeInJoule)
-        {
-            super.chargeBattery(energyChargeInJoule);
-            battery.setChargeInJoules(socInJoules);
-        }
-
-
-        private void batteryChanged()
-        {
-            usableBatteryCapacityInJoules = battery.getCapacityInJoules();
-            socInJoules = battery.getChargeInJoules();
-        }
-    }
-
-
-    private final ElectricTaxi electricTaxi;
     private Battery battery;
+    private EnergyConsumptionModel ecm;
 
 
     public VrpAgentElectricTaxi(int id, String name, Depot startingRank, int t0, int t1,
             EnergyConsumptionModel ecm)
     {
         super(id, name, startingRank, 4, t0, t1, t1 - t0);
-        electricTaxi = new ElectricTaxi(ecm);
-    }
-
-
-    public BatteryElectricVehicle getElectricVehicle()
-    {
-        return electricTaxi;
+        this.ecm = ecm;
     }
 
 
@@ -93,6 +53,5 @@ public class VrpAgentElectricTaxi
     public void setBattery(Battery battery)
     {
         this.battery = battery;
-        electricTaxi.batteryChanged();
     }
 }

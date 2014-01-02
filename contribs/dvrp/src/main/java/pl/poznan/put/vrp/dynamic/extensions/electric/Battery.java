@@ -21,11 +21,11 @@ package pl.poznan.put.vrp.dynamic.extensions.electric;
 
 public interface Battery
 {
-    double getChargeInJoules();
+    double getCapacity();
 
 
-    double getCapacityInJoules();
+    double getEnergy();
 
 
-    void setChargeInJoules(double chargeInJoules);
+    void setEnergy(double energy);
 }
