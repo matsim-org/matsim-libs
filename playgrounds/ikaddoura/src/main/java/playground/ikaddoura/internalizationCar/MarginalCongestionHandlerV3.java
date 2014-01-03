@@ -83,6 +83,9 @@ public class MarginalCongestionHandlerV3 implements
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
 	private final Map<Id, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfo>();
 	private final Map<Id, Double> agentId2storageDelay = new HashMap<Id, Double>();
+	
+	private double totalInternalizedDelay = 0.0;
+	private double totalDelay = 0.0;
 		
 	public MarginalCongestionHandlerV3(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -206,6 +209,7 @@ public class MarginalCongestionHandlerV3 implements
 	private void calculateCongestion(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
+		this.totalDelay = this.totalDelay + delayOnThisLink;
 		
 		// Check if this (affected) agent was previously delayed without internalizing the delay (= charging the causing agent for this delay).
 		double totalDelayWithDelaysOnPreviousLinks = 0.;
@@ -264,7 +268,8 @@ public class MarginalCongestionHandlerV3 implements
 					log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 				} else {
 					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getVehicleId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId());
-					this.events.processEvent(congestionEvent);		
+					this.events.processEvent(congestionEvent);
+					this.totalInternalizedDelay = this.totalInternalizedDelay + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 				}
 				delayToPayFor = delayToPayFor - linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 				
@@ -276,6 +281,8 @@ public class MarginalCongestionHandlerV3 implements
 					} else {
 						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getVehicleId(), delayToPayFor, event.getLinkId());
 						this.events.processEvent(congestionEvent);	
+						this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
+
 					}
 					delayToPayFor = 0.;
 				}
@@ -354,6 +361,14 @@ public class MarginalCongestionHandlerV3 implements
 			}
 		}
 		return lastLeavingFromThatLink;
+	}
+
+	public double getTotalInternalizedDelay() {
+		return totalInternalizedDelay;
+	}
+
+	public double getTotalDelay() {
+		return totalDelay;
 	}
 	
 }
