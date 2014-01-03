@@ -31,7 +31,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerV2;
+import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV2;
 import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
 import playground.ikaddoura.internalizationPt.CapacityDelayHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
@@ -96,7 +96,7 @@ public class OptControlerListener implements StartupListener {
 		
 		// car mode
 		if (this.calculate_carCongestionEffects) {
-			event.getControler().getEvents().addHandler(new MarginalCongestionHandlerV2(eventsManager, scenario));
+			event.getControler().getEvents().addHandler(new MarginalCongestionHandlerImplV2(eventsManager, scenario));
 		}
 		if (this.marginalCostPricingCar) {
 			event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));

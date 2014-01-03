@@ -55,7 +55,7 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		
-		event.getControler().getEvents().addHandler(new MarginalCongestionHandlerV3(eventsManager, scenario));
+		event.getControler().getEvents().addHandler(new MarginalCongestionHandlerImplV3(eventsManager, scenario));
 		event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
 		
 		event.getControler().getEvents().addHandler(tollHandler);
