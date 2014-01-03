@@ -202,7 +202,7 @@ import playground.michalm.util.gis.Schedules2GIS;
                 vrpSimEngine, false));
 
         VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new TaxiRequestCreator(
-                vrpData), TaxiRequestCreator.MODE);
+                data), TaxiRequestCreator.MODE);
 
         
         EventsManager events = qSim.getEventsManager();

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network.shortestpath;
+package pl.poznan.put.vrp.dynamic.util;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.*;
-
-import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
-import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
-
-
-public class MatsimArcFactories
+public class DoubleInterpolator
 {
-    public static ArcFactory createArcFactory(Network network, TravelTime travelTime,
-            TravelDisutility travelDisutility, TimeDiscretizer timeDiscretizer, boolean preciseArc)
-    {
-        LeastCostPathCalculator router = new Dijkstra(network, travelDisutility, travelTime);
-        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
-                travelTime, travelDisutility);
+    private TimeDiscretizer timeDiscretizer;
+    private double[] values;
 
-        return preciseArc
-                ? //
-                new PreciseMatsimArc.PreciseMatsimArcFactory(shortestPathCalculator)
-                : new SparseDiscreteMatsimArc.SparseDiscreteMatsimArcFactory(
-                        shortestPathCalculator, timeDiscretizer);
+
+    public DoubleInterpolator(TimeDiscretizer timeDiscretizer, double[] values)
+    {
+        this.timeDiscretizer = timeDiscretizer;
+        this.values = values;
+
+        if (timeDiscretizer.getIntervalCount() != values.length) {
+            throw new IllegalArgumentException();
+        }
     }
 
+
+    public double interpolate(int time)
+    {
+        return timeDiscretizer.interpolate(values, time);
+    }
 }

@@ -19,6 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.model.impl;
 
+import org.matsim.api.core.v01.Id;
+
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
@@ -27,7 +29,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
 public class VehicleImpl
     implements Vehicle
 {
-    private final int id;
+    private final Id id;
     private final String name;
     private final Depot depot;
 
@@ -43,7 +45,7 @@ public class VehicleImpl
     private final Schedule<? extends AbstractTask> schedule;
 
 
-    public VehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1, int timeLimit)
+    public VehicleImpl(Id id, String name, Depot depot, int capacity, int t0, int t1, int timeLimit)
     {
         this.id = id;
         this.name = name;
@@ -58,7 +60,7 @@ public class VehicleImpl
 
 
     @Override
-    public int getId()
+    public Id getId()
     {
         return id;
     }

@@ -20,6 +20,7 @@
 package pl.poznan.put.vrp.dynamic.data.network;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
 
 
 public interface Arc
@@ -28,6 +29,9 @@ public interface Arc
 
 
     Link getToLink();
+
+
+    ShortestPath getShortestPath(int departTime);
 
 
     /**

@@ -19,6 +19,7 @@
 
 package pl.poznan.put.vrp.dynamic.extensions.vrppd.model.impl;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
@@ -35,7 +36,7 @@ public class DeliveryRequestImpl
     private DeliveryTask deliveryTask;
 
 
-    public DeliveryRequestImpl(int id, Customer customer, int quantity, int t0, int t1,
+    public DeliveryRequestImpl(Id id, Customer customer, int quantity, int t0, int t1,
             int submissionTime, Link toLink)
     {
         super(id, customer, quantity, t0, t1, submissionTime);

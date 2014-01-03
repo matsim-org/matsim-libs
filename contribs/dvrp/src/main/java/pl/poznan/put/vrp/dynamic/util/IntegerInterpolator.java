@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network.impl;
+package pl.poznan.put.vrp.dynamic.util;
 
-import org.matsim.api.core.v01.network.Link;
-
-
-public class ConstantArc
-    extends AbstractArc
+public class IntegerInterpolator
 {
-    private int arcTime;
-    private double arcCost;
+    private TimeDiscretizer timeDiscretizer;
+    private int[] values;
 
 
-    public ConstantArc(Link fromLink, Link toLink, int arcTime, double arcCost)
+    public IntegerInterpolator(TimeDiscretizer timeDiscretizer, int[] values)
     {
-        super(fromLink, toLink);
-        this.arcTime = arcTime;
-        this.arcCost = arcCost;
+        this.timeDiscretizer = timeDiscretizer;
+        this.values = values;
+
+        if (timeDiscretizer.getIntervalCount() != values.length) {
+            throw new IllegalArgumentException();
+        }
     }
 
 
-    @Override
-    public int getTimeOnDeparture(int departureTime)
+    public int interpolate(int time)
     {
-        return arcTime;
-    }
-
-
-    @Override
-    public int getTimeOnArrival(int arrivalTime)
-    {
-        return arcTime;
-    }
-
-
-    @Override
-    public double getCostOnDeparture(int departureTime)
-    {
-        return arcCost;
+        return timeDiscretizer.interpolate(values, time);
     }
 }

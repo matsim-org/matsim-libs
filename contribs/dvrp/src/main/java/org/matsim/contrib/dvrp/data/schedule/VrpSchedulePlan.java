@@ -25,13 +25,13 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
@@ -81,7 +81,7 @@ public class VrpSchedulePlan
             switch (t.getType()) {
                 case DRIVE:
                     DriveTask dt = (DriveTask)t;
-                    addLeg((MatsimArc)dt.getArc(), dt.getBeginTime(), dt.getEndTime());
+                    addLeg(dt.getArc(), dt.getBeginTime(), dt.getEndTime());
                     break;
 
                 case STAY:
@@ -99,7 +99,7 @@ public class VrpSchedulePlan
     }
 
 
-    private void addLeg(MatsimArc arc, int departureTime, int arrivalTime)
+    private void addLeg(Arc arc, int departureTime, int arrivalTime)
     {
         ShortestPath path = arc.getShortestPath(departureTime);
 

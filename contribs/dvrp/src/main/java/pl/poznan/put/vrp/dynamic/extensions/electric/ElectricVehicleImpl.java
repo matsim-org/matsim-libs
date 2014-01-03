@@ -19,6 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.extensions.electric;
 
+import org.matsim.api.core.v01.Id;
+
 import pl.poznan.put.vrp.dynamic.data.model.Depot;
 import pl.poznan.put.vrp.dynamic.data.model.impl.VehicleImpl;
 
@@ -30,7 +32,7 @@ public class ElectricVehicleImpl
     private Battery battery;
 
 
-    public ElectricVehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1,
+    public ElectricVehicleImpl(Id id, String name, Depot depot, int capacity, int t0, int t1,
             int timeLimit, Battery battery)
     {
         super(id, name, depot, capacity, t0, t1, timeLimit);

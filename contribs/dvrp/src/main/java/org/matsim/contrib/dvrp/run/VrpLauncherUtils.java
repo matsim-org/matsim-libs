@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.file.DepotReader;
 import org.matsim.contrib.dvrp.data.network.router.*;
-import org.matsim.contrib.dvrp.data.network.shortestpath.MatsimArcFactories;
+import org.matsim.contrib.dvrp.data.network.shortestpath.ArcFactories;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -49,7 +49,7 @@ import org.matsim.core.trafficmonitoring.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.data.network.impl.GrowingVrpGraph;
+import pl.poznan.put.vrp.dynamic.data.network.impl.VrpGraphImpl;
 import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
@@ -184,10 +184,10 @@ public class VrpLauncherUtils
         Network network = scenario.getNetwork();
         TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
                 ttimeSource.numSlots);
-        ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network, travelTime,
+        ArcFactory arcFactory = ArcFactories.createArcFactory(network, travelTime,
                 travelDisutility, timeDiscretizer, false);
 
-        return new GrowingVrpGraph(arcFactory);
+        return new VrpGraphImpl(arcFactory);
     }
 
 

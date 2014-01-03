@@ -232,7 +232,7 @@ import playground.michalm.util.gis.Schedules2GIS;
         VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, actionCreator);
 
         VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new TaxiRequestCreator(
-                taxiData), TaxiRequestCreator.MODE);
+                data), TaxiRequestCreator.MODE);
 
         EventsManager events = qSim.getEventsManager();
 

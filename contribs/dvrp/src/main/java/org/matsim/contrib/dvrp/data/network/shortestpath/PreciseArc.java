@@ -20,74 +20,48 @@
 package org.matsim.contrib.dvrp.data.network.shortestpath;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.network.AbstractMatsimArc;
+import org.matsim.contrib.dvrp.data.network.AbstractArc;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
-/**
- * @author michalm
- */
-public class SparseDiscreteMatsimArc
-    extends AbstractMatsimArc
+public class PreciseArc
+    extends AbstractArc
 {
     private final ShortestPathCalculator shortestPathCalculator;
-    private final TimeDiscretizer timeDiscretizer;
-
-    private ShortestPath[] shortestPaths = null;// lazy initialization
 
 
-    public SparseDiscreteMatsimArc(Link fromLink, Link toLink,
-            ShortestPathCalculator shortestPathCalculator, TimeDiscretizer timeDiscretizer)
+    public PreciseArc(Link fromLink, Link toLink, ShortestPathCalculator shortestPathCalculator)
     {
         super(fromLink, toLink);
         this.shortestPathCalculator = shortestPathCalculator;
-        this.timeDiscretizer = timeDiscretizer;
     }
 
 
     @Override
     public ShortestPath getShortestPath(int departTime)
     {
-        // lazy initialization of the SP entries
-        if (shortestPaths == null) {
-            shortestPaths = new ShortestPath[timeDiscretizer.getIntervalCount()];
-        }
-
-        int idx = timeDiscretizer.getIdx(departTime);
-        ShortestPath shortestPath = shortestPaths[idx];
-
-        // loads necessary data on demand
-        if (shortestPath == null) {
-            shortestPath = shortestPaths[idx] = shortestPathCalculator.calculateShortestPath(
-                    fromLink, toLink, timeDiscretizer.getTime(idx));
-        }
-
-        return shortestPath;
+        return shortestPathCalculator.calculateShortestPath(fromLink, toLink, departTime);
     }
 
 
-    public static class SparseDiscreteMatsimArcFactory
+    public static class PreciseArcFactory
         implements ArcFactory
     {
         private final ShortestPathCalculator shortestPathCalculator;
-        private final TimeDiscretizer timeDiscretizer;
 
 
-        public SparseDiscreteMatsimArcFactory(ShortestPathCalculator shortestPathCalculator,
-                TimeDiscretizer timeDiscretizer)
+        public PreciseArcFactory(ShortestPathCalculator shortestPathCalculator)
         {
             this.shortestPathCalculator = shortestPathCalculator;
-            this.timeDiscretizer = timeDiscretizer;
         }
 
 
         @Override
         public Arc createArc(Link fromLink, Link toLink)
         {
-            return new SparseDiscreteMatsimArc(fromLink, toLink, shortestPathCalculator,
-                    timeDiscretizer);
+            return new PreciseArc(fromLink, toLink, shortestPathCalculator);
         }
     }
+
 }

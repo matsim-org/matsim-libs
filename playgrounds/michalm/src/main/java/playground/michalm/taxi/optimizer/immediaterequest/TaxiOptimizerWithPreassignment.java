@@ -22,6 +22,9 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 import java.io.*;
 import java.util.*;
 
+import org.matsim.api.core.v01.*;
+import org.matsim.contrib.dvrp.data.MatsimVrpData;
+
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
@@ -37,21 +40,21 @@ import playground.michalm.taxi.schedule.TaxiTask;
 public class TaxiOptimizerWithPreassignment
     extends ImmediateRequestTaxiOptimizer
 {
-    private Vehicle[] reqIdToVehMapping;
+    private Map<Id, Vehicle> reqIdToVehMap;
 
 
     public TaxiOptimizerWithPreassignment(VrpData data, int pickupDuration, int dropoffDuration,
-            final Vehicle[] reqIdToVehMapping)
+            final Map<Id, Vehicle> reqIdToVehMap)
     {
         super(data, true, false, pickupDuration, dropoffDuration);
-        this.reqIdToVehMapping = reqIdToVehMapping;
+        this.reqIdToVehMap = reqIdToVehMap;
     }
 
 
     @Override
     protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
     {
-        Vehicle veh = reqIdToVehMapping[req.getId()];
+        Vehicle veh = reqIdToVehMap.get(req.getId());
         return super.findBestVehicle(req, Arrays.asList(new Vehicle[] { veh }));
     }
 
@@ -72,8 +75,8 @@ public class TaxiOptimizerWithPreassignment
     }
 
 
-    public static TaxiOptimizerWithPreassignment createOptimizer(VrpData data, int pickupDuration,
-            int dropoffDuration, String reqIdToVehIdFile)
+    public static TaxiOptimizerWithPreassignment createOptimizer(MatsimVrpData data,
+            int pickupDuration, int dropoffDuration, String reqIdToVehIdFile)
     {
         Scanner scanner = null;
         try {
@@ -83,15 +86,18 @@ public class TaxiOptimizerWithPreassignment
             throw new RuntimeException(e);
         }
 
-        List<Vehicle> vehicles = data.getVehicles();
-        Vehicle[] reqIdToVehMapping = new Vehicle[scanner.nextInt()];
+        List<Vehicle> vehicles = data.getVrpData().getVehicles();
+        Map<Id, Vehicle> reqIdToVehMap = new HashMap<Id, Vehicle>();
 
-        for (int i = 0; i < reqIdToVehMapping.length; i++) {
-            reqIdToVehMapping[i] = vehicles.get(scanner.nextInt());
+        int count = scanner.nextInt();
+        Scenario scenario = data.getScenario();
+
+        for (int i = 0; i < count; i++) {
+            reqIdToVehMap.put(scenario.createId(i + ""), vehicles.get(scanner.nextInt()));
         }
         scanner.close();
 
-        return new TaxiOptimizerWithPreassignment(data, pickupDuration, dropoffDuration,
-                reqIdToVehMapping);
+        return new TaxiOptimizerWithPreassignment(data.getVrpData(), pickupDuration,
+                dropoffDuration, reqIdToVehMap);
     }
 }

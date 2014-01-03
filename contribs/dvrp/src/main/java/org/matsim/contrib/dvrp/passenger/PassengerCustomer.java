@@ -25,30 +25,28 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
 
 
 public class PassengerCustomer
     implements Customer
 {
-    private final int id;
     private final MobsimAgent passenger;
 
     private List<PassengerRequest> requests;
 
 
-    public PassengerCustomer(int id, MobsimAgent passenger)
+    public PassengerCustomer(MobsimAgent passenger)
     {
-        this.id = id;
         this.passenger = passenger;
         this.requests = new ArrayList<PassengerRequest>();
     }
 
 
     @Override
-    public int getId()
+    public Id getId()
     {
-        return id;
+        return passenger.getId();
     }
 
 
@@ -83,8 +81,7 @@ public class PassengerCustomer
 
         if (customer == null) {
             List<Customer> customers = data.getVrpData().getCustomers();
-            int id = customers.size();
-            customer = new PassengerCustomer(id, passenger);
+            customer = new PassengerCustomer(passenger);
             customers.add(customer);
         }
 

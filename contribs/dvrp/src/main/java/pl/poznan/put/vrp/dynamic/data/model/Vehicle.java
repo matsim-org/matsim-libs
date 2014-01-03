@@ -19,6 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.model;
 
+import org.matsim.api.core.v01.Identifiable;
+
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
@@ -26,10 +28,8 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
  * @author michalm
  */
 public interface Vehicle
+    extends Identifiable
 {
-    int getId();
-
-
     String getName();
 
 

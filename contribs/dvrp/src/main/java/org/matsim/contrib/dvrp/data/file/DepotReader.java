@@ -79,6 +79,7 @@ public class DepotReader
     private void startDepot(Attributes atts)
     {
         int id = data.getDepots().size();
+        Id depotId = scenario.createId(id + "");
 
         String name = atts.getValue("name");
         if (name == null) {
@@ -88,7 +89,7 @@ public class DepotReader
         Id linkId = scenario.createId(atts.getValue("linkId"));
         Link link = links.get(linkId);
 
-        currentDepot = new DepotImpl(id, name, link);
+        currentDepot = new DepotImpl(depotId, name, link);
         data.addDepot(currentDepot);
     }
 
@@ -96,6 +97,7 @@ public class DepotReader
     private void startVehicle(Attributes atts)
     {
         int id = data.getVehicles().size();
+        Id vehicleId = scenario.createId(id + "");
 
         String name = atts.getValue("name");
         if (name == null) {
@@ -108,7 +110,8 @@ public class DepotReader
         int t1 = getInt(atts, "t1", 24 * 60 * 60);
         int tLimit = getInt(atts, "tLimit", t1 - t0);
 
-        data.addVehicle(new VrpAgentVehicleImpl(id, name, currentDepot, capacity, t0, t1, tLimit));
+        data.addVehicle(new VrpAgentVehicleImpl(vehicleId, name, currentDepot, capacity, t0, t1,
+                tLimit));
     }
 
 

@@ -17,93 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.network.impl;
+package pl.poznan.put.vrp.dynamic.util;
 
-import org.matsim.api.core.v01.network.Link;
-
-import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
-
-
-public class InterpolatedArc
-    extends AbstractArc
+public class TravelTimeUtils
 {
-    private TimeDiscretizer timeDiscretizer;
-
-    private int[] timesOnDeparture;
-    private int[] timesOnArrival;
-    private double[] costsOnDeparture;
-
-
-    public InterpolatedArc(Link fromLink, Link toLink, TimeDiscretizer timeDiscretizer,
-            int[] timesOnDeparture, double[] costsOnDeparture)
+    public static int[] calculateATOnArival(int[] timesOnDeparture, int interval)
     {
-        super(fromLink, toLink);
-        if (timeDiscretizer.getIntervalCount() != timesOnDeparture.length
-                || timesOnDeparture.length != costsOnDeparture.length) {
-            throw new IllegalArgumentException();
-        }
-
-        this.timeDiscretizer = timeDiscretizer;
-        this.timesOnDeparture = timesOnDeparture;
-        this.costsOnDeparture = costsOnDeparture;
-
-        checkFIFOProperty(timesOnDeparture, true);
-
-        calculateATOnArival();
-        checkFIFOProperty(timesOnArrival, false);
-    }
-
-
-    @Override
-    public int getTimeOnDeparture(int departureTime)
-    {
-        return timeDiscretizer.interpolate(timesOnDeparture, departureTime);
-    }
-
-
-    @Override
-    public int getTimeOnArrival(int arrivalTime)
-    {
-        return timeDiscretizer.interpolate(timesOnArrival, arrivalTime);
-    }
-
-
-    @Override
-    public double getCostOnDeparture(int departureTime)
-    {
-        return timeDiscretizer.interpolate(costsOnDeparture, departureTime);
-    }
-
-
-    public int calculateAvgTime()
-    {
-        int sumT = 0;
-
-        for (int t : timesOnDeparture) {
-            sumT += t;
-        }
-
-        return sumT / timesOnDeparture.length;
-    }
-
-
-    public double calculateAvgCost()
-    {
-        double sumC = 0;
-
-        for (double c : costsOnDeparture) {
-            sumC += c;
-        }
-
-        return sumC / costsOnDeparture.length;
-    }
-
-
-    private void calculateATOnArival()
-    {
-        timesOnArrival = new int[timesOnDeparture.length];
-
-        int interval = timeDiscretizer.getTimeInterval();
+        int[] timesOnArrival = new int[timesOnDeparture.length];
 
         int prevArrivalTime = -interval;// !!! => firstIdx == 0 (@ first iteration)
         int prevArcTime = timesOnDeparture[0];// !!! => gradient == 0 (@ first iteration)
@@ -145,13 +65,14 @@ public class InterpolatedArc
             prevArcTime = currArcTime;
             prevArrivalTime = currArrivalTime;
         }
+
+        return timesOnArrival;
     }
 
 
-    private void checkFIFOProperty(int[] times, boolean onDeparture)
+    public static void checkFIFOProperty(int[] times, boolean onDeparture, int interval)
     {
         int prevAT = times[0];
-        int interval = timeDiscretizer.getTimeInterval();
 
         for (int i = 1; i < times.length; i++) {
             int currAT = times[i];
@@ -159,10 +80,8 @@ public class InterpolatedArc
             if (onDeparture) { // onDeparture
                 if (prevAT > currAT + interval) {
                     times[i] = currAT = prevAT - interval + 1;
-                    System.err
-                            .println("Warning!!! FIFO property was broken! - times has been modified");
-                    // throw new RuntimeException("FIFO property is broken! - prevAT=" + prevAT
-                    // + " currAT+interval=" + (currAT + interval));
+                    throw new RuntimeException("FIFO property is broken! - prevAT=" + prevAT
+                            + " currAT+interval=" + (currAT + interval));
                 }
             }
             else { // onArrival

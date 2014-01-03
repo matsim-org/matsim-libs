@@ -19,6 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.model.impl;
 
+import org.matsim.api.core.v01.Id;
+
 import pl.poznan.put.vrp.dynamic.data.model.*;
 
 
@@ -28,7 +30,7 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 public class RequestImpl
     implements Request
 {
-    private final int id;
+    private final Id id;
 
     private final Customer customer;
 
@@ -40,7 +42,7 @@ public class RequestImpl
     private final int submissionTime;
 
 
-    public RequestImpl(int id, Customer customer, int quantity, int t0, int t1, int submissionTime)
+    public RequestImpl(Id id, Customer customer, int quantity, int t0, int t1, int submissionTime)
     {
         this.id = id;
         this.customer = customer;
@@ -52,7 +54,7 @@ public class RequestImpl
 
 
     @Override
-    public int getId()
+    public Id getId()
     {
         return id;
     }

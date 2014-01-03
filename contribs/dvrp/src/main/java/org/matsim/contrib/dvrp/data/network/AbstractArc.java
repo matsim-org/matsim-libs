@@ -17,52 +17,70 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network.shortestpath;
+package org.matsim.contrib.dvrp.data.network;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.network.AbstractMatsimArc;
 
-import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
 
 
-public class PreciseMatsimArc
-    extends AbstractMatsimArc
+/**
+ * TODO The current implementation is simplistic; the class will be re-implemented in the future.
+ * 
+ * @author michalm
+ */
+public abstract class AbstractArc
+    implements Arc
 {
-    private final ShortestPathCalculator shortestPathCalculator;
+    protected final Link fromLink;
+    protected final Link toLink;
 
 
-    public PreciseMatsimArc(Link fromLink, Link toLink,
-            ShortestPathCalculator shortestPathCalculator)
+    public AbstractArc(Link fromLink, Link toLink)
     {
-        super(fromLink, toLink);
-        this.shortestPathCalculator = shortestPathCalculator;
+        this.fromLink = fromLink;
+        this.toLink = toLink;
     }
 
 
     @Override
-    public ShortestPath getShortestPath(int departTime)
+    public Link getFromLink()
     {
-        return shortestPathCalculator.calculateShortestPath(fromLink, toLink, departTime);
+        return fromLink;
     }
 
 
-    public static class PreciseMatsimArcFactory
-        implements ArcFactory
+    @Override
+    public Link getToLink()
     {
-        private final ShortestPathCalculator shortestPathCalculator;
-
-
-        public PreciseMatsimArcFactory(ShortestPathCalculator shortestPathCalculator)
-        {
-            this.shortestPathCalculator = shortestPathCalculator;
-        }
-
-
-        @Override
-        public Arc createArc(Link fromLink, Link toLink)
-        {
-            return new PreciseMatsimArc(fromLink, toLink, shortestPathCalculator);
-        }
+        return toLink;
     }
 
+
+    @Override
+    public int getTimeOnDeparture(int departureTime)
+    {
+        // no interpolation between consecutive timeSlices!
+        return getShortestPath(departureTime).travelTime;
+    }
+
+
+    @Override
+    public int getTimeOnArrival(int arrivalTime)
+    {
+        // TODO: very rough!!!
+        return getShortestPath(arrivalTime).travelTime;
+
+        // probably a bit more accurate but still rough and more time consuming
+        // return shortestPath.getSPEntry(arrivalTime -
+        // shortestPath.getSPEntry(arrivalTime).travelTime);
+    }
+
+
+    @Override
+    public double getCostOnDeparture(int departureTime)
+    {
+        // no interpolation between consecutive timeSlices!
+        return getShortestPath(departureTime).travelCost;
+    }
 }

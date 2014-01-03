@@ -29,14 +29,14 @@ import pl.poznan.put.vrp.dynamic.data.network.*;
 import com.google.common.collect.Iterators;
 
 
-public class GrowingVrpGraph
+public class VrpGraphImpl
     implements VrpGraph
 {
     private final ArcFactory arcFactory;
     private final HashMap<Id, Map<Id, Arc>> arcs;// fromLink.id->toLink.id->Arc
 
 
-    public GrowingVrpGraph(ArcFactory arcFactory)
+    public VrpGraphImpl(ArcFactory arcFactory)
     {
         this.arcFactory = arcFactory;
         arcs = new HashMap<Id, Map<Id, Arc>>();

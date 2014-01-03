@@ -58,7 +58,7 @@ public abstract class AbstractTaxiOptimizer
                 new Comparator<TaxiRequest>() {
                     public int compare(TaxiRequest r1, TaxiRequest r2)
                     {
-                        return r1.getId() - r2.getId();
+                        return r1.getSubmissionTime() - r2.getSubmissionTime();
                     }
                 });
     }
@@ -145,7 +145,7 @@ public abstract class AbstractTaxiOptimizer
             }
 
             scheduleRequest(req);// means: try to schedule
-            
+
             if (req.getStatus() == TaxiRequestStatus.UNPLANNED) {
                 return;// no taxi available
             }

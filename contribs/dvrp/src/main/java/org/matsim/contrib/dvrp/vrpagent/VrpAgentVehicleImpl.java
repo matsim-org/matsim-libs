@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
+import org.matsim.api.core.v01.Id;
+
 import pl.poznan.put.vrp.dynamic.data.model.Depot;
 import pl.poznan.put.vrp.dynamic.data.model.impl.VehicleImpl;
 
@@ -30,7 +32,7 @@ public class VrpAgentVehicleImpl
     private VrpAgentLogic agentLogic;
 
 
-    public VrpAgentVehicleImpl(int id, String name, Depot depot, int capacity, int t0, int t1,
+    public VrpAgentVehicleImpl(Id id, String name, Depot depot, int capacity, int t0, int t1,
             int timeLimit)
     {
         super(id, name, depot, capacity, t0, t1, timeLimit);

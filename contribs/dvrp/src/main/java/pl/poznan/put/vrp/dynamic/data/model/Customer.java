@@ -19,10 +19,11 @@
 
 package pl.poznan.put.vrp.dynamic.data.model;
 
+import org.matsim.api.core.v01.Identifiable;
+
+
 public interface Customer
+    extends Identifiable
 {
-    int getId();
-
-
     String getName();
 }

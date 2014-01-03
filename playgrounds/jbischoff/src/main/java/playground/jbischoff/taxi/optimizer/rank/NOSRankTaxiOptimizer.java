@@ -21,6 +21,7 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -45,7 +46,7 @@ public class NOSRankTaxiOptimizer
     private boolean idleRankMode;
     private boolean rankmode;
 
-    private final List<Integer> shortTimeIdlers;
+    private final List<Id> shortTimeIdlers;
 
     private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
 
@@ -67,7 +68,7 @@ public class NOSRankTaxiOptimizer
         super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration,
                 vehicleFinder);
         this.idleVehicleFinder = vehicleFinder;
-        this.shortTimeIdlers = new ArrayList<Integer>();
+        this.shortTimeIdlers = new ArrayList<Id>();
     }
 
 

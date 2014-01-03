@@ -19,6 +19,8 @@
 
 package pl.poznan.put.vrp.dynamic.data.model.impl;
 
+import org.matsim.api.core.v01.Id;
+
 import pl.poznan.put.vrp.dynamic.data.model.Customer;
 
 
@@ -28,11 +30,11 @@ import pl.poznan.put.vrp.dynamic.data.model.Customer;
 public class CustomerImpl
     implements Customer
 {
-    private final int id;
+    private final Id id;
     private final String name;
 
 
-    public CustomerImpl(int id, String name)
+    public CustomerImpl(Id id, String name)
     {
         this.id = id;
         this.name = name;
@@ -40,7 +42,7 @@ public class CustomerImpl
 
 
     @Override
-    public int getId()
+    public Id getId()
     {
         return id;
     }

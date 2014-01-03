@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network;
+package org.matsim.contrib.dvrp.data.network.shortestpath;
 
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.*;
 
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
+import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
-public interface MatsimArc
-    extends Arc
+public class ArcFactories
 {
-    ShortestPath getShortestPath(int departTime);
+    public static ArcFactory createArcFactory(Network network, TravelTime travelTime,
+            TravelDisutility travelDisutility, TimeDiscretizer timeDiscretizer, boolean preciseArc)
+    {
+        LeastCostPathCalculator router = new Dijkstra(network, travelDisutility, travelTime);
+        ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
+                travelTime, travelDisutility);
+
+        return preciseArc
+                ? //
+                new PreciseArc.PreciseArcFactory(shortestPathCalculator)
+                : new SparseDiscreteArc.SparseDiscreteArcFactory(
+                        shortestPathCalculator, timeDiscretizer);
+    }
+
 }

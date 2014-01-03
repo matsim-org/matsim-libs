@@ -25,13 +25,13 @@ import java.util.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.MatsimArc;
 import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -90,7 +90,7 @@ public class Schedules2GIS
 
     private Coordinate[] createLineString(DriveTask driveTask)
     {
-        MatsimArc arc = (MatsimArc)driveTask.getArc();
+        Arc arc = driveTask.getArc();
         ShortestPath path = arc.getShortestPath(driveTask.getBeginTime());
 
         Link[] links = path.links;

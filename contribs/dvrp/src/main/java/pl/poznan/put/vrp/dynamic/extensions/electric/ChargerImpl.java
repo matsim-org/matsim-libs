@@ -19,13 +19,14 @@
 
 package pl.poznan.put.vrp.dynamic.extensions.electric;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
 public class ChargerImpl
     implements Charger
 {
-    private final int id;
+    private final Id id;
     private final String name;
     private final double powerInWatts;
     private final Link link;
@@ -33,7 +34,7 @@ public class ChargerImpl
     private final ChargingSchedule<? extends ChargeTask> schedule;
 
 
-    public ChargerImpl(int id, String name, double powerInWatts, Link link)
+    public ChargerImpl(Id id, String name, double powerInWatts, Link link)
     {
         this.id = id;
         this.name = name;
@@ -45,7 +46,7 @@ public class ChargerImpl
 
 
     @Override
-    public int getId()
+    public Id getId()
     {
         return id;
     }

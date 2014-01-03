@@ -35,10 +35,10 @@ public class OneTaxiRequest
     private final Link toLink;
 
 
-    public OneTaxiRequest(int id, Customer customer, Link fromLink, Link toLink, int time)
+    public OneTaxiRequest(Customer customer, Link fromLink, Link toLink, int time)
     {
         //I want a taxi now: t0 == t1 == submissionTime
-        super(id, customer, 1, time, time, time);
+        super(customer.getId(), customer, 1, time, time, time);
         this.fromLink = fromLink;
         this.toLink = toLink;
     }
