@@ -98,7 +98,7 @@ public class MarginalCongestionHandlerV2Test {
 			
 		});
 						
-		MarginalCongestionHandlerV2 congestionHandler = new MarginalCongestionHandlerV2(this.events, this.scenario);
+		MarginalCongestionHandlerImplV2 congestionHandler = new MarginalCongestionHandlerImplV2(this.events, this.scenario);
 
 		// start agent 1...
 		congestionHandler.handleEvent(new PersonDepartureEvent((double) 0, testAgent1, linkId1, "car"));
@@ -150,7 +150,7 @@ public class MarginalCongestionHandlerV2Test {
 			
 		});
 						
-		MarginalCongestionHandlerV2 congestionHandler = new MarginalCongestionHandlerV2(this.events, this.scenario);
+		MarginalCongestionHandlerImplV2 congestionHandler = new MarginalCongestionHandlerImplV2(this.events, this.scenario);
 
 		// start agent 1...
 		congestionHandler.handleEvent(new PersonDepartureEvent((double) 0, testAgent1, linkId1, "car"));
@@ -256,7 +256,7 @@ public class MarginalCongestionHandlerV2Test {
 			
 		});
 						
-		MarginalCongestionHandlerV2 congestionHandler = new MarginalCongestionHandlerV2(this.events, this.scenario);
+		MarginalCongestionHandlerImplV2 congestionHandler = new MarginalCongestionHandlerImplV2(this.events, this.scenario);
 
 		// agent 3 blockiert link3
 		congestionHandler.handleEvent(new PersonDepartureEvent((double) 0, testAgent3, linkId2, "car"));
@@ -319,7 +319,7 @@ public class MarginalCongestionHandlerV2Test {
 			
 		});
 						
-		MarginalCongestionHandlerV2 congestionHandler = new MarginalCongestionHandlerV2(this.events, this.scenario);
+		MarginalCongestionHandlerImplV2 congestionHandler = new MarginalCongestionHandlerImplV2(this.events, this.scenario);
 
 		// start agent 1...
 		congestionHandler.handleEvent(new PersonDepartureEvent((double) 0, testAgent1, linkId1, "car"));

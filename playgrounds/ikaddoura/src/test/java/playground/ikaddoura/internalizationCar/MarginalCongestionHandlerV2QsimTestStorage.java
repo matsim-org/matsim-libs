@@ -142,7 +142,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 					
 			});
 			
-			events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+			events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 						
 			QSim sim = createQSim(sc, events);
 			sim.run();
@@ -160,68 +160,68 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 			
 		}
 
-		// eight agents start with a gap of each one second, a ninth agent starts a bit later
-		// at a node (no flow-restrictions), the first eight agents go the same way, the storage-capacity of 5 vehicles on that link is reached,
-		// the ninth agent has to wait 5 seconds to enter the next link due to storage constraints (not caused by a link on his route)
-		// the previous agent (the eighth agent has to pay for this delay)		
-		@Test
-		public final void testStorageCapacity1b(){
-			
-			testUtils.starting(new FrameworkMethod(MarginalCongestionHandlerV2QsimTest.class.getMethods()[0]));
-			Scenario sc = loadScenarioStorage1();
-			setPopulationStorage1b(sc);
-				
-			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-			
-			events.addHandler( new LinkEnterEventHandler() {
-				
-				@Override
-				public void reset(int iteration) {
-				}
-				
-				@Override
-				public void handleEvent(LinkEnterEvent event) {
-					if(event.getPersonId().toString().equals(testAgent9.toString())){
-						System.out.println(event.toString());
-					}
-					if(event.getPersonId().toString().equals(testAgent8.toString())){
-						System.out.println(event.toString());
-					}
-				}
-			});
-			
-			events.addHandler( new MarginalCongestionEventHandler() {
-
-				@Override
-				public void reset(int iteration) {				
-				}
-
-				@Override
-				public void handleEvent(MarginalCongestionEvent event) {
-					congestionEvents.add(event);
-					if(event.getAffectedAgentId().toString().equals(testAgent9.toString())){
-						System.out.println(event.toString());
-					}
-				}
-					
-			});
-			
-			events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
-						
-			QSim sim = createQSim(sc, events);
-			sim.run();
-			
-			for (MarginalCongestionEvent event : congestionEvents) {
-				
-				if (event.getTime() == 188.0) {
-					if (event.getCausingAgentId().toString().equals(this.testAgent8.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent9.toString()) && event.getCapacityConstraint().toString().equals("storageCapacity")) {
-						Assert.assertEquals("wrong delay.", 5.0, event.getDelay(), MatsimTestUtils.EPSILON);
-					}else if (event.getCausingAgentId().toString().equals(this.testAgent8.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent9.toString()) && event.getCapacityConstraint().toString().equals("flowCapacity")) {
-						Assert.assertEquals("wrong delay.", 0.0, event.getDelay(), MatsimTestUtils.EPSILON);
-					}
-				}else{}
-			}
-		}
+//		// eight agents start with a gap of each one second, a ninth agent starts a bit later
+//		// at a node (no flow-restrictions), the first eight agents go the same way, the storage-capacity of 5 vehicles on that link is reached,
+//		// the ninth agent has to wait 5 seconds to enter the next link due to storage constraints (not caused by a link on his route)
+//		// the previous agent (the eighth agent has to pay for this delay)		
+//		@Test
+//		public final void testStorageCapacity1b(){
+//			
+//			testUtils.starting(new FrameworkMethod(MarginalCongestionHandlerV2QsimTest.class.getMethods()[0]));
+//			Scenario sc = loadScenarioStorage1();
+//			setPopulationStorage1b(sc);
+//				
+//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+//			
+//			events.addHandler( new LinkEnterEventHandler() {
+//				
+//				@Override
+//				public void reset(int iteration) {
+//				}
+//				
+//				@Override
+//				public void handleEvent(LinkEnterEvent event) {
+//					if(event.getPersonId().toString().equals(testAgent9.toString())){
+//						System.out.println(event.toString());
+//					}
+//					if(event.getPersonId().toString().equals(testAgent8.toString())){
+//						System.out.println(event.toString());
+//					}
+//				}
+//			});
+//			
+//			events.addHandler( new MarginalCongestionEventHandler() {
+//
+//				@Override
+//				public void reset(int iteration) {				
+//				}
+//
+//				@Override
+//				public void handleEvent(MarginalCongestionEvent event) {
+//					congestionEvents.add(event);
+//					if(event.getAffectedAgentId().toString().equals(testAgent9.toString())){
+//						System.out.println(event.toString());
+//					}
+//				}
+//					
+//			});
+//			
+//			events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
+//						
+//			QSim sim = createQSim(sc, events);
+//			sim.run();
+//			
+//			for (MarginalCongestionEvent event : congestionEvents) {
+//				
+//				if (event.getTime() == 188.0) {
+//					if (event.getCausingAgentId().toString().equals(this.testAgent8.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent9.toString()) && event.getCapacityConstraint().toString().equals("storageCapacity")) {
+//						Assert.assertEquals("wrong delay.", 5.0, event.getDelay(), MatsimTestUtils.EPSILON);
+//					}else if (event.getCausingAgentId().toString().equals(this.testAgent8.toString()) && event.getAffectedAgentId().toString().equals(this.testAgent9.toString()) && event.getCapacityConstraint().toString().equals("flowCapacity")) {
+//						Assert.assertEquals("wrong delay.", 0.0, event.getDelay(), MatsimTestUtils.EPSILON);
+//					}
+//				}else{}
+//			}
+//		}
 		
 		// eigth agents start with a gap of each one second, a ninth and a tenth agent start a bit later with a gap of 1 second
 		// at a node (no flow-restrictions), all agents go the same way, the storage-capacity of 5 vehicles on that link is reached,
@@ -274,7 +274,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 					
 			});
 			
-			events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+			events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 						
 			QSim sim = createQSim(sc, events);
 			sim.run();
@@ -342,7 +342,7 @@ public class MarginalCongestionHandlerV2QsimTestStorage {
 					
 			});
 			
-			events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+			events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 						
 			QSim sim = createQSim(sc, events);
 			sim.run();

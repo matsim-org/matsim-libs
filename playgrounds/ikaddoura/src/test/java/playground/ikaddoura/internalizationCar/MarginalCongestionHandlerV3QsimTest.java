@@ -109,7 +109,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new MarginalCongestionHandlerV3(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();

@@ -118,7 +118,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			}	
 		});
 			
-		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 					
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -165,7 +165,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 				
 		});
 			
-		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 					
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -202,7 +202,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			}	
 		});
 		
-		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -262,7 +262,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			
 		});
 		
-		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -302,7 +302,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			
 		});
 		
-		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -349,7 +349,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			
 		});
 
-		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -403,7 +403,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 			}	
 		});
 				
-		events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 						
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -475,7 +475,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 					
 			});
 				
-			events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+			events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 						
 			QSim sim = createQSim(sc, events);
 			sim.run();
@@ -550,7 +550,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 //					
 //			});
 //				
-//			events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+//			events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 //						
 //			QSim sim = createQSim(sc, events);
 //			sim.run();
@@ -590,7 +590,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 					
 			});
 
-			events.addHandler(new MarginalCongestionHandlerV2(events, (ScenarioImpl) sc));
+			events.addHandler(new MarginalCongestionHandlerImplV2(events, (ScenarioImpl) sc));
 						
 			QSim sim = createQSim(sc, events);
 			sim.run();
