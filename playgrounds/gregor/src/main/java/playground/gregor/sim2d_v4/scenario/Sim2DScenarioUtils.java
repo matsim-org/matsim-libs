@@ -37,6 +37,8 @@ public abstract class Sim2DScenarioUtils {
 			Sim2DEnvironment env = new Sim2DEnvironment();
 			new Sim2DEnvironmentReader02(env, false).readFile(envPath);
 			scenario.addSim2DEnvironment(env);
+			Sim2DSectionPreprocessor.preprocessSections(env);
+//			Sim2DEnvironmentNetworkBuilder.buildAndSetEnvironmentNetwork(env);
 			String netPath = conf.getNetworkPath(envPath);
 			if (netPath != null) { //not yet clear if this can be null, maybe it even must be null [gl dec 12]
 				Config c = ConfigUtils.createConfig();

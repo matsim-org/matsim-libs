@@ -71,22 +71,14 @@ public class Sim2DConfig {
 	}
 	
 	public void addSim2DEnvNetworkMapping(String sim2DEnv, String network) {
+//		throw new RuntimeException("not longer supported!");
 		this.sim2DEnvNetworkMapping.put(sim2DEnv, network);
 	}
 	
 	public String getNetworkPath(String sim2DEnvPath) {
+//		throw new RuntimeException("not longer supported!");
 		return this.sim2DEnvNetworkMapping.get(sim2DEnvPath);
 	}
 	
-//	public void setOffsets(double offsetX, double offsetY) {
-//		this.offsetX = offsetX;
-//		this.offsetY = offsetY;
-//	}
-//	public double getOffsetX() {
-//		return this.offsetX;
-//	}
-//	public double getOffsetY() {
-//		return this.offsetY; 
-//	}
 
 }

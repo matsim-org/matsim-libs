@@ -119,9 +119,9 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 						Coordinate c0 = sec.getPolygon().getExteriorRing().getCoordinateN(i);
 						Coordinate c1 = sec.getPolygon().getExteriorRing().getCoordinateN(i+1);
 						if (c0.x < c1.x) {
-							this.vis.addDashedLineStatic(c0.x, c0.y, c1.x, c1.y, lp.r,lp.g,lp.b,lp.a, 200,.25,.1);
+							this.vis.addDashedLineStatic(c0.x, c0.y, c1.x, c1.y, lp.r,lp.g,lp.b,lp.a, 50,.25,.1);
 						} else {
-							this.vis.addDashedLineStatic(c1.x, c1.y, c0.x, c0.y, lp.r,lp.g,lp.b,lp.a, 200,.25,.1);
+							this.vis.addDashedLineStatic(c1.x, c1.y, c0.x, c0.y, lp.r,lp.g,lp.b,lp.a, 50,.25,.1);
 						}
 						if (oct < open.length-1) {
 							oct++;
@@ -234,6 +234,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		//			this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 200);
 		//		} else {
 		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 200);
+//		this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 50);
 		//		}
 
 	}

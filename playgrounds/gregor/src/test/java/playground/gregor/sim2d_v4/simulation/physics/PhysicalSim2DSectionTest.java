@@ -78,31 +78,31 @@ public class PhysicalSim2DSectionTest {
 		});
 		DummyAgent agentInQuestion = new DummyAgent(4.5f, 6.5f, qveh);
 		this.psec1.getAgents().add(agentInQuestion);
-		agentInQuestion.setPSec(this.psec1);
+		agentInQuestion.setSec(this.psec1);
 
 		DummyAgent a0 = new DummyAgent(4.5f, 2f,qveh); //dist to agentInQuestion 4.5f
 		this.psec0.getAgents().add(a0);
-		a0.setPSec(this.psec0);
+		a0.setSec(this.psec0);
 
 		DummyAgent a1 = new DummyAgent(2.5f, 6.5f,qveh); //dist to agentInQuestion 2.f
 		this.psec1.getAgents().add(a1);
-		a1.setPSec(this.psec1);
+		a1.setSec(this.psec1);
 
 		DummyAgent a2 = new DummyAgent(-2.f, 6.5f,qveh); //dist to agentInQuestion 6.5f
 		this.psec2.getAgents().add(a2);
-		a2.setPSec(this.psec2);
+		a2.setSec(this.psec2);
 
 		DummyAgent a5 = new DummyAgent(-3.5f, 6.5f,qveh); //dist to agentInQuestion 8.f
 		this.psec2.getAgents().add(a5);
-		a5.setPSec(this.psec2);
+		a5.setSec(this.psec2);
 		
 		DummyAgent a3 = new DummyAgent(0.5f, 4.f,qveh); //not visible from agentInQuestion
 		this.psec0.getAgents().add(a3);
-		a3.setPSec(this.psec0);
+		a3.setSec(this.psec0);
 
 		DummyAgent a4 = new DummyAgent(-3.f, 3f,qveh); //not visible from agentInQuestion
 		this.psec2.getAgents().add(a4);
-		a4.setPSec(this.psec2);
+		a4.setSec(this.psec2);
 		
 //		this.psec0.updatedTwoDTree();
 //		this.psec1.updatedTwoDTree();
@@ -228,7 +228,7 @@ public class PhysicalSim2DSectionTest {
 
 
 		@Override
-		public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
+		public void setSec(PhysicalSim2DSection physicalSim2DSection) {
 			this.currentPSec = physicalSim2DSection;
 
 		}
