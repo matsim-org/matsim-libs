@@ -90,7 +90,7 @@ public class CreatePopulation {
 		
 		
 		zones.buildCells();
-		PopulationFromSightings.readSampleWithOneRandomPointForEachSightingInNewCell(scenario, new CellularCoverageLinkToZoneResolver(zones, scenario.getNetwork()), allSightings);
+		PopulationFromSightings.createPopulationWithTwoPlansEach(scenario, new CellularCoverageLinkToZoneResolver(zones, scenario.getNetwork()), allSightings);
 
 
 

@@ -3,6 +3,8 @@ package playground.mzilske.cdr;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -20,12 +22,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class TwoWorkplaces {
 	
 	private Scenario scenario;
+	private CompareMain compareMain;
 
 	public static void main(String[] args) {
 		new TwoWorkplaces().run();
 	}
 
-	private void run() {
+	void run() {
 		int quantity = 1000;
 		Config config = ConfigUtils.createConfig();
 		ActivityParams workParams = new ActivityParams("work");
@@ -67,9 +70,26 @@ public class TwoWorkplaces {
 		}
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
-		CompareMain compareMain = new CompareMain(scenario, controler.getEvents());
+		compareMain = new CompareMain(scenario, controler.getEvents(), new CallBehavior() {
+
+			@Override
+			public boolean makeACall(ActivityEndEvent event) {
+				return true;
+			}
+
+			@Override
+			public boolean makeACall(ActivityStartEvent event) {
+				return true;
+			}
+
+			@Override
+			public boolean makeACall(Id id, double time) {
+				return false;
+			}
+			
+		});
 		controler.run();
-		compareMain.finish();
+		compareMain.runWithTwoPlansAndCadyts();
 	}
 
 	private Activity createHomeMorning(IdImpl idImpl) {
@@ -92,6 +112,10 @@ public class TwoWorkplaces {
 	private Activity createHomeEvening(IdImpl idImpl) {
 		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
 		return act;
+	}
+
+	public CompareMain getCompare() {
+		return compareMain;
 	}
 
 }

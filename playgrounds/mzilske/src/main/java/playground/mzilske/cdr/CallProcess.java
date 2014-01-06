@@ -29,9 +29,6 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 
 	private Map<Id, CallingAgent> agents = new HashMap<Id, CallingAgent>();
 
-	private final int dailyRate;
-	private final double secondlyProbability;
-
 	private EventsManager eventsManager;
 
 	List<Sighting> sightings = new ArrayList<Sighting>();
@@ -40,12 +37,13 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 
 	private double lastTime;
 
-	public CallProcess(EventsManager events, Population population, final ZoneTracker zoneTracker, int dailyRate) {
+	private CallBehavior callBehavior;
+
+	public CallProcess(EventsManager events, Population population, final ZoneTracker zoneTracker, CallBehavior callBehavior) {
 		this.population = population;
 		this.eventsManager = events;
 		this.zoneTracker = zoneTracker;
-		this.dailyRate = dailyRate;
-		this.secondlyProbability = this.dailyRate / (double) (24*60*60);
+		this.callBehavior = callBehavior;
 		for (Person p : population.getPersons().values()) {
 			agents.put(p.getId(), new CallingAgent());
 		}
@@ -67,7 +65,7 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 		}
 		for (Person p : population.getPersons().values()) {
 			CallingAgent agent = agents.get(p.getId());
-			if (Math.random() < secondlyProbability) { // Let's make a call!
+			if (callBehavior.makeACall(p.getId(), time)) { // Let's make a call!
 				agent.nCalls++;
 				call(time, p.getId());
 			}
@@ -116,14 +114,14 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (Integer.parseInt(event.getPersonId().toString()) % 2 == 0) {
+		if (callBehavior.makeACall(event)) {
 			call(event.getTime(), event.getPersonId());
 		}
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (Integer.parseInt(event.getPersonId().toString()) % 2 == 1) {
+		if (callBehavior.makeACall(event)) {
 			call(event.getTime(), event.getPersonId());
 		}
 	}

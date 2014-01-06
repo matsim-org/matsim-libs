@@ -43,8 +43,7 @@ public class PopulationFromSightings {
 
 	private static Random rnd = MatsimRandom.getRandom();
 	
-	public static void readSampleWithOneRandomPointForEachSightingInNewCell(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
-		
+	public static void createPopulationWithTwoPlansEach(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
 		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
 			Id personId = sightingsPerPerson.getKey();
 			List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
@@ -59,7 +58,17 @@ public class PopulationFromSightings {
 		}
 	}
 
-
+	public static void createPopulationWithEndTimesAtLastSightings(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
+		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
+			Id personId = sightingsPerPerson.getKey();
+			List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
+			Person person = scenario.getPopulation().getFactory().createPerson(personId);
+			Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
+					sightingsForThisPerson);
+			person.addPlan(plan1);
+			scenario.getPopulation().addPerson(person);
+		}
+	}
 
 	public static Plan createPlanWithEndTimeAtLastSighting(Scenario scenario,
 			LinkToZoneResolver zones, List<Sighting> sightingsForThisPerson) {
