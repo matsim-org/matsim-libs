@@ -162,12 +162,12 @@ public class MarginalCongestionHandlerV2Test {
 		congestionHandler.handleEvent(new LinkEnterEvent((double) 11, testAgent2, linkId2, testAgent2));
 		
 		// agent 1 kann ohne Probleme link 2 verlassen...
-		congestionHandler.handleEvent(new LinkLeaveEvent((double) 51, testAgent1, linkId2, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent((double) 51, testAgent1, linkId3, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent((double) 52, testAgent1, linkId2, testAgent1));
+		congestionHandler.handleEvent(new LinkEnterEvent((double) 52, testAgent1, linkId3, testAgent1));
 		
 		// agent 2 muss allerdings durch die flow capacity warten.
-		congestionHandler.handleEvent(new LinkLeaveEvent((double) (51 + 10), testAgent2, linkId2, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent((double) (51 + 10), testAgent2, linkId3, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent((double) (52 + 10), testAgent2, linkId2, testAgent2));
+		congestionHandler.handleEvent(new LinkEnterEvent((double) (52 + 10), testAgent2, linkId3, testAgent2));
 		
 		// *****************
 		
@@ -355,21 +355,18 @@ public class MarginalCongestionHandlerV2Test {
 		Assert.assertEquals("congested link", linkId2.toString(), congEvent1.getLinkId().toString());
 		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent1.getCausingAgentId().toString());
 		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent1.getAffectedAgentId().toString());
-		Assert.assertEquals("capacity constraint", "flowCapacity", congEvent1.getCapacityConstraint());
 		
 		MarginalCongestionEvent congEvent2 = congestionEvents.get(1);
 		Assert.assertEquals("external delay", 10, congEvent2.getDelay(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("congested link", linkId2.toString(), congEvent2.getLinkId().toString());
 		Assert.assertEquals("causing Agent", testAgent2.toString(), congEvent2.getCausingAgentId().toString());
 		Assert.assertEquals("affected Agent", testAgent3.toString(), congEvent2.getAffectedAgentId().toString());
-		Assert.assertEquals("capacity constraint", "flowCapacity", congEvent2.getCapacityConstraint());
 		
 		MarginalCongestionEvent congEvent3 = congestionEvents.get(2);
 		Assert.assertEquals("external delay", 2, congEvent3.getDelay(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("congested link", linkId2.toString(), congEvent3.getLinkId().toString());
 		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent3.getCausingAgentId().toString());
 		Assert.assertEquals("affected Agent", testAgent3.toString(), congEvent3.getAffectedAgentId().toString());
-		Assert.assertEquals("capacity constraint", "flowCapacity", congEvent3.getCapacityConstraint());
 		
 	}	
 			

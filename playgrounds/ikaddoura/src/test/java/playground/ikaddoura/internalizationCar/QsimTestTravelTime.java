@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -89,15 +88,13 @@ public class QsimTestTravelTime {
 	
 	// the travel time on single links is tested,
 	// the length and the velocity are varied
-	@Ignore
 	@Test
-	public final void testTravelTimeLK(){
+	public final void testTravelTime(){
 		
 		Scenario sc = loadScenario();
 		setPopulation(sc);
 		
 		final List<LinkEnterEvent> linkEnterEvents = new ArrayList<LinkEnterEvent>();
-//		final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
 		
 		events.addHandler( new LinkEnterEventHandler() {
 
@@ -123,28 +120,22 @@ public class QsimTestTravelTime {
 				System.out.println(event.toString());
 			}	
 		});
-		
-		events.addHandler(new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) sc));
-				
+						
 		QSim sim = createQSim(sc, events);
 		sim.run();
 		
 		for (LinkEnterEvent event : linkEnterEvents) {
 //			
-//				System.out.println(event.toString());
+				System.out.println(event.toString());
 //					
 				if (event.getLinkId().toString().equals("link2")){
-					Assert.assertEquals("wrong time.", 101.0, event.getTime(), MatsimTestUtils.EPSILON);
-					System.out.println("TestAgent1 reached link1 in the right time step.");
+					Assert.assertEquals("wrong link enter time (link2).", 101.0, event.getTime(), MatsimTestUtils.EPSILON);
 				} else if (event.getLinkId().toString().equals("link3")){
-					Assert.assertEquals("wrong time.", 103.0, event.getTime(), MatsimTestUtils.EPSILON);
-					System.out.println("TestAgent1 reached link2 in the right time step.");
+					Assert.assertEquals("wrong link enter time (link3).", 103.0, event.getTime(), MatsimTestUtils.EPSILON);
 				} else if (event.getLinkId().toString().equals("link4")){
-					Assert.assertEquals("wrong time.", 104.0, event.getTime(), MatsimTestUtils.EPSILON);
-					System.out.println("TestAgent1 reached link3 in the right time step.");
+					Assert.assertEquals("wrong link enter time (link4).", 104.0, event.getTime(), MatsimTestUtils.EPSILON);
 				} else if (event.getLinkId().toString().equals("link5")){
-					Assert.assertEquals("wrong time.", 106.0, event.getTime(), MatsimTestUtils.EPSILON);
-					System.out.println("TestAgent1 reached link4 in the right time step.");
+					Assert.assertEquals("wrong link enter time (link5).", 106.0, event.getTime(), MatsimTestUtils.EPSILON);
 				}
 			}			
 	}
@@ -218,31 +209,34 @@ public class QsimTestTravelTime {
 		link1.setAllowedModes(modes);
 		link1.setCapacity(999999);
 		link1.setFreespeed(1);
-		link1.setNumberOfLanes(100);
+		link1.setNumberOfLanes(1000);
 		link1.setLength(1);
 		
+		// t = s/v = 10/10 = 1 --> 1 time step on link
 		link2.setAllowedModes(modes);
 		link2.setCapacity(999999);
 		link2.setFreespeed(10);
-		link2.setNumberOfLanes(100);
+		link2.setNumberOfLanes(1000);
 		link2.setLength(10);
 		
+		// t = s/v = 10/10.1 = 0.99 --> 0 time step on link
 		link3.setAllowedModes(modes);
 		link3.setCapacity(999999);
 		link3.setFreespeed(10.1);
-		link3.setNumberOfLanes(100);
+		link3.setNumberOfLanes(1000);
 		link3.setLength(10);
 		
+		// t = s/v = 10/9.9 = 1.01 --> 1 time step on link
 		link4.setAllowedModes(modes);
 		link4.setCapacity(999999);
 		link4.setFreespeed(9.9);
-		link4.setNumberOfLanes(100);
+		link4.setNumberOfLanes(1000);
 		link4.setLength(10);
 		
 		link5.setAllowedModes(modes);
 		link5.setCapacity(999999);
 		link5.setFreespeed(1);
-		link5.setNumberOfLanes(100);
+		link5.setNumberOfLanes(1000);
 		link5.setLength(1);
 		
 		network.addNode(node0);

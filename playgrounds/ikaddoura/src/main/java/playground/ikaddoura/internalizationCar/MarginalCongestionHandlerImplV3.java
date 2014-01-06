@@ -41,9 +41,10 @@ import org.matsim.core.scenario.ScenarioImpl;
  *
  */
 public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler implements ActivityEndEventHandler{
-	final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV3.class);
-	final Map<Id, Double> agentId2storageDelay = new HashMap<Id, Double>();
-
+	private final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV3.class);
+	private final Map<Id, Double> agentId2storageDelay = new HashMap<Id, Double>();
+	private double spillbackMissing = 0.;
+	
 	public MarginalCongestionHandlerImplV3(EventsManager events, ScenarioImpl scenario) {
 		super(events, scenario);
 	}
@@ -59,16 +60,17 @@ public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler i
 			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink;
 		} else {
 			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
+			this.agentId2storageDelay.put(event.getVehicleId(), 0.);
 		}
 		
-		if (totalDelayWithDelaysOnPreviousLinks < -1.) {
-			throw new RuntimeException("The total delay is below -1.0. Aborting...");
+		if (totalDelayWithDelaysOnPreviousLinks < 0.) {
+			throw new RuntimeException("The total delay is below 0. Aborting...");
 			
-		} else if (totalDelayWithDelaysOnPreviousLinks == 0. || totalDelayWithDelaysOnPreviousLinks == -1.) {
+		} else if (totalDelayWithDelaysOnPreviousLinks == 0.) {
 			// The agent was leaving the link without a delay.
-			// A delay of -1.0 may result from rounding errors and is therefore considered as 0.
 			
 		} else {
+			// The agent was leaving the link with a delay.
 						
 			double storageDelay = throwFlowCongestionEventsAndReturnStorageDelay(totalDelayWithDelaysOnPreviousLinks, event);
 			
@@ -103,10 +105,15 @@ public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler i
 			
 		} else {
 			if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
-				log.warn("A delay of " + this.agentId2storageDelay.get(event.getPersonId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
+//				log.warn("A delay of " + this.agentId2storageDelay.get(event.getPersonId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
+				this.spillbackMissing = this.spillbackMissing + this.agentId2storageDelay.get(event.getPersonId());
 			}
 			this.agentId2storageDelay.put(event.getPersonId(), 0.);
 		}
+	}
+
+	public double getSpillbackMissing() {
+		return spillbackMissing;
 	}
 	
 }

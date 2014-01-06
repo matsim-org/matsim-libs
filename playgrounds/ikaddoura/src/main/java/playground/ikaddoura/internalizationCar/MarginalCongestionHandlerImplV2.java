@@ -47,14 +47,14 @@ public class MarginalCongestionHandlerImplV2 extends MarginalCongestionHandler {
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		this.totalDelay = this.totalDelay + delayOnThisLink;
 		
-		if (delayOnThisLink < -1.) {
-			throw new RuntimeException("The total delay is below -1.0. Aborting...");
+		if (delayOnThisLink < 0.) {
+			throw new RuntimeException("The total delay is below 0. Aborting...");
 			
-		} else if (delayOnThisLink == 0. || delayOnThisLink == -1.0) {
+		} else if (delayOnThisLink == 0.) {
 			// The agent was leaving the link without a delay.
-			// A delay of -1.0 may result from rounding errors and is therefore considered as 0.
 			
 		} else {
+			// The agent was leaving the link with a delay.
 						
 			double storageDelay = throwFlowCongestionEventsAndReturnStorageDelay(delayOnThisLink, event);
 			
@@ -92,6 +92,7 @@ public class MarginalCongestionHandlerImplV2 extends MarginalCongestionHandler {
 		} else {
 			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getVehicleId(), remainingDelay, event.getLinkId());
 			this.events.processEvent(congestionEvent);
+			this.totalInternalizedDelay = this.totalInternalizedDelay + remainingDelay;
 		}
 	}
 	

@@ -80,6 +80,8 @@ public abstract class MarginalCongestionHandler implements
 	
 	double totalInternalizedDelay = 0.0;
 	double totalDelay = 0.0;
+	
+	double roundingErrors = 0.;
 		
 	public MarginalCongestionHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -159,15 +161,11 @@ public abstract class MarginalCongestionHandler implements
 			}
 						
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			
-			double length = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
-			double freeSpeed = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getFreespeed();
-		
-			if(((length / freeSpeed) - (Math.ceil(length / freeSpeed))) == 0){
-				linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
-			} else {
-				linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime());
-			}
+						
+			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
+//			System.out.println(event.toString());
+//			System.out.println("free travel time: " + linkInfo.getFreeTravelTime());
+//			System.out.println("free speed leave time: " + linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId()));
 		}	
 	}
 
@@ -229,7 +227,7 @@ public abstract class MarginalCongestionHandler implements
 				if (event.getVehicleId().toString().equals(id.toString())) {
 					log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 				} else {
-					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getVehicleId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId());
+					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", id, event.getVehicleId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId());
 					this.events.processEvent(congestionEvent);
 					this.totalInternalizedDelay = this.totalInternalizedDelay + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 				}
@@ -241,7 +239,7 @@ public abstract class MarginalCongestionHandler implements
 					if (event.getVehicleId().toString().equals(id.toString())) {
 						log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 					} else {
-						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getVehicleId(), delayToPayFor, event.getLinkId());
+						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", id, event.getVehicleId(), delayToPayFor, event.getLinkId());
 						this.events.processEvent(congestionEvent);	
 						this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
 
@@ -251,8 +249,10 @@ public abstract class MarginalCongestionHandler implements
 			}
 		}
 		
-		if (delayToPayFor == 1.) {
-			// The remaining delay of 1 sec may result from rounding errors. Setting the remaining delay to 0 sec.
+		if (delayToPayFor <= 1.) {
+			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
+			// Setting the remaining delay to 0 sec.
+			this.roundingErrors = this.roundingErrors + delayToPayFor;
 			delayToPayFor = 0.;
 		}
 		
@@ -282,10 +282,9 @@ public abstract class MarginalCongestionHandler implements
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);
 		linkInfo.setLinkId(link.getId());
-		linkInfo.setFreeTravelTime(Math.ceil(link.getLength() / link.getFreespeed()));
+		linkInfo.setFreeTravelTime(Math.floor(link.getLength() / link.getFreespeed()));
 		
 		double flowCapacity_hour = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
-//		double marginalDelay_sec = Math.floor((1 / (flowCapacity_hour / this.scenario.getNetwork().getCapacityPeriod()) ) );
 		double marginalDelay_sec = ((1 / (flowCapacity_hour / this.scenario.getNetwork().getCapacityPeriod()) ) );
 		linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
 		
@@ -314,6 +313,10 @@ public abstract class MarginalCongestionHandler implements
 		return totalDelay;
 	}
 		
+	public double getRoundingErrors() {
+		return roundingErrors;
+	}
+
 	abstract void calculateCongestion(LinkLeaveEvent event);
 		
 }
