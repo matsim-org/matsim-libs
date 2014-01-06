@@ -69,6 +69,7 @@ public class MyCarrierPlanGenerator {
 		Double depotLat = Double.parseDouble(args[2]);
 		String demandInputFile = args[3];
 		initialPlanAlgorithm = args[4];
+		String changeEventsInputFile = args[5];
 		
 		/* Output */
 		String vehicleTypeOutputFile = "./output/freight/vehicleTypes.xml";
@@ -79,7 +80,10 @@ public class MyCarrierPlanGenerator {
 		config.addCoreModules();
 		scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(networkFile);
+		scenario.getConfig().network().setTimeVariantNetwork(true);
+		scenario.getConfig().network().setChangeEventInputFile(changeEventsInputFile);
 		network = scenario.getNetwork();
+		
 		
 		/* Set coordinate and linkId of depot */
 		depotCoord = new CoordImpl(depotLong, depotLat);
@@ -219,7 +223,8 @@ public class MyCarrierPlanGenerator {
 	 */
 	public CarrierCapabilities createCarrierCapabilities(){
 		double earliestStart = 0;
-		double latestEnd = 64800; //6pm (just arbitrary value for now)
+//		double latestEnd = 64800; //6pm (just arbitrary value for now)
+		double latestEnd = 32400; //pm (just arbitrary value for now)
 		
 		CarrierVehicle.Builder builder = CarrierVehicle.Builder.newInstance(new IdImpl("truck_3_1"), depotLink) ;
 		builder.setTypeId(new IdImpl("3_tonner")) ;
