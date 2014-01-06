@@ -37,8 +37,8 @@ import playground.michalm.taxi.model.VrpAgentElectricTaxi;
 public class TaxiRankReader
     extends MatsimXmlParser
 {
-    private final static String RANK = "rank";
-    private final static String TAXI = "taxi";
+    private final static String RANK = "depot";
+    private final static String TAXI = "vehicle";
     private final static String CHARGER = "charger";
 
     private final Scenario scenario;

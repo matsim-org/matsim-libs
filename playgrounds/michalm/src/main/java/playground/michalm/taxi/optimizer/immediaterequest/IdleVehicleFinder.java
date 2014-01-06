@@ -101,7 +101,7 @@ public class IdleVehicleFinder
             return deltaX * deltaX + deltaY * deltaY;
         }
         else {
-            return data.getVrpGraph().getArc(fromLink, toLink).getCostOnDeparture(time);
+            return data.getVrpGraph().getArc(fromLink, toLink).getShortestPath(time).travelCost;
         }
     }
 }

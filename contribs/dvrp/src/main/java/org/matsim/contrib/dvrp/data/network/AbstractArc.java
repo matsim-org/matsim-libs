@@ -55,32 +55,4 @@ public abstract class AbstractArc
     {
         return toLink;
     }
-
-
-    @Override
-    public int getTimeOnDeparture(int departureTime)
-    {
-        // no interpolation between consecutive timeSlices!
-        return getShortestPath(departureTime).travelTime;
-    }
-
-
-    @Override
-    public int getTimeOnArrival(int arrivalTime)
-    {
-        // TODO: very rough!!!
-        return getShortestPath(arrivalTime).travelTime;
-
-        // probably a bit more accurate but still rough and more time consuming
-        // return shortestPath.getSPEntry(arrivalTime -
-        // shortestPath.getSPEntry(arrivalTime).travelTime);
-    }
-
-
-    @Override
-    public double getCostOnDeparture(int departureTime)
-    {
-        // no interpolation between consecutive timeSlices!
-        return getShortestPath(departureTime).travelCost;
-    }
 }

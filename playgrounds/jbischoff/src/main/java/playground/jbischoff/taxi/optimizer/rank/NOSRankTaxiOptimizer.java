@@ -98,7 +98,7 @@ public class NOSRankTaxiOptimizer
             if (link != depotLink) {
                 int t5 = dropoffStayTask.getEndTime();
                 Arc arc = data.getVrpGraph().getArc(link, depotLink);
-                int t6 = arc.getTimeOnDeparture(t5);
+                int t6 = arc.getShortestPath(t5).travelTime;
                 schedule.addTask(new TaxiCruiseDriveTask(t5, t6, arc));
 
                 int tEnd = Math.max(t6, Schedules.getActualT1(schedule));
@@ -181,7 +181,7 @@ public class NOSRankTaxiOptimizer
 
         if (veh.getDepot().getLink() != lastLink) {// not a loop
             Arc darc = data.getVrpGraph().getArc(lastLink, veh.getDepot().getLink());
-            int arrivalTime = darc.getTimeOnDeparture(currentTime) + currentTime;
+            int arrivalTime = darc.getShortestPath(currentTime).travelTime + currentTime;
 
             sched.addTask(new TaxiCruiseDriveTask(currentTime, arrivalTime, darc));
             sched.addTask(new TaxiWaitStayTask(arrivalTime, oldendtime, veh.getDepot().getLink()));

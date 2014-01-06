@@ -154,10 +154,10 @@ public class ScheduleChartUtils
         {
             switch (task.getType()) {
                 case DRIVE:
-                    return DARK_BLUE;
+                    return DARK_RED;
 
                 case STAY:
-                    return DARK_RED;
+                    return DARK_BLUE;
 
                 default:
                     throw new IllegalStateException();

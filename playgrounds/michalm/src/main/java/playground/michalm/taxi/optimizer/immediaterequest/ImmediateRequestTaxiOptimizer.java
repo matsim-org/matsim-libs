@@ -132,7 +132,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
             int t1 = departure.getTime();
             Arc arc = data.getVrpGraph().getArc(departure.getLink(), req.getFromLink());
-            int t2 = t1 + arc.getTimeOnDeparture(departure.getTime());
+            int t2 = t1 + arc.getShortestPath(t1).travelTime;
 
             if (minimizePickupTripTime) {
                 if (t2 - t1 < best.t2 - best.t1) {
@@ -289,7 +289,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         int t3 = pickupStayTask.getEndTime();
 
         Arc arc = data.getVrpGraph().getArc(reqFromLink, reqToLink);
-        int t4 = t3 + arc.getTimeOnDeparture(t3);
+        int t4 = t3 + arc.getShortestPath(t3).travelTime;
         schedule.addTask(new TaxiDropoffDriveTask(t3, t4, arc, req));
 
         int t5 = t4 + dropoffDuration;
@@ -375,7 +375,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                 case CRUISE_DRIVE: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
-                    t += ((DriveTask)task).getArc().getTimeOnDeparture(t);
+                    t += ((DriveTask)task).getArc().getShortestPath(t).travelTime;
                     task.setEndTime(t);
 
                     break;

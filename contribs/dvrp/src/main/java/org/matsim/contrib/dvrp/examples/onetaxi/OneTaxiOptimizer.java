@@ -85,14 +85,14 @@ public class OneTaxiOptimizer
         int t0 = Schedules.getLastTask(schedule).getEndTime();
 
         Arc pickupArc = data.getVrpGraph().getArc(lastTask.getLink(), fromLink);
-        int t1 = t0 + pickupArc.getTimeOnDeparture(t0);
+        int t1 = t0 + pickupArc.getShortestPath(t0).travelTime;
         schedule.addTask(new DriveTaskImpl(t0, t1, pickupArc));
 
         int t2 = t1 + 120;// 2 minutes for picking up the passenger
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
         Arc deliveryArc = data.getVrpGraph().getArc(fromLink, toLink);
-        int t3 = t2 + deliveryArc.getTimeOnDeparture(t2);
+        int t3 = t2 + deliveryArc.getShortestPath(t2).travelTime;
         schedule.addTask(new DriveTaskImpl(t2, t3, deliveryArc));
 
         int t4 = t3 + 60;// 1 minute for dropping off the passenger
