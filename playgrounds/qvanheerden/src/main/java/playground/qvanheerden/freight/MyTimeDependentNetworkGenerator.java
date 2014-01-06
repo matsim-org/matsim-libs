@@ -54,13 +54,7 @@ public class MyTimeDependentNetworkGenerator {
 		
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		
-		Network network = scenario.getNetwork();
-		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
-		NetworkImpl ni = (NetworkImpl)network;
-		nf.setLinkFactory(new TimeVariantLinkFactory());
-		ni.setFactory(nf);
-		
-		for ( Link link : ni.getLinks().values() ) {
+		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
 			double kmph = 1;
 			final double threshold = kmph/3.6; //convert to m/s
