@@ -639,6 +639,8 @@ public class Controller {
 	}
 
 	public void disableAllRenderLayers() {
+		if (hasShapeRenderer())
+			deselectShapes();
 		if (this.visualizer.getRenderLayers() != null)
 			for (AbstractRenderLayer layer : this.visualizer.getRenderLayers())
 				layer.setEnabled(false);
@@ -858,9 +860,6 @@ public class Controller {
 	}
 
 	public boolean openMastimConfig() {
-		
-//		if (1==1)
-//			return openMastimConfig(new File("c:/temp/!matsimfiles/fostercityca/output/config.xml"));
 		
 		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoMatsimFile(), true);
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
@@ -1148,6 +1147,20 @@ public class Controller {
 				return ((PopAreaSelector)module).getPopAreaCount();
 		}
 		return -1;
+	}
+	
+	public void deselectShapes()
+	{
+		for (Shape shape : getActiveShapes()) 
+			shape.setSelected(false);
+	}
+
+	public void deselectShapesByMetaData(String string) {
+		for (Shape shape : getActiveShapes()) {
+			if (shape.getMetaData(string) != null)
+				shape.setSelected(false);
+		}
+		
 	}
 
 }

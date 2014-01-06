@@ -61,4 +61,6 @@ public interface Locale
 	public String popArea();
 	public String moduleScenarioXml();
 	
+	public String agents();
+	
 }

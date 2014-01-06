@@ -235,4 +235,9 @@ public class GermanLocale implements Locale
 		return popArea;
 	}
 
+	@Override
+	public String agents() {
+		return "Agenten";
+	}
+
 }

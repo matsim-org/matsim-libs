@@ -235,5 +235,11 @@ public class EnglishLocale implements Locale
 		return popArea;
 	}
 
+	@Override
+	public String agents() {
+		
+		return "agents";
+	}
+
 	
 }

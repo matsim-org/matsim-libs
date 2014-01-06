@@ -316,10 +316,7 @@ class PopToolBox extends AbstractToolBox {
 				populationAreaSelector.setSelectedAreaID(id);
 				populationAreaSelector.setSelectedAreaPop(pop);
 
-				for (Shape shape : controller.getActiveShapes()) {
-					if (shape.getMetaData("population") != null)
-						shape.setSelected(false);
-				}
+				controller.deselectShapesByMetaData("population");
 
 				populationAreaSelector.getController().getShapeById(id).setSelected(true);
 				controller.paintLayers();
@@ -328,7 +325,9 @@ class PopToolBox extends AbstractToolBox {
 
 		}
 
+
 	}
+
 
 	public int getPopAreaCount() {
 		
