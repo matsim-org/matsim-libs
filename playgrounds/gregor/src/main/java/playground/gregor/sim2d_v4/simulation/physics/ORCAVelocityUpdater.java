@@ -85,7 +85,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 
 		List<ORCALine> constr = new ArrayList<ORCALine>();
-		for (LineSegment seg : this.agent.getPSec().getObstacles()) {
+		for (LineSegment seg : this.agent.getPSec().getObstacleSegments()) {
 			ORCALineEnvironment ol = new ORCALineEnvironment(this, seg, this.tau);
 			constr.add(ol);
 			

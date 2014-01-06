@@ -170,7 +170,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 	@Override
 	public void addAgentTransitionBuffer(Sim2DAgent agent, double linkDensity) {
 		this.transitionBuffer.add(agent);
-		agent.setPSec(this);
+		agent.setSec(this);
 	}
 
 

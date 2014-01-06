@@ -25,6 +25,7 @@ import java.util.List;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
+import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 
@@ -36,16 +37,16 @@ public class Obstacles {
 		List<LineSegment> ret = new ArrayList<LineSegment>(100);
 		
 		PhysicalSim2DSection psec = agent.getPSec();
-		ret.addAll(psec.getObstacles());
+		ret.addAll(psec.getObstacleSegments());
 
 		double[] aPos = agent.getPos();
 		
 		//agents from neighboring sections
-		LineSegment[] openings = psec.getOpenings();
-		for (int i = 0; i < openings.length; i++) {
-			LineSegment opening = openings[i];
-			PhysicalSim2DSection qSec = psec.getNeighbor(opening);
+		List<LineSegment> openings = psec.getOpeningSegments();
+		for (LineSegment opening : openings) {
+			Section qSec = psec.getNeighbor(opening);
 			if (qSec == null) {
+//				System.err.println("this should not happen!!!");
 				continue;
 			}
 			//first test whether agent is inside the neighboring section, then we ignore the obstacles so that the agent does not become trapped!
@@ -53,7 +54,7 @@ public class Obstacles {
 			if (left >= 0) {
 				continue;
 			}
-			for (LineSegment obstacle : qSec.getObstacles()) {
+			for (LineSegment obstacle : qSec.getObstacleSegments()) {
 				if (bothEndesVisible(obstacle,opening,aPos)) {
 					ret.add(obstacle);
 //					if (this.debugger != null)

@@ -52,7 +52,7 @@ public class Sim2DAgent implements VoronoiCenter {
 	
 	private final QVehicle veh;
 	private final MobsimDriverAgent driver;
-	private PhysicalSim2DSection currentPSec;
+	
 
 	private final double r;
 	
@@ -79,6 +79,8 @@ public class Sim2DAgent implements VoronoiCenter {
 	private VoronoiCell voronoiCell;
 
 	private final Id id;
+
+	private PhysicalSim2DSection currentPSec;
 	
 	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.r = MatsimRandom.getRandom().nextDouble()*.1 + 0.25;//.25;//.19;//MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius//.25; //0.19; //MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius
@@ -123,10 +125,14 @@ public class Sim2DAgent implements VoronoiCenter {
 
 
 
-	public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
-		this.currentPSec = physicalSim2DSection;
-		
+//	public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
+//		this.currentPSec = physicalSim2DSection;
+//	}
+	
+	public void setSec(PhysicalSim2DSection pSec) {
+		this.currentPSec = pSec;
 	}
+
 
 	public boolean move(double dx, double dy, double time) {
 		if (this.ls.isSwitchLink(this.pos, dx, dy, this.getCurrentLinkId())) {
@@ -167,6 +173,7 @@ public class Sim2DAgent implements VoronoiCenter {
 		this.pos[0] += dx;
 		this.pos[1] += dy;
 		if (this.emitPosEvents) {
+//			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time,this);
 			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1], time);
 			this.pEnv.getEventsManager().processEvent(e);
 		}
@@ -198,7 +205,6 @@ public class Sim2DAgent implements VoronoiCenter {
 //		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed()+(MatsimRandom.getRandom().nextDouble()*.1)-.05;
 		this.setDesiredSpeed(this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed());
 	}
-
 
 	public PhysicalSim2DSection getPSec() {
 		return this.currentPSec;

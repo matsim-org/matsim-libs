@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
+import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
@@ -64,7 +65,6 @@ public class KDTreeNeighbors implements Neighbors {
 		PhysicalSim2DSection psec = this.agent.getPSec();
 
 
-
 		double twoDTreeRange = this.range;
 		Envelope e = new Envelope(aPos[0]-twoDTreeRange,aPos[0]+twoDTreeRange,aPos[1]-twoDTreeRange,aPos[1]+twoDTreeRange);
 		List<Sim2DAgent> agents = psec.getAgents(e);
@@ -72,17 +72,18 @@ public class KDTreeNeighbors implements Neighbors {
 
 
 		//agents from neighboring sections
-		LineSegment[] openings = psec.getOpenings();
-		for (int i = 0; i < openings.length; i++) {
-			LineSegment opening = openings[i];
-			PhysicalSim2DSection qSec = psec.getNeighbor(opening);
+		List<LineSegment> openings = psec.getOpeningSegments();
+		for (LineSegment opening : openings) {
+			
+			Section qSec = psec.getNeighbor(opening);
 			if (qSec == null) {
 				continue;
 			}
 
 			twoDTreeRange = this.range;
 			e = new Envelope(this.agent.getPos()[0]-twoDTreeRange,this.agent.getPos()[0]+twoDTreeRange,this.agent.getPos()[1]-twoDTreeRange,this.agent.getPos()[1]+twoDTreeRange);
-			List<Sim2DAgent> tmp = qSec.getAgents(e);
+			PhysicalSim2DSection qPSec = this.agent.getPSec().getPhysicalEnvironment().getPhysicalSim2DSection(qSec);
+			List<Sim2DAgent> tmp = qPSec.getAgents(e);
 			this.agentsNeigh.put(opening, tmp);
 			//agents from neighboring sections need to check visibility
 		}

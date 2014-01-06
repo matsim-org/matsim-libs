@@ -39,7 +39,7 @@ public class PerceivedPersonalSpaceApproach implements SpaceDependentSpeed {
 	@Override
 	public double computeSpaceDependentSpeed(Sim2DAgent agent, List<Sim2DAgent> neighbors) {
 
-		List<LineSegment> obs = agent.getPSec().getObstacles();
+		List<LineSegment> obs = agent.getPSec().getObstacleSegments();
 
 		VoronoiCell vc = agent.getVoronoiCell();
 		if (vc == null) {

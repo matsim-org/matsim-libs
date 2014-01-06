@@ -63,7 +63,7 @@ public class VDNeighbors implements Neighbors{
 			if (np == psec || np.getClass() != psec.getClass()) {
 				ret.add(next);
 			} else {
-				LineSegment open = psec.getConnectingOpening(next.getPSec());
+				LineSegment open = psec.getOpening(next.getPSec());
 				if (beelineIntersectsSegment(open,this.agent,next)) {
 					ret.add(next);
 				}

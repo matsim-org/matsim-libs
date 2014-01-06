@@ -20,12 +20,9 @@
 
 package playground.gregor.sim2d_v4.simulation.physics;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,7 +36,6 @@ import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class PhysicalSim2DSection {
@@ -48,10 +44,7 @@ public class PhysicalSim2DSection {
 
 	private static int leaveNotOrderlyCnt = 0;
 
-	private final Section sec;
-
-	List<LineSegment> obstacles;
-	LineSegment [] openings;//TODO why not using a list, is array really faster?? [gl April '13]
+	protected final Section sec;
 
 	private final Sim2DScenario sim2dsc;
 
@@ -62,13 +55,11 @@ public class PhysicalSim2DSection {
 
 	protected final PhysicalSim2DEnvironment penv;
 
-	private final Map<LineSegment,PhysicalSim2DSection> neighbors = new HashMap<LineSegment,PhysicalSim2DSection>();
-	private final Map<PhysicalSim2DSection,LineSegment> neighborsInvMapping = new HashMap<PhysicalSim2DSection, LineSegment>();
+
 
 
 	protected final TwoDTree<Sim2DAgent> agentTwoDTree;
 
-	private int numOpenings;
 
 
 
@@ -87,7 +78,6 @@ public class PhysicalSim2DSection {
 		this.penv = penv;
 		Envelope e = this.sec.getPolygon().getEnvelopeInternal();
 		this.agentTwoDTree = new TwoDTree<Sim2DAgent>(new Envelope(e.getMinX(),e.getMaxX(),e.getMinY(),e.getMaxY()));
-		init();
 	}
 
 	public int getNumberOfAllAgents() {
@@ -96,7 +86,7 @@ public class PhysicalSim2DSection {
 
 	public void addAgentToInBuffer(Sim2DAgent agent) {
 		this.inBuffer.add(agent);
-		agent.setPSec(this);
+		agent.setSec(this);
 	}
 
 	public void prepare() {
@@ -163,15 +153,16 @@ public class PhysicalSim2DSection {
 //				}
 			}
 			if (mv) {
-				for (int i = 0; i < this.numOpenings; i++) {
-					LineSegment opening = this.openings[i];
+				for (LineSegment opening : this.sec.getOpeningSegments()) {
 					double leftOfOpening = CGAL.isLeftOfLine(newXPosX, newXPosY, opening.x0, opening.y0, opening.x1, opening.y1);
 					if (leftOfOpening >= 0) {
 						double l1 = CGAL.isLeftOfLine(oldX, oldY, opening.x0, opening.y0, opening.x1, opening.y1);
 						double l2 = CGAL.isLeftOfLine(opening.x0, opening.y0,oldX,oldY,newXPosX,newXPosY);
 						double l3 = CGAL.isLeftOfLine(opening.x1, opening.y1,oldX,oldY,newXPosX,newXPosY);
 						if (l2*l3 < 0 && leftOfOpening*l1 < 0) {
-							PhysicalSim2DSection nextSection = this.neighbors.get(opening);
+							Section n = this.sec.getNeighbor(opening);
+							PhysicalSim2DSection nextSection = this.penv.getPhysicalSim2DSection(n);
+//							this.neighbors.get(opening);
 //							if (nextSection instanceof TransitionAreaII) {
 //								System.out.println("got you!!");
 //							}
@@ -203,67 +194,6 @@ public class PhysicalSim2DSection {
 
 	}
 
-	//initialization 
-	private void init() {
-		Coordinate[] coords = this.sec.getPolygon().getCoordinates();
-		int[] openings = this.sec.getOpenings();
-		int oidx = 0;
-
-		List<LineSegment> obst = new ArrayList<LineSegment>();
-		List<LineSegment> open = new ArrayList<LineSegment>();
-
-		for (int i = 0; i < coords.length-1; i++){
-			Coordinate c0 = coords[i];
-			Coordinate c1 = coords[i+1];
-			LineSegment seg = new LineSegment();
-			seg.x0 = c0.x;
-			seg.x1 = c1.x;
-			seg.y0 = c0.y;
-			seg.y1 = c1.y;
-
-			double dx = seg.x1-seg.x0;
-			double dy = seg.y1-seg.y0;
-			double length = Math.sqrt(dx*dx+dy*dy);
-			dx /= length;
-			dy /= length;
-			seg.dx = dx;
-			seg.dy = dy;
-
-			if (oidx < openings.length && i == openings[oidx]) {
-				oidx++;
-				open.add(seg);
-			} else {
-				obst.add(seg);
-			}
-		}
-		this.obstacles = obst;
-		this.openings = open.toArray(new LineSegment[0]);
-		this.numOpenings = this.openings.length;
-	}
-
-	/*package*/ void connect() {
-		for (LineSegment opening : this.openings) {
-			for (Id n : this.sec.getNeighbors()) {
-				PhysicalSim2DSection nPSec = this.penv.psecs.get(n);
-				if (isConnectedViaOpening(opening,nPSec)){
-					this.neighbors.put(opening, nPSec);
-					this.neighborsInvMapping.put(nPSec,opening);
-					break;
-				}
-			}
-		}
-	}
-
-	private boolean isConnectedViaOpening(LineSegment opening,
-			PhysicalSim2DSection nPSec) {
-		for (LineSegment nOpening : nPSec.getOpenings()) {
-			if (nOpening.equalInverse(opening)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public Id getId() {
 		return this.sec.getId();
 	}
@@ -277,29 +207,8 @@ public class PhysicalSim2DSection {
 		return this.agentTwoDTree.get(e);
 	}
 
-	public LineSegment [] getOpenings() {
-		return this.openings;
-
-	}
-
-	public PhysicalSim2DSection getNeighbor(LineSegment opening) {
-		return this.neighbors.get(opening);
-	}
-
-	public LineSegment getConnectingOpening(PhysicalSim2DSection neighbor) {
-		return this.neighborsInvMapping.get(neighbor);
-	}
-
-	/*package*/ void putNeighbor(LineSegment finishLine, PhysicalSim2DSection psec) {
-		this.neighbors.put(finishLine, psec);
-	}
-
 	public PhysicalSim2DEnvironment getPhysicalEnvironment() {
 		return this.penv;
-	}
-
-	public List<LineSegment> getObstacles() {
-		return this.obstacles;
 	}
 
 	public Sim2DScenario getSim2dsc() {
@@ -309,6 +218,22 @@ public class PhysicalSim2DSection {
 	@Override
 	public String toString() {
 		return "id:" + this.sec.getId() + " agents in section:" + this.agents.size();
+	}
+
+	public List<LineSegment> getObstacleSegments() {
+		return this.sec.getObstacleSegments();
+	}
+
+	public LineSegment getOpening(PhysicalSim2DSection pSec) {
+		return this.sec.getOpening(pSec.sec);
+	}
+
+	public List<LineSegment> getOpeningSegments() {
+		return this.sec.getOpeningSegments();
+	}
+
+	public Section getNeighbor(LineSegment opening) {
+		return this.sec.getNeighbor(opening);
 	}
 
 }

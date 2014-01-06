@@ -48,6 +48,7 @@ import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.scenario.Sim2DSectionPreprocessor;
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -67,8 +68,11 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 	private final Sim2DEnvironment env;
 
 	Map<Id,PhysicalSim2DSection> psecs = new HashMap<Id,PhysicalSim2DSection>();
+	Map<Section,PhysicalSim2DSection> psecsSecs = new HashMap<Section,PhysicalSim2DSection>();
+	
+	@Deprecated
 	Map<Id,PhysicalSim2DSection> linkIdPsecsMapping = new HashMap<Id,PhysicalSim2DSection>();
-
+	private final Map<Id,Section> linkIdSecsMapping = new HashMap<Id,Section>();
 	private final Sim2DScenario sim2dsc;
 
 
@@ -81,22 +85,22 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 	
 
 	
-	//EXPERIMENTAL multi threading stuff
-	private final Poison poison = new Poison();
-	private final int numOfThreads = 4; 
-	private final CyclicBarrier kdSync = new CyclicBarrier(this.numOfThreads);
-	private final CyclicBarrier cb = new CyclicBarrier(this.numOfThreads+1);
-	private final List<PhysicalSim2DSectionUpdaterThread> threads = new ArrayList<PhysicalSim2DEnvironment.PhysicalSim2DSectionUpdaterThread>();
+//	//EXPERIMENTAL multi threading stuff
+//	private final Poison poison = new Poison();
+//	private final int numOfThreads = 4; 
+//	private final CyclicBarrier kdSync = new CyclicBarrier(this.numOfThreads);
+//	private final CyclicBarrier cb = new CyclicBarrier(this.numOfThreads+1);
+//	private final List<PhysicalSim2DSectionUpdaterThread> threads = new ArrayList<PhysicalSim2DEnvironment.PhysicalSim2DSectionUpdaterThread>();
 	
-	private void awaitKDTreeSync() {
-		try {
-			this.kdSync.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
-			e.printStackTrace();
-		}
-	}
+//	private void awaitKDTreeSync() {
+//		try {
+//			this.kdSync.await();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		} catch (BrokenBarrierException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
 		this.env = env;
@@ -110,20 +114,19 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 	
 
 	private void init() {
-		for (int i = 0; i < this.numOfThreads; i++) {
-			PhysicalSim2DSectionUpdaterThread pt = new PhysicalSim2DSectionUpdaterThread(this.cb);
-			this.threads.add(pt);
-			new Thread(pt,this.env.getId().toString() + " PhysicalSim2DSectionUpdaterThread." + i).start();
-		}
+//		for (int i = 0; i < this.numOfThreads; i++) {
+//			PhysicalSim2DSectionUpdaterThread pt = new PhysicalSim2DSectionUpdaterThread(this.cb);
+//			this.threads.add(pt);
+//			new Thread(pt,this.env.getId().toString() + " PhysicalSim2DSectionUpdaterThread." + i).start();
+//		}
 		
 		for (Section sec : this.env.getSections().values()) {
 			PhysicalSim2DSection psec = createAndAddPhysicalSection(sec);
+			this.psecsSecs.put(sec, psec);
 			for (Id id : sec.getRelatedLinkIds()) {
 				this.linkIdPsecsMapping.put(id, psec);
+				this.linkIdSecsMapping.put(id, sec);
 			}
-		}
-		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			psec.connect();
 		}
 
 	}
@@ -136,6 +139,10 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 
 	public PhysicalSim2DSection getPhysicalSim2DSectionAssociatedWithLinkId(Id id) {
 		return this.linkIdPsecsMapping.get(id);
+	}
+
+	public Section getSectionAssociatedWithLinkId(Id id) {
+		return this.linkIdSecsMapping.get(id);
 	}
 	
 	public Collection<PhysicalSim2DSection> getPhysicalSim2DSections(){
@@ -154,37 +161,37 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		}
 		
 		
-//		//single threaded
-//		for (PhysicalSim2DSection psec : this.psecs.values()) {
-//			psec.prepare();
-//		}
-//		for (PhysicalSim2DSection psec : this.psecs.values()) {
-//			psec.updateAgents(time);
-//		}
-		
-		//multi threaded
-		this.cb.reset();
-		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
-			pt.setTime(time);
-		}
-		int idx = 0;
+		//single threaded
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			int tidx = idx % (this.numOfThreads);
-			PhysicalSim2DSectionUpdaterThread pt = this.threads.get(tidx);
-			pt.offer(psec);
-			idx++;
+			psec.prepare();
 		}
-		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
-			pt.offer(this.poison);
+		for (PhysicalSim2DSection psec : this.psecs.values()) {
+			psec.updateAgents(time);
 		}
-		try {
-			this.cb.await();
-			
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
-			e.printStackTrace();
-		}
+		
+//		//multi threaded
+//		this.cb.reset();
+//		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
+//			pt.setTime(time);
+//		}
+//		int idx = 0;
+//		for (PhysicalSim2DSection psec : this.psecs.values()) {
+//			int tidx = idx % (this.numOfThreads);
+//			PhysicalSim2DSectionUpdaterThread pt = this.threads.get(tidx);
+//			pt.offer(psec);
+//			idx++;
+//		}
+//		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
+//			pt.offer(this.poison);
+//		}
+//		try {
+//			this.cb.await();
+//			
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		} catch (BrokenBarrierException e) {
+//			e.printStackTrace();
+//		}
 		
 		
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
@@ -204,7 +211,7 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		Coord c = hiResLink.getLink().getFromNode().getCoord();
 		double cx = c.getX();
 		double cy = c.getY();
-		for (LineSegment op : psec.getOpenings()) {
+		for (LineSegment op : sec.getOpeningSegments()) {
 			if (CGAL.isOnVector(cx, cy, op.x0, op.y0, op.x1, op.y1)){ 
 				double cx1 = hiResLink.getLink().getToNode().getCoord().getX();
 				double cy1 = hiResLink.getLink().getToNode().getCoord().getX();
@@ -268,18 +275,19 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		Id [] neighbors = {id};
 		int level = sec.getLevel();
 		Section s = this.env.createSection(boxId, p, openings, neighbors, level);
+		Sim2DSectionPreprocessor.genLineSegments(s);
 		double spawnX = (c0.x+c2.x)/2;
 		double spawnY = (c0.y+c2.y)/2;
 
 		double flowCap = hiResLink.getLink().getFromNode().getInLinks().values().iterator().next().getCapacity() / this.sim2dsc.getMATSimScenario().getNetwork().getCapacityPeriod();
-		//		if (hiResLink.getLink().getId().toString().equals("l2d1")) {
 		TransitionAreaII ta = new TransitionAreaII(s,this.sim2dsc,this,(int) flowCap+1);
 		this.psecs.put(s.getId(),ta);
+		this.psecsSecs.put(s, ta);
 
 
-		LineSegment o = ta.getOpenings()[1];
-		ta.putNeighbor(o,psec);
-		psec.putNeighbor(opening, ta);
+		LineSegment o = s.getOpeningSegments().get(1);
+		s.addOpeningNeighborMapping(o,sec);
+		sec.addOpeningNeighborMapping(opening, s);
 		hiResLink.createDepartureBox(ta,spawnX,spawnY);
 
 //		//DEBUG
@@ -337,7 +345,10 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 					e.printStackTrace();
 				}
 				if (sec instanceof Poison) {
-					PhysicalSim2DEnvironment.this.awaitKDTreeSync();
+//					PhysicalSim2DEnvironment.this.awaitKDTreeSync();
+					if (true){
+						throw new RuntimeException();
+					}
 					while (secs.peek() != null) {
 						secs.poll().updateAgents(this.time);
 					}
@@ -397,9 +408,13 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-		for (PhysicalSim2DSectionUpdaterThread t : this.threads) {
-			t.offer(new Kill());
-		}
+//		for (PhysicalSim2DSectionUpdaterThread t : this.threads) {
+//			t.offer(new Kill());
+//		}
+	}
+
+	public PhysicalSim2DSection getPhysicalSim2DSection(Section n) {
+		return this.psecsSecs.get(n);
 	}
 
 }

@@ -21,6 +21,7 @@
 package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -31,10 +32,10 @@ import org.matsim.api.core.v01.network.Network;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
+import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 
 public class LinkSwitcher {// TODO more meaningful name for this class [gl April '13]
 
@@ -97,13 +98,15 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		li.dx = dx;
 		li.dy = dy;
 
-		PhysicalSim2DSection pSec = this.pEnv.getPhysicalSim2DSectionAssociatedWithLinkId(currentLinkId);
+		Section sec = this.pEnv.getSectionAssociatedWithLinkId(currentLinkId);
+		
 //		if (pSec == null) {
 //			System.out.println();
 //		}
 		LineSegment fl = null;
-		if (pSec != null) {
-			fl = getTouchingSegment(seg, pSec.getOpenings());
+		if (sec != null) {
+			fl = getTouchingSegment(seg, sec.getOpeningSegments());
+			
 		}
 		
 		
@@ -154,7 +157,7 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 	}
 
 
-	private LineSegment getTouchingSegment(LineSegment seg, LineSegment[] openings) {
+	private LineSegment getTouchingSegment(LineSegment seg, List<LineSegment> openings) {
 
 		for (LineSegment opening : openings) {
 
