@@ -119,6 +119,7 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 			// be use to construct the scoring function
 			scoring.notifyIterationStarts( new IterationStartsEvent( null , i ) );
 
+			events.initProcessing();
 			try {
 				if ( stopWatch != null ) stopWatch.beginOperation( "PSim iter "+i );
 				pSimFactory.createMobsim(
@@ -127,6 +128,7 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 				if ( stopWatch != null ) stopWatch.endOperation( "PSim iter "+i );
 			}
 			finally {
+				events.finishProcessing();
 				if ( writer != null ) {
 					events.removeHandler( writer );
 					writer.closeFile();
