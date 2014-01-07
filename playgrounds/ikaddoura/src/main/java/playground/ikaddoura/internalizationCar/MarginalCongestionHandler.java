@@ -71,7 +71,7 @@ public abstract class MarginalCongestionHandler implements
 		
 	// If the following parameter is false, the delays resulting from the storage capacity are not internalized.
 	final boolean calculateStorageCapacityConstraints = true;
-	double delayNotInternalized = 0.0;
+	double delayNotInternalized_storageCapacity = 0.0;
 
 	final ScenarioImpl scenario;
 	final EventsManager events;
@@ -80,8 +80,8 @@ public abstract class MarginalCongestionHandler implements
 	
 	double totalInternalizedDelay = 0.0;
 	double totalDelay = 0.0;
-	
-	double roundingErrors = 0.;
+	double delayNotInternalized_roundingErrors = 0.0;
+	double delayNotInternalized_spillbackNoCausingAgent = 0.;
 		
 	public MarginalCongestionHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -116,9 +116,11 @@ public abstract class MarginalCongestionHandler implements
 	public void reset(int iteration) {
 		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
-		this.delayNotInternalized = 0.0;
+		this.delayNotInternalized_storageCapacity = 0.0;
 		this.totalDelay = 0.0;
 		this.totalInternalizedDelay = 0.0;
+		this.delayNotInternalized_roundingErrors = 0.0;
+		this.delayNotInternalized_spillbackNoCausingAgent = 0.0;
 	}
 
 	@Override
@@ -160,12 +162,8 @@ public abstract class MarginalCongestionHandler implements
 				collectLinkInfos(event.getLinkId());
 			}
 						
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-						
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());	
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
-//			System.out.println(event.toString());
-//			System.out.println("free travel time: " + linkInfo.getFreeTravelTime());
-//			System.out.println("free speed leave time: " + linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId()));
 		}	
 	}
 
@@ -252,7 +250,7 @@ public abstract class MarginalCongestionHandler implements
 		if (delayToPayFor <= 1.) {
 			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
 			// Setting the remaining delay to 0 sec.
-			this.roundingErrors = this.roundingErrors + delayToPayFor;
+			this.delayNotInternalized_roundingErrors = this.delayNotInternalized_roundingErrors + delayToPayFor;
 			delayToPayFor = 0.;
 		}
 		
@@ -313,8 +311,12 @@ public abstract class MarginalCongestionHandler implements
 		return totalDelay;
 	}
 		
-	public double getRoundingErrors() {
-		return roundingErrors;
+	public double getDelayNotInternalizedRoundingErrors() {
+		return delayNotInternalized_roundingErrors;
+	}
+	
+	public double getDelayNotInternalizedSpillbackNoCausingAgent() {
+		return delayNotInternalized_spillbackNoCausingAgent;
 	}
 
 	abstract void calculateCongestion(LinkLeaveEvent event);

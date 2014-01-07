@@ -43,7 +43,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler implements ActivityEndEventHandler{
 	private final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV3.class);
 	private final Map<Id, Double> agentId2storageDelay = new HashMap<Id, Double>();
-	private double spillbackMissing = 0.;
 	
 	public MarginalCongestionHandlerImplV3(EventsManager events, ScenarioImpl scenario) {
 		super(events, scenario);
@@ -86,8 +85,8 @@ public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler i
 						// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
 						this.agentId2storageDelay.put(event.getVehicleId(), storageDelay);
 					} else {
-						this.delayNotInternalized = this.delayNotInternalized + storageDelay;
-						log.warn("Delay which is not internalized: " + this.delayNotInternalized);
+						this.delayNotInternalized_storageCapacity = this.delayNotInternalized_storageCapacity + storageDelay;
+						log.warn("Delay which is not internalized: " + this.delayNotInternalized_storageCapacity);
 					}
 					
 				} else {
@@ -106,14 +105,10 @@ public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler i
 		} else {
 			if (this.agentId2storageDelay.get(event.getPersonId()) != 0.) {
 //				log.warn("A delay of " + this.agentId2storageDelay.get(event.getPersonId()) + " sec. resulting from spill-back effects was not internalized. Setting the delay to 0.");
-				this.spillbackMissing = this.spillbackMissing + this.agentId2storageDelay.get(event.getPersonId());
+				this.delayNotInternalized_spillbackNoCausingAgent += this.agentId2storageDelay.get(event.getPersonId());
 			}
 			this.agentId2storageDelay.put(event.getPersonId(), 0.);
 		}
 	}
 
-	public double getSpillbackMissing() {
-		return spillbackMissing;
-	}
-	
 }

@@ -45,7 +45,7 @@ public class MarginalCongestionHandlerImplV2 extends MarginalCongestionHandler {
 	void calculateCongestion(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
-		this.totalDelay = this.totalDelay + delayOnThisLink;
+		this.totalDelay += delayOnThisLink;
 		
 		if (delayOnThisLink < 0.) {
 			throw new RuntimeException("The total delay is below 0. Aborting...");
@@ -70,8 +70,8 @@ public class MarginalCongestionHandlerImplV2 extends MarginalCongestionHandler {
 						// Search for the agent who has to pay additionally for the left over delay resulting from the storage capacity constraint.
 						calculateStorageCongestion(event, storageDelay);
 					} else {
-						this.delayNotInternalized = this.delayNotInternalized + storageDelay;
-						log.warn("The total delay resulting from storage capacity constraints and not being internalized amounts to " + this.delayNotInternalized + ".");
+						this.delayNotInternalized_storageCapacity = this.delayNotInternalized_storageCapacity + storageDelay;
+						log.warn("The total delay resulting from storage capacity constraints and not being internalized amounts to " + this.delayNotInternalized_storageCapacity + ".");
 					}
 					
 				} else {
@@ -89,10 +89,12 @@ public class MarginalCongestionHandlerImplV2 extends MarginalCongestionHandler {
 		if (causingAgent == null){
 			log.warn("An agent is delayed due to storage congestion on link " + event.getLinkId() + " but no agent has left the link before. " +
 					"That is, storage congestion appears due to agents departing on that link. In this version, these delays are not internalized.");
+			this.delayNotInternalized_spillbackNoCausingAgent += remainingDelay;
+			
 		} else {
 			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getVehicleId(), remainingDelay, event.getLinkId());
 			this.events.processEvent(congestionEvent);
-			this.totalInternalizedDelay = this.totalInternalizedDelay + remainingDelay;
+			this.totalInternalizedDelay += remainingDelay;
 		}
 	}
 	
