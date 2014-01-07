@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -215,11 +216,14 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 				else {
 					linkId = actToMove.getLinkId();
 				}
-				
-				if (this.lcContext.getScenario().getNetwork().getLinks().get(linkId).getAllowedModes().contains(mode)) {
+				// TODO: solve this generic. for that we need info from the config, which modes are actually teleported.
+				if (this.lcContext.getScenario().getNetwork().getLinks().get(linkId).getAllowedModes().contains(mode) || 
+						mode.equals(TransportMode.bike) || 
+						mode.equals(TransportMode.walk) ||
+						mode.equals(TransportMode.transit_walk) ||
+						mode.equals(TransportMode.other)) {
 					cs.addDestination(facility.getId());
-				}
-				
+				}	
 			}
 		}
 		return cs;
