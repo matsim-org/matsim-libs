@@ -548,10 +548,10 @@ public class EvacuationControlerListener implements StartupListener {
 		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
 		withinDayEngine.addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-//		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(scenario, withinDayEngine, decisionDataProvider,
-//				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, ptTravelTimeEvacuation, tripRouterFactory, routingContext);
-//		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
-//		withinDayEngine.addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(scenario, withinDayEngine, decisionDataProvider,
+				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, ptTravelTimeEvacuation, tripRouterFactory, routingContext);
+		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
+		withinDayEngine.addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
 		/*
 		 * During Leg Replanners
@@ -561,18 +561,18 @@ public class EvacuationControlerListener implements StartupListener {
 		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		withinDayEngine.addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
-//		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
-//		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
-//		withinDayEngine.addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-//		
-//		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(scenario, withinDayEngine);
-//		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
-//		withinDayEngine.addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-//		
-//		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
-//		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-//		withinDayEngine.addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-				
+		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
+		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
+		withinDayEngine.addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(scenario, withinDayEngine);
+		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
+		withinDayEngine.addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
+		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
+		withinDayEngine.addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
 		/*
 		 * Collect Replanners that can be disabled after all agents have been informed.
 		 */
