@@ -22,16 +22,15 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.contrib.dvrp.data.online.VehicleTracker;
+import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.data.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.impl.LinkTimePair;
-import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.*;
@@ -68,6 +67,21 @@ public abstract class ImmediateRequestTaxiOptimizer
             this.path = path;
         }
     }
+    
+    
+    private static class LinkTimePair
+    {
+        public final Link link;
+        public final int time;
+
+
+        public LinkTimePair(Link link, int time)
+        {
+            this.link = link;
+            this.time = time;
+        }
+    }
+
 
 
     private final VrpPathCalculator calculator;

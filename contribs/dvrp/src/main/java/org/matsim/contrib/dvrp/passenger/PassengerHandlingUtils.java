@@ -23,12 +23,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
+import org.matsim.contrib.dvrp.data.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgents;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
 
 
 public class PassengerHandlingUtils

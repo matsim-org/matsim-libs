@@ -22,10 +22,10 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.schedule.*;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;

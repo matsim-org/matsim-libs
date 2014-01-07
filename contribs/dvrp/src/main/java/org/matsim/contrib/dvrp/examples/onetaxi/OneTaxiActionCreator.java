@@ -20,11 +20,10 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.contrib.dvrp.VrpSimEngine;
+import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.passenger.PassengerHandlingUtils;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
 public class OneTaxiActionCreator

@@ -29,6 +29,7 @@ import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.network.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
+import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
@@ -49,7 +50,6 @@ import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer;
-import playground.michalm.util.gis.Schedules2GIS;
 
 
 /*package*/class SingleIterTaxiLauncher

@@ -23,11 +23,10 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.schedule.Schedule;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;
 

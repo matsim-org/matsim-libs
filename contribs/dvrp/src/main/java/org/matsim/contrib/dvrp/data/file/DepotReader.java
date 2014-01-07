@@ -23,13 +23,12 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.model.Depot;
+import org.matsim.contrib.dvrp.data.model.impl.DepotImpl;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Depot;
-import pl.poznan.put.vrp.dynamic.data.model.impl.DepotImpl;
 
 
 public class DepotReader

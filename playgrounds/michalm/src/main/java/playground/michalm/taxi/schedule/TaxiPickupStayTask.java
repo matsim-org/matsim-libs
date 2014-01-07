@@ -19,7 +19,8 @@
 
 package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
+import org.matsim.contrib.dvrp.data.schedule.impl.StayTaskImpl;
+
 import playground.michalm.taxi.model.TaxiRequest;
 
 

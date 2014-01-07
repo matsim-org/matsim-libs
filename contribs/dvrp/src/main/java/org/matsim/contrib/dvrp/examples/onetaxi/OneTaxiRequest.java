@@ -20,11 +20,10 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.model.Customer;
+import org.matsim.contrib.dvrp.data.model.impl.RequestImpl;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
-import pl.poznan.put.vrp.dynamic.data.model.impl.RequestImpl;
 
 
 public class OneTaxiRequest

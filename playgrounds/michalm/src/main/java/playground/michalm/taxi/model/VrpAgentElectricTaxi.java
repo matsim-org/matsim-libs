@@ -20,11 +20,10 @@
 package playground.michalm.taxi.model;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.model.Depot;
+import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
-
-import pl.poznan.put.vrp.dynamic.data.model.Depot;
-import pl.poznan.put.vrp.dynamic.extensions.electric.*;
 
 
 public class VrpAgentElectricTaxi

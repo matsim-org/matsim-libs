@@ -24,9 +24,8 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.data.model.Request;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-
-import pl.poznan.put.vrp.dynamic.data.model.Request;
 
 //TODO this class is not finished yet
 public class PassengerCallHandler

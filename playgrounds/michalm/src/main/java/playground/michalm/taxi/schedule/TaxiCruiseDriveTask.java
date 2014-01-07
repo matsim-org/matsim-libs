@@ -20,8 +20,7 @@
 package playground.michalm.taxi.schedule;
 
 import org.matsim.contrib.dvrp.data.network.VrpPath;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.DriveTaskImpl;
+import org.matsim.contrib.dvrp.data.schedule.impl.DriveTaskImpl;
 
 
 public class TaxiCruiseDriveTask

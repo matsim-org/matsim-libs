@@ -20,9 +20,8 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.model.Request;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-
-import pl.poznan.put.vrp.dynamic.data.model.Request;
 
 
 public interface PassengerRequest

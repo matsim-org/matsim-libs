@@ -20,8 +20,7 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.network.Link;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.StayTaskImpl;
+import org.matsim.contrib.dvrp.data.schedule.impl.StayTaskImpl;
 
 
 public class OneTaxiServeTask

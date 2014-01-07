@@ -21,10 +21,10 @@ package playground.michalm.taxi;
 
 import java.util.*;
 
+import org.matsim.contrib.dvrp.data.VrpDataImpl;
+import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
 
-import pl.poznan.put.vrp.dynamic.data.VrpDataImpl;
-import pl.poznan.put.vrp.dynamic.extensions.electric.*;
 import playground.michalm.taxi.model.*;
 
 

@@ -19,7 +19,8 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
+
 import playground.michalm.taxi.model.TaxiRequest;
 
 

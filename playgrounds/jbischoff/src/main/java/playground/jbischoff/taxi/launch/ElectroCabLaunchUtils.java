@@ -24,6 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.data.model.*;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
@@ -31,7 +32,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;

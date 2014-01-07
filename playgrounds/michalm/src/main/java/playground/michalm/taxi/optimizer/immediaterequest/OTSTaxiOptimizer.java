@@ -19,8 +19,9 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.schedule.Schedule;
+
 import playground.michalm.taxi.schedule.TaxiTask;
 
 

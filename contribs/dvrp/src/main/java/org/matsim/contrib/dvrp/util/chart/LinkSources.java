@@ -22,8 +22,7 @@ package org.matsim.contrib.dvrp.util.chart;
 import java.util.List;
 
 import org.matsim.api.core.v01.*;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import org.matsim.contrib.dvrp.data.schedule.*;
 
 import com.google.common.collect.Lists;
 

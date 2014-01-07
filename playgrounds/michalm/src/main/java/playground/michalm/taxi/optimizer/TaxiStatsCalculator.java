@@ -21,9 +21,10 @@ package playground.michalm.taxi.optimizer;
 
 import java.io.PrintWriter;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.model.*;
+import org.matsim.contrib.dvrp.data.schedule.*;
+
 import playground.michalm.taxi.schedule.*;
 
 

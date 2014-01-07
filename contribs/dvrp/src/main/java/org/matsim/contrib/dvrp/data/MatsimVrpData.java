@@ -26,8 +26,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-
 
 public class MatsimVrpData
 {

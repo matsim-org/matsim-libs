@@ -22,10 +22,10 @@ package playground.jbischoff.taxi.optimizer.rank;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.core.basic.v01.IdImpl;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;

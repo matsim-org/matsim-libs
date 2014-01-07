@@ -24,10 +24,9 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.vehicles.Vehicle;
-
-import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
 public class LeastCostPathCalculatorWithCache

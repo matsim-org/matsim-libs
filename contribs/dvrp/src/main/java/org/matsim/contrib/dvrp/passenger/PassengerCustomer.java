@@ -23,9 +23,8 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
 
 
 public class PassengerCustomer

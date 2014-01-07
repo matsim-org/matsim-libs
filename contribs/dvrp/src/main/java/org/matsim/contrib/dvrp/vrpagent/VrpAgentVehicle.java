@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
 
 
 public interface VrpAgentVehicle

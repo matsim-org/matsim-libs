@@ -24,14 +24,13 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.schedule.VrpSchedulePlanFactory;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.util.schedule.VrpSchedulePlanFactory;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.VehicleUtils;
-
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 
 
 public class VrpAgentSource

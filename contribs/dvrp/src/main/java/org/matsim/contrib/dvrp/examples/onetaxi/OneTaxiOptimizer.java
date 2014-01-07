@@ -20,13 +20,12 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.model.*;
 import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.data.schedule.impl.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
 
 
 /**

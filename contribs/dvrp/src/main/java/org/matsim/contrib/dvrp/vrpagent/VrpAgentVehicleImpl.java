@@ -20,9 +20,8 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
-
-import pl.poznan.put.vrp.dynamic.data.model.Depot;
-import pl.poznan.put.vrp.dynamic.data.model.impl.VehicleImpl;
+import org.matsim.contrib.dvrp.data.model.Depot;
+import org.matsim.contrib.dvrp.data.model.impl.VehicleImpl;
 
 
 public class VrpAgentVehicleImpl

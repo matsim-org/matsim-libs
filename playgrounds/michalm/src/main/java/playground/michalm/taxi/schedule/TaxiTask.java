@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import org.matsim.contrib.dvrp.data.schedule.Task;
 
 
 public interface TaxiTask

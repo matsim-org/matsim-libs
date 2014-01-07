@@ -37,21 +37,18 @@ public class Net2GIS
         String dirName;
         String netFileName;
         String outFileNameLs;
-        String outFileNameP;
         String outFileNameN;
 
         if (args.length == 0) {// for testing
             dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
             netFileName = dirName + "network.xml";
             outFileNameLs = dirName + "GIS\\linksLs.shp";
-            outFileNameP = dirName + "GIS\\linksP.shp";
             outFileNameN = dirName + "GIS\\nodes.shp";
         }
         else if (args.length == 5) {
             dirName = args[0];
             netFileName = dirName + args[1];
             outFileNameLs = dirName + args[2];
-            outFileNameP = dirName + args[3];
             outFileNameN = dirName + args[4];
         }
         else {
@@ -72,12 +69,6 @@ public class Net2GIS
         builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
         builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
         new Links2ESRIShape(network, outFileNameLs, builder).write();
-
-        // links as polygons
-        builder = new FeatureGeneratorBuilderImpl(network, coordSystem);// necessary?
-        builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
-        builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-        new Links2ESRIShape(network, outFileNameP, builder).write();
 
         // nodes as points
         new Nodes2ESRIShape(network, outFileNameN, coordSystem).write();

@@ -23,12 +23,12 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.core.basic.v01.IdImpl;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.immediaterequest.NOSTaxiOptimizer;
 import playground.michalm.taxi.schedule.*;

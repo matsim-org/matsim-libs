@@ -19,9 +19,8 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
+import org.matsim.contrib.dvrp.data.schedule.Task;
 import org.matsim.contrib.dynagent.DynAgent;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
 
 public class VrpAgents
 {
