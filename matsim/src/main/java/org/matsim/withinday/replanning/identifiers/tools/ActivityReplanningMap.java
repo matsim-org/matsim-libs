@@ -21,14 +21,12 @@
 package org.matsim.withinday.replanning.identifiers.tools;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NavigableSet;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -69,11 +67,12 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	private final Set<Id> startingAgents;	// PersonId
 
 	/*
-	 * Contains the Agents that are currently performing an Activity.
+	 * Contains activity end times of agents that are currently performing an activity.
 	 */
-	private final NavigableSet<AgentEntry> activityPerformingAgents;	// PersonDriverAgentId
 	private final Map<Id, Double> activityEndTimes;	// scheduled activity end times
 
+	private Set<Id> activityPerformingAgentsCache = null;
+	private double activityPerformingAgentsCacheTime = Double.NaN;
 	private Map<Id, MobsimAgent> personAgentsToReplanActivityEndCache = null;
 	private double personAgentsToReplanActivityEndCacheTime = Double.NaN;
 		
@@ -82,7 +81,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		
 		this.mobsimDataProvider = mobsimDataProvider;
 		
-		this.activityPerformingAgents = new TreeSet<AgentEntry>(new AgentEntryComparator());
+//		this.activityPerformingAgents = new TreeSet<AgentEntry>(new AgentEntryComparator());
 		this.startingAgents = new HashSet<Id>();
 		this.activityEndTimes = new HashMap<Id, Double>();
 	}
@@ -102,7 +101,6 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 			
 			// get the agent's activity end time and mark it as currently performing an Activity
 			double activityEndTime = mobsimAgent.getActivityEndTime();
-			this.activityPerformingAgents.add(new AgentEntry(mobsimAgent, activityEndTime));
 			
 			// get the agent's activity end time
 			this.activityEndTimes.put(mobsimAgent.getId(), activityEndTime);
@@ -118,7 +116,8 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		
-		// reset cache by resetting the cache time
+		// reset caches by resetting the cache times
+		this.activityPerformingAgentsCacheTime = Double.NaN;
 		this.personAgentsToReplanActivityEndCacheTime = Double.NaN;
 		
 		for (Id id : startingAgents) {
@@ -132,24 +131,12 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 			 * Otherwise we select the agent for a replanning.
 			 */
 			if (departureTime >= now) {
-				this.activityPerformingAgents.add(new AgentEntry(personAgent, departureTime));
 				this.activityEndTimes.put(id, departureTime);
 			} else {
 				log.warn("Departure time is in the past - ignoring activity!");
 			}
 		}
 		startingAgents.clear();
-		
-		// remove entry from agents that have departed
-		Iterator<AgentEntry> iter = this.activityPerformingAgents.iterator();
-		while (iter.hasNext()) {
-			AgentEntry entry = iter.next();
-			if (entry.activityEndTime <= e.getSimulationTime()) {
-				iter.remove();
-				this.activityEndTimes.remove(entry.agent.getId());
-			}
-			else break;
-		}
 	}
 
 	/*
@@ -176,8 +163,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 
 	/*
 	 * Nothing to do here?
-	 * Agents should not be removed from the simulation
-	 * if they are performing an activity.
+	 * Agents should not be removed from the simulation if they are performing an activity.
 	 */
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
@@ -194,17 +180,8 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 			MobsimAgent agent = this.mobsimDataProvider.getAgent(event.getPersonId());
 			if (activityEndTime != agent.getActivityEndTime()) {
 				/*
-				 * Update the agents entry in the activityPerformingAgents set.
-				 * To do so, create a duplicate of the existing entry and remove it.
-				 * Then add a new entry with the new activity end time.
+				 * Update the agent's activity end time.
 				 */
-				AgentEntry entry = new AgentEntry(agent, activityEndTime);
-				boolean removed = this.activityPerformingAgents.remove(entry);
-				if (!removed) {
-					log.error("Could not remove entry for agent " + agent.getId() + " from set of activity performing agents!");
-				}
-				entry.activityEndTime = agent.getActivityEndTime();
-				this.activityPerformingAgents.add(entry);
 				this.activityEndTimes.put(agent.getId(), agent.getActivityEndTime());
 			}
 		}
@@ -213,9 +190,39 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	/*
 	 * Returns a List of all Agents, that are currently performing an Activity.
 	 */
+	@Deprecated
 	public Set<Id> getActivityPerformingAgents() {
 		return Collections.unmodifiableSet(this.activityEndTimes.keySet());
 	}
+	
+	/*
+	 * Returns a List of all Agents, that are currently performing an Activity.
+	 */
+	public Set<Id> getActivityPerformingAgents(double time) {
+
+		if (time == this.activityPerformingAgentsCacheTime) return this.activityPerformingAgentsCache;
+		else {
+			// use a TreeSet which stores its entries in a deterministic order
+			this.activityPerformingAgentsCache = new TreeSet<Id>();
+			this.activityPerformingAgentsCacheTime = time;
+			
+			for (Entry<Id, Double> entry : this.activityEndTimes.entrySet()) {
+				double activityEndTime = entry.getValue();
+				
+				/*
+				 * This is typically called before the mobsims simulate the time step.
+				 * If time <= activityEndTime, the agent will not depart in this time step.
+				 */
+				if (time <= activityEndTime) {
+					Id id = entry.getKey();
+					this.activityPerformingAgentsCache.add(id);
+				}
+			}
+			
+			return this.activityPerformingAgentsCache;
+		}
+	}
+
 	
 	/*
 	 * Returns a List of all agents that are going to end their activity
@@ -225,22 +232,21 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		
 		if (time == this.personAgentsToReplanActivityEndCacheTime) return this.personAgentsToReplanActivityEndCache;
 		else {
-			// activityPerformingAgents is sorted, therefore we do not need a TreeMap here
-			this.personAgentsToReplanActivityEndCache = new LinkedHashMap<Id, MobsimAgent>();
+			// use a TreeMap which stores its entries in a deterministic order
+			this.personAgentsToReplanActivityEndCache = new TreeMap<Id, MobsimAgent>();
 			this.personAgentsToReplanActivityEndCacheTime = time;
 			
-			Iterator<AgentEntry> iter = this.activityPerformingAgents.iterator();
-			while (iter.hasNext()) {
-				AgentEntry entry = iter.next();
-				
-				double activityEndTime = entry.activityEndTime;
+			for (Entry<Id, Double> entry : this.activityEndTimes.entrySet()) {
+				double activityEndTime = entry.getValue();
 				
 				/*
 				 * This is typically called before the mobsims simulate the time step.
 				 * If time >= activityEndTime, the agent will depart in this time step.
 				 */
 				if (time >= activityEndTime) {
-					personAgentsToReplanActivityEndCache.put(entry.agent.getId(), entry.agent);
+					Id id = entry.getKey();
+					MobsimAgent personAgent = this.mobsimDataProvider.getAgent(id);
+					this.personAgentsToReplanActivityEndCache.put(id, personAgent);
 				}
 			}
 			
@@ -252,36 +258,11 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	public void reset(int iteration) {
 		this.startingAgents.clear();
 		this.activityEndTimes.clear();
-		this.activityPerformingAgents.clear();
+		
+		this.activityPerformingAgentsCache = null;
+		this.activityPerformingAgentsCacheTime = Double.NaN;
+		this.personAgentsToReplanActivityEndCache = null;
+		this.personAgentsToReplanActivityEndCacheTime = Double.NaN;
 	}
 
-	private static class AgentEntry {
-		public AgentEntry(MobsimAgent agent, double activityEndTime) {
-			this.agent = agent;
-			this.activityEndTime = activityEndTime;
-		}
-		MobsimAgent agent;
-		double activityEndTime;
-	}
-	
-	private static class AgentEntryComparator implements Comparator<AgentEntry> {
-
-		@Override
-		public int compare(AgentEntry arg0, AgentEntry arg1) {
-			int cmp = Double.compare(arg0.activityEndTime, arg1.activityEndTime);
-			if (cmp == 0) {
-				// Both depart at the same time -> let the one with the larger id be first (=smaller)
-				//
-				// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
-				// to say that the agent with the larger ID should be "smaller" one in the comparison. 
-				// In practice, it seems
-				// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
-				// It is unclear why this convention is supposed to be helpful.
-				// kai & dominik, jul'12
-				//
-				return arg1.agent.getId().compareTo(arg0.agent.getId());
-			}
-			return cmp;
-		}
-	}
 }
