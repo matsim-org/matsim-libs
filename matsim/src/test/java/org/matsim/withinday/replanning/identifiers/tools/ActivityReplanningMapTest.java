@@ -176,12 +176,12 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 			}
 			
 			if (e.getSimulationTime() == t5) {
-				assertEquals(1, this.arp.getActivityPerformingAgents().size());	// one agent performs an activity before the time step
+				assertEquals(1, this.arp.getActivityPerformingAgents(e.getSimulationTime()).size());	// one agent performs an activity before the time step
 				assertEquals(0, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());	// no agent ends an activity
 			}
 			
 			if (e.getSimulationTime() == t6) {
-				assertEquals(1, this.arp.getActivityPerformingAgents().size());	// one agent performs an activity before the time step
+				assertEquals(1, this.arp.getActivityPerformingAgents(e.getSimulationTime()).size());	// one agent performs an activity before the time step
 				assertEquals(1, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());	// one agent ends an activity
 			}
 

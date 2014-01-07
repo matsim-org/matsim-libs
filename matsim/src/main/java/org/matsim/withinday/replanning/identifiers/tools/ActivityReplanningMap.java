@@ -80,8 +80,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 		
 		this.mobsimDataProvider = mobsimDataProvider;
-		
-//		this.activityPerformingAgents = new TreeSet<AgentEntry>(new AgentEntryComparator());
+
 		this.startingAgents = new HashSet<Id>();
 		this.activityEndTimes = new HashMap<Id, Double>();
 	}
@@ -185,14 +184,6 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 				this.activityEndTimes.put(agent.getId(), agent.getActivityEndTime());
 			}
 		}
-	}
-
-	/*
-	 * Returns a List of all Agents, that are currently performing an Activity.
-	 */
-	@Deprecated
-	public Set<Id> getActivityPerformingAgents() {
-		return Collections.unmodifiableSet(this.activityEndTimes.keySet());
 	}
 	
 	/*
