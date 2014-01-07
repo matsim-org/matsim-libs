@@ -53,7 +53,7 @@ public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler i
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getVehicleId());
 		this.totalDelay = this.totalDelay + delayOnThisLink;
 		
-		// Check if this (affected) agent was previously delayed without internalizing the delay (= charging the causing agent for this delay).
+		// Check if this (affected) agent was previously delayed without internalizing the delay.
 		double totalDelayWithDelaysOnPreviousLinks = 0.;
 		if (this.agentId2storageDelay.get(event.getVehicleId()) == null) {
 			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink;
@@ -85,7 +85,7 @@ public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler i
 						// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
 						this.agentId2storageDelay.put(event.getVehicleId(), storageDelay);
 					} else {
-						this.delayNotInternalized_storageCapacity = this.delayNotInternalized_storageCapacity + storageDelay;
+						this.delayNotInternalized_storageCapacity += storageDelay;
 						log.warn("Delay which is not internalized: " + this.delayNotInternalized_storageCapacity);
 					}
 					

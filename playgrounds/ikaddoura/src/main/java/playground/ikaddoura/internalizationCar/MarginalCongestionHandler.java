@@ -22,6 +22,10 @@
  */
 package playground.ikaddoura.internalizationCar;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -80,8 +84,9 @@ public abstract class MarginalCongestionHandler implements
 	
 	double totalInternalizedDelay = 0.0;
 	double totalDelay = 0.0;
+	double totalStorageDelay = 0.0;
 	double delayNotInternalized_roundingErrors = 0.0;
-	double delayNotInternalized_spillbackNoCausingAgent = 0.;
+	double delayNotInternalized_spillbackNoCausingAgent = 0.0;
 		
 	public MarginalCongestionHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -250,7 +255,7 @@ public abstract class MarginalCongestionHandler implements
 		if (delayToPayFor <= 1.) {
 			// The remaining delay of up to 1 sec may result from rounding errors. The delay caused by the flow capacity sometimes varies by 1 sec.
 			// Setting the remaining delay to 0 sec.
-			this.delayNotInternalized_roundingErrors = this.delayNotInternalized_roundingErrors + delayToPayFor;
+			this.delayNotInternalized_roundingErrors += delayToPayFor;
 			delayToPayFor = 0.;
 		}
 		
@@ -301,6 +306,30 @@ public abstract class MarginalCongestionHandler implements
 			}
 		}
 		return lastLeavingFromThatLink;
+	}
+	
+	public void writeCongestionStats(String fileName) {
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write("total delay [hours]: " + this.totalDelay / 3600.);
+			bw.newLine();
+			bw.write("total internalized delay [hours]: " + this.totalInternalizedDelay / 3600.);
+			bw.newLine();
+			bw.write("not internalized delay (rounding errors) [hours]: " + this.delayNotInternalized_roundingErrors / 3600.);
+			bw.newLine();
+			bw.write("not internalized delay (spill-back related delays without identifiying the causing agent) [hours]: " + this.delayNotInternalized_spillbackNoCausingAgent / 3600.);
+			bw.newLine();
+			bw.write("not internalized delay (in case delays resulting from the storage capacity are ignored) [hours]: " + this.delayNotInternalized_storageCapacity / 3600.);
+			bw.newLine();
+			
+			bw.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public double getTotalInternalizedDelay() {

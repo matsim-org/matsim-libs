@@ -44,6 +44,7 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
+	private MarginalCongestionHandlerImplV3 congestionHandler;
 	
 	public InternalizationCarControlerListener(ScenarioImpl scenario, TollHandler tollHandler){
 		this.scenario = scenario;
@@ -54,8 +55,9 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 	public void notifyStartup(StartupEvent event) {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
+		congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, scenario);
 		
-		event.getControler().getEvents().addHandler(new MarginalCongestionHandlerImplV3(eventsManager, scenario));
+		event.getControler().getEvents().addHandler(congestionHandler);
 		event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
 		
 		event.getControler().getEvents().addHandler(tollHandler);
@@ -69,7 +71,10 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 		tollHandler.setLinkId2timeBin2avgToll();
 		
 		// write out toll statistics every iteration
-		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollstats.csv");
+		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
+		
+		// write out congestion statistics every iteration
+		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
 	}
 
 }
