@@ -17,22 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network.shortestpath;
+package org.matsim.contrib.dvrp.data.network;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 
-public class ShortestPathCalculatorImpl
-    implements ShortestPathCalculator
+public class VrpPathCalculatorImpl
+    implements VrpPathCalculator
 {
     private final LeastCostPathCalculator router;
     private final TravelTime travelTime;
     private final TravelDisutility travelDisutility;
 
 
-    public ShortestPathCalculatorImpl(LeastCostPathCalculator router, TravelTime travelTime,
+    public VrpPathCalculatorImpl(LeastCostPathCalculator router, TravelTime travelTime,
             TravelDisutility travelDisutility)
     {
         this.router = router;
@@ -45,7 +45,7 @@ public class ShortestPathCalculatorImpl
      * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
      */
     @Override
-    public ShortestPath calculateShortestPath(Link fromLink, Link toLink, int departureTime)
+    public VrpPath calcPath(Link fromLink, Link toLink, int departureTime)
     {
         if (fromLink != toLink) {
             Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
@@ -85,10 +85,10 @@ public class ShortestPathCalculatorImpl
             double cost = path.travelCost
                     + travelDisutility.getLinkTravelDisutility(toLink, toLinkEnterTime, null, null);
 
-            return new ShortestPath(departureTime, (int)accTT, cost, links, accLinkTravelTimes);
+            return new VrpPathImpl(departureTime, (int)accTT, cost, links, accLinkTravelTimes);
         }
         else {
-            return new ShortestPath(departureTime, 0, 0, new Link[] { fromLink }, new int[] { 0 });
+            return new VrpPathImpl(departureTime, 0, 0, new Link[] { fromLink }, new int[] { 0 });
         }
     }
 }

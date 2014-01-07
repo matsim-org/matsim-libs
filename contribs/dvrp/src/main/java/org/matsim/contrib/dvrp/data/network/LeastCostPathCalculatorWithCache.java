@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network.shortestpath;
+package org.matsim.contrib.dvrp.data.network;
 
 import java.util.*;
 

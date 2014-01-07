@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.chart;
+package org.matsim.contrib.dvrp.data.network;
 
 import org.matsim.api.core.v01.network.Link;
 
 
-public interface LinkSource
+public interface VrpPath
 {
-    int getCount();
+
+    public abstract int getDepartureTime();
 
 
-    Link getLink(int item);
+    public abstract int getTravelTime();
+
+
+    public abstract int getArrivalTime();
+
+
+    public abstract double getTravelCost();
+
+
+    public abstract Link[] getLinks();
+
+
+    public abstract Link getFromLink();
+
+
+    public abstract Link getToLink();
+
 }

@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
-import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgents;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;

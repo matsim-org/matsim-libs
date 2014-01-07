@@ -104,8 +104,8 @@ public class IdleVehicleFinder
             
             //TODO consider storing the shortest path (sth like BestShortestPath object)
             
-            return data.getShortestPathCalculator()
-                    .calculateShortestPath(fromLink, toLink, time).travelCost;
+            return data.getPathCalculator()
+                    .calcPath(fromLink, toLink, time).getTravelCost();
         }
     }
 }

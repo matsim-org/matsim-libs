@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.shortestpath.*;
+import org.matsim.contrib.dvrp.data.network.VrpPath;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -80,7 +80,7 @@ public class VrpSchedulePlan
             switch (t.getType()) {
                 case DRIVE:
                     DriveTask dt = (DriveTask)t;
-                    addLeg(dt.getShortestPath());
+                    addLeg(dt.getPath());
                     break;
 
                 case STAY:
@@ -98,13 +98,13 @@ public class VrpSchedulePlan
     }
 
 
-    private void addLeg(ShortestPath path)
+    private void addLeg(VrpPath path)
     {
         Leg leg = populFactory.createLeg(TransportMode.car);
 
-        leg.setDepartureTime(path.departureTime);
+        leg.setDepartureTime(path.getDepartureTime());
 
-        Link[] links = path.links;
+        Link[] links = path.getLinks();
         Id fromLinkId = path.getFromLink().getId();
         Id toLinkId = path.getToLink().getId();
 
@@ -127,12 +127,12 @@ public class VrpSchedulePlan
             netRoute.setDistance(0.0);
         }
 
-        netRoute.setTravelTime(path.travelTime);
-        netRoute.setTravelCost(path.travelCost);
+        netRoute.setTravelTime(path.getTravelTime());
+        netRoute.setTravelCost(path.getTravelCost());
 
         leg.setRoute(netRoute);
-        leg.setDepartureTime(path.departureTime);
-        leg.setTravelTime(path.travelTime);
+        leg.setDepartureTime(path.getDepartureTime());
+        leg.setTravelTime(path.getTravelTime());
         ((LegImpl)leg).setArrivalTime(path.getArrivalTime());
 
         actsLegs.add(leg);

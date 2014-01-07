@@ -19,7 +19,7 @@
 
 package pl.poznan.put.vrp.dynamic.data.schedule;
 
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
+import org.matsim.contrib.dvrp.data.network.VrpPath;
 
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 
@@ -27,7 +27,7 @@ import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 public interface DriveTask
     extends Task
 {
-    ShortestPath getShortestPath();
+    VrpPath getPath();
 
 
     VehicleTracker getVehicleTracker();

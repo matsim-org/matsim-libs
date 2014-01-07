@@ -30,8 +30,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.file.DepotReader;
-import org.matsim.contrib.dvrp.data.network.router.*;
-import org.matsim.contrib.dvrp.data.network.shortestpath.*;
+import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -177,7 +176,7 @@ public class VrpLauncherUtils
     }
 
 
-    public static ShortestPathCalculator initShortestPathCalculator(Scenario scenario,
+    public static VrpPathCalculator initVrpPathFinder(Scenario scenario,
             TravelTimeSource ttimeSource, TravelTime travelTime, TravelDisutility travelDisutility)
     {
         Network network = scenario.getNetwork();
@@ -187,14 +186,14 @@ public class VrpLauncherUtils
         LeastCostPathCalculator router = new LeastCostPathCalculatorWithCache(new Dijkstra(network,
                 travelDisutility, travelTime), timeDiscretizer);
 
-        return new ShortestPathCalculatorImpl(router, travelTime, travelDisutility);
+        return new VrpPathCalculatorImpl(router, travelTime, travelDisutility);
     }
 
 
-    public static VrpData initVrpData(Scenario scenario, ShortestPathCalculator calculator, String depotsFileName)
+    public static VrpData initVrpData(Scenario scenario, VrpPathCalculator pathCalculator, String depotsFileName)
     {
         VrpData vrpData = new VrpDataImpl();
-        vrpData.setShortestPathCalculator(calculator);
+        vrpData.setPathCalculator(pathCalculator);
         new DepotReader(scenario, vrpData).readFile(depotsFileName);
         return vrpData;
     }

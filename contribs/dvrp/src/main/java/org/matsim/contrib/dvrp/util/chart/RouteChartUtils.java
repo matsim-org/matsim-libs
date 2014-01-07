@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.chart;
+package org.matsim.contrib.dvrp.util.chart;
 
 import java.awt.*;
 import java.util.*;
@@ -43,8 +43,8 @@ public class RouteChartUtils
 {
     public static JFreeChart chartRoutes(VrpData data)
     {
-        LinkDataset lData = new LinkDataset();
-        lData.addSeries("Depot", LinkSources.createFromLocalizables(data.getDepots()));
+        CoordDataset lData = new CoordDataset();
+        lData.addSeries("Depot", LinkSources.createFromBasicLocations(data.getDepots()));
 
         List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
@@ -71,7 +71,7 @@ public class RouteChartUtils
         renderer.setBaseItemLabelGenerator(new XYItemLabelGenerator() {
             public String generateLabel(XYDataset dataset, int series, int item)
             {
-                return ((LinkDataset)dataset).getText(series, item);
+                return ((CoordDataset)dataset).getText(series, item);
             }
         });
 
@@ -87,13 +87,13 @@ public class RouteChartUtils
 
     public static JFreeChart chartRoutesByStatus(VrpData data)
     {
-        LinkDataset nData = new LinkDataset();
-        nData.addSeries("Depot", LinkSources.createFromLocalizables(data.getDepots()));
+        CoordDataset nData = new CoordDataset();
+        nData.addSeries("Depot", LinkSources.createFromBasicLocations(data.getDepots()));
 
         List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
             Schedule<?> schedule = vehicles.get(i).getSchedule();
-            Map<TaskStatus, LinkSource> vsByStatus = createLinkSourceByStatus(schedule);
+            Map<TaskStatus, CoordSource> vsByStatus = createLinkSourceByStatus(schedule);
             nData.addSeries(i + "-PR", vsByStatus.get(TaskStatus.PERFORMED));
             nData.addSeries(i + "-ST", vsByStatus.get(TaskStatus.STARTED));
             nData.addSeries(i + "-PL", vsByStatus.get(TaskStatus.PLANNED));
@@ -153,7 +153,7 @@ public class RouteChartUtils
     }
 
 
-    private static Map<TaskStatus, LinkSource> createLinkSourceByStatus(
+    private static Map<TaskStatus, CoordSource> createLinkSourceByStatus(
             Schedule<? extends Task> schedule)
     {
         Iterator<DriveTask> taskIter = Schedules.createDriveTaskIter(schedule);
@@ -172,12 +172,11 @@ public class RouteChartUtils
         }
 
         // creating LinkSources
-        Map<TaskStatus, LinkSource> linkSourceByStatus = new EnumMap<TaskStatus, LinkSource>(
+        Map<TaskStatus, CoordSource> linkSourceByStatus = new EnumMap<TaskStatus, CoordSource>(
                 TaskStatus.class);
 
         for (TaskStatus ts : TaskStatus.values()) {
-            linkSourceByStatus.put(ts,
-                    LinkSources.createFromDriveTasks(taskListByStatus.get(ts)));
+            linkSourceByStatus.put(ts, LinkSources.createFromDriveTasks(taskListByStatus.get(ts)));
         }
 
         return linkSourceByStatus;
@@ -197,7 +196,7 @@ public class RouteChartUtils
                 return null;
             }
 
-            return ((LinkDataset)dataset).getText(series, item);
+            return ((CoordDataset)dataset).getText(series, item);
         }
     }
 }

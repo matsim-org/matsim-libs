@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network.shortestpath;
+package org.matsim.contrib.dvrp.data.network;
 
 import org.matsim.api.core.v01.network.Link;
 
 
-public class ShortestPath
+public interface VrpPathCalculator
 {
-    public final int departureTime;
-    public final int travelTime;
-    public final double travelCost;
-    public final Link[] links;
-    public final int[] accLinkTravelTimes;//accumulated link travel times
-
-
-    public ShortestPath(int departureTime, int travelTime, double travelCost, Link[] links,
-            int[] accLinkTravelTimes)
-    {
-        this.departureTime = departureTime;
-        this.travelTime = travelTime;
-        this.travelCost = travelCost;
-        this.links = links;
-        this.accLinkTravelTimes = accLinkTravelTimes;
-    }
-
-
-    public int getArrivalTime()
-    {
-        return departureTime + travelTime;
-    }
-
-
-    public Link getFromLink()
-    {
-        return links[0];
-    }
-
-
-    public Link getToLink()
-    {
-        return links[links.length - 1];
-    }
+    /**
+     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
+     */
+    public abstract VrpPath calcPath(Link fromLink, Link toLink, int departureTime);
 }

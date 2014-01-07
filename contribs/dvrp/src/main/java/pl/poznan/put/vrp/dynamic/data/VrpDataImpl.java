@@ -21,7 +21,7 @@ package pl.poznan.put.vrp.dynamic.data;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPathCalculator;
+import org.matsim.contrib.dvrp.data.network.VrpPathCalculator;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 
@@ -39,7 +39,7 @@ public class VrpDataImpl
 
     private int time;
 
-    private ShortestPathCalculator calculator;
+    private VrpPathCalculator calculator;
 
     private VrpDataParameters parameters;
 
@@ -80,7 +80,7 @@ public class VrpDataImpl
 
 
     @Override
-    public ShortestPathCalculator getShortestPathCalculator()
+    public VrpPathCalculator getPathCalculator()
     {
         return calculator;
     }
@@ -131,7 +131,7 @@ public class VrpDataImpl
 
 
     @Override
-    public void setShortestPathCalculator(ShortestPathCalculator calculator)
+    public void setPathCalculator(VrpPathCalculator calculator)
     {
         this.calculator = calculator;
     }

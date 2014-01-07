@@ -17,13 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.chart;
+package org.matsim.contrib.dvrp.util.chart;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.*;
 
-import pl.poznan.put.vrp.dynamic.data.model.Localizable;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 import com.google.common.collect.Lists;
@@ -31,13 +30,13 @@ import com.google.common.collect.Lists;
 
 public class LinkSources
 {
-    public static abstract class AbstractLinkSource<T>
-        implements LinkSource
+    public static abstract class AbstractCoordSource<T>
+        implements CoordSource
     {
         private List<T> list;
 
 
-        public AbstractLinkSource(List<T> list)
+        public AbstractCoordSource(List<T> list)
         {
             this.list = list;
         }
@@ -51,52 +50,41 @@ public class LinkSources
 
 
         @Override
-        public Link getLink(int index)
+        public Coord getCoord(int index)
         {
-            return getLink(list.get(index));
+            return getCoord(list.get(index));
         }
 
 
-        protected abstract Link getLink(T item);
+        protected abstract Coord getCoord(T item);
     }
 
 
-    public static LinkSource createFromLinks(final List<Link> links)
+    public static <T extends BasicLocation> CoordSource createFromBasicLocations(
+            final List<T> basicLocations)
     {
-        return new AbstractLinkSource<Link>(links) {
-            protected Link getLink(Link item)
+        return new AbstractCoordSource<T>(basicLocations) {
+            protected Coord getCoord(T item)
             {
-                return item;
-            };
-        };
-    }
-
-
-    public static <T extends Localizable> LinkSource createFromLocalizables(
-            final List<T> localizables)
-    {
-        return new AbstractLinkSource<T>(localizables) {
-            protected Link getLink(T item)
-            {
-                return item.getLink();
+                return item.getCoord();
             };
         };
     }
 
 
     // n DriveTasks -> n+1 Links
-    public static LinkSource createFromDriveTasks(final List<DriveTask> tasks)
+    public static CoordSource createFromDriveTasks(final List<DriveTask> tasks)
     {
-        return new LinkSource() {
+        return new CoordSource() {
 
             @Override
-            public Link getLink(int item)
+            public Coord getCoord(int item)
             {
                 if (item == 0) {
-                    return tasks.get(0).getShortestPath().getFromLink();
+                    return tasks.get(0).getPath().getFromLink().getCoord();
                 }
 
-                return tasks.get(item - 1).getShortestPath().getToLink();
+                return tasks.get(item - 1).getPath().getToLink().getCoord();
             }
 
 
@@ -111,7 +99,7 @@ public class LinkSources
 
 
     // Schedule -> n DriveTasks -> n+1 Links
-    public static LinkSource createLinkSource(Schedule<?> schedule)
+    public static CoordSource createLinkSource(Schedule<?> schedule)
     {
         List<DriveTask> tasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
         return LinkSources.createFromDriveTasks(tasks);

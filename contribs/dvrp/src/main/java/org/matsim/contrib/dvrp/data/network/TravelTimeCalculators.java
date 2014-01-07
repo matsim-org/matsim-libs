@@ -17,37 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network.router;
+package org.matsim.contrib.dvrp.data.network;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.*;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.*;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.*;
 
 
-public class TimeAsTravelDisutility
-    implements TravelDisutility
+public class TravelTimeCalculators
 {
-    private TravelTime travelTime;
-
-
-    public TimeAsTravelDisutility(TravelTime travelTime)
+    public static TravelTime createTravelTimeFromEvents(String eventFileName, Scenario scenario)
     {
-        this.travelTime = travelTime;
-    }
+        TravelTimeCalculator ttimeCalc = new TravelTimeCalculatorFactoryImpl()
+                .createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig()
+                        .travelTimeCalculator());
 
+        EventsManager inputEvents = EventsUtils.createEventsManager();
+        inputEvents.addHandler(ttimeCalc);
+        new EventsReaderXMLv1(inputEvents).parse(eventFileName);
 
-    @Override
-    public double getLinkTravelDisutility(final Link link, final double time, final Person person,
-            final Vehicle vehicle)
-    {
-        return travelTime.getLinkTravelTime(link, time, person, vehicle);
-    }
-
-
-    @Override
-    public double getLinkMinimumTravelDisutility(Link link)
-    {
-        return link.getLength() / link.getFreespeed();
+        return ttimeCalc.getLinkTravelTimes();
     }
 }

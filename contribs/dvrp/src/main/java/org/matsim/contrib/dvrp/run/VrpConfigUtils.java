@@ -20,8 +20,7 @@
 package org.matsim.contrib.dvrp.run;
 
 import org.matsim.core.config.*;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.config.groups.*;
 
 
 public class VrpConfigUtils

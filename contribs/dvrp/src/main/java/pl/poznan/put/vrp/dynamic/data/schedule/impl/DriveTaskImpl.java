@@ -19,7 +19,7 @@
 
 package pl.poznan.put.vrp.dynamic.data.schedule.impl;
 
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
+import org.matsim.contrib.dvrp.data.network.VrpPath;
 
 import pl.poznan.put.vrp.dynamic.data.online.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
@@ -29,14 +29,14 @@ public class DriveTaskImpl
     extends AbstractTask
     implements DriveTask
 {
-    private final ShortestPath shortestPath;
+    private final VrpPath path;
     private VehicleTracker vehicleTracker;
 
 
-    public DriveTaskImpl(ShortestPath shortestPath)
+    public DriveTaskImpl(VrpPath path)
     {
-        super(shortestPath.departureTime, shortestPath.getArrivalTime());
-        this.shortestPath = shortestPath;
+        super(path.getDepartureTime(), path.getArrivalTime());
+        this.path = path;
 
         vehicleTracker = new OfflineVehicleTracker(this);//by default; can be changed later
     }
@@ -50,9 +50,9 @@ public class DriveTaskImpl
 
 
     @Override
-    public ShortestPath getShortestPath()
+    public VrpPath getPath()
     {
-        return shortestPath;
+        return path;
     }
 
 
@@ -73,7 +73,7 @@ public class DriveTaskImpl
     @Override
     public String toString()
     {
-        return "D(@" + shortestPath.getFromLink().getId() + "->@"
-                + shortestPath.getToLink().getId() + ")" + commonToString();
+        return "D(@" + path.getFromLink().getId() + "->@"
+                + path.getToLink().getId() + ")" + commonToString();
     }
 }

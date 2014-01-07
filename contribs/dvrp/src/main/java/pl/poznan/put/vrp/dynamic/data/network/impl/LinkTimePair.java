@@ -21,32 +21,16 @@ package pl.poznan.put.vrp.dynamic.data.network.impl;
 
 import org.matsim.api.core.v01.network.Link;
 
-import pl.poznan.put.vrp.dynamic.data.model.Localizable;
-
 
 public class LinkTimePair
-    implements Localizable
 {
-    private final Link link;
-    private final int time;
+    public final Link link;
+    public final int time;
 
 
     public LinkTimePair(Link link, int time)
     {
         this.link = link;
         this.time = time;
-    }
-
-
-    @Override
-    public Link getLink()
-    {
-        return link;
-    }
-
-
-    public int getTime()
-    {
-        return time;
     }
 }

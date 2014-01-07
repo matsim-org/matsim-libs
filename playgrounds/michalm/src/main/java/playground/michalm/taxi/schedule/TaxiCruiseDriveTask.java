@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
+import org.matsim.contrib.dvrp.data.network.VrpPath;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.DriveTaskImpl;
 
@@ -28,9 +28,9 @@ public class TaxiCruiseDriveTask
     extends DriveTaskImpl
     implements TaxiTask
 {
-    public TaxiCruiseDriveTask(ShortestPath shortestPath)
+    public TaxiCruiseDriveTask(VrpPath path)
     {
-        super(shortestPath);
+        super(path);
     }
 
 

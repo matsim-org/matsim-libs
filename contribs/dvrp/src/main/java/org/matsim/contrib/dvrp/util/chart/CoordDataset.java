@@ -17,31 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.chart;
+package org.matsim.contrib.dvrp.util.chart;
 
 import java.util.*;
 
 import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.xy.*;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Coord;
 
 
 /**
  * @author michalm
  */
 @SuppressWarnings("serial")
-public class LinkDataset
+public class CoordDataset
     extends AbstractXYDataset
     implements XYDataset
 {
     private List<Comparable<String>> seriesKeys;
-    private List<LinkSource> seriesList;
+    private List<CoordSource> seriesList;
 
 
-    public LinkDataset()
+    public CoordDataset()
     {
         seriesKeys = new ArrayList<Comparable<String>>();
-        seriesList = new ArrayList<LinkSource>();
+        seriesList = new ArrayList<CoordSource>();
     }
 
 
@@ -76,7 +76,7 @@ public class LinkDataset
     @Override
     public double getXValue(int series, int item)
     {
-        return getItem(series, item).getCoord().getX();
+        return getItem(series, item).getX();
     }
 
 
@@ -90,23 +90,23 @@ public class LinkDataset
     @Override
     public double getYValue(int series, int item)
     {
-        return getItem(series, item).getCoord().getY();
+        return getItem(series, item).getY();
     }
 
 
     public String getText(int series, int item)
     {
-        return getItem(series, item).getId().toString();
+        return getItem(series, item).toString();
     }
 
 
-    public Link getItem(int series, int item)
+    public Coord getItem(int series, int item)
     {
-        return seriesList.get(series).getLink(item);
+        return seriesList.get(series).getCoord(item);
     }
 
 
-    public void addSeries(String seriesKey, LinkSource data)
+    public void addSeries(String seriesKey, CoordSource data)
     {
         if (seriesKey == null) {
             throw new IllegalArgumentException("The 'seriesKey' cannot be null.");

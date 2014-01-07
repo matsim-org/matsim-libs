@@ -20,7 +20,7 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.network.shortestpath.*;
+import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -36,7 +36,7 @@ public class OneTaxiOptimizer
     implements VrpOptimizer
 {
     private final VrpData data;
-    private final ShortestPathCalculator calculator;
+    private final VrpPathCalculator pathCalculator;
 
     private final Vehicle vehicle;//we have only one vehicle
     private final Schedule<AbstractTask> schedule;// the vehicle's schedule
@@ -47,7 +47,7 @@ public class OneTaxiOptimizer
     {
         this.data = data;
 
-        calculator = data.getShortestPathCalculator();
+        pathCalculator = data.getPathCalculator();
         vehicle = data.getVehicles().get(0);
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
     }
@@ -88,17 +88,17 @@ public class OneTaxiOptimizer
         Link toLink = req.getToLink();
         int t0 = Schedules.getLastTask(schedule).getEndTime();
 
-        ShortestPath sp1 = calculator.calculateShortestPath(lastTask.getLink(), fromLink, t0);
-        schedule.addTask(new DriveTaskImpl(sp1));
+        VrpPath p1 = pathCalculator.calcPath(lastTask.getLink(), fromLink, t0);
+        schedule.addTask(new DriveTaskImpl(p1));
 
-        int t1 = t0 + sp1.travelTime;
+        int t1 = p1.getArrivalTime();
         int t2 = t1 + 120;// 2 minutes for picking up the passenger
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
-        ShortestPath sp2 = calculator.calculateShortestPath(fromLink, toLink, t2);
-        schedule.addTask(new DriveTaskImpl(sp2));
+        VrpPath p2 = pathCalculator.calcPath(fromLink, toLink, t2);
+        schedule.addTask(new DriveTaskImpl(p2));
 
-        int t3 = t2 + sp2.travelTime;
+        int t3 = p2.getArrivalTime();
         int t4 = t3 + 60;// 1 minute for dropping off the passenger
         schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, "dropoff", req));
 

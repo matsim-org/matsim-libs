@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.chart;
+package org.matsim.contrib.dvrp.util.chart;
 
 import java.awt.*;
 import java.util.*;

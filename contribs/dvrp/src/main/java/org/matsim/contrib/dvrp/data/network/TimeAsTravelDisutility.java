@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network.shortestpath;
+package org.matsim.contrib.dvrp.data.network;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.*;
+import org.matsim.vehicles.Vehicle;
 
 
-public interface ShortestPathCalculator
+public class TimeAsTravelDisutility
+    implements TravelDisutility
 {
-    /**
-     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
-     */
-    public abstract ShortestPath calculateShortestPath(Link fromLink, Link toLink, int departureTime);
+    private TravelTime travelTime;
+
+
+    public TimeAsTravelDisutility(TravelTime travelTime)
+    {
+        this.travelTime = travelTime;
+    }
+
+
+    @Override
+    public double getLinkTravelDisutility(final Link link, final double time, final Person person,
+            final Vehicle vehicle)
+    {
+        return travelTime.getLinkTravelTime(link, time, person, vehicle);
+    }
+
+
+    @Override
+    public double getLinkMinimumTravelDisutility(Link link)
+    {
+        return link.getLength() / link.getFreespeed();
+    }
 }

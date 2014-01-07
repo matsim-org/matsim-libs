@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,61 +17,83 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.vrp.dynamic.data.model.impl;
+package org.matsim.contrib.dvrp.data.network;
 
-import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 
-import pl.poznan.put.vrp.dynamic.data.model.Depot;
 
-
-public class DepotImpl
-    implements Depot
+public class VrpPathImpl
+    implements VrpPath
 {
-    private final Id id;
-    private final String name;
-    private final Link link;
+    private final int departureTime;
+    private final int travelTime;
+    private final double travelCost;
+    private final Link[] links;
+    private final int[] accLinkTravelTimes;//accumulated link travel times
 
 
-    public DepotImpl(Id id, String name, Link link)
+    public VrpPathImpl(int departureTime, int travelTime, double travelCost, Link[] links,
+            int[] accLinkTravelTimes)
     {
-        this.id = id;
-        this.name = name;
-        this.link = link;
+        this.departureTime = departureTime;
+        this.travelTime = travelTime;
+        this.travelCost = travelCost;
+        this.links = links;
+        this.accLinkTravelTimes = accLinkTravelTimes;
     }
 
 
     @Override
-    public Id getId()
+    public int getDepartureTime()
     {
-        return id;
+        return departureTime;
     }
 
 
     @Override
-    public String getName()
+    public int getTravelTime()
     {
-        return name;
+        return travelTime;
     }
 
 
     @Override
-    public Link getLink()
+    public int getArrivalTime()
     {
-        return link;
+        return departureTime + travelTime;
+    }
+
+
+    @Override
+    public double getTravelCost()
+    {
+        return travelCost;
+    }
+
+
+    @Override
+    public Link[] getLinks()
+    {
+        return links;
+    }
+
+
+    @Override
+    public Link getFromLink()
+    {
+        return links[0];
+    }
+
+
+    @Override
+    public Link getToLink()
+    {
+        return links[links.length - 1];
     }
     
     
-    @Override
-    public Coord getCoord()
+    public int[] getAccLinkTravelTimes()
     {
-        return link.getCoord();
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Depot_" + id;
+        return accLinkTravelTimes;
     }
 }

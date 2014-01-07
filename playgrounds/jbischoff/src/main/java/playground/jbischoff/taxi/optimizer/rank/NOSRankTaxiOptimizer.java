@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.network.shortestpath.*;
+import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -49,7 +49,7 @@ public class NOSRankTaxiOptimizer
     private final List<Id> shortTimeIdlers;
 
     private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
-    private final ShortestPathCalculator calculator;
+    private final VrpPathCalculator calculator;
 
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(VrpData data,
@@ -70,7 +70,7 @@ public class NOSRankTaxiOptimizer
                 vehicleFinder);
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();
-        this.calculator = data.getShortestPathCalculator();
+        this.calculator = data.getPathCalculator();
     }
 
 
@@ -99,10 +99,10 @@ public class NOSRankTaxiOptimizer
 
             if (link != depotLink) {
                 int t5 = dropoffStayTask.getEndTime();
-                ShortestPath sp = calculator.calculateShortestPath(link, depotLink, t5);
-                schedule.addTask(new TaxiCruiseDriveTask(sp));
+                VrpPath path = calculator.calcPath(link, depotLink, t5);
+                schedule.addTask(new TaxiCruiseDriveTask(path));
 
-                int t6 = t5 + sp.travelTime;
+                int t6 = path.getArrivalTime();
                 int tEnd = Math.max(t6, Schedules.getActualT1(schedule));
                 schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getDepot()
                         .getLink()));
@@ -182,11 +182,11 @@ public class NOSRankTaxiOptimizer
         Link lastLink = lastTask.getLink();
 
         if (veh.getDepot().getLink() != lastLink) {// not a loop
-            ShortestPath sp = calculator.calculateShortestPath(lastLink, veh.getDepot().getLink(),
+            VrpPath path = calculator.calcPath(lastLink, veh.getDepot().getLink(),
                     currentTime);
-            sched.addTask(new TaxiCruiseDriveTask(sp));
+            sched.addTask(new TaxiCruiseDriveTask(path));
 
-            int arrivalTime = currentTime + sp.travelTime;
+            int arrivalTime = path.getArrivalTime();
             sched.addTask(new TaxiWaitStayTask(arrivalTime, oldendtime, veh.getDepot().getLink()));
             // System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:"
             // +oldendtime);

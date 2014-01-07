@@ -19,14 +19,17 @@
 
 package pl.poznan.put.vrp.dynamic.data.model;
 
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
  * @author michalm
  */
 public interface Depot
-    extends Localizable, Identifiable
+    extends BasicLocation, Identifiable
 {
     String getName();
+    
+    Link getLink();
 }

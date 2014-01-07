@@ -19,7 +19,7 @@
 
 package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 
 
@@ -70,6 +70,13 @@ public class ChargerImpl
     public Link getLink()
     {
         return link;
+    }
+
+
+    @Override
+    public Coord getCoord()
+    {
+        return link.getCoord();
     }
 
 

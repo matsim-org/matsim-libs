@@ -21,26 +21,24 @@ package playground.michalm.util.gis;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import pl.poznan.put.vrp.dynamic.data.model.Localizable;
-
 
 // taken from org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape
-public class Localizables2GIS<T extends Localizable>
+public class BasicLocations2GIS<T extends BasicLocation>
 {
-    private List<T> localizables;
+    private List<T> basicLocations;
     private String filename;
     private PointFeatureFactory factory;
 
 
-    public Localizables2GIS(List<T> localizables, String filename, String coordinateSystem)
+    public BasicLocations2GIS(List<T> basicLocations, String filename, String coordinateSystem)
     {
-        this.localizables = localizables;
+        this.basicLocations = basicLocations;
         this.filename = filename;
         initFeatureType(coordinateSystem);
     }
@@ -50,19 +48,19 @@ public class Localizables2GIS<T extends Localizable>
     {
         Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 
-        for (Localizable localizable : localizables) {
-            features.add(getFeature(localizable.getLink()));
+        for (BasicLocation bl : basicLocations) {
+            features.add(getFeature(bl.getCoord()));
         }
 
         ShapeFileWriter.writeGeometries(features, filename);
     }
 
 
-    private SimpleFeature getFeature(Link link)
+    private SimpleFeature getFeature(Coord coord)
     {
         try {
-            return this.factory.createPoint(link.getCoord(), new Object[] { link.getId() },
-                    link.getId().toString());
+            return this.factory.createPoint(coord, new Object[] { coord.toString() },
+                    coord.toString());
         }
         catch (IllegalArgumentException e) {
             throw new RuntimeException(e);

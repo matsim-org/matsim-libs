@@ -25,7 +25,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
+import org.matsim.contrib.dvrp.data.network.VrpPath;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
@@ -89,9 +89,9 @@ public class Schedules2GIS
 
     private Coordinate[] createLineString(DriveTask driveTask)
     {
-        ShortestPath path = driveTask.getShortestPath();
+        VrpPath path = driveTask.getPath();
 
-        Link[] links = path.links;
+        Link[] links = path.getLinks();
 
         if (links.length == 1) {
             return null;
@@ -99,7 +99,7 @@ public class Schedules2GIS
 
         List<Coordinate> coordList = new ArrayList<Coordinate>();
 
-        for (Link l : path.links) {
+        for (Link l : links) {
             Coord c = l.getToNode().getCoord();
             coordList.add(new Coordinate(c.getX(), c.getY()));
         }

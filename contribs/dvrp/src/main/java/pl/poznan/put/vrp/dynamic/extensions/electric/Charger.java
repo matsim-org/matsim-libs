@@ -19,16 +19,19 @@
 
 package pl.poznan.put.vrp.dynamic.extensions.electric;
 
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 
-import pl.poznan.put.vrp.dynamic.data.model.Localizable;
 import pl.poznan.put.vrp.dynamic.data.schedule.StayTask;
 
 
 public interface Charger
-    extends Localizable, Identifiable
+    extends BasicLocation, Identifiable
 {
     String getName();
+
+
+    Link getLink();
 
 
     double getPowerInWatts();

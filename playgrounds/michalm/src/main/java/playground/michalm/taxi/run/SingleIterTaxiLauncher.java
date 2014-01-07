@@ -26,8 +26,9 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPathCalculator;
+import org.matsim.contrib.dvrp.data.network.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
@@ -41,7 +42,6 @@ import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
-import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import playground.michalm.RunningVehicleRegister;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
@@ -211,7 +211,7 @@ import playground.michalm.util.gis.Schedules2GIS;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
                 algorithmConfig.tdisSource, travelTime);
 
-        ShortestPathCalculator calculator = VrpLauncherUtils.initShortestPathCalculator(scenario,
+        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathFinder(scenario,
                 algorithmConfig.ttimeSource, travelTime, travelDisutility);
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
