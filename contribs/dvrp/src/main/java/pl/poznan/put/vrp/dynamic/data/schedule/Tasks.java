@@ -28,7 +28,7 @@ public class Tasks
     {
         switch (task.getType()) {
             case DRIVE:
-                return ((DriveTask)task).getArc().getFromLink();
+                return ((DriveTask)task).getShortestPath().getFromLink();
             case STAY:
                 return ((StayTask)task).getLink();
             default:
@@ -41,7 +41,7 @@ public class Tasks
     {
         switch (task.getType()) {
             case DRIVE:
-                return ((DriveTask)task).getArc().getToLink();
+                return ((DriveTask)task).getShortestPath().getToLink();
             case STAY:
                 return ((StayTask)task).getLink();
             default:

@@ -121,7 +121,7 @@ public class Schedules
 
         switch (task.getType()) {
             case DRIVE:
-                return ((DriveTask)task).getArc().getToLink();
+                return ((DriveTask)task).getShortestPath().getToLink();
 
             case STAY:
                 return ((StayTask)task).getLink();

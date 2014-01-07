@@ -22,11 +22,11 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.network.shortestpath.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.network.impl.LinkTimePair;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
@@ -54,24 +54,23 @@ public abstract class ImmediateRequestTaxiOptimizer
 {
     protected static class VehicleDrive
     {
-        public static final VehicleDrive NO_VEHICLE_DRIVE_FOUND = new VehicleDrive(null, null,
-                Integer.MAX_VALUE / 2, Integer.MAX_VALUE);
+        public static final VehicleDrive NO_VEHICLE_DRIVE_FOUND = new VehicleDrive(null,
+                new ShortestPath(Integer.MAX_VALUE / 2, Integer.MAX_VALUE / 2, Double.MAX_VALUE,
+                        null, null));
 
         private final Vehicle vehicle;
-        private final Arc arc;
-        private final int t1;
-        private final int t2;
+        private final ShortestPath shortestPath;
 
 
-        protected VehicleDrive(Vehicle vehicle, Arc arc, int t1, int t2)
+        protected VehicleDrive(Vehicle vehicle, ShortestPath shortestPath)
         {
             this.vehicle = vehicle;
-            this.arc = arc;
-            this.t1 = t1;
-            this.t2 = t2;
+            this.shortestPath = shortestPath;
         }
     }
 
+
+    private final ShortestPathCalculator calculator;
 
     private TaxiDelaySpeedupStats delaySpeedupStats;
     private final boolean destinationKnown;
@@ -84,6 +83,9 @@ public abstract class ImmediateRequestTaxiOptimizer
             boolean minimizePickupTripTime, int pickupDuration, int dropoffDuration)
     {
         super(data);
+
+        this.calculator = data.getShortestPathCalculator();
+
         this.destinationKnown = destinationKnown;
         this.minimizePickupTripTime = minimizePickupTripTime;
         this.pickupDuration = pickupDuration;
@@ -130,20 +132,19 @@ public abstract class ImmediateRequestTaxiOptimizer
                 continue;
             }
 
-            int t1 = departure.getTime();
-            Arc arc = data.getVrpGraph().getArc(departure.getLink(), req.getFromLink());
-            int t2 = t1 + arc.getShortestPath(t1).travelTime;
+            ShortestPath sp = calculator.calculateShortestPath(departure.getLink(),
+                    req.getFromLink(), departure.getTime());
 
             if (minimizePickupTripTime) {
-                if (t2 - t1 < best.t2 - best.t1) {
+                if (sp.travelTime < best.shortestPath.travelTime) {
                     // TODO: in the future: add a check if the taxi time windows are satisfied
-                    best = new VehicleDrive(veh, arc, t1, t2);
+                    best = new VehicleDrive(veh, sp);
                 }
             }
             else {
-                if (t2 < best.t2) {
+                if (sp.getArrivalTime() < best.shortestPath.getArrivalTime()) {
                     // TODO: in the future: add a check if the taxi time windows are satisfied
-                    best = new VehicleDrive(veh, arc, t1, t2);
+                    best = new VehicleDrive(veh, sp);
                 }
             }
         }
@@ -200,19 +201,19 @@ public abstract class ImmediateRequestTaxiOptimizer
 
             switch (lastTask.getStatus()) {
                 case PLANNED:
-                    if (lastTask.getBeginTime() == best.t1) { // waiting for 0 seconds!!!
+                    if (lastTask.getBeginTime() == best.shortestPath.departureTime) { // waiting for 0 seconds!!!
                         bestSched.removeLastTask();// remove WaitTask
                     }
                     else {
                         // TODO actually this WAIT task will not be performed
                         // so maybe we can remove it right now?
 
-                        lastTask.setEndTime(best.t1);// shortening the WAIT task
+                        lastTask.setEndTime(best.shortestPath.departureTime);// shortening the WAIT task
                     }
                     break;
 
                 case STARTED:
-                    lastTask.setEndTime(best.t1);// shortening the WAIT task
+                    lastTask.setEndTime(best.shortestPath.departureTime);// shortening the WAIT task
                     break;
 
                 case PERFORMED:
@@ -221,10 +222,10 @@ public abstract class ImmediateRequestTaxiOptimizer
             }
         }
 
-        bestSched.addTask(new TaxiPickupDriveTask(best.t1, best.t2, best.arc, req));
+        bestSched.addTask(new TaxiPickupDriveTask(best.shortestPath, req));
 
-        int t3 = best.t2 + pickupDuration;
-        bestSched.addTask(new TaxiPickupStayTask(best.t2, t3, req));
+        int t3 = best.shortestPath.getArrivalTime() + pickupDuration;
+        bestSched.addTask(new TaxiPickupStayTask(best.shortestPath.getArrivalTime(), t3, req));
 
         if (destinationKnown) {
             appendDropoffAfterPickup(bestSched);
@@ -288,9 +289,9 @@ public abstract class ImmediateRequestTaxiOptimizer
         Link reqToLink = req.getToLink();
         int t3 = pickupStayTask.getEndTime();
 
-        Arc arc = data.getVrpGraph().getArc(reqFromLink, reqToLink);
-        int t4 = t3 + arc.getShortestPath(t3).travelTime;
-        schedule.addTask(new TaxiDropoffDriveTask(t3, t4, arc, req));
+        ShortestPath sp = calculator.calculateShortestPath(reqFromLink, reqToLink, t3);
+        int t4 = t3 + sp.travelTime;
+        schedule.addTask(new TaxiDropoffDriveTask(sp, req));
 
         int t5 = t4 + dropoffDuration;
         schedule.addTask(new TaxiDropoffStayTask(t4, t5, req));
@@ -375,7 +376,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                 case CRUISE_DRIVE: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
-                    t += ((DriveTask)task).getArc().getShortestPath(t).travelTime;
+                    t += ((DriveTask)task).getShortestPath().travelTime; //TODO one may consider recalculation of SP!!!!
                     task.setEndTime(t);
 
                     break;

@@ -25,26 +25,25 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
+import org.matsim.contrib.dvrp.data.network.shortestpath.*;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
 public class VrpSchedulePlan
     implements Plan
 {
-    private PopulationFactory populFactory;
-    private Network network;
+    private final PopulationFactory populFactory;
+    private final Network network;
 
-    private Vehicle vehicle;
+    private final Vehicle vehicle;
 
-    private List<PlanElement> actsLegs;
-    private List<PlanElement> unmodifiableActsLegs;
+    private final List<PlanElement> actsLegs;
+    private final List<PlanElement> unmodifiableActsLegs;
 
     private Person person;
 
@@ -81,7 +80,7 @@ public class VrpSchedulePlan
             switch (t.getType()) {
                 case DRIVE:
                     DriveTask dt = (DriveTask)t;
-                    addLeg(dt.getArc(), dt.getBeginTime(), dt.getEndTime());
+                    addLeg(dt.getShortestPath());
                     break;
 
                 case STAY:
@@ -99,21 +98,18 @@ public class VrpSchedulePlan
     }
 
 
-    private void addLeg(Arc arc, int departureTime, int arrivalTime)
+    private void addLeg(ShortestPath path)
     {
-        ShortestPath path = arc.getShortestPath(departureTime);
-
         Leg leg = populFactory.createLeg(TransportMode.car);
 
-        leg.setDepartureTime(departureTime);
-
-        Link fromLink = arc.getFromLink();
-        Link toLink = arc.getToLink();
+        leg.setDepartureTime(path.departureTime);
 
         Link[] links = path.links;
+        Id fromLinkId = path.getFromLink().getId();
+        Id toLinkId = path.getToLink().getId();
 
         NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl)populFactory).createRoute(
-                TransportMode.car, fromLink.getId(), toLink.getId());
+                TransportMode.car, fromLinkId, toLinkId);
 
         if (links.length > 1) {// means: fromLink != toLink
 
@@ -124,22 +120,20 @@ public class VrpSchedulePlan
                 linkIdList.add(links[i].getId());
             }
 
-            netRoute.setLinkIds(fromLink.getId(), linkIdList, toLink.getId());
+            netRoute.setLinkIds(fromLinkId, linkIdList, toLinkId);
             netRoute.setDistance(RouteUtils.calcDistance(netRoute, network));
         }
         else {
             netRoute.setDistance(0.0);
         }
 
-        int travelTime = arrivalTime - departureTime;// According to the route
-
-        netRoute.setTravelTime(travelTime);
+        netRoute.setTravelTime(path.travelTime);
         netRoute.setTravelCost(path.travelCost);
 
         leg.setRoute(netRoute);
-        leg.setDepartureTime(departureTime);
-        leg.setTravelTime(travelTime);
-        ((LegImpl)leg).setArrivalTime(arrivalTime);
+        leg.setDepartureTime(path.departureTime);
+        leg.setTravelTime(path.travelTime);
+        ((LegImpl)leg).setArrivalTime(path.getArrivalTime());
 
         actsLegs.add(leg);
     }

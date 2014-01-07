@@ -93,10 +93,10 @@ public class LinkSources
             public Link getLink(int item)
             {
                 if (item == 0) {
-                    return tasks.get(0).getArc().getFromLink();
+                    return tasks.get(0).getShortestPath().getFromLink();
                 }
 
-                return tasks.get(item - 1).getArc().getToLink();
+                return tasks.get(item - 1).getShortestPath().getToLink();
             }
 
 

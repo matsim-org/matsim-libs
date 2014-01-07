@@ -25,7 +25,6 @@ import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
 import org.matsim.contrib.dynagent.DynLeg;
 
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 
@@ -62,9 +61,8 @@ public class VrpDynLeg
     //DriveTask with OfflineVehicleTrakcer
     private VrpDynLeg(DriveTask driveTask)
     {
-        Arc arc = driveTask.getArc();
-        destinationLinkId = arc.getToLink().getId();
-        shortestPath = arc.getShortestPath(driveTask.getBeginTime());
+        shortestPath = driveTask.getShortestPath();
+        destinationLinkId = shortestPath.getToLink().getId();
         destinationLinkIdx = shortestPath.links.length - 1;
 
         onlineVehicleTracker = null;//offlineVehicleTracker is used in DriveTask by default 
@@ -74,9 +72,8 @@ public class VrpDynLeg
     //DriveTask with OnlineVehicleTrakcer; the tracker notifies VrpSimEngine of new positions
     private VrpDynLeg(DriveTask driveTask, VrpSimEngine vrpSimEngine)
     {
-        Arc arc = driveTask.getArc();
-        destinationLinkId = arc.getToLink().getId();
-        shortestPath = arc.getShortestPath(driveTask.getBeginTime());
+        shortestPath = driveTask.getShortestPath();
+        destinationLinkId = shortestPath.getToLink().getId();
         destinationLinkIdx = shortestPath.links.length - 1;
 
         onlineVehicleTracker = new OnlineVehicleTracker(driveTask, vrpSimEngine);

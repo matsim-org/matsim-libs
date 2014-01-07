@@ -26,6 +26,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
@@ -41,7 +42,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
-import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
 import playground.michalm.RunningVehicleRegister;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
@@ -211,12 +211,13 @@ import playground.michalm.util.gis.Schedules2GIS;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
                 algorithmConfig.tdisSource, travelTime);
 
-        VrpGraph graph = VrpLauncherUtils.initVrpGraph(scenario, algorithmConfig.ttimeSource,
-                travelTime, travelDisutility);
+        ShortestPathCalculator calculator = VrpLauncherUtils.initShortestPathCalculator(scenario,
+                algorithmConfig.ttimeSource, travelTime, travelDisutility);
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-        TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, graph, ranksFileName, ecm);
+        TaxiData taxiData = TaxiLauncherUtils
+                .initTaxiData(scenario, calculator, ranksFileName, ecm);
 
         data = new MatsimVrpData(taxiData, scenario);
 
@@ -231,8 +232,8 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, actionCreator);
 
-        VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new TaxiRequestCreator(
-                data), TaxiRequestCreator.MODE);
+        VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine,
+                new TaxiRequestCreator(data), TaxiRequestCreator.MODE);
 
         EventsManager events = qSim.getEventsManager();
 

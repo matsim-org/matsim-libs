@@ -19,14 +19,15 @@
 
 package pl.poznan.put.vrp.dynamic.data.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
+
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 
 
 public interface DriveTask
     extends Task
 {
-    Arc getArc();
+    ShortestPath getShortestPath();
 
 
     VehicleTracker getVehicleTracker();

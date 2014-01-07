@@ -31,7 +31,6 @@ import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -90,8 +89,7 @@ public class Schedules2GIS
 
     private Coordinate[] createLineString(DriveTask driveTask)
     {
-        Arc arc = driveTask.getArc();
-        ShortestPath path = arc.getShortestPath(driveTask.getBeginTime());
+        ShortestPath path = driveTask.getShortestPath();
 
         Link[] links = path.links;
 

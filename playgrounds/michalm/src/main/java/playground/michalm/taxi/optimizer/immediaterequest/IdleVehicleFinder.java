@@ -101,7 +101,11 @@ public class IdleVehicleFinder
             return deltaX * deltaX + deltaY * deltaY;
         }
         else {
-            return data.getVrpGraph().getArc(fromLink, toLink).getShortestPath(time).travelCost;
+            
+            //TODO consider storing the shortest path (sth like BestShortestPath object)
+            
+            return data.getShortestPathCalculator()
+                    .calculateShortestPath(fromLink, toLink, time).travelCost;
         }
     }
 }

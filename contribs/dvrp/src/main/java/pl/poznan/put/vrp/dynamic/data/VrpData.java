@@ -21,8 +21,9 @@ package pl.poznan.put.vrp.dynamic.data;
 
 import java.util.List;
 
+import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPathCalculator;
+
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.VrpGraph;
 
 
 public interface VrpData
@@ -43,7 +44,7 @@ public interface VrpData
     int getTime();
 
 
-    VrpGraph getVrpGraph();
+    ShortestPathCalculator getShortestPathCalculator();
 
 
     VrpDataParameters getParameters();
@@ -64,7 +65,7 @@ public interface VrpData
     void setTime(int time);
 
 
-    void setVrpGraph(VrpGraph vrpGraph);
+    void setShortestPathCalculator(ShortestPathCalculator calculator);
 
 
     void setParameters(VrpDataParameters parameters);

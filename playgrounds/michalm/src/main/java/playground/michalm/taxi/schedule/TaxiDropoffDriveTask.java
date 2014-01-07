@@ -19,7 +19,8 @@
 
 package playground.michalm.taxi.schedule;
 
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
+import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
+
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.DriveTaskImpl;
 import playground.michalm.taxi.model.TaxiRequest;
 
@@ -31,12 +32,12 @@ public class TaxiDropoffDriveTask
     private final TaxiRequest request;
 
 
-    public TaxiDropoffDriveTask(int beginTime, int endTime, Arc arc, TaxiRequest request)
+    public TaxiDropoffDriveTask(ShortestPath shortestPath, TaxiRequest request)
     {
-        super(beginTime, endTime, arc);
+        super(shortestPath);
 
-        if (request.getFromLink() != arc.getFromLink()
-                && request.getToLink() != arc.getToLink()) {
+        if (request.getFromLink() != shortestPath.getFromLink()
+                && request.getToLink() != shortestPath.getToLink()) {
             throw new IllegalArgumentException();
         }
 

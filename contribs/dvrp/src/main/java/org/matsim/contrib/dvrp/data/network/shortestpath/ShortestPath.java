@@ -24,17 +24,38 @@ import org.matsim.api.core.v01.network.Link;
 
 public class ShortestPath
 {
+    public final int departureTime;
     public final int travelTime;
     public final double travelCost;
     public final Link[] links;
     public final int[] accLinkTravelTimes;//accumulated link travel times
 
 
-    public ShortestPath(int travelTime, double travelCost, Link[] links, int[] accLinkTravelTimes)
+    public ShortestPath(int departureTime, int travelTime, double travelCost, Link[] links,
+            int[] accLinkTravelTimes)
     {
+        this.departureTime = departureTime;
         this.travelTime = travelTime;
         this.travelCost = travelCost;
         this.links = links;
         this.accLinkTravelTimes = accLinkTravelTimes;
+    }
+
+
+    public int getArrivalTime()
+    {
+        return departureTime + travelTime;
+    }
+
+
+    public Link getFromLink()
+    {
+        return links[0];
+    }
+
+
+    public Link getToLink()
+    {
+        return links[links.length - 1];
     }
 }

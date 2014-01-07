@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.file.DepotReader;
 import org.matsim.contrib.dvrp.data.network.router.*;
-import org.matsim.contrib.dvrp.data.network.shortestpath.ArcFactories;
+import org.matsim.contrib.dvrp.data.network.shortestpath.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -43,13 +43,12 @@ import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.data.network.impl.VrpGraphImpl;
 import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
@@ -178,23 +177,24 @@ public class VrpLauncherUtils
     }
 
 
-    public static VrpGraph initVrpGraph(Scenario scenario, TravelTimeSource ttimeSource,
-            TravelTime travelTime, TravelDisutility travelDisutility)
+    public static ShortestPathCalculator initShortestPathCalculator(Scenario scenario,
+            TravelTimeSource ttimeSource, TravelTime travelTime, TravelDisutility travelDisutility)
     {
         Network network = scenario.getNetwork();
         TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
                 ttimeSource.numSlots);
-        ArcFactory arcFactory = ArcFactories.createArcFactory(network, travelTime,
-                travelDisutility, timeDiscretizer, false);
 
-        return new VrpGraphImpl(arcFactory);
+        LeastCostPathCalculator router = new LeastCostPathCalculatorWithCache(new Dijkstra(network,
+                travelDisutility, travelTime), timeDiscretizer);
+
+        return new ShortestPathCalculatorImpl(router, travelTime, travelDisutility);
     }
 
 
-    public static VrpData initVrpData(Scenario scenario, VrpGraph graph, String depotsFileName)
+    public static VrpData initVrpData(Scenario scenario, ShortestPathCalculator calculator, String depotsFileName)
     {
         VrpData vrpData = new VrpDataImpl();
-        vrpData.setVrpGraph(graph);
+        vrpData.setShortestPathCalculator(calculator);
         new DepotReader(scenario, vrpData).readFile(depotsFileName);
         return vrpData;
     }

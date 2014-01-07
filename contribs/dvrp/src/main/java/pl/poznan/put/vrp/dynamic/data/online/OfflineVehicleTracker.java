@@ -48,7 +48,7 @@ public class OfflineVehicleTracker
     @Override
     public Link getLink()
     {
-        return driveTask.getArc().getFromLink();
+        return driveTask.getShortestPath().getFromLink();
     }
 
 

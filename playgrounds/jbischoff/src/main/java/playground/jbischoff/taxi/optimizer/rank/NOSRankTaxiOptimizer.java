@@ -23,11 +23,11 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.network.shortestpath.*;
 import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.immediaterequest.NOSTaxiOptimizer;
@@ -49,6 +49,7 @@ public class NOSRankTaxiOptimizer
     private final List<Id> shortTimeIdlers;
 
     private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
+    private final ShortestPathCalculator calculator;
 
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(VrpData data,
@@ -69,6 +70,7 @@ public class NOSRankTaxiOptimizer
                 vehicleFinder);
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();
+        this.calculator = data.getShortestPathCalculator();
     }
 
 
@@ -97,10 +99,10 @@ public class NOSRankTaxiOptimizer
 
             if (link != depotLink) {
                 int t5 = dropoffStayTask.getEndTime();
-                Arc arc = data.getVrpGraph().getArc(link, depotLink);
-                int t6 = arc.getShortestPath(t5).travelTime;
-                schedule.addTask(new TaxiCruiseDriveTask(t5, t6, arc));
+                ShortestPath sp = calculator.calculateShortestPath(link, depotLink, t5);
+                schedule.addTask(new TaxiCruiseDriveTask(sp));
 
+                int t6 = t5 + sp.travelTime;
                 int tEnd = Math.max(t6, Schedules.getActualT1(schedule));
                 schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getDepot()
                         .getLink()));
@@ -180,10 +182,11 @@ public class NOSRankTaxiOptimizer
         Link lastLink = lastTask.getLink();
 
         if (veh.getDepot().getLink() != lastLink) {// not a loop
-            Arc darc = data.getVrpGraph().getArc(lastLink, veh.getDepot().getLink());
-            int arrivalTime = darc.getShortestPath(currentTime).travelTime + currentTime;
+            ShortestPath sp = calculator.calculateShortestPath(lastLink, veh.getDepot().getLink(),
+                    currentTime);
+            sched.addTask(new TaxiCruiseDriveTask(sp));
 
-            sched.addTask(new TaxiCruiseDriveTask(currentTime, arrivalTime, darc));
+            int arrivalTime = currentTime + sp.travelTime;
             sched.addTask(new TaxiWaitStayTask(arrivalTime, oldendtime, veh.getDepot().getLink()));
             // System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:"
             // +oldendtime);

@@ -20,11 +20,11 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.network.shortestpath.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
 
@@ -36,6 +36,8 @@ public class OneTaxiOptimizer
     implements VrpOptimizer
 {
     private final VrpData data;
+    private final ShortestPathCalculator calculator;
+
     private final Vehicle vehicle;//we have only one vehicle
     private final Schedule<AbstractTask> schedule;// the vehicle's schedule
 
@@ -44,6 +46,8 @@ public class OneTaxiOptimizer
     public OneTaxiOptimizer(VrpData data)
     {
         this.data = data;
+
+        calculator = data.getShortestPathCalculator();
         vehicle = data.getVehicles().get(0);
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
     }
@@ -63,7 +67,7 @@ public class OneTaxiOptimizer
     @Override
     public void requestSubmitted(Request request)
     {
-        StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only waiting
+        StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
         int currentTime = data.getTime();
 
         switch (lastTask.getStatus()) {
@@ -84,17 +88,17 @@ public class OneTaxiOptimizer
         Link toLink = req.getToLink();
         int t0 = Schedules.getLastTask(schedule).getEndTime();
 
-        Arc pickupArc = data.getVrpGraph().getArc(lastTask.getLink(), fromLink);
-        int t1 = t0 + pickupArc.getShortestPath(t0).travelTime;
-        schedule.addTask(new DriveTaskImpl(t0, t1, pickupArc));
+        ShortestPath sp1 = calculator.calculateShortestPath(lastTask.getLink(), fromLink, t0);
+        schedule.addTask(new DriveTaskImpl(sp1));
 
+        int t1 = t0 + sp1.travelTime;
         int t2 = t1 + 120;// 2 minutes for picking up the passenger
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
-        Arc deliveryArc = data.getVrpGraph().getArc(fromLink, toLink);
-        int t3 = t2 + deliveryArc.getShortestPath(t2).travelTime;
-        schedule.addTask(new DriveTaskImpl(t2, t3, deliveryArc));
+        ShortestPath sp2 = calculator.calculateShortestPath(fromLink, toLink, t2);
+        schedule.addTask(new DriveTaskImpl(sp2));
 
+        int t3 = t2 + sp2.travelTime;
         int t4 = t3 + 60;// 1 minute for dropping off the passenger
         schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, "dropoff", req));
 
