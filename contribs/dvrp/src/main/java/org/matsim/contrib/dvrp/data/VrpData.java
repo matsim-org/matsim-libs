@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.data;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.data.model.*;
-import org.matsim.contrib.dvrp.data.network.VrpPathCalculator;
 
 
 public interface VrpData
@@ -43,9 +42,6 @@ public interface VrpData
     int getTime();
 
 
-    VrpPathCalculator getPathCalculator();
-
-
     VrpDataParameters getParameters();
 
 
@@ -62,9 +58,6 @@ public interface VrpData
 
 
     void setTime(int time);
-
-
-    void setPathCalculator(VrpPathCalculator calculator);
 
 
     void setParameters(VrpDataParameters parameters);

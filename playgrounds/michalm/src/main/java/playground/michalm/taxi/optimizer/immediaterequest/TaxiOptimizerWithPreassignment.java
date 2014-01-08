@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.Schedule;
+import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;
@@ -42,10 +43,10 @@ public class TaxiOptimizerWithPreassignment
     private Map<Id, Vehicle> reqIdToVehMap;
 
 
-    public TaxiOptimizerWithPreassignment(VrpData data, int pickupDuration, int dropoffDuration,
-            final Map<Id, Vehicle> reqIdToVehMap)
+    public TaxiOptimizerWithPreassignment(VrpData data, VrpPathCalculator calculator,
+            int pickupDuration, int dropoffDuration, final Map<Id, Vehicle> reqIdToVehMap)
     {
-        super(data, true, false, pickupDuration, dropoffDuration);
+        super(data, calculator, new Params(true, false, pickupDuration, dropoffDuration));
         this.reqIdToVehMap = reqIdToVehMap;
     }
 
@@ -75,7 +76,8 @@ public class TaxiOptimizerWithPreassignment
 
 
     public static TaxiOptimizerWithPreassignment createOptimizer(MatsimVrpData data,
-            int pickupDuration, int dropoffDuration, String reqIdToVehIdFile)
+            VrpPathCalculator calculator, int pickupDuration, int dropoffDuration,
+            String reqIdToVehIdFile)
     {
         Scanner scanner = null;
         try {
@@ -96,7 +98,7 @@ public class TaxiOptimizerWithPreassignment
         }
         scanner.close();
 
-        return new TaxiOptimizerWithPreassignment(data.getVrpData(), pickupDuration,
+        return new TaxiOptimizerWithPreassignment(data.getVrpData(), calculator, pickupDuration,
                 dropoffDuration, reqIdToVehMap);
     }
 }

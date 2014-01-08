@@ -24,12 +24,12 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.data.online.VehicleTracker;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.data.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+import org.matsim.contrib.dvrp.router.*;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -67,8 +67,8 @@ public abstract class ImmediateRequestTaxiOptimizer
             this.path = path;
         }
     }
-    
-    
+
+
     private static class LinkTimePair
     {
         public final Link link;
@@ -83,27 +83,37 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
+    public static class Params
+    {
+        public final boolean destinationKnown;
+        public final boolean minimizePickupTripTime;
+        public final int pickupDuration;
+        public final int dropoffDuration;
+
+
+        public Params(boolean destinationKnown, boolean minimizePickupTripTime, int pickupDuration,
+                int dropoffDuration)
+        {
+            super();
+            this.destinationKnown = destinationKnown;
+            this.minimizePickupTripTime = minimizePickupTripTime;
+            this.pickupDuration = pickupDuration;
+            this.dropoffDuration = dropoffDuration;
+        }
+    }
+
 
     private final VrpPathCalculator calculator;
+    private final Params params;
 
     private TaxiDelaySpeedupStats delaySpeedupStats;
-    private final boolean destinationKnown;
-    private final boolean minimizePickupTripTime;
-    private final int pickupDuration;
-    private final int dropoffDuration;
 
 
-    public ImmediateRequestTaxiOptimizer(VrpData data, boolean destinationKnown,
-            boolean minimizePickupTripTime, int pickupDuration, int dropoffDuration)
+    public ImmediateRequestTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params)
     {
         super(data);
-
-        this.calculator = data.getPathCalculator();
-
-        this.destinationKnown = destinationKnown;
-        this.minimizePickupTripTime = minimizePickupTripTime;
-        this.pickupDuration = pickupDuration;
-        this.dropoffDuration = dropoffDuration;
+        this.calculator = calculator;
+        this.params = params;
     }
 
 
@@ -146,10 +156,9 @@ public abstract class ImmediateRequestTaxiOptimizer
                 continue;
             }
 
-            VrpPath path = calculator.calcPath(departure.link,
-                    req.getFromLink(), departure.time);
+            VrpPath path = calculator.calcPath(departure.link, req.getFromLink(), departure.time);
 
-            if (minimizePickupTripTime) {
+            if (params.minimizePickupTripTime) {
                 if (path.getTravelTime() < best.path.getTravelTime()) {
                     // TODO: in the future: add a check if the taxi time windows are satisfied
                     best = new VehicleDrive(veh, path);
@@ -190,7 +199,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                         return new LinkTimePair(link, time);
 
                     case PICKUP_STAY:
-                        if (!destinationKnown) {
+                        if (!params.destinationKnown) {
                             return null;
                         }
 
@@ -238,10 +247,10 @@ public abstract class ImmediateRequestTaxiOptimizer
 
         bestSched.addTask(new TaxiPickupDriveTask(best.path, req));
 
-        int t3 = best.path.getArrivalTime() + pickupDuration;
+        int t3 = best.path.getArrivalTime() + params.pickupDuration;
         bestSched.addTask(new TaxiPickupStayTask(best.path.getArrivalTime(), t3, req));
 
-        if (destinationKnown) {
+        if (params.destinationKnown) {
             appendDropoffAfterPickup(bestSched);
             appendWaitAfterDropoff(bestSched);
         }
@@ -276,7 +285,7 @@ public abstract class ImmediateRequestTaxiOptimizer
             updatePlannedTasks(schedule);
         }
 
-        if (!destinationKnown) {
+        if (!params.destinationKnown) {
             if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
                 appendDropoffAfterPickup(schedule);
                 appendWaitAfterDropoff(schedule);
@@ -307,7 +316,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         schedule.addTask(new TaxiDropoffDriveTask(path, req));
 
         int t4 = path.getTravelTime();
-        int t5 = t4 + dropoffDuration;
+        int t5 = t4 + params.dropoffDuration;
         schedule.addTask(new TaxiDropoffStayTask(t4, t5, req));
     }
 
@@ -398,7 +407,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                 case PICKUP_STAY: {
                     task.setBeginTime(t);// t == taxi's arrival time
                     int t0 = ((TaxiPickupStayTask)task).getRequest().getT0();// t0 == passenger's departure time
-                    t = Math.max(t, t0) + pickupDuration; // the true pickup starts at max(t, t0)
+                    t = Math.max(t, t0) + params.pickupDuration; // the true pickup starts at max(t, t0)
                     task.setEndTime(t);
 
                     break;
@@ -406,7 +415,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                 case DROPOFF_STAY: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
-                    t += dropoffDuration;
+                    t += params.dropoffDuration;
                     task.setEndTime(t);
 
                     break;

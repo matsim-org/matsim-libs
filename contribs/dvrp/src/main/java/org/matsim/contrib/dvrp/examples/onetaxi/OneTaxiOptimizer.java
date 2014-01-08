@@ -22,10 +22,10 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.*;
-import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.data.schedule.impl.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.router.*;
 
 
 /**
@@ -42,11 +42,11 @@ public class OneTaxiOptimizer
 
 
     @SuppressWarnings("unchecked")
-    public OneTaxiOptimizer(VrpData data)
+    public OneTaxiOptimizer(VrpData data, VrpPathCalculator calculator)
     {
         this.data = data;
+        this.pathCalculator = calculator;
 
-        pathCalculator = data.getPathCalculator();
         vehicle = data.getVehicles().get(0);
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
     }

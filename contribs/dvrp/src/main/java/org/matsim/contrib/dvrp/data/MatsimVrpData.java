@@ -34,7 +34,7 @@ public class MatsimVrpData
 
     //all mobsim agents
     private final Map<Id, MobsimAgent> mobsimAgents = new HashMap<Id, MobsimAgent>();
-    
+
     //TODO this is not very general -- some VRPs may be about commodities, not persons
     //passenger agents --> customers
     private final Map<Id, PassengerCustomer> customersByAgentId = new HashMap<Id, PassengerCustomer>();

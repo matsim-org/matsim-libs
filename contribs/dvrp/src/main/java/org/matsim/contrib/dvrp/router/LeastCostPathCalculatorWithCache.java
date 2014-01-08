@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network;
+package org.matsim.contrib.dvrp.router;
 
 import java.util.*;
 

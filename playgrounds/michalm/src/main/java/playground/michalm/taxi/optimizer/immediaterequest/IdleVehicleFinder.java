@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
@@ -34,12 +35,15 @@ public class IdleVehicleFinder
     implements VehicleFinder
 {
     private final VrpData data;
+    private final VrpPathCalculator calculator;
     private final boolean straightLineDistance;
 
 
-    public IdleVehicleFinder(VrpData data, boolean straightLineDistance)
+    public IdleVehicleFinder(VrpData data, VrpPathCalculator calculator,
+            boolean straightLineDistance)
     {
         this.data = data;
+        this.calculator = calculator;
         this.straightLineDistance = straightLineDistance;
     }
 
@@ -51,7 +55,8 @@ public class IdleVehicleFinder
         double bestDistance = Double.MAX_VALUE;
 
         for (Vehicle veh : data.getVehicles()) {
-            double distance = calculateDistance(req, veh, data, straightLineDistance);
+            double distance = calculateDistance(req, veh, data.getTime(), calculator,
+                    straightLineDistance);
 
             if (distance < bestDistance) {
                 bestVeh = veh;
@@ -63,11 +68,10 @@ public class IdleVehicleFinder
     }
 
 
-    public static double calculateDistance(TaxiRequest req, Vehicle veh, VrpData data,
-            boolean straightLineDistance)
+    public static double calculateDistance(TaxiRequest req, Vehicle veh, int time,
+            VrpPathCalculator calculator, boolean straightLineDistance)
     {
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
-        int time = data.getTime();
         Link fromLink;
 
         if (!TaxiUtils.isIdle(sched, time, true)) {
@@ -101,11 +105,10 @@ public class IdleVehicleFinder
             return deltaX * deltaX + deltaY * deltaY;
         }
         else {
-            
+
             //TODO consider storing the shortest path (sth like BestShortestPath object)
-            
-            return data.getPathCalculator()
-                    .calcPath(fromLink, toLink, time).getTravelCost();
+
+            return calculator.calcPath(fromLink, toLink, time).getTravelCost();
         }
     }
 }

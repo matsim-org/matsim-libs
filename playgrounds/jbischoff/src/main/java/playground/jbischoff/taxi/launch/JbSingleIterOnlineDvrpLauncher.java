@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.model.Request;
-import org.matsim.contrib.dvrp.data.network.VrpPathCalculator;
+import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -50,6 +50,7 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer.Params;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
 
 
@@ -176,17 +177,18 @@ import playground.michalm.taxi.run.TaxiLauncherUtils;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource,
                 travelTime);
 
-        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathFinder(scenario,
-                ttimeSource, travelTime, travelDisutility);
+        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathFinder(scenario, ttimeSource,
+                travelTime, travelDisutility);
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-        VrpData vrpData = TaxiLauncherUtils.initTaxiData(scenario, calculator, depotsFileName, ecm);
+        VrpData vrpData = TaxiLauncherUtils.initTaxiData(scenario, depotsFileName, ecm);
 
         data = new MatsimVrpData(vrpData, scenario);
 
+        Params params = new Params(true, false, 120, 60);
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(vrpData,
-                true, false, 120, 60, true);
+                calculator, params, true);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
 

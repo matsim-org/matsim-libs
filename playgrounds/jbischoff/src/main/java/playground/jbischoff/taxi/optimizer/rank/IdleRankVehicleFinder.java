@@ -24,6 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
@@ -43,6 +44,7 @@ public class IdleRankVehicleFinder
     implements VehicleFinder
 {
     private final VrpData data;
+    private final VrpPathCalculator calculator;
     private final boolean straightLineDistance;
 	private DepotArrivalDepartureCharger depotarrivaldeparturecharger;
 	private boolean IsElectric;
@@ -50,9 +52,10 @@ public class IdleRankVehicleFinder
 	Random rnd;
 
 
-    public IdleRankVehicleFinder(VrpData data, boolean straightLineDistance)
+    public IdleRankVehicleFinder(VrpData data, VrpPathCalculator calculator, boolean straightLineDistance)
     {
         this.data = data;
+        this.calculator = calculator;
         this.straightLineDistance = straightLineDistance;
         this.IsElectric = false;
         this.useChargeOverTime = false;
@@ -210,6 +213,7 @@ public class IdleRankVehicleFinder
     
     
     private double calculateDistance(TaxiRequest req, Vehicle veh){
-        return IdleVehicleFinder.calculateDistance(req, veh, data, straightLineDistance);
+        return IdleVehicleFinder.calculateDistance(req, veh, data.getTime(), calculator,
+                straightLineDistance);
     }
 }

@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.DepotReader;
-import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.*;
@@ -188,11 +188,9 @@ public class VrpLauncherUtils
     }
 
 
-    public static VrpData initVrpData(Scenario scenario, VrpPathCalculator pathCalculator,
-            String depotsFileName)
+    public static VrpData initVrpData(Scenario scenario, String depotsFileName)
     {
         VrpData vrpData = new VrpDataImpl();
-        vrpData.setPathCalculator(pathCalculator);
         new DepotReader(scenario, vrpData).readFile(depotsFileName);
         return vrpData;
     }

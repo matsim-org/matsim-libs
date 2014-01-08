@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.data;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.model.*;
-import org.matsim.contrib.dvrp.data.network.VrpPathCalculator;
 
 
 /**
@@ -37,8 +36,6 @@ public class VrpDataImpl
     private final List<Request> requests = new ArrayList<Request>();
 
     private int time;
-
-    private VrpPathCalculator calculator;
 
     private VrpDataParameters parameters;
 
@@ -75,13 +72,6 @@ public class VrpDataImpl
     public int getTime()
     {
         return time;
-    }
-
-
-    @Override
-    public VrpPathCalculator getPathCalculator()
-    {
-        return calculator;
     }
 
 
@@ -126,13 +116,6 @@ public class VrpDataImpl
     public void setTime(int time)
     {
         this.time = time;
-    }
-
-
-    @Override
-    public void setPathCalculator(VrpPathCalculator calculator)
-    {
-        this.calculator = calculator;
     }
 
 

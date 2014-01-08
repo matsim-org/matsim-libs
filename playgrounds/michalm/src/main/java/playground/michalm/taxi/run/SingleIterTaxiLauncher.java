@@ -26,7 +26,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.network.VrpPathCalculator;
+import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
@@ -49,7 +49,8 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer;
+import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer.Params;
 
 
 /*package*/class SingleIterTaxiLauncher
@@ -216,13 +217,14 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-        TaxiData taxiData = TaxiLauncherUtils
-                .initTaxiData(scenario, calculator, ranksFileName, ecm);
+        TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
 
         data = new MatsimVrpData(taxiData, scenario);
 
+        Params params = new Params(destinationKnown, minimizePickupTripTime, pickupDuration,
+                dropoffDuration);
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiData,
-                destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
+                calculator, params);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
 

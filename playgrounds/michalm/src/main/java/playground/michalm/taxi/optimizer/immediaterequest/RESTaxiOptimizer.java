@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.schedule.*;
@@ -39,12 +40,12 @@ public class RESTaxiOptimizer
     private final TaxiOptimizationPolicy optimizationPolicy;
 
 
-    public RESTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            int pickupDuration, int dropoffDuration, TaxiOptimizationPolicy optimizationPolicy)
+    public RESTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
+            TaxiOptimizationPolicy optimizationPolicy)
     {
-        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
+        super(data, calculator, params);
         this.data = data;
-        this.destinationKnown = destinationKnown;
+        this.destinationKnown = params.destinationKnown;
         this.optimizationPolicy = optimizationPolicy;
     }
 

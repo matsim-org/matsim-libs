@@ -19,8 +19,8 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.data.network.VrpPath;
 import org.matsim.contrib.dvrp.data.schedule.impl.DriveTaskImpl;
+import org.matsim.contrib.dvrp.router.VrpPath;
 
 
 public class TaxiCruiseDriveTask

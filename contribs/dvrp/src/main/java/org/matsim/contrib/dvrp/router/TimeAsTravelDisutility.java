@@ -17,28 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network;
+package org.matsim.contrib.dvrp.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.*;
 import org.matsim.vehicles.Vehicle;
 
 
-public class DistanceAsTravelDisutility
+public class TimeAsTravelDisutility
     implements TravelDisutility
 {
+    private TravelTime travelTime;
+
+
+    public TimeAsTravelDisutility(TravelTime travelTime)
+    {
+        this.travelTime = travelTime;
+    }
+
+
     @Override
     public double getLinkTravelDisutility(final Link link, final double time, final Person person,
             final Vehicle vehicle)
     {
-        return link.getLength();
+        return travelTime.getLinkTravelTime(link, time, person, vehicle);
     }
 
 
     @Override
     public double getLinkMinimumTravelDisutility(Link link)
     {
-        return link.getLength();
+        return link.getLength() / link.getFreespeed();
     }
 }

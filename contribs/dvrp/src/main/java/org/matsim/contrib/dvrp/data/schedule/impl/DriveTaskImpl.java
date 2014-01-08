@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.dvrp.data.schedule.impl;
 
-import org.matsim.contrib.dvrp.data.network.VrpPath;
 import org.matsim.contrib.dvrp.data.online.*;
 import org.matsim.contrib.dvrp.data.schedule.DriveTask;
+import org.matsim.contrib.dvrp.router.VrpPath;
 
 
 public class DriveTaskImpl

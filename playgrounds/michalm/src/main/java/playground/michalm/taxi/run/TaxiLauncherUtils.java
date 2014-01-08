@@ -20,7 +20,6 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.network.VrpPathCalculator;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 import playground.michalm.taxi.TaxiData;
@@ -29,11 +28,10 @@ import playground.michalm.taxi.file.TaxiRankReader;
 
 public class TaxiLauncherUtils
 {
-    public static TaxiData initTaxiData(Scenario scenario, VrpPathCalculator calculator,
-            String ranksFileName, EnergyConsumptionModel ecm)
+    public static TaxiData initTaxiData(Scenario scenario, String ranksFileName,
+            EnergyConsumptionModel ecm)
     {
         TaxiData taxiData = new TaxiData();
-        taxiData.setPathCalculator(calculator);
         new TaxiRankReader(scenario, taxiData, ecm).readFile(ranksFileName);
         return taxiData;
     }

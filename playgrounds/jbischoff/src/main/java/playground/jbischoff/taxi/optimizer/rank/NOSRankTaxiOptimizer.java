@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
@@ -53,24 +53,20 @@ public class NOSRankTaxiOptimizer
 
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(VrpData data,
-            boolean destinationKnown, boolean minimizePickupTripTime, int pickupDuration,
-            int dropoffDuration, boolean straightLineDistance)
+            VrpPathCalculator calculator, Params params, boolean straightLineDistance)
     {
-        return new NOSRankTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
-                pickupDuration, dropoffDuration, new IdleRankVehicleFinder(data,
-                        straightLineDistance));
+        return new NOSRankTaxiOptimizer(data, calculator, params, new IdleRankVehicleFinder(data,
+                calculator, straightLineDistance));
     }
 
 
-    private NOSRankTaxiOptimizer(VrpData data, boolean destinationKnown,
-            boolean minimizePickupTripTime, int pickupDuration, int dropoffDuration,
+    private NOSRankTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
             IdleRankVehicleFinder vehicleFinder)
     {
-        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration,
-                vehicleFinder);
+        super(data, calculator, params, vehicleFinder);
+        this.calculator = calculator;
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();
-        this.calculator = data.getPathCalculator();
     }
 
 
@@ -182,8 +178,7 @@ public class NOSRankTaxiOptimizer
         Link lastLink = lastTask.getLink();
 
         if (veh.getDepot().getLink() != lastLink) {// not a loop
-            VrpPath path = calculator.calcPath(lastLink, veh.getDepot().getLink(),
-                    currentTime);
+            VrpPath path = calculator.calcPath(lastLink, veh.getDepot().getLink(), currentTime);
             sched.addTask(new TaxiCruiseDriveTask(path));
 
             int arrivalTime = path.getArrivalTime();

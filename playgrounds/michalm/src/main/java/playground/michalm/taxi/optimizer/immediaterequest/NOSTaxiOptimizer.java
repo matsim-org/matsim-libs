@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;
@@ -36,18 +37,18 @@ public class NOSTaxiOptimizer
     private final VehicleFinder idleVehicleFinder;
 
 
-    public NOSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            int pickupDuration, int dropoffDuration, boolean straightLineDistance)
+    public NOSTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
+            boolean straightLineDistance)
     {
-        this(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration,
-                new IdleVehicleFinder(data, straightLineDistance));
+        this(data, calculator, params,
+                new IdleVehicleFinder(data, calculator, straightLineDistance));
     }
 
 
-    public NOSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            int pickupDuration, int dropoffDuration, VehicleFinder idleVehicleFinder)
+    public NOSTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
+            VehicleFinder idleVehicleFinder)
     {
-        super(data, destinationKnown, minimizePickupTripTime, pickupDuration, dropoffDuration);
+        super(data, calculator, params);
         this.idleVehicleFinder = idleVehicleFinder;
     }
 

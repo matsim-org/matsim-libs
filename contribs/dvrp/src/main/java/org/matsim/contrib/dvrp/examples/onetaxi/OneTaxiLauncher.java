@@ -24,7 +24,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -68,9 +68,9 @@ public class OneTaxiLauncher
         VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathFinder(scenario,
                 TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility);
 
-        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, calculator, depotsFileName);
+        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, depotsFileName);
         MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
-        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(vrpData);
+        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(vrpData, calculator);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
         VrpSimEngine vrpSimEngine = VrpLauncherUtils.initVrpSimEngine(qSim, data, optimizer);
