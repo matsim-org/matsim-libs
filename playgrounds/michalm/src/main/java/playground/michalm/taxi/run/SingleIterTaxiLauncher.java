@@ -167,7 +167,8 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
         }
         scanner.close();
 
-        dirName = params.get("dirName") + '/';
+//        dirName = params.get("dirName") + '/';
+        dirName = new File(paramFile).getParent() + '/';
         netFileName = dirName + params.get("netFileName");
 
         plansFileName = dirName + params.get("plansFileName");

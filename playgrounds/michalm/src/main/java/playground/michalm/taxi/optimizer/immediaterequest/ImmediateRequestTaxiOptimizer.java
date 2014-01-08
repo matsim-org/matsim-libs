@@ -315,7 +315,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         VrpPath path = calculator.calcPath(reqFromLink, reqToLink, t3);
         schedule.addTask(new TaxiDropoffDriveTask(path, req));
 
-        int t4 = path.getTravelTime();
+        int t4 = path.getArrivalTime();
         int t5 = t4 + params.dropoffDuration;
         schedule.addTask(new TaxiDropoffStayTask(t4, t5, req));
     }
