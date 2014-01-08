@@ -341,6 +341,70 @@ public class QSimIntegrationTest {
 		Assert.assertTrue(events.get(idx++) instanceof PersonArrivalEvent);
 	}
 
+	/**
+	 * This checks for the right events in the case of a stupid-looking transit route which has only two stops which are even the same.
+	 * But think about round-trip ship cruises, tourist buses etc and it makes more sense.
+	 * To add a twist assume some non-useful (because automatically generated) network route with only a single link and no
+	 * real round-trip route.
+	 *
+	 * And yes, this case has appeared in real data, that's why there is a test case for it... (mrieser, jan2014)
+	 *
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 */
+	@Test
+	public void test_circularEmptyRoute_singleLinkRoute_noPassengers() throws SAXException, ParserConfigurationException, IOException {
+		Fixture f = new Fixture();
+		String scheduleXml = "" +
+		"<?xml version='1.0' encoding='UTF-8'?>" +
+		"<!DOCTYPE transitSchedule SYSTEM \"http://www.matsim.org/files/dtd/transitSchedule_v1.dtd\">" +
+		"<transitSchedule>" +
+		"	<transitStops>" +
+		"		<stopFacility id=\"1\" x=\"1050\" y=\"1050\" linkRefId=\"2\"/>" +
+		"	</transitStops>" +
+		"	<transitLine id=\"A\">" +
+		"		<transitRoute id=\"Aa\">" +
+		"			<transportMode>train</transportMode>" +
+		"			<routeProfile>" +
+		"				<stop refId=\"1\" departureOffset=\"00:00:00\"/>" +
+		"				<stop refId=\"1\" arrivalOffset=\"00:15:00\"/>" +
+		"			</routeProfile>" +
+		"			<route>" +
+		"				<link refId=\"2\"/>" +
+		"				<link refId=\"2\"/>" +
+		"			</route>" +
+		"			<departures>" +
+		"				<departure id=\"0x\" departureTime=\"06:00:00\" vehicleRefId=\"tr_1\" />" +
+		"			</departures>" +
+		"		</transitRoute>" +
+		"	</transitLine>" +
+		"</transitSchedule>";
+		new TransitScheduleReaderV1(f.scenario).parse(new ByteArrayInputStream(scheduleXml.getBytes()));
+
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		SelectiveEventsCollector coll = new SelectiveEventsCollector(TransitDriverStartsEvent.class,
+				PersonDepartureEvent.class, VehicleArrivesAtFacilityEvent.class, VehicleDepartsAtFacilityEvent.class, PersonArrivalEvent.class,
+				LinkEnterEvent.class);
+		eventsManager.addHandler(coll);
+
+		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
+		sim.run();
+
+		coll.printEvents();
+
+		List<Event> events = coll.getEvents();
+		Assert.assertEquals("wrong number of events", 7, events.size());
+		Assert.assertTrue(events.get(0) instanceof TransitDriverStartsEvent);
+		Assert.assertTrue(events.get(1) instanceof PersonDepartureEvent);
+		Assert.assertTrue(events.get(2) instanceof VehicleArrivesAtFacilityEvent); // stop 1
+		Assert.assertTrue(events.get(3) instanceof VehicleDepartsAtFacilityEvent); // stop 1
+		Assert.assertTrue(events.get(4) instanceof VehicleArrivesAtFacilityEvent); // stop 1
+		Assert.assertTrue(events.get(5) instanceof VehicleDepartsAtFacilityEvent); // stop 1
+		Assert.assertTrue(events.get(6) instanceof PersonArrivalEvent);
+	}
+
+
 	private static class Fixture {
 		public final ScenarioImpl scenario;
 		public Fixture() throws SAXException, ParserConfigurationException, IOException {
