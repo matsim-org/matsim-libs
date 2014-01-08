@@ -14,11 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
@@ -40,19 +37,14 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkChangeEventFactory;
+import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkImplTest;
-import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -94,15 +86,15 @@ public class MyCarrierSimulation {
 //		config.planCalcScore().setMarginalUtilityOfMoney(100.);
 //		config.planCalcScore().setMarginalUtlOfDistanceOther(-120.);
 		config.strategy().setMaxAgentPlanMemorySize(5);
-		
+
 		//Read network
 		scenario = ScenarioUtils.loadScenario(config);
 		//config.network().setInputFile(networkFile);
 		scenario.getConfig().network().setTimeVariantNetwork(true);
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		//scenario.getConfig().network().setChangeEventInputFile(changeEventsInputFile);
-		
-		
+
+
 		MyCarrierSimulation mcs = new MyCarrierSimulation();
 		mcs.getNetworkChangeEvents(0, 6, 15, 22);
 
@@ -122,32 +114,32 @@ public class MyCarrierSimulation {
 
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
-		
+
 		CarrierControlerListener carrierController = new CarrierControlerListener(carriers, stratManFactory, scoringFactory);
 		//		carrierController.setEnableWithinDayActivityReScheduling(false); // FIXME commented out, as it's not compiling
 		controler.addControlerListener(carrierController);
-		
+
 		mcs.prepareFreightOutput(controler, carriers);
-		
+
 		controler.run();
 
 		new CarrierPlanXmlWriterV2(carriers).write(scenario.getConfig().controler().getOutputDirectory() + "output_carriers.xml.gz") ;
-		
+
 		Header.printFooter();
 
 	}
 
 	public void getNetworkChangeEvents(double amStart, double amEnd, double pmStart, double pmEnd) {
 		Collection<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>();
-		
+
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl();
-		
+
 //		Network network = scenario.getNetwork();
 //		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 //		NetworkImpl ni = (NetworkImpl)network;
 //		nf.setLinkFactory(new TimeVariantLinkFactory());
 //		ni.setFactory(nf);
-		
+
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
 //			double speed = 0 ;
@@ -188,9 +180,9 @@ public class MyCarrierSimulation {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(){
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
@@ -240,7 +232,7 @@ public class MyCarrierSimulation {
 				final LegScoring legScoringFunction = new CharyparNagelLegScoring(new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()),
 						scenario.getNetwork() );
 				sum.addScoringFunction(legScoringFunction ) ;
-				
+
 //				final MoneyScoring moneyScoringFunction = new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()) );
 //				sum.addScoringFunction( moneyScoringFunction ) ;
 				return sum ;
@@ -250,25 +242,25 @@ public class MyCarrierSimulation {
 
 		return scoringFunctionFactory;
 	}
-	
+
 	//freight part from sschroeder/usecases/chessboard/RunPassengerAlongWithCarrier
 	public void prepareFreightOutput(Controler controler, final Carriers carriers) {
 		final LegHistogram freightOnly = new LegHistogram(900);
 		freightOnly.setPopulation(controler.getPopulation());
 		freightOnly.setInclPop(false);
-		
+
 		CarrierScoreStats scores = new CarrierScoreStats(carriers, "output/carrier_scores", true);
-		
+
 		controler.getEvents().addHandler(freightOnly);
 		controler.addControlerListener(scores);
 		controler.addControlerListener(new IterationEndsListener() {
-			
+
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				//write plans
 				String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
 				new CarrierPlanXmlWriterV2(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
-				
+
 				//write stats
 				freightOnly.writeGraphic(dir + "/" + event.getIteration() + ".legHistogram_freight.png");
 				freightOnly.reset(event.getIteration());
