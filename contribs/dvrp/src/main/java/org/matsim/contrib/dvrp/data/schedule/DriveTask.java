@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.dvrp.data.schedule;
 
-import org.matsim.contrib.dvrp.data.online.VehicleTracker;
 import org.matsim.contrib.dvrp.router.VrpPath;
+import org.matsim.contrib.dvrp.tracker.OfflineVehicleTracker;
 
 
 public interface DriveTask
@@ -29,8 +29,8 @@ public interface DriveTask
     VrpPath getPath();
 
 
-    VehicleTracker getVehicleTracker();
+    OfflineVehicleTracker getVehicleTracker();
 
 
-    void setVehicleTracker(VehicleTracker vehicleTracker);
+    void setVehicleTracker(OfflineVehicleTracker vehicleTracker);
 }

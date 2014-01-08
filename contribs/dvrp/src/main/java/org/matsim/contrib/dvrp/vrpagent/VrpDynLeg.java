@@ -22,9 +22,9 @@ package org.matsim.contrib.dvrp.vrpagent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.VrpSimEngine;
-import org.matsim.contrib.dvrp.data.online.VehicleTracker;
 import org.matsim.contrib.dvrp.data.schedule.DriveTask;
 import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dynagent.DynLeg;
 
 
@@ -48,23 +48,16 @@ public class VrpDynLeg
 
 
     private final VrpPath path;
-
-    private final Id destinationLinkId;
-    private final int destinationLinkIdx;
-
     private int currentLinkIdx = 0;
-
-    private final OnlineVehicleTracker onlineVehicleTracker;
+    private final OnlineVehicleTrackerImpl onlineVehicleTracker;
 
 
     //DriveTask with OfflineVehicleTrakcer
     private VrpDynLeg(DriveTask driveTask)
     {
         path = driveTask.getPath();
-        destinationLinkId = path.getToLink().getId();
-        destinationLinkIdx = path.getLinks().length - 1;
-
-        onlineVehicleTracker = null;//offlineVehicleTracker is used in DriveTask by default 
+        onlineVehicleTracker = null;
+        driveTask.setVehicleTracker(new OfflineVehicleTrackerImpl(driveTask));
     }
 
 
@@ -72,10 +65,7 @@ public class VrpDynLeg
     private VrpDynLeg(DriveTask driveTask, VrpSimEngine vrpSimEngine)
     {
         path = driveTask.getPath();
-        destinationLinkId = path.getToLink().getId();
-        destinationLinkIdx = path.getLinks().length - 1;
-
-        onlineVehicleTracker = new OnlineVehicleTracker(driveTask, vrpSimEngine);
+        onlineVehicleTracker = new OnlineVehicleTrackerImpl(driveTask, vrpSimEngine);
         driveTask.setVehicleTracker(onlineVehicleTracker);
     }
 
@@ -101,18 +91,20 @@ public class VrpDynLeg
     @Override
     public Id getNextLinkId()
     {
-        if (currentLinkIdx == destinationLinkIdx) {
+        Link[] links = path.getLinks();
+
+        if (currentLinkIdx == links.length - 1) {
             return null;
         }
 
-        return path.getLinks()[currentLinkIdx + 1].getId();
+        return links[currentLinkIdx + 1].getId();
     }
 
 
     @Override
     public Id getDestinationLinkId()
     {
-        return destinationLinkId;
+        return path.getToLink().getId();
     }
 
 
@@ -121,25 +113,25 @@ public class VrpDynLeg
     {}
 
 
-    private class OnlineVehicleTracker
-        implements VehicleTracker
+    private class OnlineVehicleTrackerImpl
+        implements OnlineVehicleTracker
     {
         private final DriveTask driveTask;
         private final VrpSimEngine vrpSimEngine;
 
-        private int timeAtLastNode;
-        private int delayAtLastNode;
+        private int linkEnterTime;
+        private int delayOnLinkEnter;
 
         private int expectedLinkTravelTime;
 
 
-        public OnlineVehicleTracker(DriveTask driveTask, VrpSimEngine vrpSimEngine)
+        public OnlineVehicleTrackerImpl(DriveTask driveTask, VrpSimEngine vrpSimEngine)
         {
             this.driveTask = driveTask;
             this.vrpSimEngine = vrpSimEngine;
 
-            timeAtLastNode = driveTask.getBeginTime();
-            delayAtLastNode = 0;
+            linkEnterTime = driveTask.getBeginTime();
+            delayOnLinkEnter = 0;
 
             expectedLinkTravelTime = getAccLinkTravelTimes()[0];
         }
@@ -147,16 +139,16 @@ public class VrpDynLeg
 
         private void movedOverNode(int time)
         {
-            timeAtLastNode = time;
+            linkEnterTime = time;
 
             int expectedTimeEnRoute = getAccLinkTravelTimes()[currentLinkIdx - 1];
-            int actualTimeEnRoute = timeAtLastNode - driveTask.getBeginTime();
+            int actualTimeEnRoute = linkEnterTime - driveTask.getBeginTime();
 
-            delayAtLastNode = actualTimeEnRoute - expectedTimeEnRoute;
+            delayOnLinkEnter = actualTimeEnRoute - expectedTimeEnRoute;
 
             expectedLinkTravelTime = getAccLinkTravelTimes()[currentLinkIdx] - expectedTimeEnRoute;
 
-            vrpSimEngine.nextPositionReached(this);
+            vrpSimEngine.nextLinkEntered(this);
         }
 
 
@@ -170,8 +162,8 @@ public class VrpDynLeg
         @Override
         public int calculateCurrentDelay(int currentTime)
         {
-            int estimatedDelay = delayAtLastNode;
-            int timeOnLink = currentTime - timeAtLastNode;
+            int estimatedDelay = delayOnLinkEnter;
+            int timeOnLink = currentTime - linkEnterTime;
 
             // delay on the current link
             if (timeOnLink > expectedLinkTravelTime) {
@@ -185,35 +177,33 @@ public class VrpDynLeg
         @Override
         public Link getLink()
         {
-            if (currentLinkIdx == 0) {
-                return null;//the vehicle is at the very beginning (before the first node)
-            }
-
-            return path.getLinks()[currentLinkIdx - 1];
+            return path.getLinks()[currentLinkIdx];
         }
 
 
         @Override
         public int getLinkEnterTime()
         {
-            return timeAtLastNode;
+            return linkEnterTime;
         }
 
 
         @Override
         public int predictLinkExitTime(int currentTime)
         {
-            int predictedTimeAtNextNode = timeAtLastNode
-                    + Math.max(currentTime - timeAtLastNode, expectedLinkTravelTime);
-            return predictedTimeAtNextNode;
+            int predictedLinkExitTime = linkEnterTime
+                    + Math.max(currentTime - linkEnterTime, expectedLinkTravelTime);
+            return predictedLinkExitTime;
         }
 
 
         @Override
         public int predictEndTime(int currentTime)
         {
-            int predictedTimeFromNextNode = getAccLinkTravelTimes()[destinationLinkIdx]
-                    - getAccLinkTravelTimes()[currentLinkIdx];
+            int[] accLinkTT = getAccLinkTravelTimes();
+
+            int predictedTimeFromNextNode = accLinkTT[accLinkTT.length - 1]
+                    - accLinkTT[currentLinkIdx];
 
             return predictLinkExitTime(currentTime) + predictedTimeFromNextNode;
         }
@@ -222,7 +212,8 @@ public class VrpDynLeg
         @Override
         public int getInitialEndTime()
         {
-            return driveTask.getBeginTime() + getAccLinkTravelTimes()[destinationLinkIdx];
+            int[] accLinkTT = getAccLinkTravelTimes();
+            return driveTask.getBeginTime() + accLinkTT[accLinkTT.length - 1];
         }
 
 

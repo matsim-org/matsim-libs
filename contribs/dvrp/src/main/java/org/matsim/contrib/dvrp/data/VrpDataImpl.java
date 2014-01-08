@@ -37,7 +37,7 @@ public class VrpDataImpl
 
     private int time;
 
-    private VrpDataParameters parameters;
+    private Parameters parameters;
 
 
     @Override
@@ -76,7 +76,7 @@ public class VrpDataImpl
 
 
     @Override
-    public VrpDataParameters getParameters()
+    public Parameters getParameters()
     {
         return parameters;
     }
@@ -120,7 +120,7 @@ public class VrpDataImpl
 
 
     @Override
-    public void setParameters(VrpDataParameters parameters)
+    public void setParameters(Parameters parameters)
     {
         this.parameters = parameters;
     }

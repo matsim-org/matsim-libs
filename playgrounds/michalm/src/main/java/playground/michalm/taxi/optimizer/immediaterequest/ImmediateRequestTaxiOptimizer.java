@@ -24,12 +24,12 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.online.VehicleTracker;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.data.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.tracker.OnlineVehicleTracker;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -429,7 +429,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
 
     @Override
-    public boolean nextPositionReached(VehicleTracker vehicleTracker)
+    public boolean nextLinkEntered(OnlineVehicleTracker vehicleTracker)
     {
         DriveTask dt = vehicleTracker.getDriveTask();
         dt.setEndTime(vehicleTracker.predictEndTime(data.getTime()));

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp.tracker;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.schedule.DriveTask;
 
 
-public class MatsimVrpData
+public interface OfflineVehicleTracker
 {
-    private final VrpData vrpData;
-    private final Scenario scenario;
-    private final MobsimAgentMappings agentMappings = new MobsimAgentMappings();
+    DriveTask getDriveTask();
 
 
-    public MatsimVrpData(VrpData vrpData, Scenario scenario)
-    {
-        this.vrpData = vrpData;
-        this.scenario = scenario;
-    }
+    int predictEndTime(int currentTime);
 
 
-    public VrpData getVrpData()
-    {
-        return vrpData;
-    }
+    int getInitialEndTime();
 
 
-    public Scenario getScenario()
-    {
-        return scenario;
-    }
-
-
-    public MobsimAgentMappings getMobsimAgentMappings()
-    {
-        return agentMappings;
-    }
+    /**
+     * Delay relative to the initial driveTask.getEndTime(), i.e. getInitialEndTime(), since the end
+     * time my be updated periodically, thus driveTask.getEndTime() may return different results
+     * over time)
+     */
+    int calculateCurrentDelay(int currentTime);
 }

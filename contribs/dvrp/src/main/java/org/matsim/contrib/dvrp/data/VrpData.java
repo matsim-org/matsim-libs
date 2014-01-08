@@ -25,8 +25,11 @@ import org.matsim.contrib.dvrp.data.model.*;
 
 
 public interface VrpData
-
 {
+    interface Parameters
+    {}
+
+
     List<Depot> getDepots();
 
 
@@ -42,7 +45,7 @@ public interface VrpData
     int getTime();
 
 
-    VrpDataParameters getParameters();
+    Parameters getParameters();
 
 
     void addDepot(Depot depot);
@@ -60,5 +63,5 @@ public interface VrpData
     void setTime(int time);
 
 
-    void setParameters(VrpDataParameters parameters);
+    void setParameters(Parameters parameters);
 }

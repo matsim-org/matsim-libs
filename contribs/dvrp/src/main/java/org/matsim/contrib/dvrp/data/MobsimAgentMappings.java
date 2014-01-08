@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,5 +19,31 @@
 
 package org.matsim.contrib.dvrp.data;
 
-public interface VrpDataParameters
-{}
+import java.util.*;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+
+
+/**
+ * Contains mappings: MobsimAgent.id => xxxx
+ */
+public class MobsimAgentMappings
+{
+    private final Map<Id, MobsimAgent> mobsimAgents = new HashMap<Id, MobsimAgent>();
+
+    private final Map<Id, PassengerCustomer> passengerCustomers = new HashMap<Id, PassengerCustomer>();
+
+
+    public Map<Id, MobsimAgent> getMobsimAgents()
+    {
+        return mobsimAgents;
+    }
+
+
+    public Map<Id, PassengerCustomer> getPassengerCustomers()
+    {
+        return passengerCustomers;
+    }
+}

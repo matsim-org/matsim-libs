@@ -24,7 +24,6 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.router.VrpPath;
@@ -41,12 +40,12 @@ public class Schedules2GIS
     private final PolylineFeatureFactory factory;
 
 
-    public Schedules2GIS(List<Vehicle> vehicles, MatsimVrpData data)
+    public Schedules2GIS(List<Vehicle> vehicles, String coordSystem)
     {
         this.vehicles = vehicles;
 
         factory = new PolylineFeatureFactory.Builder().//
-                setCrs(MGC.getCRS(data.getCoordSystem())).//
+                setCrs(MGC.getCRS(coordSystem)).//
                 setName("vrp_route").//
                 addAttribute("VEH_ID", Integer.class).//
                 addAttribute("VEH_NAME", String.class).//

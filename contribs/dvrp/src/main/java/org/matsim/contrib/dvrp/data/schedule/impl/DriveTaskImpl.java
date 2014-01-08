@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.dvrp.data.schedule.impl;
 
-import org.matsim.contrib.dvrp.data.online.*;
 import org.matsim.contrib.dvrp.data.schedule.DriveTask;
 import org.matsim.contrib.dvrp.router.VrpPath;
+import org.matsim.contrib.dvrp.tracker.OfflineVehicleTracker;
 
 
 public class DriveTaskImpl
@@ -29,15 +29,13 @@ public class DriveTaskImpl
     implements DriveTask
 {
     private final VrpPath path;
-    private VehicleTracker vehicleTracker;
+    private OfflineVehicleTracker vehicleTracker;
 
 
     public DriveTaskImpl(VrpPath path)
     {
         super(path.getDepartureTime(), path.getArrivalTime());
         this.path = path;
-
-        vehicleTracker = new OfflineVehicleTracker(this);//by default; can be changed later
     }
 
 
@@ -56,14 +54,14 @@ public class DriveTaskImpl
 
 
     @Override
-    public VehicleTracker getVehicleTracker()
+    public OfflineVehicleTracker getVehicleTracker()
     {
         return vehicleTracker;
     }
 
 
     @Override
-    public void setVehicleTracker(VehicleTracker vehicleTracker)
+    public void setVehicleTracker(OfflineVehicleTracker vehicleTracker)
     {
         this.vehicleTracker = vehicleTracker;
     }
@@ -72,7 +70,7 @@ public class DriveTaskImpl
     @Override
     public String toString()
     {
-        return "D(@" + path.getFromLink().getId() + "->@"
-                + path.getToLink().getId() + ")" + commonToString();
+        return "D(@" + path.getFromLink().getId() + "->@" + path.getToLink().getId() + ")"
+                + commonToString();
     }
 }

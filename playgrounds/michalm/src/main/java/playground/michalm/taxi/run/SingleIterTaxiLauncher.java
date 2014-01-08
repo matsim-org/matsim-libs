@@ -39,6 +39,7 @@ import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
@@ -375,7 +376,8 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
         pw.flush();
 
         if (vrpOutFiles) {
-            new Schedules2GIS(data.getVrpData().getVehicles(), data).write(vrpOutDirName);
+            new Schedules2GIS(data.getVrpData().getVehicles(), TransformationFactory.WGS84_UTM33N)
+                    .write(vrpOutDirName);
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));

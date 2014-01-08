@@ -24,9 +24,9 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.Request;
-import org.matsim.contrib.dvrp.data.online.VehicleTracker;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.optimizer.*;
+import org.matsim.contrib.dvrp.tracker.OnlineVehicleTracker;
 import org.matsim.contrib.dynagent.DynAgentLogic;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -76,7 +76,7 @@ public class VrpSimEngine
         int time = (int)qsim.getSimTimer().getTimeOfDay();
         data.getVrpData().setTime(time);
 
-        Map<Id, MobsimAgent> agents = data.getMobsimAgents();
+        Map<Id, MobsimAgent> agents = data.getMobsimAgentMappings().getMobsimAgents();
         for (MobsimAgent mobsimAgent : qsim.getAgents()) {
             agents.put(mobsimAgent.getId(), mobsimAgent);
         }
@@ -112,10 +112,10 @@ public class VrpSimEngine
     }
 
 
-    public void nextPositionReached(VehicleTracker vehicleTracker)
+    public void nextLinkEntered(OnlineVehicleTracker vehicleTracker)
     {
         boolean scheduleChanged = ((VrpOptimizerWithOnlineTracking)optimizer)
-                .nextPositionReached(vehicleTracker);
+                .nextLinkEntered(vehicleTracker);
 
         if (scheduleChanged) {
             notifyAgentLogics();

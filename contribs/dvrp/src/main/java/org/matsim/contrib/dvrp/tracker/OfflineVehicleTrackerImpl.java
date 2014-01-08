@@ -17,35 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.online;
+package org.matsim.contrib.dvrp.tracker;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.schedule.DriveTask;
 
 
-public interface VehicleTracker
+public class OfflineVehicleTrackerImpl
+    implements OfflineVehicleTracker
 {
-    DriveTask getDriveTask();
+    private final DriveTask driveTask;
+    private final int initialEndTime;
 
 
-    Link getLink();
+    public OfflineVehicleTrackerImpl(DriveTask driveTask)
+    {
+        this.driveTask = driveTask;
+        this.initialEndTime = driveTask.getEndTime();
+    }
 
 
-    int getLinkEnterTime();
+    @Override
+    public DriveTask getDriveTask()
+    {
+        return driveTask;
+    }
 
 
-    int predictLinkExitTime(int currentTime);
+    @Override
+    public int calculateCurrentDelay(int currentTime)
+    {
+        return Math.max(0, currentTime - initialEndTime);
+    }
 
 
-    int predictEndTime(int currentTime);
+    @Override
+    public int predictEndTime(int currentTime)
+    {
+        return Math.max(initialEndTime, currentTime);
+    }
 
 
-    int getInitialEndTime();
-
-
-    /**
-     * Delay relative to the initial driveTask.getEndTime() (the end time my be updated
-     * periodically, thus driveTask.getEndTime() may return different results over time)
-     */
-    int calculateCurrentDelay(int currentTime);
+    @Override
+    public int getInitialEndTime()
+    {
+        return initialEndTime;
+    }
 }

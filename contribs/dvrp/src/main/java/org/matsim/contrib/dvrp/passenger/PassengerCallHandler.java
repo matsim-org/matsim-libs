@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.Request;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
+
 //TODO this class is not finished yet
 public class PassengerCallHandler
     implements ActivityStartEventHandler
@@ -57,7 +58,7 @@ public class PassengerCallHandler
         Network network = data.getScenario().getNetwork();
         Link link = network.getLinks().get(event.getLinkId());
 
-        MobsimAgent passenger = data.getMobsimAgents().get(event.getPersonId());
+        MobsimAgent passenger = data.getMobsimAgentMappings().getMobsimAgents().get(event.getPersonId());
 
         double serveTime = passenger.getActivityEndTime();//TODO is this the best idea???
         //can we get the serveTime in any other way?

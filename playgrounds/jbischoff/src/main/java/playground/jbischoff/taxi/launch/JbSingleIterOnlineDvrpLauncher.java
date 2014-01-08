@@ -40,6 +40,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
@@ -249,7 +250,8 @@ import playground.michalm.taxi.run.TaxiLauncherUtils;
         pw.flush();
 
         if (vrpOutFiles) {
-            new Schedules2GIS(data.getVrpData().getVehicles(), data).write(vrpOutDirName);
+            new Schedules2GIS(data.getVrpData().getVehicles(), TransformationFactory.WGS84_UTM33N)
+                    .write(vrpOutDirName);
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));

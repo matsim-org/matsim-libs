@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,70 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.online;
+package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.schedule.DriveTask;
 
 
-public class OfflineVehicleTracker
-    implements VehicleTracker
+public interface OnlineVehicleTracker
+    extends OfflineVehicleTracker
 {
-    private final DriveTask driveTask;
-    private final int initialEndTime;
+    Link getLink();
 
 
-    public OfflineVehicleTracker(DriveTask driveTask)
-    {
-        this.driveTask = driveTask;
-        this.initialEndTime = driveTask.getEndTime();
-    }
+    int getLinkEnterTime();
 
 
-    @Override
-    public DriveTask getDriveTask()
-    {
-        return driveTask;
-    }
-
-
-    @Override
-    public Link getLink()
-    {
-        return driveTask.getPath().getFromLink();
-    }
-
-
-    @Override
-    public int getLinkEnterTime()
-    {
-        return driveTask.getBeginTime();
-    }
-
-    @Override
-    public int predictLinkExitTime(int currentTime)
-    {
-        return predictEndTime(currentTime);
-    }
-
-
-    @Override
-    public int calculateCurrentDelay(int currentTime)
-    {
-        return Math.max(0, currentTime - initialEndTime);
-    }
-
-
-    @Override
-    public int predictEndTime(int currentTime)
-    {
-        return Math.max(initialEndTime, currentTime);
-    }
-
-
-    @Override
-    public int getInitialEndTime()
-    {
-        return initialEndTime;
-    }
+    int predictLinkExitTime(int currentTime);
 }

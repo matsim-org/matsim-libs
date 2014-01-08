@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.data.online.VehicleTracker;
+import org.matsim.contrib.dvrp.tracker.OnlineVehicleTracker;
 
 
 public interface VrpOptimizerWithOnlineTracking
@@ -28,5 +28,5 @@ public interface VrpOptimizerWithOnlineTracking
     /**
      * @return true if reoptimization has been performed
      */
-    boolean nextPositionReached(VehicleTracker vehicleTracker);
+    boolean nextLinkEntered(OnlineVehicleTracker vehicleTracker);
 }
