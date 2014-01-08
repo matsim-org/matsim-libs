@@ -10,9 +10,7 @@ package playground.gregor.sim2d_v4.io.jaxb.gmlfeature;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSectionPropertyType;
 
 
 /**
@@ -43,9 +41,6 @@ import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSectionPropertyT
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "PolygonPropertyType")
-@XmlSeeAlso({
-    XMLSectionPropertyType.class
-})
 public class XMLPolygonPropertyType
     extends XMLGeometryAssociationType
 {

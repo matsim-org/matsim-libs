@@ -15,8 +15,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLFeatureCollectionType;
-import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSim2DEnvironmentSectionType;
+
+import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment03.XMLFeatureCollectionType;
 import playground.gregor.sim2d_v4.io.jaxb.xlink.XMLActuateType;
 import playground.gregor.sim2d_v4.io.jaxb.xlink.XMLShowType;
 import playground.gregor.sim2d_v4.io.jaxb.xlink.XMLTypeType;
@@ -85,14 +85,13 @@ public class XMLFeatureAssociationType {
      * 
      * @return
      *     possible object is
-     *     {@link JAXBElement }{@code <}{@link XMLSim2DEnvironmentSectionType }{@code >}
      *     {@link JAXBElement }{@code <}{@link XMLAbstractFeatureCollectionType }{@code >}
      *     {@link JAXBElement }{@code <}{@link XMLFeatureCollectionType }{@code >}
      *     {@link JAXBElement }{@code <}{@link XMLAbstractFeatureType }{@code >}
      *     
      */
     public JAXBElement<? extends XMLAbstractFeatureType> getFeature() {
-        return feature;
+        return this.feature;
     }
 
     /**
@@ -100,14 +99,13 @@ public class XMLFeatureAssociationType {
      * 
      * @param value
      *     allowed object is
-     *     {@link JAXBElement }{@code <}{@link XMLSim2DEnvironmentSectionType }{@code >}
      *     {@link JAXBElement }{@code <}{@link XMLAbstractFeatureCollectionType }{@code >}
      *     {@link JAXBElement }{@code <}{@link XMLFeatureCollectionType }{@code >}
      *     {@link JAXBElement }{@code <}{@link XMLAbstractFeatureType }{@code >}
      *     
      */
     public void setFeature(JAXBElement<? extends XMLAbstractFeatureType> value) {
-        this.feature = ((JAXBElement<? extends XMLAbstractFeatureType> ) value);
+        this.feature = (value);
     }
 
     /**
@@ -119,7 +117,7 @@ public class XMLFeatureAssociationType {
      *     
      */
     public String getRemoteSchema() {
-        return remoteSchema;
+        return this.remoteSchema;
     }
 
     /**
@@ -143,10 +141,10 @@ public class XMLFeatureAssociationType {
      *     
      */
     public XMLTypeType getType() {
-        if (type == null) {
+        if (this.type == null) {
             return XMLTypeType.SIMPLE;
         } else {
-            return type;
+            return this.type;
         }
     }
 
@@ -171,7 +169,7 @@ public class XMLFeatureAssociationType {
      *     
      */
     public String getHref() {
-        return href;
+        return this.href;
     }
 
     /**
@@ -195,7 +193,7 @@ public class XMLFeatureAssociationType {
      *     
      */
     public String getRole() {
-        return role;
+        return this.role;
     }
 
     /**
@@ -219,7 +217,7 @@ public class XMLFeatureAssociationType {
      *     
      */
     public String getArcrole() {
-        return arcrole;
+        return this.arcrole;
     }
 
     /**
@@ -243,7 +241,7 @@ public class XMLFeatureAssociationType {
      *     
      */
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
     /**
@@ -267,7 +265,7 @@ public class XMLFeatureAssociationType {
      *     
      */
     public XMLShowType getShow() {
-        return show;
+        return this.show;
     }
 
     /**
@@ -291,7 +289,7 @@ public class XMLFeatureAssociationType {
      *     
      */
     public XMLActuateType getActuate() {
-        return actuate;
+        return this.actuate;
     }
 
     /**

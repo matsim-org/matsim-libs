@@ -64,8 +64,8 @@ public class Sim2DRunner implements IterationStartsListener{
 //		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
 		sim2dsc.connect(sc);
 		
-		c.qsim().setEndTime(120);
-//		c.qsim().setEndTime(23*3600);
+//		c.qsim().setEndTime(120);
+		c.qsim().setEndTime(23*3600);
 //		c.qsim().setEndTime(41*60);//+30*60);
 
 

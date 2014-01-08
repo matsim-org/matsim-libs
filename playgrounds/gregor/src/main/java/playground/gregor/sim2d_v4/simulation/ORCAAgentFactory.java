@@ -60,6 +60,7 @@ public class ORCAAgentFactory implements Sim2DAgentFactory {
 			KDTreeNeighbors nn = new KDTreeNeighbors(agent, this.config);
 			nn.setRangeAndMaxNrOfNeighbors(8, 5);			
 			VelocityUpdater vu = new ORCAVelocityUpdater(new FNDDependentSpeed(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
+//			VelocityUpdater vu = new ORCAVelocityUpdater(new FNDDependentSpeed(),new PathAndDrivingDirection(agent, ls), nn, this.config, agent);
 			agent.setVelocityUpdater(vu);
 		}
 		

@@ -37,7 +37,7 @@ public class Sim2DRunnerTest extends MatsimTestCase{
 		Config c = ConfigUtils.createConfig();
 		c.network().setInputFile(getInputDirectory()+"/network.xml.gz");
 		c.plans().setInputFile(getInputDirectory()+"/population.xml.gz");
-		c.controler().setLastIteration(10);
+		c.controler().setLastIteration(0);
 		c.strategy().addParam("Module_1", "ReRoute");
 		c.strategy().addParam("ModuleProbability_1", ".1");
 		c.strategy().addParam("ModuleDisableAfterIteration_1", "250");

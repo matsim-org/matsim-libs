@@ -105,8 +105,8 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 //		}
 		LineSegment fl = null;
 		if (sec != null) {
-			fl = getTouchingSegment(seg, sec.getOpeningSegments());
-			
+//			fl = getTouchingSegment(seg, sec.getOpeningSegments());
+			fl = sec.getOpening(l.getToNode().getId());
 		}
 		
 		
@@ -125,11 +125,8 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			
 
 			
-			double fdx = fl.x1-fl.x0;
-			double fdy = fl.y1-fl.y0;
-			double ll = Math.sqrt(fdx*fdx + fdy*fdy); 
-			fdx /= ll;
-			fdy /= ll;
+			double fdx = fl.dx;
+			double fdy = fl.dy;
 			fdx *= .4;
 			fdy *= .4;
 			
@@ -137,7 +134,9 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			targetLine.x0 = fl.x1 - fdx;
 			targetLine.y0 = fl.y1 - fdy;
 			targetLine.x1 = fl.x0 + fdx;
-			targetLine.y1 = fl.y0 + fdy;			
+			targetLine.y1 = fl.y0 + fdy;	
+			targetLine.dx = -fl.dx;
+			targetLine.dy = -fl.dy;
 			
 		} else {
 //			//HACK July '13 [gl]
@@ -149,9 +148,14 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			fl.x1 = seg.x1 + width/2*li.dy;// + rY;
 			fl.y1 = seg.y1 - width/2*li.dx;// + rX;
 			targetLine = fl;
+			targetLine.dx = -li.dy;
+			targetLine.dy = li.dx;
 		}
 		li.finishLine = fl;
-		li.width = 10; //TODO section width [gl Jan'13];
+		double dx2 = targetLine.x0-targetLine.x1;
+		double dy2 = targetLine.y0-targetLine.y1;
+		li.width = Math.sqrt(dx2*dx2+dy2*dy2);
+		
 		li.targetLine = targetLine;
 		return li;
 	}

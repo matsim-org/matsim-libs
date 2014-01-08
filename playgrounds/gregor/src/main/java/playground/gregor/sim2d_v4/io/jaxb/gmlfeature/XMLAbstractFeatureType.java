@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSim2DEnvironmentSectionType;
 
 
 /**
@@ -56,7 +55,7 @@ import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLSim2DEnvironment
     "boundedBy"
 })
 @XmlSeeAlso({
-    XMLSim2DEnvironmentSectionType.class,
+//    XMLSim2DEnvironmentSectionType.class,
     XMLAbstractFeatureCollectionBaseType.class
 })
 public abstract class XMLAbstractFeatureType {
@@ -79,7 +78,7 @@ public abstract class XMLAbstractFeatureType {
      *     
      */
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     /**
@@ -103,7 +102,7 @@ public abstract class XMLAbstractFeatureType {
      *     
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -127,7 +126,7 @@ public abstract class XMLAbstractFeatureType {
      *     
      */
     public XMLBoundingShapeType getBoundedBy() {
-        return boundedBy;
+        return this.boundedBy;
     }
 
     /**
@@ -151,7 +150,7 @@ public abstract class XMLAbstractFeatureType {
      *     
      */
     public String getFid() {
-        return fid;
+        return this.fid;
     }
 
     /**

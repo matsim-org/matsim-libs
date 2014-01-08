@@ -50,7 +50,7 @@ public class PopulationGenerator {
 
 	public static void main (String [] args) {
 		String config = "/Users/laemmel/devel/gct/input/config.xml";
-		String s2config = "/Users/laemmel/devel/gct/input/s2d_config.xml";
+		String s2config = "/Users/laemmel/devel/gct/input/s2d_config_v0.3.xml";
 
 
 		Config conf = ConfigUtils.loadConfig(config);

@@ -42,20 +42,27 @@ public class Sim2DEnvironment implements Identifiable{
 	private final Map<Link,Section> linkSectionMapping = new HashMap<Link,Section>();
 	private Network net;
 	private  Id id = null;
-	
-	
-	
+
+
+
 	public void setEnvelope(Envelope e) {
 		this.envelope = e;
 	}
-	
+
 	public Section createSection(Id id, Polygon p, int[] openings,
 			Id[] neighbors, int level) {
 		//Hack: having openings in ascending order makes things much easier, so wie do it here [gl Jan' 13]
 		if (openings != null)
-		Arrays.sort(openings);
+			Arrays.sort(openings);
 		Section s = new Section(id,p,openings,neighbors, level);
-		
+
+		return s;
+	}
+
+	private Section createSection(Id id2, Polygon p, int[] openings,
+			Id[] neighbors, int level, Id[] neighborsIds) {
+		Section s = new Section(id2,p,openings,neighbors,neighborsIds,level);
+
 		return s;
 	}
 
@@ -66,9 +73,18 @@ public class Sim2DEnvironment implements Identifiable{
 		return s;
 	}
 
+	public Section createAndAddSection(Id id, Polygon p, int[] openings,
+			Id[] neighbors, int level, Id[] neighborsIds) {
+		Section s = createSection(id, p, openings, neighbors, level, neighborsIds);
+		this.sections.put(id, s);
+		return s;
+	}
+
+
+
 	public void setCRS(CoordinateReferenceSystem crs) {
 		this.crs = crs;
-		
+
 	}
 
 	public Envelope getEnvelope() {
@@ -87,15 +103,15 @@ public class Sim2DEnvironment implements Identifiable{
 	public void setNetwork(Network net) {
 		this.net = net;
 	}
-	
+
 	public Network getEnvironmentNetwork(){
 		return this.net;
 	}
-	
+
 	public Section getSection(Link link) {
 		return this.linkSectionMapping.get(link);
 	}
-	
+
 	/*package*/ void addLinkSectionMapping(Link link, Section sec) {
 		Section tmp = this.linkSectionMapping.put(link, sec);
 		if (tmp != null) {//TODO this is not long a requirement, so fix it!! [GL Oct '13]
@@ -107,14 +123,14 @@ public class Sim2DEnvironment implements Identifiable{
 	public Id getId() {
 		return this.id;
 	}
-	
+
 	public void setId(Id id) {
 		this.id = id;
 	}
 
 
 
-	
 
-	
+
+
 }

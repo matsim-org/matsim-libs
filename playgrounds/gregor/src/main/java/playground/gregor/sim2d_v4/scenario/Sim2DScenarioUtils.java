@@ -20,14 +20,7 @@
 
 package playground.gregor.sim2d_v4.scenario;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
+import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader03;
 
 public abstract class Sim2DScenarioUtils {
 	
@@ -35,18 +28,18 @@ public abstract class Sim2DScenarioUtils {
 		Sim2DScenario scenario = new Sim2DScenario(conf);
 		for (String envPath : conf.getSim2DEnvironmentPaths()){
 			Sim2DEnvironment env = new Sim2DEnvironment();
-			new Sim2DEnvironmentReader02(env, false).readFile(envPath);
+			new Sim2DEnvironmentReader03(env, false).readFile(envPath);
 			scenario.addSim2DEnvironment(env);
 			Sim2DSectionPreprocessor.preprocessSections(env);
-//			Sim2DEnvironmentNetworkBuilder.buildAndSetEnvironmentNetwork(env);
-			String netPath = conf.getNetworkPath(envPath);
-			if (netPath != null) { //not yet clear if this can be null, maybe it even must be null [gl dec 12]
-				Config c = ConfigUtils.createConfig();
-				Scenario sc = ScenarioUtils.createScenario(c);
-				new MatsimNetworkReader(sc).readFile(netPath);
-				Network net = sc.getNetwork();
-				env.setNetwork(net);
-			}
+			Sim2DEnvironmentNetworkBuilder.buildAndSetEnvironmentNetwork(env);
+//			String netPath = conf.getNetworkPath(envPath);
+//			if (netPath != null) { //not yet clear if this can be null, maybe it even must be null [gl dec 12]
+//				Config c = ConfigUtils.createConfig();
+//				Scenario sc = ScenarioUtils.createScenario(c);
+//				new MatsimNetworkReader(sc).readFile(netPath);
+//				Network net = sc.getNetwork();
+//				env.setNetwork(net);
+//			}
 		}
 		return scenario;
 	}

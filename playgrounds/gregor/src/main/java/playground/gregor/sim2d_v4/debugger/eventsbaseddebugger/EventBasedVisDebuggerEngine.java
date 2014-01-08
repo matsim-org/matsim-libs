@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -119,9 +120,9 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 						Coordinate c0 = sec.getPolygon().getExteriorRing().getCoordinateN(i);
 						Coordinate c1 = sec.getPolygon().getExteriorRing().getCoordinateN(i+1);
 						if (c0.x < c1.x) {
-							this.vis.addDashedLineStatic(c0.x, c0.y, c1.x, c1.y, lp.r,lp.g,lp.b,lp.a, 50,.25,.1);
+							this.vis.addDashedLineStatic(c0.x, c0.y, c1.x, c1.y, lp.r,lp.g,lp.b,lp.a, 40,.25,.1);
 						} else {
-							this.vis.addDashedLineStatic(c1.x, c1.y, c0.x, c0.y, lp.r,lp.g,lp.b,lp.a, 50,.25,.1);
+							this.vis.addDashedLineStatic(c1.x, c1.y, c0.x, c0.y, lp.r,lp.g,lp.b,lp.a, 40,.25,.1);
 						}
 						if (oct < open.length-1) {
 							oct++;
@@ -148,7 +149,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 					offset = 0;
 //										this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
 
-					//					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 100);
+					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 90);
 				}
 			}
 		}
@@ -168,10 +169,10 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 				//					handled.add(key);
 				//				}
 
-//				Coord c0 = l.getFromNode().getCoord();
-//				Coord c1 = l.getToNode().getCoord();
+				Coord c0 = l.getFromNode().getCoord();
+				Coord c1 = l.getToNode().getCoord();
 //				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, lp.minScale,.1,.9);
-//				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, lp.minScale);
+				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
 //				this.vis.addCircleStatic(c0.getX(), c0.getY(), .04f, 0, 0, 0, 255, 0);
 //				this.vis.addCircleStatic(c1.getX(), c1.getY(), .04f, 0, 0, 0, 255, 0);
 //				double dx = c1.getX()-c0.getX();
@@ -233,7 +234,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		//		if (event.getAgent() != null) {
 		//			this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 200);
 		//		} else {
-		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 200);
+		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 60);
 //		this.vis.addText(event.getX(),event.getY(), event.getAgent().toString(), 50);
 		//		}
 

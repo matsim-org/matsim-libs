@@ -45,6 +45,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
@@ -71,15 +72,15 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ThreeDoors {
+public class Square {
 	
-	private static String inputDir = "/Users/laemmel/devel/3doors/input";
-	private static String outputDir = "/Users/laemmel/devel/3doors/output";
+	private static String inputDir = "/Users/laemmel/devel/square/input";
+	private static String outputDir = "/Users/laemmel/devel/square/output";
 
 
 	private static final boolean uni = true;
 
-	private static final int nrAgents = 2000;
+	private static final int nrAgents = 100;
 
 	public static final double SEPC_FLOW =0.8;//1.2;
 
@@ -272,7 +273,8 @@ public class ThreeDoors {
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k3"));
+			String dest = MatsimRandom.getRandom().nextBoolean() ? "k6_rev" : "k4_rev";
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl(dest));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -287,7 +289,7 @@ public class ThreeDoors {
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k0_rev"));
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k6_rev"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -298,6 +300,21 @@ public class ThreeDoors {
 			pers.addPlan(plan);
 			Activity act0;
 			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k3_rev"));
+			act0.setEndTime(t);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("car");
+			plan.addLeg(leg);
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k0_rev"));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+		}
+		
+		for (int i = 3*nrAgents; i < 4*nrAgents; i++) {
+			Person pers = fac.createPerson(new IdImpl("e"+i));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0;
+			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k6"));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
@@ -327,21 +344,23 @@ public class ThreeDoors {
 
 		
 		{
-			int[] open = {1,5,7};
-			Id [] openingIds = new Id[]{new IdImpl("n0"),new IdImpl("n2"),new IdImpl("n4")};
+			int[] open = {1,4,7,10};
+			Id [] openingIds = new Id[]{new IdImpl("n0"),new IdImpl("n6"),new IdImpl("n2"),new IdImpl("n4")};
 			GeometryFactory geofac = new GeometryFactory();
 			Coordinate c0 = new Coordinate(0,0);
-			Coordinate c1 = new Coordinate(0,35.5);
-			Coordinate c2 = new Coordinate(0,38.5);
-			Coordinate c3 = new Coordinate(0,40);
-			Coordinate c4 = new Coordinate(20,40);
-			Coordinate c5 = new Coordinate(20,38.5);
-			Coordinate c6 = new Coordinate(20,35.5);
-			Coordinate c7 = new Coordinate(20,4.5);
-			Coordinate c8 = new Coordinate(20,1.5);
+			Coordinate c1 = new Coordinate(0,8.5);
+			Coordinate c2 = new Coordinate(0,11.5);
+			Coordinate c3 = new Coordinate(0,20);
+			Coordinate c4 = new Coordinate(8.5,20);
+			Coordinate c5 = new Coordinate(11.5,20);
+			Coordinate c6 = new Coordinate(20,20);
+			Coordinate c7 = new Coordinate(20,11.5);
+			Coordinate c8 = new Coordinate(20,8.5);
 			Coordinate c9 = new Coordinate(20,0);
-			Coordinate c10 = new Coordinate(0,0);
-			Coordinate[] coords = {c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10};
+			Coordinate c10 = new Coordinate(11.5,0);
+			Coordinate c11 = new Coordinate(8.5,0);
+			Coordinate c12 = new Coordinate(0,0);
+			Coordinate[] coords = {c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
 			Section sec = env.createAndAddSection(new IdImpl("sec0"), p, open, null , 0,openingIds);
@@ -354,20 +373,21 @@ public class ThreeDoors {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node m0 = fac.createNode(new IdImpl("m0"), new CoordImpl(-40,37));
-		Node m1 = fac.createNode(new IdImpl("m1"), new CoordImpl(-20,37.001));
+		Node m0 = fac.createNode(new IdImpl("m0"), new CoordImpl(-40,10));
+		Node m1 = fac.createNode(new IdImpl("m1"), new CoordImpl(-20,10.001));
+		Node n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(0,10));
 		
-		Node n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(0,37));
+		Node n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(20,10));
+		Node m2 = fac.createNode(new IdImpl("m2"), new CoordImpl(40,10.001));
+		Node m3 = fac.createNode(new IdImpl("m3"), new CoordImpl(60,10));
 		
-		Node n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(20,37));
+		Node m4 = fac.createNode(new IdImpl("m4"), new CoordImpl(10.001,-20));
+		Node m5 = fac.createNode(new IdImpl("m5"), new CoordImpl(10,-40));
+		Node n4 = fac.createNode(new IdImpl("n4"), new CoordImpl(10,0));
 		
-		Node m2 = fac.createNode(new IdImpl("m2"), new CoordImpl(40,37.001));
-		Node m3 = fac.createNode(new IdImpl("m3"), new CoordImpl(60,37));
-		
-		Node m4 = fac.createNode(new IdImpl("m4"), new CoordImpl(60,3));
-		Node m5 = fac.createNode(new IdImpl("m5"), new CoordImpl(40,3.001));
-		
-		Node n4 = fac.createNode(new IdImpl("n4"), new CoordImpl(20,3));
+		Node m6 = fac.createNode(new IdImpl("m6"), new CoordImpl(10.001,40));
+		Node m7 = fac.createNode(new IdImpl("m7"), new CoordImpl(10,60));
+		Node n6 = fac.createNode(new IdImpl("n6"), new CoordImpl(10,20));
 		
 		
 		net.addNode(m0);
@@ -376,9 +396,12 @@ public class ThreeDoors {
 		net.addNode(m3);
 		net.addNode(m4);
 		net.addNode(m5);
+		net.addNode(m6);
+		net.addNode(m7);
 		net.addNode(n0);
 		net.addNode(n2);
 		net.addNode(n4);
+		net.addNode(n6);
 		double flow = SEPC_FLOW * 3;
 		
 		
@@ -394,11 +417,17 @@ public class ThreeDoors {
 		Link k2Rev = fac.createLink(new IdImpl("k2_rev"), m2, n2);
 		Link k3Rev = fac.createLink(new IdImpl("k3_rev"), m3, m2);
 		
-		Link k4 = fac.createLink(new IdImpl("k4"), m4, m5);
-		Link k5 = fac.createLink(new IdImpl("k5"), m5, n4);
+		Link k4 = fac.createLink(new IdImpl("k4"), m5, m4);
+		Link k5 = fac.createLink(new IdImpl("k5"), m4, n4);
 
-		Link k4Rev = fac.createLink(new IdImpl("k4_rev"), m5, m4);
-		Link k5Rev = fac.createLink(new IdImpl("k5_rev"), n4, m5);
+		Link k4Rev = fac.createLink(new IdImpl("k4_rev"), m4, m5);
+		Link k5Rev = fac.createLink(new IdImpl("k5_rev"), n4, m4);
+		
+		Link k6 = fac.createLink(new IdImpl("k6"), m7, m6);
+		Link k7 = fac.createLink(new IdImpl("k7"), m6, n6);
+
+		Link k6Rev = fac.createLink(new IdImpl("k6_rev"), m6, m7);
+		Link k7Rev = fac.createLink(new IdImpl("k7_rev"), n6, m6);
 		
 		
 		Set<String> modes = new HashSet<String>();
@@ -409,13 +438,16 @@ public class ThreeDoors {
 		k3.setLength(20);
 		k4.setLength(20);
 		k5.setLength(20);
+		k6.setLength(20);
+		k7.setLength(20);
 		k0Rev.setLength(20);
 		k1Rev.setLength(20);
 		k2Rev.setLength(20);
 		k3Rev.setLength(20);
 		k4Rev.setLength(20);
 		k5Rev.setLength(20);
-		
+		k6Rev.setLength(20);
+		k7Rev.setLength(20);		
 		
 
 		k0.setAllowedModes(modes);
@@ -424,14 +456,16 @@ public class ThreeDoors {
 		k3.setAllowedModes(modes);
 		k4.setAllowedModes(modes);
 		k5.setAllowedModes(modes);
-
+		k6.setAllowedModes(modes);
+		k7.setAllowedModes(modes);
 		k0Rev.setAllowedModes(modes);
 		k1Rev.setAllowedModes(modes);
 		k2Rev.setAllowedModes(modes);
 		k3Rev.setAllowedModes(modes);
 		k4Rev.setAllowedModes(modes);
 		k5Rev.setAllowedModes(modes);
-		
+		k6Rev.setAllowedModes(modes);
+		k7Rev.setAllowedModes(modes);		
 
 		k0.setFreespeed(1.34);
 		k1.setFreespeed(1.34);
@@ -439,6 +473,8 @@ public class ThreeDoors {
 		k3.setFreespeed(1.34);
 		k4.setFreespeed(1.34);
 		k5.setFreespeed(1.34);
+		k6.setFreespeed(1.34);
+		k7.setFreespeed(1.34);
 		
 		k0Rev.setFreespeed(1.34);
 		k1Rev.setFreespeed(1.34);
@@ -446,7 +482,8 @@ public class ThreeDoors {
 		k3Rev.setFreespeed(1.34);
 		k4Rev.setFreespeed(1.34);
 		k5Rev.setFreespeed(1.34);
-		
+		k6Rev.setFreespeed(1.34);
+		k7Rev.setFreespeed(1.34);		
 		
 		k0.setCapacity(flow);
 		k1.setCapacity(flow);
@@ -454,6 +491,8 @@ public class ThreeDoors {
 		k3.setCapacity(flow);
 		k4.setCapacity(flow);
 		k5.setCapacity(flow);
+		k6.setCapacity(flow);
+		k7.setCapacity(flow);
 		
 		k0Rev.setCapacity(flow);
 		k1Rev.setCapacity(flow);
@@ -461,6 +500,8 @@ public class ThreeDoors {
 		k3Rev.setCapacity(flow);
 		k4Rev.setCapacity(flow);
 		k5Rev.setCapacity(flow);
+		k6Rev.setCapacity(flow);
+		k7Rev.setCapacity(flow);
 		
 		double lanes = 3/0.71;
 		k0.setNumberOfLanes(lanes);
@@ -469,6 +510,8 @@ public class ThreeDoors {
 		k3.setNumberOfLanes(lanes);
 		k4.setNumberOfLanes(lanes);
 		k5.setNumberOfLanes(lanes);
+		k6.setNumberOfLanes(lanes);
+		k7.setNumberOfLanes(lanes);
 		
 		k0Rev.setNumberOfLanes(lanes);
 		k1Rev.setNumberOfLanes(lanes);
@@ -476,13 +519,17 @@ public class ThreeDoors {
 		k3Rev.setNumberOfLanes(lanes);
 		k4Rev.setNumberOfLanes(lanes);
 		k5Rev.setNumberOfLanes(lanes);
-
+		k6Rev.setNumberOfLanes(lanes);
+		k7Rev.setNumberOfLanes(lanes);
+		
 		net.addLink(k0);
 		net.addLink(k1);
 		net.addLink(k2);
 		net.addLink(k3);
 		net.addLink(k4);
 		net.addLink(k5);
+		net.addLink(k6);
+		net.addLink(k7);
 		
 		net.addLink(k0Rev);
 		net.addLink(k1Rev);
@@ -490,7 +537,9 @@ public class ThreeDoors {
 		net.addLink(k3Rev);
 		net.addLink(k4Rev);
 		net.addLink(k5Rev);
-
+		net.addLink(k6Rev);
+		net.addLink(k7Rev);
+		
 		((NetworkImpl)net).setCapacityPeriod(1);
 		((NetworkImpl)net).setEffectiveCellSize(.26);
 		((NetworkImpl)net).setEffectiveLaneWidth(.71);

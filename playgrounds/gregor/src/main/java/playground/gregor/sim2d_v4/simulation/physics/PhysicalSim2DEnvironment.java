@@ -41,9 +41,9 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
-import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.VoronoiDiagramCells;
+import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
@@ -54,6 +54,7 @@ import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
@@ -208,21 +209,37 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 
 		//retrieve opening
 		LineSegment opening = null;
+		Id oId = hiResLink.getLink().getFromNode().getId();
+		opening = sec.getOpening(oId);
 		Coord c = hiResLink.getLink().getFromNode().getCoord();
 		double cx = c.getX();
 		double cy = c.getY();
-		for (LineSegment op : sec.getOpeningSegments()) {
-			if (CGAL.isOnVector(cx, cy, op.x0, op.y0, op.x1, op.y1)){ 
-				double cx1 = hiResLink.getLink().getToNode().getCoord().getX();
-				double cy1 = hiResLink.getLink().getToNode().getCoord().getX();
-				double left1 = CGAL.isLeftOfLine(op.x0, op.y0, cx, cy, cx1, cy1);
-				double left2 = CGAL.isLeftOfLine(op.x1, op.y1, cx, cy, cx1, cy1);
-				if (left1*left2 < 0) {
-					opening = op;
-					break;
-				}
-			}
+		
+		Section s = sec.getNeighbor(opening);
+		if (s != null) {
+			log.info("transition area already exist: " + s.getId());
+			PhysicalSim2DSection ta = getPhysicalSim2DSection(s);
+			Point cc = s.getPolygon().getCentroid();
+			double spawnX = cc.getX();
+			double spawnY = cc.getY();
+			
+			hiResLink.createDepartureBox((TransitionAreaI) ta,spawnX,spawnY);
+			return;
 		}
+		
+		
+//		for (LineSegment op : sec.getOpeningSegments()) {
+//			if (CGAL.isOnVector(cx, cy, op.x0, op.y0, op.x1, op.y1)){ 
+//				double cx1 = hiResLink.getLink().getToNode().getCoord().getX();
+//				double cy1 = hiResLink.getLink().getToNode().getCoord().getX();
+//				double left1 = CGAL.isLeftOfLine(op.x0, op.y0, cx, cy, cx1, cy1);
+//				double left2 = CGAL.isLeftOfLine(op.x1, op.y1, cx, cy, cx1, cy1);
+//				if (left1*left2 < 0) {
+//					opening = op;
+//					break;
+//				}
+//			}
+//		}
 
 		if (opening == null) {
 			double width = 8;
@@ -274,13 +291,12 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		int [] openings = {3,1};
 		Id [] neighbors = {id};
 		int level = sec.getLevel();
-		Section s = this.env.createSection(boxId, p, openings, neighbors, level);
+		s = this.env.createSection(boxId, p, openings, neighbors, level);
 		Sim2DSectionPreprocessor.genLineSegments(s);
-		double spawnX = (c0.x+c2.x)/2;
-		double spawnY = (c0.y+c2.y)/2;
 
-		double flowCap = hiResLink.getLink().getFromNode().getInLinks().values().iterator().next().getCapacity() / this.sim2dsc.getMATSimScenario().getNetwork().getCapacityPeriod();
-		TransitionAreaII ta = new TransitionAreaII(s,this.sim2dsc,this,(int) flowCap+1);
+		double area = 5*width;
+//		double flowCap = hiResLink.getLink().getFromNode().getInLinks().values().iterator().next().getCapacity() / this.sim2dsc.getMATSimScenario().getNetwork().getCapacityPeriod();
+		TransitionAreaII ta = new TransitionAreaII(s,this.sim2dsc,this,(int) (area*5.4));
 		this.psecs.put(s.getId(),ta);
 		this.psecsSecs.put(s, ta);
 
@@ -288,12 +304,14 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		LineSegment o = s.getOpeningSegments().get(1);
 		s.addOpeningNeighborMapping(o,sec);
 		sec.addOpeningNeighborMapping(opening, s);
+		double spawnX = (c0.x+c2.x)/2;
+		double spawnY = (c0.y+c2.y)/2;
 		hiResLink.createDepartureBox(ta,spawnX,spawnY);
 
 //		//DEBUG
-//		for ( LineSegment bo : ta.getObstacles()) {
-//			this.eventsManager.processEvent(new LineEvent(0,bo,true,0,0,0,255,0));0
-//		}
+		for ( LineSegment bo : s.getObstacleSegments()) {
+			this.eventsManager.processEvent(new LineEvent(0,bo,true,192,0,0,255,0));
+		}
 		//		} else {
 		//			TransitionArea ta = new TransitionArea(s,this.sim2dsc,this,(int) flowCap+1);
 		//			this.psecs.put(s.getId(),ta);

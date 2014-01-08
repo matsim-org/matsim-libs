@@ -48,7 +48,7 @@ public class Sim2DScenario {
 
 	private Scenario sc;
 	
-	/*package*/ Sim2DScenario(Sim2DConfig conf) {
+	public Sim2DScenario(Sim2DConfig conf) {
 		this.config = conf;
 	}
 	

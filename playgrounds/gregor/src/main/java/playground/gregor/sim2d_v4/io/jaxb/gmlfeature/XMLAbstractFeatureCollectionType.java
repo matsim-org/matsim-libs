@@ -10,11 +10,10 @@ package playground.gregor.sim2d_v4.io.jaxb.gmlfeature;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLFeatureCollectionType;
 
 
 /**
@@ -44,9 +43,9 @@ import playground.gregor.sim2d_v4.io.jaxb.sim2denvironment02.XMLFeatureCollectio
 @XmlType(name = "AbstractFeatureCollectionType", propOrder = {
     "featureMember"
 })
-@XmlSeeAlso({
-    XMLFeatureCollectionType.class
-})
+//@XmlSeeAlso({
+//    XMLFeatureCollectionType.class
+//})
 public abstract class XMLAbstractFeatureCollectionType
     extends XMLAbstractFeatureCollectionBaseType
 {
@@ -76,8 +75,8 @@ public abstract class XMLAbstractFeatureCollectionType
      * 
      */
     public List<XMLFeatureAssociationType> getFeatureMember() {
-        if (featureMember == null) {
-            featureMember = new ArrayList<XMLFeatureAssociationType>();
+        if (this.featureMember == null) {
+            this.featureMember = new ArrayList<XMLFeatureAssociationType>();
         }
         return this.featureMember;
     }

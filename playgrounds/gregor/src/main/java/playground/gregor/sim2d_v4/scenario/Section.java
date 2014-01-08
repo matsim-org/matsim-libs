@@ -46,13 +46,26 @@ public class Section implements Identifiable {
 	
 	private final Map<LineSegment,Section> neighbors = new HashMap<LineSegment,Section>();
 	private final Map<Section,LineSegment> neighborsInvMapping = new HashMap<Section, LineSegment>();
+	private final Map<Id,LineSegment> openingsMappings = new HashMap<Id,LineSegment>(); 
+	private Id[] openingMATSimIds;
 
 	/*package*/ Section(Id id, Polygon p, int[] openings, Id[] neighbors, int level) {
+		this(id,p,openings,neighbors,null,level);
+	}
+	
+	/*package*/ Section(Id id, Polygon p, int[] openings, Id[] neighbors, Id[] openingsMATSimIds, int level) {
 		this.id = id;
 		this.p = p; //maybe we can sparse the polygon here and take the coordinate array of its exterior ring instead [gl Jan' 2013]
 		this.openingsIDs = openings;
 		this.neighborsIDs = neighbors;
 		this.level = level;
+		this.openingMATSimIds = openingsMATSimIds;
+
+	}
+	
+	@Deprecated //for transition period only
+	public void setOpeningMATSimIds(Id [] ids) {
+		this.openingMATSimIds = ids;
 	}
 
 	public Polygon getPolygon() {
@@ -65,6 +78,10 @@ public class Section implements Identifiable {
 
 	public int[] getOpenings() {
 		return this.openingsIDs;
+	}
+	
+	public Id[] getOpeningsIds() {
+		return this.openingMATSimIds;
 	}
 	
 	public Id[] getNeighbors() {
@@ -97,7 +114,9 @@ public class Section implements Identifiable {
 	
 	public void addOpeningNeighborMapping(LineSegment opening, Section neighbor) {
 		this.neighborsInvMapping.put(neighbor, opening);
-		this.neighbors.put(opening, neighbor);
+		if (this.neighbors.put(opening, neighbor) != null){
+//			throw new RuntimeException();
+		};
 	}
 	
 	/*package*/ void setObstacles(List<LineSegment> obst) {
@@ -106,8 +125,16 @@ public class Section implements Identifiable {
 	
 	/*package*/ void setOpenings(List<LineSegment> open) {
 		this.openings = open;
+		if (this.openingMATSimIds != null) {
+			for (int i = 0; i < open.size(); i++) {
+				this.openingsMappings.put(this.openingMATSimIds[i], open.get(i));
+			}
+		}
 	}
 	
+	public LineSegment getOpening(Id id) {
+		return this.openingsMappings.get(id);
+	}
 	public List<LineSegment> getOpeningSegments() {
 		return this.openings;
 	}
