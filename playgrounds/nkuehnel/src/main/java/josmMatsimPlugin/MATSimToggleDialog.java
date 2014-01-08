@@ -39,11 +39,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		LayerChangeListener, SelectionChangedListener {
 	private JTable table;
 	private Map<Layer, MATSimTableModel> tableModels = new HashMap<Layer, MATSimTableModel>();
-	protected final static JCheckBox renderMatsim = new JCheckBox(
-			"Activate MATSim Renderer");
-	protected final static JCheckBox showIds = new JCheckBox("Show Ids");
-
-
 
 
 	public MATSimToggleDialog() {
@@ -57,28 +52,8 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 		JScrollPane tableContainer = new JScrollPane(table);
 
-		JPanel overview = new JPanel(new BorderLayout());
-		overview.add(tableContainer, BorderLayout.CENTER);
 
-		JPanel options = new JPanel(new GridBagLayout());
-		GridBagConstraints cOptions = new GridBagConstraints();
-
-		showIds.addActionListener(new ShowIdsListener());
-		renderMatsim.addActionListener(new RenderMatsimListener());
-
-		showIds.setSelected(Defaults.showIds);
-		renderMatsim.setSelected(Defaults.renderMatsim);
-
-		cOptions.gridx = 0;
-		cOptions.gridy = 0;
-		options.add(renderMatsim, cOptions);
-		cOptions.gridx = 1;
-		options.add(showIds, cOptions);
-
-		JTabbedPane pane = new JTabbedPane(JTabbedPane.TOP);
-		pane.addTab("Overview", overview);
-		pane.addTab("Options", options);
-		createLayout(pane, false, null);
+		createLayout(tableContainer, false, null);
 	}
 
 	private void clearTable() {
@@ -224,31 +199,4 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			throw new RuntimeException();
 		}
 	}
-
-	private class ShowIdsListener implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			if (!showIds.isSelected()) {
-				Defaults.showIds = false;
-			} else {
-				Defaults.showIds = true;
-			}
-			Main.map.mapView.repaint();
-		}
-	}
-
-	private class RenderMatsimListener implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			if (!renderMatsim.isSelected()) {
-				Defaults.renderMatsim = false;
-				showIds.setEnabled(false);
-			} else {
-				Defaults.renderMatsim = true;
-				showIds.setEnabled(true);
-			}
-			Main.map.mapView.repaint();
-		}
-	}
-
 }

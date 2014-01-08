@@ -11,7 +11,9 @@ import java.util.HashMap;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.visitor.paint.MapRendererFactory;
@@ -85,7 +87,7 @@ public class MATSimPlugin extends Plugin {
 
 		MapRendererFactory factory = MapRendererFactory.getInstance();
 		factory.register(MapRenderer.class, "My map renderer",
-				"This is is a fast map renderer");
+				"This is the MATSim map renderer");
 		factory.activate(MapRenderer.class);
 
 	}
@@ -105,6 +107,9 @@ public class MATSimPlugin extends Plugin {
 
 	@Override
 	public PreferenceSetting getPreferenceSetting() {
-		return null;
+		return new Preferences.Factory().createPreferenceSetting();
 	}
+	
+	
+	
 }

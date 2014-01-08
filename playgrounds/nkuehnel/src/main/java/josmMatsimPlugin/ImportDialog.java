@@ -40,7 +40,6 @@ public class ImportDialog extends JPanel
 
 		//--------------displayed elements---------------------------------
 		
-		final JComboBox coordCombo = new JComboBox(Defaults.coordSystems);
 		final JLabel coordSystemLabel = new JLabel(tr("original coord system:"));
 		final JLabel openLabel =new JLabel(tr("Open:"));
 		final JTextField path = new JTextField(Defaults.importPath);
@@ -55,8 +54,6 @@ public class ImportDialog extends JPanel
 		c.gridy = 0;
 		add(coordSystemLabel, c);
 		
-		c.gridx = 1;
-		add(coordCombo, c);
 
 		c.gridx = 0;
 		c.gridy = 1;
@@ -97,13 +94,6 @@ public class ImportDialog extends JPanel
 			}
 		});
 		
-		coordCombo.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(java.awt.event.ActionEvent e)
-			{
-				Defaults.originSystem = (String) coordCombo.getSelectedItem();
-			}
-		});
 	}
 
 	public void setOptionPane(JOptionPane optionPane)

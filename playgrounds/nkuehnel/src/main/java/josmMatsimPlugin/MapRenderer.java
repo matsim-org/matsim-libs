@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
@@ -46,14 +45,14 @@ public class MapRenderer extends StyledMapRenderer {
 			boolean showOrientation, boolean showHeadArrowOnly,
 			boolean showOneway, boolean onewayReversed) {
 
-		if (Defaults.renderMatsim) {
+		if (Main.pref.getBoolean("matsim_renderer", true)) {
 			Layer layer = Main.main.getActiveLayer();
 			Id id = new IdImpl(way.getUniqueId());
 			if (layer instanceof NetworkLayer) {
 				Network network = ((NetworkLayer) layer).getMatsimNetwork();
 				if (network.getLinks().containsKey(id)) {
 					Link link = network.getLinks().get(id);
-					if (Defaults.showIds) {
+					if (Main.pref.getBoolean("matsim_showIds", false)) {
 						drawTextOnPath(way, new TextElement(STRATEGY, FONT, 0,
 								textOffset(network, link), MATSIMCOLOR, 0.f,
 								null));
@@ -70,7 +69,6 @@ public class MapRenderer extends StyledMapRenderer {
 		}
 		super.drawWay(way, color, line, dashes, dashedColor, offset,
 				showOrientation, showHeadArrowOnly, showOneway, onewayReversed);
-
 	}
 
 	private float wayOffset(Network network, Link link) {

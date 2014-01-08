@@ -4,12 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * Stores the default values
@@ -18,29 +16,11 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * 
  */
 public class Defaults {
-    protected static boolean renderMatsim = true;
-    protected static boolean showIds = false;
     protected static Map<String, OsmHighwayDefaults> defaults = new HashMap<String, OsmHighwayDefaults>();
-    protected static boolean cleanNet = true;
     protected static boolean keepPaths = false;
-    protected static String exportPath = System.getProperty("user.home")
-	    + "\\josm_matsim_export";
     protected static String importPath = System.getProperty("user.home");
-    protected static String targetSystem = "WGS84";
     protected static String originSystem = "WGS84";
-    protected static String[] coordSystems = { TransformationFactory.WGS84,
-	    TransformationFactory.ATLANTIS, TransformationFactory.CH1903_LV03,
-	    TransformationFactory.GK4, TransformationFactory.WGS84_UTM47S,
-	    TransformationFactory.WGS84_UTM48N,
-	    TransformationFactory.WGS84_UTM35S,
-	    TransformationFactory.WGS84_UTM36S,
-	    TransformationFactory.WGS84_Albers,
-	    TransformationFactory.WGS84_SA_Albers,
-	    TransformationFactory.WGS84_UTM33N, TransformationFactory.DHDN_GK4,
-	    TransformationFactory.WGS84_UTM29N,
-	    TransformationFactory.CH1903_LV03_GT,
-	    TransformationFactory.WGS84_SVY21,
-	    TransformationFactory.NAD83_UTM17N, TransformationFactory.WGS84_TM };
+    
 
     protected static class OsmHighwayDefaults {
 

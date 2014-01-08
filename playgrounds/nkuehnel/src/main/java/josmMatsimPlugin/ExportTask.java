@@ -19,6 +19,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -53,7 +54,6 @@ public class ExportTask extends PleaseWaitRunnable
 	protected void cancel()
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -62,8 +62,7 @@ public class ExportTask extends PleaseWaitRunnable
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#finish()
 	 */
 	@Override
-	protected void finish()
-	{
+	protected void finish() {
 		JOptionPane.showMessageDialog(Main.main.parent, "Export finished.");
 	}
 
@@ -78,9 +77,10 @@ public class ExportTask extends PleaseWaitRunnable
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
+		String targetSystem = Main.pref.get("matsim_exportSystem", "WGS84");
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
-						Defaults.targetSystem);
+						targetSystem);
 
 		Layer layer = Main.main.getActiveLayer();
 		if (layer instanceof OsmDataLayer) {
@@ -104,16 +104,20 @@ public class ExportTask extends PleaseWaitRunnable
 			} else {
 				Converter converter = new Converter(((OsmDataLayer) layer).data, network, Defaults.defaults, Defaults.keepPaths);
 				converter.convert();
-				if (!(Defaults.targetSystem.equals("WGS84"))) {
+				if (!(targetSystem.equals("WGS84"))) {
 					for(Node node: ((NetworkImpl) network).getNodes().values()) {
 						Coord temp=ct.transform(node.getCoord());
 						node.getCoord().setXY(temp.getX(), temp.getY());
 					}
 				}
 			}
-			new NetworkWriter(network).write(Defaults.exportPath+".xml");
+			if (Main.pref.getBoolean("matsim_cleanNetwork")) {
+				new NetworkCleaner().run(network);
+			}
+			String path = ExportDialog.exportFilePath.getText()+".xml";
+			new NetworkWriter(network).write(path);
+			System.out.println("schreibe: " + path + " von WGS84 nach "+targetSystem);
 		}
-		System.out.println("schreibe: "+Defaults.exportPath+".xml"+" von WGS84 nach "+Defaults.targetSystem);
 	}
 
 }
