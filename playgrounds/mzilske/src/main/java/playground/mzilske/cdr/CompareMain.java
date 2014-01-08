@@ -81,19 +81,14 @@ public class CompareMain {
 
 		Counts counts = volumesToCounts(groundTruthVolumes);
 		cdrVolumes = runWithTwoPlansAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
-		System.out.println(compareSquaresAllDay());
-		System.out.println(compareSquaresTimebins());
-		System.out.println(compareEMD());
 	}
-	
+
 	public void runOnceWithSimplePlans() {
 		ticker.finish();
 		callProcess.dump();
 		List<Sighting> sightings = callProcess.getSightings();
 
 		cdrVolumes = runOnceWithSimplePlans(scenario.getNetwork(), linkToZoneResolver, sightings);
-		System.out.println(compareSquaresAllDay());
-		System.out.println(compareSquaresTimebins());
 	}
 
 	double compareEMD() {
@@ -104,14 +99,14 @@ public class CompareMain {
 		return emd;
 	}
 
-	double compareSquaresTimebins() {
-		int squares = 0;
+	double compareTimebins() {
+		double sum = 0;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			int[] volumesForLink1 = getVolumesForLink(groundTruthVolumes, link);
 			int[] volumesForLink2 = getVolumesForLink(cdrVolumes, link);
 			for (int i = 0; i < volumesForLink1.length; ++i) {
 				int diff = volumesForLink1[i] - volumesForLink2[i];
-				squares += diff * diff;
+				sum += Math.abs(diff) * link.getLength();
 				if (diff != 0) {
 					System.out.println(Arrays.toString(volumesForLink1));
 					System.out.println(Arrays.toString(volumesForLink2));
@@ -119,17 +114,11 @@ public class CompareMain {
 				}
 			}
 		}
-
-
-
-		double result = Math.sqrt(squares);
-		return result;
+		return sum;
 	}
 
-	double compareSquaresAllDay() {
-		
-
-		int squares = 0;
+	double compareAllDay() {
+		double sum = 0;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			int[] volumesForLink1 = getVolumesForLink(groundTruthVolumes, link);
 			int[] volumesForLink2 = getVolumesForLink(cdrVolumes, link);
@@ -140,11 +129,24 @@ public class CompareMain {
 				sum2 += volumesForLink2[i];
 			}
 			int diff = sum2 - sum1;
-			squares += diff * diff;
+			sum += Math.abs(diff) * link.getLength();
 		}
+		return sum;
+	}
 
-
-		return Math.sqrt(squares);
+	double compareEMDMassPerLink() {
+		double sum = 0;
+		double lengthsum = 0;
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			int[] volumesForLink1 = getVolumesForLink(groundTruthVolumes, link);
+			int[] volumesForLink2 = getVolumesForLink(cdrVolumes, link);
+			double emd =  MatchDistance.emd(MatchDistance.int2double(volumesForLink1), MatchDistance.int2double(volumesForLink2));
+			if (! Double.isNaN(emd)) {
+				lengthsum += link.getLength();
+				sum += link.getLength() *emd;
+			}
+		}
+		return sum / lengthsum;
 	}
 
 	private Counts volumesToCounts(VolumesAnalyzer volumesAnalyzer) {
@@ -352,7 +354,7 @@ public class CompareMain {
 		controler.run();
 		return controler.getVolumes();
 	}
-	
+
 	public static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Link link) {
 		int maxSlotIndex = (MAX_TIME / TIME_BIN_SIZE) + 1;
 		int[] maybeVolumes = volumesAnalyzer1.getVolumesForLink(link.getId());

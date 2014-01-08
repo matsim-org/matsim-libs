@@ -20,8 +20,8 @@ public class CDREquilTest {
 	public void testOneWorkplace() {
 		OneWorkplace oneWorkplace = new OneWorkplace();
 		oneWorkplace.run();
-		Assert.assertEquals("All-day squares", 0.0, oneWorkplace.getCompare().compareSquaresAllDay(), 0.0);
-		Assert.assertEquals("Timebin squares", 0.0, oneWorkplace.getCompare().compareSquaresTimebins(), 0.0);
+		Assert.assertEquals("All-day squares", 0.0, oneWorkplace.getCompare().compareAllDay(), 0.0);
+		Assert.assertEquals("Timebin squares", 0.0, oneWorkplace.getCompare().compareTimebins(), 0.0);
 		Assert.assertEquals("EMD", 0.0, oneWorkplace.getCompare().compareEMD(), 0.0);
 	}
 	
@@ -29,8 +29,8 @@ public class CDREquilTest {
 	public void testTwoWorkplaces() {
 		TwoWorkplaces twoWorkplaces = new TwoWorkplaces();
 		twoWorkplaces.run();
-		Assert.assertEquals("All-day squares", 0.0, twoWorkplaces.getCompare().compareSquaresAllDay(), 0.0);
-		Assert.assertEquals("Timebin squares", 0.0, twoWorkplaces.getCompare().compareSquaresTimebins(), 0.0);
+		Assert.assertEquals("All-day squares", 0.0, twoWorkplaces.getCompare().compareAllDay(), 0.0);
+		Assert.assertEquals("Timebin squares", 0.0, twoWorkplaces.getCompare().compareTimebins(), 0.0);
 		Assert.assertEquals("EMD", 0.0, twoWorkplaces.getCompare().compareEMD(), 0.0);
 	}
 
