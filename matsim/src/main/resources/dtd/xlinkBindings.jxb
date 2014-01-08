@@ -1,0 +1,28 @@
+<jxb:bindings version="2.0"
+          xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema" >
+
+    <jxb:bindings schemaLocation="http://www.w3.org/1999/xlink.xsd" node="/xs:schema">
+
+        <jxb:bindings node="//xs:attributeGroup[@name='locatorAttrs']">
+            <jxb:bindings node=".//xs:attribute[@ref='xlink:title']">
+                <jxb:property name="title1"/>
+            </jxb:bindings>
+        </jxb:bindings>
+
+        <jxb:bindings node="//xs:attributeGroup[@name='arcAttrs']">           
+            <jxb:bindings node=".//xs:attribute[@ref='xlink:title']">
+                <jxb:property name="title2"/>
+            </jxb:bindings>            
+        </jxb:bindings>        
+
+    </jxb:bindings>
+    
+    <jxb:bindings schemaLocation="http://schemas.opengis.net/gml/2.1.2/feature.xsd" node="/xs:schema">
+    <jxb:bindings node="//xs:element[@name='_geometryProperty']">
+        <jxb:factoryMethod name="gmlAbstractGeometryPropertyFactory" />
+    </jxb:bindings>
+</jxb:bindings>
+
+
+</jxb:bindings>

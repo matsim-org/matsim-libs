@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.matsim.org/files/dtd"
+	xmlns="http://www.matsim.org/files/dtd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:gml="http://www.opengis.net/gml" elementFormDefault="qualified" version="1.0">
+	<xs:import namespace="http://www.opengis.net/gml"
+		schemaLocation="http://schemas.opengis.net/gml/2.1.2/gml.xsd" />
+	<xs:element name="sim2DEnvironment" type="FeatureCollectionType"
+		substitutionGroup="gml:_FeatureCollection" />
+	<xs:complexType name="FeatureCollectionType">
+		<xs:complexContent>
+			<xs:extension base="gml:AbstractFeatureCollectionType">
+				<xs:attribute name="lockId" type="xs:string" use="optional" />
+				<xs:attribute name="scope" type="xs:string" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="sim2dEnvironmentSection" type="sim2dEnvironmentSectionType"
+		substitutionGroup="gml:_Feature" />
+	<xs:complexType name="sim2dEnvironmentSectionType">
+		<xs:complexContent>
+			<xs:extension base="gml:AbstractFeatureType">
+				<xs:sequence>
+					<xs:element name="geometryProperty" type="sectionPropertyType"
+						nillable="false" minOccurs="0" maxOccurs="1" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="sectionPropertyType">
+		<xs:complexContent>
+			<xs:extension base="gml:PolygonPropertyType">
+				<xs:sequence>
+					<xs:element name="matsim_type" type="xs:string" fixed="sim2d_section" />
+					<xs:element name="level" type="xs:integer"></xs:element>
+					<xs:element name="openings" type="openingsType"
+						nillable="true" minOccurs="0" maxOccurs="1"></xs:element>
+					<xs:element name="openingsIds" type="openingsIdsType"
+						nillable="true" minOccurs="0" maxOccurs="1"></xs:element>
+					<xs:element name="neighbors" type="neighborsType"
+						minOccurs="0" maxOccurs="1"></xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="openingsType">
+		<xs:annotation>
+			<xs:documentation>
+				Openings define line segments of the describing
+				polygon that are open like
+				doors etc. The value of 'vs' attribute
+				is
+				the separator.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<!-- <xs:attribute name="integer" type="xs:string" use="required" /> -->
+				<xs:attribute name="vs" type="xs:string" use="optional"
+					default="&#x20;" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="openingsIdsType">
+		<xs:annotation>
+			<xs:documentation>
+				IDs of the openings. The value of 'vs' attribute
+				is
+				the separator.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<!-- <xs:attribute name="integer" type="xs:string" use="required" /> -->
+				<xs:attribute name="vs" type="xs:string" use="optional"
+					default="&#x20;" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="neighborsType">
+		<xs:annotation>
+			<xs:documentation>
+				A list of fids referencing adjacent
+				neighbors.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="fidrefs" type="xs:IDREFS" minOccurs="1"
+				maxOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
