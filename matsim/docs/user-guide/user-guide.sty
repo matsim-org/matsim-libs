@@ -57,3 +57,31 @@
   [\vspace{2ex}%
 \titlerule]
 
+
+% ====================================================================
+% CUSTOM ENVIRONMENTS
+% ====================================================================
+\usepackage{framed,color}
+
+\newenvironment{chapter-intro}
+{% This is the begin code
+\definecolor{shadecolor}{RGB}{220,220,220}
+\sf
+\begin{shaded}
+\noindent\ignorespaces
+}
+{% This is the end code
+\end{shaded}
+\vskip\baselineskip }
+
+\newenvironment{note}
+{% This is the begin code
+\definecolor{shadecolor}{RGB}{255,255,150}
+\sf
+\begin{shaded}
+\noindent\ignorespaces
+}
+{% This is the end code
+\end{shaded}
+\vskip\baselineskip }
+
