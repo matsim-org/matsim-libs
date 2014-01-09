@@ -60,7 +60,9 @@ public class FilterEventsForCommunity {
 		includeInSection.add(rectangleWattwil);
 		RectangularArea rectangleBuchs = new RectangularArea(new CoordImpl(748300,222700   ), new CoordImpl(756800, 230000));
 		includeInSection.add(rectangleBuchs);
-
+		RectangularArea rectangleZernez = new RectangularArea(new CoordImpl(792900,165100   ), new CoordImpl(817400, 179050));
+		includeInSection.add(rectangleBuchs);
+		
 		ComplexRectangularSelectionArea complexRectangularSelectionArea = new ComplexRectangularSelectionArea(includeInSection,
 				excludeFromSelection);
 		return complexRectangularSelectionArea;
