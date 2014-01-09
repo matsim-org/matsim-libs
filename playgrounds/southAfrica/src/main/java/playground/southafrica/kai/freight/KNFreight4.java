@@ -33,7 +33,6 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -107,9 +106,9 @@ public class KNFreight4 {
 	private static final String ALGORITHM = QVH_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
 	
-	private static final boolean generatingCarrierPlansFromScratch = true ;
+	private static final boolean generatingCarrierPlansFromScratch = false ;
 	
-	private static final boolean addingCongestion = false ;
+	private static final boolean addingCongestion = true ;
 
 	private static final boolean usingWithinDayReScheduling = false ;
 
@@ -164,7 +163,7 @@ public class KNFreight4 {
 	}
 
 
-	public static Config createConfig(String[] args) {
+	private static Config createConfig(String[] args) {
 		Config config = ConfigUtils.createConfig() ;
 		
 		if ((args == null) || (args.length == 0)) {
@@ -237,7 +236,7 @@ public class KNFreight4 {
 			if ( speed > threshold ) {
 				{
 					NetworkChangeEvent event = cef.createNetworkChangeEvent(7.*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold/10 ));
 					event.addLink(link);
 					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 				}

@@ -72,7 +72,7 @@ public class KNGautengControler {
 	final static String outputDirectoryName = "/Users/nagel/kairuns/output2/";
 	
 	static enum Case {equil,gauteng} ;
-	static final Case ccc = Case.gauteng ;
+	static final Case ccc = Case.equil ;
 	
 	private Config config = null;
 
@@ -119,7 +119,7 @@ public class KNGautengControler {
 				// === sanral scenario start ===
 				config.network().setInputFile(SANRAL2010 + "network/gautengNetwork_CleanV2.xml.gz");
 //				config.plans().setInputFile(SANRAL2010 + "plans/car-com-bus-taxi-ext_plans_2009_1pct-with-routesV0.xml.gz") ;
-				config.plans().setInputFile("/Users/nagel/gauteng-kairuns/runs/2013-11-30-14h50/output_plans.xml.gz") ;
+				config.plans().setInputFile("/Users/nagel/shared-svn/projects/freight/studies/gauteng-kairuns/runs/2013-11-30-14h50/output_plans.xml.gz") ;
 
 				
 				config.roadpricing().setTollLinksFile(SANRAL2010 + "toll/gauteng_toll_joint_weekday_02.xml" );
