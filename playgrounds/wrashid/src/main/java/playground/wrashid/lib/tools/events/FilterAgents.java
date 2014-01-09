@@ -106,7 +106,15 @@ public class FilterAgents {
 		// this method is for the xml events writer, the methods below for the txt case
 		@Override
 		public void handleEvent(final Event event) {
-			Id personId = new IdImpl(event.toString().split("person=\"")[1].split("\"")[0]);
+			//System.out.println(event.toString());
+			Id personId=null;
+			if (event.toString().split("driverId=\"").length<2){
+				if (event.toString().split("person=\"").length>=2){
+					personId = new IdImpl(event.toString().split("person=\"")[1].split("\"")[0]);
+				}
+			} else {
+				personId = new IdImpl(event.toString().split("driverId=\"")[1].split("\"")[0]);
+			}
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {

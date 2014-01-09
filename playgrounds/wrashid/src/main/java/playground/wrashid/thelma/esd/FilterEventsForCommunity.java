@@ -13,7 +13,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.tools.events.FilterAgents;
@@ -23,10 +25,11 @@ import playground.wrashid.lib.tools.network.obj.RectangularArea;
 public class FilterEventsForCommunity {
 
 	public static void main(String[] args) {
-		String eventsFile = "H:/data/cvs/ivt/studies/switzerland/results/census2000v2/runs/ivtch-10pctcv2-rev9473-run00/ITERS/it.200/200.events.txt.gz";
+		String eventsFile = "P:/_TEMP/Stahel/rashid_thelma2030/baseline2030/run.baseline.150.events.xml.gz";
 		EventsManager events = EventsUtils.createEventsManager();
 
-		Network network = GeneralLib.readNetwork("H:/data/cvs/ivt/studies/switzerland/networks/ivtch/network.xml");
+		String networkFilePath = "P:/_TEMP/Stahel/rashid_thelma2030/baseline2030/multimodalNetwork2030final.xml.gz";
+		Network network = GeneralLib.readNetwork(networkFilePath);
 
 		ComplexRectangularSelectionArea complexRectangularSelectionArea = defineAreaOfInterest();
 
@@ -34,22 +37,26 @@ public class FilterEventsForCommunity {
 		
 		events.addHandler(filterAgentsWithHomeLocationInPredefinedAreas);
 
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		//EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 
-		reader.readFile(eventsFile);
+		//reader.readFile(eventsFile);
+		reader.parse(eventsFile);
 
-		FilterAgents.keepAgents(filterAgentsWithHomeLocationInPredefinedAreas.getIncludedAgents(), "H:/data/cvs/ivt/studies/switzerland/results/census2000v2/runs/ivtch-10pctcv2-rev9473-run00/ITERS/it.200/200.events.txt.gz", "C:/eTmp/filteredEventsForWattwilAndBuchs.txt.gz");
+		FilterAgents.keepAgents(filterAgentsWithHomeLocationInPredefinedAreas.getIncludedAgents(), eventsFile, "C:/eTmp/filteredEventsForWattwil-Buchs-Zernez-2030.txt.gz");
 	
-		Scenario scenario = GeneralLib.readScenario("H:/data/cvs/ivt/studies/switzerland/results/census2000v2/runs/ivtch-10pctcv2-rev9473-run00/ITERS/it.200/200.plans.xml.gz", "H:/data/cvs/ivt/studies/switzerland/networks/ivtch/network.xml","H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz");
+		Scenario scenario = GeneralLib.readScenario("P:/_TEMP/Stahel/rashid_thelma2030/baseline2030/run.baseline.output_plans.xml.gz", networkFilePath,"P:/_TEMP/Stahel/rashid_thelma2030/baseline2010/facilities2012secondary.xml.gz");
 	
 		
 		LinkedList<Person> persons=new LinkedList<Person>();
 		
+		System.out.println("personId selected for filtered plans file");
 		for (Id personId:filterAgentsWithHomeLocationInPredefinedAreas.getIncludedAgents()){
 			persons.add(scenario.getPopulation().getPersons().get(personId));
+			System.out.println(personId);
 		}
 		
-		GeneralLib.writePersons(persons, "C:/eTmp/plansForWattwilAndBuchs.xml.gz", network);
+		GeneralLib.writePersons(persons, "C:/eTmp/plansForWattwil-Buchs-Zernetz-2030.xml.gz", network,(ScenarioImpl) scenario);
 	}
 
 	private static ComplexRectangularSelectionArea defineAreaOfInterest() {
@@ -61,7 +68,7 @@ public class FilterEventsForCommunity {
 		RectangularArea rectangleBuchs = new RectangularArea(new CoordImpl(748300,222700   ), new CoordImpl(756800, 230000));
 		includeInSection.add(rectangleBuchs);
 		RectangularArea rectangleZernez = new RectangularArea(new CoordImpl(792900,165100   ), new CoordImpl(817400, 179050));
-		includeInSection.add(rectangleBuchs);
+		includeInSection.add(rectangleZernez);
 		
 		ComplexRectangularSelectionArea complexRectangularSelectionArea = new ComplexRectangularSelectionArea(includeInSection,
 				excludeFromSelection);
