@@ -55,19 +55,31 @@ abstract class UtilityChanges {
 				
 				double sumSent = 0. ;
 
-				for ( Mode mode : Mode.values() ) { // for all modes
-
-					Attributes econValues = economicValues.getAttributes(mode, segm) ;
+				for ( Mode mode : Mode.values() )
+					{ // for all modes
+//					{
+//					Mode mode = Mode.ROAD; //only ROAD
+//					
+					Attributes 		econValues = economicValues.getAttributes(mode, segm) ;
+					
 					Attributes attributesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
 					Attributes attributesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
 
 					final Key key = makeKey(mode, segm, Attribute.XX);
 					System.out.println( "key: " + key.toString() );
 					System.out.flush(); 
-					final double amountNullfall = nullfallForODRelation.get( key) ;
-					final double amountPlanfall = planfallForODRelation.get( key) ;
-					final double deltaAmounts = amountPlanfall - amountNullfall ;
-
+					final double amountNullfall;
+					final double amountPlanfall;
+					final double deltaAmounts ;
+					try{
+					amountNullfall = nullfallForODRelation.get( key) ;
+					amountPlanfall = planfallForODRelation.get( key) ;
+					deltaAmounts = amountPlanfall - amountNullfall ;
+					}
+					catch (NullPointerException e) {
+						System.err.println("Mode: " + mode + " lacks data - skipping.");
+						continue;
+					}
 					System.out.flush();
 					System.err.println(" amountPlanfall: " + amountPlanfall + " amountNullfall: " + amountNullfall );
 					System.err.flush() ;
