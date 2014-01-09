@@ -28,7 +28,7 @@ clean:
 	-rm *.aux *.log *.out *.toc *.4ct *.4tc *.dvi *.idv *.lg *.tmp *.xref *.html *.css
 	-rm chapters/*.aux
 
-veryclean:
+veryclean: clean
 	-rm *.bbl *.blg *.pdf
 	-rm -rf html
 

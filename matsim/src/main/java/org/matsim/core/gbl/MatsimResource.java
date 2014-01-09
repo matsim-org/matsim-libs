@@ -58,6 +58,7 @@ public abstract class MatsimResource {
 
 	/** The path where resources are located in a local file system. */
 	private static final String RES_PATH_LOCAL = "./res/";  //NOPMD // this line should be ignored for PMD analysis
+	private static final String RES_PATH_LOCAL2 = "./src/main/resources/res/";  //NOPMD // this line should be ignored for PMD analysis
 
 	private static final Logger log = Logger.getLogger(MatsimResource.class);
 
@@ -67,6 +68,7 @@ public abstract class MatsimResource {
 	 */
 	public final static URL getAsURL(final String filename) {
 		// look for the file locally
+		{
 		File file = new File(RES_PATH_LOCAL + filename);
 		if (file.exists()) {
 			try {
@@ -74,6 +76,17 @@ public abstract class MatsimResource {
 			} catch (MalformedURLException e) {
 				log.warn("Found resource-file, but could not return URL for it.", e);				// just continue, maybe we have more luck in the classpath
 			}
+		}
+		}
+		{
+		File file = new File(RES_PATH_LOCAL2 + filename);
+		if (file.exists()) {
+			try {
+				return file.toURI().toURL();
+			} catch (MalformedURLException e) {
+				log.warn("Found resource-file, but could not return URL for it.", e);				// just continue, maybe we have more luck in the classpath
+			}
+		}
 		}
 		// maybe we find the file in the classpath, possibly inside a jar-file
 		URL url = MatsimResource.class.getResource(RES_PATH_JARFILE + filename);
