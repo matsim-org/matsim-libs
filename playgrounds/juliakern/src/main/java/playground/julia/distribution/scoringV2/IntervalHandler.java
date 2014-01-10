@@ -14,21 +14,18 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 
 	HashMap<Id, ArrayList<ActivityStartEvent>> person2asevent = new HashMap<Id, ArrayList<ActivityStartEvent>>();
 	HashMap<Id, ArrayList<ActivityEndEvent>> person2aeevent = new HashMap<Id, ArrayList<ActivityEndEvent>>();
-	ArrayList<EmActivity> activities;
+	ArrayList<EmActivity> activities = new ArrayList<EmActivity>();
 	
 	public ArrayList<EmActivity> getActivities() {
 		return activities;
 	}
 
-
-
 	@Override
 	public void reset(int iteration) {
 		person2aeevent.clear();
-		person2aeevent.clear();
+		person2asevent.clear();
+		activities.clear();
 	}
-
-
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {

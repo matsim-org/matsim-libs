@@ -107,6 +107,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Integer iteration = event.getIteration();
 
+		geh.reset(iteration);
+		
 		if(lastIteration.equals(iteration)){
 			emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
 			logger.info("creating new emission events writer...");

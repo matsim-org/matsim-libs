@@ -69,7 +69,8 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	}
 	
 	@Override
-	public void reset(int iteration) {		
+	public void reset(int iteration) {	
+		this.emissionPerCell.clear();
 	}
 
 	@Override
