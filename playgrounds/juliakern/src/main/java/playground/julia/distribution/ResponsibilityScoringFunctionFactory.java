@@ -19,52 +19,38 @@
 
 package playground.julia.distribution;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.emissions.types.WarmPollutant;
+public class ResponsibilityScoringFunctionFactory implements
+		ScoringFunctionFactory {
+	
+	private CharyparNagelScoringFunctionFactory delegate;
+	private ArrayList<ResponsibilityEvent> allRevents;
 
-public interface DistributionConfiguration {
-
-	public abstract Double getSimulationEndTime();
-
-	public abstract boolean storeResponsibilityEvents();
-
-	public abstract Map<Id, ? extends Link> getLinks();
-
-	public abstract String getMunichShapeFile();
-
-	public abstract String getEventsFile();
-
-	public abstract String getEmissionFile();
-
-	public abstract String getOutPathStub();
-
-	public abstract double getXmin();
-
-	public abstract double getXmax();
-
-	public abstract double getYmin();
-
-	public abstract double getYmax();
-
-	public abstract int getNoOfTimeBins();
-
-	public abstract int getNumberOfXBins();
-
-	public abstract int getNumberOfYBins();
-
-	public abstract WarmPollutant getWarmPollutant2analyze();
-
-	public abstract ColdPollutant getColdPollutant2analyze();
-
-	public abstract Double getTimeBinSize();
-
-	public abstract Map<Id, Integer> getLink2yBin();
-
-	public abstract Map<Id, Integer> getLink2xBin();
+	public ResponsibilityScoringFunctionFactory(Config config, Network network, ArrayList<ResponsibilityEvent> allRevents){
+		this.delegate = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), network);
+		this.allRevents = allRevents;
+		
+	}
+	@Override
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		
+			ArrayList<ResponsibilityEvent> rEventsOfPerson = new ArrayList<ResponsibilityEvent>();
+			Id personId = plan.getPerson().getId();
+			for(ResponsibilityEvent re: allRevents){
+				if(re.getResponsiblePersonId().equals(personId)){
+					rEventsOfPerson.add(re);
+				}
+			}	
+		return new ResponsibilityScoringFunction(plan.getPerson().getId(), delegate.createNewScoringFunction(plan), rEventsOfPerson);
+	}
 
 }

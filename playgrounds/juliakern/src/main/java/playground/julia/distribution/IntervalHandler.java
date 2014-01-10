@@ -27,7 +27,7 @@ LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 	public void reset(int iteration) {
 		person2llevent.clear();
 		person2leevent.clear();
-		person2aeevent.clear();
+		person2asevent.clear();
 		person2aeevent.clear();
 	}
 

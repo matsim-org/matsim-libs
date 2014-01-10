@@ -47,6 +47,7 @@ public class SpatialAveragingDistribution {
 	
 	Map<Double, ArrayList<EmPerCell>> emissionPerBin ;
 	Map<Double, ArrayList<EmPerLink>> emissionPerLink;
+	ArrayList<ResponsibilityEvent> responsibilityAndExposure;
 
 	private void run() throws IOException{
 		
@@ -56,8 +57,8 @@ public class SpatialAveragingDistribution {
 		 * 
 		 */
 		
-//		DistributionConfiguration distConfig = new DistributionConfig(logger);
-		DistributionConfiguration distConfig = new DistributionConfigTest(logger);
+		DistributionConfiguration distConfig = new DistributionConfig();
+//		DistributionConfiguration distConfig = new DistributionConfigTest(logger);
 		Double simulationEndTime = distConfig.getSimulationEndTime();
 		int noOfTimeBins = distConfig.getNoOfTimeBins();
 		Double timeBinSize = distConfig.getSimulationEndTime()/noOfTimeBins;
@@ -69,8 +70,8 @@ public class SpatialAveragingDistribution {
 		 * needed frequently
 		 */
 		
-		link2xbin = calculateXbins(distConfig);
-		link2ybin = calculateYbins(distConfig);
+		link2xbin = distConfig.getLink2xBin();
+		link2ybin = distConfig.getLink2yBin();
 		
 		/*
 		 * four lists to store information on activities, car trips and emissions
@@ -104,11 +105,11 @@ public class SpatialAveragingDistribution {
 		 * TODO later: write emission per bin/link into xml... handle as exposure events
 		 */
 		
-		ArrayList<ResponsibilityEvent> responsibilityAndExposure = new ArrayList<ResponsibilityEvent>();
+		responsibilityAndExposure = new ArrayList<ResponsibilityEvent>();
 		
 		ResponsibilityUtils reut = new ResponsibilityUtils();
 		reut.addExposureAndResponsibilityBinwise(activities, emissionPerBin, responsibilityAndExposure, timeBinSize, simulationEndTime);
-		reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, responsibilityAndExposure, timeBinSize, simulationEndTime);
+		//reut.addExposureAndResponsibilityLinkwise(carTrips, emissionPerLink, responsibilityAndExposure, timeBinSize, simulationEndTime);
 		
 		logger.info("Done calculating responsibility events.");
 		

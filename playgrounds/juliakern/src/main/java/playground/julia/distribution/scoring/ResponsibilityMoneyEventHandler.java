@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialAveragingForLinkEmissions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution;
 
-import org.matsim.api.core.v01.Id;
+package playground.julia.distribution.scoring;
 
-/**
- * simple class to store information on agents' activities
- * used to calculate exposure values
- * @author julia 
- */
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 
-public class EmActivity {
-	Double startOfActivity;
-	Double endOfActivity;
-	Id personId;
-	int xBin;
-	int yBin;
-	String activityType;
+public class ResponsibilityMoneyEventHandler implements PersonMoneyEventHandler {
 
-	public EmActivity(Double startOfActivity,	Double endOfActivity, Id personId, int xBin, int yBin, String activityType){
-		this.startOfActivity=startOfActivity;
-		this.endOfActivity=endOfActivity;
-		this.personId=personId;
-		this.xBin=xBin;
-		this.yBin=yBin;
-		this.activityType = activityType;
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+
 	}
 
-	public Id getPersonId() {
-		return this.personId;
+	@Override
+	public void handleEvent(PersonMoneyEvent event) {
+		// TODO Auto-generated method stub
+
 	}
 
-	public double getStartTime() {
-		return this.startOfActivity;
-	}
-
-	public Double getEndTime() {
-		return this.endOfActivity;
-	}
-
-	public String getActivityType() {
-		return this.activityType;
-	}
-
-	public int getXBin() {
-		return this.xBin;
-	}
-	public int getYBin() {
-		return this.yBin;
-	}
-
-	public Double getDuration() {
-		return endOfActivity-startOfActivity;
-	}
 }

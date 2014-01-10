@@ -19,6 +19,7 @@ public class ResponsibilityEventWriter implements EventWriter, BasicEventHandler
 		super();
 		try {
 			this.out = new BufferedWriter(new FileWriter(outPutPath));
+			this.out.write("<events> \n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

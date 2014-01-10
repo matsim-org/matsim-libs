@@ -19,6 +19,7 @@
 
 package playground.julia.distribution;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -38,8 +39,10 @@ import playground.vsp.emissions.types.WarmPollutant;
 
 public class DistributionConfig implements DistributionConfiguration {
 	
+	private static final Logger logger = Logger.getLogger(DistributionConfig.class);
+	
 	private final static String runDirectory1 = "input/sample/";
-	private final String netFile1 = runDirectory1 + "sample_network.xml.gz";
+	private final String netFile1 = runDirectory1 + "sample_network.xml";
 	private final String munichShapeFile = runDirectory1 + "cityArea.shp";
 
 	private static String configFile1 = runDirectory1 + "sample_config.xml.gz";
@@ -51,7 +54,7 @@ public class DistributionConfig implements DistributionConfiguration {
 	private final String emissionFile1 = runDirectory1 + "compcase.sample.emission.events.xml";
 	String plansFile1 = runDirectory1+"compcase.sample.plans.xml";
 	String eventsFile1 = runDirectory1+"compcase.sample.events.xml";
-	String outPathStub = "output/sample/compcase_30timebins_16x12cells_";
+	String outPathStub = "output/sampleV2/compcase_30timebins_160x120cells_";
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static double xMin = 4452550.25;
@@ -60,8 +63,8 @@ public class DistributionConfig implements DistributionConfiguration {
 	static double yMax = 5345696.81;
 
 	final int noOfTimeBins = 30; //30
-	final int noOfXbins = 16; //160 
-	final int noOfYbins = 12; //120
+	final int noOfXbins = 160; //160 
+	final int noOfYbins = 120; //120
 	final WarmPollutant warmPollutant2analyze = WarmPollutant.NO2;
 	final ColdPollutant coldPollutant2analyze = ColdPollutant.NO2;
 		
@@ -73,11 +76,12 @@ public class DistributionConfig implements DistributionConfiguration {
 	private boolean storeResponsibilityEvents = true;
 	double timeBinSize;
 	
+	
 	/*
 	 * load scenario
 	 * calculate time bin size
 	 */
-	public DistributionConfig(Logger logger) {
+	public DistributionConfig() {
 		this.config = ConfigUtils.createConfig();
 		MatsimConfigReader configReader = new MatsimConfigReader(this.config);
 		configReader.readFile(configFile1);
@@ -229,5 +233,53 @@ public class DistributionConfig implements DistributionConfiguration {
 	public Double getTimeBinSize() {
 		return timeBinSize;
 	}
+	
+	public Config getConfig(){
+		return this.config;
+	}
 
+	public String getNetworkFile() {
+		return this.netFile1;
+	}
+
+	public String getPlansFile() {
+		// TODO Auto-generated method stub
+		return this.plansFile1;
+	}
+
+
+	@Override
+	public Map<Id, Integer> getLink2xBin() {
+		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
+		for(Id linkId: this.getLinks().keySet()){
+			link2xbin.put(linkId, mapXCoordToBin(this.getLinks().get(linkId).getCoord().getX()));
+		}
+		return link2xbin;
+	}
+
+	@Override
+	public Map<Id, Integer> getLink2yBin() {
+		Map<Id, Integer> link2ybin = new HashMap<Id, Integer>();
+		for(Id linkId: this.getLinks().keySet()){
+			link2ybin.put(linkId, mapYCoordToBin(this.getLinks().get(linkId).getCoord().getY()));
+		}
+		return link2ybin;
+	}
+
+
+	private Integer mapYCoordToBin(double yCoord) {
+		double yMin = this.getYmin();
+		double yMax = this.getYmax();
+		if (yCoord <= yMin || yCoord >= yMax) return null; // yCoord is not in area of interest
+		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * this.getNumberOfYBins()); // gives the relative position along the y-range
+		return (int) relativePositionY; // returns the number of the bin [0..n-1]
+	}
+
+	private Integer mapXCoordToBin(double xCoord) {
+		double xMin = this.getXmin();
+		double xMax = this.getXmax();
+		if (xCoord <= xMin  || xCoord >= xMax) return null; // xCorrd is not in area of interest
+		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * this.getNumberOfXBins()); // gives the relative position along the x-range
+		return (int) relativePositionX; // returns the number of the bin [0..n-1]
+	}
 }

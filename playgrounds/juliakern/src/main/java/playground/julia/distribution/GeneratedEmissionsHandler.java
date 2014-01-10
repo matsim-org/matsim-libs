@@ -71,7 +71,9 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	}
 	
 	@Override
-	public void reset(int iteration) {		
+	public void reset(int iteration) {	
+		emissionPerCell = new HashMap<Double, ArrayList<EmPerCell>>();
+		emissionPerLink = new HashMap<Double, ArrayList<EmPerLink>>();
 	}
 
 	@Override
@@ -151,7 +153,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		
 		ArrayList<EmPerLink> distributedEmissions = new ArrayList<EmPerLink>();
 		
-		// for each link: if distance to current link < ??
+		// for each link: if distance to current link < 4
 		// => EmPerLink with value = distance dependent factor * current value
 		
 		int sourceX = link2xbins.get(sourcelinkId);

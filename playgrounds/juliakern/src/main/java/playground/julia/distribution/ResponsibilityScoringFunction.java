@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialAveragingForLinkEmissions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +16,67 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.julia.distribution;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.scoring.ScoringFunction;
 
-/**
- * simple class to store information on agents' activities
- * used to calculate exposure values
- * @author julia 
- */
-
-public class EmActivity {
-	Double startOfActivity;
-	Double endOfActivity;
-	Id personId;
-	int xBin;
-	int yBin;
-	String activityType;
-
-	public EmActivity(Double startOfActivity,	Double endOfActivity, Id personId, int xBin, int yBin, String activityType){
-		this.startOfActivity=startOfActivity;
-		this.endOfActivity=endOfActivity;
-		this.personId=personId;
-		this.xBin=xBin;
-		this.yBin=yBin;
-		this.activityType = activityType;
+public class ResponsibilityScoringFunction implements ScoringFunction {
+	
+	ScoringFunction delegate;
+	double score =0.;
+	
+	public ResponsibilityScoringFunction(Id personId, ScoringFunction scoringFunction, ArrayList<ResponsibilityEvent> responsibilityEventsOfPerson){
+		for(ResponsibilityEvent re: responsibilityEventsOfPerson){
+			score -= re.getExposureValue();
+		}
+		this.delegate = scoringFunction;
 	}
 
-	public Id getPersonId() {
-		return this.personId;
+	@Override
+	public void handleActivity(Activity activity) {
+		delegate.handleActivity(activity);
+
 	}
 
-	public double getStartTime() {
-		return this.startOfActivity;
+	@Override
+	public void handleLeg(Leg leg) {
+		delegate.handleLeg(leg);
+
 	}
 
-	public Double getEndTime() {
-		return this.endOfActivity;
+	@Override
+	public void agentStuck(double time) {
+		delegate.agentStuck(time);
+
 	}
 
-	public String getActivityType() {
-		return this.activityType;
+	@Override
+	public void addMoney(double amount) {
+		delegate.addMoney(amount);
+
 	}
 
-	public int getXBin() {
-		return this.xBin;
-	}
-	public int getYBin() {
-		return this.yBin;
+	@Override
+	public void finish() {
+		delegate.finish();
 	}
 
-	public Double getDuration() {
-		return endOfActivity-startOfActivity;
+	@Override
+	public double getScore() {
+		return delegate.getScore() + score;
 	}
+
+	@Override
+	public void handleEvent(Event event) {
+		delegate.handleEvent(event);
+
+	}
+
 }

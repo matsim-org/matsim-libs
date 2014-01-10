@@ -19,6 +19,7 @@
 
 package playground.julia.distribution;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -37,7 +38,7 @@ public class DistributionConfigTest implements DistributionConfiguration{
 	
 	private final static String runDirectory1 = "input/sample/";
 	private final String netFile1 = runDirectory1 + "test_network.xml";
-//	private final String munichShapeFile = runDirectory1 + "cityArea.shp";
+	private final String munichShapeFile = runDirectory1 + "cityArea.shp";
 
 //	private static String configFile1 = runDirectory1 + "sample_config.xml.gz";
 //	private final String emissionFile1 = runDirectory1 + "basecase.sample.emission.events.xml";
@@ -162,9 +163,43 @@ public class DistributionConfigTest implements DistributionConfiguration{
 	}
 
 	@Override
+	public Map<Id, Integer> getLink2xBin() {
+		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
+		for(Id linkId: this.getLinks().keySet()){
+			link2xbin.put(linkId, mapXCoordToBin(this.getLinks().get(linkId).getCoord().getX()));
+		}
+		return link2xbin;
+	}
+
+	@Override
+	public Map<Id, Integer> getLink2yBin() {
+		Map<Id, Integer> link2ybin = new HashMap<Id, Integer>();
+		for(Id linkId: this.getLinks().keySet()){
+			link2ybin.put(linkId, mapYCoordToBin(this.getLinks().get(linkId).getCoord().getY()));
+		}
+		return link2ybin;
+	}
+
+
+	private Integer mapYCoordToBin(double yCoord) {
+		double yMin = this.getYmin();
+		double yMax = this.getYmax();
+		if (yCoord <= yMin || yCoord >= yMax) return null; // yCoord is not in area of interest
+		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * this.getNumberOfYBins()); // gives the relative position along the y-range
+		return (int) relativePositionY; // returns the number of the bin [0..n-1]
+	}
+
+	private Integer mapXCoordToBin(double xCoord) {
+		double xMin = this.getXmin();
+		double xMax = this.getXmax();
+		if (xCoord <= xMin  || xCoord >= xMax) return null; // xCorrd is not in area of interest
+		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * this.getNumberOfXBins()); // gives the relative position along the x-range
+		return (int) relativePositionX; // returns the number of the bin [0..n-1]
+	}
+
+	@Override
 	public String getMunichShapeFile() {
-		logger.warn("getMunich used");
-		return null;
+		return this.munichShapeFile;
 	}
 
 }

@@ -31,7 +31,9 @@ import org.matsim.api.core.v01.Id;
 /**
  * class to analyze responsibility events 
  *  
- *  
+ *  print information on responsibility or exposure from responsibility events to a text file
+ *   personal: per agent
+ *   otherwise: accumulated for all causing/receiving agents
  *  
  * @author julia
  *

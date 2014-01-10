@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SpatialAveragingForLinkEmissions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution;
 
-import org.matsim.api.core.v01.Id;
+package playground.julia.distribution.scoring;
 
-/**
- * simple class to store information on agents' activities
- * used to calculate exposure values
- * @author julia 
- */
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
-public class EmActivity {
-	Double startOfActivity;
-	Double endOfActivity;
-	Id personId;
-	int xBin;
-	int yBin;
-	String activityType;
+import playground.julia.distribution.ResponsibilityCostModule;
+import playground.julia.distribution.ResponsibilityScoringFunction;
 
-	public EmActivity(Double startOfActivity,	Double endOfActivity, Id personId, int xBin, int yBin, String activityType){
-		this.startOfActivity=startOfActivity;
-		this.endOfActivity=endOfActivity;
-		this.personId=personId;
-		this.xBin=xBin;
-		this.yBin=yBin;
-		this.activityType = activityType;
+public class ResponisibilityScoringFunctionFactory implements
+		ScoringFunctionFactory {
+
+	private ResponsibilityCostModule rcm;
+
+	public ResponisibilityScoringFunctionFactory(ResponsibilityCostModule rcm) {
+		// TODO Auto-generated constructor stub
+		this.rcm=rcm;
 	}
 
-	public Id getPersonId() {
-		return this.personId;
+	@Override
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		// TODO Auto-generated method stub
+		//TODO hier den alten wert + wert fuer verursachte exposure....
+		// mal bei daniel gucken
+		//ScoringFunction sf = new ResponsibilityScoringFunction(rcm);
+		return null;
 	}
 
-	public double getStartTime() {
-		return this.startOfActivity;
-	}
-
-	public Double getEndTime() {
-		return this.endOfActivity;
-	}
-
-	public String getActivityType() {
-		return this.activityType;
-	}
-
-	public int getXBin() {
-		return this.xBin;
-	}
-	public int getYBin() {
-		return this.yBin;
-	}
-
-	public Double getDuration() {
-		return endOfActivity-startOfActivity;
-	}
 }
