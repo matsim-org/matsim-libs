@@ -30,12 +30,12 @@ public class ResponsiblityScoringFunction implements ScoringFunction {
 	
 	ScoringFunction delegate;
 	private Plan plan;
-	double rScore = 0.0;
+	//double rScore = 0.0;
 	EmissionControlerListener ecl;
 	
 	public ResponsiblityScoringFunction(Plan plan, ScoringFunction scoringFunction, EmissionControlerListener ecl){
 		this.plan=plan;
-		rScore=0.0;
+		//rScore=0.0;
 		this.delegate = scoringFunction;
 		this.ecl=ecl;
 		//this.ecl.runDistribution();
@@ -70,15 +70,8 @@ public class ResponsiblityScoringFunction implements ScoringFunction {
 
 	@Override
 	public double getScore() {
-		// TODO handling hier, wahlweise als score oder als addmoney
 		Id personId = plan.getPerson().getId();
-//		ArrayList<ResponsibilityEvent> personalRevents = new ArrayList<ResponsibilityEvent>();
-//		for(ResponsibilityEvent re: resp){
-//			if(re.getResponsiblePersonId().equals(personId)){
-//				personalRevents.add(re);
-//			}
-//		}
-		
+
 		Double amount = new Double(.0);
 		if(ecl!=null){
 			if(ecl.getResp()!=null){
@@ -91,11 +84,13 @@ public class ResponsiblityScoringFunction implements ScoringFunction {
 				}
 			}
 		}
-		if(amount>0.0)System.out.println("price " + amount + "----------------------------------------");
-		delegate.addMoney(amount);
-		//return delegate.getScore();
-		//return amount;
-		return 55.;
+		
+		if(amount>0.0) delegate.addMoney(-amount); //TODO ueberpruefen, hier muesste immer >=0 sein
+		
+		System.out.println("Person id: " + personId.toString() + " exposure amount " + amount + " resulting score " + delegate.getScore());
+		
+		
+		return delegate.getScore();
 	}
 
 	@Override

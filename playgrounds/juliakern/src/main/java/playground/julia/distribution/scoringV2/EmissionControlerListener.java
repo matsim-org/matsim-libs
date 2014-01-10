@@ -85,7 +85,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		links2xcells = gt.mapLinks2Xcells(noOfXCells);
 		links2ycells = gt.mapLinks2Ycells(noOfYCells);
 		
-		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);
 		emissionModule.createLookupTables();
@@ -101,7 +100,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		timeBinSize = simulationEndTime/noOfTimeBins;
 		
 		geh = new GeneratedEmissionsHandler(0.0, timeBinSize, links2xcells, links2ycells, WarmPollutant.NO2, ColdPollutant.NO2);
-		//eventsManager.addHandler(geh);
 		emissionModule.emissionEventsManager.addHandler(geh);
 	}
 
@@ -138,29 +136,14 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyScoring(ScoringEvent event) {
 		logger.info("before scoring. starting resp calc.");
 		
-		
-		
 		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
 		timeBinSize = simulationEndTime/noOfTimeBins;
 
 		intervalHandler.addActivitiesToTimetables(links2xcells, links2ycells, simulationEndTime);
 
-	//	System.out.println("+++++++++++++ " + intervalHandler.getActivities().size()); // sp-> 23
-		
-		
-//		for(ColdEmissionEvent coldEvent: seh.getColdEmissionEvents()){
-//			geh.handleEvent(coldEvent);
-//		}
-//		for(WarmEmissionEvent warmEvent: emissionModule.getWarmEmissionHandler().getWarmEvents()){
-//			geh.handleEvent(warmEvent);
-//		}
-		
-		System.out.println(intervalHandler.getActivities().size() + "activities");
-		System.out.println(geh.getEmissionsPerCell().size());
 		ResponsibilityUtils reut = new ResponsibilityUtils();
 		resp = new ArrayList<ResponsibilityEvent>();
 		reut.addExposureAndResponsibilityBinwise(intervalHandler.getActivities(), geh.getEmissionsPerCell(), resp, timeBinSize, controler.getConfig().qsim().getEndTime());
-		System.out.println("---------------------------" + resp.size());
 		
 	}
 	
