@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.testcases.MatsimTestUtils;
+//import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class ResponsibilityCostModule {
@@ -34,6 +34,7 @@ public class ResponsibilityCostModule {
 	double timeBinSize;
 	private Map<Id, Integer> link2xBins;
 	private Map<Id, Integer> link2yBins;
+	private double eps = 0.000001;
 	
 	private final static Double dist0factor = 0.216;
 	private final static Double dist1factor = 0.132;
@@ -76,8 +77,8 @@ public class ResponsibilityCostModule {
 				case 3: distributionFactor = dist3factor; break;
 			}
 			
-			if(ema.getStartTime() >= startOfTimeInterval -MatsimTestUtils.EPSILON){
-				if(ema.getEndTime()<= endOfTimeInterval + MatsimTestUtils.EPSILON){
+			if(ema.getStartTime() >= startOfTimeInterval - eps ){
+				if(ema.getEndTime()<= endOfTimeInterval + eps){
 					//TODO woher??
 					Double emissionConcentration = 100.;
 					value += ema.getDuration() * distributionFactor * emissionConcentration;
