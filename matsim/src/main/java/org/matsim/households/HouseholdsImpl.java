@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.households;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -42,7 +42,7 @@ public class HouseholdsImpl implements Households{
 	private final ObjectAttributes householdAttributes = new ObjectAttributes();
 	
 	public HouseholdsImpl(){
-		this.households = new HashMap<Id, Household>();
+		this.households = new LinkedHashMap<Id, Household>();
 		this.factory = new HouseholdsFactoryImpl();
 	}
 	
