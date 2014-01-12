@@ -66,6 +66,22 @@ public class PopulationFromSightings {
 			Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
 					sightingsForThisPerson);
 			person.addPlan(plan1);
+			
+			scenario.getPopulation().addPerson(person);
+		}
+	}
+	
+	public static void createPopulationWithEndTimesAtLastSightingsAndStayAtHomePlan(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
+		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
+			Id personId = sightingsPerPerson.getKey();
+			List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
+			Person person = scenario.getPopulation().getFactory().createPerson(personId);
+			Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
+					sightingsForThisPerson);
+			person.addPlan(plan1);
+			Plan plan2 = scenario.getPopulation().getFactory().createPlan();
+			person.addPlan(plan2);
+			person.setSelectedPlan(plan1);
 			scenario.getPopulation().addPerson(person);
 		}
 	}

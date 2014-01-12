@@ -13,8 +13,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
+import org.matsim.contrib.cadyts.general.CadytsPlanUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -82,7 +84,16 @@ public class CompareMain {
 		Counts counts = volumesToCounts(groundTruthVolumes);
 		cdrVolumes = runWithTwoPlansAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
 	}
+	
+	public void runWithOnePlanAndCadyts() {
+		ticker.finish();
+		callProcess.dump();
+		List<Sighting> sightings = callProcess.getSightings();
 
+		Counts counts = volumesToCounts(groundTruthVolumes);
+		cdrVolumes = runWithOnePlanAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
+	}
+	
 	public void runOnceWithSimplePlans() {
 		ticker.finish();
 		callProcess.dump();
@@ -304,9 +315,91 @@ public class CompareMain {
 			}} ) ;
 		controler.setCreateGraphs(false);
 		controler.run();
+		double sum=0.0;
+		for (Person person : scenario2.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			double currentPlanCadytsCorrection = calcCadytsScore(context, plan);
+			sum += Math.abs(currentPlanCadytsCorrection);
+		}
+		System.out.println(sum);
 		return controler.getVolumes();
 	}
 
+	public static VolumesAnalyzer runWithOnePlanAndCadyts(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, Counts counts) {
+		Config config = ConfigUtils.createConfig();
+		ActivityParams sightingParam = new ActivityParams("sighting");
+		sightingParam.setTypicalDuration(30.0 * 60);
+		config.planCalcScore().addActivityParams(sightingParam);
+		config.planCalcScore().setTraveling_utils_hr(-6);
+		config.planCalcScore().setPerforming_utils_hr(0);
+		config.planCalcScore().setTravelingOther_utils_hr(-6);
+		config.planCalcScore().setConstantCar(0);
+		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
+		config.planCalcScore().setWriteExperiencedPlans(true);
+		config.controler().setLastIteration(10);
+		QSimConfigGroup tmp = config.qsim();
+		tmp.setFlowCapFactor(100);
+		tmp.setStorageCapFactor(100);
+		tmp.setRemoveStuckVehicles(false);
+		
+		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+		stratSets.setModuleName("ccc") ;
+		stratSets.setProbability(1.) ;
+		config.strategy().addStrategySettings(stratSets) ;
+
+		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario2.setNetwork(network);
+
+
+
+		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
+		for (Sighting sighting : sightings) {
+
+			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
+			if (sightingsOfPerson == null) {
+				sightingsOfPerson = new ArrayList<Sighting>();
+				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
+
+			}
+			System.out.println(sighting.getCellTowerId().toString());
+
+			sightingsOfPerson.add(sighting);
+		}
+
+
+		PopulationFromSightings.createPopulationWithEndTimesAtLastSightingsAndStayAtHomePlan(scenario2, linkToZoneResolver, allSightings);
+		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
+
+		final CadytsContext context = new CadytsContext(config, counts) ;
+		Controler controler = new Controler(scenario2);
+		controler.setOverwriteFiles(true);
+		controler.addControlerListener(context);
+		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+				// KeepSelected planSelector = new KeepSelected();
+				CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,context);
+				planSelector.setCadytsWeight(10000000);
+				return new PlanStrategyImpl(planSelector);
+			}} ) ;
+		controler.setCreateGraphs(false);
+		controler.run();
+		for (Person person : scenario2.getPopulation().getPersons().values()) {
+			double score0 = calcCadytsScore(context, person.getPlans().get(0));
+			double score1 = calcCadytsScore(context, person.getPlans().get(1));
+			// double score1 = 0;
+			System.out.printf("%f\t%f\n", score0, score1);
+		}
+		return controler.getVolumes();
+	}
+
+	private static double calcCadytsScore(final CadytsContext context, Plan plan) {
+		cadyts.demand.Plan<Link> currentPlanSteps = context.getPlansTranslator().getPlanSteps(plan);
+		double currentPlanCadytsCorrection = context.getCalibrator().calcLinearPlanEffect(currentPlanSteps); // / this.beta;
+		CadytsPlanUtils.printCadytsPlan(currentPlanSteps);
+		return currentPlanCadytsCorrection;
+	}
+	
 	public static VolumesAnalyzer runOnceWithSimplePlans(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings) {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");

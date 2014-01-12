@@ -19,13 +19,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class OneWorkplace {
+public class OneWorkplaceOneStratumUnderestimated {
 
 	private Scenario scenario;
 	private CompareMain compareMain;
 
 	public static void main(String[] args) {
-		new OneWorkplace().run();
+		new OneWorkplaceOneStratumUnderestimated().run();
 	}
 
 	void run() {
@@ -49,9 +49,20 @@ public class OneWorkplace {
 		new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
 		Population population = scenario.getPopulation();
 		for (int i=0; i<quantity; i++) {
-			Person person = population.getFactory().createPerson(createId(i));
+			Person person = population.getFactory().createPerson(new IdImpl("9h_"+Integer.toString(i)));
 			Plan plan = population.getFactory().createPlan();
-			plan.addActivity(createHomeMorning(new IdImpl("1")));
+			plan.addActivity(createHomeMorning(new IdImpl("1"), 9 * 60 * 60));
+			plan.addLeg(createDriveLeg());
+			plan.addActivity(createWork(new IdImpl("20")));
+			plan.addLeg(createDriveLeg());
+			plan.addActivity(createHomeEvening(new IdImpl("1")));
+			person.addPlan(plan);
+			population.addPerson(person);
+		}
+		for (int i=0; i<quantity; i++) {
+			Person person = population.getFactory().createPerson(new IdImpl("7h_"+Integer.toString(i)));
+			Plan plan = population.getFactory().createPlan();
+			plan.addActivity(createHomeMorning(new IdImpl("1"), 7 * 60 * 60));
 			plan.addLeg(createDriveLeg());
 			plan.addActivity(createWork(new IdImpl("20")));
 			plan.addLeg(createDriveLeg());
@@ -65,30 +76,29 @@ public class OneWorkplace {
 
 			@Override
 			public boolean makeACall(ActivityEndEvent event) {
-				return Integer.parseInt(event.getPersonId().toString()) % 2 == 0;
+				return event.getActType().equals("home") || event.getPersonId().toString().startsWith("9h") || Math.random() < 0.5;
 			}
 
 			@Override
 			public boolean makeACall(ActivityStartEvent event) {
-				return Integer.parseInt(event.getPersonId().toString()) % 2 == 1;
+				return false;
 			}
 
 			@Override
 			public boolean makeACall(Id id, double time) {
-				double dailyRate = 0;
-				double secondlyProbability = dailyRate / (double) (24*60*60);
-				return Math.random() < secondlyProbability;
+				return false;
 			}
 
 		});
 		controler.run();
-		compareMain.runWithTwoPlansAndCadyts();
+		compareMain.runWithOnePlanAndCadyts();
 		System.out.printf("%f\t%f\t%f\n",compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
+
 	}
 
-	private Activity createHomeMorning(IdImpl idImpl) {
+	private Activity createHomeMorning(IdImpl idImpl, double time) {
 		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
-		act.setEndTime(9 * 60 * 60);
+		act.setEndTime(time);
 		return act;
 	}
 
@@ -106,10 +116,6 @@ public class OneWorkplace {
 	private Activity createHomeEvening(IdImpl idImpl) {
 		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
 		return act;
-	}
-
-	private Id createId(int i) {
-		return new IdImpl(Integer.toString(i));
 	}
 
 	CompareMain getCompare() {

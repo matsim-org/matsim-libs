@@ -12,10 +12,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class PotsdamRun implements Runnable {
+public class BerlinRun implements Runnable {
 	
 	public static void main(String[] args) {
-		PotsdamRun potsdamRun = new PotsdamRun();
+		BerlinRun potsdamRun = new BerlinRun();
 		potsdamRun.run();
 	}
 	
@@ -24,8 +24,8 @@ public class PotsdamRun implements Runnable {
 		Config config = ConfigUtils.createConfig();
 //		config.vspExperimental().setActivityDurationInterpretation(VspExperimentalConfigGroup.END_TIME_ONLY);
 //		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
-		config.network().setInputFile("input/berlin/bb_5_merge.xml.gz");
-		config.plans().setInputFile("input/berlin/bb_5_merge.xml.gz");
+		config.network().setInputFile("input/potsdam/network.xml");
+		config.plans().setInputFile("input/potsdam/plans.xml");
 		config.controler().setOutputDirectory("output");
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.strategy().setMaxAgentPlanMemorySize(5);
