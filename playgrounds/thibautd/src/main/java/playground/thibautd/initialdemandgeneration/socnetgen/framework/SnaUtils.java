@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -36,17 +35,16 @@ public class SnaUtils {
 		int nTriples = 0;
 		int nTriangles = 0;
 		for ( Id ego : socialNetwork.getEgos() ) {
-			final Set<Id> alters = socialNetwork.getAlters( ego );
-			final Set<Id> remainingAlters = new HashSet<Id>( alters );
+			final Set<Id> alterSet = socialNetwork.getAlters( ego );
+			final Id[] alters = alterSet.toArray( new Id[ alterSet.size() ] ); 
 
-			for ( Id alter1 : alters ) {
-				remainingAlters.remove( alter1 );
-				final Set<Id> altersOfAlter1 = socialNetwork.getAlters( alter1 );
-				for ( Id alter2 : remainingAlters ) {
+			for ( int alter1index = 0; alter1index < alters.length; alter1index++ ) {
+				final Set<Id> altersOfAlter1 = socialNetwork.getAlters( alters[ alter1index ] );
+				for ( int alter2index = alter1index + 1; alter2index < alters.length; alter2index++ ) {
 					// this is a new triple
 					nTriples++;
 
-					if ( altersOfAlter1.contains( alter2 ) ) {
+					if ( altersOfAlter1.contains( alters[ alter2index ] ) ) {
 						nTriangles++;
 					}
 				}
