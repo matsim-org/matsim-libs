@@ -87,6 +87,7 @@ public class ModelIterator {
 			final double target) {
 		SocialNetwork currentbest = initialNetwork;
 		double bestNetSize = SnaUtils.calcAveragePersonalNetworkSize( initialNetwork );
+		double bestThreshold = runner.getThresholds().getPrimaryTieThreshold();
 
 		// assumes that net size decreases with threshold increase
 		// and use binary search until randomness makes it invalid
@@ -115,6 +116,7 @@ public class ModelIterator {
 			if ( Math.abs( target - bestNetSize ) > Math.abs( target - newNetSize ) ) {
 				bestNetSize = newNetSize;
 				currentbest = newNet;
+				bestThreshold = newThreshold;
 			}
 
 			if ( newNetSize < target ) {
@@ -125,6 +127,8 @@ public class ModelIterator {
 			}
 		}
 
+		// make the thresholds match the ones used to generate the returned network
+		runner.getThresholds().setPrimaryTieThreshold( bestThreshold );
 		return currentbest;
 	}
 
@@ -149,6 +153,7 @@ public class ModelIterator {
 			final double target) {
 		SocialNetwork currentbest = initialNetwork;
 		double bestClustering = SnaUtils.calcClusteringCoefficient( initialNetwork );
+		double bestThreshold = runner.getThresholds().getSecondaryReduction();
 
 		// assumes that clustering index decreases with threshold increase,
 		// and use binary search until randomness makes it invalid
@@ -177,6 +182,7 @@ public class ModelIterator {
 			if ( Math.abs( target - bestClustering ) > Math.abs( target - newClustering ) ) {
 				bestClustering = newClustering;
 				currentbest = newNet;
+				bestThreshold = newThreshold;
 			}
 
 			if ( newClustering < target ) {
@@ -187,6 +193,8 @@ public class ModelIterator {
 			}
 		}
 
+		// make the thresholds match the ones used to generate the returned network
+		runner.getThresholds().setSecondaryReduction( bestThreshold );
 		return currentbest;
 	}
 
