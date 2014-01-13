@@ -328,8 +328,10 @@ public class ModelIterator {
 						controlValue);
 			}
 
-			if ( interpolate && !Double.isNaN( controlValue ) ) {
+			if ( interpolate && !Double.isNaN( controlValue ) &&
+					(Double.isNaN( valueAtLowerBound ) || Double.isNaN( valueAtUpperBound )) ) {
 				if ( !Double.isNaN( valueAtLowerBound ) ) {
+					log.info( "new threshold: interpolated from lower bound and control" );
 					return interpolate(
 							lowerBoundThreshold,
 							valueAtLowerBound,
@@ -338,6 +340,7 @@ public class ModelIterator {
 				}
 
 				if ( !Double.isNaN( valueAtUpperBound ) ) {
+					log.info( "new threshold: interpolated from lower bound and control" );
 					return interpolate(
 							upperBoundThreshold,
 							valueAtUpperBound,
