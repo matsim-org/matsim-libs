@@ -99,7 +99,7 @@ public class ModelIterator {
 				bestNetSize );
 
 		while ( adaptiveThreshold.continueSearch() &&
-				Math.abs( target - bestNetSize ) > PRECISION_PRIMARY ) {
+				continueBasedOnStat( target , bestNetSize , PRECISION_PRIMARY ) ) {
 			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setPrimaryTieThreshold( newThreshold );
 
@@ -137,6 +137,7 @@ public class ModelIterator {
 				// but could not find a better way to do it right.
 				adaptiveThreshold.updateLowerBoundWithoutResult( newThreshold );
 				log.info( "secondary tie generation aborted" );
+				log.info( "avg. personal network size at abort: "+SnaUtils.calcAveragePersonalNetworkSize( e.getSocialNetworkAtAbort() ) );
 			}
 		}
 
@@ -178,13 +179,15 @@ public class ModelIterator {
 			bestThreshold,
 			bestClustering );
 
+		// this is stable: only compute once
+		final SocialNetwork primaryNetwork = runner.runPrimary( population );
 		while ( adaptiveThreshold.continueSearch() &&
-				Math.abs( target - bestClustering ) > PRECISION_SECONDARY ) {
+				continueBasedOnStat( target , bestClustering , PRECISION_SECONDARY ) ) {
 			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setSecondaryReduction( -newThreshold );
 
 			// TODO: early abort
-			final SocialNetwork newNet = runner.runSecondary( initialNetwork , population );
+			final SocialNetwork newNet = runner.runSecondary( primaryNetwork , population );
 			double newClustering = SnaUtils.calcClusteringCoefficient( newNet );
 			notifyNewState( runner.getThresholds() , newNet , -1 , newClustering );
 			if ( Math.abs( target - bestClustering ) > Math.abs( target - newClustering ) ) {
@@ -202,6 +205,19 @@ public class ModelIterator {
 		runner.getThresholds().setSecondaryReduction( -bestThreshold );
 		assert adaptiveThreshold.inRange( bestThreshold );
 		return currentbest;
+	}
+
+	private static boolean continueBasedOnStat(
+			final double target,
+			final double stat,
+			final double precision) {
+		final double dist = Math.abs( target - stat );
+		final boolean v = dist > precision;
+
+		log.info( "stat "+stat+" at distance "+dist+" of target "+target );
+		log.info( (v ? "CONTINUE" : "STOP" )+" at precision "+precision );
+
+		return v;
 	}
 
 	// adapts threshold assuming stat monotonically decreases with threshold
@@ -262,7 +278,9 @@ public class ModelIterator {
 			final double newThreshold = Double.isInfinite( interpolatedThreshold ) ?
 				calcThreshold( false ) :
 				interpolatedThreshold;
-			log.info( "new threshold "+newThreshold+" in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[" );
+			log.info( "new threshold "+newThreshold+" in ["+lowerBoundThreshold+" ("+valueAtLowerBound+") ; "+
+					upperBoundThreshold+" ("+valueAtUpperBound+")] with control "+
+					controlThreshold+" ("+controlValue+")" );
 			assert Double.isNaN( lowerBoundThreshold ) || newThreshold > lowerBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			return newThreshold;
@@ -345,9 +363,14 @@ public class ModelIterator {
 
 		public boolean continueSearch( ) {
 			// stop if lower bound greater than upper bound
-			return Double.isNaN( lowerBoundThreshold ) ||
+			final boolean v = Double.isNaN( lowerBoundThreshold ) ||
 				Double.isNaN( upperBoundThreshold ) ||
 				lowerBoundThreshold <= upperBoundThreshold;
+
+			log.info( "interval ["+lowerBoundThreshold+" ; "+upperBoundThreshold+"]: "+
+					(v ? "CONTINUE" : "STOP" ) );
+
+			return v;
 		}
 	}
 }

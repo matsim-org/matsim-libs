@@ -213,7 +213,7 @@ public class ModelRunner<T extends Agent> {
 
 				if ( random.nextDouble() < prob ) {
 					network.addTie( ego.getId() , alter.getId() );
-					if ( nTies++ > maxNTies ) throw new SecondaryTieLimitExceededException();
+					if ( nTies++ > maxNTies ) throw new SecondaryTieLimitExceededException( network );
 				}
 			}
 		}
@@ -260,6 +260,15 @@ public class ModelRunner<T extends Agent> {
 
 	public static class SecondaryTieLimitExceededException extends Exception {
 		private static final long serialVersionUID = -3209753011944061999L;
+		private final SocialNetwork sn;
+
+		public SecondaryTieLimitExceededException(final SocialNetwork sn) {
+			this.sn = sn;
+		}
+
+		public SocialNetwork getSocialNetworkAtAbort() {
+			return sn;
+		}
 	}
 }
 
