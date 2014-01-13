@@ -24,8 +24,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelRunner.SecondaryTieLimitExceededException;
-
 /**
  * Iteratively runs a ModelRunner, modifying the thresholds at each time step,
  * in order to obtain average personal network size and clustering coefficients
@@ -113,34 +111,18 @@ public class ModelIterator {
 				continue;
 			}
 
-			try {
-				final double nTies = newNetPrimarySize * population.getAgents().size();
-				final double targetTies = target * population.getAgents().size();
-				final long maxNSecondaryTies = (long) (targetTies - nTies);
-
-				final SocialNetwork newNet = runner.runSecondary( newNetPrimary , population , maxNSecondaryTies );
-				final double newNetSize = SnaUtils.calcAveragePersonalNetworkSize( newNet );
-				notifyNewState( runner.getThresholds() , newNet , newNetSize , -1 );
-				if ( Math.abs( target - bestNetSize ) > Math.abs( target - newNetSize ) ) {
-					bestNetSize = newNetSize;
-					currentbest = newNet;
-					bestThreshold = newThreshold;
-				}
-
-				adaptiveThreshold.notifyNewValue(
-					newThreshold,
-					newNetSize );
+			final SocialNetwork newNet = runner.runSecondary( newNetPrimary , population );
+			final double newNetSize = SnaUtils.calcAveragePersonalNetworkSize( newNet );
+			notifyNewState( runner.getThresholds() , newNet , newNetSize , -1 );
+			if ( Math.abs( target - bestNetSize ) > Math.abs( target - newNetSize ) ) {
+				bestNetSize = newNetSize;
+				currentbest = newNet;
+				bestThreshold = newThreshold;
 			}
-			catch (SecondaryTieLimitExceededException e) {
-				// this skips the whole "best" updating
-				// this looks almost as ugly as good ol' goto,
-				// but could not find a better way to do it right.
-				adaptiveThreshold.updateLowerBoundWithoutResult( newThreshold );
-				log.info( "secondary tie generation aborted" );
-				final double netSize = SnaUtils.calcAveragePersonalNetworkSize( e.getSocialNetworkAtAbort() );
-				assert netSize > target;
-				log.info( "avg. personal network size at abort: "+netSize );
-			}
+
+			adaptiveThreshold.notifyNewValue(
+				newThreshold,
+				newNetSize );
 		}
 
 		// make the thresholds match the ones used to generate the returned network
