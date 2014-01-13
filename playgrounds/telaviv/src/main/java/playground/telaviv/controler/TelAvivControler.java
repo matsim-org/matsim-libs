@@ -20,11 +20,11 @@
 
 package playground.telaviv.controler;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
+//import org.matsim.core.controler.Controler;
+//import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.roadpricing.RoadPricing;
-
 import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
+import playground.telaviv.locationchoice.matsimdc.DCControler;
 
 public final class TelAvivControler {
 		
@@ -34,7 +34,7 @@ public final class TelAvivControler {
 			System.out.println("Usage: TelAvivControler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new Controler(args);
+			final DCControler controler = new DCControler(args);
 			
 			// add road pricing contrib
 			controler.addControlerListener(new RoadPricing());
@@ -48,9 +48,9 @@ public final class TelAvivControler {
 			 * We use a Scoring Function that get the Facility Opening Times from
 			 * the Facilities instead of the Config File.
 			 */
-			controler.setScoringFunctionFactory(
-					new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario())
-					) ;
+//			controler.setScoringFunctionFactory(
+//					new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario())
+//					) ;
 
 			controler.run();
 		}
