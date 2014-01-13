@@ -134,6 +134,7 @@ public class ModelRunner<T extends Agent> {
 			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
 		}
 
+		primaryNetwork.lock();
 		final Random random = new Random( randomSeed + 20140107 );
 		final SocialNetwork network = new SocialNetwork( primaryNetwork );
 
@@ -205,26 +206,18 @@ public class ModelRunner<T extends Agent> {
 			final T ego,
 			final SocialNetwork network,
 			final Map<Id, T> remainingAgents) {
-		final Set<T> unknownFriendsOfFriends = Collections.newSetFromMap( new LinkedHashMap<T, Boolean>() );
-		final Set<Id> alters = network.getAlters( ego.getId() );
+		final Set<Id> allSecondary = network.getNetworkOfUnknownFriendsOfFriends().getAlters( ego.getId() );
+		final List<T> list = new ArrayList<T>( allSecondary.size() );
 
-		for ( Id alter : alters ) {
-			final Set<Id> altersOfAlter = network.getAlters( alter );
-			
-			for ( Id alterOfAlter : altersOfAlter ) {
-				// is the ego?
-				if ( alterOfAlter.equals( ego.getId() ) ) continue;
-				// already a friend?
-				if ( alters.contains( alterOfAlter ) ) continue;
-				final T friendOfFriend = remainingAgents.get( alterOfAlter );
+		for ( Id alterOfAlter : allSecondary ) {
+			final T friendOfFriend = remainingAgents.get( alterOfAlter );
 
-				// already allocated?
-				if ( friendOfFriend == null ) continue;
-				unknownFriendsOfFriends.add( friendOfFriend );
-			}
+			// already allocated?
+			if ( friendOfFriend == null ) continue;
+			list.add( friendOfFriend );
 		}
 
-		return new ArrayList<T>( unknownFriendsOfFriends );
+		return list;
 	}
 
 	private static double calcAcceptanceProbability(
