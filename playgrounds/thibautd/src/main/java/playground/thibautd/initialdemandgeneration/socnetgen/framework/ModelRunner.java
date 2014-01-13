@@ -81,20 +81,16 @@ public class ModelRunner<T extends Agent> {
 		if ( utilityFunction == null || thresholds == null ) {
 			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
 		}
-		final Random random = new Random( randomSeed );
-		final SocialNetwork network = new SocialNetwork( population );
-
 		log.info( "create primary ties using step size "+stepSizePrimary );
-		fillInPrimaryTies( random , network , population );
+		final SocialNetwork primaryNetwork = runPrimary( population );
+
 		log.info( "create secondary ties using step size "+stepSizeSecondary );
 		try {
-			fillInSecondaryTies( random , network , population , Long.MAX_VALUE );
+			return runSecondary( primaryNetwork , population , Long.MAX_VALUE );
 		}
 		catch (SecondaryTieLimitExceededException e) {
 			throw new RuntimeException( "limit exceeded while not specified!?" , e );
 		}
-
-		return network;
 	}
 
 	public SocialNetwork runPrimary(final SocialPopulation<T> population) {
@@ -122,7 +118,7 @@ public class ModelRunner<T extends Agent> {
 		final SocialNetwork network = new SocialNetwork( primaryNetwork );
 
 		log.info( "create secondary ties using step size "+stepSizeSecondary );
-		fillInSecondaryTies( random , network , population , maxNSecondaryTies );
+		fillInSecondaryTies( random , primaryNetwork , network , population , maxNSecondaryTies );
 
 		return network;
 	}
@@ -168,6 +164,7 @@ public class ModelRunner<T extends Agent> {
 
 	private void fillInSecondaryTies(
 			final Random random,
+			final SocialNetwork primaryNetwork,
 			final SocialNetwork network,
 			final SocialPopulation<T> population,
 			final long maxNTies) throws SecondaryTieLimitExceededException {
@@ -185,7 +182,7 @@ public class ModelRunner<T extends Agent> {
 			final T ego = remainingAgents.remove( id );
 
 			final List<T> potentialAlters =
-				getUnknownFriendsOfFriends( ego , network , remainingAgents );
+				getUnknownFriendsOfFriends( ego , primaryNetwork , remainingAgents );
 
 			for ( int remainingChecks = (int) (potentialAlters.size() / ((double) stepSizeSecondary));
 					remainingChecks > 0 && !potentialAlters.isEmpty();
