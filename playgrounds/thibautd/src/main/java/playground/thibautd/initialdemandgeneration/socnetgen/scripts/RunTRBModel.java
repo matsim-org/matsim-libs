@@ -61,8 +61,10 @@ public class RunTRBModel {
 							final ArentzeAgent alter) {
 						final int ageClassDifference = Math.abs( ego.getAgeCategory() - alter.getAgeCategory() );
 
-						// XXX: solve case dist == 0
-						return -1.222 * Math.log( CoordUtils.calcDistance( ego.getCoord() , alter.getCoord() ) )
+						// increase distance by 1 (normally meter) to avoid linking with all agents
+						// living in the same place.
+						// TODO: test sensitivity of the results to this
+						return -1.222 * Math.log( CoordUtils.calcDistance( ego.getCoord() , alter.getCoord() ) + 1 )
 							+0.725 * dummy( ego.isMale() == alter.isMale() )
 							+0.918 * dummy( ageClassDifference == 0 )
 							-0.227 * dummy( ageClassDifference == 2 )
