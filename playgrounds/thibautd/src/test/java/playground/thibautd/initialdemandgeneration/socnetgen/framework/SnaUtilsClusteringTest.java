@@ -42,12 +42,15 @@ public class SnaUtilsClusteringTest {
 	private static class Fixture {
 		public final SocialNetwork socialNetwork;
 		public final double clusteringIndex;
+		public final double avgNetworkSize;
 
 		public Fixture(
 				final SocialNetwork socialNetwork,
-				final double clusteringIndex) {
+				final double clusteringIndex,
+				final double avgNetworkSize) {
 			this.socialNetwork = socialNetwork;
 			this.clusteringIndex = clusteringIndex;
+			this.avgNetworkSize = avgNetworkSize;
 		}
 	}
 
@@ -84,15 +87,26 @@ public class SnaUtilsClusteringTest {
 		net.addTie( new Tie( id6 , id5 ) );
 		net.addTie( new Tie( id6 , id4 ) );
 
-		fixtures.add( new Fixture( net , 9. / 20 ) );
+		double sumNetSizes = 0;
+		sumNetSizes += 3; // agent 1
+		sumNetSizes += 2; // agent 2
+		sumNetSizes += 3; // agent 3
+		sumNetSizes += 1; // agent 4
+		sumNetSizes += 1; // agent 5
+		sumNetSizes += 4; // agent 6
+		sumNetSizes += 2; // agent 7
+		sumNetSizes += 3; // agent 8
+		sumNetSizes += 3; // agent 9
+
+		fixtures.add( new Fixture( net , 9. / 20 , sumNetSizes / 9. ) );
 	}
 
 	@Before
 	public void createUnitIndex() {
-		// 1 -- 2 
-		// | \/ |
-		// | /\ |
-		// 4 -- 3
+		// 1 -- 2  5 -- 6
+		// | \/ |  | \/ |
+		// | /\ |  | /\ |
+		// 4 -- 3  8 -- 7
 		final SocialNetwork net = new SocialNetwork( false );
 
 		// ids
@@ -100,20 +114,58 @@ public class SnaUtilsClusteringTest {
 		final Id id2 = new IdImpl( 2 );
 		final Id id3 = new IdImpl( 3 );
 		final Id id4 = new IdImpl( 4 );
+		final Id id5 = new IdImpl( 5 );
+		final Id id6 = new IdImpl( 6 );
+		final Id id7 = new IdImpl( 7 );
+		final Id id8 = new IdImpl( 8 );
 
 		// horizontal
 		net.addTie( new Tie( id1 , id2 ) );
 		net.addTie( new Tie( id4 , id3 ) );
+		net.addTie( new Tie( id5 , id6 ) );
+		net.addTie( new Tie( id7 , id8 ) );
 
 		// vertical
 		net.addTie( new Tie( id1 , id4 ) );
 		net.addTie( new Tie( id2 , id3 ) );
+		net.addTie( new Tie( id5 , id8 ) );
+		net.addTie( new Tie( id6 , id7 ) );
 
 		// diagonal
 		net.addTie( new Tie( id1 , id3 ) );
 		net.addTie( new Tie( id4 , id2 ) );
+		net.addTie( new Tie( id5 , id7 ) );
+		net.addTie( new Tie( id8 , id6 ) );
 
-		fixtures.add( new Fixture( net , 1 ) );
+		fixtures.add( new Fixture( net , 1 , 3 ) );
+	}
+
+	@Before
+	public void createNullIndex() {
+		// 1 -- 2  5    6
+		//
+		// 4 -- 3  8    7
+		final SocialNetwork net = new SocialNetwork( false );
+
+		// ids
+		final Id id1 = new IdImpl( 1 );
+		final Id id2 = new IdImpl( 2 );
+		final Id id3 = new IdImpl( 3 );
+		final Id id4 = new IdImpl( 4 );
+		final Id id5 = new IdImpl( 5 );
+		final Id id6 = new IdImpl( 6 );
+		final Id id7 = new IdImpl( 7 );
+		final Id id8 = new IdImpl( 8 );
+
+		net.addTie( new Tie( id1 , id2 ) );
+		net.addTie( new Tie( id4 , id3 ) );
+
+		net.addEgo( id5 );
+		net.addEgo( id6 );
+		net.addEgo( id7 );
+		net.addEgo( id8 );
+
+		fixtures.add( new Fixture( net , 0 , .5 ) );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -128,6 +180,18 @@ public class SnaUtilsClusteringTest {
 					SnaUtils.calcClusteringCoefficient( f.socialNetwork ),
 					MatsimTestUtils.EPSILON);
 		}
+	}
+
+	@Test
+	public void testAvgNetworkSize() {
+		for ( Fixture f : fixtures ) {
+			Assert.assertEquals(
+					"unexpected avg. network size",
+					f.avgNetworkSize,
+					SnaUtils.calcAveragePersonalNetworkSize( f.socialNetwork ),
+					MatsimTestUtils.EPSILON);
+		}
+
 	}
 }
 

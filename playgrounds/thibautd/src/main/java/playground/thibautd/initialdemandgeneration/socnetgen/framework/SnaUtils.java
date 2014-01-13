@@ -54,7 +54,19 @@ public class SnaUtils {
 
 		// note: in Arentze's paper, it is 3 * triangle / triples.
 		// but here, we count every triangle three times.
-		return (1d * nTriangles) / nTriples;
+		assert nTriples >= 0;
+		assert nTriangles >= 0;
+		return nTriples > 0 ? (1d * nTriangles) / nTriples : 0;
+	}
+
+	public static double calcAveragePersonalNetworkSize(final SocialNetwork socialNetwork) {
+		int count = 0;
+		int sum = 0;
+		for ( Id ego : socialNetwork.getEgos() ) {
+			count++;
+			sum += socialNetwork.getAlters( ego ).size();
+		}
+		return ((double) sum) / count;
 	}
 }
 
