@@ -344,9 +344,10 @@ public class ModelIterator {
 		}
 
 		public boolean continueSearch( ) {
+			// stop if lower bound greater than upper bound
 			return Double.isNaN( lowerBoundThreshold ) ||
 				Double.isNaN( upperBoundThreshold ) ||
-				lowerBoundThreshold >= upperBoundThreshold;
+				lowerBoundThreshold <= upperBoundThreshold;
 		}
 	}
 }
