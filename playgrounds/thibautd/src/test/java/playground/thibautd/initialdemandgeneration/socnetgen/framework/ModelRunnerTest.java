@@ -21,7 +21,9 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -97,6 +99,29 @@ public class ModelRunnerTest {
 						"got non remaining agent",
 						partialAgents.values().contains( candidate ) );
 			}
+		}
+	}
+
+	@Test
+	public void testGetUnknownFriendsOfFriendsReturnsUniqueAgents() {
+		final TestSocialNetwork network = createTestNetwork();
+
+		final Map<Id, Agent> allAgents = new LinkedHashMap<Id, Agent>();
+		for ( Id ego : network.socialNetwork.getEgos() ) {
+			allAgents.put( ego , new AgentImpl( ego ) );
+		}
+
+		for ( Agent ego : allAgents.values() ) {
+			final Collection<Agent> v =
+				ModelRunner.getUnknownFriendsOfFriends(
+						ego,
+						network.socialNetwork,
+						Collections.unmodifiableMap( allAgents) );
+
+			Assert.assertEquals(
+					"unexpected number of friends of friends: duplicates",
+					new HashSet<Agent>( v ).size(),
+					v.size() );
 		}
 	}
 
