@@ -47,9 +47,9 @@ public class ModelRunnerTest {
 	public void testRemoveRandomMappingRemovesSomething() {
 		final Random rand = new Random( 1234 );
 
-		final SocialPopulation population = new SocialPopulation();
+		final SocialPopulation<AgentImpl> population = new SocialPopulation<AgentImpl>();
 		for ( int i = 0; i < 1000; i++ ) {
-			population.addAgent( new Agent( new IdImpl( i ) ) );
+			population.addAgent( new AgentImpl( new IdImpl( i ) ) );
 		}
 
 		final Map<Id, Agent> map = new HashMap<Id, Agent>( population.getAgentsMap() );
@@ -72,9 +72,9 @@ public class ModelRunnerTest {
 	public void testRemoveRandomMappingIsRandom() {
 		final Random rand = new Random( 1234 );
 
-		final SocialPopulation population = new SocialPopulation();
+		final SocialPopulation<AgentImpl> population = new SocialPopulation<AgentImpl>();
 		for ( int i = 0; i < 1000; i++ ) {
-			population.addAgent( new Agent( new IdImpl( i ) ) );
+			population.addAgent( new AgentImpl( new IdImpl( i ) ) );
 		}
 
 		final Set<Agent> returnedAgents = new HashSet<Agent>();
@@ -98,7 +98,7 @@ public class ModelRunnerTest {
 
 		final Map<Id, Agent> allAgents = new HashMap<Id, Agent>();
 		for ( Id ego : network.socialNetwork.getEgos() ) {
-			allAgents.put( ego , new Agent( ego ) );
+			allAgents.put( ego , new AgentImpl( ego ) );
 		}
 
 		for ( Agent ego : allAgents.values() ) {
@@ -126,7 +126,7 @@ public class ModelRunnerTest {
 
 		final Map<Id, Agent> allAgents = new LinkedHashMap<Id, Agent>();
 		for ( Id ego : network.socialNetwork.getEgos() ) {
-			allAgents.put( ego , new Agent( ego ) );
+			allAgents.put( ego , new AgentImpl( ego ) );
 		}
 
 		final Random rand = new Random( 9734 );
@@ -227,6 +227,19 @@ public class ModelRunnerTest {
 	private static class TestSocialNetwork {
 		public final SocialNetwork socialNetwork = new SocialNetwork();
 		public final Map<Id, Collection<Id>> unkownFriendsOfFriends = new LinkedHashMap<Id, Collection<Id>>();
+	}
+	
+	private static class AgentImpl implements Agent {
+		private final Id id;
+
+		public AgentImpl(final Id id) {
+			this.id = id;
+		}
+
+		@Override
+		public Id getId() {
+			return id;
+		}
 	}
 }
 

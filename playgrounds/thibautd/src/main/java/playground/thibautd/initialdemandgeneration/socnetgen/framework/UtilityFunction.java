@@ -22,7 +22,7 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 /**
  * @author thibautd
  */
-public interface UtilityFunction {
-	public double calcTieUtility( Agent ego , Agent alter );
+public interface UtilityFunction<T extends Agent> {
+	public double calcTieUtility( T ego , T alter );
 }
 

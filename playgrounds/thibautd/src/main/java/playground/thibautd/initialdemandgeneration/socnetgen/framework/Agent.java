@@ -19,53 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
 /**
- * Represents an agent with id and (socio-demographic) caracteristics
+ * Represents an agent with id and (socio-demographic) caracteristics.
+ * There is volontarily not default characteristics (thus, this is mainly a
+ * marker interface)
  * @author thibautd
  */
-public class Agent implements Identifiable {
-	private final Id id;
-	private final Map<String, Object> attributes = new HashMap<String, Object>();
-
-	public Agent(final Id id) {
-		this.id = id;
-	}
-
-	@Override
-	public Id getId() {
-		return id;
-	}
-
-	public void setAttribute(final String name, final Object value) {
-		if ( value == null ) throw new NullPointerException();
-		final Object old = attributes.put( name , value );
-		if ( old != null ) {
-			throw new IllegalStateException( "attribute "+name
-					+" already had value "+old+" for agent "+id
-					+": cannot set new value "+value );
-		}
-	}
-
-	public <T extends Object> T getAttribute(final String name, final Class<? extends T> klass) {
-		final Object value = attributes.get( name );
-
-		if ( value == null ) {
-			throw new IllegalStateException( "attribute "+name+" does not exist for agent "+id );
-		}
-
-		try{
-			return klass.cast( value );
-		}
-		catch (ClassCastException e) {
-			throw new RuntimeException( "attribute "+name+" for agent "+id
-					+" is of type "+value.getClass()+" not "+klass , e );
-		}
-	}
+public interface Agent extends Identifiable {
 }
 

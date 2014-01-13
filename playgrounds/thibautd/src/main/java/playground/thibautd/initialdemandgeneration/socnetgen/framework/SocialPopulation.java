@@ -29,20 +29,20 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author thibautd
  */
-public class SocialPopulation {
-	private final Map<Id, Agent> agents = new LinkedHashMap<Id, Agent>();
-	private final Map<Id, Agent> unmodifiableAgentsMap = Collections.unmodifiableMap( agents );
-	private final Collection<Agent> unmodifiableAgents = Collections.unmodifiableCollection( agents.values() );
+public class SocialPopulation<T extends Agent> {
+	private final Map<Id, T> agents = new LinkedHashMap<Id, T>();
+	private final Map<Id, T> unmodifiableAgentsMap = Collections.unmodifiableMap( agents );
+	private final Collection<T> unmodifiableAgents = Collections.unmodifiableCollection( agents.values() );
 
-	public void addAgent( final Agent agent ) {
+	public void addAgent( final T agent ) {
 		agents.put( agent.getId() , agent );
 	}
 
-	public Collection<Agent> getAgents() {
+	public Collection<T> getAgents() {
 		return unmodifiableAgents;
 	}
 
-	public Map<Id, Agent> getAgentsMap() {
+	public Map<Id, T> getAgentsMap() {
 		return this.unmodifiableAgentsMap;
 	}
 }

@@ -31,17 +31,18 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * @author thibautd
  */
-public class ModelRunner {
+public class ModelRunner<T extends Agent> {
 	private static final Logger log =
 		Logger.getLogger(ModelRunner.class);
 
 	private int randomSeed = 20130226;
 	private int stepSize = 1;
-	private UtilityFunction utilityFunction = null;
+	private UtilityFunction<T> utilityFunction = null;
 	private ThresholdFunction thresholds = null;
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -56,7 +57,7 @@ public class ModelRunner {
 		this.stepSize = stepSize;
 	}
 
-	public void setUtilityFunction(final UtilityFunction utilityFunction) {
+	public void setUtilityFunction(final UtilityFunction<T> utilityFunction) {
 		this.utilityFunction = utilityFunction;
 	}
 
@@ -67,14 +68,16 @@ public class ModelRunner {
 	// /////////////////////////////////////////////////////////////////////////
 	// run
 	// /////////////////////////////////////////////////////////////////////////
-	public SocialNetwork run(final SocialPopulation population) {
+	public SocialNetwork run(final SocialPopulation<T> population) {
 		if ( utilityFunction == null || thresholds == null ) {
 			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
 		}
 		final Random random = new Random( randomSeed );
 		final SocialNetwork network = new SocialNetwork();
 
+		log.info( "create primary ties" );
 		fillInPrimaryTies( random , network , population );
+		log.info( "create secondary ties" );
 		fillInSecondaryTies( random , network , population );
 
 		return network;
@@ -83,22 +86,24 @@ public class ModelRunner {
 	private void fillInPrimaryTies(
 			final Random random,
 			final SocialNetwork network,
-			final SocialPopulation population) {
-		final List<Agent> remainingAgents = new ArrayList<Agent>( population.getAgents() );
+			final SocialPopulation<T> population) {
+		final List<T> remainingAgents = new ArrayList<T>( population.getAgents() );
 
+		final Counter counter = new Counter( "consider primary pair # " );
 		while ( !remainingAgents.isEmpty() ) {
 			Collections.shuffle( remainingAgents , random );
-			final Agent ego = remainingAgents.remove( 0 );
+			final T ego = remainingAgents.remove( 0 );
 			final int lastAlterToConsider = (int) (remainingAgents.size() / ((double) stepSize));
 
 			if ( lastAlterToConsider == 0 ) continue;
 
-			final List<Agent> potentialAlters =
+			final List<T> potentialAlters =
 				remainingAgents.subList(
 						0,
 						lastAlterToConsider);
 
-			for ( Agent alter : potentialAlters ) {
+			for ( T alter : potentialAlters ) {
+				counter.incCounter();
 				final double prob = calcAcceptanceProbability(
 						utilityFunction.calcTieUtility( ego , alter ),
 						thresholds.getPrimaryTieThreshold() );
@@ -108,25 +113,28 @@ public class ModelRunner {
 				}
 			}
 		}
+		counter.printCounter();
 	}
 
 	private void fillInSecondaryTies(
 			final Random random,
 			final SocialNetwork network,
-			final SocialPopulation population) {
-		final Map<Id, Agent> remainingAgents = new HashMap<Id, Agent>( population.getAgentsMap() );
+			final SocialPopulation<T> population) {
+		final Map<Id, T> remainingAgents = new HashMap<Id, T>( population.getAgentsMap() );
 
 		if ( stepSize != 1 ) {
 			log.warn( "step size "+stepSize+" is not considered for secondary ties" );
 		}
 
+		final Counter counter = new Counter( "consider secondary pair # " );
 		while ( !remainingAgents.isEmpty() ) {
-			final Agent ego = removeRandomMapping( random , remainingAgents );
+			final T ego = removeRandomMapping( random , remainingAgents );
 
-			final List<Agent> potentialAlters =
+			final List<T> potentialAlters =
 				getUnknownFriendsOfFriends( ego , network , remainingAgents );
 
-			for ( Agent alter : potentialAlters ) {
+			for ( T alter : potentialAlters ) {
+				counter.incCounter();
 				final double prob = calcAcceptanceProbability(
 						utilityFunction.calcTieUtility( ego , alter ),
 						thresholds.getSecondaryTieThreshold() );
@@ -136,17 +144,18 @@ public class ModelRunner {
 				}
 			}
 		}
+		counter.printCounter();
 	}
 
 	// package visible for tests
-	final static Agent removeRandomMapping(
+	final static <T extends Agent> T removeRandomMapping(
 			final Random random,
-			final Map<Id, Agent> remainingAgents) {
+			final Map<Id, T> remainingAgents) {
 		final int index = random.nextInt( remainingAgents.size() );
 
-		final Iterator< Agent > iterator = remainingAgents.values().iterator();
+		final Iterator< T > iterator = remainingAgents.values().iterator();
 
-		Agent a = null;
+		T a = null;
 		for ( int i = 0 ; i <= index ; i++ ) a = iterator.next();
 		iterator.remove();
 
@@ -154,11 +163,11 @@ public class ModelRunner {
 	}
 
 	// package visible for tests
-	final static List<Agent> getUnknownFriendsOfFriends(
-			final Agent ego,
+	final static <T extends Agent> List<T> getUnknownFriendsOfFriends(
+			final T ego,
 			final SocialNetwork network,
-			final Map<Id, Agent> remainingAgents) {
-		final List<Agent> unknownFriendsOfFriends = new ArrayList<Agent>();
+			final Map<Id, T> remainingAgents) {
+		final List<T> unknownFriendsOfFriends = new ArrayList<T>();
 		final Set<Id> alters = network.getAlters( ego.getId() );
 
 		for ( Id alter : alters ) {
@@ -169,7 +178,7 @@ public class ModelRunner {
 				if ( alterOfAlter.equals( ego.getId() ) ) continue;
 				// already a friend?
 				if ( alters.contains( alterOfAlter ) ) continue;
-				final Agent friendOfFriend = remainingAgents.get( alterOfAlter );
+				final T friendOfFriend = remainingAgents.get( alterOfAlter );
 
 				// already allocated?
 				if ( friendOfFriend == null ) continue;
