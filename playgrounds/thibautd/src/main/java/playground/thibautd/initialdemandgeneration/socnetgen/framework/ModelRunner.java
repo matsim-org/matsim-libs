@@ -95,19 +95,14 @@ public class ModelRunner<T extends Agent> {
 
 		final Counter counter = new Counter( "consider primary pair # " );
 		while ( !remainingAgents.isEmpty() ) {
-			Collections.shuffle( remainingAgents , random );
-			final T ego = remainingAgents.remove( 0 );
-			final int lastAlterToConsider = (int) (remainingAgents.size() / ((double) stepSize));
+			final T ego = remainingAgents.remove( random.nextInt( remainingAgents.size() ) );
 
-			if ( lastAlterToConsider == 0 ) continue;
+			final List<T> potentialAlters = new ArrayList<T>( remainingAgents );
+			int nAltersToConsider = (int) (remainingAgents.size() / ((double) stepSize));
 
-			final List<T> potentialAlters =
-				remainingAgents.subList(
-						0,
-						lastAlterToConsider);
-
-			for ( T alter : potentialAlters ) {
+			while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
 				counter.incCounter();
+				final T alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
 				final double prob = calcAcceptanceProbability(
 						utilityFunction.calcTieUtility( ego , alter ),
 						thresholds.getPrimaryTieThreshold() );
