@@ -92,6 +92,37 @@ public class ModelRunner<T extends Agent> {
 		return network;
 	}
 
+	public SocialNetwork runPrimary(final SocialPopulation<T> population) {
+		if ( utilityFunction == null || thresholds == null ) {
+			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
+		}
+		final Random random = new Random( randomSeed );
+		final SocialNetwork network = new SocialNetwork( population );
+
+		log.info( "create primary ties using step size "+stepSizePrimary );
+		fillInPrimaryTies( random , network , population );
+
+		return network;
+	}
+
+	public SocialNetwork runSecondary(
+			final SocialNetwork primaryNetwork,
+			final SocialPopulation<T> population) {
+		if ( utilityFunction == null || thresholds == null ) {
+			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
+		}
+
+		final Random random = new Random( randomSeed + 20140107 );
+		final SocialNetwork network = new SocialNetwork( primaryNetwork );
+
+		log.info( "create secondary ties using step size "+stepSizeSecondary );
+		fillInSecondaryTies( random , network , population );
+
+		return network;
+	}
+
+
+
 	// package protected to allow calls from iterator
 	void fillInPrimaryTies(
 			final Random random,

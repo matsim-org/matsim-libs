@@ -112,8 +112,17 @@ public class ModelIterator {
 			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			runner.getThresholds().setPrimaryTieThreshold( newThreshold );
 
-			final SocialNetwork newNet = runner.run( population );
-			double newNetSize = SnaUtils.calcAveragePersonalNetworkSize( newNet );
+			final SocialNetwork newNetPrimary = runner.runPrimary( population );
+			final double newNetPrimarySize = SnaUtils.calcAveragePersonalNetworkSize( newNetPrimary );
+			if ( newNetPrimarySize > target &&
+				Math.abs( target - bestNetSize ) <= Math.abs( target - newNetPrimarySize ) ) {
+				// already worst than current best, and can only get farther
+				lowerBoundThreshold = newThreshold;
+				continue;
+			}
+
+			final SocialNetwork newNet = runner.runSecondary( newNetPrimary , population );
+			final double newNetSize = SnaUtils.calcAveragePersonalNetworkSize( newNet );
 			notifyNewState( runner.getThresholds() , newNet , newNetSize , -1 );
 			if ( Math.abs( target - bestNetSize ) > Math.abs( target - newNetSize ) ) {
 				bestNetSize = newNetSize;
