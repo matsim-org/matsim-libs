@@ -37,7 +37,7 @@ public final class TelAvivControler {
 			final DCControler controler = new DCControler(args);
 			
 			// add road pricing contrib
-			controler.addControlerListener(new RoadPricing());
+			// controler.addControlerListener(new RoadPricing());
 			
 			// use an adapted MobsimFactory
 			controler.setMobsimFactory(new TTAQSimFactory());
