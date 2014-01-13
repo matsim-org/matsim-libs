@@ -384,14 +384,25 @@ public class ModelIterator {
 
 		public boolean continueSearch( ) {
 			// stop if lower bound greater than upper bound
-			final boolean v = Double.isNaN( lowerBoundThreshold ) ||
+			final boolean basedOnBounds = Double.isNaN( lowerBoundThreshold ) ||
 				Double.isNaN( upperBoundThreshold ) ||
 				lowerBoundThreshold <= upperBoundThreshold;
 
 			log.info( "interval ["+lowerBoundThreshold+" ; "+upperBoundThreshold+"]: "+
-					(v ? "CONTINUE" : "STOP" ) );
+					(basedOnBounds ? "CONTINUE" : "STOP" ) );
 
-			return v;
+			// or if values at the two bounds are undistinguishable (no progress possible)
+			final boolean basedOnValues =
+				Double.isNaN( valueAtLowerBound ) ||
+				Double.isNaN( valueAtUpperBound ) ||
+				valueAtLowerBound > valueAtUpperBound + 1E-5;
+
+			log.info( "interval ["+lowerBoundThreshold+" ("+valueAtLowerBound+") ; "+
+					upperBoundThreshold+" ("+valueAtUpperBound+")]: "+
+					(basedOnValues ? "CONTINUE" : "STOP" )+
+					" based on values" );
+
+			return basedOnBounds && basedOnValues;
 		}
 	}
 }
