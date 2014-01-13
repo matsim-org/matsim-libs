@@ -89,9 +89,12 @@ public class DistanceStats implements IterationEndsListener {
 				}
 			}
 		}
+		String runId = event.getControler().getConfig().findParam("controler", "runId");
+		if (runId == null) runId ="";
+		
 		this.bins.plotBinnedDistribution(
 				event.getControler().getControlerIO().getIterationPath(
-						event.getIteration())+ "/" + event.getControler().getConfig().getParam("controler", "runId") + "." + 
+						event.getIteration())+ "/" + runId + "." + 
 						event.getIteration() + ".plan=" + this.bestOrSelected +"_" , "#", "m");
 	}
 	
