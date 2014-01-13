@@ -81,10 +81,8 @@ public class ModelRunner<T extends Agent> {
 		if ( utilityFunction == null || thresholds == null ) {
 			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
 		}
-		log.info( "create primary ties using step size "+stepSizePrimary );
 		final SocialNetwork primaryNetwork = runPrimary( population );
 
-		log.info( "create secondary ties using step size "+stepSizeSecondary );
 		try {
 			return runSecondary( primaryNetwork , population , Long.MAX_VALUE );
 		}
