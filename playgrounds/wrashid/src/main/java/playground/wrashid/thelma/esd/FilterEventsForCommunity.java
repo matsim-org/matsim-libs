@@ -25,10 +25,10 @@ import playground.wrashid.lib.tools.network.obj.RectangularArea;
 public class FilterEventsForCommunity {
 
 	public static void main(String[] args) {
-		String eventsFile = "P:/_TEMP/Stahel/rashid_thelma2030/baseline2030/run.baseline.150.events.xml.gz";
+		String eventsFile = "P:/_TEMP/Stahel/rashid_thelma2030/baseline2010/run.2010.150.events.xml.gz";
 		EventsManager events = EventsUtils.createEventsManager();
 
-		String networkFilePath = "P:/_TEMP/Stahel/rashid_thelma2030/baseline2030/multimodalNetwork2030final.xml.gz";
+		String networkFilePath = "P:/_TEMP/Stahel/rashid_thelma2030/baseline2010/multimodalNetwork2010final.xml.gz";
 		Network network = GeneralLib.readNetwork(networkFilePath);
 
 		ComplexRectangularSelectionArea complexRectangularSelectionArea = defineAreaOfInterest();
@@ -43,9 +43,9 @@ public class FilterEventsForCommunity {
 		//reader.readFile(eventsFile);
 		reader.parse(eventsFile);
 
-		FilterAgents.keepAgents(filterAgentsWithHomeLocationInPredefinedAreas.getIncludedAgents(), eventsFile, "C:/eTmp/filteredEventsForWattwil-Buchs-Zernez-2030.txt.gz");
+		FilterAgents.keepAgents(filterAgentsWithHomeLocationInPredefinedAreas.getIncludedAgents(), eventsFile, "C:/eTmp/filteredEventsForWattwil-Buchs-Zernez-2010.txt.gz");
 	
-		Scenario scenario = GeneralLib.readScenario("P:/_TEMP/Stahel/rashid_thelma2030/baseline2030/run.baseline.output_plans.xml.gz", networkFilePath,"P:/_TEMP/Stahel/rashid_thelma2030/baseline2010/facilities2012secondary.xml.gz");
+		Scenario scenario = GeneralLib.readScenario("P:/_TEMP/Stahel/rashid_thelma2030/baseline2010/run.2010.output_plans.xml.gz", networkFilePath,"P:/_TEMP/Stahel/rashid_thelma2030/baseline2010/facilities2012secondary.xml.gz");
 	
 		
 		LinkedList<Person> persons=new LinkedList<Person>();
@@ -56,7 +56,7 @@ public class FilterEventsForCommunity {
 			System.out.println(personId);
 		}
 		
-		GeneralLib.writePersons(persons, "C:/eTmp/plansForWattwil-Buchs-Zernetz-2030.xml.gz", network,(ScenarioImpl) scenario);
+		GeneralLib.writePersons(persons, "C:/eTmp/plansForWattwil2010.xml.gz", network,(ScenarioImpl) scenario);
 	}
 
 	private static ComplexRectangularSelectionArea defineAreaOfInterest() {
@@ -65,10 +65,10 @@ public class FilterEventsForCommunity {
 
 		RectangularArea rectangleWattwil = new RectangularArea(new CoordImpl(719500,234500 ), new CoordImpl(729700, 243600));
 		includeInSection.add(rectangleWattwil);
-		RectangularArea rectangleBuchs = new RectangularArea(new CoordImpl(748300,222700   ), new CoordImpl(756800, 230000));
-		includeInSection.add(rectangleBuchs);
-		RectangularArea rectangleZernez = new RectangularArea(new CoordImpl(792900,165100   ), new CoordImpl(817400, 179050));
-		includeInSection.add(rectangleZernez);
+		//RectangularArea rectangleBuchs = new RectangularArea(new CoordImpl(748300,222700   ), new CoordImpl(756800, 230000));
+		//includeInSection.add(rectangleBuchs);
+		//RectangularArea rectangleZernez = new RectangularArea(new CoordImpl(792900,165100   ), new CoordImpl(817400, 179050));
+		//includeInSection.add(rectangleZernez);
 		
 		ComplexRectangularSelectionArea complexRectangularSelectionArea = new ComplexRectangularSelectionArea(includeInSection,
 				excludeFromSelection);
