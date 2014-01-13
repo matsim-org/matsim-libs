@@ -66,8 +66,6 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 		final List<ReplanningGroup> mergedGroups =
 			randomlyMergeGroups( jointPlansGroups , socialNetwork );
 
-		assert mergedGroups.size() <= jointPlansGroups.size();
-
 		return mergedGroups;
 	}
 
@@ -93,6 +91,12 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 			}
 
 			final List<Id> groupAlters = getGroupAlters( g , socialNetwork , groupPerPerson.keySet() );
+
+			if ( groupAlters.isEmpty() ) {
+				// no need to merge
+				merged.add( g );
+				continue;
+			}
 
 			final Id selectedAlter = groupAlters.get( random.nextInt( groupAlters.size() ) );
 			final ReplanningGroup selectedGroup = groupPerPerson.remove( selectedAlter );
