@@ -40,7 +40,8 @@ public class ModelRunner<T extends Agent> {
 		Logger.getLogger(ModelRunner.class);
 
 	private int randomSeed = 20130226;
-	private int stepSize = 1;
+	private int stepSizePrimary = 1;
+	private int stepSizeSecondary = 1;
 	private UtilityFunction<T> utilityFunction = null;
 	private ThresholdFunction thresholds = null;
 
@@ -51,9 +52,14 @@ public class ModelRunner<T extends Agent> {
 		this.randomSeed = randomSeed;
 	}
 
-	public void setSamplingRate(final int stepSize) {
+	public void setStepSizePrimary(int stepSize) {
 		if ( stepSize <= 0 ) throw new IllegalArgumentException( stepSize+" is negative" );
-		this.stepSize = stepSize;
+		this.stepSizePrimary = stepSize;
+	}
+
+	public void setStepSizeSecondary(int stepSize) {
+		if ( stepSize <= 0 ) throw new IllegalArgumentException( stepSize+" is negative" );
+		this.stepSizeSecondary = stepSize;
 	}
 
 	public void setUtilityFunction(final UtilityFunction<T> utilityFunction) {
@@ -78,9 +84,9 @@ public class ModelRunner<T extends Agent> {
 		final Random random = new Random( randomSeed );
 		final SocialNetwork network = new SocialNetwork( population );
 
-		log.info( "create primary ties" );
+		log.info( "create primary ties using step size "+stepSizePrimary );
 		fillInPrimaryTies( random , network , population );
-		log.info( "create secondary ties" );
+		log.info( "create secondary ties using step size "+stepSizeSecondary );
 		fillInSecondaryTies( random , network , population );
 
 		return network;
@@ -98,7 +104,7 @@ public class ModelRunner<T extends Agent> {
 			final T ego = remainingAgents.remove( random.nextInt( remainingAgents.size() ) );
 
 			final List<T> potentialAlters = new ArrayList<T>( remainingAgents );
-			int nAltersToConsider = (int) (remainingAgents.size() / ((double) stepSize));
+			int nAltersToConsider = (int) (remainingAgents.size() / ((double) stepSizePrimary));
 
 			while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
 				counter.incCounter();
@@ -135,7 +141,7 @@ public class ModelRunner<T extends Agent> {
 			final List<T> potentialAlters =
 				getUnknownFriendsOfFriends( ego , network , remainingAgents );
 
-			for ( int remainingChecks = (int) (potentialAlters.size() / ((double) stepSize));
+			for ( int remainingChecks = (int) (potentialAlters.size() / ((double) stepSizeSecondary));
 					remainingChecks > 0 && !potentialAlters.isEmpty();
 					remainingChecks--) {
 				counter.incCounter();

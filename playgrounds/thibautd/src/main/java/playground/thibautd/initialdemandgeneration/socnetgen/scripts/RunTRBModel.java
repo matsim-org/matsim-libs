@@ -57,12 +57,14 @@ public class RunTRBModel {
 	public static void main(final String[] args) {
 		final String populationFile = args[ 0 ];
 		final String outputDirectory = args[ 1 ];
-		final int stepSize = args.length > 2 ? Integer.parseInt( args[ 2 ] ) : 1;
+		final int stepSizePrimary = args.length > 2 ? Integer.parseInt( args[ 2 ] ) : 1;
+		final int stepSizeSecondary = args.length > 3 ? Integer.parseInt( args[ 3 ] ) : 1;
 		log.info( "################################################################################" );
 		log.info( "###### start socnet gen" );
 		log.info( "###### popfile: "+populationFile );
 		log.info( "###### outputdir: "+outputDirectory );
-		log.info( "###### step size: "+stepSize );
+		log.info( "###### step size primary: "+stepSizePrimary );
+		log.info( "###### step size secondary: "+stepSizeSecondary );
 		log.info( "################################################################################" );
 
 		MoreIOUtils.initOut( outputDirectory );
@@ -71,7 +73,9 @@ public class RunTRBModel {
 		
 		final ModelRunner<ArentzeAgent> runner = new ModelRunner<ArentzeAgent>();
 
-		runner.setSamplingRate( stepSize );
+		runner.setStepSizePrimary( stepSizePrimary );
+		runner.setStepSizeSecondary( stepSizeSecondary );
+
 		runner.setUtilityFunction(
 				new UtilityFunction<ArentzeAgent>() {
 					@Override
