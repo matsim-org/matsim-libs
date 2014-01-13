@@ -33,6 +33,7 @@ import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelRunner;
+import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIterator;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialNetwork;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialNetworkWriter;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
@@ -43,6 +44,9 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.UtilityFu
  * @author thibautd
  */
 public class RunTRBModel {
+	private static final double TARGET_NET_SIZE = 22.0;
+	private static final double TARGET_CLUSTERING = 0.206;
+
 	public static void main(final String[] args) {
 		final String populationFile = args[ 0 ];
 		final String outputNetworkFile = args[ 1 ];
@@ -74,8 +78,14 @@ public class RunTRBModel {
 				});
 		runner.setThresholds( new ThresholdFunction( 1.735 , -0.1 ) );
 
-		// TODO: iterate and calibrate thresholds
-		final SocialNetwork network = runner.run( population );
+		final ModelIterator modelIterator = new ModelIterator();
+		final SocialNetwork network =
+			modelIterator.iterateModelToTarget(
+				runner,
+				population,
+				TARGET_NET_SIZE,
+				TARGET_CLUSTERING,
+				2);
 
 		new SocialNetworkWriter().write( outputNetworkFile , network );
 	}
