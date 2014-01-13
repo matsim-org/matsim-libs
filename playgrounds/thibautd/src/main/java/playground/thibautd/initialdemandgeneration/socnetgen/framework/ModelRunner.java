@@ -151,15 +151,9 @@ public class ModelRunner<T extends Agent> {
 	final static <T extends Agent> T removeRandomMapping(
 			final Random random,
 			final Map<Id, T> remainingAgents) {
+		final List<Id> list = new ArrayList<Id>( remainingAgents.keySet() );
 		final int index = random.nextInt( remainingAgents.size() );
-
-		final Iterator< T > iterator = remainingAgents.values().iterator();
-
-		T a = null;
-		for ( int i = 0 ; i <= index ; i++ ) a = iterator.next();
-		iterator.remove();
-
-		return a;
+		return remainingAgents.remove( list.get( index ) );
 	}
 
 	// package visible for tests
