@@ -20,6 +20,8 @@
 package playground.thibautd.socnetsim.replanning.grouping;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -29,6 +31,7 @@ import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -82,7 +85,105 @@ public class DynamicGroupIdentifierTest {
 			}
 		}
 
-		test( new Fixture( scenario , 50 ) );
+		test( new Fixture( scenario , nPersons / 2 ) );
+	}
+
+	@Test
+	public void testNGroupsWithJointPlansNoSocialNet() {
+		Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+
+		final JointPlans jointPlans = new JointPlans();
+		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , jointPlans );
+
+		final SocialNetwork socnet = new SocialNetwork();
+		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , socnet );
+
+		final int nGroups = 100;
+		final int nPersonsPerGroup = 5;
+
+		for ( int i=0; i < nGroups; i++ ) {
+			final Person[] persons = new Person[ nPersonsPerGroup ];
+			for ( int j=0; j < nPersonsPerGroup; j++ ) {
+				final Person p = scenario.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i+"."+j ) );
+				persons[ j ] = p;
+				scenario.getPopulation().addPerson( p );
+			}
+
+			for ( int j=1; j < persons.length; j++ ) {
+				final Plan plan1 = scenario.getPopulation().getFactory().createPlan();
+				final Plan plan2 = scenario.getPopulation().getFactory().createPlan();
+
+				final Person person1 = persons[ j - 1 ];
+				final Person person2 = persons[ j ];
+
+				person1.addPlan( plan1 );
+				person2.addPlan( plan2 );
+
+				final Map<Id, Plan> jointPlan = new HashMap<Id, Plan>();
+				jointPlan.put( person1.getId() , plan1 );
+				jointPlan.put( person2.getId() , plan2 );
+
+				jointPlans.addJointPlan(
+						jointPlans.getFactory().createJointPlan(
+							jointPlan ) );
+			}
+		}
+
+		test( new Fixture( scenario , nGroups ) );
+	}
+
+	@Test
+	public void testNGroupsWithJointPlansCompleteSocialNet() {
+		Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+
+		final JointPlans jointPlans = new JointPlans();
+		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , jointPlans );
+
+		final SocialNetwork socnet = new SocialNetwork();
+		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , socnet );
+
+		final int nGroups = 100;
+		final int nPersonsPerGroup = 5;
+
+		for ( int i=0; i < nGroups; i++ ) {
+			final Person[] persons = new Person[ nPersonsPerGroup ];
+			for ( int j=0; j < nPersonsPerGroup; j++ ) {
+				final Person p = scenario.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i+"."+j ) );
+				persons[ j ] = p;
+				scenario.getPopulation().addPerson( p );
+			}
+
+			for ( int j=1; j < persons.length; j++ ) {
+				final Plan plan1 = scenario.getPopulation().getFactory().createPlan();
+				final Plan plan2 = scenario.getPopulation().getFactory().createPlan();
+
+				final Person person1 = persons[ j - 1 ];
+				final Person person2 = persons[ j ];
+
+				person1.addPlan( plan1 );
+				person2.addPlan( plan2 );
+
+				final Map<Id, Plan> jointPlan = new HashMap<Id, Plan>();
+				jointPlan.put( person1.getId() , plan1 );
+				jointPlan.put( person2.getId() , plan2 );
+
+				jointPlans.addJointPlan(
+						jointPlans.getFactory().createJointPlan(
+							jointPlan ) );
+			}
+		}
+
+		for ( Id ego : scenario.getPopulation().getPersons().keySet() ) {
+			for ( Id alter : scenario.getPopulation().getPersons().keySet() ) {
+				if ( ego == alter ) continue;
+				// no need to add bidirectional, as other direction was or will be considered
+				socnet.addMonodirectionalTie( ego , alter );
+			}
+		}
+
+		test( new Fixture( scenario , nGroups / 2 ) );
 	}
 
 	private void test( final Fixture fixture ) {
