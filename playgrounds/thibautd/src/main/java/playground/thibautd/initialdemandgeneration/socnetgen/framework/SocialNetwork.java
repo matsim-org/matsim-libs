@@ -20,7 +20,7 @@
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Identifiable;
  * @author thibautd
  */
 public class SocialNetwork {
-	private final Map<Id, Set<Id>> alterEgoMap = new LinkedHashMap<Id, Set<Id>>();
+	private final Map<Id, Set<Id>> alterEgoMap = new HashMap<Id, Set<Id>>();
 	private final boolean failOnUnknownEgo;
 
 	// mainly to simplify writing tests
