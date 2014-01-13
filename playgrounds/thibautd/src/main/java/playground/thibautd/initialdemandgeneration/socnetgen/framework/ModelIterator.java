@@ -40,6 +40,7 @@ public class ModelIterator {
 	private static final double PRECISION_PRIMARY = 1E-1;
 	private static final double PRECISION_SECONDARY = 1E-2;
 	private static final double SEARCH_STEP = 5;
+	private static final int MAX_NO_PROGRESS = 5;
 
 	public static interface IterationListener {
 		public void notifyStats(
@@ -170,7 +171,6 @@ public class ModelIterator {
 			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setSecondaryReduction( -newThreshold );
 
-			// TODO: early abort
 			final SocialNetwork newNet = runner.runSecondary( primaryNetwork , population );
 			double newClustering = SnaUtils.calcClusteringCoefficient( newNet );
 			notifyNewState( runner.getThresholds() , newNet , -1 , newClustering );
@@ -222,12 +222,18 @@ public class ModelIterator {
 		// search afterwards becomes fast
 		private int multiplicator = 1;
 
+		private int nSuccessiveLackOfSuccess = 0;
+
 		public AdaptiveThreshold(final double targetStat) {
 			this.targetStat = targetStat;
 		}
 
 		public boolean inRange(final double bestThreshold) {
-			return bestThreshold >= lowerBoundThreshold && bestThreshold <= upperBoundThreshold;
+			return bestThreshold >=
+				( Double.isNaN( lowerBoundThreshold ) ? Double.NEGATIVE_INFINITY : lowerBoundThreshold )
+				&&
+				bestThreshold <=
+				( Double.isNaN( upperBoundThreshold ) ? Double.POSITIVE_INFINITY : upperBoundThreshold );
 		}
 
 		public void notifyNewValue(
@@ -241,6 +247,14 @@ public class ModelIterator {
 					this.controlThreshold = upperBoundThreshold;
 					this.controlValue = valueAtUpperBound;
 				}
+
+				if ( Double.isNaN( lowerBoundThreshold ) &&
+						!Double.isNaN( valueAtUpperBound ) &&
+						Math.abs( resultStat - valueAtUpperBound ) < 1E-5 ) {
+					nSuccessiveLackOfSuccess++;
+				}
+				else nSuccessiveLackOfSuccess = 0;
+
 				this.upperBoundThreshold = usedThreshold;
 				this.valueAtUpperBound = resultStat;
 			}
@@ -252,6 +266,14 @@ public class ModelIterator {
 					this.controlThreshold = lowerBoundThreshold;
 					this.controlValue = valueAtLowerBound;
 				}
+
+				if ( Double.isNaN( upperBoundThreshold ) &&
+						!Double.isNaN( valueAtLowerBound ) &&
+						Math.abs( resultStat - valueAtLowerBound ) < 1E-5 ) {
+					nSuccessiveLackOfSuccess++;
+				}
+				else nSuccessiveLackOfSuccess = 0;
+
 				this.lowerBoundThreshold = usedThreshold;
 				this.valueAtLowerBound = resultStat;
 			}
@@ -383,6 +405,11 @@ public class ModelIterator {
 		}
 
 		public boolean continueSearch( ) {
+			if ( nSuccessiveLackOfSuccess > MAX_NO_PROGRESS ) {
+				log.info( "stop due to lack of progression" );
+				return false;
+			}
+
 			// stop if lower bound greater than upper bound
 			final boolean basedOnBounds = Double.isNaN( lowerBoundThreshold ) ||
 				Double.isNaN( upperBoundThreshold ) ||
