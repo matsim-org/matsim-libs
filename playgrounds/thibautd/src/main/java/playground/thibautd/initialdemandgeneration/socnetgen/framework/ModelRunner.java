@@ -208,6 +208,9 @@ public class ModelRunner<T extends Agent> {
 				final double prob = ( probKnowingNoPrimary - probPrimary ) /
 					( 1d - probPrimary );
 
+				assert prob >= 0 : prob;
+				assert prob <= 1 : prob;
+
 				if ( random.nextDouble() < prob ) {
 					network.addTie( ego.getId() , alter.getId() );
 					if ( nTies++ > maxNTies ) throw new SecondaryTieLimitExceededException();
