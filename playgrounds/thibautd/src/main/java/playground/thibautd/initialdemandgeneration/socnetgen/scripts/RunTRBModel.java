@@ -43,6 +43,7 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPop
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ThresholdFunction;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.UtilityFunction;
 import playground.thibautd.utils.MoreIOUtils;
+import playground.thibautd.utils.ObjectPool;
 
 /**
  * @author thibautd
@@ -121,6 +122,7 @@ public class RunTRBModel {
 		final SocialPopulation<ArentzeAgent> population = new SocialPopulation<ArentzeAgent>();
 
 		final Counter counter = new Counter( "convert person to agent # " );
+		final ObjectPool<Coord> coordPool = new ObjectPool<Coord>();
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			// XXX this is specific to the herbie population
 			if ( Integer.parseInt( person.getId().toString() ) > 1000000000 ) continue;
@@ -137,13 +139,14 @@ public class RunTRBModel {
 							person.getId(),
 							ageCategory,
 							male,
-							coord));
+							coordPool.getPooledInstance( coord )));
 			}
 			catch (Exception e) {
 				throw new RuntimeException( "exception when processing "+person , e );
 			}
 		}
 		counter.printCounter();
+		coordPool.printStats( "Coord pool" );
 
 		return population;
 	}
