@@ -41,11 +41,12 @@ public class SnaUtils {
 
 			for ( Id alter1 : alters ) {
 				remainingAlters.remove( alter1 );
+				final Set<Id> altersOfAlter1 = socialNetwork.getAlters( alter1 );
 				for ( Id alter2 : remainingAlters ) {
 					// this is a new triple
 					nTriples++;
 
-					if ( socialNetwork.getAlters( alter1 ).contains( alter2 ) ) {
+					if ( altersOfAlter1.contains( alter2 ) ) {
 						nTriangles++;
 					}
 				}
