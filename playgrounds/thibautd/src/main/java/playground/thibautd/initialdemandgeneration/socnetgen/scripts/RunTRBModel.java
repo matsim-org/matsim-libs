@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.scripts;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,6 +34,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
+import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIteratorFileListener;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIterator;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialNetwork;
@@ -39,18 +42,30 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialNet
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ThresholdFunction;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.UtilityFunction;
+import playground.thibautd.utils.MoreIOUtils;
 
 /**
  * @author thibautd
  */
 public class RunTRBModel {
+	private static final Logger log =
+		Logger.getLogger(RunTRBModel.class);
+
 	private static final double TARGET_NET_SIZE = 22.0;
 	private static final double TARGET_CLUSTERING = 0.206;
 
 	public static void main(final String[] args) {
 		final String populationFile = args[ 0 ];
-		final String outputNetworkFile = args[ 1 ];
+		final String outputDirectory = args[ 1 ];
 		final int stepSize = args.length > 2 ? Integer.parseInt( args[ 2 ] ) : 1;
+		log.info( "################################################################################" );
+		log.info( "###### start socnet gen" );
+		log.info( "###### popfile: "+populationFile );
+		log.info( "###### outputdir: "+outputDirectory );
+		log.info( "###### step size: "+stepSize );
+		log.info( "################################################################################" );
+
+		MoreIOUtils.initOut( outputDirectory );
 
 		final SocialPopulation<ArentzeAgent> population = parsePopulation( populationFile );
 		
@@ -79,6 +94,8 @@ public class RunTRBModel {
 		runner.setThresholds( new ThresholdFunction( 1.735 , -0.1 ) );
 
 		final ModelIterator modelIterator = new ModelIterator();
+		final ModelIteratorFileListener listener = new ModelIteratorFileListener( outputDirectory+"/thresholdEvolution.dat" );
+		modelIterator.addListener( listener );
 		final SocialNetwork network =
 			modelIterator.iterateModelToTarget(
 				runner,
@@ -86,8 +103,11 @@ public class RunTRBModel {
 				TARGET_NET_SIZE,
 				TARGET_CLUSTERING,
 				2);
+		listener.close();
 
-		new SocialNetworkWriter().write( outputNetworkFile , network );
+		new SocialNetworkWriter().write( outputDirectory+"/social-network.xml.gz" , network );
+
+		MoreIOUtils.closeOutputDirLogging();
 	}
 
 	private static double dummy(final boolean b) {
