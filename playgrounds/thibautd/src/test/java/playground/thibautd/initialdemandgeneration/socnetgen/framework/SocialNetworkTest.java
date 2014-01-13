@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,6 +57,43 @@ public class SocialNetworkTest {
 				"unexpected number of egos in network",
 				2,
 				testee.getEgos().size());
+	}
+
+	@Test
+	public void testReciprocity() {
+		final Random random = new Random( 9548756 );
+
+		for ( int i=0; i < 100; i++ ) {
+			final SocialNetwork net = createRandomNetwork( random );
+
+			for ( Id ego : net.getEgos() ) {
+				for ( Id alter : net.getAlters( ego ) ) {
+					Assert.assertTrue(
+							"found a non-reciprocal relationship!",
+							net.getAlters( alter ).contains( ego ));
+				}
+			}
+		}
+	}
+
+	private static SocialNetwork createRandomNetwork(final Random random) {
+		final List<Id> ids = new ArrayList<Id>();
+
+		for ( int i=0; i < 100 ; i++ ) {
+			ids.add( new IdImpl( i ) );
+		}
+
+		final SocialNetwork net = new SocialNetwork();
+		for ( Id ego : ids ) {
+			for ( Id alter : ids ) {
+				if ( alter == ego ) continue;
+				if ( random.nextDouble() < 0.2 ) {
+					net.addTie( new Tie( ego , alter ) );
+				}
+			}
+		}
+
+		return net;
 	}
 }
 
