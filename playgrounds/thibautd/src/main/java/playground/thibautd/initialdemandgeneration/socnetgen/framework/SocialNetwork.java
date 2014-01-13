@@ -68,5 +68,9 @@ public class SocialNetwork {
 			Collections.unmodifiableSet( alters ) :
 			Collections.<Id>emptySet();
 	}
+
+	public Set<Id> getEgos() {
+		return Collections.unmodifiableSet( alterEgoMap.keySet() );
+	}
 }
 

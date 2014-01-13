@@ -21,7 +21,7 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
  * @author thibautd
  */
 public class SocialPopulation {
-	private final Map<Id, Agent> agents = new HashMap<Id, Agent>();
+	private final Map<Id, Agent> agents = new LinkedHashMap<Id, Agent>();
 	private final Map<Id, Agent> unmodifiableAgentsMap = Collections.unmodifiableMap( agents );
 	private final Collection<Agent> unmodifiableAgents = Collections.unmodifiableCollection( agents.values() );
 

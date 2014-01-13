@@ -138,7 +138,8 @@ public class ModelRunner {
 		}
 	}
 
-	private static Agent removeRandomMapping(
+	// package visible for tests
+	final static Agent removeRandomMapping(
 			final Random random,
 			final Map<Id, Agent> remainingAgents) {
 		final int index = random.nextInt( remainingAgents.size() );
@@ -152,7 +153,8 @@ public class ModelRunner {
 		return a;
 	}
 
-	private static List<Agent> getUnknownFriendsOfFriends(
+	// package visible for tests
+	final static List<Agent> getUnknownFriendsOfFriends(
 			final Agent ego,
 			final SocialNetwork network,
 			final Map<Id, Agent> remainingAgents) {
@@ -163,6 +165,8 @@ public class ModelRunner {
 			final Set<Id> altersOfAlter = network.getAlters( alter );
 			
 			for ( Id alterOfAlter : altersOfAlter ) {
+				// is the ego?
+				if ( alterOfAlter.equals( ego.getId() ) ) continue;
 				// already a friend?
 				if ( alters.contains( alterOfAlter ) ) continue;
 				final Agent friendOfFriend = remainingAgents.get( alterOfAlter );
