@@ -26,23 +26,14 @@ public class DCControler extends org.matsim.contrib.locationchoice.DCControler {
 	private DestinationChoiceBestResponseContext dcContext;
 				
 	public DCControler(final String[] args) {
-		super(args);	
+		super(args);
+		this.setOverwriteFiles(true);
+		this.init();
 	}
-	
-	public static void main (final String[] args) { 
-		DCControler controler = new DCControler(args);
-		controler.setOverwriteFiles(true);
-		controler.init();
-    	controler.run();
-    }  
-	
+		
 	private void init() {
 		this.dcContext = new DestinationChoiceBestResponseContext(super.getScenario());	
   		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.dcContext); 	
 		super.setScoringFunctionFactory(dcScoringFunctionFactory);		
-	}
-	
-	protected void loadControlerListeners() {
-		super.loadControlerListeners();
 	}
 }
