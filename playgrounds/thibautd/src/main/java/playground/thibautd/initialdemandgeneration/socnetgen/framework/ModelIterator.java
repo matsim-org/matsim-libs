@@ -349,20 +349,13 @@ public class ModelIterator {
 				}
 			}
 			
-			if ( !interpolate ||
-					Double.isNaN( valueAtLowerBound ) ||
-					Double.isNaN( valueAtUpperBound ) ) {
-				// cannot interpolate
-				log.info( "new threshold: half interval" );
-				return (lowerBoundThreshold + upperBoundThreshold) / 2d;
-			}
-
-			log.info( "new threshold: interpolated from lower and upper bounds" );
-			return interpolate(
-					lowerBoundThreshold,
-					valueAtLowerBound,
-					upperBoundThreshold,
-					valueAtUpperBound);
+			// do not interpolate if bounds are known:
+			// the relationship between the parameters and the statistics
+			// not being linear, interpolation was found not to give a clear advantage
+			// over "pure" binary search. It is however better than the step-based approach
+			// to find initial bounds.
+			log.info( "new threshold: half interval" );
+			return (lowerBoundThreshold + upperBoundThreshold) / 2d;
 		}
 
 		private double interpolate(
