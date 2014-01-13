@@ -225,7 +225,7 @@ public class ModelRunner<T extends Agent> {
 			final T ego,
 			final SocialNetwork network,
 			final Map<Id, T> remainingAgents) {
-		final List<T> unknownFriendsOfFriends = new ArrayList<T>();
+		final Set<T> unknownFriendsOfFriends = Collections.newSetFromMap( new LinkedHashMap<T, Boolean>() );
 		final Set<Id> alters = network.getAlters( ego.getId() );
 
 		for ( Id alter : alters ) {
@@ -244,7 +244,7 @@ public class ModelRunner<T extends Agent> {
 			}
 		}
 
-		return unknownFriendsOfFriends;
+		return new ArrayList<T>( unknownFriendsOfFriends );
 	}
 
 	private static double calcAcceptanceProbability(
