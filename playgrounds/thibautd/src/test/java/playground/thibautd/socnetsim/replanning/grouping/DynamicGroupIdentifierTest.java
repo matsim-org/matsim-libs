@@ -21,9 +21,13 @@ package playground.thibautd.socnetsim.replanning.grouping;
 
 import java.util.Collection;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
@@ -39,7 +43,7 @@ import playground.thibautd.socnetsim.population.SocialNetwork;
 public class DynamicGroupIdentifierTest {
 
 	@Test
-	public void testNGroupsNoJointPlansNoSocNet() {
+	public void testNGroupsNoJointPlansNoSocialNet() {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
 		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , new SocialNetwork() );
@@ -52,6 +56,33 @@ public class DynamicGroupIdentifierTest {
 		}
 
 		test( new Fixture( scenario , nPersons ) );
+	}
+
+	@Test
+	public void testNGroupsNoJointPlansCompleteSocialNet() {
+		Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
+
+		final SocialNetwork socnet = new SocialNetwork();
+		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , socnet );
+
+		final int nPersons = 100;
+
+		for ( int i=0; i < nPersons; i++ ) {
+			final Person p = scenario.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i ) );
+			scenario.getPopulation().addPerson( p );
+		}
+
+		for ( Id ego : scenario.getPopulation().getPersons().keySet() ) {
+			for ( Id alter : scenario.getPopulation().getPersons().keySet() ) {
+				if ( ego == alter ) continue;
+				// no need to add bidirectional, as other direction was or will be considered
+				socnet.addMonodirectionalTie( ego , alter );
+			}
+		}
+
+		test( new Fixture( scenario , 50 ) );
 	}
 
 	private void test( final Fixture fixture ) {

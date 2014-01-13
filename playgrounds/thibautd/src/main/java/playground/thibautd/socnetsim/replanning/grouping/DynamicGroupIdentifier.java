@@ -30,6 +30,8 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,6 +47,9 @@ import playground.thibautd.socnetsim.population.SocialNetwork;
  * @author thibautd
  */
 public class DynamicGroupIdentifier implements GroupIdentifier {
+	private static final Logger log =
+		Logger.getLogger(DynamicGroupIdentifier.class);
+
 	private final Scenario scenario;
 	private final Random random;
 
@@ -83,17 +88,21 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 
 		final List<ReplanningGroup> merged = new ArrayList<ReplanningGroup>();
 		while ( true ) {
-			final ReplanningGroup g = groupsToMerge.remove();
+			final ReplanningGroup g = groupsToMerge.poll();
 
 			if ( g == null || groupsToMerge.isEmpty() ) {
 				if ( g != null ) merged.add( g );
 				return merged;
 			}
+			for ( Person p : g.getPersons() ) groupPerPerson.remove( p.getId() );
 
 			final List<Id> groupAlters = getGroupAlters( g , socialNetwork , groupPerPerson.keySet() );
 
 			if ( groupAlters.isEmpty() ) {
 				// no need to merge
+				if ( log.isTraceEnabled() ) {
+					log.trace( "add non-merged group "+g );
+				}
 				merged.add( g );
 				continue;
 			}
@@ -102,10 +111,16 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 			final ReplanningGroup selectedGroup = groupPerPerson.remove( selectedAlter );
 			assert selectedGroup != null;
 			for ( Person p : selectedGroup.getPersons() ) groupPerPerson.remove( p.getId() );
+			groupsToMerge.remove( selectedGroup );
 
 			final ReplanningGroup newGroup = new ReplanningGroup();
 			for ( Person p : g.getPersons() ) newGroup.addPerson( p );
 			for ( Person p : selectedGroup.getPersons() ) newGroup.addPerson( p );
+
+			if ( log.isTraceEnabled() ) {
+				log.trace( "add merged groups "+g+" and "+selectedGroup );
+			}
+			merged.add( newGroup );
 		}
 	}
 
