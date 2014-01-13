@@ -39,7 +39,7 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelRunn
 public class ModelIterator {
 	private static final Logger log =
 		Logger.getLogger(ModelIterator.class);
-	private static final double PRECISION_PRIMARY = 1E-2;
+	private static final double PRECISION_PRIMARY = 1E-1;
 	private static final double PRECISION_SECONDARY = 1E-3;
 	private static final double SEARCH_STEP = 5;
 
@@ -222,6 +222,8 @@ public class ModelIterator {
 		return currentbest;
 	}
 
+	// TODO: do not use "pure" binary search but interpolate between values,
+	// to cut at the best point possible
 	private static double newThreshold(
 			final double lowerBoundThreshold,
 			final double upperBoundThreshold,
