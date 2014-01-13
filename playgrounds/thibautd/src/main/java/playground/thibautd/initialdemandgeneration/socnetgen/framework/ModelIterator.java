@@ -92,23 +92,14 @@ public class ModelIterator {
 
 		// assumes that net size decreases with threshold increase
 		// and use binary search until randomness makes it invalid
-		double lowerBoundThreshold = Double.NaN;
-		double upperBoundThreshold = Double.NaN;
+		final AdaptiveThreshold adaptiveThreshold = new AdaptiveThreshold( target );
 
-		if ( bestNetSize < target ) {
-			upperBoundThreshold = runner.getThresholds().getPrimaryTieThreshold();
-		}
-		else {
-			lowerBoundThreshold = runner.getThresholds().getPrimaryTieThreshold();
-		}
+		adaptiveThreshold.notifyNewValue(
+				bestThreshold,
+				bestNetSize );
 
-		while ( Double.isNaN( lowerBoundThreshold ) ||
-				Double.isNaN( upperBoundThreshold ) ||
-				lowerBoundThreshold < upperBoundThreshold - PRECISION_PRIMARY ) {
-			final double newThreshold = newThreshold( lowerBoundThreshold , upperBoundThreshold , SEARCH_STEP );
-			log.info( "new primary threshold "+newThreshold+" in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[" );
-			assert Double.isNaN( lowerBoundThreshold ) || newThreshold > lowerBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
-			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
+		while ( adaptiveThreshold.continueSearch( PRECISION_PRIMARY ) ) {
+			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setPrimaryTieThreshold( newThreshold );
 
 			final SocialNetwork newNetPrimary = runner.runPrimary( population );
@@ -116,7 +107,7 @@ public class ModelIterator {
 			if ( newNetPrimarySize > target &&
 				Math.abs( target - bestNetSize ) <= Math.abs( target - newNetPrimarySize ) ) {
 				// already worst than current best, and can only get farther
-				lowerBoundThreshold = newThreshold;
+				adaptiveThreshold.updateLowerBoundWithoutResult( newThreshold );
 				log.info( "primary tie generation aborted" );
 				continue;
 			}
@@ -135,23 +126,21 @@ public class ModelIterator {
 					bestThreshold = newThreshold;
 				}
 
-				if ( newNetSize < target ) {
-					upperBoundThreshold = newThreshold;
-				}
-				else {
-					lowerBoundThreshold = newThreshold;
-				}
+				adaptiveThreshold.notifyNewValue(
+					newThreshold,
+					newNetSize );
 			}
 			catch (SecondaryTieLimitExceededException e) {
 				// this skips the whole "best" updating
 				// this looks almost as ugly as good ol' goto,
 				// but could not find a better way to do it right.
+				adaptiveThreshold.updateLowerBoundWithoutResult( newThreshold );
 				log.info( "secondary tie generation aborted" );
-				lowerBoundThreshold = newThreshold;
 			}
 		}
 
 		// make the thresholds match the ones used to generate the returned network
+		assert adaptiveThreshold.inRange( bestThreshold );
 		runner.getThresholds().setPrimaryTieThreshold( bestThreshold );
 		return currentbest;
 	}
@@ -181,25 +170,18 @@ public class ModelIterator {
 
 		// assumes that clustering index decreases with threshold increase,
 		// and use binary search until randomness makes it invalid
-		double lowerBoundThreshold = Double.NaN;
-		double upperBoundThreshold = Double.NaN;
+		final AdaptiveThreshold adaptiveThreshold = new AdaptiveThreshold( target );
 
-		if ( bestClustering < target ) {
-			upperBoundThreshold = runner.getThresholds().getSecondaryTieThreshold();
-		}
-		else {
-			lowerBoundThreshold = runner.getThresholds().getSecondaryTieThreshold();
-		}
 
-		while ( Double.isNaN( lowerBoundThreshold ) ||
-				Double.isNaN( upperBoundThreshold ) ||
-				lowerBoundThreshold < upperBoundThreshold - PRECISION_SECONDARY) {
-			final double newThreshold = newThreshold( lowerBoundThreshold , upperBoundThreshold , SEARCH_STEP );
-			log.info( "new secondary threshold "+newThreshold+" in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[" );
-			assert Double.isNaN( lowerBoundThreshold ) || newThreshold > lowerBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
-			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
+		adaptiveThreshold.notifyNewValue(
+			bestThreshold,
+			bestClustering );
+
+		while ( adaptiveThreshold.continueSearch( PRECISION_SECONDARY ) ) {
+			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setSecondaryReduction( newThreshold );
 
+			// TODO: early abort
 			final SocialNetwork newNet = runner.runSecondary( initialNetwork , population );
 			double newClustering = SnaUtils.calcClusteringCoefficient( newNet );
 			notifyNewState( runner.getThresholds() , newNet , -1 , newClustering );
@@ -209,29 +191,139 @@ public class ModelIterator {
 				bestThreshold = newThreshold;
 			}
 
-			if ( newClustering < target ) {
-				upperBoundThreshold = newThreshold;
-			}
-			else {
-				lowerBoundThreshold = newThreshold;
-			}
+			adaptiveThreshold.notifyNewValue(
+				newThreshold,
+				newClustering );
 		}
 
 		// make the thresholds match the ones used to generate the returned network
 		runner.getThresholds().setSecondaryReduction( bestThreshold );
+		assert adaptiveThreshold.inRange( bestThreshold );
 		return currentbest;
 	}
 
-	// TODO: do not use "pure" binary search but interpolate between values,
-	// to cut at the best point possible
-	private static double newThreshold(
-			final double lowerBoundThreshold,
-			final double upperBoundThreshold,
-			final double step) {
-		assert !Double.isNaN( lowerBoundThreshold ) || !Double.isNaN( upperBoundThreshold );
-		return Double.isNaN( upperBoundThreshold ) ? lowerBoundThreshold + step :
-			 Double.isNaN( lowerBoundThreshold ) ? upperBoundThreshold - step :
-			 (lowerBoundThreshold + upperBoundThreshold) / 2d;
+	// adapts threshold assuming stat monotonically decreases with threshold
+	private static class AdaptiveThreshold {
+		private final double step = SEARCH_STEP;
+		private final double targetStat;
+		private double lowerBoundThreshold = Double.NaN;
+		private double upperBoundThreshold = Double.NaN;
+		private double valueAtLowerBound = Double.NaN;
+		private double valueAtUpperBound = Double.NaN;
+
+		// to allow interpolation before having a proper interval
+		private double controlThreshold = Double.NaN;
+		private double controlValue = Double.NaN;
+
+		public AdaptiveThreshold(final double targetStat) {
+			this.targetStat = targetStat;
+		}
+
+		public boolean inRange(final double bestThreshold) {
+			return bestThreshold >= lowerBoundThreshold && bestThreshold <= upperBoundThreshold;
+		}
+
+		public void notifyNewValue(
+				final double usedThreshold,
+				final double resultStat) {
+			if ( resultStat < targetStat ) {
+				if ( !Double.isNaN( upperBoundThreshold ) &&
+						Double.isNaN( controlThreshold ) ) {
+					this.controlThreshold = upperBoundThreshold;
+					this.controlValue = valueAtUpperBound;
+				}
+				this.upperBoundThreshold = usedThreshold;
+				this.valueAtUpperBound = resultStat;
+			}
+			else {
+				if ( !Double.isNaN( lowerBoundThreshold ) &&
+						Double.isNaN( controlThreshold ) ) {
+					this.controlThreshold = lowerBoundThreshold;
+					this.controlValue = valueAtLowerBound;
+				}
+				this.lowerBoundThreshold = usedThreshold;
+				this.valueAtLowerBound = resultStat;
+			}
+		}
+
+		public double newThreshold() {
+			final double newThreshold = calcThreshold();
+			log.info( "new threshold "+newThreshold+" in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[" );
+			assert Double.isNaN( lowerBoundThreshold ) || newThreshold > lowerBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
+			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
+			return newThreshold;
+		}
+
+		private double calcThreshold() {
+			assert !Double.isNaN( lowerBoundThreshold ) || !Double.isNaN( upperBoundThreshold );
+
+			if ( Double.isNaN( upperBoundThreshold ) ) {
+				if ( Double.isNaN( controlThreshold ) || Double.isNaN( valueAtLowerBound ) ) {
+					return lowerBoundThreshold + step;
+				}
+
+				return interpolate(
+						lowerBoundThreshold,
+						valueAtLowerBound,
+						controlThreshold,
+						controlValue);
+			}
+
+			if ( Double.isNaN( lowerBoundThreshold ) ) {
+				if ( Double.isNaN( controlThreshold ) || Double.isNaN( valueAtUpperBound ) ) {
+					return upperBoundThreshold - step;
+				}
+
+				return interpolate(
+						upperBoundThreshold,
+						valueAtUpperBound,
+						controlThreshold,
+						controlValue);
+			}
+			
+			if ( Double.isNaN( valueAtLowerBound ) ||
+					Double.isNaN( valueAtUpperBound ) ) {
+				// cannot interpolate
+				return (lowerBoundThreshold + upperBoundThreshold) / 2d;
+			}
+
+			return interpolate(
+					lowerBoundThreshold,
+					valueAtLowerBound,
+					upperBoundThreshold,
+					valueAtUpperBound);
+		}
+
+		private double interpolate(
+				final double x1,
+				final double y1,
+				final double x2,
+				final double y2 ) {
+			final double slope = (y2 - y1) /
+				(x2 - x1);
+
+			final double intercept = y1 - slope * x1;
+
+
+			final double t = (targetStat - intercept) / slope;
+
+			assert !Double.isNaN( t );
+
+			return t;
+		}
+
+		public void updateLowerBoundWithoutResult(
+				final double newBound) {
+			assert newBound < upperBoundThreshold;
+			this.lowerBoundThreshold = newBound;
+			this.valueAtLowerBound = Double.NaN;
+		}
+
+		public boolean continueSearch( final double precision ) {
+			return Double.isNaN( lowerBoundThreshold ) ||
+				Double.isNaN( upperBoundThreshold ) ||
+				lowerBoundThreshold < upperBoundThreshold - precision;
+		}
 	}
 }
 
