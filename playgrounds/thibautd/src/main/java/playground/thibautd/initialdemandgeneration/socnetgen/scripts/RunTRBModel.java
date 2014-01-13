@@ -19,19 +19,18 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.scripts;
 
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
+import org.xml.sax.Attributes;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIteratorFileListener;
@@ -116,35 +115,57 @@ public class RunTRBModel {
 	}
 
 	private static SocialPopulation<ArentzeAgent> parsePopulation(final String populationFile) {
-		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( scenario ).parse( populationFile );
-
 		final SocialPopulation<ArentzeAgent> population = new SocialPopulation<ArentzeAgent>();
 
 		final Counter counter = new Counter( "convert person to agent # " );
 		final ObjectPool<Coord> coordPool = new ObjectPool<Coord>();
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			// XXX this is specific to the herbie population
-			if ( Integer.parseInt( person.getId().toString() ) > 1000000000 ) continue;
-			counter.incCounter();
 
-			try {
-				final int age = ((PersonImpl) person).getAge();
-				if ( age < 0 ) throw new IllegalArgumentException( ""+age );
-				final int ageCategory = age <= 23 ? 1 : age <= 37 ? 2 : age <= 50 ? 3 : age <= 65 ? 4 : 5;
-				final boolean male = ((PersonImpl) person).getSex().equals( "m" );
-				final Coord coord = ((Activity) person.getSelectedPlan().getPlanElements().get( 0 )).getCoord();
-				population.addAgent(
-						new ArentzeAgent(
-							person.getId(),
-							ageCategory,
-							male,
-							coordPool.getPooledInstance( coord )));
+		new MatsimXmlParser() {
+			private ArentzeAgent agentWithoutCoord = null;
+
+			@Override
+			public void startTag(
+					final String name,
+					final Attributes atts,
+					final Stack<String> context) {
+				if ( name.equals( "person" ) ) {
+					if ( Integer.parseInt( atts.getValue( "id" ) ) > 1000000000 ) return;
+					counter.incCounter();
+
+					try {
+						final int age = Integer.parseInt( atts.getValue( "age" ) );
+						if ( age < 0 ) throw new IllegalArgumentException( ""+age );
+						final int ageCategory = age <= 23 ? 1 : age <= 37 ? 2 : age <= 50 ? 3 : age <= 65 ? 4 : 5;
+						final boolean male = atts.getValue( "sex" ).equals( "m" );
+
+						agentWithoutCoord =
+								new ArentzeAgent(
+									new IdImpl( atts.getValue( "id" ) ),
+									ageCategory,
+									male );
+
+						population.addAgent(
+								agentWithoutCoord );
+					}
+					catch (Exception e) {
+						throw new RuntimeException( "exception when processing person "+atts , e );
+					}
+				}
+
+				if ( name.equals( "act" ) && agentWithoutCoord != null ) {
+					final double x = Double.parseDouble( atts.getValue( "x" ) );
+					final double y = Double.parseDouble( atts.getValue( "y" ) );
+					agentWithoutCoord.setCoord( coordPool.getPooledInstance( new CoordImpl( x , y ) ) );
+					agentWithoutCoord = null;
+				}
+
 			}
-			catch (Exception e) {
-				throw new RuntimeException( "exception when processing "+person , e );
-			}
-		}
+
+			@Override
+			public void endTag(String name, String content,
+					Stack<String> context) {}
+		}.parse( populationFile );
+
 		counter.printCounter();
 		coordPool.printStats( "Coord pool" );
 
@@ -155,17 +176,15 @@ public class RunTRBModel {
 		private final Id id;
 		private final int ageCategory;
 		private final boolean isMale;
-		private final Coord coord;
+		private Coord coord = null;
 
 		public ArentzeAgent(
 				final Id id,
 				final int ageCategory,
-				final boolean male,
-				final Coord coord) {
+				final boolean male) {
 			this.id = id;
 			this.ageCategory = ageCategory;
 			this.isMale = male;
-			this.coord = coord;
 		}
 
 		@Override
@@ -183,6 +202,11 @@ public class RunTRBModel {
 
 		public Coord getCoord() {
 			return this.coord;
+		}
+
+		public void setCoord(final Coord coord) {
+			if ( this.coord != null ) throw new IllegalStateException();
+			this.coord = coord;
 		}
 	}
 }
