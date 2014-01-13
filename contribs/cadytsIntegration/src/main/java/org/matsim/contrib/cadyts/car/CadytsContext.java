@@ -33,6 +33,7 @@ import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -107,7 +108,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	}
 
 	@Override
-	public PlanToPlanStepBasedOnEvents getPlansTranslator() {
+	public PlansTranslator<Link> getPlansTranslator() {
 		return this.ptStep;
 	}
 	

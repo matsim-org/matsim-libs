@@ -40,7 +40,7 @@ import org.matsim.contrib.cadyts.general.PlansTranslator;
 
 import cadyts.demand.PlanBuilder;
 
-/*package*/ class PlanToPlanStepBasedOnEvents implements PlansTranslator, LinkLeaveEventHandler, 
+public class PlanToPlanStepBasedOnEvents implements PlansTranslator, LinkLeaveEventHandler, 
 		PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);
@@ -150,20 +150,6 @@ import cadyts.demand.PlanBuilder;
 		}
 
 		return planStepFactory;
-	}
-
-	static void printCadytsPlan(final cadyts.demand.Plan<Link> cadytsPlan) {
-		// prints Cadyts plan
-		String sepCadStr = "==printing Cadyts Plan==";
-		System.err.println(sepCadStr);
-		if (cadytsPlan != null) {
-			for (int ii = 0; ii < cadytsPlan.size(); ii++) {
-				cadyts.demand.PlanStep<Link> cadytsPlanStep = cadytsPlan.getStep(ii);
-				System.err.println("linkId" + cadytsPlanStep.getLink().getId() + " time: " + cadytsPlanStep.getEntryTime_s());
-			}
-		} else {
-			System.err.println(" cadyts plan is null ");
-		}
 	}
 
 }
