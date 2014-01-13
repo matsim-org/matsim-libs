@@ -98,7 +98,8 @@ public class ModelIterator {
 				bestThreshold,
 				bestNetSize );
 
-		while ( adaptiveThreshold.continueSearch( PRECISION_PRIMARY ) ) {
+		while ( adaptiveThreshold.continueSearch() &&
+				Math.abs( target - bestNetSize ) > PRECISION_PRIMARY ) {
 			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setPrimaryTieThreshold( newThreshold );
 
@@ -177,7 +178,8 @@ public class ModelIterator {
 			bestThreshold,
 			bestClustering );
 
-		while ( adaptiveThreshold.continueSearch( PRECISION_SECONDARY ) ) {
+		while ( adaptiveThreshold.continueSearch() &&
+				Math.abs( target - bestClustering ) > PRECISION_SECONDARY ) {
 			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setSecondaryReduction( newThreshold );
 
@@ -319,10 +321,10 @@ public class ModelIterator {
 			this.valueAtLowerBound = Double.NaN;
 		}
 
-		public boolean continueSearch( final double precision ) {
+		public boolean continueSearch( ) {
 			return Double.isNaN( lowerBoundThreshold ) ||
 				Double.isNaN( upperBoundThreshold ) ||
-				lowerBoundThreshold < upperBoundThreshold - precision;
+				lowerBoundThreshold >= upperBoundThreshold;
 		}
 	}
 }
