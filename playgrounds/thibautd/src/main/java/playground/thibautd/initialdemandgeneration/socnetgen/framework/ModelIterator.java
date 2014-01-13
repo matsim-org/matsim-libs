@@ -21,9 +21,10 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
+
+import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelRunner.SecondaryTieLimitExceededException;
 
 /**
  * Iteratively runs a ModelRunner, modifying the thresholds at each time step,
@@ -64,7 +65,6 @@ public class ModelIterator {
 		SocialNetwork network = runner.run( population );
 
 		notifyNewState( runner.getThresholds() , network , -1 , -1 );
-		final Random random = new Random( 1943 );
 		for ( int i = 0; i < iterations; i++ ) {
 			network = convergePrimary(
 					network,
@@ -72,7 +72,6 @@ public class ModelIterator {
 					population,
 					targetAvgPersonalNetSize );
 			network = convergeSecondary(
-					random,
 					network,
 					runner,
 					population,
@@ -118,22 +117,36 @@ public class ModelIterator {
 				Math.abs( target - bestNetSize ) <= Math.abs( target - newNetPrimarySize ) ) {
 				// already worst than current best, and can only get farther
 				lowerBoundThreshold = newThreshold;
+				log.info( "primary tie generation aborted" );
 				continue;
 			}
 
-			final SocialNetwork newNet = runner.runSecondary( newNetPrimary , population );
-			final double newNetSize = SnaUtils.calcAveragePersonalNetworkSize( newNet );
-			notifyNewState( runner.getThresholds() , newNet , newNetSize , -1 );
-			if ( Math.abs( target - bestNetSize ) > Math.abs( target - newNetSize ) ) {
-				bestNetSize = newNetSize;
-				currentbest = newNet;
-				bestThreshold = newThreshold;
-			}
+			try {
+				final double nTies = newNetPrimarySize * population.getAgents().size();
+				final double targetTies = target * population.getAgents().size();
+				final long maxNSecondaryTies = (long) (targetTies - nTies);
 
-			if ( newNetSize < target ) {
-				upperBoundThreshold = newThreshold;
+				final SocialNetwork newNet = runner.runSecondary( newNetPrimary , population , maxNSecondaryTies );
+				final double newNetSize = SnaUtils.calcAveragePersonalNetworkSize( newNet );
+				notifyNewState( runner.getThresholds() , newNet , newNetSize , -1 );
+				if ( Math.abs( target - bestNetSize ) > Math.abs( target - newNetSize ) ) {
+					bestNetSize = newNetSize;
+					currentbest = newNet;
+					bestThreshold = newThreshold;
+				}
+
+				if ( newNetSize < target ) {
+					upperBoundThreshold = newThreshold;
+				}
+				else {
+					lowerBoundThreshold = newThreshold;
+				}
 			}
-			else {
+			catch (SecondaryTieLimitExceededException e) {
+				// this skips the whole "best" updating
+				// this looks almost as ugly as good ol' goto,
+				// but could not find a better way to do it right.
+				log.info( "secondary tie generation aborted" );
 				lowerBoundThreshold = newThreshold;
 			}
 		}
@@ -158,7 +171,6 @@ public class ModelIterator {
 	}
 
 	private <T extends Agent> SocialNetwork convergeSecondary(
-			final Random random,
 			final SocialNetwork initialNetwork,
 			final ModelRunner<T> runner,
 			final SocialPopulation<T> population,
@@ -188,8 +200,7 @@ public class ModelIterator {
 			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			runner.getThresholds().setSecondaryReduction( newThreshold );
 
-			final SocialNetwork newNet = new SocialNetwork( initialNetwork );
-			runner.fillInSecondaryTies( random , newNet , population );
+			final SocialNetwork newNet = runner.runSecondary( initialNetwork , population );
 			double newClustering = SnaUtils.calcClusteringCoefficient( newNet );
 			notifyNewState( runner.getThresholds() , newNet , -1 , newClustering );
 			if ( Math.abs( target - bestClustering ) > Math.abs( target - newClustering ) ) {

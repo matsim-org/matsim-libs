@@ -87,7 +87,12 @@ public class ModelRunner<T extends Agent> {
 		log.info( "create primary ties using step size "+stepSizePrimary );
 		fillInPrimaryTies( random , network , population );
 		log.info( "create secondary ties using step size "+stepSizeSecondary );
-		fillInSecondaryTies( random , network , population );
+		try {
+			fillInSecondaryTies( random , network , population , Long.MAX_VALUE );
+		}
+		catch (SecondaryTieLimitExceededException e) {
+			throw new RuntimeException( "limit exceeded while not specified!?" , e );
+		}
 
 		return network;
 	}
@@ -107,7 +112,8 @@ public class ModelRunner<T extends Agent> {
 
 	public SocialNetwork runSecondary(
 			final SocialNetwork primaryNetwork,
-			final SocialPopulation<T> population) {
+			final SocialPopulation<T> population,
+			final long maxNSecondaryTies) throws SecondaryTieLimitExceededException {
 		if ( utilityFunction == null || thresholds == null ) {
 			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
 		}
@@ -116,15 +122,23 @@ public class ModelRunner<T extends Agent> {
 		final SocialNetwork network = new SocialNetwork( primaryNetwork );
 
 		log.info( "create secondary ties using step size "+stepSizeSecondary );
-		fillInSecondaryTies( random , network , population );
+		fillInSecondaryTies( random , network , population , maxNSecondaryTies );
 
 		return network;
 	}
 
+	public SocialNetwork runSecondary(
+			final SocialNetwork primaryNetwork,
+			final SocialPopulation<T> population) {
+		try {
+			return runSecondary( primaryNetwork , population , Long.MAX_VALUE );
+		}
+		catch (SecondaryTieLimitExceededException e) {
+			throw new RuntimeException( "limit exceeded while not set !?" , e );
+		}
+	}
 
-
-	// package protected to allow calls from iterator
-	void fillInPrimaryTies(
+	private void fillInPrimaryTies(
 			final Random random,
 			final SocialNetwork network,
 			final SocialPopulation<T> population) {
@@ -152,11 +166,11 @@ public class ModelRunner<T extends Agent> {
 		counter.printCounter();
 	}
 
-	// package protected to allow calls from iterator
-	void fillInSecondaryTies(
+	private void fillInSecondaryTies(
 			final Random random,
 			final SocialNetwork network,
-			final SocialPopulation<T> population) {
+			final SocialPopulation<T> population,
+			final long maxNTies) throws SecondaryTieLimitExceededException {
 		final Map<Id, T> remainingAgents = new LinkedHashMap<Id, T>( population.getAgentsMap() );
 
 		// we do not need here to re-shuffle the list of agents over and over
@@ -166,6 +180,7 @@ public class ModelRunner<T extends Agent> {
 		Collections.shuffle( randomlyOrderedIds , random );
 
 		final Counter counter = new Counter( "consider secondary pair # " );
+		long nTies = 0;
 		for ( Id id : randomlyOrderedIds ) {
 			final T ego = remainingAgents.remove( id );
 
@@ -195,6 +210,7 @@ public class ModelRunner<T extends Agent> {
 
 				if ( random.nextDouble() < prob ) {
 					network.addTie( ego.getId() , alter.getId() );
+					if ( nTies++ > maxNTies ) throw new SecondaryTieLimitExceededException();
 				}
 			}
 		}
@@ -239,5 +255,8 @@ public class ModelRunner<T extends Agent> {
 		return expUtility / (expThreshold + expUtility);
 	}
 
+	public static class SecondaryTieLimitExceededException extends Exception {
+		private static final long serialVersionUID = -3209753011944061999L;
+	}
 }
 
