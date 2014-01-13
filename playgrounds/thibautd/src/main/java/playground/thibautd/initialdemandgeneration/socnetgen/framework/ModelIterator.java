@@ -137,7 +137,9 @@ public class ModelIterator {
 				// but could not find a better way to do it right.
 				adaptiveThreshold.updateLowerBoundWithoutResult( newThreshold );
 				log.info( "secondary tie generation aborted" );
-				log.info( "avg. personal network size at abort: "+SnaUtils.calcAveragePersonalNetworkSize( e.getSocialNetworkAtAbort() ) );
+				final double netSize = SnaUtils.calcAveragePersonalNetworkSize( e.getSocialNetworkAtAbort() );
+				assert netSize > target;
+				log.info( "avg. personal network size at abort: "+netSize );
 			}
 		}
 
@@ -275,15 +277,38 @@ public class ModelIterator {
 
 		public double newThreshold() {
 			final double interpolatedThreshold = calcThreshold( true );
-			final double newThreshold = Double.isInfinite( interpolatedThreshold ) ?
-				calcThreshold( false ) :
-				interpolatedThreshold;
+			final double newThreshold =
+				!acceptInterpolatedThreshold( interpolatedThreshold ) ?
+					calcThreshold( false ) :
+					interpolatedThreshold;
 			log.info( "new threshold "+newThreshold+" in ["+lowerBoundThreshold+" ("+valueAtLowerBound+") ; "+
 					upperBoundThreshold+" ("+valueAtUpperBound+")] with control "+
 					controlThreshold+" ("+controlValue+")" );
 			assert Double.isNaN( lowerBoundThreshold ) || newThreshold > lowerBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			return newThreshold;
+		}
+
+		private boolean acceptInterpolatedThreshold(
+				final double t) {
+			if ( Double.isInfinite( t ) ) {
+				log.info( "reject infinite interpolated threshold "+t );
+				return false;
+			}
+
+			if ( !Double.isNaN( lowerBoundThreshold ) && t < lowerBoundThreshold ) {
+				log.info( "reject interpolated threshold "+t+" lower than lower bound "+lowerBoundThreshold );
+				log.info( "this can happen because of randomness if values at bounds/control are too close." );
+				return false;
+			}
+
+			if ( !Double.isNaN( upperBoundThreshold ) && t > upperBoundThreshold ) {
+				log.info( "reject interpolated threshold "+t+" upper than upper bound "+upperBoundThreshold );
+				log.info( "this can happen because of randomness if values at bounds/control are too close." );
+				return false;
+			}
+
+			return true;
 		}
 
 		private double calcThreshold( final boolean interpolate ) {
@@ -319,6 +344,24 @@ public class ModelIterator {
 						valueAtUpperBound,
 						controlThreshold,
 						controlValue);
+			}
+
+			if ( interpolate && !Double.isNaN( controlValue ) ) {
+				if ( !Double.isNaN( valueAtLowerBound ) ) {
+					return interpolate(
+							lowerBoundThreshold,
+							valueAtLowerBound,
+							controlThreshold,
+							controlValue);
+				}
+
+				if ( !Double.isNaN( valueAtUpperBound ) ) {
+					return interpolate(
+							upperBoundThreshold,
+							valueAtUpperBound,
+							controlThreshold,
+							controlValue);
+				}
 			}
 			
 			if ( !interpolate ||
