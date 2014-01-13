@@ -110,6 +110,7 @@ public class ZHScenarioGlobal {
 			writeAllParkingEventsToFile();
 			ComparisonGarageCounts.logOutput(parkingEventDetails, getItersFolderPath() + iteration + ".parkingCountsComparison");
 		}
+		ComparisonGarageCounts.logRelativeError(parkingEventDetails, outputFolder  + "parkingCountsComparison-relativeError.png");
 	}
 
 	private static void writeAllParkingEventsToFile() {
