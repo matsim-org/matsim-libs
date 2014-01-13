@@ -225,7 +225,7 @@ public class ModelRunnerTest {
 	}
 
 	private static class TestSocialNetwork {
-		public final SocialNetwork socialNetwork = new SocialNetwork();
+		public final SocialNetwork socialNetwork = new SocialNetwork( false );
 		public final Map<Id, Collection<Id>> unkownFriendsOfFriends = new LinkedHashMap<Id, Collection<Id>>();
 	}
 	

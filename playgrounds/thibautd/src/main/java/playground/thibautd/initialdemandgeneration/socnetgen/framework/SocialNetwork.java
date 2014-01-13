@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 /**
  * @author thibautd
@@ -36,6 +37,25 @@ public class SocialNetwork {
 	private final Collection<Tie> ties = new ArrayList<Tie>();
 	private final Collection<Tie> unmodifiableTies = Collections.unmodifiableCollection( ties );
 	private final Map<Id, Set<Id>> alterEgoMap = new HashMap<Id, Set<Id>>();
+	private final boolean failOnUnknownEgo;
+
+	// mainly to simplify writing tests
+	public SocialNetwork( final boolean failOnUnknownEgo ) {
+		this.failOnUnknownEgo = failOnUnknownEgo;
+	}
+
+	public SocialNetwork() {
+		this( true );
+	}
+
+	public SocialNetwork(final SocialPopulation<?> pop) {
+		this( pop.getAgents() );
+	}
+
+	public SocialNetwork(final Iterable<? extends Identifiable> egos) {
+		this();
+		addEgos( egos );
+	}
 
 	public void addTie(final Tie tie) {
 		ties.add( tie );
@@ -44,12 +64,29 @@ public class SocialNetwork {
 		addAlter( tie.getSecondId() , tie.getFirstId() );
 	}
 
+	public void addEgos(final Iterable<? extends Identifiable> egos) {
+		for ( Identifiable ego : egos ) addEgo( ego.getId() );
+	}
+
+	public void addEgoIds(final Iterable<? extends Id> ids) {
+		for ( Id id : ids ) addEgo( id );
+	}
+
+	public void addEgo(final Id id) {
+		if ( !alterEgoMap.containsKey( id ) ) {
+			alterEgoMap.put( id , new HashSet<Id>() );
+		}
+	}
+
 	private void addAlter(
 			final Id ego,
 			final Id alter) {
 		Set<Id> alters = alterEgoMap.get( ego );
 
 		if ( alters == null ) {
+			if (failOnUnknownEgo) {
+				throw new IllegalArgumentException( "ego "+ego+" is unknown" );
+			}
 			alters = new HashSet<Id>();
 			alterEgoMap.put( ego , alters );
 		}

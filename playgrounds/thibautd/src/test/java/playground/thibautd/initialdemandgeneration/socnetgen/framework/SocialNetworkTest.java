@@ -36,7 +36,7 @@ import org.matsim.core.basic.v01.IdImpl;
 public class SocialNetworkTest {
 	@Test
 	public void testAddTie() {
-		final SocialNetwork testee = new SocialNetwork();
+		final SocialNetwork testee = new SocialNetwork( false );
 
 		final Id id1 = new IdImpl( 1 );
 		final Id id2 = new IdImpl( 2 );
@@ -84,6 +84,7 @@ public class SocialNetworkTest {
 		}
 
 		final SocialNetwork net = new SocialNetwork();
+		net.addEgoIds( ids );
 		for ( Id ego : ids ) {
 			for ( Id alter : ids ) {
 				if ( alter == ego ) continue;

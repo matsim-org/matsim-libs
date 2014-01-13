@@ -59,7 +59,7 @@ public class SnaUtilsClusteringTest {
 	@Before
 	public void createArentzeFixture() {
 		// example from the paper
-		final SocialNetwork net = new SocialNetwork();
+		final SocialNetwork net = new SocialNetwork( false );
 
 		// ids
 		final Id id1 = new IdImpl( 1 );
@@ -93,7 +93,7 @@ public class SnaUtilsClusteringTest {
 		// | \/ |
 		// | /\ |
 		// 4 -- 3
-		final SocialNetwork net = new SocialNetwork();
+		final SocialNetwork net = new SocialNetwork( false );
 
 		// ids
 		final Id id1 = new IdImpl( 1 );

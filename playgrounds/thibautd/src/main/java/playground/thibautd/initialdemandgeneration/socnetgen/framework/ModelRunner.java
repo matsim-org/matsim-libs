@@ -22,7 +22,6 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -73,7 +72,7 @@ public class ModelRunner<T extends Agent> {
 			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
 		}
 		final Random random = new Random( randomSeed );
-		final SocialNetwork network = new SocialNetwork();
+		final SocialNetwork network = new SocialNetwork( population );
 
 		log.info( "create primary ties" );
 		fillInPrimaryTies( random , network , population );
