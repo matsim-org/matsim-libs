@@ -75,17 +75,17 @@ public class SnaUtilsClusteringTest {
 		final Id id8 = new IdImpl( 8 );
 		final Id id9 = new IdImpl( 9 );
 
-		net.addTie( new Tie( id1 , id2 ) );
-		net.addTie( new Tie( id1 , id3 ) );
-		net.addTie( new Tie( id2 , id3 ) );
-		net.addTie( new Tie( id1 , id9 ) );
-		net.addTie( new Tie( id3 , id9 ) );
-		net.addTie( new Tie( id8 , id9 ) );
-		net.addTie( new Tie( id8 , id7 ) );
-		net.addTie( new Tie( id6 , id7 ) );
-		net.addTie( new Tie( id6 , id8 ) );
-		net.addTie( new Tie( id6 , id5 ) );
-		net.addTie( new Tie( id6 , id4 ) );
+		net.addTie( id1 , id2 );
+		net.addTie( id1 , id3 );
+		net.addTie( id2 , id3 );
+		net.addTie( id1 , id9 );
+		net.addTie( id3 , id9 );
+		net.addTie( id8 , id9 );
+		net.addTie( id8 , id7 );
+		net.addTie( id6 , id7 );
+		net.addTie( id6 , id8 );
+		net.addTie( id6 , id5 );
+		net.addTie( id6 , id4 );
 
 		double sumNetSizes = 0;
 		sumNetSizes += 3; // agent 1
@@ -120,22 +120,22 @@ public class SnaUtilsClusteringTest {
 		final Id id8 = new IdImpl( 8 );
 
 		// horizontal
-		net.addTie( new Tie( id1 , id2 ) );
-		net.addTie( new Tie( id4 , id3 ) );
-		net.addTie( new Tie( id5 , id6 ) );
-		net.addTie( new Tie( id7 , id8 ) );
+		net.addTie( id1 , id2 );
+		net.addTie( id4 , id3 );
+		net.addTie( id5 , id6 );
+		net.addTie( id7 , id8 );
 
 		// vertical
-		net.addTie( new Tie( id1 , id4 ) );
-		net.addTie( new Tie( id2 , id3 ) );
-		net.addTie( new Tie( id5 , id8 ) );
-		net.addTie( new Tie( id6 , id7 ) );
+		net.addTie( id1 , id4 );
+		net.addTie( id2 , id3 );
+		net.addTie( id5 , id8 );
+		net.addTie( id6 , id7 );
 
 		// diagonal
-		net.addTie( new Tie( id1 , id3 ) );
-		net.addTie( new Tie( id4 , id2 ) );
-		net.addTie( new Tie( id5 , id7 ) );
-		net.addTie( new Tie( id8 , id6 ) );
+		net.addTie( id1 , id3 );
+		net.addTie( id4 , id2 );
+		net.addTie( id5 , id7 );
+		net.addTie( id8 , id6 );
 
 		fixtures.add( new Fixture( net , 1 , 3 ) );
 	}
@@ -157,8 +157,8 @@ public class SnaUtilsClusteringTest {
 		final Id id7 = new IdImpl( 7 );
 		final Id id8 = new IdImpl( 8 );
 
-		net.addTie( new Tie( id1 , id2 ) );
-		net.addTie( new Tie( id4 , id3 ) );
+		net.addTie( id1 , id2 );
+		net.addTie( id4 , id3 );
 
 		net.addEgo( id5 );
 		net.addEgo( id6 );

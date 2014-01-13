@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,8 +32,6 @@ import org.matsim.api.core.v01.Identifiable;
  * @author thibautd
  */
 public class SocialNetwork {
-	private final Collection<Tie> ties = new ArrayList<Tie>();
-	private final Collection<Tie> unmodifiableTies = Collections.unmodifiableCollection( ties );
 	private final Map<Id, Set<Id>> alterEgoMap = new HashMap<Id, Set<Id>>();
 	private final boolean failOnUnknownEgo;
 
@@ -52,16 +48,15 @@ public class SocialNetwork {
 		this( pop.getAgents() );
 	}
 
+
 	public SocialNetwork(final Iterable<? extends Identifiable> egos) {
 		this();
 		addEgos( egos );
 	}
 
-	public void addTie(final Tie tie) {
-		ties.add( tie );
-		
-		addAlter( tie.getFirstId() , tie.getSecondId() );
-		addAlter( tie.getSecondId() , tie.getFirstId() );
+	public void addTie(final Id id1, final Id id2) {
+		addAlter( id1 , id2 );
+		addAlter( id2 , id1 );
 	}
 
 	public void addEgos(final Iterable<? extends Identifiable> egos) {
@@ -92,10 +87,6 @@ public class SocialNetwork {
 		}
 
 		alters.add( alter );
-	}
-
-	public Collection<Tie> getTies() {
-		return unmodifiableTies;
 	}
 
 	public Set<Id> getAlters(final Id ego) {

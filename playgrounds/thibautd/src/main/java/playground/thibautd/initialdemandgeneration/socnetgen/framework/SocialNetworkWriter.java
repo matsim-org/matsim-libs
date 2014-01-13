@@ -21,8 +21,11 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
@@ -44,11 +47,16 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 	}
 
 	private void writeNetwork(final SocialNetwork network) {
-		for ( Tie tie : network.getTies() ) {
-			final List<Tuple<String,String>> atts = new ArrayList<Tuple<String, String>>();
-			atts.add( createTuple( EGO_ATT , tie.getFirstId().toString() ) );
-			atts.add( createTuple( ALTER_ATT , tie.getSecondId().toString() ) );
-			writeStartTag( TIE_TAG , atts , true );
+		final Set<Id> dumpedEgos = new HashSet<Id>();
+		for ( Id ego : network.getEgos() ) {
+			for ( Id alter : network.getAlters( ego ) ) {
+				if ( dumpedEgos.contains( alter ) ) continue;
+				final List<Tuple<String,String>> atts = new ArrayList<Tuple<String, String>>();
+				atts.add( createTuple( EGO_ATT , ego.toString() ) );
+				atts.add( createTuple( ALTER_ATT , alter.toString() ) );
+				writeStartTag( TIE_TAG , atts , true );
+			}
+			dumpedEgos.add( ego );
 		}
 	}
 }

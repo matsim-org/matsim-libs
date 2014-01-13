@@ -122,24 +122,24 @@ public class ModelRunnerTest {
 		final Id id9 = new IdImpl( 9 );
 
 		// horizontal
-		net.socialNetwork.addTie( new Tie( id1 , id2 ) );
-		net.socialNetwork.addTie( new Tie( id2 , id3 ) );
-		net.socialNetwork.addTie( new Tie( id4 , id5 ) );
-		net.socialNetwork.addTie( new Tie( id5 , id6 ) );
-		net.socialNetwork.addTie( new Tie( id7 , id8 ) );
-		net.socialNetwork.addTie( new Tie( id8 , id9 ) );
+		net.socialNetwork.addTie( id1 , id2 );
+		net.socialNetwork.addTie( id2 , id3 );
+		net.socialNetwork.addTie( id4 , id5 );
+		net.socialNetwork.addTie( id5 , id6 );
+		net.socialNetwork.addTie( id7 , id8 );
+		net.socialNetwork.addTie( id8 , id9 );
 
 		// vertical
-		net.socialNetwork.addTie( new Tie( id1 , id4 ) );
-		net.socialNetwork.addTie( new Tie( id4 , id7 ) );
-		net.socialNetwork.addTie( new Tie( id2 , id5 ) );
-		net.socialNetwork.addTie( new Tie( id5 , id8 ) );
-		net.socialNetwork.addTie( new Tie( id3 , id6 ) );
-		net.socialNetwork.addTie( new Tie( id6 , id9 ) );
+		net.socialNetwork.addTie( id1 , id4 );
+		net.socialNetwork.addTie( id4 , id7 );
+		net.socialNetwork.addTie( id2 , id5 );
+		net.socialNetwork.addTie( id5 , id8 );
+		net.socialNetwork.addTie( id3 , id6 );
+		net.socialNetwork.addTie( id6 , id9 );
 
 		// diagonal
-		net.socialNetwork.addTie( new Tie( id1 , id5 ) );
-		net.socialNetwork.addTie( new Tie( id5 , id3 ) );
+		net.socialNetwork.addTie( id1 , id5 );
+		net.socialNetwork.addTie( id5 , id3 );
 
 		// expected friends info
 		net.unkownFriendsOfFriends.put(

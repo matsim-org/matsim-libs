@@ -112,7 +112,7 @@ public class ModelRunner<T extends Agent> {
 						thresholds.getPrimaryTieThreshold() );
 
 				if ( random.nextDouble() < prob ) {
-					network.addTie( new Tie( ego.getId() , alter.getId() ) );
+					network.addTie( ego.getId() , alter.getId() );
 				}
 			}
 		}
@@ -149,7 +149,7 @@ public class ModelRunner<T extends Agent> {
 						thresholds.getSecondaryTieThreshold() );
 
 				if ( random.nextDouble() < prob ) {
-					network.addTie( new Tie( ego.getId() , alter.getId() ) );
+					network.addTie( ego.getId() , alter.getId() );
 				}
 			}
 		}

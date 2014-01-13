@@ -41,7 +41,7 @@ public class SocialNetworkTest {
 		final Id id1 = new IdImpl( 1 );
 		final Id id2 = new IdImpl( 2 );
 
-		testee.addTie( new Tie( id1 , id2 ) );
+		testee.addTie( id1 , id2 );
 
 		Assert.assertEquals(
 				"alter not well added",
@@ -89,7 +89,7 @@ public class SocialNetworkTest {
 			for ( Id alter : ids ) {
 				if ( alter == ego ) continue;
 				if ( random.nextDouble() < 0.2 ) {
-					net.addTie( new Tie( ego , alter ) );
+					net.addTie( ego , alter );
 				}
 			}
 		}
