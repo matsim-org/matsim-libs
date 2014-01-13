@@ -122,10 +122,6 @@ public class ModelRunner<T extends Agent> {
 			final SocialPopulation<T> population) {
 		final Map<Id, T> remainingAgents = new LinkedHashMap<Id, T>( population.getAgentsMap() );
 
-		if ( stepSize != 1 ) {
-			log.warn( "step size "+stepSize+" is not considered for secondary ties" );
-		}
-
 		// we do not need here to re-shuffle the list of agents over and over
 		// (we always consider all remaining agents), so contrary to the primary case,
 		// we can just fix the order beforehand.
@@ -139,8 +135,11 @@ public class ModelRunner<T extends Agent> {
 			final List<T> potentialAlters =
 				getUnknownFriendsOfFriends( ego , network , remainingAgents );
 
-			for ( T alter : potentialAlters ) {
+			for ( int remainingChecks = (int) (potentialAlters.size() / ((double) stepSize));
+					remainingChecks > 0 && !potentialAlters.isEmpty();
+					remainingChecks--) {
 				counter.incCounter();
+				final T alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
 
 				final double util = utilityFunction.calcTieUtility( ego , alter );
 
