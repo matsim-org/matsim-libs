@@ -217,6 +217,11 @@ public class ModelIterator {
 		private double controlThreshold = Double.NaN;
 		private double controlValue = Double.NaN;
 
+		// each time stepping is needed, increase step size
+		// allows to adapt worng step size: the aim is to find bounds,
+		// search afterwards becomes fast
+		private int multiplicator = 1;
+
 		public AdaptiveThreshold(final double targetStat) {
 			this.targetStat = targetStat;
 		}
@@ -229,8 +234,10 @@ public class ModelIterator {
 				final double usedThreshold,
 				final double resultStat) {
 			if ( resultStat < targetStat ) {
+				log.info( "new stat "+resultStat+" < "+targetStat );
 				if ( !Double.isNaN( upperBoundThreshold ) &&
 						Double.isNaN( controlThreshold ) ) {
+					log.info( "store former upper bound as control value" );
 					this.controlThreshold = upperBoundThreshold;
 					this.controlValue = valueAtUpperBound;
 				}
@@ -238,8 +245,10 @@ public class ModelIterator {
 				this.valueAtUpperBound = resultStat;
 			}
 			else {
+				log.info( "new stat "+resultStat+" >= "+targetStat );
 				if ( !Double.isNaN( lowerBoundThreshold ) &&
 						Double.isNaN( controlThreshold ) ) {
+					log.info( "store former lower bound as control value" );
 					this.controlThreshold = lowerBoundThreshold;
 					this.controlValue = valueAtLowerBound;
 				}
@@ -249,21 +258,28 @@ public class ModelIterator {
 		}
 
 		public double newThreshold() {
-			final double newThreshold = calcThreshold();
+			final double interpolatedThreshold = calcThreshold( true );
+			final double newThreshold = Double.isInfinite( interpolatedThreshold ) ?
+				calcThreshold( false ) :
+				interpolatedThreshold;
 			log.info( "new threshold "+newThreshold+" in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[" );
 			assert Double.isNaN( lowerBoundThreshold ) || newThreshold > lowerBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			return newThreshold;
 		}
 
-		private double calcThreshold() {
+		private double calcThreshold( final boolean interpolate ) {
 			assert !Double.isNaN( lowerBoundThreshold ) || !Double.isNaN( upperBoundThreshold );
 
 			if ( Double.isNaN( upperBoundThreshold ) ) {
-				if ( Double.isNaN( controlThreshold ) || Double.isNaN( valueAtLowerBound ) ) {
-					return lowerBoundThreshold + step;
+				if ( !interpolate ||
+						Double.isNaN( controlThreshold ) ||
+						Double.isNaN( valueAtLowerBound ) ) {
+					log.info( "new threshold: step-augmented lower bound" );
+					return lowerBoundThreshold + (multiplicator++) * step;
 				}
 
+				log.info( "new threshold: interpolated from lower bound and control" );
 				return interpolate(
 						lowerBoundThreshold,
 						valueAtLowerBound,
@@ -272,10 +288,14 @@ public class ModelIterator {
 			}
 
 			if ( Double.isNaN( lowerBoundThreshold ) ) {
-				if ( Double.isNaN( controlThreshold ) || Double.isNaN( valueAtUpperBound ) ) {
-					return upperBoundThreshold - step;
+				if ( !interpolate ||
+						Double.isNaN( controlThreshold ) ||
+						Double.isNaN( valueAtUpperBound ) ) {
+					log.info( "new threshold: step-diminished upper bound" );
+					return upperBoundThreshold - (multiplicator++) * step;
 				}
 
+				log.info( "new threshold: interpolated from upper bound and control" );
 				return interpolate(
 						upperBoundThreshold,
 						valueAtUpperBound,
@@ -283,12 +303,15 @@ public class ModelIterator {
 						controlValue);
 			}
 			
-			if ( Double.isNaN( valueAtLowerBound ) ||
+			if ( !interpolate ||
+					Double.isNaN( valueAtLowerBound ) ||
 					Double.isNaN( valueAtUpperBound ) ) {
 				// cannot interpolate
+				log.info( "new threshold: half interval" );
 				return (lowerBoundThreshold + upperBoundThreshold) / 2d;
 			}
 
+			log.info( "new threshold: interpolated from lower and upper bounds" );
 			return interpolate(
 					lowerBoundThreshold,
 					valueAtLowerBound,
@@ -305,7 +328,6 @@ public class ModelIterator {
 				(x2 - x1);
 
 			final double intercept = y1 - slope * x1;
-
 
 			final double t = (targetStat - intercept) / slope;
 
