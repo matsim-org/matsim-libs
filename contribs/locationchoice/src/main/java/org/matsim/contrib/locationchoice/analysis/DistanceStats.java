@@ -59,8 +59,8 @@ public class DistanceStats implements IterationEndsListener {
 		for (Person p : event.getControler().getPopulation().getPersons().values()) {
 			
 			// continue if person is in the analysis population or if the id is not numeric
-			if (Integer.parseInt(p.getId().toString()) > Integer.parseInt(this.config.locationchoice().getIdExclusion()) ||
-					!this.isInteger(p.getId().toString())) continue;
+			if (!this.isInteger(p.getId().toString()) ||
+					Integer.parseInt(p.getId().toString()) > Integer.parseInt(this.config.locationchoice().getIdExclusion())) continue;
 					
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			
