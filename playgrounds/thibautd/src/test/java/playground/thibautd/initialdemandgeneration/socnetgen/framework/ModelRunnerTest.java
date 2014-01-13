@@ -22,12 +22,10 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.junit.Assert;
@@ -40,55 +38,6 @@ import org.matsim.core.basic.v01.IdImpl;
  * @author thibautd
  */
 public class ModelRunnerTest {
-	// ///////////////////////////////////////////////////////////////////////
-	// remove random mapping
-	// ///////////////////////////////////////////////////////////////////////
-	@Test
-	public void testRemoveRandomMappingRemovesSomething() {
-		final Random rand = new Random( 1234 );
-
-		final SocialPopulation<AgentImpl> population = new SocialPopulation<AgentImpl>();
-		for ( int i = 0; i < 1000; i++ ) {
-			population.addAgent( new AgentImpl( new IdImpl( i ) ) );
-		}
-
-		final Map<Id, Agent> map = new HashMap<Id, Agent>( population.getAgentsMap() );
-		for ( int i = 0; i < 500; i++ ) {
-			final int initSize = map.size();
-			final Agent agent = ModelRunner.removeRandomMapping( rand , map );
-
-			Assert.assertEquals(
-					"unexpected new map size",
-					initSize - 1,
-					map.size());
-
-			Assert.assertFalse(
-					"agent still in the map",
-					map.values().contains( agent ) );
-		}
-	}
-
-	@Test
-	public void testRemoveRandomMappingIsRandom() {
-		final Random rand = new Random( 1234 );
-
-		final SocialPopulation<AgentImpl> population = new SocialPopulation<AgentImpl>();
-		for ( int i = 0; i < 1000; i++ ) {
-			population.addAgent( new AgentImpl( new IdImpl( i ) ) );
-		}
-
-		final Set<Agent> returnedAgents = new HashSet<Agent>();
-		for ( int i = 0; i < 500; i++ ) {
-			// TreeMap: make sure we always iterate in the same order
-			final Map<Id, Agent> map = new TreeMap<Id, Agent>( population.getAgentsMap() );
-			returnedAgents.add( ModelRunner.removeRandomMapping( rand , map ) );
-
-			if ( returnedAgents.size() > 1 ) return;
-		}
-
-		Assert.fail( "only got "+returnedAgents.size()+" different agents" );
-	}
-
 	// ///////////////////////////////////////////////////////////////////////
 	// secondary tie candidates
 	// ///////////////////////////////////////////////////////////////////////

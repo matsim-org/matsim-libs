@@ -21,7 +21,7 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -119,15 +119,21 @@ public class ModelRunner<T extends Agent> {
 			final Random random,
 			final SocialNetwork network,
 			final SocialPopulation<T> population) {
-		final Map<Id, T> remainingAgents = new HashMap<Id, T>( population.getAgentsMap() );
+		final Map<Id, T> remainingAgents = new LinkedHashMap<Id, T>( population.getAgentsMap() );
 
 		if ( stepSize != 1 ) {
 			log.warn( "step size "+stepSize+" is not considered for secondary ties" );
 		}
 
+		// we do not need here to re-shuffle the list of agents over and over
+		// (we always consider all remaining agents), so contrary to the primary case,
+		// we can just fix the order beforehand.
+		final List<Id> randomlyOrderedIds = new ArrayList<Id>( remainingAgents.keySet() );
+		Collections.shuffle( randomlyOrderedIds , random );
+
 		final Counter counter = new Counter( "consider secondary pair # " );
-		while ( !remainingAgents.isEmpty() ) {
-			final T ego = removeRandomMapping( random , remainingAgents );
+		for ( Id id : randomlyOrderedIds ) {
+			final T ego = remainingAgents.remove( id );
 
 			final List<T> potentialAlters =
 				getUnknownFriendsOfFriends( ego , network , remainingAgents );
@@ -144,15 +150,6 @@ public class ModelRunner<T extends Agent> {
 			}
 		}
 		counter.printCounter();
-	}
-
-	// package visible for tests
-	final static <T extends Agent> T removeRandomMapping(
-			final Random random,
-			final Map<Id, T> remainingAgents) {
-		final List<Id> list = new ArrayList<Id>( remainingAgents.keySet() );
-		final int index = random.nextInt( remainingAgents.size() );
-		return remainingAgents.remove( list.get( index ) );
 	}
 
 	// package visible for tests
