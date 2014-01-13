@@ -48,6 +48,10 @@ public class SocialNetwork {
 		this( pop.getAgents() );
 	}
 
+	public SocialNetwork(final SocialNetwork toCopy) {
+		failOnUnknownEgo = toCopy.failOnUnknownEgo;
+		alterEgoMap.putAll( toCopy.alterEgoMap );
+	}
 
 	public SocialNetwork(final Iterable<? extends Identifiable> egos) {
 		this();

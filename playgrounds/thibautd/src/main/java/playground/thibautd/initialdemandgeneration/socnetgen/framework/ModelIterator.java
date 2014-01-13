@@ -21,6 +21,7 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -63,14 +64,15 @@ public class ModelIterator {
 		SocialNetwork network = runner.run( population );
 
 		notifyNewState( runner.getThresholds() , network , -1 , -1 );
+		final Random random = new Random( 1943 );
 		for ( int i = 0; i < iterations; i++ ) {
 			network = convergePrimary(
 					network,
 					runner,
 					population,
 					targetAvgPersonalNetSize );
-			// XXX: no need to re-compute primary ties each time here
 			network = convergeSecondary(
+					random,
 					network,
 					runner,
 					population,
@@ -147,6 +149,7 @@ public class ModelIterator {
 	}
 
 	private <T extends Agent> SocialNetwork convergeSecondary(
+			final Random random,
 			final SocialNetwork initialNetwork,
 			final ModelRunner<T> runner,
 			final SocialPopulation<T> population,
@@ -176,7 +179,8 @@ public class ModelIterator {
 			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			runner.getThresholds().setSecondaryReduction( newThreshold );
 
-			final SocialNetwork newNet = runner.run( population );
+			final SocialNetwork newNet = new SocialNetwork( initialNetwork );
+			runner.fillInSecondaryTies( random , newNet , population );
 			double newClustering = SnaUtils.calcClusteringCoefficient( newNet );
 			notifyNewState( runner.getThresholds() , newNet , -1 , newClustering );
 			if ( Math.abs( target - bestClustering ) > Math.abs( target - newClustering ) ) {

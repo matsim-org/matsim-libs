@@ -86,7 +86,8 @@ public class ModelRunner<T extends Agent> {
 		return network;
 	}
 
-	private void fillInPrimaryTies(
+	// package protected to allow calls from iterator
+	void fillInPrimaryTies(
 			final Random random,
 			final SocialNetwork network,
 			final SocialPopulation<T> population) {
@@ -119,7 +120,8 @@ public class ModelRunner<T extends Agent> {
 		counter.printCounter();
 	}
 
-	private void fillInSecondaryTies(
+	// package protected to allow calls from iterator
+	void fillInSecondaryTies(
 			final Random random,
 			final SocialNetwork network,
 			final SocialPopulation<T> population) {
