@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,12 +33,24 @@ import org.matsim.api.core.v01.Identifiable;
  * @author thibautd
  */
 public class SocialNetwork {
-	private final Map<Id, Set<Id>> alterEgoMap = new HashMap<Id, Set<Id>>();
+	private final Map<Id, Set<Id>> alterEgoMap;
 	private final boolean failOnUnknownEgo;
 
 	// mainly to simplify writing tests
 	public SocialNetwork( final boolean failOnUnknownEgo ) {
+		this( failOnUnknownEgo,
+				new LinkedHashMap<Id, Set<Id>>() );
+	}
+
+	private SocialNetwork( final boolean failOnUnknownEgo , final Map<Id, Set<Id>> map ) {
 		this.failOnUnknownEgo = failOnUnknownEgo;
+		this.alterEgoMap = map;
+	}
+
+	private SocialNetwork(
+			final int initialCap,
+			final float loadFactor) {
+		this( true , new LinkedHashMap<Id, Set<Id>>( initialCap , loadFactor ) );
 	}
 
 	public SocialNetwork() {
@@ -49,12 +62,13 @@ public class SocialNetwork {
 	}
 
 	public SocialNetwork(final SocialNetwork toCopy) {
-		failOnUnknownEgo = toCopy.failOnUnknownEgo;
-		alterEgoMap.putAll( toCopy.alterEgoMap );
+		this( toCopy.failOnUnknownEgo,
+			new LinkedHashMap<Id, Set<Id>>( toCopy.alterEgoMap ) );
 	}
 
-	public SocialNetwork(final Iterable<? extends Identifiable> egos) {
-		this();
+	public SocialNetwork(final Collection<? extends Identifiable> egos) {
+		// make the map big to avoid collisions
+		this( egos.size() * 2 , 0.5f ); 
 		addEgos( egos );
 	}
 
