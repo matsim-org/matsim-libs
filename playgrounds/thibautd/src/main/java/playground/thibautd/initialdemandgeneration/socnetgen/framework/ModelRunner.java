@@ -146,9 +146,21 @@ public class ModelRunner<T extends Agent> {
 
 			for ( T alter : potentialAlters ) {
 				counter.incCounter();
-				final double prob = calcAcceptanceProbability(
-						utilityFunction.calcTieUtility( ego , alter ),
+
+				final double util = utilityFunction.calcTieUtility( ego , alter );
+
+				final double probKnowingNoPrimary = calcAcceptanceProbability(
+						util,
 						thresholds.getSecondaryTieThreshold() );
+
+				final double probPrimary = calcAcceptanceProbability(
+						util,
+						thresholds.getPrimaryTieThreshold() );
+
+				// correction: we want the probability to be friends *knowing that the
+				// two individuals are not friends in the abscence of a common friend*
+				final double prob = ( probKnowingNoPrimary - probPrimary ) /
+					( 1d - probPrimary );
 
 				if ( random.nextDouble() < prob ) {
 					network.addTie( ego.getId() , alter.getId() );
