@@ -167,12 +167,12 @@ public class ModelIterator {
 			final double target) {
 		SocialNetwork currentbest = initialNetwork;
 		double bestClustering = SnaUtils.calcClusteringCoefficient( initialNetwork );
-		double bestThreshold = runner.getThresholds().getSecondaryReduction();
+		// adaptive threshold assumes decreasing stat with threshold
+		double bestThreshold = -runner.getThresholds().getSecondaryReduction();
 
 		// assumes that clustering index decreases with threshold increase,
 		// and use binary search until randomness makes it invalid
 		final AdaptiveThreshold adaptiveThreshold = new AdaptiveThreshold( target );
-
 
 		adaptiveThreshold.notifyNewValue(
 			bestThreshold,
@@ -181,7 +181,7 @@ public class ModelIterator {
 		while ( adaptiveThreshold.continueSearch() &&
 				Math.abs( target - bestClustering ) > PRECISION_SECONDARY ) {
 			final double newThreshold = adaptiveThreshold.newThreshold();
-			runner.getThresholds().setSecondaryReduction( newThreshold );
+			runner.getThresholds().setSecondaryReduction( -newThreshold );
 
 			// TODO: early abort
 			final SocialNetwork newNet = runner.runSecondary( initialNetwork , population );
@@ -199,7 +199,7 @@ public class ModelIterator {
 		}
 
 		// make the thresholds match the ones used to generate the returned network
-		runner.getThresholds().setSecondaryReduction( bestThreshold );
+		runner.getThresholds().setSecondaryReduction( -bestThreshold );
 		assert adaptiveThreshold.inRange( bestThreshold );
 		return currentbest;
 	}
