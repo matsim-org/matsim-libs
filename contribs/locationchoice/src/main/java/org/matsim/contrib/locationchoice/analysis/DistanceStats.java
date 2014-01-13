@@ -58,8 +58,9 @@ public class DistanceStats implements IterationEndsListener {
 		
 		for (Person p : event.getControler().getPopulation().getPersons().values()) {
 			
-			// if person is not in the analysis population
-			if (Integer.parseInt(p.getId().toString()) > Integer.parseInt(this.config.locationchoice().getIdExclusion())) continue;
+			// continue if person is in the analysis population or if the id is not numeric
+			if (Integer.parseInt(p.getId().toString()) > Integer.parseInt(this.config.locationchoice().getIdExclusion()) ||
+					!this.isInteger(p.getId().toString())) continue;
 					
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			
@@ -92,5 +93,13 @@ public class DistanceStats implements IterationEndsListener {
 				event.getControler().getControlerIO().getIterationPath(
 						event.getIteration())+ "/" + event.getControler().getConfig().getParam("controler", "runId") + "." + 
 						event.getIteration() + ".plan=" + this.bestOrSelected +"_" , "#", "m");
+	}
+	
+	private boolean isInteger(String str) {
+	    try {
+	        Integer.parseInt(str);
+	        return true;
+	    } catch (NumberFormatException nfe) {}
+	    return false;
 	}
 }
