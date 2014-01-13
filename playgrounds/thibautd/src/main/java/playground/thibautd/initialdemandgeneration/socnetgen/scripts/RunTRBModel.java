@@ -91,7 +91,7 @@ public class RunTRBModel {
 							-1.934 * dummy( ageClassDifference == 4 );
 					}
 				});
-		runner.setThresholds( new ThresholdFunction( 1.735 , -0.1 ) );
+		runner.setThresholds( new ThresholdFunction( 1.735 , 1.835 ) );
 
 		final ModelIterator modelIterator = new ModelIterator();
 		final ModelIteratorFileListener listener = new ModelIteratorFileListener( outputDirectory+"/thresholdEvolution.dat" );

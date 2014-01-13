@@ -169,7 +169,7 @@ public class ModelIterator {
 			log.info( "new secondary threshold "+newThreshold+" in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[" );
 			assert Double.isNaN( lowerBoundThreshold ) || newThreshold > lowerBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
 			assert Double.isNaN( upperBoundThreshold ) || newThreshold < upperBoundThreshold : newThreshold+" not in ]"+lowerBoundThreshold+" ; "+upperBoundThreshold+"[";
-			runner.getThresholds().setSecondaryTieThreshold( newThreshold );
+			runner.getThresholds().setSecondaryReduction( newThreshold );
 
 			final SocialNetwork newNet = runner.run( population );
 			double newClustering = SnaUtils.calcClusteringCoefficient( newNet );

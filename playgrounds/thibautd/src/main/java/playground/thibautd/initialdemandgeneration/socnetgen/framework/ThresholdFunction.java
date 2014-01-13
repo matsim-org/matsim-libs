@@ -24,13 +24,13 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
  */
 public class ThresholdFunction {
 	private double primaryTieThreshold;
-	private double secondaryTieThreshold;
+	private double secondaryReduction;
 
 	public ThresholdFunction(
 			final double initialPrimaryTieThreshold,
-			final double initialSecondaryTieThreshold) {
+			final double initialSecondaryReduction) {
 		this.primaryTieThreshold = initialPrimaryTieThreshold;
-		this.secondaryTieThreshold = initialSecondaryTieThreshold;
+		this.secondaryReduction = initialSecondaryReduction;
 	}
 
 	public double getPrimaryTieThreshold() {
@@ -42,11 +42,15 @@ public class ThresholdFunction {
 	}
 
 	public double getSecondaryTieThreshold() {
-		return this.secondaryTieThreshold;
+		return this.primaryTieThreshold - this.secondaryReduction;
 	}
 
-	public void setSecondaryTieThreshold(final double secondaryTieThreshold) {
-		this.secondaryTieThreshold = secondaryTieThreshold;
+	public double getSecondaryReduction() {
+		return secondaryReduction;
+	}
+
+	public void setSecondaryReduction(final double secondaryReduction) {
+		this.secondaryReduction = secondaryReduction;
 	}
 }
 
