@@ -33,6 +33,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.zones.CreateODDistanceMatrix;
 import playground.telaviv.zones.CreateODTravelTimeMatrices;
 import playground.telaviv.zones.Emme2Zone;
@@ -41,7 +42,7 @@ import playground.telaviv.zones.ZoneMapping;
 public class CalculateDestinationChoice {
 
 	private static final Logger log = Logger.getLogger(CalculateDestinationChoice.class);
-	private static String networkFile = "../../matsim/mysimulations/telaviv/network/network.xml";
+	private static String networkFile = TelAvivConfig.basePath + "network/network.xml";
 	
 	private Scenario scenario;
 	private static Coefficients coefficients = new Coefficients();
