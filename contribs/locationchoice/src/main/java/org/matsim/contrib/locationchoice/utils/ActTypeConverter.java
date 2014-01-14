@@ -20,44 +20,46 @@
 package org.matsim.contrib.locationchoice.utils;
 
 public class ActTypeConverter {
-	
-	private boolean isV1;
-	
+
+	private final boolean isV1;
+
 	public ActTypeConverter(boolean isV1) {
 		this.isV1 = isV1;
 	}
-	
+
 	public String convertType(String actType) {
 		if (this.isV1) {
 			return convert2MinimalType(actType);
 		}
 		// ah, jan 14: we should not do a conversion here anymore
 		// TODO: remove V1 later
-		//else return convert2FullType(actType); 
+		//else return convert2FullType(actType);
 		else return actType;
 	}
-	
-//	private static String convert2FullType(String type) {
-//		String fullType = "tta";
-//		if (type.startsWith("h")) {
-//			fullType = "home";
-//		}
-//		else if (type.startsWith("w")) {
-//			fullType = "work";
-//		}
-//		else if (type.startsWith("e")) {
-//			fullType = "education";
-//		}
-//		else if (type.startsWith("s")) {
-//			fullType = "shop";
-//		}
-//		else if (type.startsWith("l")) { 
-//			fullType = "leisure";
-//		}
-//		return fullType;
-//	}
-	
-	private static String convert2MinimalType(String type) {
+
+	/* made this method public again as it is used in ivtExt. mrieser/14jan2014 */
+	public static String convert2FullType(String type) {
+		String fullType = "tta";
+		if (type.startsWith("h")) {
+			fullType = "home";
+		}
+		else if (type.startsWith("w")) {
+			fullType = "work";
+		}
+		else if (type.startsWith("e")) {
+			fullType = "education";
+		}
+		else if (type.startsWith("s")) {
+			fullType = "shop";
+		}
+		else if (type.startsWith("l")) {
+			fullType = "leisure";
+		}
+		return fullType;
+	}
+
+	/* made this method public again as it is used in ivtExt. mrieser/14jan2014 */
+	public static String convert2MinimalType(String type) {
 		String minimalType = "tta";
 		if (type.startsWith("h")) {
 			minimalType = "h";
@@ -71,7 +73,7 @@ public class ActTypeConverter {
 		else if (type.startsWith("s")) {
 			minimalType = "s";
 		}
-		else if (type.startsWith("l")) { 
+		else if (type.startsWith("l")) {
 			minimalType = "l";
 		}
 		return minimalType;
