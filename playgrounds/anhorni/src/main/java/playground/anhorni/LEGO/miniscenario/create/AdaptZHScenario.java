@@ -149,9 +149,13 @@ public class AdaptZHScenario {
 								getId());
 					}
 					else {
-						((ActivityImpl)pe).setFacilityId(
-								trees.get(ActTypeConverter.convert2FullType(act.getType())).get(act.getCoord().getX(), act.getCoord().getY())
-								.getId());
+						log.error("correct for type conversion");
+						System.exit(-99);
+						
+						
+//						((ActivityImpl)pe).setFacilityId(
+//								trees.get(ActTypeConverter.convert2FullType(act.getType())).get(act.getCoord().getX(), act.getCoord().getY())
+//								.getId());
 					}
 				}
 			}
