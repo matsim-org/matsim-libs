@@ -39,6 +39,7 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -145,12 +146,12 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 			}
 		} else {
 			log.warn("prefs are taken from the config as there is no preferences file specified \n");
-			for (String actType : this.scenario.getConfig().planCalcScore().getActivityTypes()) {
+			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
-					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + actType, this.scenario.getConfig().planCalcScore().getActivityParams(actType).getLatestStartTime());
-					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + actType, this.scenario.getConfig().planCalcScore().getActivityParams(actType).getTypicalDuration());
-					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + actType, this.scenario.getConfig().planCalcScore().getActivityParams(actType).getEarliestEndTime());
-					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + actType, this.scenario.getConfig().planCalcScore().getActivityParams(actType).getMinimalDuration());
+					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getType(), activityParams.getLatestStartTime());
+					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), activityParams.getTypicalDuration());
+					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getType(), activityParams.getEarliestEndTime());
+					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getType(), activityParams.getMinimalDuration());
 				}
 			}
 		}
