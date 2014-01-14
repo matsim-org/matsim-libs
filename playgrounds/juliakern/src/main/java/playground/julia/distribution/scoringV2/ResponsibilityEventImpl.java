@@ -26,6 +26,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 
+import playground.julia.exposure.ResponsibilityEvent;
+
 public class ResponsibilityEventImpl extends Event implements ResponsibilityEvent {
 
 	private Id responsiblePersonId;

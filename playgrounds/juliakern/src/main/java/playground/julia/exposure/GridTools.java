@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.distribution.scoringV2;
+package playground.julia.exposure;
 
 import java.util.HashMap;
 import java.util.Map;

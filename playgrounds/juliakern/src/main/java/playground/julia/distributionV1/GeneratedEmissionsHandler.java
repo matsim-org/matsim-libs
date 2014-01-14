@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.distribution.scoringV2;
+package playground.julia.distributionV1;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +48,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	Double simulationStartTime;
 	Double timeBinSize;
 	Map<Double, ArrayList<EmPerCell>> emissionPerCell;
+	Map<Double, ArrayList<EmPerLink>> emissionPerLink;
 	Map<Id,Integer> link2xbins; 
 	Map<Id,Integer> link2ybins;
 	WarmPollutant warmPollutant2analyze;
@@ -67,11 +68,11 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		this.warmPollutant2analyze = warmPollutant2analyze;
 		this.coldPollutant2analyze = coldPollutant2analyze;
 		this.emissionPerCell = new HashMap<Double, ArrayList<EmPerCell>>();
+		this.emissionPerLink = new HashMap<Double, ArrayList<EmPerLink>>();
 	}
 	
 	@Override
-	public void reset(int iteration) {	
-		this.emissionPerCell.clear();
+	public void reset(int iteration) {		
 	}
 
 	@Override
@@ -95,6 +96,14 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 				emissionPerCell.put(endOfTimeIntervall, new ArrayList<EmPerCell>());
 			}
 			emissionPerCell.get(endOfTimeIntervall).addAll(arrayEpb);
+
+			// distribute onto links
+			ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
+			arrayEpl = distributeOnLinks(linkId, personId, value,	eventStartTime);
+			if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
+				emissionPerLink.put(endOfTimeIntervall,	new ArrayList<EmPerLink>());
+			}
+			emissionPerLink.get(endOfTimeIntervall).addAll(arrayEpl);
 		}
 	}
 
@@ -118,10 +127,61 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 				emissionPerCell.put(endOfTimeIntervall,	new ArrayList<EmPerCell>());
 			}
 			emissionPerCell.get(endOfTimeIntervall).addAll(arrayEpb);
+			//distribute onto links
+			ArrayList<EmPerLink> arrayEpl = new ArrayList<EmPerLink>();
+			arrayEpl = distributeOnLinks(linkId, personId, value, eventStartTime);
+			if (!emissionPerLink.containsKey(endOfTimeIntervall)) {
+				emissionPerLink.put(endOfTimeIntervall,	new ArrayList<EmPerLink>());
+			}
+			emissionPerLink.get(endOfTimeIntervall).addAll(arrayEpl);
 		}
 	}
 
-	
+	private ArrayList<EmPerLink> distributeOnLinks(Id sourcelinkId, Id personId,
+			Double value, Double eventStartTime) {
+		
+		/*
+		 * distribute the emission value onto 25 cells:
+		 * use the distance from the source cell as a measure for the distribution weights.
+		 * origin cell factor: 0.216, distance = 1 -> 0.132, distance = 2 -> 0.029,
+		 * distance = 3 -> 0.002 
+		 * values are oriented at a normalized Gaussian distribution
+		 * and therefore add up to 1.0
+		 * 
+		 */
+		
+		ArrayList<EmPerLink> distributedEmissions = new ArrayList<EmPerLink>();
+		
+		// for each link: if distance to current link < 4
+		// => EmPerLink with value = distance dependent factor * current value
+		
+		int sourceX = link2xbins.get(sourcelinkId);
+		int sourceY = link2ybins.get(sourcelinkId);
+		
+		for(Id linkId: link2xbins.keySet()){
+			if(link2xbins.get(linkId)!=null && link2ybins.get(linkId)!=null){
+			int xDistance = Math.abs(sourceX-link2xbins.get(linkId));
+			int yDistance = Math.abs(sourceY-link2ybins.get(linkId));
+			int totalDistance = xDistance+yDistance;
+			
+			if(xDistance<4 && yDistance <4 && (totalDistance<4)){
+				Double distributionFactor = 0.0;
+				switch(totalDistance){
+					case 0: distributionFactor = dist0factor; break;
+					case 1: distributionFactor = dist1factor; break;
+					case 2: distributionFactor = dist2factor; break;
+					case 3: distributionFactor = dist3factor; break;
+				}
+				if (distributionFactor>0.0) {
+					EmPerLink epl = new EmPerLink(linkId, personId, value * distributionFactor, eventStartTime);
+					distributedEmissions.add(epl);
+				}
+				distributionFactor = 0.0;
+			}
+		}
+		}
+		return distributedEmissions;
+	}
 
 	private ArrayList<EmPerCell> distributeOnCells(Integer xBin, Integer yBin,
 			Id personId, Double value, Double eventStartTime) {
@@ -167,6 +227,10 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 		Double end = Math.ceil(time/timeBinSize)*timeBinSize;
 		if(end>0.0) return end;
 		return timeBinSize;
+	}
+	
+	public Map<Double, ArrayList<EmPerLink>> getEmissionsPerLink() {
+		return emissionPerLink;
 	}
 
 	public Map<Double, ArrayList<EmPerCell>> getEmissionsPerCell() {

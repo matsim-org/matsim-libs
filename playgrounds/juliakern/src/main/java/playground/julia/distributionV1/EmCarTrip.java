@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ColdEmissionEvent.java
+ * SpatialAveragingForLinkEmissions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,41 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.julia.distribution;
-
-import java.util.Map;
+package playground.julia.distributionV1;
 
 import org.matsim.api.core.v01.Id;
 
 /**
- * 
+ * simple class to store information on agents' (car) trips
+ * used to calculate exposure values 
  * @author julia
- *
  */
-public interface ResponsibilityEvent {
+public class EmCarTrip {
+	Double startTime;
+	Double endTime;
+	Id personId;
+	Id linkId;
 	
-	public final static String EVENT_TYPE = "responsibilityEvent";
-	public final static String RESPONSIBLE_PERSON_ID = "responsiblePersonId";
-	public final static String RECEIVING_PERSON_ID = "receivingPersonId";
-	public final static String EMISSIONEVENT_STARTTIME = "emissionEventStartTime";
-	public final static String EXPOSURE_STARTTIME = "exposureStartTime";
-	public final static String EXPOSURE_ENDTIME = "exposureEndTime";
-	public final static String LOCATION = "location";
-	public final static String CONCENTRATION = "concentration";
+	public EmCarTrip(Double startOfTimeInterval, Double endOfTimeInterval, 	Id personId, Id linkId){
+		this.startTime=startOfTimeInterval;
+		this.endTime=endOfTimeInterval;
+		this.personId=personId;
+		this.linkId=linkId;
+	}
 
-	public Double getExposureValue();
+	public Double getStartTime() {
+		return this.startTime;
+	}
 
-	public Id getResponsiblePersonId();
+	public Id getLinkId() {
+		return this.linkId;
+	}
 
-	public String getResponsibilityInformation();
-	
-	public String getExposureInformation();
+	public Id getPersonId() {
+		return this.personId;
+	}
 
-	public Id getReceivingPersonId();
-
-	public Double getDuration();
-
-	public Map<String, String> getInformationMap();
+	public Double getEndTime() {
+		return this.endTime;
+	}
 
 }

@@ -29,6 +29,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
+import playground.julia.exposure.ResponsibilityEvent;
+
 public class ResponsibilityScoringFunctionFactory implements
 		ScoringFunctionFactory {
 	

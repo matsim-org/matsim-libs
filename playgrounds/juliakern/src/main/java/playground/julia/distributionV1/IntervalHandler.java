@@ -1,32 +1,64 @@
-package playground.julia.distribution.scoringV2;
+package playground.julia.distributionV1;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.xerces.dom3.as.ASElementDeclaration;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 
 import playground.julia.exposure.EmActivity;
 
-public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
+public class IntervalHandler implements LinkEnterEventHandler,
+LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 
+	HashMap<Id, ArrayList<LinkLeaveEvent>> person2llevent = new HashMap<Id, ArrayList<LinkLeaveEvent>>();
+	HashMap<Id, ArrayList<LinkEnterEvent>> person2leevent = new HashMap<Id, ArrayList<LinkEnterEvent>>();
 	HashMap<Id, ArrayList<ActivityStartEvent>> person2asevent = new HashMap<Id, ArrayList<ActivityStartEvent>>();
 	HashMap<Id, ArrayList<ActivityEndEvent>> person2aeevent = new HashMap<Id, ArrayList<ActivityEndEvent>>();
-	ArrayList<EmActivity> activities = new ArrayList<EmActivity>();
 	
-	public ArrayList<EmActivity> getActivities() {
-		return activities;
+	@Override
+	public void reset(int iteration) {
+		person2llevent.clear();
+		person2leevent.clear();
+		person2aeevent.clear();
+		person2aeevent.clear();
 	}
 
 	@Override
-	public void reset(int iteration) {
-		person2aeevent.clear();
-		person2asevent.clear();
-		activities.clear();
+	public void handleEvent(LinkLeaveEvent event) {
+		Id personId = event.getPersonId();
+		ArrayList<LinkLeaveEvent> events;
+		if(person2llevent.containsKey(personId)){
+			events = person2llevent.get(personId);
+		}else{
+			events= new ArrayList<LinkLeaveEvent>();
+		}
+		events.add(event);
+		person2llevent.put(personId, events);
+		
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		Id personId = event.getPersonId();
+		ArrayList<LinkEnterEvent> events;
+		if(person2leevent.containsKey(personId)){
+			events = person2leevent.get(personId);
+		}else{
+			events = new ArrayList<LinkEnterEvent>();
+		}
+		events.add(event);
+		person2leevent.put(personId, events);
+		
 	}
 
 	@Override
@@ -55,8 +87,8 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		person2asevent.put(personId, events);
 	}
 
-	public void addActivitiesToTimetables(Map<Id,Integer> link2xbins, Map<Id,Integer> link2ybins, Double simulationEndTime) {
-		activities = new ArrayList<EmActivity>();
+	public void addActivitiesToTimetables(ArrayList<EmActivity> activities, Map<Id,Integer> link2xbins, Map<Id,Integer> link2ybins, Double simulationEndTime) {
+		
 		// combine act start events with act leave events to em activities
 		// without emission values - store person id, time and x,y-cell
 		
@@ -101,7 +133,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 						firstAee = aee;
 					}
 				}
-				if (link2xbins.get(firstAee.getLinkId())!=null && link2ybins.get(firstAee.getLinkId())!=null) {
+				if (link2xbins.get(firstAee.getLinkId())!=null && link2ybins.get(firstAee.getLinkId())!= null) {
 					int firstXBin = link2xbins.get(firstAee.getLinkId());
 					int firstYBin = link2ybins.get(firstAee.getLinkId());
 					EmActivity emFirst = new EmActivity(0.0,
@@ -130,7 +162,39 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		return null;
 	}
 
+	public void addCarTripsToTimetables(ArrayList<EmCarTrip> carTrips, Double simulationEndTime) {
+		// combine link enter events with link leave events to em car trip
+		for(Id personId: person2leevent.keySet()){
+			for(LinkEnterEvent lee: person2leevent.get(personId)){
+				Double startOfEvent = lee.getTime();
+				Id linkId = lee.getLinkId();
+				LinkLeaveEvent lle = findCorrespondingLinkLeaveEvent(lee, person2llevent.get(personId));
+				Double endOfEvent;
+				if(lle==null){
+					endOfEvent = simulationEndTime;
+				}else{
+					endOfEvent = lle.getTime();
+				}
+				EmCarTrip emcar = new EmCarTrip(startOfEvent, endOfEvent, personId, linkId);
+				carTrips.add(emcar);
+			}
+		}
+		
+	}
 
+	private LinkLeaveEvent findCorrespondingLinkLeaveEvent(LinkEnterEvent lee,
+			ArrayList<LinkLeaveEvent> arrayList) {
+		Double enterTime = lee.getTime();
+		Double currTime = Double.MAX_VALUE;
+		LinkLeaveEvent currEvent = null;
+		for(LinkLeaveEvent event: arrayList){
+			if(event.getTime()<currTime && event.getTime()>enterTime){
+				currTime = event.getTime();
+				currEvent = event;
+			}
+		}
+		return currEvent;
+	}
 	
 
 }

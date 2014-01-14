@@ -27,12 +27,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -42,21 +40,16 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.benjamin.internalization.EmissionCostModule;
-import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
-import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 import playground.julia.distribution.DistributionConfig;
-import playground.julia.distribution.EmActivity;
+import playground.julia.exposure.EmActivity;
 import playground.julia.distribution.IntervalHandler;
 import playground.julia.distribution.ResponsibilityCostModule;
 import playground.julia.distribution.ResponsibilityTravelDisutilityCalculatorFactory;
-import playground.julia.distribution.SpatialAveragingDistribution;
-import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
+
 import playground.vsp.emissions.EmissionModule;
 import playground.vsp.emissions.example.EmissionControlerListener;
 
@@ -82,7 +75,6 @@ public class RunInterSample {
 		private static String emissionVehicleFile ="../../runs-svn/detEval/kuhmo/input/emissionVehicles_1pct.xml.gz";
 		private static String emissionEventOutputFile = "output/sampleV2/emissions.xml";
 		
-		private static final Logger logger = Logger.getLogger(RunInterSample.class);
 
 		public static void main(String[] args) {
 			//		configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";

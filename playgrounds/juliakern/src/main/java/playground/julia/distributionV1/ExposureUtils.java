@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution.scoringV3;
+package playground.julia.distributionV1;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+
+import playground.julia.exposure.ResponsibilityEvent;
 
 /**
  * class to analyze responsibility events 

@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.ScoringFunction;
 
+import playground.julia.exposure.ResponsibilityEvent;
+
 public class ResponsibilityScoringFunction implements ScoringFunction {
 	
 	ScoringFunction delegate;

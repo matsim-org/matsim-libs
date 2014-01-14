@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ColdEmissionEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +16,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution.scoringV3;
+
+package playground.julia.distributionV1;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
-/**
- * store (distributed) emission cell-wise
- * 
- * @author julia
- */
-public class EmPerCell {
-	
-	private Integer xBin;
-	private Integer yBin;
-	private Id responsiblePersonId;
-	private Double concentration;
-	private Double emissionEventStartTime;
-	
-	public EmPerCell(Integer xBin, Integer yBin, Id personId, Double concentration, Double emissisionEventStartTime) {
-		this.xBin = xBin;
-		this.yBin = yBin;
-		this.responsiblePersonId = personId;
-		this.concentration = concentration;
-		this.emissionEventStartTime = emissisionEventStartTime;
-	}
+import playground.vsp.emissions.types.ColdPollutant;
+import playground.vsp.emissions.types.WarmPollutant;
 
-	public Integer getXbin() {
-		return this.xBin;
-	}
-	
-	public Integer getYbin() {
-		return this.yBin;
-	}
+public interface DistributionConfiguration {
 
-	public Id getPersonId() {
-		return this.responsiblePersonId;
-	}
+	public abstract Double getSimulationEndTime();
 
-	public Double getConcentration() {
-		return this.concentration;
-	}
+	public abstract boolean storeResponsibilityEvents();
 
-	public Double getEmissionEventStartTime() {
-		return emissionEventStartTime;
-	}
+	public abstract Map<Id, ? extends Link> getLinks();
+
+	public abstract String getMunichShapeFile();
+
+	public abstract String getEventsFile();
+
+	public abstract String getEmissionFile();
+
+	public abstract String getOutPathStub();
+
+	public abstract double getXmin();
+
+	public abstract double getXmax();
+
+	public abstract double getYmin();
+
+	public abstract double getYmax();
+
+	public abstract int getNoOfTimeBins();
+
+	public abstract int getNumberOfXBins();
+
+	public abstract int getNumberOfYBins();
+
+	public abstract WarmPollutant getWarmPollutant2analyze();
+
+	public abstract ColdPollutant getColdPollutant2analyze();
+
+	public abstract Double getTimeBinSize();
+
+	public abstract Map<Id, Integer> getLink2yBin();
+
+	public abstract Map<Id, Integer> getLink2xBin();
 
 }

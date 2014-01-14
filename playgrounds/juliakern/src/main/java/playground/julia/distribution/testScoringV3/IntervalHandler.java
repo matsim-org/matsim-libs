@@ -10,6 +10,8 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 
+import playground.julia.exposure.EmActivity;
+
 public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
 
 	HashMap<Id, ArrayList<ActivityStartEvent>> person2asevent = new HashMap<Id, ArrayList<ActivityStartEvent>>();

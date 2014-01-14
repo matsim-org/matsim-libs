@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
+import playground.julia.exposure.EmActivity;
+import playground.julia.exposure.EmPerCell;
+import playground.julia.exposure.ResponsibilityEvent;
+
 public class ResponsibilityUtils {
 
 	

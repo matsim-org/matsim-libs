@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ColdEmissionEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,40 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.distribution.scoringV2;
+package playground.julia.distributionV1;
 
-import java.util.Map;
+import org.matsim.core.api.experimental.events.EventsManager;
 
-import org.matsim.api.core.v01.Id;
+public class TestREReader {
 
-/**
- * 
- * @author julia
- *
- */
-public interface ResponsibilityEvent {
-	
-	public final static String EVENT_TYPE = "responsibilityEvent";
-	public final static String RESPONSIBLE_PERSON_ID = "responsiblePersonId";
-	public final static String RECEIVING_PERSON_ID = "receivingPersonId";
-	public final static String EMISSIONEVENT_STARTTIME = "emissionEventStartTime";
-	public final static String EXPOSURE_STARTTIME = "exposureStartTime";
-	public final static String EXPOSURE_ENDTIME = "exposureEndTime";
-	public final static String LOCATION = "location";
-	public final static String CONCENTRATION = "concentration";
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		//EventsManager eventsManager = ;
+		// TODO Auto-generated method stub
+//		ResponsibilityEventReader rereader = new ResponsibilityEventReader(eventsManager );
 
-	public Double getExposureValue();
-
-	public Id getResponsiblePersonId();
-
-	public String getResponsibilityInformation();
-	
-	public String getExposureInformation();
-
-	public Id getReceivingPersonId();
-
-	public Double getDuration();
-
-	public Map<String, String> getInformationMap();
+	}
 
 }

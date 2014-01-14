@@ -17,57 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution;
+package playground.julia.distributionV1;
 
 import org.matsim.api.core.v01.Id;
 
 /**
- * simple class to store information on agents' activities
- * used to calculate exposure values
- * @author julia 
+ * store (distributed) emissions for each links 
+ * with associated responsible person, time, concentration value
+ * @author julia
+ *
  */
+public class EmPerLink {
+	
+	private Id linkId;
+	private Id responsiblePersonId;
+	private Double concentration;
+	private Double emissionEventStartTime;
 
-public class EmActivity {
-	Double startOfActivity;
-	Double endOfActivity;
-	Id personId;
-	int xBin;
-	int yBin;
-	String activityType;
+	public EmPerLink(Id linkId, Id personId, Double concentration, Double emissionEventStartTime) {
+		this.linkId = linkId;
+		this.responsiblePersonId = personId;
+		this.concentration = concentration;
+		this.emissionEventStartTime = emissionEventStartTime;
+	}
 
-	public EmActivity(Double startOfActivity,	Double endOfActivity, Id personId, int xBin, int yBin, String activityType){
-		this.startOfActivity=startOfActivity;
-		this.endOfActivity=endOfActivity;
-		this.personId=personId;
-		this.xBin=xBin;
-		this.yBin=yBin;
-		this.activityType = activityType;
+	public Id getLinkId() {
+		return this.linkId;
 	}
 
 	public Id getPersonId() {
-		return this.personId;
+		return this.responsiblePersonId;
 	}
 
-	public double getStartTime() {
-		return this.startOfActivity;
+	public Double getConcentration() {
+		return this.concentration;
 	}
 
-	public Double getEndTime() {
-		return this.endOfActivity;
+	public Double getEmissionEventStartTime() {
+		return emissionEventStartTime;
 	}
 
-	public String getActivityType() {
-		return this.activityType;
-	}
-
-	public int getXBin() {
-		return this.xBin;
-	}
-	public int getYBin() {
-		return this.yBin;
-	}
-
-	public Double getDuration() {
-		return endOfActivity-startOfActivity;
-	}
 }

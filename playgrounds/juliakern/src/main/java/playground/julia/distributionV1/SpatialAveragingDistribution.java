@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution;
+package playground.julia.distributionV1;
 
 import java.io.IOException;
 import java.util.ArrayList;

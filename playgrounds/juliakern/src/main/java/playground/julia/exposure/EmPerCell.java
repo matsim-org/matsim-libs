@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution.scoringV2;
+package playground.julia.exposure;
 
 import org.matsim.api.core.v01.Id;
 

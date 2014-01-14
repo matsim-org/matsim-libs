@@ -15,6 +15,8 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 
+import playground.julia.exposure.EmActivity;
+
 public class IntervalHandler implements LinkEnterEventHandler,
 LinkLeaveEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 

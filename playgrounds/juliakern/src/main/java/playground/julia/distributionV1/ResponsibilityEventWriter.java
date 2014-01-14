@@ -1,12 +1,14 @@
-package playground.julia.distribution.scoringV3;
+package playground.julia.distributionV1;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 import playground.julia.exposure.ResponsibilityEvent;

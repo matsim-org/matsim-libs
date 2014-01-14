@@ -44,9 +44,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.julia.distribution.GeneratedEmissionsHandler;
 import playground.julia.distribution.IntervalHandler;
-import playground.julia.distribution.ResponsibilityEvent;
 import playground.julia.distribution.ResponsibilityScoringFunctionFactory;
 import playground.julia.distribution.SpatialAveragingDistribution;
+import playground.julia.exposure.ResponsibilityEvent;
 import playground.vsp.emissions.example.EmissionControlerListener;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;

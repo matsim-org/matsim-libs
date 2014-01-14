@@ -11,6 +11,8 @@ import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 
+import playground.julia.exposure.ResponsibilityEvent;
+
 public class ResponsibilityEventWriter implements EventWriter, BasicEventHandler{
 
 	private BufferedWriter out;

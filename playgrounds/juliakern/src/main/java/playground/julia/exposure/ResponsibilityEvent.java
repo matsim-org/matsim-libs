@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.distribution.scoringV3;
+package playground.julia.exposure;
 
 import java.util.Map;
 

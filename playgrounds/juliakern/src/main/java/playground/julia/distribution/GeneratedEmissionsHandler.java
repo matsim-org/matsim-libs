@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.julia.exposure.EmPerCell;
 import playground.vsp.emissions.events.ColdEmissionEvent;
 import playground.vsp.emissions.events.ColdEmissionEventHandler;
 import playground.vsp.emissions.events.WarmEmissionEvent;

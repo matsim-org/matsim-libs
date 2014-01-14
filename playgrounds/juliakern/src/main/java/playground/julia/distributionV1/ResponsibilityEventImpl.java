@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.distribution.scoringV3;
+package playground.julia.distributionV1;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +32,7 @@ public class ResponsibilityEventImpl extends Event implements ResponsibilityEven
 
 	private Id responsiblePersonId;
 	private Id receivingPersonId;
+	private Double emissionEventTime;
 	private Double exposureStartTime;
 	private Double exposureEndTime;
 	private Double concentration;
@@ -42,9 +43,10 @@ public class ResponsibilityEventImpl extends Event implements ResponsibilityEven
 		return this.getDuration()*this.concentration;
 	}
 
-	public ResponsibilityEventImpl(Id responsiblePersonId, Id receivingPersonId, Double exposureStartTime, Double exposureEndTime,
+	public ResponsibilityEventImpl(Id responsiblePersonId, Id receivingPersonId, Double emissionEventTime, Double exposureStartTime, Double exposureEndTime,
 			Double concentration, String exposureLocation) {
 		super(exposureStartTime);
+		this.emissionEventTime = emissionEventTime;
 		this.responsiblePersonId = responsiblePersonId;
 		this.receivingPersonId = receivingPersonId;
 		this.exposureStartTime = exposureStartTime;
@@ -78,6 +80,7 @@ public class ResponsibilityEventImpl extends Event implements ResponsibilityEven
 		info += " exposure time: " + exposureStartTime + " - " + exposureEndTime;
 		info += " with exposure value " + this.getExposureValue();
 		info += " at/during " + exposureLocation + ". ";
+		info += "Caused by emission event at " + emissionEventTime + ".";
 		return info;
 	}
 	
@@ -86,6 +89,7 @@ public class ResponsibilityEventImpl extends Event implements ResponsibilityEven
 		info += " exposure time: " + exposureStartTime + " - " + exposureEndTime;
 		info += " with exposure value " + this.getExposureValue();
 		info += " at/during " + exposureLocation + ". ";
+		info += "Caused by emission event at " + emissionEventTime + ".";
 		return info;
 	}
 
@@ -94,6 +98,7 @@ public class ResponsibilityEventImpl extends Event implements ResponsibilityEven
 		Map<String, String> info = new HashMap<String, String>();
 		info.put(RECEIVING_PERSON_ID, receivingPersonId.toString());
 		info.put(RESPONSIBLE_PERSON_ID, responsiblePersonId.toString());
+		info.put(EMISSIONEVENT_STARTTIME, emissionEventTime.toString());
 		info.put(EXPOSURE_STARTTIME, exposureStartTime.toString());
 		info.put(EXPOSURE_ENDTIME, exposureEndTime.toString());
 		info.put(LOCATION, exposureLocation);

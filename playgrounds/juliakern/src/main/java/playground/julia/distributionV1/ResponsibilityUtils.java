@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution.scoringV2;
+package playground.julia.distributionV1;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -26,8 +26,67 @@ import org.matsim.api.core.v01.Id;
 import playground.julia.exposure.EmActivity;
 import playground.julia.exposure.EmPerCell;
 import playground.julia.exposure.ResponsibilityEvent;
+import playground.julia.toi.FirstSimulation;
 
 public class ResponsibilityUtils {
+
+	/*
+	 * calculate responsibility and exposure 
+	 * from car trips and emissions per link
+	 * 
+	 * -> generate responsibility(and exposure) events 
+	 */
+	public void addExposureAndResponsibilityLinkwise(ArrayList<EmCarTrip> carTrips,
+													Map<Double, ArrayList<EmPerLink>> emissionPerLink,
+														ArrayList<ResponsibilityEvent> responsibility, 
+														double timeBinSize, double simulationEndTime) {
+		
+		for (EmCarTrip ect : carTrips) {
+			Id linkId = ect.getLinkId();
+			Double startTime = ect.getStartTime();
+			Double endTime = ect.getEndTime();
+			Id exposedPersonId = ect.getPersonId();
+
+			// TODO Benjamin fragen: Annahme: fahrzeit auf links ist so kurz,
+			// dass sie nicht in mehrere time bins fallen
+			Double endOfTimeInterval = Math.ceil(ect.getStartTime()	/ timeBinSize) * timeBinSize;
+
+			// all responsibility events for this activity
+			ArrayList<ResponsibilityEvent> currentREvents = new ArrayList<ResponsibilityEvent>();
+			
+			currentREvents.addAll(generateResponsibilityEventsForLink(exposedPersonId, emissionPerLink.get(endOfTimeInterval), linkId, startTime, endTime));
+
+			responsibility.addAll(currentREvents);
+		}
+
+	}
+
+	/*
+	 * In: exposed person id, start time of (car) trip, end time of (car) trip
+	 *   link id of that trip
+	 *   generated emissions of corresponding time bin
+	 *   
+	 *   -> for each generated emission matching the link id and time 
+	 *   generate a responsibility (and exposure) event
+	 *   
+	 */
+	private ArrayList<ResponsibilityEvent> generateResponsibilityEventsForLink(
+			Id exposedPersonId, ArrayList<EmPerLink> emissionPerLinkOfCurrentTimeBin, Id linkId, Double startTime,
+			Double endTime) {
+		
+		ArrayList<ResponsibilityEvent> rEvents = new ArrayList<ResponsibilityEvent>();
+		
+		if (emissionPerLinkOfCurrentTimeBin!=null) {
+			for (EmPerLink epl : emissionPerLinkOfCurrentTimeBin) {
+				if (epl.getLinkId().equals(linkId)) {
+					String location = "link " + linkId.toString();
+					ResponsibilityEvent ree = new ResponsibilityEventImpl(epl.getPersonId(), exposedPersonId, epl.getEmissionEventStartTime(), startTime, endTime, epl.getConcentration(), location);
+					rEvents.add(ree);
+				}
+			}
+		}
+		return rEvents;
+	}
 
 	
 	/*

@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.population.Person;
 //import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
+import playground.julia.exposure.EmActivity;
+
 public class ResponsibilityCostModule {
 	
 	private Collection<EmActivity> activities;
