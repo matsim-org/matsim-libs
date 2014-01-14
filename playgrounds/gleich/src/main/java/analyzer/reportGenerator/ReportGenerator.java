@@ -1,14 +1,10 @@
 package analyzer.reportGenerator;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
+//import java.nio.file.FileAlreadyExistsException;
+//import java.nio.file.Files;
 
 public class ReportGenerator {
-	
+
 	/*
 	 * The working directory should include the analysis results in the
 	 * directory structure used in the outputDirectory of the
@@ -23,18 +19,18 @@ public class ReportGenerator {
 
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	/*
 	public static void main(String[] args) throws IOException {
 		ReportGenerator reportGenerator = new ReportGenerator();
 		reportGenerator.generateReport();
 	}
-	
+
 	public ReportGenerator(){	}
-	
-	public ReportGenerator(String pathToRScriptFiles, String pathToLatexFiles, 
-			String pathToRScriptExe, String pathToPdfLatexExe, 
+
+	public ReportGenerator(String pathToRScriptFiles, String pathToLatexFiles,
+			String pathToRScriptExe, String pathToPdfLatexExe,
 			String workingDirectory){
 		this.pathToRScriptFiles = pathToRScriptFiles;
 		this.pathToLatexFiles = pathToLatexFiles;
@@ -49,14 +45,14 @@ public class ReportGenerator {
 		runRScripts();
 		compileLatex();
 	}
-	
+
 	private void copyLatexAndRFiles() throws IOException{
 		System.out.println("Copying Latex and R scripts to working directory"
 				+ " if missing:");
 		copyDirectory(new File(pathToLatexFiles), new File(workingDirectory + "/Latex"));
 		copyDirectory(new File(pathToRScriptFiles), new File(workingDirectory + "/R"));
 	}
-	
+
 	private void compileLatex() {
 		System.out.println("Compiling LATEX:");
 
@@ -72,13 +68,13 @@ public class ReportGenerator {
  */
 	/*
 	}
-	
+
 	private void runRScripts() {
 		System.out.println("Running R:");
 
-		(new File(workingDirectory + "/ROutput")).mkdir(); 
-		
-		/*System.out.println("\"" + pathToRScriptExe + "\" " + "\"" 
+		(new File(workingDirectory + "/ROutput")).mkdir();
+
+		/*System.out.println("\"" + pathToRScriptExe + "\" " + "\""
     			+ pathToRScriptFiles + "\"" + "/analysis_main.R " +
     			"\"" + workingDirectory + "\" " +
     			"\"" + pathToRScriptFiles + "\"");*/
@@ -91,20 +87,20 @@ public class ReportGenerator {
     			+ "\" \"" + workingDirectory + "\" " +
     			//2nd Argument to be passed to R: Path to other R scripts
     			"\"" + workingDirectory + "/R\"");
-		
+
 		}
-	
+
 	private void runSystemCall(String command){
 		String s = null;
 	       try {
 	            // using the Runtime exec method:
 	        	Runtime runTime = Runtime.getRuntime();
 	        	Process p = runTime.exec(command);
-	            
-	            BufferedReader stdInput = new BufferedReader(new 
+
+	            BufferedReader stdInput = new BufferedReader(new
 	                 InputStreamReader(p.getInputStream()));
 
-	            BufferedReader stdError = new BufferedReader(new 
+	            BufferedReader stdError = new BufferedReader(new
 	                 InputStreamReader(p.getErrorStream()));
 
 	            // read the output from the command
@@ -112,13 +108,13 @@ public class ReportGenerator {
 	            while ((s = stdInput.readLine()) != null) {
 	                System.out.println(s);
 	            }
-	            
+
 	            // read any errors from the attempted command
 	            System.out.println("Standard error of the command (if any):\n");
 	            while ((s = stdError.readLine()) != null) {
 	                System.out.println(s);
 	            }
-	            
+
 	        }
 	        catch (IOException e) {
 	            System.out.println("Java exceptions: ");
@@ -126,12 +122,12 @@ public class ReportGenerator {
 	            System.exit(-1);
 	        }
 	}
-	
+
 	private void copyDirectory(File source, File target) throws IOException{
 		int counter = 0;
 		target.mkdirs();
 		File[] files = source.listFiles();
-		
+
 		for(File file: files){
 			if(file.isDirectory()){
 				copyDirectory(file, new File(target, file.getName()));
@@ -145,7 +141,7 @@ public class ReportGenerator {
 			}
 		}
 		if(counter > 0){
-			System.out.println((files.length - counter) + " of " 
+			System.out.println((files.length - counter) + " of "
 					+ files.length + " files copied.");
 		}
 	}
