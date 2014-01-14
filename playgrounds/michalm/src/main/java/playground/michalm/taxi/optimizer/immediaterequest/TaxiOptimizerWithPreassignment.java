@@ -52,7 +52,7 @@ public class TaxiOptimizerWithPreassignment
 
 
     @Override
-    protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
+    protected VehiclePath findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
     {
         Vehicle veh = reqIdToVehMap.get(req.getId());
         return super.findBestVehicle(req, Arrays.asList(new Vehicle[] { veh }));

@@ -20,7 +20,7 @@
 package playground.michalm.taxi.schedule;
 
 import org.matsim.contrib.dvrp.data.schedule.impl.DriveTaskImpl;
-import org.matsim.contrib.dvrp.router.VrpPath;
+import org.matsim.contrib.dvrp.router.*;
 
 import playground.michalm.taxi.model.TaxiRequest;
 
@@ -32,7 +32,7 @@ public class TaxiDropoffDriveTask
     private final TaxiRequest request;
 
 
-    public TaxiDropoffDriveTask(VrpPath path, TaxiRequest request)
+    public TaxiDropoffDriveTask(VrpPathWithTravelData path, TaxiRequest request)
     {
         super(path);
 

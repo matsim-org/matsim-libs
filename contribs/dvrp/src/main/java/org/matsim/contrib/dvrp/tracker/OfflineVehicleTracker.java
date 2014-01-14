@@ -30,7 +30,7 @@ public interface OfflineVehicleTracker
     int predictEndTime(int currentTime);
 
 
-    int getInitialEndTime();
+    int getPlannedEndTime();
 
 
     /**

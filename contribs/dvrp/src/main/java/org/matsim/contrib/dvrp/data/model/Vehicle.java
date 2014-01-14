@@ -32,7 +32,7 @@ public interface Vehicle
     String getName();
 
 
-    Depot getDepot();// TODO or just Localizable getStartLocation()?? and getEndLocation()??
+    Depot getDepot();// TODO or just BasicLocation getStartLocation()?? and getEndLocation()??
 
 
     int getCapacity();

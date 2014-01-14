@@ -95,7 +95,7 @@ public class NOSRankTaxiOptimizer
 
             if (link != depotLink) {
                 int t5 = dropoffStayTask.getEndTime();
-                VrpPath path = calculator.calcPath(link, depotLink, t5);
+                VrpPathWithTravelData path = calculator.calcPath(link, depotLink, t5);
                 schedule.addTask(new TaxiCruiseDriveTask(path));
 
                 int t6 = path.getArrivalTime();
@@ -178,7 +178,7 @@ public class NOSRankTaxiOptimizer
         Link lastLink = lastTask.getLink();
 
         if (veh.getDepot().getLink() != lastLink) {// not a loop
-            VrpPath path = calculator.calcPath(lastLink, veh.getDepot().getLink(), currentTime);
+            VrpPathWithTravelData path = calculator.calcPath(lastLink, veh.getDepot().getLink(), currentTime);
             sched.addTask(new TaxiCruiseDriveTask(path));
 
             int arrivalTime = path.getArrivalTime();

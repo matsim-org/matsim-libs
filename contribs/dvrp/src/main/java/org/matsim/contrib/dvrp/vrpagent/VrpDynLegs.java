@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.tracker;
+package org.matsim.contrib.dvrp.vrpagent;
 
+import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.schedule.DriveTask;
+import org.matsim.contrib.dvrp.tracker.*;
 
 
-public class OfflineVehicleTrackerImpl
-    implements OfflineVehicleTracker
+public class VrpDynLegs
 {
-    private final DriveTask driveTask;
-    private final int initialEndTime;
-
-
-    public OfflineVehicleTrackerImpl(DriveTask driveTask)
+    public static VrpDynLeg createLegWithOfflineVehicleTracker(DriveTask driveTask)
     {
-        this.driveTask = driveTask;
-        this.initialEndTime = driveTask.getEndTime();
+        OfflineVehicleTracker tracker = new OfflineVehicleTrackerImpl(driveTask);
+        driveTask.setVehicleTracker(tracker);
+        return new VrpDynLeg(driveTask.getPath());
     }
 
 
-    @Override
-    public DriveTask getDriveTask()
+    public static VrpDynLeg createLegWithOnlineVehicleTracker(DriveTask driveTask,
+            VrpSimEngine vrpSimEngine)
     {
-        return driveTask;
-    }
-
-
-    @Override
-    public int calculateCurrentDelay(int currentTime)
-    {
-        return Math.max(0, currentTime - initialEndTime);
-    }
-
-
-    @Override
-    public int predictEndTime(int currentTime)
-    {
-        return Math.max(initialEndTime, currentTime);
-    }
-
-
-    @Override
-    public int getPlannedEndTime()
-    {
-        return initialEndTime;
+        OnlineVehicleTracker tracker = new OnlineVehicleTrackerImpl(driveTask, vrpSimEngine);
+        driveTask.setVehicleTracker(tracker);
+        return new VrpDynLeg(tracker);
     }
 }

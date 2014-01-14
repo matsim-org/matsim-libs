@@ -19,27 +19,35 @@
 
 package org.matsim.contrib.dvrp.router;
 
+import java.util.Iterator;
+
 import org.matsim.api.core.v01.network.Link;
+
+import com.google.common.collect.Iterators;
 
 
 public class VrpPathImpl
-    implements VrpPath
+    implements VrpPathWithTravelData
 {
     private final int departureTime;
     private final int travelTime;
     private final double travelCost;
     private final Link[] links;
-    private final int[] accLinkTravelTimes;//accumulated link travel times
+    private final int[] linkTTs;//accumulated link travel times
 
 
     public VrpPathImpl(int departureTime, int travelTime, double travelCost, Link[] links,
-            int[] accLinkTravelTimes)
+            int[] linkTT)
     {
+        if (links.length != linkTT.length) {
+            throw new IllegalArgumentException();
+        }
+
         this.departureTime = departureTime;
         this.travelTime = travelTime;
         this.travelCost = travelCost;
         this.links = links;
-        this.accLinkTravelTimes = accLinkTravelTimes;
+        this.linkTTs = linkTT;
     }
 
 
@@ -72,9 +80,16 @@ public class VrpPathImpl
 
 
     @Override
-    public Link[] getLinks()
+    public int getLinkCount()
     {
-        return links;
+        return links.length;
+    }
+
+
+    @Override
+    public Link getLink(int idx)
+    {
+        return links[idx];
     }
 
 
@@ -90,10 +105,18 @@ public class VrpPathImpl
     {
         return links[links.length - 1];
     }
-    
-    
-    public int[] getAccLinkTravelTimes()
+
+
+    @Override
+    public int getLinkTravelTime(int idx)
     {
-        return accLinkTravelTimes;
+        return linkTTs[idx];
+    }
+
+
+    @Override
+    public Iterator<Link> iterator()
+    {
+        return Iterators.forArray(links);
     }
 }

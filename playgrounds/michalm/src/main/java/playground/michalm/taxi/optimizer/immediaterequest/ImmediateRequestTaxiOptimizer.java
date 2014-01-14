@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.data.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.tracker.OnlineVehicleTracker;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -51,34 +52,20 @@ public abstract class ImmediateRequestTaxiOptimizer
     extends AbstractTaxiOptimizer
     implements VrpOptimizerWithOnlineTracking
 {
-    protected static class VehicleDrive
+    protected static class VehiclePath
     {
-        public static final VehicleDrive NO_VEHICLE_DRIVE_FOUND = new VehicleDrive(null,
+        public static final VehiclePath NO_VEHICLE_PATH_FOUND = new VehiclePath(null,
                 new VrpPathImpl(Integer.MAX_VALUE / 2, Integer.MAX_VALUE / 2, Double.MAX_VALUE,
                         null, null));
 
         private final Vehicle vehicle;
-        private final VrpPath path;
+        private final VrpPathWithTravelData path;
 
 
-        protected VehicleDrive(Vehicle vehicle, VrpPath path)
+        protected VehiclePath(Vehicle vehicle, VrpPathWithTravelData path)
         {
             this.vehicle = vehicle;
             this.path = path;
-        }
-    }
-
-
-    private static class LinkTimePair
-    {
-        public final Link link;
-        public final int time;
-
-
-        public LinkTimePair(Link link, int time)
-        {
-            this.link = link;
-            this.time = time;
         }
     }
 
@@ -126,18 +113,18 @@ public abstract class ImmediateRequestTaxiOptimizer
     @Override
     protected void scheduleRequest(TaxiRequest request)
     {
-        VehicleDrive bestVehicle = findBestVehicle(request, data.getVehicles());
+        VehiclePath bestVehicle = findBestVehicle(request, data.getVehicles());
 
-        if (bestVehicle != VehicleDrive.NO_VEHICLE_DRIVE_FOUND) {
+        if (bestVehicle != VehiclePath.NO_VEHICLE_PATH_FOUND) {
             scheduleRequestImpl(bestVehicle, request);
         }
     }
 
 
-    protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
+    protected VehiclePath findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
     {
         int currentTime = data.getTime();
-        VehicleDrive best = VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
+        VehiclePath best = VehiclePath.NO_VEHICLE_PATH_FOUND;
 
         for (Vehicle veh : vehicles) {
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
@@ -156,18 +143,18 @@ public abstract class ImmediateRequestTaxiOptimizer
                 continue;
             }
 
-            VrpPath path = calculator.calcPath(departure.link, req.getFromLink(), departure.time);
+            VrpPathWithTravelData path = calculator.calcPath(departure.link, req.getFromLink(), departure.time);
 
             if (params.minimizePickupTripTime) {
                 if (path.getTravelTime() < best.path.getTravelTime()) {
                     // TODO: in the future: add a check if the taxi time windows are satisfied
-                    best = new VehicleDrive(veh, path);
+                    best = new VehiclePath(veh, path);
                 }
             }
             else {
                 if (path.getArrivalTime() < best.path.getArrivalTime()) {
                     // TODO: in the future: add a check if the taxi time windows are satisfied
-                    best = new VehicleDrive(veh, path);
+                    best = new VehiclePath(veh, path);
                 }
             }
         }
@@ -215,7 +202,7 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    protected void scheduleRequestImpl(VehicleDrive best, TaxiRequest req)
+    protected void scheduleRequestImpl(VehiclePath best, TaxiRequest req)
     {
         Schedule<TaxiTask> bestSched = TaxiSchedules.getSchedule(best.vehicle);
 
@@ -263,16 +250,16 @@ public abstract class ImmediateRequestTaxiOptimizer
         int time = data.getTime();
         TaxiTask currentTask = schedule.getCurrentTask();
 
-        int initialEndTime;
+        int plannedEndTime;
 
         if (currentTask.getType() == TaskType.DRIVE) {
-            initialEndTime = ((DriveTask)currentTask).getVehicleTracker().getInitialEndTime();
+            plannedEndTime = ((DriveTask)currentTask).getVehicleTracker().getPlannedEndTime();
         }
         else {
-            initialEndTime = currentTask.getEndTime();
+            plannedEndTime = currentTask.getEndTime();
         }
 
-        int delay = time - initialEndTime;
+        int delay = time - plannedEndTime;
 
         if (delay != 0) {
             if (delaySpeedupStats != null) {// optionally, one may record delays
@@ -312,7 +299,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         Link reqToLink = req.getToLink();
         int t3 = pickupStayTask.getEndTime();
 
-        VrpPath path = calculator.calcPath(reqFromLink, reqToLink, t3);
+        VrpPathWithTravelData path = calculator.calcPath(reqFromLink, reqToLink, t3);
         schedule.addTask(new TaxiDropoffDriveTask(path, req));
 
         int t4 = path.getArrivalTime();
@@ -399,7 +386,8 @@ public abstract class ImmediateRequestTaxiOptimizer
                 case CRUISE_DRIVE: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
-                    t += ((DriveTask)task).getPath().getTravelTime(); //TODO one may consider recalculation of SP!!!!
+                    VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath(); 
+                    t += path.getTravelTime(); //TODO one may consider recalculation of SP!!!!
                     task.setEndTime(t);
 
                     break;

@@ -52,11 +52,11 @@ public class TaxiActionCreator
             case DROPOFF_DRIVE:
             case CRUISE_DRIVE:
                 if (onlineVehicleTracker) {
-                    return VrpDynLeg.createLegWithOnlineVehicleTracker((DriveTask)task,
+                    return VrpDynLegs.createLegWithOnlineVehicleTracker((DriveTask)task,
                             vrpSimEngine);
                 }
                 else {
-                    return VrpDynLeg.createLegWithOfflineVehicleTracker((DriveTask)task);
+                    return VrpDynLegs.createLegWithOfflineVehicleTracker((DriveTask)task);
                 }
 
             case PICKUP_STAY:

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.*;
-import org.matsim.contrib.dvrp.router.VrpPath;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -78,8 +78,7 @@ public class VrpSchedulePlan
         for (Task t : schedule.getTasks()) {
             switch (t.getType()) {
                 case DRIVE:
-                    DriveTask dt = (DriveTask)t;
-                    addLeg(dt.getPath());
+                    addLeg((DriveTask)t);
                     break;
 
                 case STAY:
@@ -97,26 +96,25 @@ public class VrpSchedulePlan
     }
 
 
-    private void addLeg(VrpPath path)
+    private void addLeg(DriveTask task)
     {
+        VrpPath path = task.getPath();
         Leg leg = populFactory.createLeg(TransportMode.car);
 
-        leg.setDepartureTime(path.getDepartureTime());
-
-        Link[] links = path.getLinks();
         Id fromLinkId = path.getFromLink().getId();
         Id toLinkId = path.getToLink().getId();
 
         NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl)populFactory).createRoute(
                 TransportMode.car, fromLinkId, toLinkId);
 
-        if (links.length > 1) {// means: fromLink != toLink
+        int length = path.getLinkCount();
+        if (length > 1) {// means: fromLink != toLink
 
             // all except the first and last ones (== fromLink and toLink)
-            ArrayList<Id> linkIdList = new ArrayList<Id>(links.length - 1);
+            ArrayList<Id> linkIdList = new ArrayList<Id>(length - 1);
 
-            for (int i = 1; i < links.length - 1; i++) {
-                linkIdList.add(links[i].getId());
+            for (int i = 1; i < length - 1; i++) {
+                linkIdList.add(path.getLink(i).getId());
             }
 
             netRoute.setLinkIds(fromLinkId, linkIdList, toLinkId);
@@ -126,13 +124,21 @@ public class VrpSchedulePlan
             netRoute.setDistance(0.0);
         }
 
-        netRoute.setTravelTime(path.getTravelTime());
-        netRoute.setTravelCost(path.getTravelCost());
+        int tt = task.getEndTime() - task.getBeginTime();
+
+        netRoute.setTravelTime(tt);
+
+        if (path instanceof VrpPathWithTravelData) {
+            netRoute.setTravelCost( ((VrpPathWithTravelData)path).getTravelCost());
+        }
+        else {
+            netRoute.setTravelCost(Double.NaN);
+        }
 
         leg.setRoute(netRoute);
-        leg.setDepartureTime(path.getDepartureTime());
-        leg.setTravelTime(path.getTravelTime());
-        ((LegImpl)leg).setArrivalTime(path.getArrivalTime());
+        leg.setDepartureTime(task.getBeginTime());
+        leg.setTravelTime(tt);
+        ((LegImpl)leg).setArrivalTime(task.getEndTime());
 
         actsLegs.add(leg);
     }

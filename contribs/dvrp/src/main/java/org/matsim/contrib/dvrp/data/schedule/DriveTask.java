@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.data.schedule;
 
-import org.matsim.contrib.dvrp.router.VrpPath;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.tracker.OfflineVehicleTracker;
 
 
@@ -33,4 +33,7 @@ public interface DriveTask
 
 
     void setVehicleTracker(OfflineVehicleTracker vehicleTracker);
+
+
+    void pathDiverted(DivertedVrpPath divertedPath, int newEndTime);
 }

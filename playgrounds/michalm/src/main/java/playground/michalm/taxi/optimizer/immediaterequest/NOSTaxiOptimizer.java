@@ -54,12 +54,12 @@ public class NOSTaxiOptimizer
 
 
     @Override
-    protected VehicleDrive findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
+    protected VehiclePath findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
     {
         Vehicle veh = idleVehicleFinder.findVehicle(req);
 
         if (veh == null) {
-            return VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
+            return VehiclePath.NO_VEHICLE_PATH_FOUND;
         }
 
         return super.findBestVehicle(req, Arrays.asList(veh));

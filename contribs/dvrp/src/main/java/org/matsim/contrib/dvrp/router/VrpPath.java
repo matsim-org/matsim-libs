@@ -23,26 +23,19 @@ import org.matsim.api.core.v01.network.Link;
 
 
 public interface VrpPath
+    extends Iterable<Link>
 {
-
-    public abstract int getDepartureTime();
-
-
-    public abstract int getTravelTime();
+    int getLinkCount();
 
 
-    public abstract int getArrivalTime();
+    Link getLink(int idx);
 
 
-    public abstract double getTravelCost();
+    int getLinkTravelTime(int idx);
 
 
-    public abstract Link[] getLinks();
+    Link getFromLink();
 
 
-    public abstract Link getFromLink();
-
-
-    public abstract Link getToLink();
-
+    Link getToLink();
 }

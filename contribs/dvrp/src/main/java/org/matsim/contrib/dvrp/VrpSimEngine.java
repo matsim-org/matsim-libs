@@ -72,10 +72,6 @@ public class VrpSimEngine
     @Override
     public void onPrepareSim()
     {
-        // important: in some cases one may need to decrease simTimer.time
-        int time = (int)qsim.getSimTimer().getTimeOfDay();
-        data.getVrpData().setTime(time);
-
         Map<Id, MobsimAgent> agents = data.getMobsimAgentMappings().getMobsimAgents();
         for (MobsimAgent mobsimAgent : qsim.getAgents()) {
             agents.put(mobsimAgent.getId(), mobsimAgent);
@@ -83,13 +79,6 @@ public class VrpSimEngine
 
         optimizer.init();
         notifyAgentLogics();
-    }
-
-
-    @Override
-    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
-    {
-        data.getVrpData().setTime((int)qsim.getSimTimer().getTimeOfDay());
     }
 
 
@@ -121,6 +110,11 @@ public class VrpSimEngine
             notifyAgentLogics();
         }
     }
+
+
+    @Override
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
+    {}
 
 
     /**

@@ -233,7 +233,7 @@ public class DynAgent
     public void notifyMoveOverNode(Id newLinkId)
     {
         double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-        dynLeg.movedOverNode(currentLinkId, newLinkId, (int)now);
+        dynLeg.movedOverNode(currentLinkId, newLinkId, now);
         currentLinkId = newLinkId;
     }
 

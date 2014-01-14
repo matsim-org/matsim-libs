@@ -20,7 +20,7 @@
 package org.matsim.contrib.dvrp.data.schedule.impl;
 
 import org.matsim.contrib.dvrp.data.schedule.DriveTask;
-import org.matsim.contrib.dvrp.router.VrpPath;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.tracker.OfflineVehicleTracker;
 
 
@@ -28,13 +28,19 @@ public class DriveTaskImpl
     extends AbstractTask
     implements DriveTask
 {
-    private final VrpPath path;
+    private VrpPath path;
     private OfflineVehicleTracker vehicleTracker;
 
 
-    public DriveTaskImpl(VrpPath path)
+    public DriveTaskImpl(VrpPathWithTravelData path)
     {
-        super(path.getDepartureTime(), path.getArrivalTime());
+        this(path, path.getDepartureTime(), path.getArrivalTime());
+    }
+
+
+    public DriveTaskImpl(VrpPath path, int beginTime, int endTime)
+    {
+        super(beginTime, endTime);
         this.path = path;
     }
 
@@ -50,6 +56,24 @@ public class DriveTaskImpl
     public VrpPath getPath()
     {
         return path;
+    }
+
+
+    @Override
+    public void pathDiverted(DivertedVrpPath divertedPath, int newEndTime)
+    {
+        //can only divert an ongoing task
+        if (getStatus() != TaskStatus.STARTED) {
+            throw new IllegalStateException();
+        }
+
+        //divertedPath must be derived from the original one 
+        if (divertedPath.getOriginalPath() != path) {
+            throw new IllegalArgumentException();
+        }
+
+        path = divertedPath;
+        setEndTime(newEndTime);
     }
 
 

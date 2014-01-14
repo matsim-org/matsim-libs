@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.tracker;
+package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.data.schedule.DriveTask;
+import org.matsim.contrib.dvrp.router.DivertedVrpPath;
+import org.matsim.contrib.dynagent.DynLeg;
 
 
-public class OfflineVehicleTrackerImpl
-    implements OfflineVehicleTracker
+public interface DivertibleDynLeg
+    extends DynLeg
 {
-    private final DriveTask driveTask;
-    private final int initialEndTime;
+    /**
+     * @return true - yes, false - it is too late, the diversion is possible only at the next link
+     */
+    boolean canChangeNextLink();
 
 
-    public OfflineVehicleTrackerImpl(DriveTask driveTask)
-    {
-        this.driveTask = driveTask;
-        this.initialEndTime = driveTask.getEndTime();
-    }
-
-
-    @Override
-    public DriveTask getDriveTask()
-    {
-        return driveTask;
-    }
-
-
-    @Override
-    public int calculateCurrentDelay(int currentTime)
-    {
-        return Math.max(0, currentTime - initialEndTime);
-    }
-
-
-    @Override
-    public int predictEndTime(int currentTime)
-    {
-        return Math.max(initialEndTime, currentTime);
-    }
-
-
-    @Override
-    public int getPlannedEndTime()
-    {
-        return initialEndTime;
-    }
+    void pathDiverted(DivertedVrpPath divertedPath);
 }

@@ -27,5 +27,5 @@ public interface VrpPathCalculator
     /**
      * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
      */
-    public abstract VrpPath calcPath(Link fromLink, Link toLink, int departureTime);
+    public abstract VrpPathWithTravelData calcPath(Link fromLink, Link toLink, int departureTime);
 }

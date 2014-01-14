@@ -220,6 +220,7 @@ public class VrpLauncherUtils
     {
         VrpSimEngine vrpSimEngine = new VrpSimEngine(qSim, data, optimizer);
         qSim.addMobsimEngine(vrpSimEngine);
+        ((VrpDataImpl)data.getVrpData()).setMobsimTimer(qSim.getSimTimer());
         return vrpSimEngine;
     }
 

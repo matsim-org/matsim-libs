@@ -60,8 +60,5 @@ public interface VrpData
     void addRequest(Request request);
 
 
-    void setTime(int time);
-
-
     void setParameters(Parameters parameters);
 }

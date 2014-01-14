@@ -87,14 +87,14 @@ public class OneTaxiOptimizer
         Link toLink = req.getToLink();
         int t0 = Schedules.getLastTask(schedule).getEndTime();
 
-        VrpPath p1 = pathCalculator.calcPath(lastTask.getLink(), fromLink, t0);
+        VrpPathWithTravelData p1 = pathCalculator.calcPath(lastTask.getLink(), fromLink, t0);
         schedule.addTask(new DriveTaskImpl(p1));
 
         int t1 = p1.getArrivalTime();
         int t2 = t1 + 120;// 2 minutes for picking up the passenger
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
-        VrpPath p2 = pathCalculator.calcPath(fromLink, toLink, t2);
+        VrpPathWithTravelData p2 = pathCalculator.calcPath(fromLink, toLink, t2);
         schedule.addTask(new DriveTaskImpl(p2));
 
         int t3 = p2.getArrivalTime();

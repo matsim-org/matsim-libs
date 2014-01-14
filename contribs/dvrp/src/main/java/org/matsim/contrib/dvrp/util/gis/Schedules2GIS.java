@@ -89,15 +89,13 @@ public class Schedules2GIS
     {
         VrpPath path = driveTask.getPath();
 
-        Link[] links = path.getLinks();
-
-        if (links.length == 1) {
+        if (path.getLinkCount() == 1) {
             return null;
         }
 
         List<Coordinate> coordList = new ArrayList<Coordinate>();
 
-        for (Link l : links) {
+        for (Link l : path) {
             Coord c = l.getToNode().getCoord();
             coordList.add(new Coordinate(c.getX(), c.getY()));
         }

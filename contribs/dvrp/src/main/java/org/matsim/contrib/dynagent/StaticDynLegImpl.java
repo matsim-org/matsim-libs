@@ -25,14 +25,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.NetworkRoute;
 
 
-public class DynLegImpl
+public class StaticDynLegImpl
     implements DynLeg
 {
     private final NetworkRoute route;
     private int currentLinkIdx;
 
 
-    public DynLegImpl(NetworkRoute route)
+    public StaticDynLegImpl(NetworkRoute route)
     {
         this.route = route;
         currentLinkIdx = -1;
@@ -40,7 +40,7 @@ public class DynLegImpl
 
 
     @Override
-    public void movedOverNode(Id oldLinkId, Id newLinkId, int time)
+    public void movedOverNode(Id oldLinkId, Id newLinkId, double time)
     {
         currentLinkIdx++;
     }
@@ -85,8 +85,8 @@ public class DynLegImpl
     {
         return route.getEndLinkId();
     }
-
-
+    
+    
     @Override
     public void endAction(double now)
     {}

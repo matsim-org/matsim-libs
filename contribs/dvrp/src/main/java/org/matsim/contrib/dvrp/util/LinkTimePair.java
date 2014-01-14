@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.tracker;
+package org.matsim.contrib.dvrp.util;
 
-import org.matsim.contrib.dvrp.data.schedule.DriveTask;
+import org.matsim.api.core.v01.network.Link;
 
 
-public class OfflineVehicleTrackerImpl
-    implements OfflineVehicleTracker
+public class LinkTimePair
 {
-    private final DriveTask driveTask;
-    private final int initialEndTime;
+    public final Link link;
+    public final int time;
 
 
-    public OfflineVehicleTrackerImpl(DriveTask driveTask)
+    public LinkTimePair(Link link, int time)
     {
-        this.driveTask = driveTask;
-        this.initialEndTime = driveTask.getEndTime();
+        this.link = link;
+        this.time = time;
     }
 
 
     @Override
-    public DriveTask getDriveTask()
+    public boolean equals(Object obj)
     {
-        return driveTask;
-    }
+        if (! (obj instanceof LinkTimePair)) {
+            return false;
+        }
 
-
-    @Override
-    public int calculateCurrentDelay(int currentTime)
-    {
-        return Math.max(0, currentTime - initialEndTime);
-    }
-
-
-    @Override
-    public int predictEndTime(int currentTime)
-    {
-        return Math.max(initialEndTime, currentTime);
-    }
-
-
-    @Override
-    public int getPlannedEndTime()
-    {
-        return initialEndTime;
+        LinkTimePair pair = (LinkTimePair)obj;
+        return link.equals(pair.link) && time == pair.time;
     }
 }

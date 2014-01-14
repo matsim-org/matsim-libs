@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.data;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.model.*;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 
 /**
@@ -35,7 +36,7 @@ public class VrpDataImpl
     private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
     private final List<Request> requests = new ArrayList<Request>();
 
-    private int time;
+    private MobsimTimer mobsimTimer;
 
     private Parameters parameters;
 
@@ -71,7 +72,7 @@ public class VrpDataImpl
     @Override
     public int getTime()
     {
-        return time;
+        return (int)mobsimTimer.getTimeOfDay();
     }
 
 
@@ -113,15 +114,14 @@ public class VrpDataImpl
 
 
     @Override
-    public void setTime(int time)
-    {
-        this.time = time;
-    }
-
-
-    @Override
     public void setParameters(Parameters parameters)
     {
         this.parameters = parameters;
+    }
+
+
+    public void setMobsimTimer(MobsimTimer mobsimTimer)
+    {
+        this.mobsimTimer = mobsimTimer;
     }
 }

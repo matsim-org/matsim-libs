@@ -45,47 +45,47 @@ public class VrpPathCalculatorImpl
      * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
      */
     @Override
-    public VrpPath calcPath(Link fromLink, Link toLink, int departureTime)
+    public VrpPathWithTravelData calcPath(Link fromLink, Link toLink, int departureTime)
     {
         if (fromLink != toLink) {
+            //TODO run dijkstra with departureTime+1 (we need 1 second to move over the node)???
             Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
                     departureTime, null, null);
 
             int count = path.links.size();
             Link[] links = new Link[count + 2];
-            int[] accLinkTravelTimes = new int[count + 2];
+            double[] linkTT = new double[count + 2];
 
-            links[0] = fromLink;
-            double accTT = 1.;//we start at the end of fromLink
+            //we start at the end of fromLink
             //actually, in QSim, it usually takes 1 second to move over the first node
             //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
             //otherwise it may take even much longer)
-            accLinkTravelTimes[0] = (int)accTT;
+            double currentTime = departureTime;
+            links[0] = fromLink;
+            double tt = 1.;
+            linkTT[0] = tt;
+            currentTime += tt;
 
             for (int i = 1; i <= count; i++) {
                 Link link = path.links.get(i - 1);
                 links[i] = link;
-                accTT += travelTime.getLinkTravelTime(link, departureTime + accTT, null, null);
-                accLinkTravelTimes[i] = (int)accTT;
+                tt = travelTime.getLinkTravelTime(link, currentTime, null, null);
+                linkTT[i] = tt;
+                currentTime += tt;
             }
 
-            
-            //TODO there is extra time spent on queuing at the end of the last link - the vehicle stops there
-            
-            //?
-            //?
-            //?
-            //?
-            
+            //there is no extra time spent on queuing at the end of the last link
             links[count + 1] = toLink;
-            int toLinkEnterTime = departureTime + (int)accTT;
-            accTT += travelTime.getLinkTravelTime(toLink, toLinkEnterTime, null, null);
-            accLinkTravelTimes[count + 1] = (int)accTT;
+            tt = toLink.getLength() / toLink.getFreespeed();
+            linkTT[count + 1] = tt;
 
-            double cost = path.travelCost
-                    + travelDisutility.getLinkTravelDisutility(toLink, toLinkEnterTime, null, null);
+            double totalTT = 1 + path.travelTime + tt;
 
-            return new VrpPathImpl(departureTime, (int)accTT, cost, links, accLinkTravelTimes);
+            double totalCost = path.travelCost
+                    + travelDisutility.getLinkMinimumTravelDisutility(toLink);
+
+            return new VrpPathImpl(departureTime, (int)totalTT, (int)totalCost, links,
+                    (int[]) ((Object)linkTT));
         }
         else {
             return new VrpPathImpl(departureTime, 0, 0, new Link[] { fromLink }, new int[] { 0 });
