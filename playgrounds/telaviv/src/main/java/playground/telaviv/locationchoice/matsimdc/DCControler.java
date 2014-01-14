@@ -22,7 +22,6 @@ package playground.telaviv.locationchoice.matsimdc;
 
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.controler.Controler;
 
@@ -49,15 +48,7 @@ public class DCControler extends Controler {
 		 *  in this way scoringFunction does not need to create new, identical k-vals by itself    
 		 */
   		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.dcContext); 	
-		super.setScoringFunctionFactory(dcScoringFunctionFactory);
-		
-		if (!super.getConfig().locationchoice().getPrefsFile().equals("null") &&
-				!super.getConfig().facilities().getInputFile().equals("null")) {
-			dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
-		} else {
-			dcScoringFunctionFactory.setUsingConfigParamsForScoring(true);
-			log.info("external prefs are not used for scoring!");
-		}		
+		super.setScoringFunctionFactory(dcScoringFunctionFactory);		
 	}
 	
 	protected void loadControlerListeners() {
