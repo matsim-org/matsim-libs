@@ -81,7 +81,8 @@ mobility simulation that lead to bad scores. Typical examples of such
 modifications are the modification of activity end times, effectively changing
 the start time of the following trip, changing the mode of transport for a trip,
 or changing the route for a trip (departure time choice, mode choice, route
-choice).
+choice). In MATSim, these modifications are performed by so-called
+\emph{Strategy Modules}.
 
 \paragraph{Analysis:}
 At the end of a comlete simulation, one is often interested in some key
@@ -90,6 +91,7 @@ travelled in total by all agents, or average trip duration and distance per
 mode and hour. Such analyses could either be automatically be performed at then
 end, or in a separate post-processing step.
 
+\bigskip
 
 The three stages Execution, Scoring and Replanning are performed iteratively in
 order to give the agents multiple opportunities to adapt their plans to the
@@ -97,6 +99,15 @@ plans and behaviour of the other agents. This is why MATSim typically performs
 multiple \emph{iterations} within one simulation run, consisting of multiple
 mobility simulation, scoring and replanning executions, until the end result is
 available.
+
+MATSim provides a \emph{Controller} (sadly misspelled as \emph{Controler} in
+some places) which implements the iteration loop as shown in
+Fig.~\ref{fig:overview:controllerFlow}. This Controller is typically the entry
+point for running MATSim simulations, as it handles all aspects from loading all
+the required data, configuring the whole setup according to the user's settings,
+and iteratively calling the execution, scoring and re-planning stages.
+Chpt.~\ref{sec:Running} shows the usage of the Controller in more
+detail.
 
 
 \section{The Optimization Process}

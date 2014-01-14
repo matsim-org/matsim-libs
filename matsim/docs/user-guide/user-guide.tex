@@ -41,11 +41,20 @@
 \usepackage{listings}
 
 \lstset{language=java,basicstyle=\ttfamily\footnotesize,lineskip=-1pt,keywordstyle=\bfseries\color{blue},commentstyle=\bfseries\color{red},stringstyle=\bfseries\color{ForestGreen},morekeywords={Link,Node,Vehicle},showstringspaces=false,frame=none}
-\lstset{language=XML,basicstyle=\ttfamily\footnotesize,lineskip=-1pt,keywordstyle=\bfseries\color{blue},commentstyle=\bfseries\color{red},stringstyle=\bfseries\color{ForestGreen},showstringspaces=false,frame=none}
+\lstset{language=XML,basicstyle=\ttfamily\footnotesize,tabsize=3,lineskip=-1pt,keywordstyle=\bfseries\color{blue},commentstyle=\bfseries\color{red},stringstyle=\bfseries\color{ForestGreen},showstringspaces=false,frame=none}
 % these are my own colors but I am not militant about them.
 % I am also not militant about the morekeywords.
 % I am, however, somewhat militant about ttfamily font. 
 % kai, jul'13
+
+
+% looks like a bug that listings cannot be defined to be floating except by defining a new environment
+% work-around from http://tex.stackexchange.com/questions/43509/lstlisting-ignores-float-setting
+\lstnewenvironment{xml-file}[1][]
+  {\lstset{language=XML,float=thb,frame=tb,#1}}% \begin{xml-file}[...]
+  {} % \end{javalisting}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -93,6 +102,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{hyperref}
 % hyperref needs to be late in calling sequence!
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -151,6 +162,7 @@ Originally generated 2013-06-12T12:13:34+02:00
 \include{chapters/introduction}
 \include{chapters/overview}
 \include{chapters/terminology}
+\include{chapters/running}
 \include{chapters/buildingScenarios}
 \include{chapters/scoringFunction}
 \include{chapters/strategyModules}
