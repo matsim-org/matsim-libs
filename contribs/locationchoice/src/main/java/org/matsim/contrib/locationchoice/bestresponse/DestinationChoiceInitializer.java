@@ -54,16 +54,16 @@ public class DestinationChoiceInitializer implements StartupListener {
   		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(dcContext);
   		computer.readOrCreateMaxDCScore(controler, dcContext.kValsAreRead());
   		this.personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
-  		 				
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", dcContext.getConverter(), TransportMode.car));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", dcContext.getConverter(), TransportMode.car));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", dcContext.getConverter(), TransportMode.pt));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", dcContext.getConverter(), TransportMode.pt));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", dcContext.getConverter(), TransportMode.bike));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", dcContext.getConverter(), TransportMode.bike));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "s", dcContext.getConverter(), TransportMode.walk));
-		controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", "l", dcContext.getConverter(), TransportMode.walk));
-				
+  		
+  		for (String actType : this.dcContext.getFlexibleTypes()) {
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.car));
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.pt));
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.bike));
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.walk));
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.other));
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.ride));
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.transit_walk));
+  		}		
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
 		controler.getScenario().addScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME, dcContext);
