@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrCreateKVals;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
@@ -141,6 +142,16 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
 				log.error("unsuccessful prefs reading from files!\n" + prefsFileName);
+			}
+		} else {
+			log.warn("prefs are taken from the config as there is no preferences file specified \n");
+			for (String actType : this.scenario.getConfig().planCalcScore().getActivityTypes()) {
+				for (Person p : this.scenario.getPopulation().getPersons().values()) {
+					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + actType, this.scenario.getConfig().planCalcScore().getActivityParams(actType).getLatestStartTime());
+					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + actType, this.scenario.getConfig().planCalcScore().getActivityParams(actType).getTypicalDuration());
+					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + actType, this.scenario.getConfig().planCalcScore().getActivityParams(actType).getEarliestEndTime());
+					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + actType, this.scenario.getConfig().planCalcScore().getActivityParams(actType).getMinimalDuration());
+				}
 			}
 		}
 	}
