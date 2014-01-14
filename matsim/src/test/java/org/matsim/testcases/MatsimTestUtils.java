@@ -21,6 +21,7 @@ package org.matsim.testcases;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.security.Permission;
 
 import org.junit.Assert;
 import org.junit.rules.TestWatchman;
@@ -159,15 +160,15 @@ public class MatsimTestUtils extends TestWatchman {
 	}
 
 	/**
-	 * Initializes MatsimTestUtils without requiring the method of a class to be a JUnit test. 
+	 * Initializes MatsimTestUtils without requiring the method of a class to be a JUnit test.
 	 * This should be used for "fixtures" only that provide a scenario common to several
-	 * test cases.  
+	 * test cases.
 	 */
 	public void initWithoutJUnitForFixture(Class fixture, Method method){
 		this.testClass = fixture;
 		this.testMethodName = method.getName();
 	}
-	
+
 	/* inspired by
 	 * @see org.junit.rules.TestName#starting(org.junit.runners.model.FrameworkMethod)
 	 */
@@ -184,5 +185,26 @@ public class MatsimTestUtils extends TestWatchman {
 		this.testClass = null;
 		this.testMethodName = null;
 	}
+
+
+	public static class ExitTrappedException extends SecurityException {
+		private static final long serialVersionUID = 1L;
+	}
+
+  public static void forbidSystemExitCall() {
+    final SecurityManager securityManager = new SecurityManager() {
+      @Override
+			public void checkPermission(Permission permission) {
+      	if (permission.getName().startsWith("exitVM")) {
+          throw new ExitTrappedException();
+        }
+      }
+    };
+    System.setSecurityManager(securityManager);
+  }
+
+  public static void enableSystemExitCall() {
+    System.setSecurityManager(null);
+  }
 
 }
