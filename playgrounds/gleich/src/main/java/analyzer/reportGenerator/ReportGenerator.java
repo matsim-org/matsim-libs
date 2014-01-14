@@ -9,6 +9,12 @@ import java.nio.file.Files;
 
 public class ReportGenerator {
 	
+	/*
+	 * The working directory should include the analysis results in the
+	 * directory structure used in the outputDirectory of the
+	 * RunAnalyzer Class.
+	 */
+	/*
 	String workingDirectory = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/workingDirectory";
 	String pathToRScriptFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Rscripts";
 	String pathToLatexFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Latex";
@@ -19,12 +25,29 @@ public class ReportGenerator {
 	 * @param args
 	 * @throws IOException 
 	 */
+	/*
 	public static void main(String[] args) throws IOException {
-		
 		ReportGenerator reportGenerator = new ReportGenerator();
-		reportGenerator.copyLatexAndRFiles();
-		reportGenerator.runRScripts();
-		reportGenerator.compileLatex();
+		reportGenerator.generateReport();
+	}
+	
+	public ReportGenerator(){	}
+	
+	public ReportGenerator(String pathToRScriptFiles, String pathToLatexFiles, 
+			String pathToRScriptExe, String pathToPdfLatexExe, 
+			String workingDirectory){
+		this.pathToRScriptFiles = pathToRScriptFiles;
+		this.pathToLatexFiles = pathToLatexFiles;
+		this.pathToRScriptExe = pathToRScriptExe;
+		this.pathToPdfLatexExe = pathToPdfLatexExe;
+		this.workingDirectory = workingDirectory;
+	}
+
+	private void generateReport()
+			throws IOException {
+		copyLatexAndRFiles();
+		runRScripts();
+		compileLatex();
 	}
 	
 	private void copyLatexAndRFiles() throws IOException{
@@ -47,6 +70,7 @@ public class ReportGenerator {
         			"\" -output-directory=" + workingDirectory +
         			" " + pathToLatexFiles + "/LaTeX1.tex"
  */
+	/*
 	}
 	
 	private void runRScripts() {
@@ -59,6 +83,7 @@ public class ReportGenerator {
     			"\"" + workingDirectory + "\" " +
     			"\"" + pathToRScriptFiles + "\"");*/
 		// System Call to RScript.exe
+	/*
 		runSystemCall("\"" + pathToRScriptExe + "\" \""
 				//Execute analysis_main.R
     			+ workingDirectory + "/R/analysis_main.R"
@@ -124,5 +149,5 @@ public class ReportGenerator {
 					+ files.length + " files copied.");
 		}
 	}
-
+*/
 }
