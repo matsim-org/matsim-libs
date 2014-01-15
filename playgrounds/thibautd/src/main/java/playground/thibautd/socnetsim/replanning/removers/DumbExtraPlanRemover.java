@@ -90,7 +90,7 @@ public class DumbExtraPlanRemover implements ExtraPlanRemover {
 
 				if ( personToHandle != person ) {
 					final boolean removed = personsToHandle.remove( personToHandle );
-					if ( !removed ) throw new RuntimeException( "person "+personToHandle+" is not part of the persons to handle!" );
+					if ( !removed ) throw new RuntimeException( "person "+personToHandle+" is not part of the persons to handle when processing group "+group );
 				}
 
 				final boolean removed = personToHandle.getPlans().remove( plan );
