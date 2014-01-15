@@ -87,6 +87,7 @@ public class IgnoranceBehaviorTest {
 		final JointTripInsertorAlgorithm algo =
 			new JointTripInsertorAlgorithm(
 					random,
+					null,
 					(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
 					tripRouter );
 		

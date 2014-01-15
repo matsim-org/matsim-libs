@@ -47,6 +47,7 @@ import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointPlanUtils;
@@ -65,11 +66,15 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	private final double scale;
 	private final Random random;
 
+	private final SocialNetwork socialNetwork;
+
 	public JointTripInsertorAlgorithm(
 			final Random random,
+			final SocialNetwork socialNetwork,
 			final JointTripInsertorConfigGroup config,
 			final TripRouter router) {
 		this.router = router;
+		this.socialNetwork = socialNetwork;
 		chainBasedModes = config.getChainBasedModes();
 		betaDetour = config.getBetaDetour();
 		scale = config.getScale();
@@ -153,7 +158,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		for (Trip driverTrip : trips.carTrips) {
 			final Id driverId = driverTrip.agentId;
 			for (Trip passengerTrip : trips.nonChainBasedModeTrips) {
-				if ( !driverId.equals( passengerTrip.agentId ) &&
+				if ( acceptAgentMatch( driverId , passengerTrip.agentId ) &&
 						isInCorrectSequence( jointPlan , structure , driverTrip , passengerTrip ) ) {
 					matches.add(
 							new Match(
@@ -167,6 +172,21 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		}
 
 		return matches;
+	}
+
+	private boolean acceptAgentMatch(
+			final Id driver,
+			final Id passenger ) {
+		if ( driver.equals( passenger ) ) return false;
+		if ( socialNetwork == null ) return true;
+
+		final boolean passengerAlterOfDriver =
+			socialNetwork.getAlters( driver ).contains( passenger );
+
+		if ( socialNetwork.isReflective() ) return passengerAlterOfDriver;
+
+		return passengerAlterOfDriver || 
+			socialNetwork.getAlters( passenger ).contains( driver );
 	}
 
 	private static boolean isInCorrectSequence(
