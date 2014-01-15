@@ -70,9 +70,9 @@ public class VrpDataImpl
 
 
     @Override
-    public int getTime()
+    public double getTime()
     {
-        return (int)mobsimTimer.getTimeOfDay();
+        return mobsimTimer.getTimeOfDay();
     }
 
 

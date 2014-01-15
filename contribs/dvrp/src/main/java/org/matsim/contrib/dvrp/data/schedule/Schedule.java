@@ -109,10 +109,10 @@ public interface Schedule<T extends Task>
     ScheduleStatus getStatus();
 
 
-    int getBeginTime();
+    double getBeginTime();
 
 
-    int getEndTime();
+    double getEndTime();
 
 
     // schedule modification functionality:

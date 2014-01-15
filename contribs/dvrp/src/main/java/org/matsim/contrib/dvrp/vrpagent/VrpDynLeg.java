@@ -67,7 +67,7 @@ public class VrpDynLeg
         }
 
         if (onlineVehicleTracker != null) {
-            onlineVehicleTracker.movedOverNode((int)time);
+            onlineVehicleTracker.movedOverNode(time);
         }
     }
 

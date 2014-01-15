@@ -34,7 +34,7 @@ public class VrpAgentElectricTaxi
     private EnergyConsumptionModel ecm;
 
 
-    public VrpAgentElectricTaxi(Id id, String name, Depot startingRank, int t0, int t1,
+    public VrpAgentElectricTaxi(Id id, String name, Depot startingRank, double t0, double t1,
             EnergyConsumptionModel ecm)
     {
         super(id, name, startingRank, 4, t0, t1, t1 - t0);

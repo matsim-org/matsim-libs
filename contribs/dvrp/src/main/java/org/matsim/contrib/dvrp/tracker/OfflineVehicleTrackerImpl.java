@@ -26,7 +26,7 @@ public class OfflineVehicleTrackerImpl
     implements OfflineVehicleTracker
 {
     private final DriveTask driveTask;
-    private final int initialEndTime;
+    private final double initialEndTime;
 
 
     public OfflineVehicleTrackerImpl(DriveTask driveTask)
@@ -44,21 +44,21 @@ public class OfflineVehicleTrackerImpl
 
 
     @Override
-    public int calculateCurrentDelay(int currentTime)
+    public double calculateCurrentDelay(double currentTime)
     {
         return Math.max(0, currentTime - initialEndTime);
     }
 
 
     @Override
-    public int predictEndTime(int currentTime)
+    public double predictEndTime(double currentTime)
     {
         return Math.max(initialEndTime, currentTime);
     }
 
 
     @Override
-    public int getPlannedEndTime()
+    public double getPlannedEndTime()
     {
         return initialEndTime;
     }

@@ -30,6 +30,7 @@ public interface Depot
     extends BasicLocation, Identifiable
 {
     String getName();
-    
+
+
     Link getLink();
 }

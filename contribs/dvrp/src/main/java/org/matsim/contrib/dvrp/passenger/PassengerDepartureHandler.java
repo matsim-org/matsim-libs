@@ -74,8 +74,7 @@ public class PassengerDepartureHandler
             }
         }
 
-        PassengerRequest request = requestCreator
-                .createRequest(customer, fromLink, toLink, now);
+        PassengerRequest request = requestCreator.createRequest(customer, fromLink, toLink, now);
         submittedReqs.add(request);
         vrpSimEngine.requestSubmitted(request, now);
 

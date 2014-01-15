@@ -68,7 +68,7 @@ public class IdleVehicleFinder
     }
 
 
-    public static double calculateDistance(TaxiRequest req, Vehicle veh, int time,
+    public static double calculateDistance(TaxiRequest req, Vehicle veh, double time,
             VrpPathCalculator calculator, boolean straightLineDistance)
     {
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
@@ -105,9 +105,7 @@ public class IdleVehicleFinder
             return deltaX * deltaX + deltaY * deltaY;
         }
         else {
-
             //TODO consider storing the shortest path (sth like BestShortestPath object)
-
             return calculator.calcPath(fromLink, toLink, time).getTravelCost();
         }
     }

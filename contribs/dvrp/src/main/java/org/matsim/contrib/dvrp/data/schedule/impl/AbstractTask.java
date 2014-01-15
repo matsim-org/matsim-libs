@@ -32,11 +32,11 @@ public abstract class AbstractTask
     /*package*/TaskStatus status;
     // ==== END: fields managed by ScheduleImpl
 
-    private int beginTime;
-    private int endTime;
+    private double beginTime;
+    private double endTime;
 
 
-    public AbstractTask(int beginTime, int endTime)
+    public AbstractTask(double beginTime, double endTime)
     {
         this.beginTime = beginTime;
         this.endTime = endTime;
@@ -65,21 +65,21 @@ public abstract class AbstractTask
 
 
     @Override
-    public final int getBeginTime()
+    public final double getBeginTime()
     {
         return beginTime;
     }
 
 
     @Override
-    public final int getEndTime()
+    public final double getEndTime()
     {
         return endTime;
     }
 
 
     @Override
-    public void setBeginTime(int beginTime)
+    public void setBeginTime(double beginTime)
     {
         if (status != TaskStatus.PLANNED) { // PERFORMED or STARTED
             throw new IllegalStateException("Allowed only for PLANNED tasks");
@@ -90,7 +90,7 @@ public abstract class AbstractTask
 
 
     @Override
-    public void setEndTime(int endTime)
+    public void setEndTime(double endTime)
     {
         if (status != TaskStatus.PLANNED && status != TaskStatus.STARTED) { // PERFORMED
             throw new IllegalStateException("Allowed only for PLANNED and STARTED tasks");

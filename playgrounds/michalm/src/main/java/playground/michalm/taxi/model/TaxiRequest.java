@@ -64,8 +64,8 @@ public class TaxiRequest
     private TaxiDropoffStayTask dropoffStayTask;
 
 
-    public TaxiRequest(Id id, Customer customer, Link fromLink, Link toLink, int t0,
-            int submissionTime)
+    public TaxiRequest(Id id, Customer customer, Link fromLink, Link toLink, double t0,
+            double submissionTime)
     {
         super(id, customer, 1, t0, t0, submissionTime);
         this.fromLink = fromLink;

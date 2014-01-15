@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,27 +17,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.util.time;
+package playground.michalm.util;
 
-public class IntegerInterpolator
+import java.util.*;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.core.events.handler.EventHandler;
+
+
+public class RunningVehicleRegister
+    implements EventHandler, PersonDepartureEventHandler, PersonStuckEventHandler,
+    PersonArrivalEventHandler
 {
-    private TimeDiscretizer timeDiscretizer;
-    private int[] values;
+    private Map<Id, PersonDepartureEvent> runningAgentsMap = new HashMap<Id, PersonDepartureEvent>();
 
 
-    public IntegerInterpolator(TimeDiscretizer timeDiscretizer, int[] values)
+    @Override
+    public void handleEvent(PersonDepartureEvent event)
     {
-        this.timeDiscretizer = timeDiscretizer;
-        this.values = values;
-
-        if (timeDiscretizer.getIntervalCount() != values.length) {
-            throw new IllegalArgumentException();
-        }
+        runningAgentsMap.put(event.getPersonId(), event);
     }
 
 
-    public int interpolate(int time)
+    @Override
+    public void handleEvent(PersonArrivalEvent event)
     {
-        return timeDiscretizer.interpolate(values, time);
+        runningAgentsMap.remove(event.getPersonId());
+    }
+
+
+    @Override
+    public void handleEvent(PersonStuckEvent event)
+    {
+        //throw new RuntimeException();
+        System.err.println("AgentStuckEvent:");
+        System.err.println(event);
+    }
+
+
+    public Set<Id> getRunningAgentIds()
+    {
+        return runningAgentsMap.keySet();
+    }
+
+
+    @Override
+    public void reset(int iteration)
+    {
+        runningAgentsMap.clear();
     }
 }

@@ -25,5 +25,6 @@ import org.matsim.contrib.dvrp.extensions.vrppd.model.PickupRequest;
 public interface PickupTask
     extends VRPPDTask
 {
-    public PickupRequest getRequest();
+    @Override
+    PickupRequest getRequest();
 }

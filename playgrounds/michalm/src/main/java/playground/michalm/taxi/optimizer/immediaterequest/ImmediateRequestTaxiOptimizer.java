@@ -56,7 +56,7 @@ public abstract class ImmediateRequestTaxiOptimizer
     {
         public static final VehiclePath NO_VEHICLE_PATH_FOUND = new VehiclePath(null,
                 new VrpPathImpl(Integer.MAX_VALUE / 2, Integer.MAX_VALUE / 2, Double.MAX_VALUE,
-                        null, null));
+                        new Link[0], new double[0]));
 
         private final Vehicle vehicle;
         private final VrpPathWithTravelData path;
@@ -74,12 +74,12 @@ public abstract class ImmediateRequestTaxiOptimizer
     {
         public final boolean destinationKnown;
         public final boolean minimizePickupTripTime;
-        public final int pickupDuration;
-        public final int dropoffDuration;
+        public final double pickupDuration;
+        public final double dropoffDuration;
 
 
-        public Params(boolean destinationKnown, boolean minimizePickupTripTime, int pickupDuration,
-                int dropoffDuration)
+        public Params(boolean destinationKnown, boolean minimizePickupTripTime,
+                double pickupDuration, double dropoffDuration)
         {
             super();
             this.destinationKnown = destinationKnown;
@@ -123,7 +123,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
     protected VehiclePath findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
     {
-        int currentTime = data.getTime();
+        double currentTime = data.getTime();
         VehiclePath best = VehiclePath.NO_VEHICLE_PATH_FOUND;
 
         for (Vehicle veh : vehicles) {
@@ -143,7 +143,8 @@ public abstract class ImmediateRequestTaxiOptimizer
                 continue;
             }
 
-            VrpPathWithTravelData path = calculator.calcPath(departure.link, req.getFromLink(), departure.time);
+            VrpPathWithTravelData path = calculator.calcPath(departure.link, req.getFromLink(),
+                    departure.time);
 
             if (params.minimizePickupTripTime) {
                 if (path.getTravelTime() < best.path.getTravelTime()) {
@@ -163,10 +164,10 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    protected LinkTimePair calculateDeparture(Schedule<TaxiTask> schedule, int currentTime)
+    protected LinkTimePair calculateDeparture(Schedule<TaxiTask> schedule, double currentTime)
     {
         Link link;
-        int time;
+        double time;
 
         switch (schedule.getStatus()) {
             case UNPLANNED:
@@ -234,7 +235,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
         bestSched.addTask(new TaxiPickupDriveTask(best.path, req));
 
-        int t3 = best.path.getArrivalTime() + params.pickupDuration;
+        double t3 = best.path.getArrivalTime() + params.pickupDuration;
         bestSched.addTask(new TaxiPickupStayTask(best.path.getArrivalTime(), t3, req));
 
         if (params.destinationKnown) {
@@ -247,10 +248,10 @@ public abstract class ImmediateRequestTaxiOptimizer
     @Override
     protected boolean updateBeforeNextTask(Schedule<TaxiTask> schedule)
     {
-        int time = data.getTime();
+        double time = data.getTime();
         TaxiTask currentTask = schedule.getCurrentTask();
 
-        int plannedEndTime;
+        double plannedEndTime;
 
         if (currentTask.getType() == TaskType.DRIVE) {
             plannedEndTime = ((DriveTask)currentTask).getVehicleTracker().getPlannedEndTime();
@@ -259,7 +260,7 @@ public abstract class ImmediateRequestTaxiOptimizer
             plannedEndTime = currentTask.getEndTime();
         }
 
-        int delay = time - plannedEndTime;
+        double delay = time - plannedEndTime;
 
         if (delay != 0) {
             if (delaySpeedupStats != null) {// optionally, one may record delays
@@ -297,13 +298,13 @@ public abstract class ImmediateRequestTaxiOptimizer
         TaxiRequest req = ((TaxiPickupStayTask)pickupStayTask).getRequest();
         Link reqFromLink = req.getFromLink();
         Link reqToLink = req.getToLink();
-        int t3 = pickupStayTask.getEndTime();
+        double t3 = pickupStayTask.getEndTime();
 
         VrpPathWithTravelData path = calculator.calcPath(reqFromLink, reqToLink, t3);
         schedule.addTask(new TaxiDropoffDriveTask(path, req));
 
-        int t4 = path.getArrivalTime();
-        int t5 = t4 + params.dropoffDuration;
+        double t4 = path.getArrivalTime();
+        double t5 = t4 + params.dropoffDuration;
         schedule.addTask(new TaxiDropoffStayTask(t4, t5, req));
     }
 
@@ -313,8 +314,8 @@ public abstract class ImmediateRequestTaxiOptimizer
         TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules.getLastTask(schedule);
 
         // addWaitTime at the end (even 0-second WAIT)
-        int t5 = dropoffStayTask.getEndTime();
-        int tEnd = Math.max(t5, Schedules.getActualT1(schedule));
+        double t5 = dropoffStayTask.getEndTime();
+        double tEnd = Math.max(t5, Schedules.getActualT1(schedule));
         Link link = dropoffStayTask.getLink();
 
         schedule.addTask(new TaxiWaitStayTask(t5, tEnd, link));
@@ -331,7 +332,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         List<TaxiTask> tasks = schedule.getTasks();
 
         int startIdx = currentTask.getTaskIdx() + 1;
-        int t = currentTask.getEndTime();
+        double t = currentTask.getEndTime();
 
         for (int i = startIdx; i < tasks.size(); i++) {
             TaxiTask task = tasks.get(i);
@@ -386,7 +387,8 @@ public abstract class ImmediateRequestTaxiOptimizer
                 case CRUISE_DRIVE: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
-                    VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath(); 
+                    VrpPathWithTravelData path = (VrpPathWithTravelData) ((DriveTask)task)
+                            .getPath();
                     t += path.getTravelTime(); //TODO one may consider recalculation of SP!!!!
                     task.setEndTime(t);
 
@@ -394,7 +396,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                 }
                 case PICKUP_STAY: {
                     task.setBeginTime(t);// t == taxi's arrival time
-                    int t0 = ((TaxiPickupStayTask)task).getRequest().getT0();// t0 == passenger's departure time
+                    double t0 = ((TaxiPickupStayTask)task).getRequest().getT0();// t0 == passenger's departure time
                     t = Math.max(t, t0) + params.pickupDuration; // the true pickup starts at max(t, t0)
                     task.setEndTime(t);
 

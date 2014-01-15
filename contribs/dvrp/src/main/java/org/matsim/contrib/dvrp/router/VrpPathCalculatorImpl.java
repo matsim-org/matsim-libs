@@ -45,7 +45,7 @@ public class VrpPathCalculatorImpl
      * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
      */
     @Override
-    public VrpPathWithTravelData calcPath(Link fromLink, Link toLink, int departureTime)
+    public VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime)
     {
         if (fromLink != toLink) {
             //TODO run dijkstra with departureTime+1 (we need 1 second to move over the node)???
@@ -84,11 +84,10 @@ public class VrpPathCalculatorImpl
             double totalCost = path.travelCost
                     + travelDisutility.getLinkMinimumTravelDisutility(toLink);
 
-            return new VrpPathImpl(departureTime, (int)totalTT, (int)totalCost, links,
-                    (int[]) ((Object)linkTT));
+            return new VrpPathImpl(departureTime, totalTT, totalCost, links, linkTT);
         }
         else {
-            return new VrpPathImpl(departureTime, 0, 0, new Link[] { fromLink }, new int[] { 0 });
+            return new VrpPathImpl(departureTime, 0, 0, new Link[] { fromLink }, new double[] { 0 });
         }
     }
 }

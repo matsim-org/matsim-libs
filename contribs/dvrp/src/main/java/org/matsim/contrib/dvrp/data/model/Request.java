@@ -31,14 +31,14 @@ public interface Request
     Customer getCustomer();
 
 
-    int getQuantity();
+    double getQuantity();
 
 
-    int getT0();// earliest start time
+    double getT0();// earliest start time
 
 
-    int getT1();// latest start time
+    double getT1();// latest start time
 
 
-    int getSubmissionTime();
+    double getSubmissionTime();
 }

@@ -31,8 +31,8 @@ public class VrpAgentVehicleImpl
     private VrpAgentLogic agentLogic;
 
 
-    public VrpAgentVehicleImpl(Id id, String name, Depot depot, int capacity, int t0, int t1,
-            int timeLimit)
+    public VrpAgentVehicleImpl(Id id, String name, Depot depot, double capacity, double t0,
+            double t1, double timeLimit)
     {
         super(id, name, depot, capacity, t0, t1, timeLimit);
     }

@@ -110,8 +110,8 @@ public class TaxiRankReader
             name = "T_" + id;
         }
 
-        int t0 = getInt(atts, "t0", 0);
-        int t1 = getInt(atts, "t1", 24 * 60 * 60);
+        double t0 = getDouble(atts, "t0", 0);
+        double t1 = getDouble(atts, "t1", 24 * 60 * 60);
 
         double chargeInJoules = getDouble(atts, "battery_charge_kWh", 20) * 1000 * 3600;
         double capacityInJoules = getDouble(atts, "battery_capacity_kWh", 20) * 1000 * 3600;
@@ -135,19 +135,6 @@ public class TaxiRankReader
         double powerInJoules = getDouble(atts, "power_kW", 20) * 1000;
 
         data.addCharger(new ChargerImpl(chargerId, name, powerInJoules, currentRank.getLink()));
-    }
-
-
-    private int getInt(Attributes atts, String qName, int defaultValue)
-    {
-        String val = atts.getValue(qName);
-
-        if (val != null) {
-            return Integer.parseInt(val);
-        }
-        else {
-            return defaultValue;
-        }
     }
 
 

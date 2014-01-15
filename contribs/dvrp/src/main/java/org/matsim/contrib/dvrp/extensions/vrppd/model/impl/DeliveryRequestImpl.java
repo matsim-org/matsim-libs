@@ -35,8 +35,8 @@ public class DeliveryRequestImpl
     private DeliveryTask deliveryTask;
 
 
-    public DeliveryRequestImpl(Id id, Customer customer, int quantity, int t0, int t1,
-            int submissionTime, Link toLink)
+    public DeliveryRequestImpl(Id id, Customer customer, double quantity, double t0, double t1,
+            double submissionTime, Link toLink)
     {
         super(id, customer, quantity, t0, t1, submissionTime);
         this.toLink = toLink;

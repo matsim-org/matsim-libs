@@ -75,7 +75,8 @@ public class PassengerCustomer
      */
     static PassengerCustomer getOrCreatePassengerCustomer(MatsimVrpData data, MobsimAgent passenger)
     {
-        Map<Id, PassengerCustomer> customersByAgentId = data.getMobsimAgentMappings().getPassengerCustomers();
+        Map<Id, PassengerCustomer> customersByAgentId = data.getMobsimAgentMappings()
+                .getPassengerCustomers();
         PassengerCustomer customer = customersByAgentId.get(passenger.getId());
 
         if (customer == null) {

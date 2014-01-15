@@ -58,7 +58,8 @@ public class PassengerCallHandler
         Network network = data.getScenario().getNetwork();
         Link link = network.getLinks().get(event.getLinkId());
 
-        MobsimAgent passenger = data.getMobsimAgentMappings().getMobsimAgents().get(event.getPersonId());
+        MobsimAgent passenger = data.getMobsimAgentMappings().getMobsimAgents()
+                .get(event.getPersonId());
 
         double serveTime = passenger.getActivityEndTime();//TODO is this the best idea???
         //can we get the serveTime in any other way?

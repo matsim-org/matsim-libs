@@ -200,8 +200,9 @@ public class ScheduleChartUtils
             for (T t : tasks) {
                 String description = descriptionCreator.create(t);
 
-                TimePeriod duration = new SimpleTimePeriod(new Date(t.getBeginTime() * 1000),
-                        new Date(t.getEndTime() * 1000));
+                TimePeriod duration = new SimpleTimePeriod(//
+                        new Date((int)Math.floor(t.getBeginTime() * 1000)),//
+                        new Date((int)Math.ceil(t.getEndTime() * 1000)));
 
                 scheduleTaskSeries.add(new ChartTask<T>(description, duration, t));
             }

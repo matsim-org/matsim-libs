@@ -32,19 +32,20 @@ public class VehicleImpl
     private final String name;
     private final Depot depot;
 
-    private final int capacity;
+    private final double capacity;
 
     // TW for vehicle
-    private final int t0;
-    private final int t1;
+    private final double t0;
+    private final double t1;
 
     // max time outside the depot
-    private final int timeLimit;
+    private final double timeLimit;
 
     private final Schedule<? extends AbstractTask> schedule;
 
 
-    public VehicleImpl(Id id, String name, Depot depot, int capacity, int t0, int t1, int timeLimit)
+    public VehicleImpl(Id id, String name, Depot depot, double capacity, double t0, double t1,
+            double timeLimit)
     {
         this.id = id;
         this.name = name;
@@ -80,28 +81,28 @@ public class VehicleImpl
 
 
     @Override
-    public int getCapacity()
+    public double getCapacity()
     {
         return capacity;
     }
 
 
     @Override
-    public int getT0()
+    public double getT0()
     {
         return t0;
     }
 
 
     @Override
-    public int getT1()
+    public double getT1()
     {
         return t1;
     }
 
 
     @Override
-    public int getTimeLimit()
+    public double getTimeLimit()
     {
         return timeLimit;
     }

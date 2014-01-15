@@ -50,7 +50,7 @@ public class TaxiRequestCreator
         List<Request> requests = data.getVrpData().getRequests();
 
         Id id = data.getScenario().createId(requests.size() + "");
-        TaxiRequest request = new TaxiRequest(id, customer, fromLink, toLink, (int)now, (int)now);
+        TaxiRequest request = new TaxiRequest(id, customer, fromLink, toLink, now, now);
         requests.add(request);
 
         return request;

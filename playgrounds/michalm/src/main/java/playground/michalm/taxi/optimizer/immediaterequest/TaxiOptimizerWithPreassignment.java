@@ -44,7 +44,7 @@ public class TaxiOptimizerWithPreassignment
 
 
     public TaxiOptimizerWithPreassignment(VrpData data, VrpPathCalculator calculator,
-            int pickupDuration, int dropoffDuration, final Map<Id, Vehicle> reqIdToVehMap)
+            double pickupDuration, double dropoffDuration, final Map<Id, Vehicle> reqIdToVehMap)
     {
         super(data, calculator, new Params(true, false, pickupDuration, dropoffDuration));
         this.reqIdToVehMap = reqIdToVehMap;
@@ -76,7 +76,7 @@ public class TaxiOptimizerWithPreassignment
 
 
     public static TaxiOptimizerWithPreassignment createOptimizer(MatsimVrpData data,
-            VrpPathCalculator calculator, int pickupDuration, int dropoffDuration,
+            VrpPathCalculator calculator, double pickupDuration, double dropoffDuration,
             String reqIdToVehIdFile)
     {
         Scanner scanner = null;

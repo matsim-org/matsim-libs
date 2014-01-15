@@ -31,17 +31,10 @@ public class DeliveryTaskImpl
     private final DeliveryRequest request;
 
 
-    public DeliveryTaskImpl(int beginTime, int endTime, DeliveryRequest request)
+    public DeliveryTaskImpl(double beginTime, double endTime, DeliveryRequest request)
     {
-        this(beginTime, endTime, request, "delivery");
-    }
-    
-    
-    public DeliveryTaskImpl(int beginTime, int endTime, DeliveryRequest request, String name)
-    {
-        super(beginTime, endTime, request.getToLink(), name);
+        super(beginTime, endTime, request.getToLink());
         this.request = request;
-        
         this.request.setDeliveryTask(this);
     }
 

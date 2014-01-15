@@ -42,7 +42,7 @@ public interface VrpData
     List<Request> getRequests();
 
 
-    int getTime();
+    double getTime();
 
 
     Parameters getParameters();

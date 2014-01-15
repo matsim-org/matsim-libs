@@ -76,8 +76,7 @@ public class VrpAgentLogic
         }
         // else: PLANNED or STARTED
 
-        int time = (int)now;
-        vrpSimEngine.nextTask(vrpVehicle.getSchedule(), time);
+        vrpSimEngine.nextTask(vrpVehicle.getSchedule(), now);
         // remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
 
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks

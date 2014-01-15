@@ -53,7 +53,7 @@ public class TaxiStatsCalculator
         }
 
         for (TaxiTask t : schedule.getTasks()) {
-            int time = t.getEndTime() - t.getBeginTime();
+            double time = t.getEndTime() - t.getBeginTime();
 
             switch (t.getTaxiTaskType()) {
                 case PICKUP_DRIVE:
@@ -72,7 +72,7 @@ public class TaxiStatsCalculator
                     eval.taxiPickupTime += time;
 
                     Request req = ((TaxiPickupStayTask)t).getRequest();
-                    int waitTime = t.getBeginTime() - req.getT0();
+                    double waitTime = t.getBeginTime() - req.getT0();
                     eval.passengerWaitTime += waitTime;
 
                     if (eval.maxPassengerWaitTime < waitTime) {
@@ -89,8 +89,8 @@ public class TaxiStatsCalculator
             }
         }
 
-        int latestValidEndTime = Schedules.getActualT1(schedule);
-        int actualEndTime = schedule.getEndTime();
+        double latestValidEndTime = Schedules.getActualT1(schedule);
+        double actualEndTime = schedule.getEndTime();
 
         if (actualEndTime > latestValidEndTime) {
             eval.taxiOverTime += actualEndTime - latestValidEndTime;
@@ -110,66 +110,66 @@ public class TaxiStatsCalculator
                 + "PassengerWaitT\t" //
                 + "MaxPassengerWaitT";
 
-        private int taxiPickupDriveTime;
-        private int taxiDropoffDriveTime;
-        private int taxiPickupTime;
-        private int taxiDropoffTime;
-        private int taxiCruiseTime;
-        private int taxiWaitTime;
-        private int taxiOverTime;
-        private int passengerWaitTime;
-        private int maxPassengerWaitTime;
+        private double taxiPickupDriveTime;
+        private double taxiDropoffDriveTime;
+        private double taxiPickupTime;
+        private double taxiDropoffTime;
+        private double taxiCruiseTime;
+        private double taxiWaitTime;
+        private double taxiOverTime;
+        private double passengerWaitTime;
+        private double maxPassengerWaitTime;
 
 
-        public int getTaxiPickupDriveTime()
+        public double getTaxiPickupDriveTime()
         {
             return taxiPickupDriveTime;
         }
 
 
-        public int getTaxiDropoffDriveTime()
+        public double getTaxiDropoffDriveTime()
         {
             return taxiDropoffDriveTime;
         }
 
 
-        public int getTaxiPickupTime()
+        public double getTaxiPickupTime()
         {
             return taxiPickupTime;
         }
 
 
-        public int getTaxiDropoffTime()
+        public double getTaxiDropoffTime()
         {
             return taxiDropoffTime;
         }
 
 
-        public int getTaxiCruiseTime()
+        public double getTaxiCruiseTime()
         {
             return taxiCruiseTime;
         }
 
 
-        public int getTaxiWaitTime()
+        public double getTaxiWaitTime()
         {
             return taxiWaitTime;
         }
 
 
-        public int getTaxiOverTime()
+        public double getTaxiOverTime()
         {
             return taxiOverTime;
         }
 
 
-        public int getPassengerWaitTime()
+        public double getPassengerWaitTime()
         {
             return passengerWaitTime;
         }
 
 
-        public int getMaxPassengerWaitTime()
+        public double getMaxPassengerWaitTime()
         {
             return maxPassengerWaitTime;
         }

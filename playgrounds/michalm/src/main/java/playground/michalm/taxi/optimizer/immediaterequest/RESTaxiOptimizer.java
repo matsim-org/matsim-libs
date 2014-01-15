@@ -134,8 +134,8 @@ public class RESTaxiOptimizer
 
                 removePlannedTasks(schedule, obligatoryTasks);
 
-                int tEnd = Schedules.getActualT1(schedule);
-                int scheduleEndTime = schedule.getEndTime();
+                double tEnd = Schedules.getActualT1(schedule);
+                double scheduleEndTime = schedule.getEndTime();
                 Link lastLink = Schedules.getLastLinkInSchedule(schedule);
 
                 if (scheduleEndTime < tEnd) {

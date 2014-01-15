@@ -33,15 +33,16 @@ public class RequestImpl
 
     private final Customer customer;
 
-    private final int quantity;
+    private final double quantity;
 
-    private final int t0;// earliest start time
-    private final int t1;// latest start time
+    private final double t0;// earliest start time
+    private final double t1;// latest start time
 
-    private final int submissionTime;
+    private final double submissionTime;
 
 
-    public RequestImpl(Id id, Customer customer, int quantity, int t0, int t1, int submissionTime)
+    public RequestImpl(Id id, Customer customer, double quantity, double t0, double t1,
+            double submissionTime)
     {
         this.id = id;
         this.customer = customer;
@@ -67,28 +68,28 @@ public class RequestImpl
 
 
     @Override
-    public int getQuantity()
+    public double getQuantity()
     {
         return quantity;
     }
 
 
     @Override
-    public int getT0()
+    public double getT0()
     {
         return t0;
     }
 
 
     @Override
-    public int getT1()
+    public double getT1()
     {
         return t1;
     }
 
 
     @Override
-    public int getSubmissionTime()
+    public double getSubmissionTime()
     {
         return submissionTime;
     }

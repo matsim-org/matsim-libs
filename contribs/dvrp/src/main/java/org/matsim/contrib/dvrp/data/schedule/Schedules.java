@@ -59,7 +59,7 @@ public class Schedules
     };
 
 
-    public static int getActualT1(Schedule<?> schedule)
+    public static double getActualT1(Schedule<?> schedule)
     {
         Vehicle veh = schedule.getVehicle();
 

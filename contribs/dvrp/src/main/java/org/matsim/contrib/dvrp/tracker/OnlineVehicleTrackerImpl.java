@@ -42,12 +42,12 @@ public class OnlineVehicleTrackerImpl
     private final VrpSimEngine vrpSimEngine;
     private VrpDynLeg vrpDynLeg;
 
-    private int linkEnterTime;
-    private int linkEnterDelay;
+    private double linkEnterTime;
+    private double linkEnterDelay;
 
-    private int plannedTTAtPrevNode;
-    private int plannedLinkTT;
-    private int plannedEndTime;
+    private double plannedTTAtPrevNode;
+    private double plannedLinkTT;
+    private double plannedEndTime;
 
     private int currentLinkIdx;
     private Link currentLink;
@@ -74,7 +74,7 @@ public class OnlineVehicleTrackerImpl
 
 
     @Override
-    public void movedOverNode(int time)
+    public void movedOverNode(double time)
     {
         VrpPath path = driveTask.getPath();
 
@@ -86,7 +86,7 @@ public class OnlineVehicleTrackerImpl
         plannedTTAtPrevNode += plannedLinkTT;//add previous link TT
         plannedLinkTT = path.getLinkTravelTime(currentLinkIdx);
 
-        int actualTTAtPrevNode = linkEnterTime - driveTask.getBeginTime();
+        double actualTTAtPrevNode = linkEnterTime - driveTask.getBeginTime();
         linkEnterDelay = actualTTAtPrevNode - plannedTTAtPrevNode;
 
         vrpSimEngine.nextLinkEntered(this);
@@ -94,7 +94,7 @@ public class OnlineVehicleTrackerImpl
 
 
     @Override
-    public LinkTimePair getDiversionPoint(int currentTime)
+    public LinkTimePair getDiversionPoint(double currentTime)
     {
         if (vrpDynLeg.canChangeNextLink()) {
             return new LinkTimePair(currentLink, predictLinkExitTime(currentTime));
@@ -108,14 +108,14 @@ public class OnlineVehicleTrackerImpl
 
         Link nextLink = path.getLink(currentLinkIdx + 1);
 
-        int nextLinkTT = path.getLinkTravelTime(currentLinkIdx + 1);
-        int predictedDiversionTime = predictLinkExitTime(currentTime) + nextLinkTT;
+        double nextLinkTT = path.getLinkTravelTime(currentLinkIdx + 1);
+        double predictedDiversionTime = predictLinkExitTime(currentTime) + nextLinkTT;
 
         return new LinkTimePair(nextLink, predictedDiversionTime);
     }
 
 
-    public void divertPath(VrpPathWithTravelData newSubPath, int currentTime)
+    public void divertPath(VrpPathWithTravelData newSubPath, double currentTime)
     {
         LinkTimePair diversionPoint = getDiversionPoint(currentTime);
 
@@ -149,9 +149,9 @@ public class OnlineVehicleTrackerImpl
 
 
     @Override
-    public int calculateCurrentDelay(int currentTime)
+    public double calculateCurrentDelay(double currentTime)
     {
-        int actualTimeOnLink = currentTime - linkEnterTime;
+        double actualTimeOnLink = currentTime - linkEnterTime;
 
         // delay(positive/zero/negative) at the last node + delay(positive/zero) on the current link 
         return linkEnterDelay + Math.max(actualTimeOnLink - plannedLinkTT, 0);
@@ -166,24 +166,24 @@ public class OnlineVehicleTrackerImpl
 
 
     @Override
-    public int getLinkEnterTime()
+    public double getLinkEnterTime()
     {
         return linkEnterTime;
     }
 
 
     @Override
-    public int predictLinkExitTime(int currentTime)
+    public double predictLinkExitTime(double currentTime)
     {
         return Math.max(currentTime, linkEnterTime + plannedLinkTT);
     }
 
 
     @Override
-    public int predictEndTime(int currentTime)
+    public double predictEndTime(double currentTime)
     {
-        int plannedTotalTT = plannedEndTime - driveTask.getBeginTime();
-        int predictedRemainingTTFromNextNode = plannedTotalTT
+        double plannedTotalTT = plannedEndTime - driveTask.getBeginTime();
+        double predictedRemainingTTFromNextNode = plannedTotalTT
                 - (plannedTTAtPrevNode + plannedLinkTT);
 
         return predictLinkExitTime(currentTime) + predictedRemainingTTFromNextNode;
@@ -191,7 +191,7 @@ public class OnlineVehicleTrackerImpl
 
 
     @Override
-    public int getPlannedEndTime()
+    public double getPlannedEndTime()
     {
         return plannedEndTime;
     }

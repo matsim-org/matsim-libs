@@ -42,9 +42,13 @@ public class TimeDiscretizer
     }
 
 
-    public int getIdx(int time)
+    public int getIdx(double time)
     {
-        int idx = time / timeInterval;
+        if (time < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        int idx = (int)time / timeInterval;
 
         if (cyclic) {
             return idx % intervalCount;
@@ -58,15 +62,15 @@ public class TimeDiscretizer
     }
 
 
-    public int getTime(int idx)
+    public double getTime(int idx)
     {
         return idx * timeInterval;
     }
 
 
-    public WeightedIdxPair getIdxWeightedPair(int time)
+    public double interpolate(double[] vals, double time)
     {
-        int idx0 = time / timeInterval;
+        int idx0 = (int)time / timeInterval;
         int idx1 = idx0 + 1;
 
         if (cyclic) {
@@ -79,16 +83,17 @@ public class TimeDiscretizer
             }
         }
 
-        int weight1 = (time % timeInterval);
-        int weight0 = timeInterval - weight1;
+        double weight1 = time % timeInterval;
+        double weight0 = timeInterval - weight1;
 
-        return new WeightedIdxPair(idx0, idx1, weight0, weight1);
+        double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];
+        return weightedSum / timeInterval;
     }
 
 
-    public double interpolate(double[] vals, int time)
+    public double interpolate(int[] vals, double time)
     {
-        int idx0 = time / timeInterval;
+        int idx0 = (int)time / timeInterval;
         int idx1 = idx0 + 1;
 
         if (cyclic) {
@@ -101,40 +106,16 @@ public class TimeDiscretizer
             }
         }
 
-        int weight1 = (time % timeInterval);
-        int weight0 = timeInterval - weight1;
+        double weight1 = time % timeInterval;
+        double weight0 = timeInterval - weight1;
 
-        double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];
+        double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];// int -> double
         return weightedSum / timeInterval;
 
     }
 
 
-    public int interpolate(int[] vals, int time)
-    {
-        int idx0 = time / timeInterval;
-        int idx1 = idx0 + 1;
-
-        if (cyclic) {
-            idx0 %= intervalCount;
-            idx1 %= intervalCount;
-        }
-        else {
-            if (idx1 >= intervalCount) {
-                throw new IllegalStateException();
-            }
-        }
-
-        int weight1 = (time % timeInterval);
-        int weight0 = timeInterval - weight1;
-
-        double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];// int -> double
-        return (int)Math.round(weightedSum / timeInterval);// double -> int
-
-    }
-
-
-    public int getTimeInterval()
+    public double getTimeInterval()
     {
         return timeInterval;
     }
@@ -152,21 +133,40 @@ public class TimeDiscretizer
     }
 
 
-    public static class WeightedIdxPair
+    //=============================================================================================
+
+    public interface Interpolator
     {
-        public final int idx0;
-        public final int idx1;
-
-        public final int weight0;
-        public final int weight1;
+        double interpolate(double time);
+    }
 
 
-        private WeightedIdxPair(int idx0, int idx1, int weight0, int weight1)
-        {
-            this.idx0 = idx0;
-            this.idx1 = idx1;
-            this.weight0 = weight0;
-            this.weight1 = weight1;
+    public Interpolator createInterpolator(final int[] values)
+    {
+        if (getIntervalCount() != values.length) {
+            throw new IllegalArgumentException();
         }
+
+        return new Interpolator() {
+            public double interpolate(double time)
+            {
+                return TimeDiscretizer.this.interpolate(values, time);
+            }
+        };
+    }
+
+
+    public Interpolator createInterpolator(final double[] values)
+    {
+        if (getIntervalCount() != values.length) {
+            throw new IllegalArgumentException();
+        }
+
+        return new Interpolator() {
+            public double interpolate(double time)
+            {
+                return TimeDiscretizer.this.interpolate(values, time);
+            }
+        };
     }
 }

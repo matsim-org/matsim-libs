@@ -34,7 +34,7 @@ public class OneTaxiRequest
     private final Link toLink;
 
 
-    public OneTaxiRequest(Customer customer, Link fromLink, Link toLink, int time)
+    public OneTaxiRequest(Customer customer, Link fromLink, Link toLink, double time)
     {
         //I want a taxi now: t0 == t1 == submissionTime
         super(customer.getId(), customer, 1, time, time, time);

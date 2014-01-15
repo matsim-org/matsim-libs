@@ -31,20 +31,20 @@ public interface OnlineVehicleTracker
     Link getLink();
 
 
-    int getLinkEnterTime();
+    double getLinkEnterTime();
 
 
-    int predictLinkExitTime(int currentTime);
+    double predictLinkExitTime(double currentTime);
 
 
-    LinkTimePair getDiversionPoint(int currentTime);
+    LinkTimePair getDiversionPoint(double currentTime);
 
 
-    void divertPath(VrpPathWithTravelData newSubPath, int currentTime);
+    void divertPath(VrpPathWithTravelData newSubPath, double currentTime);
 
 
     void setVrpDynLeg(VrpDynLeg vrpDynLeg);
 
 
-    void movedOverNode(int time);
+    void movedOverNode(double time);
 }

@@ -35,18 +35,18 @@ public interface Vehicle
     Depot getDepot();// TODO or just BasicLocation getStartLocation()?? and getEndLocation()??
 
 
-    int getCapacity();
+    double getCapacity();
 
 
     // vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
-    int getT0();
+    double getT0();
 
 
-    int getT1();
+    double getT1();
 
 
     // max time outside the depot
-    int getTimeLimit();
+    double getTimeLimit();
 
 
     Schedule<? extends Task> getSchedule();

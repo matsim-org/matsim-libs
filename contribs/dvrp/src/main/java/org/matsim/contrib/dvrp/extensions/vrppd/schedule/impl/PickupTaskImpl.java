@@ -31,10 +31,11 @@ public class PickupTaskImpl
     private final PickupRequest request;
 
 
-    public PickupTaskImpl(int beginTime, int endTime, PickupRequest request)
+    public PickupTaskImpl(double beginTime, double endTime, PickupRequest request)
     {
         super(beginTime, endTime, request.getFromLink());
         this.request = request;
+        request.setPickupTask(this);
     }
 
 
@@ -50,8 +51,8 @@ public class PickupTaskImpl
     {
         return request;
     }
-    
-    
+
+
     @Override
     public void removeFromRequest()
     {

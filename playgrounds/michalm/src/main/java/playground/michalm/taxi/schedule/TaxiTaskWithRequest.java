@@ -26,7 +26,8 @@ public interface TaxiTaskWithRequest
     extends TaxiTask
 {
     TaxiRequest getRequest();
-    
+
+
     //called (when removing a task) in order to update the request-2-task assignment 
     void removeFromRequest();
 }

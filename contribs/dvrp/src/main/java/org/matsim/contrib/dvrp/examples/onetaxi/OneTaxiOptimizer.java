@@ -67,7 +67,7 @@ public class OneTaxiOptimizer
     public void requestSubmitted(Request request)
     {
         StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
-        int currentTime = data.getTime();
+        double currentTime = data.getTime();
 
         switch (lastTask.getStatus()) {
             case PLANNED:
@@ -85,24 +85,24 @@ public class OneTaxiOptimizer
         OneTaxiRequest req = (OneTaxiRequest)request;
         Link fromLink = req.getFromLink();
         Link toLink = req.getToLink();
-        int t0 = Schedules.getLastTask(schedule).getEndTime();
+        double t0 = Schedules.getLastTask(schedule).getEndTime();
 
         VrpPathWithTravelData p1 = pathCalculator.calcPath(lastTask.getLink(), fromLink, t0);
         schedule.addTask(new DriveTaskImpl(p1));
 
-        int t1 = p1.getArrivalTime();
-        int t2 = t1 + 120;// 2 minutes for picking up the passenger
+        double t1 = p1.getArrivalTime();
+        double t2 = t1 + 120;// 2 minutes for picking up the passenger
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
         VrpPathWithTravelData p2 = pathCalculator.calcPath(fromLink, toLink, t2);
         schedule.addTask(new DriveTaskImpl(p2));
 
-        int t3 = p2.getArrivalTime();
-        int t4 = t3 + 60;// 1 minute for dropping off the passenger
+        double t3 = p2.getArrivalTime();
+        double t4 = t3 + 60;// 1 minute for dropping off the passenger
         schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, "dropoff", req));
 
         //just wait (and be ready) till the end of the vehicle's time window (T1)
-        int tEnd = Schedules.getActualT1(schedule);
+        double tEnd = Schedules.getActualT1(schedule);
         schedule.addTask(new StayTaskImpl(t4, tEnd, toLink, "wait"));
     }
 

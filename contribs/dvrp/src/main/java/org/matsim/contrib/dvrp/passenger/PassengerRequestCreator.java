@@ -25,6 +25,5 @@ import org.matsim.contrib.dvrp.data.model.Customer;
 
 public interface PassengerRequestCreator
 {
-    PassengerRequest createRequest(Customer customer, Link fromLink,
-            Link toLink, double now);
+    PassengerRequest createRequest(Customer customer, Link fromLink, Link toLink, double now);
 }

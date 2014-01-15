@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.network.Link;
 public class LinkTimePair
 {
     public final Link link;
-    public final int time;
+    public final double time;
 
 
-    public LinkTimePair(Link link, int time)
+    public LinkTimePair(Link link, double time)
     {
         this.link = link;
         this.time = time;

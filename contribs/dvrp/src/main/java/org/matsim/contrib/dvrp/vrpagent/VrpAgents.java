@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 import org.matsim.contrib.dvrp.data.schedule.Task;
 import org.matsim.contrib.dynagent.DynAgent;
 
+
 public class VrpAgents
 {
     public static DynAgent getAgent(Task task)

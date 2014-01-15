@@ -44,7 +44,6 @@ import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
-import playground.michalm.RunningVehicleRegister;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.model.*;
@@ -52,6 +51,7 @@ import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
 import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer.Params;
+import playground.michalm.util.RunningVehicleRegister;
 
 
 /*package*/class SingleIterTaxiLauncher
@@ -79,8 +79,8 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
     /*package*/boolean destinationKnown;
     /*package*/boolean onlineVehicleTracker;
     /*package*/boolean minimizePickupTripTime;
-    /*package*/int pickupDuration;
-    /*package*/int dropoffDuration;
+    /*package*/double pickupDuration;
+    /*package*/double dropoffDuration;
 
     /*package*/LegHistogram legHistogram;
     /*package*/MatsimVrpData data;
@@ -167,7 +167,7 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
         }
         scanner.close();
 
-//        dirName = params.get("dirName") + '/';
+        //        dirName = params.get("dirName") + '/';
         dirName = new File(paramFile).getParent() + '/';
         netFileName = dirName + params.get("netFileName");
 
@@ -184,8 +184,8 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
         destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
         onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
         minimizePickupTripTime = Boolean.valueOf(params.get("minimizePickupTripTime"));
-        pickupDuration = Integer.valueOf(params.get("pickupDuration"));
-        dropoffDuration = Integer.valueOf(params.get("dropoffDuration"));
+        pickupDuration = Double.valueOf(params.get("pickupDuration"));
+        dropoffDuration = Double.valueOf(params.get("dropoffDuration"));
 
         otfVis = Boolean.valueOf(params.get("otfVis"));
 
@@ -312,14 +312,14 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
         // for (Task t : v.getSchedule().getTasks()) {
         // if (t.getType() == TaskType.DRIVE) {
         // DriveTask dt = (DriveTask)t;
-        // int beginTime = dt.getBeginTime();
+        // double beginTime = dt.getBeginTime();
         // MatsimArc arc = (MatsimArc)dt.getArc();
         //
-        // int actualDuration = dt.getEndTime() - beginTime;
+        // double actualDuration = dt.getEndTime() - beginTime;
         //
-        // int aPrioriEstimation = arc.getTimeOnDeparture(beginTime);
+        // double aPrioriEstimation = arc.getTimeOnDeparture(beginTime);
         //
-        // int aPosterioriEstimation = shortestPathCalculator.calculateShortestPath(arc
+        // double aPosterioriEstimation = shortestPathCalculator.calculateShortestPath(arc
         // .getFromLink(), arc.getToLink(), beginTime).travelTime;
         //
         // if (aPosterioriEstimation != 0) {

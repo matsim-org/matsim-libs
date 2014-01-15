@@ -38,8 +38,8 @@ public class PickupDeliveryRequestImpl
     private DeliveryTask deliveryTask;
 
 
-    public PickupDeliveryRequestImpl(Id id, Customer customer, int quantity, int t0, int t1,
-            int submissionTime, Link fromLink, Link toLink)
+    public PickupDeliveryRequestImpl(Id id, Customer customer, double quantity, double t0,
+            double t1, double submissionTime, Link fromLink, Link toLink)
     {
         super(id, customer, quantity, t0, t1, submissionTime);
         this.fromLink = fromLink;

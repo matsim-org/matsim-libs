@@ -45,9 +45,7 @@ public class OneTaxiRequestCreator
     public PassengerRequest createRequest(Customer customer, Link fromLink, Link toLink, double now)
     {
         List<Request> requests = vrpData.getRequests();
-
-        OneTaxiRequest request = new OneTaxiRequest(customer, fromLink, toLink, (int)now);
-
+        OneTaxiRequest request = new OneTaxiRequest(customer, fromLink, toLink, now);
         requests.add(request);
         return request;
     }

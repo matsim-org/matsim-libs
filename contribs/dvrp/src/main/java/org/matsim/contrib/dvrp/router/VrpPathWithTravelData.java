@@ -22,13 +22,13 @@ package org.matsim.contrib.dvrp.router;
 public interface VrpPathWithTravelData
     extends VrpPath
 {
-    public int getDepartureTime();
+    public double getDepartureTime();
 
 
-    public int getTravelTime();
+    public double getTravelTime();
 
 
-    public int getArrivalTime();
+    public double getArrivalTime();
 
 
     public double getTravelCost();

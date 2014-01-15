@@ -45,7 +45,6 @@ import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
-import playground.michalm.RunningVehicleRegister;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.model.*;
@@ -53,6 +52,7 @@ import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer.Params;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
+import playground.michalm.util.RunningVehicleRegister;
 
 
 /**

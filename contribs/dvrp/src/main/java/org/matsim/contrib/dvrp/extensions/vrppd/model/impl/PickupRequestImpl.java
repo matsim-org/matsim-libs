@@ -35,8 +35,8 @@ public class PickupRequestImpl
     private PickupTask pickupTask;
 
 
-    public PickupRequestImpl(Id id, Customer customer, int quantity, int t0, int t1,
-            int submissionTime, Link fromLink)
+    public PickupRequestImpl(Id id, Customer customer, double quantity, double t0, double t1,
+            double submissionTime, Link fromLink)
     {
         super(id, customer, quantity, t0, t1, submissionTime);
         this.fromLink = fromLink;

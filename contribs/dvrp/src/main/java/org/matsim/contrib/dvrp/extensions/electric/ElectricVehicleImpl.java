@@ -31,8 +31,8 @@ public class ElectricVehicleImpl
     private Battery battery;
 
 
-    public ElectricVehicleImpl(Id id, String name, Depot depot, int capacity, int t0, int t1,
-            int timeLimit, Battery battery)
+    public ElectricVehicleImpl(Id id, String name, Depot depot, double capacity, double t0,
+            double t1, double timeLimit, Battery battery)
     {
         super(id, name, depot, capacity, t0, t1, timeLimit);
         this.battery = battery;

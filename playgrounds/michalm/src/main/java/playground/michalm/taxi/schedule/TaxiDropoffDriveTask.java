@@ -20,7 +20,7 @@
 package playground.michalm.taxi.schedule;
 
 import org.matsim.contrib.dvrp.data.schedule.impl.DriveTaskImpl;
-import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 
 import playground.michalm.taxi.model.TaxiRequest;
 
@@ -36,8 +36,7 @@ public class TaxiDropoffDriveTask
     {
         super(path);
 
-        if (request.getFromLink() != path.getFromLink()
-                && request.getToLink() != path.getToLink()) {
+        if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
             throw new IllegalArgumentException();
         }
 

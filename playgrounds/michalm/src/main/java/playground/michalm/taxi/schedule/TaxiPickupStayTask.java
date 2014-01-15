@@ -31,7 +31,7 @@ public class TaxiPickupStayTask
     private final TaxiRequest request;
 
 
-    public TaxiPickupStayTask(int beginTime, int endTime, TaxiRequest request)
+    public TaxiPickupStayTask(double beginTime, double endTime, TaxiRequest request)
     {
         super(beginTime, endTime, request.getFromLink());
 

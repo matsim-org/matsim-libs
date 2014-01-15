@@ -29,7 +29,7 @@ public class OneTaxiServeTask
     private OneTaxiRequest request;
 
 
-    public OneTaxiServeTask(int beginTime, int endTime, Link link, String name,
+    public OneTaxiServeTask(double beginTime, double endTime, Link link, String name,
             OneTaxiRequest request)
     {
         super(beginTime, endTime, link, name);

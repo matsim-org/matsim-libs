@@ -94,12 +94,12 @@ public class NOSRankTaxiOptimizer
             Link depotLink = schedule.getVehicle().getDepot().getLink();
 
             if (link != depotLink) {
-                int t5 = dropoffStayTask.getEndTime();
+                double t5 = dropoffStayTask.getEndTime();
                 VrpPathWithTravelData path = calculator.calcPath(link, depotLink, t5);
                 schedule.addTask(new TaxiCruiseDriveTask(path));
 
-                int t6 = path.getArrivalTime();
-                int tEnd = Math.max(t6, Schedules.getActualT1(schedule));
+                double t6 = path.getArrivalTime();
+                double tEnd = Math.max(t6, Schedules.getActualT1(schedule));
                 schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getDepot()
                         .getLink()));
             }
@@ -155,8 +155,8 @@ public class NOSRankTaxiOptimizer
 
         @SuppressWarnings("unchecked")
         Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
-        int currentTime = data.getTime();
-        int oldendtime;
+        double currentTime = data.getTime();
+        double oldEndTime;
         TaxiWaitStayTask lastTask = (TaxiWaitStayTask)Schedules.getLastTask(sched);// only WAIT
 
         switch (lastTask.getStatus()) {
@@ -164,7 +164,7 @@ public class NOSRankTaxiOptimizer
                 return;
 
             case STARTED:
-                oldendtime = lastTask.getEndTime();
+                oldEndTime = lastTask.getEndTime();
                 lastTask.setEndTime(currentTime);// shortening the WAIT task
 
                 break;
@@ -181,8 +181,8 @@ public class NOSRankTaxiOptimizer
             VrpPathWithTravelData path = calculator.calcPath(lastLink, veh.getDepot().getLink(), currentTime);
             sched.addTask(new TaxiCruiseDriveTask(path));
 
-            int arrivalTime = path.getArrivalTime();
-            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldendtime, veh.getDepot().getLink()));
+            double arrivalTime = path.getArrivalTime();
+            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldEndTime, veh.getDepot().getLink()));
             // System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:"
             // +oldendtime);
         }

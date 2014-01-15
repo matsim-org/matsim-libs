@@ -58,7 +58,8 @@ public abstract class AbstractTaxiOptimizer
                 new Comparator<TaxiRequest>() {
                     public int compare(TaxiRequest r1, TaxiRequest r2)
                     {
-                        return r1.getSubmissionTime() - r2.getSubmissionTime();
+                        double diff = r1.getSubmissionTime() - r2.getSubmissionTime();
+                        return diff == 0 ? 0 : (diff > 0 ? 1 : -1);
                     }
                 });
     }

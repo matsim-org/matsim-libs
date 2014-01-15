@@ -31,7 +31,7 @@ public class TaxiDropoffStayTask
     private final TaxiRequest request;
 
 
-    public TaxiDropoffStayTask(int beginTime, int endTime, TaxiRequest request)
+    public TaxiDropoffStayTask(double beginTime, double endTime, TaxiRequest request)
     {
         super(beginTime, endTime, request.getToLink());
 

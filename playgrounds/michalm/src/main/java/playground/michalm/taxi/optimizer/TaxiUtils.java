@@ -28,7 +28,7 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class TaxiUtils
 {
-    public static boolean isIdle(Schedule<TaxiTask> schedule, int time,
+    public static boolean isIdle(Schedule<TaxiTask> schedule, double time,
             boolean delayedWaitTaskAsNonIdle)
     {
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
@@ -68,10 +68,10 @@ public class TaxiUtils
     }
 
 
-    public static boolean isCurrentTaskDelayed(Schedule<TaxiTask> schedule, int time)
+    public static boolean isCurrentTaskDelayed(Schedule<TaxiTask> schedule, double time)
     {
         TaxiTask currentTask = schedule.getCurrentTask();
-        int delay = time - currentTask.getEndTime();
+        double delay = time - currentTask.getEndTime();
 
         if (delay < 0) {
             return false;
@@ -83,7 +83,7 @@ public class TaxiUtils
             // a simulation step, i.e. ActivityEngine is before QNetsimEngine
             // According to some code analysis, the lag should not be larger than 1 second
             // TODO BTW. Is "ActivityEngine before QNetsimEngine" the only approach???
-            System.err.println("TaxiUtils.isCurrentTaskDelayed(Schedule schedule, int time): "
+            System.err.println("TaxiUtils.isCurrentTaskDelayed(Schedule schedule, double time): "
                     + "This is very unlikely! I am just curious if this ever happens:-)");
         }
 

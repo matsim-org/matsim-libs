@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.extensions.electric;
 import java.util.*;
 
 
-
 public class ChargingScheduleImpl<T extends ChargeTask>
     implements ChargingSchedule<T>
 {

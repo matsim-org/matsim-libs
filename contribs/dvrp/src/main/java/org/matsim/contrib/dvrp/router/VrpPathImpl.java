@@ -29,15 +29,15 @@ import com.google.common.collect.Iterators;
 public class VrpPathImpl
     implements VrpPathWithTravelData
 {
-    private final int departureTime;
-    private final int travelTime;
+    private final double departureTime;
+    private final double travelTime;
     private final double travelCost;
     private final Link[] links;
-    private final int[] linkTTs;//accumulated link travel times
+    private final double[] linkTTs;//accumulated link travel times
 
 
-    public VrpPathImpl(int departureTime, int travelTime, double travelCost, Link[] links,
-            int[] linkTT)
+    public VrpPathImpl(double departureTime, double travelTime, double travelCost, Link[] links,
+            double[] linkTT)
     {
         if (links.length != linkTT.length) {
             throw new IllegalArgumentException();
@@ -52,21 +52,21 @@ public class VrpPathImpl
 
 
     @Override
-    public int getDepartureTime()
+    public double getDepartureTime()
     {
         return departureTime;
     }
 
 
     @Override
-    public int getTravelTime()
+    public double getTravelTime()
     {
         return travelTime;
     }
 
 
     @Override
-    public int getArrivalTime()
+    public double getArrivalTime()
     {
         return departureTime + travelTime;
     }
@@ -108,7 +108,7 @@ public class VrpPathImpl
 
 
     @Override
-    public int getLinkTravelTime(int idx)
+    public double getLinkTravelTime(int idx)
     {
         return linkTTs[idx];
     }

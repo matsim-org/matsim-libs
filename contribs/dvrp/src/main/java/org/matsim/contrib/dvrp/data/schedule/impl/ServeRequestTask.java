@@ -29,7 +29,7 @@ public class ServeRequestTask
     private final Request request;
 
 
-    public ServeRequestTask(int beginTime, int endTime, Link link, Request request)
+    public ServeRequestTask(double beginTime, double endTime, Link link, Request request)
     {
         super(beginTime, endTime, link);
         this.request = request;

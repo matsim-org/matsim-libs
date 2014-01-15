@@ -103,23 +103,23 @@ public class DepotReader
             name = "V_" + id;
         }
 
-        int capacity = getInt(atts, "id", 1);
+        double capacity = getDouble(atts, "id", 1);
 
-        int t0 = getInt(atts, "t0", 0);
-        int t1 = getInt(atts, "t1", 24 * 60 * 60);
-        int tLimit = getInt(atts, "tLimit", t1 - t0);
+        double t0 = getDouble(atts, "t0", 0);
+        double t1 = getDouble(atts, "t1", 24 * 60 * 60);
+        double tLimit = getDouble(atts, "tLimit", t1 - t0);
 
         data.addVehicle(new VrpAgentVehicleImpl(vehicleId, name, currentDepot, capacity, t0, t1,
                 tLimit));
     }
 
 
-    private int getInt(Attributes atts, String qName, int defaultValue)
+    private double getDouble(Attributes atts, String qName, double defaultValue)
     {
         String val = atts.getValue(qName);
 
         if (val != null) {
-            return Integer.parseInt(val);
+            return Double.parseDouble(val);
         }
         else {
             return defaultValue;

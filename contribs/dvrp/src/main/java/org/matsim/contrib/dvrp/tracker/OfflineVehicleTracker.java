@@ -27,10 +27,10 @@ public interface OfflineVehicleTracker
     DriveTask getDriveTask();
 
 
-    int predictEndTime(int currentTime);
+    double predictEndTime(double currentTime);
 
 
-    int getPlannedEndTime();
+    double getPlannedEndTime();
 
 
     /**
@@ -38,5 +38,5 @@ public interface OfflineVehicleTracker
      * time my be updated periodically, thus driveTask.getEndTime() may return different results
      * over time)
      */
-    int calculateCurrentDelay(int currentTime);
+    double calculateCurrentDelay(double currentTime);
 }

@@ -59,8 +59,8 @@ public class DepotImpl
     {
         return link;
     }
-    
-    
+
+
     @Override
     public Coord getCoord()
     {

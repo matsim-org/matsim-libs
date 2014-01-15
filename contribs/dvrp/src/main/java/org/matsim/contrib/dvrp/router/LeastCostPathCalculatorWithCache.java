@@ -58,7 +58,7 @@ public class LeastCostPathCalculatorWithCache
     public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, Person person,
             Vehicle vehicle)
     {
-        Map<Id, Map<Id, Path>> spCacheSlice = pathCache[timeDiscretizer.getIdx((int)starttime)];
+        Map<Id, Map<Id, Path>> spCacheSlice = pathCache[timeDiscretizer.getIdx(starttime)];
 
         Map<Id, Path> spCacheFromNode = spCacheSlice.get(fromNode.getId());
         Path path = null;

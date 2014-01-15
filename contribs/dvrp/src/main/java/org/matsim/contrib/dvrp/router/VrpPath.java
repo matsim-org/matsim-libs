@@ -31,7 +31,7 @@ public interface VrpPath
     Link getLink(int idx);
 
 
-    int getLinkTravelTime(int idx);
+    double getLinkTravelTime(int idx);
 
 
     Link getFromLink();

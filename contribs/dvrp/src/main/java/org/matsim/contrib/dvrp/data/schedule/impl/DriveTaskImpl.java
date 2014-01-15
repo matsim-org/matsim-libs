@@ -38,7 +38,7 @@ public class DriveTaskImpl
     }
 
 
-    public DriveTaskImpl(VrpPath path, int beginTime, int endTime)
+    public DriveTaskImpl(VrpPath path, double beginTime, double endTime)
     {
         super(beginTime, endTime);
         this.path = path;
@@ -60,7 +60,7 @@ public class DriveTaskImpl
 
 
     @Override
-    public void pathDiverted(DivertedVrpPath divertedPath, int newEndTime)
+    public void pathDiverted(DivertedVrpPath divertedPath, double newEndTime)
     {
         //can only divert an ongoing task
         if (getStatus() != TaskStatus.STARTED) {

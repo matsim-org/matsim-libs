@@ -40,11 +40,11 @@ public interface Task
 
 
     // inclusive
-    int getBeginTime();
+    double getBeginTime();
 
 
     // exclusive
-    int getEndTime();
+    double getEndTime();
 
 
     Schedule<? extends Task> getSchedule();
@@ -54,8 +54,8 @@ public interface Task
 
 
     // SETTERS:
-    void setBeginTime(int beginTime);
+    void setBeginTime(double beginTime);
 
 
-    void setEndTime(int endTime);
+    void setEndTime(double endTime);
 }

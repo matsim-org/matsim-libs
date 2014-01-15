@@ -94,7 +94,7 @@ public class VrpSimEngine
     }
 
 
-    public void nextTask(Schedule<? extends Task> schedule, int time)
+    public void nextTask(Schedule<? extends Task> schedule, double time)
     {
         optimizer.nextTask(schedule);
         notifyAgentLogics();

@@ -101,8 +101,8 @@ public class ScheduleImpl<T extends AbstractTask>
 
     private void validateArgsBeforeAddingTask(int taskIdx, Task task)
     {
-        int beginTime = task.getBeginTime();
-        int endTime = task.getEndTime();
+        double beginTime = task.getBeginTime();
+        double endTime = task.getEndTime();
         Link beginLink = Tasks.getBeginLink(task);
         Link endLink = Tasks.getEndLink(task);
 
@@ -236,7 +236,7 @@ public class ScheduleImpl<T extends AbstractTask>
 
 
     @Override
-    public int getBeginTime()
+    public double getBeginTime()
     {
         failIfUnplanned();
         return tasks.get(0).getBeginTime();
@@ -244,7 +244,7 @@ public class ScheduleImpl<T extends AbstractTask>
 
 
     @Override
-    public int getEndTime()
+    public double getEndTime()
     {
         failIfUnplanned();
         return tasks.get(tasks.size() - 1).getEndTime();

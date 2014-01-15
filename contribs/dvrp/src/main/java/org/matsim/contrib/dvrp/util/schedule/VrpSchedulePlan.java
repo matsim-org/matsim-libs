@@ -124,7 +124,7 @@ public class VrpSchedulePlan
             netRoute.setDistance(0.0);
         }
 
-        int tt = task.getEndTime() - task.getBeginTime();
+        double tt = task.getEndTime() - task.getBeginTime();
 
         netRoute.setTravelTime(tt);
 
@@ -144,7 +144,7 @@ public class VrpSchedulePlan
     }
 
 
-    private void addActivity(Link link, int endTime, String type)
+    private void addActivity(Link link, double endTime, String type)
     {
         Activity act = new ActivityImpl(type, link.getCoord(), link.getId());
 

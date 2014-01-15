@@ -77,7 +77,7 @@ public class InterZoneDistanceCalculator
 
             zoneCentroidList.add(zc);
         }
-        
+
         scanner.close();
 
         zoneCentroids = zoneCentroidList.toArray(new ZoneCentroid[zoneCentroidList.size()]);

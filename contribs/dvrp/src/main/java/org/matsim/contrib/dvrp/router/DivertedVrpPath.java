@@ -66,7 +66,7 @@ public class DivertedVrpPath
 
 
     @Override
-    public int getLinkTravelTime(int idx)
+    public double getLinkTravelTime(int idx)
     {
         //TT for diversionLinkIdx must be taken from originalPath since TT for the first link
         //in newSubPath is 1 second (a vehicle enters the link at its end)  

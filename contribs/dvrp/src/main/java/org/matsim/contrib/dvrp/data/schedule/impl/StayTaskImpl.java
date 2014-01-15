@@ -31,13 +31,13 @@ public class StayTaskImpl
     private final String name;
 
 
-    public StayTaskImpl(int beginTime, int endTime, Link link)
+    public StayTaskImpl(double beginTime, double endTime, Link link)
     {
         this(beginTime, endTime, link, null);
     }
 
 
-    public StayTaskImpl(int beginTime, int endTime, Link link, String name)
+    public StayTaskImpl(double beginTime, double endTime, Link link, String name)
     {
         super(beginTime, endTime);
         this.link = link;

@@ -42,7 +42,7 @@ public class TaxiDelaySpeedupStats
     private final SummaryStatistics dropoffSpeedupStats = new SummaryStatistics();
 
 
-    public void updateStats(TaxiTask currentTask, int delay)
+    public void updateStats(TaxiTask currentTask, double delay)
     {
         if (delay == 0) {
             return;
@@ -75,7 +75,8 @@ public class TaxiDelaySpeedupStats
     }
 
 
-    private void updateStats(int delay, SummaryStatistics delayStats, SummaryStatistics speedupStats)
+    private void updateStats(double delay, SummaryStatistics delayStats,
+            SummaryStatistics speedupStats)
     {
         if (delay > 0) {
             delayStats.addValue(delay);

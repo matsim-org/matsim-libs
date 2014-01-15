@@ -21,20 +21,20 @@ package org.matsim.contrib.dvrp.util.time;
 
 public class TravelTimeUtils
 {
-    public static int[] calculateATOnArival(int[] timesOnDeparture, int interval)
+    public static double[] calculateATOnArival(double[] timesOnDeparture, int interval)
     {
-        int[] timesOnArrival = new int[timesOnDeparture.length];
+        double[] timesOnArrival = new double[timesOnDeparture.length];
 
-        int prevArrivalTime = -interval;// !!! => firstIdx == 0 (@ first iteration)
-        int prevArcTime = timesOnDeparture[0];// !!! => gradient == 0 (@ first iteration)
+        double prevArrivalTime = -interval;// !!! => firstIdx == 0 (@ first iteration)
+        double prevArcTime = timesOnDeparture[0];// !!! => gradient == 0 (@ first iteration)
 
         // regular loop
         for (int i = 0; i < timesOnDeparture.length; i++) {
-            int currArcTime = timesOnDeparture[i];
-            int currArrivalTime = i * interval + currArcTime;
+            double currArcTime = timesOnDeparture[i];
+            double currArrivalTime = i * interval + currArcTime;
 
-            int deltaArcTime = currArcTime - prevArcTime;
-            int deltaArrivalTime = currArrivalTime - prevArrivalTime;
+            double deltaArcTime = currArcTime - prevArcTime;
+            double deltaArrivalTime = currArrivalTime - prevArrivalTime;
 
             if (deltaArrivalTime < 0) {
                 throw new RuntimeException("FIFO property is broken");
@@ -46,16 +46,16 @@ public class TravelTimeUtils
             double gradient = (double)deltaArcTime / (double)deltaArrivalTime;
 
             // indices between prevAT (excluding) and currAT (including), ie. (prevAT;currAT]
-            int firstIdx = prevArrivalTime / interval + 1;
-            int lastIdx = currArrivalTime / interval;
+            int firstIdx = (int)prevArrivalTime / interval + 1;
+            int lastIdx = (int)currArrivalTime / interval;
 
             if (lastIdx >= timesOnArrival.length) {
                 lastIdx = timesOnArrival.length - 1;
             }
 
             for (int j = firstIdx; j <= lastIdx; j++) {
-                timesOnArrival[j] = (int) (prevArcTime + gradient
-                        * (j * interval - prevArrivalTime));
+                timesOnArrival[j] = prevArcTime + gradient
+                        * (j * interval - prevArrivalTime);
             }
 
             if (lastIdx == timesOnArrival.length - 1) {

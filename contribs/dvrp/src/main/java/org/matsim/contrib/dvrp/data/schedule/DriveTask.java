@@ -35,5 +35,5 @@ public interface DriveTask
     void setVehicleTracker(OfflineVehicleTracker vehicleTracker);
 
 
-    void pathDiverted(DivertedVrpPath divertedPath, int newEndTime);
+    void pathDiverted(DivertedVrpPath divertedPath, double newEndTime);
 }
