@@ -127,7 +127,6 @@ public class ModelIterator {
 		}
 
 		// make the thresholds match the ones used to generate the returned network
-		assert adaptiveThreshold.inRange( bestThreshold );
 		runner.getThresholds().setPrimaryTieThreshold( bestThreshold );
 		return currentbest;
 	}
@@ -174,7 +173,7 @@ public class ModelIterator {
 			final SocialNetwork newNet = runner.runSecondary( primaryNetwork , population );
 			double newClustering = SnaUtils.calcClusteringCoefficient( newNet );
 			notifyNewState( runner.getThresholds() , newNet , -1 , newClustering );
-			if ( Math.abs( target - bestClustering ) > Math.abs( target - newClustering ) ) {
+			if ( Math.abs( target - bestClustering ) >= Math.abs( target - newClustering ) ) {
 				bestClustering = newClustering;
 				currentbest = newNet;
 				bestThreshold = newThreshold;
@@ -187,7 +186,6 @@ public class ModelIterator {
 
 		// make the thresholds match the ones used to generate the returned network
 		runner.getThresholds().setSecondaryReduction( -bestThreshold );
-		assert adaptiveThreshold.inRange( bestThreshold );
 		return currentbest;
 	}
 
@@ -226,14 +224,6 @@ public class ModelIterator {
 
 		public AdaptiveThreshold(final double targetStat) {
 			this.targetStat = targetStat;
-		}
-
-		public boolean inRange(final double bestThreshold) {
-			return bestThreshold >=
-				( Double.isNaN( lowerBoundThreshold ) ? Double.NEGATIVE_INFINITY : lowerBoundThreshold )
-				&&
-				bestThreshold <=
-				( Double.isNaN( upperBoundThreshold ) ? Double.POSITIVE_INFINITY : upperBoundThreshold );
 		}
 
 		public void notifyNewValue(
