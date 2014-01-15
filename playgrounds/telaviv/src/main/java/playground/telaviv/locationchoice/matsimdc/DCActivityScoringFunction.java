@@ -38,19 +38,21 @@ public class DCActivityScoringFunction extends org.matsim.contrib.locationchoice
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
 	private TelAvivDestinationScoring destinationChoiceScoring;	
 	private Plan plan;
+	private DestinationChoiceBestResponseContext dcContext;
 		
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, 
 			DestinationChoiceBestResponseContext dcContext, ZoneMapping zoneMapping, CalculateDestinationChoice dcCalculator) {
 		super(plan, facilityPenalties, dcContext);
 		this.destinationChoiceScoring = new TelAvivDestinationScoring(dcContext, zoneMapping, dcCalculator);
 		this.plan = plan;
+		this.dcContext = dcContext;
 	}
 	
 	@Override
 	public void finish() {				
 		super.finish();	
 		for (PlanElement pe : this.plan.getPlanElements()) {
-			if (pe instanceof Activity) {				
+			if (pe instanceof Activity && dcContext.getFlexibleTypes().contains(((Activity) pe).getType())) {				
 				this.score += destinationChoiceScoring.getZonalScore((PlanImpl)plan, (ActivityImpl)pe);
 			}
 		}
