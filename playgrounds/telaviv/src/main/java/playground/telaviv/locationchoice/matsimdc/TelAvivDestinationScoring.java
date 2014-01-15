@@ -54,10 +54,10 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 		
 		double utility = 0.0;
 		if (fromZoneIndex < 0) {
-			log.warn("There is no zone mapping for the from link: " + previousActivity.getLinkId() + ". Returning zone utility = 0.0");
+			//log.warn("There is no zone mapping for the from link: " + previousActivity.getLinkId() + ". Returning zone utility = 0.0");
 			return utility;
 		} else if (toZoneIndex < 0) {
-			log.warn("There is no zone mapping for the to link: " + act.getLinkId() + ". Returning zone utility = 0.0");
+			//log.warn("There is no zone mapping for the to link: " + act.getLinkId() + ". Returning zone utility = 0.0");
 			return utility;
 		} else  
 		utility = this.dcCalculator.getVtod()
