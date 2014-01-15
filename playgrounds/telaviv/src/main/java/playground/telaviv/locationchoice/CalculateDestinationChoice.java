@@ -133,6 +133,7 @@ public class CalculateDestinationChoice {
 	}
 	
 	public void calculateVTODForDCModule() {
+		this.calculateConstantFactors();
 		vtod = new double[types][zones.size()][zones.size()][numSlots]; // type, fromZone, toZone, time bin
 		
 		/*
