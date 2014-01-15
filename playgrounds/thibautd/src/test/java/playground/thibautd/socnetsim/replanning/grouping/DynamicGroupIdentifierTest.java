@@ -23,9 +23,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,7 +60,7 @@ public class DynamicGroupIdentifierTest {
 
 	@Test
 	public void testNGroupsNoJointPlansCompleteSocialNet() {
-		Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
 
@@ -80,8 +77,10 @@ public class DynamicGroupIdentifierTest {
 		for ( Id ego : scenario.getPopulation().getPersons().keySet() ) {
 			for ( Id alter : scenario.getPopulation().getPersons().keySet() ) {
 				if ( ego == alter ) continue;
-				// no need to add bidirectional, as other direction was or will be considered
-				socnet.addMonodirectionalTie( ego , alter );
+				// no need to add bidirectional, as other direction was or will be considered...
+				// but prefer to set the social network "reflective", and this makes
+				// the monodirectional method fail
+				socnet.addBidirectionalTie( ego , alter );
 			}
 		}
 
@@ -90,7 +89,7 @@ public class DynamicGroupIdentifierTest {
 
 	@Test
 	public void testNGroupsWithJointPlansNoSocialNet() {
-		Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 		final JointPlans jointPlans = new JointPlans();
@@ -135,7 +134,7 @@ public class DynamicGroupIdentifierTest {
 
 	@Test
 	public void testNGroupsWithJointPlansCompleteSocialNet() {
-		Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( DynamicGroupIdentifier.class ).setLevel( Level.TRACE );
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
 		final JointPlans jointPlans = new JointPlans();
@@ -178,8 +177,10 @@ public class DynamicGroupIdentifierTest {
 		for ( Id ego : scenario.getPopulation().getPersons().keySet() ) {
 			for ( Id alter : scenario.getPopulation().getPersons().keySet() ) {
 				if ( ego == alter ) continue;
-				// no need to add bidirectional, as other direction was or will be considered
-				socnet.addMonodirectionalTie( ego , alter );
+				// no need to add bidirectional, as other direction was or will be considered...
+				// but prefer to set the social network "reflective", and this makes
+				// the monodirectional method fail
+				socnet.addBidirectionalTie( ego , alter );
 			}
 		}
 
