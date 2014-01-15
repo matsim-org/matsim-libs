@@ -49,15 +49,9 @@ import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
-import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
-import playground.thibautd.socnetsim.replanning.GroupReplanningListennerWithPSimLoop;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
-import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
-import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
@@ -119,10 +113,10 @@ public class RunCliquesWithModularStrategies {
 
 		final FixedGroupsIdentifier cliques = 
 			config.scenario().isUseHouseholds() ?
-			new FixedGroupsIdentifier(
-					((ScenarioImpl) scenario).getHouseholds() ) :
-			FixedGroupsIdentifierFileParser.readCliquesFile(
-					cliquesConf.getInputFile() );
+				new FixedGroupsIdentifier(
+						((ScenarioImpl) scenario).getHouseholds() ) :
+				FixedGroupsIdentifierFileParser.readCliquesFile(
+						cliquesConf.getInputFile() );
 
 		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , toSocialNetwork( cliques ) );
 
@@ -131,7 +125,7 @@ public class RunCliquesWithModularStrategies {
 				.withGroupIdentifier( cliques )
 				.build();
 
-		final ImmutableJointController controller = initializeController( controllerRegistry );
+		final ImmutableJointController controller = RunUtils.initializeController( controllerRegistry );
 
 		if ( scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() > 0 ) {
 			log.info( "add scorer for being together" );
@@ -172,94 +166,6 @@ public class RunCliquesWithModularStrategies {
 
 		// dump non flat config
 		new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
-	}
-
-	private static ImmutableJointController initializeController(
-			final ControllerRegistry controllerRegistry) {
-		final Config config = controllerRegistry.getScenario().getConfig();
-
-		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
-					config.getModule( PseudoSimConfigGroup.GROUP_NAME );
-		final GroupReplanningConfigGroup groupReplanningConf = (GroupReplanningConfigGroup)
-					config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-
-		if ( !pSimConf.isIsUsePSimAtAll() ) {
-			final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
-			final AnnealingCoalitionExpBetaFactory annealingSelectorFactory =
-				new AnnealingCoalitionExpBetaFactory(
-					Double.MIN_VALUE, // TODO pass by config
-					//0.01,
-					config.planCalcScore().getBrainExpBeta(),
-					config.controler().getFirstIteration(),
-					groupReplanningConf.getDisableInnovationAfterIter() );
-
-			{
-				final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
-				factories.addSelectorFactory( "AnnealingCoalitionExpBeta" , annealingSelectorFactory );
-				RunUtils.loadStrategyRegistryFromGroupStrategyConfigGroup(
-						factories,
-						strategyRegistry,
-						controllerRegistry );
-			}
-
-			// create strategy manager
-			final GroupStrategyManager strategyManager =
-				new GroupStrategyManager( 
-						strategyRegistry );
-
-			// create controler
-			final ImmutableJointController controller =
-				new ImmutableJointController(
-						controllerRegistry,
-						new GroupReplanningListenner(
-							controllerRegistry,
-							strategyManager));
-			controller.addControlerListener( annealingSelectorFactory );
-
-			strategyManager.setStopWatch( controller.stopwatch );
-
-			return controller;
-		}
-
-		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
-
-		final GroupStrategyRegistry mainStrategyRegistry = new GroupStrategyRegistry();
-		RunUtils.loadStrategyRegistryWithNonInnovativeStrategiesOnly(
-				factories,
-				mainStrategyRegistry,
-				controllerRegistry );
-
-		final GroupStrategyManager mainStrategyManager =
-			new GroupStrategyManager( 
-					mainStrategyRegistry );
-
-		final GroupStrategyRegistry innovativeStrategyRegistry = new GroupStrategyRegistry();
-		RunUtils.loadStrategyRegistryWithInnovativeStrategiesOnly(
-				factories,
-				innovativeStrategyRegistry,
-				controllerRegistry );
-
-		final GroupStrategyManager innovativeStrategyManager =
-			new GroupStrategyManager( 
-					innovativeStrategyRegistry );
-
-		// create controler
-		final GroupReplanningListennerWithPSimLoop listenner =
-					new GroupReplanningListennerWithPSimLoop(
-						controllerRegistry,
-						mainStrategyManager,
-						innovativeStrategyManager,
-						new JointPseudoSimFactory( 
-							controllerRegistry.getTravelTime()) );
-		final ImmutableJointController controller =
-			new ImmutableJointController(
-					controllerRegistry,
-					listenner );
-
-		listenner.setStopWatch( controller.stopwatch );
-		listenner.setOutputDirectoryHierarchy( controller.getControlerIO() );
-
-		return controller;
 	}
 
 	private static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(

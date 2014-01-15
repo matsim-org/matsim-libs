@@ -57,6 +57,7 @@ import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo
 
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.TripModeShares;
+import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
@@ -72,15 +73,20 @@ import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
+import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
+import playground.thibautd.socnetsim.replanning.GroupReplanningListennerWithPSimLoop;
+import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
@@ -95,6 +101,9 @@ import playground.thibautd.utils.DistanceFillerAlgorithm;
 /**
  * Groups methods too specific to go in the "frameworky" part of the code,
  * but which still needs to be called from various application-specific scripts.
+ *
+ * Ideally, scripts should consist mainly of calls to those methods, with a few
+ * lines specific to the application.
  * @author thibautd
  */
 public class RunUtils {
@@ -524,6 +533,94 @@ public class RunUtils {
 		}
 
 		return builder;
+	}
+
+	public static ImmutableJointController initializeController(
+			final ControllerRegistry controllerRegistry) {
+		final Config config = controllerRegistry.getScenario().getConfig();
+
+		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
+					config.getModule( PseudoSimConfigGroup.GROUP_NAME );
+		final GroupReplanningConfigGroup groupReplanningConf = (GroupReplanningConfigGroup)
+					config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+
+		if ( !pSimConf.isIsUsePSimAtAll() ) {
+			final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
+			final AnnealingCoalitionExpBetaFactory annealingSelectorFactory =
+				new AnnealingCoalitionExpBetaFactory(
+					Double.MIN_VALUE, // TODO pass by config
+					//0.01,
+					config.planCalcScore().getBrainExpBeta(),
+					config.controler().getFirstIteration(),
+					groupReplanningConf.getDisableInnovationAfterIter() );
+
+			{
+				final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
+				factories.addSelectorFactory( "AnnealingCoalitionExpBeta" , annealingSelectorFactory );
+				RunUtils.loadStrategyRegistryFromGroupStrategyConfigGroup(
+						factories,
+						strategyRegistry,
+						controllerRegistry );
+			}
+
+			// create strategy manager
+			final GroupStrategyManager strategyManager =
+				new GroupStrategyManager( 
+						strategyRegistry );
+
+			// create controler
+			final ImmutableJointController controller =
+				new ImmutableJointController(
+						controllerRegistry,
+						new GroupReplanningListenner(
+							controllerRegistry,
+							strategyManager));
+			controller.addControlerListener( annealingSelectorFactory );
+
+			strategyManager.setStopWatch( controller.stopwatch );
+
+			return controller;
+		}
+
+		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
+
+		final GroupStrategyRegistry mainStrategyRegistry = new GroupStrategyRegistry();
+		RunUtils.loadStrategyRegistryWithNonInnovativeStrategiesOnly(
+				factories,
+				mainStrategyRegistry,
+				controllerRegistry );
+
+		final GroupStrategyManager mainStrategyManager =
+			new GroupStrategyManager( 
+					mainStrategyRegistry );
+
+		final GroupStrategyRegistry innovativeStrategyRegistry = new GroupStrategyRegistry();
+		RunUtils.loadStrategyRegistryWithInnovativeStrategiesOnly(
+				factories,
+				innovativeStrategyRegistry,
+				controllerRegistry );
+
+		final GroupStrategyManager innovativeStrategyManager =
+			new GroupStrategyManager( 
+					innovativeStrategyRegistry );
+
+		// create controler
+		final GroupReplanningListennerWithPSimLoop listenner =
+					new GroupReplanningListennerWithPSimLoop(
+						controllerRegistry,
+						mainStrategyManager,
+						innovativeStrategyManager,
+						new JointPseudoSimFactory( 
+							controllerRegistry.getTravelTime()) );
+		final ImmutableJointController controller =
+			new ImmutableJointController(
+					controllerRegistry,
+					listenner );
+
+		listenner.setStopWatch( controller.stopwatch );
+		listenner.setOutputDirectoryHierarchy( controller.getControlerIO() );
+
+		return controller;
 	}
 }
 
