@@ -96,11 +96,11 @@ public class RunTRBModel {
 					}
 				});
 		//runner.setThresholds( new ThresholdFunction( 1.735 , 1.835 ) );
-		runner.setThresholds( new ThresholdFunction( -12 , 4 ) );
+		runner.setThresholds( new ThresholdFunction( -10.9 , 50 ) );
 
 		final ModelIterator modelIterator = new ModelIterator();
 		final ModelIteratorFileListener listener = new ModelIteratorFileListener( outputDirectory+"/thresholdEvolution.dat" );
-		modelIterator.addListener( listener );
+		//modelIterator.addListener( listener );
 		final SocialNetwork network =
 			modelIterator.iterateModelToTarget(
 				runner,
