@@ -28,7 +28,9 @@ import java.util.Arrays;
  */
 public class Coefficients {
 	
-	public static ArrayList<String> types = new ArrayList<String>(Arrays.asList("Shop", "Other", "Work", "Education")); // added by anhorni
+	//public static ArrayList<String> types = new ArrayList<String>(Arrays.asList("Shop", "Other", "Work", "Education")); // added by anhorni
+	public static ArrayList<String> types = new ArrayList<String>(Arrays.asList("shopping", "leisure")); // adapted for shopping and leisure (==other???)
+
 
 	// Zonal Indicators						Shop	Other		Work		Education
 	public double[] metroCult 		= new double[]{	0.75,	 1.34,		 0.0,		 0.0};
