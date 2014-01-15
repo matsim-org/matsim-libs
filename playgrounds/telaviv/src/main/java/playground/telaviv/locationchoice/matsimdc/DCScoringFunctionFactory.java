@@ -60,14 +60,14 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 			this.iteration = this.controler.getIterationNumber();
 			this.zoneMapping = new ZoneMapping(this.dcContext.getScenario(), TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 			this.dcCalculator = new CalculateDestinationChoice(this.dcContext.getScenario());
-			this.dcCalculator.calculateConstantFactors();
+			this.dcCalculator.calculateVTODForDCModule();
 			
 			// actually not necessary here:
-			this.dcCalculator.calculateDynamicFactors(
-					new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.dcContext.getScenario().getNetwork(), 
-							this.dcContext.getScenario().getConfig().travelTimeCalculator()).getLinkTravelTimes());
-					
-			this.dcCalculator.calculateTotalFactors();			
+//			this.dcCalculator.calculateDynamicFactors(
+//					new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.dcContext.getScenario().getNetwork(), 
+//							this.dcContext.getScenario().getConfig().travelTimeCalculator()).getLinkTravelTimes());
+//					
+//			this.dcCalculator.calculateTotalFactors();			
 		}
 	}
 		

@@ -132,6 +132,31 @@ public class CalculateDestinationChoice {
 		log.info("done");
 	}
 	
+	public void calculateVTODForDCModule() {
+		vtod = new double[types][zones.size()][zones.size()][numSlots]; // type, fromZone, toZone, time bin
+		
+		/*
+		 * Fill vtod Array
+		 */
+		log.info("Fill VTOD Array");
+		for (int type = 0; type < types; type++) {
+			for (int fromZoneIndex = 0; fromZoneIndex < zones.size(); fromZoneIndex++) {			
+				for (int toZoneIndex = 0; toZoneIndex < zones.size(); toZoneIndex++) {
+					
+					double constFactor = indicators[type][toZoneIndex] + 
+					sizes[type][toZoneIndex] + 
+					distances[type][fromZoneIndex][toZoneIndex];
+					
+					for (int timeSlot = 0; timeSlot < numSlots; timeSlot++) {
+						vtod[type][fromZoneIndex][toZoneIndex][timeSlot] = constFactor;
+					}
+				}
+			}
+		}
+	}
+	
+	
+	
 	/*
 	 * Time depending Travel Times
 	 */
