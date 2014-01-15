@@ -35,7 +35,7 @@ import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.Leas
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastPointedPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.strategies.ActivityInGroupLocationChoiceFactory;
-import playground.thibautd.socnetsim.replanning.strategies.CliqueJointTripMutatorFactory;
+import playground.thibautd.socnetsim.replanning.strategies.JointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionRandomFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupActivitySequenceMutator;
@@ -73,8 +73,8 @@ public class GroupPlanStrategyFactoryRegistry {
 				"TimeAllocationMutator",
 				new GroupTimeAllocationMutatorFactory( this , 1 ) );
 		addFactory(
-				"CliqueJointTripMutator",
-				new CliqueJointTripMutatorFactory( this ) );
+				"JointTripMutator",
+				new JointTripMutatorFactory( this ) );
 		addFactory(
 				"SubtourModeChoice",
 				new GroupSubtourModeChoiceFactory( this ) );

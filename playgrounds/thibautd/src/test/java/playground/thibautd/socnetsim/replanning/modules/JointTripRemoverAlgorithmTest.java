@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
+package playground.thibautd.socnetsim.replanning.modules;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -55,6 +55,7 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.socnetsim.replanning.modules.JointTripRemoverAlgorithm;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
 
 /**

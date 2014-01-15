@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
+package playground.thibautd.socnetsim.replanning.modules;
 
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
@@ -51,12 +51,13 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
  * @author thibautd
  */
-public class IterativeActionTest {
+public class InsertionRemovalIterativeActionTest {
 	private static int N_COUPLES = 100;
 	private Config config;
 	private TripRouter tripRouter;

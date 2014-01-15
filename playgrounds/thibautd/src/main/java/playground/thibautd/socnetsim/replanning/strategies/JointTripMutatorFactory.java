@@ -22,7 +22,6 @@ package playground.thibautd.socnetsim.replanning.strategies;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -32,6 +31,7 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.JointPlanBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
+import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
@@ -39,9 +39,9 @@ import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleTo
 /**
  * @author thibautd
  */
-public class CliqueJointTripMutatorFactory extends AbstractConfigurableSelectionStrategy {
+public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrategy {
 
-	public CliqueJointTripMutatorFactory(
+	public JointTripMutatorFactory(
 			GroupPlanStrategyFactoryRegistry factoryRegistry) {
 		super(factoryRegistry);
 		// TODO Auto-generated constructor stub

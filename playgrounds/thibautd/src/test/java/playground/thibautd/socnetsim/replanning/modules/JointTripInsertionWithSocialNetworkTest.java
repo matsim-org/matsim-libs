@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
+package playground.thibautd.socnetsim.replanning.modules;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +48,8 @@ import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.replanning.modules.ActedUponInformation;
+import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAlgorithm;
 
 /**
  * @author thibautd

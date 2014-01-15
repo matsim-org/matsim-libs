@@ -1,4 +1,4 @@
-package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
+package playground.thibautd.socnetsim.replanning.modules;
 
 import org.matsim.api.core.v01.Id;
 
