@@ -19,38 +19,24 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.Desires;
-import org.matsim.pt.PtConstants;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.ivt.kticompatibility.KtiPtRoutingModule;
-import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
 import playground.thibautd.config.NonFlatConfigReader;
 import playground.thibautd.config.NonFlatConfigWriter;
 import playground.thibautd.mobsim.PseudoSimConfigGroup;
@@ -58,19 +44,12 @@ import playground.thibautd.scoring.BeingTogetherScoring.LinearOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.LogOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
-import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
-import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListennerWithPSimLoop;
@@ -78,17 +57,9 @@ import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
-import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpBetaFactory;
-import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
-import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
-import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
-import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.GenericFactory;
@@ -145,8 +116,6 @@ public class RunCliquesWithModularStrategies {
 					config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
 		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
 					config.getModule( ScoringFunctionConfigGroup.GROUP_NAME );
-		final KtiInputFilesConfigGroup ktiInputFilesConf = (KtiInputFilesConfigGroup)
-					config.getModule( KtiInputFilesConfigGroup.GROUP_NAME );
 
 		final FixedGroupsIdentifier cliques = 
 			config.scenario().isUseHouseholds() ?
@@ -157,120 +126,10 @@ public class RunCliquesWithModularStrategies {
 
 		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , toSocialNetwork( cliques ) );
 
-		final PlanLinkIdentifier planLinkIdentifier =
-			RunUtils.createLinkIdentifier( weights.getSynchronize() );
-
-		final GenericStrategyModule<ReplanningGroup> additionalPrepareModule =
-			new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
-					config.global() ) {
-				@Override
-				public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
-					return 
-						scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
-						new PrepareVehicleAllocationForSimAlgorithm(
-								MatsimRandom.getLocalInstance(),
-								(JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME ),
-								(VehicleRessources) scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ),
-								planLinkIdentifier) :
-						new GenericPlanAlgorithm<ReplanningGroup>() {
-							@Override
-							public void run(final ReplanningGroup plan) {
-								// do nothing more than default
-							}
-						};
-				}
-
-				@Override
-				protected String getName() {
-					return "PrepareVehiclesForSim";
-				}
-
-			};
-
-		final ControllerRegistryBuilder builder =
-			new ControllerRegistryBuilder( scenario )
-					.withPlanRoutingAlgorithmFactory(
-							RunUtils.createPlanRouterFactory( scenario ) )
-					.withGroupIdentifier(
-							cliques )
-					.withPlanLinkIdentifier(
-							planLinkIdentifier )
-					.withAdditionalPrepareForSimModule(
-							additionalPrepareModule )
-					.withIncompatiblePlansIdentifierFactory(
-							weights.getConsiderVehicleIncompatibilities() &&
-							!weights.getSynchronize().equals( Synchro.none ) &&
-							scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
-								new VehicleBasedIncompatiblePlansIdentifierFactory(
-										SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
-								new EmptyIncompatiblePlansIdentifierFactory() )
-					.withScoringFunctionFactory(
-							scoringFunctionConf.isUseKtiScoring() ?
-							new KtiScoringFunctionFactoryWithJointModes(
-								scoringFunctionConf.getAdditionalUtilityOfBeingDriver_s(),
-								new StageActivityTypesImpl(
-										Arrays.asList(
-												PtConstants.TRANSIT_ACTIVITY_TYPE,
-												JointActingTypes.INTERACTION) ),
-								(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
-								config.planCalcScore(),
-								scenario) :
-							// if null, default will be used
-							// XXX not nice...
-							null );
-
-		if ( scoringFunctionConf.isUseKtiScoring() && !config.scenario().isUseTransit() ) {
-			builder.withTripRouterFactory(
-					new TripRouterFactoryInternal() {
-						private final TripRouterFactoryInternal delegate =
-							new JointTripRouterFactory(
-								scenario,
-								builder.getTravelDisutilityFactory(),
-								builder.getTravelTime().getLinkTravelTimes(),
-								builder.getLeastCostPathCalculatorFactory(),
-								null);
-						private final KtiPtRoutingModuleInfo info =
-							new KtiPtRoutingModuleInfo(
-									ktiInputFilesConf.getIntrazonalPtSpeed(),
-									ktiInputFilesConf.getWorldFile(),
-									ktiInputFilesConf.getTravelTimesFile(),
-									ktiInputFilesConf.getPtStopsFile(),
-									scenario.getNetwork());
-
-						@Override
-						public TripRouter instantiateAndConfigureTripRouter() {
-							final TripRouter tripRouter = delegate.instantiateAndConfigureTripRouter();
-
-							tripRouter.setRoutingModule(
-								TransportMode.pt,
-								new KtiPtRoutingModule(
-									scenario.getConfig().plansCalcRoute(),
-									info,
-									scenario.getNetwork()) );
-
-							final MainModeIdentifier identifier = tripRouter.getMainModeIdentifier();
-							tripRouter.setMainModeIdentifier(
-								new MainModeIdentifier() {
-									@Override
-									public String identifyMainMode(
-											final List<PlanElement> tripElements) {
-										for ( PlanElement pe : tripElements ) {
-											if ( pe instanceof Activity && ((Activity) pe).getType().equals( PtConstants.TRANSIT_ACTIVITY_TYPE ) ) {
-												return TransportMode.pt;
-											}
-										}
-										return identifier.identifyMainMode( tripElements );
-									}
-								});
-
-							return tripRouter;
-						}
-					});
-		}
-		// else the JointTripRouterFactory is used with pt from the config file
-
-		final ControllerRegistry controllerRegistry = builder.build();
-
+		final ControllerRegistry controllerRegistry =
+			RunUtils.loadDefaultRegistryBuilder( scenario )
+				.withGroupIdentifier( cliques )
+				.build();
 
 		final ImmutableJointController controller = initializeController( controllerRegistry );
 

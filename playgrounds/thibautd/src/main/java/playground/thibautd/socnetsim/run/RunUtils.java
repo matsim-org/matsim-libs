@@ -19,15 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -37,13 +41,25 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.pt.PtConstants;
+
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import playground.ivt.kticompatibility.KtiPtRoutingModule;
+import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
 
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.TripModeShares;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
+import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
@@ -55,18 +71,30 @@ import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
+import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
+import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.utils.DistanceFillerAlgorithm;
 
 /**
+ * Groups methods too specific to go in the "frameworky" part of the code,
+ * but which still needs to be called from various application-specific scripts.
  * @author thibautd
  */
 public class RunUtils {
@@ -377,6 +405,125 @@ public class RunUtils {
 			default:
 				throw new IllegalArgumentException( synchro.toString() );
 		}
+	}
+
+	public static ControllerRegistryBuilder loadDefaultRegistryBuilder(final Scenario scenario) {
+		final ControllerRegistryBuilder builder = new ControllerRegistryBuilder( scenario );
+
+		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
+					scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
+
+		if ( scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ) {
+			final PlanLinkIdentifier planLinkIdentifier =
+				RunUtils.createLinkIdentifier( weights.getSynchronize() );
+
+			builder.withPlanLinkIdentifier(
+					planLinkIdentifier );
+
+			final GenericStrategyModule<ReplanningGroup> additionalPrepareModule =
+				new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
+						scenario.getConfig().global() ) {
+					@Override
+					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
+						return 
+							new PrepareVehicleAllocationForSimAlgorithm(
+									MatsimRandom.getLocalInstance(),
+									(JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME ),
+									(VehicleRessources) scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ),
+									planLinkIdentifier );
+					}
+
+					@Override
+					protected String getName() {
+						return "PrepareVehiclesForSim";
+					}
+
+				};
+
+			builder.withAdditionalPrepareForSimModule(
+					additionalPrepareModule );
+		}
+
+		builder.withPlanRoutingAlgorithmFactory(
+				RunUtils.createPlanRouterFactory( scenario ) );
+
+		builder.withIncompatiblePlansIdentifierFactory(
+				weights.getConsiderVehicleIncompatibilities() &&
+				!weights.getSynchronize().equals( Synchro.none ) &&
+				scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
+					new VehicleBasedIncompatiblePlansIdentifierFactory(
+							SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
+					new EmptyIncompatiblePlansIdentifierFactory() );
+
+
+		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
+					scenario.getConfig().getModule( ScoringFunctionConfigGroup.GROUP_NAME );
+		if ( scoringFunctionConf.isUseKtiScoring() ) {
+			builder.withScoringFunctionFactory(
+				new KtiScoringFunctionFactoryWithJointModes(
+					scoringFunctionConf.getAdditionalUtilityOfBeingDriver_s(),
+					new StageActivityTypesImpl(
+								Arrays.asList(
+										PtConstants.TRANSIT_ACTIVITY_TYPE,
+										JointActingTypes.INTERACTION) ),
+						(KtiLikeScoringConfigGroup) scenario.getConfig().getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
+						scenario.getConfig().planCalcScore(),
+						scenario) );
+		}
+
+		if ( scoringFunctionConf.isUseKtiScoring() && !scenario.getConfig().scenario().isUseTransit() ) {
+			final KtiInputFilesConfigGroup ktiInputFilesConf = (KtiInputFilesConfigGroup)
+						scenario.getConfig().getModule( KtiInputFilesConfigGroup.GROUP_NAME );
+
+			builder.withTripRouterFactory(
+					new TripRouterFactoryInternal() {
+						private final TripRouterFactoryInternal delegate =
+							new JointTripRouterFactory(
+								scenario,
+								builder.getTravelDisutilityFactory(),
+								builder.getTravelTime().getLinkTravelTimes(),
+								builder.getLeastCostPathCalculatorFactory(),
+								null);
+						private final KtiPtRoutingModuleInfo info =
+							new KtiPtRoutingModuleInfo(
+									ktiInputFilesConf.getIntrazonalPtSpeed(),
+									ktiInputFilesConf.getWorldFile(),
+									ktiInputFilesConf.getTravelTimesFile(),
+									ktiInputFilesConf.getPtStopsFile(),
+									scenario.getNetwork());
+
+						@Override
+						public TripRouter instantiateAndConfigureTripRouter() {
+							final TripRouter tripRouter = delegate.instantiateAndConfigureTripRouter();
+
+							tripRouter.setRoutingModule(
+								TransportMode.pt,
+								new KtiPtRoutingModule(
+									scenario.getConfig().plansCalcRoute(),
+									info,
+									scenario.getNetwork()) );
+
+							final MainModeIdentifier identifier = tripRouter.getMainModeIdentifier();
+							tripRouter.setMainModeIdentifier(
+								new MainModeIdentifier() {
+									@Override
+									public String identifyMainMode(
+											final List<PlanElement> tripElements) {
+										for ( PlanElement pe : tripElements ) {
+											if ( pe instanceof Activity && ((Activity) pe).getType().equals( PtConstants.TRANSIT_ACTIVITY_TYPE ) ) {
+												return TransportMode.pt;
+											}
+										}
+										return identifier.identifyMainMode( tripElements );
+									}
+								});
+
+							return tripRouter;
+						}
+					});
+		}
+
+		return builder;
 	}
 }
 
