@@ -69,7 +69,6 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
-import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
@@ -159,7 +158,7 @@ public class RunCliquesWithModularStrategies {
 		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , toSocialNetwork( cliques ) );
 
 		final PlanLinkIdentifier planLinkIdentifier =
-			linkIdentifier( weights.getSynchronize() );
+			RunUtils.createLinkIdentifier( weights.getSynchronize() );
 
 		final GenericStrategyModule<ReplanningGroup> additionalPrepareModule =
 			new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
@@ -450,33 +449,6 @@ public class RunCliquesWithModularStrategies {
 			}
 		}
 		return socNet;
-	}
-
-	private static PlanLinkIdentifier linkIdentifier(final Synchro synchro) {
-		switch ( synchro ) {
-			case all:
-				return new PlanLinkIdentifier() {
-					@Override
-					public boolean areLinked(
-							final Plan p1,
-							final Plan p2) {
-						return true;
-					}
-				};
-			case dynamic:
-				return new DefaultPlanLinkIdentifier();
-			case none:
-				return new PlanLinkIdentifier() {
-					@Override
-					public boolean areLinked(
-							final Plan p1,
-							final Plan p2) {
-						return false; 
-					}
-				};
-			default:
-				throw new IllegalArgumentException( synchro.toString() );
-		}
 	}
 
 	public static void main(final String[] args) {

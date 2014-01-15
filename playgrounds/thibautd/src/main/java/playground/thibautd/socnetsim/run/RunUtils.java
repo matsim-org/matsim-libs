@@ -45,6 +45,7 @@ import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControl
 import playground.thibautd.analysis.listeners.TripModeShares;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
@@ -54,6 +55,7 @@ import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
@@ -348,6 +350,33 @@ public class RunUtils {
 						}
 					}
 				});
+	}
+
+	public static PlanLinkIdentifier createLinkIdentifier(final Synchro synchro) {
+		switch ( synchro ) {
+			case all:
+				return new PlanLinkIdentifier() {
+					@Override
+					public boolean areLinked(
+							final Plan p1,
+							final Plan p2) {
+						return true;
+					}
+				};
+			case dynamic:
+				return new DefaultPlanLinkIdentifier();
+			case none:
+				return new PlanLinkIdentifier() {
+					@Override
+					public boolean areLinked(
+							final Plan p1,
+							final Plan p2) {
+						return false; 
+					}
+				};
+			default:
+				throw new IllegalArgumentException( synchro.toString() );
+		}
 	}
 }
 
