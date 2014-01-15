@@ -43,6 +43,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
@@ -77,7 +78,7 @@ public class IterativeActionTest {
 	public void testNonIterativeRemoval() throws Exception {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
-					config,
+					ScenarioUtils.createScenario( config ),
 					tripRouter,
 					random,
 					false);
@@ -119,7 +120,7 @@ public class IterativeActionTest {
 	public void testIterativeRemoval() throws Exception {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
-					config,
+					ScenarioUtils.createScenario( config ),
 					tripRouter,
 					random,
 					true);
@@ -161,7 +162,7 @@ public class IterativeActionTest {
 	public void testNonIterativeInsertion() throws Exception {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
-					config,
+					ScenarioUtils.createScenario( config ),
 					tripRouter,
 					random,
 					false);
@@ -219,7 +220,7 @@ public class IterativeActionTest {
 	public void testIterativeInsertion() throws Exception {
 		JointTripInsertorAndRemoverAlgorithm algo =
 			new JointTripInsertorAndRemoverAlgorithm(
-					config,
+					ScenarioUtils.createScenario( config ),
 					tripRouter,
 					random,
 					true);

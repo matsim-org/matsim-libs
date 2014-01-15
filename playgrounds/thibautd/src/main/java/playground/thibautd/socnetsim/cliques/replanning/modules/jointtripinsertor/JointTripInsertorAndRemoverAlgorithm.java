@@ -28,7 +28,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -37,6 +37,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 
 /**
@@ -50,7 +51,7 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 	private final boolean iterative;
 
 	public JointTripInsertorAndRemoverAlgorithm(
-			final Config config,
+			final Scenario scenario,
 			final TripRouter tripRouter,
 			final Random random,
 			final boolean iterative) {
@@ -58,8 +59,8 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 		this.random = random;
 		this.insertor = new JointTripInsertorAlgorithm(
 				random,
-				null,
-				(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
+				(SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ),
+				(JointTripInsertorConfigGroup) scenario.getConfig().getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
 				tripRouter);
 		this.remover = new JointTripRemoverAlgorithm(
 				random,

@@ -66,7 +66,7 @@ public class CliqueJointTripMutatorFactory extends AbstractConfigurableSelection
 						@Override
 						public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
 							return new JointTripInsertorAndRemoverAlgorithm(
-								config,
+								registry.getScenario(),
 								registry.getTripRouterFactory().instantiateAndConfigureTripRouter(),
 								MatsimRandom.getLocalInstance(),
 								true); // "iterative"
