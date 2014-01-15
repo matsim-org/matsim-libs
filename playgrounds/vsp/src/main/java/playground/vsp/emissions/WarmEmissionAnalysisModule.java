@@ -265,21 +265,28 @@ public class WarmEmissionAnalysisModule {
 			}
 			
 			if(averageSpeed_kmh <= 0.0){
-				logger.warn("Average speed is somehow set to 0.0; please check consistency of your scenario!");
+				logger.warn("Average speed has been calculated to 0.0 or a negative value...");
+				logger.warn("This indicates that linkLength from network is 0.0 or negative OR travel time from handler is negative.");
+				logger.warn("Please check consistency of your scenario!");
 				logger.info("Setting average speed for emission calculation to free flow speed...");
 				averageSpeed_kmh = freeFlowSpeed_kmh;
 			}
 			if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 0.){
-				logger.warn("Average speed (" + averageSpeed_kmh + " kmh) is somehow higher than free flow speed (" + freeFlowSpeed_kmh + " kmh); please check consistency of your scenario!");
+				logger.warn("Average speed (" + averageSpeed_kmh + " kmh) is somehow higher than free flow speed (" + freeFlowSpeed_kmh + " kmh)...");
+				logger.warn("Please check consistency of your scenario!");
 				logger.info("Setting average speed for emission calculation to free flow speed...");
 				averageSpeed_kmh = freeFlowSpeed_kmh;
 //				throw new RuntimeException("Average speed is higher than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
-			// check consistency of free flow speed (add 1.0 to avoid rounding errors)
-			if(freeFlowSpeedFromTable_kmh - freeFlowSpeed_kmh > 1.0 || freeFlowSpeedFromTable_kmh - freeFlowSpeed_kmh <-1.0){
-				logger.warn("The given free flow speed does not match the table's value. Please check consistency of your scenario!");
-				logger.info("Using given speed value to avoid negative emission values...");	
-			}
+			/* NOTE: the following comparision does not make sense since HBEFA assumes freeflow speeds to be different from speed limits.
+			 * For instance for RUR/MW/80/Freeflow HBEFA assumes a freeflow speed of 82.80 kmh.
+			 * benjamin, amit 01'2014
+			 * */		
+//			// check consistency of free flow speed (add 1.0 to avoid rounding errors)
+//			if(freeFlowSpeedFromTable_kmh - freeFlowSpeed_kmh > 1.0 || freeFlowSpeedFromTable_kmh - freeFlowSpeed_kmh <-1.0){
+//				logger.warn("The given free flow speed does not match the table's value. Please check consistency of your scenario!");
+//				logger.info("Using given speed value to avoid negative emission values...");	
+//			}
 			if((averageSpeed_kmh - freeFlowSpeed_kmh) > -1.) { // both speeds are assumed to be not very different > only freeFlow on link
 				generatedEmissions = linkLength_km * efFreeFlow_gpkm;
 				freeFlowCounter++;
