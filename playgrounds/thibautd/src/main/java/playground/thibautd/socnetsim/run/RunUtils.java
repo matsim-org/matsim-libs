@@ -42,12 +42,15 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
 
@@ -57,6 +60,7 @@ import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo
 
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.TripModeShares;
+import playground.thibautd.config.NonFlatConfigReader;
 import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
@@ -90,12 +94,14 @@ import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpB
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
+import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.DistanceFillerAlgorithm;
 
 /**
@@ -621,6 +627,39 @@ public class RunUtils {
 		listenner.setOutputDirectoryHierarchy( controller.getControlerIO() );
 
 		return controller;
+	}
+
+	public static Scenario createScenario(final String configFile) {
+		final Config config = JointScenarioUtils.createConfig();
+		// needed for reading a non-flat format (other solution would be to put this in reader)
+		final GroupReplanningConfigGroup weights = new GroupReplanningConfigGroup();
+		config.addModule( weights );
+		config.addModule( new ScoringFunctionConfigGroup() );
+		config.addModule( new KtiLikeScoringConfigGroup() );
+		config.addModule( new KtiInputFilesConfigGroup() );
+		config.addModule( new PseudoSimConfigGroup() );
+		new NonFlatConfigReader( config ).parse( configFile );
+		final Scenario scenario = JointScenarioUtils.loadScenario( config );
+	
+		if ( config.scenario().isUseHouseholds() && weights.getUseLimitedVehicles() ) {
+			scenario.addScenarioElement(
+							VehicleRessources.ELEMENT_NAME,
+							new HouseholdBasedVehicleRessources(
+								((ScenarioImpl) scenario).getHouseholds() ) );
+		}
+	
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			for (Plan plan : person.getPlans()) {
+				for (Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE )) {
+					if (act.getCoord() != null) continue;
+					if (act.getLinkId() == null) throw new NullPointerException();
+					((ActivityImpl) act).setCoord(
+						scenario.getNetwork().getLinks().get( act.getLinkId() ).getCoord() );
+				}
+			}
+		}
+	
+		return scenario;
 	}
 }
 

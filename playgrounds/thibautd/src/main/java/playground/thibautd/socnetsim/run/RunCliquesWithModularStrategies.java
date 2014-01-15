@@ -24,22 +24,13 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.Desires;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.thibautd.config.NonFlatConfigReader;
 import playground.thibautd.config.NonFlatConfigWriter;
-import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.scoring.BeingTogetherScoring.LinearOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.LogOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
@@ -53,9 +44,6 @@ import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
-import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
-import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.GenericFactory;
 
 /**
@@ -68,39 +56,6 @@ public class RunCliquesWithModularStrategies {
 	private static final boolean DO_STRATEGY_TRACE = false;
 	private static final boolean DO_SELECT_TRACE = false;
 	private static final boolean DO_SCORING_TRACE = false;
-
-	public static Scenario createScenario(final String configFile) {
-		final Config config = JointScenarioUtils.createConfig();
-		// needed for reading a non-flat format (other solution would be to put this in reader)
-		final GroupReplanningConfigGroup weights = new GroupReplanningConfigGroup();
-		config.addModule( weights );
-		config.addModule( new ScoringFunctionConfigGroup() );
-		config.addModule( new KtiLikeScoringConfigGroup() );
-		config.addModule( new KtiInputFilesConfigGroup() );
-		config.addModule( new PseudoSimConfigGroup() );
-		new NonFlatConfigReader( config ).parse( configFile );
-		final Scenario scenario = JointScenarioUtils.loadScenario( config );
-
-		if ( config.scenario().isUseHouseholds() && weights.getUseLimitedVehicles() ) {
-			scenario.addScenarioElement(
-							VehicleRessources.ELEMENT_NAME,
-							new HouseholdBasedVehicleRessources(
-								((ScenarioImpl) scenario).getHouseholds() ) );
-		}
-
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			for (Plan plan : person.getPlans()) {
-				for (Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE )) {
-					if (act.getCoord() != null) continue;
-					if (act.getLinkId() == null) throw new NullPointerException();
-					((ActivityImpl) act).setCoord(
-						scenario.getNetwork().getLinks().get( act.getLinkId() ).getCoord() );
-				}
-			}
-		}
-
-		return scenario;
-	}
 
 	public static void runScenario( final Scenario scenario, final boolean produceAnalysis ) {
 		final Config config = scenario.getConfig();
@@ -224,7 +179,7 @@ public class RunCliquesWithModularStrategies {
 		final String configFile = args[ 0 ];
 
 		// load "registry"
-		final Scenario scenario = createScenario( configFile );
+		final Scenario scenario = RunUtils.createScenario( configFile );
 		runScenario( scenario , true );
 	}
 }
