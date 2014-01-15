@@ -31,7 +31,7 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+//import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
@@ -41,7 +41,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 	private final Controler controler;
 	private DestinationChoiceBestResponseContext dcContext;
 	private Config config;	
-	private int iteration = -1;
+//	private int iteration = -1;
 	private ZoneMapping zoneMapping;
 	private CalculateDestinationChoice dcCalculator;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
@@ -51,13 +51,16 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		this.controler = controler;
 		this.dcContext = dcContext;
 		this.config = config;
+		this.initialize();
 		log.info("creating DCScoringFunctionFactory");
 	}
 	
-	private void checkInitialization() {
+	private void initialize() {
 		// should not play a role here when iteration number is exactly set. 
-		if (this.iteration != this.controler.getIterationNumber()) {
-			this.iteration = this.controler.getIterationNumber();
+		
+//		not necessary anymore as the constant factors do not change over the iterations:
+//		if (this.iteration != this.controler.getIterationNumber()) {
+//			this.iteration = this.controler.getIterationNumber();
 			this.zoneMapping = new ZoneMapping(this.dcContext.getScenario(), TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 			this.dcCalculator = new CalculateDestinationChoice(this.dcContext.getScenario());
 			this.dcCalculator.calculateVTODForDCModule();
@@ -68,14 +71,11 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 //							this.dcContext.getScenario().getConfig().travelTimeCalculator()).getLinkTravelTimes());
 //					
 //			this.dcCalculator.calculateTotalFactors();			
-		}
+//		}
 	}
 		
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
-		
-		this.checkInitialization();
-		
+	public ScoringFunction createNewScoringFunction(Plan plan) {		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		CharyparNagelActivityScoring scoringFunction = new DCActivityScoringFunction(
