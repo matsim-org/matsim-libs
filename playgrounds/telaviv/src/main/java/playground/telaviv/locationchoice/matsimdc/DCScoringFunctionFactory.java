@@ -45,13 +45,13 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 	private ZoneMapping zoneMapping;
 	private CalculateDestinationChoice dcCalculator;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
+	private boolean initialized = false;
 
 	public DCScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext dcContext) {
 		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
 		this.dcContext = dcContext;
 		this.config = config;
-		this.initialize();
 		log.info("creating DCScoringFunctionFactory");
 	}
 	
@@ -75,7 +75,12 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 	}
 		
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {		
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		if (!this.initialized) {
+			this.initialize();
+			this.initialized = true;
+		}
+		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		CharyparNagelActivityScoring scoringFunction = new DCActivityScoringFunction(
