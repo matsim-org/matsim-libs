@@ -49,14 +49,6 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 	private final JointTripRemoverAlgorithm remover;
 	private final boolean iterative;
 
-
-	public JointTripInsertorAndRemoverAlgorithm(
-			final Config config,
-			final TripRouter tripRouter,
-			final Random random) {
-		this( config , tripRouter , random , false );
-	}
-
 	public JointTripInsertorAndRemoverAlgorithm(
 			final Config config,
 			final TripRouter tripRouter,
