@@ -107,6 +107,7 @@ import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForS
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
+import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.DistanceFillerAlgorithm;
@@ -646,6 +647,7 @@ public class RunUtils {
 		config.addModule( new KtiLikeScoringConfigGroup() );
 		config.addModule( new KtiInputFilesConfigGroup() );
 		config.addModule( new PseudoSimConfigGroup() );
+		config.addModule( new SocialNetworkConfigGroup() );
 		new NonFlatConfigReader( config ).parse( configFile );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 	
