@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -70,6 +71,7 @@ import playground.thibautd.scoring.BeingTogetherScoring.LogOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
 import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
+import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.Synchro;
@@ -217,9 +219,18 @@ public class RunUtils {
 					controller.getRegistry().getEvents(),
 					controller.getControlerIO() ));
 
-		final CliquesSizeGroupIdentifier groupIdentifier =
-			new CliquesSizeGroupIdentifier(
-					cliques.getGroupInfo() );
+		final AbstractPlanAnalyzerPerGroup.GroupIdentifier groupIdentifier =
+			cliques != null ?
+				new CliquesSizeGroupIdentifier(
+						cliques.getGroupInfo() ) :
+				new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
+					private final Iterable<Id> groups = Collections.<Id>singleton( new IdImpl( "all" ) );
+
+					@Override
+					public Iterable<Id> getGroups(final Person person) {
+						return groups;
+					}
+				};
 
 		controller.addControlerListener(
 				new FilteredScoreStats(
