@@ -21,6 +21,7 @@ package playground.telaviv.locationchoice.matsimdc;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
@@ -33,7 +34,8 @@ import playground.telaviv.zones.ZoneMapping;
 
 public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring { 
 	private CalculateDestinationChoice dcCalculator;
-	Map<Integer, Emme2Zone> zones;
+	private Map<Integer, Emme2Zone> zones;
+	private static final Logger log = Logger.getLogger(TelAvivDestinationScoring.class);
 		
 	public TelAvivDestinationScoring(DestinationChoiceBestResponseContext dcContext, ZoneMapping zoneMapping, CalculateDestinationChoice dcCalculator) {
 		super(dcContext);	
@@ -50,7 +52,15 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 		// not required as constant factors are not given per time slot
 		// int timeSlotIndex = this.dcCalculator.getTimeSlotIndex(plan.getPreviousLeg(act).getDepartureTime())
 		
-		double utility = this.dcCalculator.getVtod()
+		double utility = 0.0;
+		if (fromZoneIndex < 0) {
+			log.warn("There is no zone mapping for the from link: " + previousActivity.getLinkId() + ". Returning zone utility = 0.0");
+			return utility;
+		} else if (toZoneIndex < 0) {
+			log.warn("There is no zone mapping for the to link: " + act.getLinkId() + ". Returning zone utility = 0.0");
+			return utility;
+		} else  
+		utility = this.dcCalculator.getVtod()
 				[Coefficients.types.indexOf(act.getType())] // type
 						[fromZoneIndex] // origin
 								[toZoneIndex] // destination
