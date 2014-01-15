@@ -136,7 +136,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
                 passengerWaitTime.getMean(),//
                 maxPassengerWaitTime.getMean(),//
                 computationTime.getMean());
-        pw.printf("Min\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+        pw.printf("Min\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 taxiPickupDriveTime.getMin(),//
                 taxiDeliveryDriveTime.getMin(),//
                 taxiServiceTime.getMin(),//
@@ -146,7 +146,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
                 passengerWaitTime.getMin(),//
                 maxPassengerWaitTime.getMin(),//
                 computationTime.getMin());
-        pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
+        pw.printf("Max\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 taxiPickupDriveTime.getMax(),//
                 taxiDeliveryDriveTime.getMax(),//
                 taxiServiceTime.getMax(),//
