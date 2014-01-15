@@ -26,8 +26,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.opengis.feature.simple.SimpleFeature;
-
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
 import playground.telaviv.locationchoice.Coefficients;
 import playground.telaviv.zones.Emme2Zone;
@@ -48,11 +46,15 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 		int fromZoneIndex = this.getZoneIndex(previousActivity.getLinkId());
 		int toZoneIndex = this.getZoneIndex(act.getLinkId());
 		
+		int timeSlotIndex = 0;
+		// not required as constant factors are not given per time slot
+		// int timeSlotIndex = this.dcCalculator.getTimeSlotIndex(plan.getPreviousLeg(act).getDepartureTime())
+		
 		double utility = this.dcCalculator.getVtod()
 				[Coefficients.types.indexOf(act.getType())] // type
 						[fromZoneIndex] // origin
 								[toZoneIndex] // destination
-										[this.dcCalculator.getTimeSlotIndex(plan.getPreviousLeg(act).getDepartureTime())]; //time bin
+										[timeSlotIndex]; //time bin
 		
 		return utility;
 	}

@@ -134,7 +134,7 @@ public class CalculateDestinationChoice {
 	
 	public void calculateVTODForDCModule() {
 		this.calculateConstantFactors();
-		vtod = new double[types][zones.size()][zones.size()][numSlots]; // type, fromZone, toZone, time bin
+		vtod = new double[types][zones.size()][zones.size()][1]; // type, fromZone, toZone, time bin
 		
 		/*
 		 * Fill vtod Array
@@ -147,10 +147,7 @@ public class CalculateDestinationChoice {
 					double constFactor = indicators[type][toZoneIndex] + 
 					sizes[type][toZoneIndex] + 
 					distances[type][fromZoneIndex][toZoneIndex];
-					
-					for (int timeSlot = 0; timeSlot < numSlots; timeSlot++) {
-						vtod[type][fromZoneIndex][toZoneIndex][timeSlot] = constFactor;
-					}
+					vtod[type][fromZoneIndex][toZoneIndex][0] = constFactor;
 				}
 			}
 		}
