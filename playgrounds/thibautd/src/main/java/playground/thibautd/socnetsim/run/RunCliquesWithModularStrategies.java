@@ -24,17 +24,10 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.population.Desires;
 import playground.thibautd.config.NonFlatConfigWriter;
-import playground.thibautd.scoring.BeingTogetherScoring.LinearOverlapScorer;
-import playground.thibautd.scoring.BeingTogetherScoring.LogOverlapScorer;
-import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
-import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
@@ -44,15 +37,11 @@ import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.utils.GenericFactory;
 
 /**
  * @author thibautd
  */
 public class RunCliquesWithModularStrategies {
-	private static final Logger log =
-		Logger.getLogger(RunCliquesWithModularStrategies.class);
-
 	private static final boolean DO_STRATEGY_TRACE = false;
 	private static final boolean DO_SELECT_TRACE = false;
 	private static final boolean DO_SCORING_TRACE = false;
@@ -63,8 +52,6 @@ public class RunCliquesWithModularStrategies {
 					config.getModule( CliquesConfigGroup.GROUP_NAME );
 		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
 					config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
-					config.getModule( ScoringFunctionConfigGroup.GROUP_NAME );
 
 		final FixedGroupsIdentifier cliques = 
 			config.scenario().isUseHouseholds() ?
@@ -82,25 +69,7 @@ public class RunCliquesWithModularStrategies {
 
 		final ImmutableJointController controller = RunUtils.initializeController( controllerRegistry );
 
-		if ( scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() > 0 ) {
-			log.info( "add scorer for being together" );
-			final FireMoneyEventsForUtilityOfBeingTogether socialScorer =
-					new FireMoneyEventsForUtilityOfBeingTogether(
-						controllerRegistry.getEvents(),
-						scoringFunctionConf.getActTypeFilterForJointScoring(),
-						scoringFunctionConf.getModeFilterForJointScoring(),
-						getPersonOverlapScorerFactory(
-							scoringFunctionConf,
-							scenario.getPopulation() ),
-						scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
-						(SocialNetwork) scenario.getScenarioElement(
-							SocialNetwork.ELEMENT_NAME ));
-			controllerRegistry.getEvents().addHandler( socialScorer );
-			controller.addControlerListener( socialScorer );
-		}
-		else {
-			log.info( "do NOT add scorer for being together" );
-		}
+		RunUtils.loadBeingTogetherListenner( controller );
 
 		if (produceAnalysis) {
 			RunUtils.loadDefaultAnalysis(
@@ -121,41 +90,6 @@ public class RunCliquesWithModularStrategies {
 
 		// dump non flat config
 		new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
-	}
-
-	private static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(
-			final ScoringFunctionConfigGroup scoringFunctionConf,
-			final Population population) {
-		switch ( scoringFunctionConf.getTogetherScoringForm() ) {
-			case linear:
-				return new GenericFactory<PersonOverlapScorer, Id>() {
-						@Override
-						public PersonOverlapScorer create( final Id id ) {
-							return new LinearOverlapScorer(
-									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() );
-						}
-					};
-			case logarithmic:
-				return new GenericFactory<PersonOverlapScorer, Id>() {
-						@Override
-						public PersonOverlapScorer create( final Id id ) {
-							final PersonImpl person = (PersonImpl) population.getPersons().get( id );
-							if ( person == null ) {
-								// eg transit agent
-								return new LinearOverlapScorer( 0 );
-							}
-							final Desires desires = person.getDesires();
-							final double typicalDuration = desires.getActivityDuration( "leisure" );
-							final double zeroDuration = typicalDuration * Math.exp( -10.0 / typicalDuration );
-							return new LogOverlapScorer(
-									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
-									typicalDuration,
-									zeroDuration);
-						}
-					};
-			default:
-				throw new RuntimeException( ""+scoringFunctionConf.getTogetherScoringForm() );
-		}
 	}
 
 	private static SocialNetwork toSocialNetwork(

@@ -30,12 +30,13 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -43,6 +44,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
@@ -52,42 +54,47 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.population.Desires;
 import org.matsim.pt.PtConstants;
 
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.kticompatibility.KtiPtRoutingModule;
 import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
-
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
 import playground.thibautd.analysis.listeners.TripModeShares;
 import playground.thibautd.config.NonFlatConfigReader;
 import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.scoring.BeingTogetherScoring.LinearOverlapScorer;
+import playground.thibautd.scoring.BeingTogetherScoring.LogOverlapScorer;
+import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
+import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
 import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
-import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.qsim.JointPseudoSimFactory;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListennerWithPSimLoop;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
+import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpBetaFactory;
@@ -103,6 +110,7 @@ import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.DistanceFillerAlgorithm;
+import playground.thibautd.utils.GenericFactory;
 
 /**
  * Groups methods too specific to go in the "frameworky" part of the code,
@@ -660,6 +668,69 @@ public class RunUtils {
 		}
 	
 		return scenario;
+	}
+
+	public static void loadBeingTogetherListenner(final ImmutableJointController controller) {
+		final ControllerRegistry controllerRegistry = controller.getRegistry();
+		final Scenario scenario = controllerRegistry.getScenario();
+		final Config config = scenario.getConfig();
+		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
+					config.getModule( ScoringFunctionConfigGroup.GROUP_NAME );
+
+		if ( scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() > 0 ) {
+			log.info( "add scorer for being together" );
+			final FireMoneyEventsForUtilityOfBeingTogether socialScorer =
+					new FireMoneyEventsForUtilityOfBeingTogether(
+						controllerRegistry.getEvents(),
+						scoringFunctionConf.getActTypeFilterForJointScoring(),
+						scoringFunctionConf.getModeFilterForJointScoring(),
+						getPersonOverlapScorerFactory(
+							scoringFunctionConf,
+							scenario.getPopulation() ),
+						scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+						(SocialNetwork) scenario.getScenarioElement(
+							SocialNetwork.ELEMENT_NAME ));
+			controllerRegistry.getEvents().addHandler( socialScorer );
+			controller.addControlerListener( socialScorer );
+		}
+		else {
+			log.info( "do NOT add scorer for being together" );
+		}
+	}
+
+	public static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(
+			final ScoringFunctionConfigGroup scoringFunctionConf,
+			final Population population) {
+		switch ( scoringFunctionConf.getTogetherScoringForm() ) {
+			case linear:
+				return new GenericFactory<PersonOverlapScorer, Id>() {
+						@Override
+						public PersonOverlapScorer create( final Id id ) {
+							return new LinearOverlapScorer(
+									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() );
+						}
+					};
+			case logarithmic:
+				return new GenericFactory<PersonOverlapScorer, Id>() {
+						@Override
+						public PersonOverlapScorer create( final Id id ) {
+							final PersonImpl person = (PersonImpl) population.getPersons().get( id );
+							if ( person == null ) {
+								// eg transit agent
+								return new LinearOverlapScorer( 0 );
+							}
+							final Desires desires = person.getDesires();
+							final double typicalDuration = desires.getActivityDuration( "leisure" );
+							final double zeroDuration = typicalDuration * Math.exp( -10.0 / typicalDuration );
+							return new LogOverlapScorer(
+									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
+									typicalDuration,
+									zeroDuration);
+						}
+					};
+			default:
+				throw new RuntimeException( ""+scoringFunctionConf.getTogetherScoringForm() );
+		}
 	}
 }
 
