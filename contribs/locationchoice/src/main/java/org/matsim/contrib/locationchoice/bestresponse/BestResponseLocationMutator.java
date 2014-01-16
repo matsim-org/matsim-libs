@@ -96,6 +96,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	@Override
 	public final void run(final Plan plan) {
 		// if person is not in the analysis population
+		// TODO: replace this now by subpopulation!
 		if (Integer.parseInt(plan.getPerson().getId().toString()) > 
 		Integer.parseInt(super.scenario.getConfig().locationchoice().getIdExclusion())) return;
 

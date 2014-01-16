@@ -55,7 +55,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {		
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator(); // TODO: replace this now by SumScore 
 		
 		CharyparNagelActivityScoring scoringFunction ;
 		if ( usingConfigParamsForScoring ) {
