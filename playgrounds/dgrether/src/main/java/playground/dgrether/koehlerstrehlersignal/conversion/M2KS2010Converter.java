@@ -104,7 +104,7 @@ public class M2KS2010Converter {
 		
 		//gexf output for visualization
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
-		converter.convertAndWrite(ksNet, outputDirectory + "network_small_simplified.gexf");
+		converter.convertAndWrite(ksNet, outputDirectory + "network_small_simplified_ks2010_model.gexf"); //the former name was network_small_simplified.gexf which is misleading
 		
 		M2KS2010Zones2Commodities demandConverter = new M2KS2010Zones2Commodities(zones, idConverter);
 		DgCommodities commodities = demandConverter.convert(ksNet);
