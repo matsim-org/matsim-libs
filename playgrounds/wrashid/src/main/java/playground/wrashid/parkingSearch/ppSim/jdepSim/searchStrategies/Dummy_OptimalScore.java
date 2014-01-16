@@ -56,7 +56,11 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 		
 		
 		if (endOfLegReached) {
-			DebugLib.traceAgent(personId);
+			if (ZHScenarioGlobal.iteration==5){
+				DebugLib.traceAgent(personId);
+			}
+			
+			//DebugLib.traceAgent(personId);
 			if (!parkingFound.contains(personId)) {
 				parkingFound.add(personId);
 
@@ -69,12 +73,12 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 					double distance = 300;
 					Collection<Parking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),
 							1000);
-					Dummy_RandomSelection.removeInvalidParking(aem, parkings);
+					Dummy_RandomSelection.removeInvalidParkings(aem, parkings);
 					while (parkings.size() == 0) {
 						distance *= 2;
 						parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(), distance);
 					
-						Dummy_RandomSelection.removeInvalidParking(aem, parkings);
+						Dummy_RandomSelection.removeInvalidParkings(aem, parkings);
 					}
 
 					PriorityQueue<SortableMapObject<Parking>> priorityQueue = new PriorityQueue<SortableMapObject<Parking>>();

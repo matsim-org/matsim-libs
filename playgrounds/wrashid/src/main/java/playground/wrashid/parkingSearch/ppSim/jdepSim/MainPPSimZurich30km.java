@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
@@ -39,7 +40,10 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
+import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -53,10 +57,14 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.Desires;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
+import playground.wrashid.parkingChoice.infrastructure.ActInfo;
+import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TTMatrixBasedTravelTime;
@@ -70,6 +78,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSe
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndNoLawEnforcement;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ComparisonGarageCounts;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy7;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
@@ -126,11 +135,16 @@ public class MainPPSimZurich30km {
 
 		initGlobalReroute(scenario);
 		AgentWithParking.parkingManager = ParkingLoader.getParkingManagerZH(scenario.getNetwork(), Message.ttMatrix);
+		
+		if (ZHScenarioGlobal.loadBooleanParam("performCalibration")) {
+			addPrivateParkingAtEachActivityLocationWithCapacityZero(AgentWithParking.parkingManager);
+		}
+
 		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas((ScenarioImpl) scenario,
 				HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((ScenarioImpl) scenario));
-		
-		parkingPersonalBetas.externalWalkFactor=ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalWalkFactor");
-		parkingPersonalBetas.externalSearchFactor=ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalSearchFactor");
+
+		parkingPersonalBetas.externalWalkFactor = ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalWalkFactor");
+		parkingPersonalBetas.externalSearchFactor = ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalSearchFactor");
 
 		ParkingCostCalculatorZH parkingCostCalculatorZH = (ParkingCostCalculatorZH) AgentWithParking.parkingManager
 				.getParkingCostCalculator();
@@ -147,20 +161,24 @@ public class MainPPSimZurich30km {
 			log.info("iteration-" + iter + " starts");
 			ZHScenarioGlobal.iteration = iter;
 
+			if (ZHScenarioGlobal.loadBooleanParam("performCalibration")) {
+				performAutoCalibration();
+			}
+
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			EventWriterXML eventsWriter = new EventWriterXML(ZHScenarioGlobal.outputFolder + "events.xml.gz");
 			LegHistogram lh = new LegHistogram(300);
 			if (ZHScenarioGlobal.writeOutputInCurrentIteration() && ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
-					eventsManager.addHandler(lh);
-					eventsManager.addHandler(eventsWriter);
+				eventsManager.addHandler(lh);
+				eventsManager.addHandler(eventsWriter);
 
-					eventsManager.resetHandlers(0);
-					eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "events.xml.gz");
+				eventsManager.resetHandlers(0);
+				eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "events.xml.gz");
 
-					eventsManager.resetHandlers(0);
+				eventsManager.resetHandlers(0);
 
-					eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".events.xml.gz");
-				
+				eventsWriter.init(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".events.xml.gz");
+
 			}
 
 			agentsMessage.clear();
@@ -193,7 +211,7 @@ public class MainPPSimZurich30km {
 
 				}
 				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
-				
+
 				eventsWriter.reset(0);
 			}
 
@@ -206,12 +224,139 @@ public class MainPPSimZurich30km {
 			resetRoutes(scenario);
 			setParkingLinkIdToClosestActivity(scenario.getPopulation().getPersons().values());
 			log.info("number of numberOfTollAreaEntryEvents: " + AgentWithParking.numberOfTollAreaEntryEvents);
-			
+
 			log.info("iteration-" + iter + " ended");
 		}
-		
+
 		System.exit(0);
 
+	}
+
+	private static void addPrivateParkingAtEachActivityLocationWithCapacityZero(ParkingManagerZH parkingManager) {
+		// add only, if not only exists such a parking
+
+		System.out.println(parkingManager.getParkings().size());
+		// activity facility Id, activityType, parking facility id
+		TwoHashMapsConcatenated<Id, String, Id> privateParkingFacilityIdMapping = new TwoHashMapsConcatenated<Id, String, Id>();
+
+		for (Parking parking : parkingManager.getParkings()) {
+			if (parking.getId().toString().contains("private")) {
+				PrivateParking privateParking = (PrivateParking) parking;
+
+				privateParkingFacilityIdMapping.put(privateParking.getActInfo().getFacilityId(), privateParking.getActInfo()
+						.getActType(), parking.getId());
+			}
+		}
+
+		int j = 0;
+		for (Person p : ZHScenarioGlobal.scenario.getPopulation().getPersons().values()) {
+			Plan selectedPlan = p.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+
+			int i = 0;
+
+			while (i < planElements.size()) {
+				if (planElements.get(i) instanceof Activity) {
+					Activity act = (Activity) planElements.get(i);
+
+					if (privateParkingFacilityIdMapping.get(act.getFacilityId(), act.getType()) == null) {
+						ActInfo actInfo = new ActInfo(act.getFacilityId(), act.getType());
+						PrivateParking privateParking = new PrivateParking(act.getCoord(), actInfo);
+						privateParking.setParkingId(new IdImpl("privateParkings-x-" + j));
+						privateParking.setType("private");
+						j++;
+
+						privateParkingFacilityIdMapping.put(act.getFacilityId(), act.getType(), privateParking.getId());
+						parkingManager.getParkings().add(privateParking);
+					}
+				}
+				i++;
+			}
+		}
+
+		parkingManager.reset();
+
+		System.out.println(parkingManager.getParkings().size());
+		System.out.println();
+	}
+
+	private static void performAutoCalibration() {
+		Random rand = RandomNumbers.getGlobalbRandom();
+		// double
+		// countsScalingFactor=ZHScenarioGlobal.loadDoubleParam("ComparisonGarageCounts.countsScalingFactor")*rand.nextDouble()*0.2;
+
+		// ZHScenarioGlobal.config.setParam("parkingSearch",
+		// "ComparisonGarageCounts.countsScalingFactor",
+		// Double.toString(countsScalingFactor));
+
+		// log.info("countsScalingFactor=" + countsScalingFactor);
+
+		// TODO: print private parking assignment later here
+
+		double distance = 100;
+		LinkedList<Parking> parkings = AgentWithParking.parkingManager.getParkings();
+
+		EnclosingRectangle rect = new EnclosingRectangle();
+
+		for (Parking parking : parkings) {
+			rect.registerCoord(parking.getCoord());
+		}
+		QuadTree<Parking> privateParkingsQuadTree = (new QuadTreeInitializer<Parking>()).getQuadTree(rect);
+		QuadTree<Parking> garageParkingsQuadTree = (new QuadTreeInitializer<Parking>()).getQuadTree(rect);
+
+		for (Parking parking : parkings) {
+			if (parking.getId().toString().contains("private")) {
+				privateParkingsQuadTree.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
+			}
+			
+			if (parking.getId().toString().contains("gp")) {
+				garageParkingsQuadTree.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
+			}
+		}
+
+		for (Parking parking : parkings) {
+			if (parking.getId().toString().contains("private")) {
+				Collection<Parking> collection = privateParkingsQuadTree.get(parking.getCoord().getX(), parking.getCoord().getY(),
+						distance);
+
+//				LinkedList<Parking> remove = new LinkedList<Parking>();
+//				for (Parking p : collection) {
+//					if (p.getIntCapacity() == 0) {
+//						collection.removeAll(remove);
+//					}
+//				}
+				
+				Parking closestGP = garageParkingsQuadTree.get(parking.getCoord().getX(), parking.getCoord().getY());
+				
+				if (GeneralLib.getDistance(closestGP.getCoord(), parking.getCoord())<300){
+					if (ComparisonGarageCounts.relativeErrorCounts.containsKey(closestGP.getId()) && ComparisonGarageCounts.relativeErrorCounts.get(closestGP.getId())<0.5){
+						continue;
+					}
+				}
+				
+				
+				if (parking.getIntCapacity()==0){
+					continue;
+				}
+
+				if (collection.size() > 0) {
+					int i = rand.nextInt(collection.size());
+
+					for (Parking p : collection) {
+						i--;
+
+						if (i == 0) {
+							int cap = parking.getIntCapacity();
+							int keep = rand.nextInt(cap);
+							int giveAway = cap - keep;
+							parking.setCapacity(keep);
+							p.setCapacity(p.getIntCapacity() + giveAway);
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public static void initGlobalReroute(Scenario scenario) {

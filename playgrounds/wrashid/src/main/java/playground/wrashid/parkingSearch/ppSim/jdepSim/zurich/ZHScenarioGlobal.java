@@ -218,7 +218,7 @@ public class ZHScenarioGlobal {
 		file = new File(getItersFolderPath());
 		file.mkdir();
 
-		ComparisonGarageCounts.init();
+		//ComparisonGarageCounts.init();
 
 	}
 

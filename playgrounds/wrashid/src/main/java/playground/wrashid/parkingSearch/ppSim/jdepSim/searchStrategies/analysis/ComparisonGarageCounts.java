@@ -21,6 +21,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.StringMatrix;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -59,8 +61,11 @@ public class ComparisonGarageCounts {
 	private static double[] sumOfOccupancyCountsOfSelectedParkings;
 	private static HashMap<String, String> mappingOfParkingNameToParkingId;
 	private static DefaultBoxAndWhiskerCategoryDataset boxPlotDataSet=new DefaultBoxAndWhiskerCategoryDataset();
-
+	public static DoubleValueHashMap<Id> relativeErrorCounts=new DoubleValueHashMap<Id>();
+	
 	public static void logOutput(LinkedList<ParkingEventDetails> parkingEventDetails, String outputFileName) {
+		init();
+		
 		// Output file
 		log.info("starting log parking events");
 		
@@ -123,7 +128,7 @@ public class ComparisonGarageCounts {
 		log.info("finished log parking events");
 	}
 
-	public static void init() {
+	private static void init() {
 		String filePath = ZHScenarioGlobal.loadStringParam("ComparisonGarageCounts.garageParkingCountsFile");
 		Double countsScalingFactor = ZHScenarioGlobal.loadDoubleParam("ComparisonGarageCounts.countsScalingFactor");
 		
@@ -152,7 +157,12 @@ public class ComparisonGarageCounts {
 		
 	}
 
+	
 	public static void logRelativeError(LinkedList<ParkingEventDetails> parkingEventDetails, String outputFileName) {
+		int startIndex=28;
+	    int endIndex=76;
+	    
+	    Double countsScalingFactor = ZHScenarioGlobal.loadDoubleParam("ComparisonGarageCounts.countsScalingFactor");
 		
 		HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins=new HashMap<Id, ParkingOccupancyBins>();
 		
@@ -171,13 +181,13 @@ public class ComparisonGarageCounts {
 		HashMap<String, Double[]> occupancyOfAllSelectedParkings = SingleDayGarageParkingsCount
 				.getOccupancyOfAllSelectedParkings(countsMatrix);
 		
-		List relativeErrorList = new ArrayList();
+		List<Double> relativeErrorList = new ArrayList<Double>();
 		
 		for (String parkingName : selectedParkings) {
 			Double[] occupancyBins = occupancyOfAllSelectedParkings.get(parkingName);
-			double measuredOccupancy=0;
-			for (int i = 0; i < 96; i++) {
-				measuredOccupancy += occupancyBins[i];
+			double measuredOccupancySum=0;
+			for (int i = startIndex; i < endIndex; i++) {
+				measuredOccupancySum += countsScalingFactor *occupancyBins[i];
 			}
 			
 			Id parkingId = new IdImpl( mappingOfParkingNameToParkingId.get(parkingName));
@@ -186,15 +196,18 @@ public class ComparisonGarageCounts {
 			double simulatedOccupancySum=0;
 			
 			if (pob!=null){
-			for (int i = 0; i < 96; i++) {
+			for (int i = startIndex; i < endIndex; i++) {
 				simulatedOccupancySum += pob.getOccupancy()[i];
 			}
 			}
 			
 			double relativeError=-1;
-			if (measuredOccupancy!=0){
-				relativeError=Math.abs(simulatedOccupancySum-measuredOccupancy)/measuredOccupancy;
+			if (measuredOccupancySum!=0){
+				relativeError=Math.abs(simulatedOccupancySum-measuredOccupancySum)/measuredOccupancySum;
 			}
+			
+			//System.out.println(parkingId + ": " +  relativeError);
+			relativeErrorCounts.put(parkingId, relativeError);
 			
 			relativeErrorList.add(new Double(relativeError));
 		}
@@ -218,6 +231,16 @@ public class ComparisonGarageCounts {
 
 		}
 		
+        
+        // print median rel. error:
+        Double[] numArray = relativeErrorList.toArray(new Double[0]); 
+        Arrays.sort(numArray);
+        double median;
+        if (numArray.length%2==0)
+            median = ((double)numArray[numArray.length/2] + (double)numArray[numArray.length/2+1])/2;
+        else
+            median = (double) numArray[numArray.length/2];
+        log.info("median rel. error:" + median);
 	}
 
 

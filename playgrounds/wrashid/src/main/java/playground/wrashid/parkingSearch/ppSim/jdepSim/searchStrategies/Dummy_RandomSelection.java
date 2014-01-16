@@ -55,13 +55,13 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 			if (isInvalidParking(aem, parkingId)) {
 				double distance=300;
 				Collection<Parking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),1000);
-				removeInvalidParking(aem, parkings);
+				removeInvalidParkings(aem, parkings);
 				
 				while (parkings.size()==0){
 					distance*=2;
 					parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),distance);
 				
-					removeInvalidParking(aem, parkings);
+					removeInvalidParkings(aem, parkings);
 				}
 				
 				random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
@@ -83,16 +83,15 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 		
 	}
 
-	public static void removeInvalidParking(AgentWithParking aem, Collection<Parking> parkings) {
-		Parking invalidParking=null;
+	public static void removeInvalidParkings(AgentWithParking aem, Collection<Parking> parkings) {
+		LinkedList<Parking> removeList=new LinkedList<Parking>();
 		removePrivateParkings(parkings);
 		for (Parking parking:parkings){
 			if (isInvalidParking(aem, parking.getId())) {
-				invalidParking=parking;
-				break;
+				removeList.add(parking);
 			}
 		}
-		parkings.remove(invalidParking);
+		parkings.removeAll(removeList);
 	}
 	
 	public static void removePrivateParkings(Collection<Parking> parkings){
