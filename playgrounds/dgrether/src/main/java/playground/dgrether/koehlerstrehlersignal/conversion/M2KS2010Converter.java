@@ -27,6 +27,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -37,6 +40,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCommodityUtils;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.KS2010ModelWriter;
+import playground.dgrether.koehlerstrehlersignal.data.TtCommodityAsMatsimPopWriter;
 import playground.dgrether.koehlerstrehlersignal.demand.M2KS2010Zones2Commodities;
 import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
@@ -152,7 +156,9 @@ public class M2KS2010Converter {
 		
 		DgCommodityUtils.write2Shapefile(commodities, newMatsimNetwork, crs,  shapeFileDirectory + "commodities.shp");
 
+		// write ks-model and the same commodities as matsim population
 		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + filename);
+		new TtCommodityAsMatsimPopWriter().writePlansFile(this.network, idConverter, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
 		writeStats(ksNet, commodities, totalFlow, removedCommodities);
 		
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");

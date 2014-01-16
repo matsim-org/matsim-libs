@@ -54,6 +54,24 @@ public class DgIdConverter {
 		return idPool.createId(idString);
 	}
 	
+	public Id convertToCrossingNodeId2LinkId(Id toCrossingNodeId){
+		String sid = toCrossingNodeId.toString();
+		if (sid.endsWith("99")){
+			Id id = new IdImpl(sid.substring(0, sid.length() - 2));
+			return id;
+		}
+		throw new IllegalStateException("Can not convert " + sid + " to link id");
+	}
+	
+	public Id convertFromCrossingNodeId2LinkId(Id fromCrossingNodeId){
+		String sid = fromCrossingNodeId.toString();
+		if (sid.endsWith("11")){
+			Id id = new IdImpl(sid.substring(0, sid.length() - 2));
+			return id;
+		}
+		throw new IllegalStateException("Can not convert " + sid + " to link id");
+	}
+	
 	public  Id convertFromLinkIdToLinkId2LightId(Id fromLinkId, Id fromLaneId, Id toLinkId){
 		Id id =  null;
 		if (fromLaneId == null){
