@@ -36,7 +36,8 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
-import org.matsim.signalsystems.data.SignalsScenarioWriter;
+
+import playground.dgrether.DgPaths;
 
 
 /**
@@ -130,9 +131,14 @@ public class RunResultsLoader {
 	
 	public SignalsData getSignals() {
 		if (this.signals == null) {
-			String systemsfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS );
-			String groupsfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_GROUPS);
-			String controlfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_CONTROL);
+			//The next 3 lines should work with recent matsim revisions
+//			String systemsfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS );
+//			String groupsfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_GROUPS);
+//			String controlfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_CONTROL);
+			//The next 3 lines are only required by old matsim revisions that do not write the full scenario to the output folder
+			String systemsfile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems_no_13.xml";
+			String groupsfile =  DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups_no_13.xml";
+			String controlfile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_no_13.xml";
 			this.signals = loadSignals(systemsfile, groupsfile, controlfile);
 		}
 		return this.signals;
