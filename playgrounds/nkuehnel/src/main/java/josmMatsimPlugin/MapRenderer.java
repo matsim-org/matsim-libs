@@ -64,7 +64,6 @@ public class MapRenderer extends StyledMapRenderer {
 						return;
 					}
 				}
-
 			}
 		}
 		super.drawWay(way, color, line, dashes, dashedColor, offset,

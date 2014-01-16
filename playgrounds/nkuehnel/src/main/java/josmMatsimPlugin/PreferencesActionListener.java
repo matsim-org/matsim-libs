@@ -1,15 +1,20 @@
 package josmMatsimPlugin;
 
+import static org.openstreetmap.josm.tools.I18n.tr;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 import org.openstreetmap.josm.Main;
 
-public class PreferencesActionListener implements ActionListener, ItemListener {
+public class PreferencesActionListener implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -47,14 +52,27 @@ public class PreferencesActionListener implements ActionListener, ItemListener {
 			} else {
 				Main.pref.put("matsim_cleanNetwork", true);
 			}
-		} 
+		} else if (e.getActionCommand().equals("convertDefaults")) {
+			OsmConvertDefaultsDialog dialog = new OsmConvertDefaultsDialog();
+			JOptionPane pane = new JOptionPane(dialog,
+					JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+			dialog.setOptionPane(pane);
+			JDialog dlg = pane.createDialog(Main.parent, tr("Defaults"));
+			dlg.setAlwaysOnTop(true);
+			dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+			dlg.setVisible(true);
+			if (pane.getValue() != null) {
+				if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
+					dialog.handleInput();
+				}
+			}
+			dlg.dispose();
+		} else if (e.getActionCommand().equals("exportSystem")) {
+			Main.pref.put("matsim_exportSystem", (String) Preferences.exportSystem.getSelectedItem());
+		} else if (e.getActionCommand().equals("importSystem")) {
+			Main.pref.put("matsim_importSystem", (String) Preferences.importSystem.getSelectedItem());
+		}
 	}
 
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if (e.getStateChange() == ItemEvent.SELECTED) {
-			Main.pref.put("matsim_exportSystem", (String) e.getItem());
-		}
-		
-	}
 }

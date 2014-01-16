@@ -102,7 +102,7 @@ public class ExportTask extends PleaseWaitRunnable
 					network.addLink(newLink);
 				}
 			} else {
-				Converter converter = new Converter(((OsmDataLayer) layer).data, network, Defaults.defaults, Defaults.keepPaths);
+				Converter converter = new Converter(((OsmDataLayer) layer).data, network);
 				converter.convert();
 				if (!(targetSystem.equals("WGS84"))) {
 					for(Node node: ((NetworkImpl) network).getNodes().values()) {

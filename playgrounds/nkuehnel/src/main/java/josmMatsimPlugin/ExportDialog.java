@@ -35,15 +35,12 @@ public class ExportDialog extends JPanel implements ActionListener {
 
 	private JOptionPane optionPane;
 
-	private final JLabel coordSystemLabel = new JLabel(tr("Coordinate System:"));
 	private final JLabel saveToLabel = new JLabel(tr("Save to:"));
 	protected final static JTextField exportFilePath = new JTextField(
 			Main.pref.get("matsim_exportFolder",
 					System.getProperty("user.home"))
 					+ "\\josm_matsim_export");
 	private final JButton fileChooser = new JButton("Choose..");
-	private final JButton defaults = new JButton("set OSM defaults");
-	private final JButton filter = new JButton("set filter");
 
 	public ExportDialog() {
 
@@ -55,13 +52,9 @@ public class ExportDialog extends JPanel implements ActionListener {
 		c.weightx = 0.8;
 		c.fill = GridBagConstraints.HORIZONTAL;
 
-		c.gridx = 0;
-		c.gridy = 0;
-		add(coordSystemLabel, c);
-
 		c.weightx = 1;
 		c.gridx = 0;
-		c.gridy = 1;
+		c.gridy = 0;
 		add(saveToLabel, c);
 
 		c.gridwidth = 2;
@@ -72,26 +65,9 @@ public class ExportDialog extends JPanel implements ActionListener {
 		c.gridx = 3;
 		add(fileChooser, c);
 
-		c.gridy = 2;
-		c.gridx = 1;
-		add(defaults, c);
-
-		c.gridx = 2;
-		add(filter, c);
-
-		if (Main.main.getActiveLayer() instanceof NetworkLayer)
-			filter.setEnabled(false);
-		if (Main.main.getActiveLayer() instanceof NetworkLayer)
-			defaults.setEnabled(false);
-
 		fileChooser.setActionCommand("fileChooser");
 		fileChooser.addActionListener(this);
 
-		defaults.setActionCommand("defaults");
-		defaults.addActionListener(this);
-
-		filter.setActionCommand("filter");
-		filter.addActionListener(this);
 	}
 
 	public void setOptionPane(JOptionPane optionPane) {
@@ -117,40 +93,7 @@ public class ExportDialog extends JPanel implements ActionListener {
 				exportFilePath.setText(chooser.getSelectedFile()
 						.getAbsolutePath());
 			}
-		} else if (e.getActionCommand().equals("defaults")) {
-			OsmExportDefaultsDialog dialog = new OsmExportDefaultsDialog();
-			JOptionPane pane = new JOptionPane(dialog,
-					JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-			dialog.setOptionPane(pane);
-			JDialog dlg = pane.createDialog(Main.parent, tr("Defaults"));
-			dlg.setAlwaysOnTop(true);
-			dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-			dlg.setVisible(true);
-			if (pane.getValue() != null) {
-				if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
-					Defaults.handleInput(dialog.getInput());
-				}
-			}
-			dlg.dispose();
-		} else if (e.getActionCommand().equals("filter")) {
-			FilterDialog dialog = new FilterDialog();
-			JOptionPane pane = new JOptionPane(dialog,
-					JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-			dialog.setOptionPane(pane);
-			JDialog dlg = pane.createDialog(Main.parent, tr("Filter:"));
-			dlg.setAlwaysOnTop(true);
-			dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-			dlg.setVisible(true);
-			if (pane.getValue() != null) {
-				if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
-					// do something
-				}
-			}
-			dlg.dispose();
 		}
-
 	}
 
 }

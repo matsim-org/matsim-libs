@@ -38,14 +38,16 @@ import org.xml.sax.SAXException;
  * 
  */
 public class MATSimPlugin extends Plugin {
-	private MATSimAction Action;
+	private MATSimAction MATSimAction;
 	protected static MATSimToggleDialog toggleDialog;
 
 	public MATSimPlugin(PluginInformation info) throws IOException,
 			SAXException {
 		super(info);
-		Action = new MATSimAction();
-		Main.main.menu.toolsMenu.add(Action);
+		MATSimAction = new MATSimAction();
+		Main.main.menu.toolsMenu.add(MATSimAction.getExportAction());
+		Main.main.menu.toolsMenu.add(MATSimAction.getImportAction());
+		Main.main.menu.toolsMenu.add(MATSimAction.getNewNetworkAction());
 
 		Reader reader = new InputStreamReader(this
 				.getPluginResourceClassLoader().getResourceAsStream(
@@ -89,7 +91,9 @@ public class MATSimPlugin extends Plugin {
 		factory.register(MapRenderer.class, "My map renderer",
 				"This is the MATSim map renderer");
 		factory.activate(MapRenderer.class);
-
+		
+		OsmConvertDefaults.load();
+		
 	}
 
 	/**
@@ -101,7 +105,6 @@ public class MATSimPlugin extends Plugin {
 			toggleDialog = new MATSimToggleDialog();
 			Main.map.addToggleDialog(toggleDialog);
 			MapView.addLayerChangeListener(toggleDialog);
-//			JOptionPane.showMessageDialog(Main.main.parent, "Hint:\nUse the middle mouse button when selecting\nto cycle through overlapping ways.");
 		}
 	}
 

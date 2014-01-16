@@ -25,54 +25,38 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * @author nkuehnel
  * 
  */
-public class ImportDialog extends JPanel
-{
+public class ImportDialog extends JPanel {
 	// the JOptionPane that contains this dialog. required for the closeDialog()
 	// method.
 	private JOptionPane optionPane;
+	protected static JTextField path = new JTextField();
 
-	public ImportDialog()
-	{
-		//--------------layout---------------------------------------------
-		
+	public ImportDialog() {
 		GridBagConstraints c = new GridBagConstraints();
 		setLayout(new GridBagLayout());
 
-		//--------------displayed elements---------------------------------
+		final JLabel openLabel = new JLabel(tr("Open:"));
 		
-		final JLabel coordSystemLabel = new JLabel(tr("original coord system:"));
-		final JLabel openLabel =new JLabel(tr("Open:"));
-		final JTextField path = new JTextField(Defaults.importPath);
 		JButton fileChooser = new JButton("Choose..");
 
-		//--------------arrangement of elements-----------------------------
-		
 		c.gridwidth = 1;
 		c.weightx = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
 		c.gridy = 0;
-		add(coordSystemLabel, c);
-		
 
-		c.gridx = 0;
-		c.gridy = 1;
 		add(openLabel, c);
-		
+
 		c.gridwidth = 2;
 		c.gridx = 1;
 		add(path, c);
-		
+
 		c.gridwidth = 1;
 		c.gridx = 3;
 		add(fileChooser, c);
-		
-		//--------------action listeners------------------------------------
 
-		fileChooser.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(java.awt.event.ActionEvent e)
-			{
+		fileChooser.addActionListener(new ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent e) {
 				JFileChooser chooser = new JFileChooser(System
 						.getProperty("user.home"));
 				chooser.setDialogTitle("MATSim-Export");
@@ -85,19 +69,14 @@ public class ImportDialog extends JPanel
 				chooser.setSelectedFile(file);
 				int result = chooser.showOpenDialog(ImportDialog.this);
 				if (result == JFileChooser.APPROVE_OPTION
-						&& chooser.getSelectedFile().getAbsolutePath() != null)
-				{
-					Defaults.importPath = chooser.getSelectedFile()
-							.getAbsolutePath();
-					path.setText(Defaults.importPath);
+						&& chooser.getSelectedFile().getAbsolutePath() != null) {
+					path.setText(chooser.getSelectedFile().getAbsolutePath());
 				}
 			}
 		});
-		
 	}
 
-	public void setOptionPane(JOptionPane optionPane)
-	{
+	public void setOptionPane(JOptionPane optionPane) {
 		this.optionPane = optionPane;
 	}
 

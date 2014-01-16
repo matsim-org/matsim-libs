@@ -2,27 +2,18 @@ package josmMatsimPlugin;
 
 import static org.openstreetmap.josm.tools.I18n.tr;
 
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.preferences.DefaultTabPreferenceSetting;
 import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
@@ -50,14 +41,22 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 	protected final static JCheckBox cleanNetwork = new JCheckBox(
 			"Clean network");
 	
-	private JLabel coordSystemLabel = new JLabel("Target coord system: ");
+	private JLabel targetCoordSystemLabel = new JLabel("Target coord system: ");
+	
 	private static String[] coordSystems = { "WGS84", "ATLANTIS",
 			"CH1903_LV03", "GK4", "WGS84_UTM47S", "WGS84_UTM48N",
 			"WGS84_UTM35S", "WGS84_UTM36S", "WGS84_Albers", "WGS84_SA_Albers",
 			"WGS84_UTM33N", "DHDN_GK4", "WGS84_UTM29N", "CH1903_LV03_GT",
 			"WGS84_SVY21", "NAD83_UTM17N", "WGS84_TM" };
+	private JButton convertingDefaults = new JButton ("Set converting defaults");
 	
 	protected final static JComboBox exportSystem = new JComboBox(coordSystems);
+	
+	// Import Tab
+	protected final static JComboBox importSystem = new JComboBox(coordSystems);
+	private JLabel originCoordSystemLabel = new JLabel("Origin coord system: ");
+	
+	
 
 	public static class Factory implements PreferenceSettingFactory {
 		@Override
@@ -85,10 +84,18 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 				&& Main.pref.getBoolean("matsim_renderer", true));
 		renderMatsim.setSelected(Main.pref.getBoolean("matsim_renderer", true));
 
+		cOptions.anchor = GridBagConstraints.NORTHWEST;
+		
+		cOptions.insets = new Insets(4, 4, 4, 4);
+		
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
 		pnl.add(renderMatsim, cOptions);
+		
+		
 		cOptions.gridx = 1;
+		cOptions.weightx = 1.0;
+		cOptions.weighty = 1.0;
 		pnl.add(showIds, cOptions);
 
 		return pnl;
@@ -113,15 +120,20 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		
 		exportSystem.setSelectedItem(Main.pref.get("matsim_exportSystem",
 				"WGS84"));
-		exportSystem.addItemListener(listener);
+		exportSystem.setActionCommand("exportSystem");
+		exportSystem.addActionListener(listener);
 		
+		convertingDefaults.setActionCommand("convertDefaults");
+		convertingDefaults.addActionListener(listener);
 
+		cOptions.anchor = GridBagConstraints.NORTHWEST;
+		
 		cOptions.insets = new Insets(4, 4, 4, 4);
 
 		cOptions.gridx = 0;
 		cOptions.gridy = 0;
 		pnl.add(defaultExportFolder, cOptions);
-
+		
 		cOptions.gridy = 1;
 		pnl.add(fileChooser, cOptions);
 
@@ -136,8 +148,46 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		pnl.add(cleanNetwork, cOptions);
 		
 		cOptions.gridy = 6;
+		pnl.add(targetCoordSystemLabel, cOptions);
+		cOptions.gridx = 1;
+		cOptions.weightx = 1.0;
 		pnl.add(exportSystem, cOptions);
+		
+		cOptions.weightx = 0.0;
+		cOptions.weighty = 1.0;
+		cOptions.gridx = 0;
+		cOptions.gridy = 7;
+		pnl.add(convertingDefaults, cOptions);
 
+		return pnl;
+	}
+	
+	private JPanel buildImportPanel() {
+		JPanel pnl = new JPanel(new GridBagLayout());
+		GridBagConstraints cOptions = new GridBagConstraints();
+
+		optionsLabel.setFont(optionsLabel.getFont().deriveFont(Font.BOLD));
+
+		importSystem.setSelectedItem(Main.pref.get("matsim_importSystem",
+				"WGS84"));
+		importSystem.setActionCommand("importSystem");
+		importSystem.addActionListener(listener);
+		
+		cOptions.anchor = GridBagConstraints.NORTHWEST;
+		
+		cOptions.insets = new Insets(4, 4, 4, 4);
+
+		cOptions.gridy = 0;
+		cOptions.gridx = 0;
+		pnl.add(optionsLabel, cOptions);
+
+		cOptions.gridy = 1;
+		pnl.add(originCoordSystemLabel, cOptions);
+		cOptions.gridx = 1;
+		cOptions.weightx = 1.0;
+		cOptions.weighty = 1.0;
+		pnl.add(importSystem, cOptions);
+		
 		return pnl;
 	}
 
@@ -145,6 +195,7 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		JTabbedPane pane = getTabPane();
 		pane.addTab(tr("Visualization"), buildVisualizationPanel());
 		pane.addTab(tr("Export"), buildExportPanel());
+		pane.addTab(tr("Import"), buildImportPanel());
 		return pane;
 	}
 
@@ -158,7 +209,7 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		PreferencePanel panel = gui.createPreferenceTab(this);
 		panel.add(buildContentPane(), gc);
 	}
-
+	
 	@Override
 	public boolean ok() {
 		// TODO Auto-generated method stub

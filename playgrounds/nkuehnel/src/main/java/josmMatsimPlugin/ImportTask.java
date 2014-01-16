@@ -85,14 +85,14 @@ public class ImportTask extends PleaseWaitRunnable
 			OsmTransferException, UncheckedIOException
 	{
 		DataSet dataSet = new DataSet();
-		
+		String importSystem = Main.pref.get("matsim_importSystem", "WGS84");
 		CoordinateTransformation ct = TransformationFactory
-				.getCoordinateTransformation(Defaults.originSystem,
+				.getCoordinateTransformation(importSystem,
 						TransformationFactory.WGS84);
 		
 		Config config= ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(Defaults.importPath);
+		new MatsimNetworkReader(scenario).readFile(ImportDialog.path.getText());
 		Network network = NetworkImpl.createNetwork();
 		
 		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
@@ -102,7 +102,7 @@ public class ImportTask extends PleaseWaitRunnable
 			Coord tmpCoor= node.getCoord();
 			LatLon coor;
 			
-			if(Defaults.originSystem.equals("WGS84"))
+			if(importSystem.equals("WGS84"))
 			{
 				coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
 			}
@@ -148,8 +148,8 @@ public class ImportTask extends PleaseWaitRunnable
 			way2Links.put(way, Collections.singletonList(newLink));
 		}
 
-		layer = new NetworkLayer(dataSet, Defaults.importPath, new File(Defaults.importPath), network, Defaults.originSystem);
-		dataSet.addDataSetListener(new NetworkListener(layer, way2Links, Defaults.originSystem));
+		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(), new File(ImportDialog.path.getText()), network, importSystem);
+		dataSet.addDataSetListener(new NetworkListener(layer, way2Links, importSystem));
 	}
 
 	
