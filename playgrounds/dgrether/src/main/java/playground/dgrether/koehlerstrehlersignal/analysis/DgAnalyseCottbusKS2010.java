@@ -235,7 +235,7 @@ public class DgAnalyseCottbusKS2010 {
 			compareWithBaseCaseResult(r, baseResult);
 			
 			if (! r.runInfo.baseCase && r.extent.createPersonDiff) {
-//				this.createAndWritePersonDiff(baseResult, r);
+				this.createAndWritePersonDiff(baseResult, r);
 //				this.createAndWriteSimSimComparison(baseResult, r);
 				log.warn("sim sim compare currently disabled");
 			}
@@ -262,7 +262,7 @@ public class DgAnalyseCottbusKS2010 {
 		
 		Network n = baseResult.runLoader.getNetwork();
 		Population pop = baseResult.runLoader.getPopulation();
-		String outDir = "/media/data/work/repos/shared-svn/projects/cottbus/cb2ks2010/diffs/";
+		String outDir = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/diffs/";
 		File out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/");
 		Population newPop = this.getFilteredPopulation(pop, disattractedPersonsIds);
 		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, Cottbus2KS2010.CRS, out.getAbsolutePath());
@@ -517,7 +517,7 @@ public class DgAnalyseCottbusKS2010 {
 		
 		e = new Extent();
 		e.name = "all";
-		e.createPersonDiff = true;
+		e.createPersonDiff = false;
 		l.add(e);
 		return l;
 	}
