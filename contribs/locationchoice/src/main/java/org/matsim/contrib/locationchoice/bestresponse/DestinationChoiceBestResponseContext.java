@@ -40,9 +40,11 @@ import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -145,11 +147,19 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 				log.error("unsuccessful prefs reading from files!\n" + prefsFileName);
 			}
 		} else {
-			log.warn("prefs are taken from the config as there is no preferences file specified \n");
+			log.warn("prefs are taken from the config and if available from the desires as there is no preferences file specified \n");
 			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
+					PersonImpl person = (PersonImpl)p;
+					Desires desires = person.getDesires();					
+					if (desires != null) {
+						// hä? in the desires, only the typical duration can be specified. need to get the rest from the config anyway, or from where else?
+						prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), desires.getActivityDuration(activityParams.getType()));
+					} else {				
+						prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), activityParams.getTypicalDuration());
+						
+					}
 					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getType(), activityParams.getLatestStartTime());
-					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), activityParams.getTypicalDuration());
 					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getType(), activityParams.getEarliestEndTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getType(), activityParams.getMinimalDuration());
 				}
