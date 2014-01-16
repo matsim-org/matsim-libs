@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -74,6 +75,32 @@ public class PopulationFromSightings {
 	public static void createPopulationWithEndTimesAtLastSightingsAndStayAtHomePlan(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
 		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
 			Id personId = sightingsPerPerson.getKey();
+			List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
+			Person person = scenario.getPopulation().getFactory().createPerson(personId);
+			Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
+					sightingsForThisPerson);
+			person.addPlan(plan1);
+			Plan plan2 = scenario.getPopulation().getFactory().createPlan();
+			person.addPlan(plan2);
+			person.setSelectedPlan(plan1);
+			scenario.getPopulation().addPerson(person);
+		}
+	}
+	
+	public static void createPopulationWithEndTimesAtLastSightingsAndAdditionalInflationPopulation(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) {
+		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
+			Id personId = sightingsPerPerson.getKey();
+			List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
+			Person person = scenario.getPopulation().getFactory().createPerson(personId);
+			Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,
+					sightingsForThisPerson);
+			person.addPlan(plan1);
+			Plan plan2 = scenario.getPopulation().getFactory().createPlan();
+			person.addPlan(plan2);
+			scenario.getPopulation().addPerson(person);
+		}
+		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
+			Id personId = new IdImpl("I_" + sightingsPerPerson.getKey().toString());
 			List<Sighting> sightingsForThisPerson = sightingsPerPerson.getValue();
 			Person person = scenario.getPopulation().getFactory().createPerson(personId);
 			Plan plan1 = createPlanWithEndTimeAtLastSighting(scenario, zones,

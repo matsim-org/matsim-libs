@@ -9,14 +9,17 @@ import java.util.Map;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
-import org.matsim.contrib.cadyts.general.CadytsPlanUtils;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
+import org.matsim.contrib.cadyts.general.ExpBetaPlanSelectorWithCadytsPlanRegistration;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -25,6 +28,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.replanning.PlanStrategy;
@@ -32,6 +36,9 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -44,7 +51,74 @@ import com.telmomenezes.jfastemd.Signature;
 
 import d4d.Sighting;
 
+
+//		double varianceScale = 0.1;
+// matsimCalibrator.setVarianceScale(varianceScale);
+// matsimCalibrator.setMinStddev(25.*varianceScale, TYPE.FLOW_VEH_H);
+// matsimCalibrator.setMinStddev(1, TYPE.COUNT_VEH);
+
 public class CompareMain {
+	
+	private static final class ZeroScoringFunctionFactory implements
+			ScoringFunctionFactory {
+		@Override
+		public ScoringFunction createNewScoringFunction(Plan plan) {
+			return new ScoringFunction() {
+
+				@Override
+				public void handleActivity(Activity activity) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void handleLeg(Leg leg) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void agentStuck(double time) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void addMoney(double amount) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void finish() {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public double getScore() {
+					return 0;
+				}
+
+				@Override
+				public void handleEvent(Event event) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			};
+		}
+	}
+
+	static class Result {
+		
+		VolumesAnalyzer volumes;
+		
+		Scenario scenario;
+
+		CadytsContext context;
+		
+	}
 
 	private static class VolumeOnLinkFeature implements Feature {
 
@@ -85,13 +159,26 @@ public class CompareMain {
 		cdrVolumes = runWithTwoPlansAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
 	}
 	
-	public void runWithOnePlanAndCadyts() {
+	public Result runWithOnePlanAndCadyts() {
 		ticker.finish();
 		callProcess.dump();
 		List<Sighting> sightings = callProcess.getSightings();
 
 		Counts counts = volumesToCounts(groundTruthVolumes);
-		cdrVolumes = runWithOnePlanAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
+		Result result = runWithOnePlanAndCadyts(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
+		cdrVolumes = result.volumes;
+		return result;
+	}
+	
+	public Result runWithOnePlanAndCadytsAndInflation() {
+		ticker.finish();
+		callProcess.dump();
+		List<Sighting> sightings = callProcess.getSightings();
+
+		Counts counts = volumesToCounts(groundTruthVolumes);
+		Result result = runWithOnePlanAndCadytsAndInflation(scenario.getNetwork(), linkToZoneResolver, sightings, counts);
+		cdrVolumes = result.volumes;
+		return result;
 	}
 	
 	public void runOnceWithSimplePlans() {
@@ -325,7 +412,7 @@ public class CompareMain {
 		return controler.getVolumes();
 	}
 
-	public static VolumesAnalyzer runWithOnePlanAndCadyts(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, Counts counts) {
+	public static Result runWithOnePlanAndCadyts(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, Counts counts) {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		sightingParam.setTypicalDuration(30.0 * 60);
@@ -336,7 +423,7 @@ public class CompareMain {
 		config.planCalcScore().setConstantCar(0);
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(100);
 		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(100);
 		tmp.setStorageCapFactor(100);
@@ -373,6 +460,7 @@ public class CompareMain {
 		final CadytsContext context = new CadytsContext(config, counts) ;
 		Controler controler = new Controler(scenario2);
 		controler.setOverwriteFiles(true);
+		controler.setScoringFunctionFactory(new ZeroScoringFunctionFactory());
 		controler.addControlerListener(context);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
@@ -384,19 +472,106 @@ public class CompareMain {
 			}} ) ;
 		controler.setCreateGraphs(false);
 		controler.run();
-		for (Person person : scenario2.getPopulation().getPersons().values()) {
-			double score0 = calcCadytsScore(context, person.getPlans().get(0));
-			double score1 = calcCadytsScore(context, person.getPlans().get(1));
-			// double score1 = 0;
-			System.out.printf("%f\t%f\n", score0, score1);
+		
+		Result result = new Result();
+		result.volumes = controler.getVolumes();
+		result.scenario = scenario2;
+		result.context = context;
+		return result;
+	}
+	
+	public static Result runWithOnePlanAndCadytsAndInflation(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, Counts counts) {
+		final Config config = ConfigUtils.createConfig();
+		ActivityParams sightingParam = new ActivityParams("sighting");
+		sightingParam.setTypicalDuration(30.0 * 60);
+		config.planCalcScore().addActivityParams(sightingParam);
+		config.planCalcScore().setTraveling_utils_hr(-6);
+		config.planCalcScore().setPerforming_utils_hr(0);
+		config.planCalcScore().setTravelingOther_utils_hr(-6);
+		config.planCalcScore().setConstantCar(0);
+		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
+		config.planCalcScore().setWriteExperiencedPlans(true);
+		config.controler().setLastIteration(300);
+		QSimConfigGroup tmp = config.qsim();
+		tmp.setFlowCapFactor(100);
+		tmp.setStorageCapFactor(100);
+		tmp.setRemoveStuckVehicles(false);
+		
+		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+		stratSets.setModuleName("ccc") ;
+		stratSets.setProbability(1.) ;
+		config.strategy().addStrategySettings(stratSets) ;
+		StrategySettings random = new StrategySettings(new IdImpl(2));
+		random.setModuleName(Selector.SelectRandom.toString()) ;
+		random.setProbability(0.1) ;
+		config.strategy().addStrategySettings(random) ;
+
+		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario2.setNetwork(network);
+
+ 
+
+		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
+		for (Sighting sighting : sightings) {
+
+			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
+			if (sightingsOfPerson == null) {
+				sightingsOfPerson = new ArrayList<Sighting>();
+				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
+
+			}
+			System.out.println(sighting.getCellTowerId().toString());
+
+			sightingsOfPerson.add(sighting);
 		}
-		return controler.getVolumes();
+
+
+		PopulationFromSightings.createPopulationWithEndTimesAtLastSightingsAndAdditionalInflationPopulation(scenario2, linkToZoneResolver, allSightings);
+		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
+
+		final CadytsContext context = new CadytsContext(config, counts) ;
+	
+		Controler controler = new Controler(scenario2);
+		controler.setOverwriteFiles(true);
+		controler.addControlerListener(context);
+		// controler.setScoringFunctionFactory(new ZeroScoringFunctionFactory());
+		
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+
+			@Override
+			public ScoringFunction createNewScoringFunction(Plan plan) {
+				SumScoringFunction sumScoringFunction = new SumScoringFunction();
+				CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(plan, config, context);
+		//		scoringFunction.setWeightOfCadytsCorrection(10.0);
+				sumScoringFunction.addScoringFunction(scoringFunction);
+				return sumScoringFunction;
+			}
+			
+		});
+		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+				// KeepSelected planSelector = new KeepSelected();
+				// CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,context);
+				// planSelector.setCadytsWeight(100000);
+				// PlanSelectionByCadyts<Link> planSelector = new PlanSelectionByCadyts<Link>(1.0, context);
+				ExpBetaPlanSelectorWithCadytsPlanRegistration planSelector = new ExpBetaPlanSelectorWithCadytsPlanRegistration(1.0, context);
+				return new PlanStrategyImpl(planSelector);
+			}} ) ;
+		controler.setCreateGraphs(false);
+		controler.run();
+		
+		Result result = new Result();
+		result.volumes = controler.getVolumes();
+		result.scenario = scenario2;
+		result.context = context;
+		return result;
 	}
 
-	private static double calcCadytsScore(final CadytsContext context, Plan plan) {
+	public static double calcCadytsScore(final CadytsContext context, Plan plan) {
 		cadyts.demand.Plan<Link> currentPlanSteps = context.getPlansTranslator().getPlanSteps(plan);
 		double currentPlanCadytsCorrection = context.getCalibrator().calcLinearPlanEffect(currentPlanSteps); // / this.beta;
-		CadytsPlanUtils.printCadytsPlan(currentPlanSteps);
+		// CadytsPlanUtils.printCadytsPlan(currentPlanSteps);
 		return currentPlanCadytsCorrection;
 	}
 	
