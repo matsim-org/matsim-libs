@@ -2,18 +2,22 @@ package playground.dhosse.frequencyBasedPt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -35,6 +39,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  */
 public class TransitScheduleSimplifier{
+	
+	private TransitSchedule transitSchedule;
+	private TransitSchedule mergedSchedule;
+	
+	private List<TransitStopFacility> checkedFacilities = new ArrayList<TransitStopFacility>();
+	
+	private int cnt = 0;
 	
 	public static TransitSchedule mergeEqualRouteProfiles(TransitSchedule schedule, String outputDirectory){
 		
@@ -361,7 +372,7 @@ public class TransitScheduleSimplifier{
 	 */
 	private TransitSchedule mergeTouchingTransitRoutes(Scenario scenario, String outputDirectory){
 		
-		final String UNDERLINE = "___";
+		final String UNDERLINE = "_____";
 		
 		Logger log = Logger.getLogger(TransitScheduleSimplifier.class);
 		
@@ -370,15 +381,15 @@ public class TransitScheduleSimplifier{
 		
 		TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
 		
-		TransitSchedule schedule = scenario.getTransitSchedule();
+		this.transitSchedule = scenario.getTransitSchedule();
 		
-		TransitSchedule mergedSchedule = factory.createTransitSchedule();
+		mergedSchedule = factory.createTransitSchedule();
 		
-		for(TransitStopFacility facility : schedule.getFacilities().values()){
+		for(TransitStopFacility facility : transitSchedule.getFacilities().values()){
 			mergedSchedule.addStopFacility(facility);
 		}
 		
-		Map<Id,TransitLine> transitLines = schedule.getTransitLines();
+		Map<Id,TransitLine> transitLines = transitSchedule.getTransitLines();
 		
 		int routesCounter = 0;
 		int mergedRoutesCounter = 0;
@@ -386,10 +397,14 @@ public class TransitScheduleSimplifier{
 		Iterator<TransitLine> transitLineIterator = transitLines.values().iterator();
 		
 		while(transitLineIterator.hasNext()){
+			
+			this.checkedFacilities = new ArrayList<TransitStopFacility>();
 		
 			TransitLine transitLine = transitLineIterator.next();
 			
-			if(transitLine.getRoutes().size() <= 0) continue;
+			if(transitLine.getRoutes().size() <= 0){
+				continue;
+			}
 			
 			TransitLine mergedTransitLine = factory.createTransitLine(new IdImpl(transitLine.getId().toString()));
 			
@@ -412,36 +427,51 @@ public class TransitScheduleSimplifier{
 			while(uncheckedRoutes.size() > 0){
 				
 				currentTransitRoute = transitRoutes.get(uncheckedRoutes.poll());
+				Set<Id> endedTransitRoutes = new HashSet<Id>();
 				
 				if(currentTransitRoute.getDepartures().size() > 0){
 				
 					String id = currentTransitRoute.getId().toString();
 					String prevId = null;
-					
+
 					LinkedList<TransitStopFacility> drivenStops = new LinkedList<TransitStopFacility>();
 					
 					TransitStopFacility lastFacility = null;
 
-					for(TransitRouteStop stop : currentTransitRoute.getStops()){
+					for(int i = 0; i < currentTransitRoute.getStops().size(); i++){
+						
+						TransitRouteStop stop = currentTransitRoute.getStops().get(i);
 						
 						TransitStopFacility currentFacility = stop.getStopFacility();
-						
+
 						drivenStops.addLast(currentFacility);
 						
-						if(!checkedFacilities.contains(currentFacility)){
+						
+						if(checkedFacilities.contains(currentFacility)){
+							if(drivenStops.size() < 2){
+								drivenStops = new LinkedList<TransitStopFacility>();
+								id = currentTransitRoute.getId().toString();
+								continue;
+							} else{
+								breakpoint = true;
+							}
+						}
+						
+						for(TransitRoute transitRoute : transitRoutes.values()){
 							
-							for(TransitRoute transitRoute : transitRoutes.values()){
+							if(!transitRoute.equals(currentTransitRoute) && transitRoutesHaveSameDirection(currentTransitRoute, transitRoute) && !endedTransitRoutes.contains(transitRoute.getId())){
 								
-								if(!transitRoute.equals(currentTransitRoute)&&transitRoutesHaveSameDirection(currentTransitRoute, transitRoute)){
+								if(transitRoute.getStop(currentFacility) != null){
 									
-									if(transitRoute.getStop(currentFacility) != null){
-										
-										id += UNDERLINE + transitRoute.getId().toString();
-										
-									} else{
-										
-										drivenStops.remove(currentFacility);
-										reduced = true;
+									id += UNDERLINE + transitRoute.getId().toString();
+									
+								} else{
+									if(prevId != null){
+										if(prevId.contains(transitRoute.getId().toString())){
+											endedTransitRoutes.add(transitRoute.getId());
+											drivenStops.remove(currentFacility);
+											reduced = true;
+										}
 										
 									}
 									
@@ -449,38 +479,53 @@ public class TransitScheduleSimplifier{
 								
 							}
 							
-						} else{
-							if(drivenStops.size() < 2){
-								drivenStops = new LinkedList<TransitStopFacility>();
-								continue;
-							}
-							else breakpoint = true;
 						}
 						
-						if(prevId != null&&drivenStops.size()>1){
+						if(prevId != null && drivenStops.size() > 1){
 								
-							if(!prevId.equals(id) || currentTransitRoute.getStops().indexOf(stop) >= currentTransitRoute.getStops().size()-1 || breakpoint){
-
-								mergedTransitLine.addRoute(createNewMergedRoute((prevId+"==="+n),drivenStops,scenario,factory, transitRoutes));
+							if(!prevId.equals(id) || i >= currentTransitRoute.getStops().size()-1 || breakpoint){
+//								System.out.println(prevId);
+//								if(!id.contains(UNDERLINE)){
+//									mergedTransitLine.addRoute(currentTransitRoute);
+//								} else{
+									mergedTransitLine.addRoute(createNewMergedRoute((prevId+"==="+n),drivenStops,scenario,factory, transitRoutes));
+//								}
 								n++;
 								mergedRoutesCounter++;
 								
 								drivenStops = new LinkedList<TransitStopFacility>();
+								
 								if(reduced){
-									drivenStops.addLast(lastFacility);
+									i--;
+									checkedFacilities.remove(lastFacility);
+//									checkedFacilities.remove(currentFacility);
+//									drivenStops.add(lastFacility);
+//									drivenStops.addLast(currentFacility);
 									reduced = false;
 								}
 								
-								drivenStops.addLast(currentFacility);
+								i--;
+								
+//								System.out.println(currentTransitRoute.getStops().get(i));
 								
 							}
 							
+						} else if(prevId != null && drivenStops.size() <= 1){
+							if(!prevId.equals(id) || i >= currentTransitRoute.getStops().size()-1 || breakpoint){
+								drivenStops = new LinkedList<TransitStopFacility>();
+								id = currentTransitRoute.getId().toString();
+							}
 						}
 						
 						prevId = id;
 						id = currentTransitRoute.getId().toString();
-						checkedFacilities.add(currentFacility);
-						lastFacility = currentFacility;
+						if(i < 0){
+							checkedFacilities.add(currentTransitRoute.getStops().get(i+1).getStopFacility());
+							lastFacility = currentTransitRoute.getStops().get(i+1).getStopFacility();
+						} else{
+							checkedFacilities.add(currentTransitRoute.getStops().get(i).getStopFacility());
+							lastFacility = currentTransitRoute.getStops().get(i).getStopFacility();
+						}
 						breakpoint = false;
 						
 					}
@@ -511,13 +556,12 @@ public class TransitScheduleSimplifier{
 	private TransitRoute createNewMergedRoute(String s, List<TransitStopFacility> routeProfile, Scenario scenario,
 			TransitScheduleFactoryImpl factory, Map<Id,TransitRoute> transitRoutes){
 		
-		final String UNDERLINE = "___";
+		final String UNDERLINE = "_____";
 		
 		String[] prevId = s.split("===");
 		
 		String[] listOfRoutes = prevId[0].split(UNDERLINE);
-
-		TransitStopFacility firstStop = routeProfile.get(0);
+		
 		TransitRoute referenceRoute = null;
 	
 		for(String string : listOfRoutes){
@@ -527,59 +571,85 @@ public class TransitScheduleSimplifier{
 			if(referenceRoute == null)
 				referenceRoute = tr;
 			else{
-			
-				if(referenceRoute.getStops().indexOf(firstStop) < tr.getStops().indexOf(firstStop))
+				
+				if(tr.getStops().size() > referenceRoute.getStops().size() &&
+						tr.getStop(routeProfile.get(0))!=null && tr.getStop(routeProfile.get(routeProfile.size()-1))!=null){
 					referenceRoute = tr;
+				}
 			
 			}
 		
 		}
-	
+		
 		List<TransitRouteStop> newRouteProfile = createNewSplittedRouteProfile(factory,listOfRoutes,transitRoutes,referenceRoute,routeProfile);
 	
-		NetworkRoute newNetworkRoute = createNewNetworkRoute(referenceRoute,scenario.getNetwork(),routeProfile);
+		Node fromNode = scenario.getNetwork().getLinks().get(routeProfile.get(0).getLinkId()).getToNode();
+		Node toNode = scenario.getNetwork().getLinks().get(routeProfile.get(routeProfile.size()-1).getLinkId()).getFromNode();
+		
+		List<Id> linkIds = new ArrayList<Id>();
+		linkIds.add(referenceRoute.getRoute().getStartLinkId());
+		linkIds.addAll(referenceRoute.getRoute().getLinkIds());
+		linkIds.add(referenceRoute.getRoute().getEndLinkId());
+		
+		NetworkRoute newNetworkRoute = createSubRoute(referenceRoute.getRoute(), fromNode, toNode, scenario.getNetwork(), routeProfile);
 	
 		TransitRoute mergedTransitRoute = factory.createTransitRoute(new IdImpl(s), newNetworkRoute, newRouteProfile, TransportMode.pt);
 		
-		mergeDepartures(factory, transitRoutes, mergedTransitRoute, listOfRoutes);
+		mergeDeparturesTouching(factory, transitRoutes, mergedTransitRoute, listOfRoutes, routeProfile);
 		
 		return mergedTransitRoute;
 		
 	}
 	
-	private NetworkRoute createNewNetworkRoute(TransitRoute referenceRoute,
-			Network network, List<TransitStopFacility> routeProfile) {
+	private NetworkRoute createSubRoute(NetworkRoute route, Node fromNode,
+			Node toNode, Network network, List<TransitStopFacility> routeProfile) {
 		
-		LinkedList<Id> newRoute = new LinkedList<Id>();
-
-		Id firstLinkId = routeProfile.get(0).getLinkId();
-		Id lastLinkId = routeProfile.get(routeProfile.size()-1).getLinkId();
+		List<Id> linkIds = new ArrayList<Id>();
+		linkIds.add(route.getStartLinkId());
+		linkIds.addAll(route.getLinkIds());
+		linkIds.add(route.getEndLinkId());
 		
-		if(referenceRoute.getRoute().getStartLinkId().equals(firstLinkId))
-			newRoute.addFirst(firstLinkId);
+		List<Id> newLinkIds = new ArrayList<Id>();
+		boolean on = false;
+		List<Id> mustHave = new ArrayList<Id>();
 		
-		int startIndex = newRoute.isEmpty() ? referenceRoute.getRoute().getLinkIds().indexOf(firstLinkId) : 0;
-		int endIndex = newRoute.isEmpty() ? referenceRoute.getRoute().getLinkIds().indexOf(firstLinkId) : 0;
-		
-		for(TransitStopFacility stop : routeProfile){
-			if(referenceRoute.getRoute().getLinkIds().contains(stop.getLinkId())){
-				endIndex = referenceRoute.getRoute().getLinkIds().indexOf(stop.getLinkId());
-				for(int i = startIndex; i <= endIndex; i++)
-					if(!newRoute.contains(referenceRoute.getRoute().getLinkIds().get(i)))
-						newRoute.addLast(referenceRoute.getRoute().getLinkIds().get(i));
-				startIndex = endIndex;
-			}
+		for(TransitStopFacility st : routeProfile){
+			mustHave.add(st.getLinkId());
 		}
 		
-		if(referenceRoute.getRoute().getEndLinkId().equals(lastLinkId))
-			newRoute.addLast(lastLinkId);
-
-		NetworkRoute newNetworkRoute = RouteUtils.createNetworkRoute(newRoute, network);
+		for(Id linkId : linkIds){
+			
+			if(linkId == mustHave.get(0)){
+				on = true;
+			}
+			
+			if(on){
+				newLinkIds.add(linkId);
+			}
+			
+			if(newLinkIds.containsAll(mustHave) && linkId == mustHave.get(mustHave.size()-1)){
+				break;
+			}
+			
+		}
 		
-		return newNetworkRoute;
+		if(newLinkIds.size() < 2){
+			Map<Id, ? extends Link> outLinks = network.getLinks().get(newLinkIds.get(0)).getToNode().getOutLinks();
+			
+			do{
+				for(Link l : outLinks.values()){
+					if(l.getAllowedModes().contains(TransportMode.pt)&&!newLinkIds.contains(l.getId())){
+						newLinkIds.add(l.getId());
+						break;
+					}
+				}
+			}while(newLinkIds.size() < 2);
+		}
+		
+		return RouteUtils.createNetworkRoute(newLinkIds, network);
 		
 	}
-	
+
 	/**
 	 * 
 	 * Creates a new route profile for a simplified transit route.
@@ -629,40 +699,47 @@ public class TransitScheduleSimplifier{
 
 		LinkedList<TransitRouteStop> newRouteProfile = new LinkedList<TransitRouteStop>();
 		
+		int wholeRoute = routeProfile.size() == referenceRoute.getStops().size() ? 1 : 0;
+		
 		TransitStopFacility f = routeProfile.get(0);
-//		System.out.println(referenceRoute + "\t" + f);
-		TransitRouteStop referenceStop = referenceRoute.getStops().get(referenceRoute.getStops().indexOf(referenceRoute.getStop(f)));
 		
 		for(TransitStopFacility facility : routeProfile){
 			
 			double arrivalOffset = 0;
-			int arrCounter = 0;
 			double departureOffset = 0;
-			int depCounter = 0;
-			
+
 			for(String s : listOfRoutes){
 
 				TransitRoute tr = transitRoutes.get(new IdImpl(s));
 				TransitRouteStop stop = tr.getStop(facility);
-				
-//				System.out.println(tr.getId() + "\t" + stop + "\t" + facility.getId());
-				
-				if(stop != null){
-				arrivalOffset += stop.getArrivalOffset();
-				arrCounter++;
-				departureOffset += stop.getDepartureOffset();
-				depCounter++;
-				
-				if(s.equals(referenceRoute.getId().toString()) && referenceStop != null){
-					arrivalOffset -= referenceStop.getArrivalOffset();
-					departureOffset -= referenceStop.getArrivalOffset();
+
+				if(tr.getStops().indexOf(stop) > tr.getStops().indexOf(tr.getStop(f))){
+					arrivalOffset += stop.getArrivalOffset() - tr.getStop(f).getDepartureOffset();
+					departureOffset += stop.getDepartureOffset() - tr.getStop(f).getDepartureOffset();
+//					if(wholeRoute <= 0){
+//						arrivalOffset -= 100;
+//						departureOffset -= 100;
+//					}
 				}
-				
-				}
+					
 			}
 			
-			TransitRouteStop newStop = factory.createTransitRouteStop(facility, arrivalOffset/arrCounter,
-					departureOffset/depCounter);
+			TransitRouteStop newStop = null;
+			
+			if(!this.checkedFacilities.contains(facility)){
+				newStop = factory.createTransitRouteStop(facility, arrivalOffset/listOfRoutes.length,
+						departureOffset/listOfRoutes.length);
+			} else{
+				TransitStopFacility newFacility = factory.createTransitStopFacility(new IdImpl(facility.getId().toString()+"="+cnt), facility.getCoord(), facility.getIsBlockingLane());
+				newFacility.setLinkId(facility.getLinkId());
+				cnt++;
+				newStop = factory.createTransitRouteStop(newFacility, arrivalOffset/listOfRoutes.length,
+						departureOffset/listOfRoutes.length);
+				this.mergedSchedule.addStopFacility(newFacility);
+				this.checkedFacilities.add(newFacility);
+			}
+			
+			this.checkedFacilities.add(facility);
 			
 			newStop.setAwaitDepartureTime(referenceRoute.getStop(facility).isAwaitDepartureTime());
 			
@@ -711,6 +788,31 @@ public class TransitScheduleSimplifier{
 	
 	}
 	
+	private void mergeDeparturesTouching(TransitScheduleFactoryImpl factory, Map<Id,TransitRoute> transitRoutes,
+			TransitRoute mergedTransitRoute,String[] listOfTransitRoutes,List<TransitStopFacility> routeProfile) {
+
+		for(int i = 0; i < listOfTransitRoutes.length; i++){
+
+			TransitRoute transitRoute = transitRoutes.get(new IdImpl(listOfTransitRoutes[i]));
+			
+				for(Departure departure : transitRoute.getDepartures().values()){
+				
+					String departureId = (String) (mergedTransitRoute.getDepartures().size() < 10 ?
+							"0"+Integer.toString(mergedTransitRoute.getDepartures().size()) :
+							Integer.toString(mergedTransitRoute.getDepartures().size()));
+					
+					Departure dep = factory.createDeparture(new IdImpl(departureId),
+							departure.getDepartureTime() + transitRoute.getStop(routeProfile.get(0)).getDepartureOffset());
+					dep.setVehicleId(departure.getVehicleId());
+					
+					mergedTransitRoute.addDeparture(dep);
+					
+				}
+				
+		}
+	
+	}
+	
 	/**
 	 * Compares the route profiles of two given transit routes for equality.
 	 * 
@@ -752,25 +854,34 @@ public class TransitScheduleSimplifier{
 	
 	private boolean transitRoutesHaveSameDirection(TransitRoute transitRoute1, TransitRoute transitRoute2){
 		
-		for(TransitRouteStop stop : transitRoute1.getStops()){
-			
-			if(transitRoute1.getStops().indexOf(stop) < transitRoute1.getStops().size()-1){
-				
-				TransitStopFacility facility = stop.getStopFacility();
-				TransitStopFacility next = transitRoute1.getStops().get(transitRoute1.getStops().indexOf(stop)+1).getStopFacility();
-			
-				if(transitRoute2.getStop(facility) != null && transitRoute2.getStop(next) != null){
+		TransitRoute shortestRoute = transitRoute1.getStops().size() > transitRoute2.getStops().size() ?
+				transitRoute2 : transitRoute1;
+		TransitRoute otherRoute = transitRoute1.getStops().size() < transitRoute2.getStops().size() ?
+				transitRoute2 : transitRoute1;
+		
+		double d = 0;
+		int i = 0;
+		
+		for(i = 0; i < shortestRoute.getStops().size()-1; i++){
 
-					int diff = transitRoute1.getStops().indexOf(next) - transitRoute1.getStops().indexOf(facility);
-					int diff2 = transitRoute2.getStops().indexOf(next) - transitRoute2.getStops().indexOf(facility);
-					
-					if(diff == diff2)
-						return true;
-					
-				}
+			TransitStopFacility facility = shortestRoute.getStops().get(i).getStopFacility();
+			TransitStopFacility nextFacility = shortestRoute.getStops().get(i+1).getStopFacility();
+			
+			if(otherRoute.getStop(facility) != null && otherRoute.getStop(nextFacility) != null){
 				
+				int diff = shortestRoute.getStops().indexOf(shortestRoute.getStop(nextFacility)) - shortestRoute.getStops().indexOf(shortestRoute.getStop(facility));
+				int diff2 = otherRoute.getStops().indexOf(otherRoute.getStop(nextFacility)) - otherRoute.getStops().indexOf(otherRoute.getStop(facility));
+
+				d += diff - diff2;
+				
+			} else{
+				d += 1;
 			}
 			
+		}
+		
+		if(d == 0){
+			return true;
 		}
 		
 		return false;
