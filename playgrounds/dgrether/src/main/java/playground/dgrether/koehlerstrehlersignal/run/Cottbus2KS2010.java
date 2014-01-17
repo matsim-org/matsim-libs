@@ -84,7 +84,7 @@ public class Cottbus2KS2010 {
 		String name = "run run1722 output plans between 05:30 and 09:30";
 		// String name = "run run1722 output plans between 13:30 and 18:30";
 		final String outputDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2014-01-09_test/";
+				+ "shared-svn/projects/cottbus/cb2ks2010/2014-01-17_minflow_10_morning_peak/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + ".xml";
@@ -137,6 +137,7 @@ public class Cottbus2KS2010 {
 				endTime);
 
 		printStatistics(cellsX, cellsY, boundingBoxOffset, startTime, endTime);
+		log.info("output ist written to " + outputDirectory);
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 

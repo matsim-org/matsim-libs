@@ -40,7 +40,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCommodityUtils;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.KS2010ModelWriter;
-import playground.dgrether.koehlerstrehlersignal.data.TtCommodityAsMatsimPopWriter;
+import playground.dgrether.koehlerstrehlersignal.data.TtMorningCommodityAsMatsimPopWriter;
 import playground.dgrether.koehlerstrehlersignal.demand.M2KS2010Zones2Commodities;
 import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
@@ -158,7 +158,7 @@ public class M2KS2010Converter {
 
 		// write ks-model and the same commodities as matsim population
 		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + filename);
-		new TtCommodityAsMatsimPopWriter().writePlansFile(this.network, idConverter, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
+		new TtMorningCommodityAsMatsimPopWriter().writePlansFile(this.network, idConverter, commodities, outputDirectory, filename, startTimeSec, endTimeSec);
 		writeStats(ksNet, commodities, totalFlow, removedCommodities);
 		
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");
