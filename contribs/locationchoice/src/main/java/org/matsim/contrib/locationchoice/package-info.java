@@ -76,9 +76,9 @@
  * 		Description: Either use Normal or Gumbel distribution for error terms
  * 	</li>
  * <li><strong>epsilonScaleFactors</strong><br>
- * 		Type and range: float > array of double separated by ',' <br> 
+ * 		Type and range: float > array of doubles separated by ',' <br> 
  * 		Default: null <br>
- * 		Description: Scale the activities epsilons, separated by comma
+ * 		Description: Scale the activities epsilons
  * 	</li>
  * <li><strong>pkValuesFile</strong><br>
  * 		Type and range: String <br> 
@@ -93,7 +93,12 @@
  * <li><strong>prefsFile</strong><br>
  * 		Type and range: String <br>
  * 		Default: null <br>
- * 		Description: Replaces the deprecated desires data structure. Specifies the agents desired durations. This should go somewhere else, more into the core.
+ * 		Description: 
+ * 		Specifies the agents' earliestEndTime, latestStartTime, minimalDuration and typicalDuration. 
+ * 		If no prefs file is found, the module tries to get the typicalDuration from the desires and the rest from the config.
+ * 		If also no desires are available, then everything is tried to be taken from the config.
+ * 		And finally, if also in the config not everything is there, you need to help yourself ;)
+ * 		This should sooner or later go somewhere else, more into the core.
  *  </li>
  *  <li><strong>pBetasFileName</strong><br>
  * 		Type and range: String <br>
@@ -109,11 +114,12 @@
  * 
  * <h3>Search Space Construction</h3>
  * <ul>
- * 	<li><strong><font color="red">tt_approximationLevel</font></strong><br>
+ * 	<li><strong>tt_approximationLevel</strong><br>
  * 		Type and range: int (0,1,2)<br> 
  * 		Default: 0 <br>
- * 		Description: 0: no approximation, routing for every OD-pair <br>
- * 		1: Dijkstra trees forward and backwards See working paper Horni,Nagel,Axhausen 2011, page 13<br>
+ * 		Description: 
+ * 		0: no approximation, routing for every OD-pair (for real-world scenarios not applicable as it is much too slow)<br>
+ * 		1: Dijkstra trees forward and backwards. See working paper Horni, Nagel, Axhausen 2011, page 13<br>
  * 		2: based on travel distances
  * 	</li>
  * <li><strong>maxDistanceDCScore</strong><br>
@@ -124,22 +130,18 @@
  * <li><strong>probChoiceSetSize</strong><br>
  * 		Type and range: int > 0 <br> 
  * 		Default: 5 <br>
- * 		Description: Number of alternatives taken into account for the probabilistic choice. See working paper Horni,Nagel,Axhausen 2011, page 13
- * 	</li>
- *  <li><strong><font color="red">probChoiceExponent</font></strong><br>
- * 		Type and range: float <br> 
- * 		Default: 3.0 <br>
- * 		Description: Weighting of scores in the reduced choice set subject to probabilistic choice. See working paper Horni,Nagel,Axhausen 2011, page 13
+ * 		Description: Number of alternatives taken into account for the probabilistic choice. See working paper Horni, Nagel, Axhausen 2011, page 13
  * 	</li>
  * <li><strong>maxDCScoreFile</strong><br>
  * 		Type and range: String <br> 
  * 		Default: null <br>
- * 		Description: specifies the location of the max dc score file (created during pre-processing). If the k values have not changed from one run to another, the max dc score values can be reused and the pre-processing can be skipped.
+ * 		Description: specifies the location of the unscaled max dc score file (created during pre-processing). If the k values have not changed from one run to another, the (unscaled) max dc score values can be reused and the pre-processing can be skipped.
  * 	</li>
- *  <li><strong>idExclusion</strong><br>
+ *  <li><strong>idExclusion (deprecated)</strong><br>
  * 		Type and range: int > 0<br> 
  * 		Default: max int <br>
- * 		Description: exclude all agents from destination choice and analysis with id > analysisIdExclusion. (e.g., border crossers)
+ * 		Description: Better use the subpopulation specifications in the config strategy section!
+ * 		But here used to exclude all agents from destination choice and analysis with id > analysisIdExclusion. (e.g., border crossers)
  * 	</li>
  * <li><strong>travelSpeed_car</strong><br>
  * 		Type and range: double > 0.0<br> 
