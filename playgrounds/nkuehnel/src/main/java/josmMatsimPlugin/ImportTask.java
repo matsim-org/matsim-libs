@@ -85,7 +85,7 @@ public class ImportTask extends PleaseWaitRunnable
 			OsmTransferException, UncheckedIOException
 	{
 		DataSet dataSet = new DataSet();
-		String importSystem = Main.pref.get("matsim_importSystem", "WGS84");
+		String importSystem = (String) ImportDialog.importSystem.getSelectedItem();
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(importSystem,
 						TransformationFactory.WGS84);

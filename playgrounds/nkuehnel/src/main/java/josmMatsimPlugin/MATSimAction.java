@@ -9,9 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -56,6 +59,25 @@ public class MATSimAction {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			
+			String path = Main.pref.get("matsim_exportFolder",
+					System.getProperty("user.home"));
+			JFileChooser chooser = new JFileChooser(path);
+			chooser.setDialogTitle("MATSim-Export");
+			chooser.setApproveButtonText("Confirm");
+			FileFilter filter = new FileNameExtensionFilter("Network-XML",
+					"xml");
+			chooser.setFileFilter(filter);
+			File file = new File(path + "/josm_matsim_export");
+			chooser.setSelectedFile(file);
+			int result = chooser.showSaveDialog(null);
+			if (result == JFileChooser.APPROVE_OPTION
+					&& chooser.getSelectedFile().getAbsolutePath() != null) {
+				ExportDialog.exportFilePath.setText(chooser.getSelectedFile()
+						.getAbsolutePath());
+			}
+			
+			
 			ExportDialog dialog = new ExportDialog();
 			JOptionPane pane = new JOptionPane(dialog,
 					JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
@@ -81,28 +103,42 @@ public class MATSimAction {
 			super(tr("Import MATSim network"), null,
 					tr("Import MATSim network file"), Shortcut
 							.registerShortcut("menu:matsimImport",
-									tr("Menu: {0}", tr("MATSim Export")),
+									tr("Menu: {0}", tr("MATSim Import")),
 									KeyEvent.VK_G, Shortcut.ALT_CTRL), false);
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			ImportDialog dialog = new ImportDialog();
-			JOptionPane pane = new JOptionPane(dialog,
-					JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-			dialog.setOptionPane(pane);
-			JDialog dlg = pane.createDialog(Main.parent, tr("Import"));
-			dlg.setAlwaysOnTop(true);
-			dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			
+			JFileChooser chooser = new JFileChooser(System
+					.getProperty("user.home"));
+			chooser.setDialogTitle("MATSim-Import");
+			chooser.setApproveButtonText("Confirm");
+			FileFilter filter = new FileNameExtensionFilter("Network-XML",
+					"xml");
+			chooser.setFileFilter(filter);
+			int result = chooser.showOpenDialog(null);
+			if (result == JFileChooser.APPROVE_OPTION
+					&& chooser.getSelectedFile().getAbsolutePath() != null) {
+				ImportDialog.path.setText(chooser.getSelectedFile().getAbsolutePath());
+				ImportDialog dialog = new ImportDialog();
+				JOptionPane pane = new JOptionPane(dialog,
+						JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+				dialog.setOptionPane(pane);
+				JDialog dlg = pane.createDialog(Main.parent, tr("Import"));
+				dlg.setAlwaysOnTop(true);
+				dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-			dlg.setVisible(true);
-			if (pane.getValue() != null) {
-				if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
-					ImportTask task = new ImportTask();
-					Main.worker.execute(task);
+				dlg.setVisible(true);
+				if (pane.getValue() != null) {
+					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
+						ImportTask task = new ImportTask();
+						Main.worker.execute(task);
+					}
 				}
+				dlg.dispose();
 			}
-			dlg.dispose();
+			
 		}
 	}
 

@@ -77,7 +77,7 @@ public class ExportTask extends PleaseWaitRunnable
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
-		String targetSystem = Main.pref.get("matsim_exportSystem", "WGS84");
+		String targetSystem = (String) ExportDialog.exportSystem.getSelectedItem();
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
 						targetSystem);
