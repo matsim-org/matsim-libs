@@ -39,9 +39,14 @@ public class DgNetworkShrinker {
 	public Network createSmallNetwork(Network net, Envelope envelope, CoordinateReferenceSystem networkCrs) {
 		
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
+		
+		//bounding box filter - deletes all edges outside the bounding box
 		filterManager.addLinkFilter(new FeatureNetworkLinkStartOrEndCoordFilter(networkCrs, envelope, networkCrs));
+		
+		//interior link filter - deletes all edges that are not on a shortest path (according to travel time) between signalized nodes
 		Set<Id> shortestPathLinkIds = new TtSignalizedNodeShortestPath().calcShortestPathLinkIdsBetweenSignalizedNodes(net, signalizedNodes);
 		filterManager.addLinkFilter(new SignalizedNodesSpeedFilter(this.signalizedNodes, shortestPathLinkIds));
+		
 		Network newNetwork = filterManager.applyFilters();
 		return newNetwork;		
 	}
