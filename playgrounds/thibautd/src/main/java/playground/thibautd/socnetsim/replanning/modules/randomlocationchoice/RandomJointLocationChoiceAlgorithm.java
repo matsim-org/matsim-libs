@@ -198,7 +198,7 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 		}
 
 		mutateLocations(
-				quadTreePerType.get( type ),
+				type,
 				activitiesToMutate );
 	}
 
