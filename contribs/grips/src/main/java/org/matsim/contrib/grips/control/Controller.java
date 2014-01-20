@@ -49,6 +49,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.analysis.data.EventData;
 import org.matsim.contrib.grips.control.eventlistener.AbstractListener;
 import org.matsim.contrib.grips.io.GripsConfigDeserializer;
+import org.matsim.contrib.grips.io.GripsConfigSerializer;
 import org.matsim.contrib.grips.io.ShapeIO;
 import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
@@ -431,7 +432,7 @@ public class Controller {
 	}
 
 	public boolean openGripsConfig() {
-		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoGripsFile(), true);
+		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoGripsFile(), false);
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
 
 		if (returnValue == JFileChooser.APPROVE_OPTION)
@@ -447,6 +448,8 @@ public class Controller {
 	}
 
 	private void updateOtherModules() {
+		
+		//TODO add listener
 
 	}
 
@@ -861,7 +864,7 @@ public class Controller {
 
 	public boolean openMastimConfig() {
 		
-		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoMatsimFile(), true);
+		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoMatsimFile(), false);
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
 
 		if (returnValue == JFileChooser.APPROVE_OPTION)
@@ -1162,5 +1165,36 @@ public class Controller {
 		}
 		
 	}
+	
+	public boolean writeGripsConfig()
+	{
+		if ((this.gripsConfigModule!=null) && (this.gripsFile!=null))
+		{
+			return writeGripsConfig(this.gripsConfigModule, this.gripsFile);
+		}
+		else
+			return false;
+		
+	}
 
+	public boolean writeGripsConfig(GripsConfigModule gripsConfigModule, String fileLocation) {
+		
+		if (gripsConfigModule!=null)
+		{
+			try {
+				GripsConfigSerializer gcs = new GripsConfigSerializer(gripsConfigModule);
+				gcs.write(fileLocation);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+			
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	
 }

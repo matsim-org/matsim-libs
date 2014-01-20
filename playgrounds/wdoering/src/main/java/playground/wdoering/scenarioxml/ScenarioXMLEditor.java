@@ -78,10 +78,10 @@ public class ScenarioXMLEditor extends AbstractModule {
 				this.controller.setMainPanel(mask, false);
 				this.controller.setToolBoxVisible(false);
 				
-				// check if Grips config (including the OSM network) has been loaded
-				if (!controller.isGripsConfigOpenend())
-					if (!controller.openGripsConfig())
-						exit(locale.msgOpenGripsConfigFailed());
+//				// check if Grips config (including the OSM network) has been loaded
+//				if (!controller.isGripsConfigOpenend())
+//					if (!controller.openGripsConfig())
+//						exit(locale.msgOpenGripsConfigFailed());
 				
 				mask.readConfig();
 				

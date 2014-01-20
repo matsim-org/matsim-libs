@@ -142,4 +142,49 @@ public class DepartureTimeDistributionType {
         this.latest = value;
     }
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((distribution == null) ? 0 : distribution.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(earliest);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(latest);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(mu);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(sigma);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DepartureTimeDistributionType other = (DepartureTimeDistributionType) obj;
+		if (distribution != other.distribution)
+			return false;
+		if (Double.doubleToLongBits(earliest) != Double
+				.doubleToLongBits(other.earliest))
+			return false;
+		if (Double.doubleToLongBits(latest) != Double
+				.doubleToLongBits(other.latest))
+			return false;
+		if (Double.doubleToLongBits(mu) != Double.doubleToLongBits(other.mu))
+			return false;
+		if (Double.doubleToLongBits(sigma) != Double
+				.doubleToLongBits(other.sigma))
+			return false;
+		return true;
+	}
+    
+
+
 }

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.grips.model.config;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -171,4 +172,78 @@ public class GripsConfigModule extends Module {
 	public void setMainTrafficType(String mainTrafficType) {
 		this.mainTrafficType = mainTrafficType;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((distribution == null) ? 0 : distribution.hashCode());
+		result = prime
+				* result
+				+ ((evacuationAreaFileName == null) ? 0
+						: evacuationAreaFileName.hashCode());
+		result = prime * result
+				+ ((mainTrafficType == null) ? 0 : mainTrafficType.hashCode());
+		result = prime * result
+				+ ((networkFileName == null) ? 0 : networkFileName.hashCode());
+		result = prime * result
+				+ ((outputDir == null) ? 0 : outputDir.hashCode());
+		result = prime
+				* result
+				+ ((populationFileName == null) ? 0 : populationFileName
+						.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(sampleSize);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GripsConfigModule other = (GripsConfigModule) obj;
+		if (distribution == null) {
+			if (other.distribution != null)
+				return false;
+		} else if (!distribution.equals(other.distribution))
+			return false;
+		if (evacuationAreaFileName == null) {
+			if (other.evacuationAreaFileName != null)
+				return false;
+		} else if (!evacuationAreaFileName.equals(other.evacuationAreaFileName))
+			return false;
+		if (mainTrafficType == null) {
+			if (other.mainTrafficType != null)
+				return false;
+		} else if (!mainTrafficType.equals(other.mainTrafficType))
+			return false;
+		if (networkFileName == null) {
+			if (other.networkFileName != null)
+				return false;
+		} else if (!networkFileName.equals(other.networkFileName))
+			return false;
+		if (outputDir == null) {
+			if (other.outputDir != null)
+				return false;
+		} else if (!outputDir.equals(other.outputDir))
+			return false;
+		if (populationFileName == null) {
+			if (other.populationFileName != null)
+				return false;
+		} else if (!populationFileName.equals(other.populationFileName))
+			return false;
+		if (Double.doubleToLongBits(sampleSize) != Double
+				.doubleToLongBits(other.sampleSize))
+			return false;
+		return true;
+	}
+
+	
+	
 }

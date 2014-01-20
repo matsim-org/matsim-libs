@@ -67,6 +67,28 @@ public class EnglishLocale implements Locale
 	
 	private String labelSelection = "Selection mode";
 	
+	public String trafficTypeVeh = "vehicular";
+	public String trafficTypePed = "pedestrian";
+	public String trafficTypeMixed = "mixed";
+	
+	public String labelNetworkFile = "network file";
+	public String labelTrafficType = "main traffic type";
+	public String labelEvacFile = "evacuation file";
+	public String labelPopFile = "population file";
+	public String labelOutDir = "output directory";
+	public String labelSampleSize = "sample size";
+	public String labelDepTime = "departure time distribution";
+	public String labelSigma = "sigma";
+	public String labelMu = "mu";
+	public String labelEarliest = "earliest";
+	public String labelLatest = "latest";
+	public String btNew = "new";
+	public String btSet = "set";
+	public String labelCurrentFile = "current file";
+	public String msgSameFiles = "The selected file is equal to another selected file!";
+	
+	
+	
 	@Override
 	public String btOK()
 	{
@@ -239,6 +261,102 @@ public class EnglishLocale implements Locale
 	public String agents() {
 		
 		return "agents";
+	}
+
+	@Override
+	public String trafficTypeVeh() {
+		return trafficTypeVeh;
+	}
+
+	@Override
+	public String trafficTypePed() {
+		return trafficTypePed;
+	}
+
+	@Override
+	public String trafficTypeMixed() {
+		return trafficTypeMixed;
+	}
+
+	@Override
+	public String labelNetworkFile() {
+		return labelNetworkFile;
+	}
+
+	@Override
+	public String labelTrafficType() {
+		return labelTrafficType;
+	}
+
+	@Override
+	public String labelEvacFile() {
+		return labelEvacFile;
+	}
+
+	@Override
+	public String labelPopFile() {
+		return labelPopFile;
+	}
+
+	@Override
+	public String labelSampleSize() {
+		return labelSampleSize;
+	}
+
+	@Override
+	public String labelDepTime() {
+		return labelDepTime;
+	}
+
+	@Override
+	public String labelSigma() {
+		return labelSigma;
+	}
+
+	@Override
+	public String labelMu() {
+		return labelMu;
+	}
+
+	@Override
+	public String labelEarliest() {
+		return labelEarliest;
+	}
+
+	@Override
+	public String labelLatest() {
+		return labelLatest;
+	}
+
+	@Override
+	public String labelOutDir() {
+		return labelOutDir;
+	}
+
+	@Override
+	public String[] getTrafficTypeStrings() {
+		
+		return new String[]{trafficTypeVeh,trafficTypePed,trafficTypeMixed};
+	}
+
+	@Override
+	public String btNew() {
+		return btNew ;
+	}
+
+	@Override
+	public String labelCurrentFile() {
+		return labelCurrentFile ;
+	}
+	
+	@Override
+	public String btSet() {
+		return btSet;
+	}
+
+	@Override
+	public String msgSameFiles() {
+		return msgSameFiles;
 	}
 
 	

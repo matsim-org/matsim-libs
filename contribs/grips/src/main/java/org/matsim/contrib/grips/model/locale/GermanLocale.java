@@ -65,6 +65,28 @@ public class GermanLocale implements Locale
 				           "         startet das module und verwendet den über den Parameter angegebenen WMS-Layer\n\n";
 	
 	private String labelSelection = "Auswahlmodus";
+	
+	public String trafficTypeVeh = "Fahrzeuge";
+	public String trafficTypePed = "Fußgänger";
+	public String trafficTypeMixed = "gemischt";
+	
+	public String labelNetworkFile = "Netzwerkdatei";
+	public String labelTrafficType = "Primäre Verkehrsart";
+	public String labelEvacFile = "Evakuierungsdatei";
+	public String labelPopFile = "Populationsdatei";
+	public String labelOutDir = "Ausgabeverzeichnis";
+	public String labelSampleSize = "Samplegröße";
+	public String labelDepTime = "Verteilung der Abfahrtzeiten";
+	public String labelSigma = "Sigma";
+	public String labelMu = "Mu";
+	public String labelEarliest = "Frühste";
+	public String labelLatest = "Späteste";
+	public String btNew = "Neu";
+	public String labelCurrentFile = "Aktuelle Datei";
+	private String btSet = "Setzen";
+	private String msgSameFiles = "Die angegebene Datei stimmt mit einer anderen ausgewählten Datei überein!";
+
+
 
 	
 	@Override
@@ -239,5 +261,105 @@ public class GermanLocale implements Locale
 	public String agents() {
 		return "Agenten";
 	}
+	
+	@Override
+	public String trafficTypeVeh() {
+		return trafficTypeVeh;
+	}
+
+	@Override
+	public String trafficTypePed() {
+		return trafficTypePed;
+	}
+
+	@Override
+	public String trafficTypeMixed() {
+		return trafficTypeMixed;
+	}
+
+	@Override
+	public String labelNetworkFile() {
+		return labelNetworkFile;
+	}
+
+	@Override
+	public String labelTrafficType() {
+		return labelTrafficType;
+	}
+
+	@Override
+	public String labelEvacFile() {
+		return labelEvacFile;
+	}
+
+	@Override
+	public String labelPopFile() {
+		return labelPopFile;
+	}
+
+	@Override
+	public String labelSampleSize() {
+		return labelSampleSize;
+	}
+
+	@Override
+	public String labelDepTime() {
+		return labelDepTime;
+	}
+
+	@Override
+	public String labelSigma() {
+		return labelSigma;
+	}
+
+	@Override
+	public String labelMu() {
+		return labelMu;
+	}
+
+	@Override
+	public String labelEarliest() {
+		return labelEarliest;
+	}
+
+	@Override
+	public String labelLatest() {
+		return labelLatest;
+	}
+
+	@Override
+	public String labelOutDir() {
+		return labelOutDir;
+	}
+	
+	@Override
+	public String[] getTrafficTypeStrings() {
+		
+		return new String[]{trafficTypeVeh,trafficTypePed,trafficTypeMixed};
+	}
+
+	@Override
+	public String btNew() {
+		return btNew;
+
+	}
+
+	@Override
+	public String labelCurrentFile() {
+		return labelCurrentFile;
+
+	}
+
+	@Override
+	public String btSet() {
+		return btSet ;
+	}
+
+	@Override
+	public String msgSameFiles() {
+		
+		return msgSameFiles ;
+	}
+
 
 }

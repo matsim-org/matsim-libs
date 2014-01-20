@@ -56,7 +56,7 @@ public class RoadClosuresEditor extends AbstractModule
 		// inform controller that this module is running stand alone
 		controller.setStandAlone(true);
 		
-		// instantiate evacuation area selector
+		// instantiate road closure editor
 		AbstractModule roadClosureEditor = new RoadClosuresEditor(controller);
 		
 		// create default window for running this module standalone

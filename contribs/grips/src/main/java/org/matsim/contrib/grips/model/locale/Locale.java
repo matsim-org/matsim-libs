@@ -30,6 +30,7 @@ public interface Locale
 	public String btOpen();
 	public String btSave();
 	public String btRun();
+	public String btSet();
 	
 	public String infoGripsFile();
 	public String infoMatsimFile();
@@ -50,9 +51,11 @@ public interface Locale
 	public String infoMatsimTime();
 	
 	
+	
 	public String titlePopAreas();
 	public String titlePopulation();
 	public String titleAreaID();
+	
 	public String getUsage();
 	public String btCircular();
 	public String btPolygon();
@@ -62,5 +65,27 @@ public interface Locale
 	public String moduleScenarioXml();
 	
 	public String agents();
+	
+	public String trafficTypeVeh();
+	public String trafficTypePed();
+	public String trafficTypeMixed();
+	public String[] getTrafficTypeStrings();
+	
+	public String labelNetworkFile();
+	public String labelTrafficType();
+	public String labelEvacFile();
+	public String labelPopFile();
+	public String labelOutDir();
+	public String labelSampleSize();
+	public String labelDepTime();
+	public String labelSigma();
+	public String labelMu();
+	public String labelEarliest();
+	public String labelLatest();
+	public String labelCurrentFile();
+	public String btNew();
+	public String msgSameFiles();
+	
+	
 	
 }
