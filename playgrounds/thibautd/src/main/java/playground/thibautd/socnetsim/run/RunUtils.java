@@ -44,6 +44,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.CompositeStageActivityTypes;
@@ -55,6 +56,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.Desires;
 import org.matsim.pt.PtConstants;
 
@@ -669,6 +671,12 @@ public class RunUtils {
 							VehicleRessources.ELEMENT_NAME,
 							new HouseholdBasedVehicleRessources(
 								((ScenarioImpl) scenario).getHouseholds() ) );
+		}
+
+		if ( scenario.getActivityFacilities() != null ) {
+			new WorldConnectLocations( config ).connectFacilitiesWithLinks(
+					scenario.getActivityFacilities(),
+					(NetworkImpl) scenario.getNetwork() );
 		}
 	
 		for (Person person : scenario.getPopulation().getPersons().values()) {
