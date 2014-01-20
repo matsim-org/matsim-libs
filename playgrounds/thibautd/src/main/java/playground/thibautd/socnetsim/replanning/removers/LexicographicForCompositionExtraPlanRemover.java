@@ -24,12 +24,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -49,11 +52,26 @@ import playground.thibautd.utils.MapUtils;
  * @author thibautd
  */
 public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRemover {
+	private final Random random;
 	private final int maxPlansPerComposition;
+	private final int maxPlansPerAgent;
+	private final Comparator<Plan> scoreComparator =
+		new Comparator<Plan>() {
+			@Override
+			public int compare(
+					final Plan o1,
+					final Plan o2) {
+				return o1.getScore().compareTo( o2.getScore() );
+			}
+		};
 
 	public LexicographicForCompositionExtraPlanRemover(
-			final int maxPlansPerComposition) {
+			final int maxPlansPerComposition,
+			final int maxPlansPerAgent) {
 		this.maxPlansPerComposition = maxPlansPerComposition;
+		this.maxPlansPerAgent = maxPlansPerAgent;
+
+		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override
@@ -62,6 +80,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 			final ReplanningGroup group) {
 		boolean somethingDone = false;
 
+		// check condition per composition
 		final int maxRank = maxRank( group );
 		for ( Person person : group.getPersons() ) {
 			final PlansPerComposition plansPerComposition = getPlansPerComposition( jointPlans , person );
@@ -84,6 +103,34 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 					}
 					somethingDone = true;
 				}
+			}
+		}
+
+		// now that maxima per composition are processed, check whether
+		// there are still agents with too many plans. This is mainly to
+		// avoid memory consumption getting out of control, but the number should
+		// be large, as this way of doing is problematic (it does not consider conflicts
+		// at all).
+		// randomize order to avoid the existence of "dictators" (agent for which their
+		// worst plan is always removed, whatever the ranking of the others is)
+		final List<Person> persons = new ArrayList<Person>( group.getPersons() );
+		Collections.shuffle( persons , random );
+		for ( Person person : persons ) {
+			if ( person.getPlans().size() > maxPlansPerAgent ) {
+				assert person.getPlans().size() == maxPlansPerAgent + 1;
+				final Plan toRemove = Collections.min( person.getPlans() , scoreComparator );
+				final JointPlan jpToRemove = jointPlans.getJointPlan( toRemove );
+
+				if ( jpToRemove != null ) {
+					for ( Plan p : jpToRemove.getIndividualPlans().values() ) {
+						((PersonImpl) p.getPerson()).removePlan( p );
+					}
+				}
+				else {
+					((PersonImpl) person).removePlan( toRemove );
+				}
+
+				somethingDone = true;
 			}
 		}
 
