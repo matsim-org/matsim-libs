@@ -38,7 +38,7 @@ import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
-import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
 

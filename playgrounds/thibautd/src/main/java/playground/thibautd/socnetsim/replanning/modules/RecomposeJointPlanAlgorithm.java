@@ -106,9 +106,5 @@ public class RecomposeJointPlanAlgorithm implements GenericPlanAlgorithm<GroupPl
 					plansToLook);
 		}
 	}
-
-	public static interface PlanLinkIdentifier {
-		public boolean areLinked(Plan p1, Plan p2);
-	}
 }
 
