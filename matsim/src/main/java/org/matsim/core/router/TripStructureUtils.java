@@ -209,6 +209,13 @@ public class TripStructureUtils {
 				trip.getOriginActivity().getFacilityId() :
 				trip.getOriginActivity().getLinkId();
 
+			if ( originId == null ) {
+				throw new NullPointerException( "the "+
+						(useFacilitiesInsteadOfLinks ? "facility " : "link " )+
+						"id for origin activity "+trip.getOriginActivity()+
+						" is null!" );
+			}
+
 			if (destinationId != null && !originId.equals( destinationId )) {
 				throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
 			}
@@ -216,6 +223,13 @@ public class TripStructureUtils {
 			destinationId = useFacilitiesInsteadOfLinks ?
 				trip.getDestinationActivity().getFacilityId() :
 				trip.getDestinationActivity().getLinkId();
+
+			if ( destinationId == null ) {
+				throw new NullPointerException( "the "+
+						(useFacilitiesInsteadOfLinks ? "facility " : "link " )+
+						"id for destination activity "+trip.getDestinationActivity()+
+						" is null!" );
+			}
 
 			originIds.add( originId );
 

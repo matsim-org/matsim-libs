@@ -40,6 +40,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author thibautd
@@ -407,6 +408,26 @@ public class TripStructureUtilsTest {
 					fixture.expectedNLegs,
 					countLegs);
 		}
+	}
+
+	@Test( expected=NullPointerException.class )
+	public void testNPEWhenLocationNullInSubtourAnalysis() {
+		// this may sound surprising, but for a long time the algorithm
+		// was perfectly fine with that if assertions were disabled...
+
+		final Plan plan = populationFactory.createPlan();
+		// link ids are null
+		plan.addActivity(
+				populationFactory.createActivityFromCoord(
+					"type",
+					new CoordImpl( 0 , 0 ) ) );
+		plan.addLeg( populationFactory.createLeg( "mode" ) );
+		plan.addActivity(
+				populationFactory.createActivityFromCoord(
+					"type",
+					new CoordImpl( 0 , 0 ) ) );
+
+		TripStructureUtils.getSubtours( plan , EmptyStageActivityTypes.INSTANCE );
 	}
 }
 
