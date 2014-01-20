@@ -59,6 +59,9 @@ public class RunTRBModel {
 		final String outputDirectory = args[ 1 ];
 		final int stepSizePrimary = args.length > 2 ? Integer.parseInt( args[ 2 ] ) : 1;
 		final int stepSizeSecondary = args.length > 3 ? Integer.parseInt( args[ 3 ] ) : 1;
+
+		MoreIOUtils.initOut( outputDirectory );
+
 		log.info( "################################################################################" );
 		log.info( "###### start socnet gen" );
 		log.info( "###### popfile: "+populationFile );
@@ -67,7 +70,6 @@ public class RunTRBModel {
 		log.info( "###### step size secondary: "+stepSizeSecondary );
 		log.info( "################################################################################" );
 
-		MoreIOUtils.initOut( outputDirectory );
 
 		final SocialPopulation<ArentzeAgent> population = parsePopulation( populationFile );
 		
