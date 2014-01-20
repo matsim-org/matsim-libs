@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,6 +39,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -201,36 +203,55 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 	}
 
 	private void mutateLocations(
-			final QuadTree<ActivityFacility> qt,
+			final String type,
 			final List<Activity> activitiesToMutate) {
-		double xBarycenter = 0;
-		double yBarycenter = 0;
-
-		for ( Activity act : activitiesToMutate ) {
-			final Id facilityId = act.getFacilityId();
-			if ( facilityId == null ) throw new RuntimeException( "no facility for act "+act );
-
-			final ActivityFacility fac = facilities.getFacilities().get( facilityId );
-			xBarycenter += fac.getCoord().getX();
-			yBarycenter += fac.getCoord().getY();
-		}
-
-		xBarycenter /= activitiesToMutate.size();
-		yBarycenter /= activitiesToMutate.size();
-
+		final Coord coordBarycenter = calcBarycenterCoord( activitiesToMutate );
 		final double angle = random.nextDouble() * Math.PI;
 		final double distance = nextNormalDouble() * config.getStandardDeviation();
 
-		final double xLoc = xBarycenter + distance * Math.cos( angle );
-		final double yLoc = yBarycenter + distance * Math.sin( angle );
-
-		final ActivityFacility fac = qt.get( xLoc , yLoc );
+		final ActivityFacility fac = getFacility(
+				type,
+				coordBarycenter,
+				angle,
+				distance );
 
 		for ( Activity act : activitiesToMutate ) {
 			((ActivityImpl) act).setFacilityId( fac.getId() );
 			((ActivityImpl) act).setLinkId( fac.getLinkId() );
 			((ActivityImpl) act).setCoord( fac.getCoord() );
 		}
+	}
+
+	/* package (tests) */
+	final Coord calcBarycenterCoord(
+			final List<Activity> activitiesToMutate ) {
+		double sumX = 0;
+		double sumY = 0;
+
+		for ( Activity act : activitiesToMutate ) {
+			final Id facilityId = act.getFacilityId();
+			if ( facilityId == null ) throw new RuntimeException( "no facility for act "+act );
+
+			final ActivityFacility fac = facilities.getFacilities().get( facilityId );
+			sumX += fac.getCoord().getX();
+			sumY += fac.getCoord().getY();
+		}
+
+		return new CoordImpl(
+				sumX / activitiesToMutate.size(),
+				sumY / activitiesToMutate.size() );
+	}
+
+	/* package (tests) */
+	final ActivityFacility getFacility(
+			final String type,
+			final Coord coordBarycenter,
+			final double angle,
+			final double distance ) {
+		final double xLoc = coordBarycenter.getX() + distance * Math.cos( angle );
+		final double yLoc = coordBarycenter.getY() + distance * Math.sin( angle );
+
+		return quadTreePerType.get( type ).get( xLoc , yLoc );
 	}
 
 	private double cachedNormalDouble = Double.NaN;
