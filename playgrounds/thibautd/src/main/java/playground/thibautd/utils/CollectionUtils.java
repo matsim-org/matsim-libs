@@ -20,8 +20,15 @@
 package playground.thibautd.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * @author thibautd
@@ -45,6 +52,65 @@ public class CollectionUtils {
 		}
 
 		return sample;
+	}
+
+	public static <T> Set<T> intersect(
+			final Collection<? extends T> c1,
+			final Collection<? extends T> c2) {
+		final Set<T> set = new HashSet<T>();
+		for ( T t : c1 ) {
+			if ( c2.contains( t ) ) set.add( t );
+		}
+		return set;
+	}
+
+	public static <T extends Comparable<T>> SortedSet<T> intersectSorted(
+			final Collection<? extends T> c1,
+			final Collection<? extends T> c2) {
+		final SortedSet<T> set = new TreeSet<T>();
+		for ( T t : c1 ) {
+			if ( c2.contains( t ) ) set.add( t );
+		}
+		return set;
+	}
+
+	/**
+	 * makes sense only if iteration order deterministic!
+	 */
+	public static <K,V> Map.Entry<K,V> getRandomElement(
+			final Random random,
+			final Map<K,V> map) {
+		return getRandomElement( false , random , map );
+	}
+
+	/**
+	 * makes sense only if iteration order deterministic!
+	 */
+	public static <K,V> Map.Entry<K,V> removeRandomElement(
+			final Random random,
+			final Map<K,V> map) {
+		return getRandomElement( true , random , map );
+	}
+
+
+	/**
+	 * makes sense only if iteration order deterministic!
+	 */
+	private static <K,V> Map.Entry<K,V> getRandomElement(
+			final boolean remove,
+			final Random random,
+			final Map<K,V> map) {
+		if ( map.isEmpty() ) throw new IllegalArgumentException( "map is empty!" );
+		final int index = random.nextInt( map.size() );
+
+		final Iterator<Map.Entry<K,V>> it = map.entrySet().iterator();
+		int i=0;
+
+		while ( i++ < index ) it.next();
+
+		final Map.Entry<K,V> elem = it.next();
+		if ( remove ) it.remove();
+		return elem;
 	}
 }
 
