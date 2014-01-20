@@ -22,9 +22,6 @@
  */
 package org.matsim.contrib.matrixbasedptrouter.config;
 
-import java.io.File;
-
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 
@@ -46,7 +43,10 @@ public class MatrixBasedPtRouterConfigUtils {
 		}
 		
 		MatrixBasedPtRouterConfigGroup ippcm = new MatrixBasedPtRouterConfigGroup();
+
 		config.addModule( ippcm ) ;
+		// does not/no longer seem to work if called too late.  no idea why. kai, jan'14
+		
 		return ippcm;
 	}	
 	

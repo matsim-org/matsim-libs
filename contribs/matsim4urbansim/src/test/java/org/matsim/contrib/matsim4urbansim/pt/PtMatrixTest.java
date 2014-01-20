@@ -27,6 +27,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,6 +40,7 @@ import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.network.NetworkUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -70,6 +72,15 @@ public class PtMatrixTest extends MatsimTestCase{
 	
 	private static final Logger log = Logger.getLogger(PtMatrixTest.class);
 	 
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp() ;
+		OutputDirectoryLogging.catchLogEntries();		
+		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
+	}
+
+	
 	/**
 	 * tests the pt matrix for the first case, when only the coordinates of the pt stops are known
 	 */

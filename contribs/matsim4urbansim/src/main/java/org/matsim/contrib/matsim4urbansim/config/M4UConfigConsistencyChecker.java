@@ -65,7 +65,7 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 		if ( ippcm.isUsingPtStops() ) {
 			if ( !ippcm.getPtStopsInputFile().isEmpty() && !Paths.pathExsits( ippcm.getPtStopsInputFile() )) {
 				problem = true ;
-				log.error( MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH + " is set to true but pt stops file not found.  Aborting ... ") ;
+				log.error( MatrixBasedPtRouterConfigGroup.USING_PT_STOPS + " is set to true but pt stops file not found.  Aborting ... ") ;
 			}
 			
 			if ( ippcm.isUsingTravelTimesAndDistances() ) {

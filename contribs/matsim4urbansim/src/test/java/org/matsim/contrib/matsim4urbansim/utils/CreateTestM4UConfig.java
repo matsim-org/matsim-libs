@@ -61,8 +61,8 @@ import org.xml.sax.SAXException;
  * @author thomas
  *
  */
-public class CreateTestMATSimConfig {
-	private static final Logger log = Logger.getLogger(CreateTestMATSimConfig.class) ;
+public class CreateTestM4UConfig {
+	private static final Logger log = Logger.getLogger(CreateTestM4UConfig.class) ;
 	
 	public static final int COLD_START = 0;
 	public static final int WARRM_START = 1;
@@ -148,7 +148,7 @@ public class CreateTestMATSimConfig {
 	 * @param startMode distinguishes between cold, warm and hot start
 	 * @param path gives the path, were the generated config (and other files) should be stored
 	 */
-	public CreateTestMATSimConfig(final int startMode, String path){
+	public CreateTestM4UConfig(final int startMode, String path){
 		this.startMode 			= startMode;
 		this.dummyPath 			= path;
 		this.networkInputFileName 	= path + DUMMY_FILE;
@@ -171,7 +171,7 @@ public class CreateTestMATSimConfig {
 	 * @param startMode distinguishes between cold, warm and hot start
 	 * @param path gives the path, were the generated config (and other files) should be stored
 	 */
-	public CreateTestMATSimConfig(final int startMode, String path, boolean testrun){
+	public CreateTestM4UConfig(final int startMode, String path, boolean testrun){
 		this.startMode 			= startMode;
 		this.dummyPath 			= path;
 		this.networkInputFileName 	= path + DUMMY_FILE;
@@ -197,7 +197,7 @@ public class CreateTestMATSimConfig {
 	 * @param path gives the path, were the generated config (and other files) should be stored
 	 * @param externalConfig gives the path, were the external MATSim config is stored
 	 */
-	public CreateTestMATSimConfig(final int startMode, String path, String externalConfig){
+	public CreateTestM4UConfig(final int startMode, String path, String externalConfig){
 		this.startMode = startMode;
 		this.dummyPath = path;
 		this.networkInputFileName 	= path + DUMMY_FILE;
@@ -220,7 +220,7 @@ public class CreateTestMATSimConfig {
 	 * @param path
 	 * @param inputNetworkFile
 	 */
-	public CreateTestMATSimConfig(String path, String inputNetworkFile){
+	public CreateTestM4UConfig(String path, String inputNetworkFile){
 		this.dummyPath = path;
 		this.networkInputFileName = inputNetworkFile;
 		this.inputPlansFileName		= "";
@@ -250,12 +250,12 @@ public class CreateTestMATSimConfig {
 		FileType network = of.createFileType();
 		network.setInputFile( this.networkInputFileName );
 		InputPlansFileType inputPlansFileType = of.createInputPlansFileType();
-		if(this.startMode == CreateTestMATSimConfig.COLD_START)
+		if(this.startMode == CreateTestM4UConfig.COLD_START)
 			inputPlansFileType.setInputFile( "" );
-		else if(this.startMode == CreateTestMATSimConfig.WARRM_START)
+		else if(this.startMode == CreateTestM4UConfig.WARRM_START)
 			inputPlansFileType.setInputFile( this.inputPlansFileName );
 		InputPlansFileType hotStratPlansFile = of.createInputPlansFileType();
-		if(this.startMode == CreateTestMATSimConfig.HOT_START)
+		if(this.startMode == CreateTestM4UConfig.HOT_START)
 			hotStratPlansFile.setInputFile( this.hotstartPlansFileName );
 		else
 			hotStratPlansFile.setInputFile( "" );
@@ -447,12 +447,12 @@ public class CreateTestMATSimConfig {
 		FileType network = of.createFileType();
 		network.setInputFile( this.networkInputFileName );
 		InputPlansFileType inputPlansFileType = of.createInputPlansFileType();
-		if(this.startMode == CreateTestMATSimConfig.COLD_START)
+		if(this.startMode == CreateTestM4UConfig.COLD_START)
 			inputPlansFileType.setInputFile( "" );
-		else if(this.startMode == CreateTestMATSimConfig.WARRM_START)
+		else if(this.startMode == CreateTestM4UConfig.WARRM_START)
 			inputPlansFileType.setInputFile( this.inputPlansFileName );
 		InputPlansFileType hotStratPlansFile = of.createInputPlansFileType();
-		if(this.startMode == CreateTestMATSimConfig.HOT_START)
+		if(this.startMode == CreateTestM4UConfig.HOT_START)
 			hotStratPlansFile.setInputFile( this.hotstartPlansFileName );
 		else
 			hotStratPlansFile.setInputFile( "" );
@@ -634,7 +634,7 @@ public class CreateTestMATSimConfig {
 	public static void main(String args[]){
 		
 		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
-		CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(COLD_START, path);
+		CreateTestM4UConfig testConfig = new CreateTestM4UConfig(COLD_START, path);
 
 		String matsimConfiFile = testConfig.generateConfigV3();
 

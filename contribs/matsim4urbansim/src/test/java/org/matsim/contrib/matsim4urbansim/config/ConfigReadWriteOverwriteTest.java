@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,7 +40,7 @@ import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestMATSimConfig;
+import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.basic.v01.IdImpl;
@@ -52,6 +53,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
@@ -70,12 +72,18 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
+	@Before
+	public void setUp() throws Exception {
+		OutputDirectoryLogging.catchLogEntries();		
+		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
+	}
+	
 	/**
 	 * This test makes sure that the MATSim4UrbanSim config file will be correctly written, 
 	 * correctly converted into standard MATSim format and that all values are recognized correctly
 	 */
 	@Test
-	@Ignore
+//	@Ignore // found this disabled on 19/jan/14. kai
 	public void testLoadMATSim4UrbanSimMinimalConfig(){
 		
 		// MATSim4UrbanSim configuration converter
@@ -86,8 +94,9 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
-			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path);
-			String configLocation = testConfig.generateMinimalConfig();
+			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path);
+//			String configLocation = testConfig.generateMinimalConfig();
+			String configLocation = testConfig.generateConfigV3();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
@@ -112,7 +121,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	 * correctly converted into standard MATSim format and that all values are recognized correctly
 	 */
 	@Test
-	@Ignore
+//	@Ignore // found this disabled on 19/jan/14. kai
 	public void testLoadMATSim4UrbanSimConfigOnly(){
 		
 		// MATSim4UrbanSim configuration converter
@@ -123,8 +132,8 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
-			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path);
-			String configLocation = testConfig.generateConfigV2();
+			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path);
+			String configLocation = testConfig.generateConfigV3();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
@@ -157,25 +166,25 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	 * this, different parameter settings are used in the external config.
 	 */
 	@Test
-	@Ignore
+//	@Ignore // found this disabled on 19/jan/14. kai
 	public void testExternalMATSimConfig(){
 		
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 converter = null;
 		
-		try{
+//		try{
 			String path = utils.getOutputDirectory() + "/tmp" ;
 			IOUtils.createDirectory(path) ;
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hard disk");
 			
 			// this creates an external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
-			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestMATSimConfig.COLD_START, path);
+			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestM4UConfig.COLD_START, path);
 			String externalConfigLocation = testExternalConfig.generateConfigV2();
 			
 			// this creates a MATSim4UrbanSim configuration
-			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path, externalConfigLocation);
-			String configLocation = testConfig.generateConfigV2();
+			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path, externalConfigLocation);
+			String configLocation = testConfig.generateConfigV3();
 			
 			// This converts the MATSim4UrbanSim configuration into MATSim format, 
 			// i.e. puts the settings into the MATSim config groups or adds new MATSim modules
@@ -218,13 +227,13 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			checkCoreModulesAndExternalConfigSettings(testExternalConfig, testConfig, config);
 			
 			// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
-			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
+//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 			
 			
-		} catch(Exception e){
-			e.printStackTrace();
-			Assert.assertTrue(false);
-		}
+//		} catch(Exception e){
+//			e.printStackTrace();
+//			Assert.assertTrue(false);
+//		}
 		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		
 	}
@@ -256,7 +265,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	 */
 	private void checkCoreModulesAndExternalConfigSettings(
 			CreateTestExternalMATSimConfig externalTestConfig,
-			CreateTestMATSimConfig testConfig, Config config) {
+			CreateTestM4UConfig testConfig, Config config) {
 		
 		Assert.assertTrue(config.controler().getFirstIteration() == externalTestConfig.firstIteration.intValue());
 		Assert.assertTrue(config.controler().getLastIteration() == externalTestConfig.lastIteration.intValue());
@@ -264,7 +273,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		
 		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.networkInputFileName ) ));
 		
-		if(testConfig.getStartMode() != CreateTestMATSimConfig.COLD_START){
+		if(testConfig.getStartMode() != CreateTestM4UConfig.COLD_START){
 			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.inputPlansFileName ) ));
 		}
 		
@@ -328,7 +337,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	 * @param testConfig
 	 * @param config
 	 */
-	void checkCoreModuleSettings(CreateTestMATSimConfig testConfig, Config config) {
+	void checkCoreModuleSettings(CreateTestM4UConfig testConfig, Config config) {
 		log.info("Checking settings");
 		// the following checks all settings that are (i) part of the core modules and that are (ii) set in CreateTestMATSimConfig
 		
@@ -340,7 +349,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
 		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.networkInputFileName ) ));
 		
-		if(testConfig.getStartMode() != CreateTestMATSimConfig.COLD_START){
+		if(testConfig.getStartMode() != CreateTestM4UConfig.COLD_START){
 			PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
 			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.inputPlansFileName ) ));
 		}

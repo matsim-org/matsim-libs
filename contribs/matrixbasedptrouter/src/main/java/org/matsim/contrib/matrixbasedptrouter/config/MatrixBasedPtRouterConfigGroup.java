@@ -36,9 +36,8 @@ public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 	
 	public static final String GROUP_NAME="matrixBasedPtRouter" ;
 
-	private static final String USING_PT_STOPS = "usingPtStops";
 	public static final String PT_STOPS = "ptStopsFile"; // tnicolai: originally, this was named "ptStops" in the matsim config. old config files need to be adjusted
-	public static final String PT_STOPS_SWITCH = "usePtStops";
+	public static final String USING_PT_STOPS = "usingPtStops";
 	public static final String PT_TRAVEL_TIMES = "ptTravelTimesFile"; // tnicolai: originally, this was named "ptTravelTimes" in the matsim config. old config files need to be adjusted
 	public static final String PT_TRAVEL_DISTANCES = "ptTravelDistancesFile"; // tnicolai: originally, this was named "ptTravelDistances" in the matsim config. old config files need to be adjusted
 	public static final String PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH = "usingTravelTimesAndDistances"; // tnicolai: originally, this was named "useTravelTimesAndDistances" in the matsim config. old config files need to be adjusted
@@ -97,7 +96,7 @@ public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 	protected void checkConsistency() {
     		boolean problem = false ;
 		if( isUsingPtStops() ) {
-			log.info(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
+			log.info(MatrixBasedPtRouterConfigGroup.USING_PT_STOPS + " switch is set to true. Trying to find pt stops file ...");
 			// checking for pt stops
 			if( getPtStopsInputFile() != null){
 				File ptStopsFile = new File(getPtStopsInputFile());
@@ -132,7 +131,7 @@ public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 				log.warn("No pt stops file given although switch is set to true!  Will abort ...");
 			}
 		} else {
-			log.info(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH + " switch is set to false. Matrix based pt router will not be initialized.");
+			log.info(MatrixBasedPtRouterConfigGroup.USING_PT_STOPS + " switch is set to false. Matrix based pt router will not be initialized.");
 		}
 		if ( problem ) {
 			throw new RuntimeException("found fatal problem in matrix based pt router initialization; aborting ...") ;

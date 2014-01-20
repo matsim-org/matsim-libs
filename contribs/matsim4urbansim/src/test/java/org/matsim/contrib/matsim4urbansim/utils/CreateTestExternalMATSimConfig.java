@@ -45,7 +45,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author thomas
  *
  */
-public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
+public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	
 	public static final String DUMMY_FILE_2 = "/dummy2.xml";
 	
@@ -152,7 +152,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 
 		Module ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS, this.ptStops);
-		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH, this.usePtStops);
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.USING_PT_STOPS, this.usePtStops);
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES, this.ptTravelTimes);
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
@@ -245,7 +245,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		// improved pseudo pt:
 		Module ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS, this.ptStops);
-		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH, "tRue" );
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.USING_PT_STOPS, "tRue" );
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 
 		// changeLegMode module

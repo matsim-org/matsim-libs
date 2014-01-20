@@ -27,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestMATSimConfig;
+import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
 import org.matsim.core.config.Config;
 
@@ -56,11 +56,11 @@ public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
 			// this creates a default external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
-			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestMATSimConfig.COLD_START, path);
+			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestM4UConfig.COLD_START, path);
 			String externalConfigLocation = testExternalConfig.generateConfigV2();
 			
 			// this creates a default MATSim4UrbanSim configuration including an external config
-			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path, externalConfigLocation);
+			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path, externalConfigLocation);
 			String configLocation = testConfig.generateConfigV3();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");

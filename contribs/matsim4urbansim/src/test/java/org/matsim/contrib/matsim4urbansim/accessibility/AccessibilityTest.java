@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,15 +19,20 @@ import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterf
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestMATSimConfig;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
+import org.matsim.contrib.matsim4urbansim.matsim4urbansim.AgentPerformanceControlerListener;
+import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestPopulation;
+import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,6 +49,13 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	
 	private List<Double> accessibilitiesHomeZone;
 	private List<Double> accessibilitiesWorkZone;
+	
+	@Before
+	public void setUp() throws Exception {
+		OutputDirectoryLogging.catchLogEntries();		
+		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
+	}
+
 
 	/**
 	 * This method tests the grid based accessibility computation.
@@ -54,9 +67,16 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 * any other measuring point.
 	 */
 	
-	@Test
-	@Ignore
+//	public static void main( String[] args ) {
+//		new AccessibilityTest().run() ;
+//	}
+
+		@Test
+//	@Ignore // found this with "ignore" on 19/jan/2014. ??? kai
 	public void testGridBasedAccessibilityMeasure(){
+//	void run() {
+			OutputDirectoryLogging.catchLogEntries();		
+			// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
 
 		//create local temp directory
 		String path = utils.getOutputDirectory();
@@ -66,8 +86,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		new NetworkWriter(net).write(path+"network.xml");
 		
 		//create matsim config file and write it into the temp director<
-		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"network.xml");
-		String configLocation = ctmc.generateConfigV3();
+		String configLocation = new CreateTestM4UConfig(path, path+"network.xml").generateConfigV3();
 
 		//create a test population of n persons
 		Population population = CreateTestPopulation.createTestPopulation(nPersons);
@@ -87,37 +106,45 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		Controler ctrl = new Controler(scenario);
 		ctrl.setOverwriteFiles(true);
 		
-		//create a bounding box with 9 measuring points (one for each node)
-		MyBoundingBox bbox = new MyBoundingBox();
-		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
-		
-		double minX = boundary[0]-resolution/2;
-		double minY = boundary[1]-resolution/2;
-		double maxX = boundary[2]+resolution/2;
-		double maxY = boundary[3]+resolution/2;
-		
-		bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
-		
-		//initialize opportunities for accessibility computation
-		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-		opportunities.createAndAddFacility(new IdImpl("opp"), new CoordImpl(200, 100));
-		
 		//pt not used in this test
 		PtMatrix ptMatrix = null;
+		
+		Benchmark benchmark = new Benchmark() ;
 
-		//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
-		GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, net);
-		listener.setComputingAccessibilityForFreeSpeedCar(true);
-		listener.setComputingAccessibilityForCongestedCar(true);
-		listener.setComputingAccessibilityForBike(true);
-		listener.setComputingAccessibilityForWalk(true);
-		listener.generateGridsAndMeasuringPointsByCustomBoundary(minX, minY, maxX, maxY, resolution);
-		
-		//add grid data exchange listener to get accessibilities
-		listener.addSpatialGridDataExchangeListener(this);
-		
-		//add grid based accessibility controler listener to the controler and run the simulation
-		ctrl.addControlerListener(listener);
+		{
+			//create a bounding box with 9 measuring points (one for each node)
+			MyBoundingBox bbox = new MyBoundingBox();
+			double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
+
+			double minX = boundary[0]-resolution/2;
+			double minY = boundary[1]-resolution/2;
+			double maxX = boundary[2]+resolution/2;
+			double maxY = boundary[3]+resolution/2;
+
+			bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
+
+			//initialize opportunities for accessibility computation
+			ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
+			opportunities.createAndAddFacility(new IdImpl("opp"), new CoordImpl(200, 100));
+
+			//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
+			GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, net);
+			listener.setComputingAccessibilityForFreeSpeedCar(true);
+			listener.setComputingAccessibilityForCongestedCar(true);
+			listener.setComputingAccessibilityForBike(true);
+			listener.setComputingAccessibilityForWalk(true);
+			listener.generateGridsAndMeasuringPointsByCustomBoundary(minX, minY, maxX, maxY, resolution);
+
+			//add grid data exchange listener to get accessibilities
+			listener.addSpatialGridDataExchangeListener(this);
+
+			//add grid based accessibility controler listener
+			ctrl.addControlerListener(listener);
+		}
+		{
+			UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(ctrl.getConfig());
+			ctrl.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
+		}
 		ctrl.run();
 	
 		//test case: verify that accessibility of measuring point 7 (200,100) is higher than all other's
@@ -137,7 +164,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 * The test result should be that the accessibility of the work zone is higher than the accessibility of the home zone.
 	 */
 	@Test
-	@Ignore
+//	@Ignore // found this with "ignore" on 19/jan/2014. ??? kai
 	public void testZoneBasedAccessibilityMeasure(){
 		
 		//create local temp directory
@@ -148,7 +175,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		new NetworkWriter(net).write(path+"network.xml");
 		
 		//create matsim config file and write it into the temp director<
-		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"network.xml");
+		CreateTestM4UConfig ctmc = new CreateTestM4UConfig(path, path+"network.xml");
 		String configLocation = ctmc.generateConfigV3();
 
 		//create a test population of n persons

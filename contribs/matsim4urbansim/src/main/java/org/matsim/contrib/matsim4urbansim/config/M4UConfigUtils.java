@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
@@ -413,7 +414,8 @@ public class M4UConfigUtils {
 		config.addModule(	new UrbanSimParameterConfigModuleV3() ) ;
 		config.addModule( new M4UControlerConfigModuleV3() );
 		config.addModule(	new AccessibilityConfigGroup() ) ;
-
+		config.addModule( new MatrixBasedPtRouterConfigGroup() ) ;
+		
 		// set some defaults:
 		VspExperimentalConfigGroup vsp = config.vspExperimental();
 		vsp.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
