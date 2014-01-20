@@ -267,7 +267,7 @@ public class KNGautengControler {
 		// === CONTROLER: ===
 
 		final Controler controler = new Controler( scenario ) ;
-//		controler.setOverwriteFiles(true) ;
+		controler.setOverwriteFiles(true) ;
 
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing class):
 		// insert into scoring:

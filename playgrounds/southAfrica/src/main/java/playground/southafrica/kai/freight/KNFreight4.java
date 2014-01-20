@@ -354,6 +354,8 @@ public class KNFreight4 {
 							}
 							// (note: provide penalties that work with a gradient to help the evol algo. kai, nov'13)
 							
+						} else {
+							log.warn("Carrier activities which are not FreightActivities are not scored here") ;
 						}
 						
 						
