@@ -31,10 +31,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -66,6 +68,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
@@ -454,6 +457,18 @@ public class CadytsIntegrationTest {
 		
 		final Controler controler = new Controler(config);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
+//		final CadytsContextI<TransitStopFacility> context = new CadytsContextI<TransitStopFacility>() {
+//			@Override
+//			public AnalyticalCalibrator<TransitStopFacility> getCalibrator() {
+//				// TODO Auto-generated method stub
+//				throw new RuntimeException("not implemented") ;
+//			}
+//			@Override
+//			public PlansTranslator<TransitStopFacility> getPlansTranslator() {
+//				// TODO Auto-generated method stub
+//				throw new RuntimeException("not implemented") ;
+//			} 
+//		} ;
 		controler.addControlerListener(context) ;
 		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
@@ -468,6 +483,8 @@ public class CadytsIntegrationTest {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.run();
+		
+		// ====================================
 		
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
