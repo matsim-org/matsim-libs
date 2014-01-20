@@ -99,6 +99,7 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.RandomJointLocationChoiceConfigGroup;
 import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
@@ -659,6 +660,7 @@ public class RunUtils {
 		config.addModule( new KtiInputFilesConfigGroup() );
 		config.addModule( new PseudoSimConfigGroup() );
 		config.addModule( new SocialNetworkConfigGroup() );
+		config.addModule( new RandomJointLocationChoiceConfigGroup() );
 		new NonFlatConfigReader( config ).parse( configFile );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 	
