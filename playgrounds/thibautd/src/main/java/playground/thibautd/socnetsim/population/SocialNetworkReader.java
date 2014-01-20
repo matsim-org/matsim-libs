@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 import playground.thibautd.utils.ObjectPool;
@@ -39,7 +38,6 @@ public class SocialNetworkReader extends MatsimXmlParser {
 
 	private boolean isReflective = false;
 	private final ObjectPool<Id> idPool = new ObjectPool<Id>();
-	private Counter counter = null;
 
 	public SocialNetworkReader(final Scenario scenario) {
 		super( false );
@@ -55,10 +53,8 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			this.isReflective = Boolean.parseBoolean( atts.getValue( SocialNetworkWriter.REFLECTIVE_ATT ) );
 			this.socialNetwork = new SocialNetwork( this.isReflective );
 			this.scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , this.socialNetwork );
-			this.counter = new Counter( "Read tie # " );
 		}
 		else if ( name.equals( SocialNetworkWriter.TIE_TAG ) ) {
-			counter.incCounter();
 			final Id ego = idPool.getPooledInstance(
 					new IdImpl(
 						atts.getValue(
@@ -78,7 +74,6 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			final String content,
 			final Stack<String> context) {
 		if ( name.equals( SocialNetworkWriter.ROOT_TAG ) ) {
-			counter.printCounter();
 			idPool.printStats( "ID Pool" );
 		}
 	}
