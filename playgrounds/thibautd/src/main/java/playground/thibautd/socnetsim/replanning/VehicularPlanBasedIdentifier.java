@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * VehicularPlanBasedIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.thibautd.socnetsim.replanning;
+
+import java.util.Collections;
 
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 
-// /////////////////////////////////////////////////////////////////////////
-// helpers
-// /////////////////////////////////////////////////////////////////////////
-public class DefaultPlanLinkIdentifier implements PlanLinkIdentifier {
-	private final PlanLinkIdentifier delegate =
-		new CompositePlanLinkIdentifier(
-				new JointTripsPlanLinkIdentifier(),
-				new VehicularPlanBasedIdentifier() );
-
+/**
+ * @author thibautd
+ */
+public final class VehicularPlanBasedIdentifier implements PlanLinkIdentifier {
 	@Override
 	public boolean areLinked(
 			final Plan p1,
 			final Plan p2) {
-		return delegate.areLinked( p1 , p2 );
+		return !Collections.disjoint(
+			SharedVehicleUtils.getVehiclesInPlan( p1 , SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) ,
+			SharedVehicleUtils.getVehiclesInPlan( p2 , SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) );
 	}
 }
+
