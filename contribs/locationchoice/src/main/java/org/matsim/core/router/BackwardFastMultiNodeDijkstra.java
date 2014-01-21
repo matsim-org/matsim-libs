@@ -65,10 +65,10 @@ public class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra {
 		if (currTime < 0) {
 			double timeMod = 24.0 * 3600.0 - Math.abs(currTime % (24.0 * 3600.0));
 			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, timeMod, getPerson(), getVehicle());
-			travelCost = this.costFunction.getLinkTravelDisutility(l, timeMod, null, null);			
+			travelCost = this.costFunction.getLinkTravelDisutility(l, timeMod, getPerson(), getVehicle());			
 		} else {
 			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, currTime, getPerson(), getVehicle());
-			travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, null, null);
+			travelCost = this.costFunction.getLinkTravelDisutility(l, currTime,  getPerson(), getVehicle());
 		}	
 //		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, person, vehicle);
 //		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle);
