@@ -31,6 +31,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
 
@@ -49,11 +51,20 @@ public class TimeModeChooserSolutionTest {
 		PlanImpl p = new PlanImpl();
 		testPlans.add( p );
 
-		p.createAndAddActivity( "h" ).setEndTime( 12 );
+		ActivityImpl act = p.createAndAddActivity( "h" );
+		act.setEndTime( 12 );
+		act.setLinkId( new IdImpl( 1 ) );
+
 		p.createAndAddLeg( "bike" );
-		p.createAndAddActivity( "w" ).setMaximumDuration( 298 );
+
+		act = p.createAndAddActivity( "w" );
+		act.setMaximumDuration( 298 );
+		act.setLinkId( new IdImpl( 2 ) );
+
 		p.createAndAddLeg( "bike" );
-		p.createAndAddActivity( "h" );
+
+		act = p.createAndAddActivity( "h" );
+		act.setLinkId( new IdImpl( 1 ) );
 	}
 	
 	@Test
