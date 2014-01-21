@@ -378,6 +378,69 @@ label=lst:BuildingScenarios:minimalPopulationXml]
 \label{sec:BuildingScenarios:Units}
 \todo{MR: id: any string, but please no white spaces and commas, coordinate system, mostly meter, seconds}
 
+\section{Coordinate Systems}
+\label{sec:BuildingScenarios:CoordinateSystems}
+
+\subsection{Preparing Your Data in the Right Coordinate System}
+
+In several input files, you need to specify coordinates, e.g. for the nodes of
+the network. It is strongly suggested \emph{not} to use WGS84 coordinates (i.e.
+GPS coordinates, or any other kind of spherical coordinates; coordinates ranging
+from -180 to +180 in west-east direction, and from -90 to +90 in south-north
+direction). MATSim needs to calculate distances between two points in several
+places of the code. The calculation of distances between spheric coordinates is
+very complex and potentially slow. Instead, MATSim uses the simple Pythagoras'
+theorem, but this requires the coordinates to be in a Cartesian coordinate
+system. Thus is is stronlgy advised to use a Cartesian coordinate system along
+with MATSim, preferably one where the distance unit corresponds to one meter.
+
+Many countries and regions have custom coordinate system defined, optimized for
+usages in their apropriet areas. It might be best to ask some GIS specialists in
+your region of interest what the most commonly used local coordinate system is
+and use that as well for your data. 
+
+If you don't have any clue about what coordinate system is used in your region,
+it might be best to use the Universal Transverse Mercator coordinate system.
+This coordinate system divides the world into multiple bands, each six degrees
+width and separated into a northern and southern part, which it calls UTM zones
+(see \url{http://en.wikipedia.org/wiki/UTM_zones#UTM_zone} for more details).
+For each zone, an optimized coordinate system is defined. Choose the UTM zone
+which covers your region (Wikipedia has a nice map showing the zones) and use
+its coordinate system.
+
+\subsection{Telling MATSim about Your Coordinate System}
+
+In some places, MATSim requires to know which coordinate system your data is in.
+You have multiple ways to specify the coordinate system you use. The easiest one
+is to use the so-called ``EPSG codes''. Most of the commonly used coordinate
+systems got standardized and numbered. The EPSG code uniquely identifies a
+coordinate system and can be directly used by MATSim. As an alternative, MATSim
+can also parse the description of a coordinate system in the so-called WKT
+format. As the WKT format is much more error-prone it is suggested to use EPSG
+codes whenever possible.
+
+To find the correct EPSG code for your coordinate system (e.g. for one of the
+UTM zones), the website \url{http://www.spatialreference.org} is of great use.
+Search on this website for your coordinate system, e.g. for ``WGS84 / UTM Zone
+8N'' (for the northern-hemisphere UTM Zone 8) to find a list of matching
+coordinate systems along with their EPSG codes.
+
+
+For some operations, MATSim must know the coordinate system your data is in.
+Some analyses may create output to be visualized in Google Earth for example,
+where the coordinates need to be converted back to WGS84. The coordinate system
+used by your data can be specified in the config file:
+
+\begin{lstlisting}{language=XML}
+<module name="global">
+  <param name="coordinateSystem" value="EPSG:32608" />
+</module>
+\end{lstlisting}
+
+This allows MATSim to work with your coordinates and convert them whenever
+needed.
+
+
 old stuff from here
 ================
 
@@ -400,31 +463,6 @@ In many cases, using pre-configured software is not possible because  there are 
 
 The following sections contains various information for building a scenario that presumably goes beyond what is in the tutorial.
 
-\section{Coordinate Systems in MATSim}
-
-For  some operations, MATSim must know about the coordinate system your data  is in. For example, If you want to generate kml-Output for  Counts-Validation, MATSim has to convert the coordinates in your network  to WGS84, the coordinate system used by Google Earth.
-
-
-\subsubsection{Specifying the Coordinate System used}
-
-You can specify the coordinate system in the config-file:
-\begin{lstlisting}{language=XML}
-<module name="global">
-  <param name="coordinateSystem" value="CH1903LV1903" />
-</module>
-\end{lstlisting}
-
-The value specified for the coordinateSystem parameter can be:
-\begin{itemize}
-	\item The short-name of a coordinate system known to MATSim. We define  names for coordinate systems we use regularly in our work. These names  are currently defined in \href{http://matsim.svn.sourceforge.net/viewvc/matsim/matsim/trunk/src/main/java/org/matsim/core/utils/geometry/transformations/TransformationFactory.java?view=markup}{TransformationFactory}. The short-name 
-\texttt{Atlantis}  stands for an artificial coordinate system which maps our examples  without relation to the real world somewhere in to the Atlantic ocean.
-	\item Well-Known-Text (\href{http://www.geoapi.org/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html}{WKT})  description of a coordinate system as they are supported by Geotools.  This variant is not very readable, but allows one to experiment also in  regions where MATSim does not provide a short-name for. Examples of WKT  can be found in the MATSim-class \href{http://matsim.svn.sourceforge.net/viewvc/matsim/matsim/trunk/src/main/java/org/matsim/core/utils/geometry/geotools/MGC.java?view=markup}{MGC}(in the 
-\texttt{transformations} map).
-\end{itemize}
-
-\subsubsection{Notes about Coordinate Systems}
-
-As the distance calculation in WGS84-coordinates (or any spherical coordinates) is rather complex (a simple \href{http://en.wikipedia.org/wiki/Pythagorean_theorem}{Pythagoras} is not enough), we advise people to use a \href{http://en.wikipedia.org/wiki/Coordinate_system}{Cartesian coordinate systems},  preferable where one unit corresponds to one meter. Using such a  coordinate system is a pre-requisit if one wants to use the optimized  A*Landmarks-Router in MATSim.
 
 \section{Using MATSim for Switzerland}
 
