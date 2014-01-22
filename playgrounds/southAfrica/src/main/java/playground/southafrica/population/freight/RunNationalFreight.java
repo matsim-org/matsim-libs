@@ -51,6 +51,8 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
+import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
+import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -60,57 +62,39 @@ import playground.southafrica.utilities.Header;
 public class RunNationalFreight {
 	private final static Logger LOG = Logger.getLogger(RunNationalFreight.class);
 	
+	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/5000/";
+//	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/01perc/";
 	
-	private static final class DigicorePlanStrategyModule implements
-			PlanStrategyModule {
-		
-		public DigicorePlanStrategyModule() {
-
-		}
-		
-		
-		@Override
-		public void prepareReplanning(ReplanningContext replanningContext) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void handlePlan(Plan plan) {
-			// TODO Auto-generated method stub
-			LOG.info("   ====> Woopie: plan handled.");
-		}
-
-		@Override
-		public void finishReplanning() {
-			// TODO Auto-generated method stub
-
-		}
-	}
-
 	private static String NETWORK = "/Users/jwjoubert/Documents/workspace/Data-southAfrica/network/southAfrica_20131202_coarseNetwork_clean.xml.gz";
-	private static String POPULATION = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/5000/nationalFreight_5000.xml.gz";
-	private static String POPULATION_ATTR = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/5000/nationalFreight_Attributes.xml.gz";
-	private static String OUTPUT_DIRECTORY = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/5000/output/";
+	private static String OUTPUT_DIRECTORY = HOME + "output/";
+	private static String POPULATION = HOME + "nationalFreight.xml.gz";
+	private static String POPULATION_ATTR =  HOME + "nationalFreightAttributes.xml.gz";
+	private static String PATH_DEPENDENT_NETWORK = HOME + "pathDependentNetwork.xml.gz";
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(RunNationalFreight.class.toString(), args);
-		if(args.length == 4){
+		if(args.length == 5){
 			NETWORK = args[0];
 			POPULATION = args[1];
 			POPULATION_ATTR = args[2];
 			OUTPUT_DIRECTORY = args[3];
+			PATH_DEPENDENT_NETWORK = args[4];
 		} else{
 			LOG.warn("None, or insufficient run arguments passed. Reverts back to defaults.");
+			LOG.warn("Network: " + NETWORK);
+			LOG.warn("Population: " + HOME + POPULATION);
+			LOG.warn("Population attributes: " + HOME + POPULATION_ATTR);
+			LOG.warn("Output: " + HOME + OUTPUT_DIRECTORY);
+			LOG.warn("Path-dependent network: " + HOME + PATH_DEPENDENT_NETWORK);
 		}
 		
 		/* Config stuff */
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(OUTPUT_DIRECTORY);
-		config.controler().setLastIteration(5);
+		config.controler().setLastIteration(2	);
 		config.controler().setWriteEventsInterval(1);
 		
 		config.network().setInputFile(NETWORK);
@@ -143,9 +127,15 @@ public class RunNationalFreight {
 			/* Subpopulation strategy */
 		StrategySettings commercialStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 		commercialStrategy.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
-		commercialStrategy.setProbability(0.9);
+		commercialStrategy.setProbability(0.7);
 		commercialStrategy.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialStrategy);
+		//TODO Add the custom strategy module.
+		StrategySettings newStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		newStrategy.setModuleName("Digicore1");
+		newStrategy.setProbability(0.3);
+		newStrategy.setSubpopulation("commercial");
+		config.strategy().addStrategySettings(newStrategy);
 		
 		/* Scenario stuff */
 		Scenario sc = ScenarioUtils.loadScenario(config);
@@ -171,21 +161,49 @@ public class RunNationalFreight {
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
 		
-		PlanStrategyFactory planStrategyFactory = new PlanStrategyFactory() {
-
+		PlanStrategyFactory newPlanStrategyFactory = new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario,
 					EventsManager eventsManager) {
 				PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan>() );
-				strategy.addStrategyModule(new DigicorePlanStrategyModule());
+				strategy.addStrategyModule(new NewDigicorePlanStrategyModule());
 				return strategy;
 			}
 		};
 		
-		controler.addPlanStrategyFactory("Digicore1", planStrategyFactory );
-		
+		controler.addPlanStrategyFactory("newPlan", newPlanStrategyFactory );
+
 		controler.run();
 		Header.printFooter();
 	}
+
+	private static final class NewDigicorePlanStrategyModule implements PlanStrategyModule {
+		private final PathDependentNetwork network;
+
+		public NewDigicorePlanStrategyModule() {
+			DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
+			nr.parse(PATH_DEPENDENT_NETWORK);
+			network = nr.getPathDependentNetwork();
+		}
+
+
+		@Override
+		public void prepareReplanning(ReplanningContext replanningContext) {
+
+		}
+
+		@Override
+		public void handlePlan(Plan plan) {
+			// TODO Auto-generated method stub
+			LOG.info("   ====> Woopie: plan handled.");
+		}
+
+		@Override
+		public void finishReplanning() {
+			// TODO Auto-generated method stub
+
+		}
+	}
+
 
 }
