@@ -19,8 +19,6 @@
 
 package org.matsim.api.core.v01.population;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.utils.customize.Customizable;
@@ -44,6 +42,6 @@ public interface Person extends Identifiable, Customizable, HasPlansAndId<Plan>{
 //
 //	public Plan getSelectedPlan();
 	
-	public void setSelectedPlan(final Plan selectedPlan);
+//	public void setSelectedPlan(final Plan selectedPlan);
 
 }
