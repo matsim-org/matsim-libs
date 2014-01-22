@@ -20,6 +20,18 @@
 
 package playground.southafrica.gauteng.roadpricingscheme;
 
+/**
+ * Currently the eTag penetration is set arbitrarily (January 2014):
+ * <ul>
+ * 		<li> Private car: 40%;
+ * 		<li> Commercial vehicles (intra and inter-Gauteng): 40%;
+ * 		<li> Bus: 50%;
+ * 		<li> Taxi: 40%; and
+ * 		<li> External vehicles: 25%
+ * </ul>
+ *
+ * @author jwjoubert
+ */
 public abstract class TagPenetration {
 	public final static double CAR = 0.40;
 	public final static double COMMERCIAL = 0.40;

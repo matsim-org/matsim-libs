@@ -137,26 +137,26 @@ public class SanralTollFactor implements TollFactorI {
 			// nothing
 			break ;
 		case commercialClassBWithTag:
-			sizeFactor = 3;
+			sizeFactor = 2.5;
 			tagDiscount = 0.25;
 			break ;
 		case commercialClassBWithoutTag:
-			sizeFactor = 3;
+			sizeFactor = 2.5;
 			break ;
 		case commercialClassCWithTag:
-			sizeFactor = 6;
+			sizeFactor = 5;
 			tagDiscount = 0.25;
 			break ;
 		case commercialClassCWithoutTag:
-			sizeFactor = 6;
+			sizeFactor = 5;
 			break ;
 		case busWithTag:
-			sizeFactor = 3;
+			sizeFactor = 2.5;
 			tagDiscount = 0.25;
 			ptDiscount = 0.55;
 			break ;
 		case busWithoutTag:
-			sizeFactor = 3;
+			sizeFactor = 2.5;
 			ptDiscount = 0.55;
 			break ;
 		case taxiWithTag:
