@@ -48,7 +48,7 @@ import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactorOLD;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
 import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
-import playground.southafrica.gauteng.scoring.PersonSpecificUoMScoringFunctionFactory;
+import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.utilities.Header;
@@ -247,7 +247,7 @@ public class KNGautengControler {
 		
 		// SCORING FUNCTION:
 		final ScoringFunctionFactory scoringFunctionFactory = 
-				new PersonSpecificUoMScoringFunctionFactory(scenario.getConfig(), scenario.getNetwork(), personSpecificUtilityOfMoney );
+				new GautengScoringFunctionFactory(scenario, personSpecificUtilityOfMoney );
 
 		// CONSTRUCT VEH-DEP ROAD PRICING SCHEME:
 		RoadPricingScheme scheme = null ;

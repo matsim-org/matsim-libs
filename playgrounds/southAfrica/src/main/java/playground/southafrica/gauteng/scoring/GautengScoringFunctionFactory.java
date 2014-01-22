@@ -20,21 +20,17 @@
 package playground.southafrica.gauteng.scoring;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
@@ -43,45 +39,35 @@ import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
  * @author kickhoefer after
  * @author dgrether
  */
-public class PersonSpecificUoMScoringFunctionFactory implements ScoringFunctionFactory {
+public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private Config config;
-	private PlanCalcScoreConfigGroup configGroup;
-	private CharyparNagelScoringParameters params;
-	private final Network network;
+	private final CharyparNagelScoringParameters params;
 	private final UtilityOfMoneyI utlOfMon ;
+	private final Scenario scenario ;
+	private final String subPopulationAttributeName;
+	final ObjectAttributes personAttributes ;
 
-	public PersonSpecificUoMScoringFunctionFactory(Config config, Network network, UtilityOfMoneyI utlOfMon) {
-		this.config = config;
-		this.configGroup = config.planCalcScore();
-		this.params = new CharyparNagelScoringParameters(configGroup);
-		this.network = network;
+	public GautengScoringFunctionFactory(Scenario scenario, UtilityOfMoneyI utlOfMon) {
+		this.scenario = scenario ;
+		this.params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore());
 		this.utlOfMon = utlOfMon ;
+		this.subPopulationAttributeName = scenario.getConfig().plans().getSubpopulationAttributeName() ;
+		this.personAttributes = this.scenario.getPopulation().getPersonAttributes();
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
-		// Design comment: This is the only place where the person is available (via plan.getPerson()).  Thus, all 
-		// person-specific scoring actions need to be injected from here. kai, mar'12
-
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelActivityScoring(params));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelLegScoring(params, network));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(params));
-
-		// person-dependent money scoring function (standard implementation contains person-indep scoring function):
-		double utilityOfMoney_normally_positive = this.utlOfMon.getMarginalUtilityOfMoney(plan.getPerson().getId());
-		scoringFunctionAccumulator.addScoringFunction( new MoneyScoringImpl(utilityOfMoney_normally_positive) ) ;
-		
-		return scoringFunctionAccumulator;
-	}
-	
-	public ScoringFunction createNewScoringFunction2( Plan plan ) {
+	public ScoringFunction createNewScoringFunction( Plan plan ) {
 		SumScoringFunction sum = new SumScoringFunction() ;
-
-		sum.addScoringFunction(new CharyparNagelActivityScoring(params));
-		sum.addScoringFunction(new CharyparNagelLegScoring(params,network));
+		
+		String subPopName = (String) personAttributes.getAttribute(plan.getPerson().getId().toString(), this.subPopulationAttributeName ) ;
+		if ( subPopName.equals("freight") ) {
+			// do nothing
+			// yy note that this will not be sufficient once time mutation is switched on ... freight agents may prolong activities
+			// just to move the legs out of congestion. kai, jan'14
+		} else {
+			sum.addScoringFunction(new CharyparNagelActivityScoring(params));
+		}
+		sum.addScoringFunction(new CharyparNagelLegScoring(params,scenario.getNetwork()));
 		sum.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 		// person-dependent money scoring function (standard implementation contains person-indep scoring function):
@@ -93,7 +79,7 @@ public class PersonSpecificUoMScoringFunctionFactory implements ScoringFunctionF
 
 }
 
-class MoneyScoringImpl implements MoneyScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring {
+class MoneyScoringImpl implements org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring {
 	final static private Logger log = Logger.getLogger(MoneyScoringImpl.class);
 
 	private double score = 0.0;
