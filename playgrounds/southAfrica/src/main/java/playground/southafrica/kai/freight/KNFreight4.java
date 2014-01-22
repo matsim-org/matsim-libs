@@ -40,6 +40,7 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
@@ -205,10 +206,13 @@ public class KNFreight4 {
 
 
 	private static void generateCarrierPlans(Scenario scenario, Carriers carriers, CarrierVehicleTypes vehicleTypes) {
+		final Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( scenario.getNetwork(), vehicleTypes.getVehicleTypes().values() );
+//		netBuilder.setBaseTravelTimeAndDisutility(travelTime, travelDisutility) ;
+		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
+
 		for ( Carrier carrier : carriers.getCarriers().values() ) {
+
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder( carrier, scenario.getNetwork() ) ;
-			NetworkBasedTransportCosts netBasedCosts = NetworkBasedTransportCosts.Builder.newInstance( 
-					scenario.getNetwork(), vehicleTypes.getVehicleTypes().values() ).build() ;
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem problem = vrpBuilder.build() ;
 
