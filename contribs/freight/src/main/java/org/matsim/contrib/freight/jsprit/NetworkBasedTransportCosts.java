@@ -330,7 +330,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 
 		/**
-		 * By default it takes <code>link.getFreespeed();</code> to calculate the travelTime over that link.
+		 * By default it takes <code>link.getFreespeed(time);</code> to calculate the travelTime over that link.
 		 */
 		private TravelTime travelTime = new TravelTime() {
 
