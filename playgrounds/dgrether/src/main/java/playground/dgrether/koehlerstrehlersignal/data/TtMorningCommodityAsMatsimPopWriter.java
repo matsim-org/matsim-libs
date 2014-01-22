@@ -3,10 +3,7 @@
  */
 package playground.dgrether.koehlerstrehlersignal.data;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -21,7 +18,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
-import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 
 /**
  * @author tthunig
@@ -33,7 +29,7 @@ public class TtMorningCommodityAsMatsimPopWriter {
 	
 	private Population population;
 
-	private Network network; // not necessary
+	private Network network;
 
 	private DgIdConverter idConverter;
 	
@@ -42,8 +38,7 @@ public class TtMorningCommodityAsMatsimPopWriter {
 	private double startTimeSecEveningPeak = 13.5 * 3600.0;
 	private double endTimeSecEveningPeak = 18.5 * 3600.0;
 	
-	public void writePlansFile(Network network, DgIdConverter idConverter, DgCommodities commodities, String outputDirectory,
-			String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
+	public void writePlansFile(Network network, DgIdConverter idConverter, DgCommodities commodities, String outputDirectory, String filename, double startTimeSecMorningPeak, double endTimeSecMorningPeak) {
 
 		this.network = network;
 		this.idConverter = idConverter;
@@ -53,7 +48,7 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		this.endTimeSecMorningPeak = endTimeSecMorningPeak;
 		
 		// create a person for each flow unit of each commodity (source-drain pairs)
-		// assumes that the persons drive home in the evening peak 
+		// assume that the persons drive home in the evening peak 
 		for (DgCommodity com : commodities.getCommodities().values()){
 			for (int i=0; i<com.getFlow(); i++){
 				Person person = population.getFactory().createPerson(new IdImpl(com.getId().toString()+i));
@@ -71,8 +66,9 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		//write population as plans file
 		String[] fileAttributes = filename.split("_");
 		String outputFile = outputDirectory + "all_day_plans_from_morning_peak_ks_commodities_minFlow" + fileAttributes[2] + ".xml";
-		MatsimWriter popWriter = new PopulationWriter(population, network);
+		MatsimWriter popWriter = new PopulationWriter(population, this.network);
 		popWriter.write(outputFile);
+		log.info("plans file of simplified population written to " + outputFile);
 	}
 
 	private Activity createDrainAct(DgCommodity com) {
