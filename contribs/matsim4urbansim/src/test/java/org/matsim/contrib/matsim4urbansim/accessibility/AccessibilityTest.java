@@ -67,14 +67,9 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 * any other measuring point.
 	 */
 	
-//	public static void main( String[] args ) {
-//		new AccessibilityTest().run() ;
-//	}
-
 		@Test
 //	@Ignore // found this with "ignore" on 19/jan/2014. ??? kai
 	public void testGridBasedAccessibilityMeasure(){
-//	void run() {
 			OutputDirectoryLogging.catchLogEntries();		
 			// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
 
