@@ -76,7 +76,11 @@ public class MyMultiFeatureReader {
 		this.zones = new ArrayList<MyZone>();
 		MultiPolygon mp = null;
 		GeometryFactory gf = new GeometryFactory();
-		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(shapefile);
+		
+		ShapeFileReader sfr = new ShapeFileReader();
+		sfr.readFileAndInitialize(shapefile);
+		Collection<SimpleFeature> features = sfr.getFeatureSet();
+		
 		for (SimpleFeature feature : features) {
 			String name = String.valueOf( feature.getAttribute( idField ) ); 
 			Object shape = feature.getDefaultGeometry();
