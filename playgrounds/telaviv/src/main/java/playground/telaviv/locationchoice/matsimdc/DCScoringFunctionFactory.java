@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * DCScoringFunctionFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,7 +20,11 @@
 
 package playground.telaviv.locationchoice.matsimdc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.config.Config;
@@ -27,26 +32,32 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-//import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
+import playground.telaviv.zones.Emme2Zone;
 import playground.telaviv.zones.ZoneMapping;
+//import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
 public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 	private final Controler controler;
 	private DestinationChoiceBestResponseContext dcContext;
 	private Config config;	
 //	private int iteration = -1;
-	private ZoneMapping zoneMapping;
+	private Map<Id, Integer> linkToZoneMap;
 	private CalculateDestinationChoice dcCalculator;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 	private boolean initialized = false;
 
+	private CharyparNagelScoringParameters params = null;
+	
 	public DCScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext dcContext) {
 		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
@@ -61,9 +72,19 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 //		not necessary anymore as the constant factors do not change over the iterations:
 //		if (this.iteration != this.controler.getIterationNumber()) {
 //			this.iteration = this.controler.getIterationNumber();
-			this.zoneMapping = new ZoneMapping(this.dcContext.getScenario(), TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
+			ZoneMapping zoneMapping = new ZoneMapping(this.dcContext.getScenario(), TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
+			
+			this.linkToZoneMap = new HashMap<Id, Integer>();
+			int index = 0;
+			for (Emme2Zone zone : zoneMapping.getParsedZones().values()) {
+				for (Id linkId : zone.linkIds) linkToZoneMap.put(linkId, index);
+				index++;
+			}
+			
 			this.dcCalculator = new CalculateDestinationChoice(this.dcContext.getScenario());
 			this.dcCalculator.calculateVTODForDCModule();
+			
+			this.params = new CharyparNagelScoringParameters(this.config.planCalcScore());
 			
 			// actually not necessary here:
 //			this.dcCalculator.calculateDynamicFactors(
@@ -81,17 +102,30 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 			this.initialized = true;
 		}
 		
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		
-		CharyparNagelActivityScoring scoringFunction = new DCActivityScoringFunction(
-					(PlanImpl)plan, 
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();		
+		CharyparNagelActivityScoring activityScoringFunction = new DCActivityScoringFunction(
+					(PlanImpl) plan, 
 					this.dcContext.getFacilityPenalties(), 
 					dcContext,
-					this.zoneMapping,
+					this.linkToZoneMap,
 					this.dcCalculator);
-		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		
+		scoringFunctionAccumulator.addScoringFunction(activityScoringFunction);		
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
 		return scoringFunctionAccumulator;
+		
+//		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+//		
+//		CharyparNagelActivityScoring scoringFunction = new DCActivityScoringFunction(
+//					(PlanImpl)plan, 
+//					this.dcContext.getFacilityPenalties(), 
+//					dcContext,
+//					this.linkToZoneMap,
+//					this.dcCalculator);
+//		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		
+//		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getNetwork()));
+//		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+//		return scoringFunctionAccumulator;
 	}
 }

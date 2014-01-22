@@ -43,9 +43,20 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.Desires;
@@ -139,7 +150,35 @@ public class Emme2PopulationCreator {
 		log.info("mutating populations activity times");
 		scenario.getConfig().global().setNumberOfThreads(8);
 		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(scenario.getConfig(), timeMutationRange);
-		timeAllocationMutator.prepareReplanning(null);
+		
+		final TravelTime travelTime = new FreeSpeedTravelTime();
+		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
+		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
+		final TripRouterFactoryImpl tripRouterFactory = new TripRouterFactoryImpl(scenario, travelDisutilityFactory, travelTime, new DijkstraFactory(), null);
+		ReplanningContext context = new ReplanningContext() {
+			@Override
+			public TravelDisutility getTravelDisutility() {
+				return travelDisutility;
+			}
+			@Override
+			public TravelTime getTravelTime() {
+				return travelTime;
+			}
+			@Override
+			public ScoringFunctionFactory getScoringFunctionFactory() {
+				return scoringFunctionFactory;
+			}
+			@Override
+			public int getIteration() {
+				return 0;
+			}
+			@Override
+			public TripRouter getTripRouter() {
+				return tripRouterFactory.instantiateAndConfigureTripRouter();
+			}
+		};
+		timeAllocationMutator.prepareReplanning(context);
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) timeAllocationMutator.handlePlan(plan);
 		}
@@ -147,7 +186,7 @@ public class Emme2PopulationCreator {
 		log.info("done.");
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outFile);
 		log.info("done.");
 	}
 
@@ -275,11 +314,14 @@ public class Emme2PopulationCreator {
 		activityFacility = activityFacilities.getFacilities().get(homeLinkId);
 		activity.setFacilityId(activityFacility.getId());
 		activity.setCoord(activityFacility.getCoord());
-//		desires.accumulateActivityDuration(activity.getType(), activity.getDuration());
+//		desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
 		plan.addActivity(activity);
 
 		// If we have no activity chains we have nothing left to do.
-		if (!hasPrimaryActivity && !hasSecondaryActivity) return true;
+		if (!hasPrimaryActivity && !hasSecondaryActivity) {
+			desires.accumulateActivityDuration("home", 86400);
+			return true;
+		}
 
 		previousActivityLinkId = homeLinkId;
 		transportMode = getPrimaryTransportMode(primaryMainModePreActivity);
@@ -517,17 +559,16 @@ public class Emme2PopulationCreator {
 			activity.setCoord(activityFacility.getCoord());
 //			desires.accumulateActivityDuration(activity.getType(), activity.getDuration());
 			plan.addActivity(activity);
-
-
-			/*
-			 * Finally add a home desire that has a duration of 86400 - all other activities.
-			 */
-			double otherDurations = 0.0;
-			for (double duration : desires.getActivityDurations().values()) {
-				otherDurations = otherDurations + duration;
-			}
-			if (otherDurations < 86400) desires.accumulateActivityDuration("home", 86400 - otherDurations);
 		}
+		
+		/*
+		 * Finally add a home desire that has a duration of 86400 - all other activities.
+		 */
+		double otherDurations = 0.0;
+		for (double duration : desires.getActivityDurations().values()) {
+			otherDurations = otherDurations + duration;
+		}
+		if (otherDurations < 86400) desires.accumulateActivityDuration("home", 86400 - otherDurations);
 		
 		// no errors have been found, so return true
 		return true;

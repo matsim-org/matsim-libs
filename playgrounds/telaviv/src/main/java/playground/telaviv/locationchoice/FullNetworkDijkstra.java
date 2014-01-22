@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FullNetworkDijkstra.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.telaviv.locationchoice;
 
 import java.util.ArrayList;
@@ -10,11 +30,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.priorityqueue.WrappedBinaryMinHeap;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
 public class FullNetworkDijkstra extends Dijkstra {
@@ -54,17 +74,11 @@ public class FullNetworkDijkstra extends Dijkstra {
 		return path;
 	}
 	
-	public void calcLeastCostTrees() {
-		for (Node fromNode : this.network.getNodes().values()) {
-			calcLeastCostTree(fromNode, Time.UNDEFINED_TIME);
-		}
-	}
-	
 	public void calcLeastCostTree(Node fromNode, double startTime) {
 
 		augmentIterationId();
 
-		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
+		RouterPriorityQueue<Node> pendingNodes = new WrappedBinaryMinHeap<Node>(this.network.getNodes().size());
 		initFromNode(fromNode, null, startTime, pendingNodes);
 
 		while (true) {
@@ -77,7 +91,7 @@ public class FullNetworkDijkstra extends Dijkstra {
 	}
 	
 	/*package*/ void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-			final PseudoRemovePriorityQueue<Node> pendingNodes) {
+			final RouterPriorityQueue<Node> pendingNodes) {
 		DijkstraNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 	}

@@ -19,8 +19,9 @@
 
 package playground.telaviv.locationchoice.matsimdc;
 
-
+import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,7 +33,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
-import playground.telaviv.zones.ZoneMapping;
 
 public class DCActivityScoringFunction extends org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityScoringFunction {
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
@@ -41,9 +41,9 @@ public class DCActivityScoringFunction extends org.matsim.contrib.locationchoice
 	private DestinationChoiceBestResponseContext dcContext;
 		
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, 
-			DestinationChoiceBestResponseContext dcContext, ZoneMapping zoneMapping, CalculateDestinationChoice dcCalculator) {
+			DestinationChoiceBestResponseContext dcContext, Map<Id, Integer> linkToZoneMap, CalculateDestinationChoice dcCalculator) {
 		super(plan, facilityPenalties, dcContext);
-		this.destinationChoiceScoring = new TelAvivDestinationScoring(dcContext, zoneMapping, dcCalculator);
+		this.destinationChoiceScoring = new TelAvivDestinationScoring(dcContext, linkToZoneMap, dcCalculator);
 		this.plan = plan;
 		this.dcContext = dcContext;
 	}

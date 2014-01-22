@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateODTravelTimeMatrices
+ * CreateODTravelTimeMatrices.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -44,13 +43,14 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.locationchoice.FullNetworkDijkstra;
 import playground.telaviv.locationchoice.FullNetworkDijkstraFactory;
 
 public class CreateODTravelTimeMatrices {
 
 	private static final Logger log = Logger.getLogger(CreateODTravelTimeMatrices.class);
-	private static String networkFile = "../../matsim/mysimulations/telaviv/network/network.xml";
+	private static String networkFile = TelAvivConfig.basePath + "/network/network.xml";
 	
 	protected Scenario scenario;
 	protected ZoneMapping zoneMapping;

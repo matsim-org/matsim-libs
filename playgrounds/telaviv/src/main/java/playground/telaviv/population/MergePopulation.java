@@ -130,7 +130,7 @@ public class MergePopulation {
 		}
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outFile);
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outAttributesFile);
 		log.info("done.");
 	}

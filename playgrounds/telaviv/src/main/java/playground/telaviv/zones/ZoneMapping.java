@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
@@ -121,7 +121,7 @@ public class ZoneMapping {
 		try {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			new MatsimNetworkReader(scenario).readFile(networkFile);
-			CoordinateTransformation coordinateTransformation = new IdentityTransformation();
+			CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");
 			
 //			new MatsimNetworkReader(scenario).readFile("../../matsim/mysimulations/telaviv/network/network.xml");
 //			CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");	

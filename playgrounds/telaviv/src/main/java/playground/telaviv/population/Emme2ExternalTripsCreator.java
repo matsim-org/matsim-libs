@@ -134,7 +134,7 @@ public class Emme2ExternalTripsCreator {
 		counter.printCounter();
 		
 		log.info("Writing MATSim population to file...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scaleFactor).write(outPlansFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scaleFactor).writeFileV4(outPlansFile);
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(this.outAttributesFile);
 		log.info("done.");
 	}

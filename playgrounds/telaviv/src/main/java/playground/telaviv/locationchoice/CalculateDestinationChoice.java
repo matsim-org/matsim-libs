@@ -42,7 +42,8 @@ import playground.telaviv.zones.ZoneMapping;
 public class CalculateDestinationChoice {
 
 	private static final Logger log = Logger.getLogger(CalculateDestinationChoice.class);
-	private static String networkFile = TelAvivConfig.basePath + "network/network.xml";
+
+	private static String networkFile = TelAvivConfig.basePath + "/network/network.xml";
 	
 	private Scenario scenario;
 	private static Coefficients coefficients = new Coefficients();

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TelAvivDestinationScoring.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -27,20 +28,21 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
 import playground.telaviv.locationchoice.Coefficients;
-import playground.telaviv.zones.Emme2Zone;
-import playground.telaviv.zones.ZoneMapping;
 
-public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring { 
-	private CalculateDestinationChoice dcCalculator;
-	private Map<Integer, Emme2Zone> zones;
+public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring {
+	
+	private final CalculateDestinationChoice dcCalculator;
+	private final Map<Id, Integer> linkToZoneMap;
+	
 	private static final Logger log = Logger.getLogger(TelAvivDestinationScoring.class);
 		
-	public TelAvivDestinationScoring(DestinationChoiceBestResponseContext dcContext, ZoneMapping zoneMapping, CalculateDestinationChoice dcCalculator) {
+	public TelAvivDestinationScoring(DestinationChoiceBestResponseContext dcContext, Map<Id, Integer> linkToZoneMap, CalculateDestinationChoice dcCalculator) {
 		super(dcContext);	
-		this.zones = zoneMapping.getParsedZones();
 		this.dcCalculator = dcCalculator;
+		this.linkToZoneMap = linkToZoneMap;
 	}
 	
 	public double getZonalScore(PlanImpl plan, ActivityImpl act) {
@@ -71,12 +73,14 @@ public class TelAvivDestinationScoring extends org.matsim.contrib.locationchoice
 	
 	// could be speed up: search for fromZone and toZone at the same time
 	private int getZoneIndex(Id linkId) {
-		int index = 0;
-		for (Emme2Zone zone : this.zones.values()) {
-			if (zone.linkIds.contains(linkId)) return index;
-			index++;
-		}
-		return -1;
-		
+		Integer index = this.linkToZoneMap.get(linkId);
+		if (index != null) return index;
+		else return -1;
+//		int index = 0;
+//		for (Emme2Zone zone : this.zones.values()) {
+//			if (zone.linkIds.contains(linkId)) return index;
+//			index++;
+//		}
+//		return -1;
 	}
 }

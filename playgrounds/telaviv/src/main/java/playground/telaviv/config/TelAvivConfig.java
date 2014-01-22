@@ -22,7 +22,8 @@ package playground.telaviv.config;
 
 public class TelAvivConfig {
 
-	public static String basePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/cdobler/workspace/matsim/mysimulations/telaviv_2012/";
+//	public static String basePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/cdobler/workspace/matsim/mysimulations/telaviv_2012/";
+	public static String basePath = "../../matsim/mysimulations/telaviv_2012";
 	
 	/*
 	 * Name of the field in the person object attributes that defines

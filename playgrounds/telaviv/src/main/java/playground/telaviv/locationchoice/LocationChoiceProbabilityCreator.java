@@ -29,11 +29,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
 
+import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.zones.ZoneMapping;
 
 /*
@@ -43,7 +44,7 @@ public class LocationChoiceProbabilityCreator {
 
 	private static final Logger log = Logger.getLogger(LocationChoiceProbabilityCreator.class);
 	
-	private String locationChoiceFile = "../../matsim/mysimulations/telaviv/locationchoice/destination_choice_prob.txt";
+	private String locationChoiceFile = TelAvivConfig.basePath + "/locationchoice/destination_choice_prob.txt";
 	
 	private ZoneMapping zoneMapping;
 	
@@ -54,7 +55,11 @@ public class LocationChoiceProbabilityCreator {
 	private Map<Integer, Double>[] fromZoneProbabilities;	// <toZoneId, Probability>[fromZoneId from zoneToMatrixMapping]
 	
 	public static void main(String[] args) {
-		Map<Integer, Double> probabs = new LocationChoiceProbabilityCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()))).getFromZoneProbabilities(1525);
+		
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(TelAvivConfig.basePath + "/network/network.xml");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Map<Integer, Double> probabs = new LocationChoiceProbabilityCreator(scenario).getFromZoneProbabilities(1525);
 		
 		double sum = 0.0;
 		for (double value : probabs.values()) {
