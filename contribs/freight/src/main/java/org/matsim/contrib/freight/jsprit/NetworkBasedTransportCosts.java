@@ -337,10 +337,10 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, org.matsim.vehicles.Vehicle vehicle) {
 				double velocity;
-				if(vehicle.getType().getMaximumVelocity() < link.getFreespeed()){
+				if(vehicle.getType().getMaximumVelocity() < link.getFreespeed(time)){
 					velocity = vehicle.getType().getMaximumVelocity();
 				}
-				else velocity = link.getFreespeed();
+				else velocity = link.getFreespeed(time);
 				if(velocity <= 0.0) throw new IllegalStateException("velocity must be bigger than zero");
 				return link.getLength() / velocity;
 			}
@@ -443,6 +443,12 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		/**
 		 * Builds the network-based transport costs which are the basis for solving the {@link VehicleRoutingProblem}.
+		 * <p/>
+		 * Comments:<ul>
+		 * <li> By default this will take free speed travel times.
+		 * <li> yyyy These free speed travel times do <i>not</i> take the time-dependent network into account. kai, jan'14
+		 * <li> Either can be changed with builder.setTravelTime(...) or with builder.setBaseTravelTimeAndDisutility(...).
+		 * </ul>
 		 * 
 		 * @return {@link NetworkBasedTransportCosts}
 		 */
