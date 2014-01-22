@@ -35,5 +35,18 @@ public interface DriveTask
     void setVehicleTracker(OfflineVehicleTracker vehicleTracker);
 
 
-    void pathDiverted(DivertedVrpPath divertedPath, double newEndTime);
+    /**
+     * Vehicle changes its path. Can be used for: <br/>
+     * - changing destination (while keepen the current task active) <br/>
+     * - stopping it as soon as possible (i.e. at the end of the current/next link) <br/>
+     * - random walk, roaming/crusing around <br/>
+     * - ...
+     */
+    void divertPath(DivertedVrpPath divertedPath, double newEndTime);
+
+
+    /**
+     * Cancels DriveTask on the fly. The next task must be also DriveTask.
+     */
+    //void cancel(double now);
 }

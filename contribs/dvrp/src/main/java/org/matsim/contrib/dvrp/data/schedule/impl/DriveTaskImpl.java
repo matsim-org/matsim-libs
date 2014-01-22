@@ -60,7 +60,7 @@ public class DriveTaskImpl
 
 
     @Override
-    public void pathDiverted(DivertedVrpPath divertedPath, double newEndTime)
+    public void divertPath(DivertedVrpPath divertedPath, double newEndTime)
     {
         //can only divert an ongoing task
         if (getStatus() != TaskStatus.STARTED) {

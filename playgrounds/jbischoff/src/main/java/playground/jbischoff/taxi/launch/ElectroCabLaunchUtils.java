@@ -22,7 +22,6 @@ package playground.jbischoff.taxi.launch;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.*;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
@@ -56,7 +55,7 @@ public class ElectroCabLaunchUtils
     /**
      * Mandatory
      */
-    public VrpSimEngine initVrpSimEngine(QSim qSim, MatsimVrpData data,
+    public ElectricTaxiSimEngine initVrpSimEngine(QSim qSim, MatsimVrpData data,
             NOSRankTaxiOptimizer optimizer)
     {
         Scenario scenario = data.getScenario();
@@ -113,7 +112,7 @@ public class ElectroCabLaunchUtils
 
         // handlerGroup.addHandler(chargeUponDepotArrival);
 
-        VrpSimEngine taxiSimEngine = new ElectricTaxiSimEngine(qSim, data, optimizer,
+        ElectricTaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(optimizer,
                 depotArrivalDepartureCharger);
         qSim.addMobsimEngine(taxiSimEngine);
 

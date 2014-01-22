@@ -22,9 +22,9 @@ package org.matsim.contrib.dvrp.passenger;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.Request;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 
@@ -35,15 +35,15 @@ public class PassengerCallHandler
     private final String type;
     private final PassengerRequestCreator requestCreator;
     private final MatsimVrpData data;
-    private final VrpSimEngine vrpSimEngine;
+    private final VrpOptimizer optimizer;
 
 
     public PassengerCallHandler(String type, PassengerRequestCreator requestCreator,
-            VrpSimEngine vrpSimEngine, MatsimVrpData data)
+            VrpOptimizer optimizer, MatsimVrpData data)
     {
         this.type = type;
         this.requestCreator = requestCreator;
-        this.vrpSimEngine = vrpSimEngine;
+        this.optimizer = optimizer;
         this.data = data;
     }
 
@@ -55,21 +55,21 @@ public class PassengerCallHandler
             return;
         }
 
-        Network network = data.getScenario().getNetwork();
-        Link link = network.getLinks().get(event.getLinkId());
-
-        MobsimAgent passenger = data.getMobsimAgentMappings().getMobsimAgents()
-                .get(event.getPersonId());
-
-        double serveTime = passenger.getActivityEndTime();//TODO is this the best idea???
-        //can we get the serveTime in any other way?
-        //what about the destination?
-
-        PassengerCustomer customer = PassengerCustomer
-                .getOrCreatePassengerCustomer(data, passenger);
-        Request request = requestCreator.createRequest(customer, link, null, serveTime);
-
-        vrpSimEngine.requestSubmitted(request, event.getTime());
+//        Network network = data.getScenario().getNetwork();
+//        Link link = network.getLinks().get(event.getLinkId());
+//
+//        MobsimAgent passenger = data.getMobsimAgentMappings().getMobsimAgents()
+//                .get(event.getPersonId());
+//
+//        double serveTime = passenger.getActivityEndTime();//TODO is this the best idea???
+//        //can we get the serveTime in any other way?
+//        //what about the destination?
+//
+//        PassengerCustomer customer = PassengerCustomer
+//                .getOrCreatePassengerCustomer(data, passenger);
+//        Request request = requestCreator.createRequest(customer, link, null, serveTime);
+//
+//        optimizer.requestSubmitted(request);
     }
 
 

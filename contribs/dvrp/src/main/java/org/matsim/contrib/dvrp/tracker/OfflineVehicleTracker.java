@@ -19,14 +19,8 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
-import org.matsim.contrib.dvrp.data.schedule.DriveTask;
-
-
 public interface OfflineVehicleTracker
 {
-    DriveTask getDriveTask();
-
-
     double predictEndTime(double currentTime);
 
 

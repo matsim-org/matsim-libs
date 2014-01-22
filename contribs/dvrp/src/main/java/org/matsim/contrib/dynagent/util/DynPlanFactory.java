@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dynagent.util;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.dynagent.DynAgent;
 
 
-/**
- * Contains mappings: MobsimAgent.id => xxxx
- */
-public class MobsimAgentMappings
+public interface DynPlanFactory
 {
-    private final Map<Id, MobsimAgent> mobsimAgents = new HashMap<Id, MobsimAgent>();
-
-    private final Map<Id, PassengerCustomer> passengerCustomers = new HashMap<Id, PassengerCustomer>();
-
-
-    public Map<Id, MobsimAgent> getMobsimAgents()
-    {
-        return mobsimAgents;
-    }
-
-
-    public Map<Id, PassengerCustomer> getPassengerCustomers()
-    {
-        return passengerCustomers;
-    }
+    Plan create(DynAgent agent);
 }

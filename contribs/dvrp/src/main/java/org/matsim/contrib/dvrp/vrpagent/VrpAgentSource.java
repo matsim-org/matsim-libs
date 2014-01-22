@@ -22,14 +22,15 @@ package org.matsim.contrib.dvrp.vrpagent;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.util.schedule.VrpSchedulePlanFactory;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.util.DynAgentWithPlan;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.*;
 import org.matsim.vehicles.VehicleUtils;
 
 
@@ -39,25 +40,26 @@ public class VrpAgentSource
     private final DynActionCreator nextActionCreator;
 
     private final MatsimVrpData data;
-    private final VrpSimEngine vrpSimEngine;
+    private final VrpOptimizer optimizer;
+    private final QSim qSim;
 
     private final boolean isAgentWithPlan;
 
 
     public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpData data,
-            VrpSimEngine vrpSimEngine)
+            VrpOptimizer optimizer, QSim qSim)
     {
-        this(nextActionCreator, data, vrpSimEngine, false);
+        this(nextActionCreator, data, optimizer, qSim, false);
     }
 
 
     public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpData data,
-            VrpSimEngine vrpSimEngine, boolean isAgentWithPlan)
+            VrpOptimizer optimizer, QSim qSim, boolean isAgentWithPlan)
     {
         this.nextActionCreator = nextActionCreator;
         this.data = data;
-        this.vrpSimEngine = vrpSimEngine;
-
+        this.optimizer = optimizer;
+        this.qSim = qSim;
         this.isAgentWithPlan = isAgentWithPlan;
     }
 
@@ -65,20 +67,16 @@ public class VrpAgentSource
     @Override
     public void insertAgentsIntoMobsim()
     {
-        QSim qSim = (QSim)vrpSimEngine.getInternalInterface().getMobsim();
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
         for (Vehicle vrpVeh : vehicles) {
-            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(vrpSimEngine, nextActionCreator,
+            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator,
                     (VrpAgentVehicle)vrpVeh);
-
-            vrpSimEngine.addAgentLogic(vrpAgentLogic);
 
             Id id = data.getScenario().createId(vrpVeh.getName());
             Id startLinkId = vrpVeh.getDepot().getLink().getId();
 
-            DynAgent taxiAgent = new DynAgent(id, startLinkId, vrpSimEngine.getInternalInterface(),
-                    vrpAgentLogic);
+            DynAgent taxiAgent = new DynAgent(id, startLinkId, qSim, vrpAgentLogic);
 
             if (isAgentWithPlan) {
                 qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent,

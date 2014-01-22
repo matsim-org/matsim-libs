@@ -29,7 +29,7 @@ public class TaxiDropoffDriveTask
     extends DriveTaskImpl
     implements TaxiTaskWithRequest
 {
-    private final TaxiRequest request;
+    private TaxiRequest request;//non-final due to vehicle diversion
 
 
     public TaxiDropoffDriveTask(VrpPathWithTravelData path, TaxiRequest request)

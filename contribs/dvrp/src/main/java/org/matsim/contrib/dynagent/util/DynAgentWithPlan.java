@@ -17,10 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent;
+package org.matsim.contrib.dynagent.util;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 

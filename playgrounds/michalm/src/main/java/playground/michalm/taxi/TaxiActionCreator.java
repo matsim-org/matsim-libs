@@ -19,9 +19,8 @@
 
 package playground.michalm.taxi;
 
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.schedule.*;
-import org.matsim.contrib.dvrp.passenger.PassengerHandlingUtils;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
 
@@ -31,14 +30,14 @@ import playground.michalm.taxi.schedule.*;
 public class TaxiActionCreator
     implements VrpAgentLogic.DynActionCreator
 {
-    private final VrpSimEngine vrpSimEngine;
-    private final boolean onlineVehicleTracker;
+    private final PassengerEngine passengerEngine;
+    private final VrpDynLegs.LegCreator legCreator;
 
 
-    public TaxiActionCreator(VrpSimEngine vrpSimEngine, boolean onlineVehicleTracker)
+    public TaxiActionCreator(PassengerEngine passengerEngine, VrpDynLegs.LegCreator legCreator)
     {
-        this.vrpSimEngine = vrpSimEngine;
-        this.onlineVehicleTracker = onlineVehicleTracker;
+        this.passengerEngine = passengerEngine;
+        this.legCreator = legCreator;
     }
 
 
@@ -51,13 +50,7 @@ public class TaxiActionCreator
             case PICKUP_DRIVE:
             case DROPOFF_DRIVE:
             case CRUISE_DRIVE:
-                if (onlineVehicleTracker) {
-                    return VrpDynLegs.createLegWithOnlineVehicleTracker((DriveTask)task,
-                            vrpSimEngine);
-                }
-                else {
-                    return VrpDynLegs.createLegWithOfflineVehicleTracker((DriveTask)task);
-                }
+                return legCreator.createLeg((DriveTask)task);
 
             case PICKUP_STAY:
                 final TaxiPickupStayTask pst = (TaxiPickupStayTask)task;
@@ -65,8 +58,7 @@ public class TaxiActionCreator
                 return new VrpActivity("ServeTask" + pst.getRequest().getId(), pst) {
                     public void endAction(double now)
                     {
-                        PassengerHandlingUtils.pickUpPassenger(vrpSimEngine, task,
-                                pst.getRequest(), now);
+                        passengerEngine.pickUpPassenger(task, pst.getRequest(), now);
                     }
                 };
 
@@ -76,8 +68,7 @@ public class TaxiActionCreator
                 return new VrpActivity("ServeTask" + dst.getRequest().getId(), dst) {
                     public void endAction(double now)
                     {
-                        PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, dst,
-                                dst.getRequest(), now);
+                        passengerEngine.dropOffPassenger(dst, dst.getRequest(), now);
                     }
                 };
 

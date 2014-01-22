@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
@@ -65,26 +64,5 @@ public class PassengerCustomer
     public List<PassengerRequest> getRequests()
     {
         return requests;
-    }
-
-
-    /**
-     * not well established
-     * 
-     * @param vrpData
-     */
-    static PassengerCustomer getOrCreatePassengerCustomer(MatsimVrpData data, MobsimAgent passenger)
-    {
-        Map<Id, PassengerCustomer> customersByAgentId = data.getMobsimAgentMappings()
-                .getPassengerCustomers();
-        PassengerCustomer customer = customersByAgentId.get(passenger.getId());
-
-        if (customer == null) {
-            List<Customer> customers = data.getVrpData().getCustomers();
-            customer = new PassengerCustomer(passenger);
-            customers.add(customer);
-        }
-
-        return customer;
     }
 }

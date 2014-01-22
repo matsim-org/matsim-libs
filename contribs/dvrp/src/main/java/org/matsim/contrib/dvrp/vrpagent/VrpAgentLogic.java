@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dynagent.*;
 
 
@@ -34,16 +34,16 @@ public class VrpAgentLogic
     }
 
 
-    private final VrpSimEngine vrpSimEngine;
+    private final VrpOptimizer optimizer;
     private final DynActionCreator dynActionCreator;
     private final VrpAgentVehicle vrpVehicle;
     private DynAgent agent;
 
 
-    public VrpAgentLogic(VrpSimEngine vrpSimEngine, DynActionCreator dynActionCreator,
+    public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator,
             VrpAgentVehicle vrpVehicle)
     {
-        this.vrpSimEngine = vrpSimEngine;
+        this.optimizer = optimizer;
         this.dynActionCreator = dynActionCreator;
 
         this.vrpVehicle = vrpVehicle;
@@ -76,7 +76,7 @@ public class VrpAgentLogic
         }
         // else: PLANNED or STARTED
 
-        vrpSimEngine.nextTask(vrpVehicle.getSchedule(), now);
+        optimizer.nextTask(vrpVehicle.getSchedule());
         // remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
 
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
@@ -114,12 +114,5 @@ public class VrpAgentLogic
     {
         return new StaticDynActivity("After schedule: " + vrpVehicle.getId(),
                 Double.POSITIVE_INFINITY);
-    }
-
-
-    @Override
-    public void actionPossiblyChanged()
-    {
-        agent.update();
     }
 }

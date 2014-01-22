@@ -52,17 +52,6 @@ public class OneTaxiOptimizer
     }
 
 
-    /**
-     */
-    @Override
-    public void init()
-    {
-        //just wait (and be ready) till the end of the vehicle's time window (T1)
-        schedule.addTask(new StayTaskImpl(vehicle.getT0(), Schedules.getActualT1(schedule), vehicle
-                .getDepot().getLink()));
-    }
-
-
     @Override
     public void requestSubmitted(Request request)
     {

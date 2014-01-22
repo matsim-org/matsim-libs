@@ -19,9 +19,10 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.schedule.DriveTask;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.tracker.*;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 
 public class VrpDynLegs
@@ -35,10 +36,41 @@ public class VrpDynLegs
 
 
     public static VrpDynLeg createLegWithOnlineVehicleTracker(DriveTask driveTask,
-            VrpSimEngine vrpSimEngine)
+            VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
     {
-        OnlineVehicleTracker tracker = new OnlineVehicleTrackerImpl(driveTask, vrpSimEngine);
+        OnlineVehicleTrackerImpl tracker = new OnlineVehicleTrackerImpl(driveTask, optimizer, timer);
         driveTask.setVehicleTracker(tracker);
-        return new VrpDynLeg(tracker);
+
+        VrpDynLeg leg = new VrpDynLeg(driveTask.getPath(), tracker);
+        tracker.setVrpDynLeg(leg);
+
+        return leg;
+    }
+
+
+    public static interface LegCreator
+    {
+        VrpDynLeg createLeg(DriveTask driveTask);
+    }
+
+
+    public static final LegCreator LEG_WITH_OFFLINE_TRACKER_CREATOR = new LegCreator() {
+        public VrpDynLeg createLeg(DriveTask driveTask)
+        {
+            return createLegWithOfflineVehicleTracker(driveTask);
+        };
+    };
+
+
+    public static LegCreator createLegWithOnlineTrackerCreator(
+            final VrpOptimizerWithOnlineTracking optimizer, final MobsimTimer timer)
+    {
+        return new LegCreator() {
+            @Override
+            public VrpDynLeg createLeg(DriveTask driveTask)
+            {
+                return createLegWithOnlineVehicleTracker(driveTask, optimizer, timer);
+            }
+        };
     }
 }

@@ -19,13 +19,16 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.router.DivertedVrpPath;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dynagent.DynLeg;
 
 
 public interface DivertibleDynLeg
     extends DynLeg
 {
+    VrpPath getPath();
+
+
     /**
      * @return true - yes, false - it is too late, the diversion is possible only at the next link
      */

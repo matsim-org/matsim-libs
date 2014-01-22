@@ -40,7 +40,7 @@ public class StaticDynLegImpl
 
 
     @Override
-    public void movedOverNode(Id oldLinkId, Id newLinkId, double time)
+    public void movedOverNode(Id newLinkId)
     {
         currentLinkIdx++;
     }

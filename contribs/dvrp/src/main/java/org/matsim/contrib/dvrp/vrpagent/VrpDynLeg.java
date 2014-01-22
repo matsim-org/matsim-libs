@@ -46,18 +46,15 @@ public class VrpDynLeg
 
 
     //DriveTask with OnlineVehicleTrakcer; the tracker notifies VrpSimEngine of new positions
-    /*package*/VrpDynLeg(OnlineVehicleTracker onlineVehicleTracker)
+    /*package*/VrpDynLeg(VrpPath path, OnlineVehicleTracker onlineVehicleTracker)
     {
+        this.path = path;
         this.onlineVehicleTracker = onlineVehicleTracker;
-        this.onlineVehicleTracker.setVrpDynLeg(this);
-
-        this.path = onlineVehicleTracker.getDriveTask().getPath();
-
     }
 
 
     @Override
-    public void movedOverNode(Id oldLinkId, Id newLinkId, double time)
+    public void movedOverNode(Id newLinkId)
     {
         currentLinkIdx++;
         askedAboutNextLink = false;
@@ -67,7 +64,7 @@ public class VrpDynLeg
         }
 
         if (onlineVehicleTracker != null) {
-            onlineVehicleTracker.movedOverNode(time);
+            onlineVehicleTracker.movedOverNode();
         }
     }
 
@@ -89,6 +86,13 @@ public class VrpDynLeg
         }
 
         path = divertedPath;
+    }
+
+
+    @Override
+    public VrpPath getPath()
+    {
+        return path;
     }
 
 

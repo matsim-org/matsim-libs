@@ -204,6 +204,27 @@ public class ScheduleImpl<T extends AbstractTask>
         failIfUnplanned();
         failIfCompleted();
 
+        nextTaskImpl();
+
+        return currentTask;
+    }
+
+
+    @Override
+    public T cancelTaskAndNextTask()
+    {
+        failIfNotStarted();
+
+        T cancelledTask = currentTask;
+        nextTaskImpl();
+        cancelledTask.status = TaskStatus.CANCELLED;
+
+        return currentTask;
+    }
+
+
+    private void nextTaskImpl()
+    {
         int nextIdx;
 
         if (status == ScheduleStatus.PLANNED) {
@@ -223,8 +244,6 @@ public class ScheduleImpl<T extends AbstractTask>
             currentTask = tasks.get(nextIdx);
             currentTask.status = TaskStatus.STARTED;
         }
-
-        return currentTask;
     }
 
 

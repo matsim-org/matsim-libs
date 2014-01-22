@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.tracker;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.dvrp.vrpagent.VrpDynLeg;
 
 
 public interface OnlineVehicleTracker
@@ -43,8 +42,5 @@ public interface OnlineVehicleTracker
     void divertPath(VrpPathWithTravelData newSubPath, double currentTime);
 
 
-    void setVrpDynLeg(VrpDynLeg vrpDynLeg);
-
-
-    void movedOverNode(double time);
+    void movedOverNode();
 }

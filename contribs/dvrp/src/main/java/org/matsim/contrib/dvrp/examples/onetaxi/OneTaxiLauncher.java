@@ -22,8 +22,8 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -69,15 +69,19 @@ public class OneTaxiLauncher
                 TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility);
 
         VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, depotsFileName);
-        MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
+
         OneTaxiOptimizer optimizer = new OneTaxiOptimizer(vrpData, calculator);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
-        VrpSimEngine vrpSimEngine = VrpLauncherUtils.initVrpSimEngine(qSim, data, optimizer);
-        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new OneTaxiActionCreator(
-                vrpSimEngine));
-        VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new OneTaxiRequestCreator(
-                vrpData), OneTaxiRequestCreator.MODE);
+
+        MatsimVrpData data = new MatsimVrpData(vrpData, scenario, qSim.getSimTimer());
+
+        PassengerEngine passengerEngine = new PassengerEngine(OneTaxiRequestCreator.MODE,
+                new OneTaxiRequestCreator(vrpData), optimizer, data);
+        qSim.addMobsimEngine(passengerEngine);
+
+        VrpLauncherUtils.initAgentSources(qSim, data, optimizer, new OneTaxiActionCreator(
+                passengerEngine));
 
         EventsManager events = qSim.getEventsManager();
 

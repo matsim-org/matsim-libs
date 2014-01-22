@@ -20,10 +20,13 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.schedule.Schedule;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 import playground.michalm.taxi.TaxiData;
 import playground.michalm.taxi.file.TaxiRankReader;
+import playground.michalm.taxi.schedule.*;
 
 
 public class TaxiLauncherUtils
@@ -33,6 +36,13 @@ public class TaxiLauncherUtils
     {
         TaxiData taxiData = new TaxiData();
         new TaxiRankReader(scenario, taxiData, ecm).readFile(ranksFileName);
+
+        for (Vehicle veh : taxiData.getVehicles()) {
+            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+            schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getDepot()
+                    .getLink()));
+        }
+
         return taxiData;
     }
 }

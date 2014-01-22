@@ -25,13 +25,9 @@ import org.matsim.contrib.dvrp.data.schedule.*;
 
 public interface VrpOptimizer
 {
-    void init();
-
-
     /**
      * This function can be generalized (in the future) to encompass request modification,
-     * cancellation etc. See:
-     * {@link org.matsim.contrib.dvrp.VrpSimEngine#requestSubmitted(Request, double)}
+     * cancellation etc.
      */
     //return boolean? ("has anything changed?" true/false)
     void requestSubmitted(Request request);

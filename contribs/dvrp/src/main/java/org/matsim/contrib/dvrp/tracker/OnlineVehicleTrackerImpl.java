@@ -20,11 +20,12 @@
 package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.schedule.DriveTask;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.dvrp.vrpagent.VrpDynLeg;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 
 /**
@@ -39,8 +40,10 @@ public class OnlineVehicleTrackerImpl
     implements OnlineVehicleTracker
 {
     private final DriveTask driveTask;
-    private final VrpSimEngine vrpSimEngine;
     private VrpDynLeg vrpDynLeg;
+
+    private final VrpOptimizerWithOnlineTracking optimizer;
+    private final MobsimTimer timer;
 
     private double linkEnterTime;
     private double linkEnterDelay;
@@ -53,10 +56,12 @@ public class OnlineVehicleTrackerImpl
     private Link currentLink;
 
 
-    public OnlineVehicleTrackerImpl(DriveTask driveTask, VrpSimEngine vrpSimEngine)
+    public OnlineVehicleTrackerImpl(DriveTask driveTask, VrpOptimizerWithOnlineTracking optimizer,
+            MobsimTimer timer)
     {
         this.driveTask = driveTask;
-        this.vrpSimEngine = vrpSimEngine;
+        this.optimizer = optimizer;
+        this.timer = timer;
 
         VrpPath path = driveTask.getPath();
 
@@ -74,14 +79,14 @@ public class OnlineVehicleTrackerImpl
 
 
     @Override
-    public void movedOverNode(double time)
+    public void movedOverNode()
     {
-        VrpPath path = driveTask.getPath();
+        VrpPath path = vrpDynLeg.getPath();
 
         currentLinkIdx++;
         currentLink = path.getLink(currentLinkIdx);
 
-        linkEnterTime = time;
+        linkEnterTime = timer.getTimeOfDay();
 
         plannedTTAtPrevNode += plannedLinkTT;//add previous link TT
         plannedLinkTT = path.getLinkTravelTime(currentLinkIdx);
@@ -89,7 +94,7 @@ public class OnlineVehicleTrackerImpl
         double actualTTAtPrevNode = linkEnterTime - driveTask.getBeginTime();
         linkEnterDelay = actualTTAtPrevNode - plannedTTAtPrevNode;
 
-        vrpSimEngine.nextLinkEntered(this);
+        optimizer.nextLinkEntered(driveTask);
     }
 
 
@@ -100,7 +105,7 @@ public class OnlineVehicleTrackerImpl
             return new LinkTimePair(currentLink, predictLinkExitTime(currentTime));
         }
 
-        VrpPath path = driveTask.getPath();
+        VrpPath path = vrpDynLeg.getPath();
 
         if (path.getLinkCount() == currentLinkIdx + 1) {
             return null;//the current link is the last one, but it is too late to divert the vehicle
@@ -124,13 +129,16 @@ public class OnlineVehicleTrackerImpl
             throw new IllegalArgumentException();
         }
 
-        VrpPath originalPath = driveTask.getPath();
+        VrpPath originalPath = vrpDynLeg.getPath();
 
         int diversionLinkIdx = currentLinkIdx + (vrpDynLeg.canChangeNextLink() ? 0 : 1);
         DivertedVrpPath divertedPath = new DivertedVrpPath(originalPath, newSubPath,
                 diversionLinkIdx);
 
+        double newEndTime = newSubPath.getArrivalTime();
         vrpDynLeg.pathDiverted(divertedPath);
+
+        //=====================================================================================
 
         //ASSUMPTION: newSubPath has been calculated at currentTime given that the vehicle will
         //exit the current link at predictLinkExitTime(currentTime)
@@ -138,13 +146,12 @@ public class OnlineVehicleTrackerImpl
 
         //1. If vehicle really reaches the end of the link at predictLinkExitTime(currentTime),
         // it means no delays/speedups, i.e. everything happens just on time, as if planned
-        plannedTTAtPrevNode = linkEnterTime - driveTask.getBeginTime();
+        plannedTTAtPrevNode = linkEnterTime - newEndTime;
         linkEnterDelay = 0;
         plannedLinkTT = predictLinkExitTime(currentTime) - linkEnterTime;
 
         //2. Additionally, memorize the planned end time
-        plannedEndTime = driveTask.getEndTime();
-
+        plannedEndTime = newEndTime;
     }
 
 
@@ -197,14 +204,6 @@ public class OnlineVehicleTrackerImpl
     }
 
 
-    @Override
-    public DriveTask getDriveTask()
-    {
-        return driveTask;
-    }
-
-
-    @Override
     public void setVrpDynLeg(VrpDynLeg vrpDynLeg)
     {
         this.vrpDynLeg = vrpDynLeg;

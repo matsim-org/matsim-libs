@@ -17,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent;
+package org.matsim.contrib.dynagent.util;
 
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.core.population.routes.NetworkRoute;
 
 
@@ -81,12 +82,5 @@ public class PlanToDynAgentLogicAdapter
         else {
             throw new IllegalStateException();
         }
-    }
-
-
-    @Override
-    public void actionPossiblyChanged()
-    {
-        //do nothing -- all data are constant
     }
 }

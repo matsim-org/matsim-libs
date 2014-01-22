@@ -23,8 +23,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -36,8 +35,6 @@ public class DynAgent
     private Id id;
 
     private MobsimVehicle veh;
-
-    private InternalInterface internalInterface;
 
     private EventsManager events;
 
@@ -53,58 +50,24 @@ public class DynAgent
 
     private DynActivity dynActivity;
 
-    private double activityEndTime = Time.UNDEFINED_TIME;
-
 
     // =====
 
-    public DynAgent(Id id, Id startLinkId, InternalInterface internalInterface,
-            DynAgentLogic agentLogic)
+    public DynAgent(Id id, Id startLinkId, Netsim netsim, DynAgentLogic agentLogic)
     {
         this.id = id;
         this.currentLinkId = startLinkId;
         this.agentLogic = agentLogic;
-        this.internalInterface = internalInterface;
-        this.events = internalInterface.getMobsim().getEventsManager();
+        this.events = netsim.getEventsManager();
 
         // initial activity
         dynActivity = this.agentLogic.init(this);
-        activityEndTime = dynActivity.getEndTime();
 
-        if (activityEndTime != Time.UNDEFINED_TIME) {
+        if (dynActivity.getEndTime() != Time.UNDEFINED_TIME) {
             state = MobsimAgent.State.ACTIVITY;
         }
         else {
             state = MobsimAgent.State.ABORT;// ??????
-        }
-    }
-
-
-    public void update()
-    {
-        if (state == null) {
-            // this agent is right now switching from one task (Act/Leg) to another (Act/Leg)
-            // so he is the source of this schedule updating process and so he will not be handled here
-            return;
-        }
-
-        switch (state) {
-            case ACTIVITY: // WAIT (will it be also SERVE???)
-                if (activityEndTime != dynActivity.getEndTime()) {
-                    activityEndTime = dynActivity.getEndTime();
-                    internalInterface.rescheduleActivityEnd(this);
-                }
-                break;
-
-            case LEG: // DRIVE
-                // currently not supported (only if VEHICLE DIVERSION is turned ON)
-                // but in general, this should be handled by vrpLeg itself!
-
-                // idea: pass destionationLinkId and linkIds to the vrpLeg...
-                break;
-
-            default:
-                throw new IllegalStateException();
         }
     }
 
@@ -121,7 +84,6 @@ public class DynAgent
 
         if (nextDynAction instanceof DynActivity) {
             dynActivity = (DynActivity)nextDynAction;
-            activityEndTime = dynActivity.getEndTime();
             state = MobsimAgent.State.ACTIVITY;
 
             events.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, dynActivity
@@ -232,8 +194,7 @@ public class DynAgent
     @Override
     public void notifyMoveOverNode(Id newLinkId)
     {
-        double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-        dynLeg.movedOverNode(currentLinkId, newLinkId, now);
+        dynLeg.movedOverNode(newLinkId);
         currentLinkId = newLinkId;
     }
 
@@ -241,7 +202,7 @@ public class DynAgent
     @Override
     public double getActivityEndTime()
     {
-        return activityEndTime;
+        return dynActivity.getEndTime();
     }
 
 

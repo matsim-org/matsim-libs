@@ -20,19 +20,23 @@
 package org.matsim.contrib.dvrp.data;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 
 public class MatsimVrpData
 {
     private final VrpData vrpData;
     private final Scenario scenario;
-    private final MobsimAgentMappings agentMappings = new MobsimAgentMappings();
+    private final MobsimTimer timer;
 
 
-    public MatsimVrpData(VrpData vrpData, Scenario scenario)
+    public MatsimVrpData(VrpData vrpData, Scenario scenario, MobsimTimer timer)
     {
         this.vrpData = vrpData;
         this.scenario = scenario;
+        this.timer = timer;
+
+        ((VrpDataImpl)vrpData).setMobsimTimer(timer);
     }
 
 
@@ -48,8 +52,8 @@ public class MatsimVrpData
     }
 
 
-    public MobsimAgentMappings getMobsimAgentMappings()
+    public MobsimTimer getTimer()
     {
-        return agentMappings;
+        return timer;
     }
 }

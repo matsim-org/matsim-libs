@@ -22,14 +22,14 @@ package playground.michalm.taxi.optimizer;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.model.*;
+import org.matsim.contrib.dvrp.data.model.Request;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask;
 
 
 /**
@@ -62,23 +62,6 @@ public abstract class AbstractTaxiOptimizer
                         return diff == 0 ? 0 : (diff > 0 ? 1 : -1);
                     }
                 });
-    }
-
-
-    /**
-     */
-    @Override
-    public void init()
-    {
-        // Initial remark!!!
-        // We start with 0 requests so there is no need for any pre-optimization.
-        // Let's just add a WAIT task to each schedule
-
-        for (Vehicle veh : data.getVehicles()) {
-            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
-            schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getDepot()
-                    .getLink()));
-        }
     }
 
 

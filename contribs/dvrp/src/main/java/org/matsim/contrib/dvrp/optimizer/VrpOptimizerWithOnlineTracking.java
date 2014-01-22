@@ -19,14 +19,11 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.tracker.OnlineVehicleTracker;
+import org.matsim.contrib.dvrp.data.schedule.DriveTask;
 
 
 public interface VrpOptimizerWithOnlineTracking
     extends VrpOptimizer
 {
-    /**
-     * @return true if reoptimization has been performed
-     */
-    boolean nextLinkEntered(OnlineVehicleTracker vehicleTracker);
+    void nextLinkEntered(DriveTask driveTask);
 }

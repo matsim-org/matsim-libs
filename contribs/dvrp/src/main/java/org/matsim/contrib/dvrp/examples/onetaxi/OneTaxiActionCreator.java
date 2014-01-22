@@ -19,9 +19,8 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.schedule.*;
-import org.matsim.contrib.dvrp.passenger.PassengerHandlingUtils;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
 
@@ -29,12 +28,12 @@ import org.matsim.contrib.dynagent.DynAction;
 public class OneTaxiActionCreator
     implements VrpAgentLogic.DynActionCreator
 {
-    private final VrpSimEngine vrpSimEngine;
+    private final PassengerEngine passengerEngine;
 
 
-    public OneTaxiActionCreator(VrpSimEngine vrpSimEngine)
+    public OneTaxiActionCreator(PassengerEngine passengerEngine)
     {
-        this.vrpSimEngine = vrpSimEngine;
+        this.passengerEngine = passengerEngine;
     }
 
 
@@ -54,8 +53,7 @@ public class OneTaxiActionCreator
                         return new VrpActivity("ServeTask" + request.getId(), serveTask) {
                             public void endAction(double now)
                             {
-                                PassengerHandlingUtils.pickUpPassenger(vrpSimEngine, serveTask,
-                                        request, now);
+                                passengerEngine.pickUpPassenger(serveTask, request, now);
                             }
                         };
 
@@ -64,8 +62,7 @@ public class OneTaxiActionCreator
                         return new VrpActivity("ServeTask" + request.getId(), serveTask) {
                             public void endAction(double now)
                             {
-                                PassengerHandlingUtils.dropOffPassenger(vrpSimEngine, serveTask,
-                                        request, now);
+                                passengerEngine.dropOffPassenger(serveTask, request, now);
                             }
                         };
                     }

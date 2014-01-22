@@ -29,7 +29,6 @@ import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.data.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.tracker.OnlineVehicleTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.model.TaxiRequest;
@@ -268,10 +267,7 @@ public abstract class ImmediateRequestTaxiOptimizer
             }
         }
 
-        if (currentTask.getEndTime() != time) {
-            currentTask.setEndTime(time);
-            updatePlannedTasks(schedule);
-        }
+        updateCurrentAndPlannedTasks(schedule, time);
 
         if (!params.destinationKnown) {
             if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
@@ -324,44 +320,28 @@ public abstract class ImmediateRequestTaxiOptimizer
 
     /**
      * @param schedule
-     * @return {@code true} if something has been changed; otherwise {@code false}
      */
-    protected void updatePlannedTasks(Schedule<TaxiTask> schedule)
+    protected void updateCurrentAndPlannedTasks(Schedule<TaxiTask> schedule,
+            double currentTaskEndTime)
     {
         Task currentTask = schedule.getCurrentTask();
+
+        if (currentTask.getEndTime() == currentTaskEndTime) {
+            return;
+        }
+
+        currentTask.setEndTime(currentTaskEndTime);
+
         List<TaxiTask> tasks = schedule.getTasks();
 
         int startIdx = currentTask.getTaskIdx() + 1;
-        double t = currentTask.getEndTime();
+        double t = currentTaskEndTime;
 
         for (int i = startIdx; i < tasks.size(); i++) {
             TaxiTask task = tasks.get(i);
 
             switch (task.getTaxiTaskType()) {
                 case WAIT_STAY: {
-                    // wait can be at the end of the schedule
-                    //
-                    // BUT:
-                    //
-                    // t1 - beginTime for WAIT
-                    // t2 - arrival of new task
-                    // t3 - updateSchedule() called -- end of the current task (STARTED)
-                    // t4 - endTime for WAIT (according to some earlier plan)
-                    //
-                    // t1 <= t2 <= t3 < t4
-                    //
-                    // it may also be kept in situation where we have WAIT for [t1;t4) and at t2
-                    // (t1 < t2 < t4) arrives new tasks are to be added but WAIT is still PLANNED
-                    // (not STARTED) since there has been a delay in performing some previous tasks
-                    // so we shorten WAIT to [t1;t2) and plan the newly arrived task at [t2; t2+x)
-                    // but of course there will probably be a delay in performing this task, as
-                    // we do not know when exactly the current task (one that is STARTED) will end
-                    // (t3).
-                    //
-                    // Of course, the WAIT task will never be performed as we have now time t2
-                    // and it is planned for [t1;t2); it will be removed on the nearest
-                    // updateSchedule(), just like here:
-
                     if (i == tasks.size() - 1) {// last task
                         task.setBeginTime(t);
 
@@ -375,8 +355,29 @@ public abstract class ImmediateRequestTaxiOptimizer
                         // if this is not the last task then some other task must have been added
                         // at time <= t
                         // THEREFORE: task.endTime() <= t, and so it can be removed
-                        schedule.removeTask(task);
-                        i--;
+
+                        TaxiTask nextTask = tasks.get(i + 1);
+                        switch (nextTask.getTaxiTaskType()) {
+                            case PICKUP_DRIVE:
+
+                                TaxiRequest req = ((TaxiPickupDriveTask)nextTask).getRequest();
+
+                                if (req.getT0() > req.getSubmissionTime()) {//advance requests
+                                    //currently no support
+                                    throw new RuntimeException();
+                                }
+                                else {//immediate requests
+                                    schedule.removeTask(task);
+                                    i--;
+                                }
+
+                                break;
+
+                            default:
+                                //maybe in the future: WAIT+CHARGE or WAIT+CRUISE would make sense
+                                //but currently it is not supported
+                                throw new RuntimeException();
+                        }
                     }
 
                     break;
@@ -419,15 +420,12 @@ public abstract class ImmediateRequestTaxiOptimizer
 
 
     @Override
-    public boolean nextLinkEntered(OnlineVehicleTracker vehicleTracker)
+    public void nextLinkEntered(DriveTask driveTask)
     {
-        DriveTask dt = vehicleTracker.getDriveTask();
-        dt.setEndTime(vehicleTracker.predictEndTime(data.getTime()));
-
         @SuppressWarnings("unchecked")
-        Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)dt.getSchedule();
-        updatePlannedTasks(schedule);
+        Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
 
-        return false;
+        double predictedEndTime = driveTask.getVehicleTracker().predictEndTime(data.getTime());
+        updateCurrentAndPlannedTasks(schedule, predictedEndTime);
     }
 }

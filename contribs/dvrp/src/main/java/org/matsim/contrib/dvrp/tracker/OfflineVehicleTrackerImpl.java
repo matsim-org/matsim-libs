@@ -25,41 +25,32 @@ import org.matsim.contrib.dvrp.data.schedule.DriveTask;
 public class OfflineVehicleTrackerImpl
     implements OfflineVehicleTracker
 {
-    private final DriveTask driveTask;
-    private final double initialEndTime;
+    private final double plannedEndTime;
 
 
     public OfflineVehicleTrackerImpl(DriveTask driveTask)
     {
-        this.driveTask = driveTask;
-        this.initialEndTime = driveTask.getEndTime();
-    }
-
-
-    @Override
-    public DriveTask getDriveTask()
-    {
-        return driveTask;
+        this.plannedEndTime = driveTask.getEndTime();
     }
 
 
     @Override
     public double calculateCurrentDelay(double currentTime)
     {
-        return Math.max(0, currentTime - initialEndTime);
+        return Math.max(0, currentTime - plannedEndTime);
     }
 
 
     @Override
     public double predictEndTime(double currentTime)
     {
-        return Math.max(initialEndTime, currentTime);
+        return Math.max(plannedEndTime, currentTime);
     }
 
 
     @Override
     public double getPlannedEndTime()
     {
-        return initialEndTime;
+        return plannedEndTime;
     }
 }

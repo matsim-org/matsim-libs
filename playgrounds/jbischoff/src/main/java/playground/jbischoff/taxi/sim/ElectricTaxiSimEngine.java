@@ -19,35 +19,50 @@
 
 package playground.jbischoff.taxi.sim;
 
-import org.matsim.contrib.dvrp.VrpSimEngine;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
+
+
 /**
- * 
- * 
- * 
  * @author jbischoff
- *
  */
-public class ElectricTaxiSimEngine extends VrpSimEngine {
-	private DepotArrivalDepartureCharger dac;
-	private NOSRankTaxiOptimizer optimizer;
+public class ElectricTaxiSimEngine
+    implements MobsimEngine
+{
+    private DepotArrivalDepartureCharger dac;
+    private NOSRankTaxiOptimizer optimizer;
 
-	public ElectricTaxiSimEngine(QSim qsim, MatsimVrpData data,
-	        NOSRankTaxiOptimizer optimizer, DepotArrivalDepartureCharger dac) {
-		super(qsim, data, optimizer);
-		this.optimizer=optimizer;
-		this.dac = dac;
-	}
 
-	@Override
-	public void doSimStep(double time) {
-		
-		this.optimizer.doSimStep(time);
-		this.dac.doSimStep(time);
-		notifyAgentLogics();
-	}
+    public ElectricTaxiSimEngine(NOSRankTaxiOptimizer optimizer, DepotArrivalDepartureCharger dac)
+    {
+        this.optimizer = optimizer;
+        this.dac = dac;
+    }
+
+
+    @Override
+    public void doSimStep(double time)
+    {
+
+        this.optimizer.doSimStep(time);
+        this.dac.doSimStep(time);
+    }
+
+
+    @Override
+    public void onPrepareSim()
+    {}
+
+
+    @Override
+    public void afterSim()
+    {}
+
+
+    @Override
+    public void setInternalInterface(InternalInterface internalInterface)
+    {}
 }

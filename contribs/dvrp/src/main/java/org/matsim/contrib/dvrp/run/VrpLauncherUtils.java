@@ -27,15 +27,17 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.DepotReader;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.data.schedule.impl.StayTaskImpl;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dynagent.util.DynActivityEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.*;
@@ -192,6 +194,15 @@ public class VrpLauncherUtils
     {
         VrpData vrpData = new VrpDataImpl();
         new DepotReader(scenario, vrpData).readFile(depotsFileName);
+
+        for (Vehicle veh : vrpData.getVehicles()) {
+            @SuppressWarnings("unchecked")
+            Schedule<Task> schedule = (Schedule<Task>)veh.getSchedule();
+
+            schedule.addTask(new StayTaskImpl(veh.getT0(), Schedules.getActualT1(schedule), veh
+                    .getDepot().getLink()));
+        }
+
         return vrpData;
     }
 
@@ -201,9 +212,9 @@ public class VrpLauncherUtils
         EventsManager events = EventsUtils.createEventsManager();
         QSim qSim = new QSim(scenario, events);
 
-        ActivityEngine activityEngine = new ActivityEngine();
-        qSim.addMobsimEngine(activityEngine);
-        qSim.addActivityHandler(activityEngine);
+        DynActivityEngine dynActivityEngine = new DynActivityEngine(new ActivityEngine());
+        qSim.addMobsimEngine(dynActivityEngine);
+        qSim.addActivityHandler(dynActivityEngine);
 
         QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim);
         qSim.addMobsimEngine(netsimEngine);
@@ -215,30 +226,12 @@ public class VrpLauncherUtils
     }
 
 
-    public static VrpSimEngine initVrpSimEngine(QSim qSim, MatsimVrpData data,
-            VrpOptimizer optimizer)
-    {
-        VrpSimEngine vrpSimEngine = new VrpSimEngine(qSim, data, optimizer);
-        qSim.addMobsimEngine(vrpSimEngine);
-        ((VrpDataImpl)data.getVrpData()).setMobsimTimer(qSim.getSimTimer());
-        return vrpSimEngine;
-    }
-
-
-    public static void initAgentSources(QSim qSim, MatsimVrpData data, VrpSimEngine vrpSimEngine,
+    public static void initAgentSources(QSim qSim, MatsimVrpData data, VrpOptimizer optimizer,
             DynActionCreator actionCreator)
     {
-        qSim.addAgentSource(new VrpAgentSource(actionCreator, data, vrpSimEngine));
+        qSim.addAgentSource(new VrpAgentSource(actionCreator, data, optimizer, qSim));
         qSim.addAgentSource(new PopulationAgentSource(data.getScenario().getPopulation(),
                 new DefaultAgentFactory(qSim), qSim));
-    }
-
-
-    public static void initDepartureHandler(QSim qSim, MatsimVrpData data,
-            VrpSimEngine vrpSimEngine, PassengerRequestCreator requestCreator, String mode)
-    {
-        qSim.addDepartureHandler(new PassengerDepartureHandler(mode, requestCreator, vrpSimEngine,
-                data));
     }
 
 

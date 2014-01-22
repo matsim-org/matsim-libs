@@ -28,16 +28,7 @@ public interface Schedule<T extends Task>
 {
     public enum ScheduleStatus
     {
-        UNPLANNED(0), PLANNED(1), STARTED(2), COMPLETED(3);
-
-        private final int stage;
-
-
-        private ScheduleStatus(int stage)
-        {
-            this.stage = stage;
-        }
-
+        UNPLANNED(), PLANNED(), STARTED(), COMPLETED();
 
         public boolean isUnplanned()
         {
@@ -60,36 +51,6 @@ public interface Schedule<T extends Task>
         public boolean isCompleted()
         {
             return this == COMPLETED;
-        }
-
-
-        public boolean ge(ScheduleStatus other)
-        {
-            return this.stage >= other.stage;
-        }
-
-
-        public boolean gt(ScheduleStatus other)
-        {
-            return this.stage > other.stage;
-        }
-
-
-        public boolean le(ScheduleStatus other)
-        {
-            return this.stage <= other.stage;
-        }
-
-
-        public boolean lt(ScheduleStatus other)
-        {
-            return this.stage < other.stage;
-        }
-
-
-        public int compareStage(ScheduleStatus other)
-        {
-            return this.stage - other.stage;
         }
     };
 
@@ -129,5 +90,8 @@ public interface Schedule<T extends Task>
     void removeTask(T task);
 
 
-    T nextTask();// sets the next task as the current one, updates this schedule status
+    T nextTask();
+
+
+    T cancelTaskAndNextTask();
 }

@@ -24,12 +24,14 @@ import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
+import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dvrp.vrpagent.VrpDynLegs.LegCreator;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
@@ -221,23 +223,27 @@ import playground.michalm.util.RunningVehicleRegister;
 
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
 
-        data = new MatsimVrpData(taxiData, scenario);
-
         Params params = new Params(destinationKnown, minimizePickupTripTime, pickupDuration,
                 dropoffDuration);
+
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiData,
                 calculator, params);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
 
-        VrpSimEngine vrpSimEngine = VrpLauncherUtils.initVrpSimEngine(qSim, data, optimizer);
+        data = new MatsimVrpData(taxiData, scenario, qSim.getSimTimer());
 
-        TaxiActionCreator actionCreator = new TaxiActionCreator(vrpSimEngine, onlineVehicleTracker);
+        PassengerEngine passengerEngine = new PassengerEngine(TaxiRequestCreator.MODE,
+                new TaxiRequestCreator(data), optimizer, data);
+        qSim.addMobsimEngine(passengerEngine);
 
-        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, actionCreator);
+        LegCreator legCreator = onlineVehicleTracker ? VrpDynLegs
+                .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())
+                : VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
 
-        VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine,
-                new TaxiRequestCreator(data), TaxiRequestCreator.MODE);
+        TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator);
+
+        VrpLauncherUtils.initAgentSources(qSim, data, optimizer, actionCreator);
 
         EventsManager events = qSim.getEventsManager();
 
