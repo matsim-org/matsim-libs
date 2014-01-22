@@ -18,13 +18,13 @@
  * *********************************************************************** */
 package playground.vsp.bvwp;
 
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
-import playground.vsp.bvwp.MultiDimensionalArray.ChangeType;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
 
@@ -33,31 +33,29 @@ import playground.vsp.bvwp.MultiDimensionalArray.Mode;
  *
  */
 class Utils {
-	static final String FMT_STRING = "%16s || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %12.1f  mio||\n";
+	static final String FMT_STRING = "%16s || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %12.1e  mio||\n";
 
 	private Utils() {} // not to be instantiated
 
 	static void writePartialSum(Html html, double utils) {
-		System.out.printf("--------------------%163.1f mio\n", utils / 1000. / 1000.  ) ;
+		System.out.printf("--------------------%163.1e mio\n", utils / 1000. / 1000.  ) ;
 		html.beginTableMulticolumnRow(); 
 		html.beginDivRightAlign();
-//		html.write("<strong>" + Double.toString(((long)(utils/100./1000.))/10.)+" mio</strong>" ) ;
-		html.write("<strong>" + Double.toString(utils)+" </strong>" ) ;
-
+		html.write("<strong>" + convertToMillions(utils) +"</strong>" ) ;
 		html.endDiv() ;
 		html.endTableRow(); 
 	}
 
 	static void writeSum(Html html, double utils) {
 		System.out.printf("%188s\n", "----------------" ) ;
-		System.out.printf("bvwp benefit: %169.1f \n", utils   ) ;
+		System.out.printf("bvwp benefit: %169.1e mio\n", utils / 1000. / 1000.  ) ;
 		System.out.printf("%188s\n", "================" ) ;
 	
 		html.beginTableMulticolumnRow() ;
-		html.write("Summe") ;
+		html.write("<strong>Summe</strong>") ;
 		html.endTableRow() ;
 	
-		html.bvwpTableRow("Summe", "", "", "", "", "", "", "", "", "<strong>" + Double.toString(   ((long)(utils/100./1000.))/10.   ) + " mio</strong>" ) ;
+		html.bvwpTableRow("", "", "", "", "", "", "", "", "", "<strong>" + convertToMillions(utils) + "</strong>" ) ;
 	}
 
 	static void initializeOutputTables(Html html) {
@@ -83,11 +81,11 @@ class Utils {
 	}
 
 	static void writeRohAndEndOutput(Html html, double utilsUserFromRoH, double operatorProfit) {
-		System.out.printf("RoH: utl gain users: %16.1f ; operator profit gain: %16.1f ; sum: %16.1f\n", 
+		System.out.printf("RoH: utl gain users: %16.1e ; operator profit gain: %16.1e ; sum: %16.1e\n", 
 				utilsUserFromRoH, operatorProfit, utilsUserFromRoH+operatorProfit ) ; 
 	
 		html.beginTableMulticolumnRow() ;
-		html.write("Zum Vergleich: RoH-Rechnung") ;
+		html.write("<strong>Zum Vergleich: RoH-Rechnung</strong>") ;
 		html.endTableRow() ;
 	
 		html.beginTableMulticolumnRow() ;
@@ -153,9 +151,7 @@ class Utils {
 					0.,0.,
 					0.,0.,
 					0.,0.,
-					implicitUtlPerItem, Double.toString(  implicitUtlOverall  ) + " " 
-//					implicitUtlPerItem, Double.toString(   ((long)(implicitUtlOverall/100./1000.))/10.   ) + " mio" 
-
+					implicitUtlPerItem, convertToMillions(implicitUtlOverall)
 					) ;
 	
 		}
@@ -181,10 +177,18 @@ class Utils {
 				quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
 				deltaQuantities , deltaQuantities * amountAltnutzer ,
 				utlChangePerItem , 
-				Double.toString(   utlChange   ) + " mio" 
-//				Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" 
-
+				convertToMillions(utlChange) 
 				) ;
+	}
+	
+	static String convertToMillions( double tmp ) {
+		StringBuilder sb = new StringBuilder() ;
+		Formatter formatter = new Formatter(sb) ;
+		formatter.format("%12.6f mio", tmp/1000./1000.) ;
+		formatter.close(); 
+		return sb.toString();
+//		
+//		return Double.toString( ((long)(tmp/100./1000.))/10. ) + " mio";
 	}
 
 	static void writeAufnehmendRow(Html html, final double deltaAmounts, Attribute attribute, final double attributeValuePlanfall,
@@ -199,9 +203,7 @@ class Utils {
 				0., 0., 
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-				utlChangesPerItem.utl , Double.toString(   utlChange   ) + " " ) ;
-//		utlChangesPerItem.utl , Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" ) ;
-
+				utlChangesPerItem.utl , convertToMillions(utlChange) ) ;
 	}
 
 	static void writeAbgebendRow(Html html, final double deltaAmounts, Attribute attribute, final double attributeValuePlanfall,
@@ -220,7 +222,7 @@ class Utils {
 				-attributeValueNullfall, attributeValueNullfall * deltaAmounts,
 				// (selbst wenn sich das abgebende System ändert, so ist unser Gewinn dennoch basierend auf dem
 				// Nullfall)
-				utlChangesPerItem.utl , Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" ) ;
+				utlChangesPerItem.utl , convertToMillions( utlChange) ) ;
 	}
 	
 	
