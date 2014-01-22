@@ -204,6 +204,12 @@ public class DynAgent
     {
         return dynActivity.getEndTime();
     }
+    
+    
+    public void doSimStep(double now)
+    {
+        dynActivity.doSimStep(now);
+    }
 
 
     @Override

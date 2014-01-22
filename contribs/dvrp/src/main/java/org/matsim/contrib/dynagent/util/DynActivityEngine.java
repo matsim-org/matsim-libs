@@ -64,6 +64,8 @@ public class DynActivityEngine
     {
         for (EndTimeEntry e : activityEndTimes.values()) {
             if (e.agent.getState() == State.ACTIVITY) {
+                e.agent.doSimStep(time);
+                
                 //ask agents who are performing an activity about its end time;
                 double currentEndTime = e.agent.getActivityEndTime();
 
@@ -73,8 +75,8 @@ public class DynActivityEngine
                     //and if the agent is very indecisive we may repeat this operation each sim step
                     //that is why it is better to defer the rescheduling as much as possible
 
-                    if (currentEndTime <= time //the agent wants to end the activity NOW
-                            || e.scheduledEndTime <= time) { //or the simulation thinks the agent wants to finish the activity NOW
+                    if (currentEndTime <= time //the agent wants to end the activity NOW, or
+                            || e.scheduledEndTime <= time) { //the simulation thinks the agent wants to finish the activity NOW
                         internalInterface.rescheduleActivityEnd(e.agent);
                         e.scheduledEndTime = currentEndTime;
                     }

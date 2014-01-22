@@ -42,9 +42,4 @@ public class StaticDynActivity
     {
         return endTime;
     }
-
-
-    @Override
-    public void endAction(double now)
-    {}
 }

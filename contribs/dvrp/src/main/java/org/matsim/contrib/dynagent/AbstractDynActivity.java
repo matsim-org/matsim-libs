@@ -39,6 +39,11 @@ public abstract class AbstractDynActivity
 
 
     @Override
+    public void doSimStep(double now)
+    {}
+
+
+    @Override
     public void endAction(double now)
     {}
 }
