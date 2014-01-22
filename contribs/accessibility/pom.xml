@@ -8,6 +8,23 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>accessibility</artifactId>
   <name>accessibility</name>
+  <build>
+  		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>**/revision.txt</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/revision.txt</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+  </build>
   <dependencies>
     <dependency>
         <groupId>trove</groupId>
