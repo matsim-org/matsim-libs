@@ -368,7 +368,7 @@ public class DgAnalyseCottbusKS2010 {
 					DgMfd mfd = new DgMfd(net, runInfo.storagecap);
 					eventsManager.addHandler(mfd);
 
-					TTTotalDelay totalDelay = new TTTotalDelay(net);
+					TtTotalDelay totalDelay = new TtTotalDelay(net);
 					eventsManager.addHandler(totalDelay);
 
 					this.processEvents(eventsManager, inMemoryEvents, eventsFilename);
@@ -416,9 +416,9 @@ public class DgAnalyseCottbusKS2010 {
 		all.endTime = 24.0 * 3600.0;
 		all.name = "all_day";
 		List<TimeConfig> list = new ArrayList<TimeConfig>();
-//		list.add(morning);
+		list.add(morning);
 //		list.add(evening);
-		list.add(all);
+//		list.add(all);
 		return list;
 	}
 
@@ -599,10 +599,10 @@ public class DgAnalyseCottbusKS2010 {
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2013-12-29_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2014-01-16_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
-		ana.setUseInMemoryEvents(true);
+		ana.setUseInMemoryEvents(false);
 		ana.calculateResults(runIds, times, extents);
 		ana.analyseResults();
 		new ResultsWriter().writeResultsTable(ana.results, outputFilename + extentString +".txt");

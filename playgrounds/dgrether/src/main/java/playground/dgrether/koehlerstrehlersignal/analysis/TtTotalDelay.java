@@ -40,13 +40,13 @@ import org.matsim.api.core.v01.network.Network;
  * @author tthunig
  *
  */
-public class TTTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
+public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
 
 	private Network network;
 	private Map<Id, LinkEnterEvent> linkEnterByPerson;
 	private double totalDelay;
 
-	public TTTotalDelay(Network network) {
+	public TtTotalDelay(Network network) {
 		this.network = network;
 		this.reset(0);
 	}
