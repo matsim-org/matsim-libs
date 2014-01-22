@@ -18,9 +18,13 @@
  * *********************************************************************** */
 package playground.vsp.bvwp;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Id;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwp.MultiDimensionalArray.ChangeType;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
 
@@ -37,14 +41,16 @@ class Utils {
 		System.out.printf("--------------------%163.1f mio\n", utils / 1000. / 1000.  ) ;
 		html.beginTableMulticolumnRow(); 
 		html.beginDivRightAlign();
-		html.write("<strong>" + Double.toString(((long)(utils/100./1000.))/10.)+" mio</strong>" ) ;
+//		html.write("<strong>" + Double.toString(((long)(utils/100./1000.))/10.)+" mio</strong>" ) ;
+		html.write("<strong>" + Double.toString(utils)+" </strong>" ) ;
+
 		html.endDiv() ;
 		html.endTableRow(); 
 	}
 
 	static void writeSum(Html html, double utils) {
 		System.out.printf("%188s\n", "----------------" ) ;
-		System.out.printf("bvwp benefit: %169.1f mio\n", utils / 1000. / 1000.  ) ;
+		System.out.printf("bvwp benefit: %169.1f \n", utils   ) ;
 		System.out.printf("%188s\n", "================" ) ;
 	
 		html.beginTableMulticolumnRow() ;
@@ -96,12 +102,33 @@ class Utils {
 	}
 
 	static void writeSubHeaderWechselnd(Html html, Id id, DemandSegment segm, Mode mode, final double deltaAmounts) {
+		
 		System.out.printf("====================%16s; %16s; %16s; wechselnder & induzierter Verkehr: %16.1f Personen/Tonnen ====================\n", 
 				id, mode, segm, deltaAmounts ) ;
 		html.beginTableMulticolumnRow() ;
 		html.write( "<strong>" + id + "; " + segm + "; " + mode + "; wechselnder & induzierter Verkehr: " + deltaAmounts + " Personen/Tonnen" + "</strong>") ;
 		html.endTableRow();
 	}
+	
+	static void writeSubHeaderVerlagert(Html html, Id id, DemandSegment segm, Mode mode, final double deltaAmounts) {
+		
+		System.out.printf("====================%16s; %16s; %16s; verlagerter Verkehr: %16.1f Personen/Tonnen ====================\n", 
+				id, mode, segm, deltaAmounts ) ;
+		html.beginTableMulticolumnRow() ;
+		html.write( "<strong>" + id + "; " + segm + "; " + mode + "; verlagerter Verkehr: " + deltaAmounts + " Personen/Tonnen" + "</strong>") ;
+		html.endTableRow();
+	}
+	
+	static void writeSubHeaderInduziert(Html html, Id id, DemandSegment segm, Mode mode, final double deltaAmounts) {
+		
+		System.out.printf("====================%16s; %16s; %16s;  induzierter Verkehr: %16.1f Personen/Tonnen ====================\n", 
+				id, mode, segm, deltaAmounts ) ;
+		html.beginTableMulticolumnRow() ;
+		html.write( "<strong>" + id + "; " + segm + "; " + mode + "; induzierter Verkehr: " + deltaAmounts + " Personen/Tonnen" + "</strong>") ;
+		html.endTableRow();
+	}
+	
+	
 
 	static void writeSubHeaderVerbleibend(Html html, Id id, DemandSegment segm, Mode mode, double amountAltnutzer) {
 		System.out.printf("====================%16s; %16s; %16s;             verbleibender Verkehr: %16.1f Personen/Tonnen ====================\n", 
@@ -126,7 +153,9 @@ class Utils {
 					0.,0.,
 					0.,0.,
 					0.,0.,
-					implicitUtlPerItem, Double.toString(   ((long)(implicitUtlOverall/100./1000.))/10.   ) + " mio" 
+					implicitUtlPerItem, Double.toString(  implicitUtlOverall  ) + " " 
+//					implicitUtlPerItem, Double.toString(   ((long)(implicitUtlOverall/100./1000.))/10.   ) + " mio" 
+
 					) ;
 	
 		}
@@ -152,7 +181,9 @@ class Utils {
 				quantitiesPlanfall.getByEntry(attribute) * amountAltnutzer,
 				deltaQuantities , deltaQuantities * amountAltnutzer ,
 				utlChangePerItem , 
-				Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" 
+				Double.toString(   utlChange   ) + " mio" 
+//				Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" 
+
 				) ;
 	}
 
@@ -168,7 +199,9 @@ class Utils {
 				0., 0., 
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
-				utlChangesPerItem.utl , Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" ) ;
+				utlChangesPerItem.utl , Double.toString(   utlChange   ) + " " ) ;
+//		utlChangesPerItem.utl , Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" ) ;
+
 	}
 
 	static void writeAbgebendRow(Html html, final double deltaAmounts, Attribute attribute, final double attributeValuePlanfall,
@@ -189,5 +222,97 @@ class Utils {
 				// Nullfall)
 				utlChangesPerItem.utl , Double.toString(   ((long)(utlChange/100./1000.))/10.   ) + " mio" ) ;
 	}
+	
+	
+	static void writeVerlagertSum(Html html, HashMap<Mode,Double> utilsVerl) {
+		System.out.printf("%188s\n", "----------------" ) ;
+		for (Entry<Mode,Double> e : utilsVerl.entrySet()){
+			System.out.println("Fuer Mode "+e.getKey()+" Summe Nutzen verlagert: "+e.getValue() ) ;
+		}
 
+		System.out.printf("%188s\n", "================" ) ;
+	
+//		html.beginTableMulticolumnRow() ;
+//		html.write("Summe") ;
+//		html.endTableRow() ;
+//	
+//		html.bvwpTableRow("Summe", "", "", "", "", "", "", "", "", "<strong>" + Double.toString(   ((long)(utilsVerl/100./1000.))/10.   ) + " mio</strong>" ) ;
+	}
+	
+	static void writeInduziertSum(Html html,  HashMap<Mode,Double> utilsInduz) {
+		System.out.printf("%188s\n", "----------------" ) ;
+
+		for (Entry<Mode,Double> e : utilsInduz.entrySet()){
+			System.out.println("Fuer Mode "+e.getKey()+" Summe Nutzen induziert: "+e.getValue() ) ;
+		}
+		
+		System.out.printf("%188s\n", "================" ) ;
+//	
+//		html.beginTableMulticolumnRow() ;
+//		html.write("Summe") ;
+//		html.endTableRow() ;
+//	
+//		html.bvwpTableRow("Summe", "", "", "", "", "", "", "", "", "<strong>" + Double.toString(   ((long)(utilsInduz/100./1000.))/10.   ) + " mio</strong>" ) ;
+	}
+
+	 static void writeImplVerlagertSum(Html html,
+			HashMap<Mode, Double> modularImplVerlagertUtils) {
+
+			System.out.printf("%188s\n", "----------------" ) ;
+			for (Entry<Mode,Double> e : modularImplVerlagertUtils.entrySet()){
+				System.out.println("Fuer Mode "+e.getKey()+" Summe IMPLIZITER Nutzen verlagert: "+e.getValue() ) ;
+			}
+
+			System.out.printf("%188s\n", "================" ) ;
+	}
+	
+
+		static void writeImplInduziertSum(Html html,  HashMap<Mode,Double> utilsImplInduz) {
+			System.out.printf("%188s\n", "----------------" ) ;
+
+			for (Entry<Mode,Double> e : utilsImplInduz.entrySet()){
+				System.out.println("Fuer Mode "+e.getKey()+" Summe IMPLIZITER Nutzen induziert: "+e.getValue() ) ;
+			}
+			
+			System.out.printf("%188s\n", "================" ) ;
+}
+		
+		static void writeOverallOutputTable(Html html,HashMap<Mode,Double> modularUtils, HashMap<Mode,Double> modUtilsVerl,HashMap<Mode,Double> modImplUtilsVerl, HashMap<Mode,Double> modUtilsInd,HashMap<Mode,Double> modImplUtilsInd )
+		{
+			html.beginTableMulticolumnRow();
+			html.write("Summen ueber alle Relationen und Zwecke");
+			html.endTableRow();
+			
+			html.bvwpTableRow("Verkehrstraeger", "Verbleibend", "", "Verlagert", "","", "Induziert", "", "",  "Summe");
+			html.bvwpTableRow("", "RV", "", "RV", "Implizit","", "RV", "Implizit", "", "Summe");
+			Double total = 0.;
+			for (Mode mode : Mode.values()){
+				
+				Double vblRV = tryToGetValueOrReturnZero(modularUtils, mode);
+				Double verlRV = tryToGetValueOrReturnZero(modUtilsVerl, mode);
+				Double verlIm = tryToGetValueOrReturnZero(modImplUtilsVerl, mode);
+				Double indRV = tryToGetValueOrReturnZero(modUtilsInd, mode);
+				Double indIm = tryToGetValueOrReturnZero(modImplUtilsInd, mode);
+				
+				Double sum = vblRV + verlRV + verlIm + indRV + indIm;
+				total += sum;
+				html.bvwpTableRow(mode.toString(), vblRV.toString(), "", verlRV.toString(), verlIm.toString(),"", indRV.toString(), indIm.toString(),  "", sum.toString());
+				
+			}
+			html.bvwpTableRow("", "", "", "", "","", "", "", "", total.toString());
+
+			html.endTable() ;
+			
+			html.endBody() ;
+			html.endHtml() ;
+	
+		}
+		private static Double tryToGetValueOrReturnZero(HashMap<Mode,Double> map, Mode mode){
+			Double result;
+			result = map.get(mode);
+			if (result == null) result = 0.;
+			
+			return result;
+			
+		}
 }

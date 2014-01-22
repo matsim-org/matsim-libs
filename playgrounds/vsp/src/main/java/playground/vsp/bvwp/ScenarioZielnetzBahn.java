@@ -181,6 +181,7 @@ class ScenarioZielnetzBahn {
 		return nullfall;
 	}
 
+
 	static ScenarioForEvalData createPlanfallBahnausbau(ScenarioForEvalData nullfall) {
 		// The policy case is initialized as a complete copy of the base case:
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;

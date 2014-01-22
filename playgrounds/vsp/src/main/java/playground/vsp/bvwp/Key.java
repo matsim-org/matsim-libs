@@ -1,6 +1,7 @@
 package playground.vsp.bvwp;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwp.MultiDimensionalArray.ChangeType;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
 
@@ -17,12 +18,24 @@ class Key /*implements Comparable<Key>*/ {
 		return delegate.hashCode() ;
 	}
 	
-	private Key(Mode mode, Attribute attr, DemandSegment segm) {
-		delegate = mode.toString() + "," + segm.toString() + "," + attr.toString() ;
+	private Key(Mode mode, Attribute attr, DemandSegment segm, ChangeType ct) {
+		ChangeType ctt;
+		if (ct==null) {ctt = ChangeType.INDUZIERT
+				;
+		}
+		else {ctt = ct ;
+		
+		}
+		
+		delegate = mode.toString() + "," + segm.toString() + "," + attr.toString() +"," + ctt ;
 	}
 
-	static Key makeKey( Mode mode, DemandSegment segm, Attribute attr ) {
-		return new Key( mode, attr, segm) ;
+	static Key makeKey( Mode mode, DemandSegment segm, Attribute attr, ChangeType ct ) {
+		return new Key( mode, attr, segm, ct) ;
+	}
+	
+	static Key makeKey( Mode mode, DemandSegment segm, Attribute attr) {
+		return new Key( mode, attr, segm, null) ;
 	}
 	
 	public String toString() {

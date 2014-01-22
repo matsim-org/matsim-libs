@@ -12,7 +12,7 @@ public class MultiDimensionalArray {
 	 * aber abgesehen davon spricht eigentlich nichts dagegen.  kai,benjamin, sep'12
 	 * </ul>
 	 */
-	enum Attribute { XX, km, hrs, priceUser, costOfProduction, access_hrs }
+	enum Attribute { XX, km, hrs, priceUser, costOfProduction, access_hrs, changetype }
 
 	/**
 	 * Design thoughts:<ul>
@@ -23,21 +23,23 @@ public class MultiDimensionalArray {
 	enum DemandSegment { GV, PV_NON_COMMERCIAL, PV_COMMERCIAL, PV_BERUF, PV_AUSBILDUNG, PV_EINKAUF, PV_GESCHAEFT, PV_URLAUB, PV_SONST }
 
 	enum Mode { ROAD, RAIL }
-	
-	public static void main(String[] args) {
-		Values m = new Values() ;
-		
-		double sum = 0 ;
 
-		for ( DemandSegment segm : DemandSegment.values() ) {
-			for ( Mode mode : Mode.values() ) {
-				sum += m.get(makeKey(mode,segm, Attribute.km )) ;
-			}
-		}
+	enum ChangeType{VERLAGERT, INDUZIERT}
+	
+//	public static void main(String[] args) {
+//		Values m = new Values() ;
+//		
+//		double sum = 0 ;
+//
+//		for ( DemandSegment segm : DemandSegment.values() ) {
+//			for ( Mode mode : Mode.values() ) {
+//				sum += m.get(makeKey(mode,segm, Attribute.km )) ;
+//			}
+//		}
 		
 		
 		
 		
-	}
+//	}
 	
 }

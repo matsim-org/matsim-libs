@@ -2,9 +2,12 @@ package playground.vsp.bvwp;
 
 import static playground.vsp.bvwp.Key.makeKey;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Id;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwp.MultiDimensionalArray.ChangeType;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
 
@@ -19,11 +22,15 @@ abstract class UtilityChanges {
 	}
 
 	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall ) {
+		
+		
+		
 		Html html = new Html() ;
-		computeAndPrintResults(economicValues,nullfall,planfall,html) ;
+		Html totalHtml = new Html("total");
+		computeAndPrintResults(economicValues,nullfall,planfall,html, totalHtml) ;
 	}
 
-	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, Html html ) {
+	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, Html html, Html totalHtml ) {
 		// (GK-GK') * x + 0.5 * (GK-GK') (x'-x) =
 		// 0.5 * (GK-GK') (x+x') = 0.5 * ( GK*x + GK*x' - GK'*x - GK'*x' )
 
@@ -31,18 +38,37 @@ abstract class UtilityChanges {
 		html.beginHtml() ;
 		html.beginBody() ;
 		html.beginTable() ;
+		
+		totalHtml.beginHtml() ;
+		totalHtml.beginBody() ;
+		totalHtml.beginTable() ;
+		
+		
 
+		HashMap<Mode,Double> modularUtils = new HashMap<Mode,Double>();
+		HashMap<Mode,Double> modularInducedUtils = new HashMap<Mode,Double>();
+		HashMap<Mode,Double> modularVerlagertUtils = new HashMap<Mode,Double>();
+		HashMap<Mode,Double> modularImplInducedUtils = new HashMap<Mode,Double>();
+		HashMap<Mode,Double> modularImplVerlagertUtils = new HashMap<Mode,Double>();
 
+		
+		
+		// total
 		double utils = 0. ;
+
+		
 		double utilsUserFromRoH = 0. ;
 		double operatorProfit = 0. ;
+		
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
 			Utils.initializeOutputTables(html);				
 			
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Values planfallForODRelation = planfall.getByODRelation(id) ;
+			boolean verbleibendGerechnet = false;
 			for ( DemandSegment segm : DemandSegment.values() ) { // for all types (e.g. PV or GV)
-
+				
+				
 				Mode improvedMode = autodetectImprovingMode( nullfallForODRelation, planfallForODRelation, segm);
 
 				if ( improvedMode == null ) {
@@ -56,16 +82,17 @@ abstract class UtilityChanges {
 				double sumSent = 0. ;
 
 				for ( Mode mode : Mode.values() )
+				{
+					for (ChangeType type : ChangeType.values())
 					{ // for all modes
-//					{
-//					Mode mode = Mode.ROAD; //only ROAD
-//					
+							
+					
 					Attributes 		econValues = economicValues.getAttributes(mode, segm) ;
 					
-					Attributes attributesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
-					Attributes attributesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
+					Attributes attributesNullfall = nullfallForODRelation.getAttributes(mode, segm, type) ;
+					Attributes attributesPlanfall = planfallForODRelation.getAttributes(mode, segm, type) ;
 
-					final Key key = makeKey(mode, segm, Attribute.XX);
+					final Key key = makeKey(mode, segm, Attribute.XX, type);
 					System.out.println( "key: " + key.toString() );
 					System.out.flush(); 
 					final double amountNullfall;
@@ -93,57 +120,124 @@ abstract class UtilityChanges {
 					System.err.println(" mode: " + mode + " improvedMode: " + improvedMode );
 					System.err.flush() ;
 
+					if (!verbleibendGerechnet)
+					{
 					if ( mode.equals(improvedMode) ) {
 						// Altnutzer:
+						Double verbleibendUpToNow;
+						verbleibendUpToNow = modularUtils.get(mode);
+						if (verbleibendUpToNow == null) {	
+							verbleibendUpToNow = 0.;
+						}
+						
+						
 						double amountAltnutzer = amountNullfall ;
 						System.out.flush();
 						System.err.println("writing verbleibend:");
 						System.err.flush() ;
 						Utils.writeSubHeaderVerbleibend(html, id, segm, mode, amountAltnutzer);
-						utils += computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
+						double verbleibend = computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
+						utils += verbleibend;
+						verbleibendUpToNow += verbleibend;
+						modularUtils.put(mode, verbleibendUpToNow);
 					} else {
 						sumSent += Math.abs( deltaAmounts ) ;
 					}
-
-					Utils.writeSubHeaderWechselnd(html, id, segm, mode, deltaAmounts);
+						verbleibendGerechnet = true;
+					}
 					
-					utils += computeAndPrintGivingOrReceiving(econValues, attributesNullfall, attributesPlanfall, html);
-
+				
+					
+					if (type == ChangeType.VERLAGERT){
+						Double verlagertUpToNow;
+						
+						verlagertUpToNow = modularVerlagertUtils.get(mode);
+						if (verlagertUpToNow == null) {	verlagertUpToNow = 0.;
+						}
+					
+					Utils.writeSubHeaderVerlagert(html, id, segm, mode, deltaAmounts);
+					double currentVerlUtil = computeAndPrintGivingOrReceiving(econValues, attributesNullfall, attributesPlanfall, html);
+					
+					verlagertUpToNow+= currentVerlUtil;
+					modularVerlagertUtils.put(mode, verlagertUpToNow);
+					utils += currentVerlUtil;
+					}
+					
+					
+					else if (type == ChangeType.INDUZIERT){
+						Double induziertUpToNow;
+						
+						induziertUpToNow = modularInducedUtils.get(mode);
+						if (induziertUpToNow == null) {	induziertUpToNow = 0.;
+						}
+						Utils.writeSubHeaderInduziert(html, id, segm, mode, deltaAmounts);
+						double currentIndUtil = computeAndPrintGivingOrReceiving(econValues, attributesNullfall, attributesPlanfall, html);
+						induziertUpToNow+= currentIndUtil;
+						modularInducedUtils.put(mode, induziertUpToNow);
+						utils += currentIndUtil;
+						
+						
+						
+						System.out.println( " amount induced: " + deltaAmounts ) ;
+						
+						final double implUtlInducedPerItem = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
+						final double implUtlInduced = implUtlInducedPerItem * deltaAmounts ;
+						
+						
+						if ( implUtlInduced != 0. ) {
+							Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "impl utl ind");
+							Utils.writePartialSum(html, implUtlInduced );
+						}
+						Double implInduziertUtil;
+						implInduziertUtil = modularImplInducedUtils.get(mode);
+						if (implInduziertUtil == null ) {
+							implInduziertUtil = 0.;
+						}
+						implInduziertUtil += implUtlInduced;
+						modularImplInducedUtils.put(mode, implInduziertUtil);
+						utils += implUtlInduced ;
+						
+					}
+					
+					//Verlagert
 					if ( mode != improvedMode ) {
-						// compute implicit uti completely on the side of the giving modes:
-						utils += computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
+						
+						Double implVerlagertUtil;
+						implVerlagertUtil = modularImplVerlagertUtils.get(mode);
+						if (implVerlagertUtil == null)
+							{
+							implVerlagertUtil = 0.;
+							}
+							
+						
+						double u=computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
 								econValues, attributesNullfall, attributesPlanfall, html);
+					
+						// compute implicit uti completely on the side of the giving modes:
+						implVerlagertUtil += u;
+						modularImplVerlagertUtils.put(mode, implVerlagertUtil);
+						utils += u;
 					}
 
 					// roh etc. stuff (for comparison):
 					utilsUserFromRoH = computeUserBenefit(utilsUserFromRoH, econValues, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
 					operatorProfit = computeOperatorProfit(operatorProfit, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
-
+					} //changeType
 				} // mode			
 				
-				final double amountNullfallRcv = nullfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
-				final double amountPlanfallRcv = planfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
-				final double deltaAmountsRcv = amountPlanfallRcv - amountNullfallRcv ;
-				final double amountInduced = deltaAmountsRcv - sumSent ;
-				System.out.println( " amount induced: " + amountInduced ) ;
-				
-				final double implUtlInducedPerItem = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
-				final double implUtlInduced = implUtlInducedPerItem * amountInduced ;
-				
-				
-				if ( implUtlInduced != 0. ) {
-					Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "impl utl ind");
-					Utils.writePartialSum(html, implUtlInduced );
-				}
-				
-				utils += implUtlInduced ;
-				
+
 
 			} // demand segment
 		} // relation
-
+		
+		
 		Utils.writeSum(html, utils);
-
+		
+		Utils.writeVerlagertSum(html, modularVerlagertUtils);
+		Utils.writeImplVerlagertSum(html, modularImplVerlagertUtils);
+		Utils.writeInduziertSum(html, modularInducedUtils);
+		Utils.writeImplInduziertSum(html, modularImplInducedUtils);
+		Utils.writeOverallOutputTable(totalHtml, modularUtils, modularVerlagertUtils,modularImplVerlagertUtils,modularInducedUtils, modularImplInducedUtils);
 		Utils.writeRohAndEndOutput(html, utilsUserFromRoH, operatorProfit);
 	}
 

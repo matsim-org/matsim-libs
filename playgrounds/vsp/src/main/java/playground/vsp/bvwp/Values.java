@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwp.MultiDimensionalArray.ChangeType;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
 import static playground.vsp.bvwp.Key.*;
@@ -22,7 +23,17 @@ class Values {
 		return m.put( key,  value) ;
 	}
 	Double inc( Key key, double value ) {
+		
+	try{
 		value += m.get(key); 
+		System.out.println(key + " increased ");
+
+	}
+	catch(NullPointerException e) {
+		System.err.println(key + " not found");
+		e.printStackTrace();
+		System.exit(-1);
+	}
 		return m.put( key, value ) ;
 	}
 	Values createDeepCopy() {
@@ -36,12 +47,24 @@ class Values {
 	/**
 	 * Convenience class, not strictly necessary:
 	 */
-	Attributes getAttributes( Mode mode, DemandSegment segm ) {
-		Attributes attrs = new Attributes() ;
-		for ( Attribute attr : Attribute.values() ) {
-			attrs.addEntry( attr, this.get( makeKey( mode, segm, attr) ) ) ;
+	Attributes getAttributes(Mode mode, DemandSegment segm) {
+		Attributes attrs = new Attributes();
+		for (Attribute attr : Attribute.values()) {
+			for (ChangeType type : ChangeType.values()) {
+
+				attrs.addEntry(attr, this.get(makeKey(mode, segm, attr, type)));
+			}
 		}
-		return attrs ;
+		return attrs;
+	}
+	
+	Attributes getAttributes(Mode mode, DemandSegment segm, ChangeType type) {
+		Attributes attrs = new Attributes();
+		for (Attribute attr : Attribute.values()) {
+				attrs.addEntry(attr, this.get(makeKey(mode, segm, attr, type)));
+			
+		}
+		return attrs;
 	}
 	
 	public String toString() {
