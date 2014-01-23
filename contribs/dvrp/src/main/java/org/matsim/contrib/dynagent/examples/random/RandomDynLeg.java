@@ -24,6 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dynagent.DynLeg;
+import org.matsim.core.gbl.MatsimRandom;
 
 
 public class RandomDynLeg
@@ -82,7 +83,7 @@ public class RandomDynLeg
     private void doRandomChoice()
     {
         //Do I want to end at this link?
-        if (RandomDynAgentUtils.RANDOM.nextInt(10) == 0) {//10% chance
+        if (MatsimRandom.getRandom().nextInt(10) == 0) {//10% chance
             nextLinkId = null;
             destinationLinkId = currentLinkId;
         }
@@ -92,7 +93,7 @@ public class RandomDynLeg
             Map<Id, ?> possibleNextLinks = currentLink.getToNode().getOutLinks();
 
             //Let's choose the next link randomly
-            nextLinkId = RandomDynAgentUtils.getRandomId(possibleNextLinks);
+            nextLinkId = RandomDynAgentLogic.chooseRandomElement(possibleNextLinks.keySet());
 
             //at this point the destination can be anything, QSim does not take it into account
             destinationLinkId = null;

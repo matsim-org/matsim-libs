@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent.util;
+package org.matsim.contrib.dynagent.run;
 
 import java.util.*;
 

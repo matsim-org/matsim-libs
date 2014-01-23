@@ -20,6 +20,7 @@
 package org.matsim.contrib.dynagent.examples.random;
 
 import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.core.gbl.MatsimRandom;
 
 
 public class RandomDynActivity
@@ -63,6 +64,6 @@ public class RandomDynActivity
     private void doRandomChoice(double now)
     {
         //When do I want to stop the current activity?
-        endTime = now + RandomDynAgentUtils.RANDOM.nextInt(100);//1% chance that endTime == now
+        endTime = now + MatsimRandom.getRandom().nextInt(100);//1% chance that endTime == now
     }
 }

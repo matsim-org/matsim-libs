@@ -27,13 +27,11 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.vis.otfvis.*;
 
 
 public class OneTaxiLauncher
@@ -65,14 +63,14 @@ public class OneTaxiLauncher
         TravelTime travelTime = new FreeSpeedTravelTime();
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
-        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathFinder(scenario,
+        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
                 TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility);
 
         VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, depotsFileName);
 
         OneTaxiOptimizer optimizer = new OneTaxiOptimizer(vrpData, calculator);
 
-        QSim qSim = VrpLauncherUtils.initQSim(scenario);
+        QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
 
         MatsimVrpData data = new MatsimVrpData(vrpData, scenario, qSim.getSimTimer());
 
@@ -86,11 +84,7 @@ public class OneTaxiLauncher
         EventsManager events = qSim.getEventsManager();
 
         if (otfVis) { // OFTVis visualization
-            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME,
-                    OTFVisConfigGroup.class).setDrawNonMovingItems(true);
-            OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
-                    scenario, qSim.getEventsManager(), qSim);
-            OTFClientLive.run(scenario.getConfig(), server);
+            DynAgentLauncherUtils.runOTFVis(qSim, true);
         }
 
         qSim.run();

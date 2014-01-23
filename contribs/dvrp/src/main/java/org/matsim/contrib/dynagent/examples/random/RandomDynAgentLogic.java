@@ -19,8 +19,13 @@
 
 package org.matsim.contrib.dynagent.examples.random;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dynagent.*;
+import org.matsim.core.gbl.MatsimRandom;
+
+import com.google.common.collect.Iterators;
 
 
 public class RandomDynAgentLogic
@@ -56,16 +61,23 @@ public class RandomDynAgentLogic
     public DynAction computeNextAction(DynAction oldAction, double now)
     {
         //I am tired, I want to stop being simulated (1% chance)
-        if (RandomDynAgentUtils.RANDOM.nextInt(100) == 0) {
+        if (MatsimRandom.getRandom().nextInt(100) == 0) {
             return new StaticDynActivity("Laziness", Double.POSITIVE_INFINITY);
         }
         
         //Do I want to stay or drive? (50-50 choice)
-        if (RandomDynAgentUtils.RANDOM.nextBoolean()) {
+        if (MatsimRandom.getRandom().nextBoolean()) {
             return new RandomDynActivity(now);
         }
         else {
             return new RandomDynLeg(agent.getCurrentLinkId(), network);
         }
+    }
+
+
+    /*package*/ static <E> E chooseRandomElement(Set<E> set)
+    {
+        int randomIndex = MatsimRandom.getRandom().nextInt(set.size());
+        return Iterators.get(set.iterator(), randomIndex);
     }
 }

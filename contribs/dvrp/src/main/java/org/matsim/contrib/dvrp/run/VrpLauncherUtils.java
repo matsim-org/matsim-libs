@@ -38,12 +38,8 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.util.DynActivityEngine;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.Dijkstra;
@@ -177,7 +173,7 @@ public class VrpLauncherUtils
     }
 
 
-    public static VrpPathCalculator initVrpPathFinder(Scenario scenario,
+    public static VrpPathCalculator initVrpPathCalculator(Scenario scenario,
             TravelTimeSource ttimeSource, TravelTime travelTime, TravelDisutility travelDisutility)
     {
         Network network = scenario.getNetwork();
@@ -205,25 +201,6 @@ public class VrpLauncherUtils
         }
 
         return vrpData;
-    }
-
-
-    public static QSim initQSim(Scenario scenario)
-    {
-        EventsManager events = EventsUtils.createEventsManager();
-        QSim qSim = new QSim(scenario, events);
-
-        DynActivityEngine dynActivityEngine = new DynActivityEngine();
-        qSim.addMobsimEngine(dynActivityEngine);
-        qSim.addActivityHandler(dynActivityEngine);
-
-        QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim);
-        qSim.addMobsimEngine(netsimEngine);
-        qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-
-        qSim.addMobsimEngine(new TeleportationEngine());
-
-        return qSim;
     }
 
 

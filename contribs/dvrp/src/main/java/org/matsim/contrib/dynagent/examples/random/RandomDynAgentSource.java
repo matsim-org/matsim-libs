@@ -52,7 +52,7 @@ public class RandomDynAgentSource
             RandomDynAgentLogic agentLogic = new RandomDynAgentLogic(network);
 
             Id id = scenario.createId(i + "");
-            Id startLinkId = RandomDynAgentUtils.getRandomId(network.getLinks());
+            Id startLinkId = RandomDynAgentLogic.chooseRandomElement(network.getLinks().keySet());
             DynAgent agent = new DynAgent(id, startLinkId, qSim, agentLogic);
 
             qSim.insertAgentIntoMobsim(agent);

@@ -32,17 +32,15 @@ import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpDynLegs.LegCreator;
-import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
@@ -216,7 +214,7 @@ import playground.michalm.util.RunningVehicleRegister;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
                 algorithmConfig.tdisSource, travelTime);
 
-        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathFinder(scenario,
+        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
                 algorithmConfig.ttimeSource, travelTime, travelDisutility);
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
@@ -229,7 +227,7 @@ import playground.michalm.util.RunningVehicleRegister;
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiData,
                 calculator, params);
 
-        QSim qSim = VrpLauncherUtils.initQSim(scenario);
+        QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
 
         data = new MatsimVrpData(taxiData, scenario, qSim.getSimTimer());
 
@@ -268,11 +266,7 @@ import playground.michalm.util.RunningVehicleRegister;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
-            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME,
-                    OTFVisConfigGroup.class).setColoringScheme(ColoringScheme.taxicab);
-            OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
-                    scenario, qSim.getEventsManager(), qSim);
-            OTFClientLive.run(scenario.getConfig(), server);
+            DynAgentLauncherUtils.runOTFVis(qSim, false, ColoringScheme.taxicab);
         }
 
         if (outHistogram) {

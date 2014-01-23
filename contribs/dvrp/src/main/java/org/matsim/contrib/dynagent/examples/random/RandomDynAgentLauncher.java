@@ -20,14 +20,12 @@
 package org.matsim.contrib.dynagent.examples.random;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 
@@ -57,20 +55,13 @@ public class RandomDynAgentLauncher
     {
         new MatsimNetworkReader(scenario).readFile(netFileName);
 
-        QSim qSim = VrpLauncherUtils.initQSim(scenario);
+        QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         qSim.addAgentSource(new RandomDynAgentSource(qSim, agentCount));
 
         EventsManager events = qSim.getEventsManager();
 
         if (otfVis) { // OFTVis visualization
-            OTFVisConfigGroup configGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
-                    OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-            configGroup.setDrawNonMovingItems(true);
-            configGroup.setColoringScheme(ColoringScheme.byId);
-
-            OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
-                    scenario, qSim.getEventsManager(), qSim);
-            OTFClientLive.run(scenario.getConfig(), server);
+            DynAgentLauncherUtils.runOTFVis(qSim, true, ColoringScheme.byId);
         }
 
         qSim.run();
