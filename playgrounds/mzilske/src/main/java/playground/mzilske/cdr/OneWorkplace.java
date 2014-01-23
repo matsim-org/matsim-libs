@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,6 +78,11 @@ public class OneWorkplace {
 				double dailyRate = 0;
 				double secondlyProbability = dailyRate / (double) (24*60*60);
 				return Math.random() < secondlyProbability;
+			}
+
+			@Override
+			public boolean makeACallAtMorningAndNight() {
+				return true;
 			}
 
 		});

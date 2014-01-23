@@ -56,12 +56,16 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 		for (Person p : population.getPersons().values()) {
 			System.out.println(agents.get(p.getId()).nCalls);
 		}
-		handleNight();
+		if (callBehavior.makeACallAtMorningAndNight()) {
+			handleNight();
+		}
 	}
 
 	public void doSimStep(double time) {
-		if (time == 0.0) {
-			handleMorning();
+		if (callBehavior.makeACallAtMorningAndNight()) {
+			if (time == 0.0) {
+				handleMorning();
+			}
 		}
 		for (Person p : population.getPersons().values()) {
 			CallingAgent agent = agents.get(p.getId());
@@ -78,7 +82,6 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 			CallingAgent agent = agents.get(p.getId());
 			agent.nCalls++;
 			call(lastTime, p.getId());
-			System.out.println("pups");
 		}
 	}
 

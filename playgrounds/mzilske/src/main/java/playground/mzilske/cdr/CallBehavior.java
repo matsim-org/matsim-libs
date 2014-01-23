@@ -12,4 +12,6 @@ public interface CallBehavior {
 
 	boolean makeACall(Id id, double time);
 
+	boolean makeACallAtMorningAndNight();
+
 }

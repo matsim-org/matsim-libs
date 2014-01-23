@@ -16,14 +16,18 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class Potsdam {
-
+public class BerlinPhone {
+	
 	public static void main(String[] args) throws FileNotFoundException {
+		new BerlinPhone().run();
+	}
+
+	private void run() throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile("input/potsdam/network.xml");
-		new MatsimPopulationReader(scenario).readFile("output-homogeneous-37/ITERS/it.0/0.plans.xml.gz");
+		new MatsimNetworkReader(scenario).readFile(BerlinRun.BERLIN_PATH + "network/bb_4.xml.gz");
+		new MatsimPopulationReader(scenario).readFile("output-berlin/ITERS/it.0/2kW.15.0.plans.xml.gz");
 		PrintWriter pw = new PrintWriter(new File("output/quality-over-callrate.txt"));
-		for (int dailyRate=0; dailyRate<160; dailyRate+=20) {
+		for (int dailyRate=0; dailyRate<160; dailyRate+=10) {
 			run(scenario, dailyRate, pw);
 		}
 		pw.close();
@@ -44,7 +48,7 @@ public class Potsdam {
 			}
 
 			@Override
-			public boolean makeACall(Id id, double time) {			
+			public boolean makeACall(Id id, double time) {
 				double secondlyProbability = dailyRate / (double) (24*60*60);
 				return Math.random() < secondlyProbability;
 			}
@@ -53,11 +57,12 @@ public class Potsdam {
 			public boolean makeACallAtMorningAndNight() {
 				return false;
 			}
-			
+
 		});
-		new MatsimEventsReader(events).readFile("output-homogeneous-37/ITERS/it.0/0.events.xml.gz");
+		compareMain.setSuffix(Integer.toString((int) dailyRate));
+		new MatsimEventsReader(events).readFile("output-berlin/ITERS/it.0/2kW.15.0.events.xml.gz");
 		compareMain.runOnceWithSimplePlans();
-		pw.printf("%f\t%f\t%f\t%f\n", dailyRate, compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
+		pw.printf("%f\t%f\t%f\n",compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
 	}
 
 }

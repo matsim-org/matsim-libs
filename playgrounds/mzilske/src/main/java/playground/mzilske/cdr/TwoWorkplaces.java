@@ -86,6 +86,11 @@ public class TwoWorkplaces {
 			public boolean makeACall(Id id, double time) {
 				return false;
 			}
+
+			@Override
+			public boolean makeACallAtMorningAndNight() {
+				return true;
+			}
 			
 		});
 		controler.run();

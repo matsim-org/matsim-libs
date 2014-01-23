@@ -59,6 +59,12 @@ import d4d.Sighting;
 
 public class CompareMain {
 	
+	private String suffix = "";
+	
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
+
 	private static final class ZeroScoringFunctionFactory implements
 			ScoringFunctionFactory {
 		@Override
@@ -186,7 +192,7 @@ public class CompareMain {
 		callProcess.dump();
 		List<Sighting> sightings = callProcess.getSightings();
 
-		cdrVolumes = runOnceWithSimplePlans(scenario.getNetwork(), linkToZoneResolver, sightings);
+		cdrVolumes = runOnceWithSimplePlans(scenario.getNetwork(), linkToZoneResolver, sightings, suffix);
 	}
 
 	double compareEMD() {
@@ -575,7 +581,7 @@ public class CompareMain {
 		return currentPlanCadytsCorrection;
 	}
 	
-	public static VolumesAnalyzer runOnceWithSimplePlans(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings) {
+	public static VolumesAnalyzer runOnceWithSimplePlans(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, String suffix) {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		// sighting.setOpeningTime(0.0);
@@ -589,6 +595,7 @@ public class CompareMain {
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.controler().setLastIteration(0);
+		config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "-" + suffix);
 		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(100);
 		tmp.setStorageCapFactor(100);

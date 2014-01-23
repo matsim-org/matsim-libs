@@ -104,6 +104,11 @@ public class OneWorkplaceOneStratumUnderestimated {
 				return false;
 			}
 
+			@Override
+			public boolean makeACallAtMorningAndNight() {
+				return true;
+			}
+
 		});
 		controler.run();
 		Result result = compareMain.runWithOnePlanAndCadytsAndInflation();
