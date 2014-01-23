@@ -295,6 +295,58 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 	}
 	
 	/*
+	 * Driver and one passenger from l2 to l3
+	 * Driver ends activity after passenger
+	 * Passenger traveled from l1 to l2 with a different vehicle
+	 * Tests whether an agent's vehicle is set to null after arrival
+	 */
+	public void testDriverAndPassenger3() {
+		
+		Scenario scenario = makeScenario();
+		
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		eventsManager.addHandler(new EventsPrinter());
+		EventsCounter eventsCounter = new EventsCounter();
+		eventsManager.addHandler(eventsCounter);
+		
+		makeNetwork(scenario.getNetwork());
+		Person driver = makeDropOffPickupDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		Person passenger = makeDriverThenPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		
+		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
+		QSim qSim = tuple.getFirst();
+		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v0"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+
+		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		passengerIds.add(new IdImpl("p2"));
+		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		assignJointDeparture(driver, 3, jointDeparture, jointDepartureOrganizer);
+		assignJointDeparture(passenger, 3, jointDeparture, jointDepartureOrganizer);
+		
+		qSim.run();
+		
+		// check agents final destinations
+		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
+			if (mobsimAgent.getId().toString().equals("p1")) {
+				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+			} else if (mobsimAgent.getId().toString().equals("p2")) {
+				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+			}
+		}
+		
+		// check number of enter and leave events
+		assertEquals(4, eventsCounter.getEnterCount());
+		assertEquals(4, eventsCounter.getLeaveCount());
+		
+		// check whether all scheduled joint departures have been processed
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+	}
+	
+	/*
 	 * Driver and one picked up passenger
 	 * Driver reaches pickup location before passenger
 	 */
@@ -1024,7 +1076,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 	 * @return true if the agent has still joint departures left, otherwise false.
 	 */
 	private boolean peekJointDeparture(JointDepartureOrganizer jointDepartureOrganizer, Id agentId) {
-		Map<Leg, JointDeparture> jointDepartures = jointDepartureOrganizer.scheduledDepartures.get(agentId);
+		Map<Leg, JointDeparture> jointDepartures = jointDepartureOrganizer.scheduledDeparturesMap.get(agentId);
 		if (jointDepartures == null || jointDepartures.size() == 0) return false;
 		else return true;
 	}
@@ -1152,6 +1204,40 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		plan.addLeg(l1);		
 		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("2to3"));
 		plan.addActivity(a2);
+		person.addPlan(plan);
+		population.addPerson(person);
+		
+		return person;
+	}
+	
+	private static Person makeDriverThenPassenger(Id id, Population population, Network network, double activityEndTime) {
+		Person person = population.getFactory().createPerson(id);
+		
+		Plan plan = population.getFactory().createPlan();
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
+		a1.setEndTime(activityEndTime);
+		plan.addActivity(a1);
+		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
+		List<Id> route1 = new ArrayList<Id>();
+		route1.add(new IdImpl("0to1"));
+		route1.add(new IdImpl("1to2"));
+		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
+		r1.setVehicleId(new IdImpl("v0"));
+		l1.setRoute(r1);
+		plan.addLeg(l1);		
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("1to2"));
+		a2.setEndTime(activityEndTime);
+		plan.addActivity(a2);
+		Leg l2 = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
+		List<Id> route = new ArrayList<Id>();
+		route.add(new IdImpl("1to2"));
+		route.add(new IdImpl("2to3"));
+		NetworkRoute r2 = RouteUtils.createNetworkRoute(route, network);
+		r2.setVehicleId(new IdImpl("v1"));
+		l2.setRoute(r2);
+		plan.addLeg(l2);
+		Activity a3 = population.getFactory().createActivityFromLinkId("a3", new IdImpl("2to3"));
+		plan.addActivity(a3);
 		person.addPlan(plan);
 		population.addPerson(person);
 		
