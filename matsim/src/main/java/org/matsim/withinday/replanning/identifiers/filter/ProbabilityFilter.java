@@ -51,6 +51,14 @@ public class ProbabilityFilter implements AgentFilter {
 	
 	@Override
 	public boolean applyAgentFilter(Id id, double time) {
+		
+		/*
+		 * This ensures that the filter's outcomes do not depend on the order
+		 * in which agents are filtered. Otherwise agents stored in unsorted
+		 * data structures will not produce deterministic outcomes!
+		 */
+		random.setSeed(id.hashCode() + (long) time);
+		
 		/*
 		 * Based on a random number it is decided whether an agent should 
 		 * do a replanning or not.

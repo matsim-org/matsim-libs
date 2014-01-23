@@ -25,6 +25,10 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 
 /**
+ * AgentFilters are often applied to several agents stored in unordered data
+ * structures. Therefore please ensure that the filter result does NOT depend
+ * on the order in which agents are processed. If e.g. random numbers are drawn,
+ * set a deterministic seed (e.g. agentId.hashCode() + (long) time).
  *  
  * @author cdobler
  */
