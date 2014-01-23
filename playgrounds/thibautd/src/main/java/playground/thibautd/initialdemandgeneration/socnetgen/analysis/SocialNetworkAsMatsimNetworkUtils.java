@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.analysis;
 
+import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -48,14 +49,20 @@ public class SocialNetworkAsMatsimNetworkUtils {
 	}
 
 	public static Network convertToNetwork(final SocialNetwork sn) {
+		return convertToNetwork( sn , null );
+	}
+
+	public static Network convertToNetwork(final SocialNetwork sn, final Map<Id, Coord> agentCoords) {
 		final Network net = NetworkImpl.createNetwork();
 	
 		final Coord dummyCoord = new CoordImpl( 0 , 0 );
 		for ( Id ego : sn.getEgos() ) {
+			final Coord coord = agentCoords == null ? dummyCoord : agentCoords.get( ego );
 			net.addNode(
 					net.getFactory().createNode(
 						ego,
-						dummyCoord ) );
+						coord ) );
+
 		}
 	
 		for ( Id ego : sn.getEgos() ) {
