@@ -58,7 +58,7 @@ public class TripStructureUtils {
 		return getLegs( plan.getPlanElements() );
 	}
 
-	public static List<Leg> getLegs( final List<? extends PlanElement> planElements ) {
+	public static List<Leg> getLegs( final List<PlanElement> planElements ) {
 		final List<Leg> legs = new ArrayList<Leg>();
 
 		for (PlanElement pe : planElements) {
