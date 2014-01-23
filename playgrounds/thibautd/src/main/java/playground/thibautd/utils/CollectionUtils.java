@@ -112,5 +112,42 @@ public class CollectionUtils {
 		if ( remove ) it.remove();
 		return elem;
 	}
+
+	/**
+	 * makes sense only if iteration order deterministic!
+	 */
+	public static <T> T removeElement(
+			final int index,
+			final Collection<T> coll) {
+		return getElement( true , index , coll );
+	}
+
+	/**
+	 * makes sense only if iteration order deterministic!
+	 */
+	public static <T> T getElement(
+			final int index,
+			final Collection<T> coll) {
+		return getElement( false , index , coll );
+	}
+
+	/**
+	 * makes sense only if iteration order deterministic!
+	 */
+	private static <T> T getElement(
+			final boolean remove,
+			final int index,
+			final Collection<T> coll) {
+		if ( index >= coll.size() ) throw new IndexOutOfBoundsException( index+" >= "+coll.size() );
+
+		final Iterator<T> it = coll.iterator();
+		int i=0;
+
+		while ( i++ < index ) it.next();
+
+		final T elem = it.next();
+		if ( remove ) it.remove();
+		return elem;
+	}
 }
 
