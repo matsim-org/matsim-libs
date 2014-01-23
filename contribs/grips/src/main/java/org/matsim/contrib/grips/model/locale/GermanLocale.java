@@ -83,8 +83,9 @@ public class GermanLocale implements Locale
 	public String labelLatest = "Späteste";
 	public String btNew = "Neu";
 	public String labelCurrentFile = "Aktuelle Datei";
-	private String btSet = "Setzen";
-	private String msgSameFiles = "Die angegebene Datei stimmt mit einer anderen ausgewählten Datei überein!";
+	public String btSet = "Setzen";
+	public String msgSameFiles = "Die angegebene Datei stimmt mit einer anderen ausgewählten Datei überein!";
+	public String msgUnsavedChanges = "Möchten Sie die aktuellen Änderungen speichern?";
 
 
 
@@ -359,6 +360,11 @@ public class GermanLocale implements Locale
 	public String msgSameFiles() {
 		
 		return msgSameFiles ;
+	}
+
+	@Override
+	public String msgUnsavedChanges() {
+		return msgUnsavedChanges;
 	}
 
 

@@ -86,6 +86,7 @@ public class EnglishLocale implements Locale
 	public String btSet = "set";
 	public String labelCurrentFile = "current file";
 	public String msgSameFiles = "The selected file is equal to another selected file!";
+	public String msgUnsavedChanges = "Do you want to save the current changes?";
 	
 	
 	
@@ -357,6 +358,11 @@ public class EnglishLocale implements Locale
 	@Override
 	public String msgSameFiles() {
 		return msgSameFiles;
+	}
+
+	@Override
+	public String msgUnsavedChanges() {
+		return msgUnsavedChanges;
 	}
 
 	

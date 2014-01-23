@@ -85,6 +85,7 @@ public interface Locale
 	public String labelCurrentFile();
 	public String btNew();
 	public String msgSameFiles();
+	public String msgUnsavedChanges();
 	
 	
 	

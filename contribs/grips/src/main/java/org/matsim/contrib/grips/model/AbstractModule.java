@@ -47,6 +47,7 @@ public abstract class AbstractModule
 	protected Controller controller;
 	protected Point mousePosition;
 	protected boolean mainGoalAchieved;
+	protected boolean unsavedChanges;
 	
 	protected String title;
 	protected ModuleType moduleType;
@@ -85,6 +86,7 @@ public abstract class AbstractModule
 		this.controller.setActiveModuleType(this.moduleType);
 		
 		this.offsetX = this.offsetY = this.controller.getImageContainer().getBorderWidth();
+		this.unsavedChanges = false;
 		
 	}
 	
@@ -205,6 +207,21 @@ public abstract class AbstractModule
 	
 	public void setListener(AbstractListener listener) {
 		this.listener = listener;
+	}
+	
+	public void setUnsavedChanges(boolean unsavedChanges) {
+		this.unsavedChanges = unsavedChanges;
+	}
+	
+	public boolean hasUnsavedChanges()
+	{
+		return unsavedChanges;
+	}
+	
+	public boolean saveChanges()
+	{
+		unsavedChanges=false;
+		return true;
 	}
 	
 	

@@ -55,6 +55,7 @@ import org.matsim.contrib.grips.io.jaxb.gripsconfig.MainTrafficTypeType;
 import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
 import org.matsim.contrib.grips.model.Constants;
+import org.matsim.contrib.grips.model.Constants.ModuleType;
 import org.matsim.contrib.grips.model.SelectionModeSwitch;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.model.shape.PolygonShape;
@@ -85,7 +86,7 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 	private JButton btOSMBrowse;
 	
 	//main traffic type
-	private JComboBox<String> boxTrafficType;
+	private JComboBox boxTrafficType;
 	
 	//evac file
 	private JLabel labelEvacFilePath;
@@ -105,7 +106,7 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 	private JSlider sliderSampleSize;
 	
 	//dep time
-	private JComboBox<String> boxDepTime;
+	private JComboBox boxDepTime;
 	
 	//sigma
 	private JLabel labelSigma;
@@ -176,7 +177,7 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
         
         //main traffic type
         JPanel panelTrafficType = new JPanel();
-        boxTrafficType = new JComboBox<String>(trafficTypeStrings);
+        boxTrafficType = new JComboBox(trafficTypeStrings);
         boxTrafficType.setPreferredSize(inputSize);
         boxTrafficType.setActionCommand(controller.getLocale().labelTrafficType());
         boxTrafficType.addActionListener(this);
@@ -248,7 +249,7 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
         
         JPanel panelDepTime = new JPanel();
         panelDepTime.setLayout(new BoxLayout(panelDepTime, BoxLayout.PAGE_AXIS));
-        boxDepTime = new JComboBox<String>(distTypeStrings);
+        boxDepTime = new JComboBox(distTypeStrings);
         boxDepTime.setSelectedIndex(1);
         boxDepTime.setBorder(emptyBorder);
         boxDepTime.setActionCommand(controller.getLocale().labelDepTime());
@@ -399,6 +400,8 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 				this.labelOutDirPath.setText(save.getSelectedFile().getParent() + "/");
 				this.fileLocation = save.getSelectedFile().getAbsolutePath();
 				this.configOpened = true;
+				
+				controller.setGoalAchieved(false);
 
 			}
 			
@@ -415,10 +418,30 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 				protected String doInBackground() {
 					if (controller.openGripsConfig())
 					{
+						
 						fileLocation = controller.getGripsFile();
 						gcm = controller.getGripsConfigModule();
 						configOpened = true;
 						setMaskEnabled(true);
+						controller.setGoalAchieved(true);
+						btSave.setEnabled(false);
+						
+						//enable other modules if shape files exist
+						if (!controller.isStandAlone())
+						{
+							File evacFile = new File(gcm.getEvacuationAreaFileName());
+							if(evacFile.exists())
+								controller.enableModule(ModuleType.POPULATION);
+							File popFile = new File(gcm.getEvacuationAreaFileName());
+							if(popFile.exists())
+							{
+								controller.enableModule(ModuleType.GRIPSSCENARIO);
+								controller.setPopulationFileOpened(true);
+							}
+							
+							controller.updateParentUI();
+						}
+						
 					}
 					return "";
 				}
@@ -428,6 +451,8 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 					setEnabled(true);
 					setCursor(Cursor.getDefaultCursor());
 					updateMask();
+					
+					
 
 				}
 			};

@@ -18,6 +18,8 @@ public class ScenarioManagerModuleChain extends ModuleChain {
 	{
 		super();
 		
+		nextModules.put(ModuleType.SCENARIOXML, new ArrayList<ModuleType>(){{ add(ModuleType.EVACUATION); }});
+		
 		nextModules.put(ModuleType.EVACUATION, new ArrayList<ModuleType>(){{ add(ModuleType.POPULATION); }});
 		nextModules.put(ModuleType.POPULATION, new ArrayList<ModuleType>(){{ add(ModuleType.GRIPSSCENARIO); }});
 		nextModules.put(ModuleType.GRIPSSCENARIO, new ArrayList<ModuleType>(){{ add(ModuleType.ROADCLOSURE); add(ModuleType.BUSSTOPS); add(ModuleType.MATSIMSCENARIO); }});
@@ -25,6 +27,8 @@ public class ScenarioManagerModuleChain extends ModuleChain {
 		
 		pastModules.put(ModuleType.GRIPSSCENARIO, new ArrayList<ModuleType>(){{ add(ModuleType.EVACUATION); add(ModuleType.POPULATION); }});
 		pastModules.put(ModuleType.MATSIMSCENARIO, new ArrayList<ModuleType>(){{ add(ModuleType.ROADCLOSURE); add(ModuleType.BUSSTOPS); add(ModuleType.GRIPSSCENARIO);}});
+		
+//		pastModules.put(ModuleType.SCENARIOXML, new ArrayList<ModuleType>(){{ add(ModuleType.GRIPSSCENARIO); add(ModuleType.ROADCLOSURE); add(ModuleType.BUSSTOPS); add(ModuleType.ANALYSIS); add(ModuleType.MATSIMSCENARIO); }});
 		
 	}
 	
