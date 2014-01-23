@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -59,7 +60,7 @@ public class ParkingReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		Id parkingId = ParkingInfrastructure.selectedParkings.get(withinDayAgent.getId());
 		List<Id> parkingSubRoute = ParkingInfrastructure.toParkingSubRoutes.get(parkingId);
@@ -81,7 +82,7 @@ public class ParkingReplanner extends WithinDayDuringLegReplanner {
 		((ActivityImpl) nextActivity).setLinkId(route.getEndLinkId());
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 
 		return true;
 	}

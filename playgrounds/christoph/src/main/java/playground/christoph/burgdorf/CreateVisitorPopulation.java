@@ -50,8 +50,8 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 //	private static String day = "samstag";
 	private static String day = "sonntag";
 	
-	private static String direction = "to";
-//	private static String direction = "from";
+//	private static String direction = "to";
+	private static String direction = "from";
 
 //	private boolean viaKriegstetten = true;
 //	private boolean viaSchoenbuehl = true;
@@ -61,7 +61,6 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 	
 	public static String networkFile = "../../matsim/mysimulations/burgdorf/input/network_burgdorf_cut.xml.gz";
 	public static String populationFile = "../../matsim/mysimulations/burgdorf/input/plans_visitors_" + day + "_" + direction + "_burgdorf.xml.gz";
-
 	
 	/*
 	 * The array below contain the expected arrival time but we have to set the departure times.
@@ -80,14 +79,14 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 //	public static int[] from4Departures = new int[]{ 0, 0, 0, 0, 0, 100, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 //	public static int[] from5Departures = new int[]{ 0, 0, 0, 0, 0, 100, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	// Samstag
+	// Samstag to Burgdorf
 	public static int[] from1Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 63, 188, 188, 250, 250, 119, 119, 32, 25, 19, 13, 13, 7, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] from2Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 62, 62, 187, 187, 250, 250, 119, 119, 31, 25, 19, 12, 12, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] from3Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 42, 125, 125, 167, 167, 79, 79, 21, 17, 12, 8, 8, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] from4Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 42, 125, 125, 167, 167, 79, 79, 21, 17, 12, 8, 8, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] from5Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 41, 41, 125, 125, 166, 166, 79, 79, 20, 16, 13, 9, 9, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	
-	// Sonntag
+	// Sonntag from Burgdorf
 	public static int[] to1Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 1250, 125, 125, 50, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] to2Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 1250, 125, 125, 50, 0, 0, 0, 0, 0, 0, 0, 0};
 	public static int[] to3Departures = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 833, 83, 83, 33, 0, 0, 0, 0, 0, 0, 0, 0};

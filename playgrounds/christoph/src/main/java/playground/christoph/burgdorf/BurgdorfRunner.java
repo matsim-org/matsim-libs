@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.MultiNodeDijkstraFactory;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.LinkFilterFactory;
@@ -98,7 +98,7 @@ public class BurgdorfRunner implements StartupListener {
 		this.withinDayControlerListener = new WithinDayControlerListener();
 		
 		// workaround
-		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
+		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new MultiNodeDijkstraFactory());
 	}
 	
 	@Override

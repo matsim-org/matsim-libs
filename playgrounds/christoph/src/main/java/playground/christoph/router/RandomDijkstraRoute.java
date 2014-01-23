@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.MultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -57,7 +57,7 @@ public class RandomDijkstraRoute extends SimpleRouter {
 		this.travelCostFactory = travelCostFactory;
 		this.travelTime = travelTime;
 		this.travelCost = travelCostFactory.createTravelDisutility(travelTime, new PlanCalcScoreConfigGroup());
-		this.leastCostPathCalculator = new DijkstraFactory().createPathCalculator(network, travelCost, travelTime);
+		this.leastCostPathCalculator = new MultiNodeDijkstraFactory().createPathCalculator(network, travelCost, travelTime);
 	}
 	
 	@Override

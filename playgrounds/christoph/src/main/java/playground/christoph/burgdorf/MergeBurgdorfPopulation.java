@@ -37,19 +37,19 @@ public class MergeBurgdorfPopulation {
 	private static final Logger log = Logger.getLogger(MergeBurgdorfPopulation.class);
 
 //	private String day = "freitag";
-	private String day = "samstag";
-//	private String day = "sonntag";
+//	private String day = "samstag";
+	private String day = "sonntag";
 	
-	private String direction = "to";
-//	private String direction = "from";
+//	private String direction = "to";
+	private String direction = "from";
 	
-//	boolean useVisitorPopulation = true;
-//	boolean useBackgroundPopulation = true;
-	boolean useCampingPopulation = true;
+	boolean useVisitorPopulation = true;
+	boolean useBackgroundPopulation = true;
+//	boolean useCampingPopulation = true;
 
-	boolean useVisitorPopulation = false;
-	boolean useBackgroundPopulation = false;
-//	boolean useCampingPopulation = false;
+//	boolean useVisitorPopulation = false;
+//	boolean useBackgroundPopulation = false;
+	boolean useCampingPopulation = false;
 	
 	private String backgroundPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_background_samstag.xml.gz";
 	private String visitorPopulationFile = "../../matsim/mysimulations/burgdorf/input/plans_visitors_" + day + "_" + direction + "_burgdorf.xml.gz";

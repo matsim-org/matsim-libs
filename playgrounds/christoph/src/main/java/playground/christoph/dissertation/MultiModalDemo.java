@@ -71,19 +71,17 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.MultiNodeDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -92,7 +90,6 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 
 /**
  * Demonstrate the influence of age and gender on persons' walk speed.
@@ -890,7 +887,7 @@ public class MultiModalDemo {
 				TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, 
 						scenario.getConfig().planCalcScore());
 				
-				LeastCostPathCalculator leastCostPathCalculator = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), 
+				LeastCostPathCalculator leastCostPathCalculator = new MultiNodeDijkstraFactory().createPathCalculator(scenario.getNetwork(), 
 						travelDisutility, travelTime);
 				((IntermodalLeastCostPathCalculator) leastCostPathCalculator).setModeRestriction(CollectionUtils.stringToSet(mode));
 				

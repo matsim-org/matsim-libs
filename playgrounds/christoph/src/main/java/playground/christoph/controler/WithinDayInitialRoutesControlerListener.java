@@ -50,7 +50,7 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.MultiNodeDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -123,7 +123,7 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		this.withinDayControlerListener = new WithinDayControlerListener();
 		
 		// workaround
-		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
+		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new MultiNodeDijkstraFactory());
 	}
 
 

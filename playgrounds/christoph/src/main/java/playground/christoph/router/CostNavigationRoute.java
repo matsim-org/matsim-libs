@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -94,11 +95,11 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		double gamma = costNavigationTravelTimeLogger.getTrust(personId);
 		double phi = 1 - gamma;
 		
-		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
 		Link currentLink = network.getLinks().get(currentLinkId);
 		Node nextNode = currentLink.getToNode();
-		Link endLink = network.getLinks().get(this.withinDayAgentUtils.getCurrentLeg(withinDayAgent).getRoute().getEndLinkId());
+		Link endLink = network.getLinks().get(WithinDayAgentUtils.getCurrentLeg(withinDayAgent).getRoute().getEndLinkId());
 		Node endNode = endLink.getFromNode();
 		
 		Map<Id, ? extends Link> outLinksMap = nextNode.getOutLinks();
@@ -132,7 +133,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 			Link lookupLink = this.network.getLinks().get(outLink.getId());
 			double outLinkCosts = this.travelDisutility.getLinkTravelDisutility(lookupLink, this.time, null, null);
 			
-			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time, this.withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPerson(), null);
+			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time, WithinDayAgentUtils.getSelectedPlan(withinDayAgent).getPerson(), null);
 			paths.put(outLink.getId(), path);
 			double pathCosts = path.travelCost + outLinkCosts;
 			costs.put(outLink.getId(), pathCosts);
@@ -205,7 +206,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 			costNavigationTravelTimeLogger.setExpectedAlternativeTravelTime(personId, expectedAlternativeCosts);
 		}
 			
-		Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		Leg leg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
 		Route route = leg.getRoute();
 
 		// if the route type is not supported (e.g. because it is a walking agent)
@@ -243,7 +244,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, oldRoute.getEndLinkId());
 			
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 
 		return true;
 	}
