@@ -43,6 +43,15 @@ public class SocialNetwork {
 		this( true );
 	}
 
+	public SocialNetwork(final SocialNetwork socialNetwork) {
+		this( socialNetwork.isReflective() );
+		for ( Id ego : socialNetwork.getEgos() ) {
+			for ( Id alter : socialNetwork.getAlters( ego ) ) {
+				addTieInternal( ego , alter );
+			}
+		}
+	}
+
 	/**
 	 * @param isReflective
 	 * indicates whether social ties are directed.
@@ -58,6 +67,11 @@ public class SocialNetwork {
 		addTieInternal( id2 , id1 );
 	}
 
+	public void removeBidirectionalTie(final Id id1, final Id id2) {
+		removeTieInternal( id1 , id2 );
+		removeTieInternal( id2 , id1 );
+	}
+
 	public void addMonodirectionalTie(
 			final Id ego,
 			final Id alter) {
@@ -67,12 +81,30 @@ public class SocialNetwork {
 		addTieInternal( ego , alter );
 	}
 
+	public void removeMonodirectionalTie(
+			final Id ego,
+			final Id alter) {
+		if ( isReflective ) {
+			throw new IllegalStateException( "cannot remove a monodirectional tie to a reflective social network." );
+		}
+		removeTieInternal( ego , alter );
+	}
+
 	private void addTieInternal(
 			final Id ego,
 			final Id alter) {
 		final Set<Id> alters = MapUtils.getSet( ego , map );
 		final boolean added = alters.add( alter );
 		if ( added ) tieCounter.incCounter();
+	}
+
+	private void removeTieInternal(
+			final Id ego,
+			final Id alter) {
+		final Set<Id> alters = map.get( ego );
+		if ( alters == null ) throw new RuntimeException( alter+" not alter of ego "+ego+": ego has no alters!" );
+		final boolean rem = alters.remove( alter );
+		if ( !rem ) throw new RuntimeException( alter+" not alter of ego "+ego );
 	}
 
 	public Set<Id> getAlters(final Id ego) {
@@ -84,6 +116,10 @@ public class SocialNetwork {
 
 	public Set<Id> getEgos() {
 		return Collections.unmodifiableSet( map.keySet() );
+	}
+
+	public Map<Id, Set<Id>> getMapRepresentation() {
+		return Collections.unmodifiableMap( map );
 	}
 
 	public boolean isReflective() {
