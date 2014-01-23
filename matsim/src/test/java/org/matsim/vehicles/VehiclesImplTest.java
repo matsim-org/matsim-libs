@@ -61,7 +61,7 @@ public class VehiclesImplTest {
 		} catch (IllegalArgumentException e){
 			/* Pass. */
 		}
-	}
+	} 
 	
 	@Test
 	public void testGetVehicleTypes(){

@@ -77,7 +77,6 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 			this.currentCapacity = null;
 		}
 		else if (VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase(name)){
-//			this.vehicles.getVehicleTypes().put(this.currentVehType.getId(), this.currentVehType);
 			this.vehicles.addVehicleType(this.currentVehType);
 			this.currentVehType = null;
 		}
@@ -159,7 +158,6 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 			String idString = atts.getValue(VehicleSchemaV1Names.ID);
 			Id id = new IdImpl(idString);
 			Vehicle v = this.builder.createVehicle(id, type);
-//			this.vehicles.getVehicles().put(id, v);
 			this.vehicles.addVehicle(v);
 		}
 		else if (VehicleSchemaV1Names.ACCESSTIME.equalsIgnoreCase(name)){

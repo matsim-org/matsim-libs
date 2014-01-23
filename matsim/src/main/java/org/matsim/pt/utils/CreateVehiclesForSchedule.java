@@ -55,7 +55,6 @@ public class CreateVehiclesForSchedule {
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-//		this.vehicles.getVehicleTypes().put(vehicleType.getId(), vehicleType);
 		this.vehicles.addVehicleType(vehicleType);
 
 		long vehId = 0;
@@ -63,7 +62,6 @@ public class CreateVehiclesForSchedule {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
 					Vehicle veh = vb.createVehicle(new IdImpl("tr_" + Long.toString(vehId++)), vehicleType);
-//					this.vehicles.getVehicles().put(veh.getId(), veh);
 					this.vehicles.addVehicle(veh);
 					departure.setVehicleId(veh.getId());
 				}

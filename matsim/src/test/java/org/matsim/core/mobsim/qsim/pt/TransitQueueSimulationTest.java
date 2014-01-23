@@ -147,11 +147,6 @@ public class TransitQueueSimulationTest {
         capacity.setStandingRoom(Integer.valueOf(0));
         vehicleType.setCapacity(capacity);
         
-//        vehicles.getVehicles().put(new IdImpl("veh1"), vb.createVehicle(new IdImpl("veh1"), vehicleType));
-//        vehicles.getVehicles().put(new IdImpl("veh2"), vb.createVehicle(new IdImpl("veh2"), vehicleType));
-//        vehicles.getVehicles().put(new IdImpl("veh3"), vb.createVehicle(new IdImpl("veh3"), vehicleType));
-//        vehicles.getVehicles().put(new IdImpl("veh4"), vb.createVehicle(new IdImpl("veh4"), vehicleType));
-//        vehicles.getVehicles().put(new IdImpl("veh5"), vb.createVehicle(new IdImpl("veh5"), vehicleType));
         vehicles.addVehicle(vb.createVehicle(new IdImpl("veh1"), vehicleType));
         vehicles.addVehicle(vb.createVehicle(new IdImpl("veh2"), vehicleType));
         vehicles.addVehicle(vb.createVehicle(new IdImpl("veh3"), vehicleType));
