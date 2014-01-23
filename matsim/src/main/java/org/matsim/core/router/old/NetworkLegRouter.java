@@ -19,6 +19,7 @@
 
 package org.matsim.core.router.old;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -56,6 +57,11 @@ public class NetworkLegRouter implements LegRouter {
 		double travTime = 0;
 		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
 		Link toLink = this.network.getLinks().get(toAct.getLinkId());
+		
+		/* Remove this and next three lines once debugged. */
+		if(fromLink == null || toLink == null){
+			Logger.getLogger(NetworkLegRouter.class).error("  ==>  null from/to link for person " + person.getId().toString());
+		}
 		if (fromLink == null) throw new RuntimeException("fromLink "+fromAct.getLinkId()+" missing.");
 		if (toLink == null) throw new RuntimeException("toLink "+toAct.getLinkId()+" missing.");
 

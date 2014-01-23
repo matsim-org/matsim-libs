@@ -102,6 +102,7 @@ import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
@@ -145,11 +146,17 @@ public class TransitQueueSimulationTest {
         capacity.setSeats(Integer.valueOf(101));
         capacity.setStandingRoom(Integer.valueOf(0));
         vehicleType.setCapacity(capacity);
-        vehicles.getVehicles().put(new IdImpl("veh1"), vb.createVehicle(new IdImpl("veh1"), vehicleType));
-        vehicles.getVehicles().put(new IdImpl("veh2"), vb.createVehicle(new IdImpl("veh2"), vehicleType));
-        vehicles.getVehicles().put(new IdImpl("veh3"), vb.createVehicle(new IdImpl("veh3"), vehicleType));
-        vehicles.getVehicles().put(new IdImpl("veh4"), vb.createVehicle(new IdImpl("veh4"), vehicleType));
-        vehicles.getVehicles().put(new IdImpl("veh5"), vb.createVehicle(new IdImpl("veh5"), vehicleType));
+        
+//        vehicles.getVehicles().put(new IdImpl("veh1"), vb.createVehicle(new IdImpl("veh1"), vehicleType));
+//        vehicles.getVehicles().put(new IdImpl("veh2"), vb.createVehicle(new IdImpl("veh2"), vehicleType));
+//        vehicles.getVehicles().put(new IdImpl("veh3"), vb.createVehicle(new IdImpl("veh3"), vehicleType));
+//        vehicles.getVehicles().put(new IdImpl("veh4"), vb.createVehicle(new IdImpl("veh4"), vehicleType));
+//        vehicles.getVehicles().put(new IdImpl("veh5"), vb.createVehicle(new IdImpl("veh5"), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh1"), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh2"), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh3"), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh4"), vehicleType));
+        vehicles.addVehicle(vb.createVehicle(new IdImpl("veh5"), vehicleType));
 
         // setup: transit schedule
         TransitSchedule schedule = scenario.getTransitSchedule();

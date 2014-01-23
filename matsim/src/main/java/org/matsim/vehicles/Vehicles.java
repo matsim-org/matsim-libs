@@ -23,11 +23,13 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
 /**
+ * Root class of the vehicles container.
  * @author dgrether
- *
+ * @author jwjoubert
  */
 public interface Vehicles extends MatsimToplevelContainer {
 
@@ -37,5 +39,11 @@ public interface Vehicles extends MatsimToplevelContainer {
 	
 	@Override
 	public VehiclesFactory getFactory();
+	
+	public void addVehicle(final Vehicle v);
+
+	public void addVehicleType(final VehicleType type);
+	
+	public ObjectAttributes getVehicleAttributes();
 	
 }

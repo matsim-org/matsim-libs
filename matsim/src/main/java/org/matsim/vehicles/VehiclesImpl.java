@@ -19,21 +19,27 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
 /**
  * @author dgrether
- *
+ * @author jwjoubert
  */
 class VehiclesImpl implements Vehicles {
 	
 	private Map<Id, VehicleType> vehicleTypes;
 	private LinkedHashMap<Id, Vehicle> vehicles;
 	private VehiclesFactoryImpl builder;
+	private final ObjectAttributes vehicleAttributes = new ObjectAttributes();
+	
+	private Counter counter = new Counter(" vehicles # ");
 
 	/**
 	 * deliberately non-public since there is a factory.  kai, nov'11
@@ -51,14 +57,57 @@ class VehiclesImpl implements Vehicles {
 	}
 
 	@Override
-	public Map<Id, Vehicle> getVehicles() {
-		return this.vehicles;
+	public final Map<Id, Vehicle> getVehicles() {
+		return Collections.unmodifiableMap(this.vehicles);
 	}
 
 
 	@Override
 	public Map<Id, VehicleType> getVehicleTypes() {
-		return this.vehicleTypes;
+		return Collections.unmodifiableMap(this.vehicleTypes);
 	}
 
+	/**
+	 * Add the vehicle to the container.
+	 *  
+	 * @param v
+	 * @throws IllegalArgumentException if another {@link Vehicle} with 
+	 * the same {@link Id} already exists in the container.
+	 */
+	@Override
+	public void addVehicle(final Vehicle v) {
+		/* Validation. */
+		if(this.getVehicles().containsKey(v.getId())){
+			throw new IllegalArgumentException("Vehicle with id = " + v.getId() + " already exists.");
+		}
+		
+		/* Add the vehicle. */
+		this.vehicles.put(v.getId(), v);
+		this.counter.incCounter();
+	}
+	
+	/**
+	 * Adds the vehicle type to the container.
+	 * 
+	 * @param type 
+	 * @throws IllegalArgumentException if another {@link VehicleType} with the
+	 * same {@link Id} already exists in the container.
+	 */
+	@Override
+	public void addVehicleType(VehicleType type){
+		/* Validation. */
+		if(this.getVehicleTypes().containsKey(type.getId())){
+			throw new IllegalArgumentException("Vehicle type with id = " + type.getId() + " already exists.");
+		}
+		
+		/* Add the vehicle type. */
+		this.vehicleTypes.put(type.getId(), type);
+	}
+
+
+	@Override
+	public ObjectAttributes getVehicleAttributes() {
+		return this.vehicleAttributes;
+	}
+	
 }
