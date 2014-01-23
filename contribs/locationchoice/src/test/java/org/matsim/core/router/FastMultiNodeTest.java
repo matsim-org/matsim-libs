@@ -39,6 +39,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 /**
+ * Some more tests - but all of them assuming that there is only
+ * a single from node as in the location choice use case.
+ * For test using multiple from nodes look at MultiNodeDijkstraTest!
+ * 
  * @author cdobler
  */
 public class FastMultiNodeTest {
