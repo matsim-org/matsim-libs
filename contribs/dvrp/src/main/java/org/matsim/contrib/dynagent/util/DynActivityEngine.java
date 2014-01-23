@@ -94,14 +94,20 @@ public class DynActivityEngine
     {
         if (super.handleActivity(agent)) {
             if (agent instanceof DynAgent) {
-                EndTimeEntry entry = activityEndTimes.get(agent.getId());
 
-                if (entry == null) {
-                    entry = new EndTimeEntry((DynAgent)agent);
-                    activityEndTimes.put(agent.getId(), entry);
+                //0-second activities are ended within super.handleActivity(agent)
+                //(even without DynActivity.doSimStep(now))
+                //so the state may be different (i.e. LEG)
+                if (agent.getState() == State.ACTIVITY) {
+                    EndTimeEntry entry = activityEndTimes.get(agent.getId());
+
+                    if (entry == null) {
+                        entry = new EndTimeEntry((DynAgent)agent);
+                        activityEndTimes.put(agent.getId(), entry);
+                    }
+
+                    entry.scheduledEndTime = agent.getActivityEndTime();
                 }
-
-                entry.scheduledEndTime = agent.getActivityEndTime();
             }
 
             return true;

@@ -55,7 +55,7 @@ public class TaxiActionCreator
             case PICKUP_STAY:
                 final TaxiPickupStayTask pst = (TaxiPickupStayTask)task;
 
-                return new VrpActivity("ServeTask" + pst.getRequest().getId(), pst) {
+                return new VrpActivity("Picking up Req_" + pst.getRequest().getId(), pst) {
                     public void endAction(double now)
                     {
                         passengerEngine.pickUpPassenger(task, pst.getRequest(), now);
@@ -65,7 +65,7 @@ public class TaxiActionCreator
             case DROPOFF_STAY:
                 final TaxiDropoffStayTask dst = (TaxiDropoffStayTask)task;
 
-                return new VrpActivity("ServeTask" + dst.getRequest().getId(), dst) {
+                return new VrpActivity("Dropping off Req_" + dst.getRequest().getId(), dst) {
                     public void endAction(double now)
                     {
                         passengerEngine.dropOffPassenger(dst, dst.getRequest(), now);
@@ -73,7 +73,7 @@ public class TaxiActionCreator
                 };
 
             case WAIT_STAY:
-                return new VrpActivity("WaitTask", (TaxiWaitStayTask)task);
+                return new VrpActivity("Waiting", (TaxiWaitStayTask)task);
 
             default:
                 throw new IllegalStateException();
