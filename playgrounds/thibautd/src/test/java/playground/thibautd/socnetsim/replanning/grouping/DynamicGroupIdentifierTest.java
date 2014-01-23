@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 
 /**
@@ -46,7 +47,7 @@ public class DynamicGroupIdentifierTest {
 	public void testNGroupsNoJointPlansNoSocialNet() {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
-		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , new SocialNetwork() );
+		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , new SocialNetworkImpl() );
 
 		final int nPersons = 100;
 
@@ -64,7 +65,7 @@ public class DynamicGroupIdentifierTest {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
 
-		final SocialNetwork socnet = new SocialNetwork();
+		final SocialNetwork socnet = new SocialNetworkImpl();
 		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , socnet );
 
 		final int nPersons = 100;
@@ -96,7 +97,7 @@ public class DynamicGroupIdentifierTest {
 		final JointPlans jointPlans = new JointPlans();
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , jointPlans );
 
-		final SocialNetwork socnet = new SocialNetwork();
+		final SocialNetwork socnet = new SocialNetworkImpl();
 		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , socnet );
 
 		final int nGroups = 100;
@@ -141,7 +142,7 @@ public class DynamicGroupIdentifierTest {
 		final JointPlans jointPlans = new JointPlans();
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , jointPlans );
 
-		final SocialNetwork socnet = new SocialNetwork();
+		final SocialNetwork socnet = new SocialNetworkImpl();
 		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , socnet );
 
 		final int nGroups = 100;

@@ -100,7 +100,7 @@ public class SocialNetworkIOTest {
 	}
 
 	private SocialNetwork generateRandomSocialNetwork(final boolean isReflective) {
-		final SocialNetwork sn = new SocialNetwork( isReflective );
+		final SocialNetwork sn = new SocialNetworkImpl( isReflective );
 
 		final int nEgos = 500;
 		final List<Id> ids = new ArrayList<Id>( nEgos );

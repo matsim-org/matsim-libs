@@ -32,6 +32,7 @@ import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
+import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
@@ -94,7 +95,7 @@ public class RunCliquesWithModularStrategies {
 
 	private static SocialNetwork toSocialNetwork(
 			final FixedGroupsIdentifier cliques) {
-		final SocialNetwork socNet = new SocialNetwork();
+		final SocialNetwork socNet = new SocialNetworkImpl();
 		for ( Collection<? extends Id> clique : cliques.getGroupInfo() ) {
 			for ( Id id1 : clique ) {
 				for ( Id id2 : clique ) {

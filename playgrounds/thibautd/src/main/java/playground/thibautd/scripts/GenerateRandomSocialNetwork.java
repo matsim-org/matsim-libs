@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
 
@@ -47,7 +48,7 @@ public class GenerateRandomSocialNetwork {
 		final double prob = ((double) avgEgocentricNetworkSize) / ids.length;
 		if ( prob <= 0 || prob > 1 ) throw new RuntimeException( "prob="+prob );
 
-		final SocialNetwork sn = new SocialNetwork( true );
+		final SocialNetwork sn = new SocialNetworkImpl( true );
 
 		for ( int i=0; i < ids.length; i++ ) {
 			sn.addEgo( ids[ i ] );		

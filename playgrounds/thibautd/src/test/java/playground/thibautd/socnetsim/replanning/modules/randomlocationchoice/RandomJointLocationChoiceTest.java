@@ -38,7 +38,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 
 /**
  * @author thibautd
@@ -85,7 +85,7 @@ public class RandomJointLocationChoiceTest {
 		final Coord bar = new RandomJointLocationChoiceAlgorithm(
 				config,
 				facilities,
-				new SocialNetwork() ).calcBarycenterCoord( activities );
+				new SocialNetworkImpl() ).calcBarycenterCoord( activities );
 
 		assertEquals(
 				"wrong barycenter",
@@ -164,7 +164,7 @@ public class RandomJointLocationChoiceTest {
 			new RandomJointLocationChoiceAlgorithm(
 				config,
 				facilities,
-				new SocialNetwork() );
+				new SocialNetworkImpl() );
 
 		for ( FacilityFixture f : new FacilityFixture[]{
 				// go 1 in the direction of each facility

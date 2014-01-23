@@ -47,6 +47,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.modules.ActedUponInformation;
 import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAlgorithm;
@@ -136,7 +137,7 @@ public class JointTripInsertionWithSocialNetworkTest {
 			population.addPerson( person );
 		}
 
-		final SocialNetwork sn = new SocialNetwork( true );
+		final SocialNetwork sn = new SocialNetworkImpl( true );
 		sc.addScenarioElement( SocialNetwork.ELEMENT_NAME , sn );
 
 		for ( int i=0; i < nAgents; i++ ) sn.addEgo( new IdImpl( i ) );

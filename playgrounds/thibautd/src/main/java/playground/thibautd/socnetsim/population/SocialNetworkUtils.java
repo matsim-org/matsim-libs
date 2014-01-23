@@ -34,7 +34,7 @@ public final class SocialNetworkUtils {
 
 	public static SocialNetwork createNetworkOfUnknownFriendsOfFriends( final SocialNetwork socialNetwork ) {
 		final Counter counter = new Counter( "search secondary friends of agent # ");
-		final SocialNetwork secondaryNetwork = new SocialNetwork( );
+		final SocialNetwork secondaryNetwork = new SocialNetworkImpl( );
 
 		for ( Id ego : socialNetwork.getEgos() ) {
 			final Set<Id> alters = socialNetwork.getAlters( ego );

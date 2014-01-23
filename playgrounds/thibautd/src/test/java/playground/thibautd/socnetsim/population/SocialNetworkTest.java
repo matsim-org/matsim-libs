@@ -35,7 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 public class SocialNetworkTest {
 	@Test( expected=IllegalStateException.class )
 	public void testFailsIfAddingDirectedTieInReflectiveNetwork() {
-		final SocialNetwork sn = new SocialNetwork( true );
+		final SocialNetwork sn = new SocialNetworkImpl( true );
 		sn.addMonodirectionalTie( new IdImpl( 1 ) , new IdImpl( 2 ) );
 	}
 
@@ -44,7 +44,7 @@ public class SocialNetworkTest {
 		final Id ego = new IdImpl( 1 );
 		final Id alter = new IdImpl( 2 );
 
-		final SocialNetwork sn = new SocialNetwork( false );
+		final SocialNetwork sn = new SocialNetworkImpl( false );
 		sn.addEgo( ego );
 		sn.addEgo( alter );
 		sn.addMonodirectionalTie( ego , alter );
@@ -70,7 +70,7 @@ public class SocialNetworkTest {
 		final Id ego = new IdImpl( 1 );
 		final Id alter = new IdImpl( 2 );
 
-		final SocialNetwork sn = new SocialNetwork( false );
+		final SocialNetwork sn = new SocialNetworkImpl( false );
 		sn.addEgo( ego );
 		sn.addEgo( alter );
 		sn.addBidirectionalTie( ego , alter );

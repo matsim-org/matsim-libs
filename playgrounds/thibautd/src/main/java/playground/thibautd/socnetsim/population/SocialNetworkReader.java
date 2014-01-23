@@ -51,7 +51,7 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			final Stack<String> context) {
 		if ( name.equals( SocialNetworkWriter.ROOT_TAG ) ) {
 			this.isReflective = Boolean.parseBoolean( atts.getValue( SocialNetworkWriter.REFLECTIVE_ATT ) );
-			this.socialNetwork = new SocialNetwork( this.isReflective );
+			this.socialNetwork = new SocialNetworkImpl( this.isReflective );
 			this.scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , this.socialNetwork );
 		}
 		else if ( name.equals( SocialNetworkWriter.EGO_TAG ) ) {
