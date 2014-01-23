@@ -139,9 +139,8 @@ public class SocialNetworkImpl implements SocialNetwork {
 	@Override
 	public Set<Id> getAlters(final Id ego) {
 		final Set<Id> alters = map.get( ego );
-		return alters == null ?
-			null :
-			Collections.unmodifiableSet( alters );
+		if ( alters == null ) throw new IllegalArgumentException( "unknown ego "+ego );
+		return Collections.unmodifiableSet( alters );
 	}
 
 	/* (non-Javadoc)
