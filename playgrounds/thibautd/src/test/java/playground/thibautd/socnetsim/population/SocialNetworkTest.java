@@ -45,17 +45,24 @@ public class SocialNetworkTest {
 		final Id alter = new IdImpl( 2 );
 
 		final SocialNetwork sn = new SocialNetwork( false );
+		sn.addEgo( ego );
+		sn.addEgo( alter );
 		sn.addMonodirectionalTie( ego , alter );
 
 		Assert.assertEquals(
 				"unexpected egos",
-				Collections.singleton( ego ),
+				new HashSet<Id>( Arrays.asList( ego , alter ) ),
 				sn.getEgos() );
 
 		Assert.assertEquals(
 				"unexpected alters of ego",
 				Collections.singleton( alter ),
 				sn.getAlters( ego ) );
+		
+		Assert.assertEquals(
+				"unexpected alters of alter",
+				Collections.<Id>emptySet(),
+				sn.getAlters( alter ) );
 	}
 
 	@Test
@@ -64,6 +71,8 @@ public class SocialNetworkTest {
 		final Id alter = new IdImpl( 2 );
 
 		final SocialNetwork sn = new SocialNetwork( false );
+		sn.addEgo( ego );
+		sn.addEgo( alter );
 		sn.addBidirectionalTie( ego , alter );
 
 		Assert.assertEquals(

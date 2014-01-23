@@ -54,15 +54,22 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			this.socialNetwork = new SocialNetwork( this.isReflective );
 			this.scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , this.socialNetwork );
 		}
+		else if ( name.equals( SocialNetworkWriter.EGO_TAG ) ) {
+			final Id ego = idPool.getPooledInstance(
+					new IdImpl(
+						atts.getValue(
+							SocialNetworkWriter.EGO_ATT ) ) );
+			this.socialNetwork.addEgo( ego );
+		}
 		else if ( name.equals( SocialNetworkWriter.TIE_TAG ) ) {
 			final Id ego = idPool.getPooledInstance(
 					new IdImpl(
 						atts.getValue(
-							SocialNetworkWriter.EGO_ATT ) ) );;
+							SocialNetworkWriter.EGO_ATT ) ) );
 			final Id alter = idPool.getPooledInstance(
 					new IdImpl(
 						atts.getValue(
-							SocialNetworkWriter.ALTER_ATT ) ) );;
+							SocialNetworkWriter.ALTER_ATT ) ) );
 			if ( this.isReflective ) this.socialNetwork.addBidirectionalTie( ego , alter );
 			else this.socialNetwork.addMonodirectionalTie( ego , alter );
 		}

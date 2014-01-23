@@ -21,13 +21,12 @@ package playground.thibautd.socnetsim.population;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Counter;
-
-import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
@@ -62,6 +61,25 @@ public class SocialNetwork {
 		this.isReflective = isReflective;
 	}
 
+	/**
+	 * Must be called before adding ties.
+	 * This allows to make sure that isolated agents (without social contacts)
+	 * are identified as such in the network.
+	 * This is necessary for analysing the topology of the network, but also
+	 * for more safety in simulation (fail if the social network does not cover the
+	 * whole population).
+	 */
+	public void addEgo(final Id id) {
+		final Set<Id> alters = map.put( id , new HashSet<Id>() );
+		if ( alters != null ) {
+			throw new IllegalStateException( "network already contains ego "+id );
+		}
+	}
+
+	public void addEgos( final Iterable<Id> ids ) {
+		for ( Id id : ids ) addEgo( id );
+	}
+
 	public void addBidirectionalTie(final Id id1, final Id id2) {
 		addTieInternal( id1 , id2 );
 		addTieInternal( id2 , id1 );
@@ -93,7 +111,8 @@ public class SocialNetwork {
 	private void addTieInternal(
 			final Id ego,
 			final Id alter) {
-		final Set<Id> alters = MapUtils.getSet( ego , map );
+		final Set<Id> alters = map.get( ego );
+		if ( alters == null ) throw new IllegalArgumentException(  "ego "+ego+" unknown" );
 		final boolean added = alters.add( alter );
 		if ( added ) tieCounter.incCounter();
 	}
@@ -102,7 +121,7 @@ public class SocialNetwork {
 			final Id ego,
 			final Id alter) {
 		final Set<Id> alters = map.get( ego );
-		if ( alters == null ) throw new RuntimeException( alter+" not alter of ego "+ego+": ego has no alters!" );
+		if ( alters == null ) throw new IllegalArgumentException(  "ego "+ego+" unknown" );
 		final boolean rem = alters.remove( alter );
 		if ( !rem ) throw new RuntimeException( alter+" not alter of ego "+ego );
 	}
@@ -110,7 +129,7 @@ public class SocialNetwork {
 	public Set<Id> getAlters(final Id ego) {
 		final Set<Id> alters = map.get( ego );
 		return alters == null ?
-			Collections.<Id>emptySet() :
+			null :
 			Collections.unmodifiableSet( alters );
 	}
 

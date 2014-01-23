@@ -34,6 +34,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  */
 public class SocialNetworkWriter extends MatsimXmlWriter {
 	public static final String ROOT_TAG = "socialnet";
+	public static final String EGO_TAG = "ego";
 	public static final String TIE_TAG = "tie";
 
 	public static final String REFLECTIVE_ATT = "isReflective";
@@ -54,9 +55,18 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 					createTuple(
 						REFLECTIVE_ATT,
 						network.isReflective() ) ) );
+		writeEgos();
 		writeNetwork( );
 		this.writeEndTag( ROOT_TAG );
 		this.close();
+	}
+
+	private void writeEgos() {
+		for ( Id ego : network.getEgos() ) {
+			final List<Tuple<String,String>> atts = new ArrayList<Tuple<String, String>>();
+			atts.add( createTuple( EGO_ATT , ego.toString() ) );
+			writeStartTag( EGO_TAG , atts , true );
+		}
 	}
 
 	private void writeNetwork() {

@@ -105,7 +105,11 @@ public class SocialNetworkIOTest {
 		final int nEgos = 500;
 		final List<Id> ids = new ArrayList<Id>( nEgos );
 
-		for ( int i=0; i < nEgos; i++ ) ids.add( new IdImpl( i ) );
+		for ( int i=0; i < nEgos; i++ ) {
+			final Id id = new IdImpl( i );
+			sn.addEgo( id );
+			ids.add( id );
+		}
 
 		final Random random = new Random( 20140114 );
 		for ( Id ego : ids ) {

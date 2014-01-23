@@ -139,6 +139,7 @@ public class JointTripInsertionWithSocialNetworkTest {
 		final SocialNetwork sn = new SocialNetwork( true );
 		sc.addScenarioElement( SocialNetwork.ELEMENT_NAME , sn );
 
+		for ( int i=0; i < nAgents; i++ ) sn.addEgo( new IdImpl( i ) );
 		for ( int i=0; i < nAgents - 1; i++ ) {
 			sn.addBidirectionalTie( new IdImpl( i ) , new IdImpl( i + 1 ) );
 		}

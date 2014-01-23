@@ -49,9 +49,13 @@ public class GenerateRandomSocialNetwork {
 
 		final SocialNetwork sn = new SocialNetwork( true );
 
+		for ( int i=0; i < ids.length; i++ ) {
+			sn.addEgo( ids[ i ] );		
+		}
 		final Random random = new Random( 1234 );
 		for ( int i=0; i < ids.length; i++ ) {
 			final Id ego = ids[ i ];
+
 			for ( int j=i+1; j < ids.length; j++ ) {
 				if ( random.nextDouble() < prob ) {
 					sn.addBidirectionalTie( ego , ids[ j ] );

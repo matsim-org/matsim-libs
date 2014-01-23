@@ -74,6 +74,7 @@ public class DynamicGroupIdentifierTest {
 			scenario.getPopulation().addPerson( p );
 		}
 
+		socnet.addEgos( scenario.getPopulation().getPersons().keySet() );
 		for ( Id ego : scenario.getPopulation().getPersons().keySet() ) {
 			for ( Id alter : scenario.getPopulation().getPersons().keySet() ) {
 				if ( ego == alter ) continue;
@@ -174,6 +175,7 @@ public class DynamicGroupIdentifierTest {
 			}
 		}
 
+		socnet.addEgos( scenario.getPopulation().getPersons().keySet() );
 		for ( Id ego : scenario.getPopulation().getPersons().keySet() ) {
 			for ( Id alter : scenario.getPopulation().getPersons().keySet() ) {
 				if ( ego == alter ) continue;
