@@ -55,7 +55,12 @@ class Utils {
 		html.write("<strong>Summe</strong>") ;
 		html.endTableRow() ;
 	
-		html.bvwpTableRow("", "", "", "", "", "", "", "", "", "<strong>" + convertToMillions(utils) + "</strong>" ) ;
+//		html.bvwpTableRow("", "", "", "", "", "", "", "", "", "<strong>" + convertToMillions(utils) + "</strong>" ) ;
+		html.beginTableMulticolumnRow() ;
+		html.beginDivRightAlign();
+		html.write("<strong>" + convertToMillions(utils) + "</strong>" ) ;
+		html.endDiv();
+		html.endTableRow() ;
 	}
 
 	static void initializeOutputTables(Html html) {
@@ -76,7 +81,7 @@ class Utils {
 		html.write("<strong>... mal Menge</strong>") ; html.nextTableEntry() ;
 		html.write("<strong>Nutzen Diff</strong>") ; html.nextTableEntry() ;
 		html.write("<strong>... mal Menge</strong>") ; html.nextTableEntry() ;
-		html.write(" ");
+		html.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 		html.endTableRow() ;
 	}
 
@@ -199,15 +204,15 @@ class Utils {
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
 				utlChangesPerItem.utl , utlChange/1000./1000.
 				) ;
-		html.bvwpTableRow(attribute.toString(),
+		html.bvwpTableRow(attribute.toString()+" rcv",
 				0., 0., 
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
 				utlChangesPerItem.utl , convertToMillions(utlChange) ) ;
 	}
 
-	static void writeAbgebendRow(Html html, final double deltaAmounts, Attribute attribute, final double attributeValuePlanfall,
-			final double attributeValueNullfall, UtlChangesData utlChangesPerItem, final double utlChange) {
+	static void writeAbgebendRow(Html html, final double deltaAmounts, Attribute attribute, final double attributeValueNullfall,
+			final double attributeValuePlanfall, UtlChangesData utlChangesPerItem, final double utlChange) {
 		System.out.printf(FMT_STRING, attribute,
 				attributeValueNullfall, attributeValueNullfall * deltaAmounts,
 				0., 0., 
@@ -216,9 +221,9 @@ class Utils {
 				// Nullfall)
 				utlChangesPerItem.utl , utlChange/1000./1000.
 				) ;
-		html.bvwpTableRow(attribute.toString(),
+		html.bvwpTableRow(attribute.toString()+" giv",
 				attributeValueNullfall, attributeValueNullfall * deltaAmounts,
-				attributeValuePlanfall, 0., 
+				attributeValuePlanfall, 0., // this uses Planfall just for completeness 
 				-attributeValueNullfall, attributeValueNullfall * deltaAmounts,
 				// (selbst wenn sich das abgebende System ändert, so ist unser Gewinn dennoch basierend auf dem
 				// Nullfall)

@@ -21,6 +21,7 @@ package playground.vsp.bvwp;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Formatter;
 
 import org.matsim.core.utils.io.IOUtils;
 
@@ -128,8 +129,13 @@ class Html {
 		myWrite("</p>\n") ;
 	}
 
-	public void write(double dbl) {
-		myWrite( Double.toString(dbl) ) ;
+	void write(double dbl) {
+		StringBuilder stb = new StringBuilder() ;
+		Formatter fmt = new Formatter(stb) ;
+		fmt.format("%12.6f", dbl ) ;
+		fmt.close(); 
+		
+		myWrite( stb.toString() ) ;
 	}
 
 	private void myWrite( String str ) {

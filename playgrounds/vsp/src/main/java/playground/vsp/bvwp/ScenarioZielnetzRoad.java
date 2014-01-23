@@ -77,16 +77,16 @@ class ScenarioZielnetzRoad {
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 4209. ) ; // Menge Strasse im Nullfall = verbleibender Verkehr
 					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 206.53/60. ) ; // Fahrzeit Strasse im Nullfall
 					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), 10.95) ; // Nutzerkosten Strasse im Nullfall
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // ???  Produktionskosten Strasse im Nullfall
+					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 20. ) ; // ???  Produktionskosten Strasse im Nullfall
 				}
 			}
 			{
 				Mode mode = Mode.RAIL ;
 				{
 					DemandSegment segm = DemandSegment.PV_SONST ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 4209. ) ;   // Menge Bahn im Nullfall.  Wenn nicht bekannt, ggf. die gesamte verlagerte Menge
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 206.53/60. ) ; // Fahrzeit Bahn
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), 10.95) ; // ??? Nutzerkosten Bahn
+					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 15. ) ;   // Menge Bahn im Nullfall.  Wenn nicht bekannt, ggf. die gesamte verlagerte Menge
+					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 300./60. ) ; // Fahrzeit Bahn
+					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), 15.) ; // ??? Nutzerkosten Bahn
 					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // Produktionskosten sind Null bei Bahn.
 				}
 			}
@@ -107,9 +107,9 @@ class ScenarioZielnetzRoad {
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
 				DemandSegment segm = DemandSegment.PV_SONST ;
-				planfallValuesForOD.put( makeKey( Mode.ROAD, segm, Attribute.hrs), 206.53 ) ; // Fahrzeit Strasse im Planfall 
-				planfallValuesForOD.put( makeKey( Mode.RAIL, segm, Attribute.XX), 123. ) ; // Menge Bahn im Planfall.  Wenn nicht bekannt, dann jetzt Null. 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 545. ) ; // Menge Straße im Planfall.
+				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), -0.1 ) ; // Fahrzeit Strasse im Planfall 
+				planfallValuesForOD.put( makeKey( Mode.RAIL, segm, Attribute.XX), 0. ) ; // Menge Bahn im Planfall.  Wenn nicht bekannt, dann jetzt Null. 
+				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 20. ) ; // Menge Straße im Planfall.
 				
 				// später zu berechnen: Menge Str im Planfall - Menge Str im Nullfall - Menge verlagert = Menge induziert
 			}
