@@ -79,6 +79,7 @@ public class OneTaxiLauncher
         PassengerEngine passengerEngine = new PassengerEngine(OneTaxiRequestCreator.MODE,
                 new OneTaxiRequestCreator(vrpData), optimizer, data);
         qSim.addMobsimEngine(passengerEngine);
+        qSim.addDepartureHandler(passengerEngine);
 
         VrpLauncherUtils.initAgentSources(qSim, data, optimizer, new OneTaxiActionCreator(
                 passengerEngine));

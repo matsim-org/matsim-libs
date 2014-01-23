@@ -212,7 +212,7 @@ public class VrpLauncherUtils
         EventsManager events = EventsUtils.createEventsManager();
         QSim qSim = new QSim(scenario, events);
 
-        DynActivityEngine dynActivityEngine = new DynActivityEngine(new ActivityEngine());
+        DynActivityEngine dynActivityEngine = new DynActivityEngine();
         qSim.addMobsimEngine(dynActivityEngine);
         qSim.addActivityHandler(dynActivityEngine);
 

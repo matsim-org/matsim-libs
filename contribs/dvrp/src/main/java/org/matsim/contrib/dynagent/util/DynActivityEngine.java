@@ -26,12 +26,15 @@ import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.*;
-import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.utils.misc.Time;
 
 
+/**
+ * It might be nicer to have ActivityEngine as a delegate, not as a superclass. But there is a
+ * "instanceof ActivityEngine" check in QSim
+ */
 public class DynActivityEngine
-    implements MobsimEngine, ActivityHandler
+    extends ActivityEngine
 {
     private static class EndTimeEntry
     {
@@ -46,15 +49,13 @@ public class DynActivityEngine
     }
 
 
-    private final ActivityEngine activityEngine;
     private final Map<Id, EndTimeEntry> activityEndTimes;
 
     private InternalInterface internalInterface;
 
 
-    public DynActivityEngine(ActivityEngine activityEngine)
+    public DynActivityEngine()
     {
-        this.activityEngine = activityEngine;
         activityEndTimes = new HashMap<Id, EndTimeEntry>();
     }
 
@@ -65,7 +66,7 @@ public class DynActivityEngine
         for (EndTimeEntry e : activityEndTimes.values()) {
             if (e.agent.getState() == State.ACTIVITY) {
                 e.agent.doSimStep(time);
-                
+
                 //ask agents who are performing an activity about its end time;
                 double currentEndTime = e.agent.getActivityEndTime();
 
@@ -84,14 +85,14 @@ public class DynActivityEngine
             }
         }
 
-        activityEngine.doSimStep(time);
+        super.doSimStep(time);
     }
 
 
     @Override
     public boolean handleActivity(MobsimAgent agent)
     {
-        if (activityEngine.handleActivity(agent)) {
+        if (super.handleActivity(agent)) {
             if (agent instanceof DynAgent) {
                 EndTimeEntry entry = activityEndTimes.get(agent.getId());
 
@@ -111,16 +112,9 @@ public class DynActivityEngine
 
 
     @Override
-    public void onPrepareSim()
-    {
-        activityEngine.onPrepareSim();
-    }
-
-
-    @Override
     public void afterSim()
     {
-        activityEngine.afterSim();
+        super.afterSim();
         activityEndTimes.clear();
     }
 
@@ -129,7 +123,6 @@ public class DynActivityEngine
     public void setInternalInterface(InternalInterface internalInterface)
     {
         this.internalInterface = internalInterface;
-        activityEngine.setInternalInterface(internalInterface);
+        super.setInternalInterface(internalInterface);
     }
-
 }

@@ -236,6 +236,7 @@ import playground.michalm.util.RunningVehicleRegister;
         PassengerEngine passengerEngine = new PassengerEngine(TaxiRequestCreator.MODE,
                 new TaxiRequestCreator(data), optimizer, data);
         qSim.addMobsimEngine(passengerEngine);
+        qSim.addDepartureHandler(passengerEngine);
 
         LegCreator legCreator = onlineVehicleTracker ? VrpDynLegs
                 .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())
