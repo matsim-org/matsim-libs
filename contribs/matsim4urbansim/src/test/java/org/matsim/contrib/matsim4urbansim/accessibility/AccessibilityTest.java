@@ -18,14 +18,11 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
+import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
-import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
-import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.AgentPerformanceControlerListener;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestPopulation;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
@@ -133,10 +130,6 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 			//add grid based accessibility controler listener
 			ctrl.addControlerListener(listener);
-		}
-		{
-			UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(ctrl.getConfig());
-			ctrl.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
 		}
 		ctrl.run();
 	

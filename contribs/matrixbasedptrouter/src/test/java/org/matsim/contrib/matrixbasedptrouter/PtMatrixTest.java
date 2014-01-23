@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4urbansim.pt;
+package org.matsim.contrib.matrixbasedptrouter;
 
 import java.util.List;
 
@@ -34,11 +34,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.NetworkUtil;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
-//import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
-import org.matsim.contrib.matsim4urbansim.utils.network.NetworkUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;

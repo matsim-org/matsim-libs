@@ -3,8 +3,8 @@ package org.matsim.contrib.matsim4urbansim.grid;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestCase;
 

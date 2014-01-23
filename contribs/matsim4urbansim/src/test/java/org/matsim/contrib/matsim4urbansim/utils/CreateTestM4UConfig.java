@@ -81,7 +81,7 @@ public class CreateTestM4UConfig {
 	public String inputPlansFileName 						= "";
 	public String hotstartPlansFileName						= "";
 	public BigInteger firstIteration					= new BigInteger("0");
-	public BigInteger lastIteration						= new BigInteger("100");
+	public BigInteger lastIteration						= new BigInteger("1");
 	public String activityType_0						= "home";
 	public String activityType_1						= "work";
 	public BigInteger homeActivityTypicalDuration		= new BigInteger("43200");	

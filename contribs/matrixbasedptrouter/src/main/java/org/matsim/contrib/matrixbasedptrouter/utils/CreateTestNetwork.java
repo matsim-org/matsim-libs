@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4urbansim.utils;
+package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;

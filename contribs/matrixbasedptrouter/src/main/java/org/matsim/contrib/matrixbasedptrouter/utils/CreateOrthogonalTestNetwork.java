@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4urbansim.utils;
+package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;

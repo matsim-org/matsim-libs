@@ -5,11 +5,11 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.matrixbasedptrouter.utils.CreateOrthogonalTestNetwork;
+import org.matsim.contrib.matrixbasedptrouter.utils.NetworkUtil;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
-import org.matsim.contrib.matsim4urbansim.utils.CreateOrthogonalTestNetwork;
+import org.matsim.contrib.matrixbasedptrouter.utils.helperobjects.Distances;
 import org.matsim.contrib.matsim4urbansim.utils.OPUSDirectoryUtil;
-import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Distances;
-import org.matsim.contrib.matsim4urbansim.utils.network.NetworkUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 

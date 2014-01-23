@@ -1,10 +1,10 @@
-package org.matsim.contrib.matsim4urbansim.utils.network;
+package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Distances;
+import org.matsim.contrib.matrixbasedptrouter.utils.helperobjects.Distances;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;

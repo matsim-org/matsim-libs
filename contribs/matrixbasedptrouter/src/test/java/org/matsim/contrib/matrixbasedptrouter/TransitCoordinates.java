@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4urbansim.pt;
+package org.matsim.contrib.matrixbasedptrouter;
 
 import java.util.Collection;
 import java.util.Iterator;

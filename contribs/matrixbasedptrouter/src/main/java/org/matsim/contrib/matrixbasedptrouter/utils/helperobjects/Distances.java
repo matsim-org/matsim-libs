@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4urbansim.utils.helperobjects;
+package org.matsim.contrib.matrixbasedptrouter.utils.helperobjects;
 
 /**
  * @author thomas
