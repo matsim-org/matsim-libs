@@ -331,7 +331,7 @@ implements ShutdownListener{
 	 */
 	public void generateGridsAndMeasuringPointsByShapeFile(String shapeFile, double cellSize){
 		
-		if(TempDirectoryUtil.pathExsits(shapeFile))
+		if(TempDirectoryUtil.pathExists(shapeFile))
 			log.info("Using shape file to determine the area for accessibility computation.");
 		else
 			throw new RuntimeException("ShapeFile for accessibility computation not found: " + shapeFile);

@@ -35,19 +35,19 @@ import org.apache.log4j.Logger;
  * @author thomas
  *
  */
-public class TempDirectoryUtil {
+public final class TempDirectoryUtil {
 	
 	// logger
 	private static final Logger log = Logger.getLogger(TempDirectoryUtil.class);
 	// storage for created custom directories
-	private static ArrayList<File> tempDirectoryList = null;
+	private ArrayList<File> tempDirectoryList = null;
 	
 	/**
 	 * creates a custom temp directory
 	 * @param customDirectory
 	 * @return canonical path of the custom temp directory
 	 */
-	public static String createCustomTempDirectory(String customDirectory){
+	public String createCustomTempDirectory(String customDirectory){
 		
 		log.info("Creating a custom temp directory");
 		
@@ -77,7 +77,7 @@ public class TempDirectoryUtil {
 	/**
 	 * Removes the custom temp directories
 	 */
-	public static void cleaningUpCustomTempDirectories(){
+	public void cleaningUpCustomTempDirectories(){
 
 		if(tempDirectoryList != null){
 			log.info("Removing custom temp directories");
@@ -101,7 +101,7 @@ public class TempDirectoryUtil {
 	 * @param path
 	 * @return
 	 */
-	public static boolean createDirectory(String path){
+	 public static boolean createDirectory(String path){
 		log.info("Creating directory " + path);
 		try {
 			File f = new File(path);
@@ -165,7 +165,7 @@ public class TempDirectoryUtil {
 	 * @param arg path
 	 * @return true if the given file exists
 	 */
-	public static boolean pathExsits(String path){
+	 public static boolean pathExists(String path){
 		return( (new File(path)).exists() );
 	}
 }

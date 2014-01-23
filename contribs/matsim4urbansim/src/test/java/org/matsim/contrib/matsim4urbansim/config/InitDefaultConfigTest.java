@@ -26,9 +26,10 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
-import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
+import org.matsim.contrib.matsim4urbansim.utils.OPUSDirectoryUtil;
 import org.matsim.core.config.Config;
 
 /**
@@ -46,12 +47,13 @@ public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 	@Test
 	//@Ignore // found this as ignored as of 22/jan/14. kai
 	public void testLoadDefaultMATSim4UrbanSimWithExternalConfigFile(){
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 		
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 connector = null;
 		
 		try{
-			String path = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = tempDirectoryUtil.createCustomTempDirectory("tmp");
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
@@ -79,7 +81,7 @@ public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertFalse(true);
 		}
-		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 
 }

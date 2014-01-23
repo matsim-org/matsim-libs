@@ -164,9 +164,10 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 * @param args
 	 */
 	public static void main(String args[]){
-		
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
+
 		// create temp output dir
-		String tmpOutputLocation = TempDirectoryUtil.createCustomTempDirectory("test");
+		String tmpOutputLocation = tempDirectoryUtil.createCustomTempDirectory("test");
 		
 		// create network
 		NetworkImpl network = LeastCostPathTreeExtended.createTriangularNetwork();
@@ -200,7 +201,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		log.info("Distance = " + distance );
 		log.info("Toll = " + toll);
 		
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 	
 	/**

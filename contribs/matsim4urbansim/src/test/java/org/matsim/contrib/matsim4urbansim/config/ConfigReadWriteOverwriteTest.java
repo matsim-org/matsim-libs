@@ -37,11 +37,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
+import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
-import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
+import org.matsim.contrib.matsim4urbansim.utils.OPUSDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -88,9 +89,10 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 connector = null;
+		TempDirectoryUtil tmpDirUtl = new TempDirectoryUtil() ;
 		
 		try{
-			String path = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = tmpDirUtl.createCustomTempDirectory("tmp");
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
@@ -127,8 +129,10 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 connector = null;
 		
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
+		
 		try{
-			String path = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = tempDirectoryUtil.createCustomTempDirectory("tmp");
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
@@ -153,7 +157,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertTrue(false);
 		}
-		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("done") ;
 	}
 	
@@ -168,6 +172,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	@Test
 //	@Ignore // found this disabled on 19/jan/14. kai
 	public void testExternalMATSimConfig(){
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 		
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 converter = null;
@@ -234,7 +239,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 //			e.printStackTrace();
 //			Assert.assertTrue(false);
 //		}
-			org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
+			tempDirectoryUtil.cleaningUpCustomTempDirectories();
 		
 	}
 

@@ -37,7 +37,7 @@ import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
-import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
+import org.matsim.contrib.matsim4urbansim.utils.OPUSDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.io.CreateHomeWorkHomePlan;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel.PopulationCounter;
@@ -67,7 +67,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 	@Test
 	public void testPopulationMergeZoneColdStart(){
 		Config config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
-		TempDirectoryUtil.setTmpDirectories(config);
+		OPUSDirectoryUtil.setTmpDirectories(config);
 		
 		log.info("Testing merge process of new and old population for cold start (zones)");
 				
@@ -77,7 +77,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 		Population oldPop = null;
 		PopulationCounter counter = runTestZone(oldPop, zones, config);
 		
-		TempDirectoryUtil.cleaningUpOPUSDirectories(config);
+		OPUSDirectoryUtil.cleaningUpOPUSDirectories(config);
 		
 		Assert.assertTrue( counter.numberOfUrbanSimPersons == 6);
 		Assert.assertTrue( counter.fromBackupCnt == 0);				// 0 since no old population is there for comparison
@@ -100,7 +100,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 		
 		Scenario scenario = ScenarioUtils.createScenario(M4UConfigUtils.createEmptyConfigWithSomeDefaults());
 		Config config = scenario.getConfig();
-		TempDirectoryUtil.setTmpDirectories(config);
+		OPUSDirectoryUtil.setTmpDirectories(config);
 		
 		// create dummy persons
 		Population oldPop = scenario.getPopulation();
@@ -153,7 +153,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 		
 		PopulationCounter counter = runTestZone(oldPop, zones, config);
 		
-		TempDirectoryUtil.cleaningUpOPUSDirectories(config);
+		OPUSDirectoryUtil.cleaningUpOPUSDirectories(config);
 		
 		Assert.assertTrue( counter.numberOfUrbanSimPersons == 6);   // number of processed persons
 		Assert.assertTrue( counter.fromBackupCnt == 1);				// one person not found in new population (person 1)
@@ -181,7 +181,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 	private PopulationCounter runTestZone(Population oldPop, ActivityFacilitiesImpl zones, Config config){
 		
 		// creates necessary folder structure (OPUS_HOME)
-		TempDirectoryUtil.createOPUSDirectories(config);
+		OPUSDirectoryUtil.createOPUSDirectories(config);
 		// create dummy network
 		Network network = CreateTestNetwork.createTestNetwork();
 		// dump new dummy population zone 

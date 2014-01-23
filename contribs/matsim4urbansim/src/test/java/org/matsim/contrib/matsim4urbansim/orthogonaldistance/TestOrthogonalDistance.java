@@ -5,8 +5,9 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.CreateOrthogonalTestNetwork;
-import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
+import org.matsim.contrib.matsim4urbansim.utils.OPUSDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Distances;
 import org.matsim.contrib.matsim4urbansim.utils.network.NetworkUtil;
 import org.matsim.core.basic.v01.IdImpl;
@@ -53,10 +54,10 @@ public class TestOrthogonalDistance extends MatsimTestCase{
 	 */
 	@Test
 	public void testOrthogonalDistanceToLinks(){
-
 		log.info("Start testing orthogonal distances to links.");
-		
 		long start = System.currentTimeMillis();
+		
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 		
 		Network network = CreateOrthogonalTestNetwork.createOrthogonalDistanceTestNetwork();			// creates a dummy network
 		
@@ -77,7 +78,7 @@ public class TestOrthogonalDistance extends MatsimTestCase{
 				distanceFromNode2ToLink3 == 300.0 ); // the distance between node 2 to link 3 corresponds to the euclidean distance of 300 m between node 2 and the midpoint of link 3
 		
 		// cleaning up
-		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("Test orthogonal distances to links took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 	
@@ -91,10 +92,10 @@ public class TestOrthogonalDistance extends MatsimTestCase{
 	 */
 	@Test
 	public void testOrthogonalDistanceToNodes(){
-
 		log.info("Start testing orthogonal distances to nodes.");
-		
 		long start = System.currentTimeMillis();
+		
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 		
 		Network network = CreateOrthogonalTestNetwork.createOrthogonalDistanceTestNetwork();			// creates a dummy network
 		
@@ -125,7 +126,7 @@ public class TestOrthogonalDistance extends MatsimTestCase{
 				doubleDistanceFromNode5ToNode1_Link1 == 625.0 ); // euclidean walking distance to node 1 = 625 m; no driving necessary
 			
 		// cleaning up
-		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("Test orthogonal distances to nodes took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 		

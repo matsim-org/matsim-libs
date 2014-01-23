@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.LoadFile;
 import org.matsim.contrib.matsim4urbansim.utils.securitymanager.ExitException;
@@ -129,10 +130,12 @@ public class UpdateXMLBindingClasses {
 				log.info(helpMessage);
 		}
 		
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
+
 		
 		if(xsdLocation == null){
 			log.warn("XSD location not given (optional)...");
-			String tmpDir = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("xsd");
+			String tmpDir = tempDirectoryUtil.createCustomTempDirectory("xsd");
 			// set default location			
 			LoadFile loadFile = new LoadFile(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tmpDir, InternalConstants.CURRENT_XSD_FILE_NAME);
 			xsdLocation = loadFile.loadMATSim4UrbanSimXSDString();
@@ -143,7 +146,7 @@ public class UpdateXMLBindingClasses {
 			log.warn("Destination not given (optional)...");
 			// set default location
 			outputDirectory = InternalConstants.MATSIM_WORKING_DIRECTORY + "/src/main/java/";
-			org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createDirectory( outputDirectory );
+			TempDirectoryUtil.createDirectory( outputDirectory );
 			log.warn("Set default destination to: " + outputDirectory);
 		}
 		if(targetPackage == null){

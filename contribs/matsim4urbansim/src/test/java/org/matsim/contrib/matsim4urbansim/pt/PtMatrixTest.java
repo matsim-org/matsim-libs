@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
@@ -86,10 +87,10 @@ public class PtMatrixTest extends MatsimTestCase{
 	 */
 	@Test
 	public void testPtMatrixStops(){
-
 		log.info("Start testing the pt matrix with information about the pt stops.");
-		
 		long start = System.currentTimeMillis();
+		
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 		
 		// some default values
 		double defaultWalkSpeed = 1.; // in m/s
@@ -179,7 +180,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		}
 		
 		// cleaning up
-		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("Creating pt matrix took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 	
@@ -192,10 +193,10 @@ public class PtMatrixTest extends MatsimTestCase{
 	 */
 	@Test
 	public void testPtMatrixTimesAndDistances(){
-
 		log.info("Start testing the pt matrix with information about the pt stops, pt travel times and distances.");
-		
 		long start = System.currentTimeMillis();
+		
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 		
 		// some default values
 		double defaultWalkSpeed = 1.; // in m/s
@@ -267,7 +268,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		}
 		
 		// cleaning up
-		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("Creating pt matrix took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 

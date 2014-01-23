@@ -37,8 +37,8 @@ import org.matsim.core.config.Config;
  * @author thomas
  *
  */
-public class TempDirectoryUtil {
-	private static final Logger log = Logger.getLogger(TempDirectoryUtil.class);
+public class OPUSDirectoryUtil {
+	private static final Logger log = Logger.getLogger(OPUSDirectoryUtil.class);
 
 	
 	public static void setTmpDirectories(Config c){

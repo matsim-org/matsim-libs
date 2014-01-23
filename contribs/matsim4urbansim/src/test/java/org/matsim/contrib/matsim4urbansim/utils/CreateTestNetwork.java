@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -120,8 +121,9 @@ public class CreateTestNetwork {
 		 * 	|(pt1)   |   (pt4)
 		 * (3)      (6)------(9)
 		 */
-		
-		String location = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptStops.csv";
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
+
+		String location = tempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptStops.csv";
 		BufferedWriter bw = IOUtils.getBufferedWriter(location);
 		
 		try{
@@ -148,10 +150,12 @@ public class CreateTestNetwork {
 	 * @return the location of the written file
 	 */
 	public static String createTestPtTravelTimesAndDistancesCSVFile(){
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
+
 		
 		// set dummy travel times or distances to all possible pairs of pt stops
 		
-		String location = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptTravelInfo.csv";
+		String location = tempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptTravelInfo.csv";
 		BufferedWriter bw = IOUtils.getBufferedWriter(location);
 		
 		try{
