@@ -30,10 +30,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
@@ -50,7 +52,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author cdobler
  */
-public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, PersonArrivalEventHandler,
+public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,
 		PersonDepartureEventHandler, PersonStuckEventHandler {
 
 	private static final Logger log = Logger.getLogger(EarliestLinkExitTimeProvider.class);
@@ -139,7 +141,7 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 					throw new RuntimeException("No TravelTime object was found for mode " + transportMode + ". Aborting!");
 				}
 
-				earliestExitTime = travelTime.getLinkTravelTime(link, now, person, null);
+				earliestExitTime = Math.floor(now + travelTime.getLinkTravelTime(link, now, person, null));
 			}
 		} else {
 			earliestExitTime = Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
@@ -148,6 +150,11 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Pers
 		this.handleAddEarliestLinkExitTime(event.getPersonId(), earliestExitTime);
 	}
 
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
+	}
+	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		this.transportModeProvider.handleEvent(event);
