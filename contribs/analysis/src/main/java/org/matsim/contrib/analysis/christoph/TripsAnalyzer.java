@@ -241,8 +241,12 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 			this.durationWriter.write(String.valueOf(averageTravelTime));
 			this.durationWriter.write("\n");
 
-			this.tripsWriter.flush();
-			this.durationWriter.flush();
+//			this.tripsWriter.flush();
+//			this.durationWriter.flush();
+//			this.tripsWriter.close();
+//			this.durationWriter.close();
+//			this.tripsWriter = null;
+//			this.durationWriter = null;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -300,10 +304,14 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		try {
-			this.tripsWriter.flush();
-			this.durationWriter.flush();
-			this.tripsWriter.close();
-			this.durationWriter.close();
+			if (this.tripsWriter != null) {
+				this.tripsWriter.flush();
+				this.tripsWriter.close();				
+			}
+			if (this.durationWriter != null) {
+				this.durationWriter.flush();
+				this.durationWriter.close();
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
