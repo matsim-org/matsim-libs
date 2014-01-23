@@ -45,17 +45,11 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 	final static double MIDNIGHT = 24.0*3600;
 
 	protected final TransitRouterConfig config;
-//	private Link previousLink = null;
-//	private double previousTime = Double.NaN;
-//	private double cachedTravelTime = Double.NaN;
 	
 	/*
-	 * TODO: put them into a single object. Therefore, only one lookup
-	 * as to be performed.
+	 * A single data object that holds all thread-local data.
 	 */
-	private final ThreadLocal<Link> previousLinks = new ThreadLocal<Link>();
-	private final ThreadLocal<Double> previousTimes = new ThreadLocal<Double>();
-	private final ThreadLocal<Double> cachedTravelTimes = new ThreadLocal<Double>();
+	private final ThreadLocal<ThreadLocalData> data = new ThreadLocal<ThreadLocalData>();
 
 	private final PreparedTransitSchedule preparedTransitSchedule;
 	
@@ -83,7 +77,7 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 		}
 		return cost;
 	}
-
+	
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
 		return 0;
@@ -134,11 +128,13 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 	
 	@Override
 	public double getLinkTravelTime(Link link, final double time, Person person, Vehicle vehicle) {
-		if ((link == this.previousLinks.get()) && (time == this.previousTimes.get())) {
-			return this.cachedTravelTimes.get();
+		
+		ThreadLocalData threadLocalData = this.data.get();
+		if ((link == threadLocalData.previousLink) && (time == threadLocalData.previousTime)) {
+			return threadLocalData.cachedTravelTime;
 		}
-		this.previousLinks.set(link);
-		this.previousTimes.set(time);
+		threadLocalData.previousLink = link;
+		threadLocalData.previousTime = time;
 //		if ((link == this.previousLink) && (time == this.previousTime)) {
 //			return this.cachedTravelTime;
 //		}
@@ -166,29 +162,31 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 				// ( this can only happen, I think, when ``bestDepartureTime'' is after midnight but ``time'' was before )
 				time2 += MIDNIGHT;
 			}
-			this.cachedTravelTimes.set(time2);
+			threadLocalData.cachedTravelTime = time2;
 //			this.cachedTravelTime = time2;
 			return time2;
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
 		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
-		this.cachedTravelTimes.set(time2);
+		threadLocalData.cachedTravelTime = time2;
 //		this.cachedTravelTime = time2;
 		return time2;
 	}
 	
-	//variables for caching offVehWaitTime
-	Link previousWaitLink;
-	double previousWaitTime;
-	double cachedVehArrivalTime;
-	
 	public double getVehArrivalTime(final Link link, final double now){
-		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
-			return this.cachedVehArrivalTime;
+		
+		ThreadLocalData threadLocalData = this.data.get();
+		if ((link == threadLocalData.previousWaitLink) && (now == threadLocalData.previousWaitTime)) {
+			return threadLocalData.cachedVehArrivalTime;
 		}
-		this.previousWaitLink = link;
-		this.previousWaitTime = now;
+		threadLocalData.previousWaitLink = link;
+		threadLocalData.previousWaitTime = now;
+//		if ((link == this.previousWaitLink) && (now == this.previousWaitTime)) {
+//			return this.cachedVehArrivalTime;
+//		}
+//		this.previousWaitLink = link;
+//		this.previousWaitTime = now;
 		
 		//first find out vehicle arrival time to fromStop according to transit schedule
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
@@ -202,25 +200,37 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
 		double vehWaitAtStopTime = fromStop.getDepartureOffset() - fromStopArrivalOffset; //time in which the veh stops at station
 		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime;
-		cachedVehArrivalTime = vehArrivalTime ;
-		return vehArrivalTime ;		
+		threadLocalData.cachedVehArrivalTime = vehArrivalTime;
+//		cachedVehArrivalTime = vehArrivalTime;
+		return vehArrivalTime;
 	}
 
 	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
 		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
-		double timeCost = - getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
+		double timeCost = - getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s();
 		// (sign: margUtl is negative; overall it should be positive because it is a cost.)
 		
-		double distanceCost = - CoordUtils.calcDistance(coord,toCoord) * config.getMarginalUtilityOfTravelDistancePt_utl_m() ;
+		double distanceCost = - CoordUtils.calcDistance(coord,toCoord) * config.getMarginalUtilityOfTravelDistancePt_utl_m();
 		// (sign: same as above)
 		
-		return timeCost + distanceCost ;
+		return timeCost + distanceCost;
 	}
 
 	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
 		double distance = CoordUtils.calcDistance(coord, toCoord);
-		double initialTime = distance / config.getBeelineWalkSpeed();
+		double initialTime = distance / this.config.getBeelineWalkSpeed();
 		return initialTime;
 	}
 
+	private static class ThreadLocalData {
+		
+		private Link previousLink;
+		private double previousTime;
+		private double cachedTravelTime;
+		
+		//variables for caching offVehWaitTime
+		private Link previousWaitLink;
+		private double previousWaitTime;
+		private double cachedVehArrivalTime;
+	}
 }
