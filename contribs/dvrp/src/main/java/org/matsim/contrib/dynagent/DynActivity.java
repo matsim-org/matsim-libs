@@ -26,7 +26,8 @@ public interface DynActivity
 
 
     double getEndTime();
-    
-    
+
+
+    //performed at steps: now == beginTime + 1, ..., endTime
     void doSimStep(double now);
 }

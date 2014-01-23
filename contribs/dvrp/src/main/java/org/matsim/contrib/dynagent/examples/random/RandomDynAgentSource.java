@@ -17,77 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent;
+package org.matsim.contrib.dynagent.examples.random;
 
-import java.util.List;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.vehicles.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.population.routes.NetworkRoute;
 
-
-public class DynLegImpl
-    implements DynLeg
+public class RandomDynAgentSource
+    implements AgentSource
 {
-    private final NetworkRoute route;
-    private int currentLinkIdx;
+    private final QSim qSim;
+    private final int agentCount;
 
 
-    public DynLegImpl(NetworkRoute route)
+    public RandomDynAgentSource(QSim qSim, int agentCount)
     {
-        this.route = route;
-        currentLinkIdx = -1;
+        this.qSim = qSim;
+        this.agentCount = agentCount;
     }
 
 
     @Override
-    public void movedOverNode(Id oldLinkId, Id newLinkId, int time)
+    public void insertAgentsIntoMobsim()
     {
-        currentLinkIdx++;
-    }
+        Scenario scenario = qSim.getScenario();
+        Network network = scenario.getNetwork();
+        VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
 
+        for (int i = 0; i < agentCount; i++) {
+            RandomDynAgentLogic agentLogic = new RandomDynAgentLogic(network);
 
-    @Override
-    public Id getCurrentLinkId()
-    {
-        if (currentLinkIdx == -1) {
-            return route.getStartLinkId();
+            Id id = scenario.createId(i + "");
+            Id startLinkId = RandomDynAgentUtils.getRandomId(network.getLinks());
+            DynAgent agent = new DynAgent(id, startLinkId, qSim, agentLogic);
+
+            qSim.insertAgentIntoMobsim(agent);
+            qSim.createAndParkVehicleOnLink(
+                    qSimVehicleFactory.createVehicle(id, VehicleUtils.getDefaultVehicleType()),
+                    startLinkId);
         }
-
-        List<Id> linkIds = route.getLinkIds();
-
-        if (currentLinkIdx == linkIds.size()) {
-            return route.getEndLinkId();
-        }
-
-        return linkIds.get(currentLinkIdx);
     }
-
-
-    @Override
-    public Id getNextLinkId()
-    {
-        List<Id> linkIds = route.getLinkIds();
-
-        if (currentLinkIdx == linkIds.size()) {
-            return null;
-        }
-
-        if (currentLinkIdx == linkIds.size() - 1) {
-            return route.getEndLinkId();
-        }
-
-        return linkIds.get(currentLinkIdx + 1);
-    }
-
-
-    @Override
-    public Id getDestinationLinkId()
-    {
-        return route.getEndLinkId();
-    }
-
-
-    @Override
-    public void endAction(double now)
-    {}
 }

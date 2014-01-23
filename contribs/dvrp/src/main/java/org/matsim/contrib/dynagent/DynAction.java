@@ -21,5 +21,6 @@ package org.matsim.contrib.dynagent;
 
 public interface DynAction
 {
+    //used for finalizing this action just before switching to the next one
     void endAction(double now);
 }

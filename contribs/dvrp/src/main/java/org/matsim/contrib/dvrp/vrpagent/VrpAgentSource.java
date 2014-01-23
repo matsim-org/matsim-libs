@@ -30,8 +30,8 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.util.DynAgentWithPlan;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.qsim.*;
-import org.matsim.vehicles.VehicleUtils;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.vehicles.*;
 
 
 public class VrpAgentSource
@@ -68,6 +68,7 @@ public class VrpAgentSource
     public void insertAgentsIntoMobsim()
     {
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
+        VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
 
         for (Vehicle vrpVeh : vehicles) {
             VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator,
@@ -87,8 +88,8 @@ public class VrpAgentSource
             }
 
             qSim.createAndParkVehicleOnLink(
-                    VehicleUtils.getFactory().createVehicle(taxiAgent.getId(),
-                            VehicleUtils.getDefaultVehicleType()), taxiAgent.getCurrentLinkId());
+                    qSimVehicleFactory.createVehicle(id, VehicleUtils.getDefaultVehicleType()),
+                    startLinkId);
         }
     }
 }

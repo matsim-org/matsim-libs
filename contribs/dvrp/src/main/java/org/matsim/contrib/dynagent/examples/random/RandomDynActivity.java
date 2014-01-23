@@ -17,33 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dynagent.examples.random;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.contrib.dynagent.DynActivity;
 
 
-/**
- * Contains mappings: MobsimAgent.id => xxxx
- */
-public class MobsimAgentMappings
+public class RandomDynActivity
+    implements DynActivity
 {
-    private final Map<Id, MobsimAgent> mobsimAgents = new HashMap<Id, MobsimAgent>();
-
-    private final Map<Id, PassengerCustomer> passengerCustomers = new HashMap<Id, PassengerCustomer>();
+    private double endTime;
 
 
-    public Map<Id, MobsimAgent> getMobsimAgents()
+    public RandomDynActivity(double now)
     {
-        return mobsimAgents;
+        doRandomChoice(now);//decision made at time beginTime
     }
 
 
-    public Map<Id, PassengerCustomer> getPassengerCustomers()
+    @Override
+    public void endAction(double now)
+    {}
+
+
+    @Override
+    public String getActivityType()
     {
-        return passengerCustomers;
+        return "RandomActivity";
+    }
+
+
+    @Override
+    public double getEndTime()
+    {
+        return endTime;
+    }
+
+
+    @Override
+    public void doSimStep(double now)
+    {
+        doRandomChoice(now);//decisions made at times beginTime+1, ..., endTime
+    }
+
+
+    private void doRandomChoice(double now)
+    {
+        //When do I want to stop the current activity?
+        endTime = now + RandomDynAgentUtils.RANDOM.nextInt(100);//1% chance that endTime == now
     }
 }

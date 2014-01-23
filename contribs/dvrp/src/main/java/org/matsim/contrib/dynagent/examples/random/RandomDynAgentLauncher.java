@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,77 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.onetaxi;
-
-import java.io.IOException;
+package org.matsim.contrib.dynagent.examples.random;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.util.*;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.*;
+import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 
-public class OneTaxiLauncher
+public class RandomDynAgentLauncher
 {
     private final String dirName;
     private final String netFileName;
-    private final String plansFileName;
-    private final String depotsFileName;
     private final boolean otfVis;
+    private final int agentCount;
 
     private final Scenario scenario;
 
 
-    public OneTaxiLauncher()
+    public RandomDynAgentLauncher()
     {
         dirName = "./src/main/resources/";
         netFileName = dirName + "network.xml";
-        plansFileName = dirName + "population.xml";
-        depotsFileName = dirName + "1_depot_1_taxi.xml";
 
         otfVis = true;//or false -- turning ON/OFF visualization
+        agentCount = 100;
 
-        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
+        scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
     }
 
 
     public void go()
     {
-        TravelTime travelTime = new FreeSpeedTravelTime();
-        TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-
-        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathFinder(scenario,
-                TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility);
-
-        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, depotsFileName);
-
-        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(vrpData, calculator);
+        new MatsimNetworkReader(scenario).readFile(netFileName);
 
         QSim qSim = VrpLauncherUtils.initQSim(scenario);
-
-        MatsimVrpData data = new MatsimVrpData(vrpData, scenario, qSim.getSimTimer());
-
-        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                OneTaxiRequestCreator.MODE, new OneTaxiRequestCreator(vrpData), optimizer, data,
-                qSim);
-
-        VrpLauncherUtils.initAgentSources(qSim, data, optimizer, new OneTaxiActionCreator(
-                passengerEngine));
+        qSim.addAgentSource(new RandomDynAgentSource(qSim, agentCount));
 
         EventsManager events = qSim.getEventsManager();
 
         if (otfVis) { // OFTVis visualization
-            ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME,
-                    OTFVisConfigGroup.class).setDrawNonMovingItems(true);
+            OTFVisConfigGroup configGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
+                    OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+            configGroup.setDrawNonMovingItems(true);
+            configGroup.setColoringScheme(ColoringScheme.byId);
+
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);
@@ -98,10 +78,9 @@ public class OneTaxiLauncher
     }
 
 
-    public static void main(String... args)
-        throws IOException
+    public static void main(String[] args)
     {
-        OneTaxiLauncher launcher = new OneTaxiLauncher();
+        RandomDynAgentLauncher launcher = new RandomDynAgentLauncher();
         launcher.go();
     }
 }

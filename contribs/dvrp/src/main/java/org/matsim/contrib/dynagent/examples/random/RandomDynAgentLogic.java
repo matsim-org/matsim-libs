@@ -17,27 +17,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.util.time;
+package org.matsim.contrib.dynagent.examples.random;
 
-public class IntegerInterpolator
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dynagent.*;
+
+
+public class RandomDynAgentLogic
+    implements DynAgentLogic
 {
-    private TimeDiscretizer timeDiscretizer;
-    private int[] values;
+    private final Network network;
+
+    private DynAgent agent;
 
 
-    public IntegerInterpolator(TimeDiscretizer timeDiscretizer, int[] values)
+    public RandomDynAgentLogic(Network network)
     {
-        this.timeDiscretizer = timeDiscretizer;
-        this.values = values;
-
-        if (timeDiscretizer.getIntervalCount() != values.length) {
-            throw new IllegalArgumentException();
-        }
+        this.network = network;
     }
 
 
-    public int interpolate(int time)
+    @Override
+    public DynActivity init(DynAgent agent)
     {
-        return timeDiscretizer.interpolate(values, time);
+        this.agent = agent;
+        return new RandomDynActivity(1);
+    }
+
+
+    @Override
+    public DynAgent getDynAgent()
+    {
+        return agent;
+    }
+
+
+    @Override
+    public DynAction computeNextAction(DynAction oldAction, double now)
+    {
+        //I am tired, I want to stop being simulated (1% chance)
+        if (RandomDynAgentUtils.RANDOM.nextInt(100) == 0) {
+            return new StaticDynActivity("Laziness", Double.POSITIVE_INFINITY);
+        }
+        
+        //Do I want to stay or drive? (50-50 choice)
+        if (RandomDynAgentUtils.RANDOM.nextBoolean()) {
+            return new RandomDynActivity(now);
+        }
+        else {
+            return new RandomDynLeg(agent.getCurrentLinkId(), network);
+        }
     }
 }

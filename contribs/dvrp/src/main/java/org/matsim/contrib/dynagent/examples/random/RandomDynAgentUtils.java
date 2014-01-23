@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,12 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent;
+package org.matsim.contrib.dynagent.examples.random;
 
-import org.matsim.api.core.v01.population.Plan;
+import java.util.*;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.MatsimRandom;
+
+import com.google.common.collect.Iterators;
 
 
-public interface DynPlanFactory
+public class RandomDynAgentUtils
 {
-    Plan create(DynAgent agent);
+    public static final Random RANDOM = MatsimRandom.getRandom();
+
+
+    public static Id getRandomId(Map<Id, ?> map)
+    {
+        int randomIndex = RANDOM.nextInt(map.size());
+        return Iterators.get(map.keySet().iterator(), randomIndex);
+    }
 }
