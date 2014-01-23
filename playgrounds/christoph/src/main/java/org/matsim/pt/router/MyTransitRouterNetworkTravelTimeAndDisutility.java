@@ -48,6 +48,11 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 //	private Link previousLink = null;
 //	private double previousTime = Double.NaN;
 //	private double cachedTravelTime = Double.NaN;
+	
+	/*
+	 * TODO: put them into a single object. Therefore, only one lookup
+	 * as to be performed.
+	 */
 	private final ThreadLocal<Link> previousLinks = new ThreadLocal<Link>();
 	private final ThreadLocal<Double> previousTimes = new ThreadLocal<Double>();
 	private final ThreadLocal<Double> cachedTravelTimes = new ThreadLocal<Double>();
@@ -114,7 +119,7 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
 		
-		double walkDistance = link.getLength() ;
+		double walkDistance = link.getLength();
 		
 		// weigh this "buffer" not with the walk time disutility, but with the wait time disutility:
 		// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.MyMultiNodeDijkstra;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -39,17 +38,22 @@ import org.matsim.vehicles.Vehicle;
  * 		ArrayRoutingNetworkNode routingNetworkNode = (ArrayRoutingNetworkNode) n;
  *		return this.nodeData[routingNetworkNode.getArrayIndex()];
  */
-public class TransitMultiNodeDijkstra extends MyMultiNodeDijkstra {
+public class TransitMultiNodeDijkstra extends org.matsim.core.router.MultiNodeDijkstra {
 
-	private final CustomDataManager customDataManager = new CustomDataManager();
+//	private final CustomDataManager customDataManager = new CustomDataManager();
+	private final CustomDataManager customDataManager;
 	
 	public TransitMultiNodeDijkstra(Network network, TravelDisutility costFunction, TravelTime timeFunction) {
-		super(network, costFunction, timeFunction);
+		super(network, costFunction, timeFunction, false);
+//		this.customDataManager = new FastCustomDataManager(network);
+		this.customDataManager = new CustomDataManager();
 	}
 	
 	public TransitMultiNodeDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
-		super(network, costFunction, timeFunction, preProcessData);
+		super(network, costFunction, timeFunction, preProcessData, false);
+//		this.customDataManager = new FastCustomDataManager(network);
+		this.customDataManager = new CustomDataManager();
 	}
 	
 	public CustomDataManager getCustomDataManager() {

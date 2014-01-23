@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitMultiNodeDijkstra.java
+ * FastTransitMultiNodeDijkstra.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.FastMultiNodeDijkstra;
 import org.matsim.core.router.FastRouterDelegateFactory;
-import org.matsim.core.router.MyFastDijkstra;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.RoutingNetwork;
 import org.matsim.core.router.util.TravelDisutility;
@@ -33,21 +33,15 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
-/*
- * TODO: 
- * - replace CustomDataManager with an array-based structure using the routing networks 
- * 		array indices, e.g. like:
- * 		ArrayRoutingNetworkNode routingNetworkNode = (ArrayRoutingNetworkNode) n;
- *		return this.nodeData[routingNetworkNode.getArrayIndex()];
- */
-public class FastTransitMultiNodeDijkstra extends MyFastDijkstra {
+public class FastTransitMultiNodeDijkstra extends FastMultiNodeDijkstra {
 
-	private final CustomDataManager customDataManager = new CustomDataManager();
-		
+	private CustomDataManager customDataManager;
+	
 	public FastTransitMultiNodeDijkstra(final Network network, final TravelDisutility costFunction,
 			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 
 			final RoutingNetwork routingNetwork, final FastRouterDelegateFactory fastRouterFactory) {
-		super(network, costFunction, timeFunction, preProcessData, routingNetwork, fastRouterFactory);
+		super(network, costFunction, timeFunction, preProcessData, routingNetwork, fastRouterFactory, false);
+		this.customDataManager = new FastCustomDataManager(network);
 	}
 	
 	public CustomDataManager getCustomDataManager() {
