@@ -90,4 +90,8 @@ public class AbstractToolBox extends JPanel implements ActionListener
 		
 	}
 
+	public boolean save() {
+		return true;
+	}
+
 }

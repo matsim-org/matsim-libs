@@ -136,5 +136,10 @@ public class EvacuationAreaSelector extends AbstractModule {
 		this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(evacCircle);
 
 	}
+	
+	@Override
+	public boolean saveChanges() {
+		return this.toolBox.save();
+	}
 
 }

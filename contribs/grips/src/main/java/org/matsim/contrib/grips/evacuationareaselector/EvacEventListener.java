@@ -149,6 +149,7 @@ class EvacEventListener extends AbstractListener {
 					controller.getActiveToolBox().setGoalAchieved(true);
 			}
 			controller.paintLayers();
+			controller.setUnsavedChanges(true);
 				
 		}
 

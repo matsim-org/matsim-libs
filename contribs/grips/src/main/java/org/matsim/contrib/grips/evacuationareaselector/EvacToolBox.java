@@ -125,21 +125,36 @@ class EvacToolBox extends AbstractToolBox {
 				this.controller.enableAllRenderLayers();
 			}
 		} else if (cmd.equals(locale.btSave())) {
-			Shape shape = controller.getShapeById(Constants.ID_EVACAREAPOLY);
-
-			if (shape instanceof PolygonShape) {
-				this.goalAchieved = controller.saveShape(shape, controller.getGripsConfigModule().getEvacuationAreaFileName());
-				this.controller.setGoalAchieved(this.goalAchieved);
-
-				this.saveButton.setEnabled(false);
-			}
+			save();
 		} else if (cmd.equals(locale.btClear())) {
 			this.controller.removeShape(Constants.ID_EVACAREAPOLY); 
 			this.controller.setInSelection(false);
 			this.setGoalAchieved(false);
 			this.controller.paintLayers();
+			
 		}
 
 	}
+
+	@Override
+	public boolean save() {
+		Shape shape = controller.getShapeById(Constants.ID_EVACAREAPOLY);
+
+		if (shape instanceof PolygonShape) {
+			this.goalAchieved = controller.saveShape(shape, controller.getGripsConfigModule().getEvacuationAreaFileName());
+				
+			
+			this.controller.setGoalAchieved(this.goalAchieved);
+
+			this.saveButton.setEnabled(false);
+			if (this.goalAchieved)
+			{
+				this.controller.setUnsavedChanges(false);
+				return true;
+			}
+		}
+		return false;
+	}
+	
 
 }

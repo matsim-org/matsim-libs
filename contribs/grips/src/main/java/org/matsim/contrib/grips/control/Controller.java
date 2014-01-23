@@ -1195,6 +1195,10 @@ public class Controller {
 		else
 			return false;
 	}
+
+	public void setUnsavedChanges(boolean b) {
+		getModuleByType(this.getActiveModuleType()).setUnsavedChanges(b);
+	}
 	
 	
 }
