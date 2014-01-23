@@ -21,7 +21,6 @@ package playground.vsp.bvwp;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -36,8 +35,6 @@ class ScenarioForEvalData {
 //				values.put( id, vals ) ;
 //			}
 		}
-		
-		
 		ScenarioForEvalData createDeepCopy() {
 			ScenarioForEvalData nnn = new ScenarioForEvalData() ;
 			for ( Id id : values.keySet() ) {
@@ -47,12 +44,6 @@ class ScenarioForEvalData {
 			}
 			return nnn ;
 		}
-		void printall(){
-			for (Entry<Id,Values> e : values.entrySet()){
-				System.out.println(e.getKey()+": "+e.getValue());
-			}
-		}
-		
 		Values getByODRelation( Id id ) {
 			return values.get(id) ;
 		}

@@ -21,7 +21,6 @@ package playground.vsp.bvwp;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Formatter;
 
 import org.matsim.core.utils.io.IOUtils;
 
@@ -89,19 +88,19 @@ class Html {
 	void bvwpTableRow( String str, double n1, double n2, double p1, double p2, double d1, double d2, double u1, double u2 ) {
 		beginTableRow() ;
 		write(str) ; 
-		nextTableEntry() ; write(n1,3) ; nextTableEntry() ; write(n2,3) ; 
-		nextTableEntry() ; write(p1,3) ; nextTableEntry() ; write(p2,3) ; 
-		nextTableEntry() ; write(d1,3) ; nextTableEntry() ; write(d2,3) ; 
-		nextTableEntry() ; write(u1,3) ; nextTableEntry() ; write(u2,3) ; 
+		nextTableEntry() ; write(n1) ; nextTableEntry() ; write(n2) ; 
+		nextTableEntry() ; write(p1) ; nextTableEntry() ; write(p2) ; 
+		nextTableEntry() ; write(d1) ; nextTableEntry() ; write(d2) ; 
+		nextTableEntry() ; write(u1) ; nextTableEntry() ; write(u2) ; 
 		endTableRow() ;
 	}
 	void bvwpTableRow( String str, double n1, double n2, double p1, double p2, double d1, double d2, double u1, String u2 ) {
 		beginTableRow() ;
 		write(str) ; 
-		nextTableEntry() ; write(n1,3) ; nextTableEntry() ; write(n2,3) ; 
-		nextTableEntry() ; write(p1,3) ; nextTableEntry() ; write(p2,3) ; 
-		nextTableEntry() ; write(d1,3) ; nextTableEntry() ; write(d2,3) ; 
-		nextTableEntry() ; write(u1,3) ; nextTableEntry() ; this.beginDivRightAlign() ; write(u2) ; this.endDiv() ; 
+		nextTableEntry() ; write(n1) ; nextTableEntry() ; write(n2) ; 
+		nextTableEntry() ; write(p1) ; nextTableEntry() ; write(p2) ; 
+		nextTableEntry() ; write(d1) ; nextTableEntry() ; write(d2) ; 
+		nextTableEntry() ; write(u1) ; nextTableEntry() ; this.beginDivRightAlign() ; write(u2) ; this.endDiv() ; 
 		endTableRow() ;
 	}
 	void bvwpTableRow( String str, String n1, String n2, String p1, String p2, String d1, String d2, String u1, String u2, String zz ) {
@@ -128,13 +127,9 @@ class Html {
 	void endParagraph() {
 		myWrite("</p>\n") ;
 	}
-	
-	void write( double dbl ) {
-		myWrite( Double.toString( dbl ) ) ;
-	}
 
-	void write(double dbl, int digits ) {
-		myWrite( Double.toString( ((long)(dbl*Math.pow(10,digits)))/Math.pow(10,digits) ) ) ;
+	public void write(double dbl) {
+		myWrite( Double.toString(dbl) ) ;
 	}
 
 	private void myWrite( String str ) {
