@@ -36,7 +36,7 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
-import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
+//import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.network.NetworkUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -179,7 +179,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		}
 		
 		// cleaning up
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("Creating pt matrix took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 	
@@ -267,7 +267,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		}
 		
 		// cleaning up
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("Creating pt matrix took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 

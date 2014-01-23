@@ -90,7 +90,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		M4UConfigurationConverterV4 connector = null;
 		
 		try{
-			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("tmp");
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
@@ -128,7 +128,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		M4UConfigurationConverterV4 connector = null;
 		
 		try{
-			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("tmp");
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
@@ -153,7 +153,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertTrue(false);
 		}
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("done") ;
 	}
 	
@@ -234,7 +234,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 //			e.printStackTrace();
 //			Assert.assertTrue(false);
 //		}
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+			org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		
 	}
 

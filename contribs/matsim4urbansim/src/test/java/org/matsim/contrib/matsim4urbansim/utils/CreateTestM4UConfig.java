@@ -530,7 +530,7 @@ public class CreateTestM4UConfig {
 			String destination = this.dummyPath + "/test_config.xml";	
 			BufferedWriter bw = IOUtils.getBufferedWriter( destination );
 			
-			String xsdPath = TempDirectoryUtil.createCustomTempDirectory("xsd");
+			String xsdPath = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("xsd");
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
 			LoadFile loadFile = new LoadFile(InternalConstants.V2_MATSIM_4_URBANSIM_XSD_MATSIMORG, xsdPath, InternalConstants.V2_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
@@ -580,7 +580,7 @@ public class CreateTestM4UConfig {
 			log.info("writing test config into: " + destination ) ;
 			BufferedWriter bw = IOUtils.getBufferedWriter( destination );
 			
-			String xsdPath = TempDirectoryUtil.createCustomTempDirectory("xsd");
+			String xsdPath = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("xsd");
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
 			LoadFile loadFile = new LoadFile(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, xsdPath, InternalConstants.CURRENT_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
@@ -633,7 +633,7 @@ public class CreateTestM4UConfig {
 	 */
 	public static void main(String args[]){
 		
-		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+		String path = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("tmp");
 		CreateTestM4UConfig testConfig = new CreateTestM4UConfig(COLD_START, path);
 
 		String matsimConfiFile = testConfig.generateConfigV3();

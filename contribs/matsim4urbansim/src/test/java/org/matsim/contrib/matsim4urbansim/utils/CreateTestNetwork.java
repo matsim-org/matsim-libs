@@ -121,7 +121,7 @@ public class CreateTestNetwork {
 		 * (3)      (6)------(9)
 		 */
 		
-		String location = TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptStops.csv";
+		String location = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptStops.csv";
 		BufferedWriter bw = IOUtils.getBufferedWriter(location);
 		
 		try{
@@ -151,7 +151,7 @@ public class CreateTestNetwork {
 		
 		// set dummy travel times or distances to all possible pairs of pt stops
 		
-		String location = TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptTravelInfo.csv";
+		String location = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptTravelInfo.csv";
 		BufferedWriter bw = IOUtils.getBufferedWriter(location);
 		
 		try{

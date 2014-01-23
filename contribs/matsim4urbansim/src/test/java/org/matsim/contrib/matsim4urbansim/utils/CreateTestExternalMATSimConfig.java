@@ -319,12 +319,12 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	 */
 	public static void main(String args[]){
 		
-		String tmpPath = TempDirectoryUtil.createCustomTempDirectory("tmp");
+		String tmpPath = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("tmp");
 		
 		CreateTestExternalMATSimConfig configGenerator = new CreateTestExternalMATSimConfig(CreateTestExternalMATSimConfig.COLD_START, tmpPath);
 		System.out.println("Config stored at: " + configGenerator.generateMinimalConfig() );
 		
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 
 }

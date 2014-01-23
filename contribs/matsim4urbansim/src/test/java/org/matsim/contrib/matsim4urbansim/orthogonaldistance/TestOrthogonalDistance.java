@@ -77,7 +77,7 @@ public class TestOrthogonalDistance extends MatsimTestCase{
 				distanceFromNode2ToLink3 == 300.0 ); // the distance between node 2 to link 3 corresponds to the euclidean distance of 300 m between node 2 and the midpoint of link 3
 		
 		// cleaning up
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("Test orthogonal distances to links took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 	
@@ -125,7 +125,7 @@ public class TestOrthogonalDistance extends MatsimTestCase{
 				doubleDistanceFromNode5ToNode1_Link1 == 625.0 ); // euclidean walking distance to node 1 = 625 m; no driving necessary
 			
 		// cleaning up
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("Test orthogonal distances to nodes took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
 		

@@ -44,14 +44,14 @@ public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 	 * correctly converted into standard MATSim format and that all values are recognized correctly
 	 */
 	@Test
-	@Ignore
+	//@Ignore // found this as ignored as of 22/jan/14. kai
 	public void testLoadDefaultMATSim4UrbanSimWithExternalConfigFile(){
 		
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 connector = null;
 		
 		try{
-			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
+			String path = org.matsim.contrib.accessibility.utils.TempDirectoryUtil.createCustomTempDirectory("tmp");
 			
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
@@ -79,7 +79,7 @@ public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertFalse(true);
 		}
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		org.matsim.contrib.accessibility.utils.TempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 
 }
