@@ -79,7 +79,7 @@ public class ReRoutingTest extends MatsimTestCase {
 	/**
 	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
 	 */
-	public void testReRouting() {
+	public void testReRoutingAStarLandmarks() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 		TestControler controler = new TestControler(scenario);
@@ -88,8 +88,8 @@ public class ReRoutingTest extends MatsimTestCase {
 		controler.run();
 		this.evaluate();
 	}
-	
-	public void testReRoutingFast() {
+
+	public void testReRoutingFastAStarLandmarks() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
 		TestControler controler = new TestControler(scenario);
