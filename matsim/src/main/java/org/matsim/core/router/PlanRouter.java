@@ -21,6 +21,9 @@ package org.matsim.core.router;
 
 import java.util.List;
 
+import org.apache.log4j.* ;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -29,6 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -42,8 +46,14 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author thibautd
  */
 public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
+	static private Logger log = Logger.getLogger(PlanRouter.class) ;
+	
 	private final TripRouter routingHandler;
 	private final ActivityFacilities facilities;
+	/**
+	 * may work.  but I don't know how to get configuration info into this class in a reliable way.  kai, jan'14
+	 */
+	private boolean memorizingVehicles = false ;
 
 	/**
 	 * Initialises an instance.
@@ -83,6 +93,25 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		final List<Trip> trips = TripStructureUtils.getTrips( plan , routingHandler.getStageActivityTypes() );
 
 		for (Trip trip : trips) {
+			
+			Id vehId = null ;
+			if ( memorizingVehicles ) {
+				for ( Leg leg : trip.getLegsOnly() ) {
+					if ( leg.getRoute()!=null && leg.getRoute() instanceof NetworkRoute ) {
+						Id id = ((NetworkRoute)leg.getRoute()).getVehicleId() ;
+						if ( id != null ) {
+							if ( vehId==null ) {
+								vehId=id ;
+							} else if (vehId.equals(id)) {
+								// ok, do nothing
+							} else {
+								log.warn("trip is using more than one vehicle; needs to be implemented ...") ;
+							}
+						}
+					}
+				}
+			}
+			
 			final List<? extends PlanElement> newTrip =
 				routingHandler.calcRoute(
 						routingHandler.getMainModeIdentifier().identifyMainMode( trip.getTripElements() ),
@@ -90,6 +119,20 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 						toFacility( trip.getDestinationActivity() ),
 						calcEndOfActivity( trip.getOriginActivity() , plan ),
 						plan.getPerson() );
+			
+			if (memorizingVehicles){
+				for ( Leg leg : TripStructureUtils.getLegs( newTrip ) ) {
+					if ( leg.getRoute()!=null && leg.getRoute() instanceof NetworkRoute ) {
+						final NetworkRoute networkRoute = (NetworkRoute)leg.getRoute();
+						Id id = networkRoute.getVehicleId() ;
+						if ( id!=null && id.equals(vehId) ) {
+							log.warn( "router assigned new vehicle to route; don't know how to handle that ") ;
+						} else {
+							networkRoute.setVehicleId(vehId);
+						}
+					}
+				}
+			}
 
 			TripRouter.insertTrip(
 					plan, 
@@ -165,6 +208,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		}
 		double tt = ((Leg) pe).getTravelTime();
 		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
-	}	
+	}
+
 }
 
