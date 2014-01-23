@@ -324,7 +324,7 @@ public class QSimTest {
 	public void testSingleAgent_EmptyRoute() {
 		Fixture f = new Fixture();
 
-		// add a single person with leg from link1 to link3
+		// add a single person with leg from link1 to link1
 		PersonImpl person = new PersonImpl(new IdImpl(0));
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
@@ -363,6 +363,63 @@ public class QSimTest {
 		Assert.assertEquals("wrong link in 2nd event.", f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId());
 		Assert.assertEquals("wrong link in 3rd event.", f.link1.getId(), ((PersonArrivalEvent) allEvents.get(2)).getLinkId());
 		Assert.assertEquals("wrong link in 4th event.", f.link1.getId(), ((ActivityStartEvent) allEvents.get(3)).getLinkId());
+	}
+
+	/**
+	 * Simulates a single agent whose route ends on a link that is actually a loop link.
+	 * Yes, this can happen in real scenarios.
+	 *
+	 * @author mrieser
+	 */
+	@Test
+	public void testSingleAgent_LastLinkIsLoop() {
+		Fixture f = new Fixture();
+		Link loopLink = f.network.createAndAddLink(new IdImpl("loop"), f.node4, f.node4, 100.0, 10.0, 500, 1);
+
+		// add a single person with leg from link1 to loop-link
+		PersonImpl person = new PersonImpl(new IdImpl(0));
+		PlanImpl plan = person.createAndAddPlan(true);
+		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
+		a1.setEndTime(6*3600);
+		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), loopLink.getId());
+		ArrayList<Id> links = new ArrayList<Id>();
+		links.add(f.link2.getId());
+		links.add(f.link3.getId());
+		route.setLinkIds(f.link1.getId(), links, loopLink.getId());
+		leg.setRoute(route);
+		plan.createAndAddActivity("w", loopLink.getId());
+		f.plans.addPerson(person);
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		EventsCollector collector = new EventsCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		f.config.qsim().setEndTime(7*3600);
+		QSim sim = createQSim(f, events);
+		sim.run();
+
+		/* finish */
+		List<Event> allEvents = collector.getEvents();
+		for (Event event : allEvents) {
+			System.out.println(event);
+		}
+		Assert.assertEquals("wrong number of events.", 13, allEvents.size());
+		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
+		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
+		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
+		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link 1
+		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link 2
+		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
+		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(7).getClass()); // link 3
+		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(8).getClass());
+		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(9).getClass()); // loop link
+		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(10).getClass());
+		Assert.assertEquals("wrong type of 11th event.", PersonArrivalEvent.class, allEvents.get(11).getClass());
+		Assert.assertEquals("wrong type of 12th event.", ActivityStartEvent.class, allEvents.get(12).getClass());
 	}
 
 	/*package*/ static class LinkEnterEventCollector implements LinkEnterEventHandler {

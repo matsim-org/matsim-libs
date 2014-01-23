@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -192,6 +191,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 			// we have no more information for the route, so the next link should be the destination link
 			Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
 			Link destinationLink = this.simulation.getScenario().getNetwork().getLinks().get(this.cachedDestinationLinkId);
+			if (currentLink == destinationLink && this.currentLinkIdIndex > this.cachedRouteLinkIds.size()) {
+				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
+				return null;
+			}
 			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
 				this.cachedNextLinkId = destinationLink.getId();
 				return this.cachedNextLinkId;
