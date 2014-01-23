@@ -109,6 +109,9 @@ public class PSimPlanStrategyTranslationAndRegistration {
 		compatibleStrategies.add("SubtourModeChoice");
 		controler.getMATSimControler().addPlanStrategyFactory("SubtourModeChoicePSim",
 				new PSimSubtourModeChoiceStrategyFactory(controler));
+		compatibleStrategies.add("TripSubtourModeChoice");
+		controler.getMATSimControler().addPlanStrategyFactory("TripSubtourModeChoicePSim",
+				new PSimTripSubtourModeChoiceStrategyFactory(controler));
 		compatibleStrategies.add("DoNothing");
 		controler.getMATSimControler().addPlanStrategyFactory("DoNothingPSim",
 				new PSimDoNothingPlanStrategyFactory(controler));

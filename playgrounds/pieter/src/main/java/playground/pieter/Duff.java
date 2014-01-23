@@ -35,24 +35,24 @@ public class Duff {
 		DataBaseAdmin dba = new DataBaseAdmin(new File("f:/data/matsim2postgres.properties"));
 		// need to update the transit stop ids so they are consistent with LTA
 		// list
-		String update = "		UPDATE " + "a_nea.matsim_trips_nea"
+		String update = "		UPDATE " + "u_sergioo.matsim_trips_realsched_m2plans"
 				+ " SET boarding_stop = matsim_to_transitstops_lookup.stop_id "
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE boarding_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		update = "		UPDATE "
-				+ "a_nea.matsim_trips_nea"
+				+ "u_sergioo.matsim_trips_realsched_m2plans"
 				+ " SET alighting_stop = matsim_to_transitstops_lookup.stop_id "
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
-		update = "		UPDATE " + "a_nea.matsim_journeys_nea"
+		update = "		UPDATE " + "u_sergioo.matsim_journeys_realsched_m2plans"
 				+ " SET first_boarding_stop = matsim_to_transitstops_lookup.stop_id "
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE first_boarding_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		update = "		UPDATE "
-				+ "a_nea.matsim_journeys_nea"
+				+ "u_sergioo.matsim_journeys_realsched_m2plans"
 				+ " SET last_alighting_stop = matsim_to_transitstops_lookup.stop_id "
 				+ " FROM m_calibration.matsim_to_transitstops_lookup "
 				+ " WHERE last_alighting_stop = matsim_stop ";
@@ -60,14 +60,14 @@ public class Duff {
 
 		HashMap<String, String[]> idxNames = new HashMap<String, String[]>();
 		String[] idx1 = { "person_id", "facility_id", "type" };
-		idxNames.put("a_nea.matsim_activities_nea", idx1);
+		idxNames.put("u_sergioo.matsim_activities_realsched_m2plans", idx1);
 		String[] idx2 = { "person_id", "from_act", "to_act", "main_mode" };
-		idxNames.put("a_nea.matsim_journeys_nea", idx2);
+		idxNames.put("u_sergioo.matsim_journeys_realsched_m2plans", idx2);
 		String[] idx3 = { "journey_id", "mode", "line", "route",
 				"boarding_stop", "alighting_stop" };
-		idxNames.put("a_nea.matsim_trips_nea", idx3);
+		idxNames.put("u_sergioo.matsim_trips_realsched_m2plans", idx3);
 		String[] idx4 = { "journey_id", "from_trip", "to_trip" };
-		idxNames.put("a_nea.matsim_transfers_nea", idx4);
+		idxNames.put("u_sergioo.matsim_transfers_realsched_m2plans", idx4);
 		for (Entry<String, String[]> entry : idxNames.entrySet()) {
 			String tableName = entry.getKey();
 			String[] columnNames = entry.getValue();

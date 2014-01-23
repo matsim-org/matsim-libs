@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -11,6 +12,8 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
+import org.matsim.pt.router.TransitRouterFactory;
 
 import playground.pieter.pseudosimulation.controler.listeners.AfterScoringSelectedPlanScoreRestoreListener;
 import playground.pieter.pseudosimulation.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
@@ -20,6 +23,7 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
 import playground.pieter.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
 
@@ -163,6 +167,24 @@ public class PSimControler {
 
 	public PSimTravelTimeCalculator getCarTravelTimeCalculator() {
 		return carTravelTimeCalculator;
+	}
+
+
+	public void setTransitRouterFactory(TransitRouterFactory transitRouterFactory) {
+		this.matsimControler.setTransitRouterFactory(transitRouterFactory);
+		
+	}
+
+
+	public Scenario getScenario() {
+		return matsimControler.getScenario();
+	}
+
+
+	public void setScoringFunctionFactory(
+			CharyparNagelOpenTimesScoringFunctionFactory charyparNagelOpenTimesScoringFunctionFactory) {
+		this.matsimControler.setScoringFunctionFactory(charyparNagelOpenTimesScoringFunctionFactory);
+		
 	}
 
 
