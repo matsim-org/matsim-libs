@@ -33,14 +33,14 @@ import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
+import playground.thibautd.initialdemandgeneration.socnetgen.framework.LockedSocialNetwork;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIteratorFileListener;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIterator;
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialNetwork;
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialNetworkWriter;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ThresholdFunction;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.UtilityFunction;
+import playground.thibautd.socnetsim.population.SocialNetworkWriter;
 import playground.thibautd.utils.MoreIOUtils;
 import playground.thibautd.utils.ObjectPool;
 
@@ -103,7 +103,7 @@ public class RunTRBModel {
 		final ModelIterator modelIterator = new ModelIterator();
 		final ModelIteratorFileListener listener = new ModelIteratorFileListener( outputDirectory+"/thresholdEvolution.dat" );
 		//modelIterator.addListener( listener );
-		final SocialNetwork network =
+		final LockedSocialNetwork network =
 			modelIterator.iterateModelToTarget(
 				runner,
 				population,
@@ -112,7 +112,7 @@ public class RunTRBModel {
 				2);
 		listener.close();
 
-		new SocialNetworkWriter().write( outputDirectory+"/social-network.xml.gz" , network );
+		new SocialNetworkWriter( network ).write( outputDirectory+"/social-network.xml.gz" );
 
 		MoreIOUtils.closeOutputDirLogging();
 	}

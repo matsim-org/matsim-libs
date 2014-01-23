@@ -38,7 +38,7 @@ public interface SocialNetwork {
 	 */
 	public abstract void addEgo(Id id);
 
-	public abstract void addEgos(Iterable<Id> ids);
+	public abstract void addEgos(Iterable<? extends Id> ids);
 
 	public abstract void addBidirectionalTie(Id id1, Id id2);
 

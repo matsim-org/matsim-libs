@@ -36,7 +36,7 @@ import org.matsim.core.basic.v01.IdImpl;
 public class SocialNetworkTest {
 	@Test
 	public void testAddTie() {
-		final SocialNetwork testee = new SocialNetwork( false );
+		final LockedSocialNetwork testee = new LockedSocialNetwork( false );
 
 		final Id id1 = new IdImpl( 1 );
 		final Id id2 = new IdImpl( 2 );
@@ -64,7 +64,7 @@ public class SocialNetworkTest {
 		final Random random = new Random( 9548756 );
 
 		for ( int i=0; i < 100; i++ ) {
-			final SocialNetwork net = createRandomNetwork( random );
+			final LockedSocialNetwork net = createRandomNetwork( random );
 
 			for ( Id ego : net.getEgos() ) {
 				for ( Id alter : net.getAlters( ego ) ) {
@@ -76,15 +76,15 @@ public class SocialNetworkTest {
 		}
 	}
 
-	private static SocialNetwork createRandomNetwork(final Random random) {
+	private static LockedSocialNetwork createRandomNetwork(final Random random) {
 		final List<Id> ids = new ArrayList<Id>();
 
 		for ( int i=0; i < 100 ; i++ ) {
 			ids.add( new IdImpl( i ) );
 		}
 
-		final SocialNetwork net = new SocialNetwork();
-		net.addEgoIds( ids );
+		final LockedSocialNetwork net = new LockedSocialNetwork();
+		net.addEgos( ids );
 		for ( Id ego : ids ) {
 			for ( Id alter : ids ) {
 				if ( alter == ego ) continue;

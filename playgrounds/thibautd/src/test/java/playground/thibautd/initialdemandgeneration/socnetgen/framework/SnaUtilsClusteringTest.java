@@ -40,12 +40,12 @@ public class SnaUtilsClusteringTest {
 	// /////////////////////////////////////////////////////////////////////////
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 	private static class Fixture {
-		public final SocialNetwork socialNetwork;
+		public final LockedSocialNetwork socialNetwork;
 		public final double clusteringIndex;
 		public final double avgNetworkSize;
 
 		public Fixture(
-				final SocialNetwork socialNetwork,
+				final LockedSocialNetwork socialNetwork,
 				final double clusteringIndex,
 				final double avgNetworkSize) {
 			this.socialNetwork = socialNetwork;
@@ -62,7 +62,7 @@ public class SnaUtilsClusteringTest {
 	@Before
 	public void createArentzeFixture() {
 		// example from the paper
-		final SocialNetwork net = new SocialNetwork( false );
+		final LockedSocialNetwork net = new LockedSocialNetwork( false );
 
 		// ids
 		final Id id1 = new IdImpl( 1 );
@@ -107,7 +107,7 @@ public class SnaUtilsClusteringTest {
 		// | \/ |  | \/ |
 		// | /\ |  | /\ |
 		// 4 -- 3  8 -- 7
-		final SocialNetwork net = new SocialNetwork( false );
+		final LockedSocialNetwork net = new LockedSocialNetwork( false );
 
 		// ids
 		final Id id1 = new IdImpl( 1 );
@@ -145,7 +145,7 @@ public class SnaUtilsClusteringTest {
 		// 1 -- 2  5    6
 		//
 		// 4 -- 3  8    7
-		final SocialNetwork net = new SocialNetwork( false );
+		final LockedSocialNetwork net = new LockedSocialNetwork( false );
 
 		// ids
 		final Id id1 = new IdImpl( 1 );

@@ -55,13 +55,13 @@ public class ModelIterator {
 		listeners.add( l );
 	}
 
-	public <T extends Agent> SocialNetwork iterateModelToTarget(
+	public <T extends Agent> LockedSocialNetwork iterateModelToTarget(
 			final ModelRunner<T> runner,
 			final SocialPopulation<T> population,
 			final double targetAvgPersonalNetSize,
 			final double targetClusteringCoeficient,
 			final int iterations) {
-		SocialNetwork network = runner.run( population );
+		LockedSocialNetwork network = runner.run( population );
 
 		notifyNewState( runner.getThresholds() , network , -1 , -1 );
 		for ( int i = 0; i < iterations; i++ ) {
@@ -80,12 +80,12 @@ public class ModelIterator {
 		return network;
 	}
 
-	private <T extends Agent> SocialNetwork convergePrimary(
-			final SocialNetwork initialNetwork,
+	private <T extends Agent> LockedSocialNetwork convergePrimary(
+			final LockedSocialNetwork initialNetwork,
 			final ModelRunner<T> runner,
 			final SocialPopulation<T> population,
 			final double target) {
-		SocialNetwork currentbest = initialNetwork;
+		LockedSocialNetwork currentbest = initialNetwork;
 		double bestNetSize = SnaUtils.calcAveragePersonalNetworkSize( initialNetwork );
 		double bestThreshold = runner.getThresholds().getPrimaryTieThreshold();
 
@@ -102,7 +102,7 @@ public class ModelIterator {
 			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setPrimaryTieThreshold( newThreshold );
 
-			final SocialNetwork newNetPrimary = runner.runPrimary( population );
+			final LockedSocialNetwork newNetPrimary = runner.runPrimary( population );
 			final double newNetPrimarySize = SnaUtils.calcAveragePersonalNetworkSize( newNetPrimary );
 			if ( newNetPrimarySize > target &&
 				Math.abs( target - bestNetSize ) <= Math.abs( target - newNetPrimarySize ) ) {
@@ -112,7 +112,7 @@ public class ModelIterator {
 				continue;
 			}
 
-			final SocialNetwork newNet = runner.runSecondary( newNetPrimary , population );
+			final LockedSocialNetwork newNet = runner.runSecondary( newNetPrimary , population );
 			final double newNetSize = SnaUtils.calcAveragePersonalNetworkSize( newNet );
 			notifyNewState( runner.getThresholds() , newNet , newNetSize , -1 );
 			if ( Math.abs( target - bestNetSize ) > Math.abs( target - newNetSize ) ) {
@@ -133,7 +133,7 @@ public class ModelIterator {
 
 	private void notifyNewState(
 			final ThresholdFunction thresholds,
-			final SocialNetwork newNet,
+			final LockedSocialNetwork newNet,
 			final double newNetSize,
 			final double newClusteringCoef) {
 		if ( listeners.isEmpty() ) return;
@@ -145,12 +145,12 @@ public class ModelIterator {
 		}
 	}
 
-	private <T extends Agent> SocialNetwork convergeSecondary(
-			final SocialNetwork initialNetwork,
+	private <T extends Agent> LockedSocialNetwork convergeSecondary(
+			final LockedSocialNetwork initialNetwork,
 			final ModelRunner<T> runner,
 			final SocialPopulation<T> population,
 			final double target) {
-		SocialNetwork currentbest = initialNetwork;
+		LockedSocialNetwork currentbest = initialNetwork;
 		double bestClustering = SnaUtils.calcClusteringCoefficient( initialNetwork );
 		// adaptive threshold assumes decreasing stat with threshold
 		double bestThreshold = -runner.getThresholds().getSecondaryReduction();
@@ -164,13 +164,13 @@ public class ModelIterator {
 			bestClustering );
 
 		// this is stable: only compute once
-		final SocialNetwork primaryNetwork = runner.runPrimary( population );
+		final LockedSocialNetwork primaryNetwork = runner.runPrimary( population );
 		while ( adaptiveThreshold.continueSearch() &&
 				continueBasedOnStat( target , bestClustering , PRECISION_SECONDARY ) ) {
 			final double newThreshold = adaptiveThreshold.newThreshold();
 			runner.getThresholds().setSecondaryReduction( -newThreshold );
 
-			final SocialNetwork newNet = runner.runSecondary( primaryNetwork , population );
+			final LockedSocialNetwork newNet = runner.runSecondary( primaryNetwork , population );
 			double newClustering = SnaUtils.calcClusteringCoefficient( newNet );
 			notifyNewState( runner.getThresholds() , newNet , -1 , newClustering );
 			if ( Math.abs( target - bestClustering ) >= Math.abs( target - newClustering ) ) {

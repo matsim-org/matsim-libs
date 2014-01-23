@@ -32,51 +32,53 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.thibautd.socnetsim.population.SocialNetwork;
+
 /**
  * @author thibautd
  */
-public class SocialNetwork {
+public class LockedSocialNetwork implements SocialNetwork {
 	private static final Logger log =
-		Logger.getLogger(SocialNetwork.class);
+		Logger.getLogger(LockedSocialNetwork.class);
 
 	private final Map<Id, Set<Id>> alterEgoMap;
 	private final boolean failOnUnknownEgo;
 	private boolean locked = false;
 
 	// mainly to simplify writing tests
-	public SocialNetwork( final boolean failOnUnknownEgo ) {
+	public LockedSocialNetwork( final boolean failOnUnknownEgo ) {
 		this( failOnUnknownEgo,
 				new LinkedHashMap<Id, Set<Id>>() );
 	}
 
-	private SocialNetwork( final boolean failOnUnknownEgo , final Map<Id, Set<Id>> map ) {
+	private LockedSocialNetwork( final boolean failOnUnknownEgo , final Map<Id, Set<Id>> map ) {
 		this.failOnUnknownEgo = failOnUnknownEgo;
 		this.alterEgoMap = map;
 	}
 
-	private SocialNetwork(
+	private LockedSocialNetwork(
 			final int initialCap,
 			final float loadFactor) {
 		this( true , new LinkedHashMap<Id, Set<Id>>( initialCap , loadFactor ) );
 	}
 
-	public SocialNetwork() {
+	public LockedSocialNetwork() {
 		this( true );
 	}
 
-	public SocialNetwork(final SocialPopulation<?> pop) {
+	public LockedSocialNetwork(final SocialPopulation<?> pop) {
 		this( pop.getAgents() );
 	}
 
-	public SocialNetwork(final SocialNetwork toCopy) {
+	public LockedSocialNetwork(final LockedSocialNetwork toCopy) {
 		this( toCopy.failOnUnknownEgo,
 			new LinkedHashMap<Id, Set<Id>>( toCopy.alterEgoMap ) );
 	}
 
-	public SocialNetwork(final Collection<? extends Identifiable> egos) {
+	public LockedSocialNetwork(final Collection<? extends Identifiable> egos) {
 		// make the map big to avoid collisions
 		this( egos.size() * 2 , 0.5f ); 
-		addEgos( egos );
+		addEgosObjects( egos );
 	}
 
 	public void lock() {
@@ -93,16 +95,18 @@ public class SocialNetwork {
 		addAlter( id2 , id1 );
 	}
 
-	public void addEgos(final Iterable<? extends Identifiable> egos) {
+	public void addEgosObjects(final Iterable<? extends Identifiable> egos) {
 		if ( locked ) throw new IllegalStateException();
 		for ( Identifiable ego : egos ) addEgo( ego.getId() );
 	}
 
-	public void addEgoIds(final Iterable<? extends Id> ids) {
+	@Override
+	public void addEgos(final Iterable<? extends Id> ids) {
 		if ( locked ) throw new IllegalStateException();
 		for ( Id id : ids ) addEgo( id );
 	}
 
+	@Override
 	public void addEgo(final Id id) {
 		if ( locked ) throw new IllegalStateException();
 		if ( !alterEgoMap.containsKey( id ) ) {
@@ -127,6 +131,7 @@ public class SocialNetwork {
 		alters.add( alter );
 	}
 
+	@Override
 	public Set<Id> getAlters(final Id ego) {
 		final Set<Id> alters = alterEgoMap.get( ego );
 
@@ -135,12 +140,13 @@ public class SocialNetwork {
 			Collections.<Id>emptySet();
 	}
 
+	@Override
 	public Set<Id> getEgos() {
 		return Collections.unmodifiableSet( alterEgoMap.keySet() );
 	}
 
-	private SocialNetwork secondaryNetwork = null;
-	public SocialNetwork getNetworkOfUnknownFriendsOfFriends() {
+	private LockedSocialNetwork secondaryNetwork = null;
+	public LockedSocialNetwork getNetworkOfUnknownFriendsOfFriends() {
 		if ( !locked ) {
 			log.warn( "getting the network of secondary ties has the side effect of locking the primary network" );
 			lock();
@@ -151,8 +157,8 @@ public class SocialNetwork {
 
 	private void buildSecondaryNetwork() {
 		final Counter counter = new Counter( "search secondary friends of agent # ");
-		secondaryNetwork = new SocialNetwork( getEgos().size() * 2 , 0.5f );
-		secondaryNetwork.addEgoIds( getEgos() );
+		secondaryNetwork = new LockedSocialNetwork( getEgos().size() * 2 , 0.5f );
+		secondaryNetwork.addEgos( getEgos() );
 
 		for ( Id ego : getEgos() ) {
 			final Set<Id> alters = getAlters( ego );
@@ -174,6 +180,26 @@ public class SocialNetwork {
 		counter.printCounter();
 
 		secondaryNetwork.lock();
+	}
+
+	@Override
+	public void addBidirectionalTie(Id id1, Id id2) {
+		addTie( id1 , id2 );
+	}
+
+	@Override
+	public void addMonodirectionalTie(Id ego, Id alter) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Map<Id, Set<Id>> getMapRepresentation() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean isReflective() {
+		return true;
 	}
 }
 

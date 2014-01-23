@@ -31,7 +31,7 @@ public class SnaUtils {
 	private SnaUtils() {}
 
 	public static double calcClusteringCoefficient(
-			final SocialNetwork socialNetwork) {
+			final LockedSocialNetwork socialNetwork) {
 		int nTriples = 0;
 		int nTriangles = 0;
 		for ( Id ego : socialNetwork.getEgos() ) {
@@ -58,7 +58,7 @@ public class SnaUtils {
 		return nTriples > 0 ? (1d * nTriangles) / nTriples : 0;
 	}
 
-	public static double calcAveragePersonalNetworkSize(final SocialNetwork socialNetwork) {
+	public static double calcAveragePersonalNetworkSize(final LockedSocialNetwork socialNetwork) {
 		int count = 0;
 		int sum = 0;
 		for ( Id ego : socialNetwork.getEgos() ) {

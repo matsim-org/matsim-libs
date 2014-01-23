@@ -75,7 +75,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#addEgos(java.lang.Iterable)
 	 */
 	@Override
-	public void addEgos( final Iterable<Id> ids ) {
+	public void addEgos( final Iterable<? extends Id> ids ) {
 		for ( Id id : ids ) addEgo( id );
 	}
 

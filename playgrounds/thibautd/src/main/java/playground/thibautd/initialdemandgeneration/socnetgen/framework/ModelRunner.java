@@ -77,11 +77,11 @@ public class ModelRunner<T extends Agent> {
 	// /////////////////////////////////////////////////////////////////////////
 	// run
 	// /////////////////////////////////////////////////////////////////////////
-	public SocialNetwork run(final SocialPopulation<T> population) {
+	public LockedSocialNetwork run(final SocialPopulation<T> population) {
 		if ( utilityFunction == null || thresholds == null ) {
 			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
 		}
-		final SocialNetwork primaryNetwork = runPrimary( population );
+		final LockedSocialNetwork primaryNetwork = runPrimary( population );
 
 		try {
 			return runSecondary( primaryNetwork , population , Long.MAX_VALUE );
@@ -91,12 +91,12 @@ public class ModelRunner<T extends Agent> {
 		}
 	}
 
-	public SocialNetwork runPrimary(final SocialPopulation<T> population) {
+	public LockedSocialNetwork runPrimary(final SocialPopulation<T> population) {
 		if ( utilityFunction == null || thresholds == null ) {
 			throw new IllegalStateException( "utility="+utilityFunction+"; thresholds="+thresholds );
 		}
 		final Random random = new Random( randomSeed );
-		final SocialNetwork network = new SocialNetwork( population );
+		final LockedSocialNetwork network = new LockedSocialNetwork( population );
 
 		log.info( "create primary ties using step size "+stepSizePrimary );
 		final List<T> remainingAgents = new ArrayList<T>( population.getAgents() );
@@ -126,8 +126,8 @@ public class ModelRunner<T extends Agent> {
 		return network;
 	}
 
-	public SocialNetwork runSecondary(
-			final SocialNetwork primaryNetwork,
+	public LockedSocialNetwork runSecondary(
+			final LockedSocialNetwork primaryNetwork,
 			final SocialPopulation<T> population,
 			final long maxNSecondaryTies) throws SecondaryTieLimitExceededException {
 		if ( utilityFunction == null || thresholds == null ) {
@@ -136,7 +136,7 @@ public class ModelRunner<T extends Agent> {
 
 		primaryNetwork.lock();
 		final Random random = new Random( randomSeed + 20140107 );
-		final SocialNetwork network = new SocialNetwork( primaryNetwork );
+		final LockedSocialNetwork network = new LockedSocialNetwork( primaryNetwork );
 
 		log.info( "create secondary ties using step size "+stepSizeSecondary );
 		final Map<Id, T> remainingAgents = new LinkedHashMap<Id, T>( population.getAgentsMap() );
@@ -190,8 +190,8 @@ public class ModelRunner<T extends Agent> {
 		return network;
 	}
 
-	public SocialNetwork runSecondary(
-			final SocialNetwork primaryNetwork,
+	public LockedSocialNetwork runSecondary(
+			final LockedSocialNetwork primaryNetwork,
 			final SocialPopulation<T> population) {
 		try {
 			return runSecondary( primaryNetwork , population , Long.MAX_VALUE );
@@ -204,7 +204,7 @@ public class ModelRunner<T extends Agent> {
 	// package visible for tests
 	final static <T extends Agent> List<T> getUnknownFriendsOfFriends(
 			final T ego,
-			final SocialNetwork network,
+			final LockedSocialNetwork network,
 			final Map<Id, T> remainingAgents) {
 		final Set<Id> allSecondary = network.getNetworkOfUnknownFriendsOfFriends().getAlters( ego.getId() );
 		final List<T> list = new ArrayList<T>( allSecondary.size() );
@@ -233,13 +233,13 @@ public class ModelRunner<T extends Agent> {
 
 	public static class SecondaryTieLimitExceededException extends Exception {
 		private static final long serialVersionUID = -3209753011944061999L;
-		private final SocialNetwork sn;
+		private final LockedSocialNetwork sn;
 
-		public SecondaryTieLimitExceededException(final SocialNetwork sn) {
+		public SecondaryTieLimitExceededException(final LockedSocialNetwork sn) {
 			this.sn = sn;
 		}
 
-		public SocialNetwork getSocialNetworkAtAbort() {
+		public LockedSocialNetwork getSocialNetworkAtAbort() {
 			return sn;
 		}
 	}
