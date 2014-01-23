@@ -25,8 +25,8 @@ package org.matsim.contrib.matsim4urbansim.utils;
 import java.math.BigInteger;
 
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;

@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
+import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.LoadFile;
 import org.matsim.contrib.matsim4urbansim.utils.securitymanager.ExitException;

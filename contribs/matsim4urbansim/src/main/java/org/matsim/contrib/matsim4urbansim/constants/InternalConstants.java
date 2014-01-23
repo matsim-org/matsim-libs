@@ -32,47 +32,9 @@ import org.apache.log4j.Logger;
  */
 public class InternalConstants {
 	
-	// logger
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(InternalConstants.class);
 	
-	/** important system environments */
-//	private static String OPUS_HOME;
-//	private static String OPUS_DATA_PATH;
-	
-	/** subdirectories in OPUS_HOME */
-//	public static String MATSIM_4_OPUS; 		// OPUS_HOME/matsim4opus/
-//	public static String MATSIM_4_OPUS_CONFIG;	// OPUS_HOME/matsim4opus/matsim_config/
-//	public static String MATSIM_4_OPUS_OUTPUT;	// OPUS_HOME/matsim4opus/output/
-//	public static String MATSIM_4_OPUS_TEMP;	// OPUS_HOME/matsim4opus/tmp/
-//	public static String MATSIM_4_OPUS_BACKUP;	// OPUS_HOME/matsim4opus/backup
-	
-	/**
-	 * Apply a new root path for the OPUS_HOME directory
-	 * @param opusHome path to the new OPUS_HOME Directory
-	 */
-//	public static void setOpusHomeDirectory(String opusHome){
-//		
-//		if(!opusHome.endsWith("/"))
-//			opusHome += "/";
-//		
-//		setOPUS_HOME(opusHome);
-//		OPUS_DATA_PATH = opusHome+"data/";
-////		MATSIM_4_OPUS = opusHome+"opus_matsim/";
-////		MATSIM_4_OPUS_CONFIG = opusHome+"opus_matsim/matsim_config/";
-////		MATSIM_4_OPUS_OUTPUT = opusHome+"opus_matsim/output/";
-////		MATSIM_4_OPUS_TEMP = opusHome+"opus_matsim/tmp/";
-////		MATSIM_4_OPUS_BACKUP = opusHome+"opus_matsim/backup/";
-//
-//	}
-//	
-//	public static void setOPUS_HOME(String opusHOME) {
-//		OPUS_HOME = opusHOME;
-//	}
-//	public static String getOPUS_HOME() {
-//		return OPUS_HOME;
-//	}
-
 	/** subdirectories in MATSim */
 	public static final String MATSIM_WORKING_DIRECTORY = System.getProperty("user.dir");
 	
@@ -90,7 +52,6 @@ public class InternalConstants {
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";
 	public static final String TAB = "\t";
-	public static final String NEW_LINE	= "\r\n";
 	public static final String PERSON_ID = "person_id";
 	public static final String JOB_ID = "job_id";
 	public static final String PARCEL_ID = "parcel_id";

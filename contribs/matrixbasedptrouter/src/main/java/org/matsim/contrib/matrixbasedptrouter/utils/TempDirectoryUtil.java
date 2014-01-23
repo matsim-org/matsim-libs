@@ -21,7 +21,7 @@
 /**
  * 
  */
-package org.matsim.contrib.accessibility.utils;
+package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import java.io.File;
 import java.io.IOException;

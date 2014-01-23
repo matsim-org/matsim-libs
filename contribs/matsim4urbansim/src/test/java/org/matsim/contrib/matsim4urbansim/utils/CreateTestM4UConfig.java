@@ -38,7 +38,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
+import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.AccessibilityParameterType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.ConfigType;
@@ -81,7 +81,7 @@ public class CreateTestM4UConfig {
 	public String inputPlansFileName 						= "";
 	public String hotstartPlansFileName						= "";
 	public BigInteger firstIteration					= new BigInteger("0");
-	public BigInteger lastIteration						= new BigInteger("1");
+	public BigInteger lastIteration						= new BigInteger("100");
 	public String activityType_0						= "home";
 	public String activityType_1						= "work";
 	public BigInteger homeActivityTypicalDuration		= new BigInteger("43200");	

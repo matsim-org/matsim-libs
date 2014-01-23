@@ -97,16 +97,16 @@ public class OPUSDirectoryUtil {
 //			deleteDirectory(tempFile);
 		tempFile = new File(module.getMATSim4Opus());
 		if(tempFile.exists())
-			org.matsim.contrib.accessibility.utils.TempDirectoryUtil.deleteDirectory(tempFile);
+			org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil.deleteDirectory(tempFile);
 		tempFile = new File(module.getMATSim4OpusOutput());
 		if(tempFile.exists())
-			org.matsim.contrib.accessibility.utils.TempDirectoryUtil.deleteDirectory(tempFile);
+			org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil.deleteDirectory(tempFile);
 		tempFile = new File(module.getMATSim4OpusTemp());
 		if(tempFile.exists())
-			org.matsim.contrib.accessibility.utils.TempDirectoryUtil.deleteDirectory(tempFile);
+			org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil.deleteDirectory(tempFile);
 		tempFile = new File(module.getMATSim4OpusConfig());
 		if(tempFile.exists())
-			org.matsim.contrib.accessibility.utils.TempDirectoryUtil.deleteDirectory(tempFile);	
+			org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil.deleteDirectory(tempFile);	
 		log.info("Finished removing temp directories");
 	}
 

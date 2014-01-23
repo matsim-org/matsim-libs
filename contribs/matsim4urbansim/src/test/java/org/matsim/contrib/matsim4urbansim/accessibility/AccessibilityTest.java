@@ -70,8 +70,6 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		@Test
 //	@Ignore // found this with "ignore" on 19/jan/2014. ??? kai
 	public void testGridBasedAccessibilityMeasure(){
-			OutputDirectoryLogging.catchLogEntries();		
-			// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
 
 		//create local temp directory
 		String path = utils.getOutputDirectory();

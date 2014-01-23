@@ -501,6 +501,8 @@ public abstract class AccessibilityControlerListenerImpl {
 						ptAccessibility	 = inverseOfLogitScaleParameter * Math.log( gcs.getPtSum() );
 				}
 				else{ 				// get raw sum
+					// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
+					// a * ln(b) = ln( b^a ).  kai, jan'14
 					if(this.useFreeSpeedGrid)
 						freeSpeedAccessibility = inverseOfLogitScaleParameter * gcs.getFreeSpeedSum();
 					if(this.useCarGrid)

@@ -5,7 +5,7 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
+import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.CreateOrthogonalTestNetwork;
 import org.matsim.contrib.matsim4urbansim.utils.OPUSDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Distances;

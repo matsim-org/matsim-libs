@@ -32,17 +32,15 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
-import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
-import org.matsim.contrib.matsim4urbansim.utils.OPUSDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -68,91 +66,117 @@ import difflib.Patch;
  *
  */
 public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
-	
+
 	private static final Logger log = Logger.getLogger(ConfigReadWriteOverwriteTest.class);
-	
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	
+
 	@Before
 	public void setUp() throws Exception {
 		OutputDirectoryLogging.catchLogEntries();		
 		// (collect log messages internally before they can be written to file.  Can be called multiple times without harm.)
 	}
-	
+
 	/**
 	 * This test makes sure that the MATSim4UrbanSim config file will be correctly written, 
 	 * correctly converted into standard MATSim format and that all values are recognized correctly
 	 */
 	@Test
-//	@Ignore // found this disabled on 19/jan/14. kai
+	//	@Ignore // found this disabled on 19/jan/14. kai
 	public void testLoadMATSim4UrbanSimMinimalConfig(){
-		
-		// MATSim4UrbanSim configuration converter
+
 		M4UConfigurationConverterV4 connector = null;
-		TempDirectoryUtil tmpDirUtl = new TempDirectoryUtil() ;
-		
-		try{
-			String path = tmpDirUtl.createCustomTempDirectory("tmp");
-			
-			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
-			
-			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path);
-//			String configLocation = testConfig.generateMinimalConfig();
-			String configLocation = testConfig.generateConfigV3();
-			
-			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
-			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
-				log.error("An error occured while initializing MATSim scenario ...");
-				Assert.assertTrue(false);
-			}
-			
-			log.info("Getting config settings in matsim format");
-			Config config = connector.getConfig();
-			
-			checkCoreModuleSettings(testConfig, config);
-			
-		} catch(Exception e){
-			e.printStackTrace();
+		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
+
+		String path = tempDirectoryUtil.createCustomTempDirectory("tmp");
+
+		log.info("Creating a matsim4urbansim config file and writing it on hand disk");
+
+		CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path);
+		//			String configLocation = testConfig.generateMinimalConfig();
+		String configLocation = testConfig.generateConfigV3();
+
+		log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
+		if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
+			log.error("An error occured while initializing MATSim scenario ...");
 			Assert.assertTrue(false);
 		}
+
+		log.info("Getting config settings in matsim format");
+		Config config = connector.getConfig();
+
+		String revisedFileName = utils.getOutputDirectory()+"/config.xml"  ;
+		log.info( "new: " + revisedFileName ) ;
+		new ConfigWriter(config).write( revisedFileName ) ;
+		final long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName) ;
+
+		String originalFileName = utils.getClassInputDirectory()+"/config.xml" ;
+		log.info( "old: " + originalFileName ) ;
+		final long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
+
+		if ( revisedCheckSum != originalCheckSum ) {
+
+			List<String> original = fileToLines(originalFileName);
+			List<String> revised  = fileToLines(revisedFileName);
+
+			Patch patch = DiffUtils.diff(original, revised);
+
+			for (Delta delta: patch.getDeltas()) {
+				System.out.flush() ;
+				System.err.println("===");
+				System.err.println(delta.getOriginal());
+				System.err.println(delta.getRevised());
+				System.err.println("===");
+				System.err.flush() ;
+			}
+
+		}
+		checkCoreModuleSettings(testConfig, config);
+
+		// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
+		//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
+
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
+
+
 		log.info("done") ;
 	}
-	
+
 	/**
 	 * This test makes sure that the MATSim4UrbanSim config file will be correctly written, 
 	 * correctly converted into standard MATSim format and that all values are recognized correctly
 	 */
 	@Test
-//	@Ignore // found this disabled on 19/jan/14. kai
+	//	@Ignore // found this disabled on 19/jan/14. kai
 	public void testLoadMATSim4UrbanSimConfigOnly(){
-		
+
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 connector = null;
-		
+
 		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
-		
+
 		try{
 			String path = tempDirectoryUtil.createCustomTempDirectory("tmp");
-			
+
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
-			
+
 			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path);
 			String configLocation = testConfig.generateConfigV3();
-			
+
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
 				Assert.assertTrue(false);
 			}
-			
+
 			log.info("Getting config settings in matsim format");
 			Config config = connector.getConfig();
-			
+
 			checkCoreModuleSettings(testConfig, config);
-			
+
 			config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl() ) ;
 			config.checkConsistency() ;
-			
+
 		} catch(Exception e){
 			e.printStackTrace();
 			Assert.assertTrue(false);
@@ -160,7 +184,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("done") ;
 	}
-	
+
 	/**
 	 * This test makes sure that settings made in an external config
 	 * file will always overwrite MATSim4UrbanSim settings. 
@@ -170,94 +194,86 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	 * this, different parameter settings are used in the external config.
 	 */
 	@Test
-//	@Ignore // found this disabled on 19/jan/14. kai
+	//	@Ignore // found this disabled on 19/jan/14. kai
 	public void testExternalMATSimConfig(){
 		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
-		
-		// MATSim4UrbanSim configuration converter
+
 		M4UConfigurationConverterV4 converter = null;
-		
-//		try{
-			String path = utils.getOutputDirectory() + "/tmp" ;
-			IOUtils.createDirectory(path) ;
-			
-			log.info("Creating a matsim4urbansim config file and writing it on hard disk");
-			
-			// this creates an external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
-			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestM4UConfig.COLD_START, path);
-			String externalConfigLocation = testExternalConfig.generateConfigV2();
-			
-			// this creates a MATSim4UrbanSim configuration
-			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path, externalConfigLocation);
-			String configLocation = testConfig.generateConfigV3();
-			
-			// This converts the MATSim4UrbanSim configuration into MATSim format, 
-			// i.e. puts the settings into the MATSim config groups or adds new MATSim modules
-			// An important task is that settings from the external config file are overwriting the settings from MATSim4UrbanSim
-			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
-			if( !(converter = new M4UConfigurationConverterV4( configLocation )).init() ){
-				log.error("An error occured while initializing MATSim scenario ...");
-				Assert.assertTrue(false);
+
+		String path = utils.getOutputDirectory() + "/tmp" ;
+		IOUtils.createDirectory(path) ;
+
+		log.info("Creating a matsim4urbansim config file and writing it on hard disk");
+
+		// this creates an external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
+		CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestM4UConfig.COLD_START, path);
+		String externalConfigLocation = testExternalConfig.generateConfigV2();
+
+		// this creates a MATSim4UrbanSim configuration
+		CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path, externalConfigLocation);
+		String configLocation = testConfig.generateConfigV3();
+
+		// This converts the MATSim4UrbanSim configuration into MATSim format, 
+		// i.e. puts the settings into the MATSim config groups or adds new MATSim modules
+		// An important task is that settings from the external config file are overwriting the settings from MATSim4UrbanSim
+		log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
+		if( !(converter = new M4UConfigurationConverterV4( configLocation )).init() ){
+			log.error("An error occured while initializing MATSim scenario ...");
+			Assert.assertTrue(false);
+		}
+
+		log.info("Getting config settings in matsim format");
+		Config config = converter.getConfig();
+
+		String revisedFileName = utils.getOutputDirectory()+"/config.xml"  ;
+		log.info( "new: " + revisedFileName ) ;
+		new ConfigWriter(config).write( revisedFileName ) ;
+		final long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName) ;
+
+		String originalFileName = utils.getClassInputDirectory()+"/config.xml" ;
+		log.info( "old: " + originalFileName ) ;
+		final long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
+
+		if ( revisedCheckSum != originalCheckSum ) {
+
+			List<String> original = fileToLines(originalFileName);
+			List<String> revised  = fileToLines(revisedFileName);
+
+			Patch patch = DiffUtils.diff(original, revised);
+
+			for (Delta delta: patch.getDeltas()) {
+				System.out.flush() ;
+				System.err.println(delta.getOriginal());
+				System.err.println(delta.getRevised());
+				System.err.flush() ;
 			}
-			
-			log.info("Getting config settings in matsim format");
-			Config config = converter.getConfig();
 
-			String revisedFileName = utils.getOutputDirectory()+"/config.xml"  ;
-			log.info( "new: " + revisedFileName ) ;
-			new ConfigWriter(config).write( revisedFileName ) ;
-			final long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName) ;
+		}
 
-			String originalFileName = utils.getClassInputDirectory()+"/config.xml" ;
-			log.info( "old: " + originalFileName ) ;
-			final long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
+		// checking if overlapping parameter settings are overwritten by the external config
+		checkCoreModulesAndExternalConfigSettings(testExternalConfig, testConfig, config);
 
-			if ( revisedCheckSum != originalCheckSum ) {
+		// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
+		//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 
-				List<String> original = fileToLines(originalFileName);
-				List<String> revised  = fileToLines(revisedFileName);
-
-				Patch patch = DiffUtils.diff(original, revised);
-
-				for (Delta delta: patch.getDeltas()) {
-					System.out.flush() ;
-					System.err.println(delta.getOriginal());
-					System.err.println(delta.getRevised());
-					System.err.flush() ;
-				}
-
-			}
-            
-			// checking if overlapping parameter settings are overwritten by the external config
-			checkCoreModulesAndExternalConfigSettings(testExternalConfig, testConfig, config);
-			
-			// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
-//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
-			
-			
-//		} catch(Exception e){
-//			e.printStackTrace();
-//			Assert.assertTrue(false);
-//		}
-			tempDirectoryUtil.cleaningUpCustomTempDirectories();
-		
+		tempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 
 	// Helper method for get the file content
-    private static List<String> fileToLines(String filename) {
-            List<String> lines = new LinkedList<String>();
-            String line = "";
-            try {
-                    BufferedReader in = new BufferedReader(new FileReader(filename));
-                    while ((line = in.readLine()) != null) {
-                            lines.add(line);
-                    }
-                    in.close() ;
-            } catch (IOException e) {
-                    e.printStackTrace();
-            }
-            return lines;
-    }
+	private static List<String> fileToLines(String filename) {
+		List<String> lines = new LinkedList<String>();
+		String line = "";
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(filename));
+			while ((line = in.readLine()) != null) {
+				lines.add(line);
+			}
+			in.close() ;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return lines;
+	}
 
 	/**
 	 * This tests if overlapping parameter settings are overwritten by the external config.
@@ -271,21 +287,21 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	private void checkCoreModulesAndExternalConfigSettings(
 			CreateTestExternalMATSimConfig externalTestConfig,
 			CreateTestM4UConfig testConfig, Config config) {
-		
+
 		Assert.assertTrue(config.controler().getFirstIteration() == externalTestConfig.firstIteration.intValue());
 		Assert.assertTrue(config.controler().getLastIteration() == externalTestConfig.lastIteration.intValue());
 		Assert.assertTrue( Paths.checkPathEnding( config.controler().getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.matsim4opusOutput ) ));
-		
+
 		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.networkInputFileName ) ));
-		
+
 		if(testConfig.getStartMode() != CreateTestM4UConfig.COLD_START){
 			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.inputPlansFileName ) ));
 		}
-		
+
 		Iterator<StrategySettings> iteratorStrategyCG = config.strategy().getStrategySettings().iterator();
 		while(iteratorStrategyCG.hasNext()){
 			StrategySettings strategySettings = iteratorStrategyCG.next();
-			
+
 			if(strategySettings.getId() == new IdImpl(1))
 				Assert.assertTrue(strategySettings.getProbability() == externalTestConfig.timeAllocationMutatorProbability);
 			else if(strategySettings.getId() == new IdImpl(2))
@@ -293,7 +309,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			else if(strategySettings.getId() == new IdImpl(3))
 				Assert.assertTrue(strategySettings.getProbability() == externalTestConfig.reRouteDijkstraProbability);
 		}
-		
+
 		// tnicolai: times and durations in testExternalConfig are given as String, so they are not comparable with double values
 		ActivityParams homeActivity = config.planCalcScore().getActivityParams(externalTestConfig.activityType_0);
 		ActivityParams workActivity = config.planCalcScore().getActivityParams(externalTestConfig.activityType_1);
@@ -302,21 +318,21 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		Assert.assertTrue(workActivity.getType().equalsIgnoreCase( externalTestConfig.activityType_1 ));
 		// Assert.assertTrue(workActivity.getOpeningTime() == testExternalConfig.workActivityOpeningTime.intValue());
 		// Assert.assertTrue(workActivity.getLatestStartTime() == testExternalConfig.workActivityLatestStartTime.intValue());
-		
-		
+
+
 		///////////////////////////////////////////////////
 		// Here, additional parameters from the external config, that are not overlapping, are tested!
 		///////////////////////////////////////////////////
-		
-//		Module matsim4UrbanSimModule = config.getModule(M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		
+
+		//		Module matsim4UrbanSimModule = config.getModule(M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+
 		///////////////////////////////////////////////////
 		// MATSim4UrbanSim Controler Config Module Settings
 		///////////////////////////////////////////////////
-//		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
+		//		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
 		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		MatrixBasedPtRouterConfigGroup ippcm = MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		
+
 		// time of day
 		Assert.assertTrue( acm.getTimeOfDay() == externalTestConfig.timeOfDay );
 		// use pt stops flag
@@ -328,13 +344,13 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// use pt travel times and distances
 		boolean usePtTimesAndDiastances = ippcm.isUsingTravelTimesAndDistances() ;
 		Assert.assertTrue( usePtTimesAndDiastances == externalTestConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") );
-		
+
 		if( externalTestConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") ){
 			// pt travel times
 			Assert.assertTrue( Paths.checkPathEnding( ippcm.getPtTravelTimesInputFile() ).equalsIgnoreCase( externalTestConfig.ptTravelTimes ));
 			// pt travel distances
 			Assert.assertTrue(Paths.checkPathEnding( ippcm.getPtTravelDistancesInputFile() ).equalsIgnoreCase( externalTestConfig.ptTravelDistances ));
-		
+
 		}
 	}
 
@@ -345,7 +361,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	void checkCoreModuleSettings(CreateTestM4UConfig testConfig, Config config) {
 		log.info("Checking settings");
 		// the following checks all settings that are (i) part of the core modules and that are (ii) set in CreateTestMATSimConfig
-		
+
 		ControlerConfigGroup contolerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
 		Assert.assertTrue(contolerCG.getFirstIteration() == testConfig.firstIteration.intValue());
 		Assert.assertTrue(contolerCG.getLastIteration() == testConfig.lastIteration.intValue());
@@ -353,17 +369,17 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
 		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.networkInputFileName ) ));
-		
+
 		if(testConfig.getStartMode() != CreateTestM4UConfig.COLD_START){
 			PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
 			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.inputPlansFileName ) ));
 		}
-		
+
 		StrategyConfigGroup strategyCG = (StrategyConfigGroup) config.getModule(StrategyConfigGroup.GROUP_NAME);
 		Iterator<StrategySettings> iteratorStrategyCG = strategyCG.getStrategySettings().iterator();
 		while(iteratorStrategyCG.hasNext()){
 			StrategySettings strategySettings = iteratorStrategyCG.next();
-			
+
 			if(strategySettings.getId() == new IdImpl(1))
 				Assert.assertTrue(strategySettings.getProbability() == testConfig.timeAllocationMutatorProbability);
 			else if(strategySettings.getId() == new IdImpl(2))
@@ -371,7 +387,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			else if(strategySettings.getId() == new IdImpl(3))
 				Assert.assertTrue(strategySettings.getProbability() == testConfig.reRouteDijkstraProbability);
 		}
-		
+
 		ActivityParams homeActivity = config.planCalcScore().getActivityParams(testConfig.activityType_0);
 		ActivityParams workActivity = config.planCalcScore().getActivityParams(testConfig.activityType_1);
 		Assert.assertTrue(homeActivity.getType().equalsIgnoreCase( testConfig.activityType_0 ));
@@ -380,6 +396,6 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		Assert.assertTrue(workActivity.getOpeningTime() == testConfig.workActivityOpeningTime.intValue());
 		Assert.assertTrue(workActivity.getLatestStartTime() == testConfig.workActivityLatestStartTime.intValue());
 	}
-	
+
 
 }
