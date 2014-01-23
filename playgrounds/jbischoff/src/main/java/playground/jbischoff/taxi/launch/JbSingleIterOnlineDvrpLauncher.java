@@ -24,7 +24,7 @@ import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
@@ -187,7 +187,7 @@ import playground.michalm.util.RunningVehicleRegister;
         TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, depotsFileName, ecm);
 
         Params params = new Params(true, false, 120, 60);
-        
+
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(vrpData,
                 calculator, params, true);
 
@@ -198,10 +198,8 @@ import playground.michalm.util.RunningVehicleRegister;
         ElectroCabLaunchUtils olutils = new ElectroCabLaunchUtils();
         olutils.initVrpSimEngine(qSim, data, optimizer);
 
-        PassengerEngine passengerEngine = new PassengerEngine(TaxiRequestCreator.MODE,
-                new TaxiRequestCreator(data), optimizer, data);
-        qSim.addMobsimEngine(passengerEngine);
-        qSim.addDepartureHandler(passengerEngine);
+        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
+                TaxiRequestCreator.MODE, new TaxiRequestCreator(data), optimizer, data, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, data, optimizer, new TaxiActionCreator(
                 passengerEngine, VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR));

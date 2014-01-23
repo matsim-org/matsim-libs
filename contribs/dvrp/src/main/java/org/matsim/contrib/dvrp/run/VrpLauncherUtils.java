@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.data.schedule.impl.StayTaskImpl;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -223,6 +224,17 @@ public class VrpLauncherUtils
         qSim.addMobsimEngine(new TeleportationEngine());
 
         return qSim;
+    }
+
+
+    public static PassengerEngine initPassengerEngine(String mode,
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, MatsimVrpData data,
+            QSim qSim)
+    {
+        PassengerEngine passengerEngine = new PassengerEngine(mode, requestCreator, optimizer, data);
+        qSim.addMobsimEngine(passengerEngine);
+        qSim.addDepartureHandler(passengerEngine);
+        return passengerEngine;
     }
 
 
