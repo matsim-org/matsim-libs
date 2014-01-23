@@ -26,9 +26,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -36,16 +42,23 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme;
-import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactorOLD;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
 import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
 import playground.southafrica.gauteng.routing.PersonSpecificTravelDisutilityInclTollFactory;
-import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
+import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.utilities.Header;
@@ -55,7 +68,39 @@ import playground.southafrica.utilities.Header;
  * @author jwjoubert
  */
 public class GautengControler_subpopulations {
+	private static final class SetVehicleInAllNetworkRoutes implements PlanStrategyModule {
+		private final Scenario scenario;
+
+		private SetVehicleInAllNetworkRoutes(Scenario scenario) {
+			this.scenario = scenario;
+		}
+
+		@Override
+		public void prepareReplanning(ReplanningContext replanningContext) {}
+
+		@Override
+		public void handlePlan(Plan plan) {
+			@SuppressWarnings("unchecked")
+			Map<String,Id> modeToVehIdMap = (Map<String, Id>) scenario.getPopulation().getPersonAttributes()
+				.getAttribute(plan.getPerson().getId().toString(), TRANSPORT_MODE_TO_VEH_ID_MAP ) ;
+			Id vehId = modeToVehIdMap.get( TransportMode.car ) ;
+			for ( Leg leg : PopulationUtils.getLegs(plan) ) {
+				if ( leg.getRoute()!=null && leg.getRoute() instanceof NetworkRoute ) {
+					((NetworkRoute)leg.getRoute()).setVehicleId(vehId);
+				}
+			}
+		}
+
+		@Override
+		public void finishReplanning() {}
+	}
+
+
 	private final static Logger LOG = Logger.getLogger(GautengControler_subpopulations.class);
+	
+	private static final String RE_ROUTE_AND_SET_VEHICLE = "ReRouteAndSetVehicle";
+	private static String TRANSPORT_MODE_TO_VEH_ID_MAP = "TransportModeToVehicleIdMap" ;
+
 
 	/**
 	 * @param args
@@ -101,6 +146,8 @@ public class GautengControler_subpopulations {
 		if ( args.length>6 && args[7]!=null && args[7].length()>0 ) {
 			numberOfThreads = Integer.parseInt(args[7]);
 		}
+		
+		// ===========================================
 
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, configFilename);
@@ -149,7 +196,7 @@ public class GautengControler_subpopulations {
 			config.strategy().addStrategySettings(timeStrategySettings);
 			
 			StrategySettings rerouteStrategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-			rerouteStrategySettings.setModuleName(PlanStrategyRegistrar.Names.ReRoute.toString());
+			rerouteStrategySettings.setModuleName(RE_ROUTE_AND_SET_VEHICLE);
 			rerouteStrategySettings.setSubpopulation("commercial");
 			rerouteStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(rerouteStrategySettings);
@@ -221,6 +268,8 @@ public class GautengControler_subpopulations {
 			rerouteStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(rerouteStrategySettings);
 		}
+		
+		// ===========================================
 			
 		final Controler controler = new Controler( config ) ;
 		controler.setOverwriteFiles(true) ;
@@ -245,14 +294,37 @@ public class GautengControler_subpopulations {
 		controler.getConfig().global().setNumberOfThreads(numberOfThreads);
 		
 		final Scenario sc = controler.getScenario();
+		
+		LOG.error("TRANSPORT_MODE_TO_VEHICLE_ID map needs to be there.  If that exists, delete this line. kai, jan'14") ;
+		// something like:
+		for ( Person person : sc.getPopulation().getPersons().values() ) {
+			Map<String,Id> mode2vehMap = new HashMap<String,Id>() ;
+			Id vehId = null ; // replace by actual vehicle id 
+			mode2vehMap.put( TransportMode.car, vehId ) ;
+			sc.getPopulation().getPersonAttributes().putAttribute( person.getId().toString(), TRANSPORT_MODE_TO_VEH_ID_MAP, mode2vehMap );
+		}
+		LOG.error("The whole thing also needs to be tested!!") ;
+		System.exit(-1) ;
 
 		if (sc.getConfig().scenario().isUseRoadpricing()) {
 			throw new RuntimeException("roadpricing must NOT be enabled in config.scenario in order to use special " +
 					"road pricing features.  aborting ...");
 		}
+		
+		// CONSTRUCT ROUTING ALGO WHICH ALSO SETS VEHICLES:
+		controler.addPlanStrategyFactory(RE_ROUTE_AND_SET_VEHICLE, new PlanStrategyFactory() {
+			@Override
+			public PlanStrategy createPlanStrategy(final Scenario scenario, EventsManager eventsManager) {
+				PlanStrategyImpl planStrategy = new PlanStrategyImpl( new RandomPlanSelector<Plan>() ) ; 
+				planStrategy.addStrategyModule( new ReRoute( scenario ) ); 
+				planStrategy.addStrategyModule( new SetVehicleInAllNetworkRoutes(scenario));
+				return planStrategy ;
+			}
+		});
 
 		final TollFactorI tollFactor = new SanralTollFactor_Subpopulation(sc);
 
+		// SOME STATISTICS:
 		controler.addControlerListener( new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
