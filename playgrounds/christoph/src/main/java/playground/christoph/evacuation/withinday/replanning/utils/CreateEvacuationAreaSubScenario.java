@@ -21,7 +21,9 @@
 package playground.christoph.evacuation.withinday.replanning.utils;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -42,6 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -79,7 +82,7 @@ public class CreateEvacuationAreaSubScenario {
 		/*
 		 * Identify affected nodes.
 		 */
-		Set<Id> affectedNodes = new HashSet<Id>();
+		Set<Id> affectedNodes = new TreeSet<Id>();
 		for (Node node : subNetwork.getNodes().values()) {
 			if (coordAnalyzer.isNodeAffected(node)) affectedNodes.add(node.getId());
 		}
@@ -89,7 +92,7 @@ public class CreateEvacuationAreaSubScenario {
 		 * Identify buffered affected nodes.
 		 */
 		CoordAnalyzer bufferedCoordAnalyzer = this.defineBufferedArea();
-		Set<Id> bufferedAffectedNodes = new HashSet<Id>();
+		Set<Id> bufferedAffectedNodes = new TreeSet<Id>();
 		for (Node node : subNetwork.getNodes().values()) {
 			if (bufferedCoordAnalyzer.isNodeAffected(node) && !affectedNodes.contains(node.getId())) {
 				bufferedAffectedNodes.add(node.getId());
@@ -101,8 +104,8 @@ public class CreateEvacuationAreaSubScenario {
 		 * Identify link that cross the evacuation line and their start and
 		 * end nodes which are located right after the evacuation line.
 		 */
-		Set<Id> crossEvacuationLineNodes = new HashSet<Id>(bufferedAffectedNodes);
-		Set<Id> crossEvacuationLineLinks = new HashSet<Id>();
+		Set<Id> crossEvacuationLineNodes = new TreeSet<Id>(bufferedAffectedNodes);
+		Set<Id> crossEvacuationLineLinks = new TreeSet<Id>();
 		for (Link link : subNetwork.getLinks().values()) {
 			boolean fromNodeInside = affectedNodes.contains(link.getFromNode().getId());
 			boolean toNodeInside = affectedNodes.contains(link.getToNode().getId());
@@ -121,7 +124,7 @@ public class CreateEvacuationAreaSubScenario {
 		/*
 		 * Remove links and nodes.
 		 */
-		Set<Id> nodesToRemove = new HashSet<Id>();
+		Set<Id> nodesToRemove = new TreeSet<Id>();
 		for (Node node : subNetwork.getNodes().values()) {
 			if (!crossEvacuationLineNodes.contains(node.getId()) && !affectedNodes.contains(node.getId())) {
 				nodesToRemove.add(node.getId());
@@ -141,9 +144,9 @@ public class CreateEvacuationAreaSubScenario {
 		NetworkFactory networkFactory = subNetwork.getFactory();
 		Coord exitNode1Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0); 
 		Coord exitNode2Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
-		Node exitNode1 = networkFactory.createNode(subScenario.createId("exitNode1"), exitNode1Coord);
-		Node exitNode2 = networkFactory.createNode(subScenario.createId("exitNode2"), exitNode2Coord);
-		Link exitLink = networkFactory.createLink(subScenario.createId("exitLink"), exitNode1, exitNode2);
+		Node exitNode1 = networkFactory.createNode(subScenario.createId(AddExitLinksToNetwork.exitNode + "1"), exitNode1Coord);
+		Node exitNode2 = networkFactory.createNode(subScenario.createId(AddExitLinksToNetwork.exitNode + "2"), exitNode2Coord);
+		Link exitLink = networkFactory.createLink(subScenario.createId(AddExitLinksToNetwork.exitLink), exitNode1, exitNode2);
 		exitLink.setAllowedModes(transportModes);
 		exitLink.setLength(1.0);
 		subNetwork.addNode(exitNode1);
@@ -156,7 +159,7 @@ public class CreateEvacuationAreaSubScenario {
 		int i = 0;
 		for (Id id : crossEvacuationLineNodes) {
 			Node node = subNetwork.getNodes().get(id);
-			Link link = networkFactory.createLink(subScenario.createId("exitLink" + i), node, exitNode1);
+			Link link = networkFactory.createLink(subScenario.createId(AddExitLinksToNetwork.exitLink + i), node, exitNode1);
 			link.setAllowedModes(transportModes);
 			link.setLength(1.0);
 			subNetwork.addLink(link);
@@ -181,7 +184,7 @@ public class CreateEvacuationAreaSubScenario {
 		/*
 		 * Identify not affected links where affected facilities are attached.
 		 */
-		Set<Link> links = new HashSet<Link>();
+		Set<Link> links = new LinkedHashSet<Link>();
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			if (this.coordAnalyzer.isFacilityAffected(facility)) {
 				Id linkId = facility.getLinkId();

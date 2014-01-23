@@ -20,13 +20,14 @@
 
 package playground.christoph.evacuation.mobsim.decisionmodel;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -66,7 +67,8 @@ public class DecisionModelRunner implements BeforeMobsimListener, MobsimBeforeSi
 		this.decisionDataProvider = new DecisionDataProvider();
 		this.panicModel = new PanicModel(this.decisionDataProvider, EvacuationConfig.panicShare);
 		this.pickupModel = new PickupModel(this.decisionDataProvider);
-		this.evacuationDecisionModel = new EvacuationDecisionModel(this.scenario, MatsimRandom.getLocalInstance(), this.decisionDataProvider);
+		this.evacuationDecisionModel = new EvacuationDecisionModel(this.scenario, 
+				new Random(EvacuationConfig.evacuationDecisionRandomSeed + EvacuationConfig.deterministicRNGOffset), this.decisionDataProvider);
 		this.latestAcceptedLeaveTimeModel = new LatestAcceptedLeaveTimeModel(this.decisionDataProvider,
 				EvacuationConfig.latestAcceptedLeaveTimeRandomSeed + EvacuationConfig.deterministicRNGOffset);
 		this.departureDelayModel = new DepartureDelayModel(decisionDataProvider, 600.0, 
@@ -113,6 +115,8 @@ public class DecisionModelRunner implements BeforeMobsimListener, MobsimBeforeSi
 			
 			this.evacuationDecisionModel.runModel(household);
 			this.latestAcceptedLeaveTimeModel.runModel(household);
+			
+			// this might be run even later - e.g. when the household has met
 			this.departureDelayModel.runModel(household);
 		}
 	}

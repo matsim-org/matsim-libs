@@ -48,6 +48,9 @@ import org.matsim.households.Households;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
+/*
+ * Tracks the locations of all households, including the joined/not joined state.
+ */
 public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(HouseholdsTracker.class);
@@ -170,10 +173,12 @@ public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimSt
 			householdPosition.update();
 			
 			if (householdPosition.isHouseholdJoined()) this.joinedHouseholds.add(household.getId());
+			else log.warn("Household " + household.getId().toString() + " is not joined initially! This might be a problem in the initial demand.");
 			
 			// only observe household if its member size is > 0
 			if (household.getMemberIds().size() > 0) householdPositions.put(household.getId(), householdPosition);
-		}
+			else log.warn("Household " + household.getId().toString() + " has no members! This might be a problem in the initial demand.");
+		}		
 	}
 	
 	@Override

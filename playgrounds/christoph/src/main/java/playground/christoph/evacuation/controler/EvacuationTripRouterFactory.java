@@ -46,6 +46,7 @@ public class EvacuationTripRouterFactory implements TripRouterFactory {
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
 		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
+		
 		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory, 
 				transitRouterFactory);
 		

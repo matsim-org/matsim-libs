@@ -98,6 +98,7 @@ import playground.christoph.evacuation.mobsim.ReplanningTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataWriter;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
 import playground.christoph.evacuation.pt.EvacuationTransitRouterFactory;
 import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
@@ -108,7 +109,9 @@ import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFacto
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
 import playground.christoph.evacuation.trafficmonitoring.EvacuationPTTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeEvacuationCalculator;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
@@ -144,6 +147,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private HouseholdsTracker householdsTracker;
 	private InformedHouseholdsTracker informedHouseholdsTracker;
 	private DecisionDataGrabber decisionDataGrabber;
+	private DecisionDataWriter decisionDataWriter;
 	private DecisionModelRunner decisionModelRunner;
 	private LinkEnteredProvider linkEnteredProvider;
 	private HouseholdDepartureManager householdDepartureManager;
@@ -213,7 +217,7 @@ public class EvacuationControlerListener implements StartupListener {
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-
+		
 		// register FixedOrderControlerListener
 		event.getControler().addControlerListener(this.fixedOrderControlerListener);
 		
@@ -281,6 +285,9 @@ public class EvacuationControlerListener implements StartupListener {
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.decisionModelRunner);
 		this.fixedOrderControlerListener.addControlerListener(this.decisionModelRunner);
 		
+		this.decisionDataWriter = new DecisionDataWriter(this.decisionModelRunner.getDecisionDataProvider());
+		this.fixedOrderControlerListener.addControlerListener(this.decisionDataWriter);
+				
 		this.vehiclesTracker = new VehiclesTracker(this.withinDayControlerListener.getMobsimDataProvider());
 		controler.getEvents().addHandler(vehiclesTracker);
 
@@ -293,16 +300,21 @@ public class EvacuationControlerListener implements StartupListener {
 		// workaround
 		scenario.getConfig().scenario().setUseTransit(false);
 		
+		// init within-day travel times and trip router factory
 		this.initWithinDayTravelTimes(controler);
+		this.initWithinDayTripRouterFactory(controler);
 		
+		// evacuationTransitRouterFactory is not initialized yet
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenario, this.withinDayTravelTimes, 
 				this.coordAnalyzer.createInstance(), this.affectedArea, this.informedHouseholdsTracker, 
-				this.decisionModelRunner, this.withinDayControlerListener.getMobsimDataProvider());
+				this.decisionModelRunner, this.withinDayControlerListener.getMobsimDataProvider(), this.evacuationTransitRouterFactory);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		this.fixedOrderControlerListener.addControlerListener(this.selectHouseholdMeetingPoint);
 		
+		// Has to be registered as simulation listener after the informed households tracker since it uses results from there! 
 		this.householdDepartureManager = new HouseholdDepartureManager(scenario, this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.informedHouseholdsTracker, this.decisionModelRunner.getDecisionDataProvider());
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.householdDepartureManager);
 	}
 	
 	private void initAnalysisStuff(Controler controler) {
@@ -399,11 +411,11 @@ public class EvacuationControlerListener implements StartupListener {
 				this.replanningTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.initialReplanningRemover);
 		
-		this.initWithinDayTripRouterFactory(controler);
+//		this.initWithinDayTripRouterFactory(controler);
 		this.initIdentifiers(controler);
 		this.initReplanners(controler);
 	}
-	
+
 	private void initWithinDayTripRouterFactory(Controler controler) {
 		
 		Config config = controler.getConfig();
@@ -561,11 +573,12 @@ public class EvacuationControlerListener implements StartupListener {
 		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		withinDayEngine.addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
-		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
+		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext,
+				(AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
 		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
 		withinDayEngine.addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(scenario, withinDayEngine);
+		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(scenario, withinDayEngine, (AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
 		withinDayEngine.addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		

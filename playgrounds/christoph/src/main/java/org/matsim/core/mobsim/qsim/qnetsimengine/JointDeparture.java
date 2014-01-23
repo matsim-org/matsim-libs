@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;

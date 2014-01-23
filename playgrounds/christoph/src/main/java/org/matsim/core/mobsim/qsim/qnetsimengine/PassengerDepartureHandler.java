@@ -82,6 +82,9 @@ public class PassengerDepartureHandler implements DepartureHandler {
 			Leg leg = (Leg) planElement;
 			JointDeparture jointDeparture = this.jointDepartureOrganizer.removeJointDepartureForLeg(agent.getId(), leg);
 			if (jointDeparture == null) return false;
+
+			// this is necessary since it is not performed in the PersonDriverAgentImpl so far...
+			((PassengerAgent) agent).setVehicle(null);
 			
 			QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 			QVehicle vehicle = qlink.getParkedVehicle(jointDeparture.getVehicleId());
@@ -94,7 +97,6 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	
 	private void handleDriverDeparture(JointDeparture jointDeparture, QVehicle vehicle,
 			QLinkInternalI qlink, MobsimDriverAgent driver, double now) {
-		
 		boolean canDepart = true;
 		Id vehicleId = driver.getPlannedVehicleId();
 		
@@ -118,6 +120,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 			canDepart = false;
 		} else {
 			vehicle.setDriver(driver);
+			driver.setVehicle(vehicle);
 		}
 		
 		if (canDepart) {
@@ -126,8 +129,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	}
 	
 	private void handlePassengerDeparture(JointDeparture jointDeparture, QVehicle vehicle, 
-			QLinkInternalI qlink, MobsimAgent passenger, Leg leg, double now) {
-
+			QLinkInternalI qlink, MobsimAgent passenger, Leg leg, double now) {	
 		/*
 		 * Check whether the agent is already passenger in the vehicle, e.g.
 		 * because the vehicle has stopped to pick up or drop off another agent.
@@ -168,6 +170,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 					 * - vehicle is available
 					 */
 					vehicle.setDriver((MobsimDriverAgent) driver);
+					((MobsimDriverAgent) driver).setVehicle(vehicle);
 					handleJointDeparture(jointDeparture, vehicle, qlink, now);
 				}
 			} else return;
@@ -235,10 +238,18 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		 * ensure that it is not performed a second time. 
 		 */
 		jointDeparture.setDeparted();
+
+		/*
+		 * Remove joint departure from set of scheduled but not yet processed
+		 * departures. For debugging, remaining entries in the set are written 
+		 * to a file after the simulation has ended.
+		 */
+		this.jointDepartureOrganizer.removeHandledJointDeparture(jointDeparture);
 		
 		JointDepartureEvent event = new JointDepartureEvent(now, jointDeparture.getId(), jointDeparture.getLinkId(),
 				jointDeparture.getDriverId(), jointDeparture.getVehicleId(), jointDeparture.getPassengerIds());
 		qNetsimEngine.getMobsim().getEventsManager().processEvent(event);
+		
 		
 		/*
 		 * Check whether the driver's next leg ends at the current link.
@@ -255,7 +266,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 			 * and not anymore from ActivityEngine.doSimStep(...). As a result of this change,
 			 * the endActivityAndComputeNextState(...) method is called earlier. Passengers have not
 			 * left the car before the driver's activity is ended.
-			 * Therefore, we have to allow passengers to leave the car before we cann arrange the
+			 * Therefore, we have to allow passengers to leave the car before we can arrange the
 			 * driver's next state.
 			 */
 //			this.qNetsimEngine.internalInterface.arrangeNextAgentState(driver);

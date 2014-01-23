@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -102,7 +103,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 */
 		PersonDecisionData pdd = this.decisionDataProvider.getPersonDecisionData(withinDayAgent.getId());
 		Id householdId = pdd.getHouseholdId();
-		Id meetingPointId = identifier.getHouseholdMeetingPointMapping().get(householdId);
+		Id meetingPointId = identifier.getJoinedHouseholdsContext().getHouseholdMeetingPointMap().get(householdId);
 		
 		// set new meeting point
 		this.decisionDataProvider.getHouseholdDecisionData(householdId).setMeetingPointFacilityId(meetingPointId);
@@ -122,7 +123,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 * Create Leg from the current Activity to the Meeting Point
 		 */
 		// identify the TransportMode
-		String transportMode = this.identifier.getTransportModeMapping().get(withinDayAgent.getId());
+		String transportMode = this.identifier.getJoinedHouseholdsContext().getTransportModeMap().get(withinDayAgent.getId());
 		
 		/*
 		 * If its a passengerTransportMode leg, set the mode to Ride. Otherwise
@@ -154,7 +155,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		
 		// set vehicle in the route, if it is a car leg
 		if (transportMode.equals(TransportMode.car)) {
-			Id vehicleId = this.identifier.getDriverVehicleMapping().get(withinDayAgent.getId());
+			Id vehicleId = this.identifier.getJoinedHouseholdsContext().getDriverVehicleMap().get(withinDayAgent.getId());
 			NetworkRoute route = (NetworkRoute) legToMeeting.getRoute();
 			route.setVehicleId(vehicleId);
 		}
@@ -189,6 +190,14 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		}
 		
 		meetingActivity.setStartTime(legToMeeting.getDepartureTime() + legToMeeting.getTravelTime());
+		
+		// assign joint departure to agent's car/ride leg
+		if (legToMeeting.getMode().equals(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE) || 
+				legToMeeting.getMode().equals(TransportMode.car)) {
+			Id agentId = withinDayAgent.getId();
+			JointDeparture jointDeparture = this.identifier.getJointDeparture(agentId);
+			this.identifier.getJointDepartureOrganizer().assignAgentToJointDeparture(agentId, legToMeeting, jointDeparture);
+		}
 		
 		// mark agent as departed
 		this.identifier.incPerformedDepartures(householdId);

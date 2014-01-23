@@ -25,20 +25,23 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
+
 public class PickupAgentReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
+	private final AgentsToPickupIdentifier agentsToPickupIdentifier;
 	
-	public PickupAgentReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+	public PickupAgentReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine, AgentsToPickupIdentifier agentsToPickupIdentifier) {
 		super(withinDayEngine);
 		this.scenario = scenario;
-
+		this.agentsToPickupIdentifier = agentsToPickupIdentifier;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new PickupAgentReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getInternalInterface());
+				this.getWithinDayEngine().getInternalInterface(), this.agentsToPickupIdentifier);
 		return replanner;
 	}
 }

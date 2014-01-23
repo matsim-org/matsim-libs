@@ -34,6 +34,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -43,6 +44,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 import playground.christoph.evacuation.controler.EvacuationConstants;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
 
 /**
  * 
@@ -54,11 +56,13 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		
 	private final RouteFactory routeFactory;
 	private final TripRouter tripRouter;
+	private final AgentsToDropOffIdentifier agentsToDropOffIdentifier;
 	
 	/*package*/ DropOffAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
-			TripRouter tripRouter) {
+			TripRouter tripRouter, AgentsToDropOffIdentifier agentsToDropOffIdentifier) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.agentsToDropOffIdentifier = agentsToDropOffIdentifier;
 		this.routeFactory = new LinkNetworkRouteFactory();
 	}
 
@@ -97,12 +101,22 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		 * Create new drop off activity.
 		 * After the linkMinTravelTime the vehicle is removed from the links buffer.
 		 * At this point it is checked whether the vehicle should be parked at the link.
+		 * 
+		 * Set no end time but a duration of 60 seconds. Therefore, agents do not depart
+		 * immediately if they arrive after their scheduled end time (e.g. because their
+		 * current link is jammed and therefore it takes some time until they start their
+		 * activity).
+		 * 
+		 * Otherwise dropping off agents might fail since the driver misses that an agent
+		 * has left the vehicle and therefore waits until the simulation ends.
 		 */
-		double departureTime = this.time + 60.0;
+//		double departureTime = this.time + 60.0;
+		double duration = 60.0;
 		Activity dropOffActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE, currentLinkId);
 		dropOffActivity.setType(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE);
 		dropOffActivity.setStartTime(this.time);
-		dropOffActivity.setEndTime(departureTime);
+		dropOffActivity.setMaximumDuration(duration);
+//		dropOffActivity.setEndTime(departureTime);
 		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
 		((ActivityImpl) dropOffActivity).setFacilityId(scenario.createId(idString));
 		((ActivityImpl) dropOffActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
@@ -112,7 +126,8 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		 * Re-use existing routes vehicle.
 		 */
 		Leg carLeg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
-		carLeg.setDepartureTime(departureTime);
+//		carLeg.setDepartureTime(departureTime);
+		carLeg.setDepartureTime(this.time + duration);
 		subRoute = new ArrayList<Id>();
 		/*
 		 * If the driver is not already at the end link of its current route, copy the
@@ -133,6 +148,11 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		carRoute.setLinkIds(currentLinkId, subRoute, currentRoute.getEndLinkId());
 		carRoute.setVehicleId(currentVehicleId);
 		carLeg.setRoute(carRoute);
+		
+		// assign joint departure to agent's next car leg
+		Id agentId = withinDayAgent.getId();
+		JointDeparture jointDeparture = this.agentsToDropOffIdentifier.getJointDeparture(agentId);
+		this.agentsToDropOffIdentifier.getJointDepartureOrganizer().assignAgentToJointDeparture(agentId, carLeg, jointDeparture);
 		
 		/*
 		 * End agent's current leg at the current link.

@@ -125,7 +125,9 @@ import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalcul
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
@@ -585,7 +587,7 @@ public class EvacuationControler extends WithinDayController implements
 	
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenarioData, travelTimes, 
 				this.coordAnalyzer.createInstance(), this.affectedArea,
-				this.informedHouseholdsTracker, this.decisionModelRunner, null);
+				this.informedHouseholdsTracker, this.decisionModelRunner, null, null);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 	
@@ -785,11 +787,12 @@ public class EvacuationControler extends WithinDayController implements
 		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
-		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), tripRouterFactory, routingContext);
+		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), tripRouterFactory, routingContext,
+				(AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
 		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), (AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		

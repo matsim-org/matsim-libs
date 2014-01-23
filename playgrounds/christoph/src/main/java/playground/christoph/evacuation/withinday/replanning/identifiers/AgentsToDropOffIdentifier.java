@@ -26,12 +26,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
@@ -57,11 +59,15 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 	private final LinkEnteredProvider linkEnteredProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
+	private final Map<Id, JointDeparture> jointDepartures;
+	
 	/*package*/ AgentsToDropOffIdentifier(MobsimDataProvider mobsimDataProvider, LinkEnteredProvider linkEnteredProvider,
 			JointDepartureOrganizer jointDepartureOrganizer) {
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.linkEnteredProvider = linkEnteredProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		
+		this.jointDepartures = new ConcurrentHashMap<Id, JointDeparture>();
 	}
 
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
@@ -107,12 +113,24 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 				Id passengerId = passenger.getId();
 				if (!agentsLeaveVehicle.contains(passengerId)) remainingPassengers.add(passengerId);
 			}
-			this.jointDepartureOrganizer.createJointDeparture(linkId, vehicle.getId(), driverId, remainingPassengers);
+			JointDeparture jointDeparture = this.jointDepartureOrganizer.createJointDeparture(linkId, vehicle.getId(), driverId, remainingPassengers);
+			
+			this.jointDepartures.put(driverId, jointDeparture);
+//			for (Id passengerId :remainingPassengers) {
+//				this.jointDepartures.put(passengerId, jointDeparture);
+//			}
 			
 			// TODO: assign JointDeparture to agents and update their other joint departures
 		}	
 		
 		return agentsToDropOff;
 	}
-
+	
+	public JointDepartureOrganizer getJointDepartureOrganizer() {
+		return this.jointDepartureOrganizer;
+	}
+	
+	public JointDeparture getJointDeparture(Id agentId) {
+		return this.jointDepartures.remove(agentId);
+	}
 }

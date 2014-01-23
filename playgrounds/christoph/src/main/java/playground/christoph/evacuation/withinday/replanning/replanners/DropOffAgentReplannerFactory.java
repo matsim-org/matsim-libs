@@ -27,25 +27,31 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
+
 public class DropOffAgentReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
 	private final TripRouterFactory tripRouterFactory;
 	private final RoutingContext routingContext;
+	private final AgentsToDropOffIdentifier agentsToDropOffIdentifier;
 	
 	public DropOffAgentReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+			TripRouterFactory tripRouterFactory, RoutingContext routingContext, 
+			AgentsToDropOffIdentifier agentsToDropOffIdentifier) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.tripRouterFactory = tripRouterFactory;
 		this.routingContext = routingContext;
+		this.agentsToDropOffIdentifier = agentsToDropOffIdentifier;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new DropOffAgentReplanner(super.getId(), this.scenario,
 				this.getWithinDayEngine().getInternalInterface(),
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
+				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext), 
+				agentsToDropOffIdentifier);
 		return replanner;
 	}
 }

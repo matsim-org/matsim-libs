@@ -20,7 +20,7 @@
 
 package playground.christoph.evacuation.mobsim;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -33,6 +33,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -46,7 +50,7 @@ import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionMo
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 
-public class HouseholdDepartureManager {
+public class HouseholdDepartureManager implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsIdentifier.class);
 	
@@ -61,6 +65,8 @@ public class HouseholdDepartureManager {
 	private final Map<Id, HouseholdDeparture> scheduledHouseholdDepartures;
 	private final Queue<HouseholdDeparture> plannedDeparturesQueue;
 	private final Queue<HouseholdDeparture> handledDeparturesQueue;
+	
+	private Set<Id> householdsToHandle;	// households to handle in the current time step
 	
 	public HouseholdDepartureManager(Scenario scenario, CoordAnalyzer coordAnalyzer, HouseholdsTracker householdsTracker, 
 			InformedHouseholdsTracker informedHouseholdsTracker, DecisionDataProvider decisionDataProvider) {
@@ -85,29 +91,48 @@ public class HouseholdDepartureManager {
 		return this.scheduledHouseholdDepartures;
 	}
 	
-	public Queue<HouseholdDeparture> getPlannedDeparturesQueue() {
-		return this.plannedDeparturesQueue;
+	public HouseholdDeparture peekPlannedDepartureFromQueue() {
+		return this.plannedDeparturesQueue.peek();
+	}
+
+	public HouseholdDeparture pollPlannedDepartureFromQueue() {
+		return this.plannedDeparturesQueue.poll();
 	}
 	
-	public Queue<HouseholdDeparture> getHandledDeparturesQueue() {
-		return this.handledDeparturesQueue;
+	public void addHandledDepartureToQueue(HouseholdDeparture householdDeparture) {
+		this.handledDeparturesQueue.add(householdDeparture);
 	}
-	
-	public void handleHouseholdsStuff(double time) {
+
+	@Override
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		
+		double time = e.getSimulationTime();
+		
+		// if the evacuation has not started yet
 		if (EvacuationConfig.evacuationTime > time) return;
 		
-		Set<Id> householdsToHandle = this.collectHouseholdsToHandle();
+		this.householdsToHandle = this.collectHouseholdsToHandle(time);
 		this.handleHouseholds(householdsToHandle, time);
+	}
+	
+
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+		double time = e.getSimulationTime();
+		
+		// if the evacuation has not started yet
+		if (EvacuationConfig.evacuationTime > time) return;
+				
+		this.checkDepartureQueues(time);
 		
 		this.updateHouseholds(householdsToHandle, time);
 		
-		this.checkDepartureQueues(time);
+		this.householdsToHandle = null;
 	}
 	
-	private Set<Id> collectHouseholdsToHandle() {	
+	private Set<Id> collectHouseholdsToHandle(double time) {
 		
-		Set<Id> householdsToHandle = null;
+		Set<Id> householdsToHandle = new LinkedHashSet<Id>();
 		
 		// have all households already been informed?
 		boolean allHouseholdsInformed = this.informedHouseholdsTracker.allHouseholdsInformed();
@@ -116,16 +141,20 @@ public class HouseholdDepartureManager {
 		 * If already all households have been informed, we only have to handle
 		 * those households which have joined recently. Otherwise, we have to check
 		 * for each recently joined household whether it is already informed.
+		 * 
+		 * The second part of the if statement is a special case.
+		 * If the last households have been informed in time step i, then in time step i + 1
+		 * recently joined AND recently informed households have to be taken into account.  
 		 */
-		if (allHouseholdsInformed) {
-			householdsToHandle = this.householdsTracker.getHouseholdsJoinedInLastTimeStep();
-		} else {
-			householdsToHandle = new HashSet<Id>();
-			
+		if (allHouseholdsInformed && this.informedHouseholdsTracker.getAllHouseholdsInformedTime() + 1.0 < time) {
+			householdsToHandle.addAll(this.householdsTracker.getHouseholdsJoinedInLastTimeStep());
+		} else {			
 			// check all recently informed households
 			Set<Id> recentlyInformedHouseholds = this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep();
-			for (Id householdId : recentlyInformedHouseholds) {
-				if (this.householdsTracker.getJoinedHouseholds().contains(householdId)) householdsToHandle.add(householdId);
+			for (Id householdId : recentlyInformedHouseholds) {	
+				if (this.householdsTracker.getJoinedHouseholds().contains(householdId)) {
+					householdsToHandle.add(householdId);
+				}
 			}
 			
 			// check all recently joined households
@@ -133,6 +162,30 @@ public class HouseholdDepartureManager {
 			for (Id householdId : recentlyJoinedHouseholds) {
 				if (this.informedHouseholdsTracker.isHouseholdInformed(householdId)) householdsToHandle.add(householdId);
 			}			
+		}
+
+		/*
+		 * Some households might contain only a single member or travel together when being informed.
+		 * When they reach their meeting point, they have to be handled as well. 
+		 */
+		Set<Id> updatedHouseholds = this.householdsTracker.getHouseholdsUpdatedInLastTimeStep();
+		for (Id householdId : updatedHouseholds) {
+			// skip not informed households
+			if (!this.informedHouseholdsTracker.isHouseholdInformed(householdId)) continue;
+			
+			// skip not joined households
+			if (!this.householdsTracker.getJoinedHouseholds().contains(householdId)) continue;
+			
+			// skip households not located in a facility
+			HouseholdPosition householdPosition = this.householdsTracker.getHouseholdPosition(householdId);
+			if (!householdPosition.getPositionType().equals(Position.FACILITY)) continue;
+			
+			// skip households not located at their meeting facility
+			HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
+			if (!householdPosition.getPositionId().equals(hdd.getMeetingPointFacilityId())) continue;
+			
+			// Seems like we have to handle the household. Since its a set, we do not create duplicates.
+			householdsToHandle.add(householdId);
 		}
 		
 		return householdsToHandle;
@@ -183,6 +236,52 @@ public class HouseholdDepartureManager {
 		}
 	}
 	
+	/*
+	 * Check whether a household has missed its departure.
+	 */
+	private void checkDepartureQueues(double time) {
+		
+		HouseholdDeparture householdDeparture = null;
+		while ((householdDeparture = this.plannedDeparturesQueue.peek()) != null) {
+			
+			if (householdDeparture.departureTime < time) {
+				log.warn("Household " + householdDeparture.householdId + " missed its departure time!" + 
+						" Simulation time: " + time +
+						", expected departure time: " + householdDeparture.departureTime);
+				this.plannedDeparturesQueue.poll();
+				this.scheduledHouseholdDepartures.remove(householdDeparture.householdId);
+			} else break;
+		}
+		
+		while ((householdDeparture = this.handledDeparturesQueue.peek()) != null) {
+			
+			// departed as planned - remove entry from scheduledHouseholdDepartures map
+			if (householdDeparture.departureTime == time) {
+				this.handledDeparturesQueue.poll();
+				this.scheduledHouseholdDepartures.remove(householdDeparture.householdId);
+				
+				// check number of departed household members
+				if (householdDeparture.getExpectedDepartures() != householdDeparture.getPerformedDepartures()) {
+					log.warn("Number of expected departing people (" + householdDeparture.getExpectedDepartures() +
+							") does not match number of departed people (" + householdDeparture.getPerformedDepartures() +
+							") for household " + householdDeparture.householdId + "!");
+				}
+			} else if (householdDeparture.departureTime > time) {
+				log.warn("Household " + householdDeparture.householdId + " should not have departed yet!" + 
+						" Simulation time: " + time +
+						", expected departure time: " + householdDeparture.departureTime);
+				this.handledDeparturesQueue.poll();
+				this.scheduledHouseholdDepartures.remove(householdDeparture.householdId);
+
+				if (householdDeparture.getExpectedDepartures() != householdDeparture.getPerformedDepartures()) {
+					log.warn("Number of expected departing people (" + householdDeparture.getExpectedDepartures() +
+							") does not match number of departed people (" + householdDeparture.getPerformedDepartures() +
+							") for household " + householdDeparture.householdId + "!");
+				}
+			} else break;
+		}
+	}
+	
 	// TODO: does this stuff make sense?
 	private void updateHouseholds(Set<Id> handledHouseholds, double time) {
 		
@@ -208,43 +307,6 @@ public class HouseholdDepartureManager {
 						"departure (scheduled departure time " + scheduledDeparture.departureTime +
 						") which has not been performed.");
 			}
-		}
-	}
-	
-	/*
-	 * Check whether a household has missed its departure.
-	 */
-	private void checkDepartureQueues(double time) {
-		
-		HouseholdDeparture householdDeparture = null;
-		while ((householdDeparture = this.plannedDeparturesQueue.peek()) != null) {
-//		while (true) {
-//			HouseholdDeparture householdDeparture = this.plannedDeparturesQueue.peek();
-			
-			if (householdDeparture.departureTime < time) {
-				log.warn("Household " + householdDeparture.householdId + " missed its departure time!" + 
-						". Simulation time: " + time +
-						", expected departure time: " + householdDeparture.departureTime);
-				this.plannedDeparturesQueue.poll();
-				this.scheduledHouseholdDepartures.remove(householdDeparture.householdId);
-			} else break;
-		}
-		
-		while ((householdDeparture = this.handledDeparturesQueue.peek()) != null) {
-//		while (true) {
-//			HouseholdDeparture householdDeparture = this.handledDeparturesQueue.peek();
-			
-			if (householdDeparture.departureTime > time) {
-				log.warn("Household " + householdDeparture.householdId + " should not have departed yet!" + 
-						" Simulation time: " + time +
-						", expected departure time: " + householdDeparture.departureTime);
-				this.handledDeparturesQueue.poll();
-			} else if (householdDeparture.getExpectedDepartures() != householdDeparture.getPerformedDepartures()) {
-				log.warn("Number of expected departing people (" + householdDeparture.getExpectedDepartures() +
-						") does not match number of departed people (" + householdDeparture.getPerformedDepartures() +
-						") for household " + householdDeparture.householdId + "!");
-				this.handledDeparturesQueue.poll();
-			} else break;
 		}
 	}
 		
@@ -311,14 +373,23 @@ public class HouseholdDepartureManager {
 			this.driverVehicleMapping = new ConcurrentHashMap<Id, Id>();
 		}
 		
+		/**
+		 * @return The mapping between a household and the meeting point that should be used.
+		 */
 		public Map<Id, Id> getHouseholdMeetingPointMap() {
 			return householdMeetingPointMapping;
 		}
 
+		/**
+		 * @return The mapping between an agent and the transportMode that should be used.
+		 */
 		public Map<Id, String> getTransportModeMap() {
 			return transportModeMapping;
 		}
 
+		/**
+		 * @return The mapping between an agent and the vehicle that should be used.
+		 */
 		public Map<Id, Id> getDriverVehicleMap() {
 			return driverVehicleMapping;
 		}

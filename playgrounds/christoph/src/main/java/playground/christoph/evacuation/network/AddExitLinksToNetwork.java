@@ -73,6 +73,9 @@ public class AddExitLinksToNetwork {
 
 	private static final Logger log = Logger.getLogger(AddExitLinksToNetwork.class);
 	
+	public static final String exitNode = "exitNode";
+	public static final String exitLink = "exitLink";
+	
 	private Scenario scenario;
 	private Network network;
 	
@@ -173,18 +176,18 @@ public class AddExitLinksToNetwork {
 //		Coord rescueCoord = scenario.createCoord(0.0, 0.0);
 //		Coord rescueCoord = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0);
 		Coord rescueCoord = EvacuationConfig.getRescueCoord();
-		Node rescueNode = network.getFactory().createNode(scenario.createId("rescueNode"), rescueCoord);
+		Node rescueNode = network.getFactory().createNode(scenario.createId(AddExitLinksToNetwork.exitNode), rescueCoord);
 		network.addNode(rescueNode);
 		
 		int counter = 0;
 		for (Node node : exitNodes.values()) {
 			counter++;
-			Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink" + counter), node, rescueNode);
-			rescueLink.setLength(10);	// use short links for non-vehicular traffic
-			rescueLink.setCapacity(1000000);
-			rescueLink.setFreespeed(1000000);			
-//			rescueLink.setCapacity(Double.MAX_VALUE);
-//			rescueLink.setFreespeed(Double.MAX_VALUE);
+			Link exitLink = network.getFactory().createLink(scenario.createId(AddExitLinksToNetwork.exitLink + counter), node, rescueNode);
+			exitLink.setLength(10);	// use short links for non-vehicular traffic
+			exitLink.setCapacity(1000000);
+			exitLink.setFreespeed(1000000);			
+//			exitLink.setCapacity(Double.MAX_VALUE);
+//			exitLink.setFreespeed(Double.MAX_VALUE);
 			Set<String> allowedTransportModes = new HashSet<String>();
 			allowedTransportModes.add(TransportMode.bike);
 			allowedTransportModes.add(TransportMode.car);
@@ -192,8 +195,8 @@ public class AddExitLinksToNetwork {
 			allowedTransportModes.add(TransportMode.ride);
 			allowedTransportModes.add(TransportMode.walk);
 			allowedTransportModes.add("evacuation");
-			rescueLink.setAllowedModes(allowedTransportModes);
-			network.addLink(rescueLink);
+			exitLink.setAllowedModes(allowedTransportModes);
+			network.addLink(exitLink);
 		}
 		
 		log.info("Created " + counter + " exit links.");
@@ -206,16 +209,16 @@ public class AddExitLinksToNetwork {
 //		Coord rescueCoord2 = scenario.createCoord(1.0, 1.0);
 //		Coord rescueCoord2 = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
 		Coord rescueCoord2 = scenario.createCoord(rescueCoord.getX() + 1.0, rescueCoord.getY() + 1.0);
-		Node rescueNode2 = network.getFactory().createNode(scenario.createId("rescueNode2"), rescueCoord2);
+		Node rescueNode2 = network.getFactory().createNode(scenario.createId(AddExitLinksToNetwork.exitNode + "2"), rescueCoord2);
 		network.addNode(rescueNode2);
 		
-		Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink"), rescueNode, rescueNode2);
+		Link exitLink = network.getFactory().createLink(scenario.createId(AddExitLinksToNetwork.exitLink), rescueNode, rescueNode2);
 //		rescueLink.setLength(100000);
 //		rescueLink.setCapacity(Double.MAX_VALUE);
 //		rescueLink.setFreespeed(Double.MAX_VALUE);
-		rescueLink.setLength(10);	// use short links for non-vehicular traffic
-		rescueLink.setCapacity(1000000);
-		rescueLink.setFreespeed(1000000);
+		exitLink.setLength(10);	// use short links for non-vehicular traffic
+		exitLink.setCapacity(1000000);
+		exitLink.setFreespeed(1000000);
 		Set<String> allowedTransportModes = new HashSet<String>();
 		allowedTransportModes.add(TransportMode.bike);
 		allowedTransportModes.add(TransportMode.car);
@@ -223,15 +226,15 @@ public class AddExitLinksToNetwork {
 		allowedTransportModes.add(TransportMode.ride);
 		allowedTransportModes.add(TransportMode.walk);
 		allowedTransportModes.add("evacuation");
-		rescueLink.setAllowedModes(allowedTransportModes);
-		network.addLink(rescueLink);
+		exitLink.setAllowedModes(allowedTransportModes);
+		network.addLink(exitLink);
 		
 		/*
 		 * Create and add the rescue facility and an activity option ("rescue")
 		 */
-		ActivityFacility rescueFacility = scenario.getActivityFacilities().getFactory().createActivityFacility(scenario.createId("rescueFacility"), rescueLink.getCoord());
+		ActivityFacility rescueFacility = scenario.getActivityFacilities().getFactory().createActivityFacility(scenario.createId("rescueFacility"), exitLink.getCoord());
 		scenario.getActivityFacilities().addActivityFacility(rescueFacility);
-		((ActivityFacilityImpl)rescueFacility).setLinkId(((LinkImpl)rescueLink).getId());
+		((ActivityFacilityImpl)rescueFacility).setLinkId(((LinkImpl)exitLink).getId());
 		
 		ActivityOption activityOption = ((ActivityFacilityImpl)rescueFacility).createActivityOption("rescue");
 //		activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));

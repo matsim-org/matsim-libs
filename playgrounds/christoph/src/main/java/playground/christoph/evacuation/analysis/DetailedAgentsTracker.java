@@ -408,7 +408,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		if (this.enrouteDrivers.contains(event.getPersonId())) {
 			Id vehicleId = this.driverVehicles.remove(event.getPersonId());
 			Collection<Id> agentsInVehicle = this.vehiclePassengers.get(vehicleId);
-			this.stuckAgents.addAll(agentsInVehicle);
+			if (agentsInVehicle != null) this.stuckAgents.addAll(agentsInVehicle);
 		}
 	}
 	

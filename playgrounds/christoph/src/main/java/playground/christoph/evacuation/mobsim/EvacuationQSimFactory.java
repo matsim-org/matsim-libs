@@ -41,10 +41,12 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelPassengerQNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -83,6 +85,15 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
     @Override
     public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
+    	/*
+    	 * As long as we need ExperimentalBasicWithindayAgents because other agents cannot
+    	 * change their persons' plans. 
+    	 */
+    	ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+    	
+    	// so far "ride_passenger" - might be switched to "ride"
+    	PassengerDepartureHandler.passengerMode = PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE;
+    	
         QSimConfigGroup conf = sc.getConfig().qsim();
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");

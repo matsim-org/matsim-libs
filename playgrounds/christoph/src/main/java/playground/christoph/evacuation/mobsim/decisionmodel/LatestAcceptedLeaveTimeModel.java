@@ -53,12 +53,10 @@ public class LatestAcceptedLeaveTimeModel implements HouseholdDecisionModel {
 	public static final String latestAcceptedLeaveTimeFile = "latestAcceptedLeaveTimeModel.txt.gz";
 	
 	private final DecisionDataProvider decisionDataProvider;
-//	private final Random random;
 	private final DeterministicRNG rng;
 	
 	public LatestAcceptedLeaveTimeModel(DecisionDataProvider decisionDataProvider, long rngInitialValue) {
 		this.decisionDataProvider = decisionDataProvider;
-//		this.random = MatsimRandom.getLocalInstance();
 		this.rng = new DeterministicRNG(rngInitialValue);
 	}
 	

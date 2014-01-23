@@ -45,29 +45,41 @@ public class JointDepartureOrganizer {
 	 * Package protected to allow test cases to check whether all departures have
 	 * been processed as expected. 
 	 */
-	/*package*/ final Map<Id, Map<Leg, JointDeparture>> scheduledDepartures;	// agentId
-
+	/*package*/ final Map<Id, Map<Leg, JointDeparture>> scheduledDeparturesMap;	// agentId
+	/*package*/ final Map<Id, JointDeparture> scheduledDepartures;
+	
 	private final AtomicInteger jointDepartureCounter = new AtomicInteger(0);
 	
 	public JointDepartureOrganizer() {
 		// needs this to be thread-safe?
-		this.scheduledDepartures = new ConcurrentHashMap<Id, Map<Leg, JointDeparture>>();
+		this.scheduledDeparturesMap = new ConcurrentHashMap<Id, Map<Leg, JointDeparture>>();
+		
+		/*
+		 * This is only to check whether all departures have been processed.
+		 * I think this needs to be thread-safe, too since it is accessed
+		 * from replanners.
+		 */
+		this.scheduledDepartures = new ConcurrentHashMap<Id, JointDeparture>();
 	}
 	
 	/*package*/ Map<Leg, JointDeparture> getJointDepartures(Id agentId) {
-		return this.scheduledDepartures.get(agentId);
+		return this.scheduledDeparturesMap.get(agentId);
 	}
 	
 	public JointDeparture getJointDepartureForLeg(Id agentId, Leg leg) {
-		Map<Leg, JointDeparture> map = this.scheduledDepartures.get(agentId);
+		Map<Leg, JointDeparture> map = this.scheduledDeparturesMap.get(agentId);
 		if (map == null) return null;
 		else return map.get(leg);
 	}
 	
 	public JointDeparture removeJointDepartureForLeg(Id agentId, Leg leg) {
-		Map<Leg, JointDeparture> map = this.scheduledDepartures.get(agentId);
+		Map<Leg, JointDeparture> map = this.scheduledDeparturesMap.get(agentId);
 		if (map == null) return null;
 		else return map.remove(leg);
+	}
+	
+	/*package*/ boolean removeHandledJointDeparture(JointDeparture jointDeparture) {
+		return this.scheduledDepartures.remove(jointDeparture.getId()) != null;
 	}
 	
 	public JointDeparture createJointDeparture(Id id, Id linkId, Id vehicleId, Id driverId, 
@@ -89,10 +101,11 @@ public class JointDepartureOrganizer {
 	}
 	
 	public void assignAgentToJointDeparture(Id agentId, Leg leg, JointDeparture jointDeparture) {
-		Map<Leg, JointDeparture> jointDepartures = this.scheduledDepartures.get(agentId);
+		Map<Leg, JointDeparture> jointDepartures = this.scheduledDeparturesMap.get(agentId);
 		if (jointDepartures == null) {
 			jointDepartures = new HashMap<Leg, JointDeparture>();
-			this.scheduledDepartures.put(agentId, jointDepartures);
+			this.scheduledDeparturesMap.put(agentId, jointDepartures);
+			this.scheduledDepartures.put(jointDeparture.getId(), jointDeparture);
 		}
 		jointDepartures.put(leg, jointDeparture);
 	}

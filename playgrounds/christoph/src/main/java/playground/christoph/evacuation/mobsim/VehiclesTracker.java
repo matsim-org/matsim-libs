@@ -20,25 +20,28 @@
 
 package playground.christoph.evacuation.mobsim;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
+import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 
 /**
  * Class that tracks vehicles.
@@ -46,14 +49,13 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
  * @author cdobler
  */
 public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-		PersonDepartureEventHandler, PersonArrivalEventHandler {
+		PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler,
+		PersonEntersVehicleEventHandler {
 	
 	private static final Logger log = Logger.getLogger(VehiclesTracker.class);
 	
 	private final MobsimDataProvider mobsimDataProvider;
-	
-	// currently active drivers
-	private final Set<Id> drivers;
+	private final TransportModeProvider transportModeProvider;
 	
 	/*
 	 * Reserved capacities for passengers planned to enter. So far, we reserve seats only on 
@@ -65,11 +67,12 @@ public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHan
 	public VehiclesTracker(MobsimDataProvider mobsimDataProvider) {
 		
 		this.mobsimDataProvider = mobsimDataProvider;
+		this.transportModeProvider = new TransportModeProvider();
 		
-		this.drivers = new HashSet<Id>();
 		this.reservedCapacities = new ConcurrentHashMap<Id, AtomicInteger>();
 	}
 	
+	// called from identifiers
 	public int getFreeVehicleCapacity(Id vehicleId) {
 		
 		QVehicle vehicle = (QVehicle) this.mobsimDataProvider.getVehicle(vehicleId);
@@ -81,54 +84,70 @@ public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHan
 		return freeCapacity;
 	}
 	
+	// called from identifiers
 	public int getReservedVehicleCapacity(Id vehicleId) {
 		AtomicInteger reserved = this.reservedCapacities.get(vehicleId);
 		if (reserved == null) return 0;
 		else return reserved.get();
 	}
 	
+	// called from identifiers - this should only be done when there is free capacity left
 	public void reserveSeat(Id vehicleId) {
 		AtomicInteger reserved = this.reservedCapacities.get(vehicleId);
 		reserved.incrementAndGet();
 	}
-		
+	
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if (TransportMode.car.equals(event.getLegMode())) {
-			this.drivers.remove(event.getPersonId());
-		}
+		this.transportModeProvider.handleEvent(event);
 	}
-
+	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (TransportMode.car.equals(event.getLegMode())) {
-			this.drivers.add(event.getPersonId());			
-		}
+		this.transportModeProvider.handleEvent(event);
 	}
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		boolean isDriver = drivers.contains(event.getPersonId());
+		String transportMode = this.transportModeProvider.getTransportMode(event.getPersonId());
+		boolean isDriver = transportMode != null && transportMode.equals(TransportMode.car);
 		if (isDriver) {
 			reservedCapacities.put(event.getVehicleId(), new AtomicInteger(0));
 		}
 	}
-
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		String transportMode = this.transportModeProvider.getTransportMode(event.getPersonId());
+		boolean isDriver = transportMode != null && transportMode.equals(TransportMode.car);
+		if (!isDriver) {	// if it is not a driver, it is a passenger
+			AtomicInteger reservedCapacity = reservedCapacities.get(event.getVehicleId());
+			if (reservedCapacity != null) reservedCapacity.decrementAndGet();
+		}
+	}
+	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		boolean isDriver = drivers.contains(event.getPersonId());
+		String transportMode = this.transportModeProvider.getTransportMode(event.getPersonId());
+		boolean isDriver = transportMode != null && transportMode.equals(TransportMode.car);
 		if (isDriver) {
 			AtomicInteger reservedCapacity = reservedCapacities.get(event.getVehicleId());
 			if (reservedCapacity != null && reservedCapacity.get() > 0) {
 				log.warn("Found reserved capacity of " + reservedCapacity.get() + " for vehicle " +
-						event.getVehicleId().toString() + ". Expected this to be 0.");
+						event.getVehicleId().toString() + " on link " + event.getLinkId().toString() + 
+						" at time " + event.getTime() + ". Expected this to be 0.");
 			}
 		}
 	}
 	
 	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		this.transportModeProvider.handleEvent(event);
+	}
+	
+	@Override
 	public void reset(int iteration) {		
-		this.drivers.clear();
+		this.transportModeProvider.reset(iteration);
 		this.reservedCapacities.clear();
 	}
 

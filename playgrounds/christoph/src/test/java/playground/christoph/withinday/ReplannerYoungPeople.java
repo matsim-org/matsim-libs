@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -37,10 +38,10 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
-		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		Leg currentLeg = WithinDayAgentUtils.getCurrentLeg(withinDayAgent);
+		int currentLegIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(currentLegIndex + 1);
-		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 		// If it is not a car Leg we don't replan it.
 		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
@@ -68,7 +69,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 				executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}

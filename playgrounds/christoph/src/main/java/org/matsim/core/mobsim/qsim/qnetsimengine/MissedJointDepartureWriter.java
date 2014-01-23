@@ -22,14 +22,12 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
 
-import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class MissedJointDepartureWriter implements AfterMobsimListener {
@@ -48,15 +46,12 @@ public class MissedJointDepartureWriter implements AfterMobsimListener {
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		
 		// Write file containing all departures which have not been processed.
-		Set<JointDeparture> missedDepartures = new LinkedHashSet<JointDeparture>();
-		for (Map<Leg, JointDeparture> jointDepartures : this.jointDepartureOrganizer.scheduledDepartures.values()) {
-			missedDepartures.addAll(jointDepartures.values());
-		}
+		Map<Id, JointDeparture> missedDepartures = new TreeMap<Id, JointDeparture>(this.jointDepartureOrganizer.scheduledDepartures);
 		try {
 			String file = event.getControler().getControlerIO().getIterationFilename(event.getIteration(),
 					missedJointDeparturesFile);
 			bufferedWriter = IOUtils.getBufferedWriter(file);
-			for(JointDeparture jointDeparture : missedDepartures) {
+			for(JointDeparture jointDeparture : missedDepartures.values()) {
 				bufferedWriter.write(jointDeparture.toString());
 				bufferedWriter.write(newLine);
 			}

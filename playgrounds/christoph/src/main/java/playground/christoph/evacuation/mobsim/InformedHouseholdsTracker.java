@@ -37,6 +37,9 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.events.HouseholdInformationEvent;
 import playground.christoph.evacuation.events.handler.HouseholdInformationEventHandler;
 
+/*
+ * Tracks the information level of all households and their members.
+ */
 public class InformedHouseholdsTracker extends InformedAgentsTracker implements HouseholdInformationEventHandler {
 
 	/*package*/ final int totalHouseholds;	// number of households with more than 0 members
@@ -45,6 +48,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker implements 
 
 	private int infoTime = 0;
 	private boolean allHouseholdsInformed = false;
+	private double allHouseholdsInformedTime = Double.NaN;
 	
 	private Set<Id> informedInLastTimeStep = new LinkedHashSet<Id>();
 	private Set<Id> informedInCurrentTimeStep = new LinkedHashSet<Id>();
@@ -66,6 +70,10 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker implements 
 
 	public boolean allHouseholdsInformed() {
 		return this.allHouseholdsInformed;
+	}
+	
+	public double getAllHouseholdsInformedTime() {
+		return this.allHouseholdsInformedTime;
 	}
 	
 	public boolean isHouseholdInformed(Id id) {
@@ -114,6 +122,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker implements 
 			log.info("All households have been informed at " + Time.writeTime(e.getSimulationTime()));
 			printStatistics(time);
 			this.allHouseholdsInformed = true;
+			this.allHouseholdsInformedTime = time;
 			return;
 		}
 	}

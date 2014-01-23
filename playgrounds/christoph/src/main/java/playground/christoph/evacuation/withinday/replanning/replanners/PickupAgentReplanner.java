@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
@@ -43,6 +44,7 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 import playground.christoph.evacuation.controler.EvacuationConstants;
+import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
 
 /**
  * 
@@ -54,11 +56,13 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 	
 	private final RouteFactory carRouteFactory;
 	private final RouteFactory rideRouteFactory;
+	private final AgentsToPickupIdentifier agentsToPickupIdentifier;
 	
-	/*package*/ PickupAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	/*package*/ PickupAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface, AgentsToPickupIdentifier agentsToPickupIdentifier) {
 		super(id, scenario, internalInterface);
 		this.carRouteFactory = new LinkNetworkRouteFactory(); 
 		this.rideRouteFactory = new GenericRouteFactory();
+		this.agentsToPickupIdentifier = agentsToPickupIdentifier;
 	}
 
 	@Override
@@ -94,22 +98,33 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		
 		/*
 		 * Create new pickup activity.
+		 * 
+		 * Set no end time but a duration of 60 seconds. Therefore, agents do not depart
+		 * immediately if they arrive after their scheduled end time (e.g. because their
+		 * current link is jammed and therefore it takes some time until they start their
+		 * activity).
+		 * 
+		 * Otherwise picking up agents might fail since the vehicle is not parked when 
+		 * the mobsim tries to move waiting agents into it.
 		 */
-		double departureTime = this.time + 60.0;
+//		double departureTime = this.time + 60.0;
+		double duration = 60.0;
 		Activity waitForPickupActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE, currentLinkId);
 		waitForPickupActivity.setType(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE);
 		waitForPickupActivity.setStartTime(this.time);
-		waitForPickupActivity.setEndTime(departureTime);
+		waitForPickupActivity.setMaximumDuration(duration);
+//		waitForPickupActivity.setEndTime(departureTime);
 		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
 		((ActivityImpl) waitForPickupActivity).setFacilityId(scenario.createId(idString));
 		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 		
 		/*
 		 * Create new car leg from the current position to the current legs destination.
-		 * Re-use existing routes vehicle.
+		 * Re-use existing route's vehicle.
 		 */
 		Leg carLeg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
-		carLeg.setDepartureTime(departureTime);
+//		carLeg.setDepartureTime(departureTime);
+		carLeg.setDepartureTime(this.time + duration);
 		subRoute = new ArrayList<Id>();
 		/*
 		 * If the driver is not already at the end link of its current route, copy the
@@ -130,6 +145,11 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		carRoute.setLinkIds(currentLinkId, subRoute, currentRoute.getEndLinkId());
 		carRoute.setVehicleId(currentVehicleId);
 		carLeg.setRoute(carRoute);
+		
+		// assign joint departure to agent's next car leg
+		Id agentId = withinDayAgent.getId();
+		JointDeparture jointDeparture = this.agentsToPickupIdentifier.getJointDeparture(agentId);
+		this.agentsToPickupIdentifier.getJointDepartureOrganizer().assignAgentToJointDeparture(agentId, carLeg, jointDeparture);
 		
 		/*
 		 * End agent's current leg at the current link.
@@ -181,14 +201,18 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 				
 		/*
-		 * Create new ride_passenger leg to the rescue facility.
-		 * Set mode to ride, then create route for the leg, then
-		 * set the mode to the correct value (ride_passenger).
+		 * Create new ride_passenger leg to the rescue facility. Set mode to ride, then 
+		 * create route for the leg, then set the mode to the correct value (ride_passenger).
 		 */
 		Leg ridePassengerLeg = scenario.getPopulation().getFactory().createLeg(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
 		ridePassengerLeg.setDepartureTime(departureTime);
 		Route ridePassengerRoute = rideRouteFactory.createRoute(currentLinkId, currentLeg.getRoute().getEndLinkId());
 		ridePassengerLeg.setRoute(ridePassengerRoute);
+		
+		// assign joint departure to agent's ride leg
+		Id agentId = withinDayAgent.getId();
+		JointDeparture jointDeparture = this.agentsToPickupIdentifier.getJointDeparture(agentId);
+		this.agentsToPickupIdentifier.getJointDepartureOrganizer().assignAgentToJointDeparture(agentId, ridePassengerLeg, jointDeparture);
 		
 		/*
 		 * Insert pickup activity and ride_passenger leg into agent's plan.

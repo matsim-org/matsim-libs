@@ -88,6 +88,7 @@ public class EvacuationConfig {
 	
 	public static long householdsInformerRandomSeed = 132456;
 	public static long departureDelayRandomSeed = 123654;
+	public static long evacuationDecisionRandomSeed = 471982;
 	public static long fuzzyTravelTimeEstimatorRandomSeed = 213456;
 	public static long latestAcceptedLeaveTimeRandomSeed = 123984;
 	

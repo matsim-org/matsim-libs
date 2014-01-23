@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,6 +40,7 @@ import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -79,7 +81,9 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	private final InformedAgentsTracker informedAgentsTracker;
 	private final DecisionDataProvider decisionDataProvider;
-		
+	
+	private final Map<Id, JointDeparture> jointDepartures;
+	
 	/*package*/ AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, 
 			MobsimDataProvider mobsimDataProvider, EarliestLinkExitTimeProvider earliestLinkExitTimeProvider, 
 			InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider, 
@@ -92,8 +96,10 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		this.informedAgentsTracker = informedAgentsTracker;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
 		this.decisionDataProvider = decisionDataProvider;
+		
+		this.jointDepartures = new ConcurrentHashMap<Id, JointDeparture>();
 	}
-
+	
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
@@ -260,10 +266,22 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		 * Create joint departures for all planned pickups
 		 */
 		for (PlannedDeparture pd : plannedDepartures.values()) {
-			this.jointDepartureOrganizer.createJointDeparture(pd.linkId, pd.vehicleId, pd.driverId, pd.passengerIds);
+			JointDeparture jointDeparture = this.jointDepartureOrganizer.createJointDeparture(pd.linkId, pd.vehicleId, pd.driverId, pd.passengerIds);
+			this.jointDepartures.put(pd.driverId, jointDeparture);
+			for (Id passengerId :pd.passengerIds) {
+				this.jointDepartures.put(passengerId, jointDeparture);
+			}
 		}
 		
 		return agentsToReplan;
+	}
+	
+	public JointDepartureOrganizer getJointDepartureOrganizer() {
+		return this.jointDepartureOrganizer;
+	}
+	
+	public JointDeparture getJointDeparture(Id agentId) {
+		return this.jointDepartures.remove(agentId);
 	}
 
 	private PickupDecision checkPickup(Person passenger, Person driver) {
