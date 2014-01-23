@@ -47,7 +47,9 @@ public class DynamicGroupIdentifierTest {
 	public void testNGroupsNoJointPlansNoSocialNet() {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
-		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , new SocialNetworkImpl() );
+
+		final SocialNetwork socnet = new SocialNetworkImpl();
+		scenario.addScenarioElement( SocialNetwork.ELEMENT_NAME , socnet );
 
 		final int nPersons = 100;
 
@@ -55,6 +57,8 @@ public class DynamicGroupIdentifierTest {
 			final Person p = scenario.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i ) );
 			scenario.getPopulation().addPerson( p );
 		}
+
+		socnet.addEgos( scenario.getPopulation().getPersons().keySet() );
 
 		test( new Fixture( scenario , nPersons ) );
 	}
@@ -130,6 +134,8 @@ public class DynamicGroupIdentifierTest {
 							jointPlan ) );
 			}
 		}
+
+		socnet.addEgos( scenario.getPopulation().getPersons().keySet() );
 
 		test( new Fixture( scenario , nGroups ) );
 	}
