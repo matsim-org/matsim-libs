@@ -22,7 +22,6 @@ package org.matsim.withinday.replanning.identifiers.tools;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -129,7 +128,10 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	 * @return a list of agents who might need a replanning
 	 */
 	public Set<Id> getReplanningAgents(final double time) {
-		return this.filterAgents(time, TimeFilterMode.EXACT);
+		
+		Set<Id> set = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time);
+		if (set != null) return Collections.unmodifiableSet(set);
+		else return new HashSet<Id>();
 	}
 
 	/**
@@ -149,26 +151,25 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	}
 	
 	private Set<Id> filterAgents(final double time, final TimeFilterMode timeMode) {
+		
 		Set<Id> set = new HashSet<Id>();
 		
-		Iterator<Entry<Id, Double>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimes().entrySet().iterator();
-		while (entries.hasNext()) {
-			Entry<Id, Double> entry = entries.next();
-			Id personId = entry.getKey();
-
-			double replanningTime = entry.getValue();
-
+		Set<Entry<Double, Set<Id>>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep().entrySet();
+		
+		for (Entry<Double, Set<Id>> entry : entries) {
+			double earliestLinkExitTime = entry.getKey();
+			
 			// check time
-			if (timeMode == TimeFilterMode.EXACT) {
-				if (time != replanningTime) continue;				
-			} else if (timeMode == TimeFilterMode.RESTRICTED) {
-				if (time <= replanningTime) continue;
+			if (timeMode == TimeFilterMode.RESTRICTED) {
+				if (time <= earliestLinkExitTime) continue;
 			} else if (timeMode == TimeFilterMode.UNRESTRICTED) {
-				if (time > replanningTime) continue;
+				if (time > earliestLinkExitTime) continue;
+			} else {
+				throw new RuntimeException("Unexpected TimeFilterMode was found: " + timeMode.toString());
 			}
 			
-			// non of the checks fails therefore add agent to the replanning set
-			set.add(personId);	
+			// non of the checks fails therefore add agents to the set
+			set.addAll(entry.getValue());
 		}
 
 		return set;
