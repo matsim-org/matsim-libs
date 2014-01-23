@@ -94,4 +94,56 @@ public class Emme2Zone {
 	public double LSUMSIZE0;
 	public double LSUMSIZES;
 	public int SUPERZONE;
+	
+	public boolean hasHome() {
+		if (POPULATION > 0) return true;
+		else return false;
+	}
+	
+	public boolean hasWork() {
+		if (EDUCATION == 1 || EDUCATION == 2 || EDUCATION == 3) return true;
+		else if (OFFICE > 0) return true;
+		else if (SHOPPING > 0) return true;
+		else if (HEALTH > 0) return true;
+		else if (TRANSPORTA > 0) return true;
+		else if (EMPL_TOT > 0) return true;
+		else return false;
+	}
+
+	public boolean hasEducationUniversity() {
+		if (EDUCATION == 1) return true;
+		else return false;
+	}
+	
+	public boolean hasEducationHighSchool() {
+		if (EDUCATION == 2) return true;
+		else return false;
+	}
+	
+	public boolean hasEducationElementarySchool() {
+		if (EDUCATION == 3) return true;
+		else return false;
+	}
+
+	/*
+	 * This needs to be always true since other many agents would have invalid plans.
+	 * They want to perform shopping activities in zones where SHOPPING = 0...
+	 */
+	public boolean hasShopping() {
+//		if (SHOPPING > 0) return true;
+//		else return false;
+		return true;
+	}
+	
+	/*
+	 * Same as for shopping.
+	 */
+	public boolean hasLeisure() {
+//		if (CULTURAL > 0) return true;
+//		else if (HEALTH > 0) return true;
+//		else if (TRANSPORTA > 0) return true;
+//		else if (SHOPPING > 0) return true;
+//		else return false;
+		return true;
+	}
 }

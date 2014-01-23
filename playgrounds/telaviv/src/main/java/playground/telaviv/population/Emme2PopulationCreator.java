@@ -235,6 +235,7 @@ public class Emme2PopulationCreator {
 //		Route route;
 		String transportMode;
 		ActivityFacility activityFacility;
+		String activityType;
 
 		boolean fullTimeJob = (emme2Person.WORKSTA != 2);
 
@@ -310,7 +311,7 @@ public class Emme2PopulationCreator {
 		else {
 			// It is the only Activity in the plan so we don't set an endtime.
 		}
-
+		
 		activityFacility = activityFacilities.getFacilities().get(homeLinkId);
 		activity.setFacilityId(activityFacility.getId());
 		activity.setCoord(activityFacility.getCoord());
@@ -344,15 +345,26 @@ public class Emme2PopulationCreator {
 //				leg.setRoute(route);
 				plan.addLeg(leg);
 
+				/*
+				 * If null is returned, the found activity type cannot be performed in the found
+				 * facility. Skip those persons.
+				 */
+				activityType = getActivityTypeString(primaryPreStopActivityType, getActivityFacilityByLinkId(primaryPreLinkId));
+				if (activityType == null) return false;
 				
-				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(getActivityTypeString(primaryPreStopActivityType, getActivityFacilityByLinkId(primaryPreLinkId)), primaryPreLinkId);
+				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, primaryPreLinkId);
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_1_BEF);
 				activity.setEndTime(time + emme2Person.DUR_1_BEF);
 				activityFacility = activityFacilities.getFacilities().get(primaryPreLinkId);
 				activity.setFacilityId(activityFacility.getId());
 				activity.setCoord(activityFacility.getCoord());
-				desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
+				/*
+				 * Ensure that typical duration is at least one hour. Very few agents have a duration of
+				 * 0.0 seconds, which results in crashes in the scoring function (typical duration is 0.0
+				 * which leads to a divide by zero problem). 
+				 */
+				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousActivityLinkId = primaryPreLinkId;
@@ -372,14 +384,21 @@ public class Emme2PopulationCreator {
 //			leg.setRoute(route);
 			plan.addLeg(leg);
 
-			activity = (ActivityImpl) populationFactory.createActivityFromLinkId(getActivityTypeString(primaryMainActivityType, getActivityFacilityByLinkId(primaryLinkId)), primaryLinkId);
+			/*
+			 * If null is returned, the found activity type cannot be performed in the found
+			 * facility. Skip those persons.
+			 */
+			activityType = getActivityTypeString(primaryMainActivityType, getActivityFacilityByLinkId(primaryLinkId));
+			if (activityType == null) return false;
+			
+			activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, primaryLinkId);
 			activity.setStartTime(time);
 			activity.setMaximumDuration(emme2Person.DUR_1_MAIN);
 			activity.setEndTime(time + emme2Person.DUR_1_MAIN);
 			activityFacility = activityFacilities.getFacilities().get(primaryLinkId);
 			activity.setFacilityId(activityFacility.getId());
 			activity.setCoord(activityFacility.getCoord());
-			desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
+			desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 			plan.addActivity(activity);
 
 			previousActivityLinkId = primaryLinkId;
@@ -400,14 +419,21 @@ public class Emme2PopulationCreator {
 //				leg.setRoute(route);
 				plan.addLeg(leg);
 
-				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(getActivityTypeString(primaryPostStopActivityType, getActivityFacilityByLinkId(primaryPostLinkId)), primaryPostLinkId);
+				/*
+				 * If null is returned, the found activity type cannot be performed in the found
+				 * facility. Skip those persons.
+				 */
+				activityType = getActivityTypeString(primaryPostStopActivityType, getActivityFacilityByLinkId(primaryPostLinkId));
+				if (activityType == null) return false;
+
+				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, primaryPostLinkId);
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_1_AFT);
 				activity.setEndTime(time + emme2Person.DUR_1_AFT);
 				activityFacility = activityFacilities.getFacilities().get(primaryPostLinkId);
 				activity.setFacilityId(activityFacility.getId());
 				activity.setCoord(activityFacility.getCoord());
-				desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
+				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousActivityLinkId = primaryPostLinkId;
@@ -466,14 +492,21 @@ public class Emme2PopulationCreator {
 //				leg.setRoute(route);
 				plan.addLeg(leg);
 
-				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(getActivityTypeString(secondaryPreStopActivityType, getActivityFacilityByLinkId(secondaryPreLinkId)), secondaryPreLinkId);
+				/*
+				 * If null is returned, the found activity type cannot be performed in the found
+				 * facility. Skip those persons.
+				 */
+				activityType = getActivityTypeString(secondaryPreStopActivityType, getActivityFacilityByLinkId(secondaryPreLinkId));
+				if (activityType == null) return false;
+				
+				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, secondaryPreLinkId);
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_2_BEF);
 				activity.setEndTime(time + emme2Person.DUR_2_BEF);
 				activityFacility = activityFacilities.getFacilities().get(secondaryPreLinkId);
 				activity.setFacilityId(activityFacility.getId());
 				activity.setCoord(activityFacility.getCoord());
-				desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
+				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousActivityLinkId = secondaryPreLinkId;
@@ -497,7 +530,7 @@ public class Emme2PopulationCreator {
 			 * If null is returned, the found activity type cannot be performed in the found
 			 * facility. Skip those persons.
 			 */
-			String activityType = getActivityTypeString(secondaryMainActivityType, getActivityFacilityByLinkId(secondaryLinkId));
+			activityType = getActivityTypeString(secondaryMainActivityType, getActivityFacilityByLinkId(secondaryLinkId));
 			if (activityType == null) return false;
 			
 			activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, secondaryLinkId);
@@ -507,7 +540,7 @@ public class Emme2PopulationCreator {
 			activityFacility = activityFacilities.getFacilities().get(secondaryLinkId);
 			activity.setFacilityId(activityFacility.getId());
 			activity.setCoord(activityFacility.getCoord());
-			desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
+			desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 			plan.addActivity(activity);
 
 			previousActivityLinkId = secondaryLinkId;
@@ -527,14 +560,21 @@ public class Emme2PopulationCreator {
 //				leg.setRoute(route);
 				plan.addLeg(leg);
 
-				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(getActivityTypeString(secondaryPostStopActivityType, getActivityFacilityByLinkId(secondaryPostLinkId)), secondaryPostLinkId);
+				/*
+				 * If null is returned, the found activity type cannot be performed in the found
+				 * facility. Skip those persons.
+				 */
+				activityType = getActivityTypeString(secondaryPostStopActivityType, getActivityFacilityByLinkId(secondaryPostLinkId));
+				if (activityType == null) return false;
+				
+				activity = (ActivityImpl) populationFactory.createActivityFromLinkId(activityType, secondaryPostLinkId);
 				activity.setStartTime(time);
 				activity.setMaximumDuration(emme2Person.DUR_2_AFT);
 				activity.setEndTime(time + emme2Person.DUR_2_AFT);
 				activityFacility = activityFacilities.getFacilities().get(secondaryPostLinkId);
 				activity.setFacilityId(activityFacility.getId());
 				activity.setCoord(activityFacility.getCoord());
-				desires.accumulateActivityDuration(activity.getType(), activity.getMaximumDuration());
+				desires.accumulateActivityDuration(activity.getType(), Math.max(3600.0, activity.getMaximumDuration()));
 				plan.addActivity(activity);
 
 				previousActivityLinkId = secondaryPostLinkId;
@@ -568,7 +608,11 @@ public class Emme2PopulationCreator {
 		for (double duration : desires.getActivityDurations().values()) {
 			otherDurations = otherDurations + duration;
 		}
-		if (otherDurations < 86400) desires.accumulateActivityDuration("home", 86400 - otherDurations);
+		if (otherDurations < 86400) {
+			// make desired home duration not longer than 12 hours
+			double homeDuration = Math.min(12*3600, 86400 - otherDurations);
+			desires.accumulateActivityDuration("home", homeDuration);
+		}
 		
 		// no errors have been found, so return true
 		return true;

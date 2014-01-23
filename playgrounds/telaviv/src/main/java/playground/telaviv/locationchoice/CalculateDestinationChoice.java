@@ -149,6 +149,14 @@ public class CalculateDestinationChoice {
 					sizes[type][toZoneIndex] + 
 					distances[type][fromZoneIndex][toZoneIndex];
 					vtod[type][fromZoneIndex][toZoneIndex][0] = constFactor;
+					
+//					if (Double.isInfinite(constFactor)) {
+//						log.warn("Found infinite VTOD entry for fromZone " + fromZoneIndex +
+//								" and toZone " + toZoneIndex + " for type " + type + 
+//								"; distances: " + distances[type][fromZoneIndex][toZoneIndex] +
+//								"; sizes: " + sizes[type][toZoneIndex] + 
+//								"; indicators: " + indicators[type][toZoneIndex]);
+//					}					
 				}
 			}
 		}
@@ -247,6 +255,12 @@ public class CalculateDestinationChoice {
 					for (int timeSlot = 0; timeSlot < numSlots; timeSlot++) {
 						double value = Math.exp(vtod[type][fromZoneIndex][toZoneIndex][timeSlot]);
 						ptod[type][fromZoneIndex][toZoneIndex][timeSlot] = value / sumExp[type][fromZoneIndex][timeSlot];
+						
+//						if (Double.isInfinite(ptod[type][fromZoneIndex][toZoneIndex][timeSlot])) {
+//							log.warn("Found infinite PTOD entry for fromZone " + fromZoneIndex +
+//									" and toZone " + toZoneIndex + " for type " + type + 
+//									" and time slot " + timeSlot);
+//						}
 //					log.info("sumExp " + sumExp[type][fromZoneIndex] + ", value " + value);						
 					}
 				}
@@ -415,6 +429,11 @@ public class CalculateDestinationChoice {
 		double sum = 0.0;
 		for (int i = 0; i < betaIndicator.length; i++) sum = sum + betaIndicator[i] * xIndicator[i];
 		
+//		if (Double.isInfinite(sum) || Double.isNaN(sum)) {
+//			log.warn("found invalid value for indicator: " + sum + "; type " + 
+//					type + ", zone " + zone.TAZ);
+//		}
+		
 		return sum;
 	}
 	
@@ -454,6 +473,12 @@ public class CalculateDestinationChoice {
 		
 //		for (int i = 0; i < betaSize.length; i++) sum = sum + Math.log1p(betaSize[i] * xSize[i]);
 		sum = Math.log(sum);
+
+		if (Double.isInfinite(sum) || Double.isNaN(sum)) {
+			log.warn("found invalid value for size: " + sum + "; type " + 
+					type + ", zone " + zone.TAZ);
+		}
+		
 		return sum;
 	}
 	

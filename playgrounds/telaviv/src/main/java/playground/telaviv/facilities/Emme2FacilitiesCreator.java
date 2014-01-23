@@ -111,10 +111,7 @@ public class Emme2FacilitiesCreator {
 	
 		for (Entry<Id, SimpleFeature> entry : zoneMapping.getLinkMapping().entrySet()) {
 			Id id = entry.getKey();
-			
-			if (id.toString().equals("6078")) 
-				log.info("found it!");
-			
+						
 			Link link = zoneMapping.getNetwork().getLinks().get(id);
 			
 			/*
@@ -251,26 +248,32 @@ public class Emme2FacilitiesCreator {
 		int TAZ = (Integer) zone.getAttribute(3);
 		
 		Emme2Zone parsedZone = zoneMapping.getParsedZone(TAZ);
-		if (parsedZone.POPULATION > 0) { hasHome = true; }
-		if (parsedZone.CULTURAL > 0) { hasLeisure = true; hasWork = true; }
-		if (parsedZone.EDUCATION == 1) { hasEducationUniversity = true; hasWork = true; }
-		if (parsedZone.EDUCATION == 2) { hasEducationHighSchool = true; hasWork = true; }
-		if (parsedZone.EDUCATION == 3) { hasEducationElementarySchool = true; hasWork = true; }
-		if (parsedZone.OFFICE > 0) { hasWork = true; }
-		if (parsedZone.SHOPPING > 0) { hasShopping = true; hasWork = true; }
-		if (parsedZone.HEALTH > 0) { hasLeisure = true; hasWork = true; }
-		if (parsedZone.TRANSPORTA > 0) { hasLeisure = true; hasWork = true; }
-		if (parsedZone.EMPL_TOT > 0) { hasWork = true; }
+		hasHome = parsedZone.hasHome();
+		hasWork = parsedZone.hasWork();
+		hasEducationUniversity = parsedZone.hasEducationUniversity();
+		hasEducationHighSchool = parsedZone.hasEducationHighSchool();
+		hasEducationElementarySchool = parsedZone.hasEducationElementarySchool();
+		hasShopping = parsedZone.hasShopping();
+		hasLeisure = parsedZone.hasLeisure();
+//		if (parsedZone.POPULATION > 0) { hasHome = true; }
+//		if (parsedZone.CULTURAL > 0) { hasLeisure = true; hasWork = true; }
+//		if (parsedZone.EDUCATION == 1) { hasEducationUniversity = true; hasWork = true; }
+//		if (parsedZone.EDUCATION == 2) { hasEducationHighSchool = true; hasWork = true; }
+//		if (parsedZone.EDUCATION == 3) { hasEducationElementarySchool = true; hasWork = true; }
+//		if (parsedZone.OFFICE > 0) { hasWork = true; }
+//		if (parsedZone.SHOPPING > 0) { hasShopping = true; hasWork = true; }
+//		if (parsedZone.HEALTH > 0) { hasLeisure = true; hasWork = true; }
+//		if (parsedZone.TRANSPORTA > 0) { hasLeisure = true; hasWork = true; }
+//		if (parsedZone.EMPL_TOT > 0) { hasWork = true; }
 
 		// "Other" activities - should be possible in every zone.
-		hasLeisure = true;
+//		hasLeisure = true;
 		
 		// "Shopping" activities - should be possible in every zone.
-		hasShopping = true;
+//		hasShopping = true;
 		
 		ActivityOption activityOption;
-		
-	
+			
 		ActivityFacilitiesFactory factory = this.activityFacilities.getFactory();
 		
 		if (hasHome) {
@@ -310,6 +313,7 @@ public class Emme2FacilitiesCreator {
 		
 		if (hasShopping) {
 			activityOption = factory.createActivityOption("shopping");
+			facility.addActivityOption(activityOption);
 			activityOption.addOpeningTime(new OpeningTimeImpl(9*3600, 19*3600));
 			activityOption.setCapacity(capacity);
 		}
@@ -326,7 +330,7 @@ public class Emme2FacilitiesCreator {
 	 * Write facilities file
 	 */
 	public void writeFacilities() {
-		log.info("Writing facilities to a file...");
+		log.info("Writing " + activityFacilities.getFacilities().size() + " facilities to a file...");
 		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(activityFacilities);
 		facilitiesWriter.write(facilitiesFile);
 		log.info("done.");		
@@ -346,9 +350,13 @@ public class Emme2FacilitiesCreator {
 			// write Header
 			bw.write("fid" + "\t" + "lid" + "\n");
 			
-			for (Id id : zoneMapping.getLinkMapping().keySet()) {
+			for (Id id : activityFacilities.getFacilities().keySet()) {
 				bw.write(id.toString() + "\t" + id.toString() + "\n");
 			}
+			
+//			for (Id id : zoneMapping.getLinkMapping().keySet()) {
+//				bw.write(id.toString() + "\t" + id.toString() + "\n");
+//			}
 			
 			bw.flush();
 			bw.close();			

@@ -62,17 +62,17 @@ public final class TelAvivControler {
 			/*
 			 * We use a Scoring Function that get the Facility Opening Times from
 			 * the Facilities instead of the Config File.
+			 * This is now included in the location choice scoring function.
 			 */
 //			PlanCalcScoreConfigGroup pcsConfigGroup = config.planCalcScore();
 //			controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(pcsConfigGroup, scenario));
 //			controler.setScoringFunctionFactory(new CharyparNagelOpenTimesAndDesiresScoringFunctionFactory(pcsConfigGroup, scenario));
 
 			/*
-			 * would be muuuuch nicer to have this in DestinationChoiceInitializer, but startupListeners are called after corelisteners are called
-			 * -> scoringFunctionFactory cannot be replaced
+			 * Add location choice contrib 
 			 */
 			DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);
-			dcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
+			dcContext.init();
 			
 			/* 
 			 * Add location choice ScoringFunctionFactory to controler.
