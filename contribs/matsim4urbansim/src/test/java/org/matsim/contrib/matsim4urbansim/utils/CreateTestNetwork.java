@@ -125,11 +125,11 @@ public class CreateTestNetwork {
 		BufferedWriter bw = IOUtils.getBufferedWriter(location);
 		
 		try{
-			bw.write("id,x,y" + InternalConstants.NEW_LINE); 	// header
-			bw.write("1,10,10" + InternalConstants.NEW_LINE);	// pt stop next to node (3)
-			bw.write("2,10, 190" + InternalConstants.NEW_LINE); // pt stop next to node (2)
-			bw.write("3,190,190" + InternalConstants.NEW_LINE); // pt stop next to node (8)
-			bw.write("4,190,10" + InternalConstants.NEW_LINE);  // pt stop next to node (9)
+			bw.write("id,x,y" + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE); 	// header
+			bw.write("1,10,10" + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE);	// pt stop next to node (3)
+			bw.write("2,10, 190" + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE); // pt stop next to node (2)
+			bw.write("3,190,190" + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE); // pt stop next to node (8)
+			bw.write("4,190,10" + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE);  // pt stop next to node (9)
 			bw.flush();
 			bw.close();
 		}
@@ -159,10 +159,10 @@ public class CreateTestNetwork {
 				for (int destination = 1; destination <= 4; destination++){
 					if (origin == destination)
 						// set a travel time/distance of 0s or 0m between same origin and destination pt stops
-						bw.write(origin + " " + destination + " 0" + InternalConstants.NEW_LINE);
+						bw.write(origin + " " + destination + " 0" + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE);
 					else
 						// set a dummy travel time/distance of 100s or 100m between different origin and destination pt stops
-						bw.write(origin + " " + destination + " 100" + InternalConstants.NEW_LINE); 
+						bw.write(origin + " " + destination + " 100" + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE); 
 				}
 			}
 			bw.flush();
