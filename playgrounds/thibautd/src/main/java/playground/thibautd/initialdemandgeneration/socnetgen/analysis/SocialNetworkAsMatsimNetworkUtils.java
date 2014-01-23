@@ -19,15 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.analysis;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +32,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
-import playground.thibautd.utils.CollectionUtils;
 
 /**
  * @author thibautd
@@ -79,43 +69,6 @@ public class SocialNetworkAsMatsimNetworkUtils {
 		}
 	
 		return net;
-	}
-
-
-	public static Collection<Set<Id>> identifyConnectedComponents(
-			final SocialNetwork sn) {
-		if ( !sn.isReflective() ) {
-			throw new IllegalArgumentException( "the algorithm is valid only with reflective networks" );
-		}
-		final Map<Id, Set<Id>> altersMap = new LinkedHashMap<Id, Set<Id>>( sn.getMapRepresentation() );
-		final Collection< Set<Id> > components = new ArrayList< Set<Id> >();
-
-		while ( !altersMap.isEmpty() ) {
-			// DFS implemented as a loop (recursion results in a stackoverflow on
-			// big networks)
-			final Id seed = CollectionUtils.getElement( 0 , altersMap.keySet() );
-
-			final Set<Id> component = new HashSet<Id>();
-			components.add( component );
-			component.add( seed );
-
-			final Queue<Id> stack = Collections.asLifoQueue( new ArrayDeque<Id>( altersMap.size() ) );
-			stack.add( seed );
-
-			while ( !stack.isEmpty() ) {
-				final Id current = stack.remove();
-				final Set<Id> alters = altersMap.remove( current );
-
-				for ( Id alter : alters ) {
-					if ( component.add( alter ) ) {
-						stack.add( alter );
-					}
-				}
-			}
-
-		}
-
-		return components;
 	}
 }
 

@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
 
@@ -52,7 +53,7 @@ public class IdentifyAndWriteComponents {
 	
 		final SocialNetwork sn = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 
-		final Collection<Set<Id>> components = SocialNetworkAsMatsimNetworkUtils.identifyConnectedComponents( sn );
+		final Collection<Set<Id>> components = SnaUtils.identifyConnectedComponents( sn );
 
 		log.info( components.size()+" components" );
 

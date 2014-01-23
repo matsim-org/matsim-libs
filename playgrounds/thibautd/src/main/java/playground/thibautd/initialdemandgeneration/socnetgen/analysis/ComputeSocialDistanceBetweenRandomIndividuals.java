@@ -44,6 +44,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
+import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
 
@@ -92,7 +93,7 @@ public class ComputeSocialDistanceBetweenRandomIndividuals {
 
 		log.info( "searching for the biggest connected component..." );
 		Set<Id> biggestComponent = null;
-		for ( Set<Id> component : SocialNetworkAsMatsimNetworkUtils.identifyConnectedComponents( socialNetwork ) ) {
+		for ( Set<Id> component : SnaUtils.identifyConnectedComponents( socialNetwork ) ) {
 			if ( biggestComponent == null || biggestComponent.size() < component.size() ) {
 				biggestComponent = component;
 			}
