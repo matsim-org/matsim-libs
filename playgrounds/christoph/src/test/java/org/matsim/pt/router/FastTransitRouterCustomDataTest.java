@@ -54,8 +54,24 @@ import org.matsim.vehicles.Vehicle;
  */
 public class FastTransitRouterCustomDataTest {
 
+	private TransitRouter createTransitRouter(Scenario scenario, TransitRouterConfig config, 
+			TransitTravelDisutility disutility, TravelTime travelTime, TransitRouterNetwork transitNetwork, boolean fastRouter) {
+		if (fastRouter) {
+			return new FastTransitRouterImpl(config, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, 
+					travelTime, disutility, new FastTransitDijkstraFactory());
+		} else {
+			return new MyTransitRouterImpl(config, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, 
+					travelTime, disutility);
+		}
+	}
+	
 	@Test
 	public void testCustomDataIntegration() {
+		testCustomDataIntegration(true);
+		testCustomDataIntegration(false);
+	}
+	
+	public void testCustomDataIntegration(boolean fastRouter) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		createTestSchedule(scenario);
@@ -74,9 +90,7 @@ public class FastTransitRouterCustomDataTest {
 		
 		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
 
-//		new FastTransitRouterImplFactory(config, new PreparedTransitSchedule(scenario.getTransitSchedule())).createTransitRouter();
-		TransitRouter router = new FastTransitRouterImpl(config, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, 
-				travelTime, disutility, new FastTransitDijkstraFactory());
+		TransitRouter router = createTransitRouter(scenario, config, disutility, travelTime, transitNetwork, fastRouter);
 		
 		List<Leg> legs = router.calcRoute(scenario.createCoord(-100, 0), new CoordImpl(3100, 0), 5.9*3600, null);
 		Assert.assertEquals(1, legs.size());
