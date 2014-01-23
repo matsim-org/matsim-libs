@@ -37,7 +37,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -48,7 +47,6 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -67,18 +65,6 @@ public class FastTransitRouterImpl implements TransitRouter {
 	private final TravelTime travelTime;
 
 	private final PreparedTransitSchedule preparedTransitSchedule; 
-
-	public FastTransitRouterImpl(final TransitRouterConfig config, final TransitSchedule schedule,
-			final FastTransitDijkstraFactory dijkstraFactory) {
-		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
-		this.transitTravelDisutility = new MyTransitRouterNetworkTravelTimeAndDisutilityWrapper(config, preparedTransitSchedule);
-		this.travelTime = (TravelTime) transitTravelDisutility;
-		this.config = config;
-		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
-		this.dijkstra = (FastTransitMultiNodeDijkstra) dijkstraFactory.createPathCalculator(this.transitNetwork, 
-				(TravelDisutility) this.transitTravelDisutility, this.travelTime);
-		//		this.transitNetwork = null; // enable to save memory if no routing should be done
-	}
 
 	public FastTransitRouterImpl(
 			final TransitRouterConfig config, 
