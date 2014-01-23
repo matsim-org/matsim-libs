@@ -57,192 +57,41 @@ P2030_2010_A14_induz_ME2.wid
 
 class ScenarioZielnetzRoad {
 
+	static private final String WolfsburgRoebel = "Wolfsburg--Roebel";
+
 	static ScenarioForEvalData createNullfall1() {
 		// set up the base case:
 		ScenarioForEvalData nullfall = new ScenarioForEvalData() ;
 
-		//verbleibend
+		// Wolfsburg--Roebel:
 		{
-			final Values nullfallForOld = new Values() ;
-			nullfall.setValuesForODRelation( new IdImpl("verbleibend"), nullfallForOld ) ;
-			
+			final Values nullfallForOD = new Values() ;
+			nullfall.setValuesForODRelation( new IdImpl(WolfsburgRoebel), nullfallForOD ) ;
 			{
-			
 				Mode mode = Mode.ROAD ;
-				final double travelTime = 206.53/60.; 
 				//aus P2030_2010_A14_induz_ME2.wid
 				//XX aus P2030_2010_BMVBS_ME2_131008.csv:
 				//priceUser aus P2030_2010_A14_induz_ME2.wid
 				{
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 118. ) ; 
-					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs),travelTime ) ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), 23.34) ;
-		//			nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //????
-				}
-				
-				{
-					DemandSegment segm = DemandSegment.PV_BERUF ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs), travelTime) ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), 19.91) ;
-//					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // ????
-					
-				}
-				{
-					DemandSegment segm = DemandSegment.PV_AUSBILDUNG ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs),travelTime) ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), 16.84) ;
-//					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // ????
-					
-				}
-				{
-					DemandSegment segm = DemandSegment.PV_EINKAUF ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs),travelTime ) ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), 12.16) ;
-//					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // ????
-					
-				}
-				{
-					DemandSegment segm = DemandSegment.PV_URLAUB ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 81. ) ; 
-					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), 9.52) ;
-//					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // ????
-					
-				}
-				{
 					DemandSegment segm = DemandSegment.PV_SONST ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.XX), 4209. ) ; 
-					nullfallForOld.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-					nullfallForOld.put(makeKey(mode, segm, Attribute.priceUser), 10.95) ;
-//					nullfallForOld.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // ????
-					
+					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 4209. ) ; // Menge Strasse im Nullfall = verbleibender Verkehr
+					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 206.53/60. ) ; // Fahrzeit Strasse im Nullfall
+					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), 10.95) ; // Nutzerkosten Strasse im Nullfall
+					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // ???  Produktionskosten Strasse im Nullfall
 				}
-				
 			}
-		}
-
-		
-		// induced traffic:
-		//induziert=entstanden-entfallend
-		{
-			final Values nullfallForInduced = new Values() ;
-			nullfall.setValuesForODRelation(new IdImpl("induziert"), nullfallForInduced ) ;
 			{
-				{
-					Mode mode = Mode.ROAD ;
-					final double travelTime = 206.53/60.; 
-
-					{
-						//XX = 0, weil im Nullfall ja nichts induziert?
-						// commercial passenger traffic:
-						DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), 23.34) ;
-//						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-					}
-					
-					{
-						DemandSegment segm = DemandSegment.PV_BERUF ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), 19.91) ;
-//						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-					}
-					
-					{
-						DemandSegment segm = DemandSegment.PV_AUSBILDUNG ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), 16.84) ;
-//						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-					}
-					{
-						DemandSegment segm = DemandSegment.PV_EINKAUF ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), 12.16) ;
-//						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-					}
-					{
-						DemandSegment segm = DemandSegment.PV_URLAUB ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), 9.52) ;
-//						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-					}
-					{
-						DemandSegment segm = DemandSegment.PV_SONST ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-						nullfallForInduced.put(makeKey(mode, segm, Attribute.priceUser), 10.95) ;
-//						nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-					}
-				
-				
-				}
-				
-			}
-		}
-
-		// verlagert:
-		{
-			final Values nullfallForSwitched = new Values() ;
-			nullfall.setValuesForODRelation( new IdImpl("verlagert"), nullfallForSwitched ) ;
-			//XX = 0 , weil Nullfall
-			{	
-				Mode mode = Mode.ROAD ;
-				final double travelTime = 206.53/60.; 
-				{
-					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), 23.34) ;
-//					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), distance * 0.1 ) ;???
-				}
-				{
-					DemandSegment segm = DemandSegment.PV_BERUF ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), 19.91) ;
-//					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-				}
-				
-				{
-					DemandSegment segm = DemandSegment.PV_AUSBILDUNG ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), 16.84) ;
-//					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-				}
-				{
-					DemandSegment segm = DemandSegment.PV_EINKAUF ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), 12.16) ;
-//					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-				}
-				{
-					DemandSegment segm = DemandSegment.PV_URLAUB ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), 9.52) ;
-//					nullfallForSwitched.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
-				}
+				Mode mode = Mode.RAIL ;
 				{
 					DemandSegment segm = DemandSegment.PV_SONST ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.XX), 0. ) ; 
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.hrs), travelTime ) ;
-					nullfallForSwitched.put(makeKey(mode, segm, Attribute.priceUser), 10.95) ;
-//					nullfallForInduced.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; //???
+					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 4209. ) ;   // Menge Bahn im Nullfall.  Wenn nicht bekannt, ggf. die gesamte verlagerte Menge
+					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 206.53/60. ) ; // Fahrzeit Bahn
+					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), 10.95) ; // ??? Nutzerkosten Bahn
+					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // Produktionskosten sind Null bei Bahn.
 				}
 			}
 		}
-		
+		// end Wolfsburg--Roebel
 
 		// return the base case:
 		return nullfall;
@@ -251,123 +100,21 @@ class ScenarioZielnetzRoad {
 	static ScenarioForEvalData createPlanfallStrassenausbau(ScenarioForEvalData nullfall) {
 		// The policy case is initialized as a complete copy of the base case:
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
-		final double tt_diff = 193.60-206.53;
 
+		// Wolfsburg--Roebel:
 		{
-			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("induziert")) ;
+			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl(WolfsburgRoebel)) ;
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
-				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ; //Wirtschaftsverkehr bleibt konstant
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_BERUF ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ;
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_AUSBILDUNG ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ;
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_EINKAUF ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ;
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_URLAUB ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 8. ) ;
-
-			}
-			{
 				DemandSegment segm = DemandSegment.PV_SONST ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 545. ) ;
-
-			}
-			
-		}
-		{
-			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("verlagert")) ;
-			Assert.assertNotNull(planfallValuesForOD) ;
-			{
-				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ; 
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_BERUF ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ;
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_AUSBILDUNG ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ;
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_EINKAUF ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ;
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_URLAUB ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ;
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_SONST ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 0. ) ;
-
+				planfallValuesForOD.put( makeKey( Mode.ROAD, segm, Attribute.hrs), 206.53 ) ; // Fahrzeit Strasse im Planfall 
+				planfallValuesForOD.put( makeKey( Mode.RAIL, segm, Attribute.XX), 123. ) ; // Menge Bahn im Planfall.  Wenn nicht bekannt, dann jetzt Null. 
+				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 545. ) ; // Menge Straße im Planfall.
+				
+				// später zu berechnen: Menge Str im Planfall - Menge Str im Nullfall - Menge verlagert = Menge induziert
 			}
 		}
-		{
-			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("verbleibend")) ;
-			Assert.assertNotNull(planfallValuesForOD) ;
-			{
-				DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_BERUF ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_AUSBILDUNG ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_EINKAUF ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_URLAUB ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-
-			}
-			{
-				DemandSegment segm = DemandSegment.PV_SONST ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), tt_diff ) ; 
-
-			}
-		}
+		// end Wolfsburg--Roebel
 
 		return planfall;
 	}
