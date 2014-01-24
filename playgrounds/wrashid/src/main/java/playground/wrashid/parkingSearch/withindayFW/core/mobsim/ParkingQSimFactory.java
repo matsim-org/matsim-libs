@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
@@ -82,7 +82,7 @@ public class ParkingQSimFactory implements MobsimFactory {
             netsimEngFactory = new ParallelQNetsimEngineFactory();
             log.info("Using parallel QSim with " + numOfThreads + " threads.");
         } else {
-            netsimEngFactory = new DefaultQSimEngineFactory();
+            netsimEngFactory = new DefaultQNetsimEngineFactory();
         }
 		QSim qSim1 = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();

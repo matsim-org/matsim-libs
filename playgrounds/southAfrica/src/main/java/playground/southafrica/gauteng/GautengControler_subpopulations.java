@@ -38,6 +38,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
@@ -82,33 +85,6 @@ import playground.southafrica.utilities.Header;
  * @author jwjoubert
  */
 public class GautengControler_subpopulations {
-	private static final class SetVehicleInAllNetworkRoutes implements PlanStrategyModule {
-		private final Scenario scenario;
-
-		private SetVehicleInAllNetworkRoutes(Scenario scenario) {
-			this.scenario = scenario;
-		}
-
-		@Override
-		public void prepareReplanning(ReplanningContext replanningContext) {}
-
-		@Override
-		public void handlePlan(Plan plan) {
-			@SuppressWarnings("unchecked")
-			Id vehId = (Id) scenario.getPopulation().getPersonAttributes()
-				.getAttribute(plan.getPerson().getId().toString(), VEH_ID ) ;
-			for ( Leg leg : PopulationUtils.getLegs(plan) ) {
-				if ( leg.getRoute()!=null && leg.getRoute() instanceof NetworkRoute ) {
-					((NetworkRoute)leg.getRoute()).setVehicleId(vehId);
-				}
-			}
-		}
-
-		@Override
-		public void finishReplanning() {}
-	}
-
-
 	private final static Logger LOG = Logger
 			.getLogger(GautengControler_subpopulations.class);
 	
@@ -116,7 +92,6 @@ public class GautengControler_subpopulations {
 	private static String VEH_ID = "TransportModeToVehicleIdMap" ;
 	
 	public static enum User { johan, kai } ;
-	
 	private static User user = User.johan ;
 
 	/**
@@ -171,6 +146,10 @@ public class GautengControler_subpopulations {
 		String[] modes ={"car","commercial"};
 		config.qsim().setMainModes( Arrays.asList(modes) );
 		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
+		// yy note: I doubt that the jdqsim honors "main modes".  Either check, or do not use. kai, jan'14
+		if ( !config.controler().getMobsim().equals( ControlerConfigGroup.MobsimType.qsim.toString() ) ) {
+			throw new RuntimeException("error") ;
+		}
 		
 		assignSubpopulationStrategies(config);
 		
@@ -180,16 +159,42 @@ public class GautengControler_subpopulations {
 		} else if ( user==User.kai ) {
 			config.controler().setWritePlansInterval(50);
 		}
-		config.timeAllocationMutator().setAffectingDuration(false);
-
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
 		
+		config.controler().setOutputDirectory("/Users/jwjoubert/Documents/Temp/sanral-runs");
+		if ( user==User.kai ) {
+			config.controler().setOutputDirectory("/Users/nagel/gauteng-kairuns/output");
+		}
+		
+		config.global().setNumberOfThreads(numberOfThreads);
+		
+		config.timeAllocationMutator().setMutationRange(7200.);
+		config.timeAllocationMutator().setAffectingDuration(false);
+		
+		if ( user==User.kai ) {
+			config.controler().setRoutingAlgorithmType( RoutingAlgorithmType.FastAStarLandmarks );
+			config.controler().setWriteSnapshotsInterval(0);
+			
+			config.controler().setLastIteration(100);
+
+			config.parallelEventHandling().setNumberOfThreads(1);
+			
+			config.qsim().setEndTime(36.*3600.);
+			
+		}
+		
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
+		
+		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
+		config.vspExperimental().setWritingOutputEvents(true);
+		
+		config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() );
+		config.checkConsistency();
 
 		// ===========================================
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-		config.scenario().setUseVehicles(true);
+		config.scenario().setUseVehicles(true); // _after_ scenario loading. :-(
 
 		/* CREATE VEHICLES. */
 		createVehiclePerPerson(sc);
@@ -198,7 +203,6 @@ public class GautengControler_subpopulations {
 		controler.setOverwriteFiles(true);
 		
 		controler.addControlerListener(new IterationStartsListener() {
-			
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				if(event.getIteration() == sc.getConfig().controler().getFirstIteration()){
@@ -211,13 +215,6 @@ public class GautengControler_subpopulations {
 			}
 		});
 
-		/* Set number of threads. */
-		controler.getConfig().global().setNumberOfThreads(numberOfThreads);
-		
-
-		// final Scenario sc = controler.getScenario();
-		
-	
 		if (sc.getConfig().scenario().isUseRoadpricing()) {
 			throw new RuntimeException(
 					"roadpricing must NOT be enabled in config.scenario in order to use special "
@@ -272,38 +269,24 @@ public class GautengControler_subpopulations {
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing
 		// class):
 		// insert into scoring:
-		controler.addControlerListener(new GenerationOfMoneyEvents(sc
-				.getNetwork(), sc.getPopulation(), vehDepScheme, tollFactor));
+		controler.addControlerListener(new GenerationOfMoneyEvents(
+				sc.getNetwork(), sc.getPopulation(), vehDepScheme, tollFactor
+				));
 
 		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory(
-				sc, personSpecificUtilityOfMoney));
+				sc, personSpecificUtilityOfMoney
+				));
 
 		// insert into routing:
-		controler
-				.setTravelDisutilityFactory(new PersonSpecificTravelDisutilityInclTollFactory(
-						vehDepScheme, personSpecificUtilityOfMoney));
+		controler.setTravelDisutilityFactory(new PersonSpecificTravelDisutilityInclTollFactory(
+				vehDepScheme, personSpecificUtilityOfMoney
+				));
 
 		// ADDITIONAL ANALYSIS:
-		// This is not truly necessary. It could be removed or copied in order
-		// to remove the dependency on the kai
-		// playground. For the time being, I (kai) would prefer to leave it the
-		// way it is since I am running the Gauteng
-		// scenario and I don't want to maintain two separate analysis
-		// listeners. But once that period is over, this
-		// argument does no longer apply. kai, mar'12
-		//
-		// I (JWJ, June '13) commented this listener out as the dependency is
-		// not working.
-
 		controler.addControlerListener(new KaiAnalysisListener());
 
 		// RUN:
 
-		controler
-				.getConfig()
-				.controler()
-				.setOutputDirectory(
-						"/Users/jwjoubert/Documents/Temp/sanral-runs");
 		 controler.run();
 
 		Header.printFooter();
@@ -387,12 +370,18 @@ public class GautengControler_subpopulations {
 			tollFilename = args[4];
 			config.roadpricing().setTollLinksFile(tollFilename);
 		}
+
+		if (args.length > 8 && args[8] != null && args[8].length() > 0) {
+			user = User.valueOf( args[8] ) ;
+		}
 	}
 
 	/**
 	 * @param config
 	 */
 	private static void assignSubpopulationStrategies(Config config) {
+		
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.8); 
 		
 		/* Set up the strategies for the different subpopulations. */
 		
@@ -530,5 +519,32 @@ public class GautengControler_subpopulations {
 			config.strategy().addStrategySettings(reRouteWithId);
 		}
 	}
+
+	private static final class SetVehicleInAllNetworkRoutes implements PlanStrategyModule {
+		private final Scenario scenario;
+
+		private SetVehicleInAllNetworkRoutes(Scenario scenario) {
+			this.scenario = scenario;
+		}
+
+		@Override
+		public void prepareReplanning(ReplanningContext replanningContext) {}
+
+		@Override
+		public void handlePlan(Plan plan) {
+			Id vehId = (Id) scenario.getPopulation().getPersonAttributes()
+				.getAttribute(plan.getPerson().getId().toString(), VEH_ID ) ;
+			for ( Leg leg : PopulationUtils.getLegs(plan) ) {
+				if ( leg.getRoute()!=null && leg.getRoute() instanceof NetworkRoute ) {
+					((NetworkRoute)leg.getRoute()).setVehicleId(vehId);
+				}
+			}
+		}
+
+		@Override
+		public void finishReplanning() {}
+	}
+
+
 
 }

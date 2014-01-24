@@ -68,7 +68,7 @@ public class MyQSimFactory implements MobsimFactory {
 			netsimEngFactory = new MyParallelQNetsimEngineFactory();
 			log.info("Using parallel QSim with " + numOfThreads + " threads.");
 		} else {
-			netsimEngFactory = new DefaultQSimEngineFactory();
+			netsimEngFactory = new DefaultQNetsimEngineFactory();
 		}
 		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();

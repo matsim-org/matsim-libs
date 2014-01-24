@@ -44,6 +44,7 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Population pop = event.getControler().getScenario().getPopulation();
 		Config config = event.getControler().getScenario().getConfig() ;
+		ActivityDurationInterpretation actDurInterp = ActivityDurationInterpretation.valueOf( config.vspExperimental().getActivityDurationInterpretation() ) ;
 		for ( Person person : pop.getPersons().values() ) {
 
 			Plan plan = person.getSelectedPlan() ; 
@@ -53,20 +54,17 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 				if ( pe instanceof Activity ) {
 					Activity act = (Activity) pe ;
 					
-					if ( config.vspExperimental().getActivityDurationInterpretation()
-							.equals(ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
+					if ( actDurInterp == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 						
 						// person stays at the activity either until its duration is over or until its end time, whatever comes first
 						// do nothing
 						
-					} else if ( config.vspExperimental().getActivityDurationInterpretation()
-							.equals(ActivityDurationInterpretation.endTimeOnly ) ) {
+					} else if ( actDurInterp == ActivityDurationInterpretation.endTimeOnly ) {
 						
 						// always set duration to undefined:
 						act.setMaximumDuration( Time.UNDEFINED_TIME ) ;
 						
-					} else if ( config.vspExperimental().getActivityDurationInterpretation()
-							.equals(ActivityDurationInterpretation.tryEndTimeThenDuration ) ) {
+					} else if ( actDurInterp == ActivityDurationInterpretation.tryEndTimeThenDuration ) {
 						
 						// set duration to undefined if there is an activity end time:
 						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {

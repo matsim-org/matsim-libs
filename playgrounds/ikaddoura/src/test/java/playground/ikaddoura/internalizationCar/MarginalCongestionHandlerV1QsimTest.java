@@ -51,7 +51,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -573,7 +573,7 @@ public class MarginalCongestionHandlerV1QsimTest {
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-		DefaultQSimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
+		DefaultQNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());

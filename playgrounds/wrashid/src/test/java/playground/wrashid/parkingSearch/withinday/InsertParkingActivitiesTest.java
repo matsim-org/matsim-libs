@@ -49,7 +49,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.population.ActivityImpl;
@@ -171,7 +171,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qSim = new QSim(sc, eventsManager);
-		QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
+		QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);

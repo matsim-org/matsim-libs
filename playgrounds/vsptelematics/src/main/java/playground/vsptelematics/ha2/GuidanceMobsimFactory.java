@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
@@ -76,7 +76,7 @@ public class GuidanceMobsimFactory implements MobsimFactory, ShutdownListener {
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 		QNetsimEngineFactory netsimEngFactory;
-		netsimEngFactory = new DefaultQSimEngineFactory();
+		netsimEngFactory = new DefaultQNetsimEngineFactory();
 		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);

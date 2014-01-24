@@ -39,7 +39,7 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -89,7 +89,7 @@ public class WagonSimQSimFactory implements MobsimFactory {
 			netsimEngFactory = new ParallelQNetsimEngineFactory();
 			log.info("Using parallel QSim with " + numOfThreads + " threads.");
 		} else {
-			netsimEngFactory = new DefaultQSimEngineFactory();
+			netsimEngFactory = new DefaultQNetsimEngineFactory();
 		}
 		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();

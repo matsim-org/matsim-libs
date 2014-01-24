@@ -16,7 +16,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
@@ -34,7 +34,7 @@ final class VariableSpeedQSim implements MobsimFactory {
 			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
 			netsimEngFactory = new ParallelQNetsimEngineFactory();
 		} else {
-			netsimEngFactory = new DefaultQSimEngineFactory();
+			netsimEngFactory = new DefaultQNetsimEngineFactory();
 		}
 		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();

@@ -19,7 +19,7 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
@@ -67,7 +67,7 @@ public class TransitControler extends Controler {
             eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
             netsimEngFactory = new ParallelQNetsimEngineFactory();
         } else {
-            netsimEngFactory = new DefaultQSimEngineFactory();
+            netsimEngFactory = new DefaultQNetsimEngineFactory();
         }
 		QSim qSim1 = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();

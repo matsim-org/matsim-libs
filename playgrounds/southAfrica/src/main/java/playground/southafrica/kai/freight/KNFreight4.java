@@ -179,7 +179,7 @@ public class KNFreight4 {
 			config.network().setTimeVariantNetwork(true);
 		}
 		
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
 		
 		config.vspExperimental().addParam( VspExperimentalConfigGroup.VspExperimentalConfigKey.vspDefaultsCheckingLevel, 
 				VspExperimentalConfigGroup.WARN);

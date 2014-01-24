@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -73,7 +73,7 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		final QNetsimEngine netsim = new DefaultQSimEngineFactory().createQSimEngine( qSim );
+		final QNetsimEngine netsim = new DefaultQNetsimEngineFactory().createQSimEngine( qSim );
 
 		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
 			sc.getConfig().getModule( PseudoSimConfigGroup.GROUP_NAME );

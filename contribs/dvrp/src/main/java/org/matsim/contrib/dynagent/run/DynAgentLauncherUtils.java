@@ -41,7 +41,7 @@ public class DynAgentLauncherUtils
         qSim.addMobsimEngine(dynActivityEngine);
         qSim.addActivityHandler(dynActivityEngine);
 
-        QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim);
+        QNetsimEngine netsimEngine = new DefaultQNetsimEngineFactory().createQSimEngine(qSim);
         qSim.addMobsimEngine(netsimEngine);
         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 

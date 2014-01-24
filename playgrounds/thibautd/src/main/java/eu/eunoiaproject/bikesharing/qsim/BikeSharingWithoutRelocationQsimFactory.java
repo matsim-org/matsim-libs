@@ -34,7 +34,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
@@ -56,7 +56,7 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		final QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
+		final QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
 	
 		final QSim qSim = new QSim( sc, eventsManager );
 

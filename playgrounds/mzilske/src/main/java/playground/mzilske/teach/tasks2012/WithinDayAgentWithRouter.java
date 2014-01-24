@@ -19,7 +19,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.PopulationUtils;
@@ -140,7 +140,7 @@ public class WithinDayAgentWithRouter {
 			ActivityEngine activityEngine = new ActivityEngine();
 			qSim1.addMobsimEngine(activityEngine);
 			qSim1.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1);
+			QNetsimEngine netsimEngine = new DefaultQNetsimEngineFactory().createQSimEngine(qSim1);
 			qSim1.addMobsimEngine(netsimEngine);
 			qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 			TeleportationEngine teleportationEngine = new TeleportationEngine();

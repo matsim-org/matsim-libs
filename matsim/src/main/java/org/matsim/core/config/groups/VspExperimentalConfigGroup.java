@@ -23,7 +23,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveModule;
-import org.matsim.core.trafficmonitoring.AveragingTravelTimeGetter;
 import org.matsim.core.utils.misc.Time;
 
 interface ConfigKey {}
@@ -295,17 +294,18 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 		return this.activityDurationInterpretation.toString();
 	}
 	@StringSetter(ACTIVITY_DURATION_INTERPRETATION)
-	public void setActivityDurationInterpretation(final ActivityDurationInterpretation activityDurationInterpretation) {
-		if ( ActivityDurationInterpretation.endTimeOnly.equals(activityDurationInterpretation) ){
+	public void setActivityDurationInterpretation(final String str) {
+		ActivityDurationInterpretation actDurInterpret = ActivityDurationInterpretation.valueOf(str) ;
+		if ( ActivityDurationInterpretation.endTimeOnly.equals(actDurInterpret) ){
 			/*
 			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012
 			 */
-			log.warn("You are using " + activityDurationInterpretation + " as activityDurationInterpretation. " +
+			log.warn("You are using " + actDurInterpret + " as activityDurationInterpretation. " +
 			"This is not working in conjunction with the pt module as pt interaction activities then will never end!");
-			log.warn("ActivityDurationInterpreation " + activityDurationInterpretation + " is deprecated; use " 
+			log.warn("ActivityDurationInterpreation " + actDurInterpret + " is deprecated; use " 
 					+ ActivityDurationInterpretation.minOfDurationAndEndTime + " instead. kai, jan'13") ;
 		}
-		this.activityDurationInterpretation = activityDurationInterpretation;
+		this.activityDurationInterpretation = actDurInterpret;
 	}
 	@StringGetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
 	public boolean isRemovingUnneccessaryPlanAttributes() {
@@ -347,12 +347,12 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 	public String getAverageColdEmissionFactorsFile() {
 		return this.averageFleetColdEmissionFactorsFile;
 	}
-	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
+	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
 	public boolean isUsingDetailedEmissionCalculation(){
 		return this.isUsingDetailedEmissionCalculation;
 	}
-	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
-	public void setIsUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
+	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
+	public void setUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
 		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
 	}
 	@StringSetter(EMISSION_FACTORS_WARM_FILE_DETAILED)
@@ -371,19 +371,19 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 	public String getDetailedColdEmissionFactorsFile(){
 		return this.detailedColdEmissionFactorsFile;
 	}
-	@StringSetter(WRITING_OUTPUT_EVENTS)
+	@StringGetter(WRITING_OUTPUT_EVENTS)
 	public boolean isWritingOutputEvents() {
 		return this.writingOutputEvents ;
 	}
-	@StringGetter(WRITING_OUTPUT_EVENTS)
+	@StringSetter(WRITING_OUTPUT_EVENTS)
 	public void setWritingOutputEvents(boolean writingOutputEvents) {
 		this.writingOutputEvents = writingOutputEvents;
 	}
-	@StringSetter(MATSIM_GLOBAL_TIME_FORMAT)
+	@StringGetter(MATSIM_GLOBAL_TIME_FORMAT)
 	public String getMatsimGlobalTimeFormat() {
 		return this.matsimGlobalTimeFormat;
 	}
-	@StringGetter(MATSIM_GLOBAL_TIME_FORMAT)
+	@StringSetter(MATSIM_GLOBAL_TIME_FORMAT)
 	public void setMatsimGlobalTimeFormat(String format) {
 		this.matsimGlobalTimeFormat = format;
 		Time.setDefaultTimeFormat(format) ;

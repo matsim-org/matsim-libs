@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
  * @author dgrether
  *
  */
-public final class DefaultQSimEngineFactory implements QNetsimEngineFactory {
+public final class DefaultQNetsimEngineFactory implements QNetsimEngineFactory {
 
 	@Override
 	public QNetsimEngine createQSimEngine(Netsim sim) {

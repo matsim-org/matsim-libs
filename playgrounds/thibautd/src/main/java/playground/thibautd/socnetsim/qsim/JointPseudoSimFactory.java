@@ -36,7 +36,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -85,7 +85,7 @@ public class JointPseudoSimFactory implements MobsimFactory {
 					new SynchronizedEventsManagerImpl(
 						eventsManager ) );
 		
-		final QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
+		final QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
 		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
 		final QVehicleProvider vehicles = new NetsimWrappingQVehicleProvider( netsimEngine );
 

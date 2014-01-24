@@ -34,6 +34,10 @@ import org.matsim.core.utils.misc.Time;
 
 public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	
+	public static enum LinkDynamics { FIFO, PassingQ }
+	private LinkDynamics linkDynamics = LinkDynamics.FIFO ;
+	private static final String LINK_DYNAMICS = "linkDynamics" ;
+
 	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
 
 	public static final String GROUP_NAME = "qsim";
@@ -95,6 +99,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	private double nodeOffset = 0;
 	private float linkWidth = 30;
+
 	public static final String LINK_WIDTH = "linkWidth";
 
 	public QSimConfigGroup() {
@@ -107,6 +112,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			setStartTime(Time.parseTime(value));
 		} else if ( INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES.equals(key) ) {
 			setInsertingWaitingVehiclesBeforeDrivingVehicles(Boolean.parseBoolean(value));
+		} else if ( LINK_DYNAMICS.equals(key)) {
+			setLinkDynamics(value);
 		} else if (END_TIME.equals(key)) {
 			setEndTime(Time.parseTime(value));
 		} else if (TIME_STEP_SIZE.equals(key)) {
@@ -175,6 +182,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainModes())));
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) );
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
+		map.put(LINK_DYNAMICS, this.getLinkDynamics() ) ;
 		
 		return map;
 	}
@@ -207,6 +215,13 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false"); 
 		map.put(NODE_OFFSET, "Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow. ");
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
+		{
+			StringBuilder stb = new StringBuilder() ;
+			for ( LinkDynamics ld : LinkDynamics.values() ) {
+				stb.append( " " + ld.toString() ) ;
+			}
+			map.put(LINK_DYNAMICS, "default: FIFO; options:" + stb ) ;
+		}
 		return map;
 	}
 	/* direct access */
@@ -375,5 +390,12 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	public void setLinkWidth(final float linkWidth) {
 		this.linkWidth = linkWidth;
+	}
+
+	public String getLinkDynamics() {
+		return this.linkDynamics.toString() ;
+	}
+	public void setLinkDynamics( String str ) {
+		this.linkDynamics = LinkDynamics.valueOf( str ) ;
 	}
 }

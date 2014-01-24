@@ -21,6 +21,7 @@ package playground.southafrica.gauteng.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -61,9 +62,38 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		
 		String subPopName = (String) personAttributes.getAttribute(plan.getPerson().getId().toString(), this.subPopulationAttributeName ) ;
 		if ( subPopName.equals("commercial") ) {
-			// do nothing
-			// yy note that this will not be sufficient once time mutation is switched on ... freight agents may prolong activities
-			// just to move the legs out of congestion. kai, jan'14
+			sum.addScoringFunction( new SumScoringFunction.ActivityScoring() {
+				private final double margUtlOfTime_s = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600. ;
+				private double score = 0. ;
+				private double overnightActEndTime = Double.NaN ;
+				@Override public void reset() { score = 0. ; }
+				@Override public void handleActivity(Activity act) { }
+				@Override public void handleFirstActivity(Activity act) { 
+					overnightActEndTime = act.getEndTime() ;
+				}
+				@Override public void handleLastActivity(Activity act) { 
+					score += margUtlOfTime_s * ( overnightActEndTime + 24.*3600. - act.getStartTime() );
+					// (The idea is that we get positive score from getting home earlier.  Could also be the standard log functional
+					// form. -- If the benefit goes to the employer, the marginal wage rate is in theory the same as the marginal utility
+					// of leisure.  In practice, the employer pays much more so that this does not hold.  But we are using a much larger
+					// utility of money instead! )
+					// (Overall, the effect is that the mUTTS (marginal utility of travel time savings) is the same for commercial as
+					// for others: beta_trav - beta_perf , and so differences are caught in the utility of money.)
+					// (Now with sub-populations, might consider alternatives to this approach: utility of money same for everybody, and
+					// utility of time as a resource different. ---???  kai, jan'14)
+				}
+				@Override 
+				public void finish() { 
+					// if the last activity hasn't happened yet, it is not clear what to do.  Hopefully the simulation end time is beyond this.
+				}
+				@Override
+				public double getScore() {
+					if ( Double.isNaN(score) ) {
+						throw new RuntimeException ("trying to get score when it is not yet ready") ;
+					}
+					return score ;
+				}
+			} ) ;
 		} else {
 			sum.addScoringFunction(new CharyparNagelActivityScoring(params));
 		}

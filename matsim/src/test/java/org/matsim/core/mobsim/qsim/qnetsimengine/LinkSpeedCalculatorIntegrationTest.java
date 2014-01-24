@@ -146,7 +146,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
 		
-		QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();
+		QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qsim);
 		if (linkSpeedCalculator != null) {
 			netsimEngine.setLinkSpeedCalculator(linkSpeedCalculator);

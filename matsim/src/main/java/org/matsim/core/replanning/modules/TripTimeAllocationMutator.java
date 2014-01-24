@@ -48,14 +48,15 @@ public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
 		this.affectingDuration = config.timeAllocationMutator().isAffectingDuration() ;
-		if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
-			useActivityDurations = true;
-		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.endTimeOnly ) ) {
-			useActivityDurations = false;
-		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.tryEndTimeThenDuration ) ) {
-			throw new UnsupportedOperationException("need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10");
+		ActivityDurationInterpretation actDurInterpr = ActivityDurationInterpretation.valueOf( config.vspExperimental().getActivityDurationInterpretation() ) ;
+		if ( actDurInterpr == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
+			useActivityDurations = true ;
+		} else if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {
+			useActivityDurations = false ;
+		} else if ( actDurInterpr == ActivityDurationInterpretation.tryEndTimeThenDuration ) {
+			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
 		} else {
-			throw new IllegalStateException("beahvior not defined for this configuration setting");
+			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;
 		}
 	}
 

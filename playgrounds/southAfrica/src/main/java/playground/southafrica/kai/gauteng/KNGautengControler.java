@@ -177,7 +177,7 @@ public class KNGautengControler {
 			
 			// VSP DEFAULTS:
 			config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
-			config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+			config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
 			config.timeAllocationMutator().setMutationRange(7200.);
 			
 			config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;

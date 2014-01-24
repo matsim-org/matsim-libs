@@ -46,7 +46,7 @@ class KNBerlinControler {
 		config.vspExperimental().addParam(VspExperimentalConfigKey.scoreMSAStartsAtIteration, Integer.toString((int)(0.8*config.controler().getLastIteration()) ));
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
 
 		config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT );
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());

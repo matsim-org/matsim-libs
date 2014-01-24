@@ -71,7 +71,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
@@ -107,7 +107,7 @@ public class QSimTest {
 	// Run all the tests with the single-threaded as well as the multi-threaded QSim.
 	@Parameters
     public static List<Object[]> enginesToTest() {
-    	return Arrays.asList( new Object[][] { { new DefaultQSimEngineFactory() }, { new ParallelQNetsimEngineFactory() } });
+    	return Arrays.asList( new Object[][] { { new DefaultQNetsimEngineFactory() }, { new ParallelQNetsimEngineFactory() } });
     }
 	
 	private final static Logger log = Logger.getLogger(QSimTest.class);

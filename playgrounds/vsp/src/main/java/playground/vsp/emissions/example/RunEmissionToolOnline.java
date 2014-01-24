@@ -142,7 +142,7 @@ public class RunEmissionToolOnline {
 		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 		
-		vcg.setIsUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
+		vcg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		vcg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		

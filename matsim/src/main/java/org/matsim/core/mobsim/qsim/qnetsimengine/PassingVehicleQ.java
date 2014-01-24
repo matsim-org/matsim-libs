@@ -1,4 +1,4 @@
-package playground.kai.run;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.AbstractQueue;
 import java.util.Comparator;
@@ -6,12 +6,10 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
+public final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 
-final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
-
-
+	public PassingVehicleQ() {} // to find calls 
+	
 	private final Queue<QVehicle> delegate = new PriorityQueue<QVehicle>(11, new Comparator<QVehicle>() {
 
 		@Override

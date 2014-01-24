@@ -41,9 +41,7 @@ import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class PlanTimesAdapter {
@@ -125,8 +123,9 @@ public class PlanTimesAdapter {
 					// iterated element.)  kai, jan'13
 					
 //					actTmp.setStartTime(arrivalTime);
-
-					if ( config.vspExperimental().getActivityDurationInterpretation().equals(ActivityDurationInterpretation.endTimeOnly.toString()) ) {
+					
+					ActivityDurationInterpretation actDurInterpr = ActivityDurationInterpretation.valueOf( config.vspExperimental().getActivityDurationInterpretation() ) ;
+					if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {
 						throw new RuntimeException("activity duration interpretation of " 
 								+ config.vspExperimental().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
 										"Use " + ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;

@@ -80,8 +80,6 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		return utilityOfTravelTime_hr;
 	}
 
-	private static int wrncnt=0 ;
-	
 	private double getValueOfTime_hr(SanralTollVehicleType vehicleType) {
 		double valueOfTime_hr = baseValueOfTime_h ;
 		switch( vehicleType ) {
@@ -92,8 +90,9 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		case commercialClassBWithoutTag:
 		case busWithTag:
 		case busWithoutTag:
-			valueOfTime_hr = baseValueOfTime_h*0.5*commercialMultiplier ; 
+			//			valueOfTime_hr = baseValueOfTime_h*0.5*commercialMultiplier ; 
 			// yy if someone sets the commercial multiplier to less than two, this may not work as intended. kai, nov'13
+			valueOfTime_hr = baseValueOfTime_h * Math.sqrt( commercialMultiplier ) ;
 			break;
 		case commercialClassCWithTag:
 		case commercialClassCWithoutTag:
@@ -110,12 +109,14 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		default:
 			throw new RuntimeException("vehicle type not implemented") ;
 		}
-		if ( wrncnt<1 ) {
-			wrncnt++ ;
-			Logger.getLogger(this.getClass()).warn("Johan, commercialClassAWith/WithoutTag were not explicitly given a value of time.  I now added them "
-					+ "under the vehicle types which are getting the base value of time ... which is what they must have gotten implicitly in previous runs. "
-					+ "Could you please modify if necessary, and in any case remove this warning when things are ok.  Thanks, kai, nov'13");
-		}
+//		if ( wrncnt<1 ) {
+//			wrncnt++ ;
+//			Logger.getLogger(this.getClass()).warn("Johan, commercialClassAWith/WithoutTag were not explicitly given a value of time.  I now added them "
+//					+ "under the vehicle types which are getting the base value of time ... which is what they must have gotten implicitly in previous runs. "
+//					+ "Could you please modify if necessary, and in any case remove this warning when things are ok.  Thanks, kai, nov'13");
+//		}
+		// I think we had talked about this in dec'13. kai
+		
 		return valueOfTime_hr;
 	}
 
