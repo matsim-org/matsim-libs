@@ -67,28 +67,38 @@ public class PuttingGautengPopulationTogether {
 		String outputFolder = args[0];
 
 		/* First convert all the old Sanral population components. */
-		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/car_plans_2009_10pctV0.xml.gz",
-				"car", "WGS84_UTM35S", "car", 0.1, 
-				outputFolder + "car.xml.gz",
-				outputFolder + "carAttr.xml.gz",
-				"WGS84_SA_Albers");
-		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/bus_plans_2009_10pctV0.xml.gz",
-				"bus", "WGS84_UTM35S", "bus", 0.1, 
-				outputFolder + "bus.xml.gz",
-				outputFolder + "busAttr.xml.gz",
-				"WGS84_SA_Albers");
-		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/taxi_plans_2009_10pctV0.xml.gz",
-				"taxi", "WGS84_UTM35S", "taxi", 0.1, 
-				outputFolder + "taxi.xml.gz",
-				outputFolder + "taxiAttr.xml.gz",
-				"WGS84_SA_Albers");
-		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/ext_plans_2011_10pctV0.xml.gz",
-				"ext", "WGS84_UTM35S", "ext", 0.1, 
-				outputFolder + "ext.xml.gz",
-				outputFolder + "extAttr.xml.gz",
-				"WGS84_SA_Albers");
+		convertOldSanralSubpopulations(outputFolder);
 		
 		/* Now combine the subpopulations. */
+		combineSubpopulations(outputFolder);
+		
+		/* Clean up the temporary files. */
+		cleanUpTemporaryFiles(outputFolder);
+		
+		Header.printFooter();
+	}
+
+	/**
+	 * @param outputFolder
+	 */
+	private static void cleanUpTemporaryFiles(String outputFolder) {
+		new File(outputFolder + "carAttr.xml.gz").delete();
+		new File(outputFolder + "busAttr.xml.gz").delete();
+		new File(outputFolder + "taxiAttr.xml.gz").delete();
+		new File(outputFolder + "extAttr.xml.gz").delete();
+		new File(outputFolder + "tmp1.xml.gz").delete();
+		new File(outputFolder + "tmp1Attr.xml.gz").delete();
+		new File(outputFolder + "tmp2.xml.gz").delete();
+		new File(outputFolder + "tmp2Attr.xml.gz").delete();
+		new File(outputFolder + "tmp3.xml.gz").delete();
+		new File(outputFolder + "tmp3Attr.xml.gz").delete();
+		new File(outputFolder + "tmp4Attr.xml.gz").delete();
+	}
+
+	/**
+	 * @param outputFolder
+	 */
+	private static void combineSubpopulations(String outputFolder) {
 		JoinSubpopulations.Run( 
 				/* Car and commercial vehicles... */
 				outputFolder + "car.xml.gz", outputFolder + "carAttr.xml.gz", 
@@ -120,21 +130,32 @@ public class PuttingGautengPopulationTogether {
 		ReportPopulationStatistics.Run(
 				outputFolder + "gauteng.xml.gz", 
 				outputFolder + "gautengAttr.xml.gz");
-		
-		/* Clean up the temporary files. */
-		new File(outputFolder + "carAttr.xml.gz").delete();
-		new File(outputFolder + "busAttr.xml.gz").delete();
-		new File(outputFolder + "taxiAttr.xml.gz").delete();
-		new File(outputFolder + "extAttr.xml.gz").delete();
-		new File(outputFolder + "tmp1.xml.gz").delete();
-		new File(outputFolder + "tmp1Attr.xml.gz").delete();
-		new File(outputFolder + "tmp2.xml.gz").delete();
-		new File(outputFolder + "tmp2Attr.xml.gz").delete();
-		new File(outputFolder + "tmp3.xml.gz").delete();
-		new File(outputFolder + "tmp3Attr.xml.gz").delete();
-		new File(outputFolder + "tmp4Attr.xml.gz").delete();
-		
-		Header.printFooter();
+	}
+
+	/**
+	 * @param outputFolder
+	 */
+	private static void convertOldSanralSubpopulations(String outputFolder) {
+		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/car_plans_2009_10pctV0.xml.gz",
+				"car", "WGS84_UTM35S", "car", 0.1, 
+				outputFolder + "car.xml.gz",
+				outputFolder + "carAttr.xml.gz",
+				"WGS84_SA_Albers");
+		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/bus_plans_2009_10pctV0.xml.gz",
+				"bus", "WGS84_UTM35S", "bus", 0.1, 
+				outputFolder + "bus.xml.gz",
+				outputFolder + "busAttr.xml.gz",
+				"WGS84_SA_Albers");
+		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/taxi_plans_2009_10pctV0.xml.gz",
+				"taxi", "WGS84_UTM35S", "taxi", 0.1, 
+				outputFolder + "taxi.xml.gz",
+				outputFolder + "taxiAttr.xml.gz",
+				"WGS84_SA_Albers");
+		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/ext_plans_2011_10pctV0.xml.gz",
+				"ext", "WGS84_UTM35S", "ext", 0.1, 
+				outputFolder + "ext.xml.gz",
+				outputFolder + "extAttr.xml.gz",
+				"WGS84_SA_Albers");
 	}
 
 }
