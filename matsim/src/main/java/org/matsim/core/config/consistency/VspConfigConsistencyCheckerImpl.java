@@ -104,10 +104,19 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This will be more strictly" +
-					" enforced in the future. This means you have to add the following lines to your config file: ") ;
+			log.warn("timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This means you have to add the following lines to your config file: ") ;
 			log.warn("<module name=\"TimeAllocationMutator\">");
 			log.warn("	<param name=\"mutationRange\" value=\"7200.0\" />");
+			log.warn("</module>");
+		}
+		// added jan'14
+		if ( config.timeAllocationMutator().isAffectingDuration() ) {
+//			problem = true ;
+			System.out.flush() ;
+			log.warn("timeAllocationMutator is affecting duration; vsp default is to not do that.  This will be more strictly" +
+					" enforced in the future. This means you have to add the following lines to your config file: ") ;
+			log.warn("<module name=\"TimeAllocationMutator\">");
+			log.warn("	<param name=\"affectingDuration\" value=\"false\" />");
 			log.warn("</module>");
 		}
 		
@@ -115,14 +124,14 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		if ( !config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.  This will be more strictly" +
-					" enforced in the future.") ;
+			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.") ;
 		}
 		
 
 		if ( ActivityDurationInterpretation.endTimeOnly.equals(vspConfig.getActivityDurationInterpretation()) ) {
 			// added jan'13
 			log.warn(ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
+			problem = true;
 			// added before nov'12
 			if( config.scenario().isUseTransit()) {
 				problem = true;
@@ -138,7 +147,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			problem = true ;
 			System.out.flush() ;
 			log.warn("You are using ActivityDurationInterpretation " + vspConfig.getActivityDurationInterpretation() + " ; vsp default is to use " +
-					ActivityDurationInterpretation.tryEndTimeThenDuration + " .  This will be more strictly enforced in the future.  " +
+					ActivityDurationInterpretation.tryEndTimeThenDuration + 
 							"This means you have to add the following lines into the vspExperimental section of your config file: ") ;
 			log.warn( "   <param name=\"activityDurationInterpretation\" value=\"" + ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
 			log.warn("Please report if this causes odd results (this will simplify many code maintenance issues, but is unfortunately not well tested).") ;
@@ -152,8 +161,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			problem = true ;
 			System.out.flush() ;
 			log.warn("You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
-					"problems during paper writing.) This will be more strictly "
-					+ " enforced in the future. This means you have to add the following lines to your config file: ") ;
+					"problems during paper writing.) This means you have to add the following lines to your config file: ") ;
 			log.warn("<module name=\"planCalcScore\">");
 			log.warn("	<param name=\"BrainExpBeta\" value=\"1.0\" />");
 			log.warn("</module>");
@@ -168,7 +176,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		if ( usingLocationChoice ) {
 			if ( !config.locationchoice().getDestinationSamplePercent().equals("100.") ) {
-				//			problem = true ;
+				problem = true ;
 				System.out.flush() ;
 				log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +
 				"DestinationSampler is resolved.  kai, jan'13") ;
@@ -179,7 +187,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 //				"ChoiceSet is resolved.  kai, jan'13") ;
 //			}
 			if ( !Boolean.parseBoolean( config.vspExperimental().getValue( VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice) ) ) {
-				// problem = true ;
+				problem = true ;
 				System.out.flush() ;
 				log.error("vsp will not accept location choice without including opportunity cost of time into the approximation. kai,jan'13") ;
 			}
