@@ -243,8 +243,7 @@ public class PSeudoQSimCompareEventsTest {
 			vehicleType.setCapacity( cap );
 		}
 
-		vehicles.getVehicleTypes().put(
-				vehicleType.getId(),
+		vehicles.addVehicleType(
 				vehicleType );
 
 		final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility( sc.getConfig().planCalcScore() );

@@ -85,7 +85,7 @@ public class Visum2TransitSchedule {
 			capacity.setSeats(Integer.valueOf(vehComb.numOfVehicles * vu.seats));
 			capacity.setStandingRoom(Integer.valueOf(vehComb.numOfVehicles * (vu.passengerCapacity - vu.seats)));
 			type.setCapacity(capacity);
-			this.vehicles.getVehicleTypes().put(type.getId(), type);
+			this.vehicles.addVehicleType(type);
 		}
 
 		// 2nd step: convert stop points

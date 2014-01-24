@@ -240,7 +240,7 @@ public class VehiclesDataProcessor {
 												vehicleType.setDoorOperationMode(DoorOperationMode.valueOf(result.getString(8)));
 												vehicleType.setAccessTime(result.getDouble(10)/fraction);
 												vehicleType.setEgressTime(result.getDouble(11)/fraction);
-												vehicles.getVehicleTypes().put(vehicleType.getId(), vehicleType);
+												vehicles.addVehicleType( vehicleType);
 											}
 										}
 										vehicles.addVehicle(new VehicleImpl(departure.getVehicleId(), vehicleType));		

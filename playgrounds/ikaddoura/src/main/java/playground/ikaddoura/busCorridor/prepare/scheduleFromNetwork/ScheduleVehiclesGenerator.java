@@ -485,7 +485,7 @@ public class ScheduleVehiclesGenerator {
 		type.setLength(length);
 		type.setAccessTime(accessSeconds);
 		type.setEgressTime(egressSeconds);
-		veh.getVehicleTypes().put(this.vehTypeId, type); 
+		veh.addVehicleType( type); 
 		
 		for (int vehicleNr=1 ; vehicleNr<=numberOfBusesZeitraum ; vehicleNr++){
 			vehicleIdList.add(new IdImpl("bus_"+vehicleNr));

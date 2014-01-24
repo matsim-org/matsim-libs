@@ -179,7 +179,7 @@ public class CreateTestTransit {
 		typeBus.setAccessTime(4.);
 		typeBus.setEgressTime(2.);
 		
-		vehicles.getVehicleTypes().put(typeBus.getId(), typeBus);
+		vehicles.addVehicleType( typeBus);
 		
 		for(int i = 0; i < vehicleCounter; i++){
 			VehicleImpl bus = new VehicleImpl(new IdImpl(vehicle + i),typeBus);

@@ -94,7 +94,7 @@ public class VehiclesGenerator {
 			type.setMaximumVelocity(maxVelocity);
 			type.setPcuEquivalents(pcu);
 			
-			veh.getVehicleTypes().put(vehTypeId, type); 
+			veh.addVehicleType( type); 
 			
 			if (vehicleIDs.isEmpty()){
 				throw new RuntimeException("At least 1 Bus is expected. Aborting...");

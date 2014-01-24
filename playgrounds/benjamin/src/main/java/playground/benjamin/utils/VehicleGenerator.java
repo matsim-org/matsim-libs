@@ -82,7 +82,7 @@ public class VehicleGenerator {
 
 		EngineInformation engineInfo = vehicleFactory.createEngineInformation(fuelType.diesel, gasConsumption);
 		vehicleType.setEngineInformation(engineInfo);
-		vehicles.getVehicleTypes().put(vehicleType.getId(), vehicleType);
+		vehicles.addVehicleType(vehicleType);
 		
 		for(Person person : population.getPersons().values()){
 			Id vehicleId = person.getId();

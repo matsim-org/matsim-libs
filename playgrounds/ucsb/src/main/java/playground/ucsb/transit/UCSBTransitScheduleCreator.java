@@ -116,7 +116,7 @@ public class UCSBTransitScheduleCreator {
 		
 		Vehicles vehicles = ((ScenarioImpl)scenario).getVehicles();
 		VehicleType defaultVehicleType = vehicles.getFactory().createVehicleType(new IdImpl(1));
-		vehicles.getVehicleTypes().put(defaultVehicleType.getId(),defaultVehicleType);
+		vehicles.addVehicleType(defaultVehicleType);
 		defaultVehicleType.setDescription("generic default");
 		defaultVehicleType.setLength(7.5);
 		defaultVehicleType.setMaximumVelocity(1.0);

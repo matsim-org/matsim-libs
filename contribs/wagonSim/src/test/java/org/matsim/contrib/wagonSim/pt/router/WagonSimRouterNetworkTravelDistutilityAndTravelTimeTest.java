@@ -308,7 +308,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		vt1.setAccessTime(10);
 		vt1.setCapacity(vc);
 		
-		veh.getVehicleTypes().put(vt1.getId(), vt1);
+		veh.addVehicleType(vt1);
 		
 		Vehicle v = factory.createVehicle(sc.createId("v1"), vt1);
 		veh.addVehicle( v);

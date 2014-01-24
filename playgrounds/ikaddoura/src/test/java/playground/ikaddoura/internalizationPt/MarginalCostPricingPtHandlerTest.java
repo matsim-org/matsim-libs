@@ -2149,7 +2149,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -2349,7 +2349,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -2664,7 +2664,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -2939,7 +2939,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -3214,7 +3214,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -3497,7 +3497,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -3783,7 +3783,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType( type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -4074,7 +4074,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -4362,7 +4362,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -4764,7 +4764,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType( type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -5074,7 +5074,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -5384,7 +5384,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -5720,7 +5720,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -6043,7 +6043,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);
@@ -6379,7 +6379,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
+		veh.addVehicleType(type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
 		veh.addVehicle( vehicle1);

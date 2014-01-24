@@ -35,6 +35,8 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
@@ -178,11 +180,20 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	private Vehicles addPVehiclesToOriginalOnes(Vehicles baseVehicles, Vehicles pVehicles){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		
-		vehicles.getVehicleTypes().putAll(baseVehicles.getVehicleTypes());
-		vehicles.getVehicles().putAll(baseVehicles.getVehicles());
+		for ( VehicleType t : baseVehicles.getVehicleTypes().values() ) {
+			vehicles.addVehicleType( t );
+		}
+		for ( Vehicle v : baseVehicles.getVehicles().values() ) {
+			vehicles.addVehicle( v );
+		}
 		
-		vehicles.getVehicleTypes().putAll(pVehicles.getVehicleTypes());
-		vehicles.getVehicles().putAll(pVehicles.getVehicles());
+		
+		for ( VehicleType t : pVehicles.getVehicleTypes().values() ) {
+			vehicles.addVehicleType( t );
+		}
+		for ( Vehicle v : pVehicles.getVehicles().values() ) {
+			vehicles.addVehicle( v );
+		}
 		
 		return vehicles;
 	}

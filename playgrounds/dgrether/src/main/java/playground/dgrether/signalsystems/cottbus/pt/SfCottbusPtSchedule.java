@@ -256,10 +256,10 @@ public class SfCottbusPtSchedule {
 		Id bus_64pax = new IdImpl("bus_64pax");
 		Id train = new IdImpl("train");
 		
-		veh.getVehicleTypes().put(tram_93pax, veh.getFactory().createVehicleType(tram_93pax));
-		veh.getVehicleTypes().put(bus_90pax, veh.getFactory().createVehicleType(bus_90pax));
-		veh.getVehicleTypes().put(bus_64pax, veh.getFactory().createVehicleType(bus_64pax));
-		veh.getVehicleTypes().put(train, veh.getFactory().createVehicleType(train));
+		veh.addVehicleType( veh.getFactory().createVehicleType(tram_93pax));
+		veh.addVehicleType( veh.getFactory().createVehicleType(bus_90pax));
+		veh.addVehicleType( veh.getFactory().createVehicleType(bus_64pax));
+		veh.addVehicleType( veh.getFactory().createVehicleType(train));
 		veh.getVehicleTypes().get(tram_93pax).setCapacity(cap93);
 		veh.getVehicleTypes().get(bus_90pax).setCapacity(cap90);
 		veh.getVehicleTypes().get(bus_64pax).setCapacity(cap64);

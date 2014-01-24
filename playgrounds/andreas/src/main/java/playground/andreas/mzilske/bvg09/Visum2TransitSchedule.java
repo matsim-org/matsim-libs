@@ -197,12 +197,13 @@ public class Visum2TransitSchedule {
 			capacity.setSeats(Integer.valueOf(vehComb.numOfVehicles * vu.seats));
 			capacity.setStandingRoom(Integer.valueOf(vehComb.numOfVehicles * (vu.passengerCapacity - vu.seats)));
 			type.setCapacity(capacity);
-			this.vehicles.getVehicleTypes().put(type.getId(), type);
+			this.vehicles.addVehicleType(type);
 		}
+		
 
 		// add default types
 		for (Entry<String, VehicleType> entry : DefaultVehTypes.getDefaultVehicleTypes().entrySet()) {
-			this.vehicles.getVehicleTypes().put(new IdImpl(entry.getKey()), entry.getValue());
+			this.vehicles.addVehicleType( entry.getValue());
 		}
 	}
 

@@ -57,7 +57,7 @@ class TransitScenarioManipulator {
 			vt.add(type);
 			if(sc.getVehicles().getVehicleTypes().containsKey(new IdImpl(type))){
 				VehicleType vehTyp = sc.getVehicles().getVehicleTypes().get(new IdImpl(type));
-				result.getVehicles().getVehicleTypes().put(vehTyp.getId(), vehTyp);
+				result.getVehicles().addVehicleType( vehTyp);
 			}else{
 				System.out.println(type + " doesn't exist as a vehicletype");
 			}

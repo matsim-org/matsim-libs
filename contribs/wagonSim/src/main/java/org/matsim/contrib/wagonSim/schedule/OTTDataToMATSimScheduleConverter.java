@@ -144,7 +144,7 @@ public class OTTDataToMATSimScheduleConverter {
 		vehicleType.setAccessTime(0);
 		vehicleType.setEgressTime(0);
 		vehicleType.setCapacity(vehicleCapacity);
-		((ScenarioImpl)scenario).getVehicles().getVehicleTypes().put(vehicleType.getId(),vehicleType);
+		((ScenarioImpl)scenario).getVehicles().addVehicleType(vehicleType);
 		
 		Date startDate = extractStartDate(dataContainer,isPerformance);
 		System.out.println("startDate="+startDate.toString());

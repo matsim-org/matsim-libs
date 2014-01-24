@@ -108,7 +108,7 @@ public class EmissionVehicleGenerator {
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
 			
 			if(!(outputVehicles.getVehicles().containsKey(vehTypeId))){
-				outputVehicles.getVehicleTypes().put(vehTypeId, vehicleType);
+				outputVehicles.addVehicleType(vehicleType);
 			} else {
 				// do nothing
 			}

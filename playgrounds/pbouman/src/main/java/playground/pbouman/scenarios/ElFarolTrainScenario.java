@@ -231,7 +231,7 @@ public class ElFarolTrainScenario
 			VehicleType type = vFac.createVehicleType(scen.createId("vtype"+t));
 			type.setCapacity(cap);
 			type.setMaximumVelocity(speed);
-			scen.getVehicles().getVehicleTypes().put(type.getId(), type);
+			scen.getVehicles().addVehicleType( type);
 			Vehicle veh = vFac.createVehicle(scen.createId("vehicle"+t), type);
 			scen.getVehicles().addVehicle( veh);
 			vehicles[t] = veh;

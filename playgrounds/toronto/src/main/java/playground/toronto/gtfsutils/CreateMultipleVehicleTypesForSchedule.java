@@ -66,7 +66,7 @@ public class CreateMultipleVehicleTypesForSchedule {
 			
 			type.setWidth(Double.parseDouble(tr.current().get("width")));
 			
-			this.vehicles.getVehicleTypes().put(i, type);
+			this.vehicles.addVehicleType( type);
 		}
 		tr.close();
 	}

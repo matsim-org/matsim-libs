@@ -54,6 +54,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.opengis.feature.simple.SimpleFeature;
@@ -138,8 +139,12 @@ public class TransitScheduleAreaCut2 {
 		TransitScheduleFactory factory = this.newSchedule.getFactory();
 		
 		//copy the vehicles
-		this.newVehicles.getVehicles().putAll(this.vehicles.getVehicles());
-		this.newVehicles.getVehicleTypes().putAll(this.vehicles.getVehicleTypes());
+		for ( Vehicle v : this.vehicles.getVehicles().values() ) {
+			this.newVehicles.addVehicle( v );
+		}
+		for ( VehicleType t : this.vehicles.getVehicleTypes().values() ) {
+			this.newVehicles.addVehicleType( t );
+		}
 		//add all TransitStopFacilities to the new schedule
 		for(TransitStopFacility facility : this.schedule.getFacilities().values()){
 			this.newSchedule.addStopFacility(facility);

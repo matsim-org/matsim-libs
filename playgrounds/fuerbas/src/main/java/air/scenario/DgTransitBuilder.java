@@ -120,7 +120,7 @@ public class DgTransitBuilder {
 				cap.setSeats(flight.getSeatsAvailable());
 				vehType.setCapacity( cap);
 				vehType.setMaximumVelocity(MACH_2);
-				veh.getVehicleTypes().put(typeId, vehType);
+				veh.addVehicleType(vehType);
 			}
 			Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, vehType);
 			veh.addVehicle( vehicle);

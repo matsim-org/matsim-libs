@@ -710,7 +710,7 @@ public class RblMerger {
 		vehCap.setSeats(1);
 		vehCap.setStandingRoom(1);
 		vehType.setCapacity(vehCap);
-		vehicles.getVehicleTypes().put(vehTypeId, vehType);
+		vehicles.addVehicleType(vehType);
 		
 		Map<Id, Vehicle> vehMap = vehicles.getVehicles();
 		for (Id vehId : vehIds) {

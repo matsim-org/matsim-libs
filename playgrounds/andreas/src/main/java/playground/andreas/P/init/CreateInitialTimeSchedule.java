@@ -189,7 +189,7 @@ public class CreateInitialTimeSchedule {
 		capacity.setSeats(Integer.valueOf(8));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehType.setCapacity(capacity);
-		this.veh.getVehicleTypes().put(vehType.getId(), vehType);
+		this.veh.addVehicleType(vehType);
 	
 		for (TransitLine line : this.tS.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {

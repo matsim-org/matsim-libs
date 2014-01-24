@@ -251,7 +251,7 @@ public class GeneratePopulation {
 		if (vehicleType == null) {
 			vehicleType = vehicles.getFactory().createVehicleType(vehicleTypeId);
 			vehicleType.setDescription("Baujahr:"+baujahr+";Antriebsart:"+antriebsart+";Hubraum:"+hubraum);
-			vehicles.getVehicleTypes().put(vehicleTypeId, vehicleType);
+			vehicles.addVehicleType( vehicleType);
 		}
 		return vehicleType;
 	}
@@ -262,7 +262,7 @@ public class GeneratePopulation {
 		if (defaultVehicleType == null) {
 			defaultVehicleType = vehicles.getFactory().createVehicleType(defaultVehicleTypeId);
 			defaultVehicleType.setDescription("default");
-			vehicles.getVehicleTypes().put(defaultVehicleTypeId, defaultVehicleType);
+			vehicles.addVehicleType( defaultVehicleType);
 		}
 		return defaultVehicleType;
 	}

@@ -105,7 +105,7 @@ public class Connections2PTNetwork {
 		cap.setSeats(seats);
 		cap.setStandingRoom(persons);		
 		virtualVehicleType.setCapacity(cap);
-		PTvehicles.getVehicleTypes().put(virtualVehicleID, virtualVehicleType);
+		PTvehicles.addVehicleType(virtualVehicleType);
 
 		// ------------------- add connections to network and schedule -----------------------
 		while ((curr_line = bufRdr.readLine()) != null) {

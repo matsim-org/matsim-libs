@@ -187,7 +187,7 @@ public class SfTransitBuilder {
 				cap.setSeats(aircraftCapacity);
 				type.setCapacity(cap);
 				type.setMaximumVelocity(vehicleSpeed);
-				veh.getVehicleTypes().put(vehTypeId, type); 
+				veh.addVehicleType(type); 
 			}
 			Vehicle vehicle = veh.getFactory().createVehicle(flightNumber, type); 
 			veh.addVehicle( vehicle);

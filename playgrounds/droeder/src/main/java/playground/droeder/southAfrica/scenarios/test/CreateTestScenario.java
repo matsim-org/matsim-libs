@@ -252,7 +252,7 @@ class CreateTestScenario {
 		String mode = "bus";
 		//  create vehicleType
 		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(sc.createId(mode));
-		((ScenarioImpl) sc).getVehicles().getVehicleTypes().put(vType.getId(), vType);
+		((ScenarioImpl) sc).getVehicles().addVehicleType(vType);
 		vType.setLength(15);
 		VehicleCapacity cap = new VehicleCapacityImpl();
 		cap.setSeats(51);
@@ -340,7 +340,7 @@ class CreateTestScenario {
 		String mode = "train";
 		//  create vehicleType
 		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(sc.createId(mode));
-		((ScenarioImpl) sc).getVehicles().getVehicleTypes().put(vType.getId(), vType);
+		((ScenarioImpl) sc).getVehicles().addVehicleType(vType);
 		vType.setLength(45);
 		VehicleCapacity cap = new VehicleCapacityImpl();
 		cap.setSeats(150);

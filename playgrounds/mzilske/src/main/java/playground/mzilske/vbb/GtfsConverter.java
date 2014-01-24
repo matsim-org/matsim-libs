@@ -750,7 +750,7 @@ public class GtfsConverter {
 			vc.setStandingRoom(50);
 			vt.setCapacity(vc);
 			vt.setLength(5);
-			scenario.getVehicles().getVehicleTypes().put(vt.getId(), vt);
+			scenario.getVehicles().addVehicleType( vt);
 			// Vehicle
 			Vehicle v = scenario.getVehicles().getFactory().createVehicle(new IdImpl(s), vt);
 			scenario.getVehicles().addVehicle( v);

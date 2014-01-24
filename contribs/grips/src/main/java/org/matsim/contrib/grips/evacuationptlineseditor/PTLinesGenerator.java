@@ -159,7 +159,7 @@ public class PTLinesGenerator {
 		vc.setSeats((Integer) stop.capSpinnerValue + 1);
 		vc.setStandingRoom(0);
 		vt.setCapacity(vc);
-		vehicles.getVehicleTypes().put(vt.getId(), vt);
+		vehicles.addVehicleType(vt);
 
 		int hours = Integer.parseInt(stop.hh);
 		int min = Integer.parseInt(stop.mm);

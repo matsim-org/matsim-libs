@@ -277,7 +277,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		vc.setSeats(50);
 		vc.setStandingRoom(0);
 		vt.setCapacity(vc);
-		vehicles.getVehicleTypes().put(vt.getId(), vt);
+		vehicles.addVehicleType( vt);
 
 		
 		

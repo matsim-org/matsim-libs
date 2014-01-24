@@ -233,7 +233,7 @@ public class DataPrepare {
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		this.scenario.getVehicles().getVehicleTypes().put(vehicleType.getId(),
+		this.scenario.getVehicles().addVehicleType(
 				vehicleType);
 
 		long vehId = 0;

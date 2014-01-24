@@ -66,7 +66,7 @@ public class PVehiclesFactory {
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
 		vehType.setAccessTime(this.pConfig.getDelayPerBoardingPassenger());
 		vehType.setEgressTime(this.pConfig.getDelayPerAlightingPassenger());
-		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
+		vehicles.addVehicleType( vehType);
 	
 		for (TransitLine line : pTransitSchedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {

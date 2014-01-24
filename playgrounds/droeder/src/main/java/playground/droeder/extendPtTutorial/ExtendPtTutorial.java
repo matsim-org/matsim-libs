@@ -120,7 +120,7 @@ class ExtendPtTutorial {
 		Vehicle v;
 		VehiclesFactory vFac = ((ScenarioImpl) sc).getVehicles().getFactory();
 		VehicleType type = vFac.createVehicleType(new IdImpl("bus"));
-		((ScenarioImpl) sc).getVehicles().getVehicleTypes().put(type.getId(), type);
+		((ScenarioImpl) sc).getVehicles().addVehicleType(type);
 		VehicleCapacity vCap = vFac.createVehicleCapacity();
 		vCap.setSeats(100);
 		type.setCapacity(vCap);
