@@ -378,8 +378,9 @@ public class GautengControler_subpopulations {
 	 */
 	private static void assignSubpopulationStrategies(Config config) {
 		/* Set up the strategies for the different subpopulations. */
+		
 		{ /*
-		 * Car: - ChangeExpBeta: 70% - TimeAllocationMutator: 15% - ReRoute: 15%
+		 * Car: ChangeExpBeta: 70%; TimeAllocationMutator: 15%; ReRoute: 15%
 		 */
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
@@ -411,8 +412,7 @@ public class GautengControler_subpopulations {
 		}
 
 		{ /*
-		 * Commercial vehicles: - ChangeExpBeta: 70% - TimeAllocationMutator:
-		 * 15% - ReRoute: 15%
+		 * Commercial vehicles: ChangeExpBeta: 85%; ReRoute: 15%
 		 */
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
@@ -420,18 +420,9 @@ public class GautengControler_subpopulations {
 					.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
 							.toString());
 			changeExpBetaStrategySettings.setSubpopulation("commercial");
-			changeExpBetaStrategySettings.setProbability(0.7);
+			changeExpBetaStrategySettings.setProbability(0.85);
 			config.strategy()
 					.addStrategySettings(changeExpBetaStrategySettings);
-
-			StrategySettings timeStrategySettings = new StrategySettings(
-					ConfigUtils.createAvailableStrategyId(config));
-			timeStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
-							.toString());
-			timeStrategySettings.setSubpopulation("commercial");
-			timeStrategySettings.setProbability(0.15);
-			config.strategy().addStrategySettings(timeStrategySettings);
 
 			StrategySettings rerouteStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
@@ -444,7 +435,7 @@ public class GautengControler_subpopulations {
 		}
 
 		{ /*
-		 * Bus: - ChangeExpBeta: 70% - TimeAllocationMutator: 15% - ReRoute: 15%
+		 * Bus: ChangeExpBeta: 70%; TimeAllocationMutator: 15%; ReRoute: 15%
 		 */
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
@@ -475,8 +466,7 @@ public class GautengControler_subpopulations {
 			config.strategy().addStrategySettings(rerouteStrategySettings);
 		}
 		{ /*
-		 * Taxi: - ChangeExpBeta: 70% - TimeAllocationMutator: 15% - ReRoute:
-		 * 15%
+		 * Taxi: ChangeExpBeta: 70%; TimeAllocationMutator: 15%; ReRoute: 15%
 		 */
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
@@ -507,8 +497,7 @@ public class GautengControler_subpopulations {
 			config.strategy().addStrategySettings(rerouteStrategySettings);
 		}
 		{ /*
-		 * External traffic: - ChangeExpBeta: 70% - TimeAllocationMutator: 15% -
-		 * ReRoute: 15%
+		 * External traffic: ChangeExpBeta: 70%; TimeAllocationMutator: 15%; ReRoute: 15%
 		 */
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
