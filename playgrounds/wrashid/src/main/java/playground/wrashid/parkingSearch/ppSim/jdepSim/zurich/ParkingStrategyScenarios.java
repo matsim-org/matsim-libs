@@ -30,7 +30,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_ARD
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_TakeClosestParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.Dummy_WorstScore;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.PrivateParkingWithWaitAndRandomSearchAsBackup;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.WaitAndRandomSearchAsBackup;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetSearchFromDepature;
@@ -430,7 +430,7 @@ public class ParkingStrategyScenarios {
 		strategy.setGroupName("ARD-illegal-S");
 		addStrategyAndSetLayerValues(allStrategies, strategy, i);
 
-		strategy = new PrivateParkingWithWaitAndRandomSearchAsBackup(-1, scenario.getNetwork(),
+		strategy = new WaitAndRandomSearchAsBackup(-1, scenario.getNetwork(),
 				delayBeforeSwitchToStreetParkingSearch, "ARD-waiting-S-" + i);
 		strategy.setGroupName("ARD-waiting-S");
 		addStrategyAndSetLayerValues(allStrategies, strategy, i);

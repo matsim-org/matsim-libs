@@ -32,12 +32,12 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentEventMessage;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 
 // only accept private parking, thereafter wait (penalty), thereafter normal street parking search
-public class PrivateParkingWithWaitAndRandomSearchAsBackup extends RandomParkingSearch{
+public class WaitAndRandomSearchAsBackup extends RandomParkingSearch{
 	
 	
 	private double delayBeforeSwitchToStreetParkingSearch;
 
-	public PrivateParkingWithWaitAndRandomSearchAsBackup(double maxDistance, Network network, double delayBeforeSwitchToStreetParkingSearch, String name) {
+	public WaitAndRandomSearchAsBackup(double maxDistance, Network network, double delayBeforeSwitchToStreetParkingSearch, String name) {
 		super(maxDistance, network,name);
 		this.delayBeforeSwitchToStreetParkingSearch = delayBeforeSwitchToStreetParkingSearch;
 		this.parkingType="streetParking";

@@ -70,7 +70,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TTMatrixBasedTravelTime;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TollAreaTravelDisutility;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingMemory;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.PrivateParkingWithWaitAndRandomSearchAsBackup;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.WaitAndRandomSearchAsBackup;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndLawEnforcement;
