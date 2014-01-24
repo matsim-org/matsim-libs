@@ -21,11 +21,11 @@ package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Customer;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 
 public interface PassengerRequestCreator
 {
-    PassengerRequest createRequest(Id id, Customer customer, Link fromLink, Link toLink, double t0,
-            double t1, double now);
+    PassengerRequest createRequest(Id id, MobsimAgent passenger, Link fromLink, Link toLink,
+            double t0, double t1, double now);
 }

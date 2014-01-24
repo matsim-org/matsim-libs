@@ -21,23 +21,25 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.contrib.dvrp.data.model.impl.RequestImpl;
-import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 
 public class OneTaxiRequest
     extends RequestImpl
     implements PassengerRequest
 {
+    private final MobsimAgent passenger;
     private final Link fromLink;
     private final Link toLink;
 
 
-    public OneTaxiRequest(Id id, Customer customer, Link fromLink, Link toLink, double time)
+    public OneTaxiRequest(Id id, MobsimAgent passenger, Link fromLink, Link toLink, double time)
     {
         //I want a taxi now: t0 == t1 == submissionTime
-        super(id, customer, 1, time, time, time);
+        super(id, 1, time, time, time);
+        this.passenger = passenger;
         this.fromLink = fromLink;
         this.toLink = toLink;
     }
@@ -58,8 +60,8 @@ public class OneTaxiRequest
 
 
     @Override
-    public PassengerCustomer getCustomer()
+    public MobsimAgent getPassenger()
     {
-        return (PassengerCustomer)getCustomer();
+        return passenger;
     }
 }

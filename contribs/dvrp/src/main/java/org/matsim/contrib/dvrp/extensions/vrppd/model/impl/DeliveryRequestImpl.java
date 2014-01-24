@@ -21,7 +21,6 @@ package org.matsim.contrib.dvrp.extensions.vrppd.model.impl;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.contrib.dvrp.data.model.impl.RequestImpl;
 import org.matsim.contrib.dvrp.extensions.vrppd.model.DeliveryRequest;
 import org.matsim.contrib.dvrp.extensions.vrppd.schedule.DeliveryTask;
@@ -35,10 +34,10 @@ public class DeliveryRequestImpl
     private DeliveryTask deliveryTask;
 
 
-    public DeliveryRequestImpl(Id id, Customer customer, double quantity, double t0, double t1,
-            double submissionTime, Link toLink)
+    public DeliveryRequestImpl(Id id, double quantity, double t0, double t1, double submissionTime,
+            Link toLink)
     {
-        super(id, customer, quantity, t0, t1, submissionTime);
+        super(id, quantity, t0, t1, submissionTime);
         this.toLink = toLink;
     }
 

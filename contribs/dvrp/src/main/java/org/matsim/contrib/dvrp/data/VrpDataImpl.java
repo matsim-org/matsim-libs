@@ -32,7 +32,6 @@ public class VrpDataImpl
     implements VrpData
 {
     private final List<Depot> depots = new ArrayList<Depot>();
-    private final List<Customer> customers = new ArrayList<Customer>();
     private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
     private final List<Request> requests = new ArrayList<Request>();
 
@@ -43,13 +42,6 @@ public class VrpDataImpl
     public List<Depot> getDepots()
     {
         return depots;
-    }
-
-
-    @Override
-    public List<Customer> getCustomers()
-    {
-        return customers;
     }
 
 

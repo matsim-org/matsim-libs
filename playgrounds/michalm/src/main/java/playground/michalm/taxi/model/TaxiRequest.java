@@ -21,10 +21,10 @@ package playground.michalm.taxi.model;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.contrib.dvrp.data.model.impl.RequestImpl;
 import org.matsim.contrib.dvrp.data.schedule.Task.TaskStatus;
-import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import playground.michalm.taxi.schedule.*;
 
@@ -54,6 +54,7 @@ public class TaxiRequest
     };
 
 
+    private final MobsimAgent passenger;
     private final Link fromLink;
     private final Link toLink;
 
@@ -63,10 +64,11 @@ public class TaxiRequest
     private TaxiDropoffStayTask dropoffStayTask;
 
 
-    public TaxiRequest(Id id, Customer customer, Link fromLink, Link toLink, double t0,
+    public TaxiRequest(Id id, MobsimAgent passenger, Link fromLink, Link toLink, double t0,
             double submissionTime)
     {
-        super(id, customer, 1, t0, t0, submissionTime);
+        super(id, 1, t0, t0, submissionTime);
+        this.passenger = passenger;
         this.fromLink = fromLink;
         this.toLink = toLink;
     }
@@ -87,9 +89,9 @@ public class TaxiRequest
 
 
     @Override
-    public PassengerCustomer getCustomer()
+    public MobsimAgent getPassenger()
     {
-        return (PassengerCustomer)getCustomer();
+        return passenger;
     }
 
 

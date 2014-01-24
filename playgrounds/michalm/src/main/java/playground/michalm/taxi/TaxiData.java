@@ -23,7 +23,6 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.data.VrpDataImpl;
 import org.matsim.contrib.dvrp.extensions.electric.*;
-import org.matsim.contrib.dvrp.passenger.PassengerCustomer;
 
 import playground.michalm.taxi.model.*;
 
@@ -50,12 +49,6 @@ public class TaxiData
     public List<TaxiRequest> getTaxiRequests()
     {
         return convertList(getRequests());
-    }
-
-
-    public List<PassengerCustomer> getPassengerCustomers()
-    {
-        return convertList(getCustomers());
     }
 
 

@@ -21,7 +21,6 @@ package org.matsim.contrib.dvrp.extensions.vrppd.model.impl;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.contrib.dvrp.data.model.impl.RequestImpl;
 import org.matsim.contrib.dvrp.extensions.vrppd.model.PickupRequest;
 import org.matsim.contrib.dvrp.extensions.vrppd.schedule.PickupTask;
@@ -35,10 +34,10 @@ public class PickupRequestImpl
     private PickupTask pickupTask;
 
 
-    public PickupRequestImpl(Id id, Customer customer, double quantity, double t0, double t1,
-            double submissionTime, Link fromLink)
+    public PickupRequestImpl(Id id, double quantity, double t0, double t1, double submissionTime,
+            Link fromLink)
     {
-        super(id, customer, quantity, t0, t1, submissionTime);
+        super(id, quantity, t0, t1, submissionTime);
         this.fromLink = fromLink;
     }
 

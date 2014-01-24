@@ -21,8 +21,8 @@ package playground.michalm.taxi;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import playground.michalm.taxi.model.TaxiRequest;
 
@@ -34,9 +34,9 @@ public class TaxiRequestCreator
 
 
     @Override
-    public TaxiRequest createRequest(Id id, Customer customer, Link fromLink, Link toLink,
+    public TaxiRequest createRequest(Id id, MobsimAgent passenger, Link fromLink, Link toLink,
             double t0, double t1, double now)
     {
-        return new TaxiRequest(id, customer, fromLink, toLink, t0, now);
+        return new TaxiRequest(id, passenger, fromLink, toLink, t0, now);
     }
 }

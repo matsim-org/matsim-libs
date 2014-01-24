@@ -20,7 +20,7 @@
 package org.matsim.contrib.dvrp.data.model.impl;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.model.*;
+import org.matsim.contrib.dvrp.data.model.Request;
 
 
 /**
@@ -31,8 +31,6 @@ public class RequestImpl
 {
     private final Id id;
 
-    private final Customer customer;
-
     private final double quantity;
 
     private final double t0;// earliest start time
@@ -41,11 +39,9 @@ public class RequestImpl
     private final double submissionTime;
 
 
-    public RequestImpl(Id id, Customer customer, double quantity, double t0, double t1,
-            double submissionTime)
+    public RequestImpl(Id id, double quantity, double t0, double t1, double submissionTime)
     {
         this.id = id;
-        this.customer = customer;
         this.quantity = quantity;
         this.t0 = t0;
         this.t1 = t1;
@@ -57,13 +53,6 @@ public class RequestImpl
     public Id getId()
     {
         return id;
-    }
-
-
-    @Override
-    public Customer getCustomer()
-    {
-        return customer;
     }
 
 

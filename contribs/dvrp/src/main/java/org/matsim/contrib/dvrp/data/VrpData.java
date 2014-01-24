@@ -29,9 +29,6 @@ public interface VrpData
     List<Depot> getDepots();
 
 
-    List<Customer> getCustomers();
-
-
     List<Vehicle> getVehicles();
 
 
