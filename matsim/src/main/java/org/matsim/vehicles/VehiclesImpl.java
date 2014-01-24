@@ -58,7 +58,10 @@ class VehiclesImpl implements Vehicles {
 
 	@Override
 	public final Map<Id, Vehicle> getVehicles() {
-		return Collections.unmodifiableMap(this.vehicles);
+		// XXX should be immutable, but requires refactoring of contribs
+		// and playgrounds before
+		//return Collections.unmodifiableMap(this.vehicles);
+		return this.vehicles;
 	}
 
 
