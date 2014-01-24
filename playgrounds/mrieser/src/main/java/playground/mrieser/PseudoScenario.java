@@ -27,7 +27,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.households.Households;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * Provides a real scenario, but exchanges the population.
@@ -93,6 +95,18 @@ public class PseudoScenario implements Scenario {
 	@Override
 	public Object removeScenarioElement(final String name) {
 		return this.scenario.removeScenarioElement(name);
+	}
+
+	@Override
+	public Vehicles getVehicles() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Households getHouseholds() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

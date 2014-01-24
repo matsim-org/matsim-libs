@@ -24,7 +24,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.households.Households;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 
 /**
@@ -81,6 +83,10 @@ public interface Scenario extends IdFactory {
 	public Object getScenarioElement(String name);
 
 	public ActivityFacilities getActivityFacilities();
+
+	Vehicles getVehicles();
+
+	Households getHouseholds();
 
 	// the following are available via the Impl only
 //	public Knowledges getKnowledges();

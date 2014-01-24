@@ -52,9 +52,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
+import org.matsim.households.Households;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PersonCalcTimes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * Basic wrapper for any call to external "plans-to-plans" modules. As basic handling of
@@ -302,6 +304,18 @@ public class ExternalModule implements PlanStrategyModule {
 		@Override
 		public Object removeScenarioElement(String name) {
 			return this.scenario.removeScenarioElement( name );
+		}
+
+		@Override
+		public Vehicles getVehicles() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Households getHouseholds() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 
 	}

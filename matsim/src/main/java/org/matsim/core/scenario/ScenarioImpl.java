@@ -21,7 +21,6 @@ package org.matsim.core.scenario;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -37,19 +36,14 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.ClassUtils;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
@@ -113,19 +107,19 @@ public class ScenarioImpl implements Scenario {
 		}
 	}
 
-	protected void createVehicleContainer(){
+	 void createVehicleContainer(){
 		this.vehicles = VehicleUtils.createVehiclesContainer();
 	}
 
-	protected void createHouseholdsContainer(){
+	 void createHouseholdsContainer(){
 		this.households = new HouseholdsImpl();
 	}
 
-	protected void createKnowledges() {
+	 void createKnowledges() {
 		this.knowledges = new KnowledgesImpl();
 	}
 
-	protected void createLaneDefinitionsContainer() {
+	 void createLaneDefinitionsContainer() {
 		this.laneDefinitions = new LaneDefinitionsImpl();
 		// thought: this is not the responsibility of the scenario to add 
 		// custom elements (the idea being that those elements are not known.
@@ -135,11 +129,11 @@ public class ScenarioImpl implements Scenario {
 //				new LaneDefinitions20Impl());
 	}
 
-	protected void createTransit() {
+	 void createTransit() {
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 	}
 	
-	protected void createSignals(){
+	 void createSignals(){
 //		this.addScenarioElement(
 //				SignalsData.ELEMENT_NAME,
 //				new SignalsDataImpl(this.config.signalSystems()));
@@ -200,7 +194,7 @@ public class ScenarioImpl implements Scenario {
 	public void setPopulation(Population population) {
 		this.population = population;
 	}
-
+	@Override
 	public Households getHouseholds() {
 		if ((this.households == null) && this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
@@ -210,7 +204,7 @@ public class ScenarioImpl implements Scenario {
 		}
 		return this.households;
 	}
-
+	@Override
 	public Vehicles getVehicles(){
 		if ((this.vehicles == null) && this.config.scenario().isUseVehicles()){
 			this.createVehicleContainer();
@@ -220,7 +214,7 @@ public class ScenarioImpl implements Scenario {
 		}
 		return this.vehicles;
 	}
-
+	@Deprecated // use population.getPopulationAttributes instead
 	public Knowledges getKnowledges(){
 		if ((this.knowledges == null) && this.config.scenario().isUseKnowledges()){
 			this.createKnowledges();

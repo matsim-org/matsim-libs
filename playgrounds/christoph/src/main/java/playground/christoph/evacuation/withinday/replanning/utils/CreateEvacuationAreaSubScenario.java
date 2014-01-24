@@ -40,7 +40,9 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.households.Households;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -292,6 +294,18 @@ public class CreateEvacuationAreaSubScenario {
 		@Override
 		public Object getScenarioElement(String name) {
 			return this.scenario.getScenarioElement(name);
+		}
+
+		@Override
+		public Vehicles getVehicles() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Households getHouseholds() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 	}
 }
