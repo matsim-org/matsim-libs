@@ -20,6 +20,7 @@
 package org.matsim.vehicles;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
@@ -28,6 +29,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class VehiclesImplTest {
 
+	@Ignore( "to activate after refactoring paygrounds and contribs" )
 	@Test
 	public void testGetVehicles(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
