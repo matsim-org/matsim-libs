@@ -31,7 +31,7 @@ public class VehiclesImplTest {
 	@Test
 	public void testGetVehicles(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		
+
 		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), new VehicleTypeImpl(new IdImpl("test")));
 
 		/* Should get an unmodifiable Map of the Vehicles container. */
@@ -44,16 +44,16 @@ public class VehiclesImplTest {
 		}
 	}
 
-	
+
 	@Test
 	public void testAddVehicle() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
+
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		
+
 		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), new VehicleTypeImpl(new IdImpl("test")));
 		Vehicle v2 = vehicles.getFactory().createVehicle(new IdImpl("v1"), new VehicleTypeImpl(new IdImpl("test")));
-		
+
 		vehicles.addVehicle(v1);
 		try{
 			vehicles.addVehicle(v2);
@@ -61,12 +61,12 @@ public class VehiclesImplTest {
 		} catch (IllegalArgumentException e){
 			/* Pass. */
 		}
-	} 
-	
+	}
+
 	@Test
 	public void testGetVehicleTypes(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		
+
 		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
 		/* Should get an unmodifiable Map of the Vehicles container. */
 		try{
@@ -76,14 +76,14 @@ public class VehiclesImplTest {
 			/* Pass. */
 		}
 	}
-	
+
 	@Test
 	public void testAddVehicleType(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		
+
 		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
 		VehicleType t2 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
-		
+
 		vehicles.addVehicleType(t1);
 		try{
 			vehicles.addVehicleType(t2);
@@ -92,6 +92,19 @@ public class VehiclesImplTest {
 			/* Pass. */
 		}
 	}
-	
+
+	@Test
+	public void testRemoveVehicle() {
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
+
+		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), t1);
+
+		Assert.assertEquals(0, vehicles.getVehicles().size());
+		vehicles.addVehicle(v1);
+		Assert.assertEquals(1, vehicles.getVehicles().size());
+		vehicles.removeVehicle(new IdImpl("v1"));
+		Assert.assertEquals(0, vehicles.getVehicles().size());
+	}
 
 }

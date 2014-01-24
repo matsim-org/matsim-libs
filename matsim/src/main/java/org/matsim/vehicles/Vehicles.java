@@ -34,16 +34,18 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 public interface Vehicles extends MatsimToplevelContainer {
 
 	public Map<Id, VehicleType> getVehicleTypes();
-	
+
 	public Map<Id, Vehicle> getVehicles();
-	
+
 	@Override
 	public VehiclesFactory getFactory();
-	
+
 	public void addVehicle(final Vehicle v);
 
+	public void removeVehicle(final Id vehicleId);
+
 	public void addVehicleType(final VehicleType type);
-	
+
 	public ObjectAttributes getVehicleAttributes();
-	
+
 }

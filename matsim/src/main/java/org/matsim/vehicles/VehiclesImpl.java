@@ -33,13 +33,13 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author jwjoubert
  */
 class VehiclesImpl implements Vehicles {
-	
-	private Map<Id, VehicleType> vehicleTypes;
-	private LinkedHashMap<Id, Vehicle> vehicles;
-	private VehiclesFactoryImpl builder;
+
+	private final Map<Id, VehicleType> vehicleTypes;
+	private final LinkedHashMap<Id, Vehicle> vehicles;
+	private final VehiclesFactoryImpl builder;
 	private final ObjectAttributes vehicleAttributes = new ObjectAttributes();
-	
-	private Counter counter = new Counter(" vehicles # ");
+
+	private final Counter counter = new Counter(" vehicles # ");
 
 	/**
 	 * deliberately non-public since there is a factory.  kai, nov'11
@@ -49,8 +49,8 @@ class VehiclesImpl implements Vehicles {
 		this.builder = new VehiclesFactoryImpl() ;
 		this.vehicles = new LinkedHashMap<Id, Vehicle>();
 	}
-	
-	
+
+
 	@Override
 	public VehiclesFactory getFactory() {
 		return this.builder;
@@ -69,9 +69,9 @@ class VehiclesImpl implements Vehicles {
 
 	/**
 	 * Add the vehicle to the container.
-	 *  
+	 *
 	 * @param v
-	 * @throws IllegalArgumentException if another {@link Vehicle} with 
+	 * @throws IllegalArgumentException if another {@link Vehicle} with
 	 * the same {@link Id} already exists in the container.
 	 */
 	@Override
@@ -80,16 +80,26 @@ class VehiclesImpl implements Vehicles {
 		if(this.getVehicles().containsKey(v.getId())){
 			throw new IllegalArgumentException("Vehicle with id = " + v.getId() + " already exists.");
 		}
-		
+
 		/* Add the vehicle. */
 		this.vehicles.put(v.getId(), v);
 		this.counter.incCounter();
 	}
-	
+
+	/**
+	 * Removes the vehicle with the given Id
+	 *
+	 * @param v
+	 */
+	@Override
+	public void removeVehicle(final Id vehicleId) {
+		this.vehicles.remove(vehicleId);
+	}
+
 	/**
 	 * Adds the vehicle type to the container.
-	 * 
-	 * @param type 
+	 *
+	 * @param type
 	 * @throws IllegalArgumentException if another {@link VehicleType} with the
 	 * same {@link Id} already exists in the container.
 	 */
@@ -99,7 +109,7 @@ class VehiclesImpl implements Vehicles {
 		if(this.getVehicleTypes().containsKey(type.getId())){
 			throw new IllegalArgumentException("Vehicle type with id = " + type.getId() + " already exists.");
 		}
-		
+
 		/* Add the vehicle type. */
 		this.vehicleTypes.put(type.getId(), type);
 	}
@@ -109,5 +119,5 @@ class VehiclesImpl implements Vehicles {
 	public ObjectAttributes getVehicleAttributes() {
 		return this.vehicleAttributes;
 	}
-	
+
 }
