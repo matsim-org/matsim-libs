@@ -62,7 +62,7 @@ import playground.southafrica.utilities.Header;
 public class RunNationalFreight {
 	private final static Logger LOG = Logger.getLogger(RunNationalFreight.class);
 	
-	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/5000/";
+	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/100/";
 //	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/01perc/";
 	
 	private static String NETWORK = "/Users/jwjoubert/Documents/workspace/Data-southAfrica/network/southAfrica_20131202_coarseNetwork_clean.xml.gz";
@@ -94,7 +94,7 @@ public class RunNationalFreight {
 		/* Config stuff */
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(OUTPUT_DIRECTORY);
-		config.controler().setLastIteration(2	);
+		config.controler().setLastIteration(2);
 		config.controler().setWriteEventsInterval(1);
 		
 		config.network().setInputFile(NETWORK);
@@ -120,7 +120,6 @@ public class RunNationalFreight {
 		
 			/* Generic strategy */
 		StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-//		StrategySettings changeExpBetaStrategySettings = new StrategySettings(new IdImpl("1"));
 		changeExpBetaStrategySettings.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
 		changeExpBetaStrategySettings.setProbability(0.8);
 		config.strategy().addStrategySettings(changeExpBetaStrategySettings);
@@ -131,11 +130,11 @@ public class RunNationalFreight {
 		commercialStrategy.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialStrategy);
 		//TODO Add the custom strategy module.
-		StrategySettings newStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		newStrategy.setModuleName("Digicore1");
-		newStrategy.setProbability(0.3);
-		newStrategy.setSubpopulation("commercial");
-		config.strategy().addStrategySettings(newStrategy);
+//		StrategySettings newStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+//		newStrategy.setModuleName("Digicore1");
+//		newStrategy.setProbability(0.3);
+//		newStrategy.setSubpopulation("commercial");
+//		config.strategy().addStrategySettings(newStrategy);
 		
 		/* Scenario stuff */
 		Scenario sc = ScenarioUtils.loadScenario(config);
@@ -146,7 +145,7 @@ public class RunNationalFreight {
 		VehicleType truckType = new VehicleTypeImpl(new IdImpl("commercial"));
 		truckType.setMaximumVelocity(100./3.6);
 		truckType.setLength(18.);
-		vehicles.getVehicleTypes().put(truckType.getId(), truckType);
+		vehicles.addVehicleType(truckType);
 		
 		for(Person person : sc.getPopulation().getPersons().values()){
 			/* Subpopulation. */
@@ -154,7 +153,7 @@ public class RunNationalFreight {
 			
 			/* Vehicles */
 			Vehicle truck = VehicleUtils.getFactory().createVehicle(person.getId(), truckType);
-			vehicles.getVehicles().put(person.getId(), truck);
+			vehicles.addVehicle(truck);
 		}
 		
 		/* Run the controler */

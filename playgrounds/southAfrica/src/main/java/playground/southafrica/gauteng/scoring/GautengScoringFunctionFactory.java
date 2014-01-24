@@ -60,7 +60,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		SumScoringFunction sum = new SumScoringFunction() ;
 		
 		String subPopName = (String) personAttributes.getAttribute(plan.getPerson().getId().toString(), this.subPopulationAttributeName ) ;
-		if ( subPopName.equals("freight") ) {
+		if ( subPopName.equals("commercial") ) {
 			// do nothing
 			// yy note that this will not be sufficient once time mutation is switched on ... freight agents may prolong activities
 			// just to move the legs out of congestion. kai, jan'14

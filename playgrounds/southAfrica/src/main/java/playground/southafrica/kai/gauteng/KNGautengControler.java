@@ -223,7 +223,7 @@ public class KNGautengControler {
 //			if ( attrib.equals("commercial") ) {
 				Id vehicleId = person.getId() ;
 				final Vehicle truck = VehicleUtils.getFactory().createVehicle(vehicleId, truckVehType );
-				vehicles.getVehicles().put(vehicleId, truck) ;
+				vehicles.addVehicle(truck);
 //			}
 		}
 		

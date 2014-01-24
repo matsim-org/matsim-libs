@@ -184,7 +184,6 @@ public class FreightChainGenerator {
 			
 			/* Set up the plan. */
 			PlanImpl plan = (PlanImpl) pf.createPlan();
-			double cumulativeSeconds = 0.0;
 			
 			/* Generate the first activity. */
 			Id previousId = new IdImpl("source");
@@ -194,7 +193,6 @@ public class FreightChainGenerator {
 			ActivityImpl activity = new ActivityImpl("major", coord);
 			activity.setFacilityId(new IdImpl(currentId.toString()));
 			activity.setEndTime(ChainStartTime.getStartTimeInSeconds(RANDOM.nextDouble()));
-			cumulativeSeconds += activity.getEndTime();
 			plan.addActivity(activity);
 			
 			/* Generate the consecutive activities until the next vertex Id is
@@ -226,16 +224,12 @@ public class FreightChainGenerator {
 				Coord thisCoord = network.getPathDependentNode(currentId).getCoord();
 				ActivityImpl thisActivity = new ActivityImpl(activityType, thisCoord);
 				thisActivity.setFacilityId(currentId);
-					/* Update the travel time */
-				Coord previousCoord = network.getPathDependentNode(previousId).getCoord();
-				cumulativeSeconds += CoordUtils.calcDistance(thisCoord, previousCoord) / AVERAGE_SPEED;
-					/* Update the end time. */
+				
 				double duration = ActivityDuration.getDurationInSeconds(RANDOM.nextDouble());
-				cumulativeSeconds += duration;
+
 				// FIXME Is right right i.t.o. last major activity?
 				if(activityType.equalsIgnoreCase("minor")){
 					thisActivity.setMaximumDuration(duration);
-					thisActivity.setEndTime(cumulativeSeconds);
 				}
 				
 				plan.addActivity(thisActivity);
