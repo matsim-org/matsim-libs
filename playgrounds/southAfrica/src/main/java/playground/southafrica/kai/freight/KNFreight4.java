@@ -79,7 +79,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  *
  */
 public class KNFreight4 {
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(KNFreight4.class) ;
 
 	private static final String MATSIM_SA = "/Users/Nagel/southafrica/MATSim-SA/" ;
@@ -208,6 +207,7 @@ public class KNFreight4 {
 	private static void generateCarrierPlans(Scenario scenario, Carriers carriers, CarrierVehicleTypes vehicleTypes) {
 		final Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( scenario.getNetwork(), vehicleTypes.getVehicleTypes().values() );
 //		netBuilder.setBaseTravelTimeAndDisutility(travelTime, travelDisutility) ;
+		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 
 		for ( Carrier carrier : carriers.getCarriers().values() ) {

@@ -408,6 +408,9 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		/**
 		 * Sets the width of the time-bin. By default it is Integer.MAX_VALUE().
+		 * <p/>
+		 * <i>Note that this needs to be set to some plausible value to enable any kind of time-dependent network!!!</i>
+		 * In particular if you are using the matsim time dependent network option.
 		 */
 		public Builder setTimeSliceWidth(int timeSliceWidth){
 			this.timeSliceWidth = timeSliceWidth;
