@@ -24,14 +24,20 @@ package playground.jjoubert.projects.gautengPopulation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -75,14 +81,16 @@ public class SanralPopulationConverter {
 		Double fraction = Double.parseDouble(args[3]);
 		String outputFile = args[4];
 		String attributesFile = args[5];
+		String inputCRS = args[6];
+		String outputCRS = args[7];
 		
-		SanralPopulationConverter.Run(inputFile, idPrefix, subPopulation, fraction, outputFile, attributesFile);
+		SanralPopulationConverter.Run(inputFile, inputCRS, idPrefix, subPopulation, fraction, outputFile, attributesFile, outputCRS);
 		
 		Header.printFooter();
 	}
 	
 	
-	public static void Run(String inputFile, String idPrefix, String subPopulation, double fraction, String outputFile, String attributesFile){
+	public static void Run(String inputFile, String idPrefix, String inputCRS, String subPopulation, double fraction, String outputFile, String attributesFile, String outputCRS){
 		Scenario scNew = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory pf = scNew.getPopulation().getFactory();
 		
@@ -95,7 +103,23 @@ public class SanralPopulationConverter {
 				/* Create new person. */
 				Id newId = (new IdImpl(idPrefix + "_" + id++));
 				Person newPerson = pf.createPerson(newId);
-				newPerson.addPlan(person.getSelectedPlan());
+				Plan selectedPlan = person.getSelectedPlan();
+				
+				/* Convert all the activity locations if necessary. */
+				if(!inputCRS.equalsIgnoreCase(outputCRS)){
+					CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
+					for(PlanElement pe : selectedPlan.getPlanElements()){
+						if(pe instanceof Activity){
+							ActivityImpl act = (ActivityImpl)pe;
+							act.setCoord(ct.transform(act.getCoord()));
+
+							/* Remove link IDs associated with activities. */
+							act.setLinkId(null);
+						}
+					}
+				}
+				
+				newPerson.addPlan(selectedPlan);
 				scNew.getPopulation().addPerson(newPerson);
 				
 				/* Create person attributes. */

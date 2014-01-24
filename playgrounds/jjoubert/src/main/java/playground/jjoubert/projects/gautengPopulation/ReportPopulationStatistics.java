@@ -22,8 +22,6 @@
  */
 package playground.jjoubert.projects.gautengPopulation;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -34,8 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import cadyts.utilities.misc.Tuple;
 
 import playground.southafrica.utilities.Header;
 
@@ -80,7 +76,6 @@ public class ReportPopulationStatistics {
 	
 	private static Map<String, Integer> parseAttribute(String attribute){
 		Map<String, Integer> map = new TreeMap<String, Integer>();
-		int total = 0;
 		
 		for(Id id : sc.getPopulation().getPersons().keySet()){
 			Object o = sc.getPopulation().getPersonAttributes().getAttribute(id.toString(), attribute);
@@ -91,13 +86,12 @@ public class ReportPopulationStatistics {
 				} else{
 					map.put(o.toString(), new Integer(1));
 				}
-				total++;
 			}
 		}
 		
 		LOG.info("  ==>  Statistics: " + attribute);
 		for(String s : map.keySet()){
-			LOG.info(String.format("       |_ %s: %d (%.2f%%)", s, map.get(s), ((double)map.get(s)/(double)total)*100));
+			LOG.info(String.format("         |_ %s: %d (%.2f%%)", s, map.get(s), ((double)map.get(s)/(double)sc.getPopulation().getPersons().size())*100));
 		}
 
 		return map;
