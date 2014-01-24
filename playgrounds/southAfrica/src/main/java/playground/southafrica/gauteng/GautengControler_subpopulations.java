@@ -29,7 +29,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -169,6 +168,7 @@ public class GautengControler_subpopulations {
 		config.planCalcScore().setBrainExpBeta(1.0);
 		config.controler().setWritePlansInterval(2);
 		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		config.timeAllocationMutator().setAffectingDuration(false);
 
 		// ===========================================
 
@@ -377,6 +377,7 @@ public class GautengControler_subpopulations {
 	 * @param config
 	 */
 	private static void assignSubpopulationStrategies(Config config) {
+		
 		/* Set up the strategies for the different subpopulations. */
 		
 		{ /*
@@ -400,15 +401,12 @@ public class GautengControler_subpopulations {
 			timeStrategySettings.setSubpopulation("car");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
-
-			StrategySettings rerouteStrategySettings = new StrategySettings(
-					ConfigUtils.createAvailableStrategyId(config));
-			rerouteStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.ReRoute
-							.toString());
-			rerouteStrategySettings.setSubpopulation("car");
-			rerouteStrategySettings.setProbability(0.15);
-			config.strategy().addStrategySettings(rerouteStrategySettings);
+			
+			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			reRouteWithId.setModuleName(RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setProbability(0.15);
+			reRouteWithId.setSubpopulation("car");
+			config.strategy().addStrategySettings(reRouteWithId);
 		}
 
 		{ /*
@@ -420,18 +418,15 @@ public class GautengControler_subpopulations {
 					.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
 							.toString());
 			changeExpBetaStrategySettings.setSubpopulation("commercial");
-			changeExpBetaStrategySettings.setProbability(0.85);
+			changeExpBetaStrategySettings.setProbability(0.80);
 			config.strategy()
 					.addStrategySettings(changeExpBetaStrategySettings);
 
-			StrategySettings rerouteStrategySettings = new StrategySettings(
-					ConfigUtils.createAvailableStrategyId(config));
-			rerouteStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.ReRoute
-							.toString());
-			rerouteStrategySettings.setSubpopulation("commercial");
-			rerouteStrategySettings.setProbability(0.15);
-			config.strategy().addStrategySettings(rerouteStrategySettings);
+			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			reRouteWithId.setModuleName(RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setProbability(0.20);
+			reRouteWithId.setSubpopulation("commercial");
+			config.strategy().addStrategySettings(reRouteWithId);
 		}
 
 		{ /*
@@ -456,14 +451,11 @@ public class GautengControler_subpopulations {
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
 
-			StrategySettings rerouteStrategySettings = new StrategySettings(
-					ConfigUtils.createAvailableStrategyId(config));
-			rerouteStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.ReRoute
-							.toString());
-			rerouteStrategySettings.setSubpopulation("bus");
-			rerouteStrategySettings.setProbability(0.15);
-			config.strategy().addStrategySettings(rerouteStrategySettings);
+			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			reRouteWithId.setModuleName(RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setProbability(0.15);
+			reRouteWithId.setSubpopulation("bus");
+			config.strategy().addStrategySettings(reRouteWithId);
 		}
 		{ /*
 		 * Taxi: ChangeExpBeta: 70%; TimeAllocationMutator: 15%; ReRoute: 15%
@@ -487,14 +479,11 @@ public class GautengControler_subpopulations {
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
 
-			StrategySettings rerouteStrategySettings = new StrategySettings(
-					ConfigUtils.createAvailableStrategyId(config));
-			rerouteStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.ReRoute
-							.toString());
-			rerouteStrategySettings.setSubpopulation("taxi");
-			rerouteStrategySettings.setProbability(0.15);
-			config.strategy().addStrategySettings(rerouteStrategySettings);
+			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			reRouteWithId.setModuleName(RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setProbability(0.15);
+			reRouteWithId.setSubpopulation("taxi");
+			config.strategy().addStrategySettings(reRouteWithId);
 		}
 		{ /*
 		 * External traffic: ChangeExpBeta: 70%; TimeAllocationMutator: 15%; ReRoute: 15%
@@ -518,14 +507,11 @@ public class GautengControler_subpopulations {
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
 
-			StrategySettings rerouteStrategySettings = new StrategySettings(
-					ConfigUtils.createAvailableStrategyId(config));
-			rerouteStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.ReRoute
-							.toString());
-			rerouteStrategySettings.setSubpopulation("ext");
-			rerouteStrategySettings.setProbability(0.15);
-			config.strategy().addStrategySettings(rerouteStrategySettings);
+			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			reRouteWithId.setModuleName(RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setProbability(0.15);
+			reRouteWithId.setSubpopulation("ext");
+			config.strategy().addStrategySettings(reRouteWithId);
 		}
 	}
 
