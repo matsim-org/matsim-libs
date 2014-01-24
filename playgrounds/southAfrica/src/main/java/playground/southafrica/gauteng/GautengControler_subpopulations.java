@@ -39,7 +39,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -112,6 +114,10 @@ public class GautengControler_subpopulations {
 	
 	private static final String RE_ROUTE_AND_SET_VEHICLE = "ReRouteAndSetVehicle";
 	private static String VEH_ID = "TransportModeToVehicleIdMap" ;
+	
+	public static enum User { johan, kai } ;
+	
+	private static User user = User.johan ;
 
 	/**
 	 * @param args
@@ -122,7 +128,9 @@ public class GautengControler_subpopulations {
 		/* Config must be passed as an argument, everything else is optional. */
 		final String configFilename = args[0];
 		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, configFilename);
+		if ( configFilename != null ) {
+			ConfigUtils.loadConfig(config, configFilename);
+		}
 		
 		/* Required argument:
 		 * [0] - Config file;
@@ -135,6 +143,7 @@ public class GautengControler_subpopulations {
 		 * [5] - Base value of time ;
 		 * [6] - Value-of-Time multiplier; and
 		 * [7] - Number of threads. 
+		 * [8] - user // should presumably be earlier in sequence?
 		 */
 		
 		setOptionalArguments(args, config);
@@ -166,9 +175,16 @@ public class GautengControler_subpopulations {
 		assignSubpopulationStrategies(config);
 		
 		config.planCalcScore().setBrainExpBeta(1.0);
-		config.controler().setWritePlansInterval(2);
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		if ( user==User.johan ) {
+			config.controler().setWritePlansInterval(2);
+		} else if ( user==User.kai ) {
+			config.controler().setWritePlansInterval(50);
+		}
 		config.timeAllocationMutator().setAffectingDuration(false);
+
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		
+		config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
 
 		// ===========================================
 

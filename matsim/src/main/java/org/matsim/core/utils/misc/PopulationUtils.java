@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -148,7 +149,7 @@ public class PopulationUtils {
 	 * </ul>
 	 */
 	public static double getActivityEndTime( Activity act, double now, Config config ) {
-		switch ( config.vspExperimental().getActivityDurationInterpretation() ) {
+		switch ( ActivityDurationInterpretation.valueOf(config.vspExperimental().getActivityDurationInterpretation()) ) {
 		case endTimeOnly:
 			return act.getEndTime() ;
 		case tryEndTimeThenDuration:

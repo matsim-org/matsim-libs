@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.trafficmonitoring.AveragingTravelTimeGetter;
 import org.matsim.core.utils.misc.Time;
 
 interface ConfigKey {}
@@ -31,7 +33,7 @@ interface ConfigKey {}
  * @author dgrether
  * @author nagel
  */
-public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
+public class VspExperimentalConfigGroup extends ReflectiveModule {
 
 	// !! the below cannot be renamed ... since they are at the same time the config file keys !!
 	public static enum VspExperimentalConfigKey implements ConfigKey {
@@ -264,164 +266,35 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		return map;
 	}
-
-	@Override
-	@Deprecated
-	public String getValue(final String key) {
-		throw new RuntimeException(" use direct getter or getValue( ...Key key) (depending on which one is implemented for " +
-		"your variable); aborting ... " ) ;
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		for ( VspExperimentalConfigKey keyTmp : VspExperimentalConfigKey.values() ) {
-			if ( keyTmp.toString().equals(key) ) {
-				this.addParam(keyTmp, value ) ;
-				return ;
-			}
-			// the above feels really odd.  Problem is that we can convert keys to strings, but not the other way round.
-			// alternative might be some lookup table.  kai, oct'12
-		}
-
-		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
-			//			this.setUseActivityDurations(Boolean.parseBoolean(value));
-			if ( Boolean.parseBoolean(value) ) {
-				setActivityDurationInterpretation( ActivityDurationInterpretation.minOfDurationAndEndTime ) ;
-			} else {
-				setActivityDurationInterpretation( ActivityDurationInterpretation.endTimeOnly ) ;
-			}
-			log.warn("Config parameter " + USE_ACTIVITY_DURATIONS + " is deprecated; use " 
-					+ ACTIVITY_DURATION_INTERPRETATION + " instead. kai, jan'13") ;
-		} else if ( ACTIVITY_DURATION_INTERPRETATION.equalsIgnoreCase(key)) {
-			setActivityDurationInterpretation(ActivityDurationInterpretation.valueOf(value)) ;
-		} else if ( REMOVING_UNNECESSARY_PLAN_ATTRIBUTES.equalsIgnoreCase(key)) {
-			setRemovingUnneccessaryPlanAttributes(Boolean.parseBoolean(value)) ;
-		} else if ( "coloring".equalsIgnoreCase(key) ) {
-			throw new RuntimeException("coloring in vspExperimentalConfigGroup is no longer allowed; use the corresponding " +
-			"config option in the otfvis config group (or do not use at all).  jul'12") ;
-		} else if (INPUT_MZ05_FILE.equalsIgnoreCase(key)) {
-			setInputMZ05File(value);
-		} else if (MODES_FOR_SUBTOURMODECHOICE.equalsIgnoreCase(key)) {
-			setModesForSubTourModeChoice(value);
-		} else if ( USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING.equals(key) ) {
-			this.setUsingOpportunityCostOfTimeInPtRouting(Boolean.parseBoolean(value)) ;
-		} else if (CHAIN_BASED_MODES.equalsIgnoreCase(key)) {
-			setChainBasedModes(value);
-		} else if ("offsetWalk".equalsIgnoreCase(key)) {
-			throw new RuntimeException( "offsetWalk in vspExperimentalConfigGroup is no longer; use the (alternative-specific) " +
-			"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
-			//		} else if ( VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString().equals(key) ) {
-			//			this.addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, value) ;
-			//		} else if ( VspExperimentalConfigKey.logitScaleParamForPlansRemoval.toString().equals(key) ) {
-			//			this.addParam( VspExperimentalConfigKey.logitScaleParamForPlansRemoval, value) ;
-		} else if ( EMISSION_ROADTYPE_MAPPING_FILE.equals(key)){
-			this.setEmissionRoadTypeMappingFile(value);
-		} else if ( EMISSION_VEHICLE_FILE.equals(key)){
-			this.setEmissionVehicleFile(value);
-		} else if ( EMISSION_FACTORS_WARM_FILE_AVERAGE.equals(key)){
-			this.setAverageWarmEmissionFactorsFile(value);
-		} else if ( EMISSION_FACTORS_COLD_FILE_AVERAGE.equals(key)){
-			this.setAverageColdEmissionFactorsFile(value);
-		} else if ( USING_DETAILED_EMISSION_CALCULATION.equals(key)){
-			this.setIsUsingDetailedEmissionCalculation(Boolean.parseBoolean(value));
-		} else if ( EMISSION_FACTORS_WARM_FILE_DETAILED.equals(key)) {
-			this.setDetailedWarmEmissionFactorsFile(value);
-		} else if (EMISSION_FACTORS_COLD_FILE_DETAILED.equals(key)){
-			this.setDetailedColdEmissionFactorsFile(value);
-		} else if ( WRITING_OUTPUT_EVENTS.equals(key) ) {
-			this.setWritingOutputEvents(Boolean.parseBoolean(value) ) ;
-		} else if ( MATSIM_GLOBAL_TIME_FORMAT.equals(key) ) {
-			this.setMatsimGlobalTimeFormat(value) ;
-		}
-		else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-
-		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation().toString()) ;
-		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, Boolean.toString(isRemovingUnneccessaryPlanAttributes()) ) ;
-		map.put(INPUT_MZ05_FILE, getInputMZ05File() ) ;
-		map.put(MODES_FOR_SUBTOURMODECHOICE, getModesForSubTourModeChoice() ) ;
-		map.put(CHAIN_BASED_MODES, getChainBasedModes() );
-		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
-				Boolean.toString( this.isUsingOpportunityCostOfTimeInPtRouting()) ) ;
-		map.put(EMISSION_ROADTYPE_MAPPING_FILE, this.getEmissionRoadTypeMappingFile());
-		map.put(EMISSION_VEHICLE_FILE, this.getEmissionVehicleFile());
-		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, this.getAverageWarmEmissionFactorsFile());
-		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, this.getAverageColdEmissionFactorsFile());
-		map.put(USING_DETAILED_EMISSION_CALCULATION, Boolean.toString( this.isUsingDetailedEmissionCalculation));
-		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED,  this.getDetailedWarmEmissionFactorsFile()) ;
-		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, this.getDetailedColdEmissionFactorsFile());
-		map.put( WRITING_OUTPUT_EVENTS, Boolean.toString(this.isWritingOutputEvents()) ) ;
-		map.put( MATSIM_GLOBAL_TIME_FORMAT, this.getMatsimGlobalTimeFormat() );
-		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
-			map.put( key.toString(), this.getValue(key) ) ;
-		}
-
-		return map;
-	}
-
-	//	@Override
-	//	protected void checkConsistency() throws RuntimeException {
-	//		log.info( "entering checkVspDefaults ...") ;
-	//
-	//		// begin vsp default definitions
-	//		final boolean usingOpportunityCostOfTimeInPtRoutingDefault = true ;
-	//		// end vsp default definitions
-	//
-	//		boolean problem = false ;
-	//		if ( this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.WARN )
-	//				|| this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
-	//
-	//			if ( this.isUsingOpportunityCostOfTimeInPtRouting() != usingOpportunityCostOfTimeInPtRoutingDefault ) {
-	//				log.warn( "violating VSP defaults; "+USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + "  should be set to: " +
-	//						usingOpportunityCostOfTimeInPtRoutingDefault + " in module: " + GROUP_NAME) ;
-	//				problem = true ;
-	//			}
-	//
-	//		}
-	//
-	//		if ( this.getVspDefaultsCheckingLevel().equals(VspExperimentalConfigGroup.ABORT) && problem ) {
-	//			String str = "violating VSP defaults and vspDefaultsCheckingLevel set to `abort', thus aborting ..." ;
-	//			log.fatal( str ) ;
-	//			throw new RuntimeException( str ) ;
-	//		}
-	//
-	//		log.info( "leaving checkVspDefaults ...") ;
-	//	}
-
+	@StringGetter(INPUT_MZ05_FILE)
 	public String getInputMZ05File() {
 		return this.inputMZ05File;
 	}
-
+	@StringSetter(INPUT_MZ05_FILE)
 	public void setInputMZ05File(final String inputMZ05File) {
 		this.inputMZ05File = inputMZ05File;
 	}
-
+	@StringGetter(MODES_FOR_SUBTOURMODECHOICE)
 	public String getModesForSubTourModeChoice() {
 		return this.modesForSubTourModeChoice;
 	}
-
+	@StringSetter(MODES_FOR_SUBTOURMODECHOICE)
 	public void setModesForSubTourModeChoice(final String modesForSubTourModeChoice) {
 		this.modesForSubTourModeChoice = modesForSubTourModeChoice;
 	}
-
+	@StringGetter(CHAIN_BASED_MODES)
 	public String getChainBasedModes() {
 		return this.chainBasedModes;
 	}
-
+	@StringSetter(CHAIN_BASED_MODES)
 	public void setChainBasedModes(final String chainBasedModes) {
 		this.chainBasedModes = chainBasedModes;
 	}
-
-	public ActivityDurationInterpretation getActivityDurationInterpretation() {
-		return this.activityDurationInterpretation;
+	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
+	public String getActivityDurationInterpretation() {
+		return this.activityDurationInterpretation.toString();
 	}
-
+	@StringSetter(ACTIVITY_DURATION_INTERPRETATION)
 	public void setActivityDurationInterpretation(final ActivityDurationInterpretation activityDurationInterpretation) {
 		if ( ActivityDurationInterpretation.endTimeOnly.equals(activityDurationInterpretation) ){
 			/*
@@ -434,103 +307,83 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		}
 		this.activityDurationInterpretation = activityDurationInterpretation;
 	}
-
+	@StringGetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
 	public boolean isRemovingUnneccessaryPlanAttributes() {
 		return this.removingUnneccessaryPlanAttributes;
 	}
-
+	@StringSetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
 	public void setRemovingUnneccessaryPlanAttributes(final boolean removingUnneccessaryPlanAttributes) {
 		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
 	}
-
-	@Deprecated // should always return true; switch is only there for backwards compatibility
-	public boolean isUsingOpportunityCostOfTimeInPtRouting() {
-		return this.isUsingOpportunityCostOfTimeInPtRouting;
-	}
-
-	@Deprecated // switch is only there for backwards compatibility
-	public void setUsingOpportunityCostOfTimeInPtRouting(final boolean tmp) {
-		log.warn("config parameter " + USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + " deprecated; remove from config file; " +
-		"will eventually be removed." ) ;
-		this.isUsingOpportunityCostOfTimeInPtRouting = tmp;
-	}
-
-	//	public void setVspDefaultsCheckingLevel(final String vspDefaultsCheckingLevel) {
-	//		this.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, vspDefaultsCheckingLevel) ;
-	//	}
-
-	//	public String getVspDefaultsCheckingLevel() {
-	//		return this.getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel ) ;
-	//	}
-
+	@StringSetter(EMISSION_ROADTYPE_MAPPING_FILE)
 	public void setEmissionRoadTypeMappingFile(String roadTypeMappingFile) {
 		this.emissionRoadTypeMappingFile = roadTypeMappingFile;
 	}
-
+	@StringGetter(EMISSION_ROADTYPE_MAPPING_FILE)
 	public String getEmissionRoadTypeMappingFile() {
 		return this.emissionRoadTypeMappingFile;
 	}
-
+	@StringSetter(EMISSION_VEHICLE_FILE)
 	public void setEmissionVehicleFile(String emissionVehicleFile) {
 		this.emissionVehicleFile = emissionVehicleFile;
 	}
-
+	@StringGetter(EMISSION_VEHICLE_FILE)
 	public String getEmissionVehicleFile() {
 		return this.emissionVehicleFile;
 	}
-
+	@StringSetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
 	public void setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
 		this.averageFleetWarmEmissionFactorsFile = averageFleetWarmEmissionFactorsFile;
 	}
-
+	@StringGetter(EMISSION_FACTORS_WARM_FILE_AVERAGE)
 	public String getAverageWarmEmissionFactorsFile() {
 		return this.averageFleetWarmEmissionFactorsFile;
 	}
-
+	@StringSetter(EMISSION_FACTORS_COLD_FILE_AVERAGE)
 	public void setAverageColdEmissionFactorsFile(String averageFleetColdEmissionFactorsFile) {
 		this.averageFleetColdEmissionFactorsFile = averageFleetColdEmissionFactorsFile;
 	}
-
+	@StringGetter(EMISSION_FACTORS_COLD_FILE_AVERAGE)
 	public String getAverageColdEmissionFactorsFile() {
 		return this.averageFleetColdEmissionFactorsFile;
 	}
-
+	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
 	public boolean isUsingDetailedEmissionCalculation(){
 		return this.isUsingDetailedEmissionCalculation;
 	}
-
+	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
 	public void setIsUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
 		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
 	}
-
+	@StringSetter(EMISSION_FACTORS_WARM_FILE_DETAILED)
 	public void setDetailedWarmEmissionFactorsFile(String detailedWarmEmissionFactorsFile) {
 		this.detailedWarmEmissionFactorsFile = detailedWarmEmissionFactorsFile;
 	}
-
+	@StringGetter(EMISSION_FACTORS_WARM_FILE_DETAILED)
 	public String getDetailedWarmEmissionFactorsFile() {
 		return this.detailedWarmEmissionFactorsFile;
 	}
-
+	@StringSetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
 	public void setDetailedColdEmissionFactorsFile(String detailedColdEmissionFactorsFile) {
 		this.detailedColdEmissionFactorsFile = detailedColdEmissionFactorsFile;
 	}
-
+	@StringGetter(EMISSION_FACTORS_COLD_FILE_DETAILED)
 	public String getDetailedColdEmissionFactorsFile(){
 		return this.detailedColdEmissionFactorsFile;
 	}
-
+	@StringSetter(WRITING_OUTPUT_EVENTS)
 	public boolean isWritingOutputEvents() {
 		return this.writingOutputEvents ;
 	}
-
+	@StringGetter(WRITING_OUTPUT_EVENTS)
 	public void setWritingOutputEvents(boolean writingOutputEvents) {
 		this.writingOutputEvents = writingOutputEvents;
 	}
-
+	@StringSetter(MATSIM_GLOBAL_TIME_FORMAT)
 	public String getMatsimGlobalTimeFormat() {
 		return this.matsimGlobalTimeFormat;
 	}
-
+	@StringGetter(MATSIM_GLOBAL_TIME_FORMAT)
 	public void setMatsimGlobalTimeFormat(String format) {
 		this.matsimGlobalTimeFormat = format;
 		Time.setDefaultTimeFormat(format) ;

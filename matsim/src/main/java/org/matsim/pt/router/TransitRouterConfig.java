@@ -101,30 +101,16 @@ public class TransitRouterConfig implements MatsimParameters {
 			final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig ) 
 	{
 
-		if ( !vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
-			Logger.getLogger(this.getClass()).warn("transit router is not adding the opportunity cost of time; be careful if you need that.  kai, apr'11") ;
-		}
-
 		// walk:
 		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) / pcrConfig.getBeelineDistanceFactor();
-		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0;
-		if ( vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
-			this.marginalUtilityOfTravelTimeWalk_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ; 
-		}
+		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ; 
 		
 		// pt:
-		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0 ;
-		if ( vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
-			this.marginalUtilityOfTravelTimeTransit_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ;
-			
-		}
+		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getTravelingPt_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 
 		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getMonetaryDistanceCostRatePt();
 
-		this.marginalUtilityOfWaitingPt_utl_s = pcsConfig.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0;
-		if ( vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
-			this.marginalUtilityOfWaitingPt_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ;
-		}
+		this.marginalUtilityOfWaitingPt_utl_s = pcsConfig.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 
 		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch();
 

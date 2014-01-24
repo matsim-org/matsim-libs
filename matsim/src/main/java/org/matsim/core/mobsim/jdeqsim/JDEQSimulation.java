@@ -64,7 +64,8 @@ public class JDEQSimulation implements Mobsim {
 		// constructor
 
 		this.scenario = scenario;
-		this.activityDurationInterpretation = this.scenario.getConfig().vspExperimental().getActivityDurationInterpretation() ;
+		this.activityDurationInterpretation = 
+				ActivityDurationInterpretation.valueOf(this.scenario.getConfig().vspExperimental().getActivityDurationInterpretation()) ;
 
 		// reset simulation parameters
 		SimulationParameters.reset();

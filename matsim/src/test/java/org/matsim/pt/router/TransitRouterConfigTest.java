@@ -84,7 +84,6 @@ public class TransitRouterConfigTest {
 		
 		// test with marginal utl of time:
 		{
-		vspConfig.setUsingOpportunityCostOfTimeInPtRouting(true) ;
 		TransitRouterConfig config = new TransitRouterConfig(planScoring, planRouting, transitRouting, vspConfig );
 		
 		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
