@@ -22,6 +22,7 @@
  */
 package playground.southafrica.gauteng;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -121,27 +122,23 @@ public class GautengControler_subpopulations {
 				args);
 		/* Config must be passed as an argument, everything else is optional. */
 		final String configFilename = args[0];
-
-		/* Optional arguments. */
-		String plansFilename = null;
-		if (args.length > 1 && args[1] != null && args[1].length() > 0) {
-			plansFilename = args[1];
-		}
-
-		String personAttributeFilename = null;
-		if (args.length > 2 && args[2] != null && args[2].length() > 0) {
-			personAttributeFilename = args[2];
-		}
-
-		String networkFilename = null;
-		if (args.length > 3 && args[3] != null && args[3].length() > 0) {
-			networkFilename = args[3];
-		}
-
-		String tollFilename = null;
-		if (args.length > 4 && args[4] != null && args[4].length() > 0) {
-			tollFilename = args[4];
-		}
+		Config config = ConfigUtils.createConfig();
+		ConfigUtils.loadConfig(config, configFilename);
+		
+		/* Required argument:
+		 * [0] - Config file;
+		 * 
+		 * Optional arguments:
+		 * [1] - Population file;
+		 * [2] - Person attribute file;
+		 * [3] - Network file;
+		 * [4] - Toll (road pricing) file.
+		 * [5] - Base value of time ;
+		 * [6] - Value-of-Time multiplier; and
+		 * [7] - Number of threads. 
+		 */
+		
+		setOptionalArguments(args, config);
 
 		double baseValueOfTime = 110.;
 		double valueOfTimeMultiplier = 4.;
@@ -160,86 +157,26 @@ public class GautengControler_subpopulations {
 		
 		// ===========================================
 
-		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, configFilename);
-		config.plans().setInputFile(plansFilename);
-		config.plans().setInputPersonAttributeFile(personAttributeFilename);
+		/* Set some other config parameters. */
 		config.plans().setSubpopulationAttributeName("subpopulation");
-
+		
+		String[] modes ={"car","commercial"};
+		config.qsim().setMainModes( Arrays.asList(modes) );
+		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
+		
 		assignSubpopulationStrategies(config);
 		
-		// ===========================================
-		
-		// ===========================================
-
-		/* Allow for the plans file to be passed as argument. */
-		if (plansFilename != null && plansFilename.length() > 0) {
-			config.plans().setInputFile(plansFilename);
-		}
-
-		/* Allow for network filename to be passed as an argument. */
-		if (networkFilename != null && networkFilename.length() > 0) {
-			config.network().setInputFile(networkFilename);
-		}
-
-		/* Allow for the road pricing filename to be passed as an argument. */
-		if (tollFilename != null && tollFilename.length() > 0) {
-			config.roadpricing().setTollLinksFile(tollFilename);
-		}
-
-		/* Set some other config parameters. */
 		config.planCalcScore().setBrainExpBeta(1.0);
 		config.controler().setWritePlansInterval(2);
 		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+
+		// ===========================================
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		config.scenario().setUseVehicles(true);
 
 		/* CREATE VEHICLES. */
-		/* Create vehicle types. */
-		VehiclesFactory vf = VehicleUtils.getFactory();
-		LOG.info("Creating vehicle types.");
-		VehicleType vehicle_A2 = new VehicleTypeImpl(new IdImpl("a2"));
-		vehicle_A2.setDescription("Light vehicle with SANRAL toll class `A2'");
-
-		VehicleType vehicle_B = new VehicleTypeImpl(new IdImpl("b"));
-		vehicle_B.setDescription("Light vehicle with SANRAL toll class `B'");
-		vehicle_B.setMaximumVelocity(100.0 / 3.6);
-		vehicle_B.setLength(10.0);
-
-		VehicleType vehicle_C = new VehicleTypeImpl(new IdImpl("c"));
-		vehicle_C.setDescription("Light vehicle with SANRAL toll class `C'");
-		vehicle_C.setMaximumVelocity(80.0 / 3.6);
-		vehicle_C.setLength(15.0);
-
-		/* Create a vehicle per person. */
-		Vehicles vehicles = ((ScenarioImpl) sc).getVehicles();
-		for (Person p : sc.getPopulation().getPersons().values()) {
-			String vehicleType = (String) sc.getPopulation()
-					.getPersonAttributes()
-					.getAttribute(p.getId().toString(), "vehicleTollClass");
-			Boolean eTag = (Boolean) sc.getPopulation().getPersonAttributes()
-					.getAttribute(p.getId().toString(), "eTag");
-
-			/* Create the vehicle. */
-			Vehicle v = null;
-			if (vehicleType.equalsIgnoreCase("A2")) {
-				v = vf.createVehicle(p.getId(), vehicle_A2);
-			} else if (vehicleType.equalsIgnoreCase("B")) {
-				v = vf.createVehicle(p.getId(), vehicle_B);
-			} else if (vehicleType.equalsIgnoreCase("C")) {
-				v = vf.createVehicle(p.getId(), vehicle_C);
-			} else {
-				throw new RuntimeException("Unknown vehicle toll class: "
-						+ vehicleType);
-			}
-			vehicles.addVehicle(v);
-					
-			vehicles.getVehicleAttributes().putAttribute(v.getId().toString(), "eTag", eTag);
-
-			sc.getPopulation().getPersonAttributes().putAttribute( p.getId().toString(), VEH_ID, v.getId() );
-
-		}
+		createVehiclePerPerson(sc);
 
 		final Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
@@ -257,9 +194,6 @@ public class GautengControler_subpopulations {
 				}
 			}
 		});
-		
-		
-		
 
 		/* Set number of threads. */
 		controler.getConfig().global().setNumberOfThreads(numberOfThreads);
@@ -357,6 +291,86 @@ public class GautengControler_subpopulations {
 		 controler.run();
 
 		Header.printFooter();
+	}
+
+	/**
+	 * @param sc
+	 */
+	private static void createVehiclePerPerson(final Scenario sc) {
+		/* Create vehicle types. */
+		VehiclesFactory vf = VehicleUtils.getFactory();
+		LOG.info("Creating vehicle types.");
+		VehicleType vehicle_A2 = new VehicleTypeImpl(new IdImpl("a2"));
+		vehicle_A2.setDescription("Light vehicle with SANRAL toll class `A2'");
+
+		VehicleType vehicle_B = new VehicleTypeImpl(new IdImpl("b"));
+		vehicle_B.setDescription("Light vehicle with SANRAL toll class `B'");
+		vehicle_B.setMaximumVelocity(100.0 / 3.6);
+		vehicle_B.setLength(10.0);
+
+		VehicleType vehicle_C = new VehicleTypeImpl(new IdImpl("c"));
+		vehicle_C.setDescription("Light vehicle with SANRAL toll class `C'");
+		vehicle_C.setMaximumVelocity(80.0 / 3.6);
+		vehicle_C.setLength(15.0);
+
+		/* Create a vehicle per person. */
+		Vehicles vehicles = ((ScenarioImpl) sc).getVehicles();
+		for (Person p : sc.getPopulation().getPersons().values()) {
+			String vehicleType = (String) sc.getPopulation()
+					.getPersonAttributes()
+					.getAttribute(p.getId().toString(), "vehicleTollClass");
+			Boolean eTag = (Boolean) sc.getPopulation().getPersonAttributes()
+					.getAttribute(p.getId().toString(), "eTag");
+
+			/* Create the vehicle. */
+			Vehicle v = null;
+			if (vehicleType.equalsIgnoreCase("A2")) {
+				v = vf.createVehicle(p.getId(), vehicle_A2);
+			} else if (vehicleType.equalsIgnoreCase("B")) {
+				v = vf.createVehicle(p.getId(), vehicle_B);
+			} else if (vehicleType.equalsIgnoreCase("C")) {
+				v = vf.createVehicle(p.getId(), vehicle_C);
+			} else {
+				throw new RuntimeException("Unknown vehicle toll class: "
+						+ vehicleType);
+			}
+			vehicles.addVehicle(v);
+					
+			vehicles.getVehicleAttributes().putAttribute(v.getId().toString(), "eTag", eTag);
+
+			sc.getPopulation().getPersonAttributes().putAttribute( p.getId().toString(), VEH_ID, v.getId() );
+		}
+	}
+
+	/**
+	 * @param args
+	 * @param config
+	 */
+	private static void setOptionalArguments(String[] args, Config config) {
+		/* Optional arguments. */
+		String plansFilename = null;
+		if (args.length > 1 && args[1] != null && args[1].length() > 0) {
+			plansFilename = args[1];
+			config.plans().setInputFile(plansFilename);
+		}
+
+		String personAttributeFilename = null;
+		if (args.length > 2 && args[2] != null && args[2].length() > 0) {
+			personAttributeFilename = args[2];
+			config.plans().setInputPersonAttributeFile(personAttributeFilename);
+		}
+
+		String networkFilename = null;
+		if (args.length > 3 && args[3] != null && args[3].length() > 0) {
+			networkFilename = args[3];
+			config.network().setInputFile(networkFilename);
+		}
+
+		String tollFilename = null;
+		if (args.length > 4 && args[4] != null && args[4].length() > 0) {
+			tollFilename = args[4];
+			config.roadpricing().setTollLinksFile(tollFilename);
+		}
 	}
 
 	/**
