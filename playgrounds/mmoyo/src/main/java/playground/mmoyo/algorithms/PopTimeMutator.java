@@ -34,12 +34,14 @@ public class PopTimeMutator {
 		}
 	}
 	
-	public void run4transit (Population population){
+	public void run4transit (Population population){		
+		boolean affectingDuration = true ;
+
 		PlanAlgorithm timeMutator =
 				new TripPlanMutateTimeAllocation(
 						new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 						this.mutationRange,
-						MatsimRandom.getLocalInstance());
+						affectingDuration, MatsimRandom.getLocalInstance());
 		for(Person person: population.getPersons().values()){
 			for (Plan plan : person.getPlans()){
 				timeMutator.run(plan);

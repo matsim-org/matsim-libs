@@ -53,13 +53,17 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testMutationRangeParam() {
-		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, MatsimRandom.getLocalInstance()), 750);
-		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, MatsimRandom.getLocalInstance()), 7200);
+		boolean affectingDuration = true ;
+
+		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
+		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	public void testSimplifiedMutation() {
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, MatsimRandom.getLocalInstance()), 750);
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, MatsimRandom.getLocalInstance()), 7200);
+		boolean affectingDuration = true ;
+
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	/**

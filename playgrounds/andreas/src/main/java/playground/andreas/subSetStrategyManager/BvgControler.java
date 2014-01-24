@@ -97,7 +97,7 @@ public class BvgControler extends Controler {
 			mgr.addStrategyForDefaultSubpopulation(strategy1, 0.9);
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.config,7200));
+			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.config,7200, true));
 			strategy2.addStrategyModule(new ReRoute(getScenario()));
 			mgr.addStrategyForDefaultSubpopulation(strategy2, 0.1);
 			mgr.addChangeRequestForDefaultSubpopulation(90,strategy2,0.0);

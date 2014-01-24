@@ -61,12 +61,13 @@ public class TripPlanMutateTimeAllocationTest {
 		ptAct4.setMaximumDuration(0);
 		plan.createAndAddLeg(TransportMode.transit_walk);
 		plan.createAndAddActivity("work", new CoordImpl(0, 500));
+		boolean affectingDuration = true ;
 
 		TripPlanMutateTimeAllocation mutator =
 				new TripPlanMutateTimeAllocation(
 						new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 						3600.,
-						new Random(2011));
+						affectingDuration, new Random(2011));
 		mutator.run(plan);
 
 		Assert.assertEquals(0.0, ptAct1.getMaximumDuration(), 1e-8);

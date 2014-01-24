@@ -164,7 +164,9 @@ public class GeneratePopulation {
 	}
 
 	private void mutateTimes() {
-		PlanMutateTimeAllocationSimplified planMutateTimeAllocation = new PlanMutateTimeAllocationSimplified(15 * 60, random);
+		boolean affectingDuration = true ;
+
+		PlanMutateTimeAllocationSimplified planMutateTimeAllocation = new PlanMutateTimeAllocationSimplified(15 * 60, affectingDuration, random);
 
 //		planMutateTimeAllocation.setUseActivityDurations(false);
 		// replaced this by completely separate class.  results will not be fully backwards compatible.  kai, jun'12

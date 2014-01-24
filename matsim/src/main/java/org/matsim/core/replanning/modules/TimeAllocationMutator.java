@@ -39,6 +39,7 @@ import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 public class TimeAllocationMutator extends AbstractMultithreadedModule {
 
 	private final double mutationRange;
+	private final boolean affectingDuration ;
 	private final ActivityDurationInterpretation activityDurationInterpretation;
 
 	/**
@@ -48,17 +49,20 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	public TimeAllocationMutator(Config config) {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange();
+		this.affectingDuration = config.timeAllocationMutator().isAffectingDuration() ;
 		this.activityDurationInterpretation = config.vspExperimental().getActivityDurationInterpretation();
 	}
 
-	public TimeAllocationMutator(Config config, final int mutationRange) {
-		super(config.global());
-		this.mutationRange = mutationRange;
-		this.activityDurationInterpretation = config.vspExperimental().getActivityDurationInterpretation();
-	}
+//	public TimeAllocationMutator(Config config, final int mutationRange, boolean affectingDuration) {
+//		super(config.global());
+//		this.mutationRange = mutationRange;
+//		this.affectingDuration = affectingDuration ;
+//		this.activityDurationInterpretation = config.vspExperimental().getActivityDurationInterpretation();
+//	}
 	
-	public TimeAllocationMutator(Config config, final double mutationRange) {
+	public TimeAllocationMutator(Config config, final double mutationRange, boolean affectingDuration) {
 		super(config.global());
+		this.affectingDuration = affectingDuration ;
 		this.mutationRange = mutationRange;
 		this.activityDurationInterpretation = config.vspExperimental().getActivityDurationInterpretation();
 	}
@@ -71,13 +75,13 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 			pmta = new TripPlanMutateTimeAllocation(
 					getReplanningContext().getTripRouter().getStageActivityTypes(), 
 					mutationRange, 
-					MatsimRandom.getLocalInstance());
+					affectingDuration, MatsimRandom.getLocalInstance());
 			break;
 		default:
 			pmta = new PlanMutateTimeAllocationSimplified(
 					getReplanningContext().getTripRouter().getStageActivityTypes(),
 					mutationRange,
-					MatsimRandom.getLocalInstance());
+					affectingDuration, MatsimRandom.getLocalInstance());
 		}
 		return pmta;
 	}

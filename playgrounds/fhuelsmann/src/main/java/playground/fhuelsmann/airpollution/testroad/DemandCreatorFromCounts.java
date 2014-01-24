@@ -151,7 +151,9 @@ public class DemandCreatorFromCounts {
 	}*/
 
 	private static void fuzzifyTimes(Population population) {
-		PlanMutateTimeAllocationSimplified planMutateTimeAllocation = new PlanMutateTimeAllocationSimplified(1 * 60, new Random(4711));
+		boolean affectingDuration = true ;
+
+		PlanMutateTimeAllocationSimplified planMutateTimeAllocation = new PlanMutateTimeAllocationSimplified(1 * 60, affectingDuration, new Random(4711));
 
 //		planMutateTimeAllocation.setUseActivityDurations(false);
 		// the meaning of this statement is now subsumed in the selection of the "simplified" class above.  kai, jun'12

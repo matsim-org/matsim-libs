@@ -149,7 +149,7 @@ public class Emme2PopulationCreator {
 
 		log.info("mutating populations activity times");
 		scenario.getConfig().global().setNumberOfThreads(8);
-		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(scenario.getConfig(), timeMutationRange);
+		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(scenario.getConfig(), timeMutationRange, true);
 		
 		final TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();

@@ -71,11 +71,13 @@ public class TimeAllocationMutatorTest {
 
 	@Test
 	public void testAgainstTransitTimeAllocationMutator() {
+		boolean affectingDuration = true ;
+
 		TripPlanMutateTimeAllocation transit =
 			new TripPlanMutateTimeAllocation(
 					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 					MUTATION_RANGE,
-					new Random( SEED ));
+					affectingDuration, new Random( SEED ));
 
 		PlanMutateTimeAllocation regular =
 			new PlanMutateTimeAllocation(

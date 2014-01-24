@@ -42,13 +42,15 @@ public class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	private final double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations = true;
+	private final boolean affectingDuration;
 
 	public TripPlanMutateTimeAllocation(
 			final StageActivityTypes stageActivities,
 			final double mutationRange,
-			final Random random) {
+			boolean affectingDuration, final Random random) {
 		this.stageActivities = stageActivities;
 		this.mutationRange = mutationRange;
+		this.affectingDuration = affectingDuration;
 		this.random = random;
 	}
 
@@ -77,7 +79,9 @@ public class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 					// mutate the end time of the first activity
 					act.setEndTime(mutateTime(act.getEndTime()));
 					// calculate resulting duration
-					act.setMaximumDuration(act.getEndTime() - act.getStartTime());
+					if ( affectingDuration ) {
+						act.setMaximumDuration(act.getEndTime() - act.getStartTime());
+					}
 					// move now pointer
 					now += act.getEndTime();
 
@@ -90,8 +94,12 @@ public class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 						if (this.useActivityDurations) {
 							if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 								// mutate the durations of all 'middle' activities
-								act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
-								now += act.getMaximumDuration();
+								if ( affectingDuration ) {
+									act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
+								}
+								now += act.getMaximumDuration(); 
+								// (may feel a bit disturbing since it was not mutated but it is just using the "old" value which is perfectly ok. kai, jan'14)
+								
 								// set end time accordingly
 								act.setEndTime(now);
 							} else {

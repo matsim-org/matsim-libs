@@ -38,6 +38,7 @@ public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 
 	private double mutationRange = 1800.0;
 	private boolean useActivityDurations = true;
+	private final boolean affectingDuration;
 
 	/**
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
@@ -46,6 +47,7 @@ public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 	public TripTimeAllocationMutator(Config config) {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
+		this.affectingDuration = config.timeAllocationMutator().isAffectingDuration() ;
 		if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.minOfDurationAndEndTime) ) {
 			useActivityDurations = true;
 		} else if ( config.vspExperimental().getActivityDurationInterpretation().equals( ActivityDurationInterpretation.endTimeOnly ) ) {
@@ -57,9 +59,10 @@ public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 		}
 	}
 
-	public TripTimeAllocationMutator(Config config, final double mutationRange) {
+	public TripTimeAllocationMutator(Config config, final double mutationRange, boolean affectingDuration) {
 		super(config.global());
 		this.mutationRange = mutationRange;
+		this.affectingDuration = affectingDuration;
 	}
 
 	@Override
@@ -68,7 +71,7 @@ public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 			new TripPlanMutateTimeAllocation(
 					getReplanningContext().getTripRouter().getStageActivityTypes(),
 					this.mutationRange,
-					MatsimRandom.getLocalInstance());
+					affectingDuration, MatsimRandom.getLocalInstance());
 		pmta.setUseActivityDurations(this.useActivityDurations);
 		return pmta;
 	}
