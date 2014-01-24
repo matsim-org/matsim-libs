@@ -22,6 +22,7 @@
  */
 package playground.jjoubert.projects.gautengPopulation;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -38,6 +39,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -55,6 +57,7 @@ import playground.southafrica.utilities.Header;
  * @author jwjoubert
  */
 public class SanralPopulationConverter {
+	private final static Logger LOG = Logger.getLogger(SanralPopulationConverter.class);
 
 	/**
 	 * Running the population converter. 
@@ -83,14 +86,15 @@ public class SanralPopulationConverter {
 		String attributesFile = args[5];
 		String inputCRS = args[6];
 		String outputCRS = args[7];
+		Boolean convertDurationToEndTime= Boolean.parseBoolean(args[8]);
 		
-		SanralPopulationConverter.Run(inputFile, inputCRS, idPrefix, subPopulation, fraction, outputFile, attributesFile, outputCRS);
+		SanralPopulationConverter.Run(inputFile, inputCRS, idPrefix, subPopulation, fraction, outputFile, attributesFile, outputCRS, convertDurationToEndTime);
 		
 		Header.printFooter();
 	}
 	
 	
-	public static void Run(String inputFile, String idPrefix, String inputCRS, String subPopulation, double fraction, String outputFile, String attributesFile, String outputCRS){
+	public static void Run(String inputFile, String idPrefix, String inputCRS, String subPopulation, double fraction, String outputFile, String attributesFile, String outputCRS, boolean convertDurationToEndTime){
 		Scenario scNew = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory pf = scNew.getPopulation().getFactory();
 		
@@ -103,23 +107,30 @@ public class SanralPopulationConverter {
 				/* Create new person. */
 				Id newId = (new IdImpl(idPrefix + "_" + id++));
 				Person newPerson = pf.createPerson(newId);
-				Plan selectedPlan = person.getSelectedPlan();
 				
-				/* Convert all the activity locations if necessary. */
-				if(!inputCRS.equalsIgnoreCase(outputCRS)){
-					CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
-					for(PlanElement pe : selectedPlan.getPlanElements()){
-						if(pe instanceof Activity){
-							ActivityImpl act = (ActivityImpl)pe;
-							act.setCoord(ct.transform(act.getCoord()));
-
-							/* Remove link IDs associated with activities. */
-							act.setLinkId(null);
+				for(Plan plan : person.getPlans()){
+					/* Convert all the activity locations if necessary. */
+					if(!inputCRS.equalsIgnoreCase(outputCRS)){
+						CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
+						for(PlanElement pe : plan.getPlanElements()){
+							if(pe instanceof Activity){
+								ActivityImpl act = (ActivityImpl)pe;
+								act.setCoord(ct.transform(act.getCoord()));
+								
+								/* Remove link IDs associated with activities. */
+								act.setLinkId(null);
+							}
 						}
 					}
+					
+					/* Convert duration to end time if required. */
+					if(convertDurationToEndTime){
+						changeDurationToEndTime(plan);
+					}
+					
+					newPerson.addPlan(plan);
 				}
 				
-				newPerson.addPlan(selectedPlan);
 				scNew.getPopulation().addPerson(newPerson);
 				
 				/* Create person attributes. */
@@ -130,7 +141,32 @@ public class SanralPopulationConverter {
 		/* Write everything to file. */
 		new PopulationWriter(scNew.getPopulation(), null).write(outputFile);
 		new ObjectAttributesXmlWriter(scNew.getPopulation().getPersonAttributes()).writeFile(attributesFile);
-		
+	}
+	
+	
+	private static void changeDurationToEndTime(Plan plan){
+		double estimatedTravelTime = Time.parseTime("00:15:00");
+		double cumulativeEndTime = ((Activity)plan.getPlanElements().get(0)).getEndTime();
+		for(int i = 2 ; i < plan.getPlanElements().size()-2; i+= 2){ // Don't adapt final activity.
+			PlanElement pe = plan.getPlanElements().get(i);
+			if(pe instanceof Activity){
+				Activity act = (Activity)pe;
+				Double duration = act.getMaximumDuration();
+				Double endTime = act.getEndTime();
+				if(duration == Time.UNDEFINED_TIME){
+					LOG.warn("Expected maximum duration to be set, but it was not. Activity not changed.");
+				} else{
+					if(endTime != Time.UNDEFINED_TIME){
+						LOG.warn("Overwriting end time for " + plan.getPerson().getId() + " from " + Time.writeTime(endTime) + " to " + Time.writeTime(cumulativeEndTime));
+					}
+					cumulativeEndTime += estimatedTravelTime + duration;
+					act.setEndTime(cumulativeEndTime);
+				}
+				act.setMaximumDuration(Time.UNDEFINED_TIME);
+			} else{
+				throw new RuntimeException("Expected `Activity', but got " + pe.getClass().getName());
+			}
+		}
 	}
 
 }

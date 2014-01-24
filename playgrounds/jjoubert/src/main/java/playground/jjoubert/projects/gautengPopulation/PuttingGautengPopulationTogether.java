@@ -140,22 +140,26 @@ public class PuttingGautengPopulationTogether {
 				"car", "WGS84_UTM35S", "car", 0.1, 
 				outputFolder + "car.xml.gz",
 				outputFolder + "carAttr.xml.gz",
-				"WGS84_SA_Albers");
+				"WGS84_SA_Albers",
+				true);
 		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/bus_plans_2009_10pctV0.xml.gz",
 				"bus", "WGS84_UTM35S", "bus", 0.1, 
 				outputFolder + "bus.xml.gz",
 				outputFolder + "busAttr.xml.gz",
-				"WGS84_SA_Albers");
+				"WGS84_SA_Albers",
+				true);
 		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/taxi_plans_2009_10pctV0.xml.gz",
 				"taxi", "WGS84_UTM35S", "taxi", 0.1, 
 				outputFolder + "taxi.xml.gz",
 				outputFolder + "taxiAttr.xml.gz",
-				"WGS84_SA_Albers");
+				"WGS84_SA_Albers",
+				true);
 		SanralPopulationConverter.Run("/Users/jwjoubert/Documents/workspace/data-sanral2010/plans/ext_plans_2011_10pctV0.xml.gz",
 				"ext", "WGS84_UTM35S", "ext", 0.1, 
 				outputFolder + "ext.xml.gz",
 				outputFolder + "extAttr.xml.gz",
-				"WGS84_SA_Albers");
+				"WGS84_SA_Albers",
+				false);
 	}
 
 }
