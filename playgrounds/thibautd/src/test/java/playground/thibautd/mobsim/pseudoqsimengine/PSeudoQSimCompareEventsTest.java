@@ -326,8 +326,7 @@ public class PSeudoQSimCompareEventsTest {
 							new IdImpl( "line-"+i+"-"+depTime ),
 							depTime );
 				dep.setVehicleId( new IdImpl( "veh-"+dep.getId() ) );
-				vehicles.getVehicles().put(
-						dep.getVehicleId(),
+				vehicles.addVehicle(
 						vehicles.getFactory().createVehicle(
 							dep.getVehicleId(),
 							vehicleType ) );
