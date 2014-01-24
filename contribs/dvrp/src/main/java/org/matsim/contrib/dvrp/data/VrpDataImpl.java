@@ -38,8 +38,6 @@ public class VrpDataImpl
 
     private MobsimTimer mobsimTimer;
 
-    private Parameters parameters;
-
 
     @Override
     public List<Depot> getDepots()
@@ -76,22 +74,8 @@ public class VrpDataImpl
     }
 
 
-    @Override
-    public Parameters getParameters()
-    {
-        return parameters;
-    }
-
-
     // SETTERS
-    @Override
-    public void setParameters(Parameters parameters)
-    {
-        this.parameters = parameters;
-    }
-
-
-    public void setMobsimTimer(MobsimTimer mobsimTimer)
+    /*package*/void setMobsimTimer(MobsimTimer mobsimTimer)
     {
         this.mobsimTimer = mobsimTimer;
     }

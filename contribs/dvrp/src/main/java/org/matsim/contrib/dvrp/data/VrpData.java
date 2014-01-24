@@ -26,10 +26,6 @@ import org.matsim.contrib.dvrp.data.model.*;
 
 public interface VrpData
 {
-    interface Parameters
-    {}
-
-
     List<Depot> getDepots();
 
 
@@ -43,10 +39,4 @@ public interface VrpData
 
 
     double getTime();
-
-
-    Parameters getParameters();
-
-
-    void setParameters(Parameters parameters);
 }
