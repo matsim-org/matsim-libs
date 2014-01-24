@@ -66,7 +66,8 @@ public class Converter {
 	public Converter(DataSet dataSet, Network network) {
 		this.dataSet = dataSet;
 		this.network = network;
-		this.keepPaths = Main.pref.getBoolean("matsim_convertDefaults_keepPaths", false);
+		this.keepPaths = Main.pref.getBoolean(
+				"matsim_convertDefaults_keepPaths", false);
 		this.highwayDefaults = OsmConvertDefaults.getDefaults();
 	}
 
@@ -208,8 +209,8 @@ public class Converter {
 					for (int i = 1, n = way.nodes.size(); i < n; i++) {
 						OsmNode toNode = this.nodes.get(way.nodes.get(i));
 						if (toNode != lastToNode) {
-							length += calculateWGS84Length(
-									lastToNode.coord, toNode.coord);
+							length += OsmConvertDefaults.calculateWGS84Length(lastToNode.coord,
+									toNode.coord);
 							if (toNode.used) {
 
 								if (this.hierarchyLayers.isEmpty()) {
@@ -244,6 +245,18 @@ public class Converter {
 		// free up memory
 		this.nodes.clear();
 		this.ways.clear();
+
+		log.info("= conversion statistics: ==========================");
+		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
+		log.info("MATSim: # links created: " + this.network.getLinks().size());
+
+		if (this.unknownHighways.size() > 0) {
+			log.info("The following highway-types had no defaults set and were thus NOT converted:");
+			for (String highwayType : this.unknownHighways) {
+				log.info("- \"" + highwayType + "\"");
+			}
+		}
+		log.info("= end of conversion statistics ====================");
 	}
 
 	private void createLink(final Network network, final OsmWay way,
@@ -374,7 +387,6 @@ public class Converter {
 				network.addLink(l);
 				this.id++;
 			}
-
 		}
 	}
 
@@ -470,19 +482,6 @@ public class Converter {
 		Collections.sort(result, byIdComparator);
 		return result;
 	}
+
 	
-	 protected static double calculateWGS84Length(Coord coord, Coord coord2) {
-			double lon1 = coord.getX();
-			double lat1 = coord.getY();
-
-			double lon2 = coord2.getX();
-			double lat2 = coord2.getY();
-
-			double lat = (lat1 + lat2) / 2 * 0.01745;
-			double dx = 111.3 * Math.cos(lat) * (lon1 - lon2);
-			double dy = 111.3 * (lat1 - lat2);
-
-			return Math.sqrt(dx * dx + dy * dy) * 1000;
-		    }
-
 }

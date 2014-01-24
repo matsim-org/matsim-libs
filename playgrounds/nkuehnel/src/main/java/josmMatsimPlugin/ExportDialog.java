@@ -32,7 +32,7 @@ import org.openstreetmap.josm.Main;
  * @author nkuehnel
  * 
  */
-public class ExportDialog extends JPanel implements ActionListener {
+public class ExportDialog extends JPanel {
 
 	private JOptionPane optionPane;
 
@@ -41,6 +41,11 @@ public class ExportDialog extends JPanel implements ActionListener {
 	protected final static JComboBox exportSystem = new JComboBox(
 			Preferences.coordSystems);
 	protected final static JLabel exportFilePath = new JLabel();
+	protected final static JLabel capacityPeriodLabel = new JLabel("Set capacity period \n(in seconds):");
+	protected final static JLabel effectiveLaneWidthLabel = new JLabel("Set effective lane width \n(in meters):");
+	
+	protected final static JTextField capacityPeriod = new JTextField("3600.0");
+	protected final static JTextField effectiveLaneWidth = new JTextField("3.75");
 
 	public ExportDialog() {
 
@@ -58,22 +63,28 @@ public class ExportDialog extends JPanel implements ActionListener {
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = 1;
-		
 		add(exportSystemLabel, c);
 		
 		c.gridx = 1;
 		add(exportSystem, c);
-
+		
+		c.gridy = 2;
+		c.gridx = 0;
+		add(capacityPeriodLabel, c);
+		
+		c.gridx = 1;
+		add(capacityPeriod, c);
+		
+		c.gridy = 3;
+		c.gridx = 0;
+		add(effectiveLaneWidthLabel, c);
+		
+		c.gridx = 1;
+		add(effectiveLaneWidth, c);
 	}
 
 	public void setOptionPane(JOptionPane optionPane) {
 		this.optionPane = optionPane;
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("fileChooser")) {
-
-		}
-	}
 }

@@ -12,6 +12,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -30,6 +31,8 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 	protected final static JCheckBox renderMatsim = new JCheckBox(
 			"Activate MATSim Renderer");
 	protected final static JCheckBox showIds = new JCheckBox("Show Ids");
+	protected final static JSlider wayOffset = new JSlider(0, 100);
+	protected final static JLabel wayOffsetLabel = new JLabel("link offset for overlapping links");
 
 	// Export tab
 	private JLabel defaultExportFolder = new JLabel("Default Export Folder");
@@ -88,10 +91,14 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 
 		renderMatsim.setActionCommand("renderMatsim");
 		renderMatsim.addActionListener(listener);
+		
+		wayOffset.addChangeListener(listener);
+		wayOffset.setValue((int) ((Main.pref.getDouble("matsim_wayOffset", 1.5)) / 0.03));
 
 		showIds.setSelected(Main.pref.getBoolean("matsim_showIds", false)
 				&& Main.pref.getBoolean("matsim_renderer", true));
 		renderMatsim.setSelected(Main.pref.getBoolean("matsim_renderer", true));
+		wayOffset.setEnabled(Main.pref.getBoolean("matsim_renderer", true));
 
 		cOptions.anchor = GridBagConstraints.NORTHWEST;
 
@@ -105,6 +112,13 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		cOptions.weightx = 1.0;
 		cOptions.weighty = 1.0;
 		pnl.add(showIds, cOptions);
+		
+		cOptions.gridx = 0;
+		cOptions.gridy = 1;
+		pnl.add(wayOffsetLabel, cOptions);
+		
+		cOptions.gridx = 1;
+		pnl.add(wayOffset, cOptions);
 
 		return pnl;
 	}

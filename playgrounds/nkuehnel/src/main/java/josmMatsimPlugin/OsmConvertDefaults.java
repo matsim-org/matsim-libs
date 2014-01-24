@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.openstreetmap.josm.Main;
 
 public class OsmConvertDefaults {
@@ -111,7 +112,6 @@ public class OsmConvertDefaults {
 				"6;1;" + Double.toString(30. / 3.6) + ";1.0;600;false");
 		Main.pref.put("matsim_convertDefaults_living_street",
 				"6;1;" + Double.toString(15. / 3.6) + ";1.0;300;false");
-//		load();
 	}
 
 	protected static class OsmHighwayDefaults {
@@ -133,6 +133,20 @@ public class OsmConvertDefaults {
 			this.laneCapacity = laneCapacity;
 			this.oneway = oneway;
 		}
+	}
+	
+	protected static double calculateWGS84Length(Coord coord, Coord coord2) {
+		double lon1 = coord.getX();
+		double lat1 = coord.getY();
+
+		double lon2 = coord2.getX();
+		double lat2 = coord2.getY();
+
+		double lat = (lat1 + lat2) / 2 * 0.01745;
+		double dx = 111.3 * Math.cos(lat) * (lon1 - lon2);
+		double dy = 111.3 * (lat1 - lat2);
+
+		return Math.sqrt(dx * dx + dy * dy) * 1000;
 	}
 
 }

@@ -32,18 +32,18 @@ import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
 /**
- * The task which is executed after confirming the MATSimImportDialog. Creates a new layer showing the network data.
+ * The task which is executed after confirming the MATSimImportDialog. Creates a
+ * new layer showing the network data.
+ * 
  * @author nkuehnel
  * 
  */
-public class ImportTask extends PleaseWaitRunnable 
-{
+public class ImportTask extends PleaseWaitRunnable {
 	public static final String NODE_TAG_ID = "id";
 	public static final String WAY_TAG_ID = "id";
 	private NetworkLayer layer;
-	
-	public ImportTask()
-	{
+
+	public ImportTask() {
 		super("matsimImport");
 	}
 
@@ -53,8 +53,7 @@ public class ImportTask extends PleaseWaitRunnable
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#cancel()
 	 */
 	@Override
-	protected void cancel()
-	{
+	protected void cancel() {
 		// TODO Auto-generated method stub
 	}
 
@@ -64,9 +63,8 @@ public class ImportTask extends PleaseWaitRunnable
 	 * @see org.openstreetmap.josm.gui.PleaseWaitRunnable#finish()
 	 */
 	@Override
-	protected void finish()
-	{
-		// layer = null happens if Exception happens during import, 
+	protected void finish() {
+		// layer = null happens if Exception happens during import,
 		// as Exceptions are handled only after this method is called.
 		if (layer != null) {
 			Main.main.addLayer(layer);
@@ -74,7 +72,6 @@ public class ImportTask extends PleaseWaitRunnable
 		}
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -82,62 +79,72 @@ public class ImportTask extends PleaseWaitRunnable
 	 */
 	@Override
 	protected void realRun() throws SAXException, IOException,
-			OsmTransferException, UncheckedIOException
-	{
+			OsmTransferException, UncheckedIOException {
 		DataSet dataSet = new DataSet();
-		String importSystem = (String) ImportDialog.importSystem.getSelectedItem();
+		String importSystem = (String) ImportDialog.importSystem
+				.getSelectedItem();
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(importSystem,
 						TransformationFactory.WGS84);
-		
-		Config config= ConfigUtils.createConfig();
+
+		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(ImportDialog.path.getText());
 		Network network = NetworkImpl.createNetwork();
-		
+
 		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
-		for (Node node: scenario.getNetwork().getNodes().values())
-		{
-			Coord tmpCoor= node.getCoord();
+		for (Node node : scenario.getNetwork().getNodes().values()) {
+			Coord tmpCoor = node.getCoord();
 			LatLon coor;
-			
-			if(importSystem.equals("WGS84"))
-			{
+
+			if (importSystem.equals("WGS84")) {
+				coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
+			} else {
+				tmpCoor = ct.transform(new CoordImpl(tmpCoor.getX(), tmpCoor
+						.getY()));
 				coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
 			}
-			else
-			{
-				tmpCoor =ct.transform(new CoordImpl(tmpCoor.getX(), tmpCoor.getY()));
-				coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
-			}
-			org.openstreetmap.josm.data.osm.Node nodeOsm = new org.openstreetmap.josm.data.osm.Node(coor);
+			org.openstreetmap.josm.data.osm.Node nodeOsm = new org.openstreetmap.josm.data.osm.Node(
+					coor);
 			nodeOsm.put(NODE_TAG_ID, node.getId().toString());
 			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
-			Node newNode = network.getFactory().createNode(new IdImpl(Long.toString(nodeOsm.getUniqueId())), node.getCoord());
+			Node newNode = network.getFactory().createNode(
+					new IdImpl(Long.toString(nodeOsm.getUniqueId())),
+					node.getCoord());
 			((NodeImpl) newNode).setOrigId(node.getId().toString());
 			network.addNode(newNode);
 		}
-		
-		for (Link link: scenario.getNetwork().getLinks().values())
-		{
+
+		for (Link link : scenario.getNetwork().getLinks().values()) {
 			Way way = new Way();
-			org.openstreetmap.josm.data.osm.Node fromNode = node2OsmNode.get(link.getFromNode());
+			org.openstreetmap.josm.data.osm.Node fromNode = node2OsmNode
+					.get(link.getFromNode());
 			way.addNode(fromNode);
-			org.openstreetmap.josm.data.osm.Node toNode = node2OsmNode.get(link.getToNode());
+			org.openstreetmap.josm.data.osm.Node toNode = node2OsmNode.get(link
+					.getToNode());
 			way.addNode(toNode);
 			way.put(WAY_TAG_ID, link.getId().toString());
 			way.put("freespeed", String.valueOf(link.getFreespeed()));
 			way.put("capacity", String.valueOf(link.getCapacity()));
 			way.put("length", String.valueOf(link.getLength()));
 			way.put("permlanes", String.valueOf(link.getNumberOfLanes()));
-			way.put("modes", String.valueOf(link.getAllowedModes()));
+			StringBuilder modes = new StringBuilder();
+			for (String mode: link.getAllowedModes()) {
+				modes.append(mode+"; ");
+			}
+			way.put("modes", modes.toString());
+			
+			
+			
 			dataSet.addPrimitive(way);
 			Link newLink = network.getFactory().createLink(
-					new IdImpl(Long.toString(way.getUniqueId())), 
-					network.getNodes().get(new IdImpl(Long.toString(fromNode.getUniqueId()))), 
-					network.getNodes().get(new IdImpl(Long.toString(toNode.getUniqueId()))));
+					new IdImpl(Long.toString(way.getUniqueId())),
+					network.getNodes().get(
+							new IdImpl(Long.toString(fromNode.getUniqueId()))),
+					network.getNodes().get(
+							new IdImpl(Long.toString(toNode.getUniqueId()))));
 			newLink.setFreespeed(link.getFreespeed());
 			newLink.setCapacity(link.getCapacity());
 			newLink.setLength(link.getLength());
@@ -148,10 +155,8 @@ public class ImportTask extends PleaseWaitRunnable
 			way2Links.put(way, Collections.singletonList(newLink));
 		}
 
-		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(), new File(ImportDialog.path.getText()), network, importSystem);
-		dataSet.addDataSetListener(new NetworkListener(layer, way2Links, importSystem));
+		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(),
+				new File(ImportDialog.path.getText()), network, importSystem);
+		dataSet.addDataSetListener(new NetworkListener(layer, way2Links));
 	}
-
-	
-
 }

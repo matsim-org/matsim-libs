@@ -78,7 +78,7 @@ public class ExportTask extends PleaseWaitRunnable
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
 		String targetSystem = (String) ExportDialog.exportSystem.getSelectedItem();
-		CoordinateTransformation ct = TransformationFactory
+		CoordinateTransformation osmCt = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
 						targetSystem);
 
@@ -87,6 +87,11 @@ public class ExportTask extends PleaseWaitRunnable
 			if (layer instanceof NetworkLayer) {
 				for(Node node : ((NetworkLayer) layer).getMatsimNetwork().getNodes().values()) {
 					Node newNode = network.getFactory().createNode(new IdImpl(((NodeImpl)node).getOrigId()), node.getCoord());
+					CoordinateTransformation customCt = TransformationFactory
+							.getCoordinateTransformation(((NetworkLayer) layer).getCoordSystem(),
+									targetSystem);
+					Coord temp=customCt.transform(node.getCoord());
+					node.getCoord().setXY(temp.getX(), temp.getY());
 					network.addNode(newNode);
 				}
 				for(Link link : ((NetworkLayer) layer).getMatsimNetwork().getLinks().values()) {
@@ -104,9 +109,9 @@ public class ExportTask extends PleaseWaitRunnable
 			} else {
 				Converter converter = new Converter(((OsmDataLayer) layer).data, network);
 				converter.convert();
-				if (!(targetSystem.equals("WGS84"))) {
+				if (!(targetSystem.equals(TransformationFactory.WGS84))) {
 					for(Node node: ((NetworkImpl) network).getNodes().values()) {
-						Coord temp=ct.transform(node.getCoord());
+						Coord temp=osmCt.transform(node.getCoord());
 						node.getCoord().setXY(temp.getX(), temp.getY());
 					}
 				}
@@ -115,9 +120,10 @@ public class ExportTask extends PleaseWaitRunnable
 				new NetworkCleaner().run(network);
 			}
 			String path = ExportDialog.exportFilePath.getText()+".xml";
+			((NetworkImpl) network).setCapacityPeriod(Double.parseDouble(ExportDialog.capacityPeriod.getText()));
+			((NetworkImpl) network).setEffectiveLaneWidth(Double.parseDouble(ExportDialog.effectiveLaneWidth.getText()));
 			new NetworkWriter(network).write(path);
 			System.out.println("schreibe: " + path + " von WGS84 nach "+targetSystem);
 		}
 	}
-
 }

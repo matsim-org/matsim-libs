@@ -2,11 +2,14 @@ package josmMatsimPlugin;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -14,10 +17,14 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
+import org.openstreetmap.josm.data.osm.Tag;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.event.AbstractDatasetChangedEvent;
 import org.openstreetmap.josm.data.osm.event.DataChangedEvent;
@@ -33,17 +40,14 @@ import org.openstreetmap.josm.data.osm.visitor.paint.MapPaintSettings;
 public class NetworkListener implements DataSetListener {
 	private Network network;
 	private CoordinateTransformation ct;
-	private String originSystem;
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 	private NetworkLayer layer;
 
-	public NetworkListener(NetworkLayer layer, Map<Way, List<Link>> way2Links,
-			String originSystem) {
+	public NetworkListener(NetworkLayer layer, Map<Way, List<Link>> way2Links) {
 		this.layer = layer;
 		this.network = layer.getMatsimNetwork();
-		this.originSystem = originSystem;
 		this.ct = TransformationFactory.getCoordinateTransformation(
-				TransformationFactory.WGS84, originSystem);
+				TransformationFactory.WGS84, layer.getCoordSystem());
 		this.way2Links = way2Links;
 	}
 
@@ -60,8 +64,23 @@ public class NetworkListener implements DataSetListener {
 
 		Coord temp = ct.transform(new CoordImpl(
 				moved.getNode().getCoor().lon(), moved.getNode().getCoor()
-				.lat()));
-		network.getNodes().get(id).getCoord().setXY(temp.getX(), temp.getY());
+						.lat()));
+		Node node = network.getNodes().get(id);
+		node.getCoord().setXY(temp.getX(), temp.getY());
+		
+		
+		for (Link link: node.getInLinks().values()) {
+			if ( !((Way)layer.data.getPrimitiveById(Long.parseLong(link.getId().toString()), OsmPrimitiveType.WAY)).hasKey("length")) {
+				link.setLength(linkLength(link));
+			}
+		}
+		for (Link link: node.getOutLinks().values()) {
+			if ( !((Way)layer.data.getPrimitiveById(Long.parseLong(link.getId().toString()), OsmPrimitiveType.WAY)).hasKey("length")) {
+				link.setLength(linkLength(link));
+			}
+		}
+		
+		MATSimPlugin.toggleDialog.title(layer);
 	}
 
 	@Override
@@ -97,6 +116,7 @@ public class NetworkListener implements DataSetListener {
 
 			} else if (primitive instanceof Way) {
 				Way way = (Way) primitive;
+				
 				if (!way2Links.containsKey(way)) {
 					List<Link> links = enterWay2Links(way);
 					for (Link link : links) {
@@ -105,10 +125,9 @@ public class NetworkListener implements DataSetListener {
 					}
 				}
 			}
-
 		}
 	}
-
+	
 	private List<Link> enterWay2Links(Way way) {
 		List<Link> links = computeWay2Links(way);
 		List<Link> previous = way2Links.put(way, links);
@@ -128,7 +147,7 @@ public class NetworkListener implements DataSetListener {
 			return Collections.emptyList();
 		if (!keys.containsKey("permlanes"))
 			return Collections.emptyList();
-		if (!keys.containsKey("length"))
+		if (!keys.containsKey("modes"))
 			return Collections.emptyList();
 		String id = Long.toString(way.getUniqueId());
 		Node fromNode = matsim4osm(way.firstNode());
@@ -146,8 +165,33 @@ public class NetworkListener implements DataSetListener {
 		link.setCapacity(Double.parseDouble(keys.get("capacity")));
 		link.setFreespeed(Double.parseDouble(keys.get("freespeed")));
 		link.setNumberOfLanes(Double.parseDouble(keys.get("permlanes")));
-		link.setLength(Double.parseDouble(keys.get("length")));
+		
+		Set<String> modes = new HashSet<String>();
+		String tempArray[] = keys.get("modes").split(";");
+		for(int i = 0; i < tempArray.length; i ++) {
+			modes.add(tempArray[i]);
+		}
+		link.setAllowedModes(modes);
+		
+		if (keys.containsKey("length")) {
+			link.setLength(Double.parseDouble(keys.get("length")));
+		} else {
+			Double length = linkLength(link);
+			link.setLength(length);
+		}
 		return Collections.singletonList(link);
+	}
+
+	private Double linkLength(Link link) {
+		Double length;
+		if (layer.getCoordSystem().equals(TransformationFactory.WGS84)) {
+			length = OsmConvertDefaults.calculateWGS84Length(link
+					.getFromNode().getCoord(), link.getToNode().getCoord());
+		} else {
+			length = CoordUtils.calcDistance(link.getFromNode().getCoord(),
+					link.getToNode().getCoord());
+		}
+		return length;
 	}
 
 	public Node matsim4osm(org.openstreetmap.josm.data.osm.Node firstNode) {
@@ -224,7 +268,7 @@ public class NetworkListener implements DataSetListener {
 	@Override
 	public void wayNodesChanged(WayNodesChangedEvent changed) {
 		System.out
-		.println("waychange " + changed.getChangedWay().getUniqueId());
+				.println("waychange " + changed.getChangedWay().getUniqueId());
 	}
 
 }

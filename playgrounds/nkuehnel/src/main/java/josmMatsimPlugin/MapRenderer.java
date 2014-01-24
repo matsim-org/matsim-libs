@@ -4,6 +4,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -12,6 +14,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.Tag;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.visitor.paint.StyledMapRenderer;
 import org.openstreetmap.josm.gui.NavigatableComponent;
@@ -23,6 +26,7 @@ public class MapRenderer extends StyledMapRenderer {
 	private final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
 	private final CompositionStrategy STRATEGY = new CompositionStrategy();
 	private final Color MATSIMCOLOR = new Color(80, 145, 190);
+	protected static float wayOffset = ((float) Main.pref.getDouble("matsim_wayOffset", 1.5)); 
 
 	public MapRenderer(Graphics2D arg0, NavigatableComponent arg1, boolean arg2) {
 		super(arg0, arg1, arg2);
@@ -74,7 +78,8 @@ public class MapRenderer extends StyledMapRenderer {
 		for (Link link2 : network.getLinks().values()) {
 			if (link2.getFromNode().equals(link.getToNode())
 					&& link2.getToNode().equals(link.getFromNode())) {
-				return 1.5f;
+				
+				return wayOffset;
 			}
 		}
 		return 0.f;
@@ -106,4 +111,5 @@ public class MapRenderer extends StyledMapRenderer {
 		}
 
 	}
+	
 }
