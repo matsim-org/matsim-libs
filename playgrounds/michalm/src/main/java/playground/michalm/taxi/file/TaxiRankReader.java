@@ -19,11 +19,11 @@
 
 package playground.michalm.taxi.file;
 
-import java.util.Stack;
+import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Depot;
+import org.matsim.contrib.dvrp.data.model.*;
 import org.matsim.contrib.dvrp.data.model.impl.DepotImpl;
 import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
@@ -84,7 +84,9 @@ public class TaxiRankReader
 
     private void startRank(Attributes atts)
     {
-        int id = data.getDepots().size();
+        List<Depot> depots = data.getDepots();
+
+        int id = depots.size();
         Id rankId = scenario.createId(id + "");
 
         String name = atts.getValue("name");
@@ -96,13 +98,15 @@ public class TaxiRankReader
         Link link = scenario.getNetwork().getLinks().get(linkId);
 
         currentRank = new DepotImpl(rankId, name, link);
-        data.addDepot(currentRank);
+        depots.add(currentRank);
     }
 
 
     private void startTaxi(Attributes atts)
     {
-        int id = data.getVehicles().size();
+        List<Vehicle> vehicles = data.getVehicles();
+
+        int id = vehicles.size();
         Id taxiId = scenario.createId(id + "");
 
         String name = atts.getValue("name");
@@ -118,13 +122,15 @@ public class TaxiRankReader
 
         ElectricVehicle ev = new VrpAgentElectricTaxi(taxiId, name, currentRank, t0, t1, ecm);
         ev.setBattery(new BatteryImpl(chargeInJoules, capacityInJoules));
-        data.addVehicle(ev);
+        vehicles.add(ev);
     }
 
 
     private void startCharger(Attributes atts)
     {
-        int id = data.getChargers().size();
+        List<Charger> chargers = data.getChargers();
+
+        int id = chargers.size();
         Id chargerId = scenario.createId(id + "");
 
         String name = atts.getValue("name");
@@ -134,7 +140,7 @@ public class TaxiRankReader
 
         double powerInJoules = getDouble(atts, "power_kW", 20) * 1000;
 
-        data.addCharger(new ChargerImpl(chargerId, name, powerInJoules, currentRank.getLink()));
+        chargers.add(new ChargerImpl(chargerId, name, powerInJoules, currentRank.getLink()));
     }
 
 

@@ -19,12 +19,9 @@
 
 package playground.michalm.taxi;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.*;
+import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 
 import playground.michalm.taxi.model.TaxiRequest;
@@ -35,24 +32,11 @@ public class TaxiRequestCreator
 {
     public static final String MODE = "taxi";
 
-    private final MatsimVrpData data;
-
-
-    public TaxiRequestCreator(MatsimVrpData data)
-    {
-        this.data = data;
-    }
-
 
     @Override
-    public TaxiRequest createRequest(Customer customer, Link fromLink, Link toLink, double now)
+    public TaxiRequest createRequest(Id id, Customer customer, Link fromLink, Link toLink,
+            double t0, double t1, double now)
     {
-        List<Request> requests = data.getVrpData().getRequests();
-
-        Id id = data.getScenario().createId(requests.size() + "");
-        TaxiRequest request = new TaxiRequest(id, customer, fromLink, toLink, now, now);
-        requests.add(request);
-
-        return request;
+        return new TaxiRequest(id, customer, fromLink, toLink, t0, now);
     }
 }

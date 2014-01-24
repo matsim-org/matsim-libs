@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.model.Depot;
+import org.matsim.contrib.dvrp.data.model.*;
 import org.matsim.contrib.dvrp.data.model.impl.DepotImpl;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -77,7 +77,9 @@ public class DepotReader
 
     private void startDepot(Attributes atts)
     {
-        int id = data.getDepots().size();
+        List<Depot> depots = data.getDepots();
+
+        int id = depots.size();
         Id depotId = scenario.createId(id + "");
 
         String name = atts.getValue("name");
@@ -89,12 +91,14 @@ public class DepotReader
         Link link = links.get(linkId);
 
         currentDepot = new DepotImpl(depotId, name, link);
-        data.addDepot(currentDepot);
+        depots.add(currentDepot);
     }
 
 
     private void startVehicle(Attributes atts)
     {
+        List<Vehicle> vehicles = data.getVehicles();
+
         int id = data.getVehicles().size();
         Id vehicleId = scenario.createId(id + "");
 
@@ -109,7 +113,7 @@ public class DepotReader
         double t1 = getDouble(atts, "t1", 24 * 60 * 60);
         double tLimit = getDouble(atts, "tLimit", t1 - t0);
 
-        data.addVehicle(new VrpAgentVehicleImpl(vehicleId, name, currentDepot, capacity, t0, t1,
+        vehicles.add(new VrpAgentVehicleImpl(vehicleId, name, currentDepot, capacity, t0, t1,
                 tLimit));
     }
 

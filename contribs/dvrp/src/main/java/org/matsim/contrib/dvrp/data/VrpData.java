@@ -48,17 +48,5 @@ public interface VrpData
     Parameters getParameters();
 
 
-    void addDepot(Depot depot);
-
-
-    void addCustomer(Customer customer);
-
-
-    void addVehicle(Vehicle vehicle);
-
-
-    void addRequest(Request request);
-
-
     void setParameters(Parameters parameters);
 }

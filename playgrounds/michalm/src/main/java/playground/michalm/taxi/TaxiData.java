@@ -41,12 +41,6 @@ public class TaxiData
     }
 
 
-    public void addCharger(Charger charger)
-    {
-        chargers.add(charger);
-    }
-
-
     public List<VrpAgentElectricTaxi> getElectricTaxis()
     {
         return convertList(getVehicles());

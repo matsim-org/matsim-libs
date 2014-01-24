@@ -28,7 +28,4 @@ public interface ElectricVrpData
     extends VrpData
 {
     List<Charger> getChargers();
-
-
-    void addCharger(Charger charger);
 }

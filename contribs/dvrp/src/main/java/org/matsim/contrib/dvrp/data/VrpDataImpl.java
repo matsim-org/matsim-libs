@@ -84,35 +84,6 @@ public class VrpDataImpl
 
 
     // SETTERS
-
-    @Override
-    public void addDepot(Depot depot)
-    {
-        depots.add(depot);
-    }
-
-
-    @Override
-    public void addCustomer(Customer customer)
-    {
-        customers.add(customer);
-    }
-
-
-    @Override
-    public void addVehicle(Vehicle vehicle)
-    {
-        vehicles.add(vehicle);
-    }
-
-
-    @Override
-    public void addRequest(Request request)
-    {
-        requests.add(request);
-    }
-
-
     @Override
     public void setParameters(Parameters parameters)
     {

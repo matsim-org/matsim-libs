@@ -178,8 +178,8 @@ import playground.michalm.util.RunningVehicleRegister;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource,
                 travelTime);
 
-        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario, ttimeSource,
-                travelTime, travelDisutility);
+        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
+                ttimeSource, travelTime, travelDisutility);
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
@@ -198,7 +198,7 @@ import playground.michalm.util.RunningVehicleRegister;
         olutils.initVrpSimEngine(qSim, data, optimizer);
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiRequestCreator.MODE, new TaxiRequestCreator(data), optimizer, data, qSim);
+                TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, data, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, data, optimizer, new TaxiActionCreator(
                 passengerEngine, VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR));

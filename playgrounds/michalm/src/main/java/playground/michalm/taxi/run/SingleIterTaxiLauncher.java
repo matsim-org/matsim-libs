@@ -232,7 +232,7 @@ import playground.michalm.util.RunningVehicleRegister;
         data = new MatsimVrpData(taxiData, scenario, qSim.getSimTimer());
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiRequestCreator.MODE, new TaxiRequestCreator(data), optimizer, data, qSim);
+                TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, data, qSim);
 
         LegCreator legCreator = onlineVehicleTracker ? VrpDynLegs
                 .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())

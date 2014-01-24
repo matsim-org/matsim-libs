@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -31,13 +29,10 @@ public class PassengerCustomer
 {
     private final MobsimAgent passenger;
 
-    private List<PassengerRequest> requests;
-
 
     public PassengerCustomer(MobsimAgent passenger)
     {
         this.passenger = passenger;
-        this.requests = new ArrayList<PassengerRequest>();
     }
 
 
@@ -55,14 +50,8 @@ public class PassengerCustomer
     }
 
 
-    public MobsimAgent getPassengerAgent()
+    /*package*/ MobsimAgent getPassengerAgent()
     {
         return passenger;
-    }
-
-
-    public List<PassengerRequest> getRequests()
-    {
-        return requests;
     }
 }

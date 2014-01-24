@@ -25,8 +25,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.Customer;
+import org.matsim.contrib.dvrp.data.model.*;
 import org.matsim.contrib.dvrp.data.schedule.Task;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgents;
@@ -81,17 +82,51 @@ public class PassengerEngine
 
     @Override
     public void doSimStep(double time)
-    {
-        // TODO Auto-generated method stub
-
-    }
+    {}
 
 
     @Override
     public void afterSim()
-    {
-        // TODO Auto-generated method stub
+    {}
 
+
+    private final Map<Id, Set<PassengerRequest>> advanceRequests = new HashMap<Id, Set<PassengerRequest>>();
+
+
+    public boolean callAhead(double now, MobsimAgent passengerAgent, Leg leg)
+    {
+        if (!leg.getMode().equals(mode)) {
+            return false;
+        }
+
+        if (leg.getDepartureTime() <= now) {
+            throw new IllegalStateException("This is not a call ahead");
+        }
+
+        Id fromLinkId = leg.getRoute().getStartLinkId();
+        Id toLinkId = leg.getRoute().getEndLinkId();
+        double departureTime = leg.getDepartureTime();
+
+        //==============================================
+
+        PassengerRequest request = createRequest(passengerAgent, fromLinkId, toLinkId,
+                departureTime, now);
+
+        Set<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerAgent.getId());
+
+        if (passengerAdvReqs == null) {
+            passengerAdvReqs = new TreeSet<PassengerRequest>(new Comparator<PassengerRequest>() {
+                @Override
+                public int compare(PassengerRequest r1, PassengerRequest r2)
+                {
+                    return Double.compare(r1.getT0(), r2.getT0());
+                }
+            });
+        }
+
+        passengerAdvReqs.add(request);
+        optimizer.requestSubmitted(request);
+        return true;
     }
 
 
@@ -102,36 +137,71 @@ public class PassengerEngine
             return false;
         }
 
-        internalInterface.registerAdditionalAgentOnLink(passengerAgent);
         Id toLinkId = passengerAgent.getDestinationLinkId();
+        double departureTime = now;
 
+        //==============================================
+
+        //check if this is an advance request
+        Set<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerAgent.getId());
+        PassengerRequest request = null;
+
+        if (passengerAdvReqs != null) {
+            for (PassengerRequest r : passengerAdvReqs) {
+                if (r.getFromLink().getId() == fromLinkId //
+                        && r.getToLink().getId() == toLinkId) {
+                    //there may be more than one request for the (fromLinkId, toLinkId) pair
+                    //this one, however, is the earliest one (lowest req.T0)
+                    request = r;
+
+                    //remove it from TreeSet
+                    passengerAdvReqs.remove(r);
+                    break;
+                }
+            }
+        }
+
+        if (request == null) {//this is an immediate request
+            request = createRequest(passengerAgent, fromLinkId, toLinkId, departureTime, now);
+        }
+
+        internalInterface.registerAdditionalAgentOnLink(passengerAgent);
+        optimizer.requestSubmitted(request);
+        return true;
+    }
+
+
+    private PassengerRequest createRequest(MobsimAgent passengerAgent, Id fromLinkId, Id toLinkId,
+            double departureTime, double now)
+    {
         Map<Id, ? extends Link> links = data.getScenario().getNetwork().getLinks();
         Link fromLink = links.get(fromLinkId);
         Link toLink = links.get(toLinkId);
 
-        PassengerCustomer customer = getOrCreatePassengerCustomer(passengerAgent);
-        List<PassengerRequest> submittedReqs = customer.getRequests();
-
-        for (PassengerRequest r : submittedReqs) {
-            if (r.getFromLink() == fromLink && r.getToLink() == toLink && r.getT0() <= now
-                    && r.getT1() + 1 >= now) {
-                //This is it! This is an advance request, so do not resubmit a duplicate!
-                return true;
-            }
+        PassengerCustomer customer = passengerCustomers.get(passengerAgent.getId());
+        if (customer == null) {
+            List<Customer> customers = data.getVrpData().getCustomers();
+            customer = new PassengerCustomer(passengerAgent);
+            customers.add(customer);
+            passengerCustomers.put(passengerAgent.getId(), customer);
         }
 
-        PassengerRequest request = requestCreator.createRequest(customer, fromLink, toLink, now);
-        submittedReqs.add(request);
-        optimizer.requestSubmitted(request);
+        List<Request> requests = data.getVrpData().getRequests();
+        Id id = data.getScenario().createId(requests.size() + "");
 
-        return true;
+        PassengerRequest request = requestCreator.createRequest(id, customer, fromLink, toLink,
+                departureTime, departureTime, now);
+
+        requests.add(request);
+
+        return request;
     }
 
 
     public void pickUpPassenger(Task task, PassengerRequest request, double now)
     {
         DriverAgent driver = VrpAgents.getAgent(task);
-        MobsimAgent passenger = request.getPassengerAgent();
+        MobsimAgent passenger = request.getCustomer().getPassengerAgent();
 
         Id currentLinkId = passenger.getCurrentLinkId();
 
@@ -165,7 +235,7 @@ public class PassengerEngine
     public void dropOffPassenger(Task task, PassengerRequest request, double now)
     {
         DriverAgent driver = VrpAgents.getAgent(task);
-        MobsimAgent passenger = request.getPassengerAgent();
+        MobsimAgent passenger = request.getCustomer().getPassengerAgent();
 
         if (passenger instanceof PassengerAgent) {
             PassengerAgent passengerAgent = (PassengerAgent)passenger;
@@ -181,19 +251,5 @@ public class PassengerEngine
         passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
         passenger.endLegAndComputeNextState(now);
         internalInterface.arrangeNextAgentState(passenger);
-    }
-
-
-    private PassengerCustomer getOrCreatePassengerCustomer(MobsimAgent passenger)
-    {
-        PassengerCustomer customer = passengerCustomers.get(passenger.getId());
-
-        if (customer == null) {
-            List<Customer> customers = data.getVrpData().getCustomers();
-            customer = new PassengerCustomer(passenger);
-            customers.add(customer);
-        }
-
-        return customer;
     }
 }

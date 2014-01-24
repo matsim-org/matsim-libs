@@ -25,7 +25,6 @@ import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.contrib.dvrp.data.model.impl.RequestImpl;
 import org.matsim.contrib.dvrp.data.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import playground.michalm.taxi.schedule.*;
 
@@ -88,9 +87,9 @@ public class TaxiRequest
 
 
     @Override
-    public MobsimAgent getPassengerAgent()
+    public PassengerCustomer getCustomer()
     {
-        return ((PassengerCustomer)getCustomer()).getPassengerAgent();
+        return (PassengerCustomer)getCustomer();
     }
 
 

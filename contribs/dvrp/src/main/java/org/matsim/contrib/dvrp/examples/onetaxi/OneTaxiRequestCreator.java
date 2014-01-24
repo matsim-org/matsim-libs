@@ -19,11 +19,9 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import java.util.List;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.model.*;
+import org.matsim.contrib.dvrp.data.model.Customer;
 import org.matsim.contrib.dvrp.passenger.*;
 
 
@@ -32,21 +30,11 @@ public class OneTaxiRequestCreator
 {
     public static final String MODE = "taxi";
 
-    private final VrpData vrpData;
-
-
-    public OneTaxiRequestCreator(VrpData vrpData)
-    {
-        this.vrpData = vrpData;
-    }
-
 
     @Override
-    public PassengerRequest createRequest(Customer customer, Link fromLink, Link toLink, double now)
+    public PassengerRequest createRequest(Id id, Customer customer, Link fromLink, Link toLink,
+            double t0, double t1, double now)
     {
-        List<Request> requests = vrpData.getRequests();
-        OneTaxiRequest request = new OneTaxiRequest(customer, fromLink, toLink, now);
-        requests.add(request);
-        return request;
+        return new OneTaxiRequest(id, customer, fromLink, toLink, now);
     }
 }
