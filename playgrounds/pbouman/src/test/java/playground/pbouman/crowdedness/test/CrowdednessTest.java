@@ -329,9 +329,9 @@ public class CrowdednessTest
 		VehicleType type = vFac.createVehicleType(scen.createId("vtype"));
 		type.setCapacity(cap);
 		type.setMaximumVelocity(speed);
-		scen.getVehicles().getVehicleTypes().put(type.getId(), type);
+		scen.getVehicles().addVehicleType(type);
 		Vehicle vehicle = vFac.createVehicle(scen.createId("vehicle"), type);
-		scen.getVehicles().getVehicles().put(vehicle.getId(), vehicle);
+		scen.getVehicles().addVehicle(vehicle);
 		
 		NetworkRoute route = RouteUtils.createNetworkRoute(routeIds, net);
 		TransitRoute transitRoute = sFac.createTransitRoute(scen.createId("route"), route, stopList, "pt");
