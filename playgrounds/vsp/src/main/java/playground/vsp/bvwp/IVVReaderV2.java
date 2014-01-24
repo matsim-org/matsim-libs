@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.vsp.bvwp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,17 +58,22 @@ public class IVVReaderV2 {
 	
 	
 	void read(){
-		// TODO currently implemented for debbuging-reasons. For later revisions
-		// all data from the files should be added to this.data
+		
+
 		
 		
 		
-		log.info("Start...");
-		Id odid = getODId("310301" ,"1305603");
-		createPlanUndNullfallForOdRelation(odid);
+		List<Id> odRelations = new ArrayList<Id>();
+		log.info("Creating Index using Production & Operations' file : "+config.getImpedanceMatrixFile() );
+		read(config.getImpedanceMatrixFile(), new IndexFromImpendanceFileHandler(odRelations));
+		log.info("Handling  "+odRelations.size() +" OD-Relations");
 		
+		ScenarioForEvalData nullfallData = new ScenarioForEvalData();
+		log.info("Reading demand file (00-Matrix): "+config.getDemandMatrixFile() );
+		read(config.getDemandMatrixFile(), new DemandHandler(nullfallData, odRelations));
+		log.info("Filled with "+nullfallData.getAllRelations().size() + " Od-Relations");
 		
-//		ScenarioForEvalData nullfallData = new ScenarioForEvalData();
+//
 //		
 //		
 //		nullfallData = new ScenarioForEvalData();		
@@ -209,12 +215,14 @@ public class IVVReaderV2 {
 	private static class DemandHandler implements TabularFileHandler{
 
 		private ScenarioForEvalData data;
-
+		private final List<Id> odRelations;
 		/**
 		 * @param data
+		 * @param odRelations 
 		 */
-		public DemandHandler(ScenarioForEvalData data) {
+		public DemandHandler(ScenarioForEvalData data, List<Id> odRelations) {
 			this.data = data;
+			this.odRelations=odRelations;
 		}
 
 		@Override
@@ -223,55 +231,31 @@ public class IVVReaderV2 {
 
 			String from = row[0].trim();
 			String to = row[1].trim();
-			
-			//verbleibender Verkehr wird im CT verlagert gerechnet, prinzipiell ist das egal.
+			Id odId = getODId(from, to);
+			if (this.odRelations.contains(odId)){
 			
 			Mode mode = Mode.RAIL;
 			
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[2].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[3].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[4].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_COMMERCIAL, Attribute.XX),Double.parseDouble(row[5].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[6].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[7].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[2].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[3].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[4].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_COMMERCIAL, Attribute.XX),Double.parseDouble(row[5].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[6].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[7].trim())	, data);
 			
 			mode = Mode.ROAD;
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[8].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[9].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[10].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_COMMERCIAL, Attribute.XX),Double.parseDouble(row[11].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[12].trim())	, data);
-			setValuesForODRelation(getODId(from, to), 	Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[13].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[8].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[9].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[10].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_COMMERCIAL, Attribute.XX),Double.parseDouble(row[11].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[12].trim())	, data);
+			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[13].trim())	, data);
 			}
-		
+		}
 		
 	}
 	
-	private static class DemandIndexHandler implements TabularFileHandler{
 
-        private List<Id> allOdRelations;
-
-        /**
-         * @param data
-         */
-        public DemandIndexHandler(List<Id> allOdRelations) {
-            this.allOdRelations = allOdRelations;
-        }
-
-        @Override
-        public void startRow(String[] row) {
-            if(comment(row)) return;
-
-            String from = row[0].trim();
-            String to = row[1].trim();
-            
-            
-
-            this.allOdRelations.add(getODId(from, to));
-            }
-        
-        
-    }
     private static class SetCertainODDemand implements TabularFileHandler{
         private ScenarioForEvalData data;
         private Id odid;
@@ -442,6 +426,28 @@ public class IVVReaderV2 {
 			}
 		
 	}
+	
+	private static class IndexFromImpendanceFileHandler implements TabularFileHandler{
+
+        private List<Id> allOdRelations;
+
+        /**
+         * @param data
+         */
+        public IndexFromImpendanceFileHandler(List<Id> allOdRelations) {
+            this.allOdRelations = allOdRelations;
+        }
+
+        @Override
+        public void startRow(String[] row) {
+            if(comment(row)) return;
+            String from = row[0].trim();
+            String to = row[1].trim();
+            this.allOdRelations.add(getODId(from, to));
+            }
+        
+        
+    }
 	
 	private static class SetImpedanceForOdRelationNullfallHandler implements TabularFileHandler{
 
@@ -805,7 +811,7 @@ public class IVVReaderV2 {
 
 	public static void main(String[] args) {
 		IVVReaderConfigGroup config = new IVVReaderConfigGroup();
-		String dir = "/Users/jb/tucloud/bvwp/data/";
+		String dir = "/Users/jb/tucloud/bvwp/data/P2030_Daten_IVV_20131210/";
 		config.setDemandMatrixFile(dir + "P2030_2010_BMVBS_ME2_131008.csv");
 		config.setRemainingDemandMatrixFile(dir + "P2030_2010_verbleibend_ME2.csv");
 		config.setNewDemandMatrixFile(dir + "P2030_2010_neuentstanden_ME2.csv");
