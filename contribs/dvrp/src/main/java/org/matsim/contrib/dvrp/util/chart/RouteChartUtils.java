@@ -43,7 +43,6 @@ public class RouteChartUtils
     public static JFreeChart chartRoutes(VrpData data)
     {
         CoordDataset lData = new CoordDataset();
-        lData.addSeries("Depot", LinkSources.createFromBasicLocations(data.getDepots()));
 
         List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
@@ -87,7 +86,6 @@ public class RouteChartUtils
     public static JFreeChart chartRoutesByStatus(VrpData data)
     {
         CoordDataset nData = new CoordDataset();
-        nData.addSeries("Depot", LinkSources.createFromBasicLocations(data.getDepots()));
 
         List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {

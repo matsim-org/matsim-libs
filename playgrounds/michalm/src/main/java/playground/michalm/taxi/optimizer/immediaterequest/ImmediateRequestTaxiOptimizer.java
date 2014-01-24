@@ -171,7 +171,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         switch (schedule.getStatus()) {
             case UNPLANNED:
                 Vehicle vehicle = schedule.getVehicle();
-                link = vehicle.getDepot().getLink();
+                link = vehicle.getStartLink();
                 time = Math.max(vehicle.getT0(), currentTime);
                 return new LinkTimePair(link, time);
 

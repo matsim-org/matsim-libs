@@ -39,8 +39,7 @@ public class TaxiLauncherUtils
 
         for (Vehicle veh : taxiData.getVehicles()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
-            schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getDepot()
-                    .getLink()));
+            schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
 
         return taxiData;

@@ -20,7 +20,7 @@
 package playground.michalm.taxi.model;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.model.Depot;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
@@ -34,10 +34,10 @@ public class VrpAgentElectricTaxi
     private EnergyConsumptionModel ecm;
 
 
-    public VrpAgentElectricTaxi(Id id, String name, Depot startingRank, double t0, double t1,
+    public VrpAgentElectricTaxi(Id id, String name, Link startLink, double t0, double t1,
             EnergyConsumptionModel ecm)
     {
-        super(id, name, startingRank, 4, t0, t1, t1 - t0);
+        super(id, name, startLink, 4, t0, t1, t1 - t0);
         this.ecm = ecm;
     }
 

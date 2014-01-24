@@ -20,7 +20,8 @@
 package org.matsim.contrib.dvrp.data.model.impl;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.model.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.Schedule;
 import org.matsim.contrib.dvrp.data.schedule.impl.*;
 
@@ -30,7 +31,7 @@ public class VehicleImpl
 {
     private final Id id;
     private final String name;
-    private final Depot depot;
+    private final Link startLink;
 
     private final double capacity;
 
@@ -38,18 +39,18 @@ public class VehicleImpl
     private final double t0;
     private final double t1;
 
-    // max time outside the depot
+    // max time en route
     private final double timeLimit;
 
     private final Schedule<? extends AbstractTask> schedule;
 
 
-    public VehicleImpl(Id id, String name, Depot depot, double capacity, double t0, double t1,
+    public VehicleImpl(Id id, String name, Link startLink, double capacity, double t0, double t1,
             double timeLimit)
     {
         this.id = id;
         this.name = name;
-        this.depot = depot;
+        this.startLink = startLink;
         this.capacity = capacity;
         this.t0 = t0;
         this.t1 = t1;
@@ -74,9 +75,9 @@ public class VehicleImpl
 
 
     @Override
-    public Depot getDepot()
+    public Link getStartLink()
     {
-        return depot;
+        return startLink;
     }
 
 

@@ -91,17 +91,16 @@ public class NOSRankTaxiOptimizer
                     .getLastTask(schedule);
 
             Link link = dropoffStayTask.getLink();
-            Link depotLink = schedule.getVehicle().getDepot().getLink();
+            Link startLink = schedule.getVehicle().getStartLink();
 
-            if (link != depotLink) {
+            if (link != startLink) {
                 double t5 = dropoffStayTask.getEndTime();
-                VrpPathWithTravelData path = calculator.calcPath(link, depotLink, t5);
+                VrpPathWithTravelData path = calculator.calcPath(link, startLink, t5);
                 schedule.addTask(new TaxiCruiseDriveTask(path));
 
                 double t6 = path.getArrivalTime();
                 double tEnd = Math.max(t6, Schedules.getActualT1(schedule));
-                schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getDepot()
-                        .getLink()));
+                schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getStartLink()));
             }
             else {
                 super.appendWaitAfterDropoff(schedule);
@@ -139,7 +138,7 @@ public class NOSRankTaxiOptimizer
             Task last = Schedules.getLastTask(veh.getSchedule());
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
-                if (!lastw.getLink().equals(veh.getDepot().getLink())) {
+                if (!lastw.getLink().equals(veh.getStartLink())) {
                     if (this.depotArrivalDepartureCharger.needsToReturnToRank(new IdImpl(veh
                             .getName()))) {
                         scheduleRankReturn(veh);
@@ -177,12 +176,12 @@ public class NOSRankTaxiOptimizer
 
         Link lastLink = lastTask.getLink();
 
-        if (veh.getDepot().getLink() != lastLink) {// not a loop
-            VrpPathWithTravelData path = calculator.calcPath(lastLink, veh.getDepot().getLink(), currentTime);
+        if (veh.getStartLink() != lastLink) {// not a loop
+            VrpPathWithTravelData path = calculator.calcPath(lastLink, veh.getStartLink(), currentTime);
             sched.addTask(new TaxiCruiseDriveTask(path));
 
             double arrivalTime = path.getArrivalTime();
-            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldEndTime, veh.getDepot().getLink()));
+            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldEndTime, veh.getStartLink()));
             // System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:"
             // +oldendtime);
         }
@@ -197,7 +196,7 @@ public class NOSRankTaxiOptimizer
             Task last = Schedules.getLastTask(veh.getSchedule());
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
-                if (!lastw.getLink().equals(veh.getDepot().getLink())) {
+                if (!lastw.getLink().equals(veh.getStartLink())) {
                     this.shortTimeIdlers.add(veh.getId());
                 }
             }

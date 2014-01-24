@@ -120,7 +120,8 @@ public class TaxiRankReader
         double chargeInJoules = getDouble(atts, "battery_charge_kWh", 20) * 1000 * 3600;
         double capacityInJoules = getDouble(atts, "battery_capacity_kWh", 20) * 1000 * 3600;
 
-        ElectricVehicle ev = new VrpAgentElectricTaxi(taxiId, name, currentRank, t0, t1, ecm);
+        ElectricVehicle ev = new VrpAgentElectricTaxi(taxiId, name, currentRank.getLink(), t0, t1,
+                ecm);
         ev.setBattery(new BatteryImpl(chargeInJoules, capacityInJoules));
         vehicles.add(ev);
     }

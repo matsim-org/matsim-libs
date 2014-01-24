@@ -197,7 +197,7 @@ public class VrpLauncherUtils
             Schedule<Task> schedule = (Schedule<Task>)veh.getSchedule();
 
             schedule.addTask(new StayTaskImpl(veh.getT0(), Schedules.getActualT1(schedule), veh
-                    .getDepot().getLink()));
+                    .getStartLink(), "wait"));
         }
 
         return vrpData;

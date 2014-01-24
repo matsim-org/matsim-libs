@@ -134,7 +134,7 @@ public class ScheduleImpl<T extends AbstractTask>
             }
         }
         else { // taskIdx == 0
-            if (vehicle.getDepot().getLink() != beginLink) {
+            if (vehicle.getStartLink() != beginLink) {
                 throw new IllegalArgumentException();
             }
         }

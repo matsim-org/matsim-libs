@@ -20,7 +20,7 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.model.Depot;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.model.impl.VehicleImpl;
 
 
@@ -31,10 +31,10 @@ public class VrpAgentVehicleImpl
     private VrpAgentLogic agentLogic;
 
 
-    public VrpAgentVehicleImpl(Id id, String name, Depot depot, double capacity, double t0,
+    public VrpAgentVehicleImpl(Id id, String name, Link startLink, double capacity, double t0,
             double t1, double timeLimit)
     {
-        super(id, name, depot, capacity, t0, t1, timeLimit);
+        super(id, name, startLink, capacity, t0, t1, timeLimit);
     }
 
 

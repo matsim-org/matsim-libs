@@ -113,7 +113,7 @@ public class Schedules
         List<T> tasks = schedule.getTasks();
 
         if (tasks.size() == 0) {
-            return schedule.getVehicle().getDepot().getLink();
+            return schedule.getVehicle().getStartLink();
         }
 
         Task task = tasks.get(tasks.size() - 1);

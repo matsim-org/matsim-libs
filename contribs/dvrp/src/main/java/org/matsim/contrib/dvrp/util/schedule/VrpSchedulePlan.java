@@ -63,17 +63,17 @@ public class VrpSchedulePlan
 
     private void init()
     {
-        Link depotLink = vehicle.getDepot().getLink();
+        Link startLink = vehicle.getStartLink();
 
         Schedule<?> schedule = vehicle.getSchedule();
 
-        if (schedule.getStatus().isUnplanned()) {// vehicle stays at the depot
-            addActivity(depotLink, -1, "RtU");
+        if (schedule.getStatus().isUnplanned()) {// vehicle stays on startLink
+            addActivity(startLink, -1, "RtU");
             return;
         }
 
-        // Depot - before schedule.getBeginTime()
-        addActivity(depotLink, schedule.getBeginTime(), "RtP");
+        // before schedule.getBeginTime()
+        addActivity(startLink, schedule.getBeginTime(), "RtP");
 
         for (Task t : schedule.getTasks()) {
             switch (t.getType()) {
@@ -91,8 +91,8 @@ public class VrpSchedulePlan
             }
         }
 
-        // Depot - after schedule.getEndTime()
-        addActivity(depotLink, -1, "RtC");
+        // after schedule.getEndTime()
+        addActivity(startLink, -1, "RtC");
     }
 
 

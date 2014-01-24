@@ -113,8 +113,8 @@ public class DepotReader
         double t1 = getDouble(atts, "t1", 24 * 60 * 60);
         double tLimit = getDouble(atts, "tLimit", t1 - t0);
 
-        vehicles.add(new VrpAgentVehicleImpl(vehicleId, name, currentDepot, capacity, t0, t1,
-                tLimit));
+        vehicles.add(new VrpAgentVehicleImpl(vehicleId, name, currentDepot.getLink(), capacity, t0,
+                t1, tLimit));
     }
 
 

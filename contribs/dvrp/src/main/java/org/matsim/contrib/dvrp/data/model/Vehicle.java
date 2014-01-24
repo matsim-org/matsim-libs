@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.data.model;
 
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.schedule.*;
 
 
@@ -32,7 +33,7 @@ public interface Vehicle
     String getName();
 
 
-    Depot getDepot();// TODO or just BasicLocation getStartLocation()?? and getEndLocation()??
+    Link getStartLink();// TODO or just BasicLocation getStartLocation()?? and getEndLocation()??
 
 
     double getCapacity();
@@ -45,7 +46,7 @@ public interface Vehicle
     double getT1();
 
 
-    // max time outside the depot
+    // max time en route
     double getTimeLimit();
 
 
