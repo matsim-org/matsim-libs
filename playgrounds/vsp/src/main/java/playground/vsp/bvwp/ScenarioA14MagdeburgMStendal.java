@@ -57,7 +57,7 @@ P2030_2010_A14_induz_ME2.wid
  9.17;      7.76;      5.60;     10.46;      4.38;      5.04;      
  9.13;      7.73;      5.58;     10.41;      4.37;      5.02; */
 
-class A14MagdeburgMStendal {
+class ScenarioA14MagdeburgMStendal {
 
 	static private final String MagdeburgMStendal = "MagdeburgMitte--Stendal";
 

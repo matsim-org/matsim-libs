@@ -27,7 +27,7 @@ abstract class UtilityChanges {
 		// (GK-GK') * x + 0.5 * (GK-GK') (x'-x) =
 		// 0.5 * (GK-GK') (x+x') = 0.5 * ( GK*x + GK*x' - GK'*x - GK'*x' )
 
-		// yyyy these two can't be here if html is initialized in user code!
+		// yyyy some of the following can't be here if html is initialized in user code!
 		html.beginHtml() ;
 		html.beginBody() ;
 		html.beginTable() ;
@@ -35,7 +35,7 @@ abstract class UtilityChanges {
 
 		double utils = 0. ;
 		double utilsUserFromRoH = 0. ;
-//		double operatorProfit = 0. ;
+
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
 			Utils.initializeOutputTables(html);				
 
@@ -98,12 +98,23 @@ abstract class UtilityChanges {
 					if ( mode != improvedMode ) {
 						// compute completely on the side of the giving modes:
 						Utils.writeSubHeaderVerlagert(html, id, segm, mode, deltaAmounts);
+						
+						final double utilsBefore = utils ;
  
 						utils += computeAndPrintGivingOrReceiving(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving, 
 								econValues, attributesNullfall, attributesPlanfall, html);
 
+						if ( utils != utilsBefore ) {
+							Utils.writePartialSum(html, "Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr bei Verlagerung:", utils - utilsBefore);
+						}
+
 						utils += computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
 								econValues, attributesNullfall, attributesPlanfall, html);
+						
+						if ( utils != utilsBefore ) {
+							Utils.writePartialSum(html, "Nutzen&auml;nderung bei Verlagerung gesamt:" , utils - utilsBefore);
+						}
+						
 					}
 
 					// roh etc. stuff (for comparison):
@@ -147,7 +158,7 @@ abstract class UtilityChanges {
 				}
 				partialUtl += implUtlInduced ;
 				if ( partialUtl != 0. ) {
-					Utils.writePartialSum(html, partialUtl );
+					Utils.writePartialSum(html, null, partialUtl );
 				}
 				utils += partialUtl ;
 
@@ -156,6 +167,9 @@ abstract class UtilityChanges {
 		} // relation
 
 		Utils.writeSum(html, utils);
+		
+		// ================================
+		// ROH et al:
 
 		double operatorProfit = 0. ;
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
@@ -171,7 +185,7 @@ abstract class UtilityChanges {
 					operatorProfit = computeOperatorProfit(operatorProfit, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
 					if ( operatorProfit != operatorProfitBefore ){
 						html.beginTableMulticolumnRow();
-						html.write( "Operator profit gain; " + mode.toString() + ": " + (operatorProfit-operatorProfitBefore) );
+						html.write( "Operator profit gain; " + mode.toString() + ": " + Utils.convertToMillions(operatorProfit-operatorProfitBefore) );
 						html.endTableRow();
 					}
 				}
@@ -252,7 +266,7 @@ abstract class UtilityChanges {
 				}
 			}
 			if ( partialUtils != 0. ) {
-				Utils.writePartialSum(html, partialUtils) ;
+				Utils.writePartialSum(html, null, partialUtils) ;
 			}
 			utils += partialUtils ;
 		}
@@ -287,7 +301,7 @@ abstract class UtilityChanges {
 		double util = implicitUtlOverall + implicitUtlOverallReceiving ;
 
 		if ( util != 0. ) {
-			Utils.writePartialSum(html, util);
+			Utils.writePartialSum(html, null, util);
 		}
 
 		return util ;
@@ -342,7 +356,7 @@ abstract class UtilityChanges {
 			}
 		}
 		if ( utils != 0. ) {
-			Utils.writePartialSum(html, utils);
+			Utils.writePartialSum(html, null, utils);
 		}
 		return utils;
 	}

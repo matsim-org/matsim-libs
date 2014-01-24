@@ -135,7 +135,7 @@ class Html {
 		fmt.format("%12.6f", dbl ) ;
 		fmt.close(); 
 		
-		myWrite( stb.toString() ) ;
+		this.beginDivRightAlign() ; myWrite( stb.toString() ) ; this.endDiv() ;
 	}
 
 	private void myWrite( String str ) {

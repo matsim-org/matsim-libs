@@ -15,10 +15,10 @@ public class IllustrationZielnetzRoad {
 		economicValues = EconomicValues.createEconomicValuesZielnetzRoad();
 
 		// create the base case:
-		nullfall = ScenarioZielnetzRoad.createNullfall1() ;
+		nullfall = ScenarioA14MagdeburgMStendal.createNullfall1() ;
 
 		// create the policy case:
-		planfall = ScenarioZielnetzRoad.createPlanfallStrassenausbau(nullfall);
+		planfall = ScenarioA14MagdeburgMStendal.createPlanfallStrassenausbau(nullfall);
 
 //		runBVWP2003();
 //		runBVWP2010();

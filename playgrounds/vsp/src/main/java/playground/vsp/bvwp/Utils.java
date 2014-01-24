@@ -37,10 +37,13 @@ class Utils {
 
 	private Utils() {} // not to be instantiated
 
-	static void writePartialSum(Html html, double utils) {
+	static void writePartialSum(Html html, String text, double utils) {
 		System.out.printf("--------------------%163.1e mio\n", utils / 1000. / 1000.  ) ;
 		html.beginTableMulticolumnRow(); 
 		html.beginDivRightAlign();
+		if ( text!=null ) {
+			html.write( text );
+		}
 		html.write("<strong>" + convertToMillions(utils) +"</strong>" ) ;
 		html.endDiv() ;
 		html.endTableRow(); 
@@ -94,8 +97,8 @@ class Utils {
 		html.endTableRow() ;
 	
 		html.beginTableMulticolumnRow() ;
-		html.write("RoH: utl gain users: " + utilsUserFromRoH + "; operator profit gain: " + operatorProfit
-				+ "; sum: " + (utilsUserFromRoH+operatorProfit) ) ;
+		html.write("RoH: utl gain users: " + Utils.convertToMillions(utilsUserFromRoH) + "; operator profit gain: " + Utils.convertToMillions(operatorProfit)
+				+ "; sum: " + Utils.convertToMillions(utilsUserFromRoH+operatorProfit) ) ;
 		html.endTableRow() ;
 	
 		html.endTable() ;

@@ -55,7 +55,7 @@ P2030_2010_A14_induz_ME2.wid
   310301; 1305603;    188.96;    217.73;    206.53;    193.60;     37.58;     42.39;     19.91;     16.84;     12.16;     23.34;      9.52;     10.95;     22.52;     19.06;    13.76;     26.48;     10.77;     12.39;
  */
 
-class ScenarioZielnetzRoad {
+class ScenarioA14WolfsburgRoebel {
 
 	static private final String WolfsburgRoebel = "Wolfsburg--Roebel";
 
