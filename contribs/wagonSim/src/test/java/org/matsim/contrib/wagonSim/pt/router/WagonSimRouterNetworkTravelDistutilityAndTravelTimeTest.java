@@ -311,13 +311,13 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		veh.getVehicleTypes().put(vt1.getId(), vt1);
 		
 		Vehicle v = factory.createVehicle(sc.createId("v1"), vt1);
-		veh.getVehicles().put(v.getId(), v);
+		veh.addVehicle( v);
 		
 		v = factory.createVehicle(sc.createId("v2"), vt1);
-		veh.getVehicles().put(v.getId(), v);
+		veh.addVehicle( v);
 		
 		v = factory.createVehicle(sc.createId("v3"), vt1);
-		veh.getVehicles().put(v.getId(), v);
+		veh.addVehicle( v);
 	}
 
 

@@ -164,12 +164,12 @@ import org.matsim.vehicles.VehiclesFactory;
         capacity.setSeats(Integer.valueOf(101));
         capacity.setStandingRoom(Integer.valueOf(0));
         vehicleType.setCapacity(capacity);
-        vehicles.getVehicles().put(this.scenario.createId("veh1"), vb.createVehicle(this.scenario.createId("veh1"), vehicleType));
-        vehicles.getVehicles().put(this.scenario.createId("veh2"), vb.createVehicle(this.scenario.createId("veh2"), vehicleType));
-        vehicles.getVehicles().put(this.scenario.createId("veh3"), vb.createVehicle(this.scenario.createId("veh3"), vehicleType));
-        vehicles.getVehicles().put(this.scenario.createId("veh4"), vb.createVehicle(this.scenario.createId("veh4"), vehicleType));
-        vehicles.getVehicles().put(this.scenario.createId("veh5"), vb.createVehicle(this.scenario.createId("veh5"), vehicleType));
-        vehicles.getVehicles().put(this.scenario.createId("veh6"), vb.createVehicle(this.scenario.createId("veh6"), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh1"), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh2"), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh3"), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh4"), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh5"), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh6"), vehicleType));
 	}
 	
 	protected void buildBlueLine() {
