@@ -286,9 +286,9 @@ public class SfCottbusPtSchedule {
 		int vehid = 0;
 		for (int i = 0; i<5;i++){
 			Id vd = new IdImpl(lineName+"_"+i);
-		if (this.pt_mode.equals("pt")) this.vehicles.getVehicles().put(vd, this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("bus_90pax"))));
-		if (this.pt_mode.equals("tram")) this.vehicles.getVehicles().put(vd, this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("tram_93pax"))));
-		if (this.pt_mode.equals("train")) this.vehicles.getVehicles().put(vd, this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("train"))));
+		if (this.pt_mode.equals("pt")) this.vehicles.addVehicle( this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("bus_90pax"))));
+		if (this.pt_mode.equals("tram")) this.vehicles.addVehicle( this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("tram_93pax"))));
+		if (this.pt_mode.equals("train")) this.vehicles.addVehicle( this.vehicles.getFactory().createVehicle(vd, this.vehicles.getVehicleTypes().get(new IdImpl("train"))));
 		
 		}
 		while (currentDep <= lastDep) {

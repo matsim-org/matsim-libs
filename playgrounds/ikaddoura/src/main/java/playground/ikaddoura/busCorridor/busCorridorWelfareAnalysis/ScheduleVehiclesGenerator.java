@@ -493,7 +493,7 @@ public class ScheduleVehiclesGenerator {
 
 		for (Id vehicleId : vehicleIdList){
 			Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, veh.getVehicleTypes().get(vehTypeId));
-			veh.getVehicles().put(vehicleId, vehicle);
+			veh.addVehicle( vehicle);
 		}
 		
 		return vehicleIdList;

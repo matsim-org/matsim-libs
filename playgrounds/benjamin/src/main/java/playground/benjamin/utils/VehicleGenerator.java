@@ -89,7 +89,7 @@ public class VehicleGenerator {
 			
 			Vehicle vehicle = vehicleFactory.createVehicle(vehicleId, vehicleType);
 			
-			vehicles.getVehicles().put(vehicleId, vehicle);
+			vehicles.addVehicle( vehicle);
 		}
 		return vehicles;
 	}

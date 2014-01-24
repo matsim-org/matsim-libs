@@ -154,7 +154,7 @@ public class AccessEgressDemo {
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
 		for (int i = 0; i < nOfBuses; i++) {
-			vehicles.getVehicles().put(this.ids[i], vb.createVehicle(this.ids[i], vehicleType));
+			vehicles.addVehicle( vb.createVehicle(this.ids[i], vehicleType));
 		}
 	}
 

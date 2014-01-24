@@ -324,7 +324,7 @@ public class VehicleScheduleGenerator {
 		} else {
 			for (Id vehicleId : vehicleIDs){
 				Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, veh.getVehicleTypes().get(vehTypeId));
-				veh.getVehicles().put(vehicleId, vehicle);
+				veh.addVehicle( vehicle);
 			}
 		}
 	}

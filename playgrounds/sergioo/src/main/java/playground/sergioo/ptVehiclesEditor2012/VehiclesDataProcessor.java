@@ -243,7 +243,7 @@ public class VehiclesDataProcessor {
 												vehicles.getVehicleTypes().put(vehicleType.getId(), vehicleType);
 											}
 										}
-										vehicles.getVehicles().put(departure.getVehicleId(),new VehicleImpl(departure.getVehicleId(), vehicleType));		
+										vehicles.addVehicle(new VehicleImpl(departure.getVehicleId(), vehicleType));		
 										break;
 									}
 								}

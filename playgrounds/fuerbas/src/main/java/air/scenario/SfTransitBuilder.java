@@ -190,7 +190,7 @@ public class SfTransitBuilder {
 				veh.getVehicleTypes().put(vehTypeId, type); 
 			}
 			Vehicle vehicle = veh.getFactory().createVehicle(flightNumber, type); 
-			veh.getVehicles().put(flightNumber, vehicle);
+			veh.addVehicle( vehicle);
 			
 		}
 		

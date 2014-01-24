@@ -331,6 +331,7 @@ public class CrowdednessTest
 		type.setMaximumVelocity(speed);
 		scen.getVehicles().addVehicleType(type);
 		Vehicle vehicle = vFac.createVehicle(scen.createId("vehicle"), type);
+
 		scen.getVehicles().addVehicle(vehicle);
 		
 		NetworkRoute route = RouteUtils.createNetworkRoute(routeIds, net);

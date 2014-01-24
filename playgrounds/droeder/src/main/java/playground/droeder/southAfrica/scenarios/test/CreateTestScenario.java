@@ -311,7 +311,7 @@ class CreateTestScenario {
 			if(vehicles.isEmpty()){
 				//currently we have no vehicle. create a new on, add to vehicles-container
 				v = new VehicleImpl(new IdImpl(mode + vehCnt++), vType);
-				((ScenarioImpl) sc).getVehicles().getVehicles().put(v.getId(), v);
+				((ScenarioImpl) sc).getVehicles().addVehicle( v);
 			}else{
 				//check, if the first vehicle of the queue should have finished its route. Poll it, if so
 				if(vehicles.peekFirst().getSecond() <= i){
@@ -321,7 +321,7 @@ class CreateTestScenario {
 				else{
 					
 					v = new VehicleImpl(new IdImpl(mode + vehCnt++), vType);
-					((ScenarioImpl) sc).getVehicles().getVehicles().put(v.getId(), v);
+					((ScenarioImpl) sc).getVehicles().addVehicle( v);
 				}
 			}
 			
@@ -397,7 +397,7 @@ class CreateTestScenario {
 			if(vehicles.isEmpty()){
 				//currently we have no vehicle. create a new on, add to vehicles-container
 				v = new VehicleImpl(new IdImpl(mode + vehCnt++), vType);
-				((ScenarioImpl) sc).getVehicles().getVehicles().put(v.getId(), v);
+				((ScenarioImpl) sc).getVehicles().addVehicle( v);
 			}else{
 				//check, if the first vehicle of the queue should have finished its route. Poll it, if so
 				if(vehicles.peekFirst().getSecond() <= i){
@@ -407,7 +407,7 @@ class CreateTestScenario {
 				else{
 					
 					v = new VehicleImpl(new IdImpl(mode + vehCnt++), vType);
-					((ScenarioImpl) sc).getVehicles().getVehicles().put(v.getId(), v);
+					((ScenarioImpl) sc).getVehicles().addVehicle( v);
 				}
 			}
 			

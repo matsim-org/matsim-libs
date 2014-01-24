@@ -73,7 +73,7 @@ class TransitScenarioManipulator {
 					if(vt.contains(v.getType().getId().toString())){
 						toBeAdded = true;
 						newRoute.addDeparture(d);
-						result.getVehicles().getVehicles().put(v.getId(), v);
+						result.getVehicles().addVehicle( v);
 					}
 				}
 				if(toBeAdded){

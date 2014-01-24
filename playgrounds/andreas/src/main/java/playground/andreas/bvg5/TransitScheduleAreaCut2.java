@@ -315,7 +315,7 @@ public class TransitScheduleAreaCut2 {
 			// set the vehicle for the departure
 			newDep.setVehicleId(v.getId());
 			// store the new vehicle
-			this.newVehicles.getVehicles().put(v.getId(), v);
+			this.newVehicles.addVehicle( v);
 			// and the new departure
 			newDepartures.add(newDep);
 			this.vehicleCnt++;
@@ -455,7 +455,7 @@ public class TransitScheduleAreaCut2 {
 //		
 //		VehicleType type = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(sc.createId("bus"));
 //		Vehicle v = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicle(sc.createId("bus1"), type);
-//		((ScenarioImpl) sc).getVehicles().getVehicles().put(v.getId(), v);
+//		((ScenarioImpl) sc).getVehicles().addVehicle( v);
 //		((ScenarioImpl) sc).getVehicles().getVehicleTypes().put(type.getId(), type);
 //		
 //		TransitSchedule schedule = sc.getTransitSchedule();

@@ -142,7 +142,7 @@ public class Visum2TransitSchedule {
 								log.error("Could not find any vehicle combination for deparutre " + d.index + " used in line " + line.id.toString() + ".");
 							} else {
 								Vehicle veh = vb.createVehicle(new IdImpl("tr_" + vehId++), vehType);
-								this.vehicles.getVehicles().put(veh.getId(), veh);
+								this.vehicles.addVehicle( veh);
 								departure.setVehicleId(veh.getId());
 								tRoute.addDeparture(departure);
 							}

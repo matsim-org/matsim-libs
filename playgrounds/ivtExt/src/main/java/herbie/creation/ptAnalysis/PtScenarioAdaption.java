@@ -221,7 +221,7 @@ public class PtScenarioAdaption {
 		
 		for(Id id : newVehiclesMap.keySet()){
 			
-			scenario.getVehicles().getVehicles().put(id, newVehiclesMap.get(id));
+			scenario.getVehicles().addVehicle( newVehiclesMap.get(id));
 		}
 	}
 

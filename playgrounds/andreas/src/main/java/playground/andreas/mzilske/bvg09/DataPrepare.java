@@ -244,7 +244,7 @@ public class DataPrepare {
 		long vehId = 0;
 		for (Umlauf umlauf : umlaeufe) {
 			Vehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
-			this.scenario.getVehicles().getVehicles().put(veh.getId(), veh);
+			this.scenario.getVehicles().addVehicle( veh);
 			umlauf.setVehicleId(veh.getId());
 		}
 	}

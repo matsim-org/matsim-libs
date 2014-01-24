@@ -72,7 +72,7 @@ public class PVehiclesFactory {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
 					Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
-					vehicles.getVehicles().put(vehicle.getId(), vehicle);
+					vehicles.addVehicle( vehicle);
 				}
 			}
 		}

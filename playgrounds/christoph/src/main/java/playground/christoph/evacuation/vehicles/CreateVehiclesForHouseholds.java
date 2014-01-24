@@ -69,7 +69,7 @@ public class CreateVehiclesForHouseholds {
 			veh.getType().setCapacity(cap);
 			cap.setSeats(info.getFirstCapacity());
 			vehicleIds.add(veh.getId());
-			vehicles.getVehicles().put(veh.getId(), veh);
+			vehicles.addVehicle( veh);
 		}
 		if (numVehicles > 1) {
 			Vehicle veh = vehicles.getFactory().createVehicle(scenario.createId(idString + "_veh2"), VehicleUtils.getDefaultVehicleType());
@@ -77,7 +77,7 @@ public class CreateVehiclesForHouseholds {
 			veh.getType().setCapacity(cap);
 			cap.setSeats(info.getSecondCapacity());
 			vehicleIds.add(veh.getId());
-			vehicles.getVehicles().put(veh.getId(), veh);
+			vehicles.addVehicle( veh);
 		}
 		if (numVehicles > 2) {
 			Vehicle veh = vehicles.getFactory().createVehicle(scenario.createId(idString + "_veh3"), VehicleUtils.getDefaultVehicleType());
@@ -85,7 +85,7 @@ public class CreateVehiclesForHouseholds {
 			veh.getType().setCapacity(cap);
 			cap.setSeats(info.getThirdCapacity());
 			vehicleIds.add(veh.getId());
-			vehicles.getVehicles().put(veh.getId(), veh);
+			vehicles.addVehicle( veh);
 		}
 		
 		/*
@@ -104,7 +104,7 @@ public class CreateVehiclesForHouseholds {
 			veh.getType().setCapacity(cap);
 			cap.setSeats(5);
 			vehicleIds.add(veh.getId());
-			vehicles.getVehicles().put(veh.getId(), veh);
+			vehicles.addVehicle( veh);
 			counter3Plus.incCounter();
 		}
 	}

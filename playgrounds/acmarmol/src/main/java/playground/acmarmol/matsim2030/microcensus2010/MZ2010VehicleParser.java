@@ -136,7 +136,7 @@ public class MZ2010VehicleParser {
 						
 			// creating matsim vehicle
 			Vehicle vehicle = vehicles.getFactory().createVehicle(new IdImpl(hhnr.concat(fznr)), new VehicleTypeImpl(new IdImpl(type))); 
-			vehicles.getVehicles().put(vehicle.getId(), vehicle);
+			vehicles.addVehicle( vehicle);
 			
 			
 			//filling vehicles data into matsim households

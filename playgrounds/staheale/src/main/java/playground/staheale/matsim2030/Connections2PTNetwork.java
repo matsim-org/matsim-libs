@@ -205,7 +205,7 @@ public class Connections2PTNetwork {
 					Departure dep = scheduleFactory.createDeparture(depId, time);
 					Id vehID = sc.createId(bezirkNummer+knotenNummer+1+i);
 					Vehicle virtualVehicle = vehicleFactory.createVehicle(vehID, virtualVehicleType);
-					PTvehicles.getVehicles().put(vehID, virtualVehicle);
+					PTvehicles.addVehicle( virtualVehicle);
 					dep.setVehicleId(vehID);
 					newTransitRoute1.addDeparture(dep);
 				}
@@ -232,7 +232,7 @@ public class Connections2PTNetwork {
 					Departure dep2 = scheduleFactory.createDeparture(depId2, time);
 					Id vehID = sc.createId(bezirkNummer+knotenNummer+2+i);
 					Vehicle virtualVehicle = vehicleFactory.createVehicle(vehID, virtualVehicleType);
-					PTvehicles.getVehicles().put(vehID, virtualVehicle);
+					PTvehicles.addVehicle( virtualVehicle);
 					dep2.setVehicleId(vehID);
 					newTransitRoute2.addDeparture(dep2);
 				}
@@ -328,7 +328,7 @@ public class Connections2PTNetwork {
 						Departure dep = scheduleFactory.createDeparture(depId, time);
 						Id vehID = sc.createId(arr1.get(0)+arr2.get(0)+1+i);
 						Vehicle virtualVehicle = vehicleFactory.createVehicle(vehID, virtualVehicleType);
-						PTvehicles.getVehicles().put(vehID, virtualVehicle);
+						PTvehicles.addVehicle( virtualVehicle);
 						dep.setVehicleId(vehID);
 						nTransitRoute1.addDeparture(dep);
 					}
@@ -353,7 +353,7 @@ public class Connections2PTNetwork {
 						Departure dep = scheduleFactory.createDeparture(depId, time);
 						Id vehID = sc.createId(arr1.get(0)+arr2.get(0)+2+i);
 						Vehicle virtualVehicle = vehicleFactory.createVehicle(vehID, virtualVehicleType);
-						PTvehicles.getVehicles().put(vehID, virtualVehicle);
+						PTvehicles.addVehicle( virtualVehicle);
 						dep.setVehicleId(vehID);
 						nTransitRoute2.addDeparture(dep);
 					}

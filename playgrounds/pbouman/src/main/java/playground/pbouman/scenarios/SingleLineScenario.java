@@ -173,7 +173,7 @@ public class SingleLineScenario
 			type.setMaximumVelocity(20);
 			scen.getVehicles().getVehicleTypes().put(type.getId(), type);
 			Vehicle veh = vFac.createVehicle(scen.createId("r1dep"+t+"veh"), type);
-			scen.getVehicles().getVehicles().put(veh.getId(), veh);
+			scen.getVehicles().addVehicle( veh);
 			dep.setVehicleId(veh.getId());
 			
 			

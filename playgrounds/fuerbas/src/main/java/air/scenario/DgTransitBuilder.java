@@ -123,7 +123,7 @@ public class DgTransitBuilder {
 				veh.getVehicleTypes().put(typeId, vehType);
 			}
 			Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, vehType);
-			veh.getVehicles().put(vehicleId, vehicle);
+			veh.addVehicle( vehicle);
 		}
 		
 	}

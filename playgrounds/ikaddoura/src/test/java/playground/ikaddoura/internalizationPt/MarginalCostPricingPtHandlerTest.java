@@ -2152,7 +2152,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 	}
 	
 	private void setPopulationTestInVehicleDelay02(Scenario scenario) {
@@ -2352,7 +2352,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 	}
 		
@@ -2667,7 +2667,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay01(Scenario scenario) {
@@ -2942,7 +2942,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay02(Scenario scenario) {
@@ -3217,7 +3217,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay03(Scenario scenario) {
@@ -3500,10 +3500,10 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId2, vehicle2);
+		veh.addVehicle( vehicle2);
 	}
 
 	private void setPopulationTestWaitingDelay03b(Scenario scenario) {
@@ -3786,10 +3786,10 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId2, vehicle2);
+		veh.addVehicle( vehicle2);
 	}
 	
 	private void setPopulationTestWaitingDelay04(Scenario scenario) {
@@ -4077,7 +4077,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay05(Scenario scenario) {
@@ -4365,7 +4365,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay06(Scenario scenario) {
@@ -4767,13 +4767,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId2, vehicle2);
+		veh.addVehicle( vehicle2);
 		
 		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId3, vehicle3);
+		veh.addVehicle( vehicle3);
 	}
 	
 	private void setPopulationTestCapacityDelay01(Scenario scenario) {
@@ -5077,13 +5077,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId2, vehicle2);
+		veh.addVehicle( vehicle2);
 		
 		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId3, vehicle3);
+		veh.addVehicle( vehicle3);
 	}
 	
 	private void setPopulationTestCapacityDelay02(Scenario scenario) {
@@ -5387,13 +5387,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId2, vehicle2);
+		veh.addVehicle( vehicle2);
 		
 		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId3, vehicle3);
+		veh.addVehicle( vehicle3);
 	}
 
 	private void setPopulationTestCapacityDelay03(Scenario scenario) {
@@ -5723,13 +5723,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId2, vehicle2);
+		veh.addVehicle( vehicle2);
 		
 		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId3, vehicle3);
+		veh.addVehicle( vehicle3);
 	}
 
 	private void setPopulationTestCapacityDelay04(Scenario scenario) {
@@ -6046,13 +6046,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId2, vehicle2);
+		veh.addVehicle( vehicle2);
 		
 		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId3, vehicle3);
+		veh.addVehicle( vehicle3);
 	}
 
 	private void setPopulationTestCapacityDelay05(Scenario scenario) {
@@ -6382,13 +6382,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		veh.getVehicleTypes().put(vehTypeId1, type); 
 		
 		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle1);
+		veh.addVehicle( vehicle1);
 		
 		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId2, vehicle2);
+		veh.addVehicle( vehicle2);
 		
 		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId3, vehicle3);
+		veh.addVehicle( vehicle3);
 	}
 
 }

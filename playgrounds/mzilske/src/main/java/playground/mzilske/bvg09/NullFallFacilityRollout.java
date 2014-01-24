@@ -340,7 +340,7 @@ public class NullFallFacilityRollout {
 			}
 			Vehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
 			outScenario.getVehicles().getVehicleTypes().put(vehicleType.getId(), vehicleType);
-			outScenario.getVehicles().getVehicles().put(veh.getId(), veh);
+			outScenario.getVehicles().addVehicle( veh);
 			umlauf.setVehicleId(veh.getId());
 		}
 	}

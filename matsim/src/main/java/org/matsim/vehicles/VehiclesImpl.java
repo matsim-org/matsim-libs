@@ -60,8 +60,9 @@ class VehiclesImpl implements Vehicles {
 	public final Map<Id, Vehicle> getVehicles() {
 		// XXX should be immutable, but requires refactoring of contribs
 		// and playgrounds before
-		//return Collections.unmodifiableMap(this.vehicles);
-		return this.vehicles;
+		// done. kai, jan'14
+		return Collections.unmodifiableMap(this.vehicles);
+//		return this.vehicles;
 	}
 
 

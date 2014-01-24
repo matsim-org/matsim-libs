@@ -195,7 +195,7 @@ public class CreateInitialTimeSchedule {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
 					Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
-					this.veh.getVehicles().put(vehicle.getId(), vehicle);
+					this.veh.addVehicle( vehicle);
 				}
 			}
 		}

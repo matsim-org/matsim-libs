@@ -168,7 +168,7 @@ public class PTLinesGenerator {
 		// departures
 		for (int i = 0; i < (Integer) stop.numDepSpinnerValue; i++) {
 			Vehicle veh = vf.createVehicle(new IdImpl(id.toString() + "_veh_" + i), vt);
-			vehicles.getVehicles().put(veh.getId(), veh);
+			vehicles.addVehicle( veh);
 			Departure dep = this.fac.createDeparture(new IdImpl(id.toString() + "_dep_" + i), depTime);
 			dep.setVehicleId(veh.getId());
 			tr.addDeparture(dep);

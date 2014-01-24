@@ -312,7 +312,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		VehicleType vehicleType = this.emissionVehicles.getFactory().createVehicleType(vehTypeId);
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			Vehicle vehicle = this.emissionVehicles.getFactory().createVehicle(person.getId(), vehicleType);
-			this.emissionVehicles.getVehicles().put(vehicle.getId(), vehicle);
+			this.emissionVehicles.addVehicle( vehicle);
 		}
 	}
 

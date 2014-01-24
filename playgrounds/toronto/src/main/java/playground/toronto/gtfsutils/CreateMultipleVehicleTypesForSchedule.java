@@ -100,7 +100,7 @@ public class CreateMultipleVehicleTypesForSchedule {
 					String i = "VehType" + vehTypeId.toString() + "_" + numberOfVehiclesByType.get(vehTypeId);
 					Vehicle v = vb.createVehicle(new IdImpl(i), this.vehicles.getVehicleTypes().get(vehTypeId));
 					numberOfVehiclesByType.put(vehTypeId, numberOfVehiclesByType.get(vehTypeId) + 1);
-					this.vehicles.getVehicles().put(v.getId(), v);
+					this.vehicles.addVehicle( v);
 					departure.setVehicleId(v.getId());
 				}
 			}

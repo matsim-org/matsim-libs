@@ -211,7 +211,7 @@ public class GeneratePopulation {
 					vehicleId = new IdImpl(caseid + "." + "additional_car_" + nCar);
 				}
 				Vehicle vehicle = vehicles.getFactory().createVehicle(vehicleId, vehicleType(car.baujahr, car.antriebsart, car.hubraum));
-				vehicles.getVehicles().put(vehicle.getId(), vehicle);
+				vehicles.addVehicle( vehicle);
 				household.getVehicleIds().add(vehicle.getId());
 				peopleWhoNeedCar.remove(vehicleId);
 				++nCar;
@@ -226,7 +226,7 @@ public class GeneratePopulation {
 				}
 				
 				Vehicle vehicle = vehicles.getFactory().createVehicle(personWhoNeedsCar, vehicleType);
-				vehicles.getVehicles().put(vehicle.getId(), vehicle);
+				vehicles.addVehicle( vehicle);
 				household.getVehicleIds().add(vehicle.getId());
 				++nCar;
 			}

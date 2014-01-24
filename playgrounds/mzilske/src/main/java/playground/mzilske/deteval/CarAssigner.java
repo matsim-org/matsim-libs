@@ -56,7 +56,7 @@ public class CarAssigner implements Runnable {
 	private void createCarWithPersonId(Person person) {
 		Id vehicleId = person.getId();
 		Vehicle vehicle = vehicles.getFactory().createVehicle(vehicleId, defaultType);
-		vehicles.getVehicles().put(vehicleId, vehicle);
+		vehicles.addVehicle( vehicle);
 	}
 
 }

@@ -198,9 +198,9 @@ public class BlockingStopDemo {
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
 		Id id = new IdImpl("tr_1");
-		vehicles.getVehicles().put(id, vb.createVehicle(id, vehicleType));
+		vehicles.addVehicle( vb.createVehicle(id, vehicleType));
 		id = new IdImpl("tr_2");
-		vehicles.getVehicles().put(id, vb.createVehicle(id, vehicleType));
+		vehicles.addVehicle( vb.createVehicle(id, vehicleType));
 	}
 
 	private void createPopulation() {

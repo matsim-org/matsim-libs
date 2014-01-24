@@ -114,7 +114,7 @@ public class EmissionVehicleGenerator {
 			}
 			
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(personId, vehicleType);
-			outputVehicles.getVehicles().put(vehicle.getId(), vehicle);
+			outputVehicles.addVehicle( vehicle);
 		}
 		
 		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(outputVehicles);

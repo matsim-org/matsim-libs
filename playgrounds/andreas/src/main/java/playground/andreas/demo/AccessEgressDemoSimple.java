@@ -213,15 +213,15 @@ public class AccessEgressDemoSimple {
 		trainType.setEgressTime(0.1);
 		
 		for (int i = 0; i < nOfBuses/2; i++) {
-			vehicles.getVehicles().put(new IdImpl(i), vb.createVehicle(new IdImpl(i), busType));
+			vehicles.addVehicle( vb.createVehicle(new IdImpl(i), busType));
 		}
 		
 		for (int i = nOfBuses/2; i < nOfBuses; i++) {
-			vehicles.getVehicles().put(new IdImpl(i), vb.createVehicle(new IdImpl(i), trainType));
+			vehicles.addVehicle( vb.createVehicle(new IdImpl(i), trainType));
 		}		
 		
 		for (int i = 0; i < nOfBuses; i++) {
-			vehicles.getVehicles().put(new IdImpl(i + nOfBuses), vb.createVehicle(new IdImpl(i + nOfBuses), busType));
+			vehicles.addVehicle( vb.createVehicle(new IdImpl(i + nOfBuses), busType));
 		}
 	}
 

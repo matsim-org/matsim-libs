@@ -367,7 +367,7 @@
 //		for (Umlauf umlauf : umlaeufe) {
 //			Id vehId = umlauf.getId();
 //			BasicVehicle veh = vb.createVehicle(vehId, vehicleType);
-//			this.scenario.getVehicles().getVehicles().put(veh.getId(), veh);
+//			this.scenario.getVehicles().addVehicle( veh);
 //			umlauf.setVehicleId(veh.getId());
 //		}
 //

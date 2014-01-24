@@ -138,7 +138,7 @@ public class Visum2TransitSchedule {
 			if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString())) {
 				Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
 				Vehicle veh = this.vehicles.getFactory().createVehicle(new IdImpl("tr_" + nextVehicleId++), vehType);
-				this.vehicles.getVehicles().put(veh.getId(), veh);
+				this.vehicles.addVehicle( veh);
 				departure.setVehicleId(veh.getId());
 				tRoute.addDeparture(departure);
 			}

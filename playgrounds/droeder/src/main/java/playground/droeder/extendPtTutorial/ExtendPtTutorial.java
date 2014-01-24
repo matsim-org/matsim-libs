@@ -128,7 +128,7 @@ class ExtendPtTutorial {
 		for(int i = 0; i< 86400; i+= 600){
 			d = fac.createDeparture(sc.createId(String.valueOf(i)), i);
 			v = vFac.createVehicle(sc.createId(String.valueOf(i)), type);
-			((ScenarioImpl) sc).getVehicles().getVehicles().put(v.getId(), v);
+			((ScenarioImpl) sc).getVehicles().addVehicle( v);
 			d.setVehicleId(v.getId());
 			route.addDeparture(d);
 		}

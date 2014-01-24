@@ -183,7 +183,7 @@ public class CreateTestTransit {
 		
 		for(int i = 0; i < vehicleCounter; i++){
 			VehicleImpl bus = new VehicleImpl(new IdImpl(vehicle + i),typeBus);
-			vehicles.getVehicles().put(bus.getId(), bus);
+			vehicles.addVehicle( bus);
 		}
 		
 		return vehicles;

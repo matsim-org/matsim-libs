@@ -292,7 +292,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		//Departures w/ vehicles
 		for (int i =0; i < 30; i++) {
 			Vehicle veh = vf.createVehicle(new IdImpl("bus_"+(i*5)*60), vt);
-			vehicles.getVehicles().put(veh.getId(), veh);
+			vehicles.addVehicle( veh);
 			Departure dep = fac.createDeparture(new IdImpl(i), (i*5)*60);
 			dep.setVehicleId(veh.getId());
 			tr.addDeparture(dep);
