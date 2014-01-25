@@ -67,7 +67,4 @@
 		<param name="travelTimeBinSize" value="900" />
 	</module>
 
-	<module name="vspExperimental" >
-		<param name="useActivityDurations" value="true" />
-	</module>
 </config>
