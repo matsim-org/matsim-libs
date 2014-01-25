@@ -30,9 +30,6 @@ import org.matsim.contrib.dvrp.data.schedule.*;
 public interface Vehicle
     extends Identifiable
 {
-    String getName();
-
-
     Link getStartLink();// TODO or just BasicLocation getStartLocation()?? and getEndLocation()??
 
 
@@ -44,10 +41,6 @@ public interface Vehicle
 
 
     double getT1();
-
-
-    // max time en route
-    double getTimeLimit();
 
 
     Schedule<? extends Task> getSchedule();

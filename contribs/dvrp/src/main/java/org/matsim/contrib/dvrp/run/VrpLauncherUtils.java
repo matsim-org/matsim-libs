@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.DepotReader;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.data.schedule.impl.StayTaskImpl;
@@ -190,14 +190,13 @@ public class VrpLauncherUtils
     public static VrpData initVrpData(Scenario scenario, String depotsFileName)
     {
         VrpData vrpData = new VrpDataImpl();
-        new DepotReader(scenario, vrpData).readFile(depotsFileName);
+        new VehicleReader(scenario, vrpData).readFile(depotsFileName);
 
         for (Vehicle veh : vrpData.getVehicles()) {
             @SuppressWarnings("unchecked")
             Schedule<Task> schedule = (Schedule<Task>)veh.getSchedule();
 
-            schedule.addTask(new StayTaskImpl(veh.getT0(), Schedules.getActualT1(schedule), veh
-                    .getStartLink(), "wait"));
+            schedule.addTask(new StayTaskImpl(veh.getT0(), veh.getT1(), veh.getStartLink(), "wait"));
         }
 
         return vrpData;

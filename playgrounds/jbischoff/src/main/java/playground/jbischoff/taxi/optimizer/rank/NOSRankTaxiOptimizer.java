@@ -27,7 +27,6 @@ import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.immediaterequest.NOSTaxiOptimizer;
@@ -99,7 +98,7 @@ public class NOSRankTaxiOptimizer
                 schedule.addTask(new TaxiCruiseDriveTask(path));
 
                 double t6 = path.getArrivalTime();
-                double tEnd = Math.max(t6, Schedules.getActualT1(schedule));
+                double tEnd = Math.max(t6, schedule.getVehicle().getT1());
                 schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getStartLink()));
             }
             else {
@@ -139,8 +138,7 @@ public class NOSRankTaxiOptimizer
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
                 if (!lastw.getLink().equals(veh.getStartLink())) {
-                    if (this.depotArrivalDepartureCharger.needsToReturnToRank(new IdImpl(veh
-                            .getName()))) {
+                    if (this.depotArrivalDepartureCharger.needsToReturnToRank(veh.getId())) {
                         scheduleRankReturn(veh);
                     }
                 }

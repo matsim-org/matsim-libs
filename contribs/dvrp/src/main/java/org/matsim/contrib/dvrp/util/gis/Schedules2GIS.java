@@ -75,7 +75,7 @@ public class Schedules2GIS
 
                 if (coords != null) {
                     features.add(this.factory.createPolyline(coords,
-                            new Object[] { v.getId(), v.getName(), v.getId(), drive.getTaskIdx() },
+                            new Object[] { v.getId(), v.getId(), drive.getTaskIdx() },
                             null));
                 }
             }

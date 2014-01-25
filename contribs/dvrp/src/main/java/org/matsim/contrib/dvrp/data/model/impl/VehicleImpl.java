@@ -30,31 +30,23 @@ public class VehicleImpl
     implements Vehicle
 {
     private final Id id;
-    private final String name;
     private final Link startLink;
-
     private final double capacity;
 
     // TW for vehicle
     private final double t0;
     private final double t1;
 
-    // max time en route
-    private final double timeLimit;
-
     private final Schedule<? extends AbstractTask> schedule;
 
 
-    public VehicleImpl(Id id, String name, Link startLink, double capacity, double t0, double t1,
-            double timeLimit)
+    public VehicleImpl(Id id, Link startLink, double capacity, double t0, double t1)
     {
         this.id = id;
-        this.name = name;
         this.startLink = startLink;
         this.capacity = capacity;
         this.t0 = t0;
         this.t1 = t1;
-        this.timeLimit = timeLimit;
 
         schedule = new ScheduleImpl<AbstractTask>(this);
     }
@@ -64,13 +56,6 @@ public class VehicleImpl
     public Id getId()
     {
         return id;
-    }
-
-
-    @Override
-    public String getName()
-    {
-        return name;
     }
 
 
@@ -99,13 +84,6 @@ public class VehicleImpl
     public double getT1()
     {
         return t1;
-    }
-
-
-    @Override
-    public double getTimeLimit()
-    {
-        return timeLimit;
     }
 
 

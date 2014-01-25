@@ -130,7 +130,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
             // COMPLETED or STARTED but delayed (time window T1 exceeded)
             if (schedule.getStatus() == ScheduleStatus.COMPLETED
-                    || currentTime >= Schedules.getActualT1(schedule)) {
+                    || currentTime >= veh.getT1()) {
                 // skip this vehicle
                 continue;
             }
@@ -311,7 +311,7 @@ public abstract class ImmediateRequestTaxiOptimizer
 
         // addWaitTime at the end (even 0-second WAIT)
         double t5 = dropoffStayTask.getEndTime();
-        double tEnd = Math.max(t5, Schedules.getActualT1(schedule));
+        double tEnd = Math.max(t5, schedule.getVehicle().getT1());
         Link link = dropoffStayTask.getLink();
 
         schedule.addTask(new TaxiWaitStayTask(t5, tEnd, link));

@@ -27,9 +27,6 @@ import org.matsim.contrib.dvrp.data.schedule.StayTask;
 public interface Charger
     extends BasicLocation, Identifiable
 {
-    String getName();
-
-
     Link getLink();
 
 

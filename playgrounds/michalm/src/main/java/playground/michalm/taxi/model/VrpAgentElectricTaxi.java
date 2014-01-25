@@ -34,10 +34,10 @@ public class VrpAgentElectricTaxi
     private EnergyConsumptionModel ecm;
 
 
-    public VrpAgentElectricTaxi(Id id, String name, Link startLink, double t0, double t1,
+    public VrpAgentElectricTaxi(Id id, Link startLink, double t0, double t1,
             EnergyConsumptionModel ecm)
     {
-        super(id, name, startLink, 4, t0, t1, t1 - t0);
+        super(id, startLink, 4, t0, t1);
         this.ecm = ecm;
     }
 

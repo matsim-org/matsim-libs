@@ -23,29 +23,30 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.*;
-import org.matsim.contrib.dvrp.data.model.impl.DepotImpl;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import playground.michalm.taxi.TaxiData;
-import playground.michalm.taxi.model.VrpAgentElectricTaxi;
+import playground.michalm.taxi.model.*;
 
 
 public class TaxiRankReader
     extends MatsimXmlParser
 {
-    private final static String RANK = "depot";
-    private final static String TAXI = "vehicle";
+    private final static String RANK = "rank";
+    private final static String VEHICLE = "vehicle";
     private final static String CHARGER = "charger";
 
     private final Scenario scenario;
     private final TaxiData data;
+    private Map<Id, ? extends Link> links;
+
     private final EnergyConsumptionModel ecm;
 
-    private Depot currentRank;
+    private TaxiRank currentRank;
 
 
     public TaxiRankReader(Scenario scenario, TaxiData data, EnergyConsumptionModel ecm)
@@ -53,6 +54,8 @@ public class TaxiRankReader
         this.scenario = scenario;
         this.data = data;
         this.ecm = ecm;
+
+        links = scenario.getNetwork().getLinks();
     }
 
 
@@ -68,8 +71,8 @@ public class TaxiRankReader
         if (RANK.equals(name)) {
             startRank(atts);
         }
-        else if (TAXI.equals(name)) {
-            startTaxi(atts);
+        else if (VEHICLE.equals(name)) {
+            startVehicle(atts);
         }
         else if (CHARGER.equals(name)) {
             startCharger(atts);
@@ -84,44 +87,36 @@ public class TaxiRankReader
 
     private void startRank(Attributes atts)
     {
-        List<Depot> depots = data.getDepots();
+        List<TaxiRank> depots = data.getTaxiRanks();
 
-        int id = depots.size();
-        Id rankId = scenario.createId(id + "");
+        Id id = scenario.createId(atts.getValue("id"));
 
         String name = atts.getValue("name");
-        if (name == null) {
-            name = "R_" + id;
-        }
 
-        Id linkId = scenario.createId(atts.getValue("linkId"));
+        Id linkId = scenario.createId(atts.getValue("link"));
         Link link = scenario.getNetwork().getLinks().get(linkId);
 
-        currentRank = new DepotImpl(rankId, name, link);
+        currentRank = new TaxiRank(id, name, link);
         depots.add(currentRank);
     }
 
 
-    private void startTaxi(Attributes atts)
+    private void startVehicle(Attributes atts)
     {
         List<Vehicle> vehicles = data.getVehicles();
 
-        int id = vehicles.size();
-        Id taxiId = scenario.createId(id + "");
+        Id id = scenario.createId(atts.getValue("id"));
 
-        String name = atts.getValue("name");
-        if (name == null) {
-            name = "T_" + id;
-        }
+        Id startLinkId = scenario.createId(atts.getValue("start_link"));
+        Link startLink = links.get(startLinkId);
 
-        double t0 = getDouble(atts, "t0", 0);
-        double t1 = getDouble(atts, "t1", 24 * 60 * 60);
+        double t0 = getDouble(atts, "t_0", 0);
+        double t1 = getDouble(atts, "t_1", 24 * 60 * 60);
 
         double chargeInJoules = getDouble(atts, "battery_charge_kWh", 20) * 1000 * 3600;
         double capacityInJoules = getDouble(atts, "battery_capacity_kWh", 20) * 1000 * 3600;
 
-        ElectricVehicle ev = new VrpAgentElectricTaxi(taxiId, name, currentRank.getLink(), t0, t1,
-                ecm);
+        ElectricVehicle ev = new VrpAgentElectricTaxi(id, startLink, t0, t1, ecm);
         ev.setBattery(new BatteryImpl(chargeInJoules, capacityInJoules));
         vehicles.add(ev);
     }
@@ -131,17 +126,11 @@ public class TaxiRankReader
     {
         List<Charger> chargers = data.getChargers();
 
-        int id = chargers.size();
-        Id chargerId = scenario.createId(id + "");
+        Id id = scenario.createId(atts.getValue("id"));
 
-        String name = atts.getValue("name");
-        if (name == null) {
-            name = "Ch_" + id;
-        }
+        double powerInWatts = getDouble(atts, "power_kW", 20) * 1000;
 
-        double powerInJoules = getDouble(atts, "power_kW", 20) * 1000;
-
-        chargers.add(new ChargerImpl(chargerId, name, powerInJoules, currentRank.getLink()));
+        chargers.add(new ChargerImpl(id, powerInWatts, currentRank.getLink()));
     }
 
 

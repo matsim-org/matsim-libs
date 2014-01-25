@@ -31,7 +31,14 @@ public class TaxiData
     extends VrpDataImpl
     implements ElectricVrpData
 {
+    private final List<TaxiRank> taxiRanks = new ArrayList<TaxiRank>();
     private final List<Charger> chargers = new ArrayList<Charger>();
+
+
+    public List<TaxiRank> getTaxiRanks()
+    {
+        return taxiRanks;
+    }
 
 
     public List<Charger> getChargers()

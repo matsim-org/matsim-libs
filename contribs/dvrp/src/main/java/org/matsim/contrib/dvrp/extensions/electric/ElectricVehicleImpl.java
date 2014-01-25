@@ -31,10 +31,10 @@ public class ElectricVehicleImpl
     private Battery battery;
 
 
-    public ElectricVehicleImpl(Id id, String name, Link startLink, double capacity, double t0,
-            double t1, double timeLimit, Battery battery)
+    public ElectricVehicleImpl(Id id, Link startLink, double capacity, double t0, double t1,
+            Battery battery)
     {
-        super(id, name, startLink, capacity, t0, t1, timeLimit);
+        super(id, startLink, capacity, t0, t1);
         this.battery = battery;
     }
 

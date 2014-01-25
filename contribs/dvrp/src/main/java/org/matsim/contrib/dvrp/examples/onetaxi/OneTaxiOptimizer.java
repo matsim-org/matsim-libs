@@ -91,7 +91,7 @@ public class OneTaxiOptimizer
         schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, "dropoff", req));
 
         //just wait (and be ready) till the end of the vehicle's time window (T1)
-        double tEnd = Schedules.getActualT1(schedule);
+        double tEnd = vehicle.getT1();
         schedule.addTask(new StayTaskImpl(t4, tEnd, toLink, "wait"));
     }
 

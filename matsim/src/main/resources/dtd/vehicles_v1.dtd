@@ -7,23 +7,13 @@
 
 <!-- ============================================================ -->
 
-<!ELEMENT depots (depot)*>
-
-<!ELEMENT depot (vehicles)?>
-
-<!ATTLIST depot
-	name	CDATA	#IMPLIED
-	linkId	CDATA	#REQUIRED>
-
 <!ELEMENT vehicles (vehicle)*>
 
 <!ELEMENT vehicle EMPTY>
 
 <!ATTLIST vehicle
-	name	CDATA	#IMPLIED
-	capacity	CDATA	#IMPLIED
-	cost	CDATA	#IMPLIED
-	t0	CDATA	#IMPLIED
-	t1	CDATA	#IMPLIED
-	tLimit	CDATA	#IMPLIED>
-
+	id          CDATA   #REQUIRED
+	start_link  CDATA   #REQUIRED
+	capacity    CDATA   #IMPLIED
+	t_0         CDATA   #IMPLIED
+	t_1         CDATA   #IMPLIED>

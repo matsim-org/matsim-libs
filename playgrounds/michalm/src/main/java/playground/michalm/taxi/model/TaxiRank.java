@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.model.impl;
+package playground.michalm.taxi.model;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Depot;
 
 
-public class DepotImpl
-    implements Depot
+public class TaxiRank
+    implements BasicLocation
 {
     private final Id id;
     private final String name;
     private final Link link;
 
 
-    public DepotImpl(Id id, String name, Link link)
+    public TaxiRank(Id id, String name, Link link)
     {
         this.id = id;
         this.name = name;
@@ -48,29 +47,20 @@ public class DepotImpl
 
 
     @Override
-    public String getName()
-    {
-        return name;
-    }
-
-
-    @Override
-    public Link getLink()
-    {
-        return link;
-    }
-
-
-    @Override
     public Coord getCoord()
     {
         return link.getCoord();
     }
 
 
-    @Override
-    public String toString()
+    public String getName()
     {
-        return "Depot_" + id;
+        return name;
+    }
+
+
+    public Link getLink()
+    {
+        return link;
     }
 }

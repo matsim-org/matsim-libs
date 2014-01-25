@@ -21,11 +21,9 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
@@ -73,13 +71,11 @@ public class IdleRankVehicleFinder
 	}
     
 	private boolean hasEnoughCapacityForTask(Vehicle veh){
-    		Id vid = new IdImpl(veh.getName());
-    		return this.depotarrivaldeparturecharger.isChargedForTask(vid);
+    		return this.depotarrivaldeparturecharger.isChargedForTask(veh.getId());
     }
 	
 	private double getVehicleSoc(Vehicle veh){
-		Id vid = new IdImpl(veh.getName());
-		return this.depotarrivaldeparturecharger.getVehicleSoc(vid);
+		return this.depotarrivaldeparturecharger.getVehicleSoc(veh.getId());
 	}
     
     

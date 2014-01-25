@@ -22,8 +22,6 @@ package org.matsim.contrib.dvrp.data.schedule;
 import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.data.schedule.Task.TaskType;
 
 import com.google.common.base.Predicate;
@@ -57,18 +55,6 @@ public class Schedules
             return t1.getTaskIdx() - t2.getTaskIdx();
         }
     };
-
-
-    public static double getActualT1(Schedule<?> schedule)
-    {
-        Vehicle veh = schedule.getVehicle();
-
-        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
-            return veh.getT1();
-        }
-
-        return Math.min(veh.getT1(), schedule.getBeginTime() + veh.getTimeLimit());
-    }
 
 
     public static <T extends Task> T getFirstTask(Schedule<T> schedule)

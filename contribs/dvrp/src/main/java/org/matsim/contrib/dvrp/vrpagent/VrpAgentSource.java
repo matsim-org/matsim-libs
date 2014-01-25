@@ -74,7 +74,7 @@ public class VrpAgentSource
             VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator,
                     (VrpAgentVehicle)vrpVeh);
 
-            Id id = data.getScenario().createId(vrpVeh.getName());
+            Id id = vrpVeh.getId();
             Id startLinkId = vrpVeh.getStartLink().getId();
 
             DynAgent taxiAgent = new DynAgent(id, startLinkId, qSim, vrpAgentLogic);

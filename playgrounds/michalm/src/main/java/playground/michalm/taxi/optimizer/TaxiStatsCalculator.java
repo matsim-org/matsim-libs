@@ -23,7 +23,7 @@ import java.io.PrintWriter;
 
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.model.*;
-import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.data.schedule.Schedule;
 
 import playground.michalm.taxi.schedule.*;
 
@@ -89,7 +89,7 @@ public class TaxiStatsCalculator
             }
         }
 
-        double latestValidEndTime = Schedules.getActualT1(schedule);
+        double latestValidEndTime = schedule.getVehicle().getT1();
         double actualEndTime = schedule.getEndTime();
 
         if (actualEndTime > latestValidEndTime) {

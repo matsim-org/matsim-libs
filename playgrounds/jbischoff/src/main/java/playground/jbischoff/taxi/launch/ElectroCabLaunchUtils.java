@@ -23,12 +23,11 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.*;
+import org.matsim.contrib.dvrp.data.model.Vehicle;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
@@ -36,6 +35,8 @@ import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
+import playground.michalm.taxi.TaxiData;
+import playground.michalm.taxi.model.TaxiRank;
 
 
 /**
@@ -77,15 +78,14 @@ public class ElectroCabLaunchUtils
         if (ALLCARSELECTRIC) {
 
             for (Vehicle v : data.getVrpData().getVehicles()) {
-                Id aid = new IdImpl(v.getName());
+                Id aid = v.getId();
                 elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm, 20 * 1000 * 3600));
                 travelDistanceEvaluator.addAgent(aid);
             }
         }
 
         for (Vehicle v : data.getVrpData().getVehicles()) {
-            Id aid = new IdImpl(v.getName());
-            travelDistanceEvaluator.addAgent(aid);
+            travelDistanceEvaluator.addAgent(v.getId());
         }
 
         energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
@@ -98,8 +98,8 @@ public class ElectroCabLaunchUtils
         handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
 
         List<Id> depotLinkIds = new ArrayList<Id>();
-        for (Depot d : data.getVrpData().getDepots()) {
-            depotLinkIds.add(d.getLink().getId());
+        for (TaxiRank r : ((TaxiData)data.getVrpData()).getTaxiRanks()) {
+            depotLinkIds.add(r.getLink().getId());
         }
 
         depotArrivalDepartureCharger.setDepotLocations(depotLinkIds);

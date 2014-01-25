@@ -27,17 +27,15 @@ public class ChargerImpl
     implements Charger
 {
     private final Id id;
-    private final String name;
     private final double powerInWatts;
     private final Link link;
 
     private final ChargingSchedule<? extends ChargeTask> schedule;
 
 
-    public ChargerImpl(Id id, String name, double powerInWatts, Link link)
+    public ChargerImpl(Id id, double powerInWatts, Link link)
     {
         this.id = id;
-        this.name = name;
         this.powerInWatts = powerInWatts;
         this.link = link;
 
@@ -49,13 +47,6 @@ public class ChargerImpl
     public Id getId()
     {
         return id;
-    }
-
-
-    @Override
-    public String getName()
-    {
-        return name;
     }
 
 

@@ -62,7 +62,7 @@ public class ScheduleChartUtils
         List<Vehicle> vehicles = data.getVehicles();
         String[] series = new String[vehicles.size()];
         for (int i = 0; i < series.length; i++) {
-            series[i] = vehicles.get(i).getName();
+            series[i] = vehicles.get(i).getId().toString();
         }
 
         SymbolAxis symbolAxis = new SymbolAxis("Vehicles", series);
@@ -188,7 +188,7 @@ public class ScheduleChartUtils
             @SuppressWarnings("unchecked")
             Schedule<T> schedule = (Schedule<T>)v.getSchedule();
 
-            final TaskSeries scheduleTaskSeries = new TaskSeries(v.getName());
+            final TaskSeries scheduleTaskSeries = new TaskSeries(v.getId().toString());
 
             if (schedule.getStatus().isUnplanned()) {
                 collection.add(scheduleTaskSeries);

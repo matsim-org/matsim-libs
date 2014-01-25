@@ -26,9 +26,6 @@ import org.matsim.contrib.dvrp.data.model.*;
 
 public interface VrpData
 {
-    List<Depot> getDepots();
-
-
     List<Vehicle> getVehicles();
 
 

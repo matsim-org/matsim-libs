@@ -31,10 +31,10 @@ public class VrpAgentVehicleImpl
     private VrpAgentLogic agentLogic;
 
 
-    public VrpAgentVehicleImpl(Id id, String name, Link startLink, double capacity, double t0,
-            double t1, double timeLimit)
+    public VrpAgentVehicleImpl(Id id, Link startLink, double capacity, double t0,
+            double t1)
     {
-        super(id, name, startLink, capacity, t0, t1, timeLimit);
+        super(id, startLink, capacity, t0, t1);
     }
 
 
