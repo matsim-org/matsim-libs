@@ -54,7 +54,7 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 	private boolean hasLinkCosts = false;
 
 	public RoadPricingReaderXMLv1(RoadPricingSchemeImpl scheme){
-	  this.scheme = scheme;
+		this.scheme = scheme;
 	}
 
 	@Override
@@ -63,14 +63,23 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 			this.scheme.setName(atts.getValue(ATTR_NAME));
 			this.scheme.setType(atts.getValue(ATTR_TYPE));
 		} else if (TAG_LINK.equals(name)) {
-		  this.currentLinkId = new IdImpl(atts.getValue(ATTR_ID));
-		} else if (TAG_COST.equals(name) && this.currentLinkId == null) {
-			this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
-					Time.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
-		} else if (TAG_COST.equals(name) && this.currentLinkId != null){
-      this.scheme.addLinkCost(this.currentLinkId, Time.parseTime(atts.getValue(ATTR_START_TIME)),
-          Time.parseTime(atts.getValue(ATTR_END_TIME)), Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
-      this.hasLinkCosts = true;
+			this.currentLinkId = new IdImpl(atts.getValue(ATTR_ID));
+		} else {
+			final String endTimeString = atts.getValue(ATTR_END_TIME);
+			double endTime = Time.parseTime(endTimeString);
+			if (endTimeString == null || endTimeString.length() == 0 || endTimeString.equals("undefined")) {
+				// (the above is the "undefined" definition from Time.parseTime...)
+				endTime = Double.POSITIVE_INFINITY ;
+				// (interpretation: an undefined toll end time very presumably means that it should last until +infty. kai, jan'14)
+			}
+			if (TAG_COST.equals(name) && this.currentLinkId == null) {
+				this.scheme.addCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
+						endTime, Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
+			} else if (TAG_COST.equals(name) && this.currentLinkId != null){
+				this.scheme.addLinkCost(this.currentLinkId, Time.parseTime(atts.getValue(ATTR_START_TIME)),
+						endTime, Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
+				this.hasLinkCosts = true;
+			}
 		}
 
 	}
@@ -81,11 +90,11 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 			this.scheme.setDescription(content);
 		}
 		else if (TAG_LINK.equals(name)){
-		  if (!hasLinkCosts){
-		    this.scheme.addLink(this.currentLinkId);
-		  }
-		  this.currentLinkId = null;
-		  this.hasLinkCosts = false;
+			if (!hasLinkCosts){
+				this.scheme.addLink(this.currentLinkId);
+			}
+			this.currentLinkId = null;
+			this.hasLinkCosts = false;
 		}
 	}
 

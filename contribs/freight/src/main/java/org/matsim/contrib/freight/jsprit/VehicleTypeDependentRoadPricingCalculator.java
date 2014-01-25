@@ -88,7 +88,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 		if(pricingSchemes == null) return 0.0; 
 		double toll = 0.0;
 		for(RoadPricingScheme rps : pricingSchemes){
-			Cost linkCostInfo = rps.getLinkCostInfo(link.getId(), time, null);
+			Cost linkCostInfo = rps.getLinkCostInfo(link.getId(), time, null, null);
 			toll += calculators.get(rps.getType()).getTollAmount(linkCostInfo,link);
 		}
 		return toll; 

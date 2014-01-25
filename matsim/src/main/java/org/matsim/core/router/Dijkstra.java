@@ -208,11 +208,11 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
+	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person2, final Vehicle vehicle2) {
 
 		augmentIterationId(); // this call makes the class not thread-safe
-		this.person = person;
-		this.vehicle = vehicle;
+		this.person = person2;
+		this.vehicle = vehicle2;
 
 		if (this.pruneDeadEnds) {
 			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();

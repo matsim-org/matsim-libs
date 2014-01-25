@@ -47,6 +47,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -99,6 +100,8 @@ public class GautengControler_subpopulations {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		OutputDirectoryLogging.catchLogEntries();
+
 		Header.printHeader(GautengControler_subpopulations.class.toString(),
 				args);
 		/* Config must be passed as an argument, everything else is optional. */
@@ -166,6 +169,7 @@ public class GautengControler_subpopulations {
 		config.controler().setOutputDirectory("/Users/jwjoubert/Documents/Temp/sanral-runs");
 		if ( user==User.kai ) {
 			config.controler().setOutputDirectory("/Users/nagel/gauteng-kairuns/output");
+
 		}
 		
 		config.global().setNumberOfThreads(numberOfThreads);
@@ -179,10 +183,21 @@ public class GautengControler_subpopulations {
 			
 			config.controler().setLastIteration(100);
 
-			config.parallelEventHandling().setNumberOfThreads(1);
+			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
+			
+			config.counts().setCountsFileName( KNGautengController.GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz");
+			config.counts().setCountsScaleFactor(100.);
+			config.counts().setOutputFormat("all");
 			
 			config.qsim().setEndTime(36.*3600.);
 			
+			config.qsim().setFlowCapFactor(0.01);
+			config.qsim().setStorageCapFactor(0.03);
+			config.qsim().setStuckTime(10.);
+			config.qsim().setRemoveStuckVehicles(false);
+			
+			config.qsim().setSnapshotPeriod(Double.POSITIVE_INFINITY);
+			config.controler().setWriteSnapshotsInterval(0);
 		}
 		
 		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
@@ -205,6 +220,8 @@ public class GautengControler_subpopulations {
 		final Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
 		
+		// SET VEHICLES ...
+		// ... at beginning:
 		controler.addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
@@ -218,13 +235,7 @@ public class GautengControler_subpopulations {
 			}
 		});
 
-		if (sc.getConfig().scenario().isUseRoadpricing()) {
-			throw new RuntimeException(
-					"roadpricing must NOT be enabled in config.scenario in order to use special "
-							+ "road pricing features.  aborting ...");
-		}
-		
-		// CONSTRUCT ROUTING ALGO WHICH ALSO SETS VEHICLES:
+		// ... during replanning (this also needs to be registered as strategy in the config):
 		controler.addPlanStrategyFactory(RE_ROUTE_AND_SET_VEHICLE, new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(final Scenario scenario, EventsManager eventsManager) {
@@ -235,6 +246,13 @@ public class GautengControler_subpopulations {
 			}
 		});
 
+		// ROAD PRICING:
+		if (sc.getConfig().scenario().isUseRoadpricing()) {
+			throw new RuntimeException(
+					"roadpricing must NOT be enabled in config.scenario in order to use special "
+							+ "road pricing features.  aborting ...");
+		}
+		
 		final TollFactorI tollFactor = new SanralTollFactor_Subpopulation(sc);
 
 		// SOME STATISTICS:
@@ -320,9 +338,9 @@ public class GautengControler_subpopulations {
 		for (Person p : sc.getPopulation().getPersons().values()) {
 			String vehicleType = (String) sc.getPopulation()
 					.getPersonAttributes()
-					.getAttribute(p.getId().toString(), "vehicleTollClass");
+					.getAttribute(p.getId().toString(), SanralTollFactor_Subpopulation.VEH_TOLL_CLASS_ATTRIB_NAME);
 			Boolean eTag = (Boolean) sc.getPopulation().getPersonAttributes()
-					.getAttribute(p.getId().toString(), "eTag");
+					.getAttribute(p.getId().toString(), SanralTollFactor_Subpopulation.E_TAG_ATTRIBUTE_NAME);
 
 			/* Create the vehicle. */
 			Vehicle v = null;
@@ -338,7 +356,7 @@ public class GautengControler_subpopulations {
 			}
 			vehicles.addVehicle(v);
 					
-			vehicles.getVehicleAttributes().putAttribute(v.getId().toString(), "eTag", eTag);
+			vehicles.getVehicleAttributes().putAttribute(v.getId().toString(), SanralTollFactor_Subpopulation.E_TAG_ATTRIBUTE_NAME, eTag);
 
 			sc.getPopulation().getPersonAttributes().putAttribute( p.getId().toString(), VEH_ID, v.getId() );
 		}

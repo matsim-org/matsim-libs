@@ -152,11 +152,9 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 	}
 
 	@Override
-	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId) {
+	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId, Id vehicleId) {
 		// this is the default road pricing scheme, which ignores the person.  kai, mar'12
-		// (I have decided to put the person into the method call rather than the setPerson construction in TravelDisutility etc.
-		// Reason: A big advantage of agent-based simulation over traditional methods is heterogeneity of agent population.
-		// But if we make this hard to use, the advantage shrinks.  kai, mar'12)
+		// Now also added vehicleId as an argument, which is also ignored at the default level. kai, apr'14
 
 		if (this.cacheIsInvalid) buildCache(); //(*)
 		if (this.linkIds.containsKey(linkId)) {
@@ -186,7 +184,7 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 		this.costCache = this.costs.toArray(this.costCache);
 		this.cacheIsInvalid = false;
 	}
-
+	
 	/**
 	 * A single, time-dependent toll-amount for a roadpricing scheme.
 	 *
@@ -201,6 +199,11 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 			this.startTime = startTime;
 			this.endTime = endTime;
 			this.amount = amount;
+		}
+		
+		@Override
+		public String toString() {
+			return "startTime: " + this.startTime + " endTime: " + this.endTime + " amount: " + this.amount ;
 		}
 	}
 }

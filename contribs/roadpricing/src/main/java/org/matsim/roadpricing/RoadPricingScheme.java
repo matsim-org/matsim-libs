@@ -78,15 +78,19 @@ public interface RoadPricingScheme {
 	 * But if we make this hard to use, the advantage shrinks.  kai, mar'12
 	 * <li> It should truly be based on the vehicle (type).  But since vehicles have not yet universally annealed to a 
 	 * robust state, I am sticking with persons.  kai, mar'12
+	 * <li> In jan'14 Johan is far enough to use this with vehicles rather than tolls.  However, I can imagine situations where
+	 * there is also a discount for persons, e.g. disabled or low income.  Since it is also easier to refactor by just adding the 
+	 * vehId, this is what I will do.  kai, jan'14
 	 * </ul>
 	 *
 	 * @param linkId
 	 * @param time
+	 * @param vehicleId TODO
 	 * @param person TODO
 	 * @return The cost object for the given link at the specified time,
 	 * <code>null</code> if the link is either not part of the tolling scheme
 	 * or there is no toll at the specified time for the link.
 	 */
-	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId);
+	public Cost getLinkCostInfo(final Id linkId, final double time, Id personId, Id vehicleId);
 
 }

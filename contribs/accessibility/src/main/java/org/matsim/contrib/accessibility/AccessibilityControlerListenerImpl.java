@@ -554,7 +554,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	 */
 	double getToll(Link nearestLink) {
 		if(scheme != null){
-			Cost cost = scheme.getLinkCostInfo(nearestLink.getId(), depatureTime, null);
+			Cost cost = scheme.getLinkCostInfo(nearestLink.getId(), depatureTime, null, null);
 			if(cost != null)
 				return cost.amount;
 		}

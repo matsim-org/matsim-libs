@@ -64,7 +64,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, Person
 	public void handleEvent(final LinkEnterEvent event) {
 		
 		// getting the (monetary? generalized?) cost of the link
-		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getPersonId() );
+		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getPersonId(), event.getVehicleId() );
 		
 		if (cost != null && cost.amount > 0.0) {
 			// i.e. if there is a toll on the link

@@ -120,9 +120,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	}
 
-	/* 
-	 * yyyyyy There are two "active" functionalities (see isActive()).  It probably still works, but it does not look like
-	 * it is intended this way.  kai, nov'11
+	/** 
+	 * Links are active while (see checkForActivity()): () vehicles move on it; () vehicles wait to enter; () vehicles wait at the transit stop.
+	 * Once all of those have left the link, the link is no longer active.  It then needs to be activated from the outside, which is done by
+	 * this method.
 	 */
 	@Override
 	void activateLink() {
@@ -173,7 +174,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 		// moveWaitToBuffer moves waiting (i.e. just departed) vehicles into the buffer.
 
-		this.active = this.isHavingActivity();
+		this.active = this.checkForActivity();
 		return active;
 	}
 
@@ -340,7 +341,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		return this.visdata;
 	}
 
-	private boolean isHavingActivity() {
+	private boolean checkForActivity() {
 		/*
 		 * Leave Link active as long as there are vehicles on the link (ignore
 		 * buffer because the buffer gets emptied by nodes and not links) and leave

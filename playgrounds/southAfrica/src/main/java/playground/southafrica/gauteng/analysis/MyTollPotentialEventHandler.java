@@ -90,7 +90,7 @@ public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 					 * in the map. If so, increment its toll tally. If not, add 
 					 * it to the map with first toll value.
 					 */
-					Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getPersonId());
+					Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getPersonId(), event.getVehicleId() );
 					double toll = (cost == null) ? 0 : cost.amount;
 					if(valueMaps.get(breakIndex).containsKey(event.getPersonId())){
 						valueMaps.get(breakIndex).put(event.getPersonId(), valueMaps.get(breakIndex).get(event.getPersonId()) + toll);

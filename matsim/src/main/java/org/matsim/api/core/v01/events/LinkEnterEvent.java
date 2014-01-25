@@ -81,6 +81,14 @@ public class LinkEnterEvent extends Event {
 	private final Id personId;
 
 	/**
+	 * Comments:<ul>
+	 * <li> This is currently set as deprecated.  However, there are situations where one needs the driver.  I know that one can get the driver
+	 * by other means ... but since this method is already here, and we will really save a lot of work by not removing it, we may consider leaving
+	 * it in place. kai, jan'14
+	 * <li> Should then, obviously, be called "getDriver()".  But even that would probably mean retrofitting, especially for events.xml.  Is that worth it?
+	 * kai, jan'14
+	 * </ul>
+	 * 
 	 * @deprecated will be removed soon.
 	 */
 	@Deprecated

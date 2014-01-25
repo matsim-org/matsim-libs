@@ -113,7 +113,7 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 		double tmpScore = beta_TT * travelTime + beta_TD * distance;
 		tmpScore += dudm * (distanceCostFactor * distance);
 		
-		if (doRoadPricing) tmpScore += - dudm * this.tollCostHandler.getTollCost(link, time, person); // toll disutility		
+		if (doRoadPricing) tmpScore += - dudm * this.tollCostHandler.getTollCost(link, time, person, vehicle); // toll disutility		
 		return (tmpScore * -1.0); // disutility needs to be positive!
 	}
 
@@ -125,13 +125,13 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 	}
 	
 	private interface TollRouterBehaviour {
-		public double getTollCost(Link link, double time, Person person);
+		public double getTollCost(Link link, double time, Person person, Vehicle vehicle);
 	}
 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Person person) {
-			Cost cost_per_m = SurpriceTravelDisutility.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
+		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
+			Cost cost_per_m = SurpriceTravelDisutility.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId());
 			if (cost_per_m == null) {
 				return 0.0;
 			}
@@ -143,8 +143,8 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 	
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Person person) {
-			RoadPricingSchemeImpl.Cost cost = SurpriceTravelDisutility.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
+		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
+			RoadPricingSchemeImpl.Cost cost = SurpriceTravelDisutility.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId());
 			if (cost == null) {
 				return 0.0;
 			}
@@ -162,8 +162,8 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Person person) {
-			RoadPricingSchemeImpl.Cost cost = SurpriceTravelDisutility.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
+		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
+			RoadPricingSchemeImpl.Cost cost = SurpriceTravelDisutility.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId());
 			if (cost == null) {
 				return 0.0;
 			}
@@ -173,8 +173,8 @@ public class SurpriceTravelDisutility implements TravelDisutility {
 	
 	class LinkTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, Person person) {
-			Cost cost_per_m = SurpriceTravelDisutility.this.scheme.getLinkCostInfo(link.getId(), time, person.getId());
+		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
+			Cost cost_per_m = SurpriceTravelDisutility.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId());
 			if (cost_per_m == null) {
 				return 0.0;
 			}

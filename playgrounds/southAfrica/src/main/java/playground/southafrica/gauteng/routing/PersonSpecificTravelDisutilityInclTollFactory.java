@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package playground.southafrica.gauteng.routing;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
@@ -90,11 +93,24 @@ public class PersonSpecificTravelDisutilityInclTollFactory implements TravelDisu
 
 		}
 
+		private static int wrnCnt = 0 ;
+		
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time, person, vehicle);
 			double toll_usually_positive = 0. ;
-			Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
+			Id vehicleId ;
+			if ( vehicle != null ) {
+				vehicleId = vehicle.getId();
+			} else {
+				vehicleId = person.getId() ;
+				if ( wrnCnt<1 ) {
+					wrnCnt++ ;
+					Logger.getLogger(this.getClass()).warn( "still taking vehicle id from driver id (presumably during routing)") ;
+					Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
+				}
+			}
+			Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicleId ) ;
 			if ( cost != null ) {
 				/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
 				 * Cost objects with amount=0.  kai, apr'12

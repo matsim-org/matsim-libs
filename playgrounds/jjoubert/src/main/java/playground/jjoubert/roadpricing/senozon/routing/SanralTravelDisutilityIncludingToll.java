@@ -57,7 +57,7 @@ public class SanralTravelDisutilityIncludingToll implements TravelDisutility {
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double baseCost = this.costHandler.getLinkTravelDisutility(link, time, person, vehicle);
-		double tollCost = this.tollCostHandler.getTollCost(link, time, person);
+		double tollCost = this.tollCostHandler.getTollCost(link, time, person, vehicle);
 		return baseCost + tollCost;
 	}
 	
@@ -68,13 +68,13 @@ public class SanralTravelDisutilityIncludingToll implements TravelDisutility {
 	}
 
 	private interface TollRouterBehaviour {
-		public double getTollCost(Link link, double time, Person person);
+		public double getTollCost(Link link, double time, Person person, Vehicle vehicle);
 	}
 
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, final Person person) {
-			Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
+		public double getTollCost(final Link link, final double time, final Person person, Vehicle vehicle) {
+			Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId());
 			if (cost == null) {
 				return 0.0;
 			}
@@ -84,8 +84,8 @@ public class SanralTravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, final Person person) {
-			RoadPricingSchemeImpl.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
+		public double getTollCost(final Link link, final double time, final Person person, Vehicle vehicle) {
+			RoadPricingSchemeImpl.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId());
 			if (cost == null) {
 				return 0.0;
 			}
@@ -98,8 +98,8 @@ public class SanralTravelDisutilityIncludingToll implements TravelDisutility {
 
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
-		public double getTollCost(final Link link, final double time, final Person person) {
-			RoadPricingSchemeImpl.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, null);
+		public double getTollCost(final Link link, final double time, final Person person, Vehicle vehicle) {
+			RoadPricingSchemeImpl.Cost cost = SanralTravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId());
 			if (cost == null) {
 				return 0.0;
 			}

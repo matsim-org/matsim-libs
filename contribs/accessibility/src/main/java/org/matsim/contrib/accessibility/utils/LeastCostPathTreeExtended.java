@@ -103,7 +103,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		// query toll
 		double toll = 0.;
 		if(this.scheme != null){
-			Cost cost = scheme.getLinkCostInfo(link.getId(), currTime, null);
+			Cost cost = scheme.getLinkCostInfo(link.getId(), currTime, null, null);
 			if(cost != null)
 				toll = cost.amount;
 		}

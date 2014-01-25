@@ -20,6 +20,10 @@
 
 package playground.southafrica.gauteng.roadpricingscheme;
 
+import java.util.Formatter;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -33,11 +37,15 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
+import playground.southafrica.gauteng.GautengControler_subpopulations;
+
 /**
  * @author nagel
  *
  */
 public class GautengRoadPricingScheme implements RoadPricingScheme {
+	private static final Logger log = Logger.getLogger( GautengRoadPricingScheme.class ) ;
+
 	private RoadPricingScheme delegate = null ;
 	private Network network;
 	private Population population ;
@@ -46,8 +54,9 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 	public GautengRoadPricingScheme( String tollLinksFileName, Network network, Population population, TollFactorI tollFactor ) {
 		this.network = network ;
 		this.population = population ; 
-		Logger.getLogger(this.getClass()).warn("for me, using this as cordon toll did not work; using it as new scheme `link' " +
-				"toll for the time being.  needs to be debugged?!?!  kai, mar'12") ;
+//		log.warn("for me, using this as cordon toll did not work; using it as new scheme `link' " +
+//				"toll for the time being.  needs to be debugged?!?!  kai, mar'12") ;
+		// it is, in reality, a link toll, not a cordon toll.  Marcel had implemented it as cordon toll since link toll at that point did not exist.  kai, jan'14
 		
 		// read the road pricing scheme from file
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
@@ -59,6 +68,21 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 		}
 		this.delegate = scheme ;
 		this.tollFactor = tollFactor ;
+		
+		final Cost[] costArray = scheme.getCostArray();
+		for ( int ii=0 ; ii< costArray.length ; ii++ ) {
+			log.warn( costArray[ii].toString() ) ;
+		}
+		
+		Map<Id, List<Cost>> costsForLink = scheme.getCostsForLink() ;
+		for ( Entry<Id, List<Cost>> entry : costsForLink.entrySet() ) {
+			Id id = entry.getKey() ;
+			List<Cost> costs = entry.getValue() ;
+			for ( Cost cost : costs ) {
+				log.warn( "id: " + id.toString() + "cost: " + cost.toString() ) ;
+			}
+		}
+		
 	}
 
 	@Override
@@ -67,20 +91,12 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 	}
 
 	@Override
-	public Cost getLinkCostInfo(Id linkId, double time, Id personId) {
-		Cost baseToll = delegate.getLinkCostInfo(linkId, time, personId );
+	public Cost getLinkCostInfo(Id linkId, double time, Id personId, Id vehicleId) {
+		Cost baseToll = delegate.getLinkCostInfo(linkId, time, personId, vehicleId );
 		if (baseToll == null) {
-//			return new Cost(0.,24*3600.,0.0) ;
-			// yyyyyy this is what causes the cordon setting for the Gauteng scenario to fail: It always
-			// returns a cost object, and so the algo thinks that the agent is always "inside" the area.
-			// I can't say why I programmed it this way; I seem to recall that I copied it from somewhere 
-			// but I cannot find it.  kai, apr'12
-			// Throws NullPointerException. Changed back to original... just to get SANRAL runs going . jwj, Apr 24 '12/
 			return null ;
 		}
-		Link link = network.getLinks().get(linkId) ;
-		Person person = population.getPersons().get(personId) ;
-		final double tollFactorVal = tollFactor.getTollFactor(person, link.getId(), time);
+		final double tollFactorVal = tollFactor.getTollFactor(personId, vehicleId, linkId, time);
 		return new Cost( baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal );
 	}
 
@@ -97,7 +113,6 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 	@Override
 	public String getType() {
 		return delegate.getType();
-//		return "link" ;
 	}
 
 }

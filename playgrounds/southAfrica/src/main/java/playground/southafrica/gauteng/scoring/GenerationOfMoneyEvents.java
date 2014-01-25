@@ -27,6 +27,8 @@ import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
  */
 public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimListener, IterationEndsListener
 {
+	private static final Logger log = Logger.getLogger(GenerationOfMoneyEvents.class);
+
 	final CalcPaidToll calcPaidToll ;
 	final CalcAverageTolledTripLength cattl ;
 	final GautengTollStatistics gautengTollStatistics ;
@@ -61,9 +63,9 @@ public class GenerationOfMoneyEvents implements StartupListener, AfterMobsimList
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		Logger.getLogger(this.getClass()).info("The sum of all paid tolls          : " + calcPaidToll.getAllAgentsToll() + " monetary units.");
-		Logger.getLogger(this.getClass()).info("The number of people who paid toll : " + calcPaidToll.getDraweesNr());
-		Logger.getLogger(this.getClass()).info("The average paid trip length       : " + cattl.getAverageTripLength() + " m.");
+		log.info("The sum of all paid tolls          : " + calcPaidToll.getAllAgentsToll() + " monetary units.");
+		log.info("The number of people who paid toll : " + calcPaidToll.getDraweesNr());
+		log.info("The average paid trip length       : " + cattl.getAverageTripLength() + " m.");
 
 		int iteration = event.getIteration() ;
 		gautengTollStatistics.printTollInfo(event.getControler().getControlerIO().getIterationFilename(iteration, "")) ;

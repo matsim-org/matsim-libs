@@ -20,7 +20,6 @@
 package playground.southafrica.gauteng.roadpricingscheme;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 public  class SanralTollFactorOLD implements TollFactorI {
 	private final  int carStartId = 0;
@@ -84,8 +83,8 @@ public  class SanralTollFactorOLD implements TollFactorI {
 	 * and `Medium' and `Long' combined represent Class C vehicles. */
 	private final  double fractionClassB = 0.50;
 	
-	
-	private  double getTollFactor(final Id vehicleId, final Id linkId, final double time){		
+	@Override
+	public double getTollFactor(Id personId, final Id vehicleId, final Id linkId, final double time){		
 		double timeDiscount = getTimeDiscount(time);
 		double tagDiscount = 0.00;
 		double ptDiscount = 0.00;
@@ -144,14 +143,6 @@ public  class SanralTollFactorOLD implements TollFactorI {
 		return getDiscountEligibility(linkId) ? sizeFactor*(1 - Math.min(1.0, timeDiscount + tagDiscount + ptDiscount)) : sizeFactor;
 		
 	}
-	
-	@Override
-	public  double getTollFactor(final Person person, final Id linkId, final double time) {
-		// yyyyyy aaarrrrgh ... (assuming vehId = personId).  kai, mar'12
-		Id vehicleId = person.getId() ;
-		return getTollFactor(vehicleId, linkId, time);
-	}
-	
 	
 	private  double getTimeDiscount(double time){
 		/* First get the real time of day. */

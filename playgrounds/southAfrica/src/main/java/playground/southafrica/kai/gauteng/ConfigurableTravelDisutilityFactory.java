@@ -160,7 +160,7 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 				// apply toll if applicable:
 				if ( localScheme != null ) {
 					double toll_usually_positive = 0. ;
-					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId() ) ;
+					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId() ) ;
 					if ( cost != null ) {
 						/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
 						 * Cost objects with amount=0.  kai, apr'12

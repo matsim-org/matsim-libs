@@ -19,21 +19,29 @@
 
 package playground.southafrica.gauteng.roadpricingscheme;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 
 public class SanralTollFactor_Subpopulation implements TollFactorI {
 	private final Logger log = Logger.getLogger(SanralTollFactor_Subpopulation.class);
+
+	public static final String E_TAG_ATTRIBUTE_NAME = "eTag";
+	public static final String VEH_TOLL_CLASS_ATTRIB_NAME = "vehicleTollClass";
+
 	private Scenario sc;
+	
 	
 	public SanralTollFactor_Subpopulation(Scenario scenario) {
 		this.sc = scenario;
 	}
 	
 	
-	private  double getTollFactor(final Id vehicleId, final Id linkId, final double time){		
+	@Override
+	public double getTollFactor(Id personId, final Id vehicleId, final Id linkId, final double time){		
 		double timeDiscount = getTimeDiscount(time);
 		double tagDiscount = 0.00;
 		double ptDiscount = 0.00;
@@ -93,16 +101,6 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.southafrica.gauteng.roadpricingscheme.TollFactorI#getTollFactor(org.matsim.api.core.v01.population.Person, org.matsim.api.core.v01.Id, double)
-	 */
-	@Override
-	public  double getTollFactor(final Person person, final Id linkId, final double time) {
-		// yyyyyy aaarrrrgh ... (assuming vehId = personId).  kai, mar'12
-		Id vehicleId = person.getId() ;
-		return getTollFactor(vehicleId, linkId, time);
-	}
-	
 	
 	/**
 	 * Updated 2014/01/20 (jwjoubert).
@@ -149,6 +147,8 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 			return true;
 		}
 	}
+	
+	private Map<Id,SanralTollVehicleType> tollVehicleTypes = new HashMap<Id,SanralTollVehicleType>() ; 
 
 	/**
 	 * Checks the subpopulation attributes and assigns the vehicle type 
@@ -156,59 +156,74 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	 */
 	@Override
 	public SanralTollVehicleType typeOf(Id idObj) {
+		if ( tollVehicleTypes.get(idObj) != null ) {
+			return tollVehicleTypes.get(idObj) ;
+		}
+		
 		/* Check subpopulation. */
 		Object o1 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
 		String subpopulation;
 		if(o1 instanceof String){
 			subpopulation = (String)o1;
 		} else{
-			log.error("Expected a subppulation description of type `String', but it was `" + o1.getClass().toString() + "'. Returning NULL");
-			return null;
+			throw new RuntimeException("Expected a subppulation description of type `String', but it was `" + o1.getClass().toString() + "'. Returning NULL");
 		}
 		
 		/* Check vehicle type. */
-		Object o2 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), "vehicleTollClass");
+		Object o2 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), VEH_TOLL_CLASS_ATTRIB_NAME);
 		String vehicleType;
 		if(o2 instanceof String){
 			vehicleType = (String)o2;
 		} else{
-			log.error("Expected a vehicle type description of type `String', but it was `" + o2.getClass().toString() + "'. Returning NULL");
-			return null;
+			throw new RuntimeException("Expected a vehicle type description of type `String', but it was `" + o2.getClass().toString() + "'. Returning NULL");
 		}
 		
 		/* Check availability of eTag. */
-		Object o3 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), "eTag");
+		Object o3 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), E_TAG_ATTRIBUTE_NAME);
 		Boolean tag = false;
 		if(o3 instanceof Boolean){
 			tag = (Boolean)o3;
 		} else{
-			log.error("Expected an eTag availability of type `Boolean', but it was `" + o3.getClass().toString() + "'. Returning NULL");
-			return null;
+			throw new RuntimeException("Expected an eTag availability of type `Boolean', but it was `" + o3.getClass().toString() + "'. Returning NULL");
 		}
 	
 		/* Identify correct vehicle type. */
 		if(subpopulation.equalsIgnoreCase("car")){
-			return tag ? SanralTollVehicleType.carWithTag : SanralTollVehicleType.carWithoutTag;
+			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.carWithTag : SanralTollVehicleType.carWithoutTag;
+			tollVehicleTypes.put( idObj, tvType ) ;
+			return tvType;
 
 		} else if(subpopulation.equalsIgnoreCase("commercial")){
 			if(vehicleType.equalsIgnoreCase("A2")){
-				return tag ? SanralTollVehicleType.commercialClassAWithTag : SanralTollVehicleType.commercialClassAWithoutTag;
+				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassAWithTag : SanralTollVehicleType.commercialClassAWithoutTag;
+				tollVehicleTypes.put( idObj, tvType ) ;
+				return tvType;
 			} else if(vehicleType.equalsIgnoreCase("B")){
-				return tag ? SanralTollVehicleType.commercialClassBWithTag : SanralTollVehicleType.commercialClassBWithoutTag;
+				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassBWithTag : SanralTollVehicleType.commercialClassBWithoutTag;
+				tollVehicleTypes.put( idObj, tvType ) ;
+				return tvType;
 			} else if(vehicleType.equalsIgnoreCase("C")){
-				return tag ? SanralTollVehicleType.commercialClassCWithTag : SanralTollVehicleType.commercialClassCWithoutTag;
+				final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.commercialClassCWithTag : SanralTollVehicleType.commercialClassCWithoutTag;
+				tollVehicleTypes.put( idObj, tvType ) ;
+				return tvType;
 			} else{
 				throw new RuntimeException("Unknown vehicle type " + vehicleType);
 			}
 			
 		} else if(subpopulation.equalsIgnoreCase("bus")){
-			return tag ? SanralTollVehicleType.busWithTag : SanralTollVehicleType.busWithoutTag;
+			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.busWithTag : SanralTollVehicleType.busWithoutTag;
+			tollVehicleTypes.put( idObj, tvType ) ;
+			return tvType;
 			
 		} else if(subpopulation.equalsIgnoreCase("taxi")){
-			return tag ? SanralTollVehicleType.taxiWithTag : SanralTollVehicleType.taxiWithoutTag;
+			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.taxiWithTag : SanralTollVehicleType.taxiWithoutTag;
+			tollVehicleTypes.put( idObj, tvType ) ;
+			return tvType;
 			
 		} else if(subpopulation.equalsIgnoreCase("ext")){
-			return tag ? SanralTollVehicleType.extWithTag : SanralTollVehicleType.extWithoutTag;
+			final SanralTollVehicleType tvType = tag ? SanralTollVehicleType.extWithTag : SanralTollVehicleType.extWithoutTag;
+			tollVehicleTypes.put( idObj, tvType ) ;
+			return tvType;
 			
 		} else{
 			throw new RuntimeException("Unknown subpopulation type " + subpopulation);
