@@ -246,6 +246,20 @@ public class GautengControler_subpopulations {
 			}
 		});
 
+		setUpRoadPricingAndScoring(baseValueOfTime, valueOfTimeMultiplier, sc, controler);
+
+		// ADDITIONAL ANALYSIS:
+		controler.addControlerListener(new KaiAnalysisListener());
+
+		// RUN:
+
+		 controler.run();
+
+		Header.printFooter();
+	}
+
+	private static void setUpRoadPricingAndScoring(double baseValueOfTime, double valueOfTimeMultiplier, final Scenario sc,
+			final Controler controler) {
 		// ROAD PRICING:
 		if (sc.getConfig().scenario().isUseRoadpricing()) {
 			throw new RuntimeException(
@@ -302,15 +316,6 @@ public class GautengControler_subpopulations {
 		controler.setTravelDisutilityFactory(new PersonSpecificTravelDisutilityInclTollFactory(
 				vehDepScheme, personSpecificUtilityOfMoney
 				));
-
-		// ADDITIONAL ANALYSIS:
-		controler.addControlerListener(new KaiAnalysisListener());
-
-		// RUN:
-
-		 controler.run();
-
-		Header.printFooter();
 	}
 
 	/**
