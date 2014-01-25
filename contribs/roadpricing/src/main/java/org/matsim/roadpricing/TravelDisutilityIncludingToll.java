@@ -21,6 +21,7 @@
 package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -90,7 +91,17 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
-			Cost cost_per_m = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId() );
+			// not sure why it is the object at one level, and the id on the next level.
+			// In any case, retrofitting this so it accepts null arguments.  kai, apr'14
+			Id personId = null ;
+			if ( person != null ) {
+				personId = person.getId();
+			}
+			Id vehicleId = null ;
+			if ( vehicle != null ) {
+				vehicleId = vehicle.getId();
+			}
+			Cost cost_per_m = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
 			if (cost_per_m == null) {
 				return 0.0;
 			}
@@ -103,7 +114,17 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
-			RoadPricingSchemeImpl.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId() );
+			// not sure why it is the object at one level, and the id on the next level.
+			// In any case, retrofitting this so it accepts null arguments.  kai, apr'14
+			Id personId = null ;
+			if ( person != null ) {
+				personId = person.getId();
+			}
+			Id vehicleId = null ;
+			if ( vehicle != null ) {
+				vehicleId = vehicle.getId();
+			}
+			RoadPricingSchemeImpl.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
 			if (cost == null) {
 				return 0.0;
 			}
@@ -122,7 +143,17 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
-			RoadPricingSchemeImpl.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId() );
+			// not sure why it is the object at one level, and the id on the next level.
+			// In any case, retrofitting this so it accepts null arguments.  kai, apr'14
+			Id personId = null ;
+			if ( person != null ) {
+				personId = person.getId();
+			}
+			Id vehicleId = null ;
+			if ( vehicle != null ) {
+				vehicleId = vehicle.getId();
+			}
+			RoadPricingSchemeImpl.Cost cost = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
 			if (cost == null) {
 				return 0.0;
 			}
@@ -133,7 +164,17 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	class LinkTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTollCost(final Link link, final double time, Person person, Vehicle vehicle) {
-			Cost cost_per_m = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId() );
+			// not sure why it is the object at one level, and the id on the next level.
+			// In any case, retrofitting this so it accepts null arguments.  kai, apr'14
+			Id personId = null ;
+			if ( person != null ) {
+				personId = person.getId();
+			}
+			Id vehicleId = null ;
+			if ( vehicle != null ) {
+				vehicleId = vehicle.getId();
+			}
+			Cost cost_per_m = TravelDisutilityIncludingToll.this.scheme.getLinkCostInfo(link.getId(), time, personId, vehicleId );
 			if (cost_per_m == null) {
 				return 0.0;
 			}
