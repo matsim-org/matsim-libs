@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
-import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
+import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
@@ -43,7 +43,7 @@ public class IdleRankVehicleFinder
     private final VrpData data;
     private final VrpPathCalculator calculator;
     private final boolean straightLineDistance;
-	private DepotArrivalDepartureCharger depotarrivaldeparturecharger;
+	private RankArrivalDepartureCharger rankArrivaldeparturecharger;
 	private boolean IsElectric;
 	private boolean useChargeOverTime;
 	Random rnd;
@@ -59,8 +59,8 @@ public class IdleRankVehicleFinder
         this.rnd = new Random(7);
         System.out.println("Using Straight Line Distance:" + this.straightLineDistance);
     }
-    public void addDepotArrivalCharger(DepotArrivalDepartureCharger depotArrivalDepartureCharger){
-    	this.depotarrivaldeparturecharger = depotArrivalDepartureCharger;
+    public void addRankArrivalCharger(RankArrivalDepartureCharger rankArrivalDepartureCharger){
+    	this.rankArrivaldeparturecharger = rankArrivalDepartureCharger;
     	this.IsElectric = true;
     }
     
@@ -70,11 +70,11 @@ public class IdleRankVehicleFinder
 	}
     
 	private boolean hasEnoughCapacityForTask(Vehicle veh){
-    		return this.depotarrivaldeparturecharger.isChargedForTask(veh.getId());
+    		return this.rankArrivaldeparturecharger.isChargedForTask(veh.getId());
     }
 	
 	private double getVehicleSoc(Vehicle veh){
-		return this.depotarrivaldeparturecharger.getVehicleSoc(veh.getId());
+		return this.rankArrivaldeparturecharger.getVehicleSoc(veh.getId());
 	}
     
     

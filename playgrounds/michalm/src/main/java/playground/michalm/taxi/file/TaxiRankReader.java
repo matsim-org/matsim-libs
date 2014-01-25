@@ -87,7 +87,7 @@ public class TaxiRankReader
 
     private void startRank(Attributes atts)
     {
-        List<TaxiRank> depots = data.getTaxiRanks();
+        List<TaxiRank> ranks = data.getTaxiRanks();
 
         Id id = scenario.createId(atts.getValue("id"));
 
@@ -97,7 +97,7 @@ public class TaxiRankReader
         Link link = scenario.getNetwork().getLinks().get(linkId);
 
         currentRank = new TaxiRank(id, name, link);
-        depots.add(currentRank);
+        ranks.add(currentRank);
     }
 
 

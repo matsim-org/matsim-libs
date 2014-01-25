@@ -22,7 +22,7 @@ package playground.jbischoff.taxi.sim;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
+import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 
 
@@ -32,11 +32,11 @@ import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 public class ElectricTaxiSimEngine
     implements MobsimEngine
 {
-    private DepotArrivalDepartureCharger dac;
+    private RankArrivalDepartureCharger dac;
     private NOSRankTaxiOptimizer optimizer;
 
 
-    public ElectricTaxiSimEngine(NOSRankTaxiOptimizer optimizer, DepotArrivalDepartureCharger dac)
+    public ElectricTaxiSimEngine(NOSRankTaxiOptimizer optimizer, RankArrivalDepartureCharger dac)
     {
         this.optimizer = optimizer;
         this.dac = dac;

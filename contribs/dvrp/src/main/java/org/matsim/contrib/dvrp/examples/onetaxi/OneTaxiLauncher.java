@@ -39,7 +39,7 @@ public class OneTaxiLauncher
     private final String dirName;
     private final String netFileName;
     private final String plansFileName;
-    private final String depotsFileName;
+    private final String vehiclesFileName;
     private final boolean otfVis;
 
     private final Scenario scenario;
@@ -50,7 +50,7 @@ public class OneTaxiLauncher
         dirName = "./src/main/resources/";
         netFileName = dirName + "network.xml";
         plansFileName = dirName + "population.xml";
-        depotsFileName = dirName + "1_depot_1_taxi.xml";
+        vehiclesFileName = dirName + "1_depot_1_taxi.xml";
 
         otfVis = true;//or false -- turning ON/OFF visualization
 
@@ -66,7 +66,7 @@ public class OneTaxiLauncher
         VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
                 TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility);
 
-        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, depotsFileName);
+        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, vehiclesFileName);
 
         OneTaxiOptimizer optimizer = new OneTaxiOptimizer(vrpData, calculator);
 

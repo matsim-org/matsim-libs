@@ -185,10 +185,10 @@ public class VrpLauncherUtils
     }
 
 
-    public static VrpData initVrpData(Scenario scenario, String depotsFileName)
+    public static VrpData initVrpData(Scenario scenario, String vehiclesFileName)
     {
         VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(scenario, vrpData).readFile(depotsFileName);
+        new VehicleReader(scenario, vrpData).readFile(vehiclesFileName);
 
         for (Vehicle veh : vrpData.getVehicles()) {
             @SuppressWarnings("unchecked")

@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 
-import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
+import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.immediaterequest.NOSTaxiOptimizer;
 import playground.michalm.taxi.schedule.*;
 
@@ -46,7 +46,7 @@ public class NOSRankTaxiOptimizer
 
     private final List<Id> shortTimeIdlers;
 
-    private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
+    private RankArrivalDepartureCharger rankArrivalDepartureCharger;
     private final VrpPathCalculator calculator;
 
 
@@ -74,10 +74,10 @@ public class NOSRankTaxiOptimizer
     }
 
 
-    public void setDepotArrivalCharger(DepotArrivalDepartureCharger depotArrivalDepartureCharger)
+    public void setRankArrivalCharger(RankArrivalDepartureCharger rankArrivalDepartureCharger)
     {
-        this.depotArrivalDepartureCharger = depotArrivalDepartureCharger;
-        this.idleVehicleFinder.addDepotArrivalCharger(this.depotArrivalDepartureCharger);
+        this.rankArrivalDepartureCharger = rankArrivalDepartureCharger;
+        this.idleVehicleFinder.addRankArrivalCharger(this.rankArrivalDepartureCharger);
     }
 
 
@@ -137,7 +137,7 @@ public class NOSRankTaxiOptimizer
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
                 if (!lastw.getLink().equals(veh.getStartLink())) {
-                    if (this.depotArrivalDepartureCharger.needsToReturnToRank(veh.getId())) {
+                    if (this.rankArrivalDepartureCharger.needsToReturnToRank(veh.getId())) {
                         scheduleRankReturn(veh);
                     }
                 }

@@ -101,7 +101,7 @@ import playground.michalm.util.RunningVehicleRegister;
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
         ranksFileName = dirName + "depots-5_taxis-50.xml";
-        // depotsFileName = dirName + "depots-5_taxis-150.xml";
+        // ranksFileName = dirName + "depots-5_taxis-150.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
@@ -175,7 +175,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         taxiCustomersFileName = dirName + params.get("taxiCustomersFileName");
 
-        ranksFileName = dirName + params.get("depotsFileName");
+        ranksFileName = dirName + params.get("ranksFileName");
 
         eventsFileName = dirName + params.get("eventsFileName");
 

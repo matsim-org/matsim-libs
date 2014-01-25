@@ -29,7 +29,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
 
-import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
+import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
@@ -46,8 +46,8 @@ public class ElectroCabLaunchUtils
 {
 
     private EnergyConsumptionTracker energyConsumptionTracker;
-    // private ChargeUponDepotArrival chargeUponDepotArrival;
-    private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
+    // private ChargeUponRankArrival chargeUponRankArrival;
+    private RankArrivalDepartureCharger rankArrivalDepartureCharger;
     private TravelDistanceTimeEvaluator travelDistanceEvaluator;
     private TaxiCustomerWaitTimeAnalyser taxiCustomerWaitTimeAnalyser;
 
@@ -88,31 +88,31 @@ public class ElectroCabLaunchUtils
         }
 
         energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
-        depotArrivalDepartureCharger = new DepotArrivalDepartureCharger(elvehicles);
+        rankArrivalDepartureCharger = new RankArrivalDepartureCharger(elvehicles);
         taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser(scenario);
 
         handlerGroup.addHandler(travelDistanceEvaluator);
         handlerGroup.addHandler(energyConsumptionTracker);
-        handlerGroup.addHandler(depotArrivalDepartureCharger);
+        handlerGroup.addHandler(rankArrivalDepartureCharger);
         handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
 
-        List<Id> depotLinkIds = new ArrayList<Id>();
+        List<Id> rankLinkIds = new ArrayList<Id>();
         for (TaxiRank r : ((TaxiData)data.getVrpData()).getTaxiRanks()) {
-            depotLinkIds.add(r.getLink().getId());
+            rankLinkIds.add(r.getLink().getId());
         }
 
-        depotArrivalDepartureCharger.setDepotLocations(depotLinkIds);
+        rankArrivalDepartureCharger.setRankLocations(rankLinkIds);
         events.addHandler(handlerGroup);
 
-        optimizer.setDepotArrivalCharger(depotArrivalDepartureCharger);
+        optimizer.setRankArrivalCharger(rankArrivalDepartureCharger);
 
-        // chargeUponDepotArrival = new ChargeUponDepotArrival(elvehicles);
-        // chargeUponDepotArrival.setDepotLocations(this.depotReader.getDepotLinks());
+        // chargeUponRankArrival = new ChargeUponRankArrival(elvehicles);
+        // chargeUponRankArrival.setRankLocations(this.rankReader.getRankLinks());
 
-        // handlerGroup.addHandler(chargeUponDepotArrival);
+        // handlerGroup.addHandler(chargeUponRankArrival);
 
         ElectricTaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(optimizer,
-                depotArrivalDepartureCharger);
+                rankArrivalDepartureCharger);
         qSim.addMobsimEngine(taxiSimEngine);
 
         return taxiSimEngine;
@@ -122,7 +122,7 @@ public class ElectroCabLaunchUtils
     public void printStatisticsToConsole()
     {
         System.out.println("energy consumption stats");
-        depotArrivalDepartureCharger.getSoCLog().printToConsole();
+        rankArrivalDepartureCharger.getSoCLog().printToConsole();
         System.out.println("===");
 
     }
@@ -131,8 +131,8 @@ public class ElectroCabLaunchUtils
     public String writeStatisticsToFiles(String dirname)
     {
         System.out.println("writing energy consumption stats directory to " + dirname);
-        depotArrivalDepartureCharger.getSoCLog().writeToFiles(dirname);
-        depotArrivalDepartureCharger.getChargeLog().writeToFiles(dirname);
+        rankArrivalDepartureCharger.getSoCLog().writeToFiles(dirname);
+        rankArrivalDepartureCharger.getChargeLog().writeToFiles(dirname);
         String dist = travelDistanceEvaluator.writeTravelDistanceStatsToFiles(dirname
                 + "travelDistanceStats.txt");
         String wait = taxiCustomerWaitTimeAnalyser.writeCustomerWaitStats(dirname

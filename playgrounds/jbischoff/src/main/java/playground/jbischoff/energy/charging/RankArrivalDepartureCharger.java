@@ -25,10 +25,10 @@ import playground.jbischoff.energy.log.ChargerLog;
 import playground.jbischoff.energy.log.SoCLog;
 import playground.jbischoff.energy.log.SocLogRow;
 
-public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
+public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		PersonDepartureEventHandler {
 
-	private Map<Id,Integer> depotLocations;
+	private Map<Id,Integer> rankLocations;
 	private Map<Id,Integer> currentChargerOccupation;
 	private Map<Id, Vehicle> vehicles;
 	
@@ -40,15 +40,15 @@ public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
 	private final double MINIMUMCHARGETIME = 120.;
 //	private final double POWERINKW = 50.0; // max charge for Nissan Leaf
 	private final double POWERINKW = 22.0; // max charge at standard Berlin Charger
-	private final int DEPOTCHARGERAMOUNT = 1; //amount of chargers at each depot location
+	private final int RANKCHARGERAMOUNT = 1; //amount of chargers at each rank location
 	
 	private final double MINIMUMSOCFORDEPARTURE = 5.;
 	private static final Logger log = Logger
-			.getLogger(DepotArrivalDepartureCharger.class);
+			.getLogger(RankArrivalDepartureCharger.class);
 	private final double NEEDSTORETURNTORANKSOC = 6.;
 	private SoCLog soCLog;
 	private ChargerLog chargerLog;
-	public DepotArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles) {
+	public RankArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles) {
 		this.vehicles = vehicles;
 		this.arrivalTimes = new LinkedHashMap<Id, Double>();
 		this.socUponArrival = new HashMap<Id, Double>();
@@ -67,7 +67,7 @@ public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
 
 	public void doSimStep(double time) {
 		if (time % 60 == 0) {
-			chargeAllVehiclesInDepots(time, 60);
+			chargeAllVehiclesAtRanks(time, 60);
 			refreshLog(time);
 
 		}
@@ -82,7 +82,7 @@ public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
 			return;
 		// technically no battery-electric-vehicles could also be handled here,
 		// therefore the exclusion
-		if (!isAtDepotLocation(event.getLinkId()))
+		if (!isAtRankLocation(event.getLinkId()))
 			return;
 		if (!this.arrivalTimes.containsKey(event.getPersonId()))
 			return;
@@ -112,7 +112,7 @@ public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
 			return;
 		if (!isBatteryElectricVehicle(event.getPersonId()))
 			return;
-		if (!isAtDepotLocation(event.getLinkId()))
+		if (!isAtRankLocation(event.getLinkId()))
 			return;
 
 		this.socUponArrival
@@ -124,7 +124,7 @@ public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
 
 	}
 
-	private void chargeAllVehiclesInDepots(double time, double duration) {
+	private void chargeAllVehiclesAtRanks(double time, double duration) {
 		double chargeWatt = duration * POWERINKW * 1000;
 				
 		for (Entry<Id, Double> e : arrivalTimes.entrySet()) {
@@ -193,7 +193,7 @@ public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
 		boolean result = false;
 		Id linkId = this.arrivalLinks.get(vehicleId);
 		int occ= this.currentChargerOccupation.get(linkId);
-		int max= this.depotLocations.get(linkId);
+		int max= this.rankLocations.get(linkId);
 		if (occ<max) result= true;
 		return result;
 	}
@@ -224,17 +224,17 @@ public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
 			this.soCLog.add(new SocLogRow(new IdImpl("ave"), time, average, 0));
 		}
 		for (Entry<Id,Integer> e : this.currentChargerOccupation.entrySet()){
-			double rocc = (double) e.getValue() / (double) this.depotLocations.get(e.getKey());
+			double rocc = (double) e.getValue() / (double) this.rankLocations.get(e.getKey());
 			this.chargerLog.add(new ChargeLogRow(e.getKey(), time, e.getValue(), rocc));
 		}
 	}
 
-	public void setDepotLocations(List<Id> depots) {
-		this.depotLocations = new HashMap<Id, Integer>();
+	public void setRankLocations(List<Id> ranks) {
+		this.rankLocations = new HashMap<Id, Integer>();
 		this.currentChargerOccupation = new HashMap<Id, Integer>();
-		for (Id did : depots){
+		for (Id did : ranks){
 			
-			this.depotLocations.put(did, DEPOTCHARGERAMOUNT);
+			this.rankLocations.put(did, RANKCHARGERAMOUNT);
 			this.currentChargerOccupation.put(did, 0);
 		}
 		
@@ -244,8 +244,8 @@ public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
 		return (this.vehicles.containsKey(agentId));
 	}
 
-	private boolean isAtDepotLocation(Id linkId) {
-		return (this.depotLocations.containsKey(linkId));
+	private boolean isAtRankLocation(Id linkId) {
+		return (this.rankLocations.containsKey(linkId));
 	}
 
 	private boolean isBatteryElectricVehicle(Id agentId) {

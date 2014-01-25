@@ -64,7 +64,7 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/final String netFileName;
     /*package*/final String plansFileName;
     /*package*/final String taxiCustomersFileName;
-    /*package*/final String depotsFileName;
+    /*package*/final String ranksFileName;
 
     /*package*/final boolean vrpOutFiles;
     /*package*/final String vrpOutDirName;
@@ -117,7 +117,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
-        depotsFileName = dirName + "depots-5_taxis-50.xml";
+        ranksFileName = dirName + "depots-5_taxis-50.xml";
         //         depotsFileName = dirName + "depots-5_taxis-100.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
@@ -168,8 +168,8 @@ import playground.michalm.util.RunningVehicleRegister;
             System.out.println("tcostSource");
         if (eventsFileName == null)
             System.out.println("eventsFileName");
-        if (depotsFileName == null)
-            System.out.println("depotsFileName");
+        if (ranksFileName == null)
+            System.out.println("ranksFileName");
 
         TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, null, ttimeSource,
                 eventsFileName);
@@ -182,7 +182,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-        TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, depotsFileName, ecm);
+        TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
 
         Params params = new Params(true, false, 120, 60);
 
