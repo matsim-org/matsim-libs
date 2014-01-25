@@ -23,10 +23,9 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.immediaterequest.NOSTaxiOptimizer;

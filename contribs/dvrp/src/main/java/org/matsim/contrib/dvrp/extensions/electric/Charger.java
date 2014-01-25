@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.extensions.electric;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 
 
 public interface Charger

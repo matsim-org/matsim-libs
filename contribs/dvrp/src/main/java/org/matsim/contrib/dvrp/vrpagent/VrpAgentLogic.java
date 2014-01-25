@@ -19,9 +19,10 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.data.schedule.*;
-import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dynagent.*;
 
 
@@ -36,18 +37,17 @@ public class VrpAgentLogic
 
     private final VrpOptimizer optimizer;
     private final DynActionCreator dynActionCreator;
-    private final VrpAgentVehicle vrpVehicle;
+    private final Vehicle vehicle;
     private DynAgent agent;
 
 
-    public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator,
-            VrpAgentVehicle vrpVehicle)
+    public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, Vehicle vehicle)
     {
         this.optimizer = optimizer;
         this.dynActionCreator = dynActionCreator;
 
-        this.vrpVehicle = vrpVehicle;
-        this.vrpVehicle.setAgentLogic(this);
+        this.vehicle = vehicle;
+        this.vehicle.setAgentLogic(this);
     }
 
 
@@ -69,14 +69,14 @@ public class VrpAgentLogic
     @Override
     public DynAction computeNextAction(DynAction oldAction, double now)
     {
-        Schedule<?> schedule = vrpVehicle.getSchedule();
+        Schedule<?> schedule = vehicle.getSchedule();
 
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
         // else: PLANNED or STARTED
 
-        optimizer.nextTask(vrpVehicle.getSchedule());
+        optimizer.nextTask(vehicle.getSchedule());
         // remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
 
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
@@ -92,16 +92,16 @@ public class VrpAgentLogic
 
     private DynActivity createBeforeScheduleActivity()
     {
-        return new AbstractDynActivity("Before schedule: " + vrpVehicle.getId()) {
+        return new AbstractDynActivity("Before schedule: " + vehicle.getId()) {
             public double getEndTime()
             {
-                Schedule<?> s = vrpVehicle.getSchedule();
+                Schedule<?> s = vehicle.getSchedule();
 
                 switch (s.getStatus()) {
                     case PLANNED:
                         return s.getBeginTime();
                     case UNPLANNED:
-                        return vrpVehicle.getT1();
+                        return vehicle.getT1();
                     default:
                         throw new IllegalStateException();
                 }
@@ -112,7 +112,6 @@ public class VrpAgentLogic
 
     private DynActivity createAfterScheduleActivity()
     {
-        return new StaticDynActivity("After schedule: " + vrpVehicle.getId(),
-                Double.POSITIVE_INFINITY);
+        return new StaticDynActivity("After schedule: " + vehicle.getId(), Double.POSITIVE_INFINITY);
     }
 }

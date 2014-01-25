@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.data.model.Request;
-import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.schedule.*;
 
 
 public interface VrpOptimizer

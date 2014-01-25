@@ -23,9 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -39,11 +37,12 @@ public class VehicleReader
     private VrpData data;
     private Map<Id, ? extends Link> links;
 
+
     public VehicleReader(Scenario scenario, VrpData data)
     {
         this.scenario = scenario;
         this.data = data;
-        
+
         links = scenario.getNetwork().getLinks();
     }
 
@@ -73,7 +72,7 @@ public class VehicleReader
         List<Vehicle> vehicles = data.getVehicles();
 
         Id id = scenario.createId(atts.getValue("id"));
-        
+
         Id startLinkId = scenario.createId(atts.getValue("start_link"));
         Link startLink = links.get(startLinkId);
 
@@ -82,8 +81,7 @@ public class VehicleReader
         double t0 = getDouble(atts, "t_0", 0);
         double t1 = getDouble(atts, "t_1", 24 * 60 * 60);
 
-        vehicles.add(new VrpAgentVehicleImpl(id, startLink, capacity, t0,
-                t1));
+        vehicles.add(new VehicleImpl(id, startLink, capacity, t0, t1));
     }
 
 

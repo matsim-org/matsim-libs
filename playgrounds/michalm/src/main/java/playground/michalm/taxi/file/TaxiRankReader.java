@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -116,8 +116,8 @@ public class TaxiRankReader
         double chargeInJoules = getDouble(atts, "battery_charge_kWh", 20) * 1000 * 3600;
         double capacityInJoules = getDouble(atts, "battery_capacity_kWh", 20) * 1000 * 3600;
 
-        ElectricVehicle ev = new VrpAgentElectricTaxi(id, startLink, t0, t1, ecm);
-        ev.setBattery(new BatteryImpl(chargeInJoules, capacityInJoules));
+        Battery battery = new BatteryImpl(chargeInJoules, capacityInJoules);
+        ElectricVehicle ev = new VrpAgentElectricTaxi(id, startLink, t0, t1, battery, ecm);
         vehicles.add(ev);
     }
 

@@ -21,8 +21,7 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;

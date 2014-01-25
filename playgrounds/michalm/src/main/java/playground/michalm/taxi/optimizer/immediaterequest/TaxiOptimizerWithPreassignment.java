@@ -24,9 +24,8 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.schedule.Schedule;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;

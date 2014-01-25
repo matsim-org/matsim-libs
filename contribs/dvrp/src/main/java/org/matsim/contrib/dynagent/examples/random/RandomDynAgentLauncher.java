@@ -20,8 +20,7 @@
 package org.matsim.contrib.dynagent.examples.random;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
-import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.contrib.dynagent.run.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -47,7 +46,7 @@ public class RandomDynAgentLauncher
         otfVis = true;//or false -- turning ON/OFF visualization
         agentCount = 100;
 
-        scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        scenario = ScenarioUtils.createScenario(DynConfigUtils.createConfig());
     }
 
 

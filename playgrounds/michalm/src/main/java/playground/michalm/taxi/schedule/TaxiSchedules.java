@@ -19,8 +19,8 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.schedule.Schedule;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 
 
 public class TaxiSchedules

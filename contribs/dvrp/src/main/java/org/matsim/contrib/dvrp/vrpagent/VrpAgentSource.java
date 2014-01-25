@@ -22,8 +22,8 @@ package org.matsim.contrib.dvrp.vrpagent;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.util.schedule.VrpSchedulePlanFactory;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -71,8 +71,7 @@ public class VrpAgentSource
         VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
 
         for (Vehicle vrpVeh : vehicles) {
-            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator,
-                    (VrpAgentVehicle)vrpVeh);
+            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
 
             Id id = vrpVeh.getId();
             Id startLinkId = vrpVeh.getStartLink().getId();

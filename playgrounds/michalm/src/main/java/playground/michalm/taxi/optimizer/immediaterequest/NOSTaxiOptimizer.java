@@ -21,11 +21,10 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.schedule.*;
-import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;

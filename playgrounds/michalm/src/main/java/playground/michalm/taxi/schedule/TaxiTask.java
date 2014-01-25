@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.data.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 
 public interface TaxiTask

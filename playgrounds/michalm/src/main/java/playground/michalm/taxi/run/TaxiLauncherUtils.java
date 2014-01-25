@@ -20,8 +20,8 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.schedule.Schedule;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 import playground.michalm.taxi.TaxiData;

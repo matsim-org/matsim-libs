@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.util.chart;
 import java.util.List;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.schedule.*;
+import org.matsim.contrib.dvrp.schedule.*;
 
 import com.google.common.collect.Lists;
 

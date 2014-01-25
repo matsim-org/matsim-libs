@@ -26,11 +26,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.Request;
-import org.matsim.contrib.dvrp.data.schedule.Task;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgents;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -112,7 +110,7 @@ public class PassengerEngine
                     return Double.compare(r1.getT0(), r2.getT0());
                 }
             });
-            
+
             advanceRequests.put(passenger.getId(), passengerAdvReqs);
         }
 
@@ -184,7 +182,7 @@ public class PassengerEngine
 
     public void pickUpPassenger(Task task, PassengerRequest request, double now)
     {
-        DriverAgent driver = VrpAgents.getAgent(task);
+        DriverAgent driver = task.getSchedule().getVehicle().getAgentLogic().getDynAgent();
         MobsimAgent passenger = request.getPassenger();
 
         Id currentLinkId = passenger.getCurrentLinkId();
@@ -218,7 +216,7 @@ public class PassengerEngine
 
     public void dropOffPassenger(Task task, PassengerRequest request, double now)
     {
-        DriverAgent driver = VrpAgents.getAgent(task);
+        DriverAgent driver = task.getSchedule().getVehicle().getAgentLogic().getDynAgent();
         MobsimAgent passenger = request.getPassenger();
 
         if (passenger instanceof PassengerAgent) {

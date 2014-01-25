@@ -20,8 +20,8 @@
 package playground.michalm.taxi.optimizer.immediaterequest;
 
 import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.schedule.Schedule;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 
 import playground.michalm.taxi.schedule.TaxiTask;
 

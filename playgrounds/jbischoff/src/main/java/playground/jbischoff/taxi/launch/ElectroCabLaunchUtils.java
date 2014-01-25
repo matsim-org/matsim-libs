@@ -22,8 +22,7 @@ package playground.jbischoff.taxi.launch;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;

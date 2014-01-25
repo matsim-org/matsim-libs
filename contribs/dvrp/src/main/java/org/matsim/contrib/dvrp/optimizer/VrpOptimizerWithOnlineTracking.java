@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.data.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
 
 
 public interface VrpOptimizerWithOnlineTracking

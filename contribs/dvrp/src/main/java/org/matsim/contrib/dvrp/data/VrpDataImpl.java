@@ -21,7 +21,6 @@ package org.matsim.contrib.dvrp.data;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.model.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 

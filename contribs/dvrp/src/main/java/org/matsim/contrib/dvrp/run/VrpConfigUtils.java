@@ -19,46 +19,26 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import org.matsim.core.config.*;
-import org.matsim.core.config.groups.*;
+import org.matsim.contrib.dynagent.run.DynConfigUtils;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 
 
 public class VrpConfigUtils
 {
     public static Config createConfig()
     {
-        Config config = ConfigUtils.createConfig();
-
-        updateQSimConfigGroup(config);
+        Config config = DynConfigUtils.createConfig();
         updateTravelTimeCalculatorConfigGroup(config);
-
         return config;
     }
 
 
     public static Config loadConfig(final String filename)
     {
-        Config config = ConfigUtils.loadConfig(filename);
-
-        updateQSimConfigGroup(config);
+        Config config = DynConfigUtils.loadConfig(filename);
         updateTravelTimeCalculatorConfigGroup(config);
-
         return config;
-    }
-
-
-    /**
-     * Dynamic Taxi (and other VRP's) are designed for and validated against these QSimConfigGroup
-     * settings only.
-     */
-    private static void updateQSimConfigGroup(Config config)
-    {
-        QSimConfigGroup qSimConfig = config.qsim();
-        qSimConfig.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-        qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-        qSimConfig.setRemoveStuckVehicles(false);
-        qSimConfig.setStartTime(0);
-        qSimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
     }
 
 

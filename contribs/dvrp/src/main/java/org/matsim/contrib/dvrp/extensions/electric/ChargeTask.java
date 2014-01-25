@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.extensions.electric;
 
-import org.matsim.contrib.dvrp.data.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 
 
 public interface ChargeTask

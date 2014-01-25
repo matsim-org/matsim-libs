@@ -24,8 +24,7 @@ import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.Request;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.*;

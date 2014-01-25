@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.data.schedule.impl.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
 import playground.michalm.taxi.model.TaxiRequest;
 

@@ -21,8 +21,6 @@ package org.matsim.contrib.dvrp.data;
 
 import java.util.List;
 
-import org.matsim.contrib.dvrp.data.model.*;
-
 
 public interface VrpData
 {

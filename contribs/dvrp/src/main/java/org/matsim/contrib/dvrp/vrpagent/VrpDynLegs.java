@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.data.schedule.DriveTask;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 

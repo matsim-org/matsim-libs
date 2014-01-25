@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.extensions.electric;
 
-import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
 
 public interface ElectricVehicle

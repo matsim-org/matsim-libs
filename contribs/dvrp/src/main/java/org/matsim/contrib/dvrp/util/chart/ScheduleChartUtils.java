@@ -31,10 +31,9 @@ import org.jfree.chart.renderer.xy.*;
 import org.jfree.data.gantt.*;
 import org.jfree.data.time.*;
 import org.jfree.data.xy.XYDataset;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
-import org.matsim.contrib.dvrp.data.schedule.*;
-import org.matsim.contrib.dvrp.data.schedule.Task;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 
 public class ScheduleChartUtils

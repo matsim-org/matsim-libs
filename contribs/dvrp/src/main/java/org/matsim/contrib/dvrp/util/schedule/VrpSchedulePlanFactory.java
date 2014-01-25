@@ -20,8 +20,7 @@
 package org.matsim.contrib.dvrp.util.schedule;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.util.DynPlanFactory;
 

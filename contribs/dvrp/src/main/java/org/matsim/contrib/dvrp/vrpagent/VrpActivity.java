@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.dvrp.data.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynActivity;
 
 

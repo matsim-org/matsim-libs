@@ -21,9 +21,9 @@ package playground.michalm.taxi.model;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.model.impl.RequestImpl;
-import org.matsim.contrib.dvrp.data.schedule.Task.TaskStatus;
+import org.matsim.contrib.dvrp.data.RequestImpl;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import playground.michalm.taxi.schedule.*;

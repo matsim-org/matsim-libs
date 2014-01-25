@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import org.matsim.contrib.dvrp.data.schedule.Task.TaskType;
+import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 
 import playground.michalm.taxi.schedule.TaxiTask;
 

@@ -22,36 +22,19 @@ package playground.michalm.taxi.model;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.extensions.electric.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicleImpl;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 
 public class VrpAgentElectricTaxi
-    extends VrpAgentVehicleImpl
-    implements ElectricVehicle
+    extends ElectricVehicleImpl
 {
-    private Battery battery;
     private EnergyConsumptionModel ecm;
 
 
-    public VrpAgentElectricTaxi(Id id, Link startLink, double t0, double t1,
+    public VrpAgentElectricTaxi(Id id, Link startLink, double t0, double t1, Battery battery,
             EnergyConsumptionModel ecm)
     {
-        super(id, startLink, 4, t0, t1);
+        super(id, startLink, 4, t0, t1, battery);
         this.ecm = ecm;
-    }
-
-
-    @Override
-    public Battery getBattery()
-    {
-        return battery;
-    }
-
-
-    @Override
-    public void setBattery(Battery battery)
-    {
-        this.battery = battery;
     }
 }

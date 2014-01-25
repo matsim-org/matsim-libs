@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import org.matsim.contrib.dvrp.data.model.Vehicle;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.michalm.taxi.model.TaxiRequest;
 

@@ -19,8 +19,8 @@
 
 package playground.michalm.taxi.optimizer;
 
-import org.matsim.contrib.dvrp.data.schedule.*;
-import org.matsim.contrib.dvrp.data.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;

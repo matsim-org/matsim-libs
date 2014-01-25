@@ -19,8 +19,8 @@
 
 package playground.michalm.taxi;
 
-import org.matsim.contrib.dvrp.data.schedule.*;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
 
