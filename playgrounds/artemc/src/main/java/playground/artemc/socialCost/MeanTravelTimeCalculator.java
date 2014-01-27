@@ -185,7 +185,7 @@ PersonStuckEventHandler, IterationEndsListener, ShutdownListener  {
 			for (int j = 1; j <= transportModes.size(); j++) {
 				sum = sum + data[j][i];
 			}
-			data[0][i] = sum;
+			data[0][i] = sum / transportModes.size();
 		}
 
 		names[0] = "all transport modes";

@@ -65,7 +65,7 @@ public class SocialCostController {
 	/*
 	 * Initialize the necessary components for the social cost calculation.
 	 */
-	private static class Initializer implements IterationStartsListener {
+	public static class Initializer implements IterationStartsListener {
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
@@ -105,14 +105,12 @@ public class SocialCostController {
 			this.scc = scc;
 			this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 			this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceCostRateCar() * cnScoringGroup.getMarginalUtilityOfMoney();
-
 		}
 
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			double disutility = 0.0;
-
-			disutility += this.travelTime.getLinkTravelTime(link, time, person, vehicle);
+			disutility += this.marginalCostOfTime + this.travelTime.getLinkTravelTime(link, time, person, vehicle);
 			disutility += this.marginalCostOfDistance * link.getLength();
 			disutility += this.scc.getLinkTravelDisutility(link, time, person, vehicle); 
 			return disutility;
@@ -120,7 +118,6 @@ public class SocialCostController {
 
 		@Override
 		public double getLinkMinimumTravelDisutility(Link link) {
-			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException();
 		}
 

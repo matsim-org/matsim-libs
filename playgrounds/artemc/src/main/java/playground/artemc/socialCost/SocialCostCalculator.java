@@ -183,9 +183,7 @@ public class SocialCostCalculator implements TravelDisutility,
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		
 		double linkTravelDisutility = calcSocCosts(link.getId(), time) * this.marginalUtilityOfMoney;
-		
 		return linkTravelDisutility;
 	}
 	
@@ -375,16 +373,12 @@ public class SocialCostCalculator implements TravelDisutility,
 		for (LinkTrip linkTrip : performedTrips) {
 
 			double socialCosts = calcSocCosts(linkTrip.link_id, linkTrip.enterTime);
-						
 			// convert from seconds to CHF (currently defined as 6 CHF/hour)
 //			socialCosts = socialCosts / 600;
 			
-			if (socialCosts <= 0.0) continue;
-			
+			if (socialCosts <= 0.0) continue;	
 			PersonMoneyEvent e = new PersonMoneyEvent(0.5 * (linkTrip.enterTime + linkTrip.leaveTime), linkTrip.person_id, -socialCosts);
-			//AgentMoneyEvent e = new AgentMoneyEvent(0.5 * (linkTrip.enterTime + linkTrip.leaveTime), linkTrip.person_id, -socialCosts);
 			this.events.processEvent(e);
-
 			totalSocialCosts = totalSocialCosts + socialCosts;
 		}
 
