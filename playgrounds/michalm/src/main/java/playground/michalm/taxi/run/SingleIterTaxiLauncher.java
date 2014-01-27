@@ -24,7 +24,7 @@ import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
@@ -83,7 +83,7 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/double dropoffDuration;
 
     /*package*/LegHistogram legHistogram;
-    /*package*/MatsimVrpData data;
+    /*package*/MatsimVrpContext context;
     /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
 
     /*package*/TravelTimeCalculator travelTimeCalculator;
@@ -208,6 +208,9 @@ import playground.michalm.util.RunningVehicleRegister;
      */
     /*package*/void go(boolean warmup)
     {
+        MatsimVrpContextImpl context = new MatsimVrpContextImpl();
+        context.setScenario(scenario);
+        
         TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, travelTimeCalculator,
                 algorithmConfig.ttimeSource, eventsFileName);
 
@@ -220,19 +223,19 @@ import playground.michalm.util.RunningVehicleRegister;
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
+        context.setVrpData(taxiData);
 
         Params params = new Params(destinationKnown, minimizePickupTripTime, pickupDuration,
                 dropoffDuration);
 
-        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiData,
+        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(context,
                 calculator, params);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
-
-        data = new MatsimVrpData(taxiData, scenario, qSim.getSimTimer());
+        context.setMobsimTimer(qSim.getSimTimer());
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, data, qSim);
+                TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         LegCreator legCreator = onlineVehicleTracker ? VrpDynLegs
                 .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())
@@ -240,7 +243,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator);
 
-        VrpLauncherUtils.initAgentSources(qSim, data, optimizer, actionCreator);
+        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 
         EventsManager events = qSim.getEventsManager();
 
@@ -372,16 +375,16 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/void generateOutput()
     {
         PrintWriter pw = new PrintWriter(System.out);
-        new TaxiStatsCalculator().calculateStats(data.getVrpData()).print(pw);
+        new TaxiStatsCalculator().calculateStats(context.getVrpData()).print(pw);
         pw.flush();
 
         if (vrpOutFiles) {
-            new Schedules2GIS(data.getVrpData().getVehicles(), TransformationFactory.WGS84_UTM33N)
+            new Schedules2GIS(context.getVrpData().getVehicles(), TransformationFactory.WGS84_UTM33N)
                     .write(vrpOutDirName);
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()));
 
         if (outHistogram) {
             VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);

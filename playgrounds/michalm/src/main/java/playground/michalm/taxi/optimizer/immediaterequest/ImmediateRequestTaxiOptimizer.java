@@ -22,7 +22,8 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -94,9 +95,10 @@ public abstract class ImmediateRequestTaxiOptimizer
     private TaxiDelaySpeedupStats delaySpeedupStats;
 
 
-    public ImmediateRequestTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params)
+    public ImmediateRequestTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
+            Params params)
     {
-        super(data);
+        super(context);
         this.calculator = calculator;
         this.params = params;
     }
@@ -111,7 +113,7 @@ public abstract class ImmediateRequestTaxiOptimizer
     @Override
     protected void scheduleRequest(TaxiRequest request)
     {
-        VehiclePath bestVehicle = findBestVehicle(request, data.getVehicles());
+        VehiclePath bestVehicle = findBestVehicle(request, context.getVrpData().getVehicles());
 
         if (bestVehicle != VehiclePath.NO_VEHICLE_PATH_FOUND) {
             scheduleRequestImpl(bestVehicle, request);
@@ -121,15 +123,14 @@ public abstract class ImmediateRequestTaxiOptimizer
 
     protected VehiclePath findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
     {
-        double currentTime = data.getTime();
+        double currentTime = context.getTime();
         VehiclePath best = VehiclePath.NO_VEHICLE_PATH_FOUND;
 
         for (Vehicle veh : vehicles) {
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
 
             // COMPLETED or STARTED but delayed (time window T1 exceeded)
-            if (schedule.getStatus() == ScheduleStatus.COMPLETED
-                    || currentTime >= veh.getT1()) {
+            if (schedule.getStatus() == ScheduleStatus.COMPLETED || currentTime >= veh.getT1()) {
                 // skip this vehicle
                 continue;
             }
@@ -246,7 +247,7 @@ public abstract class ImmediateRequestTaxiOptimizer
     @Override
     protected boolean updateBeforeNextTask(Schedule<TaxiTask> schedule)
     {
-        double time = data.getTime();
+        double time = context.getTime();
         TaxiTask currentTask = schedule.getCurrentTask();
 
         double plannedEndTime;
@@ -424,7 +425,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         @SuppressWarnings("unchecked")
         Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
 
-        double predictedEndTime = driveTask.getVehicleTracker().predictEndTime(data.getTime());
+        double predictedEndTime = driveTask.getVehicleTracker().predictEndTime(context.getTime());
         updateCurrentAndPlannedTasks(schedule, predictedEndTime);
     }
 }

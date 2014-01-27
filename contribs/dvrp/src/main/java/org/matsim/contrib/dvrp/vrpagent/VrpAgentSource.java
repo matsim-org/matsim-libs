@@ -21,8 +21,8 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.api.core.v01.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.util.schedule.VrpSchedulePlanFactory;
@@ -39,35 +39,27 @@ public class VrpAgentSource
 {
     private final DynActionCreator nextActionCreator;
 
-    private final MatsimVrpData data;
+    private final MatsimVrpContext context;
     private final VrpOptimizer optimizer;
     private final QSim qSim;
 
-    private final boolean isAgentWithPlan;
+    private VrpSchedulePlanFactory planFactory = null;
 
 
-    public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpData data,
+    public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpContext context,
             VrpOptimizer optimizer, QSim qSim)
     {
-        this(nextActionCreator, data, optimizer, qSim, false);
-    }
-
-
-    public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpData data,
-            VrpOptimizer optimizer, QSim qSim, boolean isAgentWithPlan)
-    {
         this.nextActionCreator = nextActionCreator;
-        this.data = data;
+        this.context = context;
         this.optimizer = optimizer;
         this.qSim = qSim;
-        this.isAgentWithPlan = isAgentWithPlan;
     }
 
 
     @Override
     public void insertAgentsIntoMobsim()
     {
-        List<Vehicle> vehicles = data.getVrpData().getVehicles();
+        List<Vehicle> vehicles = context.getVrpData().getVehicles();
         VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
 
         for (Vehicle vrpVeh : vehicles) {
@@ -78,9 +70,8 @@ public class VrpAgentSource
 
             DynAgent taxiAgent = new DynAgent(id, startLinkId, qSim, vrpAgentLogic);
 
-            if (isAgentWithPlan) {
-                qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent,
-                        new VrpSchedulePlanFactory(vrpVeh, data)));
+            if (planFactory != null) {
+                qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent, planFactory));
             }
             else {
                 qSim.insertAgentIntoMobsim(taxiAgent);
@@ -90,5 +81,11 @@ public class VrpAgentSource
                     qSimVehicleFactory.createVehicle(id, VehicleUtils.getDefaultVehicleType()),
                     startLinkId);
         }
+    }
+
+
+    public void useDynAgentWithPlan(Scenario scenario)
+    {
+        planFactory = new VrpSchedulePlanFactory(scenario);
     }
 }

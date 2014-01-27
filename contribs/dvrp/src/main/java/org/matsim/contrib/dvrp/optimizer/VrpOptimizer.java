@@ -29,10 +29,8 @@ public interface VrpOptimizer
      * This function can be generalized (in the future) to encompass request modification,
      * cancellation etc.
      */
-    //return boolean? ("has anything changed?" true/false)
     void requestSubmitted(Request request);
 
 
-    //return boolean? ("has anything changed?" true/false)
     void nextTask(Schedule<? extends Task> schedule);
 }

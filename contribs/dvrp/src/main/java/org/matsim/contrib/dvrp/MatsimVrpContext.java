@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.dvrp;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.contrib.dvrp.data.VrpData;
 
 
-public class MatsimVrpData
+public interface MatsimVrpContext
 {
-    private final VrpData vrpData;
-    private final Scenario scenario;
-    private final MobsimTimer timer;
+    VrpData getVrpData();
 
 
-    public MatsimVrpData(VrpData vrpData, Scenario scenario, MobsimTimer timer)
-    {
-        this.vrpData = vrpData;
-        this.scenario = scenario;
-        this.timer = timer;
-
-        ((VrpDataImpl)vrpData).setMobsimTimer(timer);
-    }
+    Scenario getScenario();
 
 
-    public VrpData getVrpData()
-    {
-        return vrpData;
-    }
-
-
-    public Scenario getScenario()
-    {
-        return scenario;
-    }
-
-
-    public MobsimTimer getTimer()
-    {
-        return timer;
-    }
+    double getTime();
 }

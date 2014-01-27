@@ -7,8 +7,8 @@
 
 	<person id="taxi_passenger_0" employed="no">
 		<plan selected="yes">
-			<act type="work" link="114" end_time="00:00:01" />
-			<leg mode="taxi" dep_time="00:00:01" trav_time="00:01:00" arr_time="00:01:01">
+			<act type="work" link="114" end_time="00:00:00" />
+			<leg mode="taxi" dep_time="00:00:00" trav_time="00:01:00" arr_time="00:01:00">
 				<route type="links"></route>
 			</leg> 
 			<act type="home" link="349"/>

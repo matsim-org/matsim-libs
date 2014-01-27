@@ -28,7 +28,4 @@ public interface VrpData
 
 
     List<Request> getRequests();
-
-
-    double getTime();
 }

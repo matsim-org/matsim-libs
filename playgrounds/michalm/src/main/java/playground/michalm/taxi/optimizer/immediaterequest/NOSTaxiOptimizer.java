@@ -21,6 +21,7 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 import java.util.*;
 
+import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -36,18 +37,18 @@ public class NOSTaxiOptimizer
     private final VehicleFinder idleVehicleFinder;
 
 
-    public NOSTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
+    public NOSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
             boolean straightLineDistance)
     {
-        this(data, calculator, params,
-                new IdleVehicleFinder(data, calculator, straightLineDistance));
+        this(context, calculator, params,
+                new IdleVehicleFinder(context, calculator, straightLineDistance));
     }
 
 
-    public NOSTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
+    public NOSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
             VehicleFinder idleVehicleFinder)
     {
-        super(data, calculator, params);
+        super(context, calculator, params);
         this.idleVehicleFinder = idleVehicleFinder;
     }
 

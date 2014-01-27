@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.*;
@@ -61,24 +62,27 @@ public class OneTaxiLauncher
 
     public void go()
     {
+        MatsimVrpContextImpl context = new MatsimVrpContextImpl();
+        context.setScenario(scenario);
+        
         TravelTime travelTime = new FreeSpeedTravelTime();
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
         VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
                 TravelTimeSource.FREE_FLOW_SPEED, travelTime, travelDisutility);
 
-        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, vehiclesFileName);
+        VrpData vrpData = VrpLauncherUtils.initVrpData(context, vehiclesFileName);
+        context.setVrpData(vrpData);
 
-        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(vrpData, calculator);
+        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(context, calculator);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
-
-        MatsimVrpData data = new MatsimVrpData(vrpData, scenario, qSim.getSimTimer());
+        context.setMobsimTimer(qSim.getSimTimer());
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                OneTaxiRequestCreator.MODE, new OneTaxiRequestCreator(), optimizer, data, qSim);
+                OneTaxiRequestCreator.MODE, new OneTaxiRequestCreator(), optimizer, context, qSim);
 
-        VrpLauncherUtils.initAgentSources(qSim, data, optimizer, new OneTaxiActionCreator(
+        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new OneTaxiActionCreator(
                 passengerEngine));
 
         EventsManager events = qSim.getEventsManager();

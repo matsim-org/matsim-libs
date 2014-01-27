@@ -46,15 +46,15 @@ public class VrpSchedulePlan
     private Person person;
 
 
-    public VrpSchedulePlan(Vehicle vehicle, MatsimVrpData data)
+    public VrpSchedulePlan(Vehicle vehicle, Scenario scenario)
     {
         this.vehicle = vehicle;
 
         actsLegs = new ArrayList<PlanElement>();
         unmodifiableActsLegs = (List<PlanElement>)Collections.unmodifiableList(actsLegs);
 
-        populFactory = data.getScenario().getPopulation().getFactory();
-        network = data.getScenario().getNetwork();
+        populFactory = scenario.getPopulation().getFactory();
+        network = scenario.getNetwork();
 
         init();
     }

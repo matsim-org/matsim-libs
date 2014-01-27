@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
@@ -32,10 +32,10 @@ public class OTSTaxiOptimizer
     private final TaxiOptimizationPolicy optimizationPolicy;
 
 
-    public OTSTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
+    public OTSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
             TaxiOptimizationPolicy optimizationPolicy)
     {
-        super(data, calculator, params);
+        super(context, calculator, params);
         this.optimizationPolicy = optimizationPolicy;
     }
 

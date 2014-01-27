@@ -21,6 +21,7 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -33,15 +34,15 @@ import playground.michalm.taxi.schedule.*;
 public class IdleVehicleFinder
     implements VehicleFinder
 {
-    private final VrpData data;
+    private final MatsimVrpContext context;
     private final VrpPathCalculator calculator;
     private final boolean straightLineDistance;
 
 
-    public IdleVehicleFinder(VrpData data, VrpPathCalculator calculator,
+    public IdleVehicleFinder(MatsimVrpContext context, VrpPathCalculator calculator,
             boolean straightLineDistance)
     {
-        this.data = data;
+        this.context = context;
         this.calculator = calculator;
         this.straightLineDistance = straightLineDistance;
     }
@@ -53,8 +54,8 @@ public class IdleVehicleFinder
         Vehicle bestVeh = null;
         double bestDistance = Double.MAX_VALUE;
 
-        for (Vehicle veh : data.getVehicles()) {
-            double distance = calculateDistance(req, veh, data.getTime(), calculator,
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            double distance = calculateDistance(req, veh, context.getTime(), calculator,
                     straightLineDistance);
 
             if (distance < bestDistance) {

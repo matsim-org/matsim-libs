@@ -31,34 +31,32 @@ import org.jfree.chart.renderer.xy.*;
 import org.jfree.data.gantt.*;
 import org.jfree.data.time.*;
 import org.jfree.data.xy.XYDataset;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 
 public class ScheduleChartUtils
 {
-    public static JFreeChart chartSchedule(VrpData data)
+    public static JFreeChart chartSchedule(List<Vehicle> vehicles)
     {
-        return chartSchedule(data, BASIC_DESCRIPTION_CREATOR, BASIC_PAINT_SELECTOR);
+        return chartSchedule(vehicles, BASIC_DESCRIPTION_CREATOR, BASIC_PAINT_SELECTOR);
     }
 
 
-    public static <T extends Task> JFreeChart chartSchedule(VrpData data,
+    public static <T extends Task> JFreeChart chartSchedule(List<Vehicle> vehicles,
             DescriptionCreator<T> descriptionCreator, PaintSelector<T> paintSelector)
     {
         // data
-        TaskSeriesCollection dataset = createScheduleDataset(data, descriptionCreator);
+        TaskSeriesCollection dataset = createScheduleDataset(vehicles, descriptionCreator);
         XYTaskDataset xyTaskDataset = new XYTaskDataset(dataset);
 
         // chart
-        String title = "Time " + data.getTime();
-        JFreeChart chart = ChartFactory.createXYBarChart(title, "Time", false, "Vehicles",
+        JFreeChart chart = ChartFactory.createXYBarChart("Schedules", "Time", false, "Vehicles",
                 xyTaskDataset, PlotOrientation.HORIZONTAL, false, true, false);
         XYPlot plot = (XYPlot)chart.getPlot();
 
         // Y axis
-        List<Vehicle> vehicles = data.getVehicles();
         String[] series = new String[vehicles.size()];
         for (int i = 0; i < series.length; i++) {
             series[i] = vehicles.get(i).getId().toString();
@@ -178,12 +176,12 @@ public class ScheduleChartUtils
     };
 
 
-    private static <T extends Task> TaskSeriesCollection createScheduleDataset(VrpData data,
-            DescriptionCreator<T> descriptionCreator)
+    private static <T extends Task> TaskSeriesCollection createScheduleDataset(
+            List<Vehicle> vehicles, DescriptionCreator<T> descriptionCreator)
     {
         TaskSeriesCollection collection = new TaskSeriesCollection();
 
-        for (Vehicle v : data.getVehicles()) {
+        for (Vehicle v : vehicles) {
             @SuppressWarnings("unchecked")
             Schedule<T> schedule = (Schedule<T>)v.getSchedule();
 

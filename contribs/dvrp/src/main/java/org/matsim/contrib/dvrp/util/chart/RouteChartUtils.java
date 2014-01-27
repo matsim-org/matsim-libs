@@ -39,11 +39,10 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
  */
 public class RouteChartUtils
 {
-    public static JFreeChart chartRoutes(VrpData data)
+    public static JFreeChart chartRoutes(List<Vehicle> vehicles)
     {
         CoordDataset lData = new CoordDataset();
 
-        List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
             Schedule<?> schedule = vehicles.get(i).getSchedule();
             lData.addSeries(Integer.toString(i), LinkSources.createLinkSource(schedule));
@@ -82,11 +81,10 @@ public class RouteChartUtils
     }
 
 
-    public static JFreeChart chartRoutesByStatus(VrpData data)
+    public static JFreeChart chartRoutesByStatus(List<Vehicle> vehicles)
     {
         CoordDataset nData = new CoordDataset();
 
-        List<Vehicle> vehicles = data.getVehicles();
         for (int i = 0; i < vehicles.size(); i++) {
             Schedule<?> schedule = vehicles.get(i).getSchedule();
             Map<TaskStatus, CoordSource> vsByStatus = createLinkSourceByStatus(schedule);
@@ -95,10 +93,9 @@ public class RouteChartUtils
             nData.addSeries(i + "-PL", vsByStatus.get(TaskStatus.PLANNED));
         }
 
-        String title = "Time " + data.getTime();
-        JFreeChart chart = ChartFactory.createXYLineChart(title, "X", "Y", nData,
+        JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", nData,
                 PlotOrientation.VERTICAL, false, true, false);
-
+        
         XYPlot plot = (XYPlot)chart.getPlot();
         plot.setRangeGridlinesVisible(false);
         plot.setDomainGridlinesVisible(false);

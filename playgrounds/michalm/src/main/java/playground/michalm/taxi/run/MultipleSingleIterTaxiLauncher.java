@@ -110,7 +110,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             launcher.go(false);
             TaxiStats evaluation = (TaxiStats)new TaxiStatsCalculator()
-                    .calculateStats(launcher.data.getVrpData());
+                    .calculateStats(launcher.context.getVrpData());
             long t1 = System.currentTimeMillis();
 
             taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());

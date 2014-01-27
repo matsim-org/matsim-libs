@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.*;
@@ -32,7 +33,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 public class OneTaxiOptimizer
     implements VrpOptimizer
 {
-    private final VrpData data;
+    private final MatsimVrpContext context;
     private final VrpPathCalculator pathCalculator;
 
     private final Vehicle vehicle;//we have only one vehicle
@@ -40,13 +41,15 @@ public class OneTaxiOptimizer
 
 
     @SuppressWarnings("unchecked")
-    public OneTaxiOptimizer(VrpData data, VrpPathCalculator calculator)
+    public OneTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator)
     {
-        this.data = data;
+        this.context = context;
         this.pathCalculator = calculator;
 
-        vehicle = data.getVehicles().get(0);
+        vehicle = context.getVrpData().getVehicles().get(0);
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
+        schedule.addTask(new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(),
+                "wait"));
     }
 
 
@@ -54,7 +57,7 @@ public class OneTaxiOptimizer
     public void requestSubmitted(Request request)
     {
         StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
-        double currentTime = data.getTime();
+        double currentTime = context.getTime();
 
         switch (lastTask.getStatus()) {
             case PLANNED:

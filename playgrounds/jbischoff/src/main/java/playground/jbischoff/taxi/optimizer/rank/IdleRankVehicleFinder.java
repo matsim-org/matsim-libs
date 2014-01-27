@@ -21,7 +21,8 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
@@ -40,7 +41,7 @@ import playground.michalm.taxi.schedule.TaxiSchedules;
 public class IdleRankVehicleFinder
     implements VehicleFinder
 {
-    private final VrpData data;
+    private final MatsimVrpContext context;
     private final VrpPathCalculator calculator;
     private final boolean straightLineDistance;
 	private RankArrivalDepartureCharger rankArrivaldeparturecharger;
@@ -49,9 +50,9 @@ public class IdleRankVehicleFinder
 	Random rnd;
 
 
-    public IdleRankVehicleFinder(VrpData data, VrpPathCalculator calculator, boolean straightLineDistance)
+    public IdleRankVehicleFinder(MatsimVrpContext context, VrpPathCalculator calculator, boolean straightLineDistance)
     {
-        this.data = data;
+        this.context = context;
         this.calculator = calculator;
         this.straightLineDistance = straightLineDistance;
         this.IsElectric = false;
@@ -98,8 +99,8 @@ public class IdleRankVehicleFinder
        	  Vehicle bestVeh = null;
              double bestDistance = 1e9;
              
-             Collections.shuffle(data.getVehicles(),rnd);
-             for (Vehicle veh : data.getVehicles()) {
+             Collections.shuffle(context.getVrpData().getVehicles(),rnd);
+             for (Vehicle veh : context.getVrpData().getVehicles()) {
              	if (this.IsElectric)
              		if (!this.hasEnoughCapacityForTask(veh)) continue;
              	
@@ -128,10 +129,10 @@ public class IdleRankVehicleFinder
     private Vehicle findHighestChargedIdleVehicle(TaxiRequest req){
      	  Vehicle bestVeh = null;
      	  double bestSoc=0;
-          Collections.shuffle(data.getVehicles(),rnd);
+          Collections.shuffle(context.getVrpData().getVehicles(),rnd);
           
-          for (Vehicle veh : data.getVehicles()) {
-        	  if (!TaxiUtils.isIdle(TaxiSchedules.getSchedule(veh), data.getTime(), true)) continue;
+          for (Vehicle veh : context.getVrpData().getVehicles()) {
+        	  if (!TaxiUtils.isIdle(TaxiSchedules.getSchedule(veh), context.getTime(), true)) continue;
         	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
         	  double soc = this.getVehicleSoc(veh);
         	  if (soc>bestSoc){
@@ -148,10 +149,10 @@ public class IdleRankVehicleFinder
     private Vehicle findHighestChargedIdleVehicleDistanceSort(TaxiRequest req){
    	  Vehicle bestVeh = null;
    	  double bestSoc=0;
-        Collections.shuffle(data.getVehicles(),rnd);
+        Collections.shuffle(context.getVrpData().getVehicles(),rnd);
         
-        for (Vehicle veh : data.getVehicles()) {
-      	  if (!TaxiUtils.isIdle(TaxiSchedules.getSchedule(veh), data.getTime(), true)) continue;
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+      	  if (!TaxiUtils.isIdle(TaxiSchedules.getSchedule(veh), context.getTime(), true)) continue;
       	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
       	  double soc = this.getVehicleSoc(veh);
       	  if (soc>bestSoc){
@@ -176,11 +177,11 @@ public class IdleRankVehicleFinder
   }
     
     private Vehicle findClosestFIFOVehicle(TaxiRequest req){
-        Collections.shuffle(data.getVehicles(),rnd);
+        Collections.shuffle(context.getVrpData().getVehicles(),rnd);
     	  Vehicle bestVeh = null;
 //          double bestDistance = Double.MAX_VALUE;
           double bestDistance = Double.MAX_VALUE/2;
-          for (Vehicle veh : data.getVehicles()) {
+          for (Vehicle veh : context.getVrpData().getVehicles()) {
           	if (this.IsElectric)
           		if (!this.hasEnoughCapacityForTask(veh)) continue;
           	
@@ -208,7 +209,7 @@ public class IdleRankVehicleFinder
     
     
     private double calculateDistance(TaxiRequest req, Vehicle veh){
-        return IdleVehicleFinder.calculateDistance(req, veh, data.getTime(), calculator,
+        return IdleVehicleFinder.calculateDistance(req, veh, context.getTime(), calculator,
                 straightLineDistance);
     }
 }

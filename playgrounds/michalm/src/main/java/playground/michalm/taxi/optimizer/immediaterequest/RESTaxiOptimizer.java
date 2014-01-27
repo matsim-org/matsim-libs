@@ -22,7 +22,8 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.schedule.*;
 
@@ -34,16 +35,14 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 public class RESTaxiOptimizer
     extends ImmediateRequestTaxiOptimizer
 {
-    private final VrpData data;
     private final boolean destinationKnown;
     private final TaxiOptimizationPolicy optimizationPolicy;
 
 
-    public RESTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
+    public RESTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
             TaxiOptimizationPolicy optimizationPolicy)
     {
-        super(data, calculator, params);
-        this.data = data;
+        super(context, calculator, params);
         this.destinationKnown = params.destinationKnown;
         this.optimizationPolicy = optimizationPolicy;
     }
@@ -72,7 +71,7 @@ public class RESTaxiOptimizer
     @Override
     protected void optimize()
     {
-        for (Vehicle veh : data.getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
             removePlannedRequests(TaxiSchedules.getSchedule(veh));
         }
 
@@ -122,7 +121,7 @@ public class RESTaxiOptimizer
                     case WAIT_STAY:
                         // this WAIT is not the last task, so it seems that it is delayed
                         // and there are some other planned task
-                        if (!TaxiUtils.isCurrentTaskDelayed(schedule, data.getTime())) {
+                        if (!TaxiUtils.isCurrentTaskDelayed(schedule, context.getTime())) {
                             throw new IllegalStateException();//
                         }
                 }

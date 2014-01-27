@@ -24,7 +24,8 @@ import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.*;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.*;
@@ -79,7 +80,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
     /*package*/final Scenario scenario;
 
-    /*package*/MatsimVrpData data;
+    /*package*/MatsimVrpContext context;
     /*package*/LegHistogram legHistogram;
 
     /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
@@ -154,6 +155,9 @@ import playground.michalm.util.RunningVehicleRegister;
      */
     /*package*/void go(int run)
     {
+        MatsimVrpContextImpl context = new MatsimVrpContextImpl();
+        context.setScenario(scenario);
+
         File f = new File(electricStatsDir);
         f.mkdirs();
 
@@ -183,23 +187,23 @@ import playground.michalm.util.RunningVehicleRegister;
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
         TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
+        context.setVrpData(vrpData);
 
         Params params = new Params(true, false, 120, 60);
 
-        NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(vrpData,
+        NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
                 calculator, params, true);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
-
-        data = new MatsimVrpData(vrpData, scenario, qSim.getSimTimer());
+        context.setMobsimTimer(qSim.getSimTimer());
 
         ElectroCabLaunchUtils olutils = new ElectroCabLaunchUtils();
-        olutils.initVrpSimEngine(qSim, data, optimizer);
+        olutils.initVrpSimEngine(qSim, context, optimizer);
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, data, qSim);
+                TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
-        VrpLauncherUtils.initAgentSources(qSim, data, optimizer, new TaxiActionCreator(
+        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new TaxiActionCreator(
                 passengerEngine, VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR));
 
         EventsManager events = qSim.getEventsManager();
@@ -231,7 +235,7 @@ import playground.michalm.util.RunningVehicleRegister;
         waitList.add(run + "\t" + olutils.writeStatisticsToFiles(electricStatsDir) + "\n");
 
         // check if all reqs have been served
-        for (Request r : data.getVrpData().getRequests()) {
+        for (Request r : context.getVrpData().getRequests()) {
             TaxiRequest tr = (TaxiRequest)r;
             if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
                 throw new IllegalStateException();
@@ -243,19 +247,20 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/void generateOutput()
     {
         PrintWriter pw = new PrintWriter(System.out);
-        new TaxiStatsCalculator().calculateStats(data.getVrpData()).print(pw);
+        new TaxiStatsCalculator().calculateStats(context.getVrpData()).print(pw);
         pw.flush();
 
         if (vrpOutFiles) {
-            new Schedules2GIS(data.getVrpData().getVehicles(), TransformationFactory.WGS84_UTM33N)
-                    .write(vrpOutDirName);
+            new Schedules2GIS(context.getVrpData().getVehicles(),
+                    TransformationFactory.WGS84_UTM33N).write(vrpOutDirName);
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
         //        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
 
         try {
-            ChartUtils.saveAsPDF(ScheduleChartUtils.chartSchedule(data.getVrpData()),
+            ChartUtils.saveAsPDF(
+                    ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()),
                     electricStatsDir + "taxiSchedules", 2048, 1546);
         }
         catch (IOException e) {

@@ -23,7 +23,8 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 
@@ -50,18 +51,18 @@ public class NOSRankTaxiOptimizer
     private final VrpPathCalculator calculator;
 
 
-    public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(VrpData data,
+    public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(MatsimVrpContext context,
             VrpPathCalculator calculator, Params params, boolean straightLineDistance)
     {
-        return new NOSRankTaxiOptimizer(data, calculator, params, new IdleRankVehicleFinder(data,
+        return new NOSRankTaxiOptimizer(context, calculator, params, new IdleRankVehicleFinder(context,
                 calculator, straightLineDistance));
     }
 
 
-    private NOSRankTaxiOptimizer(VrpData data, VrpPathCalculator calculator, Params params,
+    private NOSRankTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
             IdleRankVehicleFinder vehicleFinder)
     {
-        super(data, calculator, params, vehicleFinder);
+        super(context, calculator, params, vehicleFinder);
         this.calculator = calculator;
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();
@@ -132,7 +133,7 @@ public class NOSRankTaxiOptimizer
 
     private void checkWaitingVehiclesBatteryState()
     {
-        for (Vehicle veh : data.getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
             Task last = Schedules.getLastTask(veh.getSchedule());
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
@@ -151,7 +152,7 @@ public class NOSRankTaxiOptimizer
 
         @SuppressWarnings("unchecked")
         Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
-        double currentTime = data.getTime();
+        double currentTime = context.getTime();
         double oldEndTime;
         TaxiWaitStayTask lastTask = (TaxiWaitStayTask)Schedules.getLastTask(sched);// only WAIT
 
@@ -189,7 +190,7 @@ public class NOSRankTaxiOptimizer
     public void updateIdlers()
     {
         this.shortTimeIdlers.clear();
-        for (Vehicle veh : data.getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
             Task last = Schedules.getLastTask(veh.getSchedule());
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
@@ -203,7 +204,7 @@ public class NOSRankTaxiOptimizer
 
     public void sendIdlingTaxisToRank()
     {
-        for (Vehicle veh : data.getVehicles()) {
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
             if (shortTimeIdlers.contains(veh.getId())) {
                 Task last = Schedules.getLastTask(veh.getSchedule());
                 if (last instanceof TaxiWaitStayTask) {

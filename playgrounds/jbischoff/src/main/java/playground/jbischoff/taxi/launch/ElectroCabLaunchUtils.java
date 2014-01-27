@@ -22,7 +22,8 @@ package playground.jbischoff.taxi.launch;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
@@ -55,10 +56,10 @@ public class ElectroCabLaunchUtils
     /**
      * Mandatory
      */
-    public ElectricTaxiSimEngine initVrpSimEngine(QSim qSim, MatsimVrpData data,
+    public ElectricTaxiSimEngine initVrpSimEngine(QSim qSim, MatsimVrpContext context,
             NOSRankTaxiOptimizer optimizer)
     {
-        Scenario scenario = data.getScenario();
+        Scenario scenario = context.getScenario();
 
         optimizer.setRankMode(false);
         optimizer.setIdleRankMode(true);
@@ -76,14 +77,14 @@ public class ElectroCabLaunchUtils
 
         if (ALLCARSELECTRIC) {
 
-            for (Vehicle v : data.getVrpData().getVehicles()) {
+            for (Vehicle v : context.getVrpData().getVehicles()) {
                 Id aid = v.getId();
                 elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm, 20 * 1000 * 3600));
                 travelDistanceEvaluator.addAgent(aid);
             }
         }
 
-        for (Vehicle v : data.getVrpData().getVehicles()) {
+        for (Vehicle v : context.getVrpData().getVehicles()) {
             travelDistanceEvaluator.addAgent(v.getId());
         }
 
@@ -97,7 +98,7 @@ public class ElectroCabLaunchUtils
         handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
 
         List<Id> rankLinkIds = new ArrayList<Id>();
-        for (TaxiRank r : ((TaxiData)data.getVrpData()).getTaxiRanks()) {
+        for (TaxiRank r : ((TaxiData)context.getVrpData()).getTaxiRanks()) {
             rankLinkIds.add(r.getLink().getId());
         }
 

@@ -23,7 +23,8 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
@@ -42,10 +43,10 @@ public class TaxiOptimizerWithPreassignment
     private Map<Id, Vehicle> reqIdToVehMap;
 
 
-    public TaxiOptimizerWithPreassignment(VrpData data, VrpPathCalculator calculator,
+    public TaxiOptimizerWithPreassignment(MatsimVrpContext context, VrpPathCalculator calculator,
             double pickupDuration, double dropoffDuration, final Map<Id, Vehicle> reqIdToVehMap)
     {
-        super(data, calculator, new Params(true, false, pickupDuration, dropoffDuration));
+        super(context, calculator, new Params(true, false, pickupDuration, dropoffDuration));
         this.reqIdToVehMap = reqIdToVehMap;
     }
 
@@ -74,7 +75,7 @@ public class TaxiOptimizerWithPreassignment
     }
 
 
-    public static TaxiOptimizerWithPreassignment createOptimizer(MatsimVrpData data,
+    public static TaxiOptimizerWithPreassignment createOptimizer(MatsimVrpContext context,
             VrpPathCalculator calculator, double pickupDuration, double dropoffDuration,
             String reqIdToVehIdFile)
     {
@@ -86,18 +87,18 @@ public class TaxiOptimizerWithPreassignment
             throw new RuntimeException(e);
         }
 
-        List<Vehicle> vehicles = data.getVrpData().getVehicles();
+        List<Vehicle> vehicles = context.getVrpData().getVehicles();
         Map<Id, Vehicle> reqIdToVehMap = new HashMap<Id, Vehicle>();
 
         int count = scanner.nextInt();
-        Scenario scenario = data.getScenario();
+        Scenario scenario = context.getScenario();
 
         for (int i = 0; i < count; i++) {
             reqIdToVehMap.put(scenario.createId(i + ""), vehicles.get(scanner.nextInt()));
         }
         scanner.close();
 
-        return new TaxiOptimizerWithPreassignment(data.getVrpData(), calculator, pickupDuration,
+        return new TaxiOptimizerWithPreassignment(context, calculator, pickupDuration,
                 dropoffDuration, reqIdToVehMap);
     }
 }

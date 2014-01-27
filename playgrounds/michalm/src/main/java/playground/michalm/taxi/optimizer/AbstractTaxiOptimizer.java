@@ -21,6 +21,7 @@ package playground.michalm.taxi.optimizer;
 
 import java.util.*;
 
+import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -28,7 +29,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.schedule.TaxiTask;
+import playground.michalm.taxi.schedule.*;
 
 
 /**
@@ -44,15 +45,15 @@ import playground.michalm.taxi.schedule.TaxiTask;
 public abstract class AbstractTaxiOptimizer
     implements VrpOptimizer
 {
-    protected final VrpData data;
+    protected final MatsimVrpContext context;
     protected final Queue<TaxiRequest> unplannedRequestQueue;
 
 
-    public AbstractTaxiOptimizer(VrpData data)
+    public AbstractTaxiOptimizer(MatsimVrpContext context)
     {
-        this.data = data;
-        int initialCapacity = data.getVehicles().size();// just proportional to the number of
-                                                        // vehicles (for easy scaling)
+        this.context = context;
+        int initialCapacity = 10 * context.getVrpData().getVehicles().size();
+
         unplannedRequestQueue = new PriorityQueue<TaxiRequest>(initialCapacity,
                 new Comparator<TaxiRequest>() {
                     public int compare(TaxiRequest r1, TaxiRequest r2)
@@ -60,6 +61,11 @@ public abstract class AbstractTaxiOptimizer
                         return Double.compare(r1.getSubmissionTime(), r2.getSubmissionTime());
                     }
                 });
+
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+            schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+        }
     }
 
 

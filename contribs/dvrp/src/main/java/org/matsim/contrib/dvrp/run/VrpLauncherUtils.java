@@ -27,15 +27,18 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -185,38 +188,31 @@ public class VrpLauncherUtils
     }
 
 
-    public static VrpData initVrpData(Scenario scenario, String vehiclesFileName)
+    public static VrpData initVrpData(MatsimVrpContextImpl context, String vehiclesFileName)
     {
         VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(scenario, vrpData).readFile(vehiclesFileName);
-
-        for (Vehicle veh : vrpData.getVehicles()) {
-            @SuppressWarnings("unchecked")
-            Schedule<Task> schedule = (Schedule<Task>)veh.getSchedule();
-
-            schedule.addTask(new StayTaskImpl(veh.getT0(), veh.getT1(), veh.getStartLink(), "wait"));
-        }
-
+        new VehicleReader(context.getScenario(), vrpData).readFile(vehiclesFileName);
         return vrpData;
     }
 
 
     public static PassengerEngine initPassengerEngine(String mode,
-            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, MatsimVrpData data,
-            QSim qSim)
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
+            MatsimVrpContext context, QSim qSim)
     {
-        PassengerEngine passengerEngine = new PassengerEngine(mode, requestCreator, optimizer, data);
+        PassengerEngine passengerEngine = new PassengerEngine(mode, requestCreator, optimizer,
+                context);
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
         return passengerEngine;
     }
 
 
-    public static void initAgentSources(QSim qSim, MatsimVrpData data, VrpOptimizer optimizer,
-            DynActionCreator actionCreator)
+    public static void initAgentSources(QSim qSim, MatsimVrpContext context,
+            VrpOptimizer optimizer, DynActionCreator actionCreator)
     {
-        qSim.addAgentSource(new VrpAgentSource(actionCreator, data, optimizer, qSim));
-        qSim.addAgentSource(new PopulationAgentSource(data.getScenario().getPopulation(),
+        qSim.addAgentSource(new VrpAgentSource(actionCreator, context, optimizer, qSim));
+        qSim.addAgentSource(new PopulationAgentSource(context.getScenario().getPopulation(),
                 new DefaultAgentFactory(qSim), qSim));
     }
 

@@ -122,6 +122,12 @@ public class DynAgent
     }
 
 
+    public DynAgentLogic getAgentLogic()
+    {
+        return agentLogic;
+    }
+
+
     @Override
     public Id getId()
     {
@@ -204,8 +210,8 @@ public class DynAgent
     {
         return dynActivity.getEndTime();
     }
-    
-    
+
+
     public void doSimStep(double now)
     {
         dynActivity.doSimStep(now);

@@ -26,7 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -42,18 +43,18 @@ public class PassengerEngine
     private final String mode;
 
     private InternalInterface internalInterface;
-    private final MatsimVrpData data;
+    private final MatsimVrpContext context;
     private final PassengerRequestCreator requestCreator;
     private final VrpOptimizer optimizer;
 
 
     public PassengerEngine(String mode, PassengerRequestCreator requestCreator,
-            VrpOptimizer optimizer, MatsimVrpData data)
+            VrpOptimizer optimizer, MatsimVrpContext context)
     {
         this.mode = mode;
         this.requestCreator = requestCreator;
         this.optimizer = optimizer;
-        this.data = data;
+        this.context = context;
     }
 
 
@@ -164,12 +165,12 @@ public class PassengerEngine
     private PassengerRequest createRequest(MobsimAgent passenger, Id fromLinkId, Id toLinkId,
             double departureTime, double now)
     {
-        Map<Id, ? extends Link> links = data.getScenario().getNetwork().getLinks();
+        Map<Id, ? extends Link> links = context.getScenario().getNetwork().getLinks();
         Link fromLink = links.get(fromLinkId);
         Link toLink = links.get(toLinkId);
 
-        List<Request> requests = data.getVrpData().getRequests();
-        Id id = data.getScenario().createId(requests.size() + "");
+        List<Request> requests = context.getVrpData().getRequests();
+        Id id = context.getScenario().createId(requests.size() + "");
 
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);

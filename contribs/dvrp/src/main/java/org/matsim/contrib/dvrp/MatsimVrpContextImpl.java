@@ -17,31 +17,56 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.util.schedule;
+package org.matsim.contrib.dvrp;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.dynagent.util.DynPlanFactory;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 
-public class VrpSchedulePlanFactory
-    implements DynPlanFactory
+public class MatsimVrpContextImpl
+    implements MatsimVrpContext
 {
+    private VrpData vrpData;
     private Scenario scenario;
+    private MobsimTimer timer;
 
 
-    public VrpSchedulePlanFactory(Scenario scenario)
+    @Override
+    public VrpData getVrpData()
+    {
+        return vrpData;
+    }
+
+
+    @Override
+    public Scenario getScenario()
+    {
+        return scenario;
+    }
+
+
+    @Override
+    public double getTime()
+    {
+        return timer.getTimeOfDay();
+    }
+
+
+    public void setVrpData(VrpData vrpData)
+    {
+        this.vrpData = vrpData;
+    }
+
+
+    public void setScenario(Scenario scenario)
     {
         this.scenario = scenario;
     }
 
 
-    @Override
-    public Plan create(DynAgent agent)
+    public void setMobsimTimer(MobsimTimer timer)
     {
-        VrpAgentLogic agentLogic = (VrpAgentLogic)agent.getAgentLogic();
-        return new VrpSchedulePlan(agentLogic.getVehicle(), scenario);
+        this.timer = timer;
     }
 }

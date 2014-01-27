@@ -24,7 +24,7 @@ import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.*;
 import static playground.michalm.taxi.optimizer.immediaterequest.TaxiOptimizationPolicy.*;
 import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
 
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -189,18 +189,18 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
     }
 
 
-    /*package*/ImmediateRequestTaxiOptimizer createTaxiOptimizer(VrpData data,
+    /*package*/ImmediateRequestTaxiOptimizer createTaxiOptimizer(MatsimVrpContext context,
             VrpPathCalculator calculator, Params params)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(data, calculator, params, this == NOS_STRAIGHT_LINE);
+                return new NOSTaxiOptimizer(context, calculator, params, this == NOS_STRAIGHT_LINE);
 
             case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizer(data, calculator, params, optimizationPolicy);
+                return new OTSTaxiOptimizer(context, calculator, params, optimizationPolicy);
 
             case RE_SCHEDULING:
-                return new RESTaxiOptimizer(data, calculator, params, optimizationPolicy);
+                return new RESTaxiOptimizer(context, calculator, params, optimizationPolicy);
 
             default:
                 throw new IllegalStateException();
