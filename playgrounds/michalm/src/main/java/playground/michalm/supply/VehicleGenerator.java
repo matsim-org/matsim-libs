@@ -30,9 +30,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import pl.poznan.put.util.random.*;
 
 
-public class DepotGenerator
+public class VehicleGenerator
 {
-    public static void generateVehicles(String networkFilename, String depotsFilename, int count,
+    public static void generateVehicles(String networkFilename, String vehiclesFilename, int count,
             int t1)
         throws IOException
     {
@@ -44,27 +44,20 @@ public class DepotGenerator
         Id[] linkIds = linkIdSet.toArray(new Id[linkIdSet.size()]);
         UniformRandom uniform = RandomUtils.getGlobalUniform();
 
-        PrintWriter pw = new PrintWriter(new File(depotsFilename));
+        PrintWriter pw = new PrintWriter(new File(vehiclesFilename));
         pw.println("<?xml version=\"1.0\" ?>");
-        pw.println("<!DOCTYPE depots SYSTEM \"http://matsim.org/files/dtd/depots_v1.dtd\">");
+        pw.println("<!DOCTYPE vehicles SYSTEM \"http://matsim.org/files/dtd/vehicles_v1.dtd\">");
         pw.println();
 
-        pw.println("<depots>");
+        pw.println("<vehicles>");
 
         for (int i = 0; i < count; i++) {
-            pw.printf("\t<depot linkId=\"%s\">", linkIds[uniform.nextInt(0, linkIds.length - 1)]);
-            pw.println();
-
-            pw.println("\t\t<vehicles>");
-
-            pw.printf("\t\t\t<vehicle name=\"taxi_%d\" t0=\"0\" t1=\"%d\"/>", i, t1);
-            pw.println();
-
-            pw.println("\t\t</vehicles>");
-            pw.println("\t</depot>");
+            Id startLinkId = linkIds[uniform.nextInt(0, linkIds.length - 1)];
+            pw.printf("\t<vehicle id=\"taxi_%d\" start_link=\"%s\" t_0=\"0\" t_1=\"%d\"/>\n", i,
+                    startLinkId, t1);
         }
 
-        pw.println("</depots>");
+        pw.println("</vehicles>");
         pw.close();
     }
 
@@ -77,8 +70,8 @@ public class DepotGenerator
 
         String dir = "d:\\michalm\\poznan-via\\";
         String networkFilename = dir + "network.xml";
-        String depotsFilenam = dir + "depots-taxis-" + count + ".xml";
+        String vehiclesFilename = dir + "vehicle-" + count + ".xml";
 
-        generateVehicles(networkFilename, depotsFilenam, count, t1);
+        generateVehicles(networkFilename, vehiclesFilename, count, t1);
     }
 }

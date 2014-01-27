@@ -101,12 +101,12 @@ import playground.michalm.util.RunningVehicleRegister;
         //        taxiCustomersFileName = dirName + "taxiCustomers_15_pc.txt";
         //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
 
-        //        electricStatsDir = dirName +"electric_nodepots\\";
-        //        electricStatsDir = dirName +"electric_idledepots\\";
-        //        electricStatsDir = dirName +"electric_depots\\";
-        //        electricStatsDir = dirName +"gas_nodepots\\";
-        //      electricStatsDir = dirName +"gas_idledepots\\";
-        //      electricStatsDir = dirName +"gas_depots\\";
+        //        electricStatsDir = dirName +"electric_noranks\\";
+        //        electricStatsDir = dirName +"electric_idleranks\\";
+        //        electricStatsDir = dirName +"electric_ranks\\";
+        //        electricStatsDir = dirName +"gas_noranks\\";
+        //      electricStatsDir = dirName +"gas_idleranks\\";
+        //      electricStatsDir = dirName +"gas_ranks\\";
         //        electricStatsDir = dirName +"modifiedDispatch_SL\\";
         //        electricStatsDir = dirName +"1charger\\";
         electricStatsDir = dirName + "1slow_fifo\\";
@@ -117,8 +117,8 @@ import playground.michalm.util.RunningVehicleRegister;
 
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
-        ranksFileName = dirName + "depots-5_taxis-50.xml";
-        //         depotsFileName = dirName + "depots-5_taxis-100.xml";
+        ranksFileName = dirName + "ranks-5_taxis-50.xml";
+        //         ranksFileName = dirName + "ranks-5_taxis-100.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
