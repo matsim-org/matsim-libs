@@ -27,7 +27,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -36,9 +36,6 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -188,7 +185,7 @@ public class VrpLauncherUtils
     }
 
 
-    public static VrpData initVrpData(MatsimVrpContextImpl context, String vehiclesFileName)
+    public static VrpData initVrpData(MatsimVrpContext context, String vehiclesFileName)
     {
         VrpData vrpData = new VrpDataImpl();
         new VehicleReader(context.getScenario(), vrpData).readFile(vehiclesFileName);

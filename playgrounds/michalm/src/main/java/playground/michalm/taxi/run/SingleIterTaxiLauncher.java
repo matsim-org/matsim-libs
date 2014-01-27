@@ -208,8 +208,10 @@ import playground.michalm.util.RunningVehicleRegister;
      */
     /*package*/void go(boolean warmup)
     {
-        MatsimVrpContextImpl context = new MatsimVrpContextImpl();
-        context.setScenario(scenario);
+        MatsimVrpContextImpl contextImpl = new MatsimVrpContextImpl();
+        this.context = contextImpl;
+        
+        contextImpl.setScenario(scenario);
         
         TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, travelTimeCalculator,
                 algorithmConfig.ttimeSource, eventsFileName);
@@ -223,7 +225,7 @@ import playground.michalm.util.RunningVehicleRegister;
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
-        context.setVrpData(taxiData);
+        contextImpl.setVrpData(taxiData);
 
         Params params = new Params(destinationKnown, minimizePickupTripTime, pickupDuration,
                 dropoffDuration);
@@ -232,7 +234,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 calculator, params);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
-        context.setMobsimTimer(qSim.getSimTimer());
+        contextImpl.setMobsimTimer(qSim.getSimTimer());
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);

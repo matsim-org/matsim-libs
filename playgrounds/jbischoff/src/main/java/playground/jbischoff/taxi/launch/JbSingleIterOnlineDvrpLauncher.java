@@ -155,8 +155,10 @@ import playground.michalm.util.RunningVehicleRegister;
      */
     /*package*/void go(int run)
     {
-        MatsimVrpContextImpl context = new MatsimVrpContextImpl();
-        context.setScenario(scenario);
+        MatsimVrpContextImpl contextImpl = new MatsimVrpContextImpl();
+        this.context = contextImpl;
+        
+        contextImpl.setScenario(scenario);
 
         File f = new File(electricStatsDir);
         f.mkdirs();
@@ -187,7 +189,7 @@ import playground.michalm.util.RunningVehicleRegister;
         EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
         TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
-        context.setVrpData(vrpData);
+        contextImpl.setVrpData(vrpData);
 
         Params params = new Params(true, false, 120, 60);
 
@@ -195,7 +197,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 calculator, params, true);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
-        context.setMobsimTimer(qSim.getSimTimer());
+        contextImpl.setMobsimTimer(qSim.getSimTimer());
 
         ElectroCabLaunchUtils olutils = new ElectroCabLaunchUtils();
         olutils.initVrpSimEngine(qSim, context, optimizer);
