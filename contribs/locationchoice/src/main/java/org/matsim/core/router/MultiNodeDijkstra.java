@@ -100,9 +100,15 @@ public class MultiNodeDijkstra extends Dijkstra {
 					if (minCostNode == null) {
 						log.warn("No route was found from node " + fromNode.getId() + " to any of the destination nodes was found.");							
 						// seems we have no more nodes left, but not yet reached all endNodes...
+						StringBuffer sb = new StringBuffer("\tnot reached destionation nodes: ");
 						for (InitialNode endNode : endNodes.values()) {
-							log.warn("\tnot reached destionation node " + endNode.node.getId());
+							sb.append(endNode.node.getId().toString());
+							sb.append("; ");
 						}
+						log.warn(sb.toString());
+//						for (InitialNode endNode : endNodes.values()) {
+//							log.warn("\tnot reached destionation node " + endNode.node.getId());
+//						}
 					}
 					
 					if (searchAllEndNodes && endNodes.size() > 0) {
@@ -146,9 +152,9 @@ public class MultiNodeDijkstra extends Dijkstra {
 				}
 			}
 			
-			if (minCostNode == null) {
-				log.warn("No route was found to any of the to nodes!");
-			}
+//			if (minCostNode == null) {
+//				log.warn("No route was found to any of the to nodes!");
+//			}
 			
 			return minCostNode;
 		} 
