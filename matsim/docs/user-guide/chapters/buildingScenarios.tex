@@ -283,14 +283,104 @@ label=lst:BuildingScenarios:minimalPopulationXml]
 \end{xml-file}
 
 \subsection{Public Transport}
-\begin{xml-file}[caption=An example of a schedule.xml]
+
+To simulate public transport in MATSim, two additional input files are
+necessary: One describes the schedule, i.e. that lines, their routes, which
+stops they serve and the departure times. The other describes the vehicles which
+serve the lines: are they big busses, small buses, trains or light rail
+vehicles, and describes how many passengers each vehicle can transport.
+
+The description of public transport vehicles itself can be split into two parts:
+In a first part, vehicle types have to be described, specifying how many
+passengers such a vehicle can transport (Note that the term "vehicle" can refer
+to multiple vehicles in reality, e.g. a train with several wagons should be specified as
+one long vehicle with a high number of seats). In the second part, actual
+vehicles have to listed. Each vehicle has an identifier and is of a previously
+specified vehicle type. Listing~\ref{lst:BuildingScenarios:ptVehicles.xml} shows
+an example of a such a file, describing one vehicle type and two vehicles of
+that type.
+
+\begin{xml-file}[caption=An example of transitVehicles.xml,
+label=lst:BuildingScenarios:ptVehicles.xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.matsim.org/files/dtd 
+                     http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+<vehicleType id="1">
+		<description>Small Train</description>
+		<capacity>
+			<seats persons="50"/>
+			<standingRoom persons="30"/>
+		</capacity>
+		<length meter="50.0"/>
+	</vehicleType>
+	<vehicle id="tr_1" type="1"/>
+	<vehicle id="tr_2" type="1"/>
+</vehicleDefinitions>
+\end{xml-file}
+
+The public transport schedule, often referred to as \emph{transitSchedule.xml}
+only, is a rather complex file. It contains information about stop facilities
+(these can be bus stops, train stations or other stop locations) and transit
+services.
+
+In the first part, the stop facilities need to be defined, giving each one a
+coordinate, an identifier and a reference to a link in the network. The stop can
+only be served by vehicles driving on that specified link. Optionally, it is
+possible to specify a name for the stop and if other vehicles are blocked
+when a transit vehicle is waiting at a stop. This last attribute is useful to
+model e.g. the difference of bus stops, where one bus stop has a bay, while at
+another stop, the bus has to stop on the actual road.
+
+After the stop facilities, the transit lines, their routes and schedules
+are described. This is a hierarchical data structure: Each line can have one or
+more \emph{routes}, each route has a \emph{route profile}, a \emph{network
+route} and a list of \emph{departures}.
+Listing~\ref{lst:BuildingScenarios:schedule.xml} has an example of a
+minimalistic but complete transit schedule.
+
+Each transit line must have a unique id. Each transit route has an id which must
+be unique within that one line, so the same route id can be used with different
+lines. The {\tt transportMode} describes on which links in the network the line
+runs (Actually, this is currently not yet enforced. It would be possible to let
+a bus run on train links in the simulation. It might be enforced in the future).
+
+The {\tt routeProfile} describes the stops this route serves, while {\tt route}
+itself describes the series of links in the network the transit vehicle's driver
+has to drive along (thus often referred to as \emph{network route}. Note that
+the complete route, i.e. all links the vehicle drives along, must be listed in
+the route, and not only the ones where stops are located. All the specified
+stops should occur along this route in the specified order. The time offsets
+given for each stop in the routeProfile describe the relative time offset to an
+actual departure time. If a bus is to depart at 7 o'clock in the morning, and
+stop 2 has a departureOffset of {\tt 00:03:00}, this must be read that the bus
+is expected to depart at 07:03 at the specific stop. All stops in the route
+profile must have a departure offset definded, except the last one. All stops,
+except the first one, can optionally have an arrival offset defined. This is
+mostly useful for large trains that stop for several minutes at a station to
+help the routing algorithm to find connecting services at the correct time,
+namely the expected arrival time of the train.
+
+As last part of the description of a transit
+route, the list of departures should be given. Each departure has an id, which must be unique within the
+route, and gives the departure time at the first stop of the specified
+route profile. In addition, the departure specifies with which vehicle the
+service should be run. This vehicle must be defined in the aforementioned
+list of transit vehicles.
+
+\begin{xml-file}[caption=An example of a schedule.xml,
+label=lst:BuildingScenarios:schedule.xml]
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
 <transitSchedule>
 	<transitStops>
-		<stopFacility id="1" x="990.0"  y="0.0"   name="Adorf"    linkRefId="1" isBlocking="false"/>
-		<stopFacility id="2" x="1100.0" y="980.0" name="Beweiler" linkRefId="2" isBlocking="true"/>
-		<stopFacility id="3" x="0.0"    y="10.0"  name="Cestadt"  linkRefId="3" isBlocking="false"/>
+		<stopFacility id="1" x="990.0"  y="0.0"   name="Adorf"    
+		                                          linkRefId="1" isBlocking="false"/>
+		<stopFacility id="2" x="1100.0" y="980.0" name="Beweiler" 
+		                                          linkRefId="2" isBlocking="true"/>
+		<stopFacility id="3" x="0.0"    y="10.0"  name="Cestadt"  
+		                                          linkRefId="3" isBlocking="false"/>
 	</transitStops>
 	<transitLine id="Blue Line">
 		<transitRoute id="1">
@@ -298,7 +388,8 @@ label=lst:BuildingScenarios:minimalPopulationXml]
 			<transportMode>bus</transportMode>
 			<routeProfile>
 				<stop refId="1" departureOffset="00:00:00"/>
-				<stop refId="2" arrivalOffset="00:02:30" departureOffset="00:03:00" awaitDeparture="true"/>
+				<stop refId="2" arrivalOffset="00:02:30" departureOffset="00:03:00" 
+				                                         awaitDeparture="true"/>
 				<stop refId="3" arrivalOffset="00:05:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
@@ -316,26 +407,21 @@ label=lst:BuildingScenarios:minimalPopulationXml]
 </transitSchedule>
 \end{xml-file}
 
-\begin{xml-file}[caption=An example of transitVehicles.xml]
-<?xml version="1.0" encoding="UTF-8"?>
-<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
-	<vehicleType id="1">
-		<description>Small Train</description>
-		<capacity>
-			<seats persons="50"/>
-			<standingRoom persons="30"/>
-		</capacity>
-		<length meter="50.0"/>
-	</vehicleType>
-	<vehicle id="tr_1" type="1"/>
-	<vehicle id="tr_2" type="1"/>
-</vehicleDefinitions>
-\end{xml-file}
+Because of its complexity, transit schedules often contain little mistakes that
+will return in an error when the simulation runs. Typical examples include that
+the network route is missing a link, or that the network route does not pass at
+all the defined stops in the right order. To make sure a schedule does not have
+any such issues before the simulation is started, a special validation routine
+is available:
 
-\todo{MR}
+\begin{verbatim}
+java -Xmx512m -cp /path/to/matsim.jar 
+      org.matsim.pt.utils.TransitScheduleValidator
+      /path/to/transitSchedule.xml /path/to/network.xml
+\end{verbatim}
 
+If run, this validator will print out a list of errors or warnings, if any are
+found, or show a message that the schedule appears to be valid.
 
 \subsection{Counts}
 \begin{xml-file}[caption=An example of a counts.xml]
@@ -461,25 +547,25 @@ In many cases, using pre-configured software is not possible because  there are 
 
 \subsubsection{Information concerning specific scenarios}
 
-The following sections contains various information for building a scenario that presumably goes beyond what is in the tutorial.
+% The following sections contains various information for building a scenario that presumably goes beyond what is in the tutorial.
 
 
-\section{Using MATSim for Switzerland}
-
-\subsubsection{General remarks}
-
-This is material that was in the tutorial "Learning MATSim in 3 days". We moved it to here, but did not check the content.
-
-A. Horni: Shortly, there will be a working paper describing the usage of MATSim for Switzerland., 02.05.2011
-
-\subsubsection{Some data sources}
-\begin{itemize}
-	\item Microcensus (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/01/02/01.html}{www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/01/02/01.html}
-	\item Census (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen__quellen/blank/blank/vz/uebersicht.html}{www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen\_\_quellen/blank/blank/vz/uebersicht.html}
-	\item ASTRA traffic counts:\\ \href{http://www.astra.admin.ch/verkehrsdaten/00299/00303/index.html?lang=en}{www.astra.admin.ch/verkehrsdaten/00299/00303/index.html}
-	\item Business census (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen__quellen/blank/blank/bz/01.html}{www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen\_\_quellen/blank/blank/bz/01.html}
-	\item Border crossing traffic (IVT, BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/04/blank/01/01.html}{www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/04/blank/01/01.html}
-\end{itemize}
+% \section{Using MATSim for Switzerland}
+% 
+% \subsubsection{General remarks}
+% 
+% This is material that was in the tutorial "Learning MATSim in 3 days". We moved it to here, but did not check the content.
+% 
+% A. Horni: Shortly, there will be a working paper describing the usage of MATSim for Switzerland., 02.05.2011
+% 
+% \subsubsection{Some data sources}
+% \begin{itemize}
+% 	\item Microcensus (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/01/02/01.html}{www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/01/02/01.html}
+% 	\item Census (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen__quellen/blank/blank/vz/uebersicht.html}{www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen\_\_quellen/blank/blank/vz/uebersicht.html}
+% 	\item ASTRA traffic counts:\\ \href{http://www.astra.admin.ch/verkehrsdaten/00299/00303/index.html?lang=en}{www.astra.admin.ch/verkehrsdaten/00299/00303/index.html}
+% 	\item Business census (BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen__quellen/blank/blank/bz/01.html}{www.bfs.admin.ch/bfs/portal/en/index/infothek/erhebungen\_\_quellen/blank/blank/bz/01.html}
+% 	\item Border crossing traffic (IVT, BfS):\\ \href{http://www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/04/blank/01/01.html}{www.bfs.admin.ch/bfs/portal/de/index/themen/11/07/04/blank/01/01.html}
+% \end{itemize}
 
 
 %%\vfill\eject
