@@ -558,6 +558,43 @@ public class MultiNodeDijkstraTest {
 		Assert.assertNull("wow, impossible path found!", p);
 	}
 
+	/*
+	 * Ensure that the initial time and cost values are not taken into
+	 * account in the path.
+	 */
+	@Test
+	public void testInitialValuesCorrection() {
+		testInitialValuesCorrection(true);
+		testInitialValuesCorrection(false);
+	}
+	
+	public void testInitialValuesCorrection(boolean fastRouter) {
+		Fixture f = new Fixture();
+		TestTimeCost tc = new TestTimeCost();
+		tc.setData(new IdImpl(1), 100.0, 200.0);
+		tc.setData(new IdImpl(2), 100.0, 200.0);
+		tc.setData(new IdImpl(3), 100.0, 200.0);
+		tc.setData(new IdImpl(4), 100.0, 200.0);
+		tc.setData(new IdImpl(5), 100.0, 200.0);
+		tc.setData(new IdImpl(6), 100.0, 200.0);
+		tc.setData(new IdImpl(7), 100.0, 200.0);
+		
+		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
+		List<InitialNode> toNodes = new ArrayList<InitialNode>();
+		
+		fromNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(1)), 10000.0, 10000.0));
+		toNodes.add(new InitialNode(f.network.getNodes().get(new IdImpl(6)), 20000.0, 20000.0));
+		
+		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
+		Node toNode = dijkstra.createImaginaryNode(toNodes);
+
+		Path p = createPath(dijkstra, fromNode, toNode);
+		
+		Assert.assertNotNull(p);
+		Assert.assertEquals(300.0, p.travelTime, 0.0);
+		Assert.assertEquals(600.0, p.travelCost, 0.0);
+	}
 	
 	/*package*/ static Path createPath(Dijkstra dijsktra, Node fromNode, Node toNode) {
 		Path path = dijsktra.calcLeastCostPath(fromNode, toNode, 0., null, null);

@@ -201,9 +201,12 @@ public class MultiNodeDijkstra extends Dijkstra {
 			tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
 		}
 
+		// Ignore the initial time and cost of the start node!
+		DijkstraNodeData startNodeData = getData(nodes.get(0));
 		DijkstraNodeData toNodeData = getData(toNode);
-		double travelTime = arrivalTime - startTime;
-		Path path = new Path(nodes, links, travelTime, toNodeData.getCost());
+		Path path = new Path(nodes, links, toNodeData.getTime() - startNodeData.getTime(), toNodeData.getCost() - startNodeData.getCost());
+//		double travelTime = arrivalTime - startTime;
+//		Path path = new Path(nodes, links, travelTime, toNodeData.getCost());
 
 		return path;
 	}

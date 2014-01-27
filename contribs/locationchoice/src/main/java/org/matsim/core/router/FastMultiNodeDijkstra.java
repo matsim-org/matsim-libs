@@ -21,6 +21,7 @@
 package org.matsim.core.router;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -99,9 +100,46 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 	 */
 	@Override
 	protected Path constructPath(Node fromNode, Node toNode, double startTime, double arrivalTime) {
+		/*
+		 * If the fromNode is an imaginaryNode some special treatment is necessary.
+		 * The path returned by the fastRouter also contains the travel time and cost
+		 * from the trips start coordinate to the start node of the path. This information
+		 * is stored in the ImaginaryNode (respectively in its InitialNodes). Therefore,
+		 * we have to store a reference to the imaginary node.
+		 */
+		ImaginaryNode imaginaryNode = null;
+		if (fromNode instanceof ImaginaryNode) imaginaryNode = (ImaginaryNode) fromNode;
+			
 		if (!(fromNode instanceof RoutingNetworkNode)) fromNode = this.routingNetwork.getNodes().get(fromNode.getId());
 		if (!(toNode instanceof RoutingNetworkNode)) toNode = this.routingNetwork.getNodes().get(toNode.getId());
-		return this.fastRouter.constructPath(fromNode, toNode, startTime, arrivalTime);
+				
+		Path path = this.fastRouter.constructPath(fromNode, toNode, startTime, arrivalTime);
+		
+		/*
+		 * Here, we correct the path's travel time and cost if necessary.
+		 * To do so, we look for the InitialNode that matches the path's first node.
+		 * The path's travel time and cost are then reduced by the values
+		 * found in the InitialNode.
+		 */
+		if (imaginaryNode != null && path != null && path.nodes.size() > 0) {
+			Node pathFromNode = path.nodes.get(0);
+			double initialCost = 0.0;
+			double initialTime = 0.0;
+			
+			Iterator<InitialNode> iter = imaginaryNode.initialNodes.iterator();
+			while (iter.hasNext()) {
+				InitialNode initialNode = iter.next();
+				if (initialNode.node.getId().equals(pathFromNode.getId())) {
+					initialCost = initialNode.initialCost;
+					initialTime = initialNode.initialTime;
+					break;
+				}
+			}
+			
+			path = new Path(path.nodes, path.links, path.travelTime - initialTime, path.travelCost - initialCost);			
+		}
+		
+		return path;
 	}
 	
 	/*
