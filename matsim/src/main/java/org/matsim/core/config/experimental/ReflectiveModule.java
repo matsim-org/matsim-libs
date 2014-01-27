@@ -35,12 +35,18 @@ import org.matsim.core.config.Module;
 /**
  * A module using reflection for easy implementation of config groups.
  * <br>
+ * <br>
  * This class takes care of all the housekeeping tasks that you normally have
  * to manually implement when extending {@link Module} (usually forgetting half of it).
  * <br>
- * For each field in the xml file, just implement a setter taking a String,
- * a primitive data type or a "primitive wrapper" type (such as {@link Double}
- * or {@link Integer},
+ * <br>
+ * For each field in the xml file, just implement a setter taking one of the following types as parameter:
+ * <ul>
+ * <li> a String,</li>
+ * <li> a primitive data type or a "primitive wrapper" type (such as {@link Double}
+ * or {@link Integer}),</li>
+ * <li> an enumeration type</li>
+ * </ul>
  * and a getter returning an Object which String representation must be written to
  * the xml file, and annotate them with the {@link StringSetter} and
  * {@link StringGetter} annotation types.
@@ -48,9 +54,15 @@ import org.matsim.core.config.Module;
  * Those annotations take a mandatory String argument, which is the parameter name
  * in the xml.
  * <br>
+ * <br>
+ * In most of the cases, annotating the actual setters is fine. Sometimes (for instance
+ * when handling collections) it is not: just separate actual setters/getters and
+ * "string" setters/getters.
+ * <br>
  * Note that there is no restriction on access modifiers for those methods: they
  * can even be private, if for instance you do not want to confuse the users with dozens
  * of methods of the type "getStringRepresentationOfParameterX()".
+ * <br>
  * <br>
  * If something is wrong (missing setter or getter, wrong parameter or return type),
  * an {@link InconsistentModuleException} will be thrown at construction.
@@ -306,7 +318,8 @@ public abstract class ReflectiveModule extends Module {
 	/**
 	 * use to annotate the methods which should be used to read the string
 	 * values.
-	 * The methods must take one string parameter.
+	 * See the class description for a description of the valid signature of the
+	 * annotated method.
 	 */
 	@Documented
 	@Retention( RetentionPolicy.RUNTIME )
