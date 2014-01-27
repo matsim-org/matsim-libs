@@ -32,6 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 
 public class OneTaxiLauncher
@@ -48,9 +49,9 @@ public class OneTaxiLauncher
     public OneTaxiLauncher()
     {
         dirName = "./src/main/resources/";
-        netFileName = dirName + "network.xml";
-        plansFileName = dirName + "population.xml";
-        vehiclesFileName = dirName + "1_depot_1_taxi.xml";
+        netFileName = dirName + "grid_network.xml";
+        plansFileName = dirName + "one_taxi/one_taxi_population.xml";
+        vehiclesFileName = dirName + "one_taxi/one_taxi_vehicles.xml";
 
         otfVis = true;//or false -- turning ON/OFF visualization
 
@@ -83,7 +84,7 @@ public class OneTaxiLauncher
         EventsManager events = qSim.getEventsManager();
 
         if (otfVis) { // OFTVis visualization
-            DynAgentLauncherUtils.runOTFVis(qSim, true);
+            DynAgentLauncherUtils.runOTFVis(qSim, true, ColoringScheme.taxicab);
         }
 
         qSim.run();

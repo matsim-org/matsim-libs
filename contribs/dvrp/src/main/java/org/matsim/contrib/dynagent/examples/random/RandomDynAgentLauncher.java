@@ -41,7 +41,7 @@ public class RandomDynAgentLauncher
     public RandomDynAgentLauncher()
     {
         dirName = "./src/main/resources/";
-        netFileName = dirName + "network.xml";
+        netFileName = dirName + "grid_network.xml";
 
         otfVis = true;//or false -- turning ON/OFF visualization
         agentCount = 100;
