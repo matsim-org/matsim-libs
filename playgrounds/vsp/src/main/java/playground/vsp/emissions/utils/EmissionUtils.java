@@ -20,8 +20,10 @@
 package playground.vsp.emissions.utils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -81,23 +83,28 @@ public class EmissionUtils {
 		}
 		return pollutant2sumOfEmissions;
 	}
-
+	
 	public Map<Id, SortedMap<String, Double>> sumUpEmissionsPerId(
 			Map<Id, Map<WarmPollutant, Double>> warmEmissions,
 			Map<Id, Map<ColdPollutant, Double>> coldEmissions) {
 
 		Map<Id, SortedMap<String, Double>> totalEmissions = new HashMap<Id, SortedMap<String, Double>>();
-		for(Entry<Id, Map<WarmPollutant, Double>> entry : warmEmissions.entrySet()){
-			Id id = entry.getKey();
-			Map<WarmPollutant, Double> idWarmEmissions = entry.getValue();
+		Set<Id> warmColdIds = new HashSet<Id>();
+		warmColdIds.addAll(warmEmissions.keySet());
+		warmColdIds.addAll(coldEmissions.keySet());
 
-			if(coldEmissions.containsKey(id)){
-				Map<ColdPollutant, Double> idColdEmissions = coldEmissions.get(id);
-				SortedMap<String, Double> idSumOfEmissions = sumUpEmissions(idWarmEmissions, idColdEmissions);
-				totalEmissions.put(id, idSumOfEmissions);
-			} else{
-				SortedMap<String, Double> warmPollutantString2Values = convertWarmPollutantMap2String(idWarmEmissions);
-				totalEmissions.put(id, warmPollutantString2Values);
+		for (Id id : warmColdIds) {
+			if (warmEmissions.containsKey(id)) {
+				if (coldEmissions.containsKey(id)) {
+					SortedMap<String, Double> idSumOfEmissions = sumUpEmissions(warmEmissions.get(id), coldEmissions.get(id));
+					totalEmissions.put(id, idSumOfEmissions);
+				} else {
+					SortedMap<String, Double> warmPollutantString2Values = convertWarmPollutantMap2String(warmEmissions.get(id));
+					totalEmissions.put(id, warmPollutantString2Values);
+				}
+			} else {
+				SortedMap<String, Double> coldPollutantString2Values = convertColdPollutantMap2String(coldEmissions.get(id));
+				totalEmissions.put(id, coldPollutantString2Values);
 			}
 		}
 		return totalEmissions;
