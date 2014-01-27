@@ -22,20 +22,31 @@
  */
 package playground.southafrica.gauteng;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.contrib.matsim4urbansim.utils.network.NetworkSimplifier;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -53,8 +64,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -62,6 +72,8 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.vehicles.Vehicle;
@@ -89,10 +101,10 @@ import playground.southafrica.utilities.Header;
 public class GautengControler_subpopulations {
 	private final static Logger LOG = Logger
 			.getLogger(GautengControler_subpopulations.class);
-	
+
 	private static final String RE_ROUTE_AND_SET_VEHICLE = "ReRouteAndSetVehicle";
 	private static String VEH_ID = "TransportModeToVehicleIdMap" ;
-	
+
 	public static enum User { johan, kai } ;
 	private static User user = User.johan ;
 
@@ -110,7 +122,7 @@ public class GautengControler_subpopulations {
 		if ( configFilename != null ) {
 			ConfigUtils.loadConfig(config, configFilename);
 		}
-		
+
 		/* Required argument:
 		 * [0] - Config file;
 		 * 
@@ -124,7 +136,7 @@ public class GautengControler_subpopulations {
 		 * [7] - Number of threads. 
 		 * [8] - user // should presumably be earlier in sequence?
 		 */
-		
+
 		setOptionalArguments(args, config);
 
 		double baseValueOfTime = 110.;
@@ -141,12 +153,12 @@ public class GautengControler_subpopulations {
 		if (args.length > 6 && args[7] != null && args[7].length() > 0) {
 			numberOfThreads = Integer.parseInt(args[7]);
 		}
-		
+
 		// ===========================================
 
 		/* Set some other config parameters. */
 		config.plans().setSubpopulationAttributeName("subpopulation");
-		
+
 		String[] modes ={"car","commercial"};
 		config.qsim().setMainModes( Arrays.asList(modes) );
 		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
@@ -154,58 +166,57 @@ public class GautengControler_subpopulations {
 		if ( !config.controler().getMobsim().equals( ControlerConfigGroup.MobsimType.qsim.toString() ) ) {
 			throw new RuntimeException("error") ;
 		}
-		
+
 		config.qsim().setLinkDynamics( LinkDynamics.PassingQ.toString() );
-		
+
 		assignSubpopulationStrategies(config);
-		
+
 		config.planCalcScore().setBrainExpBeta(1.0);
-		if ( user==User.johan ) {
-			config.controler().setWritePlansInterval(2);
-		} else if ( user==User.kai ) {
-			config.controler().setWritePlansInterval(50);
+
+		config.controler().setWritePlansInterval(2);
+		if ( user==User.kai ) {
+			config.controler().setWritePlansInterval(10);
 		}
-		
+
 		config.controler().setOutputDirectory("/Users/jwjoubert/Documents/Temp/sanral-runs");
 		if ( user==User.kai ) {
 			config.controler().setOutputDirectory("/Users/nagel/gauteng-kairuns/output");
-
 		}
-		
+
 		config.global().setNumberOfThreads(numberOfThreads);
-		
+
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
-		
+
 		if ( user==User.kai ) {
 			config.controler().setRoutingAlgorithmType( RoutingAlgorithmType.FastAStarLandmarks );
 			config.controler().setWriteSnapshotsInterval(0);
-			
+
 			config.controler().setLastIteration(100);
 
 			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
-			
+
 			config.counts().setCountsFileName( KNGautengController.GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz");
 			config.counts().setCountsScaleFactor(100.);
 			config.counts().setOutputFormat("all");
-			
+
 			config.qsim().setEndTime(36.*3600.);
-			
+
 			config.qsim().setFlowCapFactor(0.01);
 			config.qsim().setStorageCapFactor(0.03);
 			config.qsim().setStuckTime(10.);
 			config.qsim().setRemoveStuckVehicles(false);
-			
+
 			config.qsim().setSnapshotPeriod(Double.POSITIVE_INFINITY);
 			config.controler().setWriteSnapshotsInterval(0);
 		}
-		
+
 		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
-		
+
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
 		config.vspExperimental().setWritingOutputEvents(true);
-		
+
 		config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() );
 		config.checkConsistency();
 
@@ -214,12 +225,16 @@ public class GautengControler_subpopulations {
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		config.scenario().setUseVehicles(true); // _after_ scenario loading. :-(
 
+		if ( user==User.kai ) {
+			simplifyScenario(sc);
+		}
+
 		/* CREATE VEHICLES. */
 		createVehiclePerPerson(sc);
 
 		final Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
-		
+
 		// SET VEHICLES ...
 		// ... at beginning:
 		controler.addControlerListener(new IterationStartsListener() {
@@ -253,9 +268,103 @@ public class GautengControler_subpopulations {
 
 		// RUN:
 
-		 controler.run();
+		controler.run();
 
 		Header.printFooter();
+	}
+
+	private static void installJdqsim(Config config) {
+		throw new RuntimeException("cannot use jdqsim with vehicle-based toll") ;
+		
+//		double sampleFactor = 0.01 ;
+//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
+//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
+//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
+//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.SQUEEZE_TIME, "10" ) ;
+//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
+	}
+
+	private static void simplifyScenario(final Scenario sc) {
+		
+//		simplifyNetwork(sc.getNetwork());
+
+		// modify population:
+		PopulationFactory pf = sc.getPopulation().getFactory() ;
+		Random rnd = MatsimRandom.getLocalInstance() ;
+		List<Id> commercialIds = new ArrayList<Id>() ;
+		for ( Person pp : sc.getPopulation().getPersons().values() ) {
+			Plan plan = pp.getSelectedPlan() ;
+			pp.getPlans().clear(); 
+			Plan newPlan = pf.createPlan() ;
+
+			for ( PlanElement pe : plan.getPlanElements() ) {
+				if ( pe instanceof Activity ) {
+					Activity act = (Activity) pe ;
+					
+					Activity newAct = pf.createActivityFromCoord(act.getType(), act.getCoord()) ;
+					newAct.setEndTime(act.getEndTime()); // or don't set at all if not there ???
+					newAct.setMaximumDuration(act.getMaximumDuration());
+
+					newPlan.addActivity(newAct);
+				} else if (pe instanceof Leg) {
+					Leg leg = (Leg) pe ;
+
+					Leg newLeg ;
+//					if ( leg.getMode().equals("commercial")) {
+//						newLeg = pf.createLeg("car") ;
+//						commercialIds.add(pp.getId()) ;
+//					} else {
+						newLeg = pf.createLeg(leg.getMode()) ;
+//					}
+					newLeg.setDepartureTime( leg.getDepartureTime() ) ;
+					newLeg.setTravelTime( leg.getDepartureTime() );
+
+					newPlan.addLeg(newLeg); 
+				}
+			}
+			
+			pp.addPlan( newPlan ) ;
+			pp.setSelectedPlan(newPlan);
+			
+		} // end person
+		
+//		for ( Id id : commercialIds ) {
+//			if ( rnd.nextDouble() < 0.9 ) {
+//				sc.getPopulation().getPersons().remove(id) ;
+//			}
+//		}
+
+	}
+
+	private static void simplifyNetwork(final Network network) {
+		// ...
+		List<Id> toBeRemoved = new ArrayList<Id>();
+		for ( Link link : network.getLinks().values() ) {
+			if ( link.getCapacity() < 999. && link.getNumberOfLanes() <= 1. && link.getFreespeed()<13. ) {
+				toBeRemoved.add( link.getId() ) ;
+			}
+		}
+		for ( Id id : toBeRemoved ) {
+			network.removeLink( id ) ;
+		}
+		new org.matsim.core.network.algorithms.NetworkCleaner().run(network);
+		
+		// try simplifying the network:
+		final long numberOfLinksBefore = network.getLinks().size() ;
+
+		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
+		nodeTypesToMerge.add(new Integer(4));
+		nodeTypesToMerge.add(new Integer(5));
+
+		NetworkSimplifier nsimply = new NetworkSimplifier();
+		nsimply.setNodesToMerge(nodeTypesToMerge);
+		nsimply.setMergeLinkStats(false); //default = false
+		nsimply.run(network);
+
+		final long numberOfLinksAfter = network.getLinks().size() ;
+
+		LOG.warn( "number of links before: " + numberOfLinksBefore + "; after: " + numberOfLinksAfter +
+				"; difference: " + (numberOfLinksBefore-numberOfLinksAfter) ) ;
 	}
 
 	private static void setUpRoadPricingAndScoring(double baseValueOfTime, double valueOfTimeMultiplier, final Scenario sc,
@@ -266,7 +375,7 @@ public class GautengControler_subpopulations {
 					"roadpricing must NOT be enabled in config.scenario in order to use special "
 							+ "road pricing features.  aborting ...");
 		}
-		
+
 		final TollFactorI tollFactor = new SanralTollFactor_Subpopulation(sc);
 
 		// SOME STATISTICS:
@@ -360,7 +469,7 @@ public class GautengControler_subpopulations {
 						+ vehicleType);
 			}
 			vehicles.addVehicle(v);
-					
+
 			vehicles.getVehicleAttributes().putAttribute(v.getId().toString(), SanralTollFactor_Subpopulation.E_TAG_ATTRIBUTE_NAME, eTag);
 
 			sc.getPopulation().getPersonAttributes().putAttribute( p.getId().toString(), VEH_ID, v.getId() );
@@ -406,33 +515,33 @@ public class GautengControler_subpopulations {
 	 * @param config
 	 */
 	private static void assignSubpopulationStrategies(Config config) {
-		
+
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8); 
-		
+
 		/* Set up the strategies for the different subpopulations. */
-		
+
 		{ /*
 		 * Car: ChangeExpBeta: 70%; TimeAllocationMutator: 15%; ReRoute: 15%
 		 */
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("car");
 			changeExpBetaStrategySettings.setProbability(0.7);
 			config.strategy()
-					.addStrategySettings(changeExpBetaStrategySettings);
+			.addStrategySettings(changeExpBetaStrategySettings);
 
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
+					.toString());
 			timeStrategySettings.setSubpopulation("car");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
-			
+
 			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			reRouteWithId.setModuleName(RE_ROUTE_AND_SET_VEHICLE);
 			reRouteWithId.setProbability(0.15);
@@ -446,12 +555,12 @@ public class GautengControler_subpopulations {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("commercial");
 			changeExpBetaStrategySettings.setProbability(0.80);
 			config.strategy()
-					.addStrategySettings(changeExpBetaStrategySettings);
+			.addStrategySettings(changeExpBetaStrategySettings);
 
 			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			reRouteWithId.setModuleName(RE_ROUTE_AND_SET_VEHICLE);
@@ -466,18 +575,18 @@ public class GautengControler_subpopulations {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("bus");
 			changeExpBetaStrategySettings.setProbability(0.7);
 			config.strategy()
-					.addStrategySettings(changeExpBetaStrategySettings);
+			.addStrategySettings(changeExpBetaStrategySettings);
 
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
+					.toString());
 			timeStrategySettings.setSubpopulation("bus");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
@@ -494,18 +603,18 @@ public class GautengControler_subpopulations {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("taxi");
 			changeExpBetaStrategySettings.setProbability(0.7);
 			config.strategy()
-					.addStrategySettings(changeExpBetaStrategySettings);
+			.addStrategySettings(changeExpBetaStrategySettings);
 
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
+					.toString());
 			timeStrategySettings.setSubpopulation("taxi");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
@@ -522,18 +631,18 @@ public class GautengControler_subpopulations {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("ext");
 			changeExpBetaStrategySettings.setProbability(0.7);
 			config.strategy()
-					.addStrategySettings(changeExpBetaStrategySettings);
+			.addStrategySettings(changeExpBetaStrategySettings);
 
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-					.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
-							.toString());
+			.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
+					.toString());
 			timeStrategySettings.setSubpopulation("ext");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
@@ -559,7 +668,7 @@ public class GautengControler_subpopulations {
 		@Override
 		public void handlePlan(Plan plan) {
 			Id vehId = (Id) scenario.getPopulation().getPersonAttributes()
-				.getAttribute(plan.getPerson().getId().toString(), VEH_ID ) ;
+					.getAttribute(plan.getPerson().getId().toString(), VEH_ID ) ;
 			for ( Leg leg : PopulationUtils.getLegs(plan) ) {
 				if ( leg.getRoute()!=null && leg.getRoute() instanceof NetworkRoute ) {
 					((NetworkRoute)leg.getRoute()).setVehicleId(vehId);

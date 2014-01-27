@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 
@@ -161,6 +162,12 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		}
 		
 		/* Check subpopulation. */
+		Assert.assertNotNull(this.sc);
+		Assert.assertNotNull(this.sc.getPopulation());
+		Assert.assertNotNull(this.sc.getPopulation().getPersonAttributes());
+		Assert.assertNotNull( idObj ) ;
+		Assert.assertNotNull( sc.getConfig() );
+		Assert.assertNotNull( sc.getConfig().plans() );
 		Object o1 = this.sc.getPopulation().getPersonAttributes().getAttribute(idObj.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
 		String subpopulation;
 		if(o1 instanceof String){
