@@ -38,7 +38,6 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 
 public class PassengerEngine
     implements MobsimEngine, DepartureHandler
-
 {
     private final String mode;
 
