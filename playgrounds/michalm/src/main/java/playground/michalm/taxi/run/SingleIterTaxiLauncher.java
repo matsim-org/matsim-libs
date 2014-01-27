@@ -100,8 +100,8 @@ import playground.michalm.util.RunningVehicleRegister;
         taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
-        ranksFileName = dirName + "depots-5_taxis-50.xml";
-        // ranksFileName = dirName + "depots-5_taxis-150.xml";
+        ranksFileName = dirName + "ranks-5_taxis-50.xml";
+        // ranksFileName = dirName + "ranks-5_taxis-150.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
