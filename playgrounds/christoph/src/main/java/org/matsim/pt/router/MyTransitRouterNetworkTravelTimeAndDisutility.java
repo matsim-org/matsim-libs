@@ -130,6 +130,10 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 	public double getLinkTravelTime(Link link, final double time, Person person, Vehicle vehicle) {
 		
 		ThreadLocalData threadLocalData = this.data.get();
+		if (threadLocalData == null) {
+			threadLocalData = new ThreadLocalData();
+			this.data.set(threadLocalData);
+		}
 		if ((link == threadLocalData.previousLink) && (time == threadLocalData.previousTime)) {
 			return threadLocalData.cachedTravelTime;
 		}
@@ -177,6 +181,10 @@ public class MyTransitRouterNetworkTravelTimeAndDisutility implements TravelTime
 	public double getVehArrivalTime(final Link link, final double now){
 		
 		ThreadLocalData threadLocalData = this.data.get();
+		if (threadLocalData == null) {
+			threadLocalData = new ThreadLocalData();
+			this.data.set(threadLocalData);
+		}
 		if ((link == threadLocalData.previousWaitLink) && (now == threadLocalData.previousWaitTime)) {
 			return threadLocalData.cachedVehArrivalTime;
 		}
