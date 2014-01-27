@@ -65,8 +65,16 @@ public class PuttingGautengPopulationTogether {
 		Header.printHeader(PuttingGautengPopulationTogether.class.toString(), args);
 		
 		String outputFolder = args[0];
+		
+		/* Remove all the non-Gauteng commercial vehicles. */
+		RemoveNonGautengCommercial.Run(
+				outputFolder + "com.xml.gz",
+				outputFolder + "comAttr.xml.gz",
+				"/Users/jwjoubert/Documents/workspace/shapefiles/Gauteng/zones/Gauteng_SA-Albers.shp",
+				outputFolder + "comGauteng.xml.gz",
+				outputFolder + "comAttrGauteng.xml.gz");
 
-		/* First convert all the old Sanral population components. */
+		/* Convert all the old Sanral population components. */
 		convertOldSanralSubpopulations(outputFolder);
 		
 		/* Now combine the subpopulations. */
@@ -102,7 +110,7 @@ public class PuttingGautengPopulationTogether {
 		JoinSubpopulations.Run( 
 				/* Car and commercial vehicles... */
 				outputFolder + "car.xml.gz", outputFolder + "carAttr.xml.gz", 
-				outputFolder + "com.xml.gz", outputFolder + "comAttr.xml.gz", 
+				outputFolder + "comGauteng.xml.gz", outputFolder + "comAttrGauteng.xml.gz", 
 				outputFolder + "tmp1.xml.gz", outputFolder + "tmp1Attr.xml.gz");
 		JoinSubpopulations.Run(
 				/* ... add bus... */
