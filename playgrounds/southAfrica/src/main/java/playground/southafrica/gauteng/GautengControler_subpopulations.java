@@ -291,7 +291,7 @@ public class GautengControler_subpopulations {
 		// modify population:
 		PopulationFactory pf = sc.getPopulation().getFactory() ;
 		Random rnd = MatsimRandom.getLocalInstance() ;
-		List<Id> commercialIds = new ArrayList<Id>() ;
+//		List<Id> commercialIds = new ArrayList<Id>() ;
 		for ( Person pp : sc.getPopulation().getPersons().values() ) {
 			Plan plan = pp.getSelectedPlan() ;
 			pp.getPlans().clear(); 
