@@ -46,6 +46,7 @@ public class ReflectiveModuleTest {
 		dumpedModule.setDoubleField( 1000 );
 		dumpedModule.setIdField( new IdImpl( 123 ) );
 		dumpedModule.setCoordField( new CoordImpl( 265 , 463 ) );
+		dumpedModule.setTestEnumField( TestEnum.VALUE2 );
 
 		final Config dumpedConfig = new Config();
 		dumpedConfig.addModule( dumpedModule );
@@ -55,7 +56,7 @@ public class ReflectiveModuleTest {
 		new ConfigWriter( dumpedConfig ).write( fileName );
 		final Config readConfig = ConfigUtils.loadConfig( fileName );
 		final TestModule readModule = new TestModule();
-		// ass a side effect, this loads the information
+		// as a side effect, this loads the information
 		readConfig.addModule( readModule );
 
 		assertSame( dumpedModule , readModule );
@@ -276,6 +277,11 @@ public class ReflectiveModuleTest {
 				"incompatible coord fields",
 				dumpedModule.getCoordField(),
 				readModule.getCoordField());
+
+		Assert.assertEquals(
+				"incompatible enum fields",
+				dumpedModule.getTestEnumField(),
+				readModule.getTestEnumField());
 	}
 
 	// TODO: move to tutorial?
@@ -290,6 +296,8 @@ public class ReflectiveModuleTest {
 		private Id idField = null;
 		// Coord: some conversion needed
 		private Coord coordField = null;
+		// enum: handled especially
+		private TestEnum enumField = null;
 
 		public TestModule() {
 			super( GROUP_NAME );
@@ -361,6 +369,22 @@ public class ReflectiveModuleTest {
 					Double.parseDouble( coords[ 0 ] ),
 					Double.parseDouble( coords[ 1 ] ) );
 		}
+
+		// /////////////////////////////////////////////////////////////////////
+		// enum
+		@StringGetter( "enumField" )
+		public TestEnum getTestEnumField() {
+			return this.enumField;
+		}
+
+		@StringSetter( "enumField" )
+		public void setTestEnumField(final TestEnum enumField) {
+			this.enumField = enumField;
+		}
+	}
+
+	private static enum TestEnum {
+		VALUE1, VALUE2;
 	}
 }
 

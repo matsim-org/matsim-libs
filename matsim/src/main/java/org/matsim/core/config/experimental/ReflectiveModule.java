@@ -163,8 +163,9 @@ public abstract class ReflectiveModule extends Module {
 					String.class,
 					Float.class, Double.class, Integer.class, Long.class, Boolean.class, Character.class, Byte.class, Short.class,
 					Float.TYPE, Double.TYPE, Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE);
-        if ( !allowedParameterTypes.contains( params[ 0 ] ) ) {
-			throw new InconsistentModuleException( "setter "+m+" gets a "+params[ 0 ]+". Valid types are String, primitive types and their wrapper classes." );
+        if ( !allowedParameterTypes.contains( params[ 0 ] ) && !params[ 0 ].isEnum() ) {
+			throw new InconsistentModuleException( "setter "+m+" gets a "+params[ 0 ]+". Valid types are String, primitive types and their wrapper classes, and enumerations. "+
+					"Other types are fine as parameters, but you will need to implement conversion strategies in the String setters." );
 		}
 	}
 
@@ -241,6 +242,16 @@ public abstract class ReflectiveModule extends Module {
 		}
 		else if ( type.equals( Short.class ) || type.equals( Short.TYPE ) ) {
 			setter.invoke( this , Short.parseShort( value ) );
+		}
+		else if ( type.isEnum() ) {
+			setter.invoke(
+					this,
+					Enum.valueOf(
+						type.asSubclass( Enum.class ),
+						value ) );
+		}
+		else {
+			throw new RuntimeException( "no method to handle type "+type );
 		}
 
 		setter.setAccessible( accessible );
