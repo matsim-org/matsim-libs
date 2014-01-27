@@ -17,16 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.config.experimental;
+package tutorial.programming.reflectiveModule;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
-import org.matsim.core.config.experimental.ReflectiveModule.StringSetter;
+import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class TestModule extends ReflectiveModule {
+
+/**
+ * Demonstrate how to use ReflectiveModule to easily create typed config groups.
+ * Please do not modify this class: it is used from unit tests!
+ */
+public class MyModule extends ReflectiveModule {
 	public static final String GROUP_NAME = "testModule";
 
 	// TODO: test for ALL primitive types
@@ -38,14 +42,14 @@ public class TestModule extends ReflectiveModule {
 	// Coord: some conversion needed
 	private Coord coordField = null;
 	// enum: handled especially
-	private TestEnum enumField = null;
+	private MyEnum enumField = null;
 
-	public TestModule() {
+	public MyModule() {
 		super( GROUP_NAME );
 	}
 
 	// /////////////////////////////////////////////////////////////////////
-	// double field
+	// primitive type field: standard getter and setter suffice
 	@StringGetter( "doubleField" )
 	public double getDoubleField() {
 		return this.doubleField;
@@ -61,7 +65,7 @@ public class TestModule extends ReflectiveModule {
 	}
 
 	// /////////////////////////////////////////////////////////////////////
-	// id field
+	// id field: need for a special setter, normal getter suffice
 	/**
 	 * string representation of Id is result of
 	 * toString: just annotate getter
@@ -77,8 +81,9 @@ public class TestModule extends ReflectiveModule {
 
 	/**
 	 * We need to do the conversion from string to Id
-	 * ourselves. We do not want the user to access that:
-	 * make private.
+	 * ourselves.
+	 * the annotated setter can be private to avoid polluting the
+	 * interface: the user just sees the "typed" setter.
 	 */
 	@StringSetter( "idField" )
 	private void setIdField(String s) {
@@ -86,7 +91,7 @@ public class TestModule extends ReflectiveModule {
 	}
 
 	// /////////////////////////////////////////////////////////////////////
-	// coord field
+	// coord field: need for special getter and setter
 	public Coord getCoordField() {
 		return this.coordField;
 	}
@@ -95,7 +100,9 @@ public class TestModule extends ReflectiveModule {
 		this.coordField = coordField;
 	}
 
-	// we have to convert both ways here
+	// we have to convert both ways here.
+	// the annotated getter and setter can be private to avoid polluting the
+	// interface: the user just sees the "typed" getter and setter.
 	@StringGetter( "coordField" )
 	private String getCoordFieldString() {
 		return this.coordField.getX()+","+this.coordField.getY();
@@ -112,14 +119,14 @@ public class TestModule extends ReflectiveModule {
 	}
 
 	// /////////////////////////////////////////////////////////////////////
-	// enum
+	// enum: normal getter and setter suffice
 	@StringGetter( "enumField" )
-	public TestEnum getTestEnumField() {
+	public MyEnum getTestEnumField() {
 		return this.enumField;
 	}
 
 	@StringSetter( "enumField" )
-	public void setTestEnumField(final TestEnum enumField) {
+	public void setTestEnumField(final MyEnum enumField) {
 		this.enumField = enumField;
 	}
 }

@@ -32,6 +32,9 @@ import org.matsim.core.config.experimental.ReflectiveModule.InconsistentModuleEx
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
+import tutorial.programming.reflectiveModule.MyEnum;
+import tutorial.programming.reflectiveModule.MyModule;
+
 /**
  * @author thibautd
  */
@@ -41,11 +44,11 @@ public class ReflectiveModuleTest {
 
 	@Test
 	public void testDumpAndRead() {
-		final TestModule dumpedModule = new TestModule();
+		final MyModule dumpedModule = new MyModule();
 		dumpedModule.setDoubleField( 1000 );
 		dumpedModule.setIdField( new IdImpl( 123 ) );
 		dumpedModule.setCoordField( new CoordImpl( 265 , 463 ) );
-		dumpedModule.setTestEnumField( TestEnum.VALUE2 );
+		dumpedModule.setTestEnumField( MyEnum.VALUE2 );
 
 		final Config dumpedConfig = new Config();
 		dumpedConfig.addModule( dumpedModule );
@@ -54,7 +57,7 @@ public class ReflectiveModuleTest {
 
 		new ConfigWriter( dumpedConfig ).write( fileName );
 		final Config readConfig = ConfigUtils.loadConfig( fileName );
-		final TestModule readModule = new TestModule();
+		final MyModule readModule = new MyModule();
 		// as a side effect, this loads the information
 		readConfig.addModule( readModule );
 
@@ -259,8 +262,8 @@ public class ReflectiveModuleTest {
 	}
 
 	private static void assertSame(
-			final TestModule dumpedModule,
-			final TestModule readModule) {
+			final MyModule dumpedModule,
+			final MyModule readModule) {
 		Assert.assertEquals(
 				"incompatible double fields",
 				dumpedModule.getDoubleField(),

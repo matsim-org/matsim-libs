@@ -17,8 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.config.experimental;
+package tutorial.programming.reflectiveModule;
 
-public enum TestEnum {
+public enum MyEnum {
 	VALUE1, VALUE2;
 }
