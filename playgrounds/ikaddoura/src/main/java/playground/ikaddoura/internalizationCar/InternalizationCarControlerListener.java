@@ -67,7 +67,7 @@ public class InternalizationCarControlerListener implements StartupListener, Ite
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		log.info("Set average tolls for each link Id and 15 min time bin.");
+		log.info("Set average tolls for each link Id and time bin.");
 		tollHandler.setLinkId2timeBin2avgToll();
 		
 		// write out toll statistics every iteration

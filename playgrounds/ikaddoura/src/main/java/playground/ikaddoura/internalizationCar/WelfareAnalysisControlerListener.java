@@ -72,7 +72,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	private Map<Integer, Integer> it2stuckEvents = new TreeMap<Integer, Integer>();
 	private Map<Integer, Double> it2totalTravelTimeAllModes = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2totalTravelTimeCarMode = new TreeMap<Integer, Double>();
-	
+		
 	private Map<Integer, Double> it2carLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2ptLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2walkLegs = new TreeMap<Integer, Double>();
@@ -122,7 +122,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 			bw.write("Iteration;" +
 					"User Benefits (LogSum);Number of Invalid Persons (LogSum);Number of Invalid Plans (LogSum);" +
 					"User Benefits (Selected);Number of Invalid Persons (Selected);Number of Invalid Plans (Selected);" +
-					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time All Modes (sec);Total Travel Time Car Mode (sec);Number of Agent Stuck Events;" +
+					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time All Modes (sec);Total Travel Time Car Mode (sec);Avg Travel Time Per Car Trip (sec);Number of Agent Stuck Events;" +
 					"Car Trips;Pt Trips;Walk Trips");
 			bw.newLine();
 			for (Integer it : this.it2userBenefits_selected.keySet()){
@@ -133,6 +133,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 						+ ";" + (this.it2userBenefits_selected.get(it) + this.it2tollSum.get(it))
 						+ ";" + this.it2totalTravelTimeAllModes.get(it)
 						+ ";" + this.it2totalTravelTimeCarMode.get(it)
+						+ ";" + (this.it2totalTravelTimeCarMode.get(it) / this.it2carLegs.get(it))
 						+ ";" + this.it2stuckEvents.get(it)
 						+ ";" + this.it2carLegs.get(it)
 						+ ";" + this.it2ptLegs.get(it)
@@ -160,7 +161,9 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		writeGraph("walkTrips", "Number of Walk Trips", it2walkLegs);
 
 		writeGraphSum("welfare_logsum", "Monetary Units", it2userBenefits_logsum, it2tollSum);
-		writeGraphSum("welfare_selected", "Monetary Units", it2userBenefits_selected, it2tollSum);		
+		writeGraphSum("welfare_selected", "Monetary Units", it2userBenefits_selected, it2tollSum);
+		
+		writeGraphDiv("avgTripTravelTimeCar", "Seconds", it2totalTravelTimeCarMode, it2carLegs);
 	}
 
 	private void writeGraphSum(String name, String yLabel, Map<Integer, Double> it2Double1, Map<Integer, Double> it2Double2) {
@@ -173,6 +176,30 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		for (Integer iteration : it2Double1.keySet()){
 			xValues[counter] = iteration.doubleValue();
 			yValues[counter] = (it2Double1.get(iteration)) + (it2Double2.get(iteration));
+			counter++;
+		}
+		
+		chart.addSeries(name, xValues, yValues);
+		
+		XYPlot plot = chart.getChart().getXYPlot(); 
+		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
+		axis.setAutoRange(true);
+		axis.setAutoRangeIncludesZero(false);
+		
+		String outputFile = this.scenario.getConfig().controler().getOutputDirectory() + "/" + name + ".png";
+		chart.saveAsPng(outputFile, 1000, 800); // File Export
+	}
+	
+	private void writeGraphDiv(String name, String yLabel, Map<Integer, Double> it2Double1, Map<Integer, Double> it2Double2) {
+		
+		XYLineChart chart = new XYLineChart(name, "Iteration", yLabel);
+
+		double[] xValues = new double[it2Double1.size()];
+		double[] yValues = new double[it2Double1.size()];
+		int counter = 0;
+		for (Integer iteration : it2Double1.keySet()){
+			xValues[counter] = iteration.doubleValue();
+			yValues[counter] = (it2Double1.get(iteration)) / (it2Double2.get(iteration));
 			counter++;
 		}
 		

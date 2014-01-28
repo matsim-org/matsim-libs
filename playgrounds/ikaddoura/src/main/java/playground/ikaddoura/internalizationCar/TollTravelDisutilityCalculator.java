@@ -39,6 +39,13 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 
 	private static final Logger log = Logger.getLogger(TollTravelDisutilityCalculator.class);
 
+	/*
+	 * Blur the Social Cost to speed up the relaxation process. Values between
+	 * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
+	 * the old value will be totally overwritten.
+	 */
+	private final double blendFactor = 1.0;
+	
 	private TravelTime timeCalculator;
 	private double marginalUtlOfMoney;
 	private double distanceCostRateCar;
@@ -55,7 +62,7 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle v) {
-
+		
 		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time, person, v);
 		double linkTravelTimeDisutility = this.marginalUtlOfTravelTime * linkTravelTime ;
 
@@ -63,23 +70,32 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		double distanceCost = - this.distanceCostRateCar * distance;
 		double linkDistanceDisutility = this.marginalUtlOfMoney * distanceCost;
 
-		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time);
+		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person);
 		
 		double linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedTollDisutility;
 
 		return linkTravelDisutility;
 	}
 
-	private double calculateExpectedTollDisutility(Link link, double time) {
+	private double calculateExpectedTollDisutility(Link link, double time, Person person) {
 
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
-		iteration based on the tolls of the last iteration. */
+		iteration i based on the tolls in iteration i-1 and i-2 */
 		
-		double linkExpectedToll = this.tollHandler.getAvgToll(link, time);
-//		log.info("-----------> Expected toll on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedToll);
+		double linkExpectedTollNewValue = this.tollHandler.getAvgToll(link, time);
+		double linkExpectedTollOldValue = this.tollHandler.getAvgTollOldValue(link, time);
 
-		double linkExpectedTollDisutility = -1 * this.marginalUtlOfMoney * linkExpectedToll;
-	
+		double blendedOldValue = (1 - blendFactor) * linkExpectedTollOldValue;
+		double blendedNewValue = blendFactor * linkExpectedTollNewValue;	
+		
+		if (linkExpectedTollNewValue != 0 || linkExpectedTollOldValue != 0) {
+			log.info("-----------> Person " + person.getId() + ": Expected toll (new value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollNewValue);
+			log.info("-----------> Person " + person.getId() + ": Expected toll (old value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollOldValue);
+		
+			log.info("ExpectedToll: " + (blendedNewValue + blendedOldValue) );
+		}
+				
+		double linkExpectedTollDisutility = -1 * this.marginalUtlOfMoney * (blendedOldValue + blendedNewValue);			
 		return linkExpectedTollDisutility;
 	}
 
