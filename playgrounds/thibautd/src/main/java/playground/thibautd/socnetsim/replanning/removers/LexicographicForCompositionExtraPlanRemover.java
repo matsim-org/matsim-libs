@@ -55,15 +55,6 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 	private final Random random;
 	private final int maxPlansPerComposition;
 	private final int maxPlansPerAgent;
-	private final Comparator<Plan> scoreComparator =
-		new Comparator<Plan>() {
-			@Override
-			public int compare(
-					final Plan o1,
-					final Plan o2) {
-				return o1.getScore().compareTo( o2.getScore() );
-			}
-		};
 
 	public LexicographicForCompositionExtraPlanRemover(
 			final int maxPlansPerComposition,
@@ -118,7 +109,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		for ( Person person : persons ) {
 			if ( person.getPlans().size() > maxPlansPerAgent ) {
 				assert person.getPlans().size() == maxPlansPerAgent + 1;
-				final Plan toRemove = Collections.min( person.getPlans() , scoreComparator );
+				final Plan toRemove = getWorstNonUniquelyIndividualPlan( person.getPlans() , jointPlans );
 				final JointPlan jpToRemove = jointPlans.getJointPlan( toRemove );
 
 				if ( jpToRemove != null ) {
@@ -135,6 +126,34 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		}
 
 		return somethingDone;
+	}
+
+	private static Plan getWorstNonUniquelyIndividualPlan(
+			final List<? extends Plan> plans,
+			final JointPlans jointPlans) {
+		boolean worstIsIndividual = false;
+		Plan worst = null;
+		Plan secondWorst = null;
+
+		int nIndividualPlans = 0;
+		for ( Plan plan : plans ) {
+			final JointPlan jp = jointPlans.getJointPlan( plan );
+
+			if ( jp == null ) nIndividualPlans++;
+
+			if ( worst == null || plan.getScore() < worst.getScore() ) {
+				secondWorst = worst;
+				worst = plan;
+				worstIsIndividual = jp == null;
+			}
+			else if ( secondWorst == null || plan.getScore() < secondWorst.getScore() ) {
+				secondWorst = plan;
+			}
+		}
+
+		// if there is only one individual plan, do not consider it "worse"
+		assert nIndividualPlans > 0;
+		return ( nIndividualPlans == 1 && worstIsIndividual ) ? secondWorst : worst;
 	}
 
 	private static int maxRank(final ReplanningGroup group) {
