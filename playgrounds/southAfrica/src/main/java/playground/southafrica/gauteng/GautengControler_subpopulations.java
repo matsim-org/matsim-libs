@@ -158,6 +158,7 @@ public class GautengControler_subpopulations {
 
 		/* Set some other config parameters. */
 		config.plans().setSubpopulationAttributeName("subpopulation");
+		config.global().setCoordinateSystem("WGS84_SA_Albers");
 
 		String[] modes ={"car","commercial"};
 		config.qsim().setMainModes( Arrays.asList(modes) );
@@ -187,28 +188,26 @@ public class GautengControler_subpopulations {
 
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
+		config.controler().setRoutingAlgorithmType( RoutingAlgorithmType.FastAStarLandmarks );
+		config.controler().setLastIteration(100);
 
+		config.counts().setCountsScaleFactor(100.);
+		config.qsim().setFlowCapFactor(0.01);
+		config.qsim().setStorageCapFactor(0.03);
+		config.counts().setOutputFormat("all");
+		config.qsim().setEndTime(36.*3600.);
+		
+		config.qsim().setStuckTime(10.);
+		config.qsim().setRemoveStuckVehicles(false);
+		config.qsim().setSnapshotPeriod(Double.POSITIVE_INFINITY);
+		config.controler().setWriteSnapshotsInterval(0);
+		
+		config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
 		if ( user==User.kai ) {
-			config.controler().setRoutingAlgorithmType( RoutingAlgorithmType.FastAStarLandmarks );
-			config.controler().setWriteSnapshotsInterval(0);
-
-			config.controler().setLastIteration(100);
-
 			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
-
 			config.counts().setCountsFileName( KNGautengController.GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz");
-			config.counts().setCountsScaleFactor(100.);
-			config.counts().setOutputFormat("all");
-
-			config.qsim().setEndTime(36.*3600.);
-
-			config.qsim().setFlowCapFactor(0.01);
-			config.qsim().setStorageCapFactor(0.03);
-			config.qsim().setStuckTime(10.);
-			config.qsim().setRemoveStuckVehicles(false);
-
-			config.qsim().setSnapshotPeriod(Double.POSITIVE_INFINITY);
-			config.controler().setWriteSnapshotsInterval(0);
+		} else if(user == User.johan){
+			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
 		}
 
 		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
