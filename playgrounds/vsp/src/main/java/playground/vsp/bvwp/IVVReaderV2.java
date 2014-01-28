@@ -127,7 +127,6 @@ public class IVVReaderV2 {
 		for (Id id: data.getAllRelations()){
 			double pu = data.getByODRelation(id).getAttributes(Mode.Strasse, seg).getByEntry(Attribute.Nutzerkosten_Eu);
 			double cop = data.getByODRelation(id).getAttributes(Mode.Strasse, seg).getByEntry(Attribute.Produktionskosten_Eu);
-//			System.out.println(pu  + ": vs " + cop);
 			if (pu<cop) usercostsTooLow++;
 		}
 		
@@ -135,44 +134,14 @@ public class IVVReaderV2 {
 		}	
 	}
 	
-	void createPlanUndNullfallForOdRelation(Id odRelation){
-		ScenarioForEvalData	nullfallData = new ScenarioForEvalData();		
-		log.info("Reading demand file (00-Matrix): "+config.getDemandMatrixFile() );
-		read(config.getDemandMatrixFile(), new SetCertainODDemand(odRelation, nullfallData));
-		log.info("Reading Reseizeitmatrix Nullfall (06, 18): " +config.getTravelTimesBaseMatrixFile());
-		read(config.getTravelTimesBaseMatrixFile(), new SetTravelTimeForODRelationHandler(odRelation, nullfallData, true));
 
-		log.info("Duplicating Nullfall");
-		ScenarioForEvalData planfallData = nullfallData.createDeepCopy();
-		
-		log.info("Reading Cost Of Production & Operations' file (10,12,14 Sammelfile Nullfall): "+config.getImpedanceMatrixFile() );
-		read(config.getImpedanceMatrixFile(), new SetImpedanceForOdRelationNullfallHandler(odRelation, nullfallData));
-
-		log.info("Reading Cost Of Production & Operations' file (11,13,15 Sammelfile Planfall): "+config.getImpedanceMatrixFile() );
-		read(config.getImpedanceMatrixFile(), new SetImpedanceForOdRelationPlanfallHandler(odRelation, planfallData));
-		
-		log.info("Reading Neuentstehend,induziert (02/03) "+ config.getNewDemandMatrixFile());
-		read(config.getNewDemandMatrixFile(), new SetForCertainOdDemandNewOrDroppedHandler(odRelation, planfallData));
-		log.info("Reading Entfallend (04) "+ config.getDroppedDemandMatrixFile());
-		read(config.getDroppedDemandMatrixFile(), new SetForCertainOdDemandNewOrDroppedHandler(odRelation, planfallData));
-		log.info("Reading Reseizeitmatrix Planfall (07): " +config.getTravelTimesStudyMatrixFile());
-		read(config.getTravelTimesStudyMatrixFile(), new SetTravelTimeForODRelationHandler(odRelation, planfallData, false));
-		log.info("Reading Verlagert (16-17): " +config.getImpedanceShiftedMatrixFile());
-		read(config.getImpedanceShiftedMatrixFile(), new SetforOdImpedanceShiftedHandler(odRelation, planfallData, nullfallData));
-		System.out.println("Nullfall:");
-		System.out.println(nullfallData);
-
-		System.out.println("Planfall:");
-		System.out.println(planfallData);
-		
-
-	}
 	
 
 
 	/**
 	 * @param type2ids
 	 */
+	@SuppressWarnings("unused")
 	private void analyzeAndPrint(Map<String, Set<Id>> type2ids) {
 		
 		StringBuffer b = new StringBuffer();
@@ -276,52 +245,7 @@ public class IVVReaderV2 {
 	}
 	
 
-    private static class SetCertainODDemand implements TabularFileHandler{
-        private ScenarioForEvalData data;
-        private Id odid;
-
-        /**
-         * @param data
-         */
-        public SetCertainODDemand(Id odid, ScenarioForEvalData data) {
-            this.data = data;
-            this.odid = odid;
-        }
-
-        @Override
-        public void startRow(String[] row) {
-            if(comment(row)) return;
-
-            String from = row[0].trim();
-            String to = row[1].trim();
-            Id currentOdId = getODId(from, to);
-            if( currentOdId.equals(odid))
-            {
-            
-         
-            Mode mode = Mode.Bahn;
-            
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[2].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[3].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[4].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_COMMERCIAL, Attribute.XX),Double.parseDouble(row[5].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[6].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[7].trim())    , data);
-            
-            mode = Mode.Strasse;
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[8].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[9].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[10].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_COMMERCIAL, Attribute.XX),Double.parseDouble(row[11].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[12].trim())    , data);
-            setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[13].trim())    , data);
-            }
-            
-        }
-        
-    }
-	
-	private static class DemandNewOrDroppedHandler implements TabularFileHandler{
+    private static class DemandNewOrDroppedHandler implements TabularFileHandler{
 
 		private ScenarioForEvalData data;
 		private final List<Id> odRelations;
@@ -352,49 +276,7 @@ public class IVVReaderV2 {
 		}
 	}
 	
-	private static class SetForCertainOdDemandNewOrDroppedHandler implements TabularFileHandler{
-
-		private ScenarioForEvalData data;
-		private Id odid;
-
-		/**
-		 * @param data
-		 */
-		public SetForCertainOdDemandNewOrDroppedHandler(Id odid, ScenarioForEvalData data) {
-			this.data = data;
-			this.odid = odid;
-		}
-
-		@Override
-		
-		public void startRow(String[] row) {
-			if(comment(row)) return;
-
-			String from = row[0].trim();
-			String to = row[1].trim();
-			Id currentOdid = getODId(from, to);
-			if (currentOdid.equals(odid)){
-
-			Values currentODRelation = data.getByODRelation(currentOdid);
-
-			try {
-			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Distanz_km), Double.parseDouble(row[2].trim()));
-			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Distanz_km), Double.parseDouble(row[3].trim()));
-			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Distanz_km), Double.parseDouble(row[4].trim()));
-			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Distanz_km), Double.parseDouble(row[5].trim()));
-			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Distanz_km), Double.parseDouble(row[6].trim()));
-			}
-			catch (NullPointerException e){
-				System.err.println("od ID : " + currentOdid + " has Changes in Demand, but initial Demand was not set.");
-			}
-				}
-	
-				
-			}
-	}
-	
-
-	
+	@SuppressWarnings("unused")
 	private static class DemandRemainingHandler implements TabularFileHandler{
 
 		private ScenarioForEvalData data;
@@ -442,7 +324,6 @@ public class IVVReaderV2 {
 			
 			String from = row[0].trim();
 			String to = row[1].trim();
-			//TODO set correct values
 				for (DemandSegment ds : DemandSegment.values()){
 					if (ds.equals(DemandSegment.GV)) continue;
 					if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
@@ -490,93 +371,6 @@ public class IVVReaderV2 {
         
         
     }
-	
-	private static class SetImpedanceForOdRelationNullfallHandler implements TabularFileHandler{
-
-		private ScenarioForEvalData data;
-		private Id odid;
-
-		/**
-		 * @param data
-		 */
-		public SetImpedanceForOdRelationNullfallHandler(Id odid, ScenarioForEvalData data) {
-			this.data = data;
-			this.odid = odid;
-		}
-
-		@Override
-		public void startRow(String[] row) {
-			if(comment(row)) return;
-			
-			String from = row[0].trim();
-			String to = row[1].trim();
-			Id currentOdId = getODId(from, to);
-			if(currentOdId.equals(odid)){
-			
-			for (DemandSegment ds : DemandSegment.values()){
-					if (ds.equals(DemandSegment.GV)) continue;
-					if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-					
-					setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[6]), data);
-				}
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Produktionskosten_Eu), Double.parseDouble(row[8])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Produktionskosten_Eu), Double.parseDouble(row[9])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Produktionskosten_Eu), Double.parseDouble(row[10])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Produktionskosten_Eu), Double.parseDouble(row[11])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Produktionskosten_Eu), Double.parseDouble(row[12])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Produktionskosten_Eu), Double.parseDouble(row[13])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-			
-				
-			
-			}}
-		
-	}
-	
-	
-
-	
-	private static class SetImpedanceForOdRelationPlanfallHandler implements TabularFileHandler{
-
-		private ScenarioForEvalData data;
-		private Id odid;
-
-		/**
-		 * @param data
-		 */
-		public SetImpedanceForOdRelationPlanfallHandler(Id odid, ScenarioForEvalData data) {
-			this.data = data;
-			this.odid = odid;
-		}
-
-		@Override
-		public void startRow(String[] row) {
-			if(comment(row)) return;
-			
-			String from = row[0].trim();
-			String to = row[1].trim();
-			Id currentOdId = getODId(from, to);
-			if(currentOdId.equals(odid)){
-			
-			for (DemandSegment ds : DemandSegment.values()){
-						if (ds.equals(DemandSegment.GV)) continue;
-						if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-				
-					setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[7]), data);
-				}
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Produktionskosten_Eu), Double.parseDouble(row[14])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Produktionskosten_Eu), Double.parseDouble(row[15])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Produktionskosten_Eu), Double.parseDouble(row[16])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Produktionskosten_Eu), Double.parseDouble(row[17])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Produktionskosten_Eu), Double.parseDouble(row[18])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Produktionskosten_Eu), Double.parseDouble(row[19])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-			
-				
-			
-			}}
-		
-	}
-	
-	
 	
 	private static class ImpedanceShiftedHandler implements TabularFileHandler{
 
@@ -630,54 +424,6 @@ public class IVVReaderV2 {
 		
 	}
 	
-	private static class SetforOdImpedanceShiftedHandler implements TabularFileHandler{
-
-		private ScenarioForEvalData planfalldata;
-		private ScenarioForEvalData nullfalldata;
-		private Id odid;
-		/**
-		 * @param nullfalldata
-		 */
-		public SetforOdImpedanceShiftedHandler(Id odid, ScenarioForEvalData planfalldata, ScenarioForEvalData nullfalldata) {
-			this.planfalldata = planfalldata;
-			this.nullfalldata = nullfalldata;
-			this.odid = odid;
-		}
-
-		@Override
-		public void startRow(String[] row) {
-			if(comment(row)) return;
-			String from = row[0].trim();
-			String to = row[2].trim();
-			Id currentOdId = getODId(from, to);
-			if (odid.equals(currentOdId)){
-			
-			// Annahme: Wegezwecke fuer Verlagerungen sind identisch mit Wegezwecken im MIV fuer OD-Relation
-			Double totalMIV = 0.;
-			Map<DemandSegment,Double> mivZwecke = new HashMap<DemandSegment,Double>();
-			for (DemandSegment segment : DemandSegment.values()){
-				if (segment.equals(DemandSegment.GV)) continue;
-				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-				
-				Double mivhere = nullfalldata.getByODRelation(currentOdId).getAttributes(Mode.Strasse, segment).getByEntry(Attribute.XX);	
-				totalMIV =+ mivhere;
-				
-			}
-			
-			for (DemandSegment segment : DemandSegment.values()){
-				if (segment.equals(DemandSegment.GV)) continue;
-				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-			Double verl = Double.parseDouble(row[4].trim()) * WERKTAGEPROJAHR * mivZwecke.get(segment)/totalMIV ;
-			setValuesForODRelation(currentOdId, Key.makeKey(Mode.Bahn, segment, Attribute.XX), verl, nullfalldata);
-			setValuesForODRelation(currentOdId, Key.makeKey(Mode.Bahn, segment, Attribute.Reisezeit_h), Double.parseDouble(row[5].trim()), nullfalldata);
-			setValuesForODRelation(currentOdId, Key.makeKey(Mode.Bahn, segment, Attribute.Reisezeit_h), Double.parseDouble(row[5].trim()), planfalldata);
-			setValuesForODRelation(currentOdId, Key.makeKey(Mode.Bahn, segment, Attribute.XX), 0., planfalldata);
-
-			}
-		}}
-		
-	}
-	
 	private static class TravelTimeHandler implements TabularFileHandler{
 
 		private ScenarioForEvalData data;
@@ -723,45 +469,7 @@ public class IVVReaderV2 {
 		
 	}
 	
-	private static class SetTravelTimeForODRelationHandler implements TabularFileHandler{
-
-		private ScenarioForEvalData data;
-		boolean includeRail;
-		private Id odid;
-		/**
-		 * @param data
-		 */
-		public SetTravelTimeForODRelationHandler(Id odid, ScenarioForEvalData data, boolean includeRail) {
-			this.odid = odid;
-			this.data = data;
-			this.includeRail = includeRail;
-		}
-
-		@Override
-		public void startRow(String[] row) {
-			if(comment(row)) return;
-			
-			String[] myRow = myRowSplit(row[0]);
-			Id currentOd = getODId(getIdForTTfiles(myRow[2]), getIdForTTfiles(myRow[3]));
-			if (currentOd.equals(this.odid)){
-			
-			for (DemandSegment ds : DemandSegment.values()){
-				if (ds.equals(DemandSegment.GV)) continue;
-				if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-			setValuesForODRelation(currentOd, Key.makeKey(Mode.Strasse, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
-			setValuesForODRelation(currentOd, Key.makeKey(Mode.Strasse, ds, Attribute.Reisezeit_h), Double.parseDouble(myRow[5].trim())/60., data);
-			
-			
-			if (includeRail){
-			setValuesForODRelation(currentOd, Key.makeKey(Mode.Bahn, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
-			setValuesForODRelation(currentOd, Key.makeKey(Mode.Bahn, ds, Attribute.Nutzerkosten_Eu), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
-			}
-			
-			}
-			}}
-			
-		
-	}
+	
 	
 	
 	
