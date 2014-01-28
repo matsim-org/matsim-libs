@@ -433,15 +433,15 @@ public class GautengControler_subpopulations {
 		/* Create vehicle types. */
 		VehiclesFactory vf = VehicleUtils.getFactory();
 		LOG.info("Creating vehicle types.");
-		VehicleType vehicle_A2 = new VehicleTypeImpl(new IdImpl("a2"));
+		VehicleType vehicle_A2 = new VehicleTypeImpl(new IdImpl("A2"));
 		vehicle_A2.setDescription("Light vehicle with SANRAL toll class `A2'");
 
-		VehicleType vehicle_B = new VehicleTypeImpl(new IdImpl("b"));
+		VehicleType vehicle_B = new VehicleTypeImpl(new IdImpl("B"));
 		vehicle_B.setDescription("Light vehicle with SANRAL toll class `B'");
 		vehicle_B.setMaximumVelocity(100.0 / 3.6);
 		vehicle_B.setLength(10.0);
 
-		VehicleType vehicle_C = new VehicleTypeImpl(new IdImpl("c"));
+		VehicleType vehicle_C = new VehicleTypeImpl(new IdImpl("C"));
 		vehicle_C.setDescription("Light vehicle with SANRAL toll class `C'");
 		vehicle_C.setMaximumVelocity(80.0 / 3.6);
 		vehicle_C.setLength(15.0);
