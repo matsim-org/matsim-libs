@@ -60,9 +60,9 @@ import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
-import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
+import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
@@ -274,7 +274,8 @@ public class ControllerRegistryBuilder {
 
 	public PlanLinkIdentifier getPlanLinkIdentifier() {
 		if ( planLinkIdentifier == null ) {
-			this.planLinkIdentifier = new DefaultPlanLinkIdentifier();
+			this.planLinkIdentifier = PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier();
+
 		}
 		return planLinkIdentifier;
 	}
