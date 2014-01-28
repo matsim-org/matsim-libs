@@ -88,12 +88,12 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		double blendedOldValue = (1 - blendFactor) * linkExpectedTollOldValue;
 		double blendedNewValue = blendFactor * linkExpectedTollNewValue;	
 		
-		if (linkExpectedTollNewValue != 0 || linkExpectedTollOldValue != 0) {
-			log.info("-----------> Person " + person.getId() + ": Expected toll (new value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollNewValue);
-			log.info("-----------> Person " + person.getId() + ": Expected toll (old value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollOldValue);
-		
-			log.info("ExpectedToll: " + (blendedNewValue + blendedOldValue) );
-		}
+//		if (linkExpectedTollNewValue != 0 || linkExpectedTollOldValue != 0) {
+//			log.info("-----------> Person " + person.getId() + ": Expected toll (new value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollNewValue);
+//			log.info("-----------> Person " + person.getId() + ": Expected toll (old value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollOldValue);
+//		
+//			log.info("ExpectedToll: " + (blendedNewValue + blendedOldValue) );
+//		}
 				
 		double linkExpectedTollDisutility = -1 * this.marginalUtlOfMoney * (blendedOldValue + blendedNewValue);			
 		return linkExpectedTollDisutility;
