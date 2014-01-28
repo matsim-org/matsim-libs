@@ -406,8 +406,8 @@ public class GautengControler_subpopulations {
 		// CONSTRUCT UTILITY OF MONEY:
 
 		UtilityOfMoneyI personSpecificUtilityOfMoney = new GautengUtilityOfMoney(
-				sc.getConfig().planCalcScore(), baseValueOfTime,
-				valueOfTimeMultiplier, tollFactor);
+				sc, sc.getConfig().planCalcScore(),
+				baseValueOfTime, valueOfTimeMultiplier, tollFactor);
 
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing
 		// class):
@@ -437,12 +437,12 @@ public class GautengControler_subpopulations {
 		vehicle_A2.setDescription("Light vehicle with SANRAL toll class `A2'");
 
 		VehicleType vehicle_B = new VehicleTypeImpl(new IdImpl("B"));
-		vehicle_B.setDescription("Light vehicle with SANRAL toll class `B'");
+		vehicle_B.setDescription("Short commercial vehicle with SANRAL toll class `B'");
 		vehicle_B.setMaximumVelocity(100.0 / 3.6);
 		vehicle_B.setLength(10.0);
 
 		VehicleType vehicle_C = new VehicleTypeImpl(new IdImpl("C"));
-		vehicle_C.setDescription("Light vehicle with SANRAL toll class `C'");
+		vehicle_C.setDescription("Medium/long commercial vehicle with SANRAL toll class `C'");
 		vehicle_C.setMaximumVelocity(80.0 / 3.6);
 		vehicle_C.setLength(15.0);
 

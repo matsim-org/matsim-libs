@@ -239,7 +239,7 @@ public class KNGautengControler {
 			} ;
 			break;
 		case gauteng:
-			personSpecificUtilityOfMoney = new GautengUtilityOfMoney( config.planCalcScore() , baseValueOfTime_h, valueOfTimeMultiplier, tollFactor) ;
+			personSpecificUtilityOfMoney = new GautengUtilityOfMoney( scenario , config.planCalcScore(), baseValueOfTime_h, valueOfTimeMultiplier, tollFactor) ;
 			break;
 		default:
 			throw new RuntimeException("missing") ;

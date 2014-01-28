@@ -139,7 +139,7 @@ class GautengControler {
 
 		// CONSTRUCT UTILITY OF MONEY:
 		
-		UtilityOfMoneyI personSpecificUtilityOfMoney = new GautengUtilityOfMoney( sc.getConfig().planCalcScore() , baseValueOfTime, valueOfTimeMultiplier, tollFactor) ;
+		UtilityOfMoneyI personSpecificUtilityOfMoney = new GautengUtilityOfMoney( sc , sc.getConfig().planCalcScore(), baseValueOfTime, valueOfTimeMultiplier, tollFactor) ;
 
 		// INSTALL ROAD PRICING (in the longer run, re-merge with RoadPricing class):
 		// insert into scoring:

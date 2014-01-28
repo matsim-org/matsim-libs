@@ -20,7 +20,6 @@
 
 package playground.southafrica.gauteng.roadpricingscheme;
 
-import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,16 +27,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
-
-import playground.southafrica.gauteng.GautengControler_subpopulations;
 
 /**
  * @author nagel
@@ -79,7 +74,7 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 			Id id = entry.getKey() ;
 			List<Cost> costs = entry.getValue() ;
 			for ( Cost cost : costs ) {
-				log.warn( "id: " + id.toString() + "cost: " + cost.toString() ) ;
+				log.warn( "id: " + id.toString() + "; cost: " + cost.toString() ) ;
 			}
 		}
 		
