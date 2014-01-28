@@ -88,17 +88,18 @@ class Utils {
 		html.endTableRow() ;
 	}
 
-	static void writeRohAndEndOutput(Html html, double utilsUserFromRoH, double operatorProfit) {
-		System.out.printf("RoH: utl gain users: %16.1e ; operator profit gain: %16.1e ; sum: %16.1e\n", 
-				utilsUserFromRoH, operatorProfit, utilsUserFromRoH+operatorProfit ) ; 
+	static void writeRohAndEndOutput(Html html, double utilsUserFromRoHOldUsers, double utilsUserFromRoHNewUsers, double operatorProfit) {
+		System.out.printf("RoH: utl gain old users: %16.1e ; utl gain new users: %16.1e ; operator profit gain: %16.1e ; sum: %16.1e\n", 
+				utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit, utilsUserFromRoHOldUsers+utilsUserFromRoHNewUsers+operatorProfit ) ; 
 	
 		html.beginTableMulticolumnRow() ;
 		html.write("<strong>Zum Vergleich: RoH-Rechnung</strong>") ;
 		html.endTableRow() ;
 	
 		html.beginTableMulticolumnRow() ;
-		html.write("RoH: utl gain users: " + Utils.convertToMillions(utilsUserFromRoH) + "; operator profit gain: " + Utils.convertToMillions(operatorProfit)
-				+ "; sum: " + Utils.convertToMillions(utilsUserFromRoH+operatorProfit) ) ;
+		html.write("RoH: utl gain old users: " + Utils.convertToMillions(utilsUserFromRoHOldUsers) + 
+				"RoH: utl gain new users: " + Utils.convertToMillions(utilsUserFromRoHNewUsers) + "; operator profit gain: " + Utils.convertToMillions(operatorProfit)
+				+ "; sum: " + Utils.convertToMillions(utilsUserFromRoHOldUsers + utilsUserFromRoHNewUsers +operatorProfit) ) ;
 		html.endTableRow() ;
 	
 		html.endTable() ;
@@ -207,7 +208,7 @@ class Utils {
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
 				utlChangesPerItem.utl , utlChange/1000./1000.
 				) ;
-		html.bvwpTableRow(attribute.toString()+" rcv",
+		html.bvwpTableRow(attribute.toString()+" aufn.",
 				0., 0., 
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
 				attributeValuePlanfall, attributeValuePlanfall * deltaAmounts,
@@ -224,7 +225,7 @@ class Utils {
 				// Nullfall)
 				utlChangesPerItem.utl , utlChange/1000./1000.
 				) ;
-		html.bvwpTableRow(attribute.toString()+" giv",
+		html.bvwpTableRow(attribute.toString()+" abgeb.",
 				attributeValueNullfall, attributeValueNullfall * deltaAmounts,
 				attributeValuePlanfall, 0., // this uses Planfall just for completeness 
 				-attributeValueNullfall, attributeValueNullfall * deltaAmounts,

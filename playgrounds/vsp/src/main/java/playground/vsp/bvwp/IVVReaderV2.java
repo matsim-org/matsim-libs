@@ -125,8 +125,8 @@ public class IVVReaderV2 {
 		for (DemandSegment seg : DemandSegment.values()){
 			int usercostsTooLow = 0;
 		for (Id id: data.getAllRelations()){
-			double pu = data.getByODRelation(id).getAttributes(Mode.ROAD, seg).getByEntry(Attribute.priceUser);
-			double cop = data.getByODRelation(id).getAttributes(Mode.ROAD, seg).getByEntry(Attribute.costOfProduction);
+			double pu = data.getByODRelation(id).getAttributes(Mode.Strasse, seg).getByEntry(Attribute.Nutzerkosten_Eu);
+			double cop = data.getByODRelation(id).getAttributes(Mode.Strasse, seg).getByEntry(Attribute.Produktionskosten_Eu);
 //			System.out.println(pu  + ": vs " + cop);
 			if (pu<cop) usercostsTooLow++;
 		}
@@ -254,7 +254,7 @@ public class IVVReaderV2 {
 			Id odId = getODId(from, to);
 			if (this.odRelations.contains(odId)){
 			
-			Mode mode = Mode.RAIL;
+			Mode mode = Mode.Bahn;
 			
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[2].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[3].trim())	, data);
@@ -263,7 +263,7 @@ public class IVVReaderV2 {
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[6].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[7].trim())	, data);
 			
-			mode = Mode.ROAD;
+			mode = Mode.Strasse;
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[8].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[9].trim())	, data);
 			setValuesForODRelation(odId, 	Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[10].trim())	, data);
@@ -299,7 +299,7 @@ public class IVVReaderV2 {
             {
             
          
-            Mode mode = Mode.RAIL;
+            Mode mode = Mode.Bahn;
             
             setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[2].trim())    , data);
             setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[3].trim())    , data);
@@ -308,7 +308,7 @@ public class IVVReaderV2 {
             setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_URLAUB, Attribute.XX),Double.parseDouble(row[6].trim())    , data);
             setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_SONST, Attribute.XX),Double.parseDouble(row[7].trim())    , data);
             
-            mode = Mode.ROAD;
+            mode = Mode.Strasse;
             setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_BERUF, Attribute.XX),Double.parseDouble(row[8].trim())    , data);
             setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_AUSBILDUNG, Attribute.XX),Double.parseDouble(row[9].trim())    , data);
             setValuesForODRelation(currentOdId,     Key.makeKey(mode, DemandSegment.PV_EINKAUF, Attribute.XX),Double.parseDouble(row[10].trim())    , data);
@@ -342,15 +342,13 @@ public class IVVReaderV2 {
 			String to = row[1].trim();
 			Id odid = getODId(from, to);
 			if (this.odRelations.contains(odid)){
-
-	
-			data.getByODRelation(odid).inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_BERUF, Attribute.XX), Double.parseDouble(row[2].trim()));
-			data.getByODRelation(odid).inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_AUSBILDUNG, Attribute.XX), Double.parseDouble(row[3].trim()));
-			data.getByODRelation(odid).inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_EINKAUF, Attribute.XX), Double.parseDouble(row[4].trim()));
-			data.getByODRelation(odid).inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_URLAUB, Attribute.XX), Double.parseDouble(row[5].trim()));
-			data.getByODRelation(odid).inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_SONST, Attribute.XX), Double.parseDouble(row[6].trim()));
-	
+			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Distanz_km), Double.parseDouble(row[2].trim()));
+			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Distanz_km), Double.parseDouble(row[3].trim()));
+			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Distanz_km), Double.parseDouble(row[4].trim()));
+			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Distanz_km), Double.parseDouble(row[5].trim()));
+			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Distanz_km), Double.parseDouble(row[6].trim()));
 			}
+
 		}
 	}
 	
@@ -376,6 +374,7 @@ public class IVVReaderV2 {
 			String to = row[1].trim();
 			Id currentOdid = getODId(from, to);
 			if (currentOdid.equals(odid)){
+<<<<<<< HEAD
 
 			Values currentODRelation = data.getByODRelation(currentOdid);
 			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_BERUF, Attribute.km), Double.parseDouble(row[2].trim()));
@@ -383,6 +382,18 @@ public class IVVReaderV2 {
 			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_EINKAUF, Attribute.km), Double.parseDouble(row[4].trim()));
 			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_URLAUB, Attribute.km), Double.parseDouble(row[5].trim()));
 			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_SONST, Attribute.km), Double.parseDouble(row[6].trim()));
+=======
+			try {
+			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Distanz_km), Double.parseDouble(row[2].trim()));
+			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Distanz_km), Double.parseDouble(row[3].trim()));
+			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Distanz_km), Double.parseDouble(row[4].trim()));
+			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Distanz_km), Double.parseDouble(row[5].trim()));
+			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Distanz_km), Double.parseDouble(row[6].trim()));
+			}
+			catch (NullPointerException e){
+				System.err.println("od ID : " + currentOdid + " has Changes in Demand, but initial Demand was not set.");
+			}
+>>>>>>> bvwp changes
 				}
 	
 				
@@ -408,11 +419,11 @@ public class IVVReaderV2 {
 
 			String from = row[0].trim();
 			String to = row[1].trim();
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.ROAD, DemandSegment.PV_BERUF, Attribute.XX),  Double.parseDouble(row[2]),	data);
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.ROAD, DemandSegment.PV_AUSBILDUNG, Attribute.XX),  Double.parseDouble(row[3]),	data);
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.ROAD, DemandSegment.PV_EINKAUF, Attribute.XX),  Double.parseDouble(row[4]),	data);
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.ROAD, DemandSegment.PV_URLAUB, Attribute.XX),  Double.parseDouble(row[5]),	data);
-			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.ROAD, DemandSegment.PV_SONST, Attribute.XX),  Double.parseDouble(row[6]),	data);
+			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.XX),  Double.parseDouble(row[2]),	data);
+			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.XX),  Double.parseDouble(row[3]),	data);
+			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.XX),  Double.parseDouble(row[4]),	data);
+			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.XX),  Double.parseDouble(row[5]),	data);
+			setValuesForODRelation(getODId(from, to), Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.XX),  Double.parseDouble(row[6]),	data);
 
 
 		}
@@ -443,23 +454,23 @@ public class IVVReaderV2 {
 					if (ds.equals(DemandSegment.GV)) continue;
 					if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 					
-					setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, ds, Attribute.costOfProduction), Double.parseDouble(row[6]), nullfalldata);
-					setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, ds, Attribute.costOfProduction), Double.parseDouble(row[7]), planfalldata);
+					setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[6]), nullfalldata);
+					setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[7]), planfalldata);
 
 				}
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_BERUF, Attribute.priceUser), Double.parseDouble(row[8])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_AUSBILDUNG, Attribute.priceUser), Double.parseDouble(row[9])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_EINKAUF, Attribute.priceUser), Double.parseDouble(row[10])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_COMMERCIAL, Attribute.priceUser), Double.parseDouble(row[11])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, nullfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_URLAUB, Attribute.priceUser), Double.parseDouble(row[12])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_SONST, Attribute.priceUser), Double.parseDouble(row[13])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[8])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[9])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[10])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[11])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, nullfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[12])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[13])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, nullfalldata);
 			
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_BERUF, Attribute.priceUser), Double.parseDouble(row[14])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_AUSBILDUNG, Attribute.priceUser), Double.parseDouble(row[15])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_EINKAUF, Attribute.priceUser), Double.parseDouble(row[16])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_COMMERCIAL, Attribute.priceUser), Double.parseDouble(row[17])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, planfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_URLAUB, Attribute.priceUser), Double.parseDouble(row[18])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
-				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.ROAD, DemandSegment.PV_SONST, Attribute.priceUser), Double.parseDouble(row[19])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[14])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[15])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[16])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[17])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, planfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[18])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
+				setValuesForODRelation(getODId(from, to),Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Nutzerkosten_Eu), Double.parseDouble(row[19])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, planfalldata);
 
 			}
 		
@@ -513,14 +524,14 @@ public class IVVReaderV2 {
 					if (ds.equals(DemandSegment.GV)) continue;
 					if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 					
-					setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, ds, Attribute.costOfProduction), Double.parseDouble(row[6]), data);
+					setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[6]), data);
 				}
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_BERUF, Attribute.costOfProduction), Double.parseDouble(row[8])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_AUSBILDUNG, Attribute.costOfProduction), Double.parseDouble(row[9])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_EINKAUF, Attribute.costOfProduction), Double.parseDouble(row[10])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_COMMERCIAL, Attribute.costOfProduction), Double.parseDouble(row[11])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_URLAUB, Attribute.costOfProduction), Double.parseDouble(row[12])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_SONST, Attribute.costOfProduction), Double.parseDouble(row[13])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Produktionskosten_Eu), Double.parseDouble(row[8])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Produktionskosten_Eu), Double.parseDouble(row[9])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Produktionskosten_Eu), Double.parseDouble(row[10])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Produktionskosten_Eu), Double.parseDouble(row[11])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Produktionskosten_Eu), Double.parseDouble(row[12])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Produktionskosten_Eu), Double.parseDouble(row[13])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
 			
 				
 			
@@ -557,14 +568,14 @@ public class IVVReaderV2 {
 						if (ds.equals(DemandSegment.GV)) continue;
 						if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 				
-					setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, ds, Attribute.costOfProduction), Double.parseDouble(row[7]), data);
+					setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, ds, Attribute.Produktionskosten_Eu), Double.parseDouble(row[7]), data);
 				}
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_BERUF, Attribute.costOfProduction), Double.parseDouble(row[14])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_AUSBILDUNG, Attribute.costOfProduction), Double.parseDouble(row[15])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_EINKAUF, Attribute.costOfProduction), Double.parseDouble(row[16])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_COMMERCIAL, Attribute.costOfProduction), Double.parseDouble(row[17])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_URLAUB, Attribute.costOfProduction), Double.parseDouble(row[18])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
-				setValuesForODRelation(currentOdId,Key.makeKey(Mode.ROAD, DemandSegment.PV_SONST, Attribute.costOfProduction), Double.parseDouble(row[19])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Produktionskosten_Eu), Double.parseDouble(row[14])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Produktionskosten_Eu), Double.parseDouble(row[15])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Produktionskosten_Eu), Double.parseDouble(row[16])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_COMMERCIAL, Attribute.Produktionskosten_Eu), Double.parseDouble(row[17])*IVVReaderV2.BESETZUNGSGRAD_PV_GESCHAEFT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Produktionskosten_Eu), Double.parseDouble(row[18])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
+				setValuesForODRelation(currentOdId,Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Produktionskosten_Eu), Double.parseDouble(row[19])*IVVReaderV2.BESETZUNGSGRAD_PV_PRIVAT, data);
 			
 				
 			
@@ -607,10 +618,15 @@ public class IVVReaderV2 {
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 				
+<<<<<<< HEAD
 				Double bahnhere = nullfalldata.getByODRelation(odId).getAttributes(Mode.RAIL, segment).getByEntry(Attribute.XX);	
 				bahnZwecke.put(segment, bahnhere);
 				totalBahn += bahnhere;
 				if (odId.equals(getODId("1500301", "1509001"))) System.out.println(segment + " : "+bahnhere); 
+=======
+				Double bahnhere = nullfalldata.getByODRelation(odId).getAttributes(Mode.Bahn, segment).getByEntry(Attribute.XX);	
+				totalBahn =+ bahnhere;
+>>>>>>> bvwp changes
 				
 			}
 			if (odId.equals(getODId("1500301", "1509001"))) System.out.println("Total Bahn : "+totalBahn); 
@@ -619,11 +635,16 @@ public class IVVReaderV2 {
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 				
+<<<<<<< HEAD
 				Double verl = Double.parseDouble(row[11].trim()) * -1.0 * WERKTAGEPROJAHR * bahnZwecke.get(segment)/totalBahn ;
 				if (odId.equals(getODId("1500301", "1509001"))) System.out.println(segment+": "+row[11].trim() + "* -1 * " +WERKTAGEPROJAHR+ " * "+bahnZwecke.get(segment) +" / "+ totalBahn +" = "+ verl ); 
 
 				// taegl. Verlagerungen * -1 * werktage * rel zweckanteil
 				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.RAIL, segment, Attribute.XX), verl);
+=======
+				Double verl = Double.parseDouble(row[11].trim()) * WERKTAGEPROJAHR * bahnZwecke.get(segment)/totalBahn ;
+				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.Bahn, segment, Attribute.XX), verl);
+>>>>>>> bvwp changes
 			}
 		}}
 		
@@ -658,7 +679,7 @@ public class IVVReaderV2 {
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 				
-				Double mivhere = nullfalldata.getByODRelation(currentOdId).getAttributes(Mode.ROAD, segment).getByEntry(Attribute.XX);	
+				Double mivhere = nullfalldata.getByODRelation(currentOdId).getAttributes(Mode.Strasse, segment).getByEntry(Attribute.XX);	
 				totalMIV =+ mivhere;
 				
 			}
@@ -667,10 +688,10 @@ public class IVVReaderV2 {
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 			Double verl = Double.parseDouble(row[4].trim()) * WERKTAGEPROJAHR * mivZwecke.get(segment)/totalMIV ;
-			setValuesForODRelation(currentOdId, Key.makeKey(Mode.RAIL, segment, Attribute.XX), verl, nullfalldata);
-			setValuesForODRelation(currentOdId, Key.makeKey(Mode.RAIL, segment, Attribute.hrs), Double.parseDouble(row[5].trim()), nullfalldata);
-			setValuesForODRelation(currentOdId, Key.makeKey(Mode.RAIL, segment, Attribute.hrs), Double.parseDouble(row[5].trim()), planfalldata);
-			setValuesForODRelation(currentOdId, Key.makeKey(Mode.RAIL, segment, Attribute.XX), 0., planfalldata);
+			setValuesForODRelation(currentOdId, Key.makeKey(Mode.Bahn, segment, Attribute.XX), verl, nullfalldata);
+			setValuesForODRelation(currentOdId, Key.makeKey(Mode.Bahn, segment, Attribute.Reisezeit_h), Double.parseDouble(row[5].trim()), nullfalldata);
+			setValuesForODRelation(currentOdId, Key.makeKey(Mode.Bahn, segment, Attribute.Reisezeit_h), Double.parseDouble(row[5].trim()), planfalldata);
+			setValuesForODRelation(currentOdId, Key.makeKey(Mode.Bahn, segment, Attribute.XX), 0., planfalldata);
 
 			}
 		}}
@@ -703,16 +724,16 @@ public class IVVReaderV2 {
 			for (DemandSegment ds : DemandSegment.values()){
 				if (ds.equals(DemandSegment.GV)) continue;
 				if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-			setValuesForODRelation(odId, Key.makeKey(Mode.ROAD, ds, Attribute.km), Double.parseDouble(myRow[4].trim()), data);
-			setValuesForODRelation(odId, Key.makeKey(Mode.ROAD, ds, Attribute.hrs), Double.parseDouble(myRow[5].trim())/60., data);
-			setValuesForODRelation(reverseOd, Key.makeKey(Mode.ROAD, ds, Attribute.km), Double.parseDouble(myRow[4].trim()), data);
-			setValuesForODRelation(reverseOd, Key.makeKey(Mode.ROAD, ds, Attribute.hrs), Double.parseDouble(myRow[5].trim())/60., data);
+			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
+			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, ds, Attribute.Reisezeit_h), Double.parseDouble(myRow[5].trim())/60., data);
+			setValuesForODRelation(reverseOd, Key.makeKey(Mode.Strasse, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
+			setValuesForODRelation(reverseOd, Key.makeKey(Mode.Strasse, ds, Attribute.Reisezeit_h), Double.parseDouble(myRow[5].trim())/60., data);
 			
 			if (includeRail){
-			setValuesForODRelation(odId, Key.makeKey(Mode.RAIL, ds, Attribute.km), Double.parseDouble(myRow[4].trim()), data);
-			setValuesForODRelation(odId, Key.makeKey(Mode.RAIL, ds, Attribute.priceUser), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
-			setValuesForODRelation(reverseOd, Key.makeKey(Mode.RAIL, ds, Attribute.km), Double.parseDouble(myRow[4].trim()), data);
-			setValuesForODRelation(reverseOd, Key.makeKey(Mode.RAIL, ds, Attribute.priceUser), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
+			setValuesForODRelation(odId, Key.makeKey(Mode.Bahn, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
+			setValuesForODRelation(odId, Key.makeKey(Mode.Bahn, ds, Attribute.Nutzerkosten_Eu), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
+			setValuesForODRelation(reverseOd, Key.makeKey(Mode.Bahn, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
+			setValuesForODRelation(reverseOd, Key.makeKey(Mode.Bahn, ds, Attribute.Nutzerkosten_Eu), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
 
 			}
 			
@@ -747,13 +768,13 @@ public class IVVReaderV2 {
 			for (DemandSegment ds : DemandSegment.values()){
 				if (ds.equals(DemandSegment.GV)) continue;
 				if (ds.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-			setValuesForODRelation(currentOd, Key.makeKey(Mode.ROAD, ds, Attribute.km), Double.parseDouble(myRow[4].trim()), data);
-			setValuesForODRelation(currentOd, Key.makeKey(Mode.ROAD, ds, Attribute.hrs), Double.parseDouble(myRow[5].trim())/60., data);
+			setValuesForODRelation(currentOd, Key.makeKey(Mode.Strasse, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
+			setValuesForODRelation(currentOd, Key.makeKey(Mode.Strasse, ds, Attribute.Reisezeit_h), Double.parseDouble(myRow[5].trim())/60., data);
 			
 			
 			if (includeRail){
-			setValuesForODRelation(currentOd, Key.makeKey(Mode.RAIL, ds, Attribute.km), Double.parseDouble(myRow[4].trim()), data);
-			setValuesForODRelation(currentOd, Key.makeKey(Mode.RAIL, ds, Attribute.priceUser), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
+			setValuesForODRelation(currentOd, Key.makeKey(Mode.Bahn, ds, Attribute.Distanz_km), Double.parseDouble(myRow[4].trim()), data);
+			setValuesForODRelation(currentOd, Key.makeKey(Mode.Bahn, ds, Attribute.Nutzerkosten_Eu), Double.parseDouble(myRow[4].trim())*BAHNPREISPROKM, data);
 			}
 			
 			}

@@ -26,24 +26,24 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 		nullfall.setValuesForODRelation(new IdImpl("BC"), nullfallForOD ) ;
 		{
 			// construct values for the road mode for this OD relation:
-			Mode mode = Mode.ROAD ;
+			Mode mode = Mode.Strasse ;
 			{
 				// passenger traffic:
 				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
 				nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 3000. ) ;
-				nullfallForOD.put(makeKey(mode, segm, Attribute.km), 38. ) ;
-				nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 0.45 ) ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.Distanz_km), 38. ) ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 0.45 ) ;
 			}			
 		}
 		{
 			// construct values for the rail mode for this OD relation:
-			Mode mode = Mode.RAIL ;
+			Mode mode = Mode.Bahn ;
 			{
 				// passenger traffic:
 				DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
 				nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 2000. ) ;
-				nullfallForOD.put(makeKey(mode, segm, Attribute.km), 41. ) ;
-				nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 0.43 ) ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.Distanz_km), 41. ) ;
+				nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 0.43 ) ;
 				// (yyyyyy: I think this should be _larger_ than for road for a convincing example.  kai, feb'12) 
 			}			
 		}
@@ -64,12 +64,12 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 		{
 			// modify the travel times for the rail mode:
 			DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.1 ) ;
+			planfallValuesForOD.inc( makeKey( Mode.Bahn, segm, Attribute.Reisezeit_h), -0.1 ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), delta ) ;
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -delta ) ;
+			planfallValuesForOD.inc( makeKey( Mode.Bahn, segm, Attribute.XX), delta ) ;
+			planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.XX), -delta ) ;
 		}
 		return planfall;
 	}

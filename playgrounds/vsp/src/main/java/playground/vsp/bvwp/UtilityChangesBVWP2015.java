@@ -40,7 +40,7 @@ class UtilityChangesBVWP2015 extends UtilityChanges {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 
-		if ( attribute.equals(Attribute.priceUser) ) {
+		if ( attribute.equals(Attribute.Nutzerkosten_Eu) ) {
 			// (Nutzerpreis hat keine Auswirkungen auf Resourcenverzehr!)
 			utlChanges.utl = 0. ;
 		} else {
@@ -59,7 +59,7 @@ class UtilityChangesBVWP2015 extends UtilityChanges {
 	double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, Attributes quantitiesPlanfall) {
 		double sum = 0. ;
 		for ( Attribute attribute : Attribute.values() ) {
-			if ( attribute != Attribute.XX && attribute != Attribute.costOfProduction ) {
+			if ( attribute != Attribute.XX && attribute != Attribute.Produktionskosten_Eu ) {
 				final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);
 				final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
 				final double margUtl = econValues.getByEntry(attribute) ;

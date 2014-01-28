@@ -41,7 +41,7 @@ class UtilityChangesBVWP2010 extends UtilityChanges {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 
-		if ( attribute.equals(Attribute.hrs) ) {
+		if ( attribute.equals(Attribute.Reisezeit_h) ) {
 			if ( deltaAmount > 0 ) {
 				// wir sind aufnehmend; es gilt die RoH
 				utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;

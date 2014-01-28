@@ -68,29 +68,29 @@ class ScenarioA14WolfsburgRoebel {
 			final Values nullfallForOD = new Values() ;
 			nullfall.setValuesForODRelation( new IdImpl(WolfsburgRoebel), nullfallForOD ) ;
 			{
-				Mode mode = Mode.ROAD ;
+				Mode mode = Mode.Strasse ;
 				//aus P2030_2010_A14_induz_ME2.wid
 				//XX aus P2030_2010_BMVBS_ME2_131008.csv:
 				//priceUser aus P2030_2010_A14_induz_ME2.wid
 				{
 					DemandSegment segm = DemandSegment.PV_SONST ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 4209. ) ; // Menge Strasse im Nullfall = verbleibender Verkehr
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 2.7525 ) ; // Fahrzeit Strasse im Nullfall
-					nullfallForOD.put(makeKey(mode, segm, Attribute.km), 320.77 ) ; // Distanz Strasse im Nullfall
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 2.7525 ) ; // Fahrzeit Strasse im Nullfall
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Distanz_km), 320.77 ) ; // Distanz Strasse im Nullfall
 
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), 10.95*1.74) ; // Nutzerkosten Strasse im Nullfall --> Belegungsgrad Privatverkehr = 1.74
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 37.58 ) ; // ???  Produktionskosten Strasse im Nullfall
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), 10.95*1.74) ; // Nutzerkosten Strasse im Nullfall --> Belegungsgrad Privatverkehr = 1.74
+					nullfallForOD.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu ), 37.58 ) ; // ???  Produktionskosten Strasse im Nullfall
 					
 				}
 			}
 			{
-				Mode mode = Mode.RAIL ;
+				Mode mode = Mode.Bahn ;
 				{
 					DemandSegment segm = DemandSegment.PV_SONST ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), 0.) ;   // Menge Bahn im Nullfall.  Wenn nicht bekannt, ggf. die gesamte verlagerte Menge--> für die Relation nicht relevant, da keine Verlagerungen stattfinden
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 300./60. ) ; // Fahrzeit Bahn -- unbekannt (und hier irrelevant, s.o)
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), 320.77*0.12) ; // ??? Nutzerkosten Bahn (Strassendistanz mal 12 Cent als Überschlag)
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // Produktionskosten sind Null bei Bahn.
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 300./60. ) ; // Fahrzeit Bahn -- unbekannt (und hier irrelevant, s.o)
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), 320.77*0.12) ; // ??? Nutzerkosten Bahn (Strassendistanz mal 12 Cent als Überschlag)
+					nullfallForOD.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu ), 0. ) ; // Produktionskosten sind Null bei Bahn.
 				}
 			}
 		}
@@ -110,13 +110,13 @@ class ScenarioA14WolfsburgRoebel {
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
 				DemandSegment segm = DemandSegment.PV_SONST ;
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), 545. ) ; // Menge Straße im Planfall.
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), 2.537-2.7525  ) ; // Fahrzeit Strasse im Planfall 
-				planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.km), 349.53-320.77 ) ; // Distanz Strasse im Planfall 
-				planfallValuesForOD.inc (makeKey(Mode.ROAD, segm, Attribute.priceUser), (12.39-10.95) *1.74); // Nutzerkosten Planfall
-				planfallValuesForOD.inc (makeKey(Mode.ROAD, segm, Attribute.costOfProduction), 42.39-37.58); //Produktionskosten Strasse Planfall
+				planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.XX), 545. ) ; // Menge Straße im Planfall.
+				planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.Reisezeit_h), 2.537-2.7525  ) ; // Fahrzeit Strasse im Planfall 
+				planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.Distanz_km), 349.53-320.77 ) ; // Distanz Strasse im Planfall 
+				planfallValuesForOD.inc (makeKey(Mode.Strasse, segm, Attribute.Nutzerkosten_Eu), (12.39-10.95) *1.74); // Nutzerkosten Planfall
+				planfallValuesForOD.inc (makeKey(Mode.Strasse, segm, Attribute.Produktionskosten_Eu), 42.39-37.58); //Produktionskosten Strasse Planfall
 				
-				planfallValuesForOD.put( makeKey( Mode.RAIL, segm, Attribute.XX), 0. ) ; // Menge Bahn im Planfall.  Wenn nicht bekannt, dann jetzt Null. 
+				planfallValuesForOD.put( makeKey( Mode.Bahn, segm, Attribute.XX), 0. ) ; // Menge Bahn im Planfall.  Wenn nicht bekannt, dann jetzt Null. 
 
 				
 				// später zu berechnen: Menge Str im Planfall - Menge Str im Nullfall - Menge verlagert = Menge induziert

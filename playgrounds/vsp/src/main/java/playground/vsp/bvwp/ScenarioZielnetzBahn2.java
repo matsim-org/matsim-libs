@@ -69,45 +69,45 @@ class ScenarioZielnetzBahn2 {
 			System.out.println(" distance: " + distance );
 			{
 				// construct values for the road mode for this OD relation:
-				Mode mode = Mode.ROAD ;
+				Mode mode = Mode.Strasse ;
 				{
 					// non-commercial passenger traffic:
 					DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_strasse ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 2.5 ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), (0.1 - 0.02) * distance  ) ; // price minus taxes
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 2.5 ) ;
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), distance*0.1) ;
+					nullfallForOD.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu ), (0.1 - 0.02) * distance  ) ; // price minus taxes
 					// this is per demand item!!!
 				}			
 				{
 					// commercial passenger traffic:
 					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_strasse_comm ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 2.5 ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), (0.1 - 0.02) * distance  ) ; // price minus taxes
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 2.5 ) ;
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), distance*0.1) ;
+					nullfallForOD.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu ), (0.1 - 0.02) * distance  ) ; // price minus taxes
 					// this is per demand item!!!
 				}			
 
 			}
 			{
 				// construct values for the RAIL mode for this OD relation:
-				Mode mode = Mode.RAIL ;
+				Mode mode = Mode.Bahn ;
 				{
 					// non-commercial passenger traffic:
 					DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_bahn ) ; 
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 3. ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 3. ) ;
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), distance*0.1) ;
+					nullfallForOD.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu ), 0. ) ; // assume (marginal) production cost of rail is zero
 				}			
 				{
 					// commercial passenger traffic:
 					DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
 					nullfallForOD.put(makeKey(mode, segm, Attribute.XX), verbleibend_bahn_comm ) ; 
-					nullfallForOD.put(makeKey(mode, segm, Attribute.hrs), 3. ) ;
-					nullfallForOD.put(makeKey(mode, segm, Attribute.priceUser), distance*0.1) ;
-					nullfallForOD.put( makeKey( mode, segm, Attribute.costOfProduction ), 0. ) ; // assume (marginal) production cost of rail is zero
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Reisezeit_h), 3. ) ;
+					nullfallForOD.put(makeKey(mode, segm, Attribute.Nutzerkosten_Eu), distance*0.1) ;
+					nullfallForOD.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu ), 0. ) ; // assume (marginal) production cost of rail is zero
 				}
 			}
 		}
@@ -126,11 +126,11 @@ class ScenarioZielnetzBahn2 {
 		{
 			// modify the travel times for the rail mode:
 			DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
+			planfallValuesForOD.inc( makeKey( Mode.Bahn, segm, Attribute.Reisezeit_h), -0.13 ) ; // ausgedacht
 			
 			// modify some demand (presumably as a result):
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), verlagert_bahn_von_strasse + induziert_bahn) ;
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), -verlagert_bahn_von_strasse ) ;
+			planfallValuesForOD.inc( makeKey( Mode.Bahn, segm, Attribute.XX), verlagert_bahn_von_strasse + induziert_bahn) ;
+			planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.XX), -verlagert_bahn_von_strasse ) ;
 			
 		}
 //		{
@@ -156,21 +156,21 @@ class ScenarioZielnetzBahn2 {
 		{
 			// modify the travel times for the rail mode:
 			DemandSegment segm = DemandSegment.PV_NON_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
+			planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.Reisezeit_h), -0.13 ) ; // ausgedacht
 			
 			// modify some demand (presumably as a result):
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), verlagert_strasse_von_bahn + induziert_strasse) ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), -verlagert_strasse_von_bahn ) ;
+			planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.XX), verlagert_strasse_von_bahn + induziert_strasse) ;
+			planfallValuesForOD.inc( makeKey( Mode.Bahn, segm, Attribute.XX), -verlagert_strasse_von_bahn ) ;
 			
 		}
 		{
 			// modify the travel times for the rail mode:
 			DemandSegment segm = DemandSegment.PV_COMMERCIAL ;
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.hrs), -0.13 ) ; // ausgedacht
+			planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.Reisezeit_h), -0.13 ) ; // ausgedacht
 			
 			// modify some demand (presumably as a result):
-			planfallValuesForOD.inc( makeKey( Mode.ROAD, segm, Attribute.XX), verlagert_strasse_von_bahn_comm + induziert_strasse_comm) ;
-			planfallValuesForOD.inc( makeKey( Mode.RAIL, segm, Attribute.XX), -verlagert_strasse_von_bahn_comm ) ;
+			planfallValuesForOD.inc( makeKey( Mode.Strasse, segm, Attribute.XX), verlagert_strasse_von_bahn_comm + induziert_strasse_comm) ;
+			planfallValuesForOD.inc( makeKey( Mode.Bahn, segm, Attribute.XX), -verlagert_strasse_von_bahn_comm ) ;
 			
 		}
 		return planfall;

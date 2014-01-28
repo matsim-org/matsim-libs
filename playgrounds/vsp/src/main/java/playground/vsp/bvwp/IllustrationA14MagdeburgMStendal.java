@@ -1,7 +1,7 @@
 package playground.vsp.bvwp;
 
 
-public class IllustrationZielnetzRoad {
+public class IllustrationA14MagdeburgMStendal {
 
 	private static Values economicValues;
 	private static ScenarioForEvalData nullfall;

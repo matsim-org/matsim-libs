@@ -34,8 +34,8 @@ abstract class UtilityChanges {
 
 
 		double utils = 0. ;
-		double utilsUserFromRoH = 0. ;
-
+		double utilsUserFromRoHOldUsers = 0. ;
+		double utilsUserFromRoHNewUsers= 0. ;
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
 			Utils.initializeOutputTables(html);				
 
@@ -98,9 +98,9 @@ abstract class UtilityChanges {
 					if ( mode != improvedMode ) {
 						// compute completely on the side of the giving modes:
 						Utils.writeSubHeaderVerlagert(html, id, segm, mode, deltaAmounts);
-						
+
 						final double utilsBefore = utils ;
- 
+
 						utils += computeAndPrintGivingOrReceiving(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving, 
 								econValues, attributesNullfall, attributesPlanfall, html);
 
@@ -110,19 +110,20 @@ abstract class UtilityChanges {
 
 						utils += computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
 								econValues, attributesNullfall, attributesPlanfall, html);
-						
+
 						if ( utils != utilsBefore ) {
 							Utils.writePartialSum(html, "Nutzen&auml;nderung bei Verlagerung gesamt:" , utils - utilsBefore);
 						}
-						
+
 					}
 
 					// roh etc. stuff (for comparison):
-					utilsUserFromRoH = computeUserBenefit(utilsUserFromRoH, econValues, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
+					utilsUserFromRoHOldUsers += computeUserBenefitsOldUsers(econValues, attributesNullfall, attributesPlanfall, amountNullfall);
+					utilsUserFromRoHNewUsers += computeUserBenefitsNewUsers(econValues, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
 
 				} // mode			
 
-				
+
 				final double amountNullfallRcv = nullfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
 				final double amountPlanfallRcv = planfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
 				final double deltaAmountsRcv = amountPlanfallRcv - amountNullfallRcv ;
@@ -130,9 +131,9 @@ abstract class UtilityChanges {
 				System.out.println( " amount induced: " + amountInduced ) ;
 				Utils.writeSubHeaderInduziert(html, id, segm, improvedMode, amountInduced);
 				double partialUtl = 0. ;
-				
+
 				for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
-					if ( attribute != Attribute.XX && attribute != Attribute.priceUser ) {
+					if ( attribute != Attribute.XX && attribute != Attribute.Nutzerkosten_Eu ) {
 						// aufnehmende Seite:
 						final double attributeValuePlanfallReceiving = attributesPlanfallReceiving.getByEntry(attribute);
 						final double attributeValueNullfallReceiving = attributesNullfallReceiving.getByEntry(attribute);
@@ -154,7 +155,7 @@ abstract class UtilityChanges {
 
 
 				if ( implUtlInduced != 0. ) {
-					Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "impl utl ind");
+					Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "Impl. Nutz. induz.");
 				}
 				partialUtl += implUtlInduced ;
 				if ( partialUtl != 0. ) {
@@ -167,7 +168,7 @@ abstract class UtilityChanges {
 		} // relation
 
 		Utils.writeSum(html, utils);
-		
+
 		// ================================
 		// ROH et al:
 
@@ -193,16 +194,28 @@ abstract class UtilityChanges {
 		}
 
 
-		Utils.writeRohAndEndOutput(html, utilsUserFromRoH, operatorProfit);
+		Utils.writeRohAndEndOutput(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
 	}
 
-	private double computeUserBenefit(double utilsUserFromRoH, Attributes econValues, Attributes attributesNullfall,
-			Attributes attributesPlanfall, final double amountNullfall, final double amountPlanfall) {
-		// compute user gains according to RoH: improvement * <x>
+	private static double computeUserBenefitsOldUsers(Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall,
+			final double amountNullfall) {
+		double utils = 0. ;
+		for ( Attribute attribute : Attribute.values() ) {
+			if ( attribute!=Attribute.XX && attribute!=Attribute.Produktionskosten_Eu ) {
+				final double improvementOfAttribute = attributesPlanfall.getByEntry(attribute) - attributesNullfall.getByEntry(attribute);
+				utils += improvementOfAttribute * amountNullfall * econValues.getByEntry(attribute);
+			}
+		}
+		return utils;
+	}
+	private static double computeUserBenefitsNewUsers(Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall,
+			final double amountNullfall, final double amountPlanfall) {
+		// compute user gains according to RoH: improvement * (xnew - xold) / 2
+		double utilsUserFromRoH = 0. ;
 		if ( amountPlanfall >= amountNullfall ) {
-			final double averageOfXX = (amountPlanfall + amountNullfall)/2. ;
+			final double averageOfXX = (amountPlanfall - amountNullfall)/2. ;
 			for ( Attribute attribute : Attribute.values() ) {
-				if ( attribute!=Attribute.XX && attribute!=Attribute.costOfProduction ) {
+				if ( attribute!=Attribute.XX && attribute!=Attribute.Produktionskosten_Eu ) {
 					final double improvementOfAttribute = attributesPlanfall.getByEntry(attribute) - attributesNullfall.getByEntry(attribute);
 					utilsUserFromRoH += improvementOfAttribute * averageOfXX * econValues.getByEntry(attribute);
 				}
@@ -215,10 +228,10 @@ abstract class UtilityChanges {
 			final double amountNullfall, final double amountPlanfall) {
 		{
 			// (operator profit also for operator that looses) 
-			final double revenueNullfall = attributesNullfall.getByEntry(Attribute.priceUser) * amountNullfall ;
-			final double revenuePlanfall = attributesPlanfall.getByEntry(Attribute.priceUser) * amountPlanfall ;
-			final double operatorCostNullfall = attributesNullfall.getByEntry(Attribute.costOfProduction) * amountNullfall ;
-			final double operatorCostPlanfall = attributesPlanfall.getByEntry(Attribute.costOfProduction) * amountPlanfall ;
+			final double revenueNullfall = attributesNullfall.getByEntry(Attribute.Nutzerkosten_Eu) * amountNullfall ;
+			final double revenuePlanfall = attributesPlanfall.getByEntry(Attribute.Nutzerkosten_Eu) * amountPlanfall ;
+			final double operatorCostNullfall = attributesNullfall.getByEntry(Attribute.Produktionskosten_Eu) * amountNullfall ;
+			final double operatorCostPlanfall = attributesPlanfall.getByEntry(Attribute.Produktionskosten_Eu) * amountPlanfall ;
 			operatorProfit +=  -(revenueNullfall - operatorCostNullfall) + (revenuePlanfall - operatorCostPlanfall) ;
 		}
 		return operatorProfit;
@@ -234,7 +247,7 @@ abstract class UtilityChanges {
 
 		for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
 			double partialUtils = 0. ;
-			if ( attribute != Attribute.XX && attribute != Attribute.priceUser ) {
+			if ( attribute != Attribute.XX && attribute != Attribute.Nutzerkosten_Eu ) {
 				{
 					// abgebende Seite:
 					final double attributeValuePlanfall = attributesPlanfall.getByEntry(attribute);
@@ -270,9 +283,9 @@ abstract class UtilityChanges {
 			}
 			utils += partialUtils ;
 		}
-//		if ( utils != 0. ) {
-//			Utils.writePartialSum(html, utils);
-//		}
+		//		if ( utils != 0. ) {
+		//			Utils.writePartialSum(html, utils);
+		//		}
 		return utils;
 	}
 
@@ -287,7 +300,7 @@ abstract class UtilityChanges {
 
 		final double implicitUtlOverall = - implicitUtlPerItem * Math.abs(deltaAmounts) ;
 		if ( implicitUtlOverall != 0. ) {
-			Utils.writeImplicitUtl(html, implicitUtlPerItem, implicitUtlOverall, "impl utl giv");
+			Utils.writeImplicitUtl(html, implicitUtlPerItem, implicitUtlOverall, "Impl. Nutz. abg.");
 		}
 
 		final double implicitUtlPerItemReceiving = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
@@ -295,7 +308,7 @@ abstract class UtilityChanges {
 
 		final double implicitUtlOverallReceiving = implicitUtlPerItemReceiving * Math.abs(deltaAmounts) ;
 		if ( implicitUtlOverallReceiving != 0. ) {
-			Utils.writeImplicitUtl( html, implicitUtlPerItemReceiving, implicitUtlOverallReceiving, "impl utl rcv" ) ;
+			Utils.writeImplicitUtl( html, implicitUtlPerItemReceiving, implicitUtlOverallReceiving, "Impl. Nutz. aufn." ) ;
 		}
 
 		double util = implicitUtlOverall + implicitUtlOverallReceiving ;
@@ -336,7 +349,7 @@ abstract class UtilityChanges {
 		double utils = 0. ;
 
 		for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
-			if ( attribute != Attribute.XX && attribute != Attribute.priceUser ) {
+			if ( attribute != Attribute.XX && attribute != Attribute.Nutzerkosten_Eu ) {
 				// not so great: if policy measure = price change, then RoH and resource consumption are
 				// different here.  kai/benjamin, sep'12
 				// Aber ist das nicht richtig: Eine Preisänderung bewirkt nur eine Veränderung der Einnahme-Aufteilung; roh geht (z.B.) hoch,
