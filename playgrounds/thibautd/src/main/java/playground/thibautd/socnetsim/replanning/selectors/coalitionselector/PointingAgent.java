@@ -19,8 +19,6 @@
 
 package playground.thibautd.socnetsim.replanning.selectors.coalitionselector;
 
-import java.util.NoSuchElementException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -71,15 +69,12 @@ final class PointingAgent {
 	}
 
 	public Plan getPointedPlan() {
-		try {
-			while ( !heap.peek().isFeasible() ) {
-				heap.poll();
+		while ( !heap.peek().isFeasible() ) {
+			heap.poll();
+			if ( heap.isEmpty() ) {
+				throw new RuntimeException(
+						"no more feasible plans for agent "+id );
 			}
-		}
-		catch ( NoSuchElementException e ) {
-			throw new RuntimeException(
-					"no more feasible plans for agent "+id,
-					e );
 		}
 
 		return heap.peek().getPlan();
