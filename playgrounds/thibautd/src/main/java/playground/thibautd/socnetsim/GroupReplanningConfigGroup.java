@@ -75,7 +75,6 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 		}
 	}
 
-	private Synchro doSynchronize = Synchro.dynamic;
 	private boolean checkConsistency = false;
 	private int graphWriteInterval = 25;
 	private int disableInnovationAfterIter = -1;
@@ -87,10 +86,6 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	private String selectorForRemoval = "MinimumSum";
 	private String selectorForModification = "RandomSelection";
 	private double internalizationRatio = 0;
-
-	public static enum Synchro {
-		dynamic, none, all;
-	}
 
 	public GroupReplanningConfigGroup() {
 		super( GROUP_NAME );
@@ -113,16 +108,6 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	public Collection<StrategyParameterSet> getStrategyParameterSets() {
 		final Collection<? extends Module> sets = getParameterSets( StrategyParameterSet.SET_NAME );
 		return (Collection<StrategyParameterSet>) sets;
-	}
-
-	@StringGetter( "doSynchronize" )
-	public Synchro getSynchronize() {
-		return doSynchronize;
-	}
-
-	@StringSetter( "doSynchronize" )
-	public void setSynchronize(final String v) {
-		this.doSynchronize = Synchro.valueOf( v.toLowerCase() );
 	}
 
 	@StringGetter( "checkConsistency" )

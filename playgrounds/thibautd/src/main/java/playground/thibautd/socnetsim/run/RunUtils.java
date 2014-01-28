@@ -76,7 +76,6 @@ import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup.Synchro;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
@@ -418,33 +417,6 @@ public class RunUtils {
 				});
 	}
 
-	public static PlanLinkIdentifier createLinkIdentifier(final Synchro synchro) {
-		switch ( synchro ) {
-			case all:
-				return new PlanLinkIdentifier() {
-					@Override
-					public boolean areLinked(
-							final Plan p1,
-							final Plan p2) {
-						return true;
-					}
-				};
-			case dynamic:
-				return PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier();
-			case none:
-				return new PlanLinkIdentifier() {
-					@Override
-					public boolean areLinked(
-							final Plan p1,
-							final Plan p2) {
-						return false; 
-					}
-				};
-			default:
-				throw new IllegalArgumentException( synchro.toString() );
-		}
-	}
-
 	public static ControllerRegistryBuilder loadDefaultRegistryBuilder(final Scenario scenario) {
 		final ControllerRegistryBuilder builder = new ControllerRegistryBuilder( scenario );
 
@@ -453,7 +425,7 @@ public class RunUtils {
 
 		if ( scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ) {
 			final PlanLinkIdentifier planLinkIdentifier =
-				RunUtils.createLinkIdentifier( weights.getSynchronize() );
+					PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier();
 
 			builder.withPlanLinkIdentifier(
 					planLinkIdentifier );
@@ -487,7 +459,6 @@ public class RunUtils {
 
 		builder.withIncompatiblePlansIdentifierFactory(
 				weights.getConsiderVehicleIncompatibilities() &&
-				!weights.getSynchronize().equals( Synchro.none ) &&
 				scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
 					new VehicleBasedIncompatiblePlansIdentifierFactory(
 							SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
