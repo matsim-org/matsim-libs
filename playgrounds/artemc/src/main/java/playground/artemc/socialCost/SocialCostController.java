@@ -3,23 +3,16 @@ package playground.artemc.socialCost;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -110,7 +103,7 @@ public class SocialCostController {
 		@Override
 		public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 			double disutility = 0.0;
-			disutility += this.marginalCostOfTime + this.travelTime.getLinkTravelTime(link, time, person, vehicle);
+			disutility += this.marginalCostOfTime * this.travelTime.getLinkTravelTime(link, time, person, vehicle);
 			disutility += this.marginalCostOfDistance * link.getLength();
 			disutility += this.scc.getLinkTravelDisutility(link, time, person, vehicle); 
 			return disutility;
