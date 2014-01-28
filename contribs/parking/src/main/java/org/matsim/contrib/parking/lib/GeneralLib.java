@@ -21,6 +21,7 @@ package org.matsim.contrib.parking.lib;
 
 import java.awt.Color;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,10 +31,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -87,6 +91,7 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
@@ -199,19 +204,27 @@ public class GeneralLib {
 	 * @param fileName
 	 */
 	public static void writeList(ArrayList<String> list, String fileName) {
+		Writer writer=null;
+		if (fileName.toLowerCase(Locale.ROOT).endsWith(".gz")) {
+			writer = IOUtils.getBufferedWriter(fileName);
+		}
+		
 		try {
-			FileOutputStream fos = new FileOutputStream(fileName);
-			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
-
+			if (writer==null){
+				FileOutputStream fos = new FileOutputStream(fileName);
+				writer = new OutputStreamWriter(fos);
+			}
 			char[] charArray = Lists
 					.getCharsOfAllArrayItemsWithNewLineCharacterInbetween(list);
-			outputStreamWriter.write(charArray);
+			writer.write(charArray);
 
-			outputStreamWriter.flush();
-			outputStreamWriter.close();
+			writer.flush();
+			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		
 	}
 
 	/**
@@ -845,7 +858,13 @@ public class GeneralLib {
 			FileInputStream fis = new FileInputStream(fileName);
 			InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-1");
 
-			BufferedReader br = new BufferedReader(isr);
+			BufferedReader br=null;
+			if (fileName.toLowerCase(Locale.ROOT).endsWith(".gz")) {
+				br = IOUtils.getBufferedReader(fileName);
+			} else {
+				br = new BufferedReader(isr);
+			}
+			
 			String line;
 			StringTokenizer tokenizer;
 			line = br.readLine();

@@ -5,13 +5,17 @@ import org.matsim.api.core.v01.Id;
 public class DebugLib {
 
 	public static void traceAgent(Id personId){
-		if (personId.toString().equalsIgnoreCase("999316")){
+		if (personId.toString().equalsIgnoreCase("3210")){
 			emptyFunctionForSettingBreakPoint();
 		}
 	}
 	
 	public static void traceAgent(Id personId, int flag){
-		if (personId.toString().equalsIgnoreCase("5106349") && flag==24){
+		if (personId.toString().equalsIgnoreCase("128") && flag==19){
+			emptyFunctionForSettingBreakPoint();
+		}
+		
+		if (personId.toString().equalsIgnoreCase("1364464") && flag==2){
 			emptyFunctionForSettingBreakPoint();
 		}
 	}

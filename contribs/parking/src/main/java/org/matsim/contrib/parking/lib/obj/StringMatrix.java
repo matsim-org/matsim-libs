@@ -11,6 +11,10 @@ public class StringMatrix {
 
 	ArrayList<ArrayList<String>> matrix=new ArrayList<ArrayList<String>>();
 	
+	public ArrayList<String> getRow(int rowNumber){
+		return matrix.get(rowNumber);
+	}
+	
 	public int getColumnIndex(String columnName){
 		return matrix.get(0).indexOf(columnName);
 	}
