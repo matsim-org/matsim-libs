@@ -424,11 +424,8 @@ public class RunUtils {
 					scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
 		if ( scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ) {
-			final PlanLinkIdentifier planLinkIdentifier =
-					PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier();
-
-			builder.withPlanLinkIdentifier(
-					planLinkIdentifier );
+			log.warn( "Adding the vehicle preparation algorithm with the *default* plan link identifier" );
+			log.warn( "this should be modified, or it will cause inconsistencies" );
 
 			final GenericStrategyModule<ReplanningGroup> additionalPrepareModule =
 				new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
@@ -440,7 +437,8 @@ public class RunUtils {
 									MatsimRandom.getLocalInstance(),
 									(JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME ),
 									(VehicleRessources) scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ),
-									planLinkIdentifier );
+									// not nice, but we cannot access the link identifier here...
+									PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier() );
 					}
 
 					@Override
