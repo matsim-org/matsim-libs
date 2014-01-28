@@ -24,7 +24,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.utils.LogCounter;
 
@@ -140,7 +139,7 @@ public class ConfigConsistencyCheckerImplTest {
 			System.out.println("expected exception") ;
 		}
 		
-		config.vspExperimental().addParam(VspExperimentalConfigKey.isAbleToOverwritePtInteractionParams, "true") ;
+		config.vspExperimental().setAbleToOverwritePtInteractionParams(true) ;
 		
 		try {
 			new ConfigConsistencyCheckerImpl().checkPlanCalcScore(config);

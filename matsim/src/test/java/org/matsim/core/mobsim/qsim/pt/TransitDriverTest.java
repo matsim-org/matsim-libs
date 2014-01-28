@@ -42,7 +42,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
@@ -228,7 +227,7 @@ public class TransitDriverTest {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 
 		final Config config = ConfigUtils.createConfig() ;
-		config.vspExperimental().addParam(VspExperimentalConfigKey.isGeneratingBoardingDeniedEvent, "true") ;
+		config.vspExperimental().setGeneratingBoardingDeniedEvent(true);
 		
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 

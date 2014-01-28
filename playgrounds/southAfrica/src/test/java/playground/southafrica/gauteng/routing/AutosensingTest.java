@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.southafrica.gauteng.routing;
 
-import static org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey.vspDefaultsCheckingLevel;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,10 +37,8 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -82,7 +78,7 @@ public class AutosensingTest {
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration.toString() );
 		
-		config.vspExperimental().addParam( vspDefaultsCheckingLevel, VspExperimentalConfigGroup.WARN );
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.WARN );
 		
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency(); 

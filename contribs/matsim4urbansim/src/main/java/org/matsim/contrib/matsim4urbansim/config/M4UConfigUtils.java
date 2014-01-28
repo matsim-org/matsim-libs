@@ -48,7 +48,6 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.PlanStrategyRegistrar.Names;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -418,7 +417,7 @@ public class M4UConfigUtils {
 		
 		// set some defaults:
 		VspExperimentalConfigGroup vsp = config.vspExperimental();
-		vsp.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
+		vsp.setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
 		vsp.setActivityDurationInterpretation(VspExperimentalConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration.toString()) ;
 		vsp.setRemovingUnneccessaryPlanAttributes(true) ;
 		

@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.scenario.ScenarioImpl;
 
 /**
@@ -73,7 +72,8 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 		
 		log.info("Calculating external delay effects due to capacity constraints of public vehicles.");
 		
-		if (this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isGeneratingBoardingDeniedEvent).equals("false")){
+//		if (this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isGeneratingBoardingDeniedEvent).equals("false")){
+		if ( this.scenario.getConfig().vspExperimental().isGeneratingBoardingDeniedEvents()==false ) {
 			throw new RuntimeException("Expecting BoardingDeniedEvents to be generated. Please set config parameter isGeneratingBoardingDeniedEvent in vspExperimental to true. Aborting...");
 		}
 		

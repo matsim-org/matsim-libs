@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
@@ -93,12 +92,7 @@ public class EventsToScore implements BasicEventHandler {
 		this.learningRate = learningRate;
 		initHandlers(scoringFunctionFactory);
 		
-		String str = this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.scoreMSAStartsAtIteration) ;
-		if ( str.equals("null") ) {
-			this.scoreMSAstartsAtIteration = null ;
-		} else {
-			this.scoreMSAstartsAtIteration = Integer.valueOf(str) ;
-		}
+		this.scoreMSAstartsAtIteration = this.scenario.getConfig().vspExperimental().getScoreMSAStartsAtIteration() ;
 	}
 
 	private void initHandlers(final ScoringFunctionFactory factory) {

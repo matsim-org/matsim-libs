@@ -6,10 +6,9 @@ import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,12 +42,12 @@ class KNBerlinControler {
 		config.timeAllocationMutator().setMutationRange(7200.);
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-		config.vspExperimental().addParam(VspExperimentalConfigKey.scoreMSAStartsAtIteration, Integer.toString((int)(0.8*config.controler().getLastIteration()) ));
+		config.vspExperimental().setScoreMSAStartsAtIteration( (int)(0.8*config.controler().getLastIteration()) );
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
 		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
 
-		config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT );
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT );
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency();
 		

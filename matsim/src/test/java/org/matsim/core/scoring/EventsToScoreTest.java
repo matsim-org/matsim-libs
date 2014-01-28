@@ -30,7 +30,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -72,7 +71,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	}
 	public void testMsaAveraging() {
 		Config config = ConfigUtils.createConfig() ;
-		config.vspExperimental().addParam(VspExperimentalConfigKey.scoreMSAStartsAtIteration, "100") ;
+		config.vspExperimental().setScoreMSAStartsAtIteration(100) ;
 		config.planCalcScore().setMarginalUtilityOfMoney(1.);
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);

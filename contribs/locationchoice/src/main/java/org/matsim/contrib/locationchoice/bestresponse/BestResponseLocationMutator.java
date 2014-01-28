@@ -38,7 +38,6 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -287,7 +286,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		 */
 		double travelSpeedCrowFly = Double.parseDouble(this.scenario.getConfig().locationchoice().getTravelSpeed_car());
 		double betaTime = this.scenario.getConfig().planCalcScore().getTraveling_utils_hr();
-		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
+//		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
+		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
 			betaTime -= this.scenario.getConfig().planCalcScore().getPerforming_utils_hr() ;
 			// needs to be negative (I think) since AH uses this as a cost parameter. kai, jan'13
 		}

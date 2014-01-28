@@ -33,34 +33,7 @@ interface ConfigKey {}
  * @author nagel
  */
 public class VspExperimentalConfigGroup extends ReflectiveModule {
-
-	// !! the below cannot be renamed ... since they are at the same time the config file keys !!
-	public static enum VspExperimentalConfigKey implements ConfigKey {
-		//			activityDurationInterpretation,
-		vspDefaultsCheckingLevel,
-		logitScaleParamForPlansRemoval,
-		scoreMSAStartsAtIteration,
-		isGeneratingBoardingDeniedEvent,
-		isAbleToOverwritePtInteractionParams,
-		isUsingOpportunityCostOfTimeForLocationChoice
-	}
-	// !! the above cannot be renamed ... since they are at the same time the config file keys !!
-
-	private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
-
-	public void addParam( final ConfigKey key, final String value ) {
-		String retVal = this.typedParam.put( key,value );
-		if ( retVal != null ) {
-			Logger.getLogger(this.getClass()).info(key + ": replacing >" + retVal + "< (old) with >" + value + "< (new)") ;
-		}
-	}
-
-	public String getValue( final ConfigKey key ) {
-		return this.typedParam.get(key) ;
-	}
-
-	// === testing area end ===
-
+	
 	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
 
 	public static final String GROUP_NAME = "vspExperimental";
@@ -71,8 +44,6 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 
 	// ---
 
-	@Deprecated
-	private static final String USE_ACTIVITY_DURATIONS = "useActivityDurations";
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
 
 	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly } 
@@ -94,23 +65,9 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 	private String modesForSubTourModeChoice = "car, pt";
 	private String chainBasedModes = "car";
 
-	// ---
-
-	@Deprecated
-	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING =
-		"usingOpportunityCostOfTimeForPtRouting" ;
-	@Deprecated
-	private boolean isUsingOpportunityCostOfTimeInPtRouting = true ;
-
-	// ---
-
-	//	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
-
 	public static final String IGNORE = "ignore" ;
 	public static final String WARN = "warn" ;
 	public static final String ABORT = "abort" ;
-
-	//	private String vspDefaultsCheckingLevel = IGNORE ;
 
 	// ---
 
@@ -149,61 +106,89 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
-
-		// the following somewhat curious syntax is so that both the compiler and the runtime system notice if an entry
-		// is missing
-		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
-			switch(key) {
-			case vspDefaultsCheckingLevel:
-				this.addParam( key, IGNORE ) ;
-				break ;
-			case logitScaleParamForPlansRemoval:
-				this.addParam( key, "1." ) ; 
-				break;
-			case scoreMSAStartsAtIteration:
-				this.addParam( key, "null") ;
-				break;
-			case isGeneratingBoardingDeniedEvent:
-				this.addParam( key, "false" ) ; // default is that this event is NOT generated.  kai, oct'12 
-				break;
-			case isAbleToOverwritePtInteractionParams:
-				this.addParam( key, "false" ) ; // default is that this NOT allowed.  kai, nov'12 
-				break;
-			case isUsingOpportunityCostOfTimeForLocationChoice:
-				this.addParam( key, "true" ) ; 
-				break;
-			}
-		}
 	}
+
+	// ---
+	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
+	private String vspDefaultsCheckingLevel = IGNORE ;
+	@StringGetter(VSP_DEFAULTS_CHECKING_LEVEL)
+	public String getVspDefaultsCheckingLevel() {
+		return vspDefaultsCheckingLevel;
+	}
+	@StringSetter(VSP_DEFAULTS_CHECKING_LEVEL)
+	public void setVspDefaultsCheckingLevel(String vspDefaultsCheckingLevel) {
+		this.vspDefaultsCheckingLevel = vspDefaultsCheckingLevel;
+	}
+	// ---
+	private static final String LOGIT_SCALE_PARAM_FOR_PLANS_REMOVAL = "logitScaleParamForPlansRemoval" ;
+	private double logitScaleParamForPlansRemoval = 1. ;
+	@StringGetter(LOGIT_SCALE_PARAM_FOR_PLANS_REMOVAL)
+	public double getLogitScaleParamForPlansRemoval() {
+		return logitScaleParamForPlansRemoval;
+	}
+	@StringSetter(LOGIT_SCALE_PARAM_FOR_PLANS_REMOVAL)
+	public void setLogitScaleParamForPlansRemoval(double logitScaleParamForPlansRemoval) {
+		this.logitScaleParamForPlansRemoval = logitScaleParamForPlansRemoval;
+	}
+	// ---
+	private static final String SCORE_MSA_STARTS_AT_ITERATION = "scoreMSAStartsAtIteration" ;
+	private Integer scoreMSAStartsAtIteration = null ;
+	@StringGetter(SCORE_MSA_STARTS_AT_ITERATION)
+	public Integer getScoreMSAStartsAtIteration() {
+		return scoreMSAStartsAtIteration;
+	}
+	@StringSetter(SCORE_MSA_STARTS_AT_ITERATION)
+	public void setScoreMSAStartsAtIteration(Integer scoreMSAStartsAtIteration) {
+		this.scoreMSAStartsAtIteration = scoreMSAStartsAtIteration;
+	}
+	// ---
+	private static final String GENERATING_BOARDING_DENIED_EVENT = "isGeneratingBoardingDeniedEvent" ;  // seems to be singular.
+	private boolean isGeneratingBoardingDeniedEvent = false ; // default is that this event is NOT generated.  kai, oct'12
+	@StringGetter(GENERATING_BOARDING_DENIED_EVENT)
+	public boolean isGeneratingBoardingDeniedEvents() {
+		return isGeneratingBoardingDeniedEvent;
+	}
+	@StringSetter(GENERATING_BOARDING_DENIED_EVENT)
+	public void setGeneratingBoardingDeniedEvent(boolean isGeneratingBoardingDeniedEvent) {
+		this.isGeneratingBoardingDeniedEvent = isGeneratingBoardingDeniedEvent;
+	}
+	// ---
+	private static final String ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS = "isAbleToOverwritePtInteractionParams" ; 
+	private boolean isAbleToOverwritePtInteractionParams = false ; // default is that this NOT allowed.  kai, nov'12 
+	@StringGetter(ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS)
+	public boolean isAbleToOverwritePtInteractionParams() {
+		return isAbleToOverwritePtInteractionParams;
+	}
+	@StringSetter(ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS)
+	public void setAbleToOverwritePtInteractionParams(boolean isAbleToOverwritePtInteractionParams) {
+		this.isAbleToOverwritePtInteractionParams = isAbleToOverwritePtInteractionParams;
+	}
+	// ---
+	private static final String USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE = "isUsingOpportunityCostOfTimeForLocationChoice" ; 
+	private boolean isUsingOpportunityCostOfTimeForLocationChoice = true ;
+	@StringGetter(USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE)
+	public boolean isUsingOpportunityCostOfTimeForLocationChoice() {
+		return isUsingOpportunityCostOfTimeForLocationChoice;
+	}
+	@StringSetter(USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE)
+	public void setUsingOpportunityCostOfTimeForLocationChoice(boolean isUsingOpportunityCostOfTimeForLocationChoice) {
+		this.isUsingOpportunityCostOfTimeForLocationChoice = isUsingOpportunityCostOfTimeForLocationChoice;
+	}
+	// ---
+
+
 
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 
-		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
-			switch(key) {
-			case logitScaleParamForPlansRemoval:
-				//				map.put(key.toString(), "comment") ;
-				break;
-			case scoreMSAStartsAtIteration:
-				map.put(key.toString(), "first iteration of MSA score averaging. The matsim theory department " +
+		map.put(SCORE_MSA_STARTS_AT_ITERATION, "first iteration of MSA score averaging. The matsim theory department " +
 				"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
-				break;
-			case vspDefaultsCheckingLevel:
-				break;
-			case isGeneratingBoardingDeniedEvent:
-				break;
-			case isAbleToOverwritePtInteractionParams:
-				map.put(key.toString(), "(do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the " +
+		map.put( ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS, "(do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the " +
 						"parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, " +
 				"set the following to true.") ;
-				break;
-			case isUsingOpportunityCostOfTimeForLocationChoice:
-				map.put(key.toString(), "if an approximation of the opportunity cost of time is included into the radius calculation for location choice." +
+		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE, "if an approximation of the opportunity cost of time is included into the radius calculation for location choice." +
 				"`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility.") ;
-				break;
-			}
-		}
 		map.put(MATSIM_GLOBAL_TIME_FORMAT, "changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  " +
 		"default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats");
 
@@ -227,14 +212,11 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors");
 
-		map.put(VspExperimentalConfigKey.vspDefaultsCheckingLevel.toString(), 
+		map.put( VSP_DEFAULTS_CHECKING_LEVEL, 
 				"Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
 				+WARN+"'.\n\t\t" +
 				"When violating VSP defaults, this results in " +
 		"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
-
-		//		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
-		//				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
 
 		StringBuilder str = new StringBuilder() ;
 		for ( ActivityDurationInterpretation itp : ActivityDurationInterpretation.values() ) {
@@ -251,17 +233,6 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 
 		map.put(MODES_FOR_SUBTOURMODECHOICE, "(do not use) set the traffic mode option for subTourModeChoice by Yu");
 		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. \"car,bike\", \"car\"");
-
-		//		map.put(OFFSET_WALK, "(deprecated, use corresponding option in planCalcScore) " +
-		//		"set offset for mode \"walk\" in leg scoring function");
-
-		//		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
-		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
-				"indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal " +
-				"utilities of time.\n\t\t" +
-				"Default is true; false is possible only for backwards compatibility.\n\t\t" +
-				"This is only a suggestion since there is (by matsim design) no way to enforce that mental modules " +
-		"obey this." ) ;
 
 		return map;
 	}

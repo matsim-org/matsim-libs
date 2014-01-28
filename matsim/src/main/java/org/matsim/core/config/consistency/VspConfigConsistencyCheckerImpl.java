@@ -29,7 +29,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 /**
@@ -186,15 +185,14 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 //				log.error("vsp will not accept location choice prob choice exponents other than 1 until the corresponding warning in " +
 //				"ChoiceSet is resolved.  kai, jan'13") ;
 //			}
-			if ( !Boolean.parseBoolean( config.vspExperimental().getValue( VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice) ) ) {
+			if ( !config.vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
 				problem = true ;
 				System.out.flush() ;
 				log.error("vsp will not accept location choice without including opportunity cost of time into the approximation. kai,jan'13") ;
 			}
 		}
 		
-		if ( problem && config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel)
-				.equals( VspExperimentalConfigGroup.ABORT ) ) {
+		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
 			System.out.flush() ;
 			log.fatal( str ) ; 

@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -63,10 +62,8 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		this.internalInterface = internalInterface;
 		this.agentTracker = agentTracker;
 		if ( this.internalInterface != null ) {
-			this.isGeneratingDeniedBoardingEvents = Boolean.parseBoolean(
-					this.internalInterface.getMobsim().getScenario().getConfig().vspExperimental().getValue(
-							VspExperimentalConfigKey.isGeneratingBoardingDeniedEvent
-					) ) ;
+			this.isGeneratingDeniedBoardingEvents = 
+					this.internalInterface.getMobsim().getScenario().getConfig().vspExperimental().isGeneratingBoardingDeniedEvents() ;
 			if (this.isGeneratingDeniedBoardingEvents){
 				this.agentsDeniedToBoard = new HashSet<PTPassengerAgent>();
 			}

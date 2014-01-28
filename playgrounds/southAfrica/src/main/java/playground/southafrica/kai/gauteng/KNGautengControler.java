@@ -22,7 +22,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.PlanStrategyRegistrar.Names;
@@ -47,8 +46,8 @@ import playground.southafrica.gauteng.roadpricingscheme.GautengRoadPricingScheme
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactorOLD;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollVehicleType;
 import playground.southafrica.gauteng.roadpricingscheme.TollFactorI;
-import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
+import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 import playground.southafrica.utilities.Header;
@@ -172,7 +171,7 @@ public class KNGautengControler {
 			{			
 				final int firstIt = config.controler().getFirstIteration();
 				long diff = config.controler().getLastIteration() - firstIt ;
-				config.vspExperimental().addParam( VspExperimentalConfigKey.scoreMSAStartsAtIteration,  Long.toString((long)(firstIt + 0.8*diff)) ) ;
+				config.vspExperimental().setScoreMSAStartsAtIteration( (int)(firstIt + 0.8*diff) ) ;
 			}
 			
 			// VSP DEFAULTS:
@@ -180,7 +179,7 @@ public class KNGautengControler {
 			config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString());
 			config.timeAllocationMutator().setMutationRange(7200.);
 			
-			config.vspExperimental().addParam( VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
+			config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
 	}
 
 	private void run () {
