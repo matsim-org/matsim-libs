@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.vehicles.VehicleType;
 
 public class SanralTollFactor_Subpopulation implements TollFactorI {
 	private final Logger log = Logger.getLogger(SanralTollFactor_Subpopulation.class);
@@ -48,58 +49,33 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		double ptDiscount = 0.00;
 		double sizeFactor = 1.00;
 		
-		switch( typeOf( vehicleId) ) {
-		case carWithTag:
-			tagDiscount = 0.483;
-			break ;
-		case carWithoutTag:
-			// nothing
-			break ;
-		case commercialClassAWithTag:
-			tagDiscount = 0.483;
-			break;
-		case commercialClassAWithoutTag:
-			// nothing
-			break ;
-		case commercialClassBWithTag:
-			sizeFactor = 2.5;
-			tagDiscount = 0.483;
-			break ;
-		case commercialClassBWithoutTag:
-			sizeFactor = 2.5;
-			break ;
-		case commercialClassCWithTag:
-			sizeFactor = 5;
-			tagDiscount = 0.483;
-			break ;
-		case commercialClassCWithoutTag:
-			sizeFactor = 5;
-			break ;
-		case busWithTag:
-			sizeFactor = 2.5;
-			tagDiscount = 0.483;
-			ptDiscount = 0.55;
-			break ;
-		case busWithoutTag:
-			sizeFactor = 2.5;
-			ptDiscount = 0.55;
-			break ;
-		case taxiWithTag:
-			tagDiscount = 0.483;
-			ptDiscount = 0.30;
-			break ;
-		case taxiWithoutTag:
-			ptDiscount = 0.30;
-			break ;
-		case extWithTag:
-			tagDiscount = 0.483;
-			break ;
-		case extWithoutTag:
-			// nothing
-			break ;
+		/* Determine the presence of an eTag from vehicle attributes. */  
+		Object o1 = sc.getVehicles().getVehicleAttributes().getAttribute(vehicleId.toString(), E_TAG_ATTRIBUTE_NAME);
+		if (o1 instanceof Boolean) {
+			tagDiscount = ((Boolean)o1) ? 0.483 : 0.00;
 		}
-		return getDiscountEligibility(linkId) ? sizeFactor*(1 - Math.min(1.0, timeDiscount + tagDiscount + ptDiscount)) : sizeFactor;
 		
+		/* Determine toll class from vehicle type. */
+		VehicleType type = sc.getVehicles().getVehicles().get(vehicleId).getType();
+		if(type.getId().toString().equalsIgnoreCase("A2")){
+			/* Nothing, it stays 1.00. */
+		} else if(type.getId().toString().equalsIgnoreCase("B")){
+			sizeFactor = 2.5;
+		} else if(type.getId().toString().equalsIgnoreCase("C")){
+			sizeFactor = 5.0;
+		} else{
+			log.error("Unknown vehicle class for toll. Assuming private car 'A2'");
+		}
+		
+		/* Determine public transit status from vehicle Id. Currently (Jan '14)
+		 * the subpopulations, including bus and taxi, has a prefix in its
+		 * vehicle Id. */
+		if(vehicleId.toString().startsWith("bus") || 
+		   vehicleId.toString().startsWith("taxi")){
+			ptDiscount = 0.55;
+		}
+		
+		return getDiscountEligibility(linkId) ? sizeFactor*(1 - Math.min(1.0, timeDiscount + tagDiscount + ptDiscount)) : sizeFactor;		
 	}
 	
 	
