@@ -374,26 +374,19 @@ public class IVVReaderV2 {
 			String to = row[1].trim();
 			Id currentOdid = getODId(from, to);
 			if (currentOdid.equals(odid)){
-<<<<<<< HEAD
 
 			Values currentODRelation = data.getByODRelation(currentOdid);
-			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_BERUF, Attribute.km), Double.parseDouble(row[2].trim()));
-			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_AUSBILDUNG, Attribute.km), Double.parseDouble(row[3].trim()));
-			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_EINKAUF, Attribute.km), Double.parseDouble(row[4].trim()));
-			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_URLAUB, Attribute.km), Double.parseDouble(row[5].trim()));
-			currentODRelation.inc(Key.makeKey(Mode.ROAD, DemandSegment.PV_SONST, Attribute.km), Double.parseDouble(row[6].trim()));
-=======
+
 			try {
-			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Distanz_km), Double.parseDouble(row[2].trim()));
-			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Distanz_km), Double.parseDouble(row[3].trim()));
-			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Distanz_km), Double.parseDouble(row[4].trim()));
-			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Distanz_km), Double.parseDouble(row[5].trim()));
-			data.getByODRelation(currentOdid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Distanz_km), Double.parseDouble(row[6].trim()));
+			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_BERUF, Attribute.Distanz_km), Double.parseDouble(row[2].trim()));
+			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.Distanz_km), Double.parseDouble(row[3].trim()));
+			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_EINKAUF, Attribute.Distanz_km), Double.parseDouble(row[4].trim()));
+			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_URLAUB, Attribute.Distanz_km), Double.parseDouble(row[5].trim()));
+			currentODRelation.inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_SONST, Attribute.Distanz_km), Double.parseDouble(row[6].trim()));
 			}
 			catch (NullPointerException e){
 				System.err.println("od ID : " + currentOdid + " has Changes in Demand, but initial Demand was not set.");
 			}
->>>>>>> bvwp changes
 				}
 	
 				
@@ -617,16 +610,10 @@ public class IVVReaderV2 {
 			for (DemandSegment segment : DemandSegment.values()){
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-				
-<<<<<<< HEAD
-				Double bahnhere = nullfalldata.getByODRelation(odId).getAttributes(Mode.RAIL, segment).getByEntry(Attribute.XX);	
+				Double bahnhere = nullfalldata.getByODRelation(odId).getAttributes(Mode.Bahn, segment).getByEntry(Attribute.XX);	
 				bahnZwecke.put(segment, bahnhere);
 				totalBahn += bahnhere;
 				if (odId.equals(getODId("1500301", "1509001"))) System.out.println(segment + " : "+bahnhere); 
-=======
-				Double bahnhere = nullfalldata.getByODRelation(odId).getAttributes(Mode.Bahn, segment).getByEntry(Attribute.XX);	
-				totalBahn =+ bahnhere;
->>>>>>> bvwp changes
 				
 			}
 			if (odId.equals(getODId("1500301", "1509001"))) System.out.println("Total Bahn : "+totalBahn); 
@@ -634,17 +621,10 @@ public class IVVReaderV2 {
 			for (DemandSegment segment : DemandSegment.values()){
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-				
-<<<<<<< HEAD
-				Double verl = Double.parseDouble(row[11].trim()) * -1.0 * WERKTAGEPROJAHR * bahnZwecke.get(segment)/totalBahn ;
-				if (odId.equals(getODId("1500301", "1509001"))) System.out.println(segment+": "+row[11].trim() + "* -1 * " +WERKTAGEPROJAHR+ " * "+bahnZwecke.get(segment) +" / "+ totalBahn +" = "+ verl ); 
-
-				// taegl. Verlagerungen * -1 * werktage * rel zweckanteil
-				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.RAIL, segment, Attribute.XX), verl);
-=======
 				Double verl = Double.parseDouble(row[11].trim()) * WERKTAGEPROJAHR * bahnZwecke.get(segment)/totalBahn ;
+				if (odId.equals(getODId("1500301", "1509001"))) System.out.println(segment+": "+row[11].trim() + "* -1 * " +WERKTAGEPROJAHR+ " * "+bahnZwecke.get(segment) +" / "+ totalBahn +" = "+ verl ); 
+				// taegl. Verlagerungen * -1 * werktage * rel zweckanteil
 				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.Bahn, segment, Attribute.XX), verl);
->>>>>>> bvwp changes
 			}
 		}}
 		

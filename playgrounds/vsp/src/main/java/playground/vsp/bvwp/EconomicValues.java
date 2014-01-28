@@ -131,13 +131,7 @@ class EconomicValues {
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
-			{
-				DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
-//				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
-			}
+
 			{
 				DemandSegment segm = DemandSegment.PV_SONST ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
@@ -203,17 +197,7 @@ class EconomicValues {
 				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
 				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
 			}
-<<<<<<< HEAD
 
-=======
-			{
-				DemandSegment segm = DemandSegment.PV_GESCHAEFT ;
-//				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Reisezeit_h), -6.3 ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Nutzerkosten_Eu), -1. ) ;
-				economicValues.put( makeKey( mode, segm, Attribute.Produktionskosten_Eu), -1. ) ;
-			}
->>>>>>> bvwp changes
 			{
 				DemandSegment segm = DemandSegment.PV_SONST ;
 //				economicValues.put( makeKey( mode, segm, Attribute.km), -0.0 ) ;
