@@ -31,6 +31,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.artemc.socialCost.SocialCostController.Initializer;
+
 /**
  * @author ikaddoura
  *
@@ -41,19 +43,22 @@ public class InternalizationCarControler {
 	static String configFile1;
 	static String configFile2;
 	static String configFile3;
+	static String configFile4;
 			
 	public static void main(String[] args) throws IOException {
 		
-		configFile1 = args[0];
-		configFile2 = args[1];
-		configFile3 = args[2];
+		configFile1 = args[0]; // base case
+		configFile2 = args[1]; // internalization agent-based
+		configFile3 = args[2]; // base case continued
+		configFile4 = args[3]; // internalization flow-based
 		
 		InternalizationCarControler internalizationCarControler = new InternalizationCarControler();
 		internalizationCarControler.runBaseCase(configFile1);
-		internalizationCarControler.runInternalization(configFile2);
+		internalizationCarControler.runInternalizationAgents(configFile2);
 		internalizationCarControler.runBaseCase(configFile3);
+		internalizationCarControler.runInternalizationFlows(configFile4);
 	}
-	
+
 	private void runBaseCase(String configFile) {
 		Controler controler = new Controler(configFile);
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
@@ -62,7 +67,7 @@ public class InternalizationCarControler {
 		controler.run();
 	}
 
-	private void runInternalization(String configFile) {
+	private void runInternalizationAgents(String configFile) {
 		Controler controler = new Controler(configFile);
 
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
@@ -73,6 +78,20 @@ public class InternalizationCarControler {
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.setOverwriteFiles(true);
+		controler.run();
+	}
+	
+	private void runInternalizationFlows(String configFile) {
+		Controler controler = new Controler(configFile);
+		
+		Initializer initializer = new Initializer();
+		controler.addControlerListener(initializer);
+		
+		// Additional analysis
+		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
+
+		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.run();
 	}
 }
