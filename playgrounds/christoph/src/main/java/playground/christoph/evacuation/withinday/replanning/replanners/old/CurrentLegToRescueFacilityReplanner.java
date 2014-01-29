@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.replanners;
+package playground.christoph.evacuation.withinday.replanning.replanners.old;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

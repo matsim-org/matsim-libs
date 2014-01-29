@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.replanners;
+package playground.christoph.evacuation.withinday.replanning.replanners.old;
 
 import java.util.ArrayList;
 import java.util.List;

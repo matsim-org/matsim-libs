@@ -62,6 +62,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.pt.router.FastTransitRouterImplFactory;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -69,7 +70,6 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
-import playground.christoph.evacuation.pt.TransitRouterImplFactory;
 import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
@@ -278,7 +278,8 @@ public class PrepareEvacuationScenarioListener {
 	        TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(),
 	        		config.transitRouter(), config.vspExperimental());
 //	        throw new RuntimeException("This feature is not yet implemented in TransitRouterImplFactory!");
-	        transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
+//	        transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
+	        transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
 		}
 		
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);

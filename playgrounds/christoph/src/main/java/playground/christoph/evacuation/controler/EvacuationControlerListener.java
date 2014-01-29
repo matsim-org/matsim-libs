@@ -115,6 +115,7 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsTo
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.JointDepartureCoordinator;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
@@ -142,6 +143,7 @@ public class EvacuationControlerListener implements StartupListener {
 	 */
 	private ReplanningTracker replanningTracker;
 	private JointDepartureOrganizer jointDepartureOrganizer;
+	private JointDepartureCoordinator jointDepartureCoordinator;
 	private MissedJointDepartureWriter missedJointDepartureWriter;
 	private VehiclesTracker vehiclesTracker;
 	private HouseholdsTracker householdsTracker;
@@ -262,6 +264,7 @@ public class EvacuationControlerListener implements StartupListener {
 		Scenario scenario = controler.getScenario();
 		
 		this.jointDepartureOrganizer = new JointDepartureOrganizer();
+		this.jointDepartureCoordinator = new JointDepartureCoordinator(this.withinDayControlerListener.getMobsimDataProvider());
 		this.missedJointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
 		this.fixedOrderControlerListener.addControlerListener(this.missedJointDepartureWriter);
 		
@@ -440,8 +443,10 @@ public class EvacuationControlerListener implements StartupListener {
 		
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
+//		this.evacuationTransitRouterFactory = new EvacuationTransitRouterFactory(config, 
+//				this.withinDayTravelTimes.get(TransportMode.walk), routerNetwork, transitRouterConfig);		
 		this.evacuationTransitRouterFactory = new EvacuationTransitRouterFactory(config, 
-				this.withinDayTravelTimes.get(TransportMode.walk), routerNetwork, transitRouterConfig);
+				this.withinDayTravelTimes.get(TransportMode.walk), scenario.getTransitSchedule(), routerNetwork, transitRouterConfig);
 		
 		// TODO: EvacuationTransitRouterFactory is not a TransitRouterFactory so far!
 		this.withinDayTripRouterFactory = new EvacuationTripRouterFactory(scenario, this.withinDayTravelTimes, 
@@ -502,17 +507,19 @@ public class EvacuationControlerListener implements StartupListener {
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 
-		duringLegFactory = new AgentsToDropOffIdentifierFactory(mobsimDataProvider, linkEnteredProvider, jointDepartureOrganizer, 
-				affectedAgentsFilterFactory, carOnlyTransportModeFilterFactory, notInitialReplanningFilterFactory, 
+		duringLegFactory = new AgentsToDropOffIdentifierFactory(mobsimDataProvider, this.linkEnteredProvider, this.jointDepartureOrganizer, 
+				this.jointDepartureCoordinator, affectedAgentsFilterFactory, carOnlyTransportModeFilterFactory, notInitialReplanningFilterFactory, 
 				earliestLinkExitTimeFilterFactory);
 		this.agentsToDropOffIdentifier = duringLegFactory.createIdentifier();
-	
+		this.jointDepartureCoordinator.setAgentsToDropOffIdentifier((AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
+		
 		duringLegFactory = new AgentsToPickupIdentifierFactory(scenario, this.coordAnalyzer, this.vehiclesTracker,
 				mobsimDataProvider, this.withinDayControlerListener.getEarliestLinkExitTimeProvider(), this.informedHouseholdsTracker, 
-				this.decisionModelRunner.getDecisionDataProvider(), this.jointDepartureOrganizer, affectedAgentsFilterFactory, 
-				walkOnlyTransportModeFilterFactory, notInitialReplanningFilterFactory, activityStartingFilterFactory); 
+				this.decisionModelRunner.getDecisionDataProvider(), this.jointDepartureOrganizer, this.jointDepartureCoordinator,
+				affectedAgentsFilterFactory, walkOnlyTransportModeFilterFactory, notInitialReplanningFilterFactory, activityStartingFilterFactory); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.agentsToPickupIdentifier = duringLegFactory.createIdentifier();
+		this.jointDepartureCoordinator.setAgentsToPickupIdentifier((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		
 //		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
 //		duringLegRerouteTransportModes.add(TransportMode.car);

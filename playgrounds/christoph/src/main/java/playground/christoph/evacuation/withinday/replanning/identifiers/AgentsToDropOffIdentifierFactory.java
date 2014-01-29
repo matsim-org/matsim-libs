@@ -36,14 +36,16 @@ public class AgentsToDropOffIdentifierFactory extends DuringLegIdentifierFactory
 	private final MobsimDataProvider mobsimDataProvider;
 	private final LinkEnteredProvider linkEnteredProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
+	private final JointDepartureCoordinator jointDepartureCoordinator;
 	
 	public AgentsToDropOffIdentifierFactory(MobsimDataProvider mobsimDataProvider, LinkEnteredProvider linkEnteredProvider, 
-			JointDepartureOrganizer jointDepartureOrganizer, AffectedAgentsFilterFactory affectedAgentsFilterFactory,
-			TransportModeFilterFactory transportModeFilterFactory, InformedAgentsFilterFactory informedAgentsFilterFactory,
-			EarliestLinkExitTimeFilterFactory earliestLinkExitTimeFilterFactory) {
+			JointDepartureOrganizer jointDepartureOrganizer, JointDepartureCoordinator jointDepartureCoordinator, 
+			AffectedAgentsFilterFactory affectedAgentsFilterFactory, TransportModeFilterFactory transportModeFilterFactory, 
+			InformedAgentsFilterFactory informedAgentsFilterFactory, EarliestLinkExitTimeFilterFactory earliestLinkExitTimeFilterFactory) {
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.linkEnteredProvider = linkEnteredProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		this.jointDepartureCoordinator = jointDepartureCoordinator;
 		
 		// remove agents which are not informed yet
 		this.addAgentFilterFactory(informedAgentsFilterFactory);
@@ -66,7 +68,7 @@ public class AgentsToDropOffIdentifierFactory extends DuringLegIdentifierFactory
 	public DuringLegIdentifier createIdentifier() {
 		
 		DuringLegIdentifier identifier = new AgentsToDropOffIdentifier(this.mobsimDataProvider, this.linkEnteredProvider, 
-				this.jointDepartureOrganizer);
+				this.jointDepartureOrganizer, this.jointDepartureCoordinator);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

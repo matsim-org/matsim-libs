@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *CurrentLegInitialReplannerFactory.java
+ * CurrentLegToRescueFacilityReplannerFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.replanners;
+package playground.christoph.evacuation.withinday.replanning.replanners.old;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.RoutingContext;
@@ -27,28 +27,24 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-
-public class CurrentLegInitialReplannerFactory extends WithinDayDuringLegReplannerFactory {
+public class CurrentLegToRescueFacilityReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
-	private final CoordAnalyzer coordAnalyzer;
 	private final TripRouterFactory tripRouterFactory;
 	private final RoutingContext routingContext;
 	
-	public CurrentLegInitialReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			CoordAnalyzer coordAnalyzer, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+	public CurrentLegToRescueFacilityReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
+			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
-		this.coordAnalyzer = coordAnalyzer;
 		this.tripRouterFactory = tripRouterFactory;
 		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
-		WithinDayDuringLegReplanner replanner = new CurrentLegInitialReplanner(super.getId(), 
-				scenario, this.getWithinDayEngine().getInternalInterface(), coordAnalyzer,
+		WithinDayDuringLegReplanner replanner = new CurrentLegToRescueFacilityReplanner(super.getId(), 
+				this.scenario, this.getWithinDayEngine().getInternalInterface(),
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

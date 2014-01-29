@@ -696,15 +696,15 @@ public class EvacuationControler extends WithinDayController implements
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 
-		duringLegFactory = new AgentsToDropOffIdentifierFactory(mobsimDataProvider, linkEnteredProvider, jointDepartureOrganizer, 
+		duringLegFactory = new AgentsToDropOffIdentifierFactory(mobsimDataProvider, linkEnteredProvider, jointDepartureOrganizer, null,
 				affectedAgentsFilterFactory, carOnlyTransportModeFilterFactory, notInitialReplanningFilterFactory, 
 				earliestLinkExitTimeFilterFactory);
 		this.agentsToDropOffIdentifier = duringLegFactory.createIdentifier();
 	
 		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker,
 				mobsimDataProvider, earliestLinkExitTimeProvider, this.informedHouseholdsTracker, this.decisionDataProvider, 
-				this.jointDepartureOrganizer, affectedAgentsFilterFactory, walkOnlyTransportModeFilterFactory, notInitialReplanningFilterFactory, 
-				activityStartingFilterFactory); 
+				this.jointDepartureOrganizer, null, affectedAgentsFilterFactory, walkOnlyTransportModeFilterFactory, 
+				notInitialReplanningFilterFactory, activityStartingFilterFactory); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.agentsToPickupIdentifier = duringLegFactory.createIdentifier();
 		

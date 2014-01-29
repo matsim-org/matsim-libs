@@ -111,9 +111,9 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.filters.
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegInitialReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.old.CurrentLegInitialReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.old.EndActivityAndEvacuateReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.old.ExtendCurrentActivityReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;

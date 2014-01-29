@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InsecureActivityPerformingIdentifierFactory.java
+ * SecureLegPerformingIdentifierFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,33 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.identifiers;
+package playground.christoph.evacuation.withinday.replanning.identifiers.old;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
-public class InsecureActivityPerformingIdentifierFactory extends DuringActivityIdentifierFactory {
+public class SecureLegPerformingIdentifierFactory extends DuringLegIdentifierFactory {
 
-	private final ActivityReplanningMap activityReplanningMap;
+	private final LinkReplanningMap linkReplanningMap;
 	private final MobsimDataProvider mobsimDataProvider;
 	private final Coord centerCoord;
 	private final double secureDistance;
+	private final Network network;
 	
-	public InsecureActivityPerformingIdentifierFactory(ActivityReplanningMap activityReplanningMap, 
-			MobsimDataProvider mobsimDataProvider, Coord centerCoord, double secureDistance) {
-		this.activityReplanningMap = activityReplanningMap;
+	public SecureLegPerformingIdentifierFactory(LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider, 
+			Network network, Coord centerCoord, double secureDistance) {
+		this.linkReplanningMap = linkReplanningMap;
 		this.mobsimDataProvider = mobsimDataProvider;
+		this.network = network;
 		this.centerCoord = centerCoord;
 		this.secureDistance = secureDistance;
 	}
 	
 	@Override
-	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new InsecureActivityPerformingIdentifier(this.activityReplanningMap, 
-				this.mobsimDataProvider, this.centerCoord, this.secureDistance);
+	public DuringLegIdentifier createIdentifier() {
+		DuringLegIdentifier identifier = new SecureLegPerformingIdentifier(this.linkReplanningMap, this.mobsimDataProvider, 
+				this.network, this.centerCoord, this.secureDistance);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

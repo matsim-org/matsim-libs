@@ -38,10 +38,12 @@ import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
@@ -81,13 +83,14 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	private final InformedAgentsTracker informedAgentsTracker;
 	private final DecisionDataProvider decisionDataProvider;
+	private final JointDepartureCoordinator jointDepartureCoordinator;
 	
 	private final Map<Id, JointDeparture> jointDepartures;
 	
 	/*package*/ AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, 
 			MobsimDataProvider mobsimDataProvider, EarliestLinkExitTimeProvider earliestLinkExitTimeProvider, 
 			InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider, 
-			JointDepartureOrganizer jointDepartureOrganizer) {
+			JointDepartureOrganizer jointDepartureOrganizer, JointDepartureCoordinator jointDepartureCoordinator) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
@@ -96,6 +99,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		this.informedAgentsTracker = informedAgentsTracker;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
 		this.decisionDataProvider = decisionDataProvider;
+		this.jointDepartureCoordinator = jointDepartureCoordinator;
 		
 		this.jointDepartures = new ConcurrentHashMap<Id, JointDeparture>();
 	}
@@ -145,8 +149,14 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 				 * Check whether the driver is already picking up an agent.
 				 */
 				if (agentsToReplan.contains(driver)) continue;
+				else if (checkDriversNextActivity(driver)) continue;
 				
 				Id driverId = driver.getId();
+				
+				/*
+				 * Check whether the driver has already scheduled a JointDeparture on the current link;
+				 */
+				if (this.jointDepartureCoordinator.isJointDepartureScheduled(driverId)) continue;
 				
 				/*
 				 * Check whether the driver can still stop and perform a pickup activity on the
@@ -165,6 +175,12 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 				if (!this.informedAgentsTracker.isAgentInformed(driverId)) continue;
 				
 				Id driversDestinationLinkId = driver.getDestinationLinkId();
+				
+				/*
+				 * Check whether the driver will stop its trip on the current link. Skip such drivers
+				 * since pickup up agents does not make sense.
+				 */
+				if (driversDestinationLinkId.equals(driver.getCurrentLinkId())) continue;
 				
 				// check whether the drivers destination is in a secure area
 				Link driversDestinationLink = scenario.getNetwork().getLinks().get(driversDestinationLinkId);
@@ -276,6 +292,23 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		return agentsToReplan;
 	}
 	
+	/*
+	 * Checks the drivers next activity. If it is picking up or dropping off
+	 * agents, we ignore that driver. Otherwise the logic "can the driver
+	 * pick up another agent?" would become even more complex.
+	 * Returns true if the next activity is from one of that types - then picking 
+	 * up another agent is not possible on the agents current link.
+	 */
+	private boolean checkDriversNextActivity(MobsimAgent driver) {
+		
+		int currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(driver);
+		
+		Activity nextActivity = (Activity) WithinDayAgentUtils.getSelectedPlan(driver).getPlanElements().get(currentPlanElementIndex + 1);
+		if (nextActivity.getType().equals(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE) ||
+				nextActivity.getType().equals(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE)) return true;
+		else return false;
+	}
+	
 	public JointDepartureOrganizer getJointDepartureOrganizer() {
 		return this.jointDepartureOrganizer;
 	}
@@ -284,6 +317,10 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		return this.jointDepartures.remove(agentId);
 	}
 
+	/*package*/ boolean isJointDepartureScheduled(Id agentId) {
+		return this.jointDepartures.containsKey(agentId);
+	}
+	
 	private PickupDecision checkPickup(Person passenger, Person driver) {
 		
 		if (EvacuationConfig.pickupAgents == EvacuationConfig.PickupAgentBehaviour.NEVER) return PickupDecision.NEVER;

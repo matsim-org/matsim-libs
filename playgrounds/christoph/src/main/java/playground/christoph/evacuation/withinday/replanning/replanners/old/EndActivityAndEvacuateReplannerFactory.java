@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ExtendCurrentActivityReplannerFactory.java
+ * EndActivityAndEvacuateReplannerFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,26 +18,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.replanners;
+package playground.christoph.evacuation.withinday.replanning.replanners.old;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-public class ExtendCurrentActivityReplannerFactory extends WithinDayDuringActivityReplannerFactory {
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 
-	private Scenario scenario;
+public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActivityReplannerFactory {
+
+	private final Scenario scenario;
+	private final SwissPTTravelTimeCalculator ptTravelTime;
+	private final TripRouterFactory tripRouterFactory;
+	private final RoutingContext routingContext;
 	
-	public ExtendCurrentActivityReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
+			SwissPTTravelTimeCalculator ptTravelTime, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
+		this.ptTravelTime = ptTravelTime;
+		this.tripRouterFactory = tripRouterFactory;
+		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new ExtendCurrentActivityReplanner(super.getId(),
-				scenario, this.getWithinDayEngine().getInternalInterface());
+		WithinDayDuringActivityReplanner replanner = new EndActivityAndEvacuateReplanner(super.getId(), 
+				this.scenario, this.getWithinDayEngine().getInternalInterface(), ptTravelTime,
+				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}
 

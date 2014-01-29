@@ -25,8 +25,8 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplanner;
-import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.old.EndActivityAndEvacuateReplanner;
+import playground.christoph.evacuation.withinday.replanning.replanners.old.EndActivityAndEvacuateReplannerFactory;
 
 public class MarathonEndActivityAndEvacuateReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 

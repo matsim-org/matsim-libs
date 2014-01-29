@@ -49,7 +49,11 @@ import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
  * Therefore, we only have to ensure that they enter only vehicles which have their
  * destination in the secure area. If we keep agents longer in a vehicle, we have to
  * ensure that they leave the vehicle if it arrives at its destination. Otherwise
- * they would wait their forever for another driver. 
+ * they would wait their forever for another driver.
+ * 
+ * We also have to ensure, that passengers leave the vehicle of the driver stops for
+ * an activity different than pick-up or drop-off. Otherwise they also might wait
+ * forever in the car.
  * 
  * @author cdobler
  */
@@ -58,14 +62,16 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 	private final MobsimDataProvider mobsimDataProvider;
 	private final LinkEnteredProvider linkEnteredProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
+	private final JointDepartureCoordinator jointDepartureCoordinator;
 	
 	private final Map<Id, JointDeparture> jointDepartures;
 	
 	/*package*/ AgentsToDropOffIdentifier(MobsimDataProvider mobsimDataProvider, LinkEnteredProvider linkEnteredProvider,
-			JointDepartureOrganizer jointDepartureOrganizer) {
+			JointDepartureOrganizer jointDepartureOrganizer, JointDepartureCoordinator jointDepartureCoordinator) {
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.linkEnteredProvider = linkEnteredProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		this.jointDepartureCoordinator = jointDepartureCoordinator;
 		
 		this.jointDepartures = new ConcurrentHashMap<Id, JointDeparture>();
 	}
@@ -73,7 +79,7 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		// Get all agents that have just entered a new link.
-		Map<Id, Id> linkEnteredAgents = new HashMap<Id, Id>(linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep());	
+		Map<Id, Id> linkEnteredAgents = new HashMap<Id, Id>(linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep());
 		
 		// Apply filter to remove agents that should not be replanned.
 		this.applyFilters(linkEnteredAgents.keySet(), time);
@@ -85,6 +91,11 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 			
 			Id driverId = entry.getKey();
 			Id linkId = entry.getValue();
+			
+			/*
+			 * Check whether the driver has already scheduled a JointDeparture on the current link;
+			 */
+			if (this.jointDepartureCoordinator.isJointDepartureScheduled(driverId)) continue;
 			
 			QVehicle vehicle = (QVehicle) this.mobsimDataProvider.getDriversVehicle(driverId);
 			agentsLeaveVehicle.clear();
@@ -132,5 +143,9 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 	
 	public JointDeparture getJointDeparture(Id agentId) {
 		return this.jointDepartures.remove(agentId);
+	}
+	
+	/*package*/ boolean isJointDepartureScheduled(Id agentId) {
+		return this.jointDepartures.containsKey(agentId);
 	}
 }

@@ -24,21 +24,15 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
+import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.router.MultiNodeDijkstra;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
+import org.matsim.pt.router.FastTransitMultiNodeDijkstra;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -51,45 +45,30 @@ import org.matsim.pt.router.TransitTravelDisutility;
  * @author cdobler
  */
 public class EvacuationTransitRouter implements TransitRouter {
-
-	/*
-	 * Factor to increase a beeline distance. We assume that
-	 * beelineDistance * factor ~ real world distance.
-	 */
-	private final double beelineDistanceFactor;
-		
+	
 	private final TransitRouterConfig routerConfig;
 	private final TransitRouterNetwork routerNetwork;
-	private final Collection<TransitRouterNetworkNode> toNodes;
-	private final TravelTime walkTravelTime;
-	private final MultiNodeDijkstra dijkstra;
-		
+	private final Collection<TransitRouterNetworkNode> exitNodes;
+	private final TransitTravelDisutility transitTravelDisutility;
+	private final FastTransitMultiNodeDijkstra dijkstra;
+	
 	/**
 	 * From the toNodes the rescue node / rescue facility can be reached
 	 * directly.
-	 * 
-	 * @param config
-	 * @param routerNetwork
-	 * @param travelTime
-	 * @param travelDisutility
-	 * @param toNodes
 	 */
-	public EvacuationTransitRouter(Config config, TransitRouterConfig routerConfig, TransitRouterNetwork routerNetwork,
-			TravelTime transitTravelTime, TransitTravelDisutility travelDisutility, Collection<TransitRouterNetworkNode> toNodes,
-			TravelTime walkTravelTime) {
-		this.beelineDistanceFactor = config.plansCalcRoute().getBeelineDistanceFactor();
+	public EvacuationTransitRouter(TransitRouterConfig routerConfig, TransitRouterNetwork routerNetwork,
+			TransitTravelDisutility transitTravelDisutility, Collection<TransitRouterNetworkNode> exitNodes,
+			FastTransitMultiNodeDijkstra dijkstra) {
 		this.routerConfig = routerConfig;
 		this.routerNetwork = routerNetwork;
-		this.toNodes = toNodes;
-		this.walkTravelTime = walkTravelTime;
-		
-		this.dijkstra = new MultiNodeDijkstra(routerNetwork, travelDisutility, transitTravelTime);
+		this.transitTravelDisutility = transitTravelDisutility;
+		this.exitNodes = exitNodes;
+		this.dijkstra = dijkstra;
 	}
 	
 	public TransitRouterNetwork getTransitRouterNetwork() {
 		return this.routerNetwork;
 	}
-	
 
 	@Override
 	public List<Leg> calcRoute(Coord fromCoord, Coord toCoord, double departureTime, Person person) {
@@ -105,16 +84,20 @@ public class EvacuationTransitRouter implements TransitRouter {
 			double distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
 			fromNodes = this.routerNetwork.getNearestNodes(fromCoord, distance + this.routerConfig.extensionRadius);
 		}
+
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
 			
 			double initialTime = calcInitialTime(fromCoord, node.stop.getStopFacility().getCoord(), person);
 			
 			// in the evacuation case we use travel time as travel costs
-			double initialCost = initialTime;
+//			double initialCost = initialTime;
+			double initialCost = calcInitialCost(fromCoord, node.stop.getStopFacility().getCoord(), person);
 			
-			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
+//			wrappedFromNodes.put(node, new InitialNode(node, initialCost, initialTime + departureTime));
+			wrappedFromNodes.put(node, new InitialNode(node, initialCost, initialTime));
 		}
+		Node wrappedFromNode = this.dijkstra.createImaginaryNode(wrappedFromNodes.values());
 		
 		// find possible end stops
 		Collection<TransitRouterNetworkNode> toNodes = this.routerNetwork.getNearestNodes(toCoord, this.routerConfig.searchRadius);
@@ -130,13 +113,16 @@ public class EvacuationTransitRouter implements TransitRouter {
 			double initialTime = calcInitialTime(toCoord, node.stop.getStopFacility().getCoord(), person);
 			
 			// in the evacuation case we use travel time as travel costs
-			double initialCost = initialTime;
+//			double initialCost = initialTime;
+			double initialCost = calcInitialCost(toCoord, node.stop.getStopFacility().getCoord(), person);
 			
-			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
+//			wrappedToNodes.put(node, new InitialNode(node, initialCost, initialTime + departureTime));
+			wrappedToNodes.put(node, new InitialNode(node, initialCost, initialTime));
 		}
+		Node wrappedToNode = this.dijkstra.createImaginaryNode(wrappedToNodes.values());
 		
 		// find routes between start and end stops
-		Path path = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
+		Path path = this.dijkstra.calcLeastCostPath(wrappedFromNode, wrappedToNode, departureTime, person, null);
 		
 		/*
 		 * Walk trips to first stop and from last stop are NOT included in the path.
@@ -169,18 +155,21 @@ public class EvacuationTransitRouter implements TransitRouter {
 			// in the evacuation case we use travel time as travel costs
 			double initialCost = initialTime;
 			
-			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
+//			wrappedFromNodes.put(node, new InitialNode(node, initialCost, initialTime + departureTime));
+			wrappedFromNodes.put(node, new InitialNode(node, initialCost, initialTime));
 		}
-
+		Node wrappedFromNode = this.dijkstra.createImaginaryNode(wrappedFromNodes.values());
+		
 		// find possible end stops
 		Map<Node, InitialNode> wrappedToExitNodes = new LinkedHashMap<Node, InitialNode>();
-		for (TransitRouterNetworkNode node : toNodes) {
-			wrappedToExitNodes.put(node, new InitialNode(0.0, departureTime));
+		for (TransitRouterNetworkNode node : exitNodes) {
+			wrappedToExitNodes.put(node, new InitialNode(node, 0.0, departureTime));
 		}
+		Node wrappedToExitNode = this.dijkstra.createImaginaryNode(wrappedToExitNodes.values());
 
 		// find routes between start and end stops
-		Path path = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToExitNodes, person);
-
+		Path path = this.dijkstra.calcLeastCostPath(wrappedFromNode, wrappedToExitNode, departureTime, person, null);
+		
 		/*
 		 * Walk trips to first stop and from last stop are NOT included in the path.
 		 */
@@ -196,118 +185,10 @@ public class EvacuationTransitRouter implements TransitRouter {
 	}
 
 	private double calcInitialTime(Coord fromCoord, Coord toCoord, Person person) {
-
-		// Use person speed instead of beeline walk speed
-		Link dummyLink = new DummyLink(this.beelineDistanceFactor, fromCoord, toCoord);
-		double initialTime = this.walkTravelTime.getLinkTravelTime(dummyLink, 0.0, person, null);
-		
-		return initialTime;
+		return this.transitTravelDisutility.getTravelTime(person, fromCoord, toCoord);
 	}
 	
-	private static class DummyLink implements Link {
-
-		private final static Id id = new IdImpl("dummyLink");
-		private final double length;
-		private final Node fromNode;
-		private final Node toNode;
-		
-		public DummyLink(double beelineDistanceFactor, Coord fromCoord, Coord toCoord) {
-			this.length = CoordUtils.calcDistance(fromCoord, toCoord) * beelineDistanceFactor;
-			this.fromNode = new DummyNode(fromCoord);
-			this.toNode = new DummyNode(toCoord);
-		}
-		
-		@Override
-		public Coord getCoord() { return null; }
-
-		@Override
-		public Id getId() { return id; }
-
-		@Override
-		public boolean setFromNode(Node node) { return false; }
-
-		@Override
-		public boolean setToNode(Node node) { return false; }
-
-		@Override
-		public Node getToNode() {
-			return this.toNode;
-		}
-
-		@Override
-		public Node getFromNode() {
-			return this.fromNode;
-		}
-
-		@Override
-		public double getLength() {
-			return this.length;
-		}
-
-		@Override
-		public double getNumberOfLanes() { return 0; }
-
-		@Override
-		public double getNumberOfLanes(double time) { return 0; }
-
-		@Override
-		public double getFreespeed() { return 0; }
-
-		@Override
-		public double getFreespeed(double time) { return 0; }
-
-		@Override
-		public double getCapacity() { return 0; }
-
-		@Override
-		public double getCapacity(double time) { return 0; }
-
-		@Override
-		public void setFreespeed(double freespeed) { }
-
-		@Override
-		public void setLength(double length) { }
-
-		@Override
-		public void setNumberOfLanes(double lanes) { }
-
-		@Override
-		public void setCapacity(double capacity) { }
-
-		@Override
-		public void setAllowedModes(Set<String> modes) { }
-
-		@Override
-		public Set<String> getAllowedModes() { return null; }
+	private double calcInitialCost(Coord fromCoord, Coord toCoord, Person person) {
+		return this.transitTravelDisutility.getTravelDisutility(person, fromCoord, toCoord);
 	}
-	
-	private static class DummyNode implements Node {
-
-		private final Coord coord;
-		
-		public DummyNode(Coord coord) {
-			this.coord = coord;
-		}
-		
-		@Override
-		public Coord getCoord() {
-			return coord;
-		}
-
-		@Override
-		public Id getId() { return null; }
-
-		@Override
-		public boolean addInLink(Link link) { return false; }
-
-		@Override
-		public boolean addOutLink(Link link) { return false; }
-
-		@Override
-		public Map<Id, ? extends Link> getInLinks() { return null; }
-
-		@Override
-		public Map<Id, ? extends Link> getOutLinks() { return null; }
-	}
-
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InsecureLegPerformingIdentifierFactory.java
+ * AgentsToPickupIdentifierFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -46,13 +46,14 @@ public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory 
 	private final InformedAgentsTracker informedAgentsTracker;
 	private final DecisionDataProvider decisionDataProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
+	private final JointDepartureCoordinator jointDepartureCoordinator;
 	
 	public AgentsToPickupIdentifierFactory(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, 
 			MobsimDataProvider mobsimDataProvider, EarliestLinkExitTimeProvider earliestLinkExitTimeProvider, 
 			InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider,
-			JointDepartureOrganizer jointDepartureOrganizer, AffectedAgentsFilterFactory affectedAgentsFilterFactory,
-			TransportModeFilterFactory transportModeFilterFactory, InformedAgentsFilterFactory informedAgentsFilterFactory,
-			ActivityStartingFilterFactory activityStartingFilterFactory) {
+			JointDepartureOrganizer jointDepartureOrganizer, JointDepartureCoordinator jointDepartureCoordinator, 
+			AffectedAgentsFilterFactory affectedAgentsFilterFactory, TransportModeFilterFactory transportModeFilterFactory, 
+			InformedAgentsFilterFactory informedAgentsFilterFactory, ActivityStartingFilterFactory activityStartingFilterFactory) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
@@ -61,6 +62,7 @@ public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory 
 		this.informedAgentsTracker = informedAgentsTracker;
 		this.decisionDataProvider = decisionDataProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		this.jointDepartureCoordinator = jointDepartureCoordinator;
 		
 		// remove agents which are not informed yet
 		this.addAgentFilterFactory(informedAgentsFilterFactory);
@@ -79,7 +81,7 @@ public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory 
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(this.scenario, this.coordAnalyzer.createInstance(), 
 				this.vehiclesTracker, this.mobsimDataProvider, this.earliestLinkExitTimeProvider, this.informedAgentsTracker, 
-				this.decisionDataProvider, this.jointDepartureOrganizer);
+				this.decisionDataProvider, this.jointDepartureOrganizer, this.jointDepartureCoordinator);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

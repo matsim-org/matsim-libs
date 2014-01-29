@@ -29,11 +29,16 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.router.FastTransitMultiNodeDijkstra;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.router.TransitTravelDisutilityWrapper;
+import org.matsim.pt.router.util.FastTransitDijkstraFactory;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 
@@ -44,35 +49,48 @@ public class EvacuationTransitRouterFactory implements TransitRouterFactory {
 
 	static final Logger log = Logger.getLogger(EvacuationTransitRouterFactory.class);
 	
-	private final Config config;
 	private final TravelTime walkTravelTime;
 	private final TransitRouterConfig routerConfig;
 	private final TransitRouterNetwork routerNetwork;
 	private final EvacuationTransitRouterNetworkTravelTimeAndDisutility ttCalculator;
 	private final PreparedTransitSchedule departureTimeCache;
+	private final FastTransitDijkstraFactory dijkstraFactory;
 	
 	private final Coord center = EvacuationConfig.centerCoord;
 	private final double innerRadius = EvacuationConfig.innerRadius;
 	private final double outerRadius = EvacuationConfig.outerRadius;
 	private final Collection<TransitRouterNetworkNode> exitNodes;
 	
-	public EvacuationTransitRouterFactory(final Config config, final TravelTime walkTravelTime, 
+	public EvacuationTransitRouterFactory(final Config config, final TravelTime walkTravelTime, final TransitSchedule transitSchedule,
 			final TransitRouterNetwork routerNetwork, final TransitRouterConfig routerConfig) {
-		this.config = config;
 		this.walkTravelTime = walkTravelTime;
 		this.routerConfig = routerConfig;
 		this.routerNetwork = routerNetwork;
+		this.dijkstraFactory = new FastTransitDijkstraFactory();
+		this.departureTimeCache = new PreparedTransitSchedule(transitSchedule);
 		
-		this.departureTimeCache = new PreparedTransitSchedule();
-		this.ttCalculator = new EvacuationTransitRouterNetworkTravelTimeAndDisutility(this.routerConfig, this.departureTimeCache);
+		double beelineDistanceFactor = config.plansCalcRoute().getBeelineDistanceFactor();
+		this.ttCalculator = new EvacuationTransitRouterNetworkTravelTimeAndDisutility(this.routerConfig, this.departureTimeCache, walkTravelTime,
+				beelineDistanceFactor);
 		this.exitNodes = new ArrayList<TransitRouterNetworkNode>();
 		identifyExitNodes();
+		
+		/*
+		 * We have to create an EvacuationTransitRouter here. This triggers the creation of 
+		 * the RoutingNetwork inside the dijkstraFactory, which is not thread-safe. Later,
+		 * createTransitRouter() is called concurrently from parallel running threads. Therefore,
+		 * we ensure that the RoutingNetwork is already created and re-used later.
+		 */
+		this.createTransitRouter();
 	}
 
 	@Override
 	public EvacuationTransitRouter createTransitRouter() {
-		return new EvacuationTransitRouter(this.config, this.routerConfig, this.routerNetwork, this.ttCalculator, 
-				this.ttCalculator, this.exitNodes, this.walkTravelTime);
+		TransitTravelDisutilityWrapper wrapper = new TransitTravelDisutilityWrapper(this.ttCalculator);
+		FastTransitMultiNodeDijkstra dijkstra = (FastTransitMultiNodeDijkstra) dijkstraFactory.createPathCalculator(this.routerNetwork, 
+				wrapper, this.ttCalculator);
+		
+		return new EvacuationTransitRouter(this.routerConfig, this.routerNetwork, this.ttCalculator, this.exitNodes, dijkstra);
 	}
 	
 	/**
@@ -82,7 +100,7 @@ public class EvacuationTransitRouterFactory implements TransitRouterFactory {
 	 */
 	private void identifyExitNodes() {
 		
-		for (Node node : routerNetwork.getNodes().values()) {
+		for (Node node : this.routerNetwork.getNodes().values()) {
 			double distance = CoordUtils.calcDistance(center, node.getCoord());
 			
 			if (distance >= innerRadius && distance <= outerRadius) exitNodes.add((TransitRouterNetworkNode) node);
