@@ -61,7 +61,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 		SumScoringFunction sum = new SumScoringFunction() ;
 		
 		String subPopName = (String) personAttributes.getAttribute(plan.getPerson().getId().toString(), this.subPopulationAttributeName ) ;
-		if ( subPopName.equals("commercial") ) {
+		if ( subPopName != null && subPopName.equals("commercial") ) {
 			sum.addScoringFunction( new SumScoringFunction.ActivityScoring() {
 				private final double margUtlOfTime_s = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600. ;
 				private double score = 0. ;

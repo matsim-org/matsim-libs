@@ -68,7 +68,7 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 		Map<String, Id> map = new TreeMap<String, Id>();
 		for(Id id : sc.getPopulation().getPersons().keySet()){
 			String subpopulation = (String)sc.getPopulation().getPersonAttributes().getAttribute(id.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
-			if(!map.containsKey(subpopulation)){
+			if( subpopulation!=null && !map.containsKey(subpopulation)){
 				map.put(subpopulation, id);
 			}
 		}
@@ -83,13 +83,16 @@ public class GautengUtilityOfMoney implements UtilityOfMoneyI {
 
 	@Override
 	public double getMarginalUtilityOfMoney(final Id personId ) {
-		/* Old. */
-		SanralTollVehicleType vehicleType = tollFactor.typeOf(personId);
-		double valueOfTime_hr_OLD = getValueOfTime_hr_OLD(vehicleType);
 		
-		/* New. */
-		double valueOfTime_hr = getValueOfTime_hr(personId);
-
+		double valueOfTime_hr ;
+		String subpopulation = (String)sc.getPopulation().getPersonAttributes().getAttribute(personId.toString(), sc.getConfig().plans().getSubpopulationAttributeName());
+		if ( subpopulation==null ) { // OLD
+			SanralTollVehicleType vehicleType = tollFactor.typeOf(personId);
+			valueOfTime_hr = getValueOfTime_hr_OLD( vehicleType ) ; 
+		} else { // NEW
+			valueOfTime_hr = getValueOfTime_hr(personId); 
+		}
+		
 		double utilityOfMoney = getUtilityOfMoneyFromValueOfTime(valueOfTime_hr);
 		return utilityOfMoney ;
 	}

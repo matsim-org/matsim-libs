@@ -19,7 +19,9 @@
 
 package playground.southafrica.gauteng.roadpricingscheme;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
 
 public  class SanralTollFactorOLD implements TollFactorI {
 	private final  int carStartId = 0;
@@ -83,12 +85,23 @@ public  class SanralTollFactorOLD implements TollFactorI {
 	 * and `Medium' and `Long' combined represent Class C vehicles. */
 	private final  double fractionClassB = 0.50;
 	
+	private static int wrnCnt = 0 ;
+	
 	@Override
-	public double getTollFactor(Id personId, final Id vehicleId, final Id linkId, final double time){		
+	public double getTollFactor(Id personId, Id vehicleId, final Id linkId, final double time){		
 		double timeDiscount = getTimeDiscount(time);
 		double tagDiscount = 0.00;
 		double ptDiscount = 0.00;
 		double sizeFactor = 1.00;
+		
+		if ( vehicleId==null ) {
+			vehicleId = personId ;
+			if (wrnCnt<1 ) {
+				wrnCnt++ ;
+				Logger.getLogger(this.getClass()).warn( "using personId instead of vehicleId for toll factor since vehicleId not available.  old version; should not be used.") ;
+				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
+			}
+		}
 		
 		switch( typeOf( vehicleId) ) {
 		case carWithTag:

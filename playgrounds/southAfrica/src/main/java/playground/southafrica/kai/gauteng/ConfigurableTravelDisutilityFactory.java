@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.southafrica.kai.gauteng;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -32,8 +34,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
-
-import org.apache.log4j.Logger;
 
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
 
@@ -160,7 +160,11 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 				// apply toll if applicable:
 				if ( localScheme != null ) {
 					double toll_usually_positive = 0. ;
-					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicle.getId() ) ;
+					Id vehicleId = null ;
+					if ( vehicle != null ) {
+						vehicleId  = vehicle.getId() ;
+					}
+					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicleId ) ;
 					if ( cost != null ) {
 						/* This needed to be introduced after the GautengRoadPricingScheme started to return null instead of
 						 * Cost objects with amount=0.  kai, apr'12

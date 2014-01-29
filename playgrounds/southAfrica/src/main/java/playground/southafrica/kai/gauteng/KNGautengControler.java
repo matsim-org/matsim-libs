@@ -71,7 +71,7 @@ public class KNGautengControler {
 	final static String outputDirectoryName = "/Users/nagel/kairuns/output2/";
 	
 	static enum Case {equil,gauteng} ;
-	static final Case ccc = Case.equil ;
+	static final Case ccc = Case.gauteng ;
 	
 	private Config config = null;
 
