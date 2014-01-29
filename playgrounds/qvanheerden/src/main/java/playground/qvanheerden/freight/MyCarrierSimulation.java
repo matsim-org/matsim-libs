@@ -13,6 +13,13 @@ package playground.qvanheerden.freight;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
+import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.util.Solutions;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -26,6 +33,9 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
+import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -42,9 +52,11 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -59,6 +71,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import playground.southafrica.utilities.Header;
 import usecases.analysis.CarrierScoreStats;
 import usecases.analysis.LegHistogram;
+import usecases.chessboard.SelectBestPlanAndOptimizeItsVehicleRouteFactory;
 
 
 public class MyCarrierSimulation {
@@ -79,24 +92,26 @@ public class MyCarrierSimulation {
 		String changeEventsInputFile = args[6];
 
 		Config config = ConfigUtils.createConfig();
-		config.addCoreModules();
+//		config.addCoreModules();
 		config.controler().setOutputDirectory("./output/");
-		config.controler().setLastIteration(10);
-		config.controler().setWriteEventsInterval(10);
+		config.controler().setLastIteration(3);
+		config.controler().setWriteEventsInterval(3);
 //		config.planCalcScore().setMarginalUtilityOfMoney(100.);
 //		config.planCalcScore().setMarginalUtlOfDistanceOther(-120.);
-		config.strategy().setMaxAgentPlanMemorySize(5);
+		config.network().setInputFile(networkFile);
+//		config.strategy().setMaxAgentPlanMemorySize(5);
+//		config.network().setTimeVariantNetwork(true);
 
 		//Read network
 		scenario = ScenarioUtils.loadScenario(config);
 		//config.network().setInputFile(networkFile);
-		scenario.getConfig().network().setTimeVariantNetwork(true);
-		new MatsimNetworkReader(scenario).readFile(networkFile);
-		//scenario.getConfig().network().setChangeEventInputFile(changeEventsInputFile);
+//		scenario.getConfig().network().setTimeVariantNetwork(true);
+//		new MatsimNetworkReader(scenario).readFile(networkFile);
+//		scenario.getConfig().network().setChangeEventInputFile(changeEventsInputFile);
 
 
 		MyCarrierSimulation mcs = new MyCarrierSimulation();
-		mcs.getNetworkChangeEvents(0, 6, 15, 22);
+//		MyCarrierSimulation.getNetworkChangeEvents(scenario, 0, 6, 15, 22);
 
 		//read carriers and their capabilities
 		Carriers carriers = new Carriers();
@@ -109,7 +124,7 @@ public class MyCarrierSimulation {
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 
 		//get replan strategy and scoring function factory
-		CarrierPlanStrategyManagerFactory stratManFactory = mcs.createReplanStrategyFactory();
+		CarrierPlanStrategyManagerFactory stratManFactory = mcs.createReplanStrategyFactory(vehicleTypes);
 		CarrierScoringFunctionFactory scoringFactory = mcs.createScoringFactory();
 
 		Controler controler = new Controler(scenario);
@@ -129,16 +144,10 @@ public class MyCarrierSimulation {
 
 	}
 
-	public void getNetworkChangeEvents(double amStart, double amEnd, double pmStart, double pmEnd) {
+	public static void getNetworkChangeEvents(Scenario scenario, double amStart, double amEnd, double pmStart, double pmEnd) {
 		Collection<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>();
 
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl();
-
-//		Network network = scenario.getNetwork();
-//		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
-//		NetworkImpl ni = (NetworkImpl)network;
-//		nf.setLinkFactory(new TimeVariantLinkFactory());
-//		ni.setFactory(nf);
 
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
@@ -183,7 +192,7 @@ public class MyCarrierSimulation {
 
 	}
 
-	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(){
+	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(final CarrierVehicleTypes types){
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			@Override
@@ -198,23 +207,29 @@ public class MyCarrierSimulation {
 					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>(new RandomPlanSelector<CarrierPlan>()) ;
 					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
 					strategy.addStrategyModule(module);
-					mgr.addStrategy(strategy, null, .8);
+					mgr.addStrategy(strategy, null, 0.7);
 					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
 				}
 				{
 					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new RandomPlanSelector<CarrierPlan>() ) ;
 					GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
 					strategy.addStrategyModule(module);
-					mgr.addStrategy(strategy, null, 0.2 );
+					mgr.addStrategy(strategy, null, 0.3 );
 					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
 				}
 				{
+//					GenericPlanStrategy<CarrierPlan> strategy = 
+//							new SelectBestPlanAndOptimizeItsVehicleRouteFactory(scenario.getNetwork(), types, controler.getLinkTravelTimes()).createStrategy() ;
+//					mgr.addStrategy( strategy, null, 0.3 );
+//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
+				}
+				{				
 					// the strategy to solve the pickup-and-delivery problem during the iterations is gone for the time being.  enough other
 					// things to figure out, I think.  kai
 				}
 				{
-//					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
-//					mgr.addStrategy( strategy, null, 0.01 ) ;
+					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+					mgr.addStrategy( strategy, null, 0.01 ) ;
 				}
 				return mgr ;
 			}

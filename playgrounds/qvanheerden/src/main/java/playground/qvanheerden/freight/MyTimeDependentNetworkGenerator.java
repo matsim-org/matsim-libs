@@ -2,6 +2,7 @@ package playground.qvanheerden.freight;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -37,11 +38,10 @@ public class MyTimeDependentNetworkGenerator {
 		sc.getConfig().network().setTimeVariantNetwork(true);
 		
 		NetworkChangeEventsWriter ncer = new NetworkChangeEventsWriter();
-		
 		double amStart = 0.;
-		double amEnd = 3.;
+		double amEnd = 5.;
 		double pmStart = 15.;
-		double pmEnd = 22.;
+		double pmEnd = 17.;
 		
 		Collection<NetworkChangeEvent> events = MyTimeDependentNetworkGenerator.getNetworkChangeEvents(sc, amStart, amEnd, pmStart, pmEnd); 
 		ncer.write(changeEventsOutputFile, events);

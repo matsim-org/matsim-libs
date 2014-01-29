@@ -48,12 +48,16 @@ public class MyDemandGenerator {
 		String distributionFile = args[0];
 		String customerFile = args[1];
 		String productFile = args[2];
-		String simpleDemandOutput = args[3];
+		String simpleDemandOutputDirectory = args[3];
 		
 		MyDemandGenerator mdg = new MyDemandGenerator();
 		mdg.parseProductFile(productFile);
 		mdg.parseCustomerFile(customerFile);
-		mdg.generateSimpleDemand(distributionFile, simpleDemandOutput);
+		mdg.generateSimpleDemand(distributionFile, simpleDemandOutputDirectory + "/demand_day2.csv", 2);
+		mdg.generateSimpleDemand(distributionFile, simpleDemandOutputDirectory + "/demand_day3.csv", 3);
+		mdg.generateSimpleDemand(distributionFile, simpleDemandOutputDirectory + "/demand_day4.csv", 4);
+		mdg.generateSimpleDemand(distributionFile, simpleDemandOutputDirectory + "/demand_day5.csv", 5);
+		mdg.generateSimpleDemand(distributionFile, simpleDemandOutputDirectory + "/demand_day6.csv", 6);
 
 		Header.printFooter();
 	}
@@ -106,7 +110,6 @@ public class MyDemandGenerator {
 				log.info("Could not close customer file");
 			}
 		}
-
 	}
 
 	public void parseDistributionFile(String inputFile){
@@ -302,13 +305,9 @@ public class MyDemandGenerator {
 
 	}
 
-	public void generateSimpleDemand(String inputFile, String outputFile){
+	public void generateSimpleDemand(String inputFile, String outputFile, int chosenSeqDay){
 		BufferedReader br = IOUtils.getBufferedReader(inputFile);
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
-
-		//choose arbitrary date to work with: Tuesday, 3 July 2012
-		int month = 7;
-		int day = 3;
 
 		try {
 			bw.write("customer, long, lat, product, mass, sale, duration, start, end");
@@ -338,18 +337,16 @@ public class MyDemandGenerator {
 				//double distance = Double.parseDouble(array[15]);
 
 				//ignore everything up to sequential day=3 (that is 3 july 2013)
-				if(seqDay==3 && customerMap.containsKey(customer) && productList.contains(product)){
+				if(seqDay==chosenSeqDay && customerMap.containsKey(customer) && productList.contains(product)){
 					//customer, long, lat, product, mass, sale, duration, start, end
 					double longi = customerMap.get(customer).getX();
 					double lati = customerMap.get(customer).getY();
-					bw.write(customer + "," + longi + "," + lati + "," + product + "," + mass + "," + sale + ",600,0,86400");
+					bw.write(customer + "," + longi + "," + lati + "," + product + "," + mass + "," + sale + ",300,21600,75600");
 					bw.newLine();
 
-				}else if(seqDay > 3){ //break from while loop once seqDay > 3
+				}else if(seqDay > chosenSeqDay){ //break from while loop once seqDay > chosenSeqDay
 					break;
 				}
-
-
 			}
 		}catch(IOException e){
 			log.error("Could not read distribution file...");
