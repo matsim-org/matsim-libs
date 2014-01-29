@@ -42,9 +42,10 @@ abstract class UtilityChanges {
 		double utilsUserFromRoHOldUsers = 0. ;
 		double utilsUserFromRoHNewUsers= 0. ;
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
-			Utils.initializeOutputTables(html);				
-
+			System.out.println("ODID: "+id);
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
+			Utils.initializeOutputTables(html);				
+			
 			Values planfallForODRelation = planfall.getByODRelation(id) ;
 			for ( DemandSegment segm : DemandSegment.values() ) { // for all types (e.g. PV or GV)
 
@@ -62,7 +63,7 @@ abstract class UtilityChanges {
 
 				for ( Mode mode : Mode.values() ) {
 
-					Attributes 		econValues = economicValues.getAttributes(mode, segm) ;
+					Attributes econValues = economicValues.getAttributes(mode, segm) ;
 
 					Attributes attributesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
 					Attributes attributesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
@@ -128,9 +129,10 @@ abstract class UtilityChanges {
 
 				} // mode			
 
-
+				
 				final double amountNullfallRcv = nullfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
 				final double amountPlanfallRcv = planfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
+				
 				final double deltaAmountsRcv = amountPlanfallRcv - amountNullfallRcv ;
 				final double amountInduced = deltaAmountsRcv - sumSent ;
 				System.out.println( " amount induced: " + amountInduced ) ;
