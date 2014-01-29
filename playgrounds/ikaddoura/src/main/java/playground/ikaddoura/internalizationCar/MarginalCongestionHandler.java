@@ -212,10 +212,10 @@ public abstract class MarginalCongestionHandler implements
 			if (event.getTime() > earliestLeaveTime + 1.){
 				// Flow congestion has disappeared on that link.
 				
-				// Only delete the link enter time information for those agents that have already left the link
-				for (Id id : linkInfo.getLeavingAgents()) {
-					linkInfo.getPersonId2linkEnterTime().remove(id);
-				}
+//				// Only delete the link enter time information for those agents that have already left the link
+//				for (Id id : linkInfo.getLeavingAgents()) {
+//					linkInfo.getPersonId2linkEnterTime().remove(id);
+//				}
 
 				// Deleting the information of agents previously leaving that link.
 				linkInfo.getLeavingAgents().clear();
