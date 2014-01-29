@@ -22,6 +22,11 @@ abstract class UtilityChanges {
 		Html html = new Html() ;
 		computeAndPrintResults(economicValues,nullfall,planfall,html) ;
 	}
+	
+	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, String outFileName ) {
+		Html html = new Html(outFileName) ;
+		computeAndPrintResults(economicValues,nullfall,planfall,html) ;
+	}
 
 	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, Html html ) {
 		// (GK-GK') * x + 0.5 * (GK-GK') (x'-x) =
