@@ -31,11 +31,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
 
@@ -43,15 +49,16 @@ import org.matsim.core.utils.misc.Time;
  * @author ikaddoura
  *
  */
-public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEventHandler {
+public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
 	private static final Logger log = Logger.getLogger(TollHandler.class);
 	private double timeBinSize = 900.;
 	
 	private Map<Id, Map<Double, Double>> linkId2timeBin2tollSum = new HashMap<Id, Map<Double, Double>>();
-	private Map<Id, Map<Double, Integer>> linkId2timeBin2leavingAgents = new HashMap<Id, Map<Double, Integer>>();
+	private Map<Id, Map<Double, Integer>> linkId2timeBin2enteringAndDepartingAgents = new HashMap<Id, Map<Double, Integer>>();
 	
 	private List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-	private List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
+	private List<LinkEnterEvent> linkEnterEvents = new ArrayList<LinkEnterEvent>();
+	private List<PersonDepartureEvent> personDepartureEvents = new ArrayList<PersonDepartureEvent>();
 
 	private Map<Id, Map<Double, Double>> linkId2timeBin2avgToll = new HashMap<Id, Map<Double, Double>>();
 	private Map<Id, Map<Double, Double>> linkId2timeBin2avgTollOldValue = new HashMap<Id, Map<Double, Double>>();
@@ -66,15 +73,14 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 	@Override
 	public void reset(int iteration) {
 		linkId2timeBin2tollSum.clear();
-		linkId2timeBin2leavingAgents.clear();
+		linkId2timeBin2enteringAndDepartingAgents.clear();
 		this.congestionEvents.clear();
-		this.linkLeaveEvents.clear();
+		this.linkEnterEvents.clear();
+		this.personDepartureEvents.clear();
 
 		this.linkId2timeBin2avgTollOldValue.clear();
 		this.linkId2timeBin2avgTollOldValue.putAll(linkId2timeBin2avgToll);
 		this.linkId2timeBin2avgToll.clear();
-		
-		
 	}
 
 	@Override
@@ -83,8 +89,13 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 	}
 	
 	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		this.linkLeaveEvents.add(event);
+	public void handleEvent(LinkEnterEvent event) {
+		this.linkEnterEvents.add(event);		
+	}
+	
+	@Override
+	public void handleEvent(PersonDepartureEvent event) {
+		this.personDepartureEvents.add(event);
 	}
 
 	public void setLinkId2timeBin2avgToll() {
@@ -96,11 +107,11 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 			setlinkId2timeBin2tollSum();
 		}
 		
-		if (!this.linkId2timeBin2leavingAgents.isEmpty()) {
-			throw new RuntimeException("Map linkId2timeBin2leavingAgents should be empty!");
+		if (!this.linkId2timeBin2enteringAndDepartingAgents.isEmpty()) {
+			throw new RuntimeException("Map linkId2timeBin2enteringAndDepartingAgents should be empty!");
 		} else {
 			// calculate leaving agents for each link and time bin
-			setlinkId2timeBin2leavingAgents();
+			setlinkId2timeBin2enteringAndDepartingAgents();
 		}
 		
 		if (!this.linkId2timeBin2avgToll.isEmpty()) {
@@ -119,9 +130,13 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 					if (tollSum == 0.) {
 						// avg toll is zero for this time bin on that link
 					} else {
-						double leavingAgents = this.linkId2timeBin2leavingAgents.get(linkId).get(timeBin);
-						avgToll = tollSum / leavingAgents;
-						log.info("linkId: " + linkId + " // timeBin: " + Time.writeTime(timeBin, Time.TIMEFORMAT_HHMMSS) + " // toll sum: " + tollSum + " // leaving agents: " + leavingAgents + " // avg toll: " + avgToll);
+						double enteringAndDepartingAgents = this.linkId2timeBin2enteringAndDepartingAgents.get(linkId).get(timeBin);
+						if (enteringAndDepartingAgents == 0.) {
+							throw new RuntimeException("Toll sum on link " + linkId + " in time bin " + timeBin + " is " + tollSum + ", but there is no agent departing / entering that link in that time bin. Aborting...");
+						} else {
+							avgToll = tollSum / enteringAndDepartingAgents;
+							log.info("linkId: " + linkId + " // timeBin: " + Time.writeTime(timeBin, Time.TIMEFORMAT_HHMMSS) + " // toll sum: " + tollSum + " // leaving agents: " + enteringAndDepartingAgents + " // avg toll: " + avgToll);
+						}
 					}
 					timeBin2avgToll.put(timeBin, avgToll);
 				}
@@ -130,34 +145,36 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 		}
 	}
 
-	private void setlinkId2timeBin2leavingAgents() {
-		for (LinkLeaveEvent event : this.linkLeaveEvents){
+	private void setlinkId2timeBin2enteringAndDepartingAgents() {
+		
+		// first go through all link enter events
+		for (LinkEnterEvent event : this.linkEnterEvents){
 			
 			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())){
 				// Tolls paid on this link.
 				
-				Map<Double, Integer> timeBin2leavingAgents = new HashMap<Double, Integer>();
+				Map<Double, Integer> timeBin2enteringAgents = new HashMap<Double, Integer>();
 
-				if (this.linkId2timeBin2leavingAgents.containsKey(event.getLinkId())) {
+				if (this.linkId2timeBin2enteringAndDepartingAgents.containsKey(event.getLinkId())) {
 					// link already in map
-					timeBin2leavingAgents = this.linkId2timeBin2leavingAgents.get(event.getLinkId());
+					timeBin2enteringAgents = this.linkId2timeBin2enteringAndDepartingAgents.get(event.getLinkId());
 					
 					// for this link: search for the right time bin
 					for (double time = 0; time < (30 * 3600);) {
 						time = time + this.timeBinSize;
 
 						if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
-							// link leave event in time bin
-							// update leaving agents on this link and in this time bin
+							// event in time bin
+							// update entering agents on this link and in this time bin
 							
-							if (timeBin2leavingAgents.get(time) != null) {
-								// not the first agent leaving this link in this time bin
-								int leavingAgentsSoFar = timeBin2leavingAgents.get(time);
-								int leavingAgents = leavingAgentsSoFar + 1;
-								timeBin2leavingAgents.put(time, leavingAgents);
+							if (timeBin2enteringAgents.get(time) != null) {
+								// not the first agent entering this link in this time bin
+								int enteringAgentsSoFar = timeBin2enteringAgents.get(time);
+								int enteringAgents = enteringAgentsSoFar + 1;
+								timeBin2enteringAgents.put(time, enteringAgents);
 							} else {
-								// first leaving agent leaving this link in this time bin
-								timeBin2leavingAgents.put(time, 1);
+								// first agent entering this link in this time bin
+								timeBin2enteringAgents.put(time, 1);
 							}
 						}
 					}
@@ -171,12 +188,12 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 
 						if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
 							// link leave event in time bin
-							timeBin2leavingAgents.put(time, 1);
+							timeBin2enteringAgents.put(time, 1);
 						}
 					}
 				}
 				
-				this.linkId2timeBin2leavingAgents.put(event.getLinkId(), timeBin2leavingAgents);	
+				this.linkId2timeBin2enteringAndDepartingAgents.put(event.getLinkId(), timeBin2enteringAgents);	
 			
 			} else {
 				// No tolls paid on that link. Skip that link.
@@ -184,6 +201,62 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 			}
 		}
 		
+		
+		// then go through all person departure events
+		// a person departure event means an agent also 'enters' the link
+		for (PersonDepartureEvent event : this.personDepartureEvents) {
+
+			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())) {
+				// Tolls paid on this link.
+
+				Map<Double, Integer> timeBin2departingAgents = new HashMap<Double, Integer>();
+
+				if (this.linkId2timeBin2enteringAndDepartingAgents.containsKey(event.getLinkId())) {
+					// link already in map
+					timeBin2departingAgents = this.linkId2timeBin2enteringAndDepartingAgents.get(event.getLinkId());
+
+					// for this link: search for the right time bin
+					for (double time = 0; time < (30 * 3600);) {
+						time = time + this.timeBinSize;
+
+						if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
+							// event in time bin
+							// update agents on this link and in this time bin
+
+							if (timeBin2departingAgents.get(time) != null) {
+								// not the first agent departing on this link in this time bin
+								int departingAgentsSoFar = timeBin2departingAgents.get(time);
+								int departingAgents = departingAgentsSoFar + 1;
+								timeBin2departingAgents.put(time, departingAgents);
+							} else {
+								// first agent departing on this link in this time bin
+								timeBin2departingAgents.put(time, 1);
+							}
+						}
+					}
+
+				} else {
+					// link not yet in map
+
+					// for this link: search for the right time bin
+					for (double time = 0; time < (30 * 3600);) {
+						time = time + this.timeBinSize;
+
+						if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
+							// event in time bin
+							timeBin2departingAgents.put(time, 1);
+						}
+					}
+				}
+
+				this.linkId2timeBin2enteringAndDepartingAgents.put(event.getLinkId(), timeBin2departingAgents);
+
+			} else {
+				// No tolls paid on that link. Skip that link.
+
+			}
+		}
+
 	}
 
 	private void setlinkId2timeBin2tollSum() {
@@ -255,7 +328,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 	}
 	
 	/**
-	 * Returns the avg toll (negative monetary amount) paid on that link during that time bin.
+	 * Returns the avg toll (old value) (negative monetary amount) paid on that link during that time bin.
 	 */
 	public double getAvgTollOldValue(Link link, double time) {
 		double avgTollOldValue = 0.;
@@ -277,22 +350,22 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("link;total toll (per day);leaving agents (per day)");
+			bw.write("link;total toll (per day);entering (and departing) agents (per day)");
 			bw.newLine();
 			
 			for (Id linkId : this.linkId2timeBin2tollSum.keySet()){
 				double totalToll = 0.;
-				int leavingAgents = 0;
+				int enteringAgents = 0;
 				
 				for (Double tollSum_timeBin : this.linkId2timeBin2tollSum.get(linkId).values()){
 					totalToll = totalToll + tollSum_timeBin;
 				}
 				
-				for (Integer leavingAgents_timeBin : this.linkId2timeBin2leavingAgents.get(linkId).values()){
-					leavingAgents = leavingAgents + leavingAgents_timeBin;
+				for (Integer enteringDepartingAgents_timeBin : this.linkId2timeBin2enteringAndDepartingAgents.get(linkId).values()){
+					enteringAgents = enteringAgents + enteringDepartingAgents_timeBin;
 				}
 				
-				bw.write(linkId + ";" + totalToll + ";" + leavingAgents);
+				bw.write(linkId + ";" + totalToll + ";" + enteringAgents);
 				bw.newLine();
 			}
 			
@@ -304,4 +377,5 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkLeaveEve
 		}
 		
 	}
+
 }
