@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) ${year} by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package passing;
 
 import java.util.Arrays;
@@ -46,22 +64,26 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * Tests that a faster vehicle can pass slower vehicle on the same link
+ * 
+ */
 public class PassingTest {
 
 
-	/*one bike enters at t=0; and a car at t=5sec
-link length = 1000m
-Assume car speed = 20 m/s, bike speed = 5 m/s
-tt_car = 50 sec; tt_bike = 200 sec*/
+	/* a bike enters at t=0; and a car at t=5sec link length = 1000m
+	 *Assume car speed = 20 m/s, bike speed = 5 m/s
+	 *tt_car = 50 sec; tt_bike = 200 sec
+	 */
 
 	@Test 
 	public void test4PassingInFreeFlowState(){
 
-		SmallNetwork net = new SmallNetwork();
+		SimpleNetwork net = new SimpleNetwork();
 
 		//=== build plans; two persons; one with car and another with bike; car leave 5 secs after bike
 		String transportModes [] = new String [] {"bike","car"};
-		
+
 		for(int i=0;i<2;i++){
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			PlanImpl plan = p.createAndAddPlan(true);
@@ -76,17 +98,17 @@ tt_car = 50 sec; tt_bike = 200 sec*/
 			net.population.addPerson(p);
 		}
 
-		Map<Id, Map<Id, Double>> agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
+		Map<Id, Map<Id, Double>> personLinkTravelTimes = new HashMap<Id, Map<Id, Double>>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(new PersonLinkTravelTimeEventHandler(agentTravelTimes));
+		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
 
 
 		QSim qSim = createQSim(net,manager);
 		qSim.run();
 
-		Map<Id, Double> travelTime1 = agentTravelTimes.get(new IdImpl("0"));
-		Map<Id, Double> travelTime2 = agentTravelTimes.get(new IdImpl("1"));
+		Map<Id, Double> travelTime1 = personLinkTravelTimes.get(new IdImpl("0"));
+		Map<Id, Double> travelTime2 = personLinkTravelTimes.get(new IdImpl("1"));
 
 		int bikeTravelTime = travelTime1.get(new IdImpl("2")).intValue(); 
 		int carTravelTime = travelTime2.get(new IdImpl("2")).intValue();
@@ -97,7 +119,7 @@ tt_car = 50 sec; tt_bike = 200 sec*/
 
 	}
 
-	private QSim createQSim (SmallNetwork net, EventsManager manager){
+	private QSim createQSim (SimpleNetwork net, EventsManager manager){
 		Scenario sc = net.scenario;
 		QSim qSim1 = new QSim(sc, manager);
 		ActivityEngine activityEngine = new ActivityEngine();
@@ -141,7 +163,7 @@ tt_car = 50 sec; tt_bike = 200 sec*/
 	}
 
 
-	private static final class SmallNetwork{
+	private static final class SimpleNetwork{
 
 		final Config config;
 		final Scenario scenario ;
@@ -151,7 +173,7 @@ tt_car = 50 sec; tt_bike = 200 sec*/
 		final Link link2;
 		final Link link3;
 
-		public SmallNetwork(){
+		public SimpleNetwork(){
 
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			config = scenario.getConfig();
@@ -165,13 +187,13 @@ tt_car = 50 sec; tt_bike = 200 sec*/
 			Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(-100.0,0.0));
 			Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord( 0.0,  0.0));
 			Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord( 0.0,1000.0));
-			Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord( 0.0, 1100.0));
+			Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord( 0.0,1100.0));
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","bike"));
 
-			link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 100, 25, 300, 1, null, "22"); 
-			link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000, 25, 300, 1, null, "22");	
-			link3 = network.createAndAddLink(scenario.createId("3"), node3, node4, 100, 25, 300, 1, null, "22");
+			link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 100, 25, 60, 1, null, "22"); //capacity is 1 PCU per second.
+			link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000, 25, 60, 1, null, "22");	
+			link3 = network.createAndAddLink(scenario.createId("3"), node3, node4, 100, 25, 60, 1, null, "22");
 
 			population = scenario.getPopulation();
 		}
