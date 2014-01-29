@@ -209,7 +209,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 				} else {
 					if ( wrnCnt < 1 ) {
 						wrnCnt++ ;
-						log.warn("encountering duration < zeroUtilityDuration; the logic for this was changed around mid-nov") ;
+						log.warn("encountering duration < zeroUtilityDuration; the logic for this was changed around mid-nov 2013.") ;
 						log.warn( "your final score thus will be different from earlier runs; set usingOldScoringBelowZeroUtilityDuration to true if you "
 								+ "absolutely need the old version.  See https://matsim.atlassian.net/browse/MATSIM-191." );
 						log.warn( Gbl.ONLYONCE ) ;
