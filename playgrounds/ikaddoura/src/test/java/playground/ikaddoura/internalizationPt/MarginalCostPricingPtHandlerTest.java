@@ -98,7 +98,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 	//one agent from start (stop 1) to finish (stop 6)
 	//another agent gets on (stop 2) and off (stop 3)
-	@Ignore
 	@Test
     public final void testInVehicleDelay01() {
    	 	
@@ -204,7 +203,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//he gets off and a third agent gets on (stop 3)
 	//the third agent gets off (stop 4)
 	//the door-opening and -closing time has to be divided
-	@Ignore
 	@Test
 	public final void testInVehicleDelay02(){
 	
@@ -326,7 +324,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//agent 3 from stop 2 to stop 6
 	//agent 4 from stop 4 to stop 5
 	//agent 5 from stop 4 to stop 6
-	@Ignore
 	@Test
 	public final void testInVehicleDelay03(){
 		
@@ -487,7 +484,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//agent 1 (2 --> 6)
 	//agent 2 is waiting (3 --> 4)
 	//agent 2 gets on and off the bus while agent 1 is going through
-	@Ignore
 	@Test
 	public final void testWaitingDelay01(){
 		
@@ -588,7 +584,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//agent 1 (2 --> 4)
 	//agent 2 is waiting (3 --> 5)
 	//agent 1 gets off the bus before agent 2 gets off the bus
-	@Ignore
 	@Test
 	public final void testWaitingDelay02(){
 		
@@ -691,7 +686,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//agent 2 waits less than the delay of the bus (2.0<6.0 sec) --> consideration of AffectedAgentsUnits
 	//It is important to define a bus in the schedule which leaves later on,
 	//even if agent 2 will nevertheless get the first bus.
-	@Ignore
 	@Test
 	public final void testWaitingDelay03(){
 		
@@ -902,7 +896,6 @@ public class MarginalCostPricingPtHandlerTest  {
 
 	//agent 1 and agent 2 (2 --> 3)
 	//agent 3 is waiting (4 --> 5)
-	@Ignore
 	@Test
 	public final void testWaitingDelay04(){
 		
@@ -1025,7 +1018,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 	//agent 1  (2 --> 3)
 	//agent 2 and 3 are waiting (4 --> 5)
-	@Ignore
 	@Test
 	public final void testWaitingDelay05(){
 		
@@ -1148,7 +1140,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//agent 1 (2 --> 5)
 	//agent 2 (5 --> 2)
 	//agent 3 (2 --> 5)
-	@Ignore
 	@Test
 	public final void testWaitingDelay06(){
 		
@@ -1269,7 +1260,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//capacity: 2
 	//two agents from start (stop 1) to finish (stop 6)
 	// a third cannot enter, he gets on the next bus (stop 2)
-	@Ignore
 	@Test
 	public final void testCapacityDelay01(){
 		
@@ -1342,7 +1332,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//two agents waiting at stop 2
 	//the second can get on the bus
 	//the third agent cannot enter, he gets on the next bus
-	@Ignore
 	@Test
 	public final void testCapacityDelay02(){
 	
@@ -1412,7 +1401,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//capacity: 2
 	//agent 5 is waiting at stop 4, he misses 2 buses due to capacity-constraints
 	//the gap is not the same, the Marginal costs shouldn't be equally distributed
-	@Ignore
 	@Test
 	public final void testCapacityDelay03(){
 		
@@ -1494,7 +1482,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//two agents (agent 3 and 4) waiting at stop 2
 	//two agents (agent 1 and 2) are leaving the bus at stop 2
 	//there shouldn't be any capacity-constraints
-	@Ignore
 	@Test
 	public final void testCapacityDelay04(){
 		
@@ -1573,7 +1560,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//two agents (agent 3 and 4) from stop 2 to stop 6, they get on when agents 1 and 2 get off the bus
 	//agent 5 is waiting at stop 3 and can't get on the bus
 	//Only agents 3 and 4 should be responsible for the CapacityDelay
-	@Ignore
 	@Test
 	public final void testCapacityDelay05(){
 		
