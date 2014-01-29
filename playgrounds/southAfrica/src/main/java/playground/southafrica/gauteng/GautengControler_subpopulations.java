@@ -134,6 +134,8 @@ public class GautengControler_subpopulations {
 		 * [6] - Value-of-Time multiplier; and
 		 * [7] - Number of threads. 
 		 * [8] - user // should presumably be earlier in sequence?
+		 * [9] - Output directory
+		 * [10] - Counts file
 		 */
 
 		setOptionalArguments(args, config);
@@ -146,11 +148,6 @@ public class GautengControler_subpopulations {
 
 		if (args.length > 6 && args[6] != null && args[6].length() > 0) {
 			valueOfTimeMultiplier = Double.parseDouble(args[6]);
-		}
-
-		int numberOfThreads = 1;
-		if (args.length > 6 && args[7] != null && args[7].length() > 0) {
-			numberOfThreads = Integer.parseInt(args[7]);
 		}
 
 		// ===========================================
@@ -172,18 +169,7 @@ public class GautengControler_subpopulations {
 		assignSubpopulationStrategies(config);
 
 		config.planCalcScore().setBrainExpBeta(1.0);
-
-		config.controler().setWritePlansInterval(2);
-		if ( user==User.kai ) {
-			config.controler().setWritePlansInterval(10);
-		}
-
-		config.controler().setOutputDirectory("/Users/jwjoubert/Documents/Temp/sanral-runs");
-		if ( user==User.kai ) {
-			config.controler().setOutputDirectory("/Users/nagel/gauteng-kairuns/output");
-		}
-
-		config.global().setNumberOfThreads(numberOfThreads);
+		config.controler().setWritePlansInterval(10);
 
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
@@ -201,10 +187,8 @@ public class GautengControler_subpopulations {
 		config.qsim().setSnapshotPeriod(Double.POSITIVE_INFINITY);
 		config.controler().setWriteSnapshotsInterval(0);
 		
-		config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
 		if ( user==User.kai ) {
 			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
-			config.counts().setCountsFileName( KNGautengController.GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz");
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
 		}
@@ -503,9 +487,27 @@ public class GautengControler_subpopulations {
 			tollFilename = args[4];
 			config.roadpricing().setTollLinksFile(tollFilename);
 		}
+		
+		int numberOfThreads = 1;
+		if (args.length > 7 && args[7] != null && args[7].length() > 0) {
+			numberOfThreads = Integer.parseInt(args[7]);
+			config.global().setNumberOfThreads(numberOfThreads);
+		}
 
 		if (args.length > 8 && args[8] != null && args[8].length() > 0) {
 			user = User.valueOf( args[8] ) ;
+		}
+		
+		String outputDirectory = null;
+		if(args.length > 9 && args[9] != null && args[9].length() > 0) {
+			outputDirectory = args[9];
+			config.controler().setOutputDirectory(outputDirectory);
+		}
+
+		String countsFilename = null;
+		if(args.length > 10 && args[10] != null && args[10].length() > 0) {
+			countsFilename = args[10];
+			config.counts().setCountsFileName(countsFilename);
 		}
 	}
 

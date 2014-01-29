@@ -20,6 +20,8 @@ public class KNGautengController {
 				, "1" // VoT multiplier
 				, "1" // number of threads
 				, User.kai.toString()
+				, "/Users/nagel/gauteng-kairuns/output"
+				, GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz"
 				} ;
 		GautengControler_subpopulations.main(args2);
 	}

@@ -17,7 +17,8 @@ public class JWJGautengController {
 				"110", // base VoT
 				"1", // VoT multiplier
 				"1", // number of threads
-				User.johan.toString()
+				User.johan.toString(),
+				"/Users/jwjoubert/Documents/Temp/sanral-runs/output/"
 				} ;
 		GautengControler_subpopulations.main(args2);
 	}
