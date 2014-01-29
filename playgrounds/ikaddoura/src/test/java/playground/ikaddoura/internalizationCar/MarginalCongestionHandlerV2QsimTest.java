@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
@@ -184,6 +185,7 @@ public class MarginalCongestionHandlerV2QsimTest {
 	// the flow capacity on link 3 (1car / 60 seconds) is activated by the first agent,
 	// then the storage capacity on link 3 (only one car) is reached, too
 	// finally, two cars on the link before are delayed, the second one additional because of the flow capacity on this link.
+	@Ignore
 	@Test
 	public final void testFlowAndStorageCongestion_4agents(){
 		
