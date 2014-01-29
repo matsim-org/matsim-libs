@@ -82,9 +82,10 @@ public class MarginalCongestionHandlerImplV2 extends MarginalCongestionHandler {
 	}
 
 	private void calculateStorageCongestion(LinkLeaveEvent event, double remainingDelay) {
-				
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		
 		Id causingAgent = null;
-		causingAgent = this.linkId2congestionInfo.get(event.getLinkId()).getLastLeavingAgent();
+		causingAgent = linkInfo.getLastLeavingAgent();
 		
 		if (causingAgent == null){
 			log.warn("An agent is delayed due to storage congestion on link " + event.getLinkId() + " but no agent has left the link before. " +
@@ -92,7 +93,15 @@ public class MarginalCongestionHandlerImplV2 extends MarginalCongestionHandler {
 			this.delayNotInternalized_spillbackNoCausingAgent += remainingDelay;
 			
 		} else {
-			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getVehicleId(), remainingDelay, event.getLinkId());
+			// using the time when the causing agent entered the link
+			double time = 0.;
+			if (linkInfo.getPersonId2linkEnterTime().get(causingAgent) == null) {
+				time = event.getTime();
+			} else {
+				time = linkInfo.getPersonId2linkEnterTime().get(causingAgent);
+			}
+			
+			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, "storageCapacity", causingAgent, event.getVehicleId(), remainingDelay, event.getLinkId());
 			this.events.processEvent(congestionEvent);
 			this.totalInternalizedDelay += remainingDelay;
 		}

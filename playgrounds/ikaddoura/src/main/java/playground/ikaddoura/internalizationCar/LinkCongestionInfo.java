@@ -45,6 +45,7 @@ public class LinkCongestionInfo {
 	private Map<Id, Double> personId2linkLeaveTime = new HashMap<Id, Double>();
 	private List<Id> leavingAgents = new ArrayList<Id>();
 	private Map<Id, Double> personId2freeSpeedLeaveTime = new HashMap<Id, Double>();
+	private Map<Id, Double> personId2linkEnterTime = new HashMap<Id, Double>();
 	private Id lastLeavingAgent;
 	
 	public Id getLinkId() {
@@ -89,6 +90,12 @@ public class LinkCongestionInfo {
 	}
 	public void setLastLeavingAgent(Id lastLeavingAgent) {
 		this.lastLeavingAgent = lastLeavingAgent;
+	}
+	public Map<Id, Double> getPersonId2linkEnterTime() {
+		return personId2linkEnterTime;
+	}
+	public void setPersonId2linkEnterTime(Map<Id, Double> personId2linkEnterTime) {
+		this.personId2linkEnterTime = personId2linkEnterTime;
 	}
 		
 }
