@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,52 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.onetaxi;
+package org.matsim.contrib.dvrp.passenger;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.RequestImpl;
-import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 
-public class OneTaxiRequest
-    extends RequestImpl
-    implements PassengerRequest
+public interface PassengerPickupActivity
+    extends DynActivity
 {
-    private final MobsimPassengerAgent passenger;
-    private final Link fromLink;
-    private final Link toLink;
-
-
-    public OneTaxiRequest(Id id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-            double time)
-    {
-        //I want a taxi now: t0 == t1 == submissionTime
-        super(id, 1, time, time, time);
-        this.passenger = passenger;
-        this.fromLink = fromLink;
-        this.toLink = toLink;
-    }
-
-
-    @Override
-    public Link getFromLink()
-    {
-        return fromLink;
-    }
-
-
-    @Override
-    public Link getToLink()
-    {
-        return toLink;
-    }
-
-
-    @Override
-    public MobsimPassengerAgent getPassenger()
-    {
-        return passenger;
-    }
+    void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now);
 }

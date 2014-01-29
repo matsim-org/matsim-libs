@@ -21,7 +21,7 @@ package org.matsim.contrib.dynagent;
 
 public interface DynAgentLogic
 {
-    DynActivity init(DynAgent agent);
+    DynActivity computeInitialActivity(DynAgent agent);
 
 
     DynAgent getDynAgent();

@@ -61,7 +61,7 @@ public class DynAgent
         this.events = netsim.getEventsManager();
 
         // initial activity
-        dynActivity = this.agentLogic.init(this);
+        dynActivity = this.agentLogic.computeInitialActivity(this);
 
         if (dynActivity.getEndTime() != Time.UNDEFINED_TIME) {
             state = MobsimAgent.State.ACTIVITY;
@@ -74,7 +74,7 @@ public class DynAgent
 
     private void computeNextAction(DynAction oldDynAction, double now)
     {
-        oldDynAction.endAction(now);
+        oldDynAction.finalizeAction(now);
 
         state = null;// !!! this is important
         dynActivity = null;

@@ -52,7 +52,7 @@ public class VrpAgentLogic
 
 
     @Override
-    public DynActivity init(DynAgent dynAgent)
+    public DynActivity computeInitialActivity(DynAgent dynAgent)
     {
         this.agent = dynAgent;
         return createBeforeScheduleActivity();// INITIAL ACTIVITY (activate the agent in QSim)

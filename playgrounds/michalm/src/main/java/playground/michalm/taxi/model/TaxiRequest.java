@@ -23,8 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.RequestImpl;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 import playground.michalm.taxi.schedule.*;
 
@@ -35,26 +34,24 @@ public class TaxiRequest
 {
     public enum TaxiRequestStatus
     {
-        //INACTIVE("I"), // invisible to the dispatcher (ARTIFICIAL STATE!)
-        UNPLANNED("U"), // submitted by the CUSTOMER and received by the DISPATCHER
-        PLANNED("P"), // planned - included into one of the routes
-        STARTED("S"), // vehicle starts serving
-        PERFORMED("PE"), //
-        //REJECTED("R"), // rejected by the DISPATCHER
-        //CANCELLED("C"), // canceled by the CUSTOMER
+        //INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
+        UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
+        PLANNED, // planned - included into one of the routes
+
+        //we have started serving the request but we may still divert the cab
+        PICKUP_DRIVE,
+
+        //we have to carry out the request
+        PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY,
+
+        PERFORMED, //
+        //REJECTED, // rejected by the DISPATCHER
+        //CANCELLED, // canceled by the CUSTOMER
         ;
-
-        public final String shortName;
-
-
-        private TaxiRequestStatus(String shortName)
-        {
-            this.shortName = shortName;
-        }
     };
 
 
-    private final MobsimAgent passenger;
+    private final MobsimPassengerAgent passenger;
     private final Link fromLink;
     private final Link toLink;
 
@@ -64,8 +61,8 @@ public class TaxiRequest
     private TaxiDropoffStayTask dropoffStayTask;
 
 
-    public TaxiRequest(Id id, MobsimAgent passenger, Link fromLink, Link toLink, double t0,
-            double submissionTime)
+    public TaxiRequest(Id id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+            double t0, double submissionTime)
     {
         super(id, 1, t0, t0, submissionTime);
         this.passenger = passenger;
@@ -89,7 +86,7 @@ public class TaxiRequest
 
 
     @Override
-    public MobsimAgent getPassenger()
+    public MobsimPassengerAgent getPassenger()
     {
         return passenger;
     }
@@ -149,14 +146,66 @@ public class TaxiRequest
             return TaxiRequestStatus.UNPLANNED;
         }
 
-        if (pickupDriveTask.getStatus() == TaskStatus.PLANNED) {
-            return TaxiRequestStatus.PLANNED;
+        switch (pickupDriveTask.getStatus()) {
+            case PLANNED:
+                return TaxiRequestStatus.PLANNED;
+
+            case STARTED:
+                return TaxiRequestStatus.PICKUP_DRIVE;
+
+            case CANCELLED:
+                //may happen after diverting vehicles or cancellation by the customer
+                throw new IllegalStateException(
+                        "Request.pickupDriveTask should not point to a cancelled task");
+
+            case PERFORMED:
+                //at some later stage...
         }
 
-        if (dropoffStayTask != null && dropoffStayTask.getStatus() == TaskStatus.PERFORMED) {
-            return TaxiRequestStatus.PERFORMED;
+        switch (pickupStayTask.getStatus()) {
+            case PLANNED:
+                throw new IllegalStateException("Unreachable code");
+
+            case STARTED:
+                return TaxiRequestStatus.PICKUP_STAY;
+
+            case CANCELLED:
+                //may happen only after cancellation by the customer
+                throw new IllegalStateException(
+                        "Request.pickupStayTask should not point to a cancelled task");
+
+            case PERFORMED:
+                break;//at some later stage...
         }
 
-        return TaxiRequestStatus.STARTED;
+        switch (dropoffDriveTask.getStatus()) {
+            case PLANNED:
+                throw new IllegalStateException("Unreachable code");
+
+            case STARTED:
+                return TaxiRequestStatus.DROPOFF_DRIVE;
+
+            case CANCELLED:
+                throw new IllegalStateException("Cannot cancel at this stage");
+
+            case PERFORMED:
+                break;//at some later stage...
+        }
+
+        switch (dropoffStayTask.getStatus()) {
+            case PLANNED:
+                throw new IllegalStateException("Unreachable code");
+
+            case STARTED:
+                return TaxiRequestStatus.DROPOFF_STAY;
+
+            case CANCELLED:
+                throw new IllegalStateException("Cannot cancel at this stage");
+
+            case PERFORMED:
+                return TaxiRequestStatus.PERFORMED;
+        }
+
+        throw new IllegalStateException("Unreachable code");
     }
 }

@@ -43,10 +43,10 @@ public class RandomDynAgentLogic
 
 
     @Override
-    public DynActivity init(DynAgent agent)
+    public DynActivity computeInitialActivity(DynAgent agent)
     {
         this.agent = agent;
-        return new RandomDynActivity(1);
+        return new RandomDynActivity(0);
     }
 
 

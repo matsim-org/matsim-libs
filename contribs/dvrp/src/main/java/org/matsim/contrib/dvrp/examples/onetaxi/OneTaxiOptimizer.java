@@ -39,6 +39,7 @@ public class OneTaxiOptimizer
     private final Vehicle vehicle;//we have only one vehicle
     private final Schedule<AbstractTask> schedule;// the vehicle's schedule
 
+    public static final double PICKUP_DURATION = 120;
 
     @SuppressWarnings("unchecked")
     public OneTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator)
@@ -81,7 +82,7 @@ public class OneTaxiOptimizer
         schedule.addTask(new DriveTaskImpl(p1));
 
         double t1 = p1.getArrivalTime();
-        double t2 = t1 + 120;// 2 minutes for picking up the passenger
+        double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
         VrpPathWithTravelData p2 = pathCalculator.calcPath(fromLink, toLink, t2);

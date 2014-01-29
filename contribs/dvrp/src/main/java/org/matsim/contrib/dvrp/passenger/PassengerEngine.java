@@ -21,7 +21,6 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
@@ -29,7 +28,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -79,10 +77,7 @@ public class PassengerEngine
     {}
 
 
-    private final Map<Id, Set<PassengerRequest>> advanceRequests = new HashMap<Id, Set<PassengerRequest>>();
-
-
-    public boolean callAhead(double now, MobsimAgent passenger, Leg leg)
+    public boolean callAhead(double now, MobsimPassengerAgent passenger, Leg leg)
     {
         if (!leg.getMode().equals(mode)) {
             return false;
@@ -96,73 +91,51 @@ public class PassengerEngine
         Id toLinkId = leg.getRoute().getEndLinkId();
         double departureTime = leg.getDepartureTime();
 
-        //==============================================
-
         PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime,
                 now);
+        storeAdvancedRequest(request);
 
-        Set<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
-        if (passengerAdvReqs == null) {
-            passengerAdvReqs = new TreeSet<PassengerRequest>(new Comparator<PassengerRequest>() {
-                @Override
-                public int compare(PassengerRequest r1, PassengerRequest r2)
-                {
-                    return Double.compare(r1.getT0(), r2.getT0());
-                }
-            });
-
-            advanceRequests.put(passenger.getId(), passengerAdvReqs);
-        }
-
-        passengerAdvReqs.add(request);
         optimizer.requestSubmitted(request);
         return true;
     }
 
 
     @Override
-    public boolean handleDeparture(double now, MobsimAgent passenger, Id fromLinkId)
+    public boolean handleDeparture(double now, MobsimAgent agent, Id fromLinkId)
     {
-        if (!passenger.getMode().equals(mode)) {
+        if (!agent.getMode().equals(mode)) {
             return false;
         }
+
+        MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
 
         Id toLinkId = passenger.getDestinationLinkId();
         double departureTime = now;
 
-        //==============================================
+        internalInterface.registerAdditionalAgentOnLink(passenger);
 
-        //check if this is an advance request
-        Set<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
-        PassengerRequest request = null;
-
-        if (passengerAdvReqs != null) {
-            for (PassengerRequest r : passengerAdvReqs) {
-                if (r.getFromLink().getId() == fromLinkId //
-                        && r.getToLink().getId() == toLinkId) {
-                    //there may be more than one request for the (fromLinkId, toLinkId) pair
-                    //this one, however, is the earliest one (lowest req.T0)
-                    request = r;
-
-                    //remove it from TreeSet
-                    passengerAdvReqs.remove(r);
-                    break;
-                }
-            }
-        }
+        PassengerRequest request = retrieveAdvancedRequest(passenger, fromLinkId, toLinkId);
 
         if (request == null) {//this is an immediate request
             request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
+            optimizer.requestSubmitted(request);
+        }
+        else {
+            PassengerPickupActivity awaitingPickup = retrieveAwaitingPickup(request);
+
+            if (awaitingPickup != null) {
+                awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
+            }
         }
 
-        internalInterface.registerAdditionalAgentOnLink(passenger);
-        optimizer.requestSubmitted(request);
         return true;
     }
 
 
-    private PassengerRequest createRequest(MobsimAgent passenger, Id fromLinkId, Id toLinkId,
-            double departureTime, double now)
+    //================ REQUESTS CREATION
+
+    private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id fromLinkId,
+            Id toLinkId, double departureTime, double now)
     {
         Map<Id, ? extends Link> links = context.getScenario().getNetwork().getLinks();
         Link fromLink = links.get(fromLinkId);
@@ -180,10 +153,86 @@ public class PassengerEngine
     }
 
 
-    public void pickUpPassenger(Task task, PassengerRequest request, double now)
+    //================ ADVANCED REQUESTS STORAGE
+
+    private final Map<Id, Queue<PassengerRequest>> advanceRequests = new HashMap<Id, Queue<PassengerRequest>>();
+
+
+    private void storeAdvancedRequest(PassengerRequest request)
     {
-        DriverAgent driver = task.getSchedule().getVehicle().getAgentLogic().getDynAgent();
         MobsimAgent passenger = request.getPassenger();
+        Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
+
+        if (passengerAdvReqs == null) {
+            passengerAdvReqs = new PriorityQueue<PassengerRequest>(3,
+                    new Comparator<PassengerRequest>() {
+                        @Override
+                        public int compare(PassengerRequest r1, PassengerRequest r2)
+                        {
+                            return Double.compare(r1.getT0(), r2.getT0());
+                        }
+                    });
+
+            advanceRequests.put(passenger.getId(), passengerAdvReqs);
+        }
+
+        passengerAdvReqs.add(request);
+    }
+
+
+    private PassengerRequest retrieveAdvancedRequest(MobsimAgent passenger, Id fromLinkId,
+            Id toLinkId)
+    {
+        Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
+
+        if (passengerAdvReqs != null) {
+            PassengerRequest req = passengerAdvReqs.peek();
+
+            if (req != null) {
+                if (req.getFromLink().getId() == fromLinkId //
+                        && req.getToLink().getId() == toLinkId) {
+                    passengerAdvReqs.poll();
+                    return req;// this is the advance request for the current leg
+                }
+                else {
+                    if (context.getTime() > req.getT0()) {
+                        //TODO we have to somehow handle it (in the future)
+                        //Currently this is not a problem since we do not have such cases...
+                        throw new IllegalStateException(
+                                "Seems that the agent is not going to take the previously submitted taxi");
+                    }
+                }
+            }
+        }
+
+        return null;//this is an immediate request
+    }
+
+
+    //================ WAITING FOR PASSENGERS
+
+    //passenger's request id -> driver's stay task
+    private final Map<Id, PassengerPickupActivity> awaitingPickups = new HashMap<Id, PassengerPickupActivity>();
+
+
+    public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
+    {
+        awaitingPickups.put(request.getId(), pickupActivity);
+    }
+
+
+    private PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request)
+    {
+        return awaitingPickups.remove(request.getId());
+    }
+
+
+    //================ PICKUP / DROPOFF
+
+    public boolean pickUpPassenger(PassengerPickupActivity pickupActivity,
+            MobsimDriverAgent driver, PassengerRequest request, double now)
+    {
+        MobsimPassengerAgent passenger = request.getPassenger();
 
         Id currentLinkId = passenger.getCurrentLinkId();
 
@@ -192,39 +241,30 @@ public class PassengerEngine
         }
 
         if (internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), currentLinkId) == null) {
-            throw new RuntimeException("Passenger id=" + passenger.getId()
-                    + "is not waiting for vehicle");
+            storeAwaitingPickup(request, pickupActivity);
+            return false;
         }
 
         EventsManager events = internalInterface.getMobsim().getEventsManager();
         events.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), driver
                 .getVehicle().getId()));
 
-        if (passenger instanceof PassengerAgent) {
-            PassengerAgent passengerAgent = (PassengerAgent)passenger;
-            MobsimVehicle mobVehicle = driver.getVehicle();
-            mobVehicle.addPassenger(passengerAgent);
-            passengerAgent.setVehicle(mobVehicle);
-        }
-        else {
-            Logger.getLogger(PassengerEngine.class).warn(
-                    "mobsim agent could not be converted to type PassengerAgent; will probably work anyway but "
-                            + "for the simulation the agent is now not in the vehicle");
-        }
+        PassengerAgent passengerAgent = (PassengerAgent)passenger;
+        MobsimVehicle mobVehicle = driver.getVehicle();
+        mobVehicle.addPassenger(passengerAgent);
+        passengerAgent.setVehicle(mobVehicle);
+        return true;
     }
 
 
-    public void dropOffPassenger(Task task, PassengerRequest request, double now)
+    public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now)
     {
-        DriverAgent driver = task.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-        MobsimAgent passenger = request.getPassenger();
+        MobsimPassengerAgent passenger = request.getPassenger();
 
-        if (passenger instanceof PassengerAgent) {
-            PassengerAgent passengerAgent = (PassengerAgent)passenger;
-            MobsimVehicle mobVehicle = driver.getVehicle();
-            mobVehicle.removePassenger(passengerAgent);
-            passengerAgent.setVehicle(null);
-        }
+        PassengerAgent passengerAgent = (PassengerAgent)passenger;
+        MobsimVehicle mobVehicle = driver.getVehicle();
+        mobVehicle.removePassenger(passengerAgent);
+        passengerAgent.setVehicle(null);
 
         EventsManager events = internalInterface.getMobsim().getEventsManager();
         events.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), driver

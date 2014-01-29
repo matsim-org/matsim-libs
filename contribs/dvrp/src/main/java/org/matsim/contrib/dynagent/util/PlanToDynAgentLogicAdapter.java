@@ -50,7 +50,7 @@ public class PlanToDynAgentLogicAdapter
 
 
     @Override
-    public DynActivity init(DynAgent adapterAgent)
+    public DynActivity computeInitialActivity(DynAgent adapterAgent)
     {
         this.agent = adapterAgent;
 

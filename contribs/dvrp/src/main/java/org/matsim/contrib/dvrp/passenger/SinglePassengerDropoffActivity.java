@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,52 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.onetaxi;
+package org.matsim.contrib.dvrp.passenger;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.RequestImpl;
-import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
+import org.matsim.contrib.dynagent.DynAgent;
 
 
-public class OneTaxiRequest
-    extends RequestImpl
-    implements PassengerRequest
+public class SinglePassengerDropoffActivity
+    extends VrpActivity
 {
-    private final MobsimPassengerAgent passenger;
-    private final Link fromLink;
-    private final Link toLink;
+    private final PassengerEngine passengerEngine;
+    private final StayTask dropoffTask;
+    private final PassengerRequest request;
 
 
-    public OneTaxiRequest(Id id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-            double time)
+    public SinglePassengerDropoffActivity(PassengerEngine passengerEngine, StayTask dropoffTask,
+            PassengerRequest request)
     {
-        //I want a taxi now: t0 == t1 == submissionTime
-        super(id, 1, time, time, time);
-        this.passenger = passenger;
-        this.fromLink = fromLink;
-        this.toLink = toLink;
+        super("PassengerDropoff", dropoffTask);
+
+        this.passengerEngine = passengerEngine;
+        this.dropoffTask = dropoffTask;
+        this.request = request;
     }
 
 
     @Override
-    public Link getFromLink()
+    public void finalizeAction(double now)
     {
-        return fromLink;
-    }
-
-
-    @Override
-    public Link getToLink()
-    {
-        return toLink;
-    }
-
-
-    @Override
-    public MobsimPassengerAgent getPassenger()
-    {
-        return passenger;
+        DynAgent driver = dropoffTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
+        passengerEngine.dropOffPassenger(driver, request, now);
     }
 }

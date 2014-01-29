@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 
 public interface PassengerRequest
@@ -33,5 +33,5 @@ public interface PassengerRequest
     Link getToLink();
 
 
-    MobsimAgent getPassenger();
+    MobsimPassengerAgent getPassenger();
 }

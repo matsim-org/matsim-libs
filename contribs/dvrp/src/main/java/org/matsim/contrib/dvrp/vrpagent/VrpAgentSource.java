@@ -70,16 +70,16 @@ public class VrpAgentSource
 
             DynAgent taxiAgent = new DynAgent(id, startLinkId, qSim, vrpAgentLogic);
 
+            qSim.createAndParkVehicleOnLink(
+                    qSimVehicleFactory.createVehicle(id, VehicleUtils.getDefaultVehicleType()),
+                    startLinkId);
+
             if (planFactory != null) {
                 qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent, planFactory));
             }
             else {
                 qSim.insertAgentIntoMobsim(taxiAgent);
             }
-
-            qSim.createAndParkVehicleOnLink(
-                    qSimVehicleFactory.createVehicle(id, VehicleUtils.getDefaultVehicleType()),
-                    startLinkId);
         }
     }
 

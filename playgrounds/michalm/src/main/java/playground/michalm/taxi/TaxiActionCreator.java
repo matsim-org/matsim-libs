@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi;
 
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
@@ -32,12 +32,15 @@ public class TaxiActionCreator
 {
     private final PassengerEngine passengerEngine;
     private final VrpDynLegs.LegCreator legCreator;
+    private final double pickupDuration;
 
 
-    public TaxiActionCreator(PassengerEngine passengerEngine, VrpDynLegs.LegCreator legCreator)
+    public TaxiActionCreator(PassengerEngine passengerEngine, VrpDynLegs.LegCreator legCreator,
+            double pickupDuration)
     {
         this.passengerEngine = passengerEngine;
         this.legCreator = legCreator;
+        this.pickupDuration = pickupDuration;
     }
 
 
@@ -54,23 +57,12 @@ public class TaxiActionCreator
 
             case PICKUP_STAY:
                 final TaxiPickupStayTask pst = (TaxiPickupStayTask)task;
-
-                return new VrpActivity("Picking up Req_" + pst.getRequest().getId(), pst) {
-                    public void endAction(double now)
-                    {
-                        passengerEngine.pickUpPassenger(task, pst.getRequest(), now);
-                    }
-                };
+                return new SinglePassengerPickupActivity(passengerEngine, pst, pst.getRequest(),
+                        pickupDuration);
 
             case DROPOFF_STAY:
                 final TaxiDropoffStayTask dst = (TaxiDropoffStayTask)task;
-
-                return new VrpActivity("Dropping off Req_" + dst.getRequest().getId(), dst) {
-                    public void endAction(double now)
-                    {
-                        passengerEngine.dropOffPassenger(dst, dst.getRequest(), now);
-                    }
-                };
+                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest());
 
             case WAIT_STAY:
                 return new VrpActivity("Waiting", (TaxiWaitStayTask)task);

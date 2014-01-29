@@ -243,7 +243,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())
                 : VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
 
-        TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator);
+        TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator, pickupDuration);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 

@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
@@ -50,21 +50,12 @@ public class OneTaxiActionCreator
                     final OneTaxiRequest request = serveTask.getRequest();
 
                     if (serveTask.isPickup()) {
-                        return new VrpActivity("ServeTask" + request.getId(), serveTask) {
-                            public void endAction(double now)
-                            {
-                                passengerEngine.pickUpPassenger(serveTask, request, now);
-                            }
-                        };
-
+                        return new SinglePassengerPickupActivity(passengerEngine, serveTask,
+                                request, OneTaxiOptimizer.PICKUP_DURATION);
                     }
                     else {
-                        return new VrpActivity("ServeTask" + request.getId(), serveTask) {
-                            public void endAction(double now)
-                            {
-                                passengerEngine.dropOffPassenger(serveTask, request, now);
-                            }
-                        };
+                        return new SinglePassengerDropoffActivity(passengerEngine, serveTask,
+                                request);
                     }
                 }
                 else { //WAIT

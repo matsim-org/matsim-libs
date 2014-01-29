@@ -88,6 +88,6 @@ public class StaticDynLegImpl
 
 
     @Override
-    public void endAction(double now)
+    public void finalizeAction(double now)
     {}
 }

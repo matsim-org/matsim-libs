@@ -191,7 +191,9 @@ import playground.michalm.util.RunningVehicleRegister;
         TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
         contextImpl.setVrpData(vrpData);
 
-        Params params = new Params(true, false, 120, 60);
+        double pickupDuration = 120;
+        double dropoffDuration = 60;
+        Params params = new Params(true, false, pickupDuration, dropoffDuration);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
                 calculator, params, true);
@@ -206,7 +208,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new TaxiActionCreator(
-                passengerEngine, VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR));
+                passengerEngine, VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, pickupDuration));
 
         EventsManager events = qSim.getEventsManager();
 
