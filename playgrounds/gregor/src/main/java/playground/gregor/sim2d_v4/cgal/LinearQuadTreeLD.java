@@ -77,16 +77,18 @@ public class LinearQuadTreeLD {
 	private final Map<Integer,Quad> quads = new HashMap<Integer,Quad>();
 	private final EventsManager em;//DEBUG
 
+	private static final double MIN_QUAD_SIZE = 2; 
+	
 	//	public List<>
 	public LinearQuadTreeLD(List<TwoDObject> obj, Envelope e, EventsManager em) {
-		addObjs(e.getMinX(),e.getMinY(),obj);
-		addObjs(e.getMaxX(),e.getMinY(),obj);
-		addObjs(e.getMaxX(),e.getMaxY(),obj);
-		addObjs(e.getMinX(),e.getMaxY(),obj);
-		for (double y = e.getMinY(); y < e.getMaxY(); y+=1) {
-			addObjs(e.getMaxX()-.1,y,obj);
-			addObjs(e.getMinX()+.1,y,obj);
-		}
+//		addObjs(e.getMinX(),e.getMinY(),obj);
+//		addObjs(e.getMaxX(),e.getMinY(),obj);
+//		addObjs(e.getMaxX(),e.getMaxY(),obj);
+//		addObjs(e.getMinX(),e.getMaxY(),obj);
+//		for (double y = e.getMinY(); y < e.getMaxY(); y+=1) {
+//			addObjs(e.getMaxX()-.1,y,obj);
+//			addObjs(e.getMinX()+.1,y,obj);
+//		}
 		this.em = em;
 		
 		this.root = new Quad(obj,e,0x0,0,Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
@@ -99,7 +101,7 @@ public class LinearQuadTreeLD {
 			if (quad.getColor() <= 1 || quad.getLevel() == MAX_DEPTH){ //leaf (== BLACK or WHITE)
 				continue;
 			}
-
+			
 			int key = computeKey(quad.getLocationCode(), quad.getLevel());
 			//			this.quads.remove(key);
 			incrementNeighborsLevelDifferences(quad);
@@ -110,9 +112,9 @@ public class LinearQuadTreeLD {
 
 
 //		//DEBUG
-//		for (Quad q : this.quads.values()) {
-//			q.debug();
-//		}
+		for (Quad q : this.quads.values()) {
+			q.debug();
+		}
 
 	}
 
@@ -331,48 +333,48 @@ public class LinearQuadTreeLD {
 			s3.y0 = this.e.getMaxY();
 			s3.x1 = this.e.getMinX();
 			s3.y1 = this.e.getMinY();
-			LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, s0, false, 255,0,0,64,0));
-			LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, s1, false, 255,0,0,64,0));
-			LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, s2, false, 255,0,0,64,0));
-			LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, s3, false, 255,0,0,64,0));
+			LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, s0, false, 128,128,128,64,0));
+			LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, s1, false, 128,128,128,64,0));
+			LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, s2, false, 128,128,128,64,0));
+			LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, s3, false, 128,128,128,64,0));
 
 			//neighbors
-			Quad west = getNeighbor(D_WEST);
-			if (west != null && west.getColor() < 2) {
-				LineSegment link = new LineSegment();
-				link.x0 = this.e.getMinX()+this.e.getWidth()/2;
-				link.y0 = this.e.getMinY()+this.e.getHeight()/2;
-				link.x1 = west.e.getMinX()+west.e.getWidth()/2;
-				link.y1 = west.e.getMinY()+west.e.getHeight()/2;
-				LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, link, false, 128,0,0,255,0));
-			}
-			Quad south = getNeighbor(D_SOUTH);
-			if (south != null && south.getColor() < 2) {
-				LineSegment link = new LineSegment();
-				link.x0 = this.e.getMinX()+this.e.getWidth()/2;
-				link.y0 = this.e.getMinY()+this.e.getHeight()/2;
-				link.x1 = south.e.getMinX()+south.e.getWidth()/2;
-				link.y1 = south.e.getMinY()+south.e.getHeight()/2;
-				LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, link, false, 0,128,0,255,0));
-			}
-			Quad east = getNeighbor(D_EAST);
-			if (east != null && east.getColor() < 2) {
-				LineSegment link = new LineSegment();
-				link.x0 = this.e.getMinX()+this.e.getWidth()/2;
-				link.y0 = this.e.getMinY()+this.e.getHeight()/2;
-				link.x1 = east.e.getMinX()+east.e.getWidth()/2;
-				link.y1 = east.e.getMinY()+east.e.getHeight()/2;
-				LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, link, false, 0,0,128,255,0));
-			}
-			Quad north = getNeighbor(D_NORTH);
-			if (north != null && north.getColor() < 2) {
-				LineSegment link = new LineSegment();
-				link.x0 = this.e.getMinX()+this.e.getWidth()/2;
-				link.y0 = this.e.getMinY()+this.e.getHeight()/2;
-				link.x1 = north.e.getMinX()+north.e.getWidth()/2;
-				link.y1 = north.e.getMinY()+north.e.getHeight()/2;
-				LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, link, false, 0,64,64,255,0));
-			}
+//			Quad west = getNeighbor(D_WEST);
+//			if (west != null && west.getColor() < 2) {
+//				LineSegment link = new LineSegment();
+//				link.x0 = this.e.getMinX()+this.e.getWidth()/2;
+//				link.y0 = this.e.getMinY()+this.e.getHeight()/2;
+//				link.x1 = west.e.getMinX()+west.e.getWidth()/2;
+//				link.y1 = west.e.getMinY()+west.e.getHeight()/2;
+//				LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, link, false, 128,0,0,255,0));
+//			}
+//			Quad south = getNeighbor(D_SOUTH);
+//			if (south != null && south.getColor() < 2) {
+//				LineSegment link = new LineSegment();
+//				link.x0 = this.e.getMinX()+this.e.getWidth()/2;
+//				link.y0 = this.e.getMinY()+this.e.getHeight()/2;
+//				link.x1 = south.e.getMinX()+south.e.getWidth()/2;
+//				link.y1 = south.e.getMinY()+south.e.getHeight()/2;
+//				LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, link, false, 0,128,0,255,0));
+//			}
+//			Quad east = getNeighbor(D_EAST);
+//			if (east != null && east.getColor() < 2) {
+//				LineSegment link = new LineSegment();
+//				link.x0 = this.e.getMinX()+this.e.getWidth()/2;
+//				link.y0 = this.e.getMinY()+this.e.getHeight()/2;
+//				link.x1 = east.e.getMinX()+east.e.getWidth()/2;
+//				link.y1 = east.e.getMinY()+east.e.getHeight()/2;
+//				LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, link, false, 0,0,128,255,0));
+//			}
+//			Quad north = getNeighbor(D_NORTH);
+//			if (north != null && north.getColor() < 2) {
+//				LineSegment link = new LineSegment();
+//				link.x0 = this.e.getMinX()+this.e.getWidth()/2;
+//				link.y0 = this.e.getMinY()+this.e.getHeight()/2;
+//				link.x1 = north.e.getMinX()+north.e.getWidth()/2;
+//				link.y1 = north.e.getMinY()+north.e.getHeight()/2;
+//				LinearQuadTreeLD.this.em.processEvent(new LineEvent(0, link, false, 0,64,64,255,0));
+//			}
 
 		}
 
@@ -461,7 +463,7 @@ public class LinearQuadTreeLD {
 		public int getDNorth() {
 			return this.dNorth;
 		}
-		public List<TwoDObject> getObjects() {
+		public List<? extends TwoDObject> getObjects() {
 			return this.objs;
 		}
 		public Envelope getEnvelope() {

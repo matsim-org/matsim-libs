@@ -147,7 +147,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 					int offset = MatsimRandom.getRandom().nextInt(10)*15;
 					offset += 96;
 					offset = 0;
-//										this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
+										this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
 
 					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 90);
 				}
@@ -172,7 +172,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 				Coord c0 = l.getFromNode().getCoord();
 				Coord c1 = l.getToNode().getCoord();
 //				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, lp.minScale,.1,.9);
-				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
+//				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
 //				this.vis.addCircleStatic(c0.getX(), c0.getY(), .04f, 0, 0, 0, 255, 0);
 //				this.vis.addCircleStatic(c1.getX(), c1.getY(), .04f, 0, 0, 0, 255, 0);
 //				double dx = c1.getX()-c0.getX();
@@ -311,22 +311,23 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			cp.b = 255-nr;
 			cp.a = 255;
 		}
-//		if (a.getId().toString().contains("b")){
-//			cp.r = 255;
-//			cp.g = 255-nr;
-//			cp.b = 0;
-//			cp.a = 255;
-//		} else if (a.getId().toString().contains("d")) { 
-//			cp.r = nr-nr;
-//			cp.g = 0;
-//			cp.b = 255;
-//			cp.a = 255;
-//		}else {
-//			cp.r = 0;
-//			cp.g = 255;
-//			cp.b = 255-nr;
-//			cp.a = 255;
-//		}
+		if (a.getId().toString().contains("b") && a.getId().toString().hashCode()%2 ==0){
+			
+			cp.r = 255;
+			cp.g = 255-nr;
+			cp.b = 0;
+			cp.a = 255;
+		} else if (a.getId().toString().contains("d")) { 
+			cp.r = nr-nr;
+			cp.g = 0;
+			cp.b = 255;
+			cp.a = 255;
+		}else {
+			cp.r = 0;
+			cp.g = 255;
+			cp.b = 255-nr;
+			cp.a = 255;
+		}
 //		if (a.getId().toString().contains("b")){
 //			cp.r = 255;
 //			cp.g = 255;

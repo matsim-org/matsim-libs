@@ -124,7 +124,7 @@ public class Sim2DEnvironmentV02ToV03 {
 	public static void main(String [] args) {
 //		String inputDir = "/Users/laemmel/devel/gct/floorpl/";
 //		String confPath = inputDir + "sim2dConfignextgen_floorplan.xml";
-		String inputDir = "/Users/laemmel/devel/workspace/playgrounds/gregor/test/input/playground/gregor/sim2d_v4/integration/Sim2DRunnerTest/testSim2DRunner/";
+		String inputDir = "/Users/laemmel/devel/hhw/input/";
 		
 		String confPath = inputDir + "s2d_config.xml";
 		Sim2DConfig conf = Sim2DConfigUtils.loadConfig(confPath);

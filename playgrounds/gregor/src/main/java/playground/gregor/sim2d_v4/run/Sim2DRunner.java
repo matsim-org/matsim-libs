@@ -29,19 +29,15 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimInfoBoxDrawer;
-import playground.gregor.sim2d_v4.experimental.VDTester;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 public class Sim2DRunner implements IterationStartsListener{
 
@@ -116,7 +112,7 @@ public class Sim2DRunner implements IterationStartsListener{
 			
 //			VDPath vdp = new VDPath(controller.getEvents());
 //			controller.getEvents().addHandler(vdp);
-			
+//			
 //			QuadTreePath qdp = new QuadTreePath(controller.getEvents());
 //			controller.getEvents().addHandler(qdp);
 			
@@ -149,7 +145,7 @@ public class Sim2DRunner implements IterationStartsListener{
 //			VoronoiFNDDrawer vFND = new VoronoiFNDDrawer(new Envelope(-3,3,-197.5,-192.5));
 //			VoronoiFNDDrawer vFND1 = new VoronoiFNDDrawer(10);
 			dbg.addAdditionalDrawer(iBox);
-			dbg.addAdditionalDrawer(new Branding());
+//			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 			QSimInfoBoxDrawer qDbg2 = new QSimInfoBoxDrawer(sc);
 			
@@ -176,10 +172,10 @@ public class Sim2DRunner implements IterationStartsListener{
 			
 		}
 		
-		VDTester vdt = new VDTester(new Envelope(-2.5,2.5,-27.5,-22.5),controller.getEvents());
-//		VDTester vdt = new VDTester(new Envelope(19,21,-1,1),controller.getEvents());
-		controller.getEvents().addHandler(vdt);
-		controller.addControlerListener(vdt);
+//		VDTester vdt = new VDTester(new Envelope(-2.5,2.5,-27.5,-22.5),controller.getEvents());
+////		VDTester vdt = new VDTester(new Envelope(19,21,-1,1),controller.getEvents());
+//		controller.getEvents().addHandler(vdt);
+//		controller.addControlerListener(vdt);
 
 		
 //		controller.setCreateGraphs(false);

@@ -29,13 +29,14 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
+import playground.gregor.sim2d_v4.cgal.TwoDObject;
 import playground.gregor.sim2d_v4.cgal.VoronoiCell;
 import playground.gregor.sim2d_v4.cgal.VoronoiCenter;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 
 						//EXPERIMENTAL [GL Oct'13]
-public class Sim2DAgent implements VoronoiCenter {
+public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 	
 	//testing only
 	@Deprecated
@@ -166,6 +167,7 @@ public class Sim2DAgent implements VoronoiCenter {
 			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1],time);
 			this.pEnv.getEventsManager().processEvent(e);
 		}
+		
 		return true;
 	}
 	

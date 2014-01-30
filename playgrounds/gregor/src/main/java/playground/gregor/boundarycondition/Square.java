@@ -45,7 +45,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
@@ -73,14 +72,14 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class Square {
-	
+
 	private static String inputDir = "/Users/laemmel/devel/square/input";
 	private static String outputDir = "/Users/laemmel/devel/square/output";
 
 
 	private static final boolean uni = true;
 
-	private static final int nrAgents = 100;
+	private static final int nrAgents = 150;
 
 	public static final double SEPC_FLOW =0.8;//1.2;
 
@@ -273,12 +272,13 @@ public class Square {
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			String dest = MatsimRandom.getRandom().nextBoolean() ? "k6_rev" : "k4_rev";
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl(dest));
+			//			String dest = MatsimRandom.getRandom().nextBoolean() ? "k3_rev" : "k3_rev";
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k2"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
+			t+=10;
 		}
-
+		t=0;
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
 			Person pers = fac.createPerson(new IdImpl("d"+i));
 			Plan plan = fac.createPlan();
@@ -292,37 +292,53 @@ public class Square {
 			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k6_rev"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
+//			t+=1;
 		}
-		
-		for (int i = 2*nrAgents; i < 3*nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("e"+i));
-			Plan plan = fac.createPlan();
-			pers.addPlan(plan);
-			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k3_rev"));
-			act0.setEndTime(t);
-			plan.addActivity(act0);
-			Leg leg = fac.createLeg("car");
-			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k0_rev"));
-			plan.addActivity(act1);
-			pop.addPerson(pers);
-		}
-		
-		for (int i = 3*nrAgents; i < 4*nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("e"+i));
-			Plan plan = fac.createPlan();
-			pers.addPlan(plan);
-			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k6"));
-			act0.setEndTime(t);
-			plan.addActivity(act0);
-			Leg leg = fac.createLeg("car");
-			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k4_rev"));
-			plan.addActivity(act1);
-			pop.addPerson(pers);
-		}
+
+//		for (int i = 2*nrAgents; i < 3*nrAgents; i++) {
+//			Person pers = fac.createPerson(new IdImpl("e"+i));
+//			Plan plan = fac.createPlan();
+//			pers.addPlan(plan);
+//			Activity act0;
+//			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k3_rev"));
+//			act0.setEndTime(t);
+//			plan.addActivity(act0);
+//			Leg leg = fac.createLeg("car");
+//			plan.addLeg(leg);
+//			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k0_rev"));
+//			plan.addActivity(act1);
+//			pop.addPerson(pers);
+//		}
+
+//		for (int i = 3*nrAgents; i < 4*nrAgents; i++) {
+//			Person pers = fac.createPerson(new IdImpl("e"+i));
+//			Plan plan = fac.createPlan();
+//			pers.addPlan(plan);
+//			Activity act0;
+//			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k6"));
+//			act0.setEndTime(t);
+//			plan.addActivity(act0);
+//			Leg leg = fac.createLeg("car");
+//			plan.addLeg(leg);
+//			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k3"));
+//			plan.addActivity(act1);
+//			pop.addPerson(pers);
+//		}
+
+		//		for (int i = 3*nrAgents; i < 4*nrAgents; i++) {
+		//			Person pers = fac.createPerson(new IdImpl("e"+i));
+		//			Plan plan = fac.createPlan();
+		//			pers.addPlan(plan);
+		//			Activity act0;
+		//			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k6"));
+		//			act0.setEndTime(t);
+		//			plan.addActivity(act0);
+		//			Leg leg = fac.createLeg("car");
+		//			plan.addLeg(leg);
+		//			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k4_rev"));
+		//			plan.addActivity(act1);
+		//			pop.addPerson(pers);
+		//		}
 
 	}
 
@@ -330,7 +346,7 @@ public class Square {
 	private static void create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
 		env.setId(new IdImpl("env0"));
-		env.setEnvelope(new Envelope(0,36,0,36));
+		env.setEnvelope(new Envelope(-1,21,-1,21));
 		try {
 			env.setCRS(CRS.decode("EPSG:3395"));
 		} catch (NoSuchAuthorityCodeException e) {
@@ -340,9 +356,9 @@ public class Square {
 		}
 		sc2.addSim2DEnvironment(env);
 
-		
 
-		
+
+
 		{
 			int[] open = {1,4,7,10};
 			Id [] openingIds = new Id[]{new IdImpl("n0"),new IdImpl("n6"),new IdImpl("n2"),new IdImpl("n4")};
@@ -365,31 +381,31 @@ public class Square {
 			Polygon p = geofac.createPolygon(lr , null);
 			Section sec = env.createAndAddSection(new IdImpl("sec0"), p, open, null , 0,openingIds);
 		}
-		
+
 
 	}
 
-	
+
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 		Node m0 = fac.createNode(new IdImpl("m0"), new CoordImpl(-40,10));
 		Node m1 = fac.createNode(new IdImpl("m1"), new CoordImpl(-20,10.001));
 		Node n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(0,10));
-		
+
 		Node n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(20,10));
 		Node m2 = fac.createNode(new IdImpl("m2"), new CoordImpl(40,10.001));
 		Node m3 = fac.createNode(new IdImpl("m3"), new CoordImpl(60,10));
-		
+
 		Node m4 = fac.createNode(new IdImpl("m4"), new CoordImpl(10.001,-20));
 		Node m5 = fac.createNode(new IdImpl("m5"), new CoordImpl(10,-40));
 		Node n4 = fac.createNode(new IdImpl("n4"), new CoordImpl(10,0));
-		
+
 		Node m6 = fac.createNode(new IdImpl("m6"), new CoordImpl(10.001,40));
 		Node m7 = fac.createNode(new IdImpl("m7"), new CoordImpl(10,60));
 		Node n6 = fac.createNode(new IdImpl("n6"), new CoordImpl(10,20));
-		
-		
+
+
 		net.addNode(m0);
 		net.addNode(m1);
 		net.addNode(m2);
@@ -403,33 +419,33 @@ public class Square {
 		net.addNode(n4);
 		net.addNode(n6);
 		double flow = SEPC_FLOW * 3;
-		
-		
+
+
 		Link k0 = fac.createLink(new IdImpl("k0"), m0, m1);
 		Link k1 = fac.createLink(new IdImpl("k1"), m1, n0);
 
 		Link k0Rev = fac.createLink(new IdImpl("k0_rev"), m1, m0);
 		Link k1Rev = fac.createLink(new IdImpl("k1_rev"), n0, m1);
-		
+
 		Link k2 = fac.createLink(new IdImpl("k2"), n2, m2);
 		Link k3 = fac.createLink(new IdImpl("k3"), m2, m3);
 
 		Link k2Rev = fac.createLink(new IdImpl("k2_rev"), m2, n2);
 		Link k3Rev = fac.createLink(new IdImpl("k3_rev"), m3, m2);
-		
+
 		Link k4 = fac.createLink(new IdImpl("k4"), m5, m4);
 		Link k5 = fac.createLink(new IdImpl("k5"), m4, n4);
 
 		Link k4Rev = fac.createLink(new IdImpl("k4_rev"), m4, m5);
 		Link k5Rev = fac.createLink(new IdImpl("k5_rev"), n4, m4);
-		
+
 		Link k6 = fac.createLink(new IdImpl("k6"), m7, m6);
 		Link k7 = fac.createLink(new IdImpl("k7"), m6, n6);
 
 		Link k6Rev = fac.createLink(new IdImpl("k6_rev"), m6, m7);
 		Link k7Rev = fac.createLink(new IdImpl("k7_rev"), n6, m6);
-		
-		
+
+
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");
 		k0.setLength(20);
@@ -448,7 +464,7 @@ public class Square {
 		k5Rev.setLength(20);
 		k6Rev.setLength(20);
 		k7Rev.setLength(20);		
-		
+
 
 		k0.setAllowedModes(modes);
 		k1.setAllowedModes(modes);
@@ -475,7 +491,7 @@ public class Square {
 		k5.setFreespeed(1.34);
 		k6.setFreespeed(1.34);
 		k7.setFreespeed(1.34);
-		
+
 		k0Rev.setFreespeed(1.34);
 		k1Rev.setFreespeed(1.34);
 		k2Rev.setFreespeed(1.34);
@@ -484,7 +500,7 @@ public class Square {
 		k5Rev.setFreespeed(1.34);
 		k6Rev.setFreespeed(1.34);
 		k7Rev.setFreespeed(1.34);		
-		
+
 		k0.setCapacity(flow);
 		k1.setCapacity(flow);
 		k2.setCapacity(flow);
@@ -493,7 +509,7 @@ public class Square {
 		k5.setCapacity(flow);
 		k6.setCapacity(flow);
 		k7.setCapacity(flow);
-		
+
 		k0Rev.setCapacity(flow);
 		k1Rev.setCapacity(flow);
 		k2Rev.setCapacity(flow);
@@ -502,7 +518,7 @@ public class Square {
 		k5Rev.setCapacity(flow);
 		k6Rev.setCapacity(flow);
 		k7Rev.setCapacity(flow);
-		
+
 		double lanes = 3/0.71;
 		k0.setNumberOfLanes(lanes);
 		k1.setNumberOfLanes(lanes);
@@ -512,7 +528,7 @@ public class Square {
 		k5.setNumberOfLanes(lanes);
 		k6.setNumberOfLanes(lanes);
 		k7.setNumberOfLanes(lanes);
-		
+
 		k0Rev.setNumberOfLanes(lanes);
 		k1Rev.setNumberOfLanes(lanes);
 		k2Rev.setNumberOfLanes(lanes);
@@ -521,7 +537,7 @@ public class Square {
 		k5Rev.setNumberOfLanes(lanes);
 		k6Rev.setNumberOfLanes(lanes);
 		k7Rev.setNumberOfLanes(lanes);
-		
+
 		net.addLink(k0);
 		net.addLink(k1);
 		net.addLink(k2);
@@ -530,7 +546,7 @@ public class Square {
 		net.addLink(k5);
 		net.addLink(k6);
 		net.addLink(k7);
-		
+
 		net.addLink(k0Rev);
 		net.addLink(k1Rev);
 		net.addLink(k2Rev);
@@ -539,7 +555,7 @@ public class Square {
 		net.addLink(k5Rev);
 		net.addLink(k6Rev);
 		net.addLink(k7Rev);
-		
+
 		((NetworkImpl)net).setCapacityPeriod(1);
 		((NetworkImpl)net).setEffectiveCellSize(.26);
 		((NetworkImpl)net).setEffectiveLaneWidth(.71);

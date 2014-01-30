@@ -45,7 +45,11 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 		LinkInfo li = this.ls.getLinkInfo(id);
 		LineSegment fl = li.targetLine;
 		double r = CGAL.vectorCoefOfPerpendicularProjection(pos[0], pos[1], fl.x0, fl.y0, fl.x1, fl.y1);
-
+//if (this.agent.getId().toString().equals("b1")) {
+//	System.out.println("got you");
+//}
+		
+		//TODO intersection line/line segment!
 		double dx, dy;
 
 

@@ -154,7 +154,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 		// This enables zooming/panning and should be in the draw method.
 		this.zoomer.transform();
-		background(128);	
+		background(255);	
 
 
 

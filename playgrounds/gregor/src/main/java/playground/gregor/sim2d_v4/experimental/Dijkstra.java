@@ -101,13 +101,16 @@ public class Dijkstra {
 
 	private double calcCosts(Quad q) {
 		double length = q.getEnvelope().getWidth()/2;
-		double k1 = computeKey(q.getEnvelope().getMaxX()*100,q.getEnvelope().getMinX()*100);
-		double k2 = computeKey(q.getEnvelope().getMaxY()*100,q.getEnvelope().getMinY()*100);
-		double rnd =computeKey(k1,k2);
-		length += 1./(1000.*rnd);
+//		double k1 = computeKey(q.getEnvelope().getMaxX()*100,q.getEnvelope().getMinX()*100);
+//		double k2 = computeKey(q.getEnvelope().getMaxY()*100,q.getEnvelope().getMinY()*100);
+//		double rnd =computeKey(k1,k2);
+//		length += 1./(1000.*rnd);
 		
-		double density = (q.getColor()+1)/q.getEnvelope().getArea();
-		
+		double density = (q.getColor()+1)/q.getEnvelope().getArea();//-.25;
+		if (q.getEnvelope().getWidth() >= 1 && q.getColor() == 0) {
+			density = 0.00001;
+//			return 1000;
+		}
 		double speed = 1.34 *(1-Math.exp(-1.913*(1/density-1/5.4))); 
 
 		speed = Math.max(0.001, speed);

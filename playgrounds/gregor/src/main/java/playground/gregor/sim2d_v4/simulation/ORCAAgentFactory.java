@@ -28,10 +28,12 @@ import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.VelocityUpdater;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.FNDDependentSpeed;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.KDTreeNeighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.NearestPointAtTargetLine;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.PathAndDrivingDirection;
 
 public class ORCAAgentFactory implements Sim2DAgentFactory {
 
@@ -59,8 +61,25 @@ public class ORCAAgentFactory implements Sim2DAgentFactory {
 		} else {
 			KDTreeNeighbors nn = new KDTreeNeighbors(agent, this.config);
 			nn.setRangeAndMaxNrOfNeighbors(8, 5);			
-			VelocityUpdater vu = new ORCAVelocityUpdater(new FNDDependentSpeed(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
-//			VelocityUpdater vu = new ORCAVelocityUpdater(new FNDDependentSpeed(),new PathAndDrivingDirection(agent, ls), nn, this.config, agent);
+			DesiredDirectionCalculator dd = new PathAndDrivingDirection(agent, ls);
+////			VelocityUpdater vu = new ORCAVelocityUpdater(new FNDDependentSpeed(),new NearestPointAtTargetLine(agent, ls), nn, this.config, agent);
+//			if (agent.getId().toString().startsWith("d")) {
+//				double rx =2* MatsimRandom.getRandom().nextDouble()-1;
+//				double ry =2* MatsimRandom.getRandom().nextDouble()-1;
+//				double r = MatsimRandom.getRandom().nextDouble();
+//				if (r<.4) {	
+//					dd = new TowardsActivityModellingInSim2D(agent, dd,300+MatsimRandom.getRandom().nextInt(20), 10+rx, 10+3*(0.5+ry));
+//				} else if (r <.65){
+//					dd = new TowardsActivityModellingInSim2D(agent, dd, 300+MatsimRandom.getRandom().nextInt(20), 5+rx, 15+ry);
+//				} else if (r <.9){
+//					dd = new TowardsActivityModellingInSim2D(agent, dd, 300+MatsimRandom.getRandom().nextInt(20), 15+rx, 15+ry);
+//				} else {
+//					dd = new TowardsActivityModellingInSim2D(agent, dd, 300+MatsimRandom.getRandom().nextInt(20), 10+5*rx, 4+Math.abs(rx));
+//				}
+//			} else if (agent.getId().toString().hashCode() % 2 != 0){
+//				dd = new QuadTreePathWalker(agent,dd,this.sc.getNetwork(),pEnv.getEventsManager());
+//			}
+			VelocityUpdater vu = new ORCAVelocityUpdater(new FNDDependentSpeed(),dd, nn, this.config, agent);
 			agent.setVelocityUpdater(vu);
 		}
 		

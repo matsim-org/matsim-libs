@@ -71,8 +71,12 @@ public class PathAndDrivingDirection implements DesiredDirectionCalculator {
 		if (dist < 0) {
 			dist = -dist;
 		}
+		if (dist <1.5){
+			dist = 0;
+		}
 		
-		double exp = Math.exp(dist/(li.width));
+		double exp = Math.exp(dist*dist/(li.width));
+		
 		double w0 = 1 - 1/exp;
 		double w1 = 1 - w0;
 		

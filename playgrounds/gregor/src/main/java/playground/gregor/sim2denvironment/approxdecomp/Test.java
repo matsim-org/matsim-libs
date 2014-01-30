@@ -71,11 +71,11 @@ public class Test {
 //		String network = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml";
 //		String output = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/sim2dEnv_0.gml.gz";
 
-		String baseName = "nextgen_floorplan";
-		String dir = "/Users/laemmel/devel/gct/floorpl/";
+		String baseName = "env";
+		String dir = "/Users/laemmel/devel/hhw3/raw/";
 		String p = dir + baseName +".shp";
 //		String network = dir + "raw_42nd_north_east_p_c.xml";
-		String network = "/Users/laemmel/devel/gct/floorpl/raw_network2d_floorplan.xml";
+		String network = dir + "network.xml.gz";
 		String output = dir + "s2d_environment_raw_"+ baseName + ".gml.gz";
 		
 		GeometryFactory geofac = new GeometryFactory();

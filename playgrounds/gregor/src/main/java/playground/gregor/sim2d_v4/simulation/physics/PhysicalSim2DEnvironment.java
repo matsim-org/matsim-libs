@@ -43,7 +43,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.VoronoiDiagramCells;
-import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
@@ -87,21 +86,23 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 
 	
 //	//EXPERIMENTAL multi threading stuff
-//	private final Poison poison = new Poison();
-//	private final int numOfThreads = 4; 
-//	private final CyclicBarrier kdSync = new CyclicBarrier(this.numOfThreads);
-//	private final CyclicBarrier cb = new CyclicBarrier(this.numOfThreads+1);
-//	private final List<PhysicalSim2DSectionUpdaterThread> threads = new ArrayList<PhysicalSim2DEnvironment.PhysicalSim2DSectionUpdaterThread>();
+	private final Poison poison = new Poison();
+	private final int numOfThreads = 4; 
+	private final CyclicBarrier kdSync = new CyclicBarrier(this.numOfThreads);
+	private final CyclicBarrier cb = new CyclicBarrier(this.numOfThreads+1);
+	private final List<PhysicalSim2DSectionUpdaterThread> threads = new ArrayList<PhysicalSim2DEnvironment.PhysicalSim2DSectionUpdaterThread>();
+
+	private double time;
 	
-//	private void awaitKDTreeSync() {
-//		try {
-//			this.kdSync.await();
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		} catch (BrokenBarrierException e) {
-//			e.printStackTrace();
-//		}
-//	}
+	private void awaitKDTreeSync() {
+		try {
+			this.kdSync.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public PhysicalSim2DEnvironment(Sim2DEnvironment env, Sim2DScenario sim2dsc, EventsManager eventsManager) {
 		this.env = env;
@@ -115,11 +116,11 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 	
 
 	private void init() {
-//		for (int i = 0; i < this.numOfThreads; i++) {
-//			PhysicalSim2DSectionUpdaterThread pt = new PhysicalSim2DSectionUpdaterThread(this.cb);
-//			this.threads.add(pt);
-//			new Thread(pt,this.env.getId().toString() + " PhysicalSim2DSectionUpdaterThread." + i).start();
-//		}
+		for (int i = 0; i < this.numOfThreads; i++) {
+			PhysicalSim2DSectionUpdaterThread pt = new PhysicalSim2DSectionUpdaterThread(this.cb);
+			this.threads.add(pt);
+			new Thread(pt,this.env.getId().toString() + " PhysicalSim2DSectionUpdaterThread." + i).start();
+		}
 		
 		for (Section sec : this.env.getSections().values()) {
 			PhysicalSim2DSection psec = createAndAddPhysicalSection(sec);
@@ -150,7 +151,12 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		return this.psecs.values();
 	}
 	
+	public double getTime() {
+		return this.time;
+	}
+	
 	public void doSimStep(double time) {
+		this.time = time;
 		//EXPERIMENTAL [GL Oct'13]
 		if (Sim2DConfig.EXPERIMENTAL_VD_APPROACH) {
 			//TODO this can be done more efficient, one just has to do some bookkeeping when agents enter/leave sim2d
@@ -162,37 +168,37 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		}
 		
 		
-		//single threaded
-		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			psec.prepare();
-		}
-		for (PhysicalSim2DSection psec : this.psecs.values()) {
-			psec.updateAgents(time);
-		}
-		
-//		//multi threaded
-//		this.cb.reset();
-//		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
-//			pt.setTime(time);
-//		}
-//		int idx = 0;
+//		//single threaded
 //		for (PhysicalSim2DSection psec : this.psecs.values()) {
-//			int tidx = idx % (this.numOfThreads);
-//			PhysicalSim2DSectionUpdaterThread pt = this.threads.get(tidx);
-//			pt.offer(psec);
-//			idx++;
+//			psec.prepare();
 //		}
-//		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
-//			pt.offer(this.poison);
+//		for (PhysicalSim2DSection psec : this.psecs.values()) {
+//			psec.updateAgents(time);
 //		}
-//		try {
-//			this.cb.await();
-//			
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		} catch (BrokenBarrierException e) {
-//			e.printStackTrace();
-//		}
+		
+		//multi threaded
+		this.cb.reset();
+		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
+			pt.setTime(time);
+		}
+		int idx = 0;
+		for (PhysicalSim2DSection psec : this.psecs.values()) {
+			int tidx = idx % (this.numOfThreads);
+			PhysicalSim2DSectionUpdaterThread pt = this.threads.get(tidx);
+			pt.offer(psec);
+			idx++;
+		}
+		for (PhysicalSim2DSectionUpdaterThread pt : this.threads) {
+			pt.offer(this.poison);
+		}
+		try {
+			this.cb.await();
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		}
 		
 		
 		for (PhysicalSim2DSection psec : this.psecs.values()) {
@@ -308,10 +314,10 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		double spawnY = (c0.y+c2.y)/2;
 		hiResLink.createDepartureBox(ta,spawnX,spawnY);
 
-//		//DEBUG
-		for ( LineSegment bo : s.getObstacleSegments()) {
-			this.eventsManager.processEvent(new LineEvent(0,bo,true,192,0,0,255,0));
-		}
+////		//DEBUG
+//		for ( LineSegment bo : s.getObstacleSegments()) {
+//			this.eventsManager.processEvent(new LineEvent(0,bo,true,192,0,0,255,0));
+//		}
 		//		} else {
 		//			TransitionArea ta = new TransitionArea(s,this.sim2dsc,this,(int) flowCap+1);
 		//			this.psecs.put(s.getId(),ta);
@@ -327,6 +333,10 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		//			}			
 		//		}
 
+	}
+	
+	public Sim2DEnvironment getSim2DEnvironment() {
+		return this.env;
 	}
 
 	public void registerLowResLinks(Map<Id, Sim2DQTransitionLink> lowResLinks2) {
@@ -363,10 +373,10 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 					e.printStackTrace();
 				}
 				if (sec instanceof Poison) {
-//					PhysicalSim2DEnvironment.this.awaitKDTreeSync();
-					if (true){
-						throw new RuntimeException();
-					}
+					PhysicalSim2DEnvironment.this.awaitKDTreeSync();
+//					if (true){
+//						throw new RuntimeException();
+//					}
 					while (secs.peek() != null) {
 						secs.poll().updateAgents(this.time);
 					}
@@ -426,9 +436,9 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-//		for (PhysicalSim2DSectionUpdaterThread t : this.threads) {
-//			t.offer(new Kill());
-//		}
+		for (PhysicalSim2DSectionUpdaterThread t : this.threads) {
+			t.offer(new Kill());
+		}
 	}
 
 	public PhysicalSim2DSection getPhysicalSim2DSection(Section n) {
