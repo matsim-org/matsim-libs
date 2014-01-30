@@ -22,6 +22,7 @@ package playground.vsp.bvwp;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Formatter;
+import java.util.List;
 
 import org.matsim.core.utils.io.IOUtils;
 
@@ -114,6 +115,20 @@ class Html {
 		nextTableEntry() ; write(zz) ;
 		endTableRow() ;
 	}
+	void tableRowFromList(List<String> tabledata, boolean bold ){
+		beginTableRow();
+		for (String str : tabledata){
+			if (bold) write("<b>");
+			write(str);
+			if (bold) write("</b>");
+
+			nextTableEntry();
+		}
+		
+		endTableRow();
+	}
+	
+	
 
 	void beginBody() {
 		myWrite("<body>\n") ;

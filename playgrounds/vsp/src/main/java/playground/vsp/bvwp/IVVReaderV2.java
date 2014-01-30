@@ -67,7 +67,7 @@ public class IVVReaderV2 {
 	}
 	
 	void read(){
-		
+
 		
 //	// read(config.getRemainingDemandMatrixFile(), new DemandRemainingHandler(data));
 //	// Dopplung: Entweder 00 - oder verbleibend-Matrix einlesen, 00 macht Aussagen zum Geschäftsreiseverkehr, die verbleibend Matrix nicht...
@@ -753,8 +753,8 @@ public class IVVReaderV2 {
 
 	public static void main(String[] args) {
 		IVVReaderConfigGroup config = new IVVReaderConfigGroup();
-//		String dir = "/Users/jb/tucloud/bvwp/data/P2030_Daten_IVV_20131210/";
-		String dir = "C:/local_jb/testrechnungen_strasse/IVV_NeubauA14/P2030_Daten_IVV_20131210/";
+		String dir = "/Users/jb/tucloud/bvwp/data/P2030_Daten_IVV_20131210/";
+//		String dir = "C:/local_jb/testrechnungen_strasse/IVV_NeubauA14/P2030_Daten_IVV_20131210/";
 		config.setDemandMatrixFile(dir + "P2030_2010_BMVBS_ME2_131008.csv");
 		config.setRemainingDemandMatrixFile(dir + "P2030_2010_verbleibend_ME2.csv");
 		config.setNewDemandMatrixFile(dir + "P2030_2010_neuentstanden_ME2.csv");
@@ -762,8 +762,8 @@ public class IVVReaderV2 {
 		
 		config.setTravelTimesBaseMatrixFile(dir + "P2030_Widerstaende_Ohnefall.wid");
 		config.setTravelTimesStudyMatrixFile(dir + "P2030_Widerstaende_Mitfall.wid");
-		config.setImpedanceMatrixFile(dir + "P2030_2010_A14_induz_ME2.wid");
-//		config.setImpedanceMatrixFile(dir + "induz_test.wid");
+//		config.setImpedanceMatrixFile(dir + "P2030_2010_A14_induz_ME2.wid");
+		config.setImpedanceMatrixFile(dir + "induz_test.wid");
 		config.setImpedanceShiftedMatrixFile(dir + "P2030_2010_A14_verlagert_ME2.wid");
 		
 		IVVReaderV2 reader = new IVVReaderV2(config);

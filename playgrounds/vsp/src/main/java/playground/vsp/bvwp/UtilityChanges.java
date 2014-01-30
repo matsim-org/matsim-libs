@@ -2,6 +2,9 @@ package playground.vsp.bvwp;
 
 import static playground.vsp.bvwp.Key.makeKey;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
@@ -13,34 +16,58 @@ import playground.vsp.bvwp.MultiDimensionalArray.Mode;
  * 
  * @author nagel
  */
+
+
+
 abstract class UtilityChanges {
+	
+
+	
+	
 	UtilityChanges() {
 		System.out.println("Setting utility computation method to " + this.getClass() ) ;
 	}
 
 	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall ) {
 		Html html = new Html() ;
-		computeAndPrintResults(economicValues,nullfall,planfall,html) ;
+		html.beginHtml() ;
+		html.beginBody() ;
+		html.beginTable() ;
+		
+		Html totalHtml = new Html("total");
+		totalHtml.beginHtml() ;
+		totalHtml.beginBody() ;
+		totalHtml.beginTable() ;
+
+		computeAndPrintResults(economicValues,nullfall,planfall,html, totalHtml) ;
 	}
 	
 	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, String outFileName ) {
 		Html html = new Html(outFileName) ;
-		computeAndPrintResults(economicValues,nullfall,planfall,html) ;
-	}
-
-	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, Html html ) {
-		// (GK-GK') * x + 0.5 * (GK-GK') (x'-x) =
-		// 0.5 * (GK-GK') (x+x') = 0.5 * ( GK*x + GK*x' - GK'*x - GK'*x' )
-
-		// yyyy some of the following can't be here if html is initialized in user code!
 		html.beginHtml() ;
 		html.beginBody() ;
 		html.beginTable() ;
+		Html totalHtml = new Html(outFileName+"_total");
+		totalHtml.beginHtml() ;
+		totalHtml.beginBody() ;
+		totalHtml.beginTable() ;
+		computeAndPrintResults(economicValues,nullfall,planfall,html, totalHtml) ;
+	}
 
-
+	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall, Html html, Html totalHtml ) {
+		// (GK-GK') * x + 0.5 * (GK-GK') (x'-x) =
+		// 0.5 * (GK-GK') (x+x') = 0.5 * ( GK*x + GK*x' - GK'*x - GK'*x' )
 		double utils = 0. ;
 		double utilsUserFromRoHOldUsers = 0. ;
 		double utilsUserFromRoHNewUsers= 0. ;
+		Map<Mode, Double> verbleibendRV = new HashMap<MultiDimensionalArray.Mode, Double>();
+		
+		Map<Mode, Double> verlagertRV = new HashMap<MultiDimensionalArray.Mode, Double>();
+		Map<Mode, Double> verlagertImp = new HashMap<MultiDimensionalArray.Mode, Double>();
+		
+		Map<Mode, Double> induziertRV = new HashMap<MultiDimensionalArray.Mode, Double>();
+		Map<Mode, Double> induziertImp = new HashMap<MultiDimensionalArray.Mode, Double>();
+		
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
 			System.out.println("ODID: "+id);
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
@@ -96,7 +123,9 @@ abstract class UtilityChanges {
 						System.err.println("writing verbleibend:");
 						System.err.flush() ;
 						Utils.writeSubHeaderVerbleibend(html, id, segm, mode, amountAltnutzer);
-						utils += computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
+						double utilAltnutzer = computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
+						Utils.addUtlToMap(verbleibendRV, mode, utilAltnutzer);
+						utils += utilAltnutzer;
 					} else {
 						sumSent += Math.abs( deltaAmounts ) ;
 					}
@@ -109,16 +138,19 @@ abstract class UtilityChanges {
 
 						utils += computeAndPrintGivingOrReceiving(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving, 
 								econValues, attributesNullfall, attributesPlanfall, html);
-
+						
 						if ( utils != utilsBefore ) {
 							Utils.writePartialSum(html, "Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr bei Verlagerung:", utils - utilsBefore);
+							Utils.addUtlToMap(verlagertRV, mode, utils-utilsBefore);
 						}
-
-						utils += computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
+						
+						final double utilsImp =computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
 								econValues, attributesNullfall, attributesPlanfall, html);
+						utils += utilsImp;
 
 						if ( utils != utilsBefore ) {
 							Utils.writePartialSum(html, "Nutzen&auml;nderung bei Verlagerung gesamt:" , utils - utilsBefore);
+							Utils.addUtlToMap(verlagertImp, mode, utilsImp);
 						}
 
 					}
@@ -151,6 +183,7 @@ abstract class UtilityChanges {
 						partialUtl += utlChange ;
 
 						if ( utlChange!=0. ) {
+							Utils.addUtlToMap(induziertRV, improvedMode, utlChange);
 							Utils.writeAufnehmendRow(html, -amountInduced, attribute, attributeValuePlanfallReceiving, utlChangesPerItem, utlChange);
 						}
 					}
@@ -160,9 +193,10 @@ abstract class UtilityChanges {
 						attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
 				final double implUtlInduced = implUtlInducedPerItem * amountInduced ;
 
-
+				
 				if ( implUtlInduced != 0. ) {
 					Utils.writeImplicitUtl(html, implUtlInducedPerItem, implUtlInduced, "Impl. Nutz. induz.");
+					Utils.addUtlToMap(induziertImp, improvedMode, implUtlInduced);
 				}
 				partialUtl += implUtlInduced ;
 				if ( partialUtl != 0. ) {
@@ -202,6 +236,7 @@ abstract class UtilityChanges {
 
 
 		Utils.writeRohAndEndOutput(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
+		Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRV, verlagertImp, induziertRV, induziertImp);
 	}
 
 	private static double computeUserBenefitsOldUsers(Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall,
@@ -380,6 +415,7 @@ abstract class UtilityChanges {
 		}
 		return utils;
 	}
+	
 
 	abstract UtlChangesData utlChangePerEntry(Attribute attribute, double deltaAmount, 
 			double quantityNullfall, double quantityPlanfall, double econVal);

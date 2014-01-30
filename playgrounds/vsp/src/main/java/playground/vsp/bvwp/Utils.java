@@ -18,8 +18,11 @@
  * *********************************************************************** */
 package playground.vsp.bvwp;
 
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
@@ -288,29 +291,143 @@ class Utils {
 			System.out.printf("%188s\n", "================" ) ;
 }
 		
-		static void writeOverallOutputTable(Html html,HashMap<Mode,Double> modularUtils, HashMap<Mode,Double> modUtilsVerl,HashMap<Mode,Double> modImplUtilsVerl, HashMap<Mode,Double> modUtilsInd,HashMap<Mode,Double> modImplUtilsInd )
+		static void writeOverallOutputTable(Html html,Map<Mode,Double> verblRV, Map<Mode,Double> verlRV,Map<Mode,Double> verlImp, Map<Mode,Double> indRV,Map<Mode,Double> indImp)
 		{
 			html.beginTableMulticolumnRow();
 			html.write("Summen ueber alle Relationen und Zwecke");
 			html.endTableRow();
-			
-			html.bvwpTableRow("Verkehrstraeger", "Verbleibend", "", "Verlagert", "","", "Induziert", "", "",  "Summe");
-			html.bvwpTableRow("", "RV", "", "RV", "Implizit","", "RV", "Implizit", "", "Summe");
-			Double total = 0.;
+			List<String> line = new ArrayList<String>();
+			line.add("Komponente");
 			for (Mode mode : Mode.values()){
-				
-				Double vblRV = tryToGetValueOrReturnZero(modularUtils, mode);
-				Double verlRV = tryToGetValueOrReturnZero(modUtilsVerl, mode);
-				Double verlIm = tryToGetValueOrReturnZero(modImplUtilsVerl, mode);
-				Double indRV = tryToGetValueOrReturnZero(modUtilsInd, mode);
-				Double indIm = tryToGetValueOrReturnZero(modImplUtilsInd, mode);
-				
-				Double sum = vblRV + verlRV + verlIm + indRV + indIm;
-				total += sum;
-				html.bvwpTableRow(mode.toString(), vblRV.toString(), "", verlRV.toString(), verlIm.toString(),"", indRV.toString(), indIm.toString(),  "", sum.toString());
+				line.add(mode.toString());
+			}
+			line.add("Summe");
+			html.tableRowFromList(line, true);
+			line.clear();
+			
+			line.add("Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr im verbleibenden Verkehr");
+			Double rowSum = 0.;
+			Map<Mode,Double> allesTotal = new HashMap<Mode,Double>();
+
+			for (Mode mode: Mode.values()){
+				String string1 = tryToGetValueOrReturnNa(verblRV, mode); 
+				line.add(string1);
+				Double d = tryToGetValueOrReturnNull(verblRV, mode);
+				if (d != null){
+					rowSum += d;
+					addUtlToMap(allesTotal, mode, d);
+				}	
+			}
+			line.add(convertToMillions(rowSum));
+			html.tableRowFromList(line,true);
+			line.clear();
+			
+			line.add("Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr im verlagerten Verkehr");
+			rowSum = 0.;
+			Map<Mode,Double> verlTot = new HashMap<Mode,Double>();
+			for (Mode mode: Mode.values()){
+				String string1 = tryToGetValueOrReturnNa(verlRV, mode); 
+				line.add(string1);
+				Double d = tryToGetValueOrReturnNull(verlRV, mode);
+				if (d != null){
+					rowSum += d;
+					addUtlToMap(verlTot, mode, d);
+				}
+			}
+			line.add(convertToMillions(rowSum));
+			html.tableRowFromList(line, false);
+			line.clear();
+			
+			line.add("Nutzen&auml;nderung aus impliziten Nutzen im verlagerten Verkehr");
+			rowSum = 0.;
+			for (Mode mode: Mode.values()){
+				String string1 = tryToGetValueOrReturnNa(verlImp, mode); 
+				line.add(string1);
+				Double d = tryToGetValueOrReturnNull(verlImp, mode);
+				if (d != null){
+					rowSum += d;
+					addUtlToMap(verlTot, mode, d);
+				}
 				
 			}
-			html.bvwpTableRow("", "", "", "", "","", "", "", "", total.toString());
+			line.add(convertToMillions(rowSum));
+			html.tableRowFromList(line, false);
+			line.clear();
+			
+			line.add("Nutzen&auml;nderung insgesamt im verlagerten Verkehr");
+			rowSum = 0.;
+			for (Mode mode: Mode.values()){
+				String string1 = tryToGetValueOrReturnNa(verlTot, mode); 
+				line.add(string1);
+				Double d = tryToGetValueOrReturnNull(verlTot, mode);
+				if (d != null){
+					rowSum += d;
+					addUtlToMap(allesTotal, mode, d);
+				}
+			}
+			line.add(convertToMillions(rowSum));
+			html.tableRowFromList(line,true);
+			line.clear();
+			
+			line.add("Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr im induzierten Verkehr");
+			rowSum = 0.;
+			Map<Mode,Double> indTot = new HashMap<Mode,Double>();
+			for (Mode mode: Mode.values()){
+				String string1 = tryToGetValueOrReturnNa(indRV, mode); 
+				line.add(string1);
+				Double d = tryToGetValueOrReturnNull(indRV, mode);
+				if (d != null){
+					rowSum += d;
+					addUtlToMap(indTot, mode, d);
+				}
+			}
+			line.add(convertToMillions(rowSum));
+			html.tableRowFromList(line, false);
+			line.clear();
+			
+			line.add("Nutzen&auml;nderung aus impliziten Nutzen im induzierten Verkehr");
+			rowSum = 0.;
+			for (Mode mode: Mode.values()){
+				String string1 = tryToGetValueOrReturnNa(indImp, mode); 
+				line.add(string1);
+				Double d = tryToGetValueOrReturnNull(indImp, mode);
+				if (d != null){
+					rowSum += d;
+					addUtlToMap(indTot, mode, d);
+				}
+			}
+			line.add(convertToMillions(rowSum));
+			html.tableRowFromList(line, false);
+			line.clear();
+			
+			line.add("Nutzen&auml;nderung insgesamt im induzierten Verkehr");
+			rowSum = 0.;
+			for (Mode mode: Mode.values()){
+				String string1 = tryToGetValueOrReturnNa(indTot, mode); 
+				line.add(string1);
+				Double d = tryToGetValueOrReturnNull(indTot, mode);
+				if (d != null){
+					rowSum += d;
+					addUtlToMap(allesTotal, mode, d);
+				}
+			}
+			line.add(convertToMillions(rowSum));
+			html.tableRowFromList(line,true);
+			line.clear();
+			
+			line.add("Summe Nutzen&auml;nderungen insgesamt");
+			rowSum = 0.;
+			for (Mode mode: Mode.values()){
+				String string1 = tryToGetValueOrReturnNa(allesTotal, mode); 
+				line.add(string1);
+				Double d = tryToGetValueOrReturnNull(allesTotal, mode);
+				if (d != null){
+					rowSum += d;
+				}
+			}
+			line.add(convertToMillions(rowSum));
+			html.tableRowFromList(line,true);
+			line.clear();
 
 			html.endTable() ;
 			
@@ -318,12 +435,28 @@ class Utils {
 			html.endHtml() ;
 	
 		}
-		private static Double tryToGetValueOrReturnZero(HashMap<Mode,Double> map, Mode mode){
-			Double result;
-			result = map.get(mode);
-			if (result == null) result = 0.;
+		private static String tryToGetValueOrReturnNa(Map<Mode,Double> map, Mode mode){
+			String result = null;
+			if (map.containsKey(mode)) result = convertToMillions(map.get(mode));
+			if (result == null) result = "n.a.";
 			
 			return result;
 			
+		}
+		private static Double tryToGetValueOrReturnNull(Map<Mode,Double> map, Mode mode){
+			Double result = null;
+			if (map.containsKey(mode)) result = map.get(mode);
+			
+			
+			return result;
+			
+		}
+		static void addUtlToMap(Map<Mode, Double> map, Mode mode ,double utl){
+			double utlBefore = 0.;
+			
+			if (map.containsKey(mode)) utlBefore = map.get(mode);
+			double utlAfter = utlBefore + utl;
+			map.put(mode, utlAfter);
+
 		}
 }
