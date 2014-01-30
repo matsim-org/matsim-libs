@@ -95,18 +95,24 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 			EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
 			if ( this.externalUom==null ) {
 				this.uom = muc ; // works because muc fulfills _all_ the interfaces.  Maybe not so nice.
+				log.warn( "using autosensing marginal utility of money") ;
 			} else {
 				this.uom = this.externalUom ;
+				log.warn( " using external marginal utility of money" ) ;
 			}
 			if ( this.externalUom==null ) {
 				this.uod=muc ;
+				log.warn( "using autosensing marginal utility of distance") ;
 			} else {
 				this.uod = this.externalUod ;
+				log.warn( " using external marginal utility of distance" ) ;
 			}
 			if ( this.externalUom==null ) {
 				this.uott=muc ;
+				log.warn( "using autosensing marginal utility of ttime") ;
 			} else {
 				this.uott = this.externalUott ;
+				log.warn( " using external marginal utility of ttime" ) ;
 			}
 			// yyyy the above is all not well tested. kai, dec'13
 		}
@@ -115,13 +121,16 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 		TravelDisutility tmp ;
 		if ( this.uott==null && this.uod==null ) {
 			tmp = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup) ;
+			log.warn("using regular travel disutility") ;
 		} else {
 			tmp = new PersonIndividualTimeDistanceDisutility(timeCalculator, this.uott, this.uod ) ;
+			log.warn("using person individual travel disutility") ;
 		}
 		final TravelDisutility delegate = tmp ; // (generating final variable for anonymous class)
 		
 		
 		final double normalization = 1./Math.exp( this.sigma*this.sigma/2 );
+		log.warn(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
 
 		// generating final variables for anonymous class:
 		final RoadPricingScheme localScheme = this.scheme ;

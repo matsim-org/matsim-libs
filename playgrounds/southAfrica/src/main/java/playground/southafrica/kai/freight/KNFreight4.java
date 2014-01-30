@@ -19,6 +19,7 @@
 package playground.southafrica.kai.freight;
 
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.box.SchrimpfFactory;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
@@ -27,6 +28,7 @@ import jsprit.core.util.Solutions;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -108,7 +110,7 @@ public class KNFreight4 {
 	
 	private static final boolean generatingCarrierPlansFromScratch = true ;
 	
-	private static final boolean addingCongestion = true ;
+	private static final boolean addingCongestion = false ;
 
 	private static final boolean usingWithinDayReScheduling = false ;
 
@@ -131,7 +133,7 @@ public class KNFreight4 {
 		Carriers carriers = createCarriers(vehicleTypes);
 		
 		if ( generatingCarrierPlansFromScratch ) {
-			generateCarrierPlans(scenario, carriers, vehicleTypes);
+			generateCarrierPlans(scenario.getNetwork(), carriers, vehicleTypes);
 		}
 
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "plannedCarriers.xml") ;
@@ -203,20 +205,20 @@ public class KNFreight4 {
 	}
 
 
-	private static void generateCarrierPlans(Scenario scenario, Carriers carriers, CarrierVehicleTypes vehicleTypes) {
-		final Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( scenario.getNetwork(), vehicleTypes.getVehicleTypes().values() );
+	private static void generateCarrierPlans(Network network, Carriers carriers, CarrierVehicleTypes vehicleTypes) {
+		final Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 //		netBuilder.setBaseTravelTimeAndDisutility(travelTime, travelDisutility) ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 
 		for ( Carrier carrier : carriers.getCarriers().values() ) {
 
-			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder( carrier, scenario.getNetwork() ) ;
+			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder( carrier, network ) ;
 			vrpBuilder.setRoutingCost(netBasedCosts) ;
 			VehicleRoutingProblem problem = vrpBuilder.build() ;
 
-			VehicleRoutingAlgorithm algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem,ALGORITHM);
-			//			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+//			VehicleRoutingAlgorithm algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem,ALGORITHM);
+						VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;

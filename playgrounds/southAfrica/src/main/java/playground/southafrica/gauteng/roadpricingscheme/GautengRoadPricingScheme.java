@@ -64,19 +64,19 @@ public class GautengRoadPricingScheme implements RoadPricingScheme {
 		this.delegate = scheme ;
 		this.tollFactor = tollFactor ;
 		
-		final Cost[] costArray = scheme.getCostArray();
-		for ( int ii=0 ; ii< costArray.length ; ii++ ) {
-			log.warn( costArray[ii].toString() ) ;
-		}
-		
-		Map<Id, List<Cost>> costsForLink = scheme.getCostsForLink() ;
-		for ( Entry<Id, List<Cost>> entry : costsForLink.entrySet() ) {
-			Id id = entry.getKey() ;
-			List<Cost> costs = entry.getValue() ;
-			for ( Cost cost : costs ) {
-				log.warn( "id: " + id.toString() + "; cost: " + cost.toString() ) ;
-			}
-		}
+//		final Cost[] costArray = scheme.getCostArray();
+//		for ( int ii=0 ; ii< costArray.length ; ii++ ) {
+//			log.warn( costArray[ii].toString() ) ;
+//		}
+//		
+//		Map<Id, List<Cost>> costsForLink = scheme.getCostsForLink() ;
+//		for ( Entry<Id, List<Cost>> entry : costsForLink.entrySet() ) {
+//			Id id = entry.getKey() ;
+//			List<Cost> costs = entry.getValue() ;
+//			for ( Cost cost : costs ) {
+//				log.warn( "id: " + id.toString() + "; cost: " + cost.toString() ) ;
+//			}
+//		}
 		
 	}
 
