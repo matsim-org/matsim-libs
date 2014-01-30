@@ -106,7 +106,7 @@ public class KNFreight4 {
 	private static final String ALGORITHM = QVH_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
 	
-	private static final boolean generatingCarrierPlansFromScratch = false ;
+	private static final boolean generatingCarrierPlansFromScratch = true ;
 	
 	private static final boolean addingCongestion = true ;
 
