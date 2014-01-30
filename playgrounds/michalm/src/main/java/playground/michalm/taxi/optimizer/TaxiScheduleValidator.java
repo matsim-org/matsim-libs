@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
-import playground.michalm.taxi.schedule.TaxiTask;
+import playground.michalm.taxi.TaxiData;
+import playground.michalm.taxi.model.*;
+import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 
 
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public class TaxiScheduleValidator
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
-
-
-    public OTSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, ImmediateRequestParams params,
-            TaxiOptimizationPolicy optimizationPolicy)
+    public static void assertNotIdleVehiclesAndUnplannedRequests(MatsimVrpContext context)
     {
-        super(context, calculator, params);
-        this.optimizationPolicy = optimizationPolicy;
-    }
-
-
-    @Override
-    protected void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
-    {
-        if (scheduleUpdated && optimizationPolicy.shouldOptimize(schedule.getCurrentTask())) {
-            scheduleUnplannedRequests();
+        int unplannedRequests = 0;
+        for (TaxiRequest req : ((TaxiData)context.getVrpData()).getTaxiRequests()) {
+            if (req.getStatus() == TaxiRequestStatus.UNPLANNED) {
+                unplannedRequests++;
+            }
         }
 
-        nextTask(schedule);
+        int idleTaxis = 0;
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            if (TaxiUtils.isIdle(veh, context.getTime(), true)) {
+                idleTaxis++;
+            }
+        }
+
+        if (idleTaxis > 0 && unplannedRequests > 0) {
+            throw new IllegalStateException();
+        }
     }
 }

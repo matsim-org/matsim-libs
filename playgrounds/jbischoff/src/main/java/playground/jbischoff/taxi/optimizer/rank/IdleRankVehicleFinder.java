@@ -132,7 +132,7 @@ public class IdleRankVehicleFinder
           Collections.shuffle(context.getVrpData().getVehicles(),rnd);
           
           for (Vehicle veh : context.getVrpData().getVehicles()) {
-        	  if (!TaxiUtils.isIdle(TaxiSchedules.getSchedule(veh), context.getTime(), true)) continue;
+        	  if (!TaxiUtils.isIdle(veh, context.getTime(), true)) continue;
         	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
         	  double soc = this.getVehicleSoc(veh);
         	  if (soc>bestSoc){
@@ -152,7 +152,7 @@ public class IdleRankVehicleFinder
         Collections.shuffle(context.getVrpData().getVehicles(),rnd);
         
         for (Vehicle veh : context.getVrpData().getVehicles()) {
-      	  if (!TaxiUtils.isIdle(TaxiSchedules.getSchedule(veh), context.getTime(), true)) continue;
+      	  if (!TaxiUtils.isIdle(veh, context.getTime(), true)) continue;
       	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
       	  double soc = this.getVehicleSoc(veh);
       	  if (soc>bestSoc){

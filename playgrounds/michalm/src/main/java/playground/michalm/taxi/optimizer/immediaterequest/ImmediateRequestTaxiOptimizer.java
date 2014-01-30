@@ -19,19 +19,19 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.model.*;
+import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -48,59 +48,42 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
  * @author michalm
  */
 public abstract class ImmediateRequestTaxiOptimizer
-    extends AbstractTaxiOptimizer
     implements VrpOptimizerWithOnlineTracking
 {
-    protected static class VehiclePath
-    {
-        public static final VehiclePath NO_VEHICLE_PATH_FOUND = new VehiclePath(null,
-                new VrpPathImpl(Integer.MAX_VALUE / 2, Integer.MAX_VALUE / 2, Double.MAX_VALUE,
-                        new Link[0], new double[0]));
+    protected final VrpPathCalculator calculator;
+    protected final ImmediateRequestParams params;
+    protected final MatsimVrpContext context;
 
-        private final Vehicle vehicle;
-        private final VrpPathWithTravelData path;
-
-
-        protected VehiclePath(Vehicle vehicle, VrpPathWithTravelData path)
-        {
-            this.vehicle = vehicle;
-            this.path = path;
-        }
-    }
-
-
-    public static class Params
-    {
-        public final boolean destinationKnown;
-        public final boolean minimizePickupTripTime;
-        public final double pickupDuration;
-        public final double dropoffDuration;
-
-
-        public Params(boolean destinationKnown, boolean minimizePickupTripTime,
-                double pickupDuration, double dropoffDuration)
-        {
-            super();
-            this.destinationKnown = destinationKnown;
-            this.minimizePickupTripTime = minimizePickupTripTime;
-            this.pickupDuration = pickupDuration;
-            this.dropoffDuration = dropoffDuration;
-        }
-    }
-
-
-    private final VrpPathCalculator calculator;
-    private final Params params;
+    protected final Queue<TaxiRequest> unplannedRequests;
+    protected final Comparator<VrpPathWithTravelData> pathComparator;
 
     private TaxiDelaySpeedupStats delaySpeedupStats;
 
 
     public ImmediateRequestTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
-            Params params)
+            ImmediateRequestParams params)
     {
-        super(context);
         this.calculator = calculator;
         this.params = params;
+        this.context = context;
+
+        int initialCapacity = context.getVrpData().getVehicles().size();//1 awaiting req/veh
+        unplannedRequests = new PriorityQueue<TaxiRequest>(initialCapacity,
+                new Comparator<TaxiRequest>() {
+                    public int compare(TaxiRequest r1, TaxiRequest r2)
+                    {
+                        return Double.compare(r1.getSubmissionTime(), r2.getSubmissionTime());
+                    }
+                });
+
+        pathComparator = params.minimizePickupTripTime ? //
+                VrpPathWithTravelDataComparators.TRAVEL_TIME_COMPARATOR : //
+                VrpPathWithTravelDataComparators.ARRIVAL_TIME_COMPARATOR;
+
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+            schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+        }
     }
 
 
@@ -110,52 +93,75 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    @Override
-    protected void scheduleRequest(TaxiRequest request)
-    {
-        VehiclePath bestVehicle = findBestVehicle(request, context.getVrpData().getVehicles());
+    ////========================================================
 
-        if (bestVehicle != VehiclePath.NO_VEHICLE_PATH_FOUND) {
-            scheduleRequestImpl(bestVehicle, request);
+    @Override
+    public void requestSubmitted(Request request)
+    {
+        unplannedRequests.add((TaxiRequest)request);
+        scheduleUnplannedRequests();
+        
+        //????
+        TaxiScheduleValidator.assertNotIdleVehiclesAndUnplannedRequests(context);
+    }
+
+
+    @Override
+    public void nextTask(Schedule<? extends Task> schedule)
+    {
+        @SuppressWarnings("unchecked")
+        Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
+
+        boolean scheduleUpdated = updateBeforeNextTask(taxiSchedule);
+        nextTask(taxiSchedule, scheduleUpdated);
+    }
+
+
+    protected abstract void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated);
+
+
+    /**
+     * Try to schedule all unplanned tasks (if any)
+     */
+    protected void scheduleUnplannedRequests()
+    {
+        if (unplannedRequests.isEmpty()) {
+            return;
+        }
+
+        while (!unplannedRequests.isEmpty()) {
+            TaxiRequest req = unplannedRequests.peek();
+
+            VehicleRequestPath best = findBestVehicleRequestPath(req);
+
+            if (best == null) {
+                return;//no taxi available
+            }
+
+            scheduleRequestImpl(best);
+            unplannedRequests.poll();
         }
     }
 
 
-    protected VehiclePath findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
+    ////========================================================
+
+    protected VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req)
     {
-        double currentTime = context.getTime();
-        VehiclePath best = VehiclePath.NO_VEHICLE_PATH_FOUND;
+        VehicleRequestPath best = null;
 
-        for (Vehicle veh : vehicles) {
-            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            VrpPathWithTravelData current = calculateVrpPath(veh, req);
 
-            // COMPLETED or STARTED but delayed (time window T1 exceeded)
-            if (schedule.getStatus() == ScheduleStatus.COMPLETED || currentTime >= veh.getT1()) {
-                // skip this vehicle
+            if (current == null) {
                 continue;
             }
-
-            // status = UNPLANNED/PLANNED/STARTED
-            LinkTimePair departure = calculateDeparture(schedule, currentTime);
-
-            if (departure == null) {
-                continue;
+            else if (best == null) {
+                best = new VehicleRequestPath(veh, req, current);
             }
-
-            VrpPathWithTravelData path = calculator.calcPath(departure.link, req.getFromLink(),
-                    departure.time);
-
-            if (params.minimizePickupTripTime) {
-                if (path.getTravelTime() < best.path.getTravelTime()) {
-                    // TODO: in the future: add a check if the taxi time windows are satisfied
-                    best = new VehiclePath(veh, path);
-                }
-            }
-            else {
-                if (path.getArrivalTime() < best.path.getArrivalTime()) {
-                    // TODO: in the future: add a check if the taxi time windows are satisfied
-                    best = new VehiclePath(veh, path);
-                }
+            else if (pathComparator.compare(current, best.path) < 0) {
+                // TODO: in the future: add a check if the taxi time windows are satisfied
+                best = new VehicleRequestPath(veh, req, current);
             }
         }
 
@@ -163,17 +169,25 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    protected LinkTimePair calculateDeparture(Schedule<TaxiTask> schedule, double currentTime)
+    protected VrpPathWithTravelData calculateVrpPath(Vehicle veh, TaxiRequest req)
     {
+        double currentTime = context.getTime();
+        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+
+        // COMPLETED or STARTED but delayed (time window T1 exceeded)
+        if (schedule.getStatus() == ScheduleStatus.COMPLETED || currentTime >= veh.getT1()) {
+            return null;// skip this vehicle
+        }
+
+        // status = UNPLANNED/PLANNED/STARTED
         Link link;
         double time;
 
         switch (schedule.getStatus()) {
             case UNPLANNED:
-                Vehicle vehicle = schedule.getVehicle();
-                link = vehicle.getStartLink();
-                time = Math.max(vehicle.getT0(), currentTime);
-                return new LinkTimePair(link, time);
+                link = veh.getStartLink();
+                time = Math.max(veh.getT0(), currentTime);
+                return calculator.calcPath(link, req.getFromLink(), time);
 
             case PLANNED:
             case STARTED:
@@ -183,7 +197,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                     case WAIT_STAY:
                         link = ((StayTask)lastTask).getLink();
                         time = Math.max(lastTask.getBeginTime(), currentTime);
-                        return new LinkTimePair(link, time);
+                        return calculator.calcPath(link, req.getFromLink(), time);
 
                     case PICKUP_STAY:
                         if (!params.destinationKnown) {
@@ -197,13 +211,16 @@ public abstract class ImmediateRequestTaxiOptimizer
             case COMPLETED:
             default:
                 throw new IllegalStateException();
-
         }
     }
 
 
-    protected void scheduleRequestImpl(VehiclePath best, TaxiRequest req)
+    protected void scheduleRequestImpl(VehicleRequestPath best)
     {
+        if (best.request.getStatus() != TaxiRequestStatus.UNPLANNED) {
+            throw new IllegalStateException();
+        }
+
         Schedule<TaxiTask> bestSched = TaxiSchedules.getSchedule(best.vehicle);
 
         if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
@@ -219,6 +236,8 @@ public abstract class ImmediateRequestTaxiOptimizer
                         // so maybe we can remove it right now?
 
                         lastTask.setEndTime(best.path.getDepartureTime());// shortening the WAIT task
+                        
+                        System.err.println("Hmmmmmmmmmmm");
                     }
                     break;
 
@@ -232,10 +251,10 @@ public abstract class ImmediateRequestTaxiOptimizer
             }
         }
 
-        bestSched.addTask(new TaxiPickupDriveTask(best.path, req));
+        bestSched.addTask(new TaxiPickupDriveTask(best.path, best.request));
 
         double t3 = best.path.getArrivalTime() + params.pickupDuration;
-        bestSched.addTask(new TaxiPickupStayTask(best.path.getArrivalTime(), t3, req));
+        bestSched.addTask(new TaxiPickupStayTask(best.path.getArrivalTime(), t3, best.request));
 
         if (params.destinationKnown) {
             appendDropoffAfterPickup(bestSched);
@@ -244,9 +263,20 @@ public abstract class ImmediateRequestTaxiOptimizer
     }
 
 
-    @Override
+    /**
+     * Check and decide if the schedule should be updated due to if vehicle is Update timings (i.e.
+     * beginTime and endTime) of all tasks in the schedule.
+     * 
+     * @return <code>true</code> if there have been significant changes in the schedule hence the
+     *         schedule needs to be re-optimized
+     */
     protected boolean updateBeforeNextTask(Schedule<TaxiTask> schedule)
     {
+        // Assumption: there is no delay as long as the schedule has not been started (PLANNED)
+        if (schedule.getStatus() != ScheduleStatus.STARTED) {
+            return false;
+        }
+
         double time = context.getTime();
         TaxiTask currentTask = schedule.getCurrentTask();
 
@@ -353,8 +383,8 @@ public abstract class ImmediateRequestTaxiOptimizer
                     }
                     else {
                         // if this is not the last task then some other task must have been added
-                        // at time <= t
-                        // THEREFORE: task.endTime() <= t, and so it can be removed
+                        // at time t0 <= t
+                        // THEREFORE: waittask.endTime() == t0, and so it can be removed
 
                         TaxiTask nextTask = tasks.get(i + 1);
                         switch (nextTask.getTaxiTaskType()) {

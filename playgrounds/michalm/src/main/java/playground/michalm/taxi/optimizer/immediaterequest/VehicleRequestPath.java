@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,34 +19,23 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 
-import playground.michalm.taxi.schedule.TaxiTask;
+import playground.michalm.taxi.model.TaxiRequest;
 
 
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+/*package*/class VehicleRequestPath
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
+    /*package*/final Vehicle vehicle;
+    /*package*/final TaxiRequest request;
+    /*package*/final VrpPathWithTravelData path;
 
 
-    public OTSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, ImmediateRequestParams params,
-            TaxiOptimizationPolicy optimizationPolicy)
+    /*package*/VehicleRequestPath(Vehicle vehicle, TaxiRequest request, VrpPathWithTravelData path)
     {
-        super(context, calculator, params);
-        this.optimizationPolicy = optimizationPolicy;
-    }
-
-
-    @Override
-    protected void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
-    {
-        if (scheduleUpdated && optimizationPolicy.shouldOptimize(schedule.getCurrentTask())) {
-            scheduleUnplannedRequests();
-        }
-
-        nextTask(schedule);
+        this.vehicle = vehicle;
+        this.request = request;
+        this.path = path;
     }
 }

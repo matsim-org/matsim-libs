@@ -74,7 +74,7 @@ public class IdleVehicleFinder
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         Link fromLink;
 
-        if (!TaxiUtils.isIdle(sched, time, true)) {
+        if (!TaxiUtils.isIdle(veh, time, true)) {
             return Double.MAX_VALUE;
         }
 

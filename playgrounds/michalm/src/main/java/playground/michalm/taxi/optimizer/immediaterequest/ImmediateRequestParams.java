@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,34 +19,20 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-
-import playground.michalm.taxi.schedule.TaxiTask;
-
-
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public class ImmediateRequestParams
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
+    public final boolean destinationKnown;
+    public final boolean minimizePickupTripTime;
+    public final double pickupDuration;
+    public final double dropoffDuration;
 
 
-    public OTSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, ImmediateRequestParams params,
-            TaxiOptimizationPolicy optimizationPolicy)
+    public ImmediateRequestParams(boolean destinationKnown, boolean minimizePickupTripTime,
+            double pickupDuration, double dropoffDuration)
     {
-        super(context, calculator, params);
-        this.optimizationPolicy = optimizationPolicy;
-    }
-
-
-    @Override
-    protected void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
-    {
-        if (scheduleUpdated && optimizationPolicy.shouldOptimize(schedule.getCurrentTask())) {
-            scheduleUnplannedRequests();
-        }
-
-        nextTask(schedule);
+        this.destinationKnown = destinationKnown;
+        this.minimizePickupTripTime = minimizePickupTripTime;
+        this.pickupDuration = pickupDuration;
+        this.dropoffDuration = dropoffDuration;
     }
 }

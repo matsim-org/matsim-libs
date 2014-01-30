@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
-import playground.michalm.taxi.optimizer.immediaterequest.NOSTaxiOptimizer;
+import playground.michalm.taxi.optimizer.immediaterequest.*;
 import playground.michalm.taxi.schedule.*;
 
 
@@ -52,17 +52,17 @@ public class NOSRankTaxiOptimizer
 
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(MatsimVrpContext context,
-            VrpPathCalculator calculator, Params params, boolean straightLineDistance)
+            VrpPathCalculator calculator, ImmediateRequestParams params, boolean straightLineDistance)
     {
         return new NOSRankTaxiOptimizer(context, calculator, params, new IdleRankVehicleFinder(context,
                 calculator, straightLineDistance));
     }
 
 
-    private NOSRankTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
+    private NOSRankTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, ImmediateRequestParams params,
             IdleRankVehicleFinder vehicleFinder)
     {
-        super(context, calculator, params, vehicleFinder);
+        super(context, calculator, params, vehicleFinder, false);
         this.calculator = calculator;
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();

@@ -30,7 +30,6 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 
 import playground.michalm.taxi.optimizer.immediaterequest.*;
-import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer.Params;
 
 
 /*package*/class AlgorithmConfig
@@ -38,6 +37,7 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
     /*package*/static enum AlgorithmType
     {
         NO_SCHEDULING("NOS"), // only idle vehicles
+        NO_SCHEDULING_BEST_REQUEST("NOS-BR"), //
         ONE_TIME_SCHEDULING("OTS"), // formerly "optimistic"
         RE_SCHEDULING("RES"); // formerly "pessimistic"
 
@@ -190,11 +190,16 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
 
 
     /*package*/ImmediateRequestTaxiOptimizer createTaxiOptimizer(MatsimVrpContext context,
-            VrpPathCalculator calculator, Params params)
+            VrpPathCalculator calculator, ImmediateRequestParams params)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(context, calculator, params, this == NOS_STRAIGHT_LINE);
+                return new NOSTaxiOptimizer(context, calculator, params, new IdleVehicleFinder(
+                        context, calculator, this == NOS_STRAIGHT_LINE), false);
+
+            case NO_SCHEDULING_BEST_REQUEST:
+                return new NOSTaxiOptimizer(context, calculator, params, new IdleVehicleFinder(
+                        context, calculator, this == NOS_STRAIGHT_LINE), true);
 
             case ONE_TIME_SCHEDULING:
                 return new OTSTaxiOptimizer(context, calculator, params, optimizationPolicy);

@@ -50,7 +50,7 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer.Params;
+import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestParams;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
 import playground.michalm.util.RunningVehicleRegister;
 
@@ -193,7 +193,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         double pickupDuration = 120;
         double dropoffDuration = 60;
-        Params params = new Params(true, false, pickupDuration, dropoffDuration);
+        ImmediateRequestParams params = new ImmediateRequestParams(true, false, pickupDuration, dropoffDuration);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
                 calculator, params, true);

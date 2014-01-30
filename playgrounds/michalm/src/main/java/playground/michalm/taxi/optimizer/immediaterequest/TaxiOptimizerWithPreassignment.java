@@ -46,32 +46,24 @@ public class TaxiOptimizerWithPreassignment
     public TaxiOptimizerWithPreassignment(MatsimVrpContext context, VrpPathCalculator calculator,
             double pickupDuration, double dropoffDuration, final Map<Id, Vehicle> reqIdToVehMap)
     {
-        super(context, calculator, new Params(true, false, pickupDuration, dropoffDuration));
+        super(context, calculator, new ImmediateRequestParams(true, false, pickupDuration,
+                dropoffDuration));
         this.reqIdToVehMap = reqIdToVehMap;
     }
 
 
     @Override
-    protected VehiclePath findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
+    protected VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req)
     {
         Vehicle veh = reqIdToVehMap.get(req.getId());
-        return super.findBestVehicle(req, Arrays.asList(new Vehicle[] { veh }));
+        return new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
     }
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
+    protected void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
     {
-        return false;
-    }
-
-
-    @Override
-    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
-    {
-        return false;
+        schedule.nextTask();
     }
 
 

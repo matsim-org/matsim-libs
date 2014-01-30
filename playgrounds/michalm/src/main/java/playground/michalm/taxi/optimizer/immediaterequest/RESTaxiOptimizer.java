@@ -33,49 +33,23 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class RESTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+    extends OTSTaxiOptimizer
 {
-    private final boolean destinationKnown;
-    private final TaxiOptimizationPolicy optimizationPolicy;
-
-
-    public RESTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
+    public RESTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, ImmediateRequestParams params,
             TaxiOptimizationPolicy optimizationPolicy)
     {
-        super(context, calculator, params);
-        this.destinationKnown = params.destinationKnown;
-        this.optimizationPolicy = optimizationPolicy;
+        super(context, calculator, params, optimizationPolicy);
     }
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
-    {
-        if (!scheduleUpdated) {// no changes
-            return false;
-        }
-
-        return optimizationPolicy.shouldOptimize(schedule.getCurrentTask());
-    }
-
-
-    @Override
-    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
-    {
-        return false;
-    }
-
-
-    @Override
-    protected void optimize()
+    protected void scheduleUnplannedRequests()
     {
         for (Vehicle veh : context.getVrpData().getVehicles()) {
             removePlannedRequests(TaxiSchedules.getSchedule(veh));
         }
 
-        super.optimize();
+        super.scheduleUnplannedRequests();
     }
 
 
@@ -93,7 +67,7 @@ public class RESTaxiOptimizer
 
                 switch (task.getTaxiTaskType()) {
                     case PICKUP_DRIVE:
-                        if (!destinationKnown) {
+                        if (!params.destinationKnown) {
                             return;
                         }
 
@@ -101,7 +75,7 @@ public class RESTaxiOptimizer
                         break;
 
                     case PICKUP_STAY:
-                        if (!destinationKnown) {
+                        if (!params.destinationKnown) {
                             return;
                         }
                         obligatoryTasks = 2;
@@ -123,6 +97,9 @@ public class RESTaxiOptimizer
                         // and there are some other planned task
                         if (!TaxiUtils.isCurrentTaskDelayed(schedule, context.getTime())) {
                             throw new IllegalStateException();//
+                        }
+                        else {
+                            System.err.println("Hmmmm");
                         }
                 }
 
@@ -174,7 +151,7 @@ public class RESTaxiOptimizer
                 taskWithReq.removeFromRequest();
 
                 if (task.getTaxiTaskType() == TaxiTaskType.PICKUP_DRIVE) {
-                    unplannedRequestQueue.add(taskWithReq.getRequest());
+                    unplannedRequests.add(taskWithReq.getRequest());
                 }
             }
         }

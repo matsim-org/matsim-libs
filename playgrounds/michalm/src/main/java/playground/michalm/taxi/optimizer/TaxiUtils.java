@@ -19,6 +19,7 @@
 
 package playground.michalm.taxi.optimizer;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
@@ -28,9 +29,10 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class TaxiUtils
 {
-    public static boolean isIdle(Schedule<TaxiTask> schedule, double time,
-            boolean delayedWaitTaskAsNonIdle)
+    public static boolean isIdle(Vehicle vehicle, double time, boolean delayedWaitTaskAsNonIdle)
     {
+        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
+
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
@@ -61,6 +63,7 @@ public class TaxiUtils
         // idle right now, but:
         // consider CLOSING (T1) time windows of the vehicle
         if (time >= schedule.getVehicle().getT1()) {
+            System.err.println("hmmmm");
             return false;
         }
 
@@ -77,7 +80,8 @@ public class TaxiUtils
             return false;
         }
 
-        if (currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY && delay >= 2) {
+//        if (currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY && delay > 1) {
+            if (currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY && delay >= 1) {
             // there can be a lag between a change in the schedule (WAIT->OTHER)
             // because activity ends (here, WAIT end) are handled only at the beginning of
             // a simulation step, i.e. ActivityEngine is before QNetsimEngine

@@ -19,11 +19,9 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
-import java.util.*;
-
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
@@ -35,65 +33,90 @@ public class NOSTaxiOptimizer
     extends ImmediateRequestTaxiOptimizer
 {
     private final VehicleFinder idleVehicleFinder;
+    private final boolean considerAllRequestForIdleVehicle;
 
 
-    public NOSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
-            boolean straightLineDistance)
-    {
-        this(context, calculator, params,
-                new IdleVehicleFinder(context, calculator, straightLineDistance));
-    }
-
-
-    public NOSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, Params params,
-            VehicleFinder idleVehicleFinder)
+    public NOSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
+            ImmediateRequestParams params, VehicleFinder idleVehicleFinder,
+            boolean considerAllRequestForIdleVehicle)
     {
         super(context, calculator, params);
         this.idleVehicleFinder = idleVehicleFinder;
+        this.considerAllRequestForIdleVehicle = considerAllRequestForIdleVehicle;
     }
 
 
     @Override
-    protected VehiclePath findBestVehicle(TaxiRequest req, List<Vehicle> vehicles)
+    protected VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req)
     {
         Vehicle veh = idleVehicleFinder.findVehicle(req);
+        return veh == null ? null : new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
+    }
 
-        if (veh == null) {
-            return VehiclePath.NO_VEHICLE_PATH_FOUND;
+
+    private void scheduleIdleVehicle(Vehicle veh)
+    {
+        VehicleRequestPath best = findBestVehicleRequestPath(veh);
+
+        if (best == null) {
+            return;//no unplanned requests
         }
 
-        return super.findBestVehicle(req, Arrays.asList(veh));
+        scheduleRequestImpl(best);
+        unplannedRequests.remove(best.request);
+    }
+
+
+    protected VehicleRequestPath findBestVehicleRequestPath(Vehicle veh)
+    {
+        VehicleRequestPath best = null;
+
+        for (TaxiRequest req : unplannedRequests) {
+            VrpPathWithTravelData current = calculateVrpPath(veh, req);
+
+            if (current == null) {
+                continue;
+            }
+            else if (best == null) {
+                best = new VehicleRequestPath(veh, req, current);
+            }
+            else if (pathComparator.compare(current, best.path) < 0) {
+                // TODO: in the future: add a check if the taxi time windows are satisfied
+                best = new VehicleRequestPath(veh, req, current);
+            }
+        }
+
+        return best;
     }
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
+    protected void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
     {
-        return false;
-    }
+        schedule.nextTask();
 
-
-    @Override
-    protected boolean shouldOptimizeAfterNextTask(Schedule<TaxiTask> schedule,
-            boolean scheduleUpdated)
-    {
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-            return false;
+            return;
         }
 
-        if (unplannedRequestQueue.isEmpty()) {
-            return false;
+        if (unplannedRequests.isEmpty()) {
+            return;
         }
 
         TaxiTask tt = schedule.getCurrentTask();
         switch (tt.getTaxiTaskType()) {
             case WAIT_STAY:
             case CRUISE_DRIVE:////////????????
-                return true;
+                if (considerAllRequestForIdleVehicle) {
+                    scheduleIdleVehicle(schedule.getVehicle());//schedules the BEST request
+                }
+                else {
+                    scheduleUnplannedRequests();//schedules the FIRST request
+                }
+                return;
 
             default:
-                return false;
+                return;
         }
     }
 }

@@ -50,7 +50,6 @@ import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
-import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer.Params;
 import playground.michalm.util.RunningVehicleRegister;
 
 
@@ -227,7 +226,7 @@ import playground.michalm.util.RunningVehicleRegister;
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
         contextImpl.setVrpData(taxiData);
 
-        Params params = new Params(destinationKnown, minimizePickupTripTime, pickupDuration,
+        ImmediateRequestParams params = new ImmediateRequestParams(destinationKnown, minimizePickupTripTime, pickupDuration,
                 dropoffDuration);
 
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(context,
