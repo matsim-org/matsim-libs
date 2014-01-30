@@ -115,12 +115,6 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 		return vehicles.isEmpty();
 	}
 
-	private boolean exactlyTheseTypesAreInTypeCollection(List<Id> asList,Collection<CarrierVehicleType> vehicleTypes) {
-		List<CarrierVehicleType> types = new ArrayList<CarrierVehicleType>(vehicleTypes);
-		for(CarrierVehicleType type : vehicleTypes) if(asList.contains(type.getId())) types.remove(type);
-		return types.isEmpty();
-	}
-
 	private CarrierVehicle getVehicle(String vehicleName) {
 		for(CarrierVehicle v : testCarrier.getCarrierCapabilities().getCarrierVehicles()){
 			if(v.getVehicleId().toString().equals(vehicleName)){

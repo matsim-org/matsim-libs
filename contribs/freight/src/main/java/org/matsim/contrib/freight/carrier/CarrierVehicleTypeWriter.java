@@ -2,20 +2,10 @@ package org.matsim.contrib.freight.carrier;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType.VehicleCostInformation;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
-import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
-import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.EngineInformation;
 
 /**

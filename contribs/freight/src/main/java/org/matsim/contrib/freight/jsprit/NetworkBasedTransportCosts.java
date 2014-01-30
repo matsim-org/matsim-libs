@@ -233,21 +233,21 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		private TravelTime travelTime;
 		
-		private Map<String,VehicleTypeCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeCosts>();
+		private Map<String,VehicleTypeVarCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeVarCosts>();
 		
 		/**
 		 * Constructs travelDisutility according to the builder.
 		 * @param typeSpecificCosts TODO
 		 * @param builder
 		 */
-		private BaseVehicleTransportCosts(Map<String, VehicleTypeCosts> typeSpecificCosts, TravelTime travelTime){
+		private BaseVehicleTransportCosts(Map<String, VehicleTypeVarCosts> typeSpecificCosts, TravelTime travelTime){
 			this.travelTime = travelTime;
 			this.typeSpecificCosts = typeSpecificCosts;
 		}
 
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, org.matsim.vehicles.Vehicle vehicle) {
-			VehicleTypeCosts typeCosts = typeSpecificCosts.get(vehicle.getType().getId().toString());
+			VehicleTypeVarCosts typeCosts = typeSpecificCosts.get(vehicle.getType().getId().toString());
 			if(typeCosts == null) throw new IllegalStateException("type specific costs for " + vehicle.getType().getId().toString() + " are missing.");
 			double tt = travelTime.getLinkTravelTime(link, time, person, vehicle);
 			return typeCosts.perMeter*link.getLength() + typeCosts.perSecond*tt;
@@ -257,7 +257,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		public double getLinkMinimumTravelDisutility(Link link) {
 			double minDisutility = Double.MAX_VALUE;
 			double free_tt = link.getLength()/link.getFreespeed();
-			for(VehicleTypeCosts c : typeSpecificCosts.values()){
+			for(VehicleTypeVarCosts c : typeSpecificCosts.values()){
 				double disu = c.perMeter*link.getLength() + c.perSecond*free_tt;
 				if(disu < minDisutility) minDisutility=disu;
 			}
@@ -266,14 +266,12 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 	}
 	
-	private static class VehicleTypeCosts {
-		final double fix;
+	private static class VehicleTypeVarCosts {
 		final double perMeter;
 		final double perSecond;
 		
-		VehicleTypeCosts(double fix, double perMeter, double perSecond) {
+		VehicleTypeVarCosts(double perMeter, double perSecond) {
 			super();
-			this.fix = fix;
 			this.perMeter = perMeter;
 			this.perSecond = perSecond;
 		}
@@ -305,6 +303,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			double costs = baseTransportDisutility.getLinkTravelDisutility(link, time, person, vehicle);
 			Id typeId = vehicle.getType().getId();
 			double toll = vehicleTypeDependentPricingCalculator.getTollAmount(typeId, link, time);
+//			System.out.println("huuuuuuuuuuuuuuuuuuuu - paid toll");
 			return costs + toll;
 		}
 
@@ -324,7 +323,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		
 		public static Builder newInstance(Network network) {
-			return new Builder(network, Collections.EMPTY_LIST);
+			return new Builder(network, Collections.<CarrierVehicleType> emptyList());
 		}
 
 
@@ -366,7 +365,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		private Network network;
 		
-		private Map<String,VehicleTypeCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeCosts>();
+		private Map<String,VehicleTypeVarCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeVarCosts>();
 		
 		/**
 		 * Creates the builder requiring {@link Network} and a collection of {@link CarrierVehicleType}.
@@ -381,7 +380,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		private void retrieveTypeSpecificCosts(Collection<CarrierVehicleType> vehicleTypes) {
 			for(CarrierVehicleType type : vehicleTypes){
-				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeCosts(type.getVehicleCostInformation().fix, type.getVehicleCostInformation().perDistanceUnit, type.getVehicleCostInformation().perTimeUnit));
+				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getVehicleCostInformation().perDistanceUnit, type.getVehicleCostInformation().perTimeUnit));
 			}
 		}
 
@@ -475,7 +474,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		 * @param perMeter
 		 */
 		public void addVehicleTypeSpecificCosts(String typeId, double fix, double perSecond, double perMeter) {
-			typeSpecificCosts.put(typeId, new VehicleTypeCosts(fix, perMeter, perSecond));
+			typeSpecificCosts.put(typeId, new VehicleTypeVarCosts(perMeter, perSecond));
 		}
 
 	}

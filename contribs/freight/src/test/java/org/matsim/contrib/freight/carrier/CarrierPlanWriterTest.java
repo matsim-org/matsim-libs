@@ -29,8 +29,6 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.junit.Test;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

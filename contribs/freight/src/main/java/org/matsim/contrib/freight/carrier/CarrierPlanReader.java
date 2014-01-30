@@ -9,7 +9,6 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -57,8 +56,6 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	public static String VEHICLES = "vehicles";
 
-	private static final String CAPACITY = "cap";
-
 	private static final String VEHICLESTART = "earliestStart";
 
 	private static final String VEHICLEEND = "latestEnd";
@@ -70,8 +67,6 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	private Tour.Builder currentTourBuilder = null;
 
 	private Double currentStartTime = null;
-
-	private Leg currentLeg = null;
 
 	private Id previousActLoc = null;
 
@@ -242,7 +237,6 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			}
 		}
 		currentTourBuilder.addLeg(currentTourBuilder.createLeg(route, currentLegDepTime, currentLegTransTime));
-		currentLeg = null;
 		previousRouteContent = null;
 	}
 
@@ -279,10 +273,6 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	private int getInt(String value) {
 		return Integer.parseInt(value);
-	}
-
-	private Id makeId(String value) {
-		return new IdImpl(value);
 	}
 
 }

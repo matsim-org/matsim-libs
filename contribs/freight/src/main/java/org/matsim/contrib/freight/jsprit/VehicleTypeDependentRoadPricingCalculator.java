@@ -18,8 +18,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import jsprit.core.problem.vehicle.VehicleType;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
@@ -67,7 +70,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	 */
 	public Collection<RoadPricingScheme> getPricingSchemes(Id vehicleType){
 		Collection<RoadPricingScheme> collection = schemes.get(vehicleType);
-		if(collection == null) return Collections.unmodifiableCollection(Collections.EMPTY_LIST);
+		if(collection == null) return Collections.unmodifiableCollection(Collections.<RoadPricingScheme>emptyList());
 		return Collections.unmodifiableCollection(collection);
 	}
 	
@@ -92,6 +95,12 @@ public class VehicleTypeDependentRoadPricingCalculator {
 			toll += calculators.get(rps.getType()).getTollAmount(linkCostInfo,link);
 		}
 		return toll; 
+	}
+	
+	
+	public void addPricingScheme(String vehicleTypeId, RoadPricingScheme pricingScheme){
+		Id typeId = new IdImpl(vehicleTypeId);
+		addPricingScheme(typeId, pricingScheme);
 	}
 	
 	/**

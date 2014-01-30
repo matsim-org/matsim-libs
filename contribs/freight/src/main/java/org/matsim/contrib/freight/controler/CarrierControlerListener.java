@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -75,8 +74,6 @@ import org.matsim.core.replanning.GenericStrategyManager;
 public class CarrierControlerListener implements StartupListener, ShutdownListener,BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 ReplanningListener, IterationEndsListener {
 
-
-	private static Logger logger = Logger.getLogger(CarrierControlerListener.class);
 
 	private boolean physicallyEnforceTimeWindowBeginnings = false;
 
@@ -181,7 +178,6 @@ ReplanningListener, IterationEndsListener {
 			for ( Carrier carrier : carriers.getCarriers().values() ) {
 				collection.add(carrier) ;
 			}
-			@SuppressWarnings("unchecked")
 			GenericStrategyManager<CarrierPlan> mgr = (GenericStrategyManager<CarrierPlan>) strategyManager ;
 			mgr.run( collection, null, event.getIteration(), null);
 //		} else {

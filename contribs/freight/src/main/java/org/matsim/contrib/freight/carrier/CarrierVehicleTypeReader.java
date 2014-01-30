@@ -28,7 +28,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 
 	private String currentDescription;
 
-	private Double currentWeight;
+	
 
 //	private Integer currentCap;
 
@@ -71,7 +71,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 		}
 		if(name.equals("allowableWeight")){
 			String weight = atts.getValue("weight");
-			this.currentWeight = parseDouble(weight);
+			parseDouble(weight);
 		}
 		if(name.equals("engineInformation")){
 			String fuelType = atts.getValue("fuelType");
@@ -141,7 +141,6 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	private void reset() {
 		currentTypeId = null;
 		currentDescription = null;
-		currentWeight = null;
 		currentVehicleCosts = null;
 		currentEngineInfo = null;
 	}

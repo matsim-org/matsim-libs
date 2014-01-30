@@ -54,13 +54,13 @@
 	 <dependency>
    		<groupId>jsprit</groupId>
   		<artifactId>jsprit-core</artifactId>
-   		<version>1.0.1-SNAPSHOT</version>
+   		<version>1.1.0</version>
 	</dependency>
 	
 	<dependency>
    		<groupId>jsprit</groupId>
   		<artifactId>jsprit-analysis</artifactId>
-   		<version>1.0.1-SNAPSHOT</version>
+   		<version>1.1.0</version>
 	</dependency>
 
 	<dependency>
@@ -86,11 +86,8 @@
   
   <repositories>
   	<repository>
-   		<id>jsprit-snapshots</id>
-   		<url>https://github.com/jsprit/mvn-rep/raw/master/snapshots</url>
-   		<snapshots>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
+   		<id>jsprit-releases</id>
+   		<url>https://github.com/jsprit/mvn-rep/raw/master/releases</url>
 	</repository>
 </repositories>
 	

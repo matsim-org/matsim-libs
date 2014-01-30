@@ -306,7 +306,7 @@ public class MatsimJspritFactory {
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
-		for(CarrierShipment s : carrier.getShipments()) throw new IllegalStateException("this is not supported yet.");
+		for(@SuppressWarnings("unused") CarrierShipment s : carrier.getShipments()) throw new IllegalStateException("this is not supported yet.");
 		
 		if(transportCosts != null) vrpBuilder.setRoutingCost(transportCosts);
 		if(activityCosts != null) vrpBuilder.setActivityCosts(activityCosts);
@@ -364,7 +364,7 @@ public class MatsimJspritFactory {
 			vrpBuilder.addJob(createService(service, coordinate));
 		}
 		
-		for(CarrierShipment s : carrier.getShipments()) throw new IllegalStateException("this is not supported yet.");
+		for(@SuppressWarnings("unused") CarrierShipment s : carrier.getShipments()) throw new IllegalStateException("this is not supported yet.");
 		
 		return vrpBuilder;
 	}

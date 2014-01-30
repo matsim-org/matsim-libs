@@ -61,8 +61,6 @@ public class CarrierPlanXmlReaderV2 extends MatsimXmlParser {
 
 	public static String VEHICLES = "vehicles";
 
-	private static final String CAPACITY = "cap";
-
 	private static final String VEHICLESTART = "earliestStart";
 
 	private static final String VEHICLEEND = "latestEnd";

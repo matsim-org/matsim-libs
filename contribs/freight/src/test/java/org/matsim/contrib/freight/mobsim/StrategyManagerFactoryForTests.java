@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
-import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
