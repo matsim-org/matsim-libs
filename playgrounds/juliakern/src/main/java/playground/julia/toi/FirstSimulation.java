@@ -43,7 +43,11 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class FirstSimulation {
-
+ 
+	static String networkFile = "input/oslo/trondheim_network.xml";
+	static String cvsSplitBy = ",";
+	static String outputDir = "output/oslo/";
+	static String plansFile = "input/oslo/plans_from_csv.xml";
 	/**
 	 * @param args
 	 */
@@ -59,7 +63,7 @@ public class FirstSimulation {
 		Config config = ConfigUtils.createConfig();	
 		config.addCoreModules();
 		config.controler().setLastIteration(2);
-		config.controler().setOutputDirectory("output/oslo/");
+		config.controler().setOutputDirectory(outputDir);
 		config.controler().setWriteEventsInterval(1);
 		config.controler().setWritePlansInterval(1);
 		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
@@ -86,20 +90,21 @@ public class FirstSimulation {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		
-		new MatsimNetworkReader(scenario).readFile("input/oslo/trondheim.xml");
+		//new MatsimNetworkReader(scenario).readFile("input/oslo/trondheim.xml");
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 //		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 //		PopulationFactory populationFactory = population.getFactory();
 
 
-		new MatsimPopulationReader(scenario).readFile("input/oslo/plans.xml");	
+		new MatsimPopulationReader(scenario).readFile(plansFile);	
 		
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.getConfig().controler().setMobsim("qsim");
 		NetworkConfigGroup ncg = controler.getConfig().network();
-		ncg.setInputFile("input/oslo/trondheim.xml");
-		controler.getConfig().plans().setInputFile("input/oslo/plans.xml");
+		ncg.setInputFile(networkFile);
+		controler.getConfig().plans().setInputFile(plansFile);
 		
 //		Person person = populationFactory.createPerson(scenario.createId("1"));
 //		population.addPerson(person);

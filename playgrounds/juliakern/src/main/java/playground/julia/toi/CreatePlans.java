@@ -41,15 +41,16 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
 
 public class CreatePlans {
 	
 	static String csvFile = "input/oslo/Stefan_trondheim.csv"; 
+	static String networkFile = "input/oslo/trondheim_network.xml";
 	static String cvsSplitBy = ",";
+	static String outputDir = "output/oslo/";
+	static String plansFile = "input/oslo/plans_from_csv.xml";
 
 		private static final Logger logger = Logger.getLogger(CreatePlans.class);
 
@@ -59,11 +60,9 @@ public class CreatePlans {
 		 */
 		public static void main(String[] args) {
 
-			
-			//logger.getRootLogger().setLevel(Level.OFF);
 			Config config = ConfigUtils.createConfig();
 			
-			config.controler().setOutputDirectory("output/oslo/");
+			config.controler().setOutputDirectory(outputDir);
 			config.addCoreModules();
 			
 			ActivityParams home = new ActivityParams("home");
@@ -75,17 +74,13 @@ public class CreatePlans {
 			
 			
 			Scenario scenario = ScenarioUtils.createScenario(config);
-			
-			new MatsimNetworkReader(scenario).readFile("input/oslo/trondheim.xml");
-			//new MatsimNetworkReader(scenario).readFile("input/oslo/Matsim_files_1/trondheim_med_omland_4.sbn");
+			new MatsimNetworkReader(scenario).readFile(networkFile);
 			Population pop = fillScenario(scenario);
 			
 			Controler controler = new Controler(scenario);
 			controler.setOverwriteFiles(true);
 			
-			//controler.run();
-			
-			new PopulationWriter(pop, scenario.getNetwork()).write("input/oslo/plans.xml");
+			new PopulationWriter(pop, scenario.getNetwork()).write(plansFile);
 		}
 		
 		
@@ -131,9 +126,10 @@ public class CreatePlans {
 		 
 			System.out.println("Done reading csv file.");
 			
-			CoordinateTransformation ct = //TransformationFactory.getCoordinateTransformation("PROJCS[\"ETRS89_UTM_Zone_33\",GEOGCS[\"GCS_ETRS89\",DATUM[\"D_ETRS89\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",3500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",15.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]", "EPSG:3395");
-					  TransformationFactory.getCoordinateTransformation(  TransformationFactory.WGS84, TransformationFactory.WGS84  );
+//			CoordinateTransformation ct = //TransformationFactory.getCoordinateTransformation("PROJCS[\"ETRS89_UTM_Zone_33\",GEOGCS[\"GCS_ETRS89\",DATUM[\"D_ETRS89\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",3500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",15.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]", "EPSG:3395");
+//					  TransformationFactory.getCoordinateTransformation(  TransformationFactory.WGS84, TransformationFactory.WGS84  );
 			//TransformationFactory.getCoordinateTransformation(  TransformationFactory.WGS84, TransformationFactory.CH1903_LV03  );
+			
 			
 			for(Id personId : person2lines.keySet()){
 				System.out.println(personId);
@@ -147,20 +143,28 @@ public class CreatePlans {
 				String[] last; String[] trip = null;
 				for(String currline: person2lines.get(personId)){
 						trip = currline.split(cvsSplitBy);
-						Coord startCoordinates = scenario.createCoord(Double.parseDouble(trip[5])/10+70000,Double.parseDouble(trip[4])*10-700000);
+						Double startx = Double.parseDouble(trip[4]);
+						Double starty = Double.parseDouble(trip[5]);
+						
+						Coord startCoordinates = scenario.createCoord(startx,starty);
 						//create activity
 						String actType = "work";
 						if(trip[2].equals("1"))actType="home";
+						// TODO diff trip types
 						Activity act = populationFactory.createActivityFromCoord(actType, startCoordinates);
 						act.setEndTime(getEndTimeInSeconds(trip[11]));	
 						plan.addActivity(act);
 						//create leg
 						plan.addLeg(populationFactory.createLeg("car"));
 						last= trip;
+//						logger.info("x="+startx+" y="+ starty);
 				}
-				Coord endCoordinates = scenario.createCoord(Double.parseDouble(trip[8])/10+70000, Double.parseDouble(trip[7])*10-700000);
+				Double endx = Double.parseDouble(trip[7]);
+				Double endy = Double.parseDouble(trip[8]);
+				Coord endCoordinates = scenario.createCoord(endx, endy);
 				Activity lastAct = populationFactory.createActivityFromCoord("home", endCoordinates);
 				plan.addActivity(lastAct);
+//				logger.info("x=" + endx + " y=" + endy);
 			}
 			/*
 			//+++++++++++++++
@@ -213,7 +217,6 @@ public class CreatePlans {
 			 
 			 //-----
 			  * */
-			  
 			
 			return population;
 		}
@@ -228,7 +231,6 @@ public class CreatePlans {
 			}
 			time= time[0].split(":");
 			Double timeInSeconds = 3600*Double.parseDouble(time[0])+60*Double.parseDouble(time[1])+Double.parseDouble(time[2])+pm;
-			// TODO Auto-generated method stub
 			return timeInSeconds;
 		}
 }
