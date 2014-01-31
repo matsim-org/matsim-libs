@@ -121,10 +121,10 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 		TravelDisutility tmp ;
 		if ( this.uott==null && this.uod==null ) {
 			tmp = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup) ;
-			log.warn("using regular travel disutility") ;
+			log.warn("using normal (non-person-based) base travel disutility (i.e. no time pressure) (UoM included later)") ;
 		} else {
 			tmp = new PersonIndividualTimeDistanceDisutility(timeCalculator, this.uott, this.uod ) ;
-			log.warn("using person individual travel disutility") ;
+			log.warn("using person individual travel disutility (i.e. including time pressure) (UoM included later)") ;
 		}
 		final TravelDisutility delegate = tmp ; // (generating final variable for anonymous class)
 		
@@ -136,6 +136,10 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 		final RoadPricingScheme localScheme = this.scheme ;
 		
 		int cnt = 0 ;
+		
+		if ( localUom!=null ) {
+			log.warn("will use person-specific UoM");
+		}
 		
 		// anonymous class:
 		return new TravelDisutility() {

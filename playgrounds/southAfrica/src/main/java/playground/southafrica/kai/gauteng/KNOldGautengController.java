@@ -63,8 +63,8 @@ import difflib.Patch;
  * </ul>
  *
  */
-public class KNGautengControler {
-	static Logger log = Logger.getLogger(KNGautengControler.class) ;
+public class KNOldGautengController {
+	static Logger log = Logger.getLogger(KNOldGautengController.class) ;
 
 	final static String MATSIM_SA_TRUNK = "/Users/nagel/ie-calvin/MATSim-SA/trunk/";
 	final static String SANRAL2010 = MATSIM_SA_TRUNK + "data/sanral2010/" ;
@@ -79,7 +79,7 @@ public class KNGautengControler {
 	private Double valueOfTimeMultiplier = 4.;
 
 	private void createConfiguration(String[] args) {
-		Header.printHeader(KNGautengControler.class.toString(), args);
+		Header.printHeader(KNOldGautengController.class.toString(), args);
 
 			config = ConfigUtils.loadConfig(SANRAL2010 + "config/kaiconfig.xml") ;
 
@@ -281,10 +281,12 @@ public class KNGautengControler {
 		
 		// insert into routing:
 		final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( scenario );
-		travelDisutilityFactory.setRoadPricingScheme(scheme);
-		travelDisutilityFactory.setUom(personSpecificUtilityOfMoney);
-//		travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory);
-		travelDisutilityFactory.setRandomness(1.);
+		// ---
+		travelDisutilityFactory.setRoadPricingScheme(scheme); // including toll. Needed for all experiments
+		travelDisutilityFactory.setUom(personSpecificUtilityOfMoney); 
+//		travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory); // including auto-sensing.  Not needed for abmtrans paper
+		travelDisutilityFactory.setRandomness(0.);
+		// ---
 		controler.setTravelDisutilityFactory( travelDisutilityFactory );
 		
 //		// plans removal:
@@ -306,7 +308,7 @@ public class KNGautengControler {
 	
 	public static void main( String[] args ) {
 		OutputDirectoryLogging.catchLogEntries();
-		KNGautengControler controler = new KNGautengControler() ;
+		KNOldGautengController controler = new KNOldGautengController() ;
 		controler.createConfiguration(args); ;
 		controler.run();
 	}
