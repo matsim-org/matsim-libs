@@ -618,9 +618,7 @@ public class IVVReaderV2 {
 			for (DemandSegment segment : DemandSegment.values()){
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
-				Double verl = Double.parseDouble(row[11].trim()) * WERKTAGEPROJAHR * bahnZwecke.get(segment)/totalBahn ;
-				if (odId.equals(getODId("1500301", "1509001"))) System.out.println(segment+": "+row[11].trim() + "* -1 * " +WERKTAGEPROJAHR+ " * "+bahnZwecke.get(segment) +" / "+ totalBahn +" = "+ verl ); 
-				// taegl. Verlagerungen * -1 * werktage * rel zweckanteil
+				Double verl = Double.parseDouble(row[11].trim()) * -1.0 *WERKTAGEPROJAHR * bahnZwecke.get(segment)/totalBahn ;
 				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.Bahn, segment, Attribute.XX), verl);
 			}
 		}}
@@ -763,7 +761,8 @@ public class IVVReaderV2 {
 		config.setTravelTimesBaseMatrixFile(dir + "P2030_Widerstaende_Ohnefall.wid");
 		config.setTravelTimesStudyMatrixFile(dir + "P2030_Widerstaende_Mitfall.wid");
 //		config.setImpedanceMatrixFile(dir + "P2030_2010_A14_induz_ME2.wid");
-		config.setImpedanceMatrixFile(dir + "induz_test.wid");
+//		config.setImpedanceMatrixFile(dir + "induz_test.wid");
+		config.setImpedanceMatrixFile(dir + "induz_mdst.wid");
 		config.setImpedanceShiftedMatrixFile(dir + "P2030_2010_A14_verlagert_ME2.wid");
 		
 		IVVReaderV2 reader = new IVVReaderV2(config);

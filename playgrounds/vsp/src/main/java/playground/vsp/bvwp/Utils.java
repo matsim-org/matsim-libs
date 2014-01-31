@@ -298,8 +298,11 @@ class Utils {
 			html.endTableRow();
 			List<String> line = new ArrayList<String>();
 			line.add("Komponente");
+			List<Mode> mL = new ArrayList<Mode>(); 
 			for (Mode mode : Mode.values()){
 				line.add(mode.toString());
+				mL.add(mode);
+				
 			}
 			line.add("Summe");
 			html.tableRowFromList(line, true);
@@ -309,7 +312,7 @@ class Utils {
 			Double rowSum = 0.;
 			Map<Mode,Double> allesTotal = new HashMap<Mode,Double>();
 
-			for (Mode mode: Mode.values()){
+			for (Mode mode: mL){
 				String string1 = tryToGetValueOrReturnNa(verblRV, mode); 
 				line.add(string1);
 				Double d = tryToGetValueOrReturnNull(verblRV, mode);
@@ -325,7 +328,7 @@ class Utils {
 			line.add("Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr im verlagerten Verkehr");
 			rowSum = 0.;
 			Map<Mode,Double> verlTot = new HashMap<Mode,Double>();
-			for (Mode mode: Mode.values()){
+			for (Mode mode: mL){
 				String string1 = tryToGetValueOrReturnNa(verlRV, mode); 
 				line.add(string1);
 				Double d = tryToGetValueOrReturnNull(verlRV, mode);
@@ -340,7 +343,7 @@ class Utils {
 			
 			line.add("Nutzen&auml;nderung aus impliziten Nutzen im verlagerten Verkehr");
 			rowSum = 0.;
-			for (Mode mode: Mode.values()){
+			for (Mode mode:mL){
 				String string1 = tryToGetValueOrReturnNa(verlImp, mode); 
 				line.add(string1);
 				Double d = tryToGetValueOrReturnNull(verlImp, mode);
@@ -356,7 +359,7 @@ class Utils {
 			
 			line.add("Nutzen&auml;nderung insgesamt im verlagerten Verkehr");
 			rowSum = 0.;
-			for (Mode mode: Mode.values()){
+			for (Mode mode: mL){
 				String string1 = tryToGetValueOrReturnNa(verlTot, mode); 
 				line.add(string1);
 				Double d = tryToGetValueOrReturnNull(verlTot, mode);
@@ -372,7 +375,7 @@ class Utils {
 			line.add("Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr im induzierten Verkehr");
 			rowSum = 0.;
 			Map<Mode,Double> indTot = new HashMap<Mode,Double>();
-			for (Mode mode: Mode.values()){
+			for (Mode mode: mL){
 				String string1 = tryToGetValueOrReturnNa(indRV, mode); 
 				line.add(string1);
 				Double d = tryToGetValueOrReturnNull(indRV, mode);
@@ -387,7 +390,7 @@ class Utils {
 			
 			line.add("Nutzen&auml;nderung aus impliziten Nutzen im induzierten Verkehr");
 			rowSum = 0.;
-			for (Mode mode: Mode.values()){
+			for (Mode mode: mL){
 				String string1 = tryToGetValueOrReturnNa(indImp, mode); 
 				line.add(string1);
 				Double d = tryToGetValueOrReturnNull(indImp, mode);
@@ -402,7 +405,7 @@ class Utils {
 			
 			line.add("Nutzen&auml;nderung insgesamt im induzierten Verkehr");
 			rowSum = 0.;
-			for (Mode mode: Mode.values()){
+			for (Mode mode: mL){
 				String string1 = tryToGetValueOrReturnNa(indTot, mode); 
 				line.add(string1);
 				Double d = tryToGetValueOrReturnNull(indTot, mode);
@@ -417,7 +420,7 @@ class Utils {
 			
 			line.add("Summe Nutzen&auml;nderungen insgesamt");
 			rowSum = 0.;
-			for (Mode mode: Mode.values()){
+			for (Mode mode: mL){
 				String string1 = tryToGetValueOrReturnNa(allesTotal, mode); 
 				line.add(string1);
 				Double d = tryToGetValueOrReturnNull(allesTotal, mode);

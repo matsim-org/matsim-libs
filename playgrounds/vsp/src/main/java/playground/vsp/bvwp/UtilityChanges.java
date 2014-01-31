@@ -69,7 +69,6 @@ abstract class UtilityChanges {
 		Map<Mode, Double> induziertImp = new HashMap<MultiDimensionalArray.Mode, Double>();
 		
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
-			System.out.println("ODID: "+id);
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Utils.initializeOutputTables(html);				
 			
@@ -160,12 +159,15 @@ abstract class UtilityChanges {
 					utilsUserFromRoHNewUsers += computeUserBenefitsNewUsers(econValues, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
 
 				} // mode			
-
-				
+				double deltaAmountsRcv = 0.;
+				try {
 				final double amountNullfallRcv = nullfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
 				final double amountPlanfallRcv = planfallForODRelation.get( makeKey(improvedMode, segm, Attribute.XX)) ;
-				
-				final double deltaAmountsRcv = amountPlanfallRcv - amountNullfallRcv ;
+				deltaAmountsRcv = amountPlanfallRcv - amountNullfallRcv; }
+				catch (NullPointerException e) {
+					System.err.println("Relation: " + id + " has no demand - skipping.");
+					continue;
+				}
 				final double amountInduced = deltaAmountsRcv - sumSent ;
 				System.out.println( " amount induced: " + amountInduced ) ;
 				Utils.writeSubHeaderInduziert(html, id, segm, improvedMode, amountInduced);
@@ -381,6 +383,8 @@ abstract class UtilityChanges {
 				}
 			}
 		}
+		System.out.println("improved mode eventually set to: "+improvedMode);
+
 		return improvedMode;
 	}
 
