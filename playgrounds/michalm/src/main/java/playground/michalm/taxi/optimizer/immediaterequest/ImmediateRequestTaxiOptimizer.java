@@ -28,7 +28,6 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
@@ -99,8 +98,25 @@ public abstract class ImmediateRequestTaxiOptimizer
     public void requestSubmitted(Request request)
     {
         unplannedRequests.add((TaxiRequest)request);
+
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            Task task = veh.getSchedule().getCurrentTask();
+
+            double predictedEndTime;
+
+            if (task instanceof DriveTask) {
+                predictedEndTime = ((DriveTask)task).getTaskTracker().predictEndTime(
+                        context.getTime());
+            }
+            else {
+                predictedEndTime = task.getEndTime();
+            }
+
+            updateCurrentAndPlannedTasks(TaxiSchedules.getSchedule(veh), predictedEndTime);
+        }
+
         scheduleUnplannedRequests();
-        
+
         //????
         TaxiScheduleValidator.assertNotIdleVehiclesAndUnplannedRequests(context);
     }
@@ -236,7 +252,7 @@ public abstract class ImmediateRequestTaxiOptimizer
                         // so maybe we can remove it right now?
 
                         lastTask.setEndTime(best.path.getDepartureTime());// shortening the WAIT task
-                        
+
                         System.err.println("Hmmmmmmmmmmm");
                     }
                     break;
@@ -434,10 +450,10 @@ public abstract class ImmediateRequestTaxiOptimizer
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {
-        @SuppressWarnings("unchecked")
-        Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
-
-        double predictedEndTime = driveTask.getVehicleTracker().predictEndTime(context.getTime());
-        updateCurrentAndPlannedTasks(schedule, predictedEndTime);
+        //        @SuppressWarnings("unchecked")
+        //        Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
+        //
+        //        double predictedEndTime = driveTask.getVehicleTracker().predictEndTime(context.getTime());
+        //        updateCurrentAndPlannedTasks(schedule, predictedEndTime);
     }
 }

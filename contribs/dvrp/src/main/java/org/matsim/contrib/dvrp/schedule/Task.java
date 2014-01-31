@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
+import org.matsim.contrib.dvrp.tracker.TaskTracker;
+
 public interface Task
 {
     public enum TaskType
@@ -59,4 +61,10 @@ public interface Task
 
 
     void setEndTime(double endTime);
+    
+    //
+    TaskTracker getTaskTracker();
+
+
+    void setTaskTracker(TaskTracker taskTracker);
 }

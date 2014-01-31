@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.tracker.OnlineVehicleTracker;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 
 
 /**
@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.tracker.OnlineVehicleTracker;
 public class VrpDynLeg
     implements DivertibleDynLeg
 {
-    private final OnlineVehicleTracker onlineVehicleTracker;
+    private final OnlineDriveTaskTracker onlineTracker;
 
     private VrpPath path;
     private int currentLinkIdx = 0;
@@ -41,15 +41,15 @@ public class VrpDynLeg
     /*package*/VrpDynLeg(VrpPath path)
     {
         this.path = path;
-        this.onlineVehicleTracker = null;
+        this.onlineTracker = null;
     }
 
 
     //DriveTask with OnlineVehicleTrakcer; the tracker notifies VrpSimEngine of new positions
-    /*package*/VrpDynLeg(VrpPath path, OnlineVehicleTracker onlineVehicleTracker)
+    /*package*/VrpDynLeg(VrpPath path, OnlineDriveTaskTracker onlineTracker)
     {
         this.path = path;
-        this.onlineVehicleTracker = onlineVehicleTracker;
+        this.onlineTracker = onlineTracker;
     }
 
 
@@ -63,8 +63,8 @@ public class VrpDynLeg
             throw new IllegalStateException();
         }
 
-        if (onlineVehicleTracker != null) {
-            onlineVehicleTracker.movedOverNode();
+        if (onlineTracker != null) {
+            onlineTracker.movedOverNode();
         }
     }
 

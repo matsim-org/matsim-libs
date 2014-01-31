@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
+import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 
 public abstract class AbstractTask
@@ -33,6 +34,8 @@ public abstract class AbstractTask
 
     private double beginTime;
     private double endTime;
+
+    private TaskTracker taskTracker;
 
 
     public AbstractTask(double beginTime, double endTime)
@@ -96,6 +99,20 @@ public abstract class AbstractTask
         }
 
         this.endTime = endTime;
+    }
+
+
+    @Override
+    public TaskTracker getTaskTracker()
+    {
+        return taskTracker;
+    }
+
+
+    @Override
+    public void setTaskTracker(TaskTracker taskTracker)
+    {
+        this.taskTracker = taskTracker;
     }
 
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,28 +19,31 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 
-public interface OnlineVehicleTracker
-    extends OfflineVehicleTracker
+public class OfflineTaskTracker
+    implements TaskTracker
 {
-    Link getLink();
+    private final double plannedEndTime;
 
 
-    double getLinkEnterTime();
+    public OfflineTaskTracker(Task task)
+    {
+        this.plannedEndTime = task.getEndTime();
+    }
 
 
-    double predictLinkExitTime(double currentTime);
+    @Override
+    public double predictEndTime(double currentTime)
+    {
+        return Math.max(plannedEndTime, currentTime);
+    }
 
 
-    LinkTimePair getDiversionPoint(double currentTime);
-
-
-    void divertPath(VrpPathWithTravelData newSubPath, double currentTime);
-
-
-    void movedOverNode();
+    @Override
+    public double getPlannedEndTime()
+    {
+        return plannedEndTime;
+    }
 }

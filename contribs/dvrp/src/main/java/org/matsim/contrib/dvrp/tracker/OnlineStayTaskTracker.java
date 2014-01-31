@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.schedule;
+package org.matsim.contrib.dvrp.tracker;
 
-import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dynagent.DynActivity;
 
 
-public interface DriveTask
-    extends Task
+public class OnlineStayTaskTracker
+    implements TaskTracker
 {
-    VrpPath getPath();
+    private DynActivity dynActivity;
+    private final double plannedEndTime;
 
 
-    /**
-     * Vehicle changes its path. Can be used for: <br/>
-     * - changing destination (while keepen the current task active) <br/>
-     * - stopping it as soon as possible (i.e. at the end of the current/next link) <br/>
-     * - random walk, roaming/crusing around <br/>
-     * - ...
-     */
-    void divertPath(DivertedVrpPath divertedPath, double newEndTime);
+    public OnlineStayTaskTracker(StayTask stayTask)
+    {
+        this.plannedEndTime = stayTask.getEndTime();
+    }
 
-    /**
-     * Cancels DriveTask on the fly. The next task must be also DriveTask.
-     */
-    //void cancel(double now);
+
+    @Override
+    public double predictEndTime(double currentTime)
+    {
+        return dynActivity.getEndTime();
+    }
+
+
+    @Override
+    public double getPlannedEndTime()
+    {
+        return plannedEndTime;
+    }
+
+
+    public void setDynActivity(DynActivity dynActivity)
+    {
+        this.dynActivity = dynActivity;
+    }
 }

@@ -49,7 +49,7 @@ public class TaxiDelaySpeedupStats
         double plannedEndTime;
 
         if (currentTask.getType() == TaskType.DRIVE) {
-            plannedEndTime = ((DriveTask)currentTask).getVehicleTracker().getPlannedEndTime();
+            plannedEndTime = ((DriveTask)currentTask).getTaskTracker().getPlannedEndTime();
         }
         else {
             plannedEndTime = currentTask.getEndTime();

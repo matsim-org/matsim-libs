@@ -36,8 +36,8 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * Therefore always use "fresh" Path object, i.e. driveTask.getPath() to get: total travel
  * time&cost, arrival time, or next link and its travel time
  */
-public class OnlineVehicleTrackerImpl
-    implements OnlineVehicleTracker
+public class OnlineDriveTaskTrackerImpl
+    implements OnlineDriveTaskTracker
 {
     private final DriveTask driveTask;
     private VrpDynLeg vrpDynLeg;
@@ -46,7 +46,6 @@ public class OnlineVehicleTrackerImpl
     private final MobsimTimer timer;
 
     private double linkEnterTime;
-    private double linkEnterDelay;
 
     private double plannedTTAtPrevNode;
     private double plannedLinkTT;
@@ -56,8 +55,8 @@ public class OnlineVehicleTrackerImpl
     private Link currentLink;
 
 
-    public OnlineVehicleTrackerImpl(DriveTask driveTask, VrpOptimizerWithOnlineTracking optimizer,
-            MobsimTimer timer)
+    public OnlineDriveTaskTrackerImpl(DriveTask driveTask,
+            VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
     {
         this.driveTask = driveTask;
         this.optimizer = optimizer;
@@ -73,8 +72,6 @@ public class OnlineVehicleTrackerImpl
         plannedTTAtPrevNode = 0;
         plannedLinkTT = path.getLinkTravelTime(0);
         plannedEndTime = driveTask.getEndTime();
-
-        linkEnterDelay = 0;
     }
 
 
@@ -90,9 +87,6 @@ public class OnlineVehicleTrackerImpl
 
         plannedTTAtPrevNode += plannedLinkTT;//add previous link TT
         plannedLinkTT = path.getLinkTravelTime(currentLinkIdx);
-
-        double actualTTAtPrevNode = linkEnterTime - driveTask.getBeginTime();
-        linkEnterDelay = actualTTAtPrevNode - plannedTTAtPrevNode;
 
         optimizer.nextLinkEntered(driveTask);
     }
@@ -147,21 +141,10 @@ public class OnlineVehicleTrackerImpl
         //1. If vehicle really reaches the end of the link at predictLinkExitTime(currentTime),
         // it means no delays/speedups, i.e. everything happens just on time, as if planned
         plannedTTAtPrevNode = linkEnterTime - newEndTime;
-        linkEnterDelay = 0;
         plannedLinkTT = predictLinkExitTime(currentTime) - linkEnterTime;
 
         //2. Additionally, memorize the planned end time
         plannedEndTime = newEndTime;
-    }
-
-
-    @Override
-    public double calculateCurrentDelay(double currentTime)
-    {
-        double actualTimeOnLink = currentTime - linkEnterTime;
-
-        // delay(positive/zero/negative) at the last node + delay(positive/zero) on the current link 
-        return linkEnterDelay + Math.max(actualTimeOnLink - plannedLinkTT, 0);
     }
 
 

@@ -19,18 +19,10 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
-public interface OfflineVehicleTracker
+public interface TaskTracker
 {
     double predictEndTime(double currentTime);
 
 
     double getPlannedEndTime();
-
-
-    /**
-     * Delay relative to the initial driveTask.getEndTime(), i.e. getInitialEndTime(), since the end
-     * time my be updated periodically, thus driveTask.getEndTime() may return different results
-     * over time)
-     */
-    double calculateCurrentDelay(double currentTime);
 }

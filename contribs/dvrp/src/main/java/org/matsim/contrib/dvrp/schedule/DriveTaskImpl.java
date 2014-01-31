@@ -20,7 +20,6 @@
 package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.tracker.OfflineVehicleTracker;
 
 
 public class DriveTaskImpl
@@ -28,7 +27,6 @@ public class DriveTaskImpl
     implements DriveTask
 {
     private VrpPath path;
-    private OfflineVehicleTracker vehicleTracker;
 
 
     public DriveTaskImpl(VrpPathWithTravelData path)
@@ -67,20 +65,6 @@ public class DriveTaskImpl
 
         path = divertedPath;
         setEndTime(newEndTime);
-    }
-
-
-    @Override
-    public OfflineVehicleTracker getVehicleTracker()
-    {
-        return vehicleTracker;
-    }
-
-
-    @Override
-    public void setVehicleTracker(OfflineVehicleTracker vehicleTracker)
-    {
-        this.vehicleTracker = vehicleTracker;
     }
 
 

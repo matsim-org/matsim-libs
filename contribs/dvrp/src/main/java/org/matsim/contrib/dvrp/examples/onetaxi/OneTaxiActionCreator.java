@@ -42,7 +42,7 @@ public class OneTaxiActionCreator
     {
         switch (task.getType()) {
             case DRIVE:
-                return VrpDynLegs.createLegWithOfflineVehicleTracker((DriveTask)task);
+                return VrpDynLegs.createLegWithOfflineTracker((DriveTask)task);
 
             case STAY:
                 if (task instanceof OneTaxiServeTask) { //PICKUP or DROPOFF

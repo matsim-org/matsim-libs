@@ -27,19 +27,20 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 
 public class VrpDynLegs
 {
-    public static VrpDynLeg createLegWithOfflineVehicleTracker(DriveTask driveTask)
+    public static VrpDynLeg createLegWithOfflineTracker(DriveTask driveTask)
     {
-        OfflineVehicleTracker tracker = new OfflineVehicleTrackerImpl(driveTask);
-        driveTask.setVehicleTracker(tracker);
+        TaskTracker tracker = new OfflineTaskTracker(driveTask);
+        driveTask.setTaskTracker(tracker);
         return new VrpDynLeg(driveTask.getPath());
     }
 
 
-    public static VrpDynLeg createLegWithOnlineVehicleTracker(DriveTask driveTask,
+    public static VrpDynLeg createLegWithOnlineTracker(DriveTask driveTask,
             VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
     {
-        OnlineVehicleTrackerImpl tracker = new OnlineVehicleTrackerImpl(driveTask, optimizer, timer);
-        driveTask.setVehicleTracker(tracker);
+        OnlineDriveTaskTrackerImpl tracker = new OnlineDriveTaskTrackerImpl(driveTask, optimizer,
+                timer);
+        driveTask.setTaskTracker(tracker);
 
         VrpDynLeg leg = new VrpDynLeg(driveTask.getPath(), tracker);
         tracker.setVrpDynLeg(leg);
@@ -57,7 +58,7 @@ public class VrpDynLegs
     public static final LegCreator LEG_WITH_OFFLINE_TRACKER_CREATOR = new LegCreator() {
         public VrpDynLeg createLeg(DriveTask driveTask)
         {
-            return createLegWithOfflineVehicleTracker(driveTask);
+            return createLegWithOfflineTracker(driveTask);
         };
     };
 
@@ -69,8 +70,12 @@ public class VrpDynLegs
             @Override
             public VrpDynLeg createLeg(DriveTask driveTask)
             {
-                return createLegWithOnlineVehicleTracker(driveTask, optimizer, timer);
+                return createLegWithOnlineTracker(driveTask, optimizer, timer);
             }
         };
     }
+    
+    
+    
+    
 }
