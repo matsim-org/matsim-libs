@@ -54,13 +54,13 @@
 	 <dependency>
    		<groupId>jsprit</groupId>
   		<artifactId>jsprit-core</artifactId>
-   		<version>1.1.0</version>
+   		<version>1.1.1</version>
 	</dependency>
 	
 	<dependency>
    		<groupId>jsprit</groupId>
   		<artifactId>jsprit-analysis</artifactId>
-   		<version>1.1.0</version>
+   		<version>1.1.1</version>
 	</dependency>
 
 	<dependency>
