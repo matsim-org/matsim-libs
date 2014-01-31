@@ -277,27 +277,14 @@ public abstract class ImmediateRequestTaxiOptimizer
             return false;
         }
 
-        double time = context.getTime();
+        double endTime = context.getTime();
         TaxiTask currentTask = schedule.getCurrentTask();
 
-        double plannedEndTime;
-
-        if (currentTask.getType() == TaskType.DRIVE) {
-            plannedEndTime = ((DriveTask)currentTask).getVehicleTracker().getPlannedEndTime();
-        }
-        else {
-            plannedEndTime = currentTask.getEndTime();
+        if (delaySpeedupStats != null) {// optionally, one may record delays
+            delaySpeedupStats.updateStats(currentTask, endTime);
         }
 
-        double delay = time - plannedEndTime;
-
-        if (delay != 0) {
-            if (delaySpeedupStats != null) {// optionally, one may record delays
-                delaySpeedupStats.updateStats(currentTask, delay);
-            }
-        }
-
-        updateCurrentAndPlannedTasks(schedule, time);
+        updateCurrentAndPlannedTasks(schedule, endTime);
 
         if (!params.destinationKnown) {
             if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
@@ -307,11 +294,6 @@ public abstract class ImmediateRequestTaxiOptimizer
             }
         }
 
-        // return delay != 0;//works only for offline vehicle tracking
-
-        //since we can change currentTask.endTime continuously, it is hard to determine
-        //what endTime was at the moment of last reoptimization (triggered by other vehicles or
-        //requests)
         return true;
     }
 

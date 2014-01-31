@@ -22,6 +22,8 @@ package playground.michalm.taxi.optimizer;
 import java.io.PrintWriter;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 
 import playground.michalm.taxi.schedule.TaxiTask;
 
@@ -42,8 +44,19 @@ public class TaxiDelaySpeedupStats
     private final SummaryStatistics dropoffSpeedupStats = new SummaryStatistics();
 
 
-    public void updateStats(TaxiTask currentTask, double delay)
+    public void updateStats(TaxiTask currentTask, double endTime)
     {
+        double plannedEndTime;
+
+        if (currentTask.getType() == TaskType.DRIVE) {
+            plannedEndTime = ((DriveTask)currentTask).getVehicleTracker().getPlannedEndTime();
+        }
+        else {
+            plannedEndTime = currentTask.getEndTime();
+        }
+
+        double delay = endTime - plannedEndTime;
+
         if (delay == 0) {
             return;
         }
