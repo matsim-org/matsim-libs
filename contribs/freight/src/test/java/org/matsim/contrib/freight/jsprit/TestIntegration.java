@@ -1,5 +1,7 @@
 package org.matsim.contrib.freight.jsprit;
 
+import jsprit.analysis.toolbox.SolutionPrinter;
+import jsprit.analysis.toolbox.SolutionPrinter.Print;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.box.SchrimpfFactory;
 import jsprit.core.problem.VehicleRoutingProblem;
@@ -8,23 +10,20 @@ import jsprit.core.util.Solutions;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
+import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -78,6 +77,10 @@ public class TestIntegration {
 			// certainly ok as initial solution)
 
 			carrier.setSelectedPlan(newPlan) ;
+			
+			SolutionPrinter.print(problem, solution, Print.VERBOSE);
+			
+			
 
 		}
 	}
@@ -122,7 +125,16 @@ public class TestIntegration {
 				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(0., 24.*3600.) );
 				serviceBuilder.setServiceDuration( 10.*60. );
 				CarrierService service = serviceBuilder.build();
-//				carrier.getServices().add(service); // if one uncomments this line, the test fails.  kai/quintin, jan'14
+				carrier.getServices().add(service); // if one uncomments this line, the test fails.  kai/quintin, jan'14
+			}
+			
+			{
+				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(new IdImpl("service3"), new IdImpl("146829"));
+				serviceBuilder.setCapacityDemand( 33 );
+				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(0., 24.*3600.) );
+				serviceBuilder.setServiceDuration( 10.*60. );
+				CarrierService service = serviceBuilder.build();
+				carrier.getServices().add(service); // if one uncomments this line, the test fails.  kai/quintin, jan'14
 			}
 			carriers.addCarrier(carrier);
 		}
