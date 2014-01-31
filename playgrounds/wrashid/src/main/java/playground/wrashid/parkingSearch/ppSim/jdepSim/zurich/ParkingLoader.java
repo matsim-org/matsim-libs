@@ -198,7 +198,7 @@ public class ParkingLoader {
 	private static void addIllegalParking(Network network, LinkedList<Parking> parkings) {
 		double shareOfLinksWithIllegalParking=ZHScenarioGlobal.loadDoubleParam("ParkingLoader.shareOfLinksWithIllegalParking");
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
-		Random rand=new Random();
+		Random rand=new Random(19873); // fixing seed (scenarios with different simulation seeds should still have same illegal parking infrastructure)
 		
 		int i = 0;
 		for (Link link : network.getLinks().values()) {
