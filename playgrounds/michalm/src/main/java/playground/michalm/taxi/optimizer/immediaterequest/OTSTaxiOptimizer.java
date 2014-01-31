@@ -32,8 +32,8 @@ public class OTSTaxiOptimizer
     private final TaxiOptimizationPolicy optimizationPolicy;
 
 
-    public OTSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, ImmediateRequestParams params,
-            TaxiOptimizationPolicy optimizationPolicy)
+    public OTSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
+            ImmediateRequestParams params, TaxiOptimizationPolicy optimizationPolicy)
     {
         super(context, calculator, params);
         this.optimizationPolicy = optimizationPolicy;
@@ -47,6 +47,6 @@ public class OTSTaxiOptimizer
             scheduleUnplannedRequests();
         }
 
-        nextTask(schedule);
+        schedule.nextTask();
     }
 }

@@ -62,7 +62,7 @@ public class TaxiUtils
 
         // idle right now, but:
         // consider CLOSING (T1) time windows of the vehicle
-        if (time >= schedule.getVehicle().getT1()) {
+        if (time >= vehicle.getT1()) {
             System.err.println("hmmmm");
             return false;
         }
