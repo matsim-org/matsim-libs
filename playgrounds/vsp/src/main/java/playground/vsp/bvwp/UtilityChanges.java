@@ -21,7 +21,15 @@ import playground.vsp.bvwp.MultiDimensionalArray.Mode;
 
 abstract class UtilityChanges {
 	
-
+	Map<Mode, Map<Attribute,Double>> verbleibendRV = new HashMap<MultiDimensionalArray.Mode, Map<Attribute,Double>>();
+	
+	Map<Mode, Map<Attribute,Double>> verlagertRVAb = new HashMap<MultiDimensionalArray.Mode, Map<Attribute,Double>>();
+	Map<Mode, Map<Attribute,Double>> verlagertRVAuf = new HashMap<MultiDimensionalArray.Mode, Map<Attribute,Double>>();
+	Map<Mode, Double> verlagertImpAb = new HashMap<MultiDimensionalArray.Mode, Double>();
+	Map<Mode, Double> verlagertImpAuf = new HashMap<MultiDimensionalArray.Mode, Double>();
+	
+	Map<Mode, Map<Attribute,Double>> induziertRV = new HashMap<MultiDimensionalArray.Mode, Map<Attribute,Double>>();
+	Map<Mode, Double> induziertImp = new HashMap<MultiDimensionalArray.Mode, Double>();
 	
 	
 	UtilityChanges() {
@@ -60,13 +68,7 @@ abstract class UtilityChanges {
 		double utils = 0. ;
 		double utilsUserFromRoHOldUsers = 0. ;
 		double utilsUserFromRoHNewUsers= 0. ;
-		Map<Mode, Double> verbleibendRV = new HashMap<MultiDimensionalArray.Mode, Double>();
-		
-		Map<Mode, Double> verlagertRV = new HashMap<MultiDimensionalArray.Mode, Double>();
-		Map<Mode, Double> verlagertImp = new HashMap<MultiDimensionalArray.Mode, Double>();
-		
-		Map<Mode, Double> induziertRV = new HashMap<MultiDimensionalArray.Mode, Double>();
-		Map<Mode, Double> induziertImp = new HashMap<MultiDimensionalArray.Mode, Double>();
+
 		
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
@@ -122,9 +124,7 @@ abstract class UtilityChanges {
 						System.err.println("writing verbleibend:");
 						System.err.flush() ;
 						Utils.writeSubHeaderVerbleibend(html, id, segm, mode, amountAltnutzer);
-						double utilAltnutzer = computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, attributesPlanfall, amountAltnutzer, html);
-						Utils.addUtlToMap(verbleibendRV, mode, utilAltnutzer);
-						utils += utilAltnutzer;
+						utils += computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, mode, attributesPlanfall, amountAltnutzer, html);
 					} else {
 						sumSent += Math.abs( deltaAmounts ) ;
 					}
@@ -136,20 +136,18 @@ abstract class UtilityChanges {
 						final double utilsBefore = utils ;
 
 						utils += computeAndPrintGivingOrReceiving(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving, 
-								econValues, attributesNullfall, attributesPlanfall, html);
+								econValues, attributesNullfall, attributesPlanfall, mode, html);
 						
 						if ( utils != utilsBefore ) {
 							Utils.writePartialSum(html, "Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr bei Verlagerung:", utils - utilsBefore);
-							Utils.addUtlToMap(verlagertRV, mode, utils-utilsBefore);
 						}
 						
 						final double utilsImp =computeAndPrintImplicitUtl(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving,
-								econValues, attributesNullfall, attributesPlanfall, html);
+								econValues, attributesNullfall, attributesPlanfall, mode, html);
 						utils += utilsImp;
 
 						if ( utils != utilsBefore ) {
 							Utils.writePartialSum(html, "Nutzen&auml;nderung bei Verlagerung gesamt:" , utils - utilsBefore);
-							Utils.addUtlToMap(verlagertImp, mode, utilsImp);
 						}
 
 					}
@@ -185,7 +183,7 @@ abstract class UtilityChanges {
 						partialUtl += utlChange ;
 
 						if ( utlChange!=0. ) {
-							Utils.addUtlToMap(induziertRV, improvedMode, utlChange);
+							Utils.addUtlToMap(induziertRV, improvedMode, attribute , utlChange);
 							Utils.writeAufnehmendRow(html, -amountInduced, attribute, attributeValuePlanfallReceiving, utlChangesPerItem, utlChange);
 						}
 					}
@@ -237,8 +235,12 @@ abstract class UtilityChanges {
 		}
 
 
-		Utils.writeRohAndEndOutput(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
-		Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRV, verlagertImp, induziertRV, induziertImp);
+		Utils.writeRoh(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
+		Utils.endOutput(html);
+		
+		Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRVAuf, verlagertRVAb, verlagertImpAuf, verlagertImpAb, induziertRV, induziertImp);
+		Utils.writeRoh(totalHtml, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
+		Utils.endOutput(totalHtml);
 	}
 
 	private static double computeUserBenefitsOldUsers(Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall,
@@ -282,7 +284,7 @@ abstract class UtilityChanges {
 	}
 
 	private double computeAndPrintGivingOrReceiving(Attributes econValuesReceiving, Attributes attributesNullfallReceiving,
-			Attributes attributesPlanfallReceiving, Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Html html) {
+			Attributes attributesPlanfallReceiving, Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Mode mode, Html html) {
 
 		double utils = 0. ;
 
@@ -304,6 +306,7 @@ abstract class UtilityChanges {
 
 					if ( utlChange!=0. ) {
 						Utils.writeAbgebendRow(html, deltaAmounts, attribute, attributeValueNullfall, attributeValuePlanfall, utlChangesPerItem, utlChange);
+						Utils.addUtlToMap(verlagertRVAb, mode, attribute, utlChange);
 					}
 				}
 				{
@@ -319,6 +322,9 @@ abstract class UtilityChanges {
 					if ( utlChange!=0. ) {
 						// wir sind aufnehmend; utl gains should be negative
 						Utils.writeAufnehmendRow(html, -deltaAmounts, attribute, attributeValuePlanfallReceiving, utlChangesPerItem, utlChange);
+
+						Utils.addUtlToMap(verlagertRVAuf, mode, attribute, utlChange);
+
 					}
 				}
 			}
@@ -334,7 +340,7 @@ abstract class UtilityChanges {
 	}
 
 	private double computeAndPrintImplicitUtl(Attributes econValuesReceiving, Attributes attributesNullfallReceiving, Attributes attributesPlanfallReceiving, 
-			Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Html html) {
+			Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Mode mode, Html html) {
 
 		final double deltaAmounts = attributesPlanfall.getByEntry(Attribute.XX) - attributesNullfall.getByEntry(Attribute.XX ) ;
 		// negative, since this is never called for the receiving mode
@@ -345,6 +351,7 @@ abstract class UtilityChanges {
 		final double implicitUtlOverall = - implicitUtlPerItem * Math.abs(deltaAmounts) ;
 		if ( implicitUtlOverall != 0. ) {
 			Utils.writeImplicitUtl(html, implicitUtlPerItem, implicitUtlOverall, "Impl. Nutz. abg.");
+			Utils.addUtlToMap(verlagertImpAb, mode,  implicitUtlOverall);
 		}
 
 		final double implicitUtlPerItemReceiving = this.computeImplicitUtilityPerItem( econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving ) ; 
@@ -353,6 +360,7 @@ abstract class UtilityChanges {
 		final double implicitUtlOverallReceiving = implicitUtlPerItemReceiving * Math.abs(deltaAmounts) ;
 		if ( implicitUtlOverallReceiving != 0. ) {
 			Utils.writeImplicitUtl( html, implicitUtlPerItemReceiving, implicitUtlOverallReceiving, "Impl. Nutz. aufn." ) ;
+			Utils.addUtlToMap(verlagertImpAuf, mode , implicitUtlOverallReceiving);
 		}
 
 		double util = implicitUtlOverall + implicitUtlOverallReceiving ;
@@ -383,13 +391,12 @@ abstract class UtilityChanges {
 				}
 			}
 		}
-		System.out.println("improved mode eventually set to: "+improvedMode);
 
 		return improvedMode;
 	}
 
 	private double computeAndPrintValuesForAltnutzer( Attributes econValues,
-			Attributes quantitiesNullfall,
+			Attributes quantitiesNullfall, Mode mode,
 			Attributes quantitiesPlanfall, double amountAltnutzer, Html html) {
 
 		double utils = 0. ;
@@ -410,6 +417,7 @@ abstract class UtilityChanges {
 
 				Utils.writeAltnutzerRow(quantitiesNullfall, quantitiesPlanfall, amountAltnutzer, html, attribute, deltaQuantities,
 						utlChangePerItem, utlChange);
+				Utils.addUtlToMap(verbleibendRV, mode, attribute, utlChange);
 				utils += utlChange ;
 
 			}

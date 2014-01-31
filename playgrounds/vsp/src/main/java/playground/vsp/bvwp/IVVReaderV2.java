@@ -608,6 +608,7 @@ public class IVVReaderV2 {
 				if (segment.equals(DemandSegment.GV)) continue;
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 				Double bahnhere = nullfalldata.getByODRelation(odId).getAttributes(Mode.Bahn, segment).getByEntry(Attribute.XX);	
+				
 				bahnZwecke.put(segment, bahnhere);
 				totalBahn += bahnhere;
 				if (odId.equals(getODId("1500301", "1509001"))) System.out.println(segment + " : "+bahnhere); 
@@ -620,6 +621,9 @@ public class IVVReaderV2 {
 				if (segment.equals(DemandSegment.PV_NON_COMMERCIAL)) continue;
 				Double verl = Double.parseDouble(row[11].trim()) * -1.0 *WERKTAGEPROJAHR * bahnZwecke.get(segment)/totalBahn ;
 				planfalldata.getByODRelation(odId).inc(Key.makeKey(Mode.Bahn, segment, Attribute.XX), verl);
+				planfalldata.getByODRelation(odId).put(Key.makeKey(Mode.Bahn, segment, Attribute.Reisezeit_h), Double.parseDouble(row[5].trim())/60.);
+				nullfalldata.getByODRelation(odId).put(Key.makeKey(Mode.Bahn, segment, Attribute.Reisezeit_h), Double.parseDouble(row[5].trim())/60.);
+
 			}
 		}}
 		

@@ -21,9 +21,11 @@ package playground.vsp.bvwp;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
@@ -91,7 +93,7 @@ class Utils {
 		html.endTableRow() ;
 	}
 
-	static void writeRohAndEndOutput(Html html, double utilsUserFromRoHOldUsers, double utilsUserFromRoHNewUsers, double operatorProfit) {
+	static void writeRoh(Html html, double utilsUserFromRoHOldUsers, double utilsUserFromRoHNewUsers, double operatorProfit) {
 		System.out.printf("RoH: utl gain old users: %16.1e ; utl gain new users: %16.1e ; operator profit gain: %16.1e ; sum: %16.1e\n", 
 				utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit, utilsUserFromRoHOldUsers+utilsUserFromRoHNewUsers+operatorProfit ) ; 
 	
@@ -105,12 +107,14 @@ class Utils {
 				+ "; sum: " + Utils.convertToMillions(utilsUserFromRoHOldUsers + utilsUserFromRoHNewUsers +operatorProfit) ) ;
 		html.endTableRow() ;
 	
+	}
+	static void endOutput(Html html) {
+	
 		html.endTable() ;
 	
 		html.endBody() ;
 		html.endHtml() ;
 	}
-
 	static void writeSubHeaderWechselnd(Html html, Id id, DemandSegment segm, Mode mode, final double deltaAmounts) {
 		
 		System.out.printf("====================%16s; %16s; %16s; wechselnder & induzierter Verkehr: %16.1f Personen/Tonnen ====================\n", 
@@ -454,12 +458,242 @@ class Utils {
 			return result;
 			
 		}
-		static void addUtlToMap(Map<Mode, Double> map, Mode mode ,double utl){
+		static void addUtlToMap(Map<Mode, Map<Attribute,Double>> map, Mode mode, Attribute attribute ,double utl){
+			Map<Attribute,Double> utlMapBefore = new HashMap<Attribute, Double>();
+
+			if (map.containsKey(mode)) utlMapBefore = map.get(mode);
 			double utlBefore = 0.;
+			if (utlMapBefore.containsKey(attribute)) utlBefore = utlMapBefore.get(attribute);
 			
+			double utlAfter = utlBefore + utl;
+			utlMapBefore.put(attribute, utlAfter);
+			map.put(mode, utlMapBefore);
+
+		}
+		
+		static void addUtlToMap(Map<Mode, Double> map, Mode mode, double utl){
+			
+			double utlBefore = 0.;
 			if (map.containsKey(mode)) utlBefore = map.get(mode);
+			
 			double utlAfter = utlBefore + utl;
 			map.put(mode, utlAfter);
 
 		}
-}
+
+		 static void writeOverallOutputTable(Html totalHtml,
+				Map<Mode, Map<Attribute, Double>> verbleibendRV,
+				Map<Mode, Map<Attribute, Double>> verlagertRVAuf,
+				Map<Mode, Map<Attribute, Double>> verlagertRVAb,
+				Map<Mode, Double> verlagertImpAuf,
+				Map<Mode, Double> verlagertImpAb,
+				Map<Mode, Map<Attribute, Double>> induziertRV,
+				Map<Mode, Double> induziertImp) {
+			 
+				totalHtml.beginTableMulticolumnRow();
+				totalHtml.write("<b>Summen ueber alle Relationen und Zwecke</b>");
+				totalHtml.endTableRow();
+				double totalSum = 0.;
+				
+				totalHtml.beginTableMulticolumnRow();
+				totalHtml.write("<b>Verbleibender Verkehr</b>");
+				totalHtml.endTableRow();
+
+				List<String> line = new ArrayList<String>();
+
+				double vblSum = 0.;
+				for (Entry<Mode, Map<Attribute, Double>> e : verbleibendRV.entrySet()){
+					totalHtml.beginTableMulticolumnRow();
+					totalHtml.write(e.getKey().toString()+":");
+					totalHtml.endTableRow();
+					double zws = 0.;
+					for (Entry<Attribute, Double> ee : e.getValue().entrySet()){
+						line.add(ee.getKey().toString());
+						line.add(convertToMillions(ee.getValue()));
+						totalHtml.tableRowFromList(line, false);
+						line.clear();
+						zws += ee.getValue();
+					}
+					line.add("Zwischensumme "+e.getKey().toString());
+					line.add(convertToMillions(zws));
+					totalHtml.tableRowFromList(line, true);
+					line.clear();
+					vblSum += zws;
+					
+				}
+				line.add("Summe verbleibender Verkehr insgesamt");
+				line.add(convertToMillions(vblSum));
+				totalHtml.tableRowFromList(line, true);
+				line.clear();
+				totalSum += vblSum;
+
+				totalHtml.beginTableMulticolumnRow();
+				totalHtml.write(" ");
+				totalHtml.endTableRow();
+				
+				totalHtml.beginTableMulticolumnRow();
+				totalHtml.write("<b>Verlagerter Verkehr</b>");
+				totalHtml.endTableRow();
+				
+				double verlSum = 0.;
+				HashSet<Mode> relModes = new HashSet<Mode>();
+				relModes.addAll(verlagertRVAb.keySet());
+				relModes.addAll(verlagertRVAuf.keySet());
+				Set<Attribute> relAttr = new HashSet<Attribute>();
+				for (Mode mode : relModes){
+					if (verlagertRVAb.containsKey(mode)) relAttr.addAll(verlagertRVAb.get(mode).keySet());
+					if (verlagertRVAuf.containsKey(mode)) relAttr.addAll(verlagertRVAuf.get(mode).keySet());
+				}
+				
+				for (Mode mode : relModes){
+					totalHtml.beginTableMulticolumnRow();
+					totalHtml.write("<b>"+mode.toString()+":</b>");
+					totalHtml.endTableRow();
+					double zws =0.;
+					Map <Attribute,Double> attAbmap = new HashMap<Attribute,Double>();
+						if (verlagertRVAb.containsKey(mode)) attAbmap = verlagertRVAb.get(mode);
+					Map <Attribute,Double> attAufmap = new HashMap<Attribute,Double>();
+						if (verlagertRVAuf.containsKey(mode)) attAufmap = verlagertRVAuf.get(mode);
+
+						for (Attribute attr : relAttr){
+							double zzws = 0.;
+							if (attAbmap.containsKey(attr)) {
+								line.add(attr.toString() + " abgebend");
+								double v = attAbmap.get(attr);
+								zzws += v;
+								line.add(convertToMillions(v));
+								totalHtml.tableRowFromList(line, false);
+								line.clear();								
+							}
+							if (attAufmap.containsKey(attr)) {
+								line.add(attr.toString() + " aufnehmend");
+								double v = attAufmap.get(attr);
+								zzws += v;
+								line.add(convertToMillions(v));
+								totalHtml.tableRowFromList(line, false);
+								line.clear();								
+							}
+							if (zzws!=0.0){
+							line.add("");
+							line.add(convertToMillions(zzws));
+							totalHtml.tableRowFromList(line, true);
+							line.clear();
+							zws += zzws;
+							}
+						}
+						line.add("Nutzenaenderung aus Aenderung Ressourcenverzehr bei Verlagerung");
+						line.add(convertToMillions(zws));
+						totalHtml.tableRowFromList(line, true);
+						line.clear();
+						
+						double impl =0.;
+					if (verlagertImpAb.containsKey(mode)){
+						line.add("Impl. Nutzen abgebend");
+						double v = verlagertImpAb.get(mode);
+						impl += v;
+						line.add(convertToMillions(v));
+						totalHtml.tableRowFromList(line, false);
+						line.clear();
+					}	
+					if (verlagertImpAuf.containsKey(mode)){
+						line.add("Impl. Nutzen aufnehmend");
+						double v = verlagertImpAuf.get(mode);
+						impl += v;
+						line.add(convertToMillions(v));
+						totalHtml.tableRowFromList(line, false);
+						line.clear();
+					}
+					if (impl!=0.0){
+						line.add("");
+						line.add(convertToMillions(impl));
+						totalHtml.tableRowFromList(line, true);
+						zws += impl;
+						line.clear();
+						}
+						
+						line.add("Nutzenaenderung bei Verlagerung fuer Verkehrstraeger "+mode.toString());
+						line.add(convertToMillions(zws));
+						verlSum += zws;
+						totalHtml.tableRowFromList(line, true);
+						line.clear();
+				}
+				
+				
+				line.add("Nutzenaenderung bei Verlagerung insgesamt (alle Verkehrstraeger)");
+				line.add(convertToMillions(verlSum));
+				totalHtml.tableRowFromList(line, true);		
+				line.clear();
+				totalSum += verlSum;
+				
+				totalHtml.beginTableMulticolumnRow();
+				totalHtml.write(" ");
+				totalHtml.endTableRow();
+				
+				totalHtml.beginTableMulticolumnRow();
+				totalHtml.write("<b>Induzierter Verkehr</b>");
+				totalHtml.endTableRow();
+				
+				double indSum = 0.;
+				
+				Set<Mode> relevantModesForInd = new HashSet<Mode>();
+				relevantModesForInd.addAll(induziertRV.keySet());
+				relevantModesForInd.addAll(induziertImp.keySet());
+				
+				for (Mode mode :  relevantModesForInd)
+				{
+					totalHtml.beginTableMulticolumnRow();
+					totalHtml.write(mode.toString()+":");
+					totalHtml.endTableRow();
+					double zws = 0.;
+					if (induziertRV.containsKey(mode)){
+						for (Entry<Attribute,Double> e : induziertRV.get(mode).entrySet()){
+						line.add(e.getKey().toString() + " aufnehmend");
+						line.add(convertToMillions(e.getValue()));
+						totalHtml.tableRowFromList(line, false);
+						line.clear();
+						zws += e.getValue();
+						}
+						}
+					if (induziertImp.containsKey(mode)){
+						line.add("Impliziter Nutzen induziert");
+						line.add(convertToMillions(induziertImp.get(mode)));
+						totalHtml.tableRowFromList(line, false);
+						line.clear();
+						zws += induziertImp.get(mode);
+					}
+					line.add("");
+					line.add(convertToMillions(zws));
+					totalHtml.tableRowFromList(line, true);
+					line.clear();
+					indSum += zws;
+					
+				}
+				line.add("Summe induzierter Verkehr insgesamt");
+				line.add(convertToMillions(indSum));
+				totalHtml.tableRowFromList(line, true);
+				line.clear();
+				totalSum += indSum;
+				
+				line.add("Summe");
+				line.add(convertToMillions(totalSum));
+				totalHtml.tableRowFromList(line, true);
+				line.clear();
+				
+				totalHtml.beginTableMulticolumnRow();
+				totalHtml.endTableRow();
+				
+				
+				
+			
+					
+				}
+		 
+
+		 		
+
+				
+				
+				
+				
+		}
+
