@@ -283,7 +283,7 @@ public class KNOldGautengController {
 		final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( scenario );
 		// ---
 		travelDisutilityFactory.setRoadPricingScheme(scheme); // including toll. Needed for all experiments
-		travelDisutilityFactory.setUom(personSpecificUtilityOfMoney); 
+//		travelDisutilityFactory.setUom(personSpecificUtilityOfMoney); 
 //		travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory); // including auto-sensing.  Not needed for abmtrans paper
 		travelDisutilityFactory.setRandomness(0.);
 		// ---
