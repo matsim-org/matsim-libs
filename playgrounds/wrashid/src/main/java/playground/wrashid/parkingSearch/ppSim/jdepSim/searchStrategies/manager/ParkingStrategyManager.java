@@ -135,7 +135,7 @@ public class ParkingStrategyManager {
 			
 			int randomizationPhaseEndsAtIteration=ZHScenarioGlobal.loadIntParam("convergance.useMATSimLikeConvergence.randomizationPhaseEndsAtIteration");
 			
-			if ((globalbRandom.nextDouble() < executionProbabilityMNL || !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) && randomizationPhaseEndsAtIteration<ZHScenarioGlobal.iteration) {
+			if (((globalbRandom.nextDouble() < executionProbabilityMNL || !evaluationContainer.allStrategiesHaveBeenExecutedOnce()) && randomizationPhaseEndsAtIteration<ZHScenarioGlobal.iteration) || !evaluationContainer.hasNewStrategies()) {
 				if (evaluationContainer.allStrategiesHaveBeenExecutedOnce()) {
 					evaluationContainer.selectNextStrategyAccordingToMNLExp();
 				} else {

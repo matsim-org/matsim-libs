@@ -275,6 +275,10 @@ public class EvaluationContainer {
 		int randomIndex = random.nextInt(evaluations.size());
 		evaluations.addFirst(evaluations.remove(randomIndex));
 	}
+	
+	public boolean hasNewStrategies(){
+		return allStrategies.size()>evaluations.size();
+	}
 
 	public void addRandomPlanAndSelectForExecution() {
 		int randomIndex = random.nextInt(allStrategies.size());
