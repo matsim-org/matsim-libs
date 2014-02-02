@@ -369,6 +369,29 @@ public class ParkingStrategyScenarios {
 			}
 			
 			
+		}else if (ZHScenarioGlobal.parkingStrategyScenarioId == 19){
+			int numberOfStrategiesInEachGroup = ZHScenarioGlobal
+					.loadIntParam("parkingStrategyScenarioId.19.numberOfStrategiesInEachGroup");
+
+			for (int i = 0; i < numberOfStrategiesInEachGroup; i++) {
+				ParkingSearchStrategy strategy = new AxPo1989_Strategy7(-1, scenario.getNetwork(), "ARD-illegal-S-" + i);
+				strategy.setGroupName("ARD-illegal-S");
+				addStrategyAndSetLayerValues(allStrategies, strategy, i);
+				
+				double startStrategyAtDistanceFromDestination = 250;
+				double startParkingDecision = 100;
+				int F1 = 1;
+				int F2 = 3;
+				double maxDistanceAcceptableForWalk = 400;
+				double maxSeachDuration = 10 * 60;
+				double increaseAcceptableDistanceInMetersPerMinute = 30;
+
+				strategy = new ParkAgent(-1, scenario.getNetwork(), "Parkagent-" + i, startStrategyAtDistanceFromDestination,
+						startParkingDecision, F1, F2, maxDistanceAcceptableForWalk, maxSeachDuration,
+						increaseAcceptableDistanceInMetersPerMinute);
+				strategy.setGroupName("Parkagent");
+				addStrategyAndSetLayerValues(allStrategies, strategy, i);
+			}
 		}
 
 		return allStrategies;
