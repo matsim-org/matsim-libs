@@ -88,6 +88,26 @@ public class DreieckNmodes {
 
 	private static final Logger log = Logger.getLogger(DreieckNmodes.class);
 	
+	//CONFIGURATION: static variables used for aggregating configuration options
+	public final static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
+	public final static double length = 444.44;//in m, length of one the triangle sides.
+	public final static int NETWORK_CAPACITY = 2700;//in PCU/h
+	public final static double END_TIME = 14*3600;
+	public final static boolean PASSING_ALLOWED = true;
+	private final static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_grid_expansion1.txt";
+	private final static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_expansion1.xml";
+	
+	private final static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
+	public final static int NUMBER_OF_MEMORIZED_FLOWS = 10;
+	public final static int NUMBER_OF_MODES = 3/*4*/;
+	public final static String[] NAMES= {"bicycles","motorbikes","cars"/*, "trucks"*/};	//identification of the different modes
+	public final static Double[] Probabilities = {0.15, 0.25, 0.6/*, 0.25*/}; //modal split
+	public final static Double[] Pcus = {0.25, 0.25, 1./*, 3.*/}; 			//PCUs of the different possible modes
+	public final static Double[] Speeds = {4.17, 16.67, 16.67/*, 10.*/};		//maximum velocities of the vehicle types, in m/s
+	private final static Integer[] MaxAgentDistribution = {800,800,200/*,50*/};
+	private final static Integer[] Steps = {40,40,5/*,10*/};
+	private final static Integer[] startingPoint = {0,0,0};
+
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
 		
 		private MyPersonDriverAgentImpl delegate;
@@ -211,25 +231,6 @@ public class DreieckNmodes {
 
 	}
 	
-	//CONFIGURATION: static variables used for aggregating configuration options
-	public final static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public final static double length = 444.44;//in m, length of one the triangle sides.
-	public final static int NETWORK_CAPACITY = 2700;//in PCU/h
-	public final static double END_TIME = 14*3600;
-	public final static boolean PASSING_ALLOWED = true;
-	private final static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_grid_expansion1.txt";
-	private final static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_expansion1.xml";
-	
-	private final static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
-	public final static int NUMBER_OF_MEMORIZED_FLOWS = 10;
-	public final static int NUMBER_OF_MODES = 3/*4*/;
-	public final static String[] NAMES= {"bicycles","motorbikes","cars"/*, "trucks"*/};	//identification of the different modes
-	public final static Double[] Probabilities = {0.15, 0.25, 0.6/*, 0.25*/}; //modal split
-	public final static Double[] Pcus = {0.25, 0.25, 1./*, 3.*/}; 			//PCUs of the different possible modes
-	public final static Double[] Speeds = {4.17, 16.67, 16.67/*, 10.*/};		//maximum velocities of the vehicle types, in m/s
-	private final static Integer[] MaxAgentDistribution = {800,800,200/*,50*/};
-	private final static Integer[] Steps = {40,40,5/*,10*/};
-	
 	private PrintStream writer;
 	private Scenario scenario;
 	private static FundamentalDiagramsNmodes funfunfun;
@@ -238,7 +239,7 @@ public class DreieckNmodes {
 	
 	public DreieckNmodes(int networkCapacity){
 		//Checking that configuration data has the appropriate size:
-		if (NAMES.length != NUMBER_OF_MODES){	throw new RuntimeException("There should be "+NUMBER_OF_MODES+" names for the different modes. Check your static variable NAMES!");}
+		if (NAMES.length != NUMBER_OF_MODES){ throw new RuntimeException("There should be "+NUMBER_OF_MODES+" names for the different modes. Check your static variable NAMES!");}
 		if (Probabilities.length != NUMBER_OF_MODES){ throw new RuntimeException("There should be "+NUMBER_OF_MODES+" probabilities for the different modes. Check your static variable Probabilities!");}
 		if (Pcus.length != NUMBER_OF_MODES){ throw new RuntimeException("There should be "+NUMBER_OF_MODES+" PCUs for the different modes. Check your static variable Pcus!");}
 		if (Speeds.length != NUMBER_OF_MODES){ throw new RuntimeException("There should be "+NUMBER_OF_MODES+" speeds for the different modes. Check your static variable Speeds!");}
@@ -256,7 +257,7 @@ public class DreieckNmodes {
 		// to me (kn).
 		this.scenario = ScenarioUtils.createScenario(config);
 		ConfigWriter cWriter = new ConfigWriter(config);
-		cWriter.write("Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\config.xml");
+		//cWriter.write("Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\config.xml");
 		
 		//Initializing modeData objects//TODO: should be initialized when instancing FundamentalDiagrams, no workaround still found
 		//Need to be currently initialized at this point to initialize output and modified QSim
@@ -278,9 +279,13 @@ public class DreieckNmodes {
 		DreieckNmodes dreieck = new DreieckNmodes(NETWORK_CAPACITY);
 		dreieck.fillNetworkData();
 		dreieck.openFile(OUTPUT_DIR);
+		
+		
 		//dreieck.parametricRunAccordingToGivenModalSplit();
 		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
 		//dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
+		
+		
 		dreieck.closeFile();
 	}
 	
@@ -359,7 +364,6 @@ public class DreieckNmodes {
 		//	numberOfPoints *=  ( (maxValues.get(i).intValue() / steps.get(i).intValue()) + 1);
 		//	startingPoint[i] = new Integer(0);
 		//}
-		Integer[] startingPoint = {120,520,0};
 		numberOfPoints = 13920;
 		//Actually going through the n-dimensional grid
 		BinaryAdditionModule iterationModule = new BinaryAdditionModule(maxValues, steps, startingPoint);
