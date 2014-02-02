@@ -94,8 +94,8 @@ public class DreieckNmodes {
 	public final static int NETWORK_CAPACITY = 2700;//in PCU/h
 	public final static double END_TIME = 14*3600;
 	public final static boolean PASSING_ALLOWED = true;
-	private final static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_grid_expansion1.txt";
-	private final static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_expansion1.xml";
+	private final static String OUTPUT_DIR = "pathto\\data.txt";
+	private final static String OUTPUT_EVENTS = "pathto\\events.xml";
 	
 	private final static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
 	public final static int NUMBER_OF_MEMORIZED_FLOWS = 10;
