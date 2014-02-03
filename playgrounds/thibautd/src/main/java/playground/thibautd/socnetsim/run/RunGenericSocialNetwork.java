@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.run;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -54,6 +55,11 @@ public class RunGenericSocialNetwork {
 				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
 
 		new SocialNetworkReader( scenario ).parse( snConf.getInputFile() );
+
+		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {
+			if ( !sn.getEgos().contains( p ) ) sn.addEgo( p );
+		}
 
 		final ControllerRegistry controllerRegistry =
 			RunUtils.loadDefaultRegistryBuilder( scenario )
