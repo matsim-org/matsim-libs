@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DesiresReadableConverter.java
+ * DesiresConverterTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,63 +21,46 @@ package playground.thibautd.utils;
 
 import java.util.Map;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import org.matsim.core.utils.misc.Time;
+import org.junit.Assert;
+import org.junit.Test;
+
 import org.matsim.population.Desires;
-import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * desires in form type1=dur1;type2=dur2"
  * @author thibautd
  */
-public class DesiresConverter implements AttributeConverter<Desires> {
-	private static final Logger log =
-		Logger.getLogger(DesiresConverter.class);
+public class DesiresConverterTest {
 
-	private static final String SEP_1 = ";";
-	private static final String SEP_2 = "=";
-
-	@Override
-	public Desires convert(final String value) {
+	@Test
+	public void testConvertAndGetBack() {
+		Logger.getLogger( DesiresConverter.class ).setLevel( Level.TRACE );
+		final DesiresConverter converter = new DesiresConverter();
 
 		final Desires desires = new Desires( null );
 
-		for ( String typedur : value.split( SEP_1 ) ) {
-			final String[] arr = typedur.split( SEP_2 );
-			if ( arr.length != 2 ) throw new IllegalArgumentException( value );
+		desires.putActivityDuration( "some type" , 100 );
+		desires.putActivityDuration( "some other type" , 1000 );
 
-			final String type = arr[ 0 ];
-			final double dur = Time.parseTime( arr[ 1 ] );
+		final String repr = converter.convertToString( desires );
+		final Desires reconverted = converter.convert( repr );
 
-			desires.putActivityDuration( type , dur );
+		Assert.assertEquals(
+				"unexpected number of durations",
+				desires.getActivityDurations().size(),
+				reconverted.getActivityDurations().size() );
+
+		for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
+			final String type = entry.getKey();
+			Assert.assertEquals(
+					"unexpected duration for type "+type,
+					entry.getValue(),
+					reconverted.getActivityDuration( type ),
+					MatsimTestUtils.EPSILON);
 		}
-
-		if ( log.isTraceEnabled() ) {
-			log.trace( value+" converted to desires "+desires );
-		}
-
-		return desires;
-	}
-
-	@Override
-	public String convertToString(final Object o) {
-		final Desires desires = (Desires) o;
-
-		final StringBuilder builder = new StringBuilder();
-		for ( Map.Entry<String, Double> e : desires.getActivityDurations().entrySet() ) {
-			final String type = e.getKey();
-			final double dur = e.getValue().doubleValue();
-
-			if ( builder.length() > 0 ) builder.append( SEP_1 );
-			builder.append( type + SEP_2 + Time.writeTime( dur ) );
-		}
-
-		if ( log.isTraceEnabled() ) {
-			log.trace( desires+" converted to string "+builder );
-		}
-
-		return builder.toString();
 	}
 }
 
