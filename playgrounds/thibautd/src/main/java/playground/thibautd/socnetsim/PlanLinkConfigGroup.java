@@ -25,7 +25,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  * @author thibautd
  */
 public class PlanLinkConfigGroup extends ReflectiveModule {
-	private static final String GROUP_NAME = "planLinkIdentifier";
+	public static final String GROUP_NAME = "planLinkIdentifier";
 
 	private boolean linkJointTrips = true;
 	private boolean linkVehicles = true;
