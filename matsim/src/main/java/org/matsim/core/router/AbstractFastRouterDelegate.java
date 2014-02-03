@@ -55,13 +55,30 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
 		nodes.add(0, ((RoutingNetworkNode) toNode).getNode());
 		Link tmpLink = getData(toNode).getPrevLink();
 		if (tmpLink != null) {
-			while (tmpLink.getFromNode() != fromNode) {
+			// original code
+//			while (tmpLink.getFromNode() != fromNode) {
+//				links.add(0, ((RoutingNetworkLink) tmpLink).getLink());
+//				nodes.add(0, ((RoutingNetworkLink) tmpLink).getLink().getFromNode());
+//				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
+//			}
+//			links.add(0, ((RoutingNetworkLink) tmpLink).getLink());
+//			nodes.add(0, ((RoutingNetworkNode) tmpLink.getFromNode()).getNode());
+
+			/*
+			 * Adapted this code to be compatible with the MultiNodeDijkstra located in
+			 * the location choice contrib. When a MultiNodeDijkstra uses multiple start nodes,
+			 * there is not a single start node that could be used to check whether
+			 * "tmpLink.getFromNode() != fromNode" is true. Instead, the start nodes do not have
+			 * a previous link.
+			 * For the regular Dikstra, this is also fine since the start node also does not have
+			 * a previous node.
+			 * cdobler, feb'14
+			 */
+			while (tmpLink != null) {
 				links.add(0, ((RoutingNetworkLink) tmpLink).getLink());
 				nodes.add(0, ((RoutingNetworkLink) tmpLink).getLink().getFromNode());
 				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
 			}
-			links.add(0, ((RoutingNetworkLink) tmpLink).getLink());
-			nodes.add(0, ((RoutingNetworkNode) tmpLink.getFromNode()).getNode());
 		}
 		
 		NodeData toNodeData = getData(toNode);
