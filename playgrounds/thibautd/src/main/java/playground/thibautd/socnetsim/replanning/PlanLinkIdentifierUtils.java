@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
+import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 
@@ -44,6 +45,30 @@ public class PlanLinkIdentifierUtils {
 				new JoinableActivitiesPlanLinkIdentifier( activityType ) );
 
 		id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
+		return id;
+	}
+
+	public static PlanLinkIdentifier createConfigurablePlanLinkIdentifier(
+			final PlanLinkConfigGroup conf,
+			final String activityType,
+			final SocialNetwork socialNetwork) {
+		final CompositePlanLinkIdentifier id =
+			new CompositePlanLinkIdentifier();
+
+		id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
+
+		if ( conf.getLinkJointTrips() ) {
+			id.addOrComponent( new JointTripsPlanLinkIdentifier() );
+		}
+
+		if ( conf.getLinkVehicles() ) {
+			id.addOrComponent( new VehicularPlanBasedIdentifier() );
+		}
+
+		if ( conf.getLinkJoinableActivities() ) {
+			id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
+		}
+
 		return id;
 	}
 }
