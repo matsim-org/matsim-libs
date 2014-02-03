@@ -76,10 +76,6 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	}
 
 	@StringSetter( "togetherScoringType" )
-	public void setTogetherScoringType(final String v) {
-		setTogetherScoringType( TogetherScoringType.valueOf( v ) );
-	}
-
 	public void setTogetherScoringType(final TogetherScoringType togetherScoringType) {
 		this.togetherScoringType = togetherScoringType;
 	}
@@ -105,10 +101,6 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	}
 
 	@StringSetter( "togetherScoringForm" )
-	public void setTogetherScoringForm(final String v) {
-		setTogetherScoringForm( TogetherScoringForm.valueOf( v ) );
-	}
-
 	public void setTogetherScoringForm(final TogetherScoringForm togetherScoringForm) {
 		this.togetherScoringForm = togetherScoringForm;
 	}
