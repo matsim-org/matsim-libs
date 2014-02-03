@@ -80,12 +80,12 @@ public class PlanLinkConfigGroup extends ReflectiveModule {
 		this.joinableTypes.add( type );
 	}
 
-	@StringGetter( "linkJoinableActivities" )
+	@StringGetter( "joinableTypes" )
 	public String getJoinableTypesString() {
 		return CollectionUtils.setToString( joinableTypes );
 	}
 
-	@StringSetter( "linkJoinableActivities" )
+	@StringSetter( "joinableTypes" )
 	public void setJoinableTypes(final String types) {
 		joinableTypes.clear();
 		joinableTypes.addAll( CollectionUtils.stringToSet( types ) );
