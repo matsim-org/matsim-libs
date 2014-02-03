@@ -40,6 +40,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -52,6 +53,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -87,9 +89,6 @@ public class ExtractTripModeShares20kmFromBellevue {
 	private static final double CROW_FLY_FACTOR = 1;
 	private static final boolean USE_NET_DIST = false;
 
-	private static enum OutputType { COUNT, DETAILED; }
-	private static final OutputType OUTPUT_TYPE = OutputType.DETAILED;
-
 	// TODO pass this as argument
 	private static final Filter FILTER = true ? new ODFilter() : new HomeCoordFilter();
 
@@ -104,37 +103,32 @@ public class ExtractTripModeShares20kmFromBellevue {
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
 		if ( networkFile != null ) new MatsimNetworkReader( scenario ).parse( networkFile );
-		new MatsimPopulationReader( scenario ).parse( plansFile );
 
-		switch ( OUTPUT_TYPE ) {
-			case COUNT:
-				count( FILTER , scenario , outputFile );
-				break;
-			case DETAILED:
-				detailed( FILTER , scenario , outputFile );
-				break;
-		default:
-			throw new RuntimeException( ""+OUTPUT_TYPE );
-		}
-	}
+		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 
-	private static void detailed(
-			final Filter filter,
-			final Scenario scenario,
-			final String outputFile) throws IOException {
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
 		writer.write( "agentId\tmain_mode\ttotal_dist" );
 
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			final Plan plan = person.getSelectedPlan();
-			if ( !filter.acceptPlan( plan ) ) continue;
-			for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
-				if ( !filter.acceptTrip( trip ) ) continue;
-				final String mode = MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() );
-				writer.newLine();
-				writer.write( person.getId()+"\t"+mode+"\t"+calcDist( trip , scenario.getNetwork() ) );
+		pop.setIsStreaming( true );
+		pop.addAlgorithm( new PersonAlgorithm() {
+			@Override
+			public void run(Person person) {
+				final Plan plan = person.getSelectedPlan();
+				if ( !FILTER.acceptPlan( plan ) ) return;
+				for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
+					if ( !FILTER.acceptTrip( trip ) ) continue;
+					final String mode = MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() );
+					try {
+						writer.newLine();
+						writer.write( person.getId()+"\t"+mode+"\t"+calcDist( trip , scenario.getNetwork() ) );
+					}
+					catch (IOException e) {
+						throw new RuntimeException( e );
+					}
+				}			
 			}
-		}
+		} );
+		new MatsimPopulationReader( scenario ).parse( plansFile );
 
 		writer.close();
 	}
@@ -159,35 +153,6 @@ public class ExtractTripModeShares20kmFromBellevue {
 
 		return dist;
 	}
-
-	private static void count(
-			final Filter filter,
-			final Scenario scenario,
-			final String outputFile) throws IOException {
-		final Map<String, Integer> counts = new TreeMap<String, Integer>();
-
-		int total = 0;
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			final Plan plan = person.getSelectedPlan();
-			if ( !filter.acceptPlan( plan ) ) continue;
-			for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
-				if ( !filter.acceptTrip( trip ) ) continue;
-				final String mode = MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() );
-				final Integer count = counts.get( mode );
-				counts.put( mode , count == null ? 1 : count + 1 );
-				total++;
-			}
-		}
-
-		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
-		writer.write( "mode\tcount\tshare" );
-		for ( Map.Entry<String, Integer> count : counts.entrySet() ) {
-			writer.newLine();
-			writer.write( count.getKey()+"\t"+count.getValue()+"\t"+( count.getValue().doubleValue() / total ) );
-		}
-		writer.close();
-	}
-
 
 	private static interface Filter {
 		public boolean acceptPlan(final Plan plan);
