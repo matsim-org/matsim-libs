@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
+import org.matsim.api.core.v01.Scenario;
+
 import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
@@ -29,23 +31,14 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 public class PlanLinkIdentifierUtils {
 	private PlanLinkIdentifierUtils() {}
 
-	public static PlanLinkIdentifier createDefaultPlanLinkIdentifier() {
-		return new CompositePlanLinkIdentifier(
-				new JointTripsPlanLinkIdentifier(),
-				new VehicularPlanBasedIdentifier() );
-	}
-
-	public static PlanLinkIdentifier createPlanLinkIdentifierForSocialActivities(
-			final String activityType,
-			final SocialNetwork socialNetwork) {
-		final CompositePlanLinkIdentifier id =
-			new CompositePlanLinkIdentifier(
-				new JointTripsPlanLinkIdentifier(),
-				new VehicularPlanBasedIdentifier(),
-				new JoinableActivitiesPlanLinkIdentifier( activityType ) );
-
-		id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
-		return id;
+	public static PlanLinkIdentifier createConfigurablePlanLinkIdentifier(
+			final Scenario scenario ) {
+		final PlanLinkConfigGroup configGroup = (PlanLinkConfigGroup)
+			scenario.getConfig().getModule( PlanLinkConfigGroup.GROUP_NAME );
+		return PlanLinkIdentifierUtils.createConfigurablePlanLinkIdentifier(
+					configGroup,
+					(SocialNetwork) scenario.getScenarioElement(
+						SocialNetwork.ELEMENT_NAME ) );
 	}
 
 	public static PlanLinkIdentifier createConfigurablePlanLinkIdentifier(

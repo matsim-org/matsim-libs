@@ -35,7 +35,6 @@ import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.replanning.grouping.DynamicGroupIdentifier;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
-import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 
@@ -66,11 +65,6 @@ public class RunGenericSocialNetwork {
 				.withGroupIdentifier( 
 						new DynamicGroupIdentifier(
 							scenario ) )
-				.withPlanLinkIdentifier(
-						PlanLinkIdentifierUtils.createPlanLinkIdentifierForSocialActivities(
-							weights.getLocationChoiceActivityType(),
-							(SocialNetwork) scenario.getScenarioElement(
-								SocialNetwork.ELEMENT_NAME ) ) )
 				.build();
 
 		final ImmutableJointController controller = RunUtils.initializeController( controllerRegistry );
