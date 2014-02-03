@@ -78,7 +78,7 @@ public class RunEmissionPricing {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(3);
+		ccg.setLastIteration(11);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
@@ -159,7 +159,6 @@ public class RunEmissionPricing {
 		vcg.setWritingOutputEvents(false) ;
 		
 		EmissionControlerListener ecl = new EmissionControlerListener(controler);
-		System.out.println("network at run - no of links " + controler.getNetwork().getLinks().size());
 		controler.addControlerListener(ecl);
 		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
 		

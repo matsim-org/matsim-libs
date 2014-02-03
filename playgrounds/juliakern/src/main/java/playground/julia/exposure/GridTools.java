@@ -42,6 +42,7 @@ public class GridTools {
 		this.yMax=yMax;
 	}
 
+	// TODO maybe store x and y values only if in area of interest now x might be null but y not
 	public Map<Id, Integer> mapLinks2Xcells(Integer noOfXCells) {
 		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
 		for(Id linkId: this.links.keySet()){

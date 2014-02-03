@@ -59,11 +59,11 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	Double yMin = 5324955.00;
 	Double yMax = 5345696.81;
 	
-	Integer noOfXCells = 16;
-	Integer noOfYCells = 12;
+	Integer noOfXCells = 160;
+	Integer noOfYCells = 120;
 
 	Double timeBinSize;
-	Integer noOfTimeBins =3;
+	Integer noOfTimeBins =30;
 	Map<Id, Integer> links2xcells;
 	Map<Id, Integer> links2ycells;
 

@@ -51,10 +51,6 @@ public class ResDisCalculator implements TravelDisutility{
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 
-	private double sumOfEmissionValues = 0.0;
-
-	private double sumOfDelegateValues = 0.0;
-
 	private int maximalDistance =3;
 
 	private Integer noOfXCells;
@@ -130,12 +126,8 @@ public class ResDisCalculator implements TravelDisutility{
 		emissionValue = relevantDuration * expectedEmissionPrice * marginalUtilityOfMoney;
 	
 		if(emissionValue>0.0){
-			sumOfEmissionValues += emissionValue;
-			sumOfDelegateValues += delegateValue;
-			System.out.println("emission value " +emissionValue + "deleg " +delegateValue + " person " +person.getId().toString() );
-			
+			logger.info("emission value " +emissionValue + "deleg " +delegateValue + " person " +person.getId().toString() );	
 		}
-		
 		return delegateValue + emissionValue;
 		}else{
 			return delegateValue;
@@ -181,12 +173,6 @@ public class ResDisCalculator implements TravelDisutility{
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
 		return delegate.getLinkMinimumTravelDisutility(link);
-	}
-	
-	public void printInfo(){
-		logger.info("sum of em values: " + sumOfEmissionValues);
-		logger.info("sum of deleg values: " + sumOfDelegateValues);
-		logger.info("average em/dele: " + sumOfEmissionValues/sumOfDelegateValues);
 	}
 
 }

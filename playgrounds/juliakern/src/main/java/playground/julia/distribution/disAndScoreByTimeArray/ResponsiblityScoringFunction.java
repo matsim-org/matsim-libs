@@ -27,8 +27,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.ScoringFunction;
 
-import playground.julia.exposure.ResponsibilityEvent;
-
 public class ResponsiblityScoringFunction implements ScoringFunction {
 	
 	ScoringFunction delegate;
@@ -65,7 +63,7 @@ public class ResponsiblityScoringFunction implements ScoringFunction {
 
 	@Override
 	public void finish() {
-		//TODO recalc to price/mtutil of money
+		//TODO recalc to price/mtutil of money?
 		Id personId = plan.getPerson().getId();
 
 		if(!plan.isSelected())System.out.println("++++++++++++++++shouldnt happen");
@@ -85,25 +83,8 @@ public class ResponsiblityScoringFunction implements ScoringFunction {
 
 	@Override
 	public double getScore() {
-//		Id personId = plan.getPerson().getId();
-//
-//		Double amount = new Double(.0);
-//		if(ecl!=null){
-//			if(ecl.getResp()!=null){
-//				for(ResponsibilityEvent re: ecl.getResp()){
-//		
-//					if(re.getResponsiblePersonId().equals(personId)){
-//		
-//						amount += re.getExposureValue();
-//					}
-//				}
-//			}
-//		}
-//		
-//		if(amount>0.0) delegate.addMoney(-amount); //TODO ueberpruefen, hier muesste immer >=0 sein
-//		System.out.println("Person id: " + personId.toString() + " exposure amount " + amount + " resulting score " + delegate.getScore());
 		return delegate.getScore();
-//		return delegate.getScore() - amount;
+
 	}
 
 	@Override
