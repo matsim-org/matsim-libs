@@ -48,8 +48,8 @@ public class QuadTreeRebuilder<T> {
 	}
 
 	private void buildQuadTree() {
-		assert minX < maxX;
-		assert minY < maxY;
+		assert minX <= maxX : minX +" > "+maxX;
+		assert minY <= maxY : minY +" > "+maxY;
 		this.quadTree = new QuadTree<T>(
 				minX - EPSILON ,
 				minY - EPSILON ,
