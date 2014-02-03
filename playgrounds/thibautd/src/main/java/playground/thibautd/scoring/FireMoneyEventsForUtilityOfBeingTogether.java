@@ -123,6 +123,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 
 	private <T extends Event & HasPersonId> void transmitEventToRelevantPersons( final T event ) {
 		final Id ego = event.getPersonId();
+		if ( !socialNetwork.getEgos().contains( ego ) ) return;
 		for ( Id id : cat( ego , socialNetwork.getAlters( ego ) ) ) {
 			final Id finalId = id;
 			final BeingTogetherScoring scoring =
