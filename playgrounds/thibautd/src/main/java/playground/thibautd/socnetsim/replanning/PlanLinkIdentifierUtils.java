@@ -31,17 +31,17 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 public class PlanLinkIdentifierUtils {
 	private PlanLinkIdentifierUtils() {}
 
-	public static PlanLinkIdentifier createConfigurablePlanLinkIdentifier(
+	public static PlanLinkIdentifier createPlanLinkIdentifier(
 			final Scenario scenario ) {
 		final PlanLinkConfigGroup configGroup = (PlanLinkConfigGroup)
 			scenario.getConfig().getModule( PlanLinkConfigGroup.GROUP_NAME );
-		return PlanLinkIdentifierUtils.createConfigurablePlanLinkIdentifier(
+		return PlanLinkIdentifierUtils.createPlanLinkIdentifier(
 					configGroup,
 					(SocialNetwork) scenario.getScenarioElement(
 						SocialNetwork.ELEMENT_NAME ) );
 	}
 
-	public static PlanLinkIdentifier createConfigurablePlanLinkIdentifier(
+	public static PlanLinkIdentifier createPlanLinkIdentifier(
 			final PlanLinkConfigGroup conf,
 			final SocialNetwork socialNetwork) {
 		final CompositePlanLinkIdentifier id =

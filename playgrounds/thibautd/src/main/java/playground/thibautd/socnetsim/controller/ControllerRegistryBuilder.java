@@ -275,7 +275,7 @@ public class ControllerRegistryBuilder {
 	public PlanLinkIdentifier getPlanLinkIdentifier() {
 		if ( planLinkIdentifier == null ) {
 			this.planLinkIdentifier =
-				PlanLinkIdentifierUtils.createConfigurablePlanLinkIdentifier(
+				PlanLinkIdentifierUtils.createPlanLinkIdentifier(
 						scenario );
 
 		}
