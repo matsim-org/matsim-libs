@@ -58,7 +58,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
+import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
@@ -274,7 +276,13 @@ public class ControllerRegistryBuilder {
 
 	public PlanLinkIdentifier getPlanLinkIdentifier() {
 		if ( planLinkIdentifier == null ) {
-			this.planLinkIdentifier = PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier();
+			final PlanLinkConfigGroup configGroup = (PlanLinkConfigGroup)
+				scenario.getConfig().getModule( PlanLinkConfigGroup.GROUP_NAME );
+			this.planLinkIdentifier =
+				PlanLinkIdentifierUtils.createConfigurablePlanLinkIdentifier(
+						configGroup,
+						(SocialNetwork) scenario.getScenarioElement(
+							SocialNetwork.ELEMENT_NAME ) );
 
 		}
 		return planLinkIdentifier;
