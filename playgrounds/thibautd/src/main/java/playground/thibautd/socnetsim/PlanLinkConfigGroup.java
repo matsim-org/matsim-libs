@@ -19,7 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author thibautd
@@ -30,6 +36,7 @@ public class PlanLinkConfigGroup extends ReflectiveModule {
 	private boolean linkJointTrips = true;
 	private boolean linkVehicles = true;
 	private boolean linkJoinableActivities = false;
+	private final Set<String> joinableTypes = new TreeSet<String>( Collections.singleton( "leisure" ) );
 
 	public PlanLinkConfigGroup() {
 		super( GROUP_NAME );
@@ -65,5 +72,23 @@ public class PlanLinkConfigGroup extends ReflectiveModule {
 		this.linkJoinableActivities = linkJoinableActivities;
 	}
 
+	public Collection<String> getJoinableTypes() {
+		return this.joinableTypes;
+	}
+
+	public void addJoinableType(String type) {
+		this.joinableTypes.add( type );
+	}
+
+	@StringGetter( "linkJoinableActivities" )
+	public String getJoinableTypesString() {
+		return CollectionUtils.setToString( joinableTypes );
+	}
+
+	@StringSetter( "linkJoinableActivities" )
+	public void setJoinableTypes(final String types) {
+		joinableTypes.clear();
+		joinableTypes.addAll( CollectionUtils.stringToSet( types ) );
+	}
 }
 

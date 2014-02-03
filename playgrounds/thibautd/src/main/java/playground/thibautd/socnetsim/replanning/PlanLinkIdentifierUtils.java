@@ -50,7 +50,6 @@ public class PlanLinkIdentifierUtils {
 
 	public static PlanLinkIdentifier createConfigurablePlanLinkIdentifier(
 			final PlanLinkConfigGroup conf,
-			final String activityType,
 			final SocialNetwork socialNetwork) {
 		final CompositePlanLinkIdentifier id =
 			new CompositePlanLinkIdentifier();
@@ -66,7 +65,9 @@ public class PlanLinkIdentifierUtils {
 		}
 
 		if ( conf.getLinkJoinableActivities() ) {
-			id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
+			for ( String activityType : conf.getJoinableTypes() ) {
+				id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
+			}
 		}
 
 		return id;
