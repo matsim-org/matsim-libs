@@ -83,6 +83,7 @@ import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
+import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -632,6 +633,7 @@ public class RunUtils {
 		config.addModule( new PseudoSimConfigGroup() );
 		config.addModule( new SocialNetworkConfigGroup() );
 		config.addModule( new RandomJointLocationChoiceConfigGroup() );
+		config.addModule( new PlanLinkConfigGroup() );
 		new NonFlatConfigReader( config ).parse( configFile );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 	
