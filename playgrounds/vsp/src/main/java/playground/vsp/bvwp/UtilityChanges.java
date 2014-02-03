@@ -124,6 +124,7 @@ abstract class UtilityChanges {
 						System.err.println("writing verbleibend:");
 						System.err.flush() ;
 						Utils.writeSubHeaderVerbleibend(html, id, segm, mode, amountAltnutzer);
+						final double utilsOld = utils;
 						utils += computeAndPrintValuesForAltnutzer(econValues, attributesNullfall, mode, attributesPlanfall, amountAltnutzer, html);
 					} else {
 						sumSent += Math.abs( deltaAmounts ) ;
@@ -146,9 +147,9 @@ abstract class UtilityChanges {
 								econValues, attributesNullfall, attributesPlanfall, mode, html);
 						utils += utilsImp;
 
-						if ( utils != utilsBefore ) {
+//						if ( utils != utilsBefore ) {
 							Utils.writePartialSum(html, "Nutzen&auml;nderung bei Verlagerung gesamt:" , utils - utilsBefore);
-						}
+//						}
 
 					}
 
@@ -199,9 +200,9 @@ abstract class UtilityChanges {
 					Utils.addUtlToMap(induziertImp, improvedMode, implUtlInduced);
 				}
 				partialUtl += implUtlInduced ;
-				if ( partialUtl != 0. ) {
+//				if ( partialUtl != 0. ) {
 					Utils.writePartialSum(html, null, partialUtl );
-				}
+//				}
 				utils += partialUtl ;
 
 
@@ -212,33 +213,35 @@ abstract class UtilityChanges {
 
 		// ================================
 		// ROH et al:
-
+		Map<Mode,Double> operatorProfits = new HashMap<MultiDimensionalArray.Mode, Double>();
 		double operatorProfit = 0. ;
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Values planfallForODRelation = planfall.getByODRelation(id) ;
+			for ( Mode mode : Mode.values() ) {
 			for ( DemandSegment segm : DemandSegment.values() ) {
-				for ( Mode mode : Mode.values() ) {
 					Attributes attributesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
 					Attributes attributesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
 					double amountNullfall = attributesNullfall.getByEntry(Attribute.XX) ;
 					double amountPlanfall = attributesPlanfall.getByEntry(Attribute.XX) ;
 					double operatorProfitBefore = operatorProfit ;
 					operatorProfit = computeOperatorProfit(operatorProfit, attributesNullfall, attributesPlanfall, amountNullfall, amountPlanfall);
+					
 					if ( operatorProfit != operatorProfitBefore ){
-						html.beginTableMulticolumnRow();
-						html.write( "Operator profit gain; " + mode.toString() + ": " + Utils.convertToMillions(operatorProfit-operatorProfitBefore) );
-						html.endTableRow();
+						Utils.addUtlToMap(operatorProfits, mode, operatorProfit-operatorProfitBefore);
 					}
 				}
 			}
 		}
+		
+		
 
-
+		Utils.writeOperatorProfit(operatorProfits, html);
 		Utils.writeRoh(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
 		Utils.endOutput(html);
 		
 		Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRVAuf, verlagertRVAb, verlagertImpAuf, verlagertImpAb, induziertRV, induziertImp);
+		Utils.writeOperatorProfit(operatorProfits, totalHtml);
 		Utils.writeRoh(totalHtml, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfit);
 		Utils.endOutput(totalHtml);
 	}
@@ -328,12 +331,12 @@ abstract class UtilityChanges {
 					}
 				}
 			}
-			if ( partialUtils != 0. ) {
-				Utils.writePartialSum(html, null, partialUtils) ;
-			}
-			utils += partialUtils ;
+				if ( partialUtils != 0. ) {
+					Utils.writePartialSum(html, null, partialUtils) ;
+					utils += partialUtils ;
+				}
 		}
-		//		if ( utils != 0. ) {
+		//		
 		//			Utils.writePartialSum(html, utils);
 		//		}
 		return utils;
@@ -422,9 +425,9 @@ abstract class UtilityChanges {
 
 			}
 		}
-		if ( utils != 0. ) {
+	
 			Utils.writePartialSum(html, null, utils);
-		}
+	
 		return utils;
 	}
 	

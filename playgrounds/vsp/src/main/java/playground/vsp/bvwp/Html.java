@@ -117,12 +117,14 @@ class Html {
 	}
 	void tableRowFromList(List<String> tabledata, boolean bold ){
 		beginTableRow();
+		int i= 0;
 		for (String str : tabledata){
 			if (bold) write("<b>");
 			write(str);
 			if (bold) write("</b>");
-
-			nextTableEntry();
+			i++;
+			if (i<tabledata.size()) nextTableEntry();
+			
 		}
 		
 		endTableRow();

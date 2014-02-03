@@ -53,6 +53,14 @@ class Utils {
 		html.endDiv() ;
 		html.endTableRow(); 
 	}
+	
+	static void writeOperatorProfit(Map<Mode,Double> operatorProfitGains, Html html){
+		for (Entry<Mode,Double> profit : operatorProfitGains.entrySet()){
+		html.beginTableMulticolumnRow();
+		html.write( "Operator profit gain; " + profit.getKey().toString() + ": " + Utils.convertToMillions(profit.getValue()) );
+		html.endTableRow();
+		}
+	}
 
 	static void writeSum(Html html, double utils) {
 		System.out.printf("%188s\n", "----------------" ) ;
@@ -295,153 +303,6 @@ class Utils {
 			System.out.printf("%188s\n", "================" ) ;
 }
 		
-		static void writeOverallOutputTable(Html html,Map<Mode,Double> verblRV, Map<Mode,Double> verlRV,Map<Mode,Double> verlImp, Map<Mode,Double> indRV,Map<Mode,Double> indImp)
-		{
-			html.beginTableMulticolumnRow();
-			html.write("Summen ueber alle Relationen und Zwecke");
-			html.endTableRow();
-			List<String> line = new ArrayList<String>();
-			line.add("Komponente");
-			List<Mode> mL = new ArrayList<Mode>(); 
-			for (Mode mode : Mode.values()){
-				line.add(mode.toString());
-				mL.add(mode);
-				
-			}
-			line.add("Summe");
-			html.tableRowFromList(line, true);
-			line.clear();
-			
-			line.add("Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr im verbleibenden Verkehr");
-			Double rowSum = 0.;
-			Map<Mode,Double> allesTotal = new HashMap<Mode,Double>();
-
-			for (Mode mode: mL){
-				String string1 = tryToGetValueOrReturnNa(verblRV, mode); 
-				line.add(string1);
-				Double d = tryToGetValueOrReturnNull(verblRV, mode);
-				if (d != null){
-					rowSum += d;
-					addUtlToMap(allesTotal, mode, d);
-				}	
-			}
-			line.add(convertToMillions(rowSum));
-			html.tableRowFromList(line,true);
-			line.clear();
-			
-			line.add("Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr im verlagerten Verkehr");
-			rowSum = 0.;
-			Map<Mode,Double> verlTot = new HashMap<Mode,Double>();
-			for (Mode mode: mL){
-				String string1 = tryToGetValueOrReturnNa(verlRV, mode); 
-				line.add(string1);
-				Double d = tryToGetValueOrReturnNull(verlRV, mode);
-				if (d != null){
-					rowSum += d;
-					addUtlToMap(verlTot, mode, d);
-				}
-			}
-			line.add(convertToMillions(rowSum));
-			html.tableRowFromList(line, false);
-			line.clear();
-			
-			line.add("Nutzen&auml;nderung aus impliziten Nutzen im verlagerten Verkehr");
-			rowSum = 0.;
-			for (Mode mode:mL){
-				String string1 = tryToGetValueOrReturnNa(verlImp, mode); 
-				line.add(string1);
-				Double d = tryToGetValueOrReturnNull(verlImp, mode);
-				if (d != null){
-					rowSum += d;
-					addUtlToMap(verlTot, mode, d);
-				}
-				
-			}
-			line.add(convertToMillions(rowSum));
-			html.tableRowFromList(line, false);
-			line.clear();
-			
-			line.add("Nutzen&auml;nderung insgesamt im verlagerten Verkehr");
-			rowSum = 0.;
-			for (Mode mode: mL){
-				String string1 = tryToGetValueOrReturnNa(verlTot, mode); 
-				line.add(string1);
-				Double d = tryToGetValueOrReturnNull(verlTot, mode);
-				if (d != null){
-					rowSum += d;
-					addUtlToMap(allesTotal, mode, d);
-				}
-			}
-			line.add(convertToMillions(rowSum));
-			html.tableRowFromList(line,true);
-			line.clear();
-			
-			line.add("Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr im induzierten Verkehr");
-			rowSum = 0.;
-			Map<Mode,Double> indTot = new HashMap<Mode,Double>();
-			for (Mode mode: mL){
-				String string1 = tryToGetValueOrReturnNa(indRV, mode); 
-				line.add(string1);
-				Double d = tryToGetValueOrReturnNull(indRV, mode);
-				if (d != null){
-					rowSum += d;
-					addUtlToMap(indTot, mode, d);
-				}
-			}
-			line.add(convertToMillions(rowSum));
-			html.tableRowFromList(line, false);
-			line.clear();
-			
-			line.add("Nutzen&auml;nderung aus impliziten Nutzen im induzierten Verkehr");
-			rowSum = 0.;
-			for (Mode mode: mL){
-				String string1 = tryToGetValueOrReturnNa(indImp, mode); 
-				line.add(string1);
-				Double d = tryToGetValueOrReturnNull(indImp, mode);
-				if (d != null){
-					rowSum += d;
-					addUtlToMap(indTot, mode, d);
-				}
-			}
-			line.add(convertToMillions(rowSum));
-			html.tableRowFromList(line, false);
-			line.clear();
-			
-			line.add("Nutzen&auml;nderung insgesamt im induzierten Verkehr");
-			rowSum = 0.;
-			for (Mode mode: mL){
-				String string1 = tryToGetValueOrReturnNa(indTot, mode); 
-				line.add(string1);
-				Double d = tryToGetValueOrReturnNull(indTot, mode);
-				if (d != null){
-					rowSum += d;
-					addUtlToMap(allesTotal, mode, d);
-				}
-			}
-			line.add(convertToMillions(rowSum));
-			html.tableRowFromList(line,true);
-			line.clear();
-			
-			line.add("Summe Nutzen&auml;nderungen insgesamt");
-			rowSum = 0.;
-			for (Mode mode: mL){
-				String string1 = tryToGetValueOrReturnNa(allesTotal, mode); 
-				line.add(string1);
-				Double d = tryToGetValueOrReturnNull(allesTotal, mode);
-				if (d != null){
-					rowSum += d;
-				}
-			}
-			line.add(convertToMillions(rowSum));
-			html.tableRowFromList(line,true);
-			line.clear();
-
-			html.endTable() ;
-			
-			html.endBody() ;
-			html.endHtml() ;
-	
-		}
 		private static String tryToGetValueOrReturnNa(Map<Mode,Double> map, Mode mode){
 			String result = null;
 			if (map.containsKey(mode)) result = convertToMillions(map.get(mode));
@@ -491,7 +352,7 @@ class Utils {
 				Map<Mode, Double> induziertImp) {
 			 
 				totalHtml.beginTableMulticolumnRow();
-				totalHtml.write("<b>Summen ueber alle Relationen und Zwecke</b>");
+				totalHtml.write("<b>Summen ueber alle Relationen und Zwecke (Angabe in EUR)</b>");
 				totalHtml.endTableRow();
 				double totalSum = 0.;
 				
@@ -514,14 +375,16 @@ class Utils {
 						line.clear();
 						zws += ee.getValue();
 					}
-					line.add("Zwischensumme "+e.getKey().toString());
-					line.add(convertToMillions(zws));
-					totalHtml.tableRowFromList(line, true);
-					line.clear();
+//					line.add("Zwischensumme "+e.getKey().toString());
+//					line.add("<b> </b> ");
+//					line.add(convertToMillions(zws));
+//					totalHtml.tableRowFromList(line, false);
+//					line.clear();
 					vblSum += zws;
 					
 				}
 				line.add("Summe verbleibender Verkehr insgesamt");
+				line.add(" ");
 				line.add(convertToMillions(vblSum));
 				totalHtml.tableRowFromList(line, true);
 				line.clear();
@@ -574,16 +437,19 @@ class Utils {
 								line.clear();								
 							}
 							if (zzws!=0.0){
-							line.add("");
+							line.add("<b> </b>");
+							line.add("<b> </b>");
 							line.add(convertToMillions(zzws));
-							totalHtml.tableRowFromList(line, true);
+							totalHtml.tableRowFromList(line, false);
 							line.clear();
 							zws += zzws;
 							}
 						}
+
 						line.add("Nutzenaenderung aus Aenderung Ressourcenverzehr bei Verlagerung");
+						line.add("<b> </b> ");
 						line.add(convertToMillions(zws));
-						totalHtml.tableRowFromList(line, true);
+						totalHtml.tableRowFromList(line, false);
 						line.clear();
 						
 						double impl =0.;
@@ -604,22 +470,26 @@ class Utils {
 						line.clear();
 					}
 					if (impl!=0.0){
-						line.add("");
+						line.add("<b> </b>");
+						line.add("<b> </b>");
+
 						line.add(convertToMillions(impl));
-						totalHtml.tableRowFromList(line, true);
+						totalHtml.tableRowFromList(line, false);
+						line.clear();
 						zws += impl;
-						line.clear();
 						}
-						
-						line.add("Nutzenaenderung bei Verlagerung fuer Verkehrstraeger "+mode.toString());
+
+						line.add("Nutzenaenderung bei Verlagerung von Verkehrstraeger "+mode.toString());
+						line.add("<b> </b> ");
 						line.add(convertToMillions(zws));
-						verlSum += zws;
-						totalHtml.tableRowFromList(line, true);
+						totalHtml.tableRowFromList(line, false);
 						line.clear();
+						verlSum += zws;
 				}
 				
-				
+//				writePartialSum(totalHtml, "Nutzenaenderung bei Verlagerung insgesamt (alle Verkehrstraeger)", verlSum);
 				line.add("Nutzenaenderung bei Verlagerung insgesamt (alle Verkehrstraeger)");
+				line.add("");
 				line.add(convertToMillions(verlSum));
 				totalHtml.tableRowFromList(line, true);		
 				line.clear();
@@ -661,7 +531,8 @@ class Utils {
 						line.clear();
 						zws += induziertImp.get(mode);
 					}
-					line.add("");
+					line.add("Zwischensumme "+mode.toString());
+					line.add(" ");
 					line.add(convertToMillions(zws));
 					totalHtml.tableRowFromList(line, true);
 					line.clear();
@@ -669,12 +540,18 @@ class Utils {
 					
 				}
 				line.add("Summe induzierter Verkehr insgesamt");
+				line.add(" ");
 				line.add(convertToMillions(indSum));
 				totalHtml.tableRowFromList(line, true);
 				line.clear();
 				totalSum += indSum;
 				
+				totalHtml.beginTableMulticolumnRow();
+				totalHtml.write(" ");
+				totalHtml.endTableRow();
+				
 				line.add("Summe");
+				line.add(" ");
 				line.add(convertToMillions(totalSum));
 				totalHtml.tableRowFromList(line, true);
 				line.clear();
