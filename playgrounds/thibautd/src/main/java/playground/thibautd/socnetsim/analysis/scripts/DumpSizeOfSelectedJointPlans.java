@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
+package playground.thibautd.socnetsim.analysis.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
