@@ -439,7 +439,8 @@ public class RunUtils {
 									(JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME ),
 									(VehicleRessources) scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ),
 									// not nice, but we cannot access the link identifier here...
-									PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier() );
+									PlanLinkIdentifierUtils.createPlanLinkIdentifier(
+											scenario ) );
 					}
 
 					@Override
@@ -479,7 +480,7 @@ public class RunUtils {
 						scenario) );
 		}
 
-		if ( scoringFunctionConf.isUseKtiScoring() && !scenario.getConfig().scenario().isUseTransit() ) {
+		if ( false && scoringFunctionConf.isUseKtiScoring() && !scenario.getConfig().scenario().isUseTransit() ) {
 			final KtiInputFilesConfigGroup ktiInputFilesConf = (KtiInputFilesConfigGroup)
 						scenario.getConfig().getModule( KtiInputFilesConfigGroup.GROUP_NAME );
 
