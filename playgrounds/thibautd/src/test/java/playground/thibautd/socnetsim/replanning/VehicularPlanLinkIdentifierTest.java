@@ -37,13 +37,13 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 /**
  * @author thibautd
  */
-public class DefaultPlanLinkIdentifierTest {
+public class VehicularPlanLinkIdentifierTest {
 	@Test
 	public void testNotLinkedWhenNoVehicleDefined() {
 		final Plan plan1 = createVehicularPlan( new IdImpl( 1 ) , null );
 		final Plan plan2 = createVehicularPlan( new IdImpl( 2 ) , null );
 
-		final PlanLinkIdentifier testee = PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier();
+		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
 
 		Assert.assertFalse(
 				"plans without vehicle allocated are considered linked",
@@ -55,7 +55,7 @@ public class DefaultPlanLinkIdentifierTest {
 		final Plan plan1 = createVehicularPlan( new IdImpl( 1 ) , new IdImpl( 1 ) );
 		final Plan plan2 = createVehicularPlan( new IdImpl( 2 ) , new IdImpl( 2 ) );
 
-		final PlanLinkIdentifier testee = PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier();
+		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
 		Assert.assertFalse(
 				"plans with different vehicle allocated are considered linked",
 				testee.areLinked( plan1 , plan2 ) );
@@ -66,7 +66,7 @@ public class DefaultPlanLinkIdentifierTest {
 		final Plan plan1 = createVehicularPlan( new IdImpl( 1 ) , new IdImpl( "car" ) );
 		final Plan plan2 = createVehicularPlan( new IdImpl( 2 ) , new IdImpl( "car" ) );
 
-		final PlanLinkIdentifier testee = PlanLinkIdentifierUtils.createDefaultPlanLinkIdentifier();
+		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
 		Assert.assertTrue(
 				"plans with same vehicle allocated are not considered linked",
 				testee.areLinked( plan1 , plan2 ) );
