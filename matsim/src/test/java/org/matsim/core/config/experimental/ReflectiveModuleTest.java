@@ -32,9 +32,6 @@ import org.matsim.core.config.experimental.ReflectiveModule.InconsistentModuleEx
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import tutorial.programming.reflectiveModule.MyEnum;
-import tutorial.programming.reflectiveModule.MyModule;
-
 /**
  * @author thibautd
  */
