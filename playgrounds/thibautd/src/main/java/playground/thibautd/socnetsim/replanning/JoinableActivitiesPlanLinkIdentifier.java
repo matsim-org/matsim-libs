@@ -107,9 +107,12 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 						loc,
 						lastEnd );
 
-			lastEnd = act.getEndTime() != Time.UNDEFINED_TIME ?
-				act.getEndTime() :
-				lastEnd + act.getMaximumDuration();
+			// keep events in the right order
+			lastEnd = Math.max(
+				lastEnd + .1d,
+				act.getEndTime() != Time.UNDEFINED_TIME ?
+					act.getEndTime() :
+					lastEnd + act.getMaximumDuration() );
 
 			if ( log.isTraceEnabled() ) {
 				log.trace( "add event "+event+" to queue" );

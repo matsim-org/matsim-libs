@@ -113,7 +113,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testOpenPlansOverlaping() {
+	public void testSingleTourOverlaping() {
 		final String type = "type";
 		final Id facility = new IdImpl( "fac" );
 
@@ -140,7 +140,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	}
 
 	@Test
-	public void testOpenPlansNonOverlaping() {
+	public void testSingleTourPlansNonOverlaping() {
 		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
 		final Id facility = new IdImpl( "fac" );
@@ -164,6 +164,64 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
 		Assert.assertFalse(
 				"plans with non overlaping activities should not be joint",
+				testee.areLinked( plan1 , plan2 ) );
+	}
+
+	@Test
+	public void testSingleTourPlansZeroDurationAct() {
+		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		final String type = "type";
+		final Id facility = new IdImpl( "fac" );
+
+		final Plan plan1 =
+			createSingleTripPlan(
+					new IdImpl( 1 ),
+					type,
+					facility,
+					30,
+					30);
+		final Plan plan2 =
+			createSingleTripPlan(
+					new IdImpl( 2 ),
+					type,
+					facility,
+					22,
+					40);
+
+
+		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
+		Assert.assertTrue(
+				"plans with zero-length overlaping activities should be joint",
+				testee.areLinked( plan1 , plan2 ) );
+	}
+
+	@Test
+	public void testSingleTourPlansInconsistentDurationAct() {
+		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		final String type = "type";
+		final Id facility = new IdImpl( "fac" );
+
+		final Plan plan1 =
+			createSingleTripPlan(
+					new IdImpl( 1 ),
+					type,
+					facility,
+					30,
+					// this start has to be shifted
+					20);
+		final Plan plan2 =
+			createSingleTripPlan(
+					new IdImpl( 2 ),
+					type,
+					facility,
+					// test: activity in the middle does not last for ever
+					32,
+					33);
+
+
+		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
+		Assert.assertFalse(
+				"plans with inconsistent duration not handled correctly",
 				testee.areLinked( plan1 , plan2 ) );
 	}
 
