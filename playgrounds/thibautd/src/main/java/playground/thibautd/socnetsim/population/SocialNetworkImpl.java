@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Counter;
 
@@ -32,6 +34,9 @@ import org.matsim.core.utils.misc.Counter;
  * @author thibautd
  */
 public class SocialNetworkImpl implements SocialNetwork {
+	private static final Logger log =
+		Logger.getLogger(SocialNetworkImpl.class);
+
 	private final Counter tieCounter = new Counter( "SocialNetwork: (Monodirectional) Tie # " );
 	private final Map<Id, Set<Id>> map = new HashMap<Id, Set<Id>>();
 
@@ -57,6 +62,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 	 * the size of the output by half.
 	 */
 	public SocialNetworkImpl(final boolean isReflective) {
+		log.info( "initialize social network as "+(isReflective ? "reflective" : "non reflective" ) );
 		this.isReflective = isReflective;
 	}
 
