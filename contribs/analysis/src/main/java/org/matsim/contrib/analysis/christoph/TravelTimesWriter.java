@@ -36,7 +36,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
@@ -78,12 +77,22 @@ public class TravelTimesWriter implements IterationEndsListener {
 	
 	private final Map<Link, double[]> travelTimes = new HashMap<Link, double[]>();
 
+	private String crsString = "EPSG:21781";
+	
 	public TravelTimesWriter() {
 	}
 	
 	public TravelTimesWriter(boolean writeTXTFiles, boolean writeSHPFiles) {
 		this.writeTXTFiles = writeTXTFiles;
 		this.writeSHPFiles = writeSHPFiles;
+	}
+	
+	public String getCrsString() {
+		return crsString;
+	}
+
+	public void setCrsString(String crsString) {
+		this.crsString = crsString;
 	}
 	
 	private void initBuffer(Network network) {
@@ -102,7 +111,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 		}
 	}
 
-	public void collectTravelTimes(TravelTime travelTime, Network network, int timeSlice, int numSlots) {
+	private void collectTravelTimes(TravelTime travelTime, Network network, int timeSlice, int numSlots) {
 
 		this.initBuffer(network);
 		
@@ -293,8 +302,8 @@ public class TravelTimesWriter implements IterationEndsListener {
 		if (writeSHPFiles) {
 			String absoluteSHPTravelTimesFile = controlerIO.getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteSHPFile);
 			String relativeSHPTravelTimesFile = controlerIO.getIterationFilename(0, TravelTimesWriter.travelTimesRelativeSHPFile);
-			this.writeAbsoluteSHPTravelTimes(absoluteSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
-			this.writeRelativeSHPTravelTimes(relativeSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);			
+			this.writeAbsoluteSHPTravelTimes(absoluteSHPTravelTimesFile, MGC.getCRS(crsString), true);
+			this.writeRelativeSHPTravelTimes(relativeSHPTravelTimesFile, MGC.getCRS(crsString), true);			
 		}
 		
 		this.travelTimes.clear();
