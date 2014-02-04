@@ -43,7 +43,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	private final double mutationRange;
 	private final StageActivityTypes blackList;
 	private final Random random;
-	private Setting setting = Setting.MUTATE_END_AS_DUR;
+	private Setting setting = Setting.MUTATE_END;
 
 	public enum Setting {
 		MUTATE_DUR,
@@ -75,7 +75,8 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					break;
 				case MUTATE_END:
 					a.setEndTime( mutateTime( a.getEndTime() ) );
-					if ( a.getEndTime() < lastEndTime ) {
+					if ( a.getEndTime() != Time.UNDEFINED_TIME &&
+							a.getEndTime() < lastEndTime ) {
 						a.setEndTime( lastEndTime );
 					}
 					lastEndTime = a.getEndTime();
