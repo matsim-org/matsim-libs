@@ -101,6 +101,7 @@ public class RunGenericSocialNetwork {
 
 		// load "registry"
 		final Scenario scenario = RunUtils.createScenario( configFile );
+		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
 		runScenario( scenario , true );
 	}
 }
