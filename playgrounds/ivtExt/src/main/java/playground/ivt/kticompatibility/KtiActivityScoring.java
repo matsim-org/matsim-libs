@@ -125,7 +125,10 @@ public class KtiActivityScoring implements ActivityScoring {
 		if ( act.getEndTime() == Time.UNDEFINED_TIME ) {
 			// assume wraparound
 			if ( !activityWithoutStart.getType().equals( act.getType() ) ) {
-				throw new IllegalStateException( act+" cannot be wraped around with "+activityWithoutStart );
+				//throw new IllegalStateException( act+" cannot be wraped around with "+activityWithoutStart );
+				// this can happen with unfinished plans. Just do not score.
+				// Issue a warning?
+				return;
 			}
 			// XXX this is the way it is done in "CharypayNagel", but I'm absolutely sure
 			// it doesn't do what it should if opening times are defined...
