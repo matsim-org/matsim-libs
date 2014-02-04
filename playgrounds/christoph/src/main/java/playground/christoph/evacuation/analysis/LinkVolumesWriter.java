@@ -45,7 +45,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
@@ -73,8 +72,6 @@ public class LinkVolumesWriter implements IterationEndsListener {
 	private final VolumesAnalyzer volumesAnalyzer;
 	private final Network network;
 	private final int maxTime;
-//	private final int timeSlice;
-//	private final int numSlots;
 	private final double scaleFactor;
 	private final boolean ignoreExitLinks;
 	

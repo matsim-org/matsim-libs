@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -173,6 +174,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private AgentsInEvacuationAreaActivityCounter agentsInEvacuationAreaActivityCounter;
 	private DetailedAgentsTracker detailedAgentsTracker;
 	private LinkVolumesWriter linkVolumesWriter;
+	private TravelTimesWriter travelTimesWriter;
 	
 	/*
 	 * Identifiers
@@ -379,7 +381,12 @@ public class EvacuationControlerListener implements StartupListener {
 		controler.getEvents().addHandler(volumesAnalyzer);
 		double scaleFactor = 1 / scenario.getConfig().qsim().getFlowCapFactor();
 		this.linkVolumesWriter = new LinkVolumesWriter(volumesAnalyzer, scenario.getNetwork(), timeSlice, maxTime, scaleFactor, true);
+		this.linkVolumesWriter.setCrsString(scenario.getConfig().global().getCoordinateSystem());
 		this.fixedOrderControlerListener.addControlerListener(this.linkVolumesWriter);
+		
+		this.travelTimesWriter = new TravelTimesWriter(true, true);
+		this.travelTimesWriter.setCrsString(scenario.getConfig().global().getCoordinateSystem());
+		this.fixedOrderControlerListener.addControlerListener(this.travelTimesWriter);
 	}
 	
 	private void initWithinDayTravelTimes(Controler controler) {
