@@ -207,14 +207,30 @@ public abstract class ReflectiveModule extends Module {
 			invokeSetter( setter , value );
 			log.trace( "value "+value+" successfully set for field "+param_name+" for group "+getName() );
 		}
-		catch (Exception e) {
+		catch (InvocationTargetException e) {
+			// this exception wraps Throwables intercepted in the invocation of the setter.
+			// Avoid multiple wrappings (exception wrapped in InvocationTargetException
+			// itself wrapped in a RuntimeException), as it makes error messages
+			// messy.
+			final Throwable cause = e.getCause();
+			if ( cause instanceof RuntimeException ) {
+				throw (RuntimeException) cause;
+			}
+
+			if ( cause instanceof Error ) {
+				throw (Error) cause;
+			}
+
+			throw new RuntimeException( cause );
+		}
+		catch (IllegalAccessException e) {
 			throw new RuntimeException( e );
 		}
 	}
 
 	private void invokeSetter(
 			final Method setter,
-			final String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+			final String value) throws IllegalAccessException, InvocationTargetException {
 		// do not care about access modifier:
 		// if a method is tagged with the StringSetter
 		// annotation, we are supposed to access it.
@@ -286,7 +302,24 @@ public abstract class ReflectiveModule extends Module {
 
 				return value;
 			}
-		} catch (Exception e) {
+		}
+		catch (InvocationTargetException e) {
+			// this exception wraps Throwables intercepted in the invocation of the getter.
+			// Avoid multiple wrappings (exception wrapped in InvocationTargetException
+			// itself wrapped in a RuntimeException), as it makes error messages
+			// messy.
+			final Throwable cause = e.getCause();
+			if ( cause instanceof RuntimeException ) {
+				throw (RuntimeException) cause;
+			}
+
+			if ( cause instanceof Error ) {
+				throw (Error) cause;
+			}
+
+			throw new RuntimeException( cause );
+		}
+		catch (IllegalAccessException e) {
 			throw new RuntimeException( e );
 		}
 

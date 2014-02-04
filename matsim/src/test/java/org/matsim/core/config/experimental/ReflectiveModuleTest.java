@@ -258,6 +258,44 @@ public class ReflectiveModuleTest {
 				gotExceptionAtGet );
 	}
 
+	@Test
+	public void testExceptionRedirection() {
+		final RuntimeException thrown = new RuntimeException();
+		final Module m = new ReflectiveModule( "name" ) {
+				@StringSetter( "field" )
+				public void setStuff(String s) {
+					throw thrown;
+				}
+
+				@StringGetter( "field" )
+				public String getStuff() {
+					throw thrown;
+				}
+			};
+
+		try {
+			m.addParam( "field" , "value" );
+			Assert.fail( "no transmition of exception!" );
+		}
+		catch (Exception e) {
+			Assert.assertSame(
+					"unchecked exception was not transmitted correctly",
+					thrown,
+					e );
+		}
+
+		try {
+			m.getValue( "field" );
+			Assert.fail( "no transmition of exception!" );
+		}
+		catch (Exception e) {
+			Assert.assertSame(
+					"unchecked exception was not transmitted correctly",
+					thrown,
+					e );
+		}
+	}
+
 	private static void assertSame(
 			final MyModule dumpedModule,
 			final MyModule readModule) {
