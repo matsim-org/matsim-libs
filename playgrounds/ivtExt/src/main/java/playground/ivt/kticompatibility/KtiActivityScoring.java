@@ -25,9 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -74,16 +72,16 @@ public class KtiActivityScoring implements ActivityScoring {
 	private final ActivityFacilities facilities;
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
-	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
+	private static final Set<OpeningTime> DEFAULT_OPENING_TIME =
+		Collections.<OpeningTime>singleton(
+			new OpeningTimeImpl(
+				DEFAULT_DAY,
+				Double.NEGATIVE_INFINITY,
+				Double.POSITIVE_INFINITY) );
 	
 	private Plan plan;
 	private CharyparNagelScoringParameters params;
 	
-	static {
-		OpeningTime defaultOpeningTime = new OpeningTimeImpl(DEFAULT_DAY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
-		DEFAULT_OPENING_TIME.add(defaultOpeningTime);
-	}
-
 	public KtiActivityScoring(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
 		this.params = params;
 		this.facilityPenalties = facilityPenalties;
@@ -113,7 +111,18 @@ public class KtiActivityScoring implements ActivityScoring {
 			if ( activityWithoutStart != null ) throw new IllegalStateException( "several acts without start" );
 			activityWithoutStart = act;
 		}
-		else if ( endTime == Time.UNDEFINED_TIME ) {
+		else {
+			// those acts are not passed anymore to the endActivity method
+			assert endTime != Time.UNDEFINED_TIME;
+			handleActivity( startTime , endTime , act );
+		}
+	}
+
+	@Override
+	public void startActivity(double time, Activity act) {
+		lock.checkLock();
+
+		if ( act.getEndTime() == Time.UNDEFINED_TIME ) {
 			// assume wraparound
 			if ( !activityWithoutStart.getType().equals( act.getType() ) ) {
 				throw new IllegalStateException( act+" cannot be wraped around with "+activityWithoutStart );
@@ -121,14 +130,14 @@ public class KtiActivityScoring implements ActivityScoring {
 			// XXX this is the way it is done in "CharypayNagel", but I'm absolutely sure
 			// it doesn't do what it should if opening times are defined...
 			// To investigate
-			handleActivity( startTime , activityWithoutStart.getEndTime() + 24 * 3600 , act );
-		}
-		else {
-			handleActivity( startTime , endTime , act );
+			handleActivity( act.getStartTime() , activityWithoutStart.getEndTime() + 24 * 3600 , act );
 		}
 	}
 
 	private void handleActivity(double arrivalTime, double departureTime, Activity act) {
+		if ( logger.isTraceEnabled() ) {
+			logger.trace( "handling activity "+act+" from "+Time.writeTime( arrivalTime )+" to "+Time.writeTime( departureTime ) ); 
+		}
 		double fromArrivalToDeparture = departureTime - arrivalTime;
 
 		// technical penalty: negative activity durations are penalized heavily
@@ -158,11 +167,15 @@ public class KtiActivityScoring implements ActivityScoring {
 			}
 
 			final Set<OpeningTime> openTimes =
-				actOpt.getOpeningTimes() != null ?
+				!actOpt.getOpeningTimes().isEmpty() ?
 					actOpt.getOpeningTimes() :
 					// if there is an activity option but no opening times,
 					// assume always open.
 					DEFAULT_OPENING_TIME;
+
+			if ( logger.isTraceEnabled() ) {
+				logger.trace( "using opening times "+openTimes );
+			}
 
 			// calculate effective activity duration bounded by opening times
 			double timeSpentPerforming = 0.0; // accumulates performance intervals for this activity
@@ -224,6 +237,9 @@ public class KtiActivityScoring implements ActivityScoring {
 
 			// accumulated waiting time, which is the time that could not be performed in activities due to closed facilities
 			this.timeSpentWaiting += (fromArrivalToDeparture - timeSpentPerforming);
+			if ( logger.isTraceEnabled() ) {
+				logger.trace( "adding "+Time.writeTime(fromArrivalToDeparture - timeSpentPerforming)+" to waiting time" );
+			}
 
 			// accumulate time spent performing
 			double accumulatedDuration = 0.0;
@@ -231,10 +247,16 @@ public class KtiActivityScoring implements ActivityScoring {
 				accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
 			}
 			this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + timeSpentPerforming);
+			if ( logger.isTraceEnabled() ) {
+				logger.trace( "adding "+Time.writeTime( timeSpentPerforming )+" to time performing "+act.getType() );
+			}
 
 			// disutility if duration of that activity was too short
 			if (timeSpentPerforming < MINIMUM_DURATION) {
 				this.accumulatedTooShortDuration += (MINIMUM_DURATION - timeSpentPerforming);
+			}
+			if ( logger.isTraceEnabled() ) {
+				logger.trace( "adding "+Time.writeTime( MINIMUM_DURATION - timeSpentPerforming )+" to short time penalty" );
 			}
 
 		}
@@ -362,16 +384,6 @@ public class KtiActivityScoring implements ActivityScoring {
 	public void reset() {
 		lock.lock();
 	}
-
-	@Override
-	public void startActivity(double time, Activity act) {
-		// do not care: everything is in the activity, so just handle it at the end
-		// also: do not accept to score the same plan several times.
-		// reseting is too easily bugged.
-		lock.checkLock();
-	}
-
-
 }
 
 class Lock {
