@@ -45,6 +45,7 @@ public class RunGenericSocialNetwork {
 	private static final boolean DO_STRATEGY_TRACE = false;
 	private static final boolean DO_SELECT_TRACE = false;
 	private static final boolean DO_SCORING_TRACE = false;
+	private static final boolean DO_KTI_SCORING_TRACE = false;
 
 	public static void runScenario( final Scenario scenario, final boolean produceAnalysis ) {
 		final Config config = scenario.getConfig();
@@ -97,6 +98,7 @@ public class RunGenericSocialNetwork {
 		if (DO_STRATEGY_TRACE) Logger.getLogger( GroupStrategyManager.class.getName() ).setLevel( Level.TRACE );
 		if (DO_SELECT_TRACE) Logger.getLogger( HighestWeightSelector.class.getName() ).setLevel( Level.TRACE );
 		if (DO_SCORING_TRACE) Logger.getLogger( "playground.thibautd.scoring" ).setLevel( Level.TRACE );
+		if (DO_KTI_SCORING_TRACE) Logger.getLogger( "playground.ivt.kticompatibility" ).setLevel( Level.TRACE );
 		final String configFile = args[ 0 ];
 
 		// load "registry"
