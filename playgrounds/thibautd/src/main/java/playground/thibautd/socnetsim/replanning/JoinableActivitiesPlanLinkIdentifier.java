@@ -19,14 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 
@@ -38,6 +41,9 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
  * @author thibautd
  */
 public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier {
+	private static final Logger log =
+		Logger.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
+
 	private final String type;
 
 	public JoinableActivitiesPlanLinkIdentifier(
@@ -49,28 +55,103 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 	public boolean areLinked(
 			final Plan p1,
 			final Plan p2) {
-		final Set<Id> locs1 = getLocations( p1 );
-		final Set<Id> locs2 = getLocations( p2 );
+		final Queue<LocationEvent> events = new PriorityQueue<LocationEvent>( p1.getPlanElements().size() + p2.getPlanElements().size() );
 
-		for ( Id l : locs1 ) {
-			if ( locs2.contains( l ) ) return true;
+		fillEvents( p1 , events );
+		fillEvents( p2 , events );
+
+		final Id pers1 = p1.getPerson().getId();
+		Id loc1 = null;
+		String type1 = null;
+		Id loc2 = null;
+		String type2 = null;
+
+		while ( !events.isEmpty() ) {
+			final LocationEvent event = events.remove();
+
+			if ( log.isTraceEnabled() ) {
+				log.trace( "got event "+event+" from queue" );
+			}
+
+			if ( pers1.equals( event.getPersonId() ) ) {
+				loc1 = event.getLocationId();
+				type1 = event.getActType();
+			}
+			else {
+				loc2 = event.getLocationId();
+				type2 = event.getActType();
+			}
+
+			if ( loc1 != null && loc2 != null &&
+					loc1.equals( loc2 ) &&
+					type1.equals( type ) && type2.equals( type ) ) {
+				return true;
+			}
 		}
 
 		return false;
 	}
 
-	private Set<Id> getLocations(final Plan p) {
-		final Set<Id> locs = new HashSet<Id>();
+	private static void fillEvents(
+			final Plan plan,
+			final Queue<LocationEvent> events) {
+		final Id personId = plan.getPerson().getId();
+		double lastEnd = 0;
+		for ( Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ) ) {
+			final Id loc = act.getFacilityId();
 
-		for ( Activity act : TripStructureUtils.getActivities( p , EmptyStageActivityTypes.INSTANCE ) ) {
-			if ( act.getType().equals( type ) ) {
-				locs.add(
-						act.getFacilityId() != null ?
-							act.getFacilityId() :
-							act.getLinkId() );
+			final LocationEvent event =
+				new LocationEvent(
+						personId,
+						act.getType(),
+						loc,
+						lastEnd );
+
+			lastEnd = act.getEndTime() != Time.UNDEFINED_TIME ?
+				act.getEndTime() :
+				lastEnd + act.getMaximumDuration();
+
+			if ( log.isTraceEnabled() ) {
+				log.trace( "add event "+event+" to queue" );
 			}
+
+			events.add( event );
+		}
+	}
+
+	private static class LocationEvent implements Comparable<LocationEvent> {
+		private final String type;
+		private final Id locId;
+		private final Id personId;
+		private final double startTime;
+
+		public LocationEvent(
+				final Id personId,
+				final String type,
+				final Id locId,
+				final double startTime ) {
+			if ( locId == null ) throw new NullPointerException();
+			this.type = type;
+			this.locId = locId;
+			this.personId = personId;
+			this.startTime = startTime;
 		}
 
-		return locs;
+		public Id getLocationId() { return locId; }
+		public Id getPersonId() { return personId; }
+		public String getActType() { return type; }
+
+		@Override
+		public int compareTo(final LocationEvent o) {
+			return Double.compare( startTime , o.startTime );
+		}
+
+		@Override
+		public String toString() {
+			return "[person="+personId+
+				"; type="+type+
+				"; location="+locId+
+				"; startTime="+startTime+"]";
+		}
 	}
 }
