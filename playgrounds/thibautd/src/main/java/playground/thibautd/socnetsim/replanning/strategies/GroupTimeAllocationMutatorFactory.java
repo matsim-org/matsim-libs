@@ -90,6 +90,12 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 					config,
 					tripRouterFactory) );
 
+		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+					config,
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier() ) );
+
 		return strategy;
 	}
 }
