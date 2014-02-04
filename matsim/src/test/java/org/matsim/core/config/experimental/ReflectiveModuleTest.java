@@ -133,6 +133,7 @@ public class ReflectiveModuleTest {
 				@StringSetter( "field" )
 				public Object setStuff(String s) { return null;}
 
+				// void: not good
 				@StringGetter( "field" )
 				public void getStuff() { }
 			};
@@ -148,6 +149,7 @@ public class ReflectiveModuleTest {
 				@StringSetter( "field" )
 				public Object setStuff(String stuff) { return null;}
 
+				// takes a parameter: not good
 				@StringGetter( "field" )
 				public Object getStuff(Object someArg) { return null;}
 			};
@@ -164,13 +166,13 @@ public class ReflectiveModuleTest {
 		try {
 			new ReflectiveModule( "name" ) {
 				@StringSetter( "field" )
-				public Object setStuff(String s) { return null;}
+				public void setStuff(String s) {}
 
 				@StringGetter( "field" )
-				public void getStuff() { }
+				public Object getStuff() { return null; }
 
 				@StringGetter( "field" )
-				public void getStuff2() { }
+				public Object getStuff2() { return null; }
 			};
 			// should not get here because of exception
 			Assert.fail( "no exception when 2 getters for one field" );
@@ -185,13 +187,13 @@ public class ReflectiveModuleTest {
 		try {
 			new ReflectiveModule( "name" ) {
 				@StringSetter( "field" )
-				public Object setStuff(String s) { return null;}
+				public void setStuff(String s) {}
 
 				@StringSetter( "field" )
-				public void setStuff(Object s) {}
+				public void setStuff(double s) {}
 
 				@StringGetter( "field" )
-				public void getStuff() { }
+				public Object getStuff() { return null; }
 			};
 			// should not get here because of exception
 			Assert.fail( "no exception when 2 getters for one field" );
