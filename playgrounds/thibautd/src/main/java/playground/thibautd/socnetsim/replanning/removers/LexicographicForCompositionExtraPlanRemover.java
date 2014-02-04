@@ -76,6 +76,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		for ( Person person : group.getPersons() ) {
 			final PlansPerComposition plansPerComposition = getPlansPerComposition( jointPlans , person );
 
+			// too many individual plans?
 			if ( plansPerComposition.getIndividualPlans().size() > maxPlansPerComposition ) {
 				assert plansPerComposition.getIndividualPlans().size() == maxPlansPerComposition + 1;
 				((PersonImpl) person).removePlan( 
@@ -218,14 +219,14 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		}
 
 		private int rank(final Plan plan) {
-			int nBetterPlans = 0;
+			int nWorsePlans = 0;
 
 			for ( Plan other : plan.getPerson().getPlans() ) {
-				if ( other != plan && other.getScore() > plan.getScore() ) nBetterPlans++;
+				if ( other != plan && other.getScore() < plan.getScore() ) nWorsePlans++;
 
 			}
 
-			return nBetterPlans;
+			return nWorsePlans;
 		}
 
 		@Override
