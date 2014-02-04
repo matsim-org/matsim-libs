@@ -29,12 +29,14 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.contrib.grips.io.GripsConfigDeserializer;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -120,8 +122,31 @@ public class CreatePopulationShapeFileFromExistingData {
 		}
 		ShapeFileWriter.writeGeometries(fts, gcm.getPopulationFileName());
 	}
+	
+    public static void transformCRS(ShapeFileReader r1) {
+        CoordinateReferenceSystem target = MGC.getCRS("EPSG: 4326");
+        try {
+                MathTransform t = CRS.findMathTransform(r1.getCoordinateSystem(), target);
+                for (SimpleFeature f : r1.getFeatureSet()) {
+                        Geometry geo = (Geometry) f.getDefaultGeometry();
+                        Geometry gg = JTS.transform(geo, t);
+                        f.setDefaultGeometry(gg);
+                        
+                }
+//                r1.getFeatureSource().getC
+        } catch (FactoryException e) {
+                e.printStackTrace();
+        } catch (MismatchedDimensionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        } catch (TransformException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        }
+        
+}
 
-	private static void transformCRS(ShapeFileReader r2, ShapeFileReader r1) {
+	public static void transformCRS(ShapeFileReader r2, ShapeFileReader r1) {
 		try {
 			MathTransform t = CRS.findMathTransform(r1.getCoordinateSystem(), r2.getCoordinateSystem());
 			for (SimpleFeature f : r1.getFeatureSet()) {

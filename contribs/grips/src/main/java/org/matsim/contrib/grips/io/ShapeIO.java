@@ -31,6 +31,7 @@ import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.shape.PolygonShape;
 import org.matsim.contrib.grips.model.shape.ShapeStyle;
+import org.matsim.contrib.grips.populationselector.CreatePopulationShapeFileFromExistingData;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -133,6 +134,8 @@ public class ShapeIO
 
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
 		shapeFileReader.readFileAndInitialize(shapeFileString);
+		
+		CreatePopulationShapeFileFromExistingData.transformCRS(shapeFileReader);
 
 		ArrayList<Geometry> geometries = new ArrayList<Geometry>();
 		for (SimpleFeature ft : shapeFileReader.getFeatureSet())
