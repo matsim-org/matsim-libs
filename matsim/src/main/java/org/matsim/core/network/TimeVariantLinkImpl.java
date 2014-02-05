@@ -274,7 +274,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		}
 
 		if (numEvent != this.aFlowCapacityEvents - 1) {
-			throw new RuntimeException("Expected number of change events (" + (this.aFreespeedEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
+			throw new RuntimeException("Expected number of change events (" + (this.aFlowCapacityEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
 		}
 
 	}
@@ -304,7 +304,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 		}
 
 		if (numEvent != this.aLanesEvents - 1) {
-			throw new RuntimeException("Expected number of change events (" + (this.aFreespeedEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
+			throw new RuntimeException("Expected number of change events (" + (this.aLanesEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
 		}
 
 	}
