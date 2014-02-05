@@ -29,7 +29,13 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.scoring.BeingTogetherScoring.AcceptAllFilter;
@@ -495,6 +501,90 @@ public class BeingTogetherScoringTest {
 					MatsimTestUtils.EPSILON);
 		}
 	}
+
+	@Test
+	public void testOvelapsOfActivitiesWithOpeningTimes() {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id linkId = new IdImpl( 1 );
+		final String type = "type";
+
+		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		final ActivityFacility facility =
+			facilities.getFactory().createActivityFacility(
+					new IdImpl( "facility" ),
+					new CoordImpl( 0 , 0 ) );
+		facilities.addActivityFacility( facility );
+		final ActivityOption option = facilities.getFactory().createActivityOption( type );
+		facility.addActivityOption( option );
+
+		final double startFirstWindow = 10;
+		final double endFirstWindow = 15;
+		option.addOpeningTime( new OpeningTimeImpl( startFirstWindow , endFirstWindow ) );
+
+		final double startSecondWindow = 25;
+		final double endSecondWindow = 30;
+		option.addOpeningTime( new OpeningTimeImpl( startSecondWindow , endSecondWindow ) );
+		
+		for ( OverlapSpec os : new OverlapSpec[]{
+				new OverlapSpec( 0 , 10 , 20 , 30 ),
+				new OverlapSpec( 0 , 10 , 10 , 30 ),
+				new OverlapSpec( 0 , 20 , 10 , 30 ),
+				new OverlapSpec( 10 , 20 , 10 , 30 ),
+				new OverlapSpec( 20 , 30 , 10 , 30 ),
+				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
+			final BeingTogetherScoring testee =
+				new BeingTogetherScoring(
+						facilities, // facilities
+						1,
+						ego,
+						Collections.singleton( alter ) );
+			testee.handleEvent(
+					new ActivityStartEvent(os.startEgo, ego, linkId, facility.getId(), type) );
+			testee.handleEvent(
+					new ActivityStartEvent(os.startAlter, alter, linkId, facility.getId(), type) );
+			testee.handleEvent(
+					new ActivityEndEvent(os.endEgo, ego, linkId, facility.getId(), type) );
+			testee.handleEvent(
+					new ActivityEndEvent(os.endAlter, alter, linkId, facility.getId(), type) );
+
+			final double startFirstOverlap = 
+					Math.max(
+							startFirstWindow,
+							Math.max(
+								os.startEgo,
+								os.startAlter ) );
+			final double endFirstOverlap = 
+					Math.min(
+							endFirstWindow,
+							Math.min(
+								os.endEgo,
+								os.endAlter ) );
+			final double firstOverlap = Math.max( 0 , endFirstOverlap - startFirstOverlap );
+
+			final double startSecondOverlap = 
+					Math.max(
+							startSecondWindow,
+							Math.max(
+								os.startEgo,
+								os.startAlter ) );
+			final double endSecondOverlap = 
+					Math.min(
+							endSecondWindow,
+							Math.min(
+								os.endEgo,
+								os.endAlter ) );
+			final double secondOverlap = Math.max( 0 , endSecondOverlap - startSecondOverlap );
+
+			Assert.assertEquals(
+					"unexpected overlap for "+os,
+					firstOverlap + secondOverlap,
+					testee.getScore(),
+					MatsimTestUtils.EPSILON);
+		}
+	}
+
 
 	private static class OverlapSpec {
 		public double startEgo, startAlter, endEgo, endAlter;
