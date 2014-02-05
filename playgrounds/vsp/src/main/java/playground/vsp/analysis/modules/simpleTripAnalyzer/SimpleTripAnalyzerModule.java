@@ -97,7 +97,7 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 	/**
 	 * @param traveller
 	 */
-	private Map<String, Map<Integer, Integer>> calcAndWriteTTDistribution(Map<Id, Traveller> traveller) {
+	public static Map<String, Map<Integer, Integer>> calcAndWriteTTDistribution(Map<Id, Traveller> traveller) {
 		@SuppressWarnings("serial")
 		List<Integer> distribution =  new ArrayList<Integer>(){{
 			add(0);
@@ -123,7 +123,7 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 		return map;
 	}
 	
-	private Map<String, Map<Integer, Integer>> calcWriteDistanceDistribution(Map<Id, Traveller> traveller) {
+	public static Map<String, Map<Integer, Integer>> calcWriteDistanceDistribution(Map<Id, Traveller> traveller) {
 		@SuppressWarnings("serial")
 		List<Integer> distribution =  new ArrayList<Integer>(){{
 			add(0);
@@ -152,8 +152,9 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 	/**
 	 * @param map
 	 * @param file
+	 * @return 
 	 */
-	private void dumpData(Map<String, Map<Integer, Integer>> map, String file) {
+	public static void dumpData(Map<String, Map<Integer, Integer>> map, String file) {
 		BufferedWriter w = IOUtils.getBufferedWriter(file);
 		Map<Integer, Integer> header = map.values().iterator().next();
 		try {
@@ -179,7 +180,7 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 	 * @param temp
 	 * @param dist
 	 */
-	private void increase(Map<Integer, Integer> temp, Double value) {
+	private static void increase(Map<Integer, Integer> temp, Double value) {
 		for(Integer i : temp.keySet()){
 			if(value <= i){
 				temp.put(i, temp.get(i) + 1);
@@ -190,7 +191,7 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 	
 	
 	
-	private Map<Integer, Integer> getColumn(Map<String, Map<Integer,Integer>> map, List<Integer> distribution, String mode){
+	private static Map<Integer, Integer> getColumn(Map<String, Map<Integer,Integer>> map, List<Integer> distribution, String mode){
 		if(map.containsKey(mode)) return map.get(mode);
 		Map<Integer, Integer> temp = new LinkedHashMap<Integer, Integer>();
 		for(Integer i : distribution){

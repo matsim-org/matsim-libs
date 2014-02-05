@@ -21,7 +21,6 @@ package playground.vsp.analysis.modules.simpleTripAnalyzer;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,7 +76,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 		}
 		distFactor = c.plansCalcRoute().getBeelineDistanceFactor();
 		this.net = net;
-		this.pIds = (pIds == null) ? new HashSet<Id>() : pIds;
+		this.pIds = pIds;
 	}
 
 	@Override
@@ -87,13 +86,15 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if(!pIds.contains(event.getPersonId())) return;
+		if( (pIds != null) && !pIds.contains(event.getPersonId())) return;
 		Traveller t = this.traveller.get(event.getPersonId());
 		if(t == null){
 			t = new Traveller(event.getPersonId());
 			this.traveller.put(event.getPersonId(), t);
 		}
 		String mode = event.getLegMode();
+		// a single transitWalk should be handled not as pt bus as walk...
+		mode = (mode == TransportMode.transit_walk) ? TransportMode.walk : mode;
 		// cars start at the end of a link, thus we subtract the link-length for car-trips.
 		//the distance for other modes is Double.NaN as they are teleported.
 		t.startTrip(event.getTime(), mode, 
