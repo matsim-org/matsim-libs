@@ -154,7 +154,12 @@ implements ShutdownListener{
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
 		String matsimOutputDirectory = config.controler().getOutputDirectory();
-		accessibilityWriter = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory);
+		try {
+			accessibilityWriter = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("The output directory hierarchy needs to be in place when this constructor is called") ;
+		}
 		initAccessibilityParameters(config);
 		// aggregating facilities to their nearest node on the road network
 		this.aggregatedFacilities = aggregatedOpportunities(opportunities, network);
@@ -164,8 +169,14 @@ implements ShutdownListener{
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 	}
 	
+	private boolean alreadyActive = false ;
+	
 	@Override
 	public void notifyShutdown(ShutdownEvent event){
+		if ( alreadyActive ) {
+			return ; // don't need this a second time
+		}
+		alreadyActive = true ;
 		log.info("Entering notifyShutdown ..." );
 		
 		// make sure that measuring points are set.
@@ -280,40 +291,51 @@ implements ShutdownListener{
 		final String FILE_TYPE_TXT = ".txt";
 
 		log.info("Writing plotting data for R analyis into " + matsimOutputDirectory + " ...");
-		if(freeSpeedGrid != null)
+		if(freeSpeedGrid != null) {
 			GridUtils.writeSpatialGridTable(freeSpeedGrid, matsimOutputDirectory
 				+ "/" + FREESEED_FILENAME + freeSpeedGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		if(carGrid != null)
+			AnalysisCellBasedAccessibilityCSVWriterV2 writer = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory,"freeSpeed") ;
+			for(double y = freeSpeedGrid.getYmin(); y <= freeSpeedGrid.getYmax() ; y += freeSpeedGrid.getResolution()) {
+				for(double x = freeSpeedGrid.getXmin(); x <= freeSpeedGrid.getXmax(); x += freeSpeedGrid.getResolution()) {
+					final double value = freeSpeedGrid.getValue(x, y);
+					if ( !Double.isNaN(value ) ) { 
+						writer.writeRecord( new CoordImpl(x,y), value) ;
+					}
+				}
+				writer.writeNewLine() ;
+			}
+			writer.close() ;
+		}
+		if(carGrid != null) {
 			GridUtils.writeSpatialGridTable(carGrid, matsimOutputDirectory
 				+ "/" + CAR_FILENAME + carGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		if(bikeGrid != null)
+			AnalysisCellBasedAccessibilityCSVWriterV2 writer = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory,"car") ;
+			for(double y = carGrid.getYmin(); y <= carGrid.getYmax() ; y += carGrid.getResolution()) {
+				for(double x = carGrid.getXmin(); x <= carGrid.getXmax(); x += carGrid.getResolution()) {
+					writer.writeRecord( new CoordImpl(x,y), carGrid.getValue(x, y)) ;
+				}
+				writer.writeNewLine() ;
+			}
+			writer.close() ;
+		}
+		if(bikeGrid != null) {
 			GridUtils.writeSpatialGridTable(bikeGrid, matsimOutputDirectory
 				+ "/" + BIKE_FILENAME + bikeGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		if(walkGrid != null)
+		}
+		if(walkGrid != null) {
 			GridUtils.writeSpatialGridTable(walkGrid, matsimOutputDirectory
 				+ "/" + WALK_FILENAME + walkGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		if(ptGrid != null)
+		}
+		if(ptGrid != null) {
 			GridUtils.writeSpatialGridTable(ptGrid, matsimOutputDirectory
 				+ "/" + PT_FILENAME + ptGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		
-		log.info("Writing plotting data for R done!");
-		
-		log.info("Writing data for gnuplot into " + matsimOutputDirectory + " ...") ;
-		AnalysisCellBasedAccessibilityCSVWriterV2 writer = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory,"car") ;
-		for(double y = carGrid.getYmin(); y <= carGrid.getYmax() ; y += carGrid.getResolution()) {
-			for(double x = carGrid.getXmin(); x <= carGrid.getXmax(); x += carGrid.getResolution()) {
-				writer.writeRecord( new CoordImpl(x,y), carGrid.getValue(x, y)) ;
-			}
-			writer.writeNewLine() ;
 		}
-		writer.close() ;
-		
-		log.info("Writing data for gnuplot done ..." ) ;
+		log.info("Writing plotting data for R done!");
 	}
 	
 	

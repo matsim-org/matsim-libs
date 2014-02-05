@@ -529,14 +529,16 @@ public abstract class AccessibilityControlerListenerImpl {
 						ptGrid.setValue(ptAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
 				}
 				
-				// writing measured accessibilities for current measuring point 
-				// (aFac) in csv format to disc
-				writeCSVData(aFac, fromNode, 
-							 freeSpeedAccessibility, 
-							 carAccessibility, 
-							 bikeAccessibility,
-							 walkAccessibility, 
-							 ptAccessibility);
+//				// writing measured accessibilities for current measuring point 
+//				// (aFac) in csv format to disc
+//				writeCSVData(aFac, fromNode, 
+//							 freeSpeedAccessibility, 
+//							 carAccessibility, 
+//							 bikeAccessibility,
+//							 walkAccessibility, 
+//							 ptAccessibility);
+
+				// yyyyyy kai: commenting this out since it does not work for nmbm do now know why. feb'13
 				
 				if(this.zoneDataExchangeListenerList != null){
 					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)

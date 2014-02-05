@@ -104,6 +104,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			System.exit(-1) ;
 		}
 	}
 	
