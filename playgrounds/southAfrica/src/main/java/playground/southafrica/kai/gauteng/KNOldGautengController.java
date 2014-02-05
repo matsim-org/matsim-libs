@@ -215,7 +215,7 @@ public class KNOldGautengController {
 		truckVehType.setLength(20.); 
 		truckVehType.setMaximumVelocity( 100./3.6);
 		
-		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles() ;
+		Vehicles vehicles = scenario.getVehicles() ;
 
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			String attrib = (String) pAttribs.getAttribute(person.getId().toString(), ATTR_NAME ) ;
