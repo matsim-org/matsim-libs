@@ -62,38 +62,38 @@ public class MATSimAction {
 		public void actionPerformed(ActionEvent e) {
 			
 			String path = Main.pref.get("matsim_exportFolder",
-					System.getProperty("user.home"));
+					System.getProperty("user.home"))+"/josm_matsim_export";
 			JFileChooser chooser = new JFileChooser(path);
 			chooser.setDialogTitle("MATSim-Export");
 			chooser.setApproveButtonText("Confirm");
 			FileFilter filter = new FileNameExtensionFilter("Network-XML",
 					"xml");
 			chooser.setFileFilter(filter);
-			File file = new File(path + "/josm_matsim_export");
+			File file = new File(path);
 			chooser.setSelectedFile(file);
 			int result = chooser.showSaveDialog(null);
-			if (result == JFileChooser.APPROVE_OPTION
-					&& chooser.getSelectedFile().getAbsolutePath() != null) {
-				ExportDialog.exportFilePath.setText(chooser.getSelectedFile()
-						.getAbsolutePath());
-			}
-			
 			
 			ExportDialog dialog = new ExportDialog();
-			JOptionPane pane = new JOptionPane(dialog,
-					JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-			dialog.setOptionPane(pane);
-			JDialog dlg = pane.createDialog(Main.parent, tr("Export"));
-			dlg.setAlwaysOnTop(true);
-			dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			dlg.setVisible(true);
-			if (pane.getValue() != null) {
-				if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
-					ExportTask task = new ExportTask();
-					Main.worker.execute(task);
+			
+			if (result == JFileChooser.APPROVE_OPTION
+					&& chooser.getSelectedFile().getAbsolutePath() != null) {
+				path = chooser.getSelectedFile().getAbsolutePath();
+				dialog.exportFilePath.setText(path);
+				JOptionPane pane = new JOptionPane(dialog,
+						JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+				dialog.setOptionPane(pane);
+				JDialog dlg = pane.createDialog(Main.parent, tr("Export"));
+				dlg.setAlwaysOnTop(true);
+				dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				dlg.setVisible(true);
+				if (pane.getValue() != null) {
+					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
+						ExportTask task = new ExportTask(path);
+						Main.worker.execute(task);
+					}
 				}
+				dlg.dispose();
 			}
-			dlg.dispose();
 		}
 	}
 
@@ -120,7 +120,8 @@ public class MATSimAction {
 			int result = chooser.showOpenDialog(null);
 			if (result == JFileChooser.APPROVE_OPTION
 					&& chooser.getSelectedFile().getAbsolutePath() != null) {
-				ImportDialog.path.setText(chooser.getSelectedFile().getAbsolutePath());
+				String path = chooser.getSelectedFile().getAbsolutePath();
+				ImportDialog.path.setText(path);
 				ImportDialog dialog = new ImportDialog();
 				JOptionPane pane = new JOptionPane(dialog,
 						JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
@@ -132,7 +133,7 @@ public class MATSimAction {
 				dlg.setVisible(true);
 				if (pane.getValue() != null) {
 					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
-						ImportTask task = new ImportTask();
+						ImportTask task = new ImportTask(path);
 						Main.worker.execute(task);
 					}
 				}
@@ -157,7 +158,7 @@ public class MATSimAction {
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer",
-					new File("new Layer"), scenario.getNetwork(), TransformationFactory.WGS84);
+					null, scenario.getNetwork(), TransformationFactory.WGS84);
 			dataSet.addDataSetListener(new NetworkListener(layer,
 					new HashMap<Way, List<Link>>()));
 			Main.main.addLayer(layer);

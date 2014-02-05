@@ -3,24 +3,18 @@ package josmMatsimPlugin;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
 
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.visitor.paint.MapRendererFactory;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.MapView;
-import org.openstreetmap.josm.gui.mappaint.MapPaintStyles;
-import org.openstreetmap.josm.gui.mappaint.mapcss.MapCSSStyleSource;
 import org.openstreetmap.josm.gui.preferences.PreferenceSetting;
 import org.openstreetmap.josm.gui.tagging.TaggingPreset;
 import org.openstreetmap.josm.gui.tagging.TaggingPresetMenu;
@@ -58,7 +52,7 @@ public class MATSimPlugin extends Plugin {
 			tps = TaggingPresetReader.readAll(reader, true);
 		} catch (SAXException e) {
 			e.printStackTrace();
-			tps = Collections.EMPTY_LIST;
+			tps = Collections.emptyList();
 		}
 
 		for (TaggingPreset tp : tps) {
@@ -93,7 +87,6 @@ public class MATSimPlugin extends Plugin {
 		factory.activate(MapRenderer.class);
 		
 		OsmConvertDefaults.load();
-		
 	}
 
 	/**

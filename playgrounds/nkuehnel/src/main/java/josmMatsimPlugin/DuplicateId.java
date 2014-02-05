@@ -46,7 +46,6 @@ public class DuplicateId extends Test {
 		if (layer instanceof NetworkLayer) {
 			this.network = ((NetworkLayer) layer).getMatsimNetwork();
 		}
-
 	}
 
 	@Override
@@ -62,10 +61,11 @@ public class DuplicateId extends Test {
 			}
 		}
 	}
-	
+
 	@Override
 	public void visit(Node n) {
-		for (org.matsim.api.core.v01.network.Node node : network.getNodes().values()) {
+		for (org.matsim.api.core.v01.network.Node node : network.getNodes()
+				.values()) {
 			if (String.valueOf(n.getUniqueId()).equalsIgnoreCase(
 					node.getId().toString())) {
 				String origId = ((NodeImpl) node).getOrigId();
@@ -101,7 +101,8 @@ public class DuplicateId extends Test {
 
 	@Override
 	public boolean isFixable(TestError testError) {
-		if (testError.getCode() == DUPLICATE_LINK_ID || testError.getCode() == DUPLICATE_NODE_ID) {
+		if (testError.getCode() == DUPLICATE_LINK_ID
+				|| testError.getCode() == DUPLICATE_NODE_ID) {
 			return true;
 		}
 		return false;
@@ -112,22 +113,24 @@ public class DuplicateId extends Test {
 		if (!isFixable(testError)) {
 			return null;
 		}
-		
-		int i = 1;
-		int j = 1;
-		for (OsmPrimitive primitive : testError.getPrimitives()) {
-			if (primitive instanceof Way) {
-				Link link = this.network.getLinks().get(
-						new IdImpl(((Way) primitive).getUniqueId()));
-				String origId = ((LinkImpl) link).getOrigId();
-				((LinkImpl) link).setOrigId(origId + "(" + i + ")");
-				i++;	
-			} else if (primitive instanceof Node) {
-				org.matsim.api.core.v01.network.Node node = this.network.getNodes().get(
-						new IdImpl(((Node) primitive).getUniqueId()));
-				String origId = ((NodeImpl) node).getOrigId();
-				((NodeImpl) node).setOrigId(origId + "(" + j + ")");
-				j++;
+		if (testError.getCode() == 3001 || testError.getCode() == 3002) {
+			int i = 1;
+			int j = 1;
+			for (OsmPrimitive primitive : testError.getPrimitives()) {
+				if (primitive instanceof Way) {
+					Link link = this.network.getLinks().get(
+							new IdImpl(((Way) primitive).getUniqueId()));
+					String origId = ((LinkImpl) link).getOrigId();
+					((LinkImpl) link).setOrigId(origId + "(" + i + ")");
+					i++;
+				} else if (primitive instanceof Node) {
+					org.matsim.api.core.v01.network.Node node = this.network
+							.getNodes()
+							.get(new IdImpl(((Node) primitive).getUniqueId()));
+					String origId = ((NodeImpl) node).getOrigId();
+					((NodeImpl) node).setOrigId(origId + "(" + j + ")");
+					j++;
+				}
 			}
 		}
 		return null;// undoRedo handling done in mergeNodes

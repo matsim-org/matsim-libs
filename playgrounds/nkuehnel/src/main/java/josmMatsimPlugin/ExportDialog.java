@@ -3,26 +3,14 @@
  */
 package josmMatsimPlugin;
 
-import static org.openstreetmap.josm.tools.I18n.tr;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.openstreetmap.josm.Main;
 
@@ -32,6 +20,7 @@ import org.openstreetmap.josm.Main;
  * @author nkuehnel
  * 
  */
+@SuppressWarnings("serial")
 public class ExportDialog extends JPanel {
 
 	private JOptionPane optionPane;
@@ -40,7 +29,7 @@ public class ExportDialog extends JPanel {
 
 	protected final static JComboBox exportSystem = new JComboBox(
 			Preferences.coordSystems);
-	protected final static JLabel exportFilePath = new JLabel();
+	protected final JLabel exportFilePath = new JLabel((Main.pref.get("matsim_exportFolder", System.getProperty("user.home"))+"\\josm_matsim_export.xml"));
 	protected final static JLabel capacityPeriodLabel = new JLabel("Set capacity period \n(in seconds):");
 	protected final static JLabel effectiveLaneWidthLabel = new JLabel("Set effective lane width \n(in meters):");
 	

@@ -42,9 +42,11 @@ public class ImportTask extends PleaseWaitRunnable {
 	public static final String NODE_TAG_ID = "id";
 	public static final String WAY_TAG_ID = "id";
 	private NetworkLayer layer;
+	private String path;
 
-	public ImportTask() {
+	public ImportTask(String path) {
 		super("MATSim Import");
+		this.path = path;
 	}
 
 	/*
@@ -95,7 +97,7 @@ public class ImportTask extends PleaseWaitRunnable {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		this.progressMonitor.setTicks(2);
 		this.progressMonitor.setCustomText("reading network xml..");
-		new MatsimNetworkReader(scenario).readFile(ImportDialog.path.getText());
+		new MatsimNetworkReader(scenario).readFile(path);
 		Network network = NetworkImpl.createNetwork();
 
 		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
@@ -146,8 +148,6 @@ public class ImportTask extends PleaseWaitRunnable {
 			}
 			way.put("modes", modes.toString());
 			
-			
-			
 			dataSet.addPrimitive(way);
 			Link newLink = network.getFactory().createLink(
 					new IdImpl(Long.toString(way.getUniqueId())),
@@ -169,7 +169,7 @@ public class ImportTask extends PleaseWaitRunnable {
 		this.progressMonitor.setCustomText("creating layer..");
 
 		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(),
-				new File(ImportDialog.path.getText()), network, importSystem);
+				new File(path), network, importSystem);
 		dataSet.addDataSetListener(new NetworkListener(layer, way2Links));
 	}
 }

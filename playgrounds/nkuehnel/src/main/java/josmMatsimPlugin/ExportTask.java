@@ -46,18 +46,18 @@ import org.xml.sax.SAXException;
 
 public class ExportTask extends PleaseWaitRunnable {
 	static Properties matsimConvertProperties = new Properties();
-	private int exportResult;
+	protected int exportResult;
 	private String path;
 	private String targetSystem;
-	
-	private final int SUCCESS = 0;
-	private final int VALIDATION_ERROR = 1;
+
+	protected static final int SUCCESS = 0;
+	protected static final int VALIDATION_ERROR = 1;
 	private List<TestError> validationErrors = new ArrayList<TestError>();
 
-	public ExportTask() {
+	public ExportTask(String path) {
 		super("MATSim Export");
 		this.exportResult = 0;
-		this.path = ExportDialog.exportFilePath.getText() + ".xml";
+		this.path = path.endsWith(".xml") ? path : path + ".xml";
 		this.targetSystem = (String) ExportDialog.exportSystem
 				.getSelectedItem();
 	}
@@ -79,17 +79,22 @@ public class ExportTask extends PleaseWaitRunnable {
 	 */
 	@Override
 	protected void finish() {
-		if(exportResult == SUCCESS) {
-			JOptionPane.showMessageDialog(Main.parent, "Export finished. File written to: "+path+" (WGS84 to "+ targetSystem + ")");
+		if (exportResult == SUCCESS) {
+			JOptionPane.showMessageDialog(Main.parent,
+					"Export finished. File written to: " + path + " (WGS84 to "
+							+ targetSystem + ")");
 		} else if (exportResult == VALIDATION_ERROR) {
-			JOptionPane.showMessageDialog(Main.parent, "Export failed due to validation errors. See validation layer for details.");
+			JOptionPane
+					.showMessageDialog(Main.parent,
+							"Export failed due to validation errors. See validation layer for details.");
 			OsmValidator.initializeErrorLayer();
-            Main.map.validatorDialog.unfurlDialog();
-	        Main.main.getEditLayer().validationErrors.clear();
-	        Main.main.getEditLayer().validationErrors.addAll(this.validationErrors);
-	        Main.map.validatorDialog.tree.setErrors(this.validationErrors );
+			Main.map.validatorDialog.unfurlDialog();
+			Main.main.getEditLayer().validationErrors.clear();
+			Main.main.getEditLayer().validationErrors
+					.addAll(this.validationErrors);
+			Main.map.validatorDialog.tree.setErrors(this.validationErrors);
 		}
-		
+
 	}
 
 	/*
@@ -100,10 +105,10 @@ public class ExportTask extends PleaseWaitRunnable {
 	@Override
 	protected void realRun() throws SAXException, IOException,
 			OsmTransferException, UncheckedIOException {
-		
+
 		this.progressMonitor.setTicksCount(4);
 		this.progressMonitor.setTicks(0);
-		
+
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
@@ -116,18 +121,17 @@ public class ExportTask extends PleaseWaitRunnable {
 			if (layer instanceof NetworkLayer) {
 				this.progressMonitor.setTicks(1);
 				this.progressMonitor.setCustomText("validating data..");
-				
+
 				DuplicateId test = new DuplicateId();
 				test.startTest(NullProgressMonitor.INSTANCE);
 				test.visit(((OsmDataLayer) layer).data.allPrimitives());
 				test.endTest();
 
 				if (test.getErrors().size() > 0) {
-			        this.exportResult = VALIDATION_ERROR;
-			        this.validationErrors.addAll(test.getErrors());
-			        return;
-			        
-			    
+					this.exportResult = VALIDATION_ERROR;
+					this.validationErrors.addAll(test.getErrors());
+					return;
+
 				} else {
 					this.progressMonitor.setTicks(2);
 					this.progressMonitor.setCustomText("rearranging data..");
@@ -167,7 +171,7 @@ public class ExportTask extends PleaseWaitRunnable {
 			} else {
 				this.progressMonitor.setTicks(1);
 				this.progressMonitor.setCustomText("converting osm data..");
-				
+
 				Converter converter = new Converter(
 						((OsmDataLayer) layer).data, network);
 				converter.convert();

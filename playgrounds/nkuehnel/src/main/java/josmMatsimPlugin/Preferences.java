@@ -99,6 +99,7 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 				&& Main.pref.getBoolean("matsim_renderer", true));
 		renderMatsim.setSelected(Main.pref.getBoolean("matsim_renderer", true));
 		wayOffset.setEnabled(Main.pref.getBoolean("matsim_renderer", true));
+		
 
 		cOptions.anchor = GridBagConstraints.NORTHWEST;
 
@@ -119,7 +120,7 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		
 		cOptions.gridx = 1;
 		pnl.add(wayOffset, cOptions);
-
+		
 		return pnl;
 	}
 

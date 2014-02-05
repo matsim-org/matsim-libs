@@ -4,8 +4,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -53,8 +51,6 @@ public class PreferencesActionListener implements ActionListener,
 				Main.pref.put("matsim_exportFolder", newPath);
 				Preferences.folderLabel.setText(newPath);
 				Preferences.exportFolder = newPath;
-				ExportDialog.exportFilePath.setText(newPath
-						+ "\\josm_matsim_export");
 			}
 		} else if (e.getActionCommand().equals("cleanNetwork")) {
 			if (!Preferences.cleanNetwork.isSelected()) {
