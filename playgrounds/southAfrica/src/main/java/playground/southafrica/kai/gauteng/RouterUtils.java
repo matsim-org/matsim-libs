@@ -47,7 +47,7 @@ public class RouterUtils {
 	private static Logger log = Logger.getLogger( RouterUtils.class );
 	
 	private static int cnt = 0 ;
-	public static EffectiveMarginalUtilitiesContainer createMarginalUtilitiesContainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
+	public static EffectiveMarginalUtilitiesContainer createAutoSensingMarginalUtilitiesContainer( Scenario scenario, ScoringFunctionFactory scoringFunctionFactory ) {
 		// yy one might want to make the following replaceable. kai, oct'13
 		log.warn("running ..."); 
 		

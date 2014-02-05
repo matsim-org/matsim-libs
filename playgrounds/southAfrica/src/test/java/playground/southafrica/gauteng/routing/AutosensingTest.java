@@ -101,7 +101,7 @@ public class AutosensingTest {
 		// === CONTROLER INFRASTRUCTURE (without actually running the controler): ===
 //		TravelTime tt = new FreeSpeedTravelTime() ;
 		ScoringFunctionFactory scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(scenario) ;
-		EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory) ;
+		EffectiveMarginalUtilitiesContainer muc = RouterUtils.createAutoSensingMarginalUtilitiesContainer(scenario, scoringFunctionFactory) ;
 		
 		Assert.assertEquals(-12.0/3600., muc.getEffectiveMarginalUtilityOfTtime(person.getId()), 0.01/3600. ) ;
 		Assert.assertTrue(muc.getEffectiveMarginalUtilityOfTtime(person.getId()) < 0. );
