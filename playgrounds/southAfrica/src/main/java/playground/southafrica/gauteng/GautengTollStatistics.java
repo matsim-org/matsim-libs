@@ -68,7 +68,7 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 		return (int)(amount/5.) ;
 	}
 
-	enum SimplifiedType {privateCar, commercialVehicle, otherVehicle } ;  
+	public enum SimplifiedType {privateCar, commercialVehicle, otherVehicle } ;  
 
 	class TwoWayTable<K,L,V> {
 		Map<String,Double> values = new HashMap<String,Double>() ;
@@ -98,28 +98,7 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 			Integer idx = moneyToBin( amount ) ;
 //			System.err.println( " person: " + personId + " money: " + amount ) ;
 			SanralTollVehicleType agentType = tollFactor.typeOf(personId) ;
-			SimplifiedType sType = null ;
-			switch ( agentType ) {
-			case carWithoutTag:
-			case carWithTag:
-			case commercialClassAWithTag:
-			case commercialClassAWithoutTag:
-				sType = SimplifiedType.privateCar ; break ;
-			case commercialClassBWithoutTag:
-			case commercialClassBWithTag:
-			case commercialClassCWithoutTag:
-			case commercialClassCWithTag:
-				sType = SimplifiedType.commercialVehicle ; break ;
-			case busWithTag:
-			case busWithoutTag:
-			case taxiWithTag:
-			case taxiWithoutTag:
-			case extWithTag:
-			case extWithoutTag:
-				sType = SimplifiedType.otherVehicle ; break ;
-			default:
-				throw new RuntimeException("case statement missing for type: " + agentType ) ;
-			}
+			SimplifiedType sType = simplifiedTypeOf(agentType);
 
 			if ( sType != null ) { 
 				String key = countsTable.createKey( sType, idx ) ;
@@ -174,6 +153,36 @@ public class GautengTollStatistics implements EventHandler, PersonMoneyEventHand
 			}
 			
 		}
+	}
+
+	/**
+	 * @param agentType
+	 * @return
+	 */
+	public static SimplifiedType simplifiedTypeOf(SanralTollVehicleType agentType) {
+		SimplifiedType sType = null ;
+		switch ( agentType ) {
+		case carWithoutTag:
+		case carWithTag:
+		case commercialClassAWithTag:
+		case commercialClassAWithoutTag:
+			sType = SimplifiedType.privateCar ; break ;
+		case commercialClassBWithoutTag:
+		case commercialClassBWithTag:
+		case commercialClassCWithoutTag:
+		case commercialClassCWithTag:
+			sType = SimplifiedType.commercialVehicle ; break ;
+		case busWithTag:
+		case busWithoutTag:
+		case taxiWithTag:
+		case taxiWithoutTag:
+		case extWithTag:
+		case extWithoutTag:
+			sType = SimplifiedType.otherVehicle ; break ;
+		default:
+			throw new RuntimeException("case statement missing for type: " + agentType ) ;
+		}
+		return sType;
 	}
 
 }
