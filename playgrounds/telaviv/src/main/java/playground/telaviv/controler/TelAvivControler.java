@@ -31,6 +31,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricing;
 
+import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
 import playground.telaviv.locationchoice.matsimdc.DCScoringFunctionFactory;
 
@@ -39,10 +40,13 @@ public final class TelAvivControler {
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
-			System.out.println("Usage: TelAvivControler config-file [dtd-file]");
+			System.out.println("Usage: TelAvivControler config-file base-path");
 			System.out.println();
 		} else {
 			
+			if (args.length > 1) {
+				TelAvivConfig.basePath = args[1];
+			}
 			Config config = ConfigUtils.loadConfig(args[0]);
 			Scenario scenario = ScenarioUtils.loadScenario(config);
 			
