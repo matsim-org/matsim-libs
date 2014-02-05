@@ -97,9 +97,13 @@ public class RunCliquesWithModularStrategies {
 			final FixedGroupsIdentifier cliques) {
 		final SocialNetwork socNet = new SocialNetworkImpl();
 		for ( Collection<? extends Id> clique : cliques.getGroupInfo() ) {
-			for ( Id id1 : clique ) {
-				for ( Id id2 : clique ) {
-					socNet.addMonodirectionalTie( id1 , id2 );
+			final Id[] ids = clique.toArray( new Id[ clique.size() ] );
+			socNet.addEgos( clique );
+
+			// we cannot just add monodirectional ties in a reflective social network.
+			for ( int i=0; i < ids.length; i++ ) {
+				for ( int j=i; j < ids.length; j++ ) {
+					socNet.addBidirectionalTie( ids[ i ] , ids[ j ] );
 				}
 			}
 		}
