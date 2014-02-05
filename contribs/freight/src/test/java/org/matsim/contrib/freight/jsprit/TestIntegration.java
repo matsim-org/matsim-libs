@@ -77,10 +77,10 @@ public class TestIntegration {
 			// certainly ok as initial solution)
 
 			carrier.setSelectedPlan(newPlan) ;
-			
+
 			SolutionPrinter.print(problem, solution, Print.VERBOSE);
-			
-			
+
+
 
 		}
 	}
@@ -111,30 +111,13 @@ public class TestIntegration {
 				CarrierCapabilities capabilities = capabilityBuilder.build() ;
 				carrier.setCarrierCapabilities(capabilities);
 			}
-			{
-				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(new IdImpl("service1"), new IdImpl("146829"));
+			for ( int ii=1 ; ii<=100 ; ii++ ) {
+				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(new IdImpl("service" + Integer.toString(ii) ), new IdImpl("146829"));
 				serviceBuilder.setCapacityDemand( 33 );
 				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(0., 24.*3600.) );
 				serviceBuilder.setServiceDuration( 10.*60. );
 				CarrierService service = serviceBuilder.build();
 				carrier.getServices().add(service);
-			}
-			{
-				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(new IdImpl("service2"), new IdImpl("146829"));
-				serviceBuilder.setCapacityDemand( 33 );
-				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(0., 24.*3600.) );
-				serviceBuilder.setServiceDuration( 10.*60. );
-				CarrierService service = serviceBuilder.build();
-				carrier.getServices().add(service); // if one uncomments this line, the test fails.  kai/quintin, jan'14
-			}
-			
-			{
-				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(new IdImpl("service3"), new IdImpl("146829"));
-				serviceBuilder.setCapacityDemand( 33 );
-				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(0., 24.*3600.) );
-				serviceBuilder.setServiceDuration( 10.*60. );
-				CarrierService service = serviceBuilder.build();
-				carrier.getServices().add(service); // if one uncomments this line, the test fails.  kai/quintin, jan'14
 			}
 			carriers.addCarrier(carrier);
 		}
