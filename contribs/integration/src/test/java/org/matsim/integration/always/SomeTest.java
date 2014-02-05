@@ -4,8 +4,15 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -40,12 +47,40 @@ public class SomeTest {
 		}
 		try {
 			new MatsimNetworkReader(sc).readFile("../../../" + FN);
+			// this is the one that works locally
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 
 		Assert.assertTrue(true);
+	}
+	
+	@Test
+	public void doAccessibilityTest() {
+		Config config = ConfigUtils.createConfig() ;
+		
+		config.network().setInputFile("../../../matsimExamples/countries/za/nmbm/network/network.xml.gz" );
+		config.facilities().setInputFile("../../../matsimExamples/countries/za/nmbm/facilities/facilities.xml.gz" );
+		
+		config.controler().setLastIteration(0);
+		
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		
+		Controler controler = new Controler(scenario) ;
+		controler.setOverwriteFiles(true);
+		
+		ActivityFacilities opportunities = scenario.getActivityFacilities() ;
+		PtMatrix ptMatrix = null  ;
+		GridBasedAccessibilityControlerListenerV3 listener = 
+				new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, scenario.getNetwork( ));
+		listener.setComputingAccessibilityForFreeSpeedCar(true);
+		listener.generateGridsAndMeasuringPointsByNetwork(scenario.getNetwork(), 100. );
+		
+		controler.addControlerListener(listener);
+		
+		controler.run() ;
+		
 	}
 
 }
