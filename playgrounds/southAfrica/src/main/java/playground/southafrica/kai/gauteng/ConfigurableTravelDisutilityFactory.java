@@ -45,7 +45,7 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 	private static final Logger log = Logger.getLogger(ConfigurableTravelDisutilityFactory.class ) ;
 
 	private final Scenario scenario;
-	
+
 	private UtilityOfMoneyI uom = null ;
 	private UtilityOfDistanceI uod = null ;
 	private UtilityOfTtimeI uott = null ;
@@ -87,37 +87,39 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 	public ConfigurableTravelDisutilityFactory( Scenario scenario ) {
 		this.scenario = scenario ;
 	}
-	
+
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, final PlanCalcScoreConfigGroup cnScoringGroup) {
 		log.warn( "calling createTravelDisutility" ) ;
+		EffectiveMarginalUtilitiesContainer muc = null ;
 		if ( (this.externalUom==null || this.externalUod==null || this.externalUott==null ) && this.scoringFunctionFactory != null ) { 
-			EffectiveMarginalUtilitiesContainer muc = RouterUtils.createMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
-			if ( this.externalUom==null ) {
-				this.uom = muc ; // works because muc fulfills _all_ the interfaces.  Maybe not so nice.
-				log.warn( "using autosensing marginal utility of money") ;
-			} else {
-				this.uom = this.externalUom ;
-				log.warn( " using external marginal utility of money" ) ;
-			}
-			if ( this.externalUom==null ) {
-				this.uod=muc ;
-				log.warn( "using autosensing marginal utility of distance") ;
-			} else {
-				this.uod = this.externalUod ;
-				log.warn( " using external marginal utility of distance" ) ;
-			}
-			if ( this.externalUom==null ) {
-				this.uott=muc ;
-				log.warn( "using autosensing marginal utility of ttime") ;
-			} else {
-				this.uott = this.externalUott ;
-				log.warn( " using external marginal utility of ttime" ) ;
-			}
-			// yyyy the above is all not well tested. kai, dec'13
+			 muc = RouterUtils.createAutoSensingMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
 		}
+		if ( this.externalUom==null ) {
+			this.uom = muc ; // works because muc fulfills _all_ the interfaces.  Maybe not so nice.
+			log.warn( "using autosensing marginal utility of money") ;
+		} else {
+			this.uom = this.externalUom ;
+			log.warn( " using external marginal utility of money" ) ;
+		}
+		if ( this.externalUom==null ) {
+			this.uod=muc ;
+			log.warn( "using autosensing marginal utility of distance") ;
+		} else {
+			this.uod = this.externalUod ;
+			log.warn( " using external marginal utility of distance" ) ;
+		}
+		if ( this.externalUom==null ) {
+			this.uott=muc ;
+			log.warn( "using autosensing marginal utility of ttime") ;
+		} else {
+			this.uott = this.externalUott ;
+			log.warn( " using external marginal utility of ttime" ) ;
+		}
+		// yyyy the above is all not well tested. kai, dec'13
+
 		final UtilityOfMoneyI localUom = this.uom ; // (generating final variable for anonymous class)
-		
+
 		TravelDisutility tmp ;
 		if ( this.uott==null && this.uod==null ) {
 			tmp = new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup) ;
@@ -127,20 +129,20 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 			log.warn("using person individual travel disutility (i.e. including time pressure) (UoM included later)") ;
 		}
 		final TravelDisutility delegate = tmp ; // (generating final variable for anonymous class)
-		
-		
+
+
 		final double normalization = 1./Math.exp( this.sigma*this.sigma/2 );
 		log.warn(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
 
 		// generating final variables for anonymous class:
 		final RoadPricingScheme localScheme = this.scheme ;
-		
+
 		int cnt = 0 ;
-		
+
 		if ( localUom!=null ) {
 			log.warn("will use person-specific UoM");
 		}
-		
+
 		// anonymous class:
 		return new TravelDisutility() {
 			private Person prevPerson = null ;
@@ -154,22 +156,22 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 					} else {
 						this.utilityOfMoney_normally_positive = cnScoringGroup.getMarginalUtilityOfMoney() ;
 					}
-					
+
 					// randomize if applicable:
 					if ( sigma != 0. ) {
 						double logNormal = Math.exp( sigma * MatsimRandom.getRandom().nextGaussian() ) ;
 						logNormal *= normalization ;
 						// this should be a log-normal distribution with sigma as the "width" parameter.   Instead of figuring out the "location"
 						// parameter mu, I rather just normalize (which should be the same). kai, nov'13
-						
+
 						this.utilityOfMoney_normally_positive *= logNormal ;
 						// yy the expectation value of this should be tested ...
 					}
 					// end randomize
-					
+
 				}
 				double linkTravelDisutility = delegate.getLinkTravelDisutility(link, time, person, vehicle);
-				
+
 				// apply toll if applicable:
 				if ( localScheme != null ) {
 					double toll_usually_positive = 0. ;
@@ -198,7 +200,7 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 						// positive * positive = positive, i.e. correct (since it is a positive disutility contribution)
 					}
 					// end toll
-					
+
 				}
 
 				return linkTravelDisutility;
