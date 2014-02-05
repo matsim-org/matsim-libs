@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -65,6 +66,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	private final Filter modeFilter;
 
 	private final SocialNetwork socialNetwork;
+	private final ActivityFacilities facilities;
 	private final Map<Id, BeingTogetherScoring> scorings = new HashMap<Id, BeingTogetherScoring>();
 
 	private final GenericFactory<PersonOverlapScorer, Id> scorerFactory;
@@ -77,12 +79,14 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final Filter modeFilter,
 			final GenericFactory<PersonOverlapScorer, Id> scorerFactory,
 			final double marginalUtilityOfMoney,
+			final ActivityFacilities facilities,
 			final SocialNetwork socialNetwork) {
 		this.actTypeFilter = actTypeFilter;
 		this.modeFilter = modeFilter;
 		this.events = events;
 		this.scorerFactory = scorerFactory;
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+		this.facilities = facilities;
 		this.socialNetwork = socialNetwork;
 	}
 
@@ -134,6 +138,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 							@Override
 							public BeingTogetherScoring create() {
 								return new BeingTogetherScoring(
+										facilities,
 										actTypeFilter,
 										modeFilter,
 										scorerFactory.create( finalId ),

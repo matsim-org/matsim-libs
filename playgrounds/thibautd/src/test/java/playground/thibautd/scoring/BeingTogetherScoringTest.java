@@ -57,6 +57,7 @@ public class BeingTogetherScoringTest {
 				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
 			final BeingTogetherScoring testee =
 				new BeingTogetherScoring(
+						null, // facilities
 						1,
 						ego,
 						Collections.singleton( alter ) );
@@ -87,6 +88,7 @@ public class BeingTogetherScoringTest {
 
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
+					null, // facilities
 					1,
 					ego,
 					Collections.singleton( alter ) );
@@ -118,6 +120,7 @@ public class BeingTogetherScoringTest {
 
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
+					null, // facilities
 					1,
 					ego,
 					Collections.singleton( alter ) );
@@ -150,6 +153,7 @@ public class BeingTogetherScoringTest {
 
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
+					null, // facilities
 					1,
 					ego,
 					Collections.singleton( alter ) );
@@ -182,6 +186,7 @@ public class BeingTogetherScoringTest {
 
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
+					null, // facilities
 					1,
 					ego,
 					Collections.singleton( alter ) );
@@ -213,6 +218,7 @@ public class BeingTogetherScoringTest {
 
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
+					null, // facilities
 					new RejectAllFilter(),
 					new AcceptAllFilter(),
 					1,
@@ -247,6 +253,7 @@ public class BeingTogetherScoringTest {
 
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
+					null, // facilities
 					new AcceptAllFilter(),
 					new AcceptAllFilter(),
 					1,
@@ -293,6 +300,7 @@ public class BeingTogetherScoringTest {
 
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
+					null, // facilities
 					new RejectAllFilter(),
 					new AcceptAllFilter(),
 					1,
@@ -332,6 +340,7 @@ public class BeingTogetherScoringTest {
 				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
 			final BeingTogetherScoring testee =
 				new BeingTogetherScoring(
+						null, // facilities
 						1,
 						ego,
 						Collections.singleton( alter ) );
@@ -369,6 +378,7 @@ public class BeingTogetherScoringTest {
 				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
 			final BeingTogetherScoring testee =
 				new BeingTogetherScoring(
+						null, // facilities
 						1,
 						ego,
 						Collections.singleton( alter ) );
@@ -405,6 +415,7 @@ public class BeingTogetherScoringTest {
 				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
 			final BeingTogetherScoring testee =
 				new BeingTogetherScoring(
+						null, // facilities
 						new AcceptAllFilter(),
 						new RejectAllFilter(),
 						1,
@@ -451,6 +462,7 @@ public class BeingTogetherScoringTest {
 				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
 			final BeingTogetherScoring testee =
 				new BeingTogetherScoring(
+						null, // facilities
 						startWindow,
 						endWindow,
 						1,

@@ -683,6 +683,7 @@ public class RunUtils {
 							scoringFunctionConf,
 							scenario.getPopulation() ),
 						scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+						scenario.getActivityFacilities(),
 						(SocialNetwork) scenario.getScenarioElement(
 							SocialNetwork.ELEMENT_NAME ));
 			controllerRegistry.getEvents().addHandler( socialScorer );

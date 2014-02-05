@@ -37,6 +37,10 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.OpeningTime;
 
 import playground.thibautd.utils.MapUtils;
 import playground.thibautd.utils.MapUtils.Factory;
@@ -47,6 +51,8 @@ import playground.thibautd.utils.MapUtils.Factory;
 public class BeingTogetherScoring {
 	private final Id ego;
 	private final Set<Id> alters;
+
+	private final ActivityFacilities facilities;
 
 	private final Filter actTypeFilter;
 	private final Filter modeFilter;
@@ -68,10 +74,12 @@ public class BeingTogetherScoring {
 	private final Map<Id, String> currentModeOfRelevantAgents = new HashMap<Id, String>();
 
 	public BeingTogetherScoring(
+			final ActivityFacilities facilities,
 			final double marginalUtilityOfTime,
 			final Id ego,
 			final Collection<Id> alters) {
-		this( Double.NEGATIVE_INFINITY,
+		this( facilities,
+				Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY,
 				marginalUtilityOfTime,
 				ego,
@@ -79,12 +87,14 @@ public class BeingTogetherScoring {
 	}
 
 	public BeingTogetherScoring(
+			final ActivityFacilities facilities,
 			final double startActiveWindow,
 			final double endActiveWindow,
 			final double marginalUtilityOfTime,
 			final Id ego,
 			final Collection<Id> alters) {
-		this( startActiveWindow,
+		this( facilities,
+				startActiveWindow,
 				endActiveWindow,
 				new AcceptAllFilter(),
 				new AcceptAllFilter(),
@@ -94,12 +104,14 @@ public class BeingTogetherScoring {
 	}
 
 	public BeingTogetherScoring(
+			final ActivityFacilities facilities,
 			final Filter actTypeFilter,
 			final Filter modeFilter,
 			final double marginalUtilityOfTime,
 			final Id ego,
 			final Collection<Id> alters) {
-		this( Double.NEGATIVE_INFINITY,
+		this( facilities,
+				Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY,
 				actTypeFilter,
 				modeFilter,
@@ -109,12 +121,14 @@ public class BeingTogetherScoring {
 	}
 
 	public BeingTogetherScoring(
+			final ActivityFacilities facilities,
 			final Filter actTypeFilter,
 			final Filter modeFilter,
 			final PersonOverlapScorer scorer,
 			final Id ego,
 			final Collection<Id> alters) {
-		this( Double.NEGATIVE_INFINITY,
+		this( facilities,
+				Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY,
 				actTypeFilter,
 				modeFilter,
@@ -125,6 +139,7 @@ public class BeingTogetherScoring {
 
 
 	public BeingTogetherScoring(
+			final ActivityFacilities facilities,
 			final double startActiveWindow,
 			final double endActiveWindow,
 			final Filter actTypeFilter,
@@ -133,6 +148,7 @@ public class BeingTogetherScoring {
 			final Id ego,
 			final Collection<Id> alters) {
 		this(
+			facilities,
 			startActiveWindow,
 			endActiveWindow,
 			actTypeFilter,
@@ -143,6 +159,7 @@ public class BeingTogetherScoring {
 	}
 
 	public BeingTogetherScoring(
+			final ActivityFacilities facilities,
 			final double startActiveWindow,
 			final double endActiveWindow,
 			final Filter actTypeFilter,
@@ -150,6 +167,7 @@ public class BeingTogetherScoring {
 			final PersonOverlapScorer overlapScorer,
 			final Id ego,
 			final Collection<Id> alters) {
+		this.facilities = facilities;
 		this.actTypeFilter = actTypeFilter;
 		this.modeFilter = modeFilter;
 		this.activeTimeWindow = new Interval( startActiveWindow , endActiveWindow );
@@ -176,11 +194,17 @@ public class BeingTogetherScoring {
 				if ( seq == null ) continue;
 				final List<Interval> alterIntervals = seq.getWrappedAroundSequence();
 
+				final List<Interval> openingIntervals = getOpeningIntervals( location );
+
 				MapUtils.addToDouble(
 						alter,
 						timePerSocialContact,
 						0,
-						calcOverlap( activeTimeWindow , egoIntervals , alterIntervals ) );
+						calcOverlap(
+							activeTimeWindow,
+							openingIntervals,
+							egoIntervals,
+							alterIntervals ) );
 			}
 		}
 
@@ -192,15 +216,42 @@ public class BeingTogetherScoring {
 		return accumulatedUtility;
 	}
 
+	private List<Interval> getOpeningIntervals(
+			final Location location) {
+		// TODO: cache instead of recomputing each time?
+		if ( location.facilityId == null || facilities == null ) {
+			return Collections.singletonList(
+					new Interval(
+						Double.NEGATIVE_INFINITY,
+						Double.POSITIVE_INFINITY ) );
+		}
+
+		final ArrayList<Interval> intervals = new ArrayList<Interval>();
+
+		final ActivityFacility facility = facilities.getFacilities().get( location.facilityId );
+		final ActivityOption option = facility.getActivityOptions().get( location.activityType );
+
+		for ( OpeningTime openingTime : option.getOpeningTimes() ) {
+			intervals.add( new Interval( openingTime.getStartTime() , openingTime.getEndTime() ) );
+		}
+
+		return intervals;
+	}
+
 	private static double calcOverlap(
 			final Interval activeTimeWindow,
+			final List<Interval> openingIntervals,
 			final List<Interval> egoIntervals,
 			final List<Interval> alterIntervals) {
 		double sum = 0;
 		for ( Interval ego : egoIntervals ) {
 			final Interval activeEgo = intersect( ego , activeTimeWindow );
-			for ( Interval alter : alterIntervals ) {
-				sum += measureOverlap( activeEgo , alter );
+
+			for ( Interval open : openingIntervals ) {
+				final Interval openActiveEgo = intersect( activeEgo , open );
+				for ( Interval alter : alterIntervals ) {
+					sum += measureOverlap( openActiveEgo , alter );
+				}
 			}
 		}
 		return sum;
