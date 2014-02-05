@@ -35,10 +35,10 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 public class RESTaxiOptimizer
     extends OTSTaxiOptimizer
 {
-    public RESTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, ImmediateRequestParams params,
-            TaxiOptimizationPolicy optimizationPolicy)
+    public RESTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
+            ImmediateRequestParams params)
     {
-        super(context, calculator, params, optimizationPolicy);
+        super(context, calculator, params);
     }
 
 

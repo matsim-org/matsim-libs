@@ -23,15 +23,16 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiDelaySpeedupStats;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
@@ -47,13 +48,12 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
  * @author michalm
  */
 public abstract class ImmediateRequestTaxiOptimizer
-    implements VrpOptimizerWithOnlineTracking
+    implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
 {
     protected final VrpPathCalculator calculator;
     protected final ImmediateRequestParams params;
     protected final MatsimVrpContext context;
 
-    protected final Queue<TaxiRequest> unplannedRequests;
     protected final Comparator<VrpPathWithTravelData> pathComparator;
 
     private TaxiDelaySpeedupStats delaySpeedupStats;
@@ -65,15 +65,6 @@ public abstract class ImmediateRequestTaxiOptimizer
         this.calculator = calculator;
         this.params = params;
         this.context = context;
-
-        int initialCapacity = context.getVrpData().getVehicles().size();//1 awaiting req/veh
-        unplannedRequests = new PriorityQueue<TaxiRequest>(initialCapacity,
-                new Comparator<TaxiRequest>() {
-                    public int compare(TaxiRequest r1, TaxiRequest r2)
-                    {
-                        return Double.compare(r1.getSubmissionTime(), r2.getSubmissionTime());
-                    }
-                });
 
         pathComparator = params.minimizePickupTripTime ? //
                 VrpPathWithTravelDataComparators.TRAVEL_TIME_COMPARATOR : //
@@ -91,76 +82,6 @@ public abstract class ImmediateRequestTaxiOptimizer
         this.delaySpeedupStats = delaySpeedupStats;
     }
 
-
-    ////========================================================
-
-    @Override
-    public void requestSubmitted(Request request)
-    {
-        unplannedRequests.add((TaxiRequest)request);
-
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
-            Task task = veh.getSchedule().getCurrentTask();
-
-            double predictedEndTime;
-
-            if (task instanceof DriveTask) {
-                predictedEndTime = ((DriveTask)task).getTaskTracker().predictEndTime(
-                        context.getTime());
-            }
-            else {
-                predictedEndTime = task.getEndTime();
-            }
-
-            updateCurrentAndPlannedTasks(TaxiSchedules.getSchedule(veh), predictedEndTime);
-        }
-
-        scheduleUnplannedRequests();
-
-        //????
-        TaxiScheduleValidator.assertNotIdleVehiclesAndUnplannedRequests(context);
-    }
-
-
-    @Override
-    public void nextTask(Schedule<? extends Task> schedule)
-    {
-        @SuppressWarnings("unchecked")
-        Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
-
-        boolean scheduleUpdated = updateBeforeNextTask(taxiSchedule);
-        nextTask(taxiSchedule, scheduleUpdated);
-    }
-
-
-    protected abstract void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated);
-
-
-    /**
-     * Try to schedule all unplanned tasks (if any)
-     */
-    protected void scheduleUnplannedRequests()
-    {
-        if (unplannedRequests.isEmpty()) {
-            return;
-        }
-
-        while (!unplannedRequests.isEmpty()) {
-            TaxiRequest req = unplannedRequests.peek();
-
-            VehicleRequestPath best = findBestVehicleRequestPath(req);
-
-            if (best == null) {
-                return;//no taxi available
-            }
-
-            scheduleRequestImpl(best);
-            unplannedRequests.poll();
-        }
-    }
-
-
-    ////========================================================
 
     protected VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req)
     {
@@ -282,15 +203,12 @@ public abstract class ImmediateRequestTaxiOptimizer
     /**
      * Check and decide if the schedule should be updated due to if vehicle is Update timings (i.e.
      * beginTime and endTime) of all tasks in the schedule.
-     * 
-     * @return <code>true</code> if there have been significant changes in the schedule hence the
-     *         schedule needs to be re-optimized
      */
-    protected boolean updateBeforeNextTask(Schedule<TaxiTask> schedule)
+    protected void updateBeforeNextTask(Schedule<TaxiTask> schedule)
     {
         // Assumption: there is no delay as long as the schedule has not been started (PLANNED)
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
-            return false;
+            return;
         }
 
         double endTime = context.getTime();
@@ -306,11 +224,8 @@ public abstract class ImmediateRequestTaxiOptimizer
             if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
                 appendDropoffAfterPickup(schedule);
                 appendWaitAfterDropoff(schedule);
-                return true;
             }
         }
-
-        return true;
     }
 
 
@@ -444,16 +359,5 @@ public abstract class ImmediateRequestTaxiOptimizer
                     throw new IllegalStateException();
             }
         }
-    }
-
-
-    @Override
-    public void nextLinkEntered(DriveTask driveTask)
-    {
-        //        @SuppressWarnings("unchecked")
-        //        Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
-        //
-        //        double predictedEndTime = driveTask.getVehicleTracker().predictEndTime(context.getTime());
-        //        updateCurrentAndPlannedTasks(schedule, predictedEndTime);
     }
 }

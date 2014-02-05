@@ -19,11 +19,16 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
+import java.util.*;
+
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;
@@ -31,9 +36,15 @@ import playground.michalm.taxi.schedule.TaxiTask;
 
 public class NOSTaxiOptimizer
     extends ImmediateRequestTaxiOptimizer
+    implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
 {
     private final VehicleFinder idleVehicleFinder;
     private final boolean considerAllRequestForIdleVehicle;
+
+    private final Queue<TaxiRequest> unplannedRequests;
+    private final Queue<Vehicle> idleVehicles;
+
+    private boolean requiresReoptimization = false;
 
 
     public NOSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
@@ -43,27 +54,56 @@ public class NOSTaxiOptimizer
         super(context, calculator, params);
         this.idleVehicleFinder = idleVehicleFinder;
         this.considerAllRequestForIdleVehicle = considerAllRequestForIdleVehicle;
+
+        int vehCount = context.getVrpData().getVehicles().size();
+
+        unplannedRequests = new ArrayDeque<TaxiRequest>(vehCount);//1 req per veh
+        idleVehicles = new ArrayDeque<Vehicle>(vehCount);
     }
 
 
-    @Override
-    protected VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req)
+    //==============================
+
+    /**
+     * Try to schedule all unplanned tasks (if any)
+     */
+    protected void scheduleUnplannedRequests()
     {
-        Vehicle veh = idleVehicleFinder.findVehicle(req);
-        return veh == null ? null : new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
-    }
+        while (!unplannedRequests.isEmpty()) {
+            TaxiRequest req = unplannedRequests.peek();
 
+            Vehicle veh = idleVehicleFinder.findVehicle(req);
 
-    private void scheduleIdleVehicle(Vehicle veh)
-    {
-        VehicleRequestPath best = findBestVehicleRequestPath(veh);
+            if (veh == null) {
+                return;
+            }
 
-        if (best == null) {
-            return;//no unplanned requests
+            VehicleRequestPath best = new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
+
+            scheduleRequestImpl(best);
+            unplannedRequests.poll();
+            idleVehicles.remove(veh);
         }
+    }
 
-        scheduleRequestImpl(best);
-        unplannedRequests.remove(best.request);
+
+    //==============================
+
+    private void scheduleIdleVehicles()
+    {
+        while (!idleVehicles.isEmpty()) {
+            Vehicle veh = idleVehicles.peek();
+
+            VehicleRequestPath best = findBestVehicleRequestPath(veh);
+
+            if (best == null) {
+                return;//no unplanned requests
+            }
+
+            scheduleRequestImpl(best);
+            unplannedRequests.remove(best.request);
+            idleVehicles.remove(veh);
+        }
     }
 
 
@@ -90,33 +130,66 @@ public class NOSTaxiOptimizer
     }
 
 
+    //==============================
+
     @Override
-    protected void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        schedule.nextTask();
-
-        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-            return;
-        }
-
-        if (unplannedRequests.isEmpty()) {
-            return;
-        }
-
-        TaxiTask tt = schedule.getCurrentTask();
-        switch (tt.getTaxiTaskType()) {
-            case WAIT_STAY:
-            case CRUISE_DRIVE:////////????????
-                if (considerAllRequestForIdleVehicle) {
-                    scheduleIdleVehicle(schedule.getVehicle());//schedules the BEST request
+        if (requiresReoptimization) {
+            if (!considerAllRequestForIdleVehicle) {
+                scheduleUnplannedRequests();//regular NOS
+            }
+            else {
+                if (unplannedRequests.size() > idleVehicles.size()) {
+                    scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
                 }
                 else {
-                    scheduleUnplannedRequests();//schedules the FIRST request
+                    scheduleUnplannedRequests();//reduce T_W (otherwise)
                 }
-                return;
-
-            default:
-                return;
+            }
         }
     }
+
+
+    @Override
+    public void requestSubmitted(Request request)
+    {
+        unplannedRequests.add((TaxiRequest)request);
+        requiresReoptimization = true;
+    }
+
+
+    @Override
+    public void nextTask(Schedule<? extends Task> schedule)
+    {
+        @SuppressWarnings("unchecked")
+        Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
+
+        updateBeforeNextTask(taxiSchedule);
+        taxiSchedule.nextTask();
+
+        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
+            idleVehicles.remove(schedule.getVehicle());
+            return;
+        }
+
+        switch (taxiSchedule.getCurrentTask().getTaxiTaskType()) {
+            case WAIT_STAY:
+                idleVehicles.add(schedule.getVehicle());
+                requiresReoptimization = true;
+                break;
+
+            case PICKUP_DRIVE:
+                idleVehicles.remove(schedule.getVehicle());
+                break;
+
+            default:
+                //do nothing
+        }
+    };
+
+
+    @Override
+    public void nextLinkEntered(DriveTask driveTask)
+    {}
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.model;
+package org.matsim.contrib.dvrp.data.file;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.extensions.electric.*;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
+import org.xml.sax.Attributes;
 
 
-public class VrpAgentElectricTaxi
-    extends ElectricVehicleImpl
+public class ReaderUtils
 {
-    private EnergyConsumptionModel ecm;
-
-
-    public VrpAgentElectricTaxi(Id id, Link startLink, double t0, double t1, Battery battery,
-            EnergyConsumptionModel ecm)
+    public static double getDouble(Attributes atts, String qName, double defaultValue)
     {
-        super(id, startLink, 4, t0, t1, battery);
-        this.ecm = ecm;
+        String val = atts.getValue(qName);
+
+        if (val != null) {
+            return Double.parseDouble(val);
+        }
+        else {
+            return defaultValue;
+        }
     }
 }

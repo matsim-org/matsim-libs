@@ -20,19 +20,21 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 import playground.michalm.taxi.TaxiData;
-import playground.michalm.taxi.file.TaxiRankReader;
+import playground.michalm.taxi.file.*;
 
 
 public class TaxiLauncherUtils
 {
-    public static TaxiData initTaxiData(Scenario scenario, String ranksFileName,
-            EnergyConsumptionModel ecm)
+    public static TaxiData initTaxiData(Scenario scenario, String taxisFileName,
+            String ranksFileName)
     {
         TaxiData taxiData = new TaxiData();
-        new TaxiRankReader(scenario, taxiData, ecm).readFile(ranksFileName);
+
+        new ElectricVehicleReader(scenario, taxiData).readFile(taxisFileName);
+        new TaxiRankReader(scenario, taxiData).readFile(ranksFileName);
+
         return taxiData;
     }
 }

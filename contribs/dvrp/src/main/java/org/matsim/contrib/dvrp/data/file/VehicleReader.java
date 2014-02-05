@@ -69,31 +69,16 @@ public class VehicleReader
 
     private void startVehicle(Attributes atts)
     {
-        List<Vehicle> vehicles = data.getVehicles();
-
         Id id = scenario.createId(atts.getValue("id"));
 
         Id startLinkId = scenario.createId(atts.getValue("start_link"));
         Link startLink = links.get(startLinkId);
 
-        double capacity = getDouble(atts, "capacity", 1);
+        double capacity = ReaderUtils.getDouble(atts, "capacity", 1);
 
-        double t0 = getDouble(atts, "t_0", 0);
-        double t1 = getDouble(atts, "t_1", 24 * 60 * 60);
+        double t0 = ReaderUtils.getDouble(atts, "t_0", 0);
+        double t1 = ReaderUtils.getDouble(atts, "t_1", 24 * 60 * 60);
 
-        vehicles.add(new VehicleImpl(id, startLink, capacity, t0, t1));
-    }
-
-
-    private double getDouble(Attributes atts, String qName, double defaultValue)
-    {
-        String val = atts.getValue(qName);
-
-        if (val != null) {
-            return Double.parseDouble(val);
-        }
-        else {
-            return defaultValue;
-        }
+        data.getVehicles().add(new VehicleImpl(id, startLink, capacity, t0, t1));
     }
 }

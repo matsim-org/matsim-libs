@@ -65,6 +65,7 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/final String netFileName;
     /*package*/final String plansFileName;
     /*package*/final String taxiCustomersFileName;
+    /*package*/final String taxisFileName;
     /*package*/final String ranksFileName;
 
     /*package*/final boolean vrpOutFiles;
@@ -92,15 +93,16 @@ import playground.michalm.util.RunningVehicleRegister;
     {
         //    	dirName = "Z:\\WinHome\\Docs\\maciejewski\\jbtest\\";
         //    	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
-        dirName = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\";
-        netFileName = dirName + "network.xml";
+//        dirName = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\";
+//        netFileName = dirName + "network.xml";
 
-        // michalm - testing config (may be removed...)
-        //        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\2013_12\\mielec-2-peaks-new-15-50\\";
-        //        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
-        //        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
-        //        taxiCustomersFileName = dirName + "taxiCustomers_15_pc.txt";
-        //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+        // michalm - testing config (may be removed...)////////////////////////////////////
+                dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
+                plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
+                netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
+                eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+       ////////////////////////////////////////////////////////         
+                
 
         //        electricStatsDir = dirName +"electric_noranks\\";
         //        electricStatsDir = dirName +"electric_idleranks\\";
@@ -112,18 +114,18 @@ import playground.michalm.util.RunningVehicleRegister;
         //        electricStatsDir = dirName +"1charger\\";
         electricStatsDir = dirName + "1slow_fifo\\";
 
-        plansFileName = dirName + "20.plans.xml.gz";
-
-        taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
-
+//        plansFileName = dirName + "20.plans.xml.gz";
+//
+//        taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
+        taxiCustomersFileName = dirName + "taxiCustomers_15_pc.txt";
 
-        ranksFileName = dirName + "ranks-5_taxis-50.xml";
-        //         ranksFileName = dirName + "ranks-5_taxis-100.xml";
+        taxisFileName = dirName + "electric_taxis-50.xml";
+        ranksFileName = dirName + "taxi_ranks-5.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
-        eventsFileName = dirName + "20.events.xml.gz";
+//        eventsFileName = dirName + "20.events.xml.gz";
 
         otfVis = !true;
 
@@ -186,9 +188,7 @@ import playground.michalm.util.RunningVehicleRegister;
         VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
                 ttimeSource, travelTime, travelDisutility);
 
-        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
-
-        TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
+        TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(vrpData);
 
         double pickupDuration = 120;
@@ -200,6 +200,8 @@ import playground.michalm.util.RunningVehicleRegister;
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());
+
+        qSim.addQueueSimulationListeners(optimizer);
 
         ElectroCabLaunchUtils olutils = new ElectroCabLaunchUtils();
         olutils.initVrpSimEngine(qSim, context, optimizer);

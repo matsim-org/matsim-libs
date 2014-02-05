@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,29 +23,24 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
-import org.matsim.contrib.dvrp.extensions.electric.ChargerImpl;
+import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.michalm.taxi.TaxiData;
-import playground.michalm.taxi.model.TaxiRank;
 
-
-public class TaxiRankReader
+public class ElectricVehicleReader
     extends MatsimXmlParser
 {
-    private final static String RANK = "rank";
-    private final static String CHARGER = "charger";
+    private final static String VEHICLE = "vehicle";
 
-    private final Scenario scenario;
-    private final TaxiData data;
+    private Scenario scenario;
+    private VrpData data;
     private Map<Id, ? extends Link> links;
 
-    private TaxiRank currentRank;
 
-
-    public TaxiRankReader(Scenario scenario, TaxiData data)
+    public ElectricVehicleReader(Scenario scenario, VrpData data)
     {
         this.scenario = scenario;
         this.data = data;
@@ -63,11 +58,8 @@ public class TaxiRankReader
     @Override
     public void startTag(String name, Attributes atts, Stack<String> context)
     {
-        if (RANK.equals(name)) {
-            startRank(atts);
-        }
-        else if (CHARGER.equals(name)) {
-            startCharger(atts);
+        if (VEHICLE.equals(name)) {
+            startVehicle(atts);
         }
     }
 
@@ -77,24 +69,26 @@ public class TaxiRankReader
     {}
 
 
-    private void startRank(Attributes atts)
+    private void startVehicle(Attributes atts)
     {
         Id id = scenario.createId(atts.getValue("id"));
-        String name = atts.getValue("name");
 
-        Id linkId = scenario.createId(atts.getValue("link"));
-        Link link = links.get(linkId);
+        Id startLinkId = scenario.createId(atts.getValue("start_link"));
+        Link startLink = links.get(startLinkId);
 
-        currentRank = new TaxiRank(id, name, link);
-        data.getTaxiRanks().add(currentRank);
-    }
+        double capacity = ReaderUtils.getDouble(atts, "capacity", 1);
 
+        double t0 = ReaderUtils.getDouble(atts, "t_0", 0);
+        double t1 = ReaderUtils.getDouble(atts, "t_1", 24 * 60 * 60);
 
-    private void startCharger(Attributes atts)
-    {
-        Id id = scenario.createId(atts.getValue("id"));
-        double powerInWatts = ReaderUtils.getDouble(atts, "power", 20) * 1000;
+        ElectricVehicle ev = new ElectricVehicleImpl(id, startLink, capacity, t0, t1);
 
-        data.getChargers().add(new ChargerImpl(id, powerInWatts, currentRank.getLink()));
+        double batteryCharge = ReaderUtils.getDouble(atts, "battery_charge", 20) * 1000 * 3600;
+        double batteryCapacity = ReaderUtils.getDouble(atts, "battery_capacity", 20) * 1000 * 3600;
+
+        Battery battery = new BatteryImpl(batteryCharge, batteryCapacity);
+        ev.setBattery(battery);
+
+        data.getVehicles().add(ev);
     }
 }

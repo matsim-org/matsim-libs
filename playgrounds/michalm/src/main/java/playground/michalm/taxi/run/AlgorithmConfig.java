@@ -37,7 +37,6 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
     /*package*/static enum AlgorithmType
     {
         NO_SCHEDULING("NOS"), // only idle vehicles
-        NO_SCHEDULING_BEST_REQUEST("NOS-BR"), //
         ONE_TIME_SCHEDULING("OTS"), // formerly "optimistic"
         RE_SCHEDULING("RES"); // formerly "pessimistic"
 
@@ -197,15 +196,11 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
                 return new NOSTaxiOptimizer(context, calculator, params, new IdleVehicleFinder(
                         context, calculator, this == NOS_STRAIGHT_LINE), false);
 
-            case NO_SCHEDULING_BEST_REQUEST:
-                return new NOSTaxiOptimizer(context, calculator, params, new IdleVehicleFinder(
-                        context, calculator, this == NOS_STRAIGHT_LINE), true);
-
             case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizer(context, calculator, params, optimizationPolicy);
+                return new OTSTaxiOptimizer(context, calculator, params);
 
             case RE_SCHEDULING:
-                return new RESTaxiOptimizer(context, calculator, params, optimizationPolicy);
+                return new RESTaxiOptimizer(context, calculator, params);
 
             default:
                 throw new IllegalStateException();

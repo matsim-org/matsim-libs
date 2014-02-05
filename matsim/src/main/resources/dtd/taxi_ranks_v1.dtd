@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ============================================================ -->
+
+<!-- For further information or questions, please contact
+     Michal Maciejewski, michal.maciejewski at put dot poznan dot pl -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT ranks (rank)*>
+
+<!ELEMENT rank (chargers)?>
+
+<!ATTLIST rank
+	id      CDATA   #REQUIRED
+	name    CDATA   #IMPLIED
+	link    CDATA   #REQUIRED>
+
+<!ELEMENT chargers (charger)*>
+
+<!ELEMENT charger EMPTY>
+
+<!ATTLIST charger
+	id      CDATA   #REQUIRED
+	power   CDATA   #IMPLIED>
+

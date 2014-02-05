@@ -59,6 +59,7 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/final String netFileName;
     /*package*/final String plansFileName;
     /*package*/final String taxiCustomersFileName;
+    /*package*/final String taxisFileName;
     /*package*/final String ranksFileName;
 
     /*package*/final boolean vrpOutFiles;
@@ -99,7 +100,8 @@ import playground.michalm.util.RunningVehicleRegister;
         taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
-        ranksFileName = dirName + "ranks-5_taxis-50.xml";
+        ranksFileName = null;
+        taxisFileName = dirName + "ranks-5_taxis-50.xml";
         // ranksFileName = dirName + "ranks-5_taxis-150.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
@@ -175,6 +177,7 @@ import playground.michalm.util.RunningVehicleRegister;
         taxiCustomersFileName = dirName + params.get("taxiCustomersFileName");
 
         ranksFileName = dirName + params.get("ranksFileName");
+        taxisFileName = dirName + params.get("taxisFileName");
 
         eventsFileName = dirName + params.get("eventsFileName");
 
@@ -221,9 +224,7 @@ import playground.michalm.util.RunningVehicleRegister;
         VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
                 algorithmConfig.ttimeSource, travelTime, travelDisutility);
 
-        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
-
-        TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, ranksFileName, ecm);
+        TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(taxiData);
 
         ImmediateRequestParams params = new ImmediateRequestParams(destinationKnown, minimizePickupTripTime, pickupDuration,
@@ -234,6 +235,8 @@ import playground.michalm.util.RunningVehicleRegister;
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());
+        
+        qSim.addQueueSimulationListeners(optimizer);
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);

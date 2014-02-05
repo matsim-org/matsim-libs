@@ -31,11 +31,9 @@ public class ElectricVehicleImpl
     private Battery battery;
 
 
-    public ElectricVehicleImpl(Id id, Link startLink, double capacity, double t0, double t1,
-            Battery battery)
+    public ElectricVehicleImpl(Id id, Link startLink, double capacity, double t0, double t1)
     {
         super(id, startLink, capacity, t0, t1);
-        this.battery = battery;
     }
 
 

@@ -26,10 +26,8 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.schedule.Schedule;
 
 import playground.michalm.taxi.model.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiTask;
 
 
 /**
@@ -38,7 +36,7 @@ import playground.michalm.taxi.schedule.TaxiTask;
  * @author michalm
  */
 public class TaxiOptimizerWithPreassignment
-    extends ImmediateRequestTaxiOptimizer
+    extends OTSTaxiOptimizer
 {
     private Map<Id, Vehicle> reqIdToVehMap;
 
@@ -57,13 +55,6 @@ public class TaxiOptimizerWithPreassignment
     {
         Vehicle veh = reqIdToVehMap.get(req.getId());
         return new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
-    }
-
-
-    @Override
-    protected void nextTask(Schedule<TaxiTask> schedule, boolean scheduleUpdated)
-    {
-        schedule.nextTask();
     }
 
 

@@ -47,7 +47,7 @@ public class TaxiData
     }
 
 
-    public List<VrpAgentElectricTaxi> getElectricTaxis()
+    public List<ElectricVehicle> getElectricVehicles()
     {
         return convertList(getVehicles());
     }
