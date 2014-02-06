@@ -19,6 +19,8 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
+import java.util.Collection;
+
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.michalm.taxi.model.TaxiRequest;
@@ -26,5 +28,5 @@ import playground.michalm.taxi.model.TaxiRequest;
 
 public interface VehicleFinder
 {
-    public Vehicle findVehicle(TaxiRequest req);
+    public Vehicle findVehicle(Collection<Vehicle> vehicles, TaxiRequest req);
 }

@@ -40,7 +40,7 @@ public class TaxiScheduleValidator
 
         int idleTaxis = 0;
         for (Vehicle veh : context.getVrpData().getVehicles()) {
-            if (TaxiUtils.isIdle(veh, context.getTime(), true)) {
+            if (TaxiUtils.isIdle(veh)) {
                 idleTaxis++;
             }
         }

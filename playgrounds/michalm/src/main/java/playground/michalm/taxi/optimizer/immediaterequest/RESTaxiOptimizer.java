@@ -93,14 +93,9 @@ public class RESTaxiOptimizer
                         obligatoryTasks = 0;
 
                     case WAIT_STAY:
-                        // this WAIT is not the last task, so it seems that it is delayed
-                        // and there are some other planned task
-                        if (!TaxiUtils.isCurrentTaskDelayed(schedule, context.getTime())) {
-                            throw new IllegalStateException();//
-                        }
-                        else {
-                            System.err.println("Hmmmm");
-                        }
+                        // this WAIT is not the last task
+                        // but one cannot wait if there are more tasks scheduled 
+                        throw new IllegalStateException();
                 }
 
                 if (obligatoryTasks == 0) {

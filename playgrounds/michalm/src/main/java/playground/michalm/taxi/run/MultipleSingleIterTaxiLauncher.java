@@ -81,21 +81,26 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             case 1:
             case 3:
             case 4:
+            case 5:
+            case 6:
+            case 8:
             case 9:
             case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
             case 15:
-            case 16:
-
-                if (launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED) {
-                    warmup = true;
-                }
-
                 // run as many times as requested
                 break;
 
             default:
                 // do not run
                 runs = 0;
+        }
+
+        if (launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED) {
+            warmup = true;
         }
 
         if (warmup) {

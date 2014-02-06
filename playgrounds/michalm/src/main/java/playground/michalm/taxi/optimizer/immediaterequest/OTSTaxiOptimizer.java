@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
@@ -105,8 +106,13 @@ public class OTSTaxiOptimizer
         updateBeforeNextTask(taxiSchedule);
         TaxiTask nextTask = taxiSchedule.nextTask();
 
-        if (!params.destinationKnown && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
-            requiresReoptimization = true;
+        if (!params.destinationKnown) {
+            if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
+                return;
+            }
+            else if (nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
+                requiresReoptimization = true;
+            }
         }
     }
 

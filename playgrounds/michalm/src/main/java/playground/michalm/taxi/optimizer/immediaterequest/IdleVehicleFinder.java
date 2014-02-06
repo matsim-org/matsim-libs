@@ -19,10 +19,12 @@
 
 package playground.michalm.taxi.optimizer.immediaterequest;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.schedule.*;
 
@@ -49,12 +51,12 @@ public class IdleVehicleFinder
 
 
     @Override
-    public Vehicle findVehicle(TaxiRequest req)
+    public Vehicle findVehicle(Collection<Vehicle> vehicles, TaxiRequest req)
     {
         Vehicle bestVeh = null;
         double bestDistance = Double.MAX_VALUE;
 
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : vehicles) {
             double distance = calculateDistance(req, veh, context.getTime(), calculator,
                     straightLineDistance);
 
@@ -74,8 +76,8 @@ public class IdleVehicleFinder
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         Link fromLink;
 
-        if (!TaxiUtils.isIdle(veh, time, true)) {
-            return Double.MAX_VALUE;
+        if (!TaxiUtils.isIdle(veh)) {
+            throw new IllegalStateException();
         }
 
         TaxiTask currentTask = sched.getCurrentTask();

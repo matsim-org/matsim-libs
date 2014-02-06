@@ -72,7 +72,7 @@ public class NOSTaxiOptimizer
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
 
-            Vehicle veh = idleVehicleFinder.findVehicle(req);
+            Vehicle veh = idleVehicleFinder.findVehicle(idleVehicles, req);
 
             if (veh == null) {
                 return;

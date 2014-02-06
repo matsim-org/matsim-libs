@@ -29,7 +29,6 @@ import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
-import playground.michalm.taxi.schedule.TaxiSchedules;
 /**
  * 
  * 
@@ -80,7 +79,7 @@ public class IdleRankVehicleFinder
     
     
 	@Override
-    public Vehicle findVehicle(TaxiRequest req)
+    public Vehicle findVehicle(Collection<Vehicle> vehicles, TaxiRequest req)
     {
     	
     	if(this.useChargeOverTime) {
@@ -132,7 +131,7 @@ public class IdleRankVehicleFinder
           Collections.shuffle(context.getVrpData().getVehicles(),rnd);
           
           for (Vehicle veh : context.getVrpData().getVehicles()) {
-        	  if (!TaxiUtils.isIdle(veh, context.getTime(), true)) continue;
+        	  if (!TaxiUtils.isIdle(veh)) continue;
         	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
         	  double soc = this.getVehicleSoc(veh);
         	  if (soc>bestSoc){
@@ -152,7 +151,7 @@ public class IdleRankVehicleFinder
         Collections.shuffle(context.getVrpData().getVehicles(),rnd);
         
         for (Vehicle veh : context.getVrpData().getVehicles()) {
-      	  if (!TaxiUtils.isIdle(veh, context.getTime(), true)) continue;
+      	  if (!TaxiUtils.isIdle(veh)) continue;
       	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
       	  double soc = this.getVehicleSoc(veh);
       	  if (soc>bestSoc){

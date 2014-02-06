@@ -21,7 +21,6 @@ package playground.michalm.taxi.run;
 
 import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource.*;
 import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.*;
-import static playground.michalm.taxi.optimizer.immediaterequest.TaxiOptimizationPolicy.*;
 import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -36,9 +35,10 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
 {
     /*package*/static enum AlgorithmType
     {
-        NO_SCHEDULING("NOS"), // only idle vehicles
-        ONE_TIME_SCHEDULING("OTS"), // formerly "optimistic"
-        RE_SCHEDULING("RES"); // formerly "pessimistic"
+        NO_SCHEDULING("NOS"), //
+        NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM("NOS_DS_EQ"), //
+        ONE_TIME_SCHEDULING("OTS"), //
+        RE_SCHEDULING("RES");
 
         /*package*/final String shortcut;
 
@@ -51,106 +51,100 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
 
 
     /*package*/static final AlgorithmConfig NOS_STRAIGHT_LINE = new AlgorithmConfig(//
+            "NOS_STRAIGHT_LINE",//
             FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
             DISTANCE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
-            NO_SCHEDULING,//
-            AFTER_REQUEST);//
+            NO_SCHEDULING);//
 
     /*package*/static final AlgorithmConfig NOS_TRAVEL_DISTANCE = new AlgorithmConfig(//
+            "NOS_TRAVEL_DISTANCE", //
             FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
             DISTANCE, //
-            NO_SCHEDULING,//
-            AFTER_REQUEST);//
+            NO_SCHEDULING);//
 
     /*package*/static final AlgorithmConfig NOS_FREE_FLOW = new AlgorithmConfig(//
+            "NOS_FREE_FLOW", //
             FREE_FLOW_SPEED, //
             TIME, //
-            NO_SCHEDULING,//
-            AFTER_REQUEST);//
+            NO_SCHEDULING);//
 
     /*package*/static final AlgorithmConfig NOS_24_H = new AlgorithmConfig(//
+            "NOS_24_H", //
             EVENTS_24_H, //
             TIME, //
-            NO_SCHEDULING,//
-            AFTER_REQUEST);//
+            NO_SCHEDULING);//
 
     /*package*/static final AlgorithmConfig NOS_15_MIN = new AlgorithmConfig(//
+            "NOS_15_MIN", //
             EVENTS_15_MIN, //
             TIME, //
-            NO_SCHEDULING,//
-            AFTER_REQUEST);//
+            NO_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig OTS_REQ_FREE_FLOW = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig NOS_DS_EQ_STRAIGHT_LINE = new AlgorithmConfig(//
+            "NOS_DS_EQ_STRAIGHT_LINE",//
+            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
+            DISTANCE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
+            NO_SCHEDULING);//
+
+    /*package*/static final AlgorithmConfig NOS_DS_EQ_TRAVEL_DISTANCE = new AlgorithmConfig(//
+            "NOS_DS_EQ_TRAVEL_DISTANCE", //
+            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
+            DISTANCE, //
+            NO_SCHEDULING);//
+
+    /*package*/static final AlgorithmConfig NOS_DS_EQ_FREE_FLOW = new AlgorithmConfig(//
+            "NOS_DS_EQ_FREE_FLOW", //
             FREE_FLOW_SPEED, //
             TIME, //
-            ONE_TIME_SCHEDULING,//
-            AFTER_REQUEST);//
+            NO_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig OTS_REQ_24_H = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig NOS_DS_EQ_24_H = new AlgorithmConfig(//
+            "NOS_DS_EQ_24_H", //
             EVENTS_24_H, //
             TIME, //
-            ONE_TIME_SCHEDULING,//
-            AFTER_REQUEST);//
+            NO_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig OTS_REQ_15_MIN = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig NOS_DS_EQ_15_MIN = new AlgorithmConfig(//
+            "NOS_DS_EQ_15_MIN", //
             EVENTS_15_MIN, //
             TIME, //
-            ONE_TIME_SCHEDULING,//
-            AFTER_REQUEST);//
+            NO_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig OTS_DRV_FREE_FLOW = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_FREE_FLOW = new AlgorithmConfig(//
+            "OTS_FREE_FLOW", //
             FREE_FLOW_SPEED, //
             TIME, //
-            ONE_TIME_SCHEDULING,//
-            AFTER_DRIVE_TASKS);//
+            ONE_TIME_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig OTS_DRV_24_H = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_24_H = new AlgorithmConfig(//
+            "OTS_24_H", //
             EVENTS_24_H, //
             TIME, //
-            ONE_TIME_SCHEDULING,//
-            AFTER_DRIVE_TASKS);//
+            ONE_TIME_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig OTS_DRV_15_MIN = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig OTS_15_MIN = new AlgorithmConfig(//
+            "OTS_15_MIN", //
             EVENTS_15_MIN, //
             TIME, //
-            ONE_TIME_SCHEDULING,//
-            AFTER_DRIVE_TASKS);//
+            ONE_TIME_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig RES_REQ_FREE_FLOW = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_FREE_FLOW = new AlgorithmConfig(//
+            "RES_FREE_FLOW", //
             FREE_FLOW_SPEED, //
             TIME, //
-            RE_SCHEDULING,//
-            AFTER_REQUEST);//
+            RE_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig RES_REQ_24_H = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_24_H = new AlgorithmConfig(//
+            "RES_24_H", //
             EVENTS_24_H, //
             TIME, //
-            RE_SCHEDULING,//
-            AFTER_REQUEST);//
+            RE_SCHEDULING);//
 
-    /*package*/static final AlgorithmConfig RES_REQ_15_MIN = new AlgorithmConfig(//
+    /*package*/static final AlgorithmConfig RES_15_MIN = new AlgorithmConfig(//
+            "RES_15_MIN", //
             EVENTS_15_MIN, //
             TIME, //
-            RE_SCHEDULING,//
-            AFTER_REQUEST);//
-
-    /*package*/static final AlgorithmConfig RES_DRV_FREE_FLOW = new AlgorithmConfig(//
-            FREE_FLOW_SPEED, //
-            TIME, //
-            RE_SCHEDULING,//
-            AFTER_DRIVE_TASKS);//
-
-    /*package*/static final AlgorithmConfig RES_DRV_24_H = new AlgorithmConfig(//
-            EVENTS_24_H, //
-            TIME, //
-            RE_SCHEDULING,//
-            AFTER_DRIVE_TASKS);//
-
-    /*package*/static final AlgorithmConfig RES_DRV_15_MIN = new AlgorithmConfig(//
-            EVENTS_15_MIN, //
-            TIME, //
-            RE_SCHEDULING,//
-            AFTER_DRIVE_TASKS);//
+            RE_SCHEDULING);//
 
     /*package*/static final AlgorithmConfig[] ALL = {//
     NOS_STRAIGHT_LINE,//
@@ -158,33 +152,32 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
             NOS_FREE_FLOW,//
             NOS_24_H,//
             NOS_15_MIN,//
-            OTS_REQ_FREE_FLOW,//
-            OTS_REQ_24_H,//
-            OTS_REQ_15_MIN,//
-            OTS_DRV_FREE_FLOW,//
-            OTS_DRV_24_H,//
-            OTS_DRV_15_MIN,//
-            RES_REQ_FREE_FLOW,//
-            RES_REQ_24_H,//
-            RES_REQ_15_MIN,//
-            RES_DRV_FREE_FLOW,//
-            RES_DRV_24_H,//
-            RES_DRV_15_MIN //
+            NOS_DS_EQ_STRAIGHT_LINE,//
+            NOS_DS_EQ_TRAVEL_DISTANCE,//
+            NOS_DS_EQ_FREE_FLOW,//
+            NOS_DS_EQ_24_H,//
+            NOS_DS_EQ_15_MIN,//
+            OTS_FREE_FLOW,//
+            OTS_24_H,//
+            OTS_15_MIN,//
+            RES_FREE_FLOW,//
+            RES_24_H,//
+            RES_15_MIN //
     };
 
+    /*package*/final String name;
     /*package*/final TravelTimeSource ttimeSource;
     /*package*/final TravelDisutilitySource tdisSource;
     /*package*/final AlgorithmType algorithmType;
-    /*package*/final TaxiOptimizationPolicy optimizationPolicy;
 
 
-    /*package*/AlgorithmConfig(TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource,
-            AlgorithmType algorithmType, TaxiOptimizationPolicy optimizationPolicy)
+    /*package*/AlgorithmConfig(String name, TravelTimeSource ttimeSource,
+            TravelDisutilitySource tdisSource, AlgorithmType algorithmType)
     {
+        this.name = name;
         this.ttimeSource = ttimeSource;
         this.tdisSource = tdisSource;
         this.algorithmType = algorithmType;
-        this.optimizationPolicy = optimizationPolicy;
     }
 
 
@@ -194,7 +187,7 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
         switch (algorithmType) {
             case NO_SCHEDULING:
                 return new NOSTaxiOptimizer(context, calculator, params, new IdleVehicleFinder(
-                        context, calculator, this == NOS_STRAIGHT_LINE), false);
+                        context, calculator, this == NOS_STRAIGHT_LINE), true);
 
             case ONE_TIME_SCHEDULING:
                 return new OTSTaxiOptimizer(context, calculator, params);

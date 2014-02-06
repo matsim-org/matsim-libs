@@ -169,12 +169,9 @@ public abstract class ImmediateRequestTaxiOptimizer
                         bestSched.removeLastTask();// remove WaitTask
                     }
                     else {
-                        // TODO actually this WAIT task will not be performed
-                        // so maybe we can remove it right now?
-
+                        // actually this WAIT task will not be performed
                         lastTask.setEndTime(best.path.getDepartureTime());// shortening the WAIT task
 
-                        System.err.println("Hmmmmmmmmmmm");
                     }
                     break;
 

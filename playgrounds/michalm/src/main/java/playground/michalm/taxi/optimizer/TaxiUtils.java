@@ -29,7 +29,7 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class TaxiUtils
 {
-    public static boolean isIdle(Vehicle vehicle, double time, boolean delayedWaitTaskAsNonIdle)
+    public static boolean isIdle(Vehicle vehicle)
     {
         Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
 
@@ -39,58 +39,25 @@ public class TaxiUtils
 
         TaxiTask currentTask = schedule.getCurrentTask();
 
-        switch (currentTask.getTaxiTaskType()) {
-            case PICKUP_DRIVE://maybe in the future some diversion will be enabled....
-            case PICKUP_STAY:
-            case DROPOFF_DRIVE:
-            case DROPOFF_STAY:
-                return false;
-
-            case CRUISE_DRIVE:
-                // TODO this requires some analysis if a vehicle en route can be immediately
-                // diverted or there is a lag (as in the case of WAIT);
-                // how long is the lag??
-                System.err
-                        .println("Currently CRUISE cannot be interrupted, so the vehicle is considered BUSY...");
-                return false;
-
-            case WAIT_STAY:
-                if (delayedWaitTaskAsNonIdle && isCurrentTaskDelayed(schedule, time)) {
-                    return false;// assuming that the next task is a non-wait task
-                }
+        if (Schedules.isLastTask(currentTask)
+                && currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
+            return true;
         }
 
-        // idle right now, but:
-        // consider CLOSING (T1) time windows of the vehicle
-        if (time >= vehicle.getT1()) {
-            System.err.println("hmmmm");
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
 
-    public static boolean isCurrentTaskDelayed(Schedule<TaxiTask> schedule, double time)
+    public static boolean isCurrentTaskDelayed(Schedule<TaxiTask> schedule, double now)
     {
         TaxiTask currentTask = schedule.getCurrentTask();
-        double delay = time - currentTask.getEndTime();
+        double delay = now - currentTask.getEndTime();
 
         if (delay < 0) {
             return false;
         }
-
-//        if (currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY && delay > 1) {
-            if (currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY && delay >= 1) {
-            // there can be a lag between a change in the schedule (WAIT->OTHER)
-            // because activity ends (here, WAIT end) are handled only at the beginning of
-            // a simulation step, i.e. ActivityEngine is before QNetsimEngine
-            // According to some code analysis, the lag should not be larger than 1 second
-            // TODO BTW. Is "ActivityEngine before QNetsimEngine" the only approach???
-            System.err.println("TaxiUtils.isCurrentTaskDelayed(Schedule schedule, double time): "
-                    + "This is very unlikely! I am just curious if this ever happens:-)");
+        else {
+            throw new IllegalStateException();
         }
-
-        return true;
     }
 }
