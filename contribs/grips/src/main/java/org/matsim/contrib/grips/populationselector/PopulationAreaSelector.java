@@ -22,6 +22,7 @@ package org.matsim.contrib.grips.populationselector;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.control.ShapeFactory;
@@ -110,6 +111,13 @@ public class PopulationAreaSelector extends AbstractModule
 				int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
 				Rectangle2D bbRect = controller.getBoundingBox();
 				controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, true));
+				
+				File popFile = new File(this.controller.getGripsConfigModule().getPopulationFileName());
+				if (popFile.exists())
+					((PopToolBox)getToolBox()).openPopFile();
+				
+				if (controller.isGripsConfigOpenend())
+					((PopToolBox)getToolBox()).loadPopBtn.setEnabled(true);
 			}
 
 		});

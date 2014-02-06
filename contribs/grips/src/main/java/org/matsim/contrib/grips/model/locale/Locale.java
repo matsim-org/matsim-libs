@@ -86,6 +86,7 @@ public interface Locale
 	public String btNew();
 	public String msgSameFiles();
 	public String msgUnsavedChanges();
+	public String labelExistingShapeFile();
 	
 	
 	

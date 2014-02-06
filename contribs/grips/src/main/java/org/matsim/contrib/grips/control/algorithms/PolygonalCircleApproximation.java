@@ -57,9 +57,6 @@ public abstract class PolygonalCircleApproximation {
 		
 		LinearRing ls = geofac.createLinearRing(coords);
 		Polygon poly = geofac.createPolygon(ls,null);
-//		GisDebugger.addGeometry(poly);
-//		GisDebugger.dump("/Users/laemmel/tmp/!!!hh.shp");
-//		transform.inverse()
 		return poly;
 	}
 

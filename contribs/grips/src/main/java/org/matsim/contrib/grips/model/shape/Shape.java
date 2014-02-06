@@ -186,6 +186,10 @@ public abstract class Shape
 		this.style = style;
 	}
 	
+	public static int getCurrentNumberId() {
+		return currentNumberId;
+	}
+	
 	
 
 }

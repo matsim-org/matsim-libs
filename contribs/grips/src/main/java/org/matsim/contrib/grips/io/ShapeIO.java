@@ -28,8 +28,10 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.contrib.grips.control.Controller;
+import org.matsim.contrib.grips.control.ShapeFactory;
 import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.shape.PolygonShape;
+import org.matsim.contrib.grips.model.shape.Shape;
 import org.matsim.contrib.grips.model.shape.ShapeStyle;
 import org.matsim.contrib.grips.populationselector.CreatePopulationShapeFileFromExistingData;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -106,7 +108,6 @@ public class ShapeIO
 
 			for (PolygonShape polygonShape : shapes)
 			{
-//				String id = polygonShape.getId();
 				Polygon currentPolygon = polygonShape.getPolygon();
 
 				int pop = Integer.valueOf(polygonShape.getMetaData(Constants.POPULATION));
@@ -166,6 +167,9 @@ public class ShapeIO
 
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
 		shapeFileReader.readFileAndInitialize(shapeFileString);
+		
+		CreatePopulationShapeFileFromExistingData.transformCRS(shapeFileReader);
+
 
 		for (SimpleFeature ft : shapeFileReader.getFeatureSet())
 		{
@@ -175,8 +179,17 @@ public class ShapeIO
 			GeometryFactory geofac = new GeometryFactory();
 			LinearRing shell = geofac.createLinearRing(coords);
 			
+			
 			PolygonShape newPolygon = new PolygonShape(layerID, null);
 			Polygon polygon = geofac.createPolygon(shell, null);
+			
+			String persons = ft.getAttribute("persons").toString();
+			if (persons != null)
+			{
+				newPolygon.putMetaData(Constants.POPULATION, persons);
+				ShapeFactory.setPopAreaStyle(newPolygon);
+			}
+				
 			newPolygon.setPolygon(polygon);
 			newPolygon.setStyle(style);
 			

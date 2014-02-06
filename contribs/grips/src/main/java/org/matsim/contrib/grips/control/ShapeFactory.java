@@ -109,12 +109,15 @@ public class ShapeFactory
 		CircleShape popCircle = new CircleShape(popAreaID, shapeRendererId, c0, c1);
 		
 		//set style
+		setPopAreaStyle(popCircle);
+		return popCircle;
+	}
+
+	public static void setPopAreaStyle(Shape shape) {
 		ShapeStyle style = Constants.SHAPESTYLE_POPAREA;
 		style.setHoverColor(Constants.COLOR_POPAREA_HOVER);
 		style.setSelectColor(Constants.COLOR_POPAREA_SELECTED);
-		popCircle.setStyle(style);
-		
-		return popCircle;
+		shape.setStyle(style);
 	}
 	
 	public static LineShape getRoadClosureShape(int shapeRendererId, String linkID, Point2D c0, Point2D c1)

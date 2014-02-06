@@ -29,6 +29,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -44,11 +46,15 @@ import javax.swing.table.DefaultTableModel;
 
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.control.ShapeFactory;
+import org.matsim.contrib.grips.io.ShapeIO;
 import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
 import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.shape.PolygonShape;
 import org.matsim.contrib.grips.model.shape.Shape;
+import org.matsim.contrib.grips.model.shape.ShapeStyle;
+import org.matsim.contrib.grips.model.shape.Shape.DrawMode;
+import org.matsim.contrib.grips.view.DefaultOpenDialog;
 
 /**
  * the population area selector tool box
@@ -63,6 +69,9 @@ import org.matsim.contrib.grips.model.shape.Shape;
 class PopToolBox extends AbstractToolBox {
 	private static final long serialVersionUID = 1L;
 	private JButton openBtn;
+	public JButton loadPopBtn;
+	
+	
 	private JButton saveButton;
 	private JButton popDeleteBt;
 
@@ -190,19 +199,29 @@ class PopToolBox extends AbstractToolBox {
 		tools.setBorder(BorderFactory.createTitledBorder(locale.titlePopAreas()));
 
 		this.openBtn = new JButton(locale.btOpen());
+		this.loadPopBtn = new JButton(locale.btSet());
 		this.saveButton = new JButton(locale.btSave());
 		this.saveButton.setEnabled(false);
+		this.loadPopBtn.setEnabled(false);
 
 		this.openBtn.addActionListener(this);
+		this.loadPopBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
 
 		this.add(tools, BorderLayout.CENTER);
 		JPanel openAndSave = new JPanel();
+		openAndSave.setPreferredSize(new Dimension(320,80));
 
 		if (this.controller.isStandAlone())
 			openAndSave.add(this.openBtn);
+		
+		JPanel existingFilePanel = new JPanel();
+		existingFilePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.gray, 2), locale.labelExistingShapeFile()));
+		existingFilePanel.add(this.loadPopBtn);
+		existingFilePanel.setPreferredSize(new Dimension(150,60));
 
 		openAndSave.add(this.saveButton);
+		openAndSave.add(existingFilePanel);
 		this.add(openAndSave, BorderLayout.SOUTH);
 
 	}
@@ -269,6 +288,10 @@ class PopToolBox extends AbstractToolBox {
 		if (cmd.equals(locale.btOpen())) {
 			if (this.controller.openGripsConfig()) {
 				this.controller.disableAllRenderLayers();
+				
+				File popFile = new File(this.controller.getGripsConfigModule().getPopulationFileName());
+				if (popFile.exists())
+					openPopFile();
 
 				// add network bounding box shape
 				int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
@@ -282,6 +305,7 @@ class PopToolBox extends AbstractToolBox {
 
 				this.controller.getVisualizer().getActiveMapRenderLayer().setPosition(this.controller.getCenterPosition());
 				this.saveButton.setEnabled(false);
+				this.loadPopBtn.setEnabled(true);
 				this.controller.enableAllRenderLayers();
 			}
 		} else if (cmd.equals(locale.btSave())) {
@@ -293,8 +317,57 @@ class PopToolBox extends AbstractToolBox {
 
 			this.saveButton.setEnabled(false);
 
+		} else if (cmd.equals(locale.btSet())) {
+			DefaultOpenDialog openDialog = new DefaultOpenDialog(controller, "shp", "Shape", false);
+			int returnValue = openDialog.showOpenDialog(controller.getParentComponent());
+			
+			if (openDialog.getSelectedFile()!=null)
+			{
+				CreatePopulationShapeFileFromExistingData.main(new String[]{openDialog.getSelectedFile().getAbsolutePath(),controller.getGripsFile()});
+				
+				openPopFile();
+			}
+			
 		}
 
+	}
+
+	/**
+	 * Opens population file and updates table / shape files.
+	 * 
+	 */
+	public void openPopFile() {
+		try {
+			this.editing = true;
+			
+			controller.openPopulationFile();
+			int i = 0;
+			this.controller.getVisualizer().getPrimaryShapeRenderLayer().updatePixelCoordinates(true);
+			boolean foundOne = false;
+			for (Shape shape : controller.getActiveShapes())
+			{
+				shape.setVisible(true);
+				if (shape.getMetaData(Constants.POPULATION)!=null)
+				{
+					((DefaultTableModel) areaTable.getModel()).addRow(new Object[] { shape.getId(), shape.getMetaData(Constants.POPULATION) });
+					shape.setSelected(false);
+					foundOne = true;
+				}
+			}
+			if (foundOne)
+			{
+				this.popDeleteBt.setEnabled(true);
+				this.popInput.setEnabled(true);
+				this.popLabel.setEnabled(true);
+				this.saveButton.setEnabled(true);
+			}
+			
+			this.controller.paintLayers();
+			
+		} finally
+		{
+			this.editing = false;
+		}
 	}
 
 	class SelectionListener implements ListSelectionListener {
@@ -317,15 +390,13 @@ class PopToolBox extends AbstractToolBox {
 				populationAreaSelector.setSelectedAreaPop(pop);
 
 				controller.deselectShapesByMetaData("population");
-
+				
 				populationAreaSelector.getController().getShapeById(id).setSelected(true);
 				controller.paintLayers();
 
 			}
 
 		}
-
-
 	}
 
 
