@@ -81,7 +81,7 @@ public class ExportTask extends PleaseWaitRunnable {
 	protected void finish() {
 		if (exportResult == SUCCESS) {
 			JOptionPane.showMessageDialog(Main.parent,
-					"Export finished. File written to: " + path + " (WGS84 to "
+					"Export finished. File written to: " + path + " ("
 							+ targetSystem + ")");
 		} else if (exportResult == VALIDATION_ERROR) {
 			JOptionPane
@@ -94,7 +94,6 @@ public class ExportTask extends PleaseWaitRunnable {
 					.addAll(this.validationErrors);
 			Main.map.validatorDialog.tree.setErrors(this.validationErrors);
 		}
-
 	}
 
 	/*

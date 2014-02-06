@@ -81,6 +81,9 @@ public class MATSimPlugin extends Plugin {
 			}
 		}
 
+//		Main.pref.put("color.background", "#FFFFFF");
+				
+		
 		MapRendererFactory factory = MapRendererFactory.getInstance();
 		factory.register(MapRenderer.class, "My map renderer",
 				"This is the MATSim map renderer");

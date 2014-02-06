@@ -4,14 +4,12 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -26,6 +24,7 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Way;
+import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.tools.Shortcut;
 
 /**
@@ -60,21 +59,29 @@ public class MATSimAction {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			String path = Main.pref.get("matsim_exportFolder",
-					System.getProperty("user.home"))+"/josm_matsim_export";
+					System.getProperty("user.home"))
+					+ "/josm_matsim_export";
+
+			ExportDialog dialog;
+
+			Layer layer = Main.main.getActiveLayer();
+			if (layer instanceof NetworkLayer) {
+				dialog = new ExportDialog(
+						((NetworkLayer) layer).getCoordSystem());
+			} else {
+				dialog = new ExportDialog(null);
+			}
 			JFileChooser chooser = new JFileChooser(path);
 			chooser.setDialogTitle("MATSim-Export");
 			chooser.setApproveButtonText("Confirm");
 			FileFilter filter = new FileNameExtensionFilter("Network-XML",
 					"xml");
 			chooser.setFileFilter(filter);
-			File file = new File(path);
-			chooser.setSelectedFile(file);
+
 			int result = chooser.showSaveDialog(null);
-			
-			ExportDialog dialog = new ExportDialog();
-			
+
 			if (result == JFileChooser.APPROVE_OPTION
 					&& chooser.getSelectedFile().getAbsolutePath() != null) {
 				path = chooser.getSelectedFile().getAbsolutePath();
@@ -109,9 +116,9 @@ public class MATSimAction {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
-			JFileChooser chooser = new JFileChooser(System
-					.getProperty("user.home"));
+
+			JFileChooser chooser = new JFileChooser(
+					System.getProperty("user.home"));
 			chooser.setDialogTitle("MATSim-Import");
 			chooser.setApproveButtonText("Confirm");
 			FileFilter filter = new FileNameExtensionFilter("Network-XML",
@@ -139,7 +146,7 @@ public class MATSimAction {
 				}
 				dlg.dispose();
 			}
-			
+
 		}
 	}
 
@@ -157,8 +164,8 @@ public class MATSimAction {
 			DataSet dataSet = new DataSet();
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);
-			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer",
-					null, scenario.getNetwork(), TransformationFactory.WGS84);
+			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", null,
+					scenario.getNetwork(), TransformationFactory.WGS84);
 			dataSet.addDataSetListener(new NetworkListener(layer,
 					new HashMap<Way, List<Link>>()));
 			Main.main.addLayer(layer);

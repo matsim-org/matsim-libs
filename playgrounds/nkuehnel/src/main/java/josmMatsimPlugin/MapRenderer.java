@@ -23,7 +23,8 @@ public class MapRenderer extends StyledMapRenderer {
 	private final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
 	private final CompositionStrategy STRATEGY = new CompositionStrategy();
 	private final Color MATSIMCOLOR = new Color(80, 145, 190);
-	protected static float wayOffset = ((float) Main.pref.getDouble("matsim_wayOffset", 1.5)); 
+	protected static float wayOffset = ((float) Main.pref.getDouble(
+			"matsim_wayOffset", 1.5));
 
 	public MapRenderer(Graphics2D arg0, NavigatableComponent arg1, boolean arg2) {
 		super(arg0, arg1, arg2);
@@ -53,16 +54,23 @@ public class MapRenderer extends StyledMapRenderer {
 				Network network = ((NetworkLayer) layer).getMatsimNetwork();
 				if (network.getLinks().containsKey(id)) {
 					Link link = network.getLinks().get(id);
-					if (Main.pref.getBoolean("matsim_showIds", false)) {
-						drawTextOnPath(way, new TextElement(STRATEGY, FONT, 0,
-								textOffset(network, link), MATSIMCOLOR, 0.f,
-								null));
-					}
 					if (!way.isSelected()) {
+						if (Main.pref.getBoolean("matsim_showIds", false)) {
+							drawTextOnPath(way, new TextElement(STRATEGY, FONT,
+									0, textOffset(network, link), MATSIMCOLOR,
+									0.f, null));
+						}
 						super.drawWay(way, MATSIMCOLOR, line, dashes,
 								dashedColor, wayOffset(network, link),
-								showOrientation, showHeadArrowOnly, showOneway, onewayReversed);
+								showOrientation, showHeadArrowOnly, showOneway,
+								onewayReversed);
 						return;
+					} else {
+						if (Main.pref.getBoolean("matsim_showIds", false)) {
+							drawTextOnPath(way, new TextElement(STRATEGY, FONT,
+									0, textOffset(network, link), selectedColor,
+									0.f, null));
+						}
 					}
 				}
 			}
@@ -75,7 +83,7 @@ public class MapRenderer extends StyledMapRenderer {
 		for (Link link2 : network.getLinks().values()) {
 			if (link2.getFromNode().equals(link.getToNode())
 					&& link2.getToNode().equals(link.getFromNode())) {
-				
+
 				return wayOffset;
 			}
 		}
@@ -108,5 +116,5 @@ public class MapRenderer extends StyledMapRenderer {
 		}
 
 	}
-	
+
 }

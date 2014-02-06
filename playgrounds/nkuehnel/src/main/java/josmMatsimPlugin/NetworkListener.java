@@ -1,5 +1,7 @@
 package josmMatsimPlugin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +11,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -37,6 +40,10 @@ public class NetworkListener implements DataSetListener {
 	private CoordinateTransformation ct;
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 	private NetworkLayer layer;
+	private static final List<String> TRANSPORT_MODES = Arrays.asList(
+			TransportMode.bike, TransportMode.car, TransportMode.other,
+			TransportMode.pt, TransportMode.ride, TransportMode.transit_walk,
+			TransportMode.walk);
 
 	public NetworkListener(NetworkLayer layer, Map<Way, List<Link>> way2Links) {
 		this.layer = layer;
@@ -62,19 +69,22 @@ public class NetworkListener implements DataSetListener {
 						.lat()));
 		Node node = network.getNodes().get(id);
 		node.getCoord().setXY(temp.getX(), temp.getY());
-		
-		
-		for (Link link: node.getInLinks().values()) {
-			if ( !((Way)layer.data.getPrimitiveById(Long.parseLong(link.getId().toString()), OsmPrimitiveType.WAY)).hasKey("length")) {
+
+		for (Link link : node.getInLinks().values()) {
+			if (!((Way) layer.data.getPrimitiveById(
+					Long.parseLong(link.getId().toString()),
+					OsmPrimitiveType.WAY)).hasKey("length")) {
 				link.setLength(linkLength(link));
 			}
 		}
-		for (Link link: node.getOutLinks().values()) {
-			if ( !((Way)layer.data.getPrimitiveById(Long.parseLong(link.getId().toString()), OsmPrimitiveType.WAY)).hasKey("length")) {
+		for (Link link : node.getOutLinks().values()) {
+			if (!((Way) layer.data.getPrimitiveById(
+					Long.parseLong(link.getId().toString()),
+					OsmPrimitiveType.WAY)).hasKey("length")) {
 				link.setLength(linkLength(link));
 			}
 		}
-		
+
 		MATSimPlugin.toggleDialog.title(layer);
 	}
 
@@ -111,7 +121,7 @@ public class NetworkListener implements DataSetListener {
 
 			} else if (primitive instanceof Way) {
 				Way way = (Way) primitive;
-				
+
 				if (!way2Links.containsKey(way)) {
 					List<Link> links = enterWay2Links(way);
 					for (Link link : links) {
@@ -122,7 +132,7 @@ public class NetworkListener implements DataSetListener {
 			}
 		}
 	}
-	
+
 	private List<Link> enterWay2Links(Way way) {
 		List<Link> links = computeWay2Links(way);
 		List<Link> previous = way2Links.put(way, links);
@@ -160,14 +170,20 @@ public class NetworkListener implements DataSetListener {
 		link.setCapacity(Double.parseDouble(keys.get("capacity")));
 		link.setFreespeed(Double.parseDouble(keys.get("freespeed")));
 		link.setNumberOfLanes(Double.parseDouble(keys.get("permlanes")));
-		
+
 		Set<String> modes = new HashSet<String>();
 		String tempArray[] = keys.get("modes").split(";");
-		for(int i = 0; i < tempArray.length; i ++) {
-			modes.add(tempArray[i]);
+		for (int i = 0; i < tempArray.length; i++) {
+			String mode = tempArray[i];
+			if (TRANSPORT_MODES.contains(mode)) {
+				modes.add(tempArray[i]);
+			}
+		}
+		if (modes.size()==0) {
+			return Collections.emptyList();
 		}
 		link.setAllowedModes(modes);
-		
+
 		if (keys.containsKey("length")) {
 			link.setLength(Double.parseDouble(keys.get("length")));
 		} else {
@@ -180,8 +196,8 @@ public class NetworkListener implements DataSetListener {
 	private Double linkLength(Link link) {
 		Double length;
 		if (layer.getCoordSystem().equals(TransformationFactory.WGS84)) {
-			length = OsmConvertDefaults.calculateWGS84Length(link
-					.getFromNode().getCoord(), link.getToNode().getCoord());
+			length = OsmConvertDefaults.calculateWGS84Length(link.getFromNode()
+					.getCoord(), link.getToNode().getCoord());
 		} else {
 			length = CoordUtils.calcDistance(link.getFromNode().getCoord(),
 					link.getToNode().getCoord());

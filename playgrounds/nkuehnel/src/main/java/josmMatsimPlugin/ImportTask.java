@@ -84,7 +84,7 @@ public class ImportTask extends PleaseWaitRunnable {
 			OsmTransferException, UncheckedIOException {
 		this.progressMonitor.setTicksCount(4);
 		this.progressMonitor.setTicks(0);
-		
+
 		DataSet dataSet = new DataSet();
 		String importSystem = (String) ImportDialog.importSystem
 				.getSelectedItem();
@@ -143,11 +143,15 @@ public class ImportTask extends PleaseWaitRunnable {
 			way.put("length", String.valueOf(link.getLength()));
 			way.put("permlanes", String.valueOf(link.getNumberOfLanes()));
 			StringBuilder modes = new StringBuilder();
-			for (String mode: link.getAllowedModes()) {
-				modes.append(mode+"; ");
+
+			for (String mode : link.getAllowedModes()) {
+				modes.append(mode);
+				if (link.getAllowedModes().size() > 1) {
+					modes.append(";");
+				}
 			}
 			way.put("modes", modes.toString());
-			
+
 			dataSet.addPrimitive(way);
 			Link newLink = network.getFactory().createLink(
 					new IdImpl(Long.toString(way.getUniqueId())),
@@ -164,7 +168,7 @@ public class ImportTask extends PleaseWaitRunnable {
 			network.addLink(newLink);
 			way2Links.put(way, Collections.singletonList(newLink));
 		}
-		
+
 		this.progressMonitor.setTicks(5);
 		this.progressMonitor.setCustomText("creating layer..");
 

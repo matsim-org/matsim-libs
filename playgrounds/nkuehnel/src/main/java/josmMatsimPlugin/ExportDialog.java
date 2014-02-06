@@ -36,12 +36,16 @@ public class ExportDialog extends JPanel {
 	protected final static JTextField capacityPeriod = new JTextField("3600.0");
 	protected final static JTextField effectiveLaneWidth = new JTextField("3.75");
 
-	public ExportDialog() {
+	public ExportDialog(String coordSystem) {
 
 		GridBagConstraints c = new GridBagConstraints();
 		setLayout(new GridBagLayout());
 
-		exportSystem.setSelectedItem(Main.pref.get("matsim_exportSystem", "WGS84"));
+		if(coordSystem == null) {
+			exportSystem.setSelectedItem(Main.pref.get("matsim_exportSystem", "WGS84"));
+		} else {
+			exportSystem.setSelectedItem(coordSystem);
+		}
 		
 		c.weightx = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
