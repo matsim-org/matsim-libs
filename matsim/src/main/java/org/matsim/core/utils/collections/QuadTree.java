@@ -570,6 +570,9 @@ public class QuadTree<T> implements Serializable {
 		}
 
 		public boolean put(final Leaf<T> leaf) {
+			if ( !this.bounds.containsOrEquals( leaf.x , leaf.y ) ) {
+				throw new IllegalArgumentException( "cannot add a point at x="+leaf.x+", y="+leaf.y+" with bounds "+bounds );
+			}
 			if (this.hasChilds) return getChild(leaf.x, leaf.y).put(leaf);
 			if (this.leaf == null) {
 				this.leaf = leaf;

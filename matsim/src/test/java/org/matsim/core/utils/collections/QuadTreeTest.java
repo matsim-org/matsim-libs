@@ -106,6 +106,42 @@ public class QuadTreeTest {
 		assertEquals(6, qt.size());
 	}
 
+	@Test
+	public void testPutOutsideBounds() {
+		QuadTree<String> qt = new QuadTree<String>(-50.0, -50.0, 50.0, 50.0);
+		try {
+			qt.put( -100 , 0 , "-100 0" );
+			Assert.fail( "no exception when adding an element on the left" );
+		}
+		catch (IllegalArgumentException e) {
+			log.info( "catched expected exception" , e );
+		}
+
+		try {
+			qt.put( 100 , 0 , "100 0" );
+			Assert.fail( "no exception when adding an element on the right" );
+		}
+		catch (IllegalArgumentException e) {
+			log.info( "catched expected exception" , e );
+		}
+
+		try {
+			qt.put( 0 , 100 , "0 100" );
+			Assert.fail( "no exception when adding an element above" );
+		}
+		catch (IllegalArgumentException e) {
+			log.info( "catched expected exception" , e );
+		}
+
+		try {
+			qt.put( 0 , -100 , "0 -100" );
+			Assert.fail( "no exception when adding an element below" );
+		}
+		catch (IllegalArgumentException e) {
+			log.info( "catched expected exception" , e );
+		}
+	}
+
 	/**
 	 * Test getting values from a QuadTree using {@link QuadTree#get(double, double)}
 	 * and {@link QuadTree#get(double, double, double)}.
@@ -219,30 +255,6 @@ public class QuadTreeTest {
 	}
 
 	@Test
-	public void testGetXY_EntryOutsideExtend() {
-		QuadTree<String> qt = new QuadTree<String>(5.0, 5.0, 35.0, 55.0);
-		// outside the 4 corners
-		qt.put(0.0, 0.0, "SW");
-		qt.put(40.0, 0.0, "SE");
-		qt.put(0.0, 60.0, "NW");
-		qt.put(40.0, 60.0, "NE");
-		// outside the 4 sides
-		qt.put(10.0, 60.0, "N");
-		qt.put(40.0, 10.0, "E");
-		qt.put(10.0, 0.0, "S");
-		qt.put(0.0, 10.0, "W");
-
-		assertEquals("SW", qt.get(0.0, 0.0));
-		assertEquals("SE", qt.get(40.0, 0.0));
-		assertEquals("NW", qt.get(0.0, 60.0));
-		assertEquals("NE", qt.get(400.0, 60.0));
-		assertEquals("N", qt.get(10.0, 60.0));
-		assertEquals("E", qt.get(40.0, 10.0));
-		assertEquals("S", qt.get(10.0, 0.0));
-		assertEquals("W", qt.get(0.0, 10.0));
-	}
-
-	@Test
 	public void testGetDistance_fromOutsideExtent() {
 		QuadTree<String> qt = getTestTree();
 		assertContains(new String[] {"100.0, 0.0"}, qt.get(160.0, 0, 60.1)); // E
@@ -299,30 +311,6 @@ public class QuadTreeTest {
 	}
 
 	@Test
-	public void testGetDistance_EntryOutsideExtent() {
-		QuadTree<String> qt = new QuadTree<String>(5.0, 5.0, 35.0, 55.0);
-		// outside the 4 corners
-		qt.put(0.0, 0.0, "SW");
-		qt.put(40.0, 0.0, "SE");
-		qt.put(0.0, 60.0, "NW");
-		qt.put(40.0, 60.0, "NE");
-		// outside the 4 sides
-		qt.put(10.0, 60.0, "N");
-		qt.put(40.0, 10.0, "E");
-		qt.put(10.0, 0.0, "S");
-		qt.put(0.0, 20.0, "W");
-
-		assertContains(new String[] {"SW", "S"}, qt.get(6.0, 6.0, 8.5));
-		assertContains(new String[] {"S"}, qt.get(6.0, 6.0, 8.0));
-		assertContains(new String[] {"NW", "N"}, qt.get(6.0, 54.0, 8.5));
-		assertContains(new String[] {"N"}, qt.get(6.0, 54.0, 8.0));
-		assertContains(new String[] {"NE"}, qt.get(34.0, 54.0, 8.5));
-		assertContains(new String[] {"SE", "E"}, qt.get(34.0, 6.0, 8.5));
-		assertContains(new String[] {"E"}, qt.get(34.0, 6.0, 8.0));
-		assertContains(new String[] {"W"}, qt.get(6.0, 21.0, 7.0));
-	}
-
-	@Test
 	public void testGetElliptical() {
 		final Collection<Coord> all = new ArrayList<Coord>();
 		QuadTree<Coord> qt = new QuadTree<Coord>(0, 0, 40, 60);
@@ -344,19 +332,6 @@ public class QuadTreeTest {
 		all.add( new CoordImpl( 40.0, 10.0  ) );
 		all.add( new CoordImpl( 10.0, 0.0  ) );
 		all.add( new CoordImpl( 0.0, 10.0  ) );
-
-		//// outside the 4 corners
-		//all.add( new CoordImpl( -1.0, -1.0  ) );
-		//all.add( new CoordImpl( 41.0, -1.0  ) );
-		//all.add( new CoordImpl( -1.0, 61.0  ) );
-		//// results in a stackoverflow...
-		////all.add( new CoordImpl( 41.0, 61.0  ) );
-		//// outside the 4 sides
-		////all.add( new CoordImpl( 10.0, 61.0  ) );
-		////all.add( new CoordImpl( 41.0, 10.0  ) );
-		//all.add( new CoordImpl( 10.0, -1.0  ) );
-		//all.add( new CoordImpl( -1.0, 20.0  ) );
-
 		for ( Coord coord : all ) qt.put( coord.getX() , coord.getY() , coord );
 
 		// put foci in different places, inside and on the limits
@@ -576,32 +551,6 @@ public class QuadTreeTest {
 		assertEquals("E", iter.next());
 		assertEquals("NE", iter.next());
 		assertFalse(iter.hasNext());
-	}
-
-	@Test
-	public void testValues_EntryOutsideExtend() {
-		QuadTree<String> qt = new QuadTree<String>(5.0, 5.0, 35.0, 55.0);
-		// outside the 4 corners
-		qt.put(0.0, 0.0, "SW");
-		qt.put(40.0, 0.0, "SE");
-		qt.put(0.0, 60.0, "NW");
-		qt.put(40.0, 60.0, "NE");
-		// outside the 4 sides
-		qt.put(10.0, 60.0, "N");
-		qt.put(40.0, 10.0, "E");
-		qt.put(10.0, 0.0, "S");
-		qt.put(0.0, 10.0, "W");
-
-		assertEquals(8, qt.size());
-		valuesTester(8, qt.values());
-		assertTrue(qt.values().contains("SW"));
-		assertTrue(qt.values().contains("SE"));
-		assertTrue(qt.values().contains("NW"));
-		assertTrue(qt.values().contains("NE"));
-		assertTrue(qt.values().contains("N"));
-		assertTrue(qt.values().contains("E"));
-		assertTrue(qt.values().contains("S"));
-		assertTrue(qt.values().contains("W"));
 	}
 
 	/**
