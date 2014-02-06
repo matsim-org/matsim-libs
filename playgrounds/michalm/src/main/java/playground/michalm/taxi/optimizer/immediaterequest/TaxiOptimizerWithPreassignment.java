@@ -36,29 +36,8 @@ import playground.michalm.taxi.model.TaxiRequest;
  * @author michalm
  */
 public class TaxiOptimizerWithPreassignment
-    extends OTSTaxiOptimizer
 {
-    private Map<Id, Vehicle> reqIdToVehMap;
-
-
-    public TaxiOptimizerWithPreassignment(MatsimVrpContext context, VrpPathCalculator calculator,
-            double pickupDuration, double dropoffDuration, final Map<Id, Vehicle> reqIdToVehMap)
-    {
-        super(context, calculator, new ImmediateRequestParams(true, false, pickupDuration,
-                dropoffDuration));
-        this.reqIdToVehMap = reqIdToVehMap;
-    }
-
-
-    @Override
-    protected VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req)
-    {
-        Vehicle veh = reqIdToVehMap.get(req.getId());
-        return new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
-    }
-
-
-    public static TaxiOptimizerWithPreassignment createOptimizer(MatsimVrpContext context,
+    public static OTSTaxiOptimizer createOptimizer(MatsimVrpContext context,
             VrpPathCalculator calculator, double pickupDuration, double dropoffDuration,
             String reqIdToVehIdFile)
     {
@@ -71,7 +50,7 @@ public class TaxiOptimizerWithPreassignment
         }
 
         List<Vehicle> vehicles = context.getVrpData().getVehicles();
-        Map<Id, Vehicle> reqIdToVehMap = new HashMap<Id, Vehicle>();
+        final Map<Id, Vehicle> reqIdToVehMap = new HashMap<Id, Vehicle>();
 
         int count = scanner.nextInt();
         Scenario scenario = context.getScenario();
@@ -81,7 +60,19 @@ public class TaxiOptimizerWithPreassignment
         }
         scanner.close();
 
-        return new TaxiOptimizerWithPreassignment(context, calculator, pickupDuration,
-                dropoffDuration, reqIdToVehMap);
+        ImmediateRequestParams params = new ImmediateRequestParams(true, false, pickupDuration,
+                dropoffDuration);
+
+        TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params) {
+            @Override
+            public VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req,
+                    Collection<Vehicle> vehicles)
+            {
+                Vehicle veh = reqIdToVehMap.get(req.getId());
+                return new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
+            }
+        };
+
+        return new OTSTaxiOptimizer(scheduler, context);
     }
 }

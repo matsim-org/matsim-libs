@@ -33,6 +33,7 @@ import org.jfree.data.time.*;
 import org.jfree.data.xy.XYDataset;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 
@@ -187,7 +188,7 @@ public class ScheduleChartUtils
 
             final TaskSeries scheduleTaskSeries = new TaskSeries(v.getId().toString());
 
-            if (schedule.getStatus().isUnplanned()) {
+            if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
                 collection.add(scheduleTaskSeries);
                 continue;
             }

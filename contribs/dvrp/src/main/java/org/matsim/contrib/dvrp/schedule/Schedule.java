@@ -28,30 +28,7 @@ public interface Schedule<T extends Task>
 {
     public enum ScheduleStatus
     {
-        UNPLANNED(), PLANNED(), STARTED(), COMPLETED();
-
-        public boolean isUnplanned()
-        {
-            return this == UNPLANNED;
-        }
-
-
-        public boolean isPlanned()
-        {
-            return this == PLANNED;
-        }
-
-
-        public boolean isStarted()
-        {
-            return this == STARTED;
-        }
-
-
-        public boolean isCompleted()
-        {
-            return this == COMPLETED;
-        }
+        UNPLANNED, PLANNED, STARTED, COMPLETED;
     };
 
 

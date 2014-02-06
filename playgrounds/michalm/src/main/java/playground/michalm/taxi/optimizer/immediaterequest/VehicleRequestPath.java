@@ -25,14 +25,14 @@ import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import playground.michalm.taxi.model.TaxiRequest;
 
 
-/*package*/class VehicleRequestPath
+public class VehicleRequestPath
 {
-    /*package*/final Vehicle vehicle;
-    /*package*/final TaxiRequest request;
-    /*package*/final VrpPathWithTravelData path;
+    public final Vehicle vehicle;
+    public final TaxiRequest request;
+    public final VrpPathWithTravelData path;
 
 
-    /*package*/VehicleRequestPath(Vehicle vehicle, TaxiRequest request, VrpPathWithTravelData path)
+    public VehicleRequestPath(Vehicle vehicle, TaxiRequest request, VrpPathWithTravelData path)
     {
         this.vehicle = vehicle;
         this.request = request;

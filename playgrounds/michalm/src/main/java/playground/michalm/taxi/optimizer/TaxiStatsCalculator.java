@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.schedule.*;
 
@@ -43,7 +44,7 @@ public class TaxiStatsCalculator
 
     private void evaluateSchedule(VrpData data, Schedule<TaxiTask> schedule, TaxiStats eval)
     {
-        if (schedule.getStatus().isUnplanned()) {
+        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return;// do not evaluate - the vehicle is unused
         }
 

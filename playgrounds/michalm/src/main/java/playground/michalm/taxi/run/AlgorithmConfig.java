@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 
+import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
 
 
@@ -38,7 +39,8 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
         NO_SCHEDULING("NOS"), //
         NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM("NOS_DS_EQ"), //
         ONE_TIME_SCHEDULING("OTS"), //
-        RE_SCHEDULING("RES");
+        RE_SCHEDULING("RES"),//
+        AP_SCHEDULING("APS");
 
         /*package*/final String shortcut;
 
@@ -84,31 +86,31 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
             "NOS_DS_EQ_STRAIGHT_LINE",//
             FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
             DISTANCE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
-            NO_SCHEDULING);//
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
 
     /*package*/static final AlgorithmConfig NOS_DS_EQ_TRAVEL_DISTANCE = new AlgorithmConfig(//
             "NOS_DS_EQ_TRAVEL_DISTANCE", //
             FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
             DISTANCE, //
-            NO_SCHEDULING);//
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
 
     /*package*/static final AlgorithmConfig NOS_DS_EQ_FREE_FLOW = new AlgorithmConfig(//
             "NOS_DS_EQ_FREE_FLOW", //
             FREE_FLOW_SPEED, //
             TIME, //
-            NO_SCHEDULING);//
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
 
     /*package*/static final AlgorithmConfig NOS_DS_EQ_24_H = new AlgorithmConfig(//
             "NOS_DS_EQ_24_H", //
             EVENTS_24_H, //
             TIME, //
-            NO_SCHEDULING);//
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
 
     /*package*/static final AlgorithmConfig NOS_DS_EQ_15_MIN = new AlgorithmConfig(//
             "NOS_DS_EQ_15_MIN", //
             EVENTS_15_MIN, //
             TIME, //
-            NO_SCHEDULING);//
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
 
     /*package*/static final AlgorithmConfig OTS_FREE_FLOW = new AlgorithmConfig(//
             "OTS_FREE_FLOW", //
@@ -146,6 +148,24 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
             TIME, //
             RE_SCHEDULING);//
 
+    /*package*/static final AlgorithmConfig APS_FREE_FLOW = new AlgorithmConfig(//
+            "APS_FREE_FLOW", //
+            FREE_FLOW_SPEED, //
+            TIME, //
+            AP_SCHEDULING);//
+
+    /*package*/static final AlgorithmConfig APS_24_H = new AlgorithmConfig(//
+            "APS_24_H", //
+            EVENTS_24_H, //
+            TIME, //
+            AP_SCHEDULING);//
+
+    /*package*/static final AlgorithmConfig APS_15_MIN = new AlgorithmConfig(//
+            "APS_15_MIN", //
+            EVENTS_15_MIN, //
+            TIME, //
+            AP_SCHEDULING);//
+
     /*package*/static final AlgorithmConfig[] ALL = {//
     NOS_STRAIGHT_LINE,//
             NOS_TRAVEL_DISTANCE,//
@@ -162,7 +182,10 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
             OTS_15_MIN,//
             RES_FREE_FLOW,//
             RES_24_H,//
-            RES_15_MIN //
+            RES_15_MIN, //
+            APS_FREE_FLOW,//
+            APS_24_H,//
+            APS_15_MIN //
     };
 
     /*package*/final String name;
@@ -184,16 +207,25 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
     /*package*/ImmediateRequestTaxiOptimizer createTaxiOptimizer(MatsimVrpContext context,
             VrpPathCalculator calculator, ImmediateRequestParams params)
     {
+        TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
+
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(context, calculator, params, new IdleVehicleFinder(
-                        context, calculator, this == NOS_STRAIGHT_LINE), true);
+                return new NOSTaxiOptimizer(scheduler, context, new IdleVehicleFinder(context,
+                        calculator, this == NOS_STRAIGHT_LINE), false);
+
+            case NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM:
+                return new NOSTaxiOptimizer(scheduler, context, new IdleVehicleFinder(context,
+                        calculator, this == NOS_STRAIGHT_LINE), true);
 
             case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizer(context, calculator, params);
+                return new OTSTaxiOptimizer(scheduler, context);
 
             case RE_SCHEDULING:
-                return new RESTaxiOptimizer(context, calculator, params);
+                return new RESTaxiOptimizer(scheduler, context);
+
+            case AP_SCHEDULING:
+                return new APSTaxiOptimizer(scheduler, context);
 
             default:
                 throw new IllegalStateException();

@@ -40,29 +40,31 @@ import playground.michalm.taxi.schedule.*;
 public class NOSRankTaxiOptimizer
     extends NOSTaxiOptimizer
 {
+    private MatsimVrpContext context;
+    private VrpPathCalculator calculator;
     private IdleRankVehicleFinder idleVehicleFinder;
 
     private boolean idleRankMode;
-    private boolean rankmode;
 
     private final List<Id> shortTimeIdlers;
 
     private RankArrivalDepartureCharger rankArrivalDepartureCharger;
-    private final VrpPathCalculator calculator;
 
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(MatsimVrpContext context,
-            VrpPathCalculator calculator, ImmediateRequestParams params, boolean straightLineDistance)
+            VrpPathCalculator calculator, ImmediateRequestParams params,
+            boolean straightLineDistance)
     {
-        return new NOSRankTaxiOptimizer(context, calculator, params, new IdleRankVehicleFinder(context,
-                calculator, straightLineDistance));
+        return new NOSRankTaxiOptimizer(context, calculator, params, new IdleRankVehicleFinder(
+                context, calculator, straightLineDistance));
     }
 
 
-    private NOSRankTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator, ImmediateRequestParams params,
-            IdleRankVehicleFinder vehicleFinder)
+    private NOSRankTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
+            ImmediateRequestParams params, IdleRankVehicleFinder vehicleFinder)
     {
-        super(context, calculator, params, vehicleFinder, false);
+        super(new RankModeTaxiScheduler(context, calculator, params), context, vehicleFinder, false);
+        this.context = context;
         this.calculator = calculator;
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();
@@ -71,7 +73,7 @@ public class NOSRankTaxiOptimizer
 
     public void setRankMode(boolean rankMode)
     {
-        this.rankmode = rankMode;
+        ((RankModeTaxiScheduler)getScheduler()).rankmode = rankMode;
     }
 
 
@@ -82,31 +84,48 @@ public class NOSRankTaxiOptimizer
     }
 
 
-    @Override
-    protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+    private static class RankModeTaxiScheduler
+        extends TaxiScheduler
     {
-        if (this.rankmode) {
-            TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules
-                    .getLastTask(schedule);
+        private boolean rankmode;
+        private VrpPathCalculator calculator;
 
-            Link link = dropoffStayTask.getLink();
-            Link startLink = schedule.getVehicle().getStartLink();
 
-            if (link != startLink) {
-                double t5 = dropoffStayTask.getEndTime();
-                VrpPathWithTravelData path = calculator.calcPath(link, startLink, t5);
-                schedule.addTask(new TaxiCruiseDriveTask(path));
+        public RankModeTaxiScheduler(MatsimVrpContext context, VrpPathCalculator calculator,
+                ImmediateRequestParams params)
+        {
+            super(context, calculator, params);
+            this.calculator = calculator;
+        }
 
-                double t6 = path.getArrivalTime();
-                double tEnd = Math.max(t6, schedule.getVehicle().getT1());
-                schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle().getStartLink()));
+
+        @Override
+        public void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+        {
+            if (rankmode) {
+                TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules
+                        .getLastTask(schedule);
+
+                Link link = dropoffStayTask.getLink();
+                Link startLink = schedule.getVehicle().getStartLink();
+
+                if (link != startLink) {
+                    double t5 = dropoffStayTask.getEndTime();
+                    VrpPathWithTravelData path = calculator.calcPath(link, startLink, t5);
+                    schedule.addTask(new TaxiCruiseDriveTask(path));
+
+                    double t6 = path.getArrivalTime();
+                    double tEnd = Math.max(t6, schedule.getVehicle().getT1());
+                    schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle()
+                            .getStartLink()));
+                }
+                else {
+                    super.appendWaitAfterDropoff(schedule);
+                }
             }
             else {
                 super.appendWaitAfterDropoff(schedule);
             }
-        }
-        else {
-            super.appendWaitAfterDropoff(schedule);
         }
     }
 
@@ -175,7 +194,8 @@ public class NOSRankTaxiOptimizer
         Link lastLink = lastTask.getLink();
 
         if (veh.getStartLink() != lastLink) {// not a loop
-            VrpPathWithTravelData path = calculator.calcPath(lastLink, veh.getStartLink(), currentTime);
+            VrpPathWithTravelData path = calculator.calcPath(lastLink, veh.getStartLink(),
+                    currentTime);
             sched.addTask(new TaxiCruiseDriveTask(path));
 
             double arrivalTime = path.getArrivalTime();

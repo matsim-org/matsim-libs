@@ -74,33 +74,37 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
         SummaryStatistics computationTime = new SummaryStatistics();
 
-        boolean warmup = false;
+        boolean warmup;
 
         switch (configIdx) {
-            case 0:
-            case 1:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15:
+//            case 0:
+//            case 1:
+//            case 3:
+//            case 4:
+//            case 5:
+//            case 6:
+//            case 8:
+//            case 9:
+//            case 10:
+//            case 11:
+//            case 12:
+//            case 13:
+//            case 14:
+//            case 15:
+            case 16:
+            case 17:
+            case 18:
                 // run as many times as requested
+                
+                // additionally, run warmup iterations if necessary
+                warmup = launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED;
+
                 break;
 
             default:
-                // do not run
+                // do not run at all
                 runs = 0;
-        }
-
-        if (launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED) {
-            warmup = true;
+                warmup = false;
         }
 
         if (warmup) {
@@ -129,6 +133,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             computationTime.addValue(t1 - t0);
         }
 
+        pw.println(launcher.algorithmConfig.name);
         pw.println(configIdx + "\t" + TaxiStats.HEADER + "\tcomputationT");
 
         pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//

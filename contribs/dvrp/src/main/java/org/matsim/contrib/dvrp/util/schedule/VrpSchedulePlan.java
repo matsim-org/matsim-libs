@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -66,7 +67,7 @@ public class VrpSchedulePlan
 
         Schedule<?> schedule = vehicle.getSchedule();
 
-        if (schedule.getStatus().isUnplanned()) {// vehicle stays on startLink
+        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {// vehicle stays on startLink
             addActivity(startLink, -1, "RtU");
             return;
         }

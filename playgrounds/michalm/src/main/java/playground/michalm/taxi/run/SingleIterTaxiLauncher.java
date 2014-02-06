@@ -210,9 +210,9 @@ import playground.michalm.util.RunningVehicleRegister;
     {
         MatsimVrpContextImpl contextImpl = new MatsimVrpContextImpl();
         this.context = contextImpl;
-        
+
         contextImpl.setScenario(scenario);
-        
+
         TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, travelTimeCalculator,
                 algorithmConfig.ttimeSource, eventsFileName);
 
@@ -225,15 +225,15 @@ import playground.michalm.util.RunningVehicleRegister;
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(taxiData);
 
-        ImmediateRequestParams params = new ImmediateRequestParams(destinationKnown, minimizePickupTripTime, pickupDuration,
-                dropoffDuration);
+        ImmediateRequestParams params = new ImmediateRequestParams(destinationKnown,
+                minimizePickupTripTime, pickupDuration, dropoffDuration);
 
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(context,
                 calculator, params);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());
-        
+
         qSim.addQueueSimulationListeners(optimizer);
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
@@ -243,7 +243,8 @@ import playground.michalm.util.RunningVehicleRegister;
                 .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())
                 : VrpDynLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
 
-        TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator, pickupDuration);
+        TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
+                pickupDuration);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 
@@ -264,7 +265,7 @@ import playground.michalm.util.RunningVehicleRegister;
             events.addHandler(travelTimeCalculator);
         }
         else {
-            optimizer.setDelaySpeedupStats(delaySpeedupStats);
+            optimizer.getScheduler().setDelaySpeedupStats(delaySpeedupStats);
         }
 
         RunningVehicleRegister rvr = new RunningVehicleRegister();
@@ -381,8 +382,8 @@ import playground.michalm.util.RunningVehicleRegister;
         pw.flush();
 
         if (vrpOutFiles) {
-            new Schedules2GIS(context.getVrpData().getVehicles(), TransformationFactory.WGS84_UTM33N)
-                    .write(vrpOutDirName);
+            new Schedules2GIS(context.getVrpData().getVehicles(),
+                    TransformationFactory.WGS84_UTM33N).write(vrpOutDirName);
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));

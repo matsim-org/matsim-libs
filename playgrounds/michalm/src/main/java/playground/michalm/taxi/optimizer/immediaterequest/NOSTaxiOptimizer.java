@@ -23,21 +23,19 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
-import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;
 
 
 public class NOSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
-    implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
+    implements ImmediateRequestTaxiOptimizer
 {
+    private final TaxiScheduler scheduler;
+
     private final VehicleFinder idleVehicleFinder;
     private final boolean seekDemandSupplyEquilibrium;
 
@@ -47,11 +45,11 @@ public class NOSTaxiOptimizer
     private boolean requiresReoptimization = false;
 
 
-    public NOSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
-            ImmediateRequestParams params, VehicleFinder idleVehicleFinder,
-            boolean seekDemandSupplyEquilibrium)
+    public NOSTaxiOptimizer(TaxiScheduler scheduler, MatsimVrpContext context,
+            VehicleFinder idleVehicleFinder, boolean seekDemandSupplyEquilibrium)
     {
-        super(context, calculator, params);
+        this.scheduler = scheduler;
+
         this.idleVehicleFinder = idleVehicleFinder;
         this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
 
@@ -78,9 +76,10 @@ public class NOSTaxiOptimizer
                 return;
             }
 
-            VehicleRequestPath best = new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
+            VehicleRequestPath best = new VehicleRequestPath(veh, req, scheduler.calculateVrpPath(
+                    veh, req));
 
-            scheduleRequestImpl(best);
+            scheduler.scheduleRequest(best);
             unplannedRequests.poll();
             idleVehicles.remove(veh);
         }
@@ -94,39 +93,16 @@ public class NOSTaxiOptimizer
         while (!idleVehicles.isEmpty()) {
             Vehicle veh = idleVehicles.peek();
 
-            VehicleRequestPath best = findBestVehicleRequestPath(veh);
+            VehicleRequestPath best = scheduler.findBestVehicleRequestPath(veh, unplannedRequests);
 
             if (best == null) {
                 return;//no unplanned requests
             }
 
-            scheduleRequestImpl(best);
+            scheduler.scheduleRequest(best);
             unplannedRequests.remove(best.request);
             idleVehicles.remove(veh);
         }
-    }
-
-
-    protected VehicleRequestPath findBestVehicleRequestPath(Vehicle veh)
-    {
-        VehicleRequestPath best = null;
-
-        for (TaxiRequest req : unplannedRequests) {
-            VrpPathWithTravelData current = calculateVrpPath(veh, req);
-
-            if (current == null) {
-                continue;
-            }
-            else if (best == null) {
-                best = new VehicleRequestPath(veh, req, current);
-            }
-            else if (pathComparator.compare(current, best.path) < 0) {
-                // TODO: in the future: add a check if the taxi time windows are satisfied
-                best = new VehicleRequestPath(veh, req, current);
-            }
-        }
-
-        return best;
     }
 
 
@@ -165,7 +141,7 @@ public class NOSTaxiOptimizer
         @SuppressWarnings("unchecked")
         Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
 
-        updateBeforeNextTask(taxiSchedule);
+        scheduler.updateBeforeNextTask(taxiSchedule);
         taxiSchedule.nextTask();
 
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
@@ -192,4 +168,11 @@ public class NOSTaxiOptimizer
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {}
+
+
+    @Override
+    public TaxiScheduler getScheduler()
+    {
+        return scheduler;
+    }
 }

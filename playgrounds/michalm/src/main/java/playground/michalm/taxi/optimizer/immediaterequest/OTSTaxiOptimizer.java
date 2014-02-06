@@ -23,12 +23,9 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.*;
@@ -36,45 +33,48 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
-    implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
+    implements ImmediateRequestTaxiOptimizer
+
 {
+    public static final Comparator<TaxiRequest> SUBMISSION_TIME_COMPARATOR = new Comparator<TaxiRequest>() {
+        public int compare(TaxiRequest r1, TaxiRequest r2)
+        {
+            return Double.compare(r1.getSubmissionTime(), r2.getSubmissionTime());
+        }
+    };
+
+    protected final MatsimVrpContext context;
+    protected final TaxiScheduler scheduler;
+
     protected final Queue<TaxiRequest> unplannedRequests;
 
     private boolean requiresReoptimization = false;
 
 
-    public OTSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
-            ImmediateRequestParams params)
+    public OTSTaxiOptimizer(TaxiScheduler scheduler, MatsimVrpContext context)
     {
-        super(context, calculator, params);
+        this.context = context;
+        this.scheduler = scheduler;
 
         int initialCapacity = context.getVrpData().getVehicles().size();//1 awaiting req/veh
         unplannedRequests = new PriorityQueue<TaxiRequest>(initialCapacity,
-                new Comparator<TaxiRequest>() {
-                    public int compare(TaxiRequest r1, TaxiRequest r2)
-                    {
-                        return Double.compare(r1.getSubmissionTime(), r2.getSubmissionTime());
-                    }
-                });
+                SUBMISSION_TIME_COMPARATOR);
     }
 
 
-    /**
-     * Try to schedule all unplanned tasks (if any)
-     */
     protected void scheduleUnplannedRequests()
     {
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
 
-            VehicleRequestPath best = findBestVehicleRequestPath(req);
+            VehicleRequestPath best = scheduler.findBestVehicleRequestPath(req, context
+                    .getVrpData().getVehicles());
 
             if (best == null) {
                 return;
             }
 
-            scheduleRequestImpl(best);
+            scheduler.scheduleRequest(best);
             unplannedRequests.poll();
         }
     }
@@ -103,10 +103,10 @@ public class OTSTaxiOptimizer
         @SuppressWarnings("unchecked")
         Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
 
-        updateBeforeNextTask(taxiSchedule);
+        scheduler.updateBeforeNextTask(taxiSchedule);
         TaxiTask nextTask = taxiSchedule.nextTask();
 
-        if (!params.destinationKnown) {
+        if (!scheduler.getParams().destinationKnown) {
             if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
                 return;
             }
@@ -125,6 +125,14 @@ public class OTSTaxiOptimizer
         Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
 
         double predictedEndTime = driveTask.getTaskTracker().predictEndTime(context.getTime());
-        updateCurrentAndPlannedTasks(schedule, predictedEndTime);
+        scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
     }
+
+
+    @Override
+    public TaxiScheduler getScheduler()
+    {
+        return scheduler;
+    }
+
 }
