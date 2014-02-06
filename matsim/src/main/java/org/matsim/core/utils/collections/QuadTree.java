@@ -145,6 +145,35 @@ public class QuadTree<T> implements Serializable {
 	}
 
 	/**
+	 * Gets all objects within an elliptical region
+	 *
+	 * @param x1 first focus, longitude
+	 * @param y1 first focus, latitude
+	 * @param x2 first focus, longitude
+	 * @param y2 first focus, latitude
+	 * @param distance the maximal sum of the distances between an object and the two foci
+	 * @return the objects found in the elliptical region
+	 * @throws IllegalArgumentException if the distance is shorter than the distance between the foci
+	 */
+	public Collection<T> getElliptical(
+			final double x1,
+			final double y1,
+			final double x2,
+			final double y2,
+			final double distance) {
+		if ( Math.pow( distance , 2 ) < Math.pow( (x1 - x2), 2 ) + Math.pow( (y1 - y2) , 2 ) ) {
+			throw new IllegalArgumentException( "wrong ellipse specification: distance must be greater than distance between foci."
+					+" x1="+x1
+					+" y1="+y1
+					+" x2="+x2
+					+" y2="+y2
+					+" distance="+distance );
+		}
+		return this.top.getElliptical(x1, y1, x2, y2, distance, new ArrayList<T>());
+	}
+
+
+	/**
 	 * Gets all objects inside the specified boundary. Objects on the border of the
 	 * boundary are not included.
 	 *
@@ -634,6 +663,44 @@ public class QuadTree<T> implements Serializable {
 				}
 			}
 			return null;
+		}
+
+		/* default */ Collection<T> getElliptical(
+				final double x1,
+				final double y1,
+				final double x2,
+				final double y2,
+				final double maxDistance,
+				final Collection<T> values) {
+			assert Math.pow( maxDistance , 2 ) >= Math.pow( (x1 - x2), 2 ) + Math.pow( (y1 - y2) , 2 );
+			if (this.hasChilds) {
+				if (this.northwest.bounds.calcDistance(x1, y1) + this.northwest.bounds.calcDistance(x2, y2) <= maxDistance) {
+					this.northwest.getElliptical(x1, y1, x2, y2, maxDistance, values);
+				}
+				if (this.northeast.bounds.calcDistance(x1, y1) + this.northeast.bounds.calcDistance(x2, y2) <= maxDistance) {
+					this.northeast.getElliptical(x1, y1, x2, y2, maxDistance, values);
+				}
+				if (this.southeast.bounds.calcDistance(x1, y1) + this.southeast.bounds.calcDistance(x2, y2) <= maxDistance) {
+					this.southeast.getElliptical(x1, y1, x2, y2, maxDistance, values);
+				}
+				if (this.southwest.bounds.calcDistance(x1, y1) + this.southwest.bounds.calcDistance(x2, y2) <= maxDistance) {
+					this.southwest.getElliptical(x1, y1, x2, y2, maxDistance, values);
+				}
+				return values;
+			}
+			// no more childs, so we must contain the closest object
+			if (this.leaf != null && this.leaf.values.size() > 0) {
+				final double distance1 = Math.sqrt(
+						(this.leaf.x - x1) * (this.leaf.x - x1)
+						+ (this.leaf.y - y1) * (this.leaf.y - y1));
+				final double distance2 = Math.sqrt(
+						(this.leaf.x - x2) * (this.leaf.x - x2)
+						+ (this.leaf.y - y2) * (this.leaf.y - y2));
+				if (distance1 + distance2 <= maxDistance) {
+					values.addAll(this.leaf.values);
+				}
+			}
+			return values;
 		}
 
 		/* default */ Collection<T> get(final double x, final double y, final double maxDistance, final Collection<T> values) {

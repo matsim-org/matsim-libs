@@ -36,6 +36,9 @@ import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordUtils;
+
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
@@ -317,6 +320,87 @@ public class QuadTreeTest {
 		assertContains(new String[] {"SE", "E"}, qt.get(34.0, 6.0, 8.5));
 		assertContains(new String[] {"E"}, qt.get(34.0, 6.0, 8.0));
 		assertContains(new String[] {"W"}, qt.get(6.0, 21.0, 7.0));
+	}
+
+	@Test
+	public void testGetElliptical() {
+		final Collection<Coord> all = new ArrayList<Coord>();
+		QuadTree<Coord> qt = new QuadTree<Coord>(0, 0, 40, 60);
+
+		all.add( new CoordImpl( 10.0, 10.0 ) );
+		all.add( new CoordImpl( 20.0, 20.0 ) );
+		all.add( new CoordImpl( 20.0, 30.0 ) );
+		all.add( new CoordImpl( 30.0, 30.0 ) );
+		all.add( new CoordImpl( 12.0, 15.0 ) );
+		all.add( new CoordImpl( 10.0, 25.0 ) );
+
+		// the 4 corners
+		all.add( new CoordImpl( 0.0, 0.0  ) );
+		all.add( new CoordImpl( 40.0, 0.0  ) );
+		all.add( new CoordImpl( 0.0, 60.0  ) );
+		all.add( new CoordImpl( 40.0, 60.0  ) );
+		// the 4 sides
+		all.add( new CoordImpl( 10.0, 60.0  ) );
+		all.add( new CoordImpl( 40.0, 10.0  ) );
+		all.add( new CoordImpl( 10.0, 0.0  ) );
+		all.add( new CoordImpl( 0.0, 10.0  ) );
+
+		//// outside the 4 corners
+		//all.add( new CoordImpl( -1.0, -1.0  ) );
+		//all.add( new CoordImpl( 41.0, -1.0  ) );
+		//all.add( new CoordImpl( -1.0, 61.0  ) );
+		//// results in a stackoverflow...
+		////all.add( new CoordImpl( 41.0, 61.0  ) );
+		//// outside the 4 sides
+		////all.add( new CoordImpl( 10.0, 61.0  ) );
+		////all.add( new CoordImpl( 41.0, 10.0  ) );
+		//all.add( new CoordImpl( 10.0, -1.0  ) );
+		//all.add( new CoordImpl( -1.0, 20.0  ) );
+
+		for ( Coord coord : all ) qt.put( coord.getX() , coord.getY() , coord );
+
+		// put foci in different places, inside and on the limits
+		final double[] xPositions = new double[]{  0 , 20 , 30 , 40 };
+		final double[] yPositions = new double[]{  0 , 20 , 30 , 60 };
+		final double[] distances = new double[]{ 1 , 10 , 70 };
+		for ( double x1 : xPositions ) {
+			for ( double y1 : yPositions ) {
+			final Coord f1 = new CoordImpl( x1 , y1 );
+
+				for ( double x2 : xPositions ) {
+					for ( double y2 : yPositions ) {
+						final Coord f2 = new CoordImpl( x2 , y2 );
+						final double interfoci = CoordUtils.calcDistance( f1 , f2 );
+
+						for ( double distance : distances ) {
+							if ( distance < interfoci ) continue;
+							final Collection<Coord> expected = new ArrayList<Coord>();
+							for ( Coord coord : all ) {
+								if ( CoordUtils.calcDistance( coord , f1 ) + CoordUtils.calcDistance( coord , f2 ) <= distance ) {
+									expected.add( coord );
+								}
+							}
+
+							final Collection<Coord> actual =
+								qt.getElliptical(
+										x1, y1,
+										x2, y2,
+										distance );
+
+							//log.info( "testing foci "+f1+" and "+f2+", distance="+distance+", expected="+expected );
+							Assert.assertEquals(
+									"unexpected number of elements returned for foci "+f1+" and "+f2+", distance="+distance,
+									expected.size(),
+									actual.size() );
+
+							Assert.assertTrue(
+									"unexpected elements returned for foci "+f1+" and "+f2+", distance="+distance,
+									expected.containsAll( actual ) );
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Test
