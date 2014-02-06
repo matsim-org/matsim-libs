@@ -39,7 +39,7 @@ public class NOSTaxiOptimizer
     implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
 {
     private final VehicleFinder idleVehicleFinder;
-    private final boolean considerAllRequestForIdleVehicle;
+    private final boolean seekDemandSupplyEquilibrium;
 
     private final Queue<TaxiRequest> unplannedRequests;
     private final Queue<Vehicle> idleVehicles;
@@ -49,11 +49,11 @@ public class NOSTaxiOptimizer
 
     public NOSTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
             ImmediateRequestParams params, VehicleFinder idleVehicleFinder,
-            boolean considerAllRequestForIdleVehicle)
+            boolean seekDemandSupplyEquilibrium)
     {
         super(context, calculator, params);
         this.idleVehicleFinder = idleVehicleFinder;
-        this.considerAllRequestForIdleVehicle = considerAllRequestForIdleVehicle;
+        this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
 
         int vehCount = context.getVrpData().getVehicles().size();
 
@@ -136,16 +136,16 @@ public class NOSTaxiOptimizer
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (requiresReoptimization) {
-            if (!considerAllRequestForIdleVehicle) {
-                scheduleUnplannedRequests();//regular NOS
-            }
-            else {
+            if (seekDemandSupplyEquilibrium) {
                 if (unplannedRequests.size() > idleVehicles.size()) {
                     scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
                 }
                 else {
                     scheduleUnplannedRequests();//reduce T_W (otherwise)
                 }
+            }
+            else {
+                scheduleUnplannedRequests();//regular NOS
             }
         }
     }
