@@ -20,7 +20,6 @@
 package org.matsim.contrib.locationchoice.analysis;
 
 import org.matsim.analysis.Bins;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -30,8 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
-
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class DistanceStats implements IterationEndsListener {	
 	private Config config; 
@@ -82,20 +80,16 @@ public class DistanceStats implements IterationEndsListener {
 				if (pe instanceof Activity) {
 					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
 							plan.getPreviousLeg((Activity)pe).getMode().equals(this.mode)) {
-						double distance = ((CoordImpl)((Activity) pe).getCoord()).calcDistance(
-								plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
+						double distance = CoordUtils.calcDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord()); 
 						this.bins.addVal(distance, 1.0);
 					}	
 				}
 			}
 		}
-		String runId = event.getControler().getConfig().findParam("controler", "runId");
-		if (runId == null) runId ="";
 		
-		this.bins.plotBinnedDistribution(
-				event.getControler().getControlerIO().getIterationPath(
-						event.getIteration())+ "/" + runId + "." + 
-						event.getIteration() + ".plan=" + this.bestOrSelected +"_" , "#", "m");
+		// Actually, path is not the full file name - inside the plotBinnedDistribution some other stuff is added. 
+		String path = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "plan=" + this.bestOrSelected + "_");
+		this.bins.plotBinnedDistribution(path, "#", "m");
 	}
 	
 	private boolean isInteger(String str) {
