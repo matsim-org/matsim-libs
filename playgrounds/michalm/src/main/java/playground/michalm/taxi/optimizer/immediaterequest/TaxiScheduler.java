@@ -27,6 +27,8 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.tracker.*;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
@@ -127,13 +129,21 @@ public class TaxiScheduler
 
     public VrpPathWithTravelData calculateVrpPath(Vehicle veh, TaxiRequest req)
     {
-        double currentTime = context.getTime();
-        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+        LinkTimePair departure = getClosestDeparture(veh);
+        return departure == null ? null : calculator.calcPath(departure.link, req.getFromLink(),
+                departure.time);
+    }
 
-        // time window T1 exceeded
-        if (currentTime >= veh.getT1()) {
-            return null;// skip this vehicle
+
+    public LinkTimePair getClosestDeparture(Vehicle veh)
+    {
+        double currentTime = context.getTime();
+
+        if (currentTime >= veh.getT1()) {// time window T1 exceeded
+            return null;
         }
+
+        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
 
         Link link;
         double time;
@@ -142,7 +152,7 @@ public class TaxiScheduler
             case UNPLANNED:
                 link = veh.getStartLink();
                 time = Math.max(veh.getT0(), currentTime);
-                return calculator.calcPath(link, req.getFromLink(), time);
+                return new LinkTimePair(link, time);
 
             case PLANNED:
             case STARTED:
@@ -152,7 +162,7 @@ public class TaxiScheduler
                     case WAIT_STAY:
                         link = ((StayTask)lastTask).getLink();
                         time = Math.max(lastTask.getBeginTime(), currentTime);
-                        return calculator.calcPath(link, req.getFromLink(), time);
+                        return new LinkTimePair(link, time);
 
                     case PICKUP_STAY:
                         if (!params.destinationKnown) {
@@ -166,6 +176,80 @@ public class TaxiScheduler
                         throw new IllegalStateException();
                 }
 
+            case COMPLETED:
+                return null;
+
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
+
+    public LinkTimePair getClosestDiversion(Vehicle veh)
+    {
+        double currentTime = context.getTime();
+
+        if (currentTime >= veh.getT1()) {// time window T1 exceeded
+            return null;
+        }
+
+        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+
+        Link link;
+        double time;
+        TaxiDropoffStayTask dropoffStayTask;
+
+        switch (schedule.getStatus()) {
+            case UNPLANNED:
+            case PLANNED:
+                link = veh.getStartLink();
+                time = Math.max(veh.getT0(), currentTime);
+                return new LinkTimePair(link, time);
+
+            case STARTED:
+                TaxiTask currentTask = schedule.getCurrentTask();
+
+                switch (currentTask.getTaxiTaskType()) {
+                    case WAIT_STAY:
+                        link = ((StayTask)currentTask).getLink();
+                        time = currentTime;
+                        return new LinkTimePair(link, time);
+
+                    case PICKUP_DRIVE:
+                        TaskTracker tracker = currentTask.getTaskTracker();
+
+                        if (tracker instanceof OnlineDriveTaskTracker) {
+                            return ((OnlineDriveTaskTracker)tracker).getDiversionPoint(currentTime);
+                        }
+
+                        //no "break" here!!!
+
+                    case PICKUP_STAY:
+                        if (!params.destinationKnown) {
+                            return null;
+                        }
+
+                        //no "break" here!!!
+
+                    case DROPOFF_DRIVE:
+                        dropoffStayTask = ((TaxiTaskWithRequest)currentTask).getRequest()
+                                .getDropoffStayTask();
+                        break;
+
+                    case DROPOFF_STAY:
+                        dropoffStayTask = (TaxiDropoffStayTask)currentTask;
+                        break;
+
+                    default:
+                        throw new IllegalStateException();
+                }
+
+                
+                link = dropoffStayTask.getLink();
+                time = dropoffStayTask.getEndTime();
+                return new LinkTimePair(link, time);
+
+                
             case COMPLETED:
                 return null;
 

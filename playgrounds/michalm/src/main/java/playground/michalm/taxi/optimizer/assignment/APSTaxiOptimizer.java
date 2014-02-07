@@ -24,12 +24,10 @@ import java.util.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
-import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+import playground.michalm.taxi.schedule.TaxiSchedules;
 
 
 public class APSTaxiOptimizer
@@ -53,7 +51,7 @@ public class APSTaxiOptimizer
         
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
         for (Vehicle v : context.getVrpData().getVehicles()) {
-            if (canBeUsed(v)) {
+            if (scheduler.getClosestDeparture(v) != null) {
                 vehicles.add(v);
             }
         }
@@ -105,35 +103,6 @@ public class APSTaxiOptimizer
                 TaxiRequest req = requests[r];
                 scheduler.scheduleRequest(new VehicleRequestPath(veh, req, path));
             }
-        }
-    }
-
-
-    public boolean canBeUsed(Vehicle veh)
-    {
-        double currentTime = context.getTime();
-        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
-
-        // time window T1 exceeded
-        if (currentTime >= veh.getT1()) {
-            return false;// skip this vehicle
-        }
-
-        switch (schedule.getStatus()) {
-            case UNPLANNED:
-                return true;
-
-            case PLANNED:
-            case STARTED:
-                TaxiTask lastTask = Schedules.getLastTask(schedule);
-
-                return lastTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY;
-
-            case COMPLETED:
-                return false;
-
-            default:
-                throw new IllegalStateException();
         }
     }
 }
