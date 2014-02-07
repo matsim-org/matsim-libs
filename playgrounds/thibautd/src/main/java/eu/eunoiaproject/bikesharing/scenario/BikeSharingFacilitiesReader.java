@@ -67,7 +67,7 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 						new CoordImpl(
 							Double.parseDouble( x ),
 							Double.parseDouble( y ) ),
-						linkId == null ? null : new IdImpl( linkId ),
+						new IdImpl( linkId ),
 						Integer.parseInt( capacity ),
 						Integer.parseInt( initialNumberOfBikes ) ) );
 		}

@@ -100,7 +100,7 @@ public class BikeSharingFacilitiesIOTest {
 					fs.getFactory().createBikeSharingFacility(
 						new IdImpl( i ),
 						new CoordImpl( r.nextDouble() , r.nextDouble() ),
-						r.nextBoolean() ? null : new IdImpl( r.nextInt( 20 ) ),
+						new IdImpl( r.nextInt( 20 ) ),
 						r.nextInt( 2000 ),
 						r.nextInt( 2000 ) ) );
 		}
