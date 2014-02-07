@@ -133,7 +133,7 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 
 		final double normalization = 1./Math.exp( this.sigma*this.sigma/2 );
 		log.warn(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
-
+		
 		// generating final variables for anonymous class:
 		final RoadPricingScheme localScheme = this.scheme ;
 
@@ -162,8 +162,19 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 						double logNormal = Math.exp( sigma * MatsimRandom.getRandom().nextGaussian() ) ;
 						logNormal *= normalization ;
 						// this should be a log-normal distribution with sigma as the "width" parameter.   Instead of figuring out the "location"
-						// parameter mu, I rather just normalize (which should be the same). kai, nov'13
+						// parameter mu, I rather just normalize (which should be the same, see next). kai, nov'13
 
+						/* The argument is something like this:<ul> 
+						 * <li> exp( mu + sigma * Z) with Z = Gaussian generates lognormal with mu and sigma.
+						 * <li> The mean of this is exp( mu + sigma^2/2 ) .  
+						 * <li> If we set mu=0, the expectation value is exp( sigma^2/2 ) .
+						 * <li> So in order to set the expectation value to one (which is what we want), we need to divide by exp( sigma^2/2 ) .
+						 * </ul>
+						 * kai, jan'14
+						 */
+
+
+						
 						this.utilityOfMoney_normally_positive *= logNormal ;
 						// yy the expectation value of this should be tested ...
 					}
