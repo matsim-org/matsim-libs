@@ -44,7 +44,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	
 	@Override
 	public double getTollFactor(Id personId, final Id vehicleId, final Id linkId, final double time){		
-		double timeDiscount = getTimeDiscount(time);
+		double timeDiscount = getTimeDiscount(time, vehicleId);
 		double tagDiscount = 0.00;
 		double ptDiscount = 0.00;
 		double sizeFactor = 1.00;
@@ -72,7 +72,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		 * vehicle Id. */
 		if(vehicleId.toString().startsWith("bus") || 
 		   vehicleId.toString().startsWith("taxi")){
-			ptDiscount = 0.55;
+			ptDiscount = 1.0;
 		}
 		
 		return getDiscountEligibility(linkId) ? sizeFactor*(1 - Math.min(1.0, timeDiscount + tagDiscount + ptDiscount)) : sizeFactor;		
@@ -80,35 +80,60 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 	
 	
 	/**
-	 * Updated 2014/01/20 (jwjoubert).
+	 * Updated 2014/02/07 (jwjoubert).
 	 * 
 	 * @param time
 	 * @return
-	 * @see <a href="http://sanral.ensight-cdn.com/content/37038_19-11_TransE-TollCV01~1.pdf">Government Gazette,  Vol 581, No. 37038, page 27.</a>
+	 * @see <a href="http://sanral.ensight-cdn.com/content/37038_19-11_TransE-TollCV01~1.pdf">Government Gazette,  Vol 581, No. 37038, page 13.</a>
 	 */
-	private  double getTimeDiscount(double time){
+	private  double getTimeDiscount(double time, Id vehicleId){
 		/* First get the real time of day. */
 		double timeOfDay = time;
 		while(timeOfDay > 86400){
 			timeOfDay -= 86400;
 		}
 		
-		/* Weekday discounts */
-		if(timeOfDay < 5*3600){ // 00:00 - 05:00
-			return 0.30;
-		} else if(timeOfDay < 6*3600){ // 05:00 - 06:00
-			return 0.25;
-		} else if(timeOfDay < 8.5*3600){ // 06:00 - 10:00
-			return 0.00;
-		} else if(timeOfDay < 16*3600){ // 10:00 - 14:00
-			return 0.20;
-		} else if(timeOfDay < 19*3600){ // 14:00 - 18:00
-			return 0.00;
-		} else if(timeOfDay < 23*3600){ // 18:00 - 23:00
-			return 0.25;
-		} else{ // 23:00 - 00:00
-			return 0.30;
-		}		
+		VehicleType type = this.sc.getVehicles().getVehicles().get(vehicleId).getType();
+		
+		if(type.getId().toString().equalsIgnoreCase("A1") || 
+				type.getId().toString().equalsIgnoreCase("A2")){
+			/* Weekday discounts - Class A vehicles */
+			if(timeOfDay < 5*3600){ // 00:00 - 05:00
+				return 0.25;
+			} else if(timeOfDay < 6*3600){ // 05:00 - 06:00
+				return 0.10;
+			} else if(timeOfDay < 10*3600){ // 06:00 - 10:00
+				return 0.00;
+			} else if(timeOfDay < 14*3600){ // 10:00 - 14:00
+				return 0.05;
+			} else if(timeOfDay < 18*3600){ // 14:00 - 18:00
+				return 0.00;
+			} else if(timeOfDay < 23*3600){ // 18:00 - 23:00
+				return 0.10;
+			} else{ // 23:00 - 00:00
+				return 0.25;
+			}					
+		} else if(type.getId().toString().equalsIgnoreCase("B") || 
+				type.getId().toString().equalsIgnoreCase("C")){
+			/* Weekday discounts - Class B & C vehicles */
+			if(timeOfDay < 5*3600){ // 00:00 - 05:00
+				return 0.30;
+			} else if(timeOfDay < 6*3600){ // 05:00 - 06:00
+				return 0.25;
+			} else if(timeOfDay < 10*3600){ // 06:00 - 10:00
+				return 0.00;
+			} else if(timeOfDay < 14*3600){ // 10:00 - 14:00
+				return 0.20;
+			} else if(timeOfDay < 18*3600){ // 14:00 - 18:00
+				return 0.00;
+			} else if(timeOfDay < 23*3600){ // 18:00 - 23:00
+				return 0.25;
+			} else{ // 23:00 - 00:00
+				return 0.30;
+			}		
+		} else{
+			throw new RuntimeException("Don't know how to get time-of-day-discount for vehicles of type " + type.getId().toString());
+		}
 	}
 	
 	/**
