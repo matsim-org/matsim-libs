@@ -78,7 +78,7 @@ public class APSTaxiOptimizer
                 TaxiRequest req = requests[r];
                 VrpPathWithTravelData path = scheduler.calculateVrpPath(veh, req);
 
-                costMatrix[v][r] = path.getTravelCost();
+                costMatrix[v][r] = path.getTravelTime();
                 paths[v][r] = path;
             }
 
