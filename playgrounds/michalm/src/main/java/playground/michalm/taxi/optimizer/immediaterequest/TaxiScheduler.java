@@ -79,6 +79,12 @@ public class TaxiScheduler
     }
 
 
+    public VrpPathCalculator getCalculator()
+    {
+        return calculator;
+    }
+
+
     public VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req,
             Collection<Vehicle> vehicles)
     {
@@ -129,13 +135,13 @@ public class TaxiScheduler
 
     public VrpPathWithTravelData calculateVrpPath(Vehicle veh, TaxiRequest req)
     {
-        LinkTimePair departure = getClosestDeparture(veh);
+        LinkTimePair departure = getEarliestIdleness(veh);
         return departure == null ? null : calculator.calcPath(departure.link, req.getFromLink(),
                 departure.time);
     }
 
 
-    public LinkTimePair getClosestDeparture(Vehicle veh)
+    public LinkTimePair getEarliestIdleness(Vehicle veh)
     {
         double currentTime = context.getTime();
 
@@ -149,11 +155,6 @@ public class TaxiScheduler
         double time;
 
         switch (schedule.getStatus()) {
-            case UNPLANNED:
-                link = veh.getStartLink();
-                time = Math.max(veh.getT0(), currentTime);
-                return new LinkTimePair(link, time);
-
             case PLANNED:
             case STARTED:
                 TaxiTask lastTask = Schedules.getLastTask(schedule);
@@ -179,13 +180,14 @@ public class TaxiScheduler
             case COMPLETED:
                 return null;
 
+            case UNPLANNED://there is always at least one WAIT task in a schedule
             default:
                 throw new IllegalStateException();
         }
     }
 
 
-    public LinkTimePair getClosestDiversion(Vehicle veh)
+    public LinkTimePair getEarliestDiversion(Vehicle veh)
     {
         double currentTime = context.getTime();
 
@@ -200,7 +202,6 @@ public class TaxiScheduler
         TaxiDropoffStayTask dropoffStayTask;
 
         switch (schedule.getStatus()) {
-            case UNPLANNED:
             case PLANNED:
                 link = veh.getStartLink();
                 time = Math.max(veh.getT0(), currentTime);
@@ -244,15 +245,14 @@ public class TaxiScheduler
                         throw new IllegalStateException();
                 }
 
-                
                 link = dropoffStayTask.getLink();
                 time = dropoffStayTask.getEndTime();
                 return new LinkTimePair(link, time);
 
-                
             case COMPLETED:
                 return null;
 
+            case UNPLANNED://there is always at least one WAIT task in a schedule
             default:
                 throw new IllegalStateException();
         }

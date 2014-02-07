@@ -23,7 +23,8 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
@@ -44,15 +45,20 @@ public class APSTaxiOptimizer
         for (Vehicle veh : context.getVrpData().getVehicles()) {
             scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh), unplannedRequests);
         }
-        
+
         if (unplannedRequests.size() == 0) {
             return;
         }
-        
+
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
         for (Vehicle v : context.getVrpData().getVehicles()) {
-            if (scheduler.getClosestDeparture(v) != null) {
+            LinkTimePair departure = scheduler.getEarliestIdleness(v);
+            //LinkTimePair departure = scheduler.getClosestDiversion(v);
+
+            if (departure != null) {
                 vehicles.add(v);
+                departures.add(departure);
             }
         }
 
@@ -68,17 +74,23 @@ public class APSTaxiOptimizer
             requests[r] = unplannedRequests.poll();
         }
 
+        VrpPathCalculator calculator = scheduler.getCalculator();
+        ImmediateRequestParams params = scheduler.getParams();
         double[][] costMatrix = new double[vDim][rDim];
         VrpPathWithTravelData[][] paths = new VrpPathWithTravelData[vDim][rDim];
 
-        for (int v = 0; v < vehicles.size(); v++) {
-            Vehicle veh = vehicles.get(v);
-
+        for (int v = 0; v < vDim; v++) {
             for (int r = 0; r < rDim; r++) {
+                LinkTimePair departure = departures.get(v);
                 TaxiRequest req = requests[r];
-                VrpPathWithTravelData path = scheduler.calculateVrpPath(veh, req);
 
-                costMatrix[v][r] = path.getTravelTime();
+                VrpPathWithTravelData path = calculator.calcPath(departure.link, req.getFromLink(),
+                        departure.time);
+
+                costMatrix[v][r] = params.minimizePickupTripTime ? //
+                        path.getTravelTime() : //T_P
+                        path.getArrivalTime() - req.getSubmissionTime();//T_W
+
                 paths[v][r] = path;
             }
 
