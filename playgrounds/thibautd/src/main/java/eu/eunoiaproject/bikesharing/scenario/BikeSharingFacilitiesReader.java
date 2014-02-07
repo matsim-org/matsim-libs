@@ -38,8 +38,6 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 	private Counter counter;
 
 	public BikeSharingFacilitiesReader(final Scenario scenario) {
-		// TODO: dtd
-		super( false );
 		this.scenario = scenario;
 	}
 

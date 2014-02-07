@@ -45,6 +45,7 @@ public class BikeSharingFacilitiesWriter extends MatsimXmlWriter {
 		log.info( "writing bike sharing facilities in file "+fileName );
 		openFile( fileName );
 		writeXmlHead();
+		writeDoctype( "bikeSharingFacilities" , "bikesharingfacilities_v1.dtd" );
 		writeStartTag( "bikeSharingFacilities" , Collections.<Tuple<String, String>>emptyList() );
 		final Counter counter = new Counter( "writing bike sharing facility # " );
 		for ( BikeSharingFacility f : facilities.getFacilities().values() ) {
