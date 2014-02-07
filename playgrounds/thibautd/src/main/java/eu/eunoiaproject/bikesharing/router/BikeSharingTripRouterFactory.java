@@ -36,6 +36,7 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
 
 /**
+ * Builds a standard trip router factory for bike sharing simulations.
  * @author thibautd
  */
 public class BikeSharingTripRouterFactory implements TripRouterFactory {

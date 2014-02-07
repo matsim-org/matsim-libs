@@ -25,6 +25,9 @@ import eu.eunoiaproject.bikesharing.events.NewBikeSharingFacilityStateEvent;
 import eu.eunoiaproject.bikesharing.qsim.BikeSharingManager.BikeSharingManagerListener;
 
 /**
+ * A simple {@link BikeSharingManagerListener}, which generates
+ * {@link NewBikeSharingFacilityStateEvent}s each time the state of a bike sharing
+ * facility changes.
  * @author thibautd
  */
 public class FacilityStateChangeRepeater implements BikeSharingManagerListener {

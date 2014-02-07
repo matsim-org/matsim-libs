@@ -31,6 +31,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Counter;
 
 /**
+ * Writes a {@link BikeSharingFacilities} container to a file.
  * @author thibautd
  */
 public class BikeSharingFacilitiesWriter extends MatsimXmlWriter {

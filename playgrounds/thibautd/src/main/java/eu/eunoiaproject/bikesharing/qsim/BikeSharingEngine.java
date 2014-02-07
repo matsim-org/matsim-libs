@@ -50,6 +50,10 @@ import eu.eunoiaproject.bikesharing.qsim.BikeSharingManager.BikeSharingManagerLi
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingRoute;
 
 /**
+ * A {@link MobsimEngine} and {@link DepartureHandler} for bike sharing simulations.
+ *
+ * It acts as intermediary between the QSim and the BikeSharingManager.
+ *
  * @author thibautd
  */
 public class BikeSharingEngine implements DepartureHandler, MobsimEngine {

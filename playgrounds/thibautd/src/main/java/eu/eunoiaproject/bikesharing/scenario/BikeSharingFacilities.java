@@ -34,6 +34,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.thibautd.utils.QuadTreeRebuilder;
 
 /**
+ * The scenario element containing information about bike sharing facilities.
  * @author thibautd
  */
 public class BikeSharingFacilities implements MatsimToplevelContainer {

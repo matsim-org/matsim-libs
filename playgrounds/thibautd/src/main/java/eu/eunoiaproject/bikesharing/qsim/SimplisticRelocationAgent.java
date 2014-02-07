@@ -33,6 +33,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacility;
 
 /**
+ * An agent driving around randomly to relocate bikes.
+ * For demonstration purpose only.
  * @author thibautd
  */
 public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgent, DriverAgent*/ {

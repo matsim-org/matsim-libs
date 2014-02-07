@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 /**
+ * Default implementation of a bike sharing facility.
  * @author thibautd
  */
 public class BikeSharingFacilityImpl implements BikeSharingFacility {

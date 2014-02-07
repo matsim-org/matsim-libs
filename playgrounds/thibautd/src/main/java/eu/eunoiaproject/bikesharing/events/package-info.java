@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BikeSharingConstants.java
+ * package-info.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package eu.eunoiaproject.bikesharing;
-
 /**
- * Defines some constants used thoughout the code.
+ * Contains the definition of events specific to bike sharing simulation.
+ * Be careful if you write event handlers for those events: the events you will
+ * get during the simulation will be instances of those classes, but if you re-read
+ * an events file, you will get Events with all attributes stored as Strings.
  * @author thibautd
  */
-public class BikeSharingConstants {
-	/**
-	 * The mode of bike sharing legs/trips
-	 */
-	public static final String MODE = "bikeSharing";
-
-	/**
-	 * The activity type of a bike pick-up or drop-off
-	 */
-	public static final String INTERACTION_TYPE = "bikeSharing_interaction";
-}
+package eu.eunoiaproject.bikesharing.events;
 

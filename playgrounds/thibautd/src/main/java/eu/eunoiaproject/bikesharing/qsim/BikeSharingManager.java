@@ -37,7 +37,7 @@ import playground.thibautd.utils.MapUtils;
 
 /**
  * Class responsible for adding and removing bikes from bike sharing facilities,
- * and notifying anybody is interested.
+ * and notifying anybody who is interested.
  * @author thibautd
  */
 public class BikeSharingManager {

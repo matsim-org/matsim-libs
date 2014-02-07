@@ -36,6 +36,13 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilitiesReader;
 
 /**
+ * Uses {@link BikeSharingEventsToXyTable} to convert events to a tabular
+ * file.
+ * <br>
+ * usage:
+ * <tt>
+ * ExtractStationsXyDataForVia path/to/bikeSharingFacilities.xml path/to/events.xml path/to/outputfile.xy
+ * </tt>
  * @author thibautd
  */
 public class ExtractStationsXyDataForVia {

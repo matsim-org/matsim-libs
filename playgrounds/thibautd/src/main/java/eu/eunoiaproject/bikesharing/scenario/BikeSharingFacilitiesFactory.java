@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
+ * Associated to a {@link BikeSharingFacilities} container,
+ * allows to create facilities in a standard way.
  * @author thibautd
  */
 public interface BikeSharingFacilitiesFactory extends MatsimFactory {

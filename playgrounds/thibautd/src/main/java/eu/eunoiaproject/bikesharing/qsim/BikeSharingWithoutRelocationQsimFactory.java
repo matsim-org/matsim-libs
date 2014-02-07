@@ -41,7 +41,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
 
 /**
- * Mainly a copy-paste from QSimFactory, with the addition of the Bike-sharing engine.
+ * Builds the most simple bike-sharing-aware QSim possible.
+ * It just adds a BikeSharingEngine, but no relocation of bikes is done:
+ * bike relocate only by being moved by bike sharing users.
+ * Also, normal "dumb" agents are used: agents just wait at a bike sharing station
+ * until a bike (resp. a free slot) is available.
  *
  * @author thibautd
  */

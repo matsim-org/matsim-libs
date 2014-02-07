@@ -39,6 +39,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
 
 /**
+ * Builds a QSim with vehicles traveling around randomly to relocate bikes.
+ * For demonstration purpose only!
  * @author thibautd
  */
 public class BikeSharingWithSimplisticRelocationQSimFactory implements MobsimFactory {

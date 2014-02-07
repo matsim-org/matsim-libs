@@ -39,8 +39,13 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacility;
 
 /**
- * Done to be usable off-line ( the events do not need to be of the
- * specific implementation )
+ * An event handler which listens to a stream of events and dumps bike sharing
+ * statistics in tabular format. The table can be read from via to visualize
+ * loads at bike sharing stations.
+ * <br>
+ * It is done to be usable off-line (ie when re-reading the events after the end
+ * of the simulation: the events do not need to be of the specific implementation,
+ * but can be generic events.)
  * @author thibautd
  */
 public class BikeSharingEventsToXyTable implements BasicEventHandler {

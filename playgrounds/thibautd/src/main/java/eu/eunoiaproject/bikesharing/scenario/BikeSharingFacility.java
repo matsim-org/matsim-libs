@@ -22,6 +22,9 @@ package eu.eunoiaproject.bikesharing.scenario;
 import org.matsim.core.api.experimental.facilities.Facility;
 
 /**
+ * Defines a bike sharing station: something with an Id,
+ * a location (coord + link), a capacity and an initial
+ * number of bikes.
  * @author thibautd
  */
 public interface BikeSharingFacility extends Facility {

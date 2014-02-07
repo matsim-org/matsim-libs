@@ -22,6 +22,10 @@ package eu.eunoiaproject.bikesharing.qsim;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacility;
 
 /**
+ * A bike sharing facility with a current number of bikes.
+ * Code which interacts with the stations (puting or removing bikes)
+ * must pass by the {@link BikeSharingManager} to move bikes around.
+ *
  * @author thibautd
  */
 public interface StatefulBikeSharingFacility extends BikeSharingFacility {

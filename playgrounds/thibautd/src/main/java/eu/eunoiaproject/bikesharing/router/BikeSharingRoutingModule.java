@@ -46,6 +46,13 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacility;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingRoute;
 
 /**
+ * a {@link RoutingModule} for bike sharing trips.
+ * Bike sharing trips are composed of an access walk
+ * a bike part, and an egress walk.
+ * The choice of the station is randomized, so that during the process,
+ * agents learn the best station (the best ration bike availability/travel distance)
+ * by themselves.
+ *
  * @author thibautd
  */
 public class BikeSharingRoutingModule implements RoutingModule {

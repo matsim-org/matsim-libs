@@ -29,6 +29,12 @@ import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 /**
+ * Fills a {@link BikeSharingFacilities} container, and puts it in a Scenario,
+ * under the {@link BikeSharingFacilities#ELEMENT_NAME} name.
+ * The container can be retrieved with
+ * <tt>
+ * BikeSharingFacilities fs = (BikeSharingFacilities) scenario.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME );
+ * </tt>
  * @author thibautd
  */
 public class BikeSharingFacilitiesReader extends MatsimXmlParser {

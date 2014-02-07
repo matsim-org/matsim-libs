@@ -27,6 +27,7 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 /**
+ * Defines a route for bike sharing legs.
  * @author thibautd
  */
 public class BikeSharingRoute implements GenericRoute {

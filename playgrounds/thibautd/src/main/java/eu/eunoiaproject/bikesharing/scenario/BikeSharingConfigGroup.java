@@ -22,6 +22,7 @@ package eu.eunoiaproject.bikesharing.scenario;
 import org.matsim.core.config.experimental.ReflectiveModule;
 
 /**
+ * Stores the parameters from the config file for a bike sharing simulation.
  * @author thibautd
  */
 public class BikeSharingConfigGroup extends ReflectiveModule {
