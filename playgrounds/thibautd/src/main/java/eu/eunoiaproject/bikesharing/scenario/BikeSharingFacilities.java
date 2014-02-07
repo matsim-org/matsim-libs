@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
@@ -35,6 +37,9 @@ import playground.thibautd.utils.QuadTreeRebuilder;
  * @author thibautd
  */
 public class BikeSharingFacilities implements MatsimToplevelContainer {
+	private static final Logger log =
+		Logger.getLogger(BikeSharingFacilities.class);
+
 	public static final String ELEMENT_NAME = "bikeSharingFacilities";
 	private final Map<Id, BikeSharingFacility> facilities =
 		new LinkedHashMap<Id, BikeSharingFacility>();
@@ -43,6 +48,8 @@ public class BikeSharingFacilities implements MatsimToplevelContainer {
 	private final ObjectAttributes facilitiesAttributes = new ObjectAttributes();
 
 	private final QuadTreeRebuilder<BikeSharingFacility> quadTreeBuilder = new QuadTreeRebuilder<BikeSharingFacility>();
+
+	private final Map<String, String> metadata = new LinkedHashMap<String, String>();
 
 	public void addFacility( final BikeSharingFacility facility ) {
 		facilities.put( facility.getId() , facility );
@@ -82,6 +89,23 @@ public class BikeSharingFacilities implements MatsimToplevelContainer {
 
 	public ObjectAttributes getFacilitiesAttributes() {
 		return facilitiesAttributes;
+	}
+
+	/**
+	 * retrieve the metadata
+	 */
+	public Map<String, String> getMetadata() {
+		return metadata;
+	}
+
+	/**
+	 * add metadata. Metadata associates attribute names to values,
+	 * and can be used to store any information useful to organize data:
+	 * date of generation, source, author, etc.
+	 */
+	public void addMetadata(final String attribute, final String value) {
+		final String old = metadata.put( attribute , value );
+		if ( old != null ) log.warn( "replacing metadata \""+attribute+"\" from \""+old+"\" to \""+value+"\"" );
 	}
 }
 

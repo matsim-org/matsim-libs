@@ -4,7 +4,13 @@
 
 <!-- ============================================================ -->
 
-<!ELEMENT bikeSharingFacilities  (bikeSharingFacility*)>
+<!ELEMENT bikeSharingFacilities  (metadata?,bikeSharingFacility*)>
+
+<!ELEMENT metadata  (attribute*)>
+<!ELEMENT attribute  EMPTY>
+<!ATTLIST attribute
+          name                   CDATA #REQUIRED
+	      value                  CDATA #REQUIRED>
 
 <!ELEMENT bikeSharingFacility EMPTY>
 <!ATTLIST bikeSharingFacility

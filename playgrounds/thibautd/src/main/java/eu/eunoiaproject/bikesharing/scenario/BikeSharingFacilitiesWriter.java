@@ -20,8 +20,10 @@
 package eu.eunoiaproject.bikesharing.scenario;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
@@ -47,12 +49,30 @@ public class BikeSharingFacilitiesWriter extends MatsimXmlWriter {
 		writeXmlHead();
 		writeDoctype( "bikeSharingFacilities" , "bikesharingfacilities_v1.dtd" );
 		writeStartTag( "bikeSharingFacilities" , Collections.<Tuple<String, String>>emptyList() );
+
+		if ( !facilities.getMetadata().isEmpty() ) {
+			writeStartTag( "metadata" , Collections.<Tuple<String, String>>emptyList() );
+			for ( Map.Entry<String, String> meta : facilities.getMetadata().entrySet() ) {
+				writeStartTag(
+						"attribute",
+						Arrays.asList(
+							createTuple( "name" , meta.getKey() ),
+							createTuple( "value" , meta.getValue() ) ),
+						true);
+			}
+			writeEndTag( "metadata" );
+		}
+
+		// this has the side effect of jumping a line, making the output more readable
+		writeContent( "" , true );
+
 		final Counter counter = new Counter( "writing bike sharing facility # " );
 		for ( BikeSharingFacility f : facilities.getFacilities().values() ) {
 			counter.incCounter();
 			writeFacility( f );
 		}
 		counter.printCounter();
+
 		writeEndTag( "bikeSharingFacilities" );
 		close();
 	}

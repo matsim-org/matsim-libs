@@ -69,6 +69,9 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 						Integer.parseInt( capacity ),
 						Integer.parseInt( initialNumberOfBikes ) ) );
 		}
+		if ( name.equals( "attribute" ) ) {
+			facilities.addMetadata( atts.getValue( "name" ) , atts.getValue( "value" ) );
+		}
 	}
 
 	@Override

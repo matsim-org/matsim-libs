@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.scenario;
 
+import java.util.Map;
 import java.util.Random;
 
 import org.junit.Assert;
@@ -89,6 +90,15 @@ public class BikeSharingFacilitiesIOTest {
 					f.getInitialNumberOfBikes(),
 					newF.getInitialNumberOfBikes() );
 		}
+
+		for ( Map.Entry<String, String> meta : facilities.getMetadata().entrySet() ) {
+			final String actualValue = newFacilities.getMetadata().get( meta.getKey() );
+
+			Assert.assertEquals(
+					"wrong metadata for attribute "+meta.getKey(),
+					meta.getValue(),
+					actualValue );
+		}
 	}
 
 	private static BikeSharingFacilities createFacilities() {
@@ -104,6 +114,9 @@ public class BikeSharingFacilitiesIOTest {
 						r.nextInt( 2000 ),
 						r.nextInt( 2000 ) ) );
 		}
+
+		fs.addMetadata( "some attribute" , "some value" );
+		fs.addMetadata( "some other attribute" , "some other value" );
 
 		return fs;
 	}
