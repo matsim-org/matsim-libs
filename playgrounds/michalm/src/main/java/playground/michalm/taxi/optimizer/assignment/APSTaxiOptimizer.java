@@ -43,10 +43,6 @@ public class APSTaxiOptimizer
 
     protected void scheduleUnplannedRequests()
     {
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
-            scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh), unplannedRequests);
-        }
-
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
         for (Vehicle v : context.getVrpData().getVehicles()) {
             if (canBeUsed(v)) {
@@ -55,7 +51,18 @@ public class APSTaxiOptimizer
         }
 
         int vDim = vehicles.size();
+        if (vDim == 0) {
+            return;
+        }
+
+        for (Vehicle veh : context.getVrpData().getVehicles()) {
+            scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh), unplannedRequests);
+        }
+        
         int rDim = Math.min(vDim, unplannedRequests.size());
+        if (rDim == 0) {
+            return;
+        }
 
         TaxiRequest[] requests = new TaxiRequest[rDim];
         for (int r = 0; r < rDim; r++) {
