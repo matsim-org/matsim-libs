@@ -145,12 +145,12 @@ public class QuadTree<T> implements Serializable {
 	}
 
 	/**
-	 * Gets all objects within an elliptical region
+	 * Gets all objects within an elliptical region.
 	 *
 	 * @param x1 first focus, longitude
 	 * @param y1 first focus, latitude
-	 * @param x2 first focus, longitude
-	 * @param y2 first focus, latitude
+	 * @param x2 second focus, longitude
+	 * @param y2 second focus, latitude
 	 * @param distance the maximal sum of the distances between an object and the two foci
 	 * @return the objects found in the elliptical region
 	 * @throws IllegalArgumentException if the distance is shorter than the distance between the foci
@@ -677,6 +677,14 @@ public class QuadTree<T> implements Serializable {
 				final Collection<T> values) {
 			assert Math.pow( maxDistance , 2 ) >= Math.pow( (x1 - x2), 2 ) + Math.pow( (y1 - y2) , 2 );
 			if (this.hasChilds) {
+				// note: this could probably be improved. The idea here
+				// is NOT to dive in quadrants which we know do not contain points
+				// in the ellipse. 
+				// This is done, but we will also dive in some quadrants not intersecting
+				// the ellipse, which is just a loss of time (the sum of the minimum distances
+				// to an area is always lower than the munimum of the sum of the distances,
+				// and the difference can be substantial. Just not sure how efficiently
+				// one can estimate the minimum of the sum of the distances).
 				if (this.northwest.bounds.calcDistance(x1, y1) + this.northwest.bounds.calcDistance(x2, y2) <= maxDistance) {
 					this.northwest.getElliptical(x1, y1, x2, y2, maxDistance, values);
 				}
