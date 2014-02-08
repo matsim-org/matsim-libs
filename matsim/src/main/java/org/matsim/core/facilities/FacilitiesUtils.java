@@ -41,7 +41,7 @@ public class FacilitiesUtils {
 	}
 	
 	public static ActivityFacilities createActivityFacilities(String name) {
-		return createActivityFacilities(name) ;
+		return new ActivityFacilitiesImpl( name ) ;
 	}
 
 	/**
