@@ -44,6 +44,9 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 
 	@Override
 	public void checkConsistency(Config config) {
+		if ( config.vspExperimental().getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.IGNORE ) ) {
+			log.info( "NOT running vsp config consistency check because vsp defaults checking level is set to IGNORE"); 
+		}
 		log.info("running checkConsistency ...");
 		VspExperimentalConfigGroup vspConfig = config.vspExperimental() ; // convenience variable
 		

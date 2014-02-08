@@ -65,10 +65,6 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 	private String modesForSubTourModeChoice = "car, pt";
 	private String chainBasedModes = "car";
 
-	public static final String IGNORE = "ignore" ;
-	public static final String WARN = "warn" ;
-	public static final String ABORT = "abort" ;
-
 	// ---
 
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
@@ -110,6 +106,9 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 
 	// ---
 	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
+	public static final String IGNORE = "ignore" ;
+	public static final String WARN = "warn" ;
+	public static final String ABORT = "abort" ;
 	private String vspDefaultsCheckingLevel = IGNORE ;
 	@StringGetter(VSP_DEFAULTS_CHECKING_LEVEL)
 	public String getVspDefaultsCheckingLevel() {
