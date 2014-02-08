@@ -69,13 +69,13 @@ public class RemoveNonGautengCommercial {
 		String shapefile = args[2];
 		String outputFilename = args[3];
 		String outputAttributes = args[4];
-		RemoveNonGautengCommercial.Run(inputFilename, inputAttributes, shapefile, outputFilename, outputAttributes);
+		RemoveNonGautengCommercial.run(inputFilename, inputAttributes, shapefile, outputFilename, outputAttributes);
 		
 		Header.printFooter();
 	}
 	
 	
-	public static void Run(String inputFilename, String inputAttributes, String shapefile, String outputFilename, String outputAttributes){
+	public static void run(String inputFilename, String inputAttributes, String shapefile, String outputFilename, String outputAttributes){
 		LOG.info("Checking person from " + inputFilename);
 		LOG.info("  :--> do they have any activities in " + shapefile + "?");
 		

@@ -88,7 +88,45 @@ public class AssignTollAttributes {
 		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(outputAttributes);
 	}
 
-	
+	/**
+	 * These comments serve to justify the choice of probabilities for the 
+	 * different vehicle classes. We use the eNaTIS live vehicle population of
+	 * 30 November 2013. Figure have been rounded. <br><br>
+	 * 
+	 * There are a total of 2.2 mio LDVs, panel vans etc, and 350,000 trucks
+	 * registered nationally. Of the LDVs, we argue that 40% are actually 
+	 * private vehicles, so we only need to account for 1.32 mio LDVs. This 
+	 * constitutes the <i>total</i> commercial vehicle population, nationally. 
+	 * So, when we generate a national commercial vehicle population, we 
+	 * assume a total population of 1.67 mio vehicles.
+	 * 
+	 * Of these, we know that only 40% have one or more activities in Gauteng. 
+	 * As a result, the total Gauteng population of commercial vehicles contains 
+	 * 528,000 LDVs and 140,000 trucks.<br><br>
+	 * 
+	 * The total commercial vehicle population in Gauteng is therefore
+	 * 668,000 vehicles.
+	 * 
+	 * In Gauteng we've observed that 70% of all commercial vehicles are local 
+	 * (intra-Gauteng), equating to approximately 468,000, while non-local
+	 * (inter-provincial) vehicles are the remaining 200,000. Assuming a 60:40 
+	 * split between type B and type C vehicles the leaves us with the following
+	 * table (values in thousands). 
+	 * 					A2		B		C
+	 * 				   528     84      56
+	 * 				 .----------------------
+	 *     Local: 468| 428     40       0
+	 * Non-local: 200| 100     44      56
+	 * 
+	 * Or the associated percentages (adding up per row):
+	 * 					A2		B		C
+	 * 				   528     84      56
+	 * 				 .----------------------
+	 *     Local: 468| 0.91   0.09    0.00
+	 * Non-local: 200| 0.50   0.22    0.28
+	 * 
+	 * @param p
+	 */
 	private static void addVehicleType(Person p) {
 		Id id = p.getId();
 		int subpopulation = getSubpopulationInt(p);
@@ -116,8 +154,8 @@ public class AssignTollAttributes {
 			}
 			
 			if(intraGauteng){
-				/* Assign an arbitrary split for A:B:C of 50:50:0. */ 
-				if(random <= 0.5){
+				/* Assign a split for A:B:C of 91:9:00. */ 
+				if(random <= 0.91){
 					tollClass = "A2";
 				} else if(random <= 1.0){
 					tollClass = "B";
@@ -125,10 +163,10 @@ public class AssignTollAttributes {
 					tollClass = "C";
 				}
 			} else{
-				/* Assign an arbitrary split for A:B:C of 5:45:50. */
-				if(random <= 0.05){
+				/* Assign an arbitrary split for A:B:C of 50:22:28. */
+				if(random <= 0.5){
 					tollClass = "A2";
-				} else if(random <= 0.50){
+				} else if(random <= 0.72){
 					tollClass = "B";
 				} else {
 					tollClass = "C";

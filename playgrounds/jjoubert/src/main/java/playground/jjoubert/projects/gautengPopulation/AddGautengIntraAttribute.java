@@ -70,6 +70,26 @@ public class AddGautengIntraAttribute {
 		String shapefile = args[2];
 		String newAttributesFile = args[3];
 		
+		run(populationFile, attributesFile, shapefile, newAttributesFile);
+		
+		Header.printFooter();
+	}
+
+	/**
+	 * Method to check if an activity chain (Plan) contain at least a minimum
+	 * threshold of activities within Gauteng. If so, a boolean attribute is
+	 * added to the person. Currently the threshold is set to 60% of activities
+	 * within Gauteng. This is based on the work by
+	 * <a href="http://www.sciencedirect.com/science/article/pii/S0966692309001781">Joubert 
+	 * & Axhausen (2011)</a>
+	 *  
+	 * @param populationFile
+	 * @param attributesFile
+	 * @param shapefile
+	 * @param newAttributesFile
+	 */
+	public static void run(String populationFile, String attributesFile,
+			String shapefile, String newAttributesFile) {
 		/* Read population and population attributes. */
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(sc).parse(populationFile);
@@ -131,8 +151,5 @@ public class AddGautengIntraAttribute {
 		
 		/* Report. */
 		LOG.info( String.format("Number of intra-Gauteng commercial vehicles: %.0f (%.2f%%)", numberOfIntra, (numberOfIntra/(double)sc.getPopulation().getPersons().size())*100) );
-		
-		Header.printFooter();
 	}
-
 }

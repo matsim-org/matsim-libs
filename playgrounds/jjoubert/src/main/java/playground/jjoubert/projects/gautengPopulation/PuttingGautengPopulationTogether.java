@@ -20,7 +20,9 @@
 package playground.jjoubert.projects.gautengPopulation;
 
 import java.io.File;
+import java.io.IOException;
 
+import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -67,12 +69,19 @@ public class PuttingGautengPopulationTogether {
 		String outputFolder = args[0];
 		
 		/* Remove all the non-Gauteng commercial vehicles. */
-		RemoveNonGautengCommercial.Run(
+		RemoveNonGautengCommercial.run(
 				outputFolder + "com.xml.gz",
 				outputFolder + "comAttr.xml.gz",
 				"/Users/jwjoubert/Documents/workspace/shapefiles/Gauteng/zones/Gauteng_SA-Albers.shp",
 				outputFolder + "comGauteng.xml.gz",
 				outputFolder + "comAttrGauteng.xml.gz");
+		
+		/* Add the intra-Gauteng attribute. */
+		AddGautengIntraAttribute.run(
+				outputFolder + "comGauteng.xml.gz",
+				outputFolder + "comAttrGauteng.xml.gz",
+				"/Users/jwjoubert/Documents/workspace/shapefiles/Gauteng/zones/Gauteng_SA-Albers.shp",
+				outputFolder + "comAttrGautengIntra.xml.gz");
 
 		/* Convert all the old Sanral population components. */
 		convertOldSanralSubpopulations(outputFolder);
@@ -101,6 +110,16 @@ public class PuttingGautengPopulationTogether {
 		new File(outputFolder + "tmp3.xml.gz").delete();
 		new File(outputFolder + "tmp3Attr.xml.gz").delete();
 		new File(outputFolder + "tmp4Attr.xml.gz").delete();
+		
+		new File(outputFolder + "comAttrGauteng.xml.gz");
+		File f = new File(outputFolder + "comAttrGautengIntra.xml.gz");
+		try {
+			FileUtils.copyFile(f, new File(outputFolder + "comAttrGauteng.xml.gz"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot copy " + f.getAbsolutePath());
+		}
+		f.delete();
 	}
 
 	/**
@@ -110,7 +129,7 @@ public class PuttingGautengPopulationTogether {
 		JoinSubpopulations.Run( 
 				/* Car and commercial vehicles... */
 				outputFolder + "car.xml.gz", outputFolder + "carAttr.xml.gz", 
-				outputFolder + "comGauteng.xml.gz", outputFolder + "comAttrGauteng.xml.gz", 
+				outputFolder + "comGauteng.xml.gz", outputFolder + "comAttrGautengIntra.xml.gz", 
 				outputFolder + "tmp1.xml.gz", outputFolder + "tmp1Attr.xml.gz");
 		JoinSubpopulations.Run(
 				/* ... add bus... */
