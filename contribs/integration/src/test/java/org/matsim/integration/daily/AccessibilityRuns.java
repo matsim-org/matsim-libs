@@ -9,6 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -128,7 +129,7 @@ public class AccessibilityRuns {
 			PtMatrix ptMatrix = null  ;
 			GridBasedAccessibilityControlerListenerV3 listener = 
 					new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, scenario.getNetwork( ));
-			listener.setComputingAccessibilityForFreeSpeedCar(true);
+			listener.setComputingAccessibilityForMode( Modes4Accessibility.freeSpeed, true );
 			listener.generateGridsAndMeasuringPointsByNetwork(scenario.getNetwork(), 1000. );
 			listener.setWeights( homes ) ;
 

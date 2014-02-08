@@ -23,6 +23,8 @@
 package org.matsim.contrib.accessibility.usecases;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -33,6 +35,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
@@ -110,13 +113,11 @@ public class AccessibilityIntegrationTest {
 
 		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, sc.getNetwork());
 		// activating transport modes of interest
-		// possible modes are: free speed and congested car,
-		// 					   bicycle, walk and pt
-		gacl.setComputingAccessibilityForFreeSpeedCar(true);
-		gacl.setComputingAccessibilityForCongestedCar(true);
-		gacl.setComputingAccessibilityForBike(true);
-		gacl.setComputingAccessibilityForWalk(true);
-//		gacl.usePtGrid();
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			gacl.setComputingAccessibilityForMode(mode, true);
+		}
+		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
+		// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished
 		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
@@ -179,13 +180,11 @@ public class AccessibilityIntegrationTest {
 
 		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, sc.getNetwork());
 		// activating transport modes of interest
-		// possible modes are: free speed and congested car,
-		// 					   bicycle, walk and pt
-		gacl.setComputingAccessibilityForFreeSpeedCar(true);
-		gacl.setComputingAccessibilityForCongestedCar(true);
-		gacl.setComputingAccessibilityForBike(true);
-		gacl.setComputingAccessibilityForWalk(true);
-//		gacl.usePtGrid();
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			gacl.setComputingAccessibilityForMode(mode, true);
+		}
+		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
+		// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished
 		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
@@ -255,13 +254,11 @@ public class AccessibilityIntegrationTest {
 
 		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, sc.getNetwork());
 		// activating transport modes of interest
-		// possible modes are: free speed and congested car,
-		// 					   bicycle, walk and pt
-		gacl.setComputingAccessibilityForFreeSpeedCar(true);
-		gacl.setComputingAccessibilityForCongestedCar(true);
-		gacl.setComputingAccessibilityForBike(true);
-		gacl.setComputingAccessibilityForWalk(true);
-//		gacl.usePtGrid();
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			gacl.setComputingAccessibilityForMode(mode, true);
+		}
+		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
+		// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished
 		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
@@ -290,7 +287,7 @@ public class AccessibilityIntegrationTest {
 	 */
 	public class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 		
-		private boolean usingFreeSpeedGrid, usingCarGrid, usingBikeGrid, usingWalkGrid, usingPtGrid;
+		private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>();
 		
 		/**
 		 * constructor
@@ -306,11 +303,11 @@ public class AccessibilityIntegrationTest {
 		 * @param usingPtGrid
 		 */
 		public EvaluateTestResults(boolean usingFreeSpeedGrid, boolean usingCarGrid, boolean usingBikeGrid, boolean usingWalkGrid, boolean usingPtGrid){
-			this.usingFreeSpeedGrid = usingFreeSpeedGrid;
-			this.usingCarGrid = usingCarGrid;
-			this.usingBikeGrid = usingBikeGrid;
-			this.usingWalkGrid = usingWalkGrid;
-			this.usingPtGrid = usingPtGrid;
+			this.isComputingMode.put( Modes4Accessibility.freeSpeed, usingFreeSpeedGrid ) ;
+			this.isComputingMode.put( Modes4Accessibility.car, usingCarGrid ) ;
+			this.isComputingMode.put( Modes4Accessibility.bike, usingBikeGrid ) ;
+			this.isComputingMode.put( Modes4Accessibility.walk, usingWalkGrid ) ;
+			this.isComputingMode.put( Modes4Accessibility.pt, usingPtGrid ) ;
 		}
 		
 		/**
@@ -319,34 +316,18 @@ public class AccessibilityIntegrationTest {
 		 * - SpatialGrids for transport modes with "useXXXGrid=true"must not be null
 		 * 
 		 */
-		public void getAndProcessSpatialGrids(SpatialGrid freeSpeedGrid, SpatialGrid carGrid, SpatialGrid bikeGrid, SpatialGrid walkGrid, SpatialGrid ptGrid){
+		@Override
+		public void getAndProcessSpatialGrids( Map<Modes4Accessibility,SpatialGrid> spatialGrids ){
 			
 			log.info("Evaluating resuts ...");
 			
-			if(this.usingFreeSpeedGrid)
-				Assert.assertTrue( freeSpeedGrid != null);
-			else
-				Assert.assertTrue( freeSpeedGrid == null);
-			
-			if(this.usingCarGrid)
-				Assert.assertTrue( carGrid != null);
-			else
-				Assert.assertTrue( carGrid == null);
-			
-			if(this.usingBikeGrid)
-				Assert.assertTrue( bikeGrid != null);
-			else
-				Assert.assertTrue( bikeGrid == null);
-			
-			if(this.usingWalkGrid)
-				Assert.assertTrue( walkGrid != null);
-			else
-				Assert.assertTrue( walkGrid == null);
-			
-			if(this.usingPtGrid)
-				Assert.assertTrue( ptGrid != null);
-			else
-				Assert.assertTrue( ptGrid == null);
+			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+				if ( this.isComputingMode.get(mode)) {
+					Assert.assertNotNull( spatialGrids.get(mode) ) ;
+				} else {
+					Assert.assertNull( spatialGrids.get(mode) ) ;
+				}
+			}
 			
 			log.info("... done!");
 		}

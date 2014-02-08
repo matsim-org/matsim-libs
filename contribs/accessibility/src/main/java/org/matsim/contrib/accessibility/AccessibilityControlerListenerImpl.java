@@ -66,47 +66,38 @@ import org.matsim.utils.LeastCostPathTree;
  *
  */
 public abstract class AccessibilityControlerListenerImpl {
-	
+
 	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
-	
+
 	public static enum Modes4Accessibility { freeSpeed, car, bike, walk, pt } ;
 
-	
+
 	public static final String FREESEED_FILENAME= "freeSpeedAccessibility_cellsize_";
 	public static final String CAR_FILENAME 		= "carAccessibility_cellsize_";
 	public static final String BIKE_FILENAME 	= "bikeAccessibility_cellsize_";
 	public static final String WALK_FILENAME 	= "walkAccessibility_cellsize_";
 	public static final String PT_FILENAME 		= "ptAccessibility_cellsize_";
-	
+
 	int ZONE_BASED 	= 0;
 	int PARCEL_BASED = 1;
-	
+
 	// measuring points (origins) for accessibility calculation
 	ActivityFacilitiesImpl measuringPoints;
 	// containing parcel coordinates for accessibility feedback
 	ActivityFacilitiesImpl parcels; 
 	// destinations, opportunities like jobs etc ...
 	AggregateObject2NearestNode[] aggregatedOpportunities;
-	
+
 	// storing the accessibility results
-	SpatialGrid freeSpeedGrid 	= null;
-	SpatialGrid carGrid		= null;
-	SpatialGrid bikeGrid		= null;
-	SpatialGrid walkGrid		= null;
-	SpatialGrid ptGrid			= null;
-	
-	boolean useFreeSpeedGrid 	= false;
-	boolean useCarGrid 			= false;
-	boolean useBikeGrid			= false;
-	boolean useWalkGrid			= false;
-	boolean usePtGrid				= false;
-	
-	// storing pt matrix
+	Map<Modes4Accessibility,SpatialGrid> spatialGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
+
+	Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
+
 	PtMatrix ptMatrix;
-	
+
 	ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
 	ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = null;
-	
+
 	// accessibility parameter
 
 	// yy I find it quite awkward to generate all these lines of computational code just to copy variables from one place to the other. I assume that
@@ -130,7 +121,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 	private double betaPtTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
 	private double betaPtTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
-	
+
 	private double constCar;
 	private double constBike;
 	private double constWalk;
@@ -140,19 +131,25 @@ public abstract class AccessibilityControlerListenerImpl {
 	private double bikeSpeedMeterPerHour = -1;
 	private double walkSpeedMeterPerHour = -1;
 	Benchmark benchmark;
-	
+
 	RoadPricingScheme scheme;
-	
+
+	AccessibilityControlerListenerImpl() {
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			this.isComputingMode.put( mode, false ) ;
+		}
+	}
+
 	/**
 	 * setting parameter for accessibility calculation
 	 * @param config TODO
 	 */
 	final void initAccessibilityParameters(Config config){
-		
+
 		AccessibilityConfigGroup moduleAPCM = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config);
-		
+
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
-		
+
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {
 			log.error( "marginal utility of distance for car different from zero but not used in accessibility computations");
 		}
@@ -165,7 +162,7 @@ public abstract class AccessibilityControlerListenerImpl {
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceCostRate() != 0. ) {
 			log.error( "monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
-		
+
 		useRawSum			= moduleAPCM.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
@@ -175,28 +172,28 @@ public abstract class AccessibilityControlerListenerImpl {
 		betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar();
 		betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
-		
+
 		betaBikeTT		= planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaBikeTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther();
 		betaBikeTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
-		
+
 		betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
 		betaWalkTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
-		
+
 		betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt();
-//		betaPtTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
-		
+		//		betaPtTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
+
 		constCar		= config.planCalcScore().getConstantCar();
 		constBike		= config.planCalcScore().getConstantBike();
 		constWalk		= config.planCalcScore().getConstantWalk();
 		constPt			= config.planCalcScore().getConstantPt();
-		
+
 		depatureTime 	= moduleAPCM.getTimeOfDay(); // by default = 8.*3600;	
 		// printParameterSettings(); // use only for debugging since otherwise it clutters the logfile (settings are printed as part of config dump)
 	}
-	
+
 	/**
 	 * displays settings
 	 */
@@ -218,7 +215,7 @@ public abstract class AccessibilityControlerListenerImpl {
 		log.info("Beta Walk Travel Distance: " + betaWalkTD );
 		log.info("Beta Walk Travel Monetary Cost: " + betaWalkTMC );
 	}
-	
+
 	/**
 	 * This aggregates the disjutilities Vjk to get from node j to all k that are attached to j.
 	 * Finally the sum(Vjk) is assigned to node j, which is done in this method.
@@ -233,39 +230,39 @@ public abstract class AccessibilityControlerListenerImpl {
 	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
 	final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilities opportunities, Network network){
-	
+
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
 		ProgressBar bar = new ProgressBar( opportunities.getFacilities().size() );
-	
+
 		Iterator<? extends ActivityFacility> oppIterator = opportunities.getFacilities().values().iterator();
-		
+
 		while(oppIterator.hasNext()){
-			
+
 			bar.update();
-			
+
 			ActivityFacility opprotunity = oppIterator.next();
 			Node nearestNode = ((NetworkImpl)network).getNearestNode( opprotunity.getCoord() );
-			
+
 			// get Euclidian distance to nearest node
 			double distance_meter 	= NetworkUtil.getEuclidianDistance(opprotunity.getCoord(), nearestNode.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
-			
+
 			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
 			double VjkWalkPowerTravelTime=0.; // this.betaWalkTTPower * (walkTravelTime_h * walkTravelTime_h);
 			double VjkWalkLnTravelTime	= 0.; // this.betaWalkLnTT * Math.log(walkTravelTime_h);
-			
+
 			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
 			double VjkWalkPowerDistnace	= 0.; //this.betaWalkTDPower * (distance_meter * distance_meter);
 			double VjkWalkLnDistance 	= 0.; //this.betaWalkLnTD * Math.log(distance_meter);
-			
+
 			double VjkWalkMoney			= this.betaWalkTMC * 0.; 			// no monetary costs for walking
 			double VjkWalkPowerMoney	= 0.; //this.betaWalkTDPower * 0.; 	// no monetary costs for walking
 			double VjkWalkLnMoney		= 0.; //this.betaWalkLnTMC *0.; 	// no monetary costs for walking
-			
+
 			double Vjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkPowerTravelTime + VjkWalkLnTravelTime +
-					   														   VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
-					   														   VjkWalkMoney      + VjkWalkPowerMoney      + VjkWalkLnMoney) );
+					VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
+					VjkWalkMoney      + VjkWalkPowerMoney      + VjkWalkLnMoney) );
 			// add Vjk to sum
 			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
 				AggregateObject2NearestNode jco = opportunityClusterMap.get( nearestNode.getId() );
@@ -275,11 +272,11 @@ public abstract class AccessibilityControlerListenerImpl {
 				opportunityClusterMap.put(
 						nearestNode.getId(),
 						new AggregateObject2NearestNode(opprotunity.getId(), 
-														null,
-														null,
-														nearestNode.getCoord(), 
-														nearestNode, 
-														Vjk));
+								null,
+								null,
+								nearestNode.getCoord(), 
+								nearestNode, 
+								Vjk));
 		}
 		// convert map to array
 		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ opportunityClusterMap.size() ];
@@ -287,22 +284,28 @@ public abstract class AccessibilityControlerListenerImpl {
 
 		for(int i = 0; jobClusterIterator.hasNext(); i++)
 			jobClusterArray[i] = jobClusterIterator.next();
-		
+
 		log.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + jobClusterArray.length + " nodes.");
-		
+
 		return jobClusterArray;
 	}
-	
-	final void accessibilityComputation(TravelTime ttc,
-											LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
-											LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
-											LeastCostPathTree lcptTravelDistance, 
-											NetworkImpl network,
-											ActivityFacilitiesImpl mp,
-											int mode) {
 
-		SumOfExpUtils gcs = new SumOfExpUtils();
-		
+	final void accessibilityComputation(TravelTime ttc,
+			LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
+			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
+			LeastCostPathTree lcptTravelDistance, 
+			NetworkImpl network,
+			ActivityFacilitiesImpl mp,
+			int runMode) {
+
+		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
+		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (unfounded);
+		// not using a simple double array for type safety in long argument lists. kai, feb'14
+		for ( int ii=0 ; ii<gcs.length ; ii++ ) {
+			gcs[ii] = new SumOfExpUtils() ;
+		}
+
+
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
 		Map<Id,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<Id, ArrayList<ActivityFacility>>();
 		// ========================================================================
@@ -310,10 +313,10 @@ public abstract class AccessibilityControlerListenerImpl {
 
 			// determine nearest network node (from- or toNode) based on the link 
 			Node fromNode = NetworkUtil.getNearestNode(aFac.getCoord(), network.getNearestLinkExactly(aFac.getCoord()));
-			
+
 			// this is used as a key for hash map lookups
 			Id nodeId = fromNode.getId();
-			
+
 			// create new entry if key does not exist!
 			if(!aggregatedOrigins.containsKey(nodeId)) {
 				aggregatedOrigins.put(nodeId, new ArrayList<ActivityFacility>());
@@ -322,42 +325,44 @@ public abstract class AccessibilityControlerListenerImpl {
 			aggregatedOrigins.get(nodeId).add(aFac);
 		}
 		// ========================================================================
-		
+
 		log.info("");
 		log.info("Number of measurement points (origins): " + mp.getFacilities().values().size());
 		log.info("Number of aggregated measurement points (origins): " + aggregatedOrigins.size());
 		log.info("Now going through all origins:");
-		
+
 		ProgressBar bar = new ProgressBar( aggregatedOrigins.size() );
 		// ========================================================================
 		// go through all nodes (key's) that have a measuring point (origin) assigned
 		for ( Id nodeId : aggregatedOrigins.keySet() ) {
-			
+
 			bar.update();
-			
+
 			Node fromNode = network.getNodes().get( nodeId );
-			
+
 			// run dijkstra on network
 			// this is done once for all origins in the "origins" list, see below
-			if(this.useFreeSpeedGrid)
+			if(this.isComputingMode.get(Modes4Accessibility.freeSpeed) ) {
 				lcptExtFreeSpeedCarTravelTime.calculateExtended(network, fromNode, depatureTime);
-			if(this.useCarGrid)
-				lcptExtCongestedCarTravelTime.calculateExtended(network, fromNode, depatureTime);		
+			}
+			if(this.isComputingMode.get(Modes4Accessibility.car) ) {
+				lcptExtCongestedCarTravelTime.calculateExtended(network, fromNode, depatureTime);
+			}
 			lcptTravelDistance.calculate(network, fromNode, depatureTime);
-			
+
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
 				assert( origin.getCoord() != null );
 
 				// captures the distance (as walk time) between a cell centroid and the road network
 				Link nearestLink = network.getNearestLinkExactly(origin.getCoord());
-				
+
 				// captures the distance (as walk time) between a zone centroid and its nearest node
 				Distances distance = NetworkUtil.getDistance2Node(nearestLink, origin.getCoord(), fromNode);
-				
+
 				double distanceMeasuringPoint2Road_meter 	= distance.getDistancePoint2Road(); // distance measuring point 2 road (link or node)
 				double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	// distance intersection 2 node (only for orthogonal distance), this is zero if projection is on a node 
-				
+
 				// traveling on foot from measuring point to the network (link or node)
 				double walkTravelTimeMeasuringPoint2Road_h 	= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
 
@@ -370,15 +375,17 @@ public abstract class AccessibilityControlerListenerImpl {
 				double road2NodeBikeTime_h					= distanceRoad2Node_meter / this.bikeSpeedMeterPerHour;
 				double road2NodeWalkTime_h					= distanceRoad2Node_meter / this.walkSpeedMeterPerHour;
 				double road2NodeToll_money 					= getToll(nearestLink); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
-				
+
 				// this contains the current toll based on the toll scheme
 				double toll_money 							= 0.;
 				if(this.scheme != null && RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType()))
 					toll_money = road2NodeToll_money;
 				else if(this.scheme != null && RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()))
 					toll_money = road2NodeToll_money * distanceRoad2Node_meter;
-				
-				gcs.reset();
+
+				for ( int ii = 0 ; ii<gcs.length ; ii++ ) {
+					gcs[ii].reset();
+				}
 
 				// --------------------------------------------------------------------------------------------------------------
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate/add their exp(U) contributions:
@@ -396,67 +403,47 @@ public abstract class AccessibilityControlerListenerImpl {
 
 				// aggregated value
 				Map< Modes4Accessibility, Double> accessibilities  = new HashMap< Modes4Accessibility, Double >() ;
-				
-				if(!useRawSum){ 	// get log sum
-					if(this.useFreeSpeedGrid)
-						accessibilities.put( Modes4Accessibility.freeSpeed, inverseOfLogitScaleParameter * Math.log( gcs.getFreeSpeedSum() ) ) ;
-					if(this.useCarGrid)
-						accessibilities.put( Modes4Accessibility.car, inverseOfLogitScaleParameter * Math.log( gcs.getCarSum() ) ) ;
-					if(this.useBikeGrid)
-						accessibilities.put( Modes4Accessibility.bike, inverseOfLogitScaleParameter * Math.log( gcs.getBikeSum() ) ) ;
-					if(this.useWalkGrid)
-						accessibilities.put( Modes4Accessibility.walk, inverseOfLogitScaleParameter * Math.log( gcs.getWalkSum() ) ) ;
-					if(this.usePtGrid)
-						accessibilities.put( Modes4Accessibility.pt,  inverseOfLogitScaleParameter * Math.log( gcs.getPtSum() ) ) ;
-				}
-				else{ 				// get raw sum
-					// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
-					// a * ln(b) = ln( b^a ).  kai, jan'14
-					if(this.useFreeSpeedGrid)
-						accessibilities.put( Modes4Accessibility.freeSpeed, inverseOfLogitScaleParameter * gcs.getFreeSpeedSum() ) ;
-					if(this.useCarGrid)
-						accessibilities.put( Modes4Accessibility.car, inverseOfLogitScaleParameter * gcs.getCarSum() ) ;
-					if(this.useBikeGrid)
-						accessibilities.put( Modes4Accessibility.bike, inverseOfLogitScaleParameter * gcs.getBikeSum() ) ;
-					if(this.useWalkGrid)
-						accessibilities.put( Modes4Accessibility.walk, inverseOfLogitScaleParameter * gcs.getWalkSum() ) ;
-					if(this.usePtGrid)
-						accessibilities.put( Modes4Accessibility.pt, inverseOfLogitScaleParameter * gcs.getPtSum() ) ;
+
+				for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+					if ( this.isComputingMode.get(mode) ) {
+						if(!useRawSum){ 	// get log sum
+							accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) ) ;
+						} else {
+							accessibilities.put( mode, inverseOfLogitScaleParameter * gcs[mode.ordinal()].getSum() ) ;
+							// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
+							// a * ln(b) = ln( b^a ).  kai, jan'14
+						}
+					}
 				}
 
-				if(mode == PARCEL_BASED){ // only for cell-based accessibility computation
-					// assign log sums to current starZone object and spatial grid
-					if(this.freeSpeedGrid != null)
-						freeSpeedGrid.setValue(accessibilities.get( Modes4Accessibility.freeSpeed ), origin.getCoord().getX(), origin.getCoord().getY());
-					if(this.carGrid != null)
-						carGrid.setValue( accessibilities.get( Modes4Accessibility.car ) ,origin.getCoord().getX(), origin.getCoord().getY());
-					if(this.bikeGrid != null)
-						bikeGrid.setValue( accessibilities.get( Modes4Accessibility.bike ) , origin.getCoord().getX(), origin.getCoord().getY());
-					if(this.walkGrid != null)
-						walkGrid.setValue( accessibilities.get( Modes4Accessibility.walk ) , origin.getCoord().getX(), origin.getCoord().getY());
-					if(this.ptGrid != null)
-						ptGrid.setValue( accessibilities.get( Modes4Accessibility.pt ), origin.getCoord().getX(), origin.getCoord().getY());
+				if(runMode == PARCEL_BASED){ // only for cell-based accessibility computation
+					// assign log sums to current starZone[[???]] object and spatial grid
+					for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+						if ( this.isComputingMode.get(mode) ) {
+							this.spatialGrids.get(mode).setValue( accessibilities.get(mode), origin.getCoord().getX(), origin.getCoord().getY() ) ; 
+						}
+					}
 				}
-				
+
 				// writing measured accessibilities for current measuring point 
 				// (aFac) in csv format to disc
 				writeCSVData(origin, fromNode, accessibilities ) ;
 				// yyyyyy kai: commenting this out since it does not work for nmbm do now know why. feb'13
-				
+
 				if(this.zoneDataExchangeListenerList != null){
 					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
 						this.zoneDataExchangeListenerList.get(i).getZoneAccessibilities(origin, accessibilities );
 				}
-				
+
 			}
 
 		}
 		// ========================================================================
-		
+
 	}
 
 	private void computeAndAddExpUtilContributions(LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
-			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime, LeastCostPathTree lcptTravelDistance, SumOfExpUtils gcs,
+			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime, LeastCostPathTree lcptTravelDistance, SumOfExpUtils[] gcs,
 			Node fromNode, double distanceMeasuringPoint2Road_meter, double distanceRoad2Node_meter,
 			double walkTravelTimeMeasuringPoint2Road_h, double road2NodeFreeSpeedTime_h, double road2NodeCongestedCarTime_h,
 			double road2NodeBikeTime_h, double road2NodeWalkTime_h, double toll_money,
@@ -467,22 +454,25 @@ public abstract class AccessibilityControlerListenerImpl {
 
 		// disutilities on the road network
 		double congestedCarDisutility = Double.NaN;
-		if(this.useCarGrid)
+		if(this.isComputingMode.get(Modes4Accessibility.car)) {
 			congestedCarDisutility = - lcptExtCongestedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility congested car on road network (including toll)
+		}
 		double freeSpeedCarDisutility = Double.NaN;
-		if(this.useFreeSpeedGrid)
+		if(this.isComputingMode.get(Modes4Accessibility.freeSpeed ) ){
 			freeSpeedCarDisutility = - lcptExtFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility free speed car on road network (including toll)
+		}
 		double travelDistance_meter = Double.NaN;
-		if(this.useBikeGrid || this.useWalkGrid)
+		if( this.isComputingMode.get(Modes4Accessibility.bike) || this.isComputingMode.get( Modes4Accessibility.walk ) ) {
 			travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost(); 				// travel link distances on road network for bicycle and walk
+		}
 
 		// disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distanceMeasuringPoint2Road_meter * betaWalkTD);
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		double sumExpVjkWalk = aggregatedFacility.getSumVjk();
-		
+
 		// travel times and distances for pseudo pt
-		if(this.usePtGrid){
+		if(this.isComputingMode.get(Modes4Accessibility.pt) ){
 			if ( ptMatrix==null ) {
 				throw new RuntimeException( "pt accessibility does only work when a PtMatrix is provided.  Provide such a matrix, or switch off "
 						+ "the pt accessibility computation, or extend the Java code so that it works for this situation.") ;
@@ -499,41 +489,41 @@ public abstract class AccessibilityControlerListenerImpl {
 			double ptDisutility = constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD);					
 			double expVijPt = Math.exp(this.logitScaleParameter * ptDisutility);
 			double expVhkPt = expVijPt * sumExpVjkWalk;
-			gcs.addExpUtilsPt( expVhkPt );
+			gcs[Modes4Accessibility.pt.ordinal()].addExpUtils( expVhkPt );
 		}
-		
+
 		// total disutility congested car
-		if(this.useCarGrid){
+		if(this.isComputingMode.get(Modes4Accessibility.car)){
 			double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
 			double expVijCongestedCar = Math.exp(this.logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) );
 			double expVhkCongestedCar = expVhiWalk * expVijCongestedCar * sumExpVjkWalk;
-			gcs.addExpUtilsCar( expVhkCongestedCar );
+			gcs[Modes4Accessibility.car.ordinal()].addExpUtils( expVhkCongestedCar );
 		}
-		
+
 		// total disutility free speed car
-		if(this.useFreeSpeedGrid){
+		if(this.isComputingMode.get(Modes4Accessibility.freeSpeed)){
 			double freeSpeedCarDisutilityRoad2Node = (road2NodeFreeSpeedTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
 			double expVijFreeSpeedCar = Math.exp(this.logitScaleParameter * (constCar + freeSpeedCarDisutilityRoad2Node + freeSpeedCarDisutility) );
 			double expVhkFreeSpeedCar = expVhiWalk * expVijFreeSpeedCar * sumExpVjkWalk;
-			gcs.addExpUtilsFreeSpeed( expVhkFreeSpeedCar );
+			gcs[Modes4Accessibility.freeSpeed.ordinal()].addExpUtils( expVhkFreeSpeedCar );
 		}
-		
+
 		// total disutility bicycle
-		if(this.useBikeGrid){
+		if(this.isComputingMode.get(Modes4Accessibility.bike)){
 			double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaBikeTT) + (distanceRoad2Node_meter * betaBikeTD); // toll or money ???
 			double bikeDisutility = ((travelDistance_meter/this.bikeSpeedMeterPerHour) * betaBikeTT) + (travelDistance_meter * betaBikeTD);// toll or money ???
 			double expVijBike = Math.exp(this.logitScaleParameter * (constBike + bikeDisutility + bikeDisutilityRoad2Node));
 			double expVhkBike = expVhiWalk * expVijBike * sumExpVjkWalk;
-			gcs.addExpUtilsBike( expVhkBike );
+			gcs[Modes4Accessibility.bike.ordinal()].addExpUtils( expVhkBike );
 		}
-		
+
 		// total disutility walk
-		if(this.useWalkGrid){
+		if(this.isComputingMode.get(Modes4Accessibility.walk)){
 			double walkDisutilityRoad2Node = (road2NodeWalkTime_h * betaWalkTT) + (distanceRoad2Node_meter * betaWalkTD);  // toll or money ???
 			double walkDisutility = ( (travelDistance_meter / this.walkSpeedMeterPerHour) * betaWalkTT) + ( travelDistance_meter * betaWalkTD);// toll or money ???
 			double expVijWalk = Math.exp(this.logitScaleParameter * (constWalk + walkDisutility + walkDisutilityRoad2Node));
 			double expVhkWalk = expVhiWalk * expVijWalk * sumExpVjkWalk;
-			gcs.addExpUtilsWalk( expVhkWalk );
+			gcs[Modes4Accessibility.walk.ordinal()].addExpUtils( expVhkWalk );
 		}
 	}
 
@@ -549,66 +539,11 @@ public abstract class AccessibilityControlerListenerImpl {
 		return 0.;
 	}
 	
-	/**
-	 * activates the SpatialGrid for free speed car 
-	 * <p/>
-	 * Comments:<ul>
-	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
-	 * </ul>
-	 * @param val TODO
-	 */
-	public void setComputingAccessibilityForFreeSpeedCar(boolean val){
-		this.useFreeSpeedGrid = val;
+	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
+		this.isComputingMode.put( mode, val ) ;
 	}
-	
-	/**
-	 * activates the SpatialGrid for congested car 
-	 * <p/>
-	 * Comments:<ul>
-	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
-	 * </ul>
-	 * @param val TODO
-	 */
-	public void setComputingAccessibilityForCongestedCar(boolean val){
-		this.useCarGrid = val;
-	}
-	
-	/**
-	 * activates the SpatialGrid for bicycle
-	 * <p/>
-	 * Comments:<ul>
-	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
-	 * </ul>
-	 * @param val TODO
-	 */
-	public void setComputingAccessibilityForBike(boolean val){
-		this.useBikeGrid = val;
-	}
-	
-	/**
-	 * activates the SpatialGrid for traveling on foot
-	 * <p/>
-	 * Comments:<ul>
-	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
-	 * </ul>
-	 * @param val TODO
-	 */
-	public void setComputingAccessibilityForWalk(boolean val){
-		this.useWalkGrid = val;
-	}
-	
-	/**
-	 * activates the SpatialGrid for public transport (improved pseudo pt)
-	 * <p/>
-	 * Comments:<ul>
-	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
-	 * </ul>
-	 * @param val TODO
-	 */
-	public void setComputingAccessibilityForPt(boolean val){
-		this.usePtGrid = val;
-	}
-	
+
+
 	/**
 	 * This adds listeners to write out accessibility results for parcels in UrbanSim format
 	 * @param l
@@ -616,12 +551,12 @@ public abstract class AccessibilityControlerListenerImpl {
 	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l){
 		if(this.spatialGridDataExchangeListenerList == null)
 			this.spatialGridDataExchangeListenerList = new ArrayList<SpatialGridDataExchangeInterface>();
-		
+
 		log.info("Adding new SpatialGridDataExchange listener...");
 		this.spatialGridDataExchangeListenerList.add(l);
 		log.info("... done!");
 	}
-	
+
 	/**
 	 * This adds listeners to write out accessibility results for parcels in UrbanSim format
 	 * @param l
@@ -629,7 +564,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l){
 		if(this.zoneDataExchangeListenerList == null)
 			this.zoneDataExchangeListenerList = new ArrayList<ZoneDataExchangeInterface>();
-		
+
 		log.info("Adding new SpatialGridDataExchange listener...");
 		this.zoneDataExchangeListenerList.add(l);
 		log.info("... done!");
@@ -646,69 +581,31 @@ public abstract class AccessibilityControlerListenerImpl {
 	 * @param walkAccessibility
 	 */
 	abstract void writeCSVData( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities ) ;
-	
+
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes
 	// ////////////////////////////////////////////////////////////////////
-	
-	
+
+
 	/**
 	 * stores travel disutilities for different modes
 	 */
-	 static class SumOfExpUtils {
-		
-		private double sumFREESPEED = 0.;
-		private double sumCAR  	= 0.;
-		private double sumBIKE 	= 0.;
-		private double sumWALK 	= 0.;
-		private double sumPt   	= 0.;
-		
-		 void reset() {
-			this.sumFREESPEED 	= 0.;
-			this.sumCAR		  	= 0.;
-			this.sumBIKE	  	= 0.;
-			this.sumWALK	  	= 0.;
-			this.sumPt		  	= 0.;
+	static class SumOfExpUtils {
+		// could just use Map<Modes4Accessibility,Double>, but since it is fairly far inside the loop, I leave it with primitive
+		// variables on the (unfounded) intuition that this helps with computational speed.  kai, 
+
+		private double sum  	= 0.;
+
+		void reset() {
+			this.sum		  	= 0.;
 		}
-		
-		 void addExpUtilsFreeSpeed(double cost){
-			this.sumFREESPEED += cost;
+
+		void addExpUtils(double val){
+			this.sum += val;
 		}
-		
-		 void addExpUtilsCar(double cost){
-			this.sumCAR += cost;
-		}
-		
-		 void addExpUtilsBike(double cost){
-			this.sumBIKE += cost;
-		}
-		
-		 void addExpUtilsWalk(double cost){
-			this.sumWALK += cost;
-		}
-		
-		 void addExpUtilsPt(double cost){
-			this.sumPt += cost;
-		}
-		
-		 double getFreeSpeedSum(){
-			return this.sumFREESPEED;
-		}
-		
-		 double getCarSum(){
-			return this.sumCAR;
-		}
-		
-		 double getBikeSum(){
-			return this.sumBIKE;
-		}
-		
-		 double getWalkSum(){
-			return this.sumWALK;
-		}
-		
-		 double getPtSum(){
-			return this.sumPt;
+
+		double getSum(){
+			return this.sum;
 		}
 	}
 

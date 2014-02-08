@@ -100,7 +100,15 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		log.info("Entering notifyShutdown ..." );
 		
 		// make sure that that at least one tranport mode is selected
-		if( !(this.useFreeSpeedGrid || this.useCarGrid || this.useBikeGrid || this.useWalkGrid || this.usePtGrid) ){
+		boolean problem = true ;
+		for ( Boolean bool : this.isComputingMode.values() ) {
+			if ( bool == true ) {
+				problem = false ;
+				break ;
+			}
+		}
+		
+		if( problem ) {
 			log.error("No transport mode for accessibility calculation is activated! For this reason no accessibilities can be calculated!");
 			log.info("Please activate at least one transport mode by using the corresponding method when initializing the accessibility listener to fix this problem:");
 			log.info("- useFreeSpeedGrid()");

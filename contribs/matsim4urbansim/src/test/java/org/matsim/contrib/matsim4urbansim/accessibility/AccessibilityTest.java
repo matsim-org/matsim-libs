@@ -121,10 +121,10 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 			//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
 			GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, net);
-			listener.setComputingAccessibilityForFreeSpeedCar(true);
-			listener.setComputingAccessibilityForCongestedCar(true);
-			listener.setComputingAccessibilityForBike(true);
-			listener.setComputingAccessibilityForWalk(true);
+			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+				listener.setComputingAccessibilityForMode(mode, true);
+			}
+			listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
 			listener.generateGridsAndMeasuringPointsByCustomBoundary(minX, minY, maxX, maxY, resolution);
 
 			//add grid data exchange listener to get accessibilities
@@ -207,12 +207,12 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		//initialize new zone based accessibility controler listener and grids for the modes we want to analyze here
 		ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, opportunities,
 				ptMatrix, path, scenario);
-		listener.setComputingAccessibilityForFreeSpeedCar(true);
-		listener.setComputingAccessibilityForCongestedCar(true);
-		listener.setComputingAccessibilityForBike(true);
-		listener.setComputingAccessibilityForWalk(true);
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			listener.setComputingAccessibilityForMode(mode, true);
+		}
+		listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
+		// don't know why this is not activated as a test. kai, feb'14
 		
-		//
 		listener.addZoneDataExchangeListener(this);
 		
 		//add grid based accessibility controler listener to the controler and run the simulation
@@ -236,23 +236,30 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	}
 
 	@Override
-	public void getAndProcessSpatialGrids(SpatialGrid freeSpeedGrid,
-			SpatialGrid carGrid, SpatialGrid bikeGrid, SpatialGrid walkGrid,
-			SpatialGrid ptGrid) {
+	public void getAndProcessSpatialGrids( Map<Modes4Accessibility,SpatialGrid> spatialGrids ) {
 		
 		if(accessibilities==null)
 			//initialize accessibilities-array with place for 9 measuring points and 4 modes
 			accessibilities = new double[9][4];
 		
-		//get accessibilities from the grids
-		if(freeSpeedGrid != null)
-			getAccessibilities(freeSpeedGrid,0);
-		if(carGrid != null)
-			getAccessibilities(carGrid,1);
-		if(bikeGrid != null)
-			getAccessibilities(bikeGrid,2);
-		if(walkGrid != null)
-			getAccessibilities(walkGrid,3);
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			if ( mode != Modes4Accessibility.pt ) {
+				final SpatialGrid spatialGrid = spatialGrids.get(mode);
+				if ( spatialGrid != null ) {
+					getAccessibilities( spatialGrid, mode.ordinal() ) ;
+				}
+			}
+		}
+		
+//		//get accessibilities from the grids
+//		if(freeSpeedGrid != null)
+//			getAccessibilities(freeSpeedGrid,0);
+//		if(carGrid != null)
+//			getAccessibilities(carGrid,1);
+//		if(bikeGrid != null)
+//			getAccessibilities(bikeGrid,2);
+//		if(walkGrid != null)
+//			getAccessibilities(walkGrid,3);
 		
 	}
 

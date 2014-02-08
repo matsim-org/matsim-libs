@@ -257,7 +257,7 @@ implements ShutdownListener, StartupListener {
 		if(this.spatialGridDataExchangeListenerList != null){
 			log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
 			for(int i = 0; i < this.spatialGridDataExchangeListenerList.size(); i++)
-				this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids(freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid);
+				this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids( spatialGrids );
 		}
 
 	}
@@ -292,49 +292,25 @@ implements ShutdownListener, StartupListener {
 		final String FILE_TYPE_TXT = ".txt";
 
 		log.info("Writing plotting data for R analyis into " + matsimOutputDirectory + " ...");
-		if(freeSpeedGrid != null) {
-			GridUtils.writeSpatialGridTable(freeSpeedGrid, matsimOutputDirectory
-					+ "/" + FREESEED_FILENAME + freeSpeedGrid.getResolution()
-					+ FILE_TYPE_TXT);
-			AnalysisCellBasedAccessibilityCSVWriterV2 writer = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory,"freeSpeed") ;
-			for(double y = freeSpeedGrid.getYmin(); y <= freeSpeedGrid.getYmax() ; y += freeSpeedGrid.getResolution()) {
-				for(double x = freeSpeedGrid.getXmin(); x <= freeSpeedGrid.getXmax(); x += freeSpeedGrid.getResolution()) {
-					final double value = freeSpeedGrid.getValue(x, y);
-					if ( !Double.isNaN(value ) ) { 
-						writer.writeRecord( new CoordImpl(x,y), value) ;
+		
+		for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
+			if ( this.isComputingMode.get(mode) ) {
+				final SpatialGrid spatialGrid = this.spatialGrids.get(mode);
+				GridUtils.writeSpatialGridTable( spatialGrid, matsimOutputDirectory
+						+ "/" + FREESEED_FILENAME + spatialGrid.getResolution()
+						+ FILE_TYPE_TXT);
+				AnalysisCellBasedAccessibilityCSVWriterV2 writer = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory,"freeSpeed") ;
+				for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
+					for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
+						final double value = spatialGrid.getValue(x, y);
+						if ( !Double.isNaN(value ) ) { 
+							writer.writeRecord( new CoordImpl(x,y), value) ;
+						}
 					}
+					writer.writeNewLine() ;
 				}
-				writer.writeNewLine() ;
+				writer.close() ;
 			}
-			writer.close() ;
-		}
-		if(carGrid != null) {
-			GridUtils.writeSpatialGridTable(carGrid, matsimOutputDirectory
-					+ "/" + CAR_FILENAME + carGrid.getResolution()
-					+ FILE_TYPE_TXT);
-			AnalysisCellBasedAccessibilityCSVWriterV2 writer = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory,"car") ;
-			for(double y = carGrid.getYmin(); y <= carGrid.getYmax() ; y += carGrid.getResolution()) {
-				for(double x = carGrid.getXmin(); x <= carGrid.getXmax(); x += carGrid.getResolution()) {
-					writer.writeRecord( new CoordImpl(x,y), carGrid.getValue(x, y)) ;
-				}
-				writer.writeNewLine() ;
-			}
-			writer.close() ;
-		}
-		if(bikeGrid != null) {
-			GridUtils.writeSpatialGridTable(bikeGrid, matsimOutputDirectory
-					+ "/" + BIKE_FILENAME + bikeGrid.getResolution()
-					+ FILE_TYPE_TXT);
-		}
-		if(walkGrid != null) {
-			GridUtils.writeSpatialGridTable(walkGrid, matsimOutputDirectory
-					+ "/" + WALK_FILENAME + walkGrid.getResolution()
-					+ FILE_TYPE_TXT);
-		}
-		if(ptGrid != null) {
-			GridUtils.writeSpatialGridTable(ptGrid, matsimOutputDirectory
-					+ "/" + PT_FILENAME + ptGrid.getResolution()
-					+ FILE_TYPE_TXT);
 		}
 		log.info("Writing plotting data for R done!");
 	}
@@ -360,18 +336,12 @@ implements ShutdownListener, StartupListener {
 			throw new RuntimeException("ShapeFile for accessibility computation not found: " + shapeFile);
 
 		Geometry boundary = GridUtils.getBoundary(shapeFile);
-
 		measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize);
-		if(useFreeSpeedGrid)
-			freeSpeedGrid = GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
-		if(useCarGrid)
-			carGrid	= GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
-		if(useBikeGrid)
-			bikeGrid = GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
-		if(useWalkGrid)
-			walkGrid = GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
-		if(usePtGrid)
-			ptGrid = GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			if ( this.isComputingMode.get(mode) ) {
+				this.spatialGrids.put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
+			}
+		}
 	}
 
 	/**
@@ -423,16 +393,11 @@ implements ShutdownListener, StartupListener {
 	private void generateGridsAndMeasuringPoints(double minX, double minY,
 			double maxX, double maxY, double cellSize) {
 		measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize);
-		if(useFreeSpeedGrid)
-			freeSpeedGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
-		if(useCarGrid)
-			carGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
-		if(useBikeGrid)
-			bikeGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
-		if(useWalkGrid)
-			walkGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
-		if(usePtGrid)
-			ptGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			if ( this.isComputingMode.get(mode) ) {
+				this.spatialGrids.put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize) ) ;
+			}
+		}
 	}
 
 	public void setWeights(ActivityFacilities weights ) {

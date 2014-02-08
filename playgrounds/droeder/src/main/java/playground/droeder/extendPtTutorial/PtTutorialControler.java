@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -74,8 +75,8 @@ class PtTutorialControler {
 						null, // ptMatrix,
 						controler.getConfig(), 
 						net);
-		accessibilityListener.setComputingAccessibilityForFreeSpeedCar(true);
-		accessibilityListener.setComputingAccessibilityForCongestedCar(true);
+		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true) ;
+		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		accessibilityListener.generateGridsAndMeasuringPointsByNetwork(net, 251);
 		controler.addControlerListener(accessibilityListener);
 		

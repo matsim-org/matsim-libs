@@ -25,9 +25,11 @@ package org.matsim.contrib.matsim4urbansim.utils.io.writer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.config.Config;
@@ -83,25 +85,18 @@ public class UrbanSimParcelCSVWriter {
 	 * @param carAccessibility
 	 * @param walkAccessibility
 	 */
-	public static void write(Id parcelID,
-							 double freeSpeedAccessibility,
-							 double carAccessibility, 
-							 double bikeAccessibility,
-							 double walkAccessibility,
-							 double ptAccessibility){
-		
+	public static void write(Id parcelID, Map<Modes4Accessibility,Double> accessibilities ) {
 		try{
 			assert(UrbanSimParcelCSVWriter.parcelWriter != null);
-			parcelWriter.write( parcelID + "," + 
-								freeSpeedAccessibility + "," +
-								carAccessibility + "," +
-								bikeAccessibility + "," +
-								walkAccessibility + "," +
-								ptAccessibility);
+			parcelWriter.write( parcelID.toString() ) ;
+			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+				parcelWriter.write( "," + accessibilities.get( mode ) ) ;
+			}
 			parcelWriter.newLine();
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			throw new RuntimeException("could not write") ;
 		}
 	}
 	

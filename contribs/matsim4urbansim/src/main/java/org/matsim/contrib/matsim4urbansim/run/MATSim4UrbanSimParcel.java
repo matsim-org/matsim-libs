@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
@@ -380,11 +381,9 @@ public class MATSim4UrbanSimParcel{
 																											 ptMatrix,
 																											 module.getMATSim4OpusTemp(),
 																											 this.scenario);
-			zbacl.setComputingAccessibilityForFreeSpeedCar(true);
-			zbacl.setComputingAccessibilityForCongestedCar(true);
-			zbacl.setComputingAccessibilityForBike(true);
-			zbacl.setComputingAccessibilityForWalk(true);
-			zbacl.setComputingAccessibilityForPt(true);
+			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+				zbacl.setComputingAccessibilityForMode(mode, true);
+			}
 			controler.addControlerListener( zbacl );
 			
 			log.error("yyyy I think that ZoneBasedAccessibilityControlerListener and GridBasedAccessibilityControlerListener are writing " +
@@ -398,12 +397,9 @@ public class MATSim4UrbanSimParcel{
 																											 ptMatrix,
 																											 scenario.getConfig(), 
 																											 scenario.getNetwork() );
-			// activating needed SpatialGrids
-			gbacl.setComputingAccessibilityForFreeSpeedCar(true);
-			gbacl.setComputingAccessibilityForCongestedCar(true);
-			gbacl.setComputingAccessibilityForBike(true);
-			gbacl.setComputingAccessibilityForWalk(true);
-			gbacl.setComputingAccessibilityForPt(true);
+			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+				gbacl.setComputingAccessibilityForMode(mode, true);
+			}
 			
 			if(computeGridBasedAccessibilitiesUsingShapeFile)
 				gbacl.generateGridsAndMeasuringPointsByShapeFile(shapeFile, cellSizeInMeter);
