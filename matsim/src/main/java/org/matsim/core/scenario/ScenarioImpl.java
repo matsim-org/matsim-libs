@@ -53,6 +53,7 @@ import org.matsim.vehicles.Vehicles;
  * @author mrieser
  */
 public class ScenarioImpl implements Scenario {
+	// setting this to final lead to 97 compile errors (many of them IMO multiple error messages of the same problem). kai, feb'14
 
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
 
@@ -78,6 +79,7 @@ public class ScenarioImpl implements Scenario {
 	private Knowledges knowledges;
 
 	protected ScenarioImpl(Config config) {
+		// setting to "default" results in 6 compile errors.  kai, feb'14
 		this.config = config;
 		initContainers();
 	}

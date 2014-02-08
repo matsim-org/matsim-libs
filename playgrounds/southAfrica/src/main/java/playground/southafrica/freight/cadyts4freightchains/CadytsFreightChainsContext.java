@@ -40,7 +40,7 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.utils.misc.PopulationUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 

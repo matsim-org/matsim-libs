@@ -21,7 +21,7 @@ package playground.mrieser.routedistance;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 

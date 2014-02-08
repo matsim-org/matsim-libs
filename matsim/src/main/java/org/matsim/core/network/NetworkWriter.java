@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.NetworkUtils;
 
 public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	

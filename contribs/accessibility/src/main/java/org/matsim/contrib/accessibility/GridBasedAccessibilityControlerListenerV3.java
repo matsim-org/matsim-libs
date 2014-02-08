@@ -142,7 +142,9 @@ implements ShutdownListener{
 													 PtMatrix ptMatrix,
 													 Config config, 
 													 Network network){
-		
+		// I thought about chaning the type of opportunities to Map<Id,Facility> or even Collection<Facility>, but in the end
+		// one can also use FacilitiesUtils.createActivitiesFacilities(), put everything in there, and give that to this constructor. kai, feb'14
+
 		log.info("Initializing  ...");
 
 		this.ptMatrix = ptMatrix;	// this could be zero if no input files for pseudo pt are given ...

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.core.population.routes.RouteUtils;
 
 /**Describes a connection as a simple sequence of trips without considering departure schedule*/
 public class StaticConnection {

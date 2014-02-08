@@ -4,15 +4,15 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -70,7 +70,21 @@ public class SomeTest {
 		Controler controler = new Controler(scenario) ;
 		controler.setOverwriteFiles(true);
 		
-		ActivityFacilities opportunities = scenario.getActivityFacilities() ;
+		// l, s, t, e, w, minor, h
+
+		ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
+		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
+			for ( ActivityOption option : fac.getActivityOptions().values() ) {
+				if ( option.getType().equals("w") ) {
+					opportunities.addActivityFacility(fac);
+				}
+			}
+		}
+		
+		Double aa = 1. ;
+		Double bb = 2. ;
+		Double cc = aa + bb / aa ;
+		
 		PtMatrix ptMatrix = null  ;
 		GridBasedAccessibilityControlerListenerV3 listener = 
 				new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, scenario.getNetwork( ));

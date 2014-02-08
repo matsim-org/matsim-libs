@@ -29,7 +29,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.misc.FacilitiesUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**

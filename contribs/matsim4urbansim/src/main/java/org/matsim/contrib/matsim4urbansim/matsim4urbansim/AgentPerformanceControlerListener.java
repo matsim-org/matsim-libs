@@ -22,7 +22,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.core.population.routes.RouteUtils;
 
 /**
  * implements agent-based performance feedback for UrbanSim population (time spent traveling, money spent traveling, etc.)

@@ -30,10 +30,10 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, PersonAlgorithm {

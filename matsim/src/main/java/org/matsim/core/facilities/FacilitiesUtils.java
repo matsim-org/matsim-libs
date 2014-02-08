@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.utils.misc;
+package org.matsim.core.facilities;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -33,6 +33,16 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
  * @author cdobler
  */
 public class FacilitiesUtils {
+	
+	private FacilitiesUtils() {} // container for static methods; do not instantiate
+	
+	public static ActivityFacilities createActivityFacilities() {
+		return createActivityFacilities(null) ;
+	}
+	
+	public static ActivityFacilities createActivityFacilities(String name) {
+		return createActivityFacilities(name) ;
+	}
 
 	/**
 	 * @param network

@@ -24,7 +24,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 
 
-public abstract class Time {
+public class Time {
+	private Time() {} // namespace only, do not instantiate
 
 	/** 
 	 * Never change this to NaN, as a compare of any valid time

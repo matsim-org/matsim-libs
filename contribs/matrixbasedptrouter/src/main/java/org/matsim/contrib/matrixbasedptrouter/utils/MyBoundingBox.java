@@ -2,7 +2,7 @@ package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.network.NetworkUtils;
 
 public class MyBoundingBox {
 	

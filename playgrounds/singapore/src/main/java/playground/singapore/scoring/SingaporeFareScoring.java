@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
-import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class SingaporeFareScoring implements LegScoring {

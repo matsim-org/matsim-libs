@@ -23,7 +23,7 @@ package org.matsim.withinday.utils;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.utils.misc.PopulationUtils.UnmodifiablePlan;
+import org.matsim.core.population.PopulationUtils.UnmodifiablePlan;
 
 /**
  * Only the PlanElements are changed - further Steps

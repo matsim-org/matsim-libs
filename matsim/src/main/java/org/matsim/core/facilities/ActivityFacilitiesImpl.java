@@ -59,11 +59,13 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // use creational method in FacilitiesUtils instead.  kai, feb'14
 	public ActivityFacilitiesImpl(final String name) {
 		this.name = name;
 		this.factory = new ActivityFacilitiesFactoryImpl();
 	}
 
+	@Deprecated // use creational method in FacilitiesUtils instead.  kai, feb'14
 	public ActivityFacilitiesImpl() {
 		this(null);
 	}

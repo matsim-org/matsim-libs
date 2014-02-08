@@ -15,8 +15,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 

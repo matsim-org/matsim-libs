@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.AbstractNetworkRouteTest;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;

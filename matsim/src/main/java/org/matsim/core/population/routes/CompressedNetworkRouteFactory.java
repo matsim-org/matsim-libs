@@ -43,6 +43,9 @@ public class CompressedNetworkRouteFactory implements RouteFactory {
 
 	@Override
 	public Route createRoute(final Id startLinkId, final Id endLinkId) {
+		if ( network==null ) {
+			throw new RuntimeException( "need to set Network in Population in order to be able to create compressed routes") ;
+		}
 		if (this.subsequentLinks == null) {
 			this.subsequentLinks = new SubsequentLinksAnalyzer(this.network).getSubsequentLinks();
 		}

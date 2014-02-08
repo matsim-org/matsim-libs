@@ -24,7 +24,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.utils.misc.PopulationUtils;
+import org.matsim.core.population.PopulationUtils;
 
 public class MyAgent implements MobsimDriverAgent {
 

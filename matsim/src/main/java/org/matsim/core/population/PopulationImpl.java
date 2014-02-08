@@ -26,9 +26,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -37,7 +39,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 /**
  * Root class of the population description (previously also called "plans file")
  */
-public class PopulationImpl implements Population {
+public final class PopulationImpl implements Population {
+	// more than 500 compile errors if one makes this non-public. kai, feb'14
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -61,8 +64,17 @@ public class PopulationImpl implements Population {
 
 	// constructors:
 	
+	@Deprecated // use PopulationUtils.createPopulation(...) instead.  kai, feb'14
 	public PopulationImpl(ScenarioImpl sc) {
 		this.pb = new PopulationFactoryImpl( sc ) ;
+	}
+
+	PopulationImpl(Config config) {
+		this.pb = new PopulationFactoryImpl( config ) ;
+	}
+
+	PopulationImpl(Config config, Network network) {
+		this.pb = new PopulationFactoryImpl( config, network ) ;
 	}
 
 	//////////////////////////////////////////////////////////////////////

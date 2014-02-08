@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.utils.misc.PopulationUtils;
+import org.matsim.core.population.PopulationUtils;
 
 
 /**

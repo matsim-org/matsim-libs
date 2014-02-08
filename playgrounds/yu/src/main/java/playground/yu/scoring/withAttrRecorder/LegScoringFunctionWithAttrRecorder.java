@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.utils.misc.RouteUtils;
 
 public class LegScoringFunctionWithAttrRecorder extends CharyparNagelLegScoring {
 	private final static Logger log = Logger

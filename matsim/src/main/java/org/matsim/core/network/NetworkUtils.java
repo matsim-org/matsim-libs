@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.utils.misc;
+package org.matsim.core.network;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +43,10 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class NetworkUtils {
 
+	public static Network createNetwork() {
+		return new NetworkImpl() ;
+	}
+	
 	/**
 	 * @param nodes
 	 * @return The bounding box of all the given nodes as <code>double[] = {minX, minY, maxX, maxY}</code>

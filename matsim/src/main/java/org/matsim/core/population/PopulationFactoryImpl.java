@@ -22,19 +22,19 @@ package org.matsim.core.population;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
-import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * @author dgrether, mrieser
@@ -42,25 +42,32 @@ import org.matsim.core.scenario.ScenarioImpl;
 public class PopulationFactoryImpl implements PopulationFactory {
 
 	private final ModeRouteFactory routeFactory;
-	private ScenarioImpl scenario;
 
-	public PopulationFactoryImpl(final Scenario scenario) {
+	PopulationFactoryImpl(final Config config, final Network network ) {
 		this.routeFactory = new ModeRouteFactory();
 
-		String networkRouteType = scenario.getConfig().plans().getNetworkRouteType();
+		String networkRouteType = config.plans().getNetworkRouteType();
 		RouteFactory factory = null;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
 			factory = new LinkNetworkRouteFactory();
 		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType)) {
-			factory = new CompressedNetworkRouteFactory(scenario.getNetwork());
+			factory = new CompressedNetworkRouteFactory( network );
 		} else {
 			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
 		}
-		for (String transportMode : scenario.getConfig().plansCalcRoute().getNetworkModes()) {
+		for (String transportMode : config.plansCalcRoute().getNetworkModes()) {
 			this.routeFactory.setRouteFactory(transportMode, factory);
 		}
 
-		this.scenario = (ScenarioImpl) scenario ;
+	}
+
+	@Deprecated // please get the factory from population.getFactory(). kai, feb'14
+	public PopulationFactoryImpl(Scenario scenario) {
+		this( scenario.getConfig(), scenario.getNetwork() ) ;
+	}
+
+	PopulationFactoryImpl(Config config) {
+		this( config, null ) ; // the idea is that this allows everything except setting compressed routes. kai, feb'14
 	}
 
 	@Override
@@ -80,18 +87,19 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		return act;
 	}
 
-	public Activity createActivityFromFacilityIdAndSetCoordAndLinkId(final String actType, final Id facilityId) {
-		ActivityImpl act = new ActivityImpl(actType);
-		act.setFacilityId(facilityId);
-
-		final ActivityFacility activityFacility = this.scenario.getActivityFacilities().getFacilities().get( facilityId);
-		act.setCoord( activityFacility.getCoord() ) ;
-		act.setLinkId( activityFacility.getLinkId() ) ;
-		// yyyyyy I am pretty sure that this is something we had decided to avoid: containers should not depend on each other.
-		// kai, dec'13
-		
-		return act;
-	}
+//	private Activity createActivityFromFacilityIdAndSetCoordAndLinkId(final String actType, final Id facilityId) {
+//		ActivityImpl act = new ActivityImpl(actType);
+//		act.setFacilityId(facilityId);
+//
+//		final ActivityFacility activityFacility = this.scenario.getActivityFacilities().getFacilities().get( facilityId);
+//		act.setCoord( activityFacility.getCoord() ) ;
+//		act.setLinkId( activityFacility.getLinkId() ) ;
+//		// yyyyyy I am pretty sure that this is something we had decided to avoid: containers should not depend on each other.
+//		// kai, dec'13
+//		
+//		return act;
+//	}
+	// does not seem to be used. kai, feb'14
 
 	@Override
 	public Activity createActivityFromLinkId(final String actType, final Id linkId) {

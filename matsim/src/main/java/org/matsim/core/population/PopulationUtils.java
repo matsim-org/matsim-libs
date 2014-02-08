@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.utils.misc;
+package org.matsim.core.population;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -36,21 +36,32 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author nagel
  */
-public class PopulationUtils {
+public final class PopulationUtils {
 	/**
 	 * Is a namespace, so don't instantiate:
 	 */
 	private PopulationUtils() {}
 	
+	public static Population createPopulation( Config config ) {
+		return new PopulationImpl( config ) ; 
+	}
+	public static Population createPopulation( Config config, Network network ) {
+		// yy here, the "network" lookup could be pushed into the create method: createRoute(...,network) ;
+		return new PopulationImpl( config, network ) ;
+	}
+
 	/**The idea of this method is to mirror the concept of Collections.unmodifiableXxx( xxx ) .
 	 * At this point, the protection does not go to the end, i.e. PlanElements themselves can
 	 * still be modified.  kai, nov'10

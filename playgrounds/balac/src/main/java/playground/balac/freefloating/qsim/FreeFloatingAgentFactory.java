@@ -6,7 +6,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.utils.misc.PopulationUtils;
+import org.matsim.core.population.PopulationUtils;
 
 public class FreeFloatingAgentFactory implements AgentFactory{
 	private final Netsim simulation;
