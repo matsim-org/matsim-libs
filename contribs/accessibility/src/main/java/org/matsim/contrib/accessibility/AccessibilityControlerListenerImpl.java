@@ -76,15 +76,15 @@ public abstract class AccessibilityControlerListenerImpl {
 	public static final String WALK_FILENAME 	= "walkAccessibility_cellsize_";
 	public static final String PT_FILENAME 		= "ptAccessibility_cellsize_";
 	
-	static int ZONE_BASED 	= 0;
-	static int PARCEL_BASED = 1;
+	int ZONE_BASED 	= 0;
+	int PARCEL_BASED = 1;
 	
 	// measuring points (origins) for accessibility calculation
 	ActivityFacilitiesImpl measuringPoints;
 	// containing parcel coordinates for accessibility feedback
 	ActivityFacilitiesImpl parcels; 
 	// destinations, opportunities like jobs etc ...
-	AggregateObject2NearestNode[] aggregatedFacilities;
+	AggregateObject2NearestNode[] aggregatedOpportunities;
 	
 	// storing the accessibility results
 	SpatialGrid freeSpeedGrid 	= null;
@@ -139,7 +139,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	private double walkSpeedMeterPerHour = -1;
 	Benchmark benchmark;
 	
-	RoadPricingSchemeImpl scheme;
+	RoadPricingScheme scheme;
 	
 	/**
 	 * setting parameter for accessibility calculation
@@ -291,16 +291,6 @@ public abstract class AccessibilityControlerListenerImpl {
 		return jobClusterArray;
 	}
 	
-	/**
-	 * @param ttc
-	 * @param lcptTravelDistance
-	 * @param network
-	 * @param lcptFreeSpeedCarTravelTime
-	 * @param lcptCongestedCarTravelTime
-	 * @param inverseOfLogitScaleParameter
-	 * @param accCsvWriter
-	 * @param measuringPointIterator
-	 */
 	final void accessibilityComputation(TravelTime ttc,
 											LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
 											LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
@@ -309,52 +299,41 @@ public abstract class AccessibilityControlerListenerImpl {
 											ActivityFacilitiesImpl mp,
 											int mode) {
 
-		GeneralizedCostSum gcs = new GeneralizedCostSum();
-		
-		Iterator<? extends ActivityFacility> mpIterator = mp.getFacilities().values().iterator();
+		SumOfExpUtils gcs = new SumOfExpUtils();
 		
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
-		Map<Id,ArrayList<ActivityFacility>> aggregatedMeasurementPointsV2 = new ConcurrentHashMap<Id, ArrayList<ActivityFacility>>();
+		Map<Id,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<Id, ArrayList<ActivityFacility>>();
+		// ========================================================================
+		for ( ActivityFacility aFac : mp.getFacilities().values() ) {
 
-		// go through all measuring points ...
-		while( mpIterator.hasNext() ){
-
-			ActivityFacility aFac = mpIterator.next();
-
-			// captures the distance (as walk time) between a cell centroid and the road network
-			Link nearestLink = network.getNearestLinkExactly(aFac.getCoord());
 			// determine nearest network node (from- or toNode) based on the link 
-			Node fromNode = NetworkUtil.getNearestNode(aFac.getCoord(), nearestLink);
+			Node fromNode = NetworkUtil.getNearestNode(aFac.getCoord(), network.getNearestLinkExactly(aFac.getCoord()));
 			
 			// this is used as a key for hash map lookups
-			Id id = fromNode.getId();
+			Id nodeId = fromNode.getId();
 			
 			// create new entry if key does not exist!
-			if(!aggregatedMeasurementPointsV2.containsKey(id))
-				aggregatedMeasurementPointsV2.put(id, new ArrayList<ActivityFacility>());
+			if(!aggregatedOrigins.containsKey(nodeId)) {
+				aggregatedOrigins.put(nodeId, new ArrayList<ActivityFacility>());
+			}
 			// assign measure point (origin) to it's nearest node
-			aggregatedMeasurementPointsV2.get(id).add(aFac);
+			aggregatedOrigins.get(nodeId).add(aFac);
 		}
+		// ========================================================================
 		
 		log.info("");
 		log.info("Number of measurement points (origins): " + mp.getFacilities().values().size());
-		log.info("Number of aggregated measurement points (origins): " + aggregatedMeasurementPointsV2.size());
+		log.info("Number of aggregated measurement points (origins): " + aggregatedOrigins.size());
 		log.info("Now going through all origins:");
 		
-		ProgressBar bar = new ProgressBar( aggregatedMeasurementPointsV2.size() );
-		
-		// contains all nodes that have a measuring point (origin) assigned
-		Iterator<Id> keyIterator = aggregatedMeasurementPointsV2.keySet().iterator();
-		// contains all network nodes
-		Map<Id, Node> networkNodesMap = network.getNodes();
-		
+		ProgressBar bar = new ProgressBar( aggregatedOrigins.size() );
+		// ========================================================================
 		// go through all nodes (key's) that have a measuring point (origin) assigned
-		while( keyIterator.hasNext() ){
+		for ( Id nodeId : aggregatedOrigins.keySet() ) {
 			
 			bar.update();
 			
-			Id nodeId = keyIterator.next();
-			Node fromNode = networkNodesMap.get( nodeId );
+			Node fromNode = network.getNodes().get( nodeId );
 			
 			// run dijkstra on network
 			// this is done once for all origins in the "origins" list, see below
@@ -365,18 +344,14 @@ public abstract class AccessibilityControlerListenerImpl {
 			lcptTravelDistance.calculate(network, fromNode, depatureTime);
 			
 			// get list with origins that are assigned to "fromNode"
-			ArrayList<ActivityFacility> origins = aggregatedMeasurementPointsV2.get( nodeId );
-			Iterator<ActivityFacility> originsIterator = origins.iterator();
-			
-			while( originsIterator.hasNext() ){
-				
-				ActivityFacility aFac = originsIterator.next();
-				assert( aFac.getCoord() != null );
+			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
+				assert( origin.getCoord() != null );
+
 				// captures the distance (as walk time) between a cell centroid and the road network
-				LinkImpl nearestLink = (LinkImpl)network.getNearestLinkExactly(aFac.getCoord());
+				Link nearestLink = network.getNearestLinkExactly(origin.getCoord());
 				
 				// captures the distance (as walk time) between a zone centroid and its nearest node
-				Distances distance = NetworkUtil.getDistance2Node(nearestLink, aFac.getCoord(), fromNode);
+				Distances distance = NetworkUtil.getDistance2Node(nearestLink, origin.getCoord(), fromNode);
 				
 				double distanceMeasuringPoint2Road_meter 	= distance.getDistancePoint2Road(); // distance measuring point 2 road (link or node)
 				double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	// distance intersection 2 node (only for orthogonal distance), this is zero if projection is on a node 
@@ -385,7 +360,7 @@ public abstract class AccessibilityControlerListenerImpl {
 				double walkTravelTimeMeasuringPoint2Road_h 	= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
 
 				// get free speed and congested car travel times on a certain link
-				double freeSpeedTravelTimeOnNearestLink_meterpersec = nearestLink.getFreespeedTravelTime(depatureTime);
+				double freeSpeedTravelTimeOnNearestLink_meterpersec = ((LinkImpl)nearestLink).getFreespeedTravelTime(depatureTime);
 				double carTravelTimeOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
 				// travel time in hours to get from link intersection (position on a link given by orthogonal projection from measuring point) to the corresponding node
 				double road2NodeFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTimeOnNearestLink_meterpersec * 3600);
@@ -403,85 +378,20 @@ public abstract class AccessibilityControlerListenerImpl {
 				
 				gcs.reset();
 
-				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
-				for ( int i = 0; i < this.aggregatedFacilities.length; i++ ) {
-					
-					// get stored network node (this is the nearest node next to an aggregated work place)
-					Node destinationNode = this.aggregatedFacilities[i].getNearestNode();
-					Id nodeID = destinationNode.getId();
+				// --------------------------------------------------------------------------------------------------------------
+				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate/add their exp(U) contributions:
+				for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
+					final AggregateObject2NearestNode aggregatedFacility = this.aggregatedOpportunities[i];
 
-					// disutilities on the road network
-					double congestedCarDisutility = Double.NaN;
-					if(this.useCarGrid)
-						congestedCarDisutility = - lcptExtCongestedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility congested car on road network (including toll)
-					double freeSpeedCarDisutility = Double.NaN;
-					if(this.useFreeSpeedGrid)
-						freeSpeedCarDisutility = - lcptExtFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility free speed car on road network (including toll)
-					double travelDistance_meter = Double.NaN;
-					if(this.useBikeGrid || this.useWalkGrid)
-						travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost(); 				// travel link distances on road network for bicycle and walk
-
-					// disutilities to get on or off the network
-					double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distanceMeasuringPoint2Road_meter * betaWalkTD);
-					double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
-					double sumExpVjkWalk = aggregatedFacilities[i].getSumVjk();
-					
-					// travel times and distances for pseudo pt
-					if(this.usePtGrid){
-						if ( ptMatrix==null ) {
-							throw new RuntimeException( "pt accessibility does only work when a PtMatrix is provided.  Provide such a matrix, or switch off "
-									+ "the pt accessibility computation, or extend the Java code so that it works for this situation.") ;
-						}
-						// travel time with pt:
-						double ptTravelTime_h	 = ptMatrix.getPtTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
-						// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
-						double ptTotalWalkTime_h =ptMatrix.getTotalWalkTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
-						// total travel distance including walking and pt distance from/to origin/destination location:
-						double ptTravelDistance_meter=ptMatrix.getTotalWalkTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
-						// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
-						double ptTotalWalkDistance_meter=ptMatrix.getPtTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
-
-						double ptDisutility = constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD);					
-						double expVijPt = Math.exp(this.logitScaleParameter * ptDisutility);
-						double expVhkPt = expVijPt * sumExpVjkWalk;
-						gcs.addPtCost( expVhkPt );
-					}
-					
-					// total disutility congested car
-					if(this.useCarGrid){
-						double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
-						double expVijCongestedCar = Math.exp(this.logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) );
-						double expVhkCongestedCar = expVhiWalk * expVijCongestedCar * sumExpVjkWalk;
-						gcs.addCongestedCarCost( expVhkCongestedCar );
-					}
-					
-					// total disutility free speed car
-					if(this.useFreeSpeedGrid){
-						double freeSpeedCarDisutilityRoad2Node = (road2NodeFreeSpeedTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
-						double expVijFreeSpeedCar = Math.exp(this.logitScaleParameter * (constCar + freeSpeedCarDisutilityRoad2Node + freeSpeedCarDisutility) );
-						double expVhkFreeSpeedCar = expVhiWalk * expVijFreeSpeedCar * sumExpVjkWalk;
-						gcs.addFreeSpeedCost( expVhkFreeSpeedCar );
-					}
-					
-					// total disutility bicycle
-					if(this.useBikeGrid){
-						double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaBikeTT) + (distanceRoad2Node_meter * betaBikeTD); // toll or money ???
-						double bikeDisutility = ((travelDistance_meter/this.bikeSpeedMeterPerHour) * betaBikeTT) + (travelDistance_meter * betaBikeTD);// toll or money ???
-						double expVijBike = Math.exp(this.logitScaleParameter * (constBike + bikeDisutility + bikeDisutilityRoad2Node));
-						double expVhkBike = expVhiWalk * expVijBike * sumExpVjkWalk;
-						gcs.addBikeCost( expVhkBike );
-					}
-					
-					// total disutility walk
-					if(this.useWalkGrid){
-						double walkDisutilityRoad2Node = (road2NodeWalkTime_h * betaWalkTT) + (distanceRoad2Node_meter * betaWalkTD);  // toll or money ???
-						double walkDisutility = ( (travelDistance_meter / this.walkSpeedMeterPerHour) * betaWalkTT) + ( travelDistance_meter * betaWalkTD);// toll or money ???
-						double expVijWalk = Math.exp(this.logitScaleParameter * (constWalk + walkDisutility + walkDisutilityRoad2Node));
-						double expVhkWalk = expVhiWalk * expVijWalk * sumExpVjkWalk;
-						gcs.addWalkCost( expVhkWalk );
-					}
+					computeAndAddExpUtilContributions(lcptExtFreeSpeedCarTravelTime, lcptExtCongestedCarTravelTime,
+							lcptTravelDistance, gcs, fromNode, distanceMeasuringPoint2Road_meter, distanceRoad2Node_meter,
+							walkTravelTimeMeasuringPoint2Road_h, road2NodeFreeSpeedTime_h, road2NodeCongestedCarTime_h,
+							road2NodeBikeTime_h, road2NodeWalkTime_h, toll_money, aggregatedFacility);
 				}
-				
+				// --------------------------------------------------------------------------------------------------------------
+				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
+				// points separately anyways?  Answer: The trees need to be computed only once.  (But one could save more.) kai, feb'14
+
 				// aggregated value
 				double freeSpeedAccessibility = Double.NaN; 
 				double carAccessibility = Double.NaN; 
@@ -518,37 +428,120 @@ public abstract class AccessibilityControlerListenerImpl {
 				if(mode == PARCEL_BASED){ // only for cell-based accessibility computation
 					// assign log sums to current starZone object and spatial grid
 					if(this.freeSpeedGrid != null)
-						freeSpeedGrid.setValue(freeSpeedAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
+						freeSpeedGrid.setValue(freeSpeedAccessibility, origin.getCoord().getX(), origin.getCoord().getY());
 					if(this.carGrid != null)
-						carGrid.setValue(carAccessibility ,aFac.getCoord().getX(), aFac.getCoord().getY());
+						carGrid.setValue(carAccessibility ,origin.getCoord().getX(), origin.getCoord().getY());
 					if(this.bikeGrid != null)
-						bikeGrid.setValue(bikeAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
+						bikeGrid.setValue(bikeAccessibility , origin.getCoord().getX(), origin.getCoord().getY());
 					if(this.walkGrid != null)
-						walkGrid.setValue(walkAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
+						walkGrid.setValue(walkAccessibility , origin.getCoord().getX(), origin.getCoord().getY());
 					if(this.ptGrid != null)
-						ptGrid.setValue(ptAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
+						ptGrid.setValue(ptAccessibility, origin.getCoord().getX(), origin.getCoord().getY());
 				}
 				
-//				// writing measured accessibilities for current measuring point 
-//				// (aFac) in csv format to disc
-//				writeCSVData(aFac, fromNode, 
-//							 freeSpeedAccessibility, 
-//							 carAccessibility, 
-//							 bikeAccessibility,
-//							 walkAccessibility, 
-//							 ptAccessibility);
-
+				// writing measured accessibilities for current measuring point 
+				// (aFac) in csv format to disc
+				writeCSVData(origin, fromNode, 
+							 freeSpeedAccessibility, 
+							 carAccessibility, 
+							 bikeAccessibility,
+							 walkAccessibility, 
+							 ptAccessibility);
 				// yyyyyy kai: commenting this out since it does not work for nmbm do now know why. feb'13
 				
 				if(this.zoneDataExchangeListenerList != null){
 					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
-						this.zoneDataExchangeListenerList.get(i).getZoneAccessibilities(aFac, freeSpeedAccessibility, carAccessibility,
+						this.zoneDataExchangeListenerList.get(i).getZoneAccessibilities(origin, freeSpeedAccessibility, carAccessibility,
 								bikeAccessibility, walkAccessibility, ptAccessibility);
 				}
 				
 			}
+
+		}
+		// ========================================================================
+		
+	}
+
+	private void computeAndAddExpUtilContributions(LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
+			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime, LeastCostPathTree lcptTravelDistance, SumOfExpUtils gcs,
+			Node fromNode, double distanceMeasuringPoint2Road_meter, double distanceRoad2Node_meter,
+			double walkTravelTimeMeasuringPoint2Road_h, double road2NodeFreeSpeedTime_h, double road2NodeCongestedCarTime_h,
+			double road2NodeBikeTime_h, double road2NodeWalkTime_h, double toll_money,
+			final AggregateObject2NearestNode aggregatedFacility) {
+		// get stored network node (this is the nearest node next to an aggregated work place)
+		Node destinationNode = aggregatedFacility.getNearestNode();
+		Id nodeID = destinationNode.getId();
+
+		// disutilities on the road network
+		double congestedCarDisutility = Double.NaN;
+		if(this.useCarGrid)
+			congestedCarDisutility = - lcptExtCongestedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility congested car on road network (including toll)
+		double freeSpeedCarDisutility = Double.NaN;
+		if(this.useFreeSpeedGrid)
+			freeSpeedCarDisutility = - lcptExtFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility free speed car on road network (including toll)
+		double travelDistance_meter = Double.NaN;
+		if(this.useBikeGrid || this.useWalkGrid)
+			travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost(); 				// travel link distances on road network for bicycle and walk
+
+		// disutilities to get on or off the network
+		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distanceMeasuringPoint2Road_meter * betaWalkTD);
+		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
+		double sumExpVjkWalk = aggregatedFacility.getSumVjk();
+		
+		// travel times and distances for pseudo pt
+		if(this.usePtGrid){
+			if ( ptMatrix==null ) {
+				throw new RuntimeException( "pt accessibility does only work when a PtMatrix is provided.  Provide such a matrix, or switch off "
+						+ "the pt accessibility computation, or extend the Java code so that it works for this situation.") ;
+			}
+			// travel time with pt:
+			double ptTravelTime_h	 = ptMatrix.getPtTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
+			// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
+			double ptTotalWalkTime_h =ptMatrix.getTotalWalkTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
+			// total travel distance including walking and pt distance from/to origin/destination location:
+			double ptTravelDistance_meter=ptMatrix.getTotalWalkTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
+			// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
+			double ptTotalWalkDistance_meter=ptMatrix.getPtTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
+
+			double ptDisutility = constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD);					
+			double expVijPt = Math.exp(this.logitScaleParameter * ptDisutility);
+			double expVhkPt = expVijPt * sumExpVjkWalk;
+			gcs.addExpUtilsPt( expVhkPt );
 		}
 		
+		// total disutility congested car
+		if(this.useCarGrid){
+			double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
+			double expVijCongestedCar = Math.exp(this.logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) );
+			double expVhkCongestedCar = expVhiWalk * expVijCongestedCar * sumExpVjkWalk;
+			gcs.addExpUtilsCar( expVhkCongestedCar );
+		}
+		
+		// total disutility free speed car
+		if(this.useFreeSpeedGrid){
+			double freeSpeedCarDisutilityRoad2Node = (road2NodeFreeSpeedTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
+			double expVijFreeSpeedCar = Math.exp(this.logitScaleParameter * (constCar + freeSpeedCarDisutilityRoad2Node + freeSpeedCarDisutility) );
+			double expVhkFreeSpeedCar = expVhiWalk * expVijFreeSpeedCar * sumExpVjkWalk;
+			gcs.addExpUtilsFreeSpeed( expVhkFreeSpeedCar );
+		}
+		
+		// total disutility bicycle
+		if(this.useBikeGrid){
+			double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaBikeTT) + (distanceRoad2Node_meter * betaBikeTD); // toll or money ???
+			double bikeDisutility = ((travelDistance_meter/this.bikeSpeedMeterPerHour) * betaBikeTT) + (travelDistance_meter * betaBikeTD);// toll or money ???
+			double expVijBike = Math.exp(this.logitScaleParameter * (constBike + bikeDisutility + bikeDisutilityRoad2Node));
+			double expVhkBike = expVhiWalk * expVijBike * sumExpVjkWalk;
+			gcs.addExpUtilsBike( expVhkBike );
+		}
+		
+		// total disutility walk
+		if(this.useWalkGrid){
+			double walkDisutilityRoad2Node = (road2NodeWalkTime_h * betaWalkTT) + (distanceRoad2Node_meter * betaWalkTD);  // toll or money ???
+			double walkDisutility = ( (travelDistance_meter / this.walkSpeedMeterPerHour) * betaWalkTT) + ( travelDistance_meter * betaWalkTD);// toll or money ???
+			double expVijWalk = Math.exp(this.logitScaleParameter * (constWalk + walkDisutility + walkDisutilityRoad2Node));
+			double expVhkWalk = expVhiWalk * expVijWalk * sumExpVjkWalk;
+			gcs.addExpUtilsWalk( expVhkWalk );
+		}
 	}
 
 	/**
@@ -673,7 +666,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	/**
 	 * stores travel disutilities for different modes
 	 */
-	public static class GeneralizedCostSum {
+	 static class SumOfExpUtils {
 		
 		private double sumFREESPEED = 0.;
 		private double sumCAR  	= 0.;
@@ -681,7 +674,7 @@ public abstract class AccessibilityControlerListenerImpl {
 		private double sumWALK 	= 0.;
 		private double sumPt   	= 0.;
 		
-		public void reset() {
+		 void reset() {
 			this.sumFREESPEED 	= 0.;
 			this.sumCAR		  	= 0.;
 			this.sumBIKE	  	= 0.;
@@ -689,43 +682,43 @@ public abstract class AccessibilityControlerListenerImpl {
 			this.sumPt		  	= 0.;
 		}
 		
-		public void addFreeSpeedCost(double cost){
+		 void addExpUtilsFreeSpeed(double cost){
 			this.sumFREESPEED += cost;
 		}
 		
-		public void addCongestedCarCost(double cost){
+		 void addExpUtilsCar(double cost){
 			this.sumCAR += cost;
 		}
 		
-		public void addBikeCost(double cost){
+		 void addExpUtilsBike(double cost){
 			this.sumBIKE += cost;
 		}
 		
-		public void addWalkCost(double cost){
+		 void addExpUtilsWalk(double cost){
 			this.sumWALK += cost;
 		}
 		
-		public void addPtCost(double cost){
+		 void addExpUtilsPt(double cost){
 			this.sumPt += cost;
 		}
 		
-		public double getFreeSpeedSum(){
+		 double getFreeSpeedSum(){
 			return this.sumFREESPEED;
 		}
 		
-		public double getCarSum(){
+		 double getCarSum(){
 			return this.sumCAR;
 		}
 		
-		public double getBikeSum(){
+		 double getBikeSum(){
 			return this.sumBIKE;
 		}
 		
-		public double getWalkSum(){
+		 double getWalkSum(){
 			return this.sumWALK;
 		}
 		
-		public double getPtSum(){
+		 double getPtSum(){
 			return this.sumPt;
 		}
 	}

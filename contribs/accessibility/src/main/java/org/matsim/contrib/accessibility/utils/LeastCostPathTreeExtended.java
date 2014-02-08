@@ -52,6 +52,7 @@ import org.matsim.utils.LeastCostPathTree;
  * @author thomas
  * 
  */
+@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	
 	protected static final Logger log = Logger.getLogger(LeastCostPathTreeExtended.class);
@@ -63,6 +64,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 * constructor
 	 * @param controler Controler, to get the RoadPricingScheme if available
 	 */
+	@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 	public LeastCostPathTreeExtended(final TravelTime tt, final TravelDisutility td, final RoadPricingSchemeImpl scheme) {
 		super(tt, td);
 		this.scheme = scheme;
@@ -74,6 +76,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 * @param origin
 	 * @param time
 	 */
+	@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 	public final void calculateExtended(final Network network, final Node origin, final double time) {
 		
 		this.nodeDataExt = new ConcurrentHashMap<Id, NodeDataExtended>((int) (network.getNodes().size() * 1.1), 0.95f);
@@ -92,6 +95,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 * @param currTime 
 	 */
 	@Override
+	@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 	protected final void additionalComputationsHook( final Link link, final double currTime ) {
 		
 		Node fromNode = link.getFromNode();
@@ -125,6 +129,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	// get methods
 	// ////////////////////////////////////////////////////////////////////
 	
+	@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 	public final Map<Id, NodeDataExtended> getTreeExtended() {
 		return this.nodeDataExt;
 	}
@@ -133,24 +138,29 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	// inner classes
 	// ////////////////////////////////////////////////////////////////////
 	
+	@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 	public static class NodeDataExtended {
 		private double distance = 0.;	// meter
 		private double toll 	= 0.; 	// money
 
+		@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 		/*package*/ void reset() {
 			this.distance 	= 0.;
 			this.toll 		= 0.;
 		}
 
+		@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 		void visit(final double distance, final double toll) {
 			this.distance 	= distance;
 			this.toll 		= toll;
 		}
 
+		@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 		public double getDistance() {
 			return this.distance;
 		}
 
+		@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 		public double getToll() {
 			return this.toll;
 		}
@@ -164,6 +174,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 * for testing
 	 * @param args
 	 */
+	@Deprecated // use the original LeastCostPathTree with appropriate TravelDisutility objects. kai, feb'14
 	public static void main(String args[]){
 		TempDirectoryUtil tempDirectoryUtil = new TempDirectoryUtil() ;
 

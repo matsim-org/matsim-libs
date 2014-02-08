@@ -88,7 +88,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory);
 		initAccessibilityParameters(scenario.getConfig());
 		// aggregating facilities to their nearest node on the road network
-		this.aggregatedFacilities = aggregatedOpportunities(opportunities, scenario.getNetwork());
+		this.aggregatedOpportunities = aggregatedOpportunities(opportunities, scenario.getNetwork());
 		
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListenerV3");
 	}
@@ -155,7 +155,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				log.info("Accessibility computation with " 
 						+ measuringPoints.getFacilities().size()
 						+ " zones (origins) and "
-						+ this.aggregatedFacilities.length
+						+ this.aggregatedOpportunities.length
 						+ " destinations (opportunities) took "
 						+ this.benchmark.getDurationInSeconds(benchmarkID)
 						+ " seconds ("
