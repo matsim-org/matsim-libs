@@ -1,6 +1,7 @@
 package org.matsim.contrib.accessibility;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -274,15 +275,10 @@ implements ShutdownListener, StartupListener {
 	 * @param accCsvWriter
 	 */
 	@Override
-	void writeCSVData(
-			ActivityFacility measurePoint, Node fromNode,
-			double freeSpeedAccessibility, double carAccessibility,
-			double bikeAccessibility, double walkAccessibility,
-			double ptAccessibility) {
+	void writeCSVData( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
 
 		// writing accessibility measures of current measurePoint in csv format
-		accessibilityWriter.writeRecord(measurePoint, fromNode, freeSpeedAccessibility,
-				carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
+		accessibilityWriter.writeRecord(measurePoint, fromNode, accessibilities ) ;
 	}
 
 	/**

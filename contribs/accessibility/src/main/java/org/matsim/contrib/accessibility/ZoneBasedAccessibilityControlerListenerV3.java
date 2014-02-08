@@ -1,5 +1,7 @@
 package org.matsim.contrib.accessibility;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -180,19 +182,10 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	 * @param accCsvWriter
 	 */
 	@Override
-	protected void writeCSVData(
-			ActivityFacility measurePoint, Node fromNode,
-			double freeSpeedAccessibility, double carAccessibility,
-			double bikeAccessibility, double walkAccessibility,
-			double ptAccessibility) {
+	protected void writeCSVData( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
 		
 		// writing accessibility measures of current measurePoint in csv format
 		// The UrbanSimZoneCSVWriterV2 writer produces URBANSIM INPUT
-		urbanSimZoneCSVWriterV2.write(measurePoint,
-									  freeSpeedAccessibility,
-									  carAccessibility,
-									  bikeAccessibility,
-									  walkAccessibility, 
-									  ptAccessibility);
+		urbanSimZoneCSVWriterV2.write(measurePoint, accessibilities ) ;
 	}
 }

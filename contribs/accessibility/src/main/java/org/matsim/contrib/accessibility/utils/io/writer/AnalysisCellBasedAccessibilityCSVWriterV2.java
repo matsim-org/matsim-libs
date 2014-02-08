@@ -2,10 +2,12 @@ package org.matsim.contrib.accessibility.utils.io.writer;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -90,13 +92,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public void writeRecord(ActivityFacility startZone, 
-			Node node, 
-			double freeSpeedAccessibility,
-			double carAccessibility, 
-			double bikeAccessibility,
-			double walkAccessibility,
-			double ptAccessibility){
+	public void writeRecord(ActivityFacility startZone, Node node, Map<Modes4Accessibility,Double> accessibilities ) { 
 
 		try{
 			assert(accessibilityDataWriter != null);
@@ -105,12 +101,10 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 					startZone.getCoord().getY() + "," +
 					node.getId() + "," + 
 					node.getCoord().getX() + "," +  
-					node.getCoord().getY() + "," + 
-					freeSpeedAccessibility + "," +
-					carAccessibility + "," +
-					bikeAccessibility + "," + 
-					walkAccessibility + "," +
-					ptAccessibility);
+					node.getCoord().getY() ) ;
+			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+				accessibilityDataWriter.write( "," + accessibilities.get( mode ) );
+			}
 			accessibilityDataWriter.newLine();
 		}
 		catch(Exception e){

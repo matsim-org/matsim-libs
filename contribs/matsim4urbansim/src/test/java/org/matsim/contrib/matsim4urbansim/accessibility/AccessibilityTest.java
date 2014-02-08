@@ -2,6 +2,7 @@ package org.matsim.contrib.matsim4urbansim.accessibility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
@@ -44,8 +46,8 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	private int nPersons = 3;
 	private double[][] accessibilities;
 	
-	private List<Double> accessibilitiesHomeZone;
-	private List<Double> accessibilitiesWorkZone;
+	private Map<Modes4Accessibility,Double> accessibilitiesHomeZone;
+	private Map<Modes4Accessibility,Double> accessibilitiesWorkZone;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -219,9 +221,16 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		
 		//test case: verify that accessibility of work zone (200,100) is higher than the home zone's (0,100)
 		if(this.endReached()){
-			for(int i=0;i<accessibilitiesHomeZone.size();i++){
-				Assert.assertTrue(accessibilitiesHomeZone.get(i)<accessibilitiesWorkZone.get(i));
+			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+				final Double accHZ = accessibilitiesHomeZone.get(mode);
+				final Double accWZ = accessibilitiesWorkZone.get(mode);
+				if ( accHZ != null && accWZ!=null ) {
+					Assert.assertTrue (accHZ < accWZ ) ;
+				}
 			}
+//			for(int i=0;i<accessibilitiesHomeZone.size();i++){
+//				Assert.assertTrue(accessibilitiesHomeZone.get(i)<accessibilitiesWorkZone.get(i));
+//			}
 		}
 				
 	}
@@ -263,26 +272,14 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 	@Override
 	@Ignore
-	public void getZoneAccessibilities(ActivityFacility measurePoint,
-			double freeSpeedAccessibility, double carAccessibility,
-			double bikeAccessibility, double walkAccessibility, double ptAccessibility) {
+	public void getZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities1 ) {
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
 		if(measurePoint.getCoord().equals(new CoordImpl(100,0))){
-			if(accessibilitiesHomeZone==null)
-				accessibilitiesHomeZone = new ArrayList<Double>();
-			accessibilitiesHomeZone.add(freeSpeedAccessibility);
-			accessibilitiesHomeZone.add(carAccessibility);
-			accessibilitiesHomeZone.add(bikeAccessibility);
-			accessibilitiesHomeZone.add(walkAccessibility);
+			accessibilitiesHomeZone = accessibilities1 ;
 		}
 		if(measurePoint.getCoord().equals(new CoordImpl(200,100))){
-			if(accessibilitiesWorkZone==null)
-				accessibilitiesWorkZone = new ArrayList<Double>();
-			accessibilitiesWorkZone.add(freeSpeedAccessibility);
-			accessibilitiesWorkZone.add(carAccessibility);
-			accessibilitiesWorkZone.add(bikeAccessibility);
-			accessibilitiesWorkZone.add(walkAccessibility);
+			accessibilitiesWorkZone = accessibilities1 ;
 		}
 		
 	}

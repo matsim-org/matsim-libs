@@ -3,8 +3,10 @@ package org.matsim.contrib.accessibility.utils.io.writer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -60,25 +62,19 @@ public class UrbanSimZoneCSVWriterV2 {
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public  void write( ActivityFacility startZone,
-										 double freeSpeedAccessibility,
-										 double carAccessibility, 
-										 double bikeAccessibility,
-										 double walkAccessibility,
-										 double ptAccessibility){
+	public  void write( ActivityFacility startZone, Map<Modes4Accessibility,Double> accessibilities ) {
 		
 		try{
 			assert(zoneWriter != null);
-			zoneWriter.write( startZone.getId().toString() + "," + 
-							  freeSpeedAccessibility + "," + 
-							  carAccessibility + "," + 
-							  bikeAccessibility + "," +
-							  walkAccessibility + "," +
-							  ptAccessibility);
+			zoneWriter.write( startZone.getId().toString() ) ;
+			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) { // seems a bit safer with respect to sequence. kai, feb'14
+				zoneWriter.write( "," + accessibilities.get( mode) ) ;
+			}
 			zoneWriter.newLine();
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			throw new RuntimeException("io did not work") ;
 		}
 	}
 	
@@ -99,6 +95,7 @@ public class UrbanSimZoneCSVWriterV2 {
 			log.info("... done!");
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw new RuntimeException("io did not work") ;
 		}	
 	}
 }

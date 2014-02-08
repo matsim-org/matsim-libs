@@ -1,6 +1,7 @@
 package org.matsim.contrib.accessibility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,13 +28,11 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.utils.LeastCostPathTree;
 
@@ -69,6 +68,9 @@ import org.matsim.utils.LeastCostPathTree;
 public abstract class AccessibilityControlerListenerImpl {
 	
 	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
+	
+	public static enum Modes4Accessibility { freeSpeed, car, bike, walk, pt } ;
+
 	
 	public static final String FREESEED_FILENAME= "freeSpeedAccessibility_cellsize_";
 	public static final String CAR_FILENAME 		= "carAccessibility_cellsize_";
@@ -393,66 +395,57 @@ public abstract class AccessibilityControlerListenerImpl {
 				// points separately anyways?  Answer: The trees need to be computed only once.  (But one could save more.) kai, feb'14
 
 				// aggregated value
-				double freeSpeedAccessibility = Double.NaN; 
-				double carAccessibility = Double.NaN; 
-				double bikeAccessibility= Double.NaN;
-				double walkAccessibility= Double.NaN;
-				double ptAccessibility 	= Double.NaN;
+				Map< Modes4Accessibility, Double> accessibilities  = new HashMap< Modes4Accessibility, Double >() ;
+				
 				if(!useRawSum){ 	// get log sum
 					if(this.useFreeSpeedGrid)
-						freeSpeedAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getFreeSpeedSum() );
+						accessibilities.put( Modes4Accessibility.freeSpeed, inverseOfLogitScaleParameter * Math.log( gcs.getFreeSpeedSum() ) ) ;
 					if(this.useCarGrid)
-						carAccessibility = inverseOfLogitScaleParameter * Math.log( gcs.getCarSum() );
+						accessibilities.put( Modes4Accessibility.car, inverseOfLogitScaleParameter * Math.log( gcs.getCarSum() ) ) ;
 					if(this.useBikeGrid)
-						bikeAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getBikeSum() );
+						accessibilities.put( Modes4Accessibility.bike, inverseOfLogitScaleParameter * Math.log( gcs.getBikeSum() ) ) ;
 					if(this.useWalkGrid)
-						walkAccessibility= inverseOfLogitScaleParameter * Math.log( gcs.getWalkSum() );
+						accessibilities.put( Modes4Accessibility.walk, inverseOfLogitScaleParameter * Math.log( gcs.getWalkSum() ) ) ;
 					if(this.usePtGrid)
-						ptAccessibility	 = inverseOfLogitScaleParameter * Math.log( gcs.getPtSum() );
+						accessibilities.put( Modes4Accessibility.pt,  inverseOfLogitScaleParameter * Math.log( gcs.getPtSum() ) ) ;
 				}
 				else{ 				// get raw sum
 					// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
 					// a * ln(b) = ln( b^a ).  kai, jan'14
 					if(this.useFreeSpeedGrid)
-						freeSpeedAccessibility = inverseOfLogitScaleParameter * gcs.getFreeSpeedSum();
+						accessibilities.put( Modes4Accessibility.freeSpeed, inverseOfLogitScaleParameter * gcs.getFreeSpeedSum() ) ;
 					if(this.useCarGrid)
-						carAccessibility = inverseOfLogitScaleParameter * gcs.getCarSum();
+						accessibilities.put( Modes4Accessibility.car, inverseOfLogitScaleParameter * gcs.getCarSum() ) ;
 					if(this.useBikeGrid)
-						bikeAccessibility= inverseOfLogitScaleParameter * gcs.getBikeSum();
+						accessibilities.put( Modes4Accessibility.bike, inverseOfLogitScaleParameter * gcs.getBikeSum() ) ;
 					if(this.useWalkGrid)
-						walkAccessibility= inverseOfLogitScaleParameter * gcs.getWalkSum();
+						accessibilities.put( Modes4Accessibility.walk, inverseOfLogitScaleParameter * gcs.getWalkSum() ) ;
 					if(this.usePtGrid)
-						ptAccessibility  = inverseOfLogitScaleParameter * gcs.getPtSum();
+						accessibilities.put( Modes4Accessibility.pt, inverseOfLogitScaleParameter * gcs.getPtSum() ) ;
 				}
 
 				if(mode == PARCEL_BASED){ // only for cell-based accessibility computation
 					// assign log sums to current starZone object and spatial grid
 					if(this.freeSpeedGrid != null)
-						freeSpeedGrid.setValue(freeSpeedAccessibility, origin.getCoord().getX(), origin.getCoord().getY());
+						freeSpeedGrid.setValue(accessibilities.get( Modes4Accessibility.freeSpeed ), origin.getCoord().getX(), origin.getCoord().getY());
 					if(this.carGrid != null)
-						carGrid.setValue(carAccessibility ,origin.getCoord().getX(), origin.getCoord().getY());
+						carGrid.setValue( accessibilities.get( Modes4Accessibility.car ) ,origin.getCoord().getX(), origin.getCoord().getY());
 					if(this.bikeGrid != null)
-						bikeGrid.setValue(bikeAccessibility , origin.getCoord().getX(), origin.getCoord().getY());
+						bikeGrid.setValue( accessibilities.get( Modes4Accessibility.bike ) , origin.getCoord().getX(), origin.getCoord().getY());
 					if(this.walkGrid != null)
-						walkGrid.setValue(walkAccessibility , origin.getCoord().getX(), origin.getCoord().getY());
+						walkGrid.setValue( accessibilities.get( Modes4Accessibility.walk ) , origin.getCoord().getX(), origin.getCoord().getY());
 					if(this.ptGrid != null)
-						ptGrid.setValue(ptAccessibility, origin.getCoord().getX(), origin.getCoord().getY());
+						ptGrid.setValue( accessibilities.get( Modes4Accessibility.pt ), origin.getCoord().getX(), origin.getCoord().getY());
 				}
 				
 				// writing measured accessibilities for current measuring point 
 				// (aFac) in csv format to disc
-				writeCSVData(origin, fromNode, 
-							 freeSpeedAccessibility, 
-							 carAccessibility, 
-							 bikeAccessibility,
-							 walkAccessibility, 
-							 ptAccessibility);
+				writeCSVData(origin, fromNode, accessibilities ) ;
 				// yyyyyy kai: commenting this out since it does not work for nmbm do now know why. feb'13
 				
 				if(this.zoneDataExchangeListenerList != null){
 					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
-						this.zoneDataExchangeListenerList.get(i).getZoneAccessibilities(origin, freeSpeedAccessibility, carAccessibility,
-								bikeAccessibility, walkAccessibility, ptAccessibility);
+						this.zoneDataExchangeListenerList.get(i).getZoneAccessibilities(origin, accessibilities );
 				}
 				
 			}
@@ -652,11 +645,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	abstract void writeCSVData(
-			ActivityFacility measurePoint, Node fromNode,
-			double freeSpeedAccessibility, double carAccessibility,
-			double bikeAccessibility, double walkAccessibility,
-			double ptAccessibility) ;
+	abstract void writeCSVData( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities ) ;
 	
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes
