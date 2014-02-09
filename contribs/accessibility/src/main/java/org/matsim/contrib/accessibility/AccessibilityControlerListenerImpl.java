@@ -71,12 +71,12 @@ public abstract class AccessibilityControlerListenerImpl {
 
 	public static enum Modes4Accessibility { freeSpeed, car, bike, walk, pt } ;
 
-
-	public static final String FREESEED_FILENAME= "freeSpeedAccessibility_cellsize_";
-	public static final String CAR_FILENAME 		= "carAccessibility_cellsize_";
-	public static final String BIKE_FILENAME 	= "bikeAccessibility_cellsize_";
-	public static final String WALK_FILENAME 	= "walkAccessibility_cellsize_";
-	public static final String PT_FILENAME 		= "ptAccessibility_cellsize_";
+	public static final String ACCESSIBILITY_CELLSIZE = "Accessibility_cellsize_" ;
+	public static final String FREESPEED_FILENAME= "freeSpeed" + ACCESSIBILITY_CELLSIZE ;
+	public static final String CAR_FILENAME 		= "car" + ACCESSIBILITY_CELLSIZE ;
+	public static final String BIKE_FILENAME 	= "bike" + ACCESSIBILITY_CELLSIZE ;
+	public static final String WALK_FILENAME 	= "walk" + ACCESSIBILITY_CELLSIZE ;
+	public static final String PT_FILENAME 		= "pt" + ACCESSIBILITY_CELLSIZE ;
 
 	int ZONE_BASED 	= 0;
 	int PARCEL_BASED = 1;
@@ -87,9 +87,12 @@ public abstract class AccessibilityControlerListenerImpl {
 	ActivityFacilitiesImpl parcels; 
 	// destinations, opportunities like jobs etc ...
 	AggregateObject2NearestNode[] aggregatedOpportunities;
+	
+	public static enum OtherItems { weight } ;
 
 	// storing the accessibility results
 	Map<Modes4Accessibility,SpatialGrid> spatialGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
+	Map<OtherItems,SpatialGrid> otherItems = new HashMap<OtherItems,SpatialGrid>() ;
 
 	Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
 
@@ -295,11 +298,11 @@ public abstract class AccessibilityControlerListenerImpl {
 			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
 			LeastCostPathTree lcptTravelDistance, 
 			NetworkImpl network,
-			ActivityFacilitiesImpl mp,
+			ActivityFacilities  mp,
 			int runMode) {
 
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
-		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (unfounded);
+		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
 		// not using a simple double array for type safety in long argument lists. kai, feb'14
 		for ( int ii=0 ; ii<gcs.length ; ii++ ) {
 			gcs[ii] = new SumOfExpUtils() ;
@@ -360,28 +363,30 @@ public abstract class AccessibilityControlerListenerImpl {
 				// captures the distance (as walk time) between a zone centroid and its nearest node
 				Distances distance = NetworkUtil.getDistance2Node(nearestLink, origin.getCoord(), fromNode);
 
-				double distanceMeasuringPoint2Road_meter 	= distance.getDistancePoint2Road(); // distance measuring point 2 road (link or node)
-				double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	// distance intersection 2 node (only for orthogonal distance), this is zero if projection is on a node 
-
-				// traveling on foot from measuring point to the network (link or node)
-				double walkTravelTimeMeasuringPoint2Road_h 	= distanceMeasuringPoint2Road_meter / this.walkSpeedMeterPerHour;
+				// distance to road, and then to node:
+				double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 
 				// get free speed and congested car travel times on a certain link
-				double freeSpeedTravelTimeOnNearestLink_meterpersec = ((LinkImpl)nearestLink).getFreespeedTravelTime(depatureTime);
-				double carTravelTimeOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
-				// travel time in hours to get from link intersection (position on a link given by orthogonal projection from measuring point) to the corresponding node
-				double road2NodeFreeSpeedTime_h				= distanceRoad2Node_meter / (freeSpeedTravelTimeOnNearestLink_meterpersec * 3600);
-				double road2NodeCongestedCarTime_h 			= distanceRoad2Node_meter / (carTravelTimeOnNearestLink_meterpersec * 3600.);
-				double road2NodeBikeTime_h					= distanceRoad2Node_meter / this.bikeSpeedMeterPerHour;
-				double road2NodeWalkTime_h					= distanceRoad2Node_meter / this.walkSpeedMeterPerHour;
+				double freeSpeedOnNearestLink_meterpersec = ((LinkImpl)nearestLink).getFreespeedTravelTime(depatureTime);
+				double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
+
+				// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
+				double road2NodeFreeSpeedTime_h				= distance.getDistanceRoad2Node() / (freeSpeedOnNearestLink_meterpersec * 3600);
+				double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
+				double road2NodeBikeTime_h					= distance.getDistanceRoad2Node() / this.bikeSpeedMeterPerHour;
+				double road2NodeWalkTime_h					= distance.getDistanceRoad2Node() / this.walkSpeedMeterPerHour;
 				double road2NodeToll_money 					= getToll(nearestLink); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
 
 				// this contains the current toll based on the toll scheme
 				double toll_money 							= 0.;
-				if(this.scheme != null && RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType()))
-					toll_money = road2NodeToll_money;
-				else if(this.scheme != null && RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()))
-					toll_money = road2NodeToll_money * distanceRoad2Node_meter;
+				if ( this.scheme != null ) {
+					if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType()))
+						toll_money = road2NodeToll_money;
+					else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()))
+						toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
+					else 
+						throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
+				}
 
 				for ( int ii = 0 ; ii<gcs.length ; ii++ ) {
 					gcs[ii].reset();
@@ -393,9 +398,10 @@ public abstract class AccessibilityControlerListenerImpl {
 					final AggregateObject2NearestNode aggregatedFacility = this.aggregatedOpportunities[i];
 
 					computeAndAddExpUtilContributions(lcptExtFreeSpeedCarTravelTime, lcptExtCongestedCarTravelTime,
-							lcptTravelDistance, gcs, fromNode, distanceMeasuringPoint2Road_meter, distanceRoad2Node_meter,
+							lcptTravelDistance, gcs, fromNode, distance.getDistancePoint2Road(), distance.getDistanceRoad2Node(),
 							walkTravelTimeMeasuringPoint2Road_h, road2NodeFreeSpeedTime_h, road2NodeCongestedCarTime_h,
 							road2NodeBikeTime_h, road2NodeWalkTime_h, toll_money, aggregatedFacility);
+					// yy terribly long argument list :-(.  I extracted this method but further improvements seem possible :-). kai, feb'14
 				}
 				// --------------------------------------------------------------------------------------------------------------
 				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
@@ -413,22 +419,16 @@ public abstract class AccessibilityControlerListenerImpl {
 							// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
 							// a * ln(b) = ln( b^a ).  kai, jan'14
 						}
-					}
-				}
-
-				if(runMode == PARCEL_BASED){ // only for cell-based accessibility computation
-					// assign log sums to current starZone[[???]] object and spatial grid
-					for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-						if ( this.isComputingMode.get(mode) ) {
+						if(runMode == PARCEL_BASED){ // only for cell-based accessibility computation
+							// assign log sums to current starZone[[???]] object and spatial grid
 							this.spatialGrids.get(mode).setValue( accessibilities.get(mode), origin.getCoord().getX(), origin.getCoord().getY() ) ; 
 						}
 					}
 				}
 
 				// writing measured accessibilities for current measuring point 
-				// (aFac) in csv format to disc
 				writeCSVData(origin, fromNode, accessibilities ) ;
-				// yyyyyy kai: commenting this out since it does not work for nmbm do now know why. feb'13
+				// (I think the above is the urbansim output.  Better not touch it. kai, feb'14) 
 
 				if(this.zoneDataExchangeListenerList != null){
 					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
@@ -581,6 +581,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	 * @param walkAccessibility
 	 */
 	abstract void writeCSVData( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities ) ;
+	// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes

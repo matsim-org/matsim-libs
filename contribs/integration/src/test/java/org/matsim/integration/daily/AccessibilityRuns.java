@@ -106,6 +106,10 @@ public class AccessibilityRuns {
 		// l, s, t, e, w, minor, h
 		String[] localActivityTypes = {"l", "s", "t", "e", "w", "minor", "h"} ;
 		for ( int ii=0 ; ii<localActivityTypes.length ; ii++ ) {
+			if ( ii != 4 ) {
+				System.err.println("skipping everything besides work");
+				continue ;
+			}
 			String actType = localActivityTypes[ii] ;
 
 			config.controler().setOutputDirectory( utils.getOutputDirectory() + "/" + actType + "/" );
@@ -120,7 +124,7 @@ public class AccessibilityRuns {
 
 			Controler controler = new Controler(scenario) ;
 			// yy it is a bit annoying to have to run the controler separately for every act type, or even to run it at all.
-			// But there is too much infrastructure which is built separately for each accessibility run.
+			// But the computation uses too much infrastructure which is plugged together in the controler.
 			// (Might be able to get away with ONE controler run if we manage to write the accessibility results
 			// in subdirectories of the controler output directory.) kai, feb'14
 			
@@ -131,7 +135,7 @@ public class AccessibilityRuns {
 					new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, scenario.getNetwork( ));
 			listener.setComputingAccessibilityForMode( Modes4Accessibility.freeSpeed, true );
 			listener.generateGridsAndMeasuringPointsByNetwork(scenario.getNetwork(), 1000. );
-			listener.setWeights( homes ) ;
+			listener.addAdditionalFacilityData( homes ) ;
 
 			controler.addControlerListener(listener);
 
@@ -148,7 +152,8 @@ public class AccessibilityRuns {
 				writer.write("set term pdf size 25cm,15cm \n") ;
 				writer.write("set out 'accessibility.pdf'\n") ;
 				writer.write("set title 'accessibility to " + actType + "'\n") ;
-				writer.write("splot \"<awk '!/access/{print $0}' accessibility_indicators_freeSpeed.csv\"\n ") ;
+				writer.write("splot \"<awk '!/access/{print $0}' accessibility_indicators_freeSpeed.csv\" u 1:2:3\n ") ;
+				// (the awk command filters out the first line)
 				writer.close();
 			} catch (Exception ee ) {
 				ee.printStackTrace(); 

@@ -340,7 +340,7 @@ public class GridUtils {
 		double yMin = env.getMinY();
 		double yMax = env.getMaxY();
 		
-		return new SpatialGrid(xMin, yMin, xMax, yMax, gridSize);
+		return new SpatialGrid(xMin, yMin, xMax, yMax, gridSize, Double.NaN);
 	}
 
 	/**

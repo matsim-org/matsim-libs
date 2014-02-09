@@ -26,6 +26,7 @@ package org.matsim.contrib.accessibility.gis;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.accessibility.utils.io.writer.SpatialGridTableWriter;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -62,8 +63,9 @@ public class SpatialGrid{
 	 * @param xmax
 	 * @param ymax
 	 * @param resolution cell size. E.g. (xmax-xmin)/resolution = number of cells in x direction
+	 * @param initialValue TODO
 	 */
-	public SpatialGrid(double xmin, double ymin, double xmax, double ymax, double resolution) {
+	public SpatialGrid(double xmin, double ymin, double xmax, double ymax, double resolution, double initialValue) {
 		minX = xmin;
 		minY = ymin;
 		maxX = xmax;
@@ -77,7 +79,7 @@ public class SpatialGrid{
 		// init matrix
 		for(int x = 0; x < numXBins; x++)
 			for(int y = 0; y < numYBins; y++)
-				matrix[y][x] = Double.NaN;
+				matrix[y][x] = initialValue ;
 	}
 	
 	/**
@@ -85,11 +87,11 @@ public class SpatialGrid{
 	 * @param boundingBox
 	 */
 	public SpatialGrid(double resolution, double [] boundingBox) {
-		this(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], resolution);
+		this(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], resolution, Double.NaN);
 	}
 	
 	public SpatialGrid(SpatialGrid grid) {
-		this(grid.getXmin(), grid.getYmin(), grid.getXmax(), grid.getYmax(), grid.getResolution());
+		this(grid.getXmin(), grid.getYmin(), grid.getXmax(), grid.getYmax(), grid.getResolution(), Double.NaN);
 	}
 	
 	public double getXmin() {
@@ -160,6 +162,7 @@ public class SpatialGrid{
 	 * @param point
 	 * @return true if the point lies in the bounds of the study area, false otherwise
 	 */
+	@Deprecated // use method with Coord 
 	public boolean setValue(double value, Point point) {
 		if(isInBounds(point)) {
 			setValue(value, point.getX(), point.getY());
@@ -168,6 +171,19 @@ public class SpatialGrid{
 			return false;
 	}
 	
+	public boolean addToValue( double value, Coord coord ) {
+		if ( isInBounds(coord) ) {
+			addToValue( value, coord.getX(), coord.getY() ) ;
+			return true ;
+		} else {
+			return false ;
+		}
+	}
+	
+	public boolean isInBounds(Coord coord) {
+		return isInBounds( coord.getX() , coord.getY() );
+	}
+
 	/**
 	 * independent of the intern representation (mirrored) this method sets the given value at the initial point if it lies in the bounds of the study area
 	 * 
@@ -184,9 +200,22 @@ public class SpatialGrid{
 			return false;
 	}
 	
+	public boolean addToValue( double value, double x, double y ) {
+		if ( isInBounds(x,y)) {
+			if ( Double.isNaN(matrix[getRow(y)][getColumn(x)])) {
+				return setValue( value, x, y ) ;
+			} else {
+				matrix[getRow(y)][getColumn(x)] += value;
+				return true ;
+			}
+		} else {
+			return false ;
+		}
+	}
+	
+	@Deprecated // use method with Coord 
 	public boolean isInBounds(Point point) {
-		return point.getX() >= minX && point.getX() <= maxX &&
-			   point.getY() >= minY && point.getY() <= maxY;
+		return isInBounds( point.getX(), point.getY() ) ;
 	}
 	
 	public boolean isInBounds(double x, double y){
@@ -339,7 +368,7 @@ public class SpatialGrid{
 
 			System.out.println(xmin + "," + ymin + "," + xmax + "," + ymax
 					+ "," + res);
-			SpatialGrid sg = new SpatialGrid(xmin, ymin, xmax, ymax, res);
+			SpatialGrid sg = new SpatialGrid(xmin, ymin, xmax, ymax, res, Double.NaN);
 			return sg;
 		}
 		return null;

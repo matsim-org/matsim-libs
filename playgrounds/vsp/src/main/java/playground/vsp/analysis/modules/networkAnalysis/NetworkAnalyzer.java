@@ -262,7 +262,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 		ZoneLayer<Id> measuringPoints = NetworkAnalyzer.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
 
 		//initialize grid that stores the accessibility values
-		this.freeSpeedGrid = new SpatialGrid(bbox.getXMin(),bbox.getYMin(),bbox.getXMax(),bbox.getYMax(), resolution);
+		this.freeSpeedGrid = new SpatialGrid(bbox.getXMin(),bbox.getYMin(),bbox.getXMax(),bbox.getYMax(), resolution, Double.NaN);
 		ScenarioImpl sc = (ScenarioImpl) this.scenario;
 		
 		//run accessibility computation

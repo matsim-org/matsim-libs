@@ -93,7 +93,7 @@ public class BackupMATSimOutput {
 				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp() + Zone2ZoneImpedancesControlerListener.FILE_NAME), new File(savePath + Zone2ZoneImpedancesControlerListener.FILE_NAME) );
 			
 			// backup plotting files free speed
-			String fileName = AccessibilityControlerListenerImpl.FREESEED_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			String fileName = AccessibilityControlerListenerImpl.FREESPEED_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
 				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 			// backup plotting files for car

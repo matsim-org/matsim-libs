@@ -319,7 +319,7 @@ public class NetworkInspector {//TODO pfade ändern
 		ZoneLayer<Id> measuringPoints = NetworkInspector.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
 		// tnicolai: ich habe die GridUtils auskommentiert, da es sonst nicht mehr kompiliert.
 
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getXMin(),bbox.getYMin(),bbox.getXMax(),bbox.getYMax(), 50);
+		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getXMin(),bbox.getYMin(),bbox.getXMax(),bbox.getYMax(), 50, Double.NaN);
 		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
 		
 		new AccessibilityCalcV2(measuringPoints, freeSpeedGrid, sc, this.outputFolder).runAccessibilityComputation();

@@ -77,7 +77,7 @@ public class TestScenario {
 		log.info("Interpolate file " + filename_data200 + " with interpolation method " + interpolationMethod +":");
 		long startTime= System.currentTimeMillis();
 		Interpolation interpolation = new Interpolation(sg200, interpolationMethod, exponent);
-		SpatialGrid interp_sg = new SpatialGrid(sg200.getXmin(), sg200.getYmin(), sg200.getXmax(), sg200.getYmax(), sg200.getResolution() / 2);
+		SpatialGrid interp_sg = new SpatialGrid(sg200.getXmin(), sg200.getYmin(), sg200.getXmax(), sg200.getYmax(), sg200.getResolution() / 2, Double.NaN);
 		// calculate new values for higher resolution
 		for (double y = sg200.getYmin(); y <= sg200.getYmax(); y += sg200.getResolution()/2) {
 			for (double x = sg200.getXmin(); x <= sg200.getXmax(); x += sg200.getResolution()/2) {

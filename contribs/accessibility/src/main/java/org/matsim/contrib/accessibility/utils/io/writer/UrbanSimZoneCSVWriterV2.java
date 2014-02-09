@@ -63,7 +63,8 @@ public class UrbanSimZoneCSVWriterV2 {
 	 * @param walkAccessibility
 	 */
 	public  void write( ActivityFacility startZone, Map<Modes4Accessibility,Double> accessibilities ) {
-		
+		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
+
 		try{
 			assert(zoneWriter != null);
 			zoneWriter.write( startZone.getId().toString() ) ;

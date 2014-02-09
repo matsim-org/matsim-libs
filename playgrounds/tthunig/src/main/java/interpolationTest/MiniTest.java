@@ -100,7 +100,7 @@ public class MiniTest {
 	 * Interpolates the SpatialGrid to one resolution higher.
 	 */
 	private void interpolateSG(){
-		this.interpolatedSG = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2);
+		this.interpolatedSG = new SpatialGrid(sg.getXmin(), sg.getYmin(), sg.getXmax(), sg.getYmax(), sg.getResolution() / 2, Double.NaN);
 		for (double x = this.sg.getXmin(); x <= this.sg.getXmax(); x += this.sg.getResolution()/2) {
 			for (double y = this.sg.getYmin(); y <= this.sg.getYmax(); y += this.sg.getResolution()/2) {
 				this.interpolatedSG.setValue(this.interpolation.interpolate(x, y), x, y);

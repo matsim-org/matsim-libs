@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.OtherItems;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -67,6 +67,9 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 
 			// create header
 			accessibilityDataWriter.write( "x" + "\t" + "y" + "\t" + "accessibility" );
+			for ( OtherItems item : OtherItems.values() ) {
+				accessibilityDataWriter.write( "\t" + item ) ;
+			}
 			accessibilityDataWriter.newLine();
 
 			log.info("... done!");
@@ -93,6 +96,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	 * @param walkAccessibility
 	 */
 	public void writeRecord(ActivityFacility startZone, Node node, Map<Modes4Accessibility,Double> accessibilities ) { 
+		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 
 		try{
 			assert(accessibilityDataWriter != null);
@@ -113,13 +117,22 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 		}
 	}
 
-	public void writeRecord( Coord coord, double accessibility ) {
+//	public void writeRecord( Coord coord, double accessibility ) {
+//		try {
+//			accessibilityDataWriter.write( coord.getX() + "\t" +  coord.getY() + "\t" +  accessibility ) ;
+//			accessibilityDataWriter.newLine() ;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			throw new RuntimeException("io error") ;
+//		}
+//	}
+
+	public void writeField( double val ) {
 		try {
-			accessibilityDataWriter.write( coord.getX() + "\t" +  coord.getY() + "\t" +  accessibility ) ;
-			accessibilityDataWriter.newLine() ;
+			accessibilityDataWriter.write( val + "\t" ) ;
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("io error") ;
+			throw new RuntimeException("could not write");
 		}
 	}
 
