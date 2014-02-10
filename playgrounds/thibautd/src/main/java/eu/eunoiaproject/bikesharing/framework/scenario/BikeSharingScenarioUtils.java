@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -61,6 +62,8 @@ public class BikeSharingScenarioUtils {
 	}
 
 	public static Scenario loadScenario( final Config config ) {
+		// to make sure log entries are writen in log file
+		OutputDirectoryLogging.catchLogEntries();
 		final Scenario sc = ScenarioUtils.loadScenario( config );
 
 		final BikeSharingConfigGroup confGroup = (BikeSharingConfigGroup)
