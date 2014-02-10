@@ -65,8 +65,9 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         // passengerWaitTime
 
         SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
-        SummaryStatistics taxiDeliveryDriveTime = new SummaryStatistics();
-        SummaryStatistics taxiServiceTime = new SummaryStatistics();
+        SummaryStatistics taxiDropoffDriveTime = new SummaryStatistics();
+        SummaryStatistics taxiPickupTime = new SummaryStatistics();
+        SummaryStatistics taxiDropoffTime = new SummaryStatistics();
         SummaryStatistics taxiCruiseTime = new SummaryStatistics();
         SummaryStatistics taxiWaitTime = new SummaryStatistics();
         SummaryStatistics taxiOverTime = new SummaryStatistics();
@@ -74,34 +75,45 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
         SummaryStatistics computationTime = new SummaryStatistics();
 
-        boolean warmup;
+        boolean warmup = launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED;
 
         switch (configIdx) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-            case 17:
-            case 18:
-                // run as many times as requested
-                
-                // additionally, run warmup iterations if necessary
-                warmup = launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED;
+            case 0://NOS_SL
+            case 1://NOS_TD
+            case 2://NOS_FF
+                   //case 3://NOS_24H
+            case 4://NOS_15M
 
+                //========================================
+
+            case 5://NOS_DSE_SL
+            case 6://NOS_DSE_TD
+            case 7://NOS_DSE_FF
+                   //case 8://NOS_DSE_24H
+            case 9://NOS_DSE_15M
+
+                //========================================
+
+            case 10://OTS_FF
+                //case 11://OTS_24H
+            case 12://OTS_15M
+
+                //========================================
+
+            case 13://RES_FF
+                //case 14://RES_24H
+            case 15://RES_15M
+
+                //========================================
+
+            case 16://APS_FF
+                //case 17://APS_24H
+            case 18://APS_15M
+
+                // run as many times as requested
                 break;
+
+            //========================================
 
             default:
                 // do not run at all
@@ -125,8 +137,9 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             long t1 = System.currentTimeMillis();
 
             taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
-            taxiDeliveryDriveTime.addValue(evaluation.getTaxiDropoffDriveTime());
-            taxiServiceTime.addValue(evaluation.getTaxiPickupTime());
+            taxiDropoffDriveTime.addValue(evaluation.getTaxiDropoffDriveTime());
+            taxiPickupTime.addValue(evaluation.getTaxiPickupTime());
+            taxiDropoffTime.addValue(evaluation.getTaxiPickupTime());
             taxiCruiseTime.addValue(evaluation.getTaxiCruiseTime());
             taxiWaitTime.addValue(evaluation.getTaxiWaitTime());
             taxiOverTime.addValue(evaluation.getTaxiOverTime());
@@ -135,49 +148,53 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             computationTime.addValue(t1 - t0);
         }
 
-        pw.println(launcher.algorithmConfig.name);
-        pw.println(configIdx + "\t" + TaxiStats.HEADER + "\tcomputationT");
+        pw.printf("Name\tPD\tDD\tPS\tDS\tW\tPW\tPWmax\tComp\n");
 
-        pw.printf("Mean\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        pw.printf("%10s\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+                launcher.algorithmConfig.name,//
                 taxiPickupDriveTime.getMean(),//
-                taxiDeliveryDriveTime.getMean(),//
-                taxiServiceTime.getMean(),//
-                taxiCruiseTime.getMean(),//
+                taxiDropoffDriveTime.getMean(),//
+                taxiPickupTime.getMean(),//
+                taxiDropoffTime.getMean(),//
+                //                taxiCruiseTime.getMean(),//
                 taxiWaitTime.getMean(),//
-                taxiOverTime.getMean(),//
+                //                taxiOverTime.getMean(),//
                 passengerWaitTime.getMean(),//
                 maxPassengerWaitTime.getMean(),//
                 computationTime.getMean());
-        pw.printf("Min\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
-                taxiPickupDriveTime.getMin(),//
-                taxiDeliveryDriveTime.getMin(),//
-                taxiServiceTime.getMin(),//
-                taxiCruiseTime.getMin(),//
-                taxiWaitTime.getMin(),//
-                taxiOverTime.getMin(),//
-                passengerWaitTime.getMin(),//
-                maxPassengerWaitTime.getMin(),//
-                computationTime.getMin());
-        pw.printf("Max\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
-                taxiPickupDriveTime.getMax(),//
-                taxiDeliveryDriveTime.getMax(),//
-                taxiServiceTime.getMax(),//
-                taxiCruiseTime.getMax(),//
-                taxiWaitTime.getMax(),//
-                taxiOverTime.getMax(),//
-                passengerWaitTime.getMax(),//
-                maxPassengerWaitTime.getMax(),//
-                computationTime.getMax());
-        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
-                taxiPickupDriveTime.getStandardDeviation(),//
-                taxiDeliveryDriveTime.getStandardDeviation(),//
-                taxiServiceTime.getStandardDeviation(),//
-                taxiCruiseTime.getStandardDeviation(),//
-                taxiWaitTime.getStandardDeviation(),//
-                taxiOverTime.getStandardDeviation(),//
-                passengerWaitTime.getStandardDeviation(),//
-                maxPassengerWaitTime.getStandardDeviation(),//
-                computationTime.getStandardDeviation());
+        //        pw.printf("Min\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        //                taxiPickupDriveTime.getMin(),//
+        //                taxiDropoffDriveTime.getMin(),//
+        //                taxiPickupTime.getMin(),//
+        //                taxiDropoffTime.get(),//
+        //                taxiCruiseTime.getMin(),//
+        //                taxiWaitTime.getMin(),//
+        //                taxiOverTime.getMin(),//
+        //                passengerWaitTime.getMin(),//
+        //                maxPassengerWaitTime.getMin(),//
+        //                computationTime.getMin());
+        //        pw.printf("Max\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        //                taxiPickupDriveTime.getMax(),//
+        //                taxiDropoffDriveTime.getMax(),//
+        //                taxiPickupTime.getMax(),//
+        //                taxiDropoffTime.get(),//
+        //                taxiCruiseTime.getMax(),//
+        //                taxiWaitTime.getMax(),//
+        //                taxiOverTime.getMax(),//
+        //                passengerWaitTime.getMax(),//
+        //                maxPassengerWaitTime.getMax(),//
+        //                computationTime.getMax());
+        //        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
+        //                taxiPickupDriveTime.getStandardDeviation(),//
+        //                taxiDropoffDriveTime.getStandardDeviation(),//
+        //                taxiPickupTime.getStandardDeviation(),//
+        //                taxiDropoffTime.get(),//
+        //                taxiCruiseTime.getStandardDeviation(),//
+        //                taxiWaitTime.getStandardDeviation(),//
+        //                taxiOverTime.getStandardDeviation(),//
+        //                passengerWaitTime.getStandardDeviation(),//
+        //                maxPassengerWaitTime.getStandardDeviation(),//
+        //                computationTime.getStandardDeviation());
 
         // the endTime of the simulation??? --- time of last served request
 
@@ -189,6 +206,41 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         }
 
         launcher.travelTimeCalculator = null;
+    }
+
+
+    private static final int FIRST_NON_NOS_IDX = 10;
+
+
+    private static void runNOS(int configIdx, int runs, String paramFile)
+        throws IOException
+    {
+        MultipleSingleIterTaxiLauncher multiLauncher = new MultipleSingleIterTaxiLauncher(paramFile);
+
+        String txt = "NOS";
+
+        PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt + ".out");
+        PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
+                + ".out");
+
+        if (configIdx >= FIRST_NON_NOS_IDX) {
+            pw.close();
+            pw2.close();
+            throw new IllegalArgumentException();
+        }
+
+        if (configIdx == -1) {
+            for (int i = 0; i < FIRST_NON_NOS_IDX; i++) {
+                multiLauncher.run(i, runs, false, false, false, pw, pw2);
+            }
+        }
+        else {
+            multiLauncher.run(configIdx, runs, false, false, false, pw, pw2);
+        }
+
+        pw.close();
+        pw2.close();
+
     }
 
 
@@ -205,8 +257,14 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
                 + ".out");
 
+        if (configIdx < FIRST_NON_NOS_IDX) {
+            pw.close();
+            pw2.close();
+            throw new IllegalArgumentException();
+        }
+
         if (configIdx == -1) {
-            for (int i = 0; i < AlgorithmConfig.ALL.length; i++) {
+            for (int i = FIRST_NON_NOS_IDX; i < AlgorithmConfig.ALL.length; i++) {
                 multiLauncher.run(i, runs, destinationKnown, onlineVehicleTracker,
                         minimizePickupTripTime, pw, pw2);
             }
@@ -247,14 +305,16 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             throw new RuntimeException();
         }
 
+        runNOS(configIdx, runs, paramFile);
+
         run(configIdx, runs, paramFile, false, false, false);
         run(configIdx, runs, paramFile, false, true, false);
-        run(configIdx, runs, paramFile, true, false, false);
-        run(configIdx, runs, paramFile, true, true, false);
+        //        run(configIdx, runs, paramFile, true, false, false);
+        //        run(configIdx, runs, paramFile, true, true, false);
 
         run(configIdx, runs, paramFile, false, false, true);
         run(configIdx, runs, paramFile, false, true, true);
-        run(configIdx, runs, paramFile, true, false, true);
-        run(configIdx, runs, paramFile, true, true, true);
+        //        run(configIdx, runs, paramFile, true, false, true);
+        //        run(configIdx, runs, paramFile, true, true, true);
     }
 }

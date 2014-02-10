@@ -24,6 +24,7 @@ import java.util.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
@@ -42,22 +43,22 @@ public class IdleRankVehicleFinder
 {
     private final MatsimVrpContext context;
     private final VrpPathCalculator calculator;
-    private final boolean straightLineDistance;
+    private final TravelDisutilitySource tdisSource;
 	private RankArrivalDepartureCharger rankArrivaldeparturecharger;
 	private boolean IsElectric;
 	private boolean useChargeOverTime;
 	Random rnd;
 
 
-    public IdleRankVehicleFinder(MatsimVrpContext context, VrpPathCalculator calculator, boolean straightLineDistance)
+    public IdleRankVehicleFinder(MatsimVrpContext context, VrpPathCalculator calculator, TravelDisutilitySource tdisSource)
     {
         this.context = context;
         this.calculator = calculator;
-        this.straightLineDistance = straightLineDistance;
+        this.tdisSource = tdisSource;
         this.IsElectric = false;
         this.useChargeOverTime = false;
         this.rnd = new Random(7);
-        System.out.println("Using Straight Line Distance:" + this.straightLineDistance);
+        System.out.println("Using distance measure: " + this.tdisSource.name());
     }
     public void addRankArrivalCharger(RankArrivalDepartureCharger rankArrivalDepartureCharger){
     	this.rankArrivaldeparturecharger = rankArrivalDepartureCharger;
@@ -208,7 +209,7 @@ public class IdleRankVehicleFinder
     
     
     private double calculateDistance(TaxiRequest req, Vehicle veh){
-        return IdleVehicleFinder.calculateDistance(req, veh, context.getTime(), calculator,
-                straightLineDistance);
+        return IdleVehicleFinder.calculateCost(req, veh, context.getTime(), calculator,
+                tdisSource);
     }
 }

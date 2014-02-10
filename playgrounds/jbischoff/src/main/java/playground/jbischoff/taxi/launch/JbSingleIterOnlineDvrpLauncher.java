@@ -166,7 +166,7 @@ import playground.michalm.util.RunningVehicleRegister;
         f.mkdirs();
 
         TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
-        TravelDisutilitySource tdisSource = TravelDisutilitySource.DISTANCE;
+        TravelDisutilitySource tdisSource = TravelDisutilitySource.STRAIGHT_LINE;
 
         if (scenario == null)
             System.out.println("scen");
@@ -196,7 +196,7 @@ import playground.michalm.util.RunningVehicleRegister;
         ImmediateRequestParams params = new ImmediateRequestParams(true, false, pickupDuration, dropoffDuration);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
-                calculator, params, true);
+                calculator, params, tdisSource);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());

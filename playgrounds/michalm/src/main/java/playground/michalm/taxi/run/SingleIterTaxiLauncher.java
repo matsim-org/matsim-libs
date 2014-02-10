@@ -106,23 +106,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         eventsFileName = dirName + "output\\ITERS\\it.20\\20.events.xml.gz";
 
-        // algorithmConfig = AlgorithmConfig.NOS_STRAIGHT_LINE;
-        // algorithmConfig = AlgorithmConfig.NOS_TRAVEL_DISTANCE;
-        algorithmConfig = AlgorithmConfig.NOS_FREE_FLOW;
-        // algorithmConfig = AlgorithmConfig.NOS_24_H;
-        // algorithmConfig = AlgorithmConfig.NOS_15_MIN;
-        // algorithmConfig = AlgorithmConfig.OTS_REQ_FREE_FLOW;
-        // algorithmConfig = AlgorithmConfig.OTS_REQ_24_H;
-        // algorithmConfig = AlgorithmConfig.OTS_REQ_15_MIN;
-        // algorithmConfig = AlgorithmConfig.OTS_DRV_FREE_FLOW;
-        // algorithmConfig = AlgorithmConfig.OTS_DRV_24_H;
-        // algorithmConfig = AlgorithmConfig.OTS_DRV_15_MIN;
-        // algorithmConfig = AlgorithmConfig.RES_REQ_FREE_FLOW;
-        // algorithmConfig = AlgorithmConfig.RES_REQ_24_H;
-        // algorithmConfig = AlgorithmConfig.RES_REQ_15_MIN;
-        // algorithmConfig = AlgorithmConfig.RES_DRV_FREE_FLOW;
-        // algorithmConfig = AlgorithmConfig.RES_DRV_24_H;
-        // algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
+        algorithmConfig = AlgorithmConfig.NOS_FF;
 
         destinationKnown = false;
         onlineVehicleTracker = true;

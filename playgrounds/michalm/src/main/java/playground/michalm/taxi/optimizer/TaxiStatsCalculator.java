@@ -178,8 +178,8 @@ public class TaxiStatsCalculator
         @Override
         public String toString()
         {
-            return new StringBuilder().append(taxiDropoffDriveTime).append('\t') //
-                    .append(taxiPickupDriveTime).append('\t') //
+            return new StringBuilder().append(taxiPickupDriveTime).append('\t') //
+                    .append(taxiDropoffDriveTime).append('\t') //
                     .append(taxiPickupTime).append('\t') //
                     .append(taxiDropoffTime).append('\t') //
                     .append(taxiCruiseTime).append('\t') //

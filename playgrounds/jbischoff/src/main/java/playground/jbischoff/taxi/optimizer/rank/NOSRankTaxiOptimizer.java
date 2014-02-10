@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
@@ -53,10 +54,10 @@ public class NOSRankTaxiOptimizer
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(MatsimVrpContext context,
             VrpPathCalculator calculator, ImmediateRequestParams params,
-            boolean straightLineDistance)
+            TravelDisutilitySource tdisSource)
     {
         return new NOSRankTaxiOptimizer(context, calculator, params, new IdleRankVehicleFinder(
-                context, calculator, straightLineDistance));
+                context, calculator, tdisSource));
     }
 
 

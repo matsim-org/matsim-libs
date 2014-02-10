@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.michalm.taxi.model.TaxiRequest;
@@ -38,15 +39,15 @@ public class IdleVehicleFinder
 {
     private final MatsimVrpContext context;
     private final VrpPathCalculator calculator;
-    private final boolean straightLineDistance;
+    private final TravelDisutilitySource tdisSource;
 
 
     public IdleVehicleFinder(MatsimVrpContext context, VrpPathCalculator calculator,
-            boolean straightLineDistance)
+            TravelDisutilitySource tdisSource)
     {
         this.context = context;
         this.calculator = calculator;
-        this.straightLineDistance = straightLineDistance;
+        this.tdisSource = tdisSource;
     }
 
 
@@ -54,15 +55,15 @@ public class IdleVehicleFinder
     public Vehicle findVehicle(Collection<Vehicle> vehicles, TaxiRequest req)
     {
         Vehicle bestVeh = null;
-        double bestDistance = Double.MAX_VALUE;
+        double bestCost = Double.MAX_VALUE;
 
         for (Vehicle veh : vehicles) {
-            double distance = calculateDistance(req, veh, context.getTime(), calculator,
-                    straightLineDistance);
+            double cost = calculateCost(req, veh, context.getTime(), calculator,
+                    tdisSource);
 
-            if (distance < bestDistance) {
+            if (cost < bestCost) {
                 bestVeh = veh;
-                bestDistance = distance;
+                bestCost = cost;
             }
         }
 
@@ -70,8 +71,8 @@ public class IdleVehicleFinder
     }
 
 
-    public static double calculateDistance(TaxiRequest req, Vehicle veh, double time,
-            VrpPathCalculator calculator, boolean straightLineDistance)
+    public static double calculateCost(TaxiRequest req, Vehicle veh, double time,
+            VrpPathCalculator calculator, TravelDisutilitySource tdisSource)
     {
         Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(veh);
         Link fromLink;
@@ -96,19 +97,19 @@ public class IdleVehicleFinder
 
         Link toLink = req.getFromLink();
 
-        if (straightLineDistance) {
-            Coord fromCoord = fromLink.getCoord();
-            Coord toCoord = toLink.getCoord();
+        switch (tdisSource) {
+            case STRAIGHT_LINE:
+                Coord fromCoord = fromLink.getCoord();
+                Coord toCoord = toLink.getCoord();
 
-            double deltaX = toCoord.getX() - fromCoord.getX();
-            double deltaY = toCoord.getY() - fromCoord.getY();
+                double deltaX = toCoord.getX() - fromCoord.getX();
+                double deltaY = toCoord.getY() - fromCoord.getY();
 
-            // this is a SQUARED distance!!! (to avoid unnecessary Math.sqrt() calls)
-            return deltaX * deltaX + deltaY * deltaY;
-        }
-        else {
-            //TODO consider storing the shortest path (sth like BestShortestPath object)
-            return calculator.calcPath(fromLink, toLink, time).getTravelCost();
+                // this is a SQUARED distance!!! (to avoid unnecessary Math.sqrt() calls)
+                return deltaX * deltaX + deltaY * deltaY;
+
+            default:
+                return calculator.calcPath(fromLink, toLink, time).getTravelCost();
         }
     }
 }

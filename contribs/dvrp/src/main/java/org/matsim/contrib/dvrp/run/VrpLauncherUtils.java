@@ -70,8 +70,9 @@ public class VrpLauncherUtils
 
     public enum TravelDisutilitySource
     {
-        TIME, // travel time
-        DISTANCE; // travel distance
+        STRAIGHT_LINE, // however, Dijkstra's algo will use DISTANCE cost
+        DISTANCE, // travel distance
+        TIME; // travel time
     }
 
 
@@ -159,6 +160,7 @@ public class VrpLauncherUtils
             TravelTime travelTime)
     {
         switch (tdisSource) {
+            case STRAIGHT_LINE:
             case DISTANCE:
                 return new DistanceAsTravelDisutility();
 
