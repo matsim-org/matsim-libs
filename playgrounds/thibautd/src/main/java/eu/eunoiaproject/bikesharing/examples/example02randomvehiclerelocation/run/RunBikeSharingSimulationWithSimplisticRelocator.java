@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 
+import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.config.RandomRelocatorConfigGroup;
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.BikeSharingWithSimplisticRelocationQSimFactory;
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.SimplisticRelocatorManagerEngine;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
@@ -42,13 +43,14 @@ public class RunBikeSharingSimulationWithSimplisticRelocator {
 		
 		if ( TRACE_RELOCATION ) Logger.getLogger( SimplisticRelocatorManagerEngine.class ).setLevel( Level.TRACE );
 
-		final Scenario sc = BikeSharingScenarioUtils.loadScenario( configFile );
+		final RandomRelocatorConfigGroup configGroup = new RandomRelocatorConfigGroup();
+		final Scenario sc = BikeSharingScenarioUtils.loadScenario( configFile , configGroup );
 		final Controler controler = new Controler( sc );
 
 		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc ) );
 		controler.setMobsimFactory(
 				new BikeSharingWithSimplisticRelocationQSimFactory(
-					10 ) );
+					configGroup.getNVehicles() ) );
 
 		controler.run();
 	}
