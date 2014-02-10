@@ -35,6 +35,7 @@ import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.Leas
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastPointedPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.strategies.ActivityInGroupLocationChoiceFactory;
+import playground.thibautd.socnetsim.replanning.strategies.JointPrismLocationChoiceStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.JointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.CoalitionRandomFactory;
@@ -100,6 +101,9 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory(
 				"JointLocationMutator",
 				new RandomJointLocationChoiceStrategy( this ) );
+		addFactory(
+				"JointPrismLocationChoice",
+				new JointPrismLocationChoiceStrategyFactory( this ) );
 
 		// selectors
 		// ---------------------------------------------------------------------
