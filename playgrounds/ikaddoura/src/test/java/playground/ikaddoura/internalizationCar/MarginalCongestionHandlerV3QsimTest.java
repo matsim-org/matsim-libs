@@ -227,7 +227,6 @@ public class MarginalCongestionHandlerV3QsimTest {
 	// in both iterations the "toll" and the "tollOldValue" should be the same
 	//
 	// 3 iterations are necessary to check the equality of the "toll" and the "tollOldValue"
-	@Ignore
 	@Test
 	public final void testRouting(){
 		
