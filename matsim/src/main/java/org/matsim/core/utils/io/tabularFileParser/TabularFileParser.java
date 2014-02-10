@@ -21,11 +21,10 @@
 package org.matsim.core.utils.io.tabularFileParser;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Parser for plain text files that are structured in columns.
@@ -96,13 +95,14 @@ public class TabularFileParser implements MatsimSomeReader {
 
         boolean started = (config.getStartRegex() == null);
         boolean ended = false;
-
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader(config.getFile()));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        
+        // this allows to read compressed files as well // DR feb, '14 
+        BufferedReader reader = IOUtils.getBufferedReader(config.getFile());
+//        try {
+//            reader = new BufferedReader(new FileReader(config.getFile()));
+//        } catch (FileNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
         try {
         	String line;
 	        while ((line = reader.readLine()) != null && !ended) {
