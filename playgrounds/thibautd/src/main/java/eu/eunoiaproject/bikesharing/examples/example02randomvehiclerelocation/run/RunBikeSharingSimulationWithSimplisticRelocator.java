@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GenerateRandomBikeSharingFacilities.java
+ * RunBikeSharingSimulationWithSimplisticRelocator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
+package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.run;
 
-import java.util.Random;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.controler.Controler;
 
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
+import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.BikeSharingWithSimplisticRelocationQSimFactory;
+import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.SimplisticRelocatorManagerEngine;
+import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 
 /**
  * @author thibautd
  */
-public class GenerateRandomBikeSharingFacilities {
-	private static final double P_ACCEPT_LINK = 0.01;
-	private static final int MAX_CAPACITY = 100;
-
+public class RunBikeSharingSimulationWithSimplisticRelocator {
+	// this increases the level of output of the relocating engine for debugging
+	private static final boolean TRACE_RELOCATION = false;
+	
 	public static void main(final String[] args) {
-		final String networkFile = args[ 0 ];
-		final String outputFacilitiesFile = args[ 1 ];
+		final String configFile = args[ 0 ];
+		
+		if ( TRACE_RELOCATION ) Logger.getLogger( SimplisticRelocatorManagerEngine.class ).setLevel( Level.TRACE );
 
-		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).parse( networkFile );
+		final Scenario sc = BikeSharingScenarioUtils.loadScenario( configFile );
+		final Controler controler = new Controler( sc );
 
-		final BikeSharingFacilities facilities = new BikeSharingFacilities();
+		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc ) );
+		controler.setMobsimFactory(
+				new BikeSharingWithSimplisticRelocationQSimFactory(
+					10 ) );
 
-		final Random r = new Random( 98564 );
-		for ( Link l : sc.getNetwork().getLinks().values() ) {
-			if ( r.nextDouble() > P_ACCEPT_LINK ) continue;
-
-			final int cap = r.nextInt( MAX_CAPACITY );
-			facilities.addFacility(
-					facilities.getFactory().createBikeSharingFacility(
-						new IdImpl( "bs-"+l.getId() ),
-						l.getCoord(),
-						l.getId(),
-						cap,
-						(int) (r.nextDouble() * cap) ) );
-		}
-
-		new BikeSharingFacilitiesWriter( facilities ).write( outputFacilitiesFile );
+		controler.run();
 	}
 }
 
