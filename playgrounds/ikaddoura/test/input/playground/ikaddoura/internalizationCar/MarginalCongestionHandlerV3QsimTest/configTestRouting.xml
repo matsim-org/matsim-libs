@@ -17,9 +17,9 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="3" />
 		<param name="snapshotFormat" value="otfvis" />
-		<param name="writeSnapshotsInterval" value="1" />
-		<param name="writeEventsInterval" value="1" />
-		<param name="writePlansInterval" value="1" />
+		<param name="writeSnapshotsInterval" value="0" />
+		<param name="writeEventsInterval" value="0" />
+		<param name="writePlansInterval" value="0" />
 	</module>
 
 	<module name="qsim">
@@ -27,7 +27,7 @@
 		<param name="endTime" value="30:00:00" />
 		
 		<param name="snapshotStyle" value="queue" />	
-		<param name="snapshotperiod" value = "00:00:01"/>
+		<param name="snapshotperiod" value = "00:00:00"/>
 		<param name="vehicleBehavior" value="wait" />
 		
 		<param name="removeStuckVehicles" value="true" />
