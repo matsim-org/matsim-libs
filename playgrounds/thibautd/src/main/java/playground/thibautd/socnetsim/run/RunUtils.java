@@ -97,6 +97,7 @@ import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.GroupReplanningListennerWithPSimLoop;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
+import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceConfigGroup;
 import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
@@ -626,7 +627,6 @@ public class RunUtils {
 
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig();
-		// needed for reading a non-flat format (other solution would be to put this in reader)
 		final GroupReplanningConfigGroup weights = new GroupReplanningConfigGroup();
 		config.addModule( weights );
 		config.addModule( new ScoringFunctionConfigGroup() );
@@ -636,6 +636,7 @@ public class RunUtils {
 		config.addModule( new SocialNetworkConfigGroup() );
 		config.addModule( new RandomJointLocationChoiceConfigGroup() );
 		config.addModule( new PlanLinkConfigGroup() );
+		config.addModule( new PrismicLocationChoiceConfigGroup() );
 		new NonFlatConfigReader( config ).parse( configFile );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 	
