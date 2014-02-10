@@ -169,12 +169,12 @@ public class GautengControler_subpopulations {
 		assignSubpopulationStrategies(config);
 
 		config.planCalcScore().setBrainExpBeta(1.0);
-		config.controler().setWritePlansInterval(10);
+		config.controler().setWritePlansInterval(100);
 
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.controler().setRoutingAlgorithmType( RoutingAlgorithmType.FastAStarLandmarks );
-		config.controler().setLastIteration(100);
+		config.controler().setLastIteration(1000);
 
 		config.counts().setCountsScaleFactor(100.);
 		config.qsim().setFlowCapFactor(0.01);

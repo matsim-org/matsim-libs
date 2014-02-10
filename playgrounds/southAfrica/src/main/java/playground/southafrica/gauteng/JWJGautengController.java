@@ -21,7 +21,7 @@ public class JWJGautengController {
 				GAUTENG_PATH + "toll/gauteng_toll_weekday_Existing_20131211.xml", // toll
 				"110", // base VoT
 				"3", // VoT multiplier
-				"1", // number of threads
+				"8", // number of threads
 				User.johan.toString(),
 //				"/Users/jwjoubert/Documents/Temp/sanral-runs/output/"
 				"./output_base/"
