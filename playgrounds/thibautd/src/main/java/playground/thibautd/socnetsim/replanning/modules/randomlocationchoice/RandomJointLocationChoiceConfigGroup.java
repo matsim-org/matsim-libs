@@ -55,7 +55,6 @@ public class RandomJointLocationChoiceConfigGroup extends ReflectiveModule {
 
 	@StringGetter( "activityTypes" )
 	private String getTypesAsString() {
-		if ( types.isEmpty() ) return "null";
 		final StringBuilder builder = new StringBuilder();
 		final Iterator<String> strings = types.iterator();
 		builder.append( strings.next() );
@@ -68,16 +67,11 @@ public class RandomJointLocationChoiceConfigGroup extends ReflectiveModule {
 	}
 
 	@StringSetter( "activityTypes" )
-	public void setTypes(final String types) {
-		if ( types == null ) {
-			setTypes( (Collection<String>) null );
-		}
-		else {
-			final String[] typesarr = types.split( "," );
-			final Collection<String> coll = new HashSet<String>( typesarr.length );
-			for ( String s : typesarr ) coll.add( s );
-			setTypes( coll );
-		}
+	private void setTypes(final String types) {
+		final String[] typesarr = types.split( "," );
+		final Collection<String> coll = new HashSet<String>( typesarr.length );
+		for ( String s : typesarr ) coll.add( s );
+		setTypes( coll );
 	}
 
 	public void setTypes(final Collection<String> types) {
