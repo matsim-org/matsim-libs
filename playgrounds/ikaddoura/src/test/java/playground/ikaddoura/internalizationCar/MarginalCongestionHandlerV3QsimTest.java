@@ -23,13 +23,16 @@
 package playground.ikaddoura.internalizationCar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.config.Config;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -47,6 +50,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -56,16 +65,20 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
- * @author ikaddoura
+ * @author ikaddoura , lkroeger
  *
  */
 
@@ -79,12 +92,35 @@ public class MarginalCongestionHandlerV3QsimTest {
 	private Id testAgent1 = new IdImpl("testAgent1");
 	private Id testAgent2 = new IdImpl("testAgent2");
 	private Id testAgent3 = new IdImpl("testAgent3");
+	private Id testAgent4 = new IdImpl("testAgent4");
+	private Id testAgent5 = new IdImpl("testAgent5");
+	private Id testAgent6 = new IdImpl("testAgent6");
+	private Id testAgent11 = new IdImpl("testAgent11");
+	private Id testAgent12 = new IdImpl("testAgent12");
+	private Id testAgent13 = new IdImpl("testAgent13");
+	private Id testAgent14 = new IdImpl("testAgent14");
+	private Id testAgent15 = new IdImpl("testAgent15");
+	private Id testAgent16 = new IdImpl("testAgent16");
 	
 	private Id linkId1 = new IdImpl("link1");
 	private Id linkId2 = new IdImpl("link2");
 	private Id linkId3 = new IdImpl("link3");
 	private Id linkId4 = new IdImpl("link4");
 	private Id linkId5 = new IdImpl("link5");
+	
+	private Id linkId1_ = new IdImpl("linkId1_");
+	private Id linkId2_ = new IdImpl("linkId2_");
+	private Id linkId3_ = new IdImpl("linkId3_");
+	private Id linkId4_ = new IdImpl("linkId4_");
+
+	double avgValue1 = 0.0;
+	double avgValue2 = 0.0;
+	double avgOldValue1 = 0.0;
+	double avgOldValue2 = 0.0;
+	double avgValue3 = 0.0;
+	double avgValue4 = 0.0;
+	double avgOldValue3 = 0.0;
+	double avgOldValue4 = 0.0;
 	
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
@@ -177,8 +213,141 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 	}
 	
-	// ################################################################################################################################
+	// testing the routing
+	// link 2 has a capacity of 60 vehicles / hour (= 1 vehicle / 60 seconds)
+	// 3 agents enter the relevant link at 8:14 (in the time-bin 8:00-8:15), the second and third agent  leave the link after 8:15:00 (hence in the next time-bin 8:15-8:30)
+	// some minutes later 3 agents enter and leave the relevant link in the same time-bin (8:15-8:30)
+	// in both cases delays of about 1 + 2 minutes are caused
+	// in both cases the router should consider the time-bin of the LinkEnterEvent (not that one of the Link-LeaveEvent)
+	// this applies for the calculation of the average toll-costs, too.
+	//
+	// Moreover the "toll" and "tollOldValue" are compared here for the last iteration
+	// Due to no route- and mode-alternatives and no stucking agents
+	// in both iterations the "toll" and the "tollOldValue" should be the same
+	//
+	// 3 iterations are necessary to check the equality of the "toll" and the "tollOldValue"
+	@Test
+	public final void testRouting(){
 		
+		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3QsimTest/configTestRouting.xml";
+
+		Controler controler = new Controler(configFile);
+		
+		final TollHandler tollHandler = new TollHandler(controler.getScenario());
+		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+		controler.addControlerListener(new InternalizationCarControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler ));
+	
+		final String timeBin1 = "08:00-08:15";
+		final String timeBin2 = "08:15-08:30";
+			
+		final Map<String,Integer> enterCounter = new HashMap<String,Integer>();
+		final Map<String,Integer> leaveCounter = new HashMap<String,Integer>();
+			
+		enterCounter.put(timeBin1,0);
+		enterCounter.put(timeBin2,0);
+		leaveCounter.put(timeBin1,0);
+		leaveCounter.put(timeBin2,0);
+		
+		controler.getEvents().addHandler( new LinkEnterEventHandler() {
+	
+			@Override
+			public void reset(int iteration) {	
+				enterCounter.put(timeBin1,0);
+				enterCounter.put(timeBin2,0);
+				leaveCounter.put(timeBin1,0);
+				leaveCounter.put(timeBin2,0);
+			}
+	
+			@Override
+			public void handleEvent(LinkEnterEvent event) {
+				if(event.getLinkId().toString().equals("linkId2_")){
+					if(event.getTime()>=28800 && event.getTime()<=29700){
+						enterCounter.put(timeBin1, (enterCounter.get(timeBin1)+1));
+					}else if(event.getTime()>=29700 && event.getTime()<=30600){
+						enterCounter.put(timeBin2, (enterCounter.get(timeBin2)+1));
+					}
+				}else{}
+			}	
+		});
+			
+		controler.getEvents().addHandler( new LinkLeaveEventHandler() {
+	
+			@Override
+			public void reset(int iteration) {	
+				enterCounter.put(timeBin1,0);
+				enterCounter.put(timeBin2,0);
+				leaveCounter.put(timeBin1,0);
+				leaveCounter.put(timeBin2,0);
+			}
+	
+			@Override
+			public void handleEvent(LinkLeaveEvent event) {
+				if(event.getLinkId().toString().equals("linkId2_")){
+					if(event.getTime()>=28800 && event.getTime()<=29700){
+						leaveCounter.put(timeBin1, (leaveCounter.get(timeBin1)+1));
+					}else if(event.getTime()>=29700 && event.getTime()<=30600){
+						leaveCounter.put(timeBin2, (leaveCounter.get(timeBin2)+1));
+					}
+				}else{}
+			}	
+		});
+			
+		controler.addControlerListener(new IterationStartsListener() {
+				
+			@Override
+			public void notifyIterationStarts(IterationStartsEvent event) {
+				// last but one iteration
+				if(((event.getControler().getLastIteration())-(event.getIteration()))==1){
+					Link link_2 = event.getControler().getScenario().getNetwork().getLinks().get(linkId2_);
+					avgValue1 = tollHandler.getAvgToll(link_2, 28800);
+					avgValue2 = tollHandler.getAvgToll(link_2, 29700);
+					avgOldValue1 = tollHandler.getAvgTollOldValue(link_2, 28800);
+					avgOldValue2 = tollHandler.getAvgTollOldValue(link_2, 28800);
+				}
+				// last iteration
+				else if(((event.getControler().getLastIteration())-(event.getIteration()))==0){
+					Link link_2 = event.getControler().getScenario().getNetwork().getLinks().get(linkId2_);
+					avgValue3 = tollHandler.getAvgToll(link_2, 28800);
+					avgValue4 = tollHandler.getAvgToll(link_2, 29700);
+					avgOldValue3 = tollHandler.getAvgTollOldValue(link_2, 28800);
+					avgOldValue4 = tollHandler.getAvgTollOldValue(link_2, 28800);
+				}
+			}
+				
+		});
+			
+//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+		controler.setOverwriteFiles(true);
+		controler.run();
+			
+		{ // controlling and showing the conditions of the test:
+			Assert.assertEquals("entering agents in timeBin1.", 3.0, (double)enterCounter.get(timeBin1), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("entering agents in timeBin2.", 3.0, (double)enterCounter.get(timeBin2), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("leaving agents in timeBin1.", 1.0, (double)leaveCounter.get(timeBin1), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("leaving agents in timeBin1.", 5.0, (double)leaveCounter.get(timeBin2), MatsimTestUtils.EPSILON);
+		}
+			
+		// for both time-bins ("28800-29700" and "29700-30600")
+		// the expectedTollDisutility should be the same
+		// because in both time-bins 3 agents enter the link,
+		// the congestion effects of each 3 cars are the same,
+		// the fact that 2 of the first 3 cars leave the link in the next time-bin should be irrelevant
+			
+		Assert.assertEquals("avgValue1 == avgValue2", avgValue1, avgValue2, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("avgValue3 == avgValue3", avgValue3, avgValue4, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("avgValue1 == avgValue3", avgValue1, avgValue3, MatsimTestUtils.EPSILON);
+			
+		Assert.assertEquals("avgOldValue1 == avgOldValue2", avgOldValue1, avgOldValue2, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("avgOldValue3 == avgOldValue3", avgOldValue3, avgOldValue4, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("avgOldValue1 == avgOldValue3", avgOldValue1, avgOldValue3, MatsimTestUtils.EPSILON);
+			
+		Assert.assertEquals("avgValue1 == avgOldValue1", avgValue1, avgOldValue1, MatsimTestUtils.EPSILON);
+		
+	 }
+	
+	// ################################################################################################################################
+
 	private void setPopulation1(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
@@ -284,6 +453,85 @@ private void setPopulation2(Scenario scenario) {
 		population.addPerson(person3);
 	
 
+	}
+
+	//identical with the population-xml-file for testRouting
+	private void setPopulation3(Scenario scenario) {
+		
+		Population population = scenario.getPopulation();
+		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
+		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
+	
+		Activity workActLink3 = popFactory.createActivityFromLinkId("work", linkId3);
+		
+		// leg: 1,2,3
+		Leg leg_1_3 = popFactory.createLeg("car");
+		List<Id> linkIds2 = new ArrayList<Id>();
+		linkIds2.add(linkId2);
+		NetworkRoute route1_3 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
+		route1_3.setLinkIds(linkId1, linkIds2, linkId3);
+		leg_1_3.setRoute(route1_3);
+		
+		Person person1 = popFactory.createPerson(testAgent11);
+		Plan plan1 = popFactory.createPlan();
+		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
+		homeActLink1_1.setEndTime(29620);
+		plan1.addActivity(homeActLink1_1);
+		plan1.addLeg(leg_1_3);
+		plan1.addActivity(workActLink3);
+		person1.addPlan(plan1);
+		population.addPerson(person1);
+		
+		Person person2 = popFactory.createPerson(testAgent12);
+		Plan plan2 = popFactory.createPlan();
+		Activity homeActLink1_2 = popFactory.createActivityFromLinkId("home", linkId1);
+		homeActLink1_2.setEndTime(29621);
+		plan2.addActivity(homeActLink1_2);
+		plan2.addLeg(leg_1_3);
+		plan2.addActivity(workActLink3);
+		person2.addPlan(plan2);
+		population.addPerson(person2);
+		
+		Person person3 = popFactory.createPerson(testAgent13);
+		Plan plan3 = popFactory.createPlan();
+		Activity homeActLink1_3 = popFactory.createActivityFromLinkId("home", linkId1);
+		homeActLink1_3.setEndTime(29622);
+		plan3.addActivity(homeActLink1_3);
+		plan3.addLeg(leg_1_3);
+		plan3.addActivity(workActLink3);
+		person3.addPlan(plan3);
+		population.addPerson(person3);
+		
+		Person person4 = popFactory.createPerson(testAgent14);
+		Plan plan4 = popFactory.createPlan();
+		Activity homeActLink1_4 = popFactory.createActivityFromLinkId("home", linkId1);
+		homeActLink1_4.setEndTime(30100);
+		plan4.addActivity(homeActLink1_4);
+		plan4.addLeg(leg_1_3);
+		plan4.addActivity(workActLink3);
+		person4.addPlan(plan4);
+		population.addPerson(person4);
+		
+		Person person5 = popFactory.createPerson(testAgent15);
+		Plan plan5 = popFactory.createPlan();
+		Activity homeActLink1_5 = popFactory.createActivityFromLinkId("home", linkId1);
+		homeActLink1_5.setEndTime(30101);
+		plan5.addActivity(homeActLink1_5);
+		plan5.addLeg(leg_1_3);
+		plan5.addActivity(workActLink3);
+		person5.addPlan(plan5);
+		population.addPerson(person5);
+		
+		Person person6 = popFactory.createPerson(testAgent16);
+		Plan plan6 = popFactory.createPlan();
+		Activity homeActLink1_6 = popFactory.createActivityFromLinkId("home", linkId1);
+		homeActLink1_6.setEndTime(30102);
+		plan6.addActivity(homeActLink1_6);
+		plan6.addLeg(leg_1_3);
+		plan6.addActivity(workActLink3);
+		person6.addPlan(plan6);
+		population.addPerson(person6);
+	
 	}
 	
 	private Scenario loadScenario1() {
@@ -457,6 +705,81 @@ private void setPopulation2(Scenario scenario) {
 		network.addLink(link3);
 		network.addLink(link4);
 		network.addLink(link5);
+
+		this.events = EventsUtils.createEventsManager();
+		return scenario;
+	}
+	
+	// identical with the network-xml-file for testRouting
+	private Scenario loadScenario3() {
+		
+		//	  <---------------------link4------------------< 
+		// (0)				(1)				(2)				(3)	
+		//    >----link1--->   >---link2--->   >---link3--->     
+		
+		Config config = testUtils.loadConfig(null);
+		QSimConfigGroup qSimConfigGroup = config.qsim();
+		qSimConfigGroup.setFlowCapFactor(1.0);
+		qSimConfigGroup.setStorageCapFactor(1.0);
+		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setRemoveStuckVehicles(true);
+		qSimConfigGroup.setStuckTime(3600.0);
+		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+	
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		network.setEffectiveCellSize(7.5);
+		network.setCapacityPeriod(3600.);
+		
+		Node node0 = network.getFactory().createNode(new IdImpl("0"), scenario.createCoord(0., 0.));
+		Node node1 = network.getFactory().createNode(new IdImpl("1"), scenario.createCoord(100., 0.));
+		Node node2 = network.getFactory().createNode(new IdImpl("2"), scenario.createCoord(200., 0.));
+		Node node3 = network.getFactory().createNode(new IdImpl("3"), scenario.createCoord(300., 0.));
+		
+		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
+		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);
+		Link link3 = network.getFactory().createLink(this.linkId3, node2, node3);
+		Link link4 = network.getFactory().createLink(this.linkId4, node3, node1);
+
+		Set<String> modes = new HashSet<String>();
+		modes.add("car");
+		
+		// link without capacity restrictions
+		link1.setAllowedModes(modes);
+		link1.setCapacity(3600);
+		link1.setFreespeed(10); // one time step
+		link1.setNumberOfLanes(1);
+		link1.setLength(500);
+
+		// link without capacity restrictions
+		link2.setAllowedModes(modes);
+		link2.setCapacity(60);
+		link2.setFreespeed(10); // two time steps
+		link2.setNumberOfLanes(1);
+		link2.setLength(500);
+
+		// capacity: one car every 10 sec
+		link3.setAllowedModes(modes);
+		link3.setCapacity(3600);
+		link3.setFreespeed(10); // one time step
+		link3.setNumberOfLanes(1);
+		link3.setLength(500);
+
+		// link without capacity restrictions
+		link4.setAllowedModes(modes);
+		link4.setCapacity(3600);
+		link4.setFreespeed(10); // two time steps
+		link4.setNumberOfLanes(1);
+		link4.setLength(1500);
+
+		network.addNode(node0);
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+
+		network.addLink(link1);
+		network.addLink(link2);
+		network.addLink(link3);
+		network.addLink(link4);
 
 		this.events = EventsUtils.createEventsManager();
 		return scenario;
