@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.replanning.modules.randomlocationchoice;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.replanning.ReplanningContext;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -58,7 +59,7 @@ public class RandomJointLocationChoiceModule extends AbstractMultithreadedGeneri
 	}
 
 	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm() {
+	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
 		return new RandomJointLocationChoiceAlgorithm( config , facilities , socialNetwork );
 	}
 }

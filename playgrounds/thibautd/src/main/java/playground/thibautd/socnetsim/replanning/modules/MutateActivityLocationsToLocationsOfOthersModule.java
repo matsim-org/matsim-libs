@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.replanning.modules;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -48,7 +49,7 @@ public class MutateActivityLocationsToLocationsOfOthersModule extends AbstractMu
 	}
 
 	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm() {
+	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
 		return new MutateActivityLocationsToLocationsOfOthersAlgorithm(
 				choiceSet,
 				MatsimRandom.getLocalInstance());

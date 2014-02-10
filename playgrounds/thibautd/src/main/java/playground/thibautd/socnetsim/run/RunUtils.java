@@ -47,6 +47,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
@@ -432,7 +433,7 @@ public class RunUtils {
 				new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
 						scenario.getConfig().global() ) {
 					@Override
-					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
+					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(ReplanningContext replanningContext) {
 						return 
 							new PrepareVehicleAllocationForSimAlgorithm(
 									MatsimRandom.getLocalInstance(),

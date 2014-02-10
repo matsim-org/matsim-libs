@@ -55,7 +55,7 @@ public abstract class AbstractMultithreadedGenericStrategyModule<T> implements G
 			final ReplanningContext replanningContext,
 			final Collection<T> groupPlans) {
 		log.info( "running "+name+" on "+groupPlans.size()+" groups" );
-		final List<PlanRunnable<T>> runnables = getPlanRunnables( groupPlans );
+		final List<PlanRunnable<T>> runnables = getPlanRunnables( replanningContext , groupPlans );
 		final ExceptionHandler exceptionHandler = new ExceptionHandler();
 
 		List<Thread> threads = new ArrayList<Thread>( numOfThreads );
@@ -80,12 +80,14 @@ public abstract class AbstractMultithreadedGenericStrategyModule<T> implements G
 		}
 	}
 
-	private List<PlanRunnable<T>> getPlanRunnables(Collection<T> groupPlans) {
+	private List<PlanRunnable<T>> getPlanRunnables(
+			final ReplanningContext replanningContext,
+			final Collection<T> groupPlans) {
 		final List<PlanRunnable<T>> runnables = new ArrayList<PlanRunnable<T>>();
 
 		final Counter counter = new Counter( "["+name+"] handled plan # " );
 		for (int i=0; i < numOfThreads; i++) {
-			runnables.add( new PlanRunnable<T>( counter , createAlgorithm() ) );
+			runnables.add( new PlanRunnable<T>( counter , createAlgorithm(replanningContext) ) );
 		}
 
 		int count = 0;
@@ -97,7 +99,7 @@ public abstract class AbstractMultithreadedGenericStrategyModule<T> implements G
 		return runnables;
 	}
 
-	public abstract GenericPlanAlgorithm<T> createAlgorithm();
+	public abstract GenericPlanAlgorithm<T> createAlgorithm(ReplanningContext replanningContext);
 
 	private static class PlanRunnable<T> implements Runnable {
 		final List<T> groupPlans = new ArrayList<T>();
@@ -144,7 +146,7 @@ public abstract class AbstractMultithreadedGenericStrategyModule<T> implements G
 		final String tmpName = getClass().getSimpleName();
 		if (tmpName.length() == 0) {
 			// anonymous class
-			return createAlgorithm().getClass().getSimpleName();
+			return "???";//createAlgorithm(replanningContext).getClass().getSimpleName();
 		}
 
 		return tmpName;

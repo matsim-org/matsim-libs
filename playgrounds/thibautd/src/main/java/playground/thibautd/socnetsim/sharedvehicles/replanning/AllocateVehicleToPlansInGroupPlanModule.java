@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.sharedvehicles.replanning;
 import java.util.Collection;
 
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -51,7 +52,7 @@ public class AllocateVehicleToPlansInGroupPlanModule extends AbstractMultithread
 	}
 
 	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm() {
+	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
 		return new AllocateVehicleToPlansInGroupPlanAlgorithm(
 				MatsimRandom.getLocalInstance(),
 				vehicleRessources,

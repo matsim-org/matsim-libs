@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
@@ -371,7 +372,7 @@ public class ControllerRegistryBuilder {
 				new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
 					scenario.getConfig().global()) {
 					@Override
-					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
+					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(ReplanningContext replanningContext) {
 						final PlanAlgorithm routingAlgorithm =
 									getPlanRoutingAlgorithmFactory().createPlanRoutingAlgorithm(
 										getTripRouterFactory().instantiateAndConfigureTripRouter() );

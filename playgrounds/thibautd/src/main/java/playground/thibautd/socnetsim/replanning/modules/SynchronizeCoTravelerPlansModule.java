@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.modules;
 
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.StageActivityTypes;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -38,7 +39,7 @@ public class SynchronizeCoTravelerPlansModule extends AbstractMultithreadedGener
 	}
 
 	@Override
-	public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
+	public GenericPlanAlgorithm<JointPlan> createAlgorithm(ReplanningContext replanningContext) {
 		return new SynchronizeCoTravelerPlansAlgorithm( checker );
 	}
 }

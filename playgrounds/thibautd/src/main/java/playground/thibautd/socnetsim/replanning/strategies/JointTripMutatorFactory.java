@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.replanning.strategies;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -64,7 +65,7 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 			new JointPlanBasedGroupStrategyModule(
 					new AbstractMultithreadedGenericStrategyModule<JointPlan>( config.global() ) {
 						@Override
-						public GenericPlanAlgorithm<JointPlan> createAlgorithm() {
+						public GenericPlanAlgorithm<JointPlan> createAlgorithm(ReplanningContext replanningContext) {
 							return new JointTripInsertorAndRemoverAlgorithm(
 								registry.getScenario(),
 								registry.getTripRouterFactory().instantiateAndConfigureTripRouter(),

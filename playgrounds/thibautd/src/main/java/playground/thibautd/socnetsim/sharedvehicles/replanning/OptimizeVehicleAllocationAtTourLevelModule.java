@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.sharedvehicles.replanning;
 import java.util.Collection;
 
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.StageActivityTypes;
 
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -52,7 +53,7 @@ public class OptimizeVehicleAllocationAtTourLevelModule  extends AbstractMultith
 	}	
 
 	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm() {
+	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
 		return new OptimizeVehicleAllocationAtTourLevelAlgorithm(
 			stageActs,
 			MatsimRandom.getLocalInstance(),
