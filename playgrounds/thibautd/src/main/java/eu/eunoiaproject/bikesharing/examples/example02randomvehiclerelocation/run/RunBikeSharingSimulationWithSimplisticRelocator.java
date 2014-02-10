@@ -32,6 +32,11 @@ import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactor
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 
 /**
+ * A script which builds a simulation with relocation agents.
+ * As for the example 1, it is pretty simple: just setup the specific elements
+ * and run the Controler.
+ * Here, how to use a specifically tailored config group to read specific parameters
+ * from the xml config file is also demonstrated.
  * @author thibautd
  */
 public class RunBikeSharingSimulationWithSimplisticRelocator {
