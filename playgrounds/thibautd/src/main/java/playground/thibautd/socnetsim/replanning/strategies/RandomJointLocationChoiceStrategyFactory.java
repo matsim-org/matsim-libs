@@ -28,9 +28,9 @@ import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.Ran
 /**
  * @author thibautd
  */
-public class RandomJointLocationChoiceStrategy extends AbstractConfigurableSelectionStrategy {
+public class RandomJointLocationChoiceStrategyFactory extends AbstractConfigurableSelectionStrategy {
 
-	public RandomJointLocationChoiceStrategy(
+	public RandomJointLocationChoiceStrategyFactory(
 			GroupPlanStrategyFactoryRegistry factoryRegistry) {
 		super(factoryRegistry);
 	}

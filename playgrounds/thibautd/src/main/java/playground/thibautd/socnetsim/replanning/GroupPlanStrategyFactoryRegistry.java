@@ -54,7 +54,7 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupWeightedSelectEx
 import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomGroupPlanSelectorStrategyFactory;
-import playground.thibautd.socnetsim.replanning.strategies.RandomJointLocationChoiceStrategy;
+import playground.thibautd.socnetsim.replanning.strategies.RandomJointLocationChoiceStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomSumGroupPlanSelectorStrategyFactory;
 
 /**
@@ -100,7 +100,7 @@ public class GroupPlanStrategyFactoryRegistry {
 				new GroupActivitySequenceMutator( this ) );
 		addFactory(
 				"JointLocationMutator",
-				new RandomJointLocationChoiceStrategy( this ) );
+				new RandomJointLocationChoiceStrategyFactory( this ) );
 		addFactory(
 				"JointPrismLocationChoice",
 				new JointPrismLocationChoiceStrategyFactory( this ) );
