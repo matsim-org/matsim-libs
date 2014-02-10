@@ -48,11 +48,12 @@
 			<source>CHANGELOG.txt</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
+		-->
 		<file>
-			<source>README.txt</source>
+			<source>README-EUNOIA.txt</source>
+			<destName>README.txt</destName>
 			<outputDirectory>/</outputDirectory>
 		</file>
-		-->
 		<file>
 			<source>${project.build.directory}/${project.build.finalName}.jar</source>
 			<outputDirectory>/</outputDirectory>
