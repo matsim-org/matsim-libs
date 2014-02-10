@@ -62,8 +62,9 @@ import playground.southafrica.utilities.Header;
 public class RunNationalFreight {
 	private final static Logger LOG = Logger.getLogger(RunNationalFreight.class);
 	
-	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/100/";
+//	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/100/";
 //	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/01perc/";
+	private static String HOME = "/Users/jwjoubert/Documents/Temp/freightPopulation/runs/10perc/";
 	
 	private static String NETWORK = "/Users/jwjoubert/Documents/workspace/Data-southAfrica/network/southAfrica_20131202_coarseNetwork_clean.xml.gz";
 	private static String OUTPUT_DIRECTORY = HOME + "output/";
