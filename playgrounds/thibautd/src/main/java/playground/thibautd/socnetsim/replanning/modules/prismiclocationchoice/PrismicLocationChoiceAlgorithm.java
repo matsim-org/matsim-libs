@@ -173,7 +173,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 
 		// TODO: separate in methods to replace continues by returns
 		while ( !plans.isEmpty() ) {
-			final Plan seed = CollectionUtils.getRandomElement( random , plans ).getValue();
+			final Plan seed = CollectionUtils.removeRandomElement( random , plans ).getValue();
 			final Subchain seedSubchain = getRandomSubchain( seed , config.getTypes() );
 			if ( seedSubchain == null ) continue;
 
