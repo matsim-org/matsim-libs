@@ -95,7 +95,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 		}
 	}
 
-	private void changeLocation(
+	private static void changeLocation(
 			final Collection<Subchain> subchains,
 			final ActivityFacility facility) {
 		for ( Subchain subchain : subchains ) {
@@ -114,6 +114,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 		final QuadTree<ActivityFacility> quadTree = facilitiesPerType.get( type );
 
 		// TODO: iterate Andi-like (extend search space if not enough potential solutions)
+		// TODO: handle case where one agent is far away (ie do choice only for other agents?)
 		Set<ActivityFacility> potentialLocations = null;
 		for ( Subchain subchain : subchains ) {
 			final ActivityFacility start = facilities.getFacilities().get( subchain.start.getFacilityId() );
