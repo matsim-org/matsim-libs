@@ -30,25 +30,25 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
 
-/*package*/class MultipleSingleIterTaxiLauncher
+/*package*/class MultipleTaxiLauncher
 {
     private static final int[] RANDOM_SEEDS = { 463, 467, 479, 487, 491, 499, 503, 509, 521, 523,
             541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641,
             643, 647, 653 };
 
-    private final SingleIterTaxiLauncher launcher;
+    private final TaxiLauncher launcher;
     private final TaxiDelaySpeedupStats delaySpeedupStats;
     private final LeastCostPathCalculatorCacheStats cacheStats;
 
 
-    /*package*/MultipleSingleIterTaxiLauncher(String paramFile)
+    /*package*/MultipleTaxiLauncher(String paramFile)
         throws IOException
     {
-        launcher = new SingleIterTaxiLauncher(paramFile);
-        
+        launcher = new TaxiLauncher(paramFile);
+
         delaySpeedupStats = new TaxiDelaySpeedupStats();
         launcher.delaySpeedupStats = delaySpeedupStats;
-        
+
         cacheStats = new LeastCostPathCalculatorCacheStats();
         launcher.cacheStats = cacheStats;
     }
@@ -152,7 +152,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         }
 
         VrpData data = launcher.context.getVrpData();
-        
+
         pw.printf("%10s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 launcher.algorithmConfig.name,//
                 data.getRequests().size(),//
@@ -205,7 +205,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
         delaySpeedupStats.printStats(pw2, launcher.algorithmConfig.name);
         delaySpeedupStats.clearStats();
-        
+
         cacheStats.printStats(pw3, launcher.algorithmConfig.name);
         cacheStats.clearStats();
     }
@@ -214,99 +214,99 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
     private static final int FIRST_NON_NOS_IDX = 10;
 
 
-    private static void runNOS(int configIdx, int runs, String paramFile)
-        throws IOException
+    /*package*/static void runNOS(int configIdx, int runs, String paramFile)
     {
-        MultipleSingleIterTaxiLauncher multiLauncher = new MultipleSingleIterTaxiLauncher(paramFile);
+        try {
+            MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
 
-        String txt = "NOS";
+            String txt = "NOS";
 
-        PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt + ".out");
-        pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
+            PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt
+                    + ".out");
+            pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
 
-        PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
-                + ".out");
+            PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
+                    + ".out");
 
-        PrintWriter pw3 = new PrintWriter(multiLauncher.launcher.dirName + "cacheStats_" + txt
-                + ".out");
+            PrintWriter pw3 = new PrintWriter(multiLauncher.launcher.dirName + "cacheStats_" + txt
+                    + ".out");
 
-        if (configIdx == -1) {
-            for (int i = 0; i < FIRST_NON_NOS_IDX; i++) {
-                multiLauncher.run(i, runs, false, false, false, pw, pw2, pw3);
+            if (configIdx == -1) {
+                for (int i = 0; i < FIRST_NON_NOS_IDX; i++) {
+                    multiLauncher.run(i, runs, false, false, false, pw, pw2, pw3);
+                }
             }
-        }
-        else if (configIdx >= FIRST_NON_NOS_IDX) {
+            else if (configIdx >= FIRST_NON_NOS_IDX) {
+                pw.close();
+                pw2.close();
+                pw3.close();
+                throw new IllegalArgumentException();
+            }
+            else {
+                multiLauncher.run(configIdx, runs, false, false, false, pw, pw2, pw3);
+            }
+
             pw.close();
             pw2.close();
             pw3.close();
-            throw new IllegalArgumentException();
         }
-        else {
-            multiLauncher.run(configIdx, runs, false, false, false, pw, pw2, pw3);
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        pw.close();
-        pw2.close();
-        pw3.close();
     }
 
 
-    private static void run(int configIdx, int runs, String paramFile, boolean destinationKnown,
-            boolean onlineVehicleTracker, boolean minimizePickupTripTime)
-        throws IOException
+    /*package*/static void run(int configIdx, int runs, String paramFile,
+            boolean destinationKnown, boolean onlineVehicleTracker, boolean minimizePickupTripTime)
     {
-        MultipleSingleIterTaxiLauncher multiLauncher = new MultipleSingleIterTaxiLauncher(paramFile);
+        try {
+            MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
 
-        String txt = "DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
-                + minimizePickupTripTime;
+            String txt = "DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
+                    + minimizePickupTripTime;
 
-        PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt + ".out");
-        pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
+            PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt
+                    + ".out");
+            pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
 
-        PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
-                + ".out");
+            PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
+                    + ".out");
 
-        PrintWriter pw3 = new PrintWriter(multiLauncher.launcher.dirName + "cacheStats_" + txt
-                + ".out");
-        pw3.print("cfg\tHits\tMisses\n");
+            PrintWriter pw3 = new PrintWriter(multiLauncher.launcher.dirName + "cacheStats_" + txt
+                    + ".out");
+            pw3.print("cfg\tHits\tMisses\n");
 
-        if (configIdx == -1) {
-            for (int i = FIRST_NON_NOS_IDX; i < AlgorithmConfig.ALL.length; i++) {
-                multiLauncher.run(i, runs, destinationKnown, onlineVehicleTracker,
+            if (configIdx == -1) {
+                for (int i = FIRST_NON_NOS_IDX; i < AlgorithmConfig.ALL.length; i++) {
+                    multiLauncher.run(i, runs, destinationKnown, onlineVehicleTracker,
+                            minimizePickupTripTime, pw, pw2, pw3);
+                }
+            }
+            else if (configIdx < FIRST_NON_NOS_IDX) {
+                pw.close();
+                pw2.close();
+                pw3.close();
+                throw new IllegalArgumentException();
+            }
+            else {
+                multiLauncher.run(configIdx, runs, destinationKnown, onlineVehicleTracker,
                         minimizePickupTripTime, pw, pw2, pw3);
             }
-        }
-        else if (configIdx < FIRST_NON_NOS_IDX) {
+
             pw.close();
             pw2.close();
             pw3.close();
-            throw new IllegalArgumentException();
         }
-        else {
-            multiLauncher.run(configIdx, runs, destinationKnown, onlineVehicleTracker,
-                    minimizePickupTripTime, pw, pw2, pw3);
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        pw.close();
-        pw2.close();
-        pw3.close();
     }
 
 
     // args: configIdx runs
     public static void main(String... args)
-        throws IOException
     {
-        String paramFile;
-        if (args.length == 2) {
-            paramFile = null;
-        }
-        else if (args.length == 3) {
-            paramFile = args[2];
-        }
-        else {
-            throw new RuntimeException();
-        }
+        String paramFile = args[2];
 
         int configIdx = Integer.valueOf(args[0]);
         if (configIdx < -1 || configIdx >= AlgorithmConfig.ALL.length) {

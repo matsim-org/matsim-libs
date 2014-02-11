@@ -52,7 +52,7 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
 import playground.michalm.util.RunningVehicleRegister;
 
 
-/*package*/class SingleIterTaxiLauncher
+/*package*/class TaxiLauncher
 {
     /*package*/final String dirName;
     /*package*/final String netFileName;
@@ -89,7 +89,7 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/TravelTimeCalculator travelTimeCalculator;
 
 
-    /*package*/SingleIterTaxiLauncher()
+    /*package*/TaxiLauncher()
         throws IOException
     {
         dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
@@ -132,7 +132,7 @@ import playground.michalm.util.RunningVehicleRegister;
     }
 
 
-    /*package*/SingleIterTaxiLauncher(String paramFile)
+    /*package*/TaxiLauncher(String paramFile)
         throws IOException
     {
         Scanner scanner;
@@ -391,12 +391,12 @@ import playground.michalm.util.RunningVehicleRegister;
     public static void main(String... args)
         throws IOException
     {
-        SingleIterTaxiLauncher launcher;
+        TaxiLauncher launcher;
         if (args.length == 0) {
-            launcher = new SingleIterTaxiLauncher();
+            launcher = new TaxiLauncher();
         }
         else if (args.length == 1) {
-            launcher = new SingleIterTaxiLauncher(args[0]);
+            launcher = new TaxiLauncher(args[0]);
         }
         else {
             throw new RuntimeException();
