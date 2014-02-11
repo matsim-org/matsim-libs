@@ -38,20 +38,25 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
     private final SingleIterTaxiLauncher launcher;
     private final TaxiDelaySpeedupStats delaySpeedupStats;
+    private final LeastCostPathCalculatorCacheStats cacheStats;
 
 
     /*package*/MultipleSingleIterTaxiLauncher(String paramFile)
         throws IOException
     {
         launcher = new SingleIterTaxiLauncher(paramFile);
+        
         delaySpeedupStats = new TaxiDelaySpeedupStats();
         launcher.delaySpeedupStats = delaySpeedupStats;
+        
+        cacheStats = new LeastCostPathCalculatorCacheStats();
+        launcher.cacheStats = cacheStats;
     }
 
 
     /*package*/void run(int configIdx, int runs, boolean destinationKnown,
             boolean onlineVehicleTracker, boolean minimizePickupTripTime, PrintWriter pw,
-            PrintWriter pw2)
+            PrintWriter pw2, PrintWriter pw3)
     {
         launcher.travelTimeCalculator = null;
         launcher.algorithmConfig = AlgorithmConfig.ALL[configIdx];
@@ -198,8 +203,11 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
         // the endTime of the simulation??? --- time of last served request
 
-        delaySpeedupStats.printStats(pw2, configIdx + "");
+        delaySpeedupStats.printStats(pw2, launcher.algorithmConfig.name);
         delaySpeedupStats.clearStats();
+        
+        cacheStats.printStats(pw3, launcher.algorithmConfig.name);
+        cacheStats.clearStats();
     }
 
 
@@ -219,23 +227,27 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
                 + ".out");
 
+        PrintWriter pw3 = new PrintWriter(multiLauncher.launcher.dirName + "cacheStats_" + txt
+                + ".out");
+
         if (configIdx == -1) {
             for (int i = 0; i < FIRST_NON_NOS_IDX; i++) {
-                multiLauncher.run(i, runs, false, false, false, pw, pw2);
+                multiLauncher.run(i, runs, false, false, false, pw, pw2, pw3);
             }
         }
         else if (configIdx >= FIRST_NON_NOS_IDX) {
             pw.close();
             pw2.close();
+            pw3.close();
             throw new IllegalArgumentException();
         }
         else {
-            multiLauncher.run(configIdx, runs, false, false, false, pw, pw2);
+            multiLauncher.run(configIdx, runs, false, false, false, pw, pw2, pw3);
         }
 
         pw.close();
         pw2.close();
-
+        pw3.close();
     }
 
 
@@ -254,25 +266,30 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
                 + ".out");
 
+        PrintWriter pw3 = new PrintWriter(multiLauncher.launcher.dirName + "cacheStats_" + txt
+                + ".out");
+        pw3.print("cfg\tHits\tMisses\n");
+
         if (configIdx == -1) {
             for (int i = FIRST_NON_NOS_IDX; i < AlgorithmConfig.ALL.length; i++) {
                 multiLauncher.run(i, runs, destinationKnown, onlineVehicleTracker,
-                        minimizePickupTripTime, pw, pw2);
+                        minimizePickupTripTime, pw, pw2, pw3);
             }
         }
         else if (configIdx < FIRST_NON_NOS_IDX) {
             pw.close();
             pw2.close();
+            pw3.close();
             throw new IllegalArgumentException();
         }
         else {
             multiLauncher.run(configIdx, runs, destinationKnown, onlineVehicleTracker,
-                    minimizePickupTripTime, pw, pw2);
+                    minimizePickupTripTime, pw, pw2, pw3);
         }
 
         pw.close();
         pw2.close();
-
+        pw3.close();
     }
 
 

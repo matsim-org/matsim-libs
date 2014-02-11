@@ -26,7 +26,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
@@ -36,6 +36,7 @@ import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -83,6 +84,7 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/LegHistogram legHistogram;
     /*package*/MatsimVrpContext context;
     /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
+    /*package*/LeastCostPathCalculatorCacheStats cacheStats;
 
     /*package*/TravelTimeCalculator travelTimeCalculator;
 
@@ -203,8 +205,11 @@ import playground.michalm.util.RunningVehicleRegister;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
                 algorithmConfig.tdisSource, travelTime);
 
-        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
-                algorithmConfig.ttimeSource, travelTime, travelDisutility);
+        LeastCostPathCalculatorWithCache routerWithCache = VrpLauncherUtils
+                .initLeastCostPathCalculatorWithCache(new Dijkstra(scenario.getNetwork(),
+                        travelDisutility, travelTime), algorithmConfig.ttimeSource);
+        VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
+                travelDisutility);
 
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(taxiData);
@@ -276,6 +281,10 @@ import playground.michalm.util.RunningVehicleRegister;
             if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
                 throw new IllegalStateException();
             }
+        }
+
+        if (cacheStats != null) {
+            cacheStats.updateStats(routerWithCache);
         }
 
         // TravelTime ttCalc = calc.getLinkTravelTimes();

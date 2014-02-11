@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
@@ -35,11 +35,10 @@ import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.vrpagent.VrpDynLegs;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -93,16 +92,15 @@ import playground.michalm.util.RunningVehicleRegister;
     {
         //    	dirName = "Z:\\WinHome\\Docs\\maciejewski\\jbtest\\";
         //    	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
-//        dirName = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\";
-//        netFileName = dirName + "network.xml";
+        //        dirName = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\";
+        //        netFileName = dirName + "network.xml";
 
         // michalm - testing config (may be removed...)////////////////////////////////////
-                dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
-                plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
-                netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
-                eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
-       ////////////////////////////////////////////////////////         
-                
+        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
+        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
+        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
+        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+        ////////////////////////////////////////////////////////         
 
         //        electricStatsDir = dirName +"electric_noranks\\";
         //        electricStatsDir = dirName +"electric_idleranks\\";
@@ -114,9 +112,9 @@ import playground.michalm.util.RunningVehicleRegister;
         //        electricStatsDir = dirName +"1charger\\";
         electricStatsDir = dirName + "1slow_fifo\\";
 
-//        plansFileName = dirName + "20.plans.xml.gz";
-//
-//        taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
+        //        plansFileName = dirName + "20.plans.xml.gz";
+        //
+        //        taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
         taxiCustomersFileName = dirName + "taxiCustomers_15_pc.txt";
 
@@ -125,7 +123,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
-//        eventsFileName = dirName + "20.events.xml.gz";
+        //        eventsFileName = dirName + "20.events.xml.gz";
 
         otfVis = !true;
 
@@ -159,7 +157,7 @@ import playground.michalm.util.RunningVehicleRegister;
     {
         MatsimVrpContextImpl contextImpl = new MatsimVrpContextImpl();
         this.context = contextImpl;
-        
+
         contextImpl.setScenario(scenario);
 
         File f = new File(electricStatsDir);
@@ -185,15 +183,19 @@ import playground.michalm.util.RunningVehicleRegister;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource,
                 travelTime);
 
-        VrpPathCalculator calculator = VrpLauncherUtils.initVrpPathCalculator(scenario,
-                ttimeSource, travelTime, travelDisutility);
+        LeastCostPathCalculatorWithCache routerWithCache = VrpLauncherUtils
+                .initLeastCostPathCalculatorWithCache(new Dijkstra(scenario.getNetwork(),
+                        travelDisutility, travelTime), ttimeSource);
+        VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
+                travelDisutility);
 
         TaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(vrpData);
 
         double pickupDuration = 120;
         double dropoffDuration = 60;
-        ImmediateRequestParams params = new ImmediateRequestParams(true, false, pickupDuration, dropoffDuration);
+        ImmediateRequestParams params = new ImmediateRequestParams(true, false, pickupDuration,
+                dropoffDuration);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
                 calculator, params, tdisSource);

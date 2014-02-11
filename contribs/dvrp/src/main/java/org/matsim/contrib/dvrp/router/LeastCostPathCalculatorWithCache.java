@@ -38,6 +38,9 @@ public class LeastCostPathCalculatorWithCache
 
     private final Map<Id, Map<Id, Path>>[] pathCache;
 
+    private int cacheHits = 0;
+    private int cacheMisses = 0;
+
 
     @SuppressWarnings("unchecked")
     public LeastCostPathCalculatorWithCache(LeastCostPathCalculator calculator,
@@ -72,10 +75,26 @@ public class LeastCostPathCalculatorWithCache
         }
 
         if (path == null) {
+            cacheMisses++;
             path = calculator.calcLeastCostPath(fromNode, toNode, starttime, person, vehicle);
             spCacheFromNode.put(toNode.getId(), path);
         }
+        else {
+            cacheHits++;
+        }
 
         return path;
+    }
+
+
+    public int getCacheHits()
+    {
+        return cacheHits;
+    }
+
+
+    public int getCacheMisses()
+    {
+        return cacheMisses;
     }
 }

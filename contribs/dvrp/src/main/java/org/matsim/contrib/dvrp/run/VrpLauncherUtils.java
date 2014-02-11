@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
@@ -40,7 +39,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.*;
@@ -173,23 +171,12 @@ public class VrpLauncherUtils
     }
 
 
-    private static final boolean USE_CACHING_VRP_PATHS = false;
-
-
-    public static VrpPathCalculator initVrpPathCalculator(Scenario scenario,
-            TravelTimeSource ttimeSource, TravelTime travelTime, TravelDisutility travelDisutility)
+    public static LeastCostPathCalculatorWithCache initLeastCostPathCalculatorWithCache(
+            LeastCostPathCalculator router, TravelTimeSource ttimeSource)
     {
-        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
-                travelTime);
-        //new AStarLandmarksFactory(network, travelDisutility, 1).createPathCalculator(network, travelDisutility, travelTime);
-
-        if (USE_CACHING_VRP_PATHS) {
-            TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
-                    ttimeSource.numSlots);
-            router = new LeastCostPathCalculatorWithCache(router, timeDiscretizer);
-        }
-
-        return new VrpPathCalculatorImpl(router, travelTime, travelDisutility);
+        TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
+                ttimeSource.numSlots);
+        return new LeastCostPathCalculatorWithCache(router, timeDiscretizer);
     }
 
 
