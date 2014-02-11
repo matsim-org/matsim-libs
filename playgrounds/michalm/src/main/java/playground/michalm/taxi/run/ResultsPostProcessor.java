@@ -25,30 +25,18 @@ import java.util.*;
 
 public class ResultsPostProcessor
 {
-    // 0 PickupT DeliveryT ServiceT CruiseT WaitT OverT PassengerWaitT MaxPassengerWaitT
-    // Mean 280159,85 867978,15 261000,00 0,00 7230862,00 0,00 280166,45 1053,90
-    // Min 275199 865726 261000 0 7224940 0 275199 275199
-    // Max 284150 870788 261000 0 7236939 0 284150 284150
-    // StdDev 2266,09 1425,12 0,00 0,00 2915,95 0,00 2272,45 2272,45
-    //
-    // 1 PickupT DeliveryT ServiceT CruiseT WaitT OverT PassengerWaitT MaxPassengerWaitT
-    // Mean 263303,85 867941,05 261000,00 0,00 7247755,10 0,00 263322,25 973,45
-    // Min 258881 865937 261000 0 7239965 0 258881 258881
-    // Max 268763 871056 261000 0 7251583 0 268935 268935
-    // StdDev 2618,62 1299,13 0,00 0,00 3298,15 0,00 2643,21 2643,21
-
     private static class Experiment
     {
         private final int demand;
-        private final int reqs;
         private final int taxis;
+        private final List<Stats> stats;
 
 
-        public Experiment(int demand, int reqs, int taxis)
+        private Experiment(int demand, int taxis)
         {
             this.demand = demand;
-            this.reqs = reqs;
             this.taxis = taxis;
+            this.stats = new ArrayList<Stats>();
         }
     }
 
@@ -59,18 +47,20 @@ public class ResultsPostProcessor
 
         // ============
 
-        private Experiment experiment;
+        private String name;
+        private int n;
+        private int m;
 
         // ============
 
-        private double pickupT;
-        private double deliveryT;
-        private double serviceT;
-        private double cruiseT;
-        private double waitT;
-        private double overT;
         private double passengerWaitT;
         private double maxPassengerWaitT;
+        private double pickupDriveT;
+        private double dropoffDriveT;
+        private double pickupT;
+        private double dropoffT;
+        private double waitT;
+        private double compT;
 
         // ============
 
@@ -85,61 +75,74 @@ public class ResultsPostProcessor
 
         private void calcStats()
         {
-            T_W = passengerWaitT / experiment.reqs / 60;
+            T_W = passengerWaitT / n / 60;
             T_W_MAX = maxPassengerWaitT / 60;
-            T_D = deliveryT / experiment.reqs / 60;
-            R_W = passengerWaitT / (passengerWaitT + serviceT + deliveryT);
-            T_P = pickupT / experiment.reqs / 60;
-            R_P = pickupT / (pickupT + deliveryT);
-            R_NI = (pickupT + serviceT + deliveryT) / (TIME_WINDOW * experiment.taxis);
+            T_D = dropoffDriveT / n / 60;
+            R_W = passengerWaitT / (passengerWaitT + pickupT + dropoffDriveT + dropoffT);
+            T_P = pickupDriveT / n / 60;
+            R_P = pickupDriveT / (pickupDriveT + dropoffDriveT);
+            R_NI = (pickupDriveT + pickupT + dropoffDriveT + dropoffT) / (TIME_WINDOW * m);
         }
     }
 
 
-    private List<Experiment> experiments;
-    private List<Stats[]> allStats;
+    private Experiment[] experiments;
 
 
-    private Stats[] read(String file, Experiment experiment)
+    public ResultsPostProcessor()
+    {
+        experiments = new Experiment[14];
+        experiments[0] = new Experiment(10, 50);
+        experiments[1] = new Experiment(15, 50);
+        experiments[2] = new Experiment(20, 50);
+        experiments[3] = new Experiment(25, 50);
+        experiments[4] = new Experiment(30, 50);
+        experiments[5] = new Experiment(35, 50);
+        experiments[6] = new Experiment(40, 50);
+
+        experiments[7] = new Experiment(10, 25);
+        experiments[8] = new Experiment(15, 25);
+        experiments[9] = new Experiment(20, 25);
+        experiments[10] = new Experiment(25, 25);
+        experiments[11] = new Experiment(30, 25);
+        experiments[12] = new Experiment(35, 25);
+        experiments[13] = new Experiment(40, 25);
+    }
+
+
+    private void readFile(String file, Experiment experiment)
         throws FileNotFoundException
     {
         Scanner sc = new Scanner(new File(file));
-        Stats[] stats = new Stats[AlgorithmConfig.ALL.length];
 
-        for (int i = 0; i < stats.length; i++) {
-            stats[i] = readSection(sc, experiment);
+        // header
+        // cfg n   m   PW  PWmax   PD  DD  PS  DS  W   Comp
+        sc.nextLine();
+
+        while (sc.hasNext()) {
+            experiment.stats.add(readLine(sc));
         }
-
-        return stats;
     }
 
 
-    private Stats readSection(Scanner sc, Experiment experiment)
+    private Stats readLine(Scanner sc)
     {
         Stats stats = new Stats();
-        stats.experiment = experiment;
 
-        sc.nextLine();// header
-        sc.next();// row header: "Mean"
+        //        NOS_SL  406 25  55767.00    509.00  55361.00    147689.00   48720.00    24360.00    2423870.00  2.93
 
-        stats.pickupT = sc.nextDouble();
-        stats.deliveryT = sc.nextDouble();
-        stats.serviceT = sc.nextDouble();
-        stats.cruiseT = sc.nextDouble();
-        stats.waitT = sc.nextDouble();
-        stats.overT = sc.nextDouble();
+        stats.name = sc.next();
+        stats.n = sc.nextInt();
+        stats.m = sc.nextInt();
+
         stats.passengerWaitT = sc.nextDouble();
         stats.maxPassengerWaitT = sc.nextDouble();
-
-        sc.nextLine();// Mean (the rest of the line)
-        sc.nextLine();// Min
-        sc.nextLine();// Max
-        sc.nextLine();// StdDev
-        sc.nextLine();// empty line (separator)
-
-        if (Double.isNaN(stats.pickupT)) {
-            return null;
-        }
+        stats.pickupDriveT = sc.nextDouble();
+        stats.dropoffDriveT = sc.nextDouble();
+        stats.pickupT = sc.nextDouble();
+        stats.dropoffT = sc.nextDouble();
+        stats.waitT = sc.nextDouble();
+        stats.compT = sc.nextDouble();
 
         stats.calcStats();
 
@@ -155,44 +158,42 @@ public class ResultsPostProcessor
         pw.printf("%s\t", field);
 
         for (Experiment e : experiments) {
-            double ratio = (double)e.reqs / e.taxis;
+            double ratio = (double)e.stats.get(0).n / e.taxis;
             pw.printf("\t%f", ratio);
-
         }
 
         pw.println();
 
-        for (int i = 0; i < AlgorithmConfig.ALL.length; i++) {
+        int count = experiments[0].stats.size();
 
-            if (i == 2 || (i >= 5 && i <= 8) || (i >= 11 && i <= 14)) {
-                continue;
-            }
+        for (int i = 0; i < count; i++) {
+            String name = experiments[0].stats.get(i).name;
 
-            AlgorithmConfig ac = AlgorithmConfig.ALL[i];
-            pw.printf("%d\t%s", i, ac.algorithmType.shortcut);
+            pw.printf("%s", name);
 
-            for (Stats[] stats : allStats) {
-                if (stats[i] == null) {
-                    pw.print("\t");
-                    continue;
-                }
-
+            for (Experiment e : experiments) {
                 double value;
+                Stats s = e.stats.get(i);
+
+                if (!name.equals(s.name)) {
+                    pw.close();
+                    throw new RuntimeException();
+                }
 
                 if ("T_W".equals(field)) {
-                    value = stats[i].T_W;
+                    value = s.T_W;
                 }
                 else if ("T_W_MAX".equals(field)) {
-                    value = stats[i].T_W_MAX;
+                    value = s.T_W_MAX;
                 }
                 else if ("T_P".equals(field)) {
-                    value = stats[i].T_P;
+                    value = s.T_P;
                 }
                 else if ("T_W-T_P".equals(field)) {
-                    value = stats[i].T_W - stats[i].T_P;
+                    value = s.T_W - s.T_P;
                 }
                 else if ("R_NI".equals(field)) {
-                    value = stats[i].R_NI;
+                    value = s.R_NI;
                 }
                 else {
                     pw.close();
@@ -209,6 +210,25 @@ public class ResultsPostProcessor
     }
 
 
+    public void goNOS()
+        throws FileNotFoundException
+    {
+        String dir = "d:\\michalm\\2013_07\\";
+        String subdirPrefix = "mielec-2-peaks-new-";
+        String filename = "stats_NOS.out";
+
+        for (Experiment e : experiments) {
+            readFile(dir + subdirPrefix + e.demand + '-' + e.taxis + "\\" + filename, e);
+        }
+
+        writeValues(dir + filename + ".T_W", "T_W");
+        writeValues(dir + filename + ".T_W_MAX", "T_W_MAX");
+        writeValues(dir + filename + ".T_P", "T_P");
+        writeValues(dir + filename + ".T_W_T_P", "T_W-T_P");
+        writeValues(dir + filename + ".R_NI", "R_NI");
+    }
+
+
     public void go(boolean destinationKnown, boolean onlineVehicleTracker,
             boolean minimizePickupTripTime)
         throws FileNotFoundException
@@ -218,26 +238,8 @@ public class ResultsPostProcessor
         String filename = "stats_DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
                 + minimizePickupTripTime + ".out";
 
-        experiments = new ArrayList<Experiment>();
-        experiments.add(new Experiment(10, 406, 50));
-        experiments.add(new Experiment(15, 636, 50));
-        experiments.add(new Experiment(20, 840, 50));
-        experiments.add(new Experiment(25, 1069, 50));
-        experiments.add(new Experiment(30, 1297, 50));
-        experiments.add(new Experiment(35, 1506, 50));
-        experiments.add(new Experiment(40, 1719, 50));
-
-        experiments.add(new Experiment(10, 406, 25));
-        experiments.add(new Experiment(15, 636, 25));
-        experiments.add(new Experiment(20, 840, 25));
-        experiments.add(new Experiment(25, 1069, 25));
-        experiments.add(new Experiment(30, 1297, 25));
-        experiments.add(new Experiment(35, 1506, 25));
-        experiments.add(new Experiment(40, 1719, 25));
-
-        allStats = new ArrayList<Stats[]>();
         for (Experiment e : experiments) {
-            allStats.add(read(dir + subdirPrefix + e.demand + '-' + e.taxis + "\\" + filename, e));
+            readFile(dir + subdirPrefix + e.demand + '-' + e.taxis + "\\" + filename, e);
         }
 
         writeValues(dir + filename + ".T_W", "T_W");
@@ -251,6 +253,8 @@ public class ResultsPostProcessor
     public static void main(String[] args)
         throws FileNotFoundException
     {
+        new ResultsPostProcessor().goNOS();
+        
         new ResultsPostProcessor().go(false, false, false);
         new ResultsPostProcessor().go(false, true, false);
         new ResultsPostProcessor().go(true, false, false);

@@ -22,6 +22,7 @@ package playground.michalm.taxi.run;
 import java.io.*;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -52,17 +53,11 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             boolean onlineVehicleTracker, boolean minimizePickupTripTime, PrintWriter pw,
             PrintWriter pw2)
     {
+        launcher.travelTimeCalculator = null;
         launcher.algorithmConfig = AlgorithmConfig.ALL[configIdx];
         launcher.destinationKnown = destinationKnown;
         launcher.onlineVehicleTracker = onlineVehicleTracker;
         launcher.minimizePickupTripTime = minimizePickupTripTime;
-
-        // taxiPickupDriveTime
-        // taxiDeliveryDriveTime
-        // taxiServiceTime
-        // taxiWaitTime
-        // taxiOverTime
-        // passengerWaitTime
 
         SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
         SummaryStatistics taxiDropoffDriveTime = new SummaryStatistics();
@@ -117,9 +112,10 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
             default:
                 // do not run at all
-                runs = 0;
-                warmup = false;
+                return;
         }
+
+        ///========================
 
         if (warmup) {
             for (int i = 0; i < runs; i += 4) {
@@ -127,6 +123,8 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
                 launcher.go(true);
             }
         }
+
+        ///========================
 
         for (int i = 0; i < runs; i++) {
             long t0 = System.currentTimeMillis();
@@ -139,19 +137,23 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
             taxiDropoffDriveTime.addValue(evaluation.getTaxiDropoffDriveTime());
             taxiPickupTime.addValue(evaluation.getTaxiPickupTime());
-            taxiDropoffTime.addValue(evaluation.getTaxiPickupTime());
+            taxiDropoffTime.addValue(evaluation.getTaxiDropoffTime());
             taxiCruiseTime.addValue(evaluation.getTaxiCruiseTime());
             taxiWaitTime.addValue(evaluation.getTaxiWaitTime());
             taxiOverTime.addValue(evaluation.getTaxiOverTime());
             passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
             maxPassengerWaitTime.addValue(evaluation.getMaxPassengerWaitTime());
-            computationTime.addValue(t1 - t0);
+            computationTime.addValue(0.001 * (t1 - t0));
         }
 
-        pw.printf("Name\tPD\tDD\tPS\tDS\tW\tPW\tPWmax\tComp\n");
-
-        pw.printf("%10s\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        VrpData data = launcher.context.getVrpData();
+        
+        pw.printf("%10s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 launcher.algorithmConfig.name,//
+                data.getRequests().size(),//
+                data.getVehicles().size(),//
+                passengerWaitTime.getMean(),//
+                maxPassengerWaitTime.getMean(),//
                 taxiPickupDriveTime.getMean(),//
                 taxiDropoffDriveTime.getMean(),//
                 taxiPickupTime.getMean(),//
@@ -159,8 +161,6 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
                 //                taxiCruiseTime.getMean(),//
                 taxiWaitTime.getMean(),//
                 //                taxiOverTime.getMean(),//
-                passengerWaitTime.getMean(),//
-                maxPassengerWaitTime.getMean(),//
                 computationTime.getMean());
         //        pw.printf("Min\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
         //                taxiPickupDriveTime.getMin(),//
@@ -198,14 +198,8 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
         // the endTime of the simulation??? --- time of last served request
 
-        pw.println();
-
-        if (runs > 0) {
-            delaySpeedupStats.printStats(pw2, configIdx + "");
-            delaySpeedupStats.clearStats();
-        }
-
-        launcher.travelTimeCalculator = null;
+        delaySpeedupStats.printStats(pw2, configIdx + "");
+        delaySpeedupStats.clearStats();
     }
 
 
@@ -220,19 +214,20 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         String txt = "NOS";
 
         PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt + ".out");
+        pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
+
         PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
                 + ".out");
-
-        if (configIdx >= FIRST_NON_NOS_IDX) {
-            pw.close();
-            pw2.close();
-            throw new IllegalArgumentException();
-        }
 
         if (configIdx == -1) {
             for (int i = 0; i < FIRST_NON_NOS_IDX; i++) {
                 multiLauncher.run(i, runs, false, false, false, pw, pw2);
             }
+        }
+        else if (configIdx >= FIRST_NON_NOS_IDX) {
+            pw.close();
+            pw2.close();
+            throw new IllegalArgumentException();
         }
         else {
             multiLauncher.run(configIdx, runs, false, false, false, pw, pw2);
@@ -254,20 +249,21 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
                 + minimizePickupTripTime;
 
         PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt + ".out");
+        pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
+
         PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
                 + ".out");
-
-        if (configIdx < FIRST_NON_NOS_IDX) {
-            pw.close();
-            pw2.close();
-            throw new IllegalArgumentException();
-        }
 
         if (configIdx == -1) {
             for (int i = FIRST_NON_NOS_IDX; i < AlgorithmConfig.ALL.length; i++) {
                 multiLauncher.run(i, runs, destinationKnown, onlineVehicleTracker,
                         minimizePickupTripTime, pw, pw2);
             }
+        }
+        else if (configIdx < FIRST_NON_NOS_IDX) {
+            pw.close();
+            pw2.close();
+            throw new IllegalArgumentException();
         }
         else {
             multiLauncher.run(configIdx, runs, destinationKnown, onlineVehicleTracker,

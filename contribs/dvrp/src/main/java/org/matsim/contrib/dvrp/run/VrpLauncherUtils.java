@@ -173,15 +173,21 @@ public class VrpLauncherUtils
     }
 
 
+    private static final boolean USE_CACHING_VRP_PATHS = false;
+
+
     public static VrpPathCalculator initVrpPathCalculator(Scenario scenario,
             TravelTimeSource ttimeSource, TravelTime travelTime, TravelDisutility travelDisutility)
     {
-        Network network = scenario.getNetwork();
-        TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
-                ttimeSource.numSlots);
+        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
+                travelTime);
+        //new AStarLandmarksFactory(network, travelDisutility, 1).createPathCalculator(network, travelDisutility, travelTime);
 
-        LeastCostPathCalculator router = new LeastCostPathCalculatorWithCache(new Dijkstra(network,
-                travelDisutility, travelTime), timeDiscretizer);
+        if (USE_CACHING_VRP_PATHS) {
+            TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
+                    ttimeSource.numSlots);
+            router = new LeastCostPathCalculatorWithCache(router, timeDiscretizer);
+        }
 
         return new VrpPathCalculatorImpl(router, travelTime, travelDisutility);
     }
