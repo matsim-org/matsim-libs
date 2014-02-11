@@ -89,35 +89,35 @@
 		</dependency>
   </dependencies>
   <build>
-  	<pluginManagement>
-  		<plugins>
+	<pluginManagement>
+		<plugins>
   			<plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-assembly-plugin</artifactId>
-	<configuration>
-		<descriptorRefs>
-			<descriptorRef>jar-with-dependencies</descriptorRef>
-		</descriptorRefs>
-		<archive>
-			<manifest>
-	<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-	<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-			</manifest>
-			<manifestEntries>
-				<Specification-Vendor>MATSim</Specification-Vendor>
-				<Implementation-Vendor>MATSim</Implementation-Vendor>
-			</manifestEntries>
-		</archive>
-	</configuration>
-	<executions>
-		<execution>
-			<id>create-my-bundle</id>
-			<phase>package</phase>
-			<goals>
-				<goal>single</goal>
-			</goals>
-		</execution>
-	</executions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+						<manifestEntries>
+							<Specification-Vendor>MATSim</Specification-Vendor>
+							<Implementation-Vendor>MATSim</Implementation-Vendor>
+						</manifestEntries>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<id>create-my-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
   			</plugin>
   		</plugins>
   	</pluginManagement>
