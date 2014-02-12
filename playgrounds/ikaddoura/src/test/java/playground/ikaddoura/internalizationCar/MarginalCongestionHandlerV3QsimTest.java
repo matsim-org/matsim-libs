@@ -237,7 +237,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-		controler.addControlerListener(new InternalizationCarControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler ));
+		controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
 	
 		final String timeBin1 = "08:00-08:15";
 		final String timeBin2 = "08:15-08:30";
