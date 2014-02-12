@@ -82,18 +82,18 @@ public class LexicographicRemoverTest {
 		final JointPlan toRemove =
 				createJointPlan(
 					jointPlans.getFactory(),
-					(List<Person>) group.getPersons(),
+					group.getPersons(),
 					1, 1, 2, 3 );
 		jointPlans.addJointPlan( toRemove );
 		jointPlans.addJointPlan(
 				createJointPlan(
 					jointPlans.getFactory(),
-					(List<Person>) group.getPersons(),
+					group.getPersons(),
 					2, 2, 1, 2 ) );
 		jointPlans.addJointPlan(
 				createJointPlan(
 					jointPlans.getFactory(),
-					(List<Person>) group.getPersons(),
+					group.getPersons(),
 					3, 3, 3, 1 ) );
 
 		test( new Fixture(
@@ -101,6 +101,46 @@ public class LexicographicRemoverTest {
 					jointPlans,
 					group,
 					toRemove.getIndividualPlans() ) );
+	}
+
+	@Test
+	public void testOneCompositionAndOneExcedentaryPlan() {
+		final ReplanningGroup group = new ReplanningGroup();
+
+		for ( int i=0; i < 4; i++ ) {
+			group.addPerson( new PersonImpl( new IdImpl( i ) ) );
+		}
+		
+		final JointPlans jointPlans = new JointPlans();
+
+		final JointPlan toRemove =
+				createJointPlan(
+					jointPlans.getFactory(),
+					group.getPersons(),
+					1, 1, 2, 3 );
+		jointPlans.addJointPlan( toRemove );
+		jointPlans.addJointPlan(
+				createJointPlan(
+					jointPlans.getFactory(),
+					group.getPersons(),
+					2, 2, 1, 2 ) );
+		jointPlans.addJointPlan(
+				createJointPlan(
+					jointPlans.getFactory(),
+					group.getPersons(),
+					3, 3, 3, 1 ) );
+
+		final Person p = group.getPersons().get( 0 );
+		final Plan indivPlan = jointPlans.getFactory().createIndividualPlan( p );
+		indivPlan.setScore( 0d );
+		p.addPlan( indivPlan );
+
+		test( new Fixture(
+					3, 3,
+					jointPlans,
+					group,
+					toRemove.getIndividualPlans() ) );
+
 	}
 
 	private static JointPlan createJointPlan(
