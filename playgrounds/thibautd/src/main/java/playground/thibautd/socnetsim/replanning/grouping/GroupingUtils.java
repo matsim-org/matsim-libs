@@ -31,9 +31,12 @@ import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 
 import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkUtils;
 import playground.thibautd.utils.CollectionUtils;
@@ -44,7 +47,6 @@ import playground.thibautd.utils.CollectionUtils;
 public class GroupingUtils {
 	private  GroupingUtils() {}
 
-	// TODO: use also for persons (several joint plans)
 	public static Collection<Collection<Plan>> randomlyGroup(
 			final Random random,
 			final double probActivationTie,
@@ -89,6 +91,56 @@ public class GroupingUtils {
 				alters.remove( id );
 				links.put( id , alters );
 			}
+		}
+
+		return links;
+	}
+
+	public static Collection<ReplanningGroup> randomlyGroupPersons(
+			final Random random,
+			final double probActivationTie,
+			final double probBreakingJointPlan,
+			final Population population,
+			final JointPlans jointPlans,
+			final SocialNetwork socialNetwork) {
+
+		final Map<Id, Set<Id>> jpTies = getJointPlanNetwork( population , jointPlans );
+		final Map<Id, Set<Id>> netmap = new LinkedHashMap<Id, Set<Id>>( socialNetwork.getMapRepresentation() );
+
+		final Collection<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
+		while ( !netmap.isEmpty() ) {
+			final Set<Id> ids =
+					getRandomGroup(
+						random,
+						probActivationTie,
+						netmap,
+						probBreakingJointPlan,
+						jpTies );
+
+			final ReplanningGroup group = new ReplanningGroup();
+			groups.add( group );
+			for ( Id id : ids ) group.addPerson( population.getPersons().get( id ) );
+		}
+
+		return groups;
+	}
+
+	public static Map<Id, Set<Id>> getJointPlanNetwork(
+			final Population population,
+			final JointPlans jointPlans ) {
+		final Map<Id, Set<Id>> links = new LinkedHashMap<Id, Set<Id>>();
+
+		for ( Person person : population.getPersons().values() ) {
+			final Set<Id> alters = new LinkedHashSet<Id>();
+			links.put( person.getId() , alters );
+
+			for ( Plan plan : person.getPlans() ) {
+				final JointPlan jp = jointPlans.getJointPlan( plan );
+				if ( jp == null ) continue;
+				alters.addAll( jp.getIndividualPlans().keySet() );
+			}
+
+			alters.remove( person.getId() );
 		}
 
 		return links;
