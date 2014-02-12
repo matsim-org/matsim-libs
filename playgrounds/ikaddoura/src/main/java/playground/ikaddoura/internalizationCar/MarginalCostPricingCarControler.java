@@ -37,8 +37,8 @@ import playground.artemc.socialCost.SocialCostController.Initializer;
  * @author ikaddoura
  *
  */
-public class InternalizationCarControler {
-	private static final Logger log = Logger.getLogger(InternalizationCarControler.class);
+public class MarginalCostPricingCarControler {
+	private static final Logger log = Logger.getLogger(MarginalCostPricingCarControler.class);
 	
 	static String configFile1;
 	static String configFile2;
@@ -52,7 +52,7 @@ public class InternalizationCarControler {
 		configFile3 = args[2]; // base case continued
 		configFile4 = args[3]; // internalization flow-based
 		
-		InternalizationCarControler internalizationCarControler = new InternalizationCarControler();
+		MarginalCostPricingCarControler internalizationCarControler = new MarginalCostPricingCarControler();
 		internalizationCarControler.runBaseCase(configFile1);
 		internalizationCarControler.runInternalizationAgents(configFile2);
 		internalizationCarControler.runBaseCase(configFile3);
