@@ -39,6 +39,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -47,7 +48,8 @@ public class FirstSimulation {
 	static String networkFile = "input/oslo/trondheim_network.xml";
 	static String cvsSplitBy = ",";
 	static String outputDir = "output/oslo/";
-	static String plansFile = "input/oslo/plans_from_csv.xml";
+	//static String plansFile = "input/oslo/plans_from_csv.xml";
+	static String plansFile = "input/oslo/plans_from_start_og.xml";
 	/**
 	 * @param args
 	 */
@@ -58,7 +60,6 @@ public class FirstSimulation {
 		 * mit osmosis netzwerk generieren
 		 */
 		
-		// TODO Auto-generated method stub
 
 		Config config = ConfigUtils.createConfig();	
 		config.addCoreModules();
@@ -69,11 +70,14 @@ public class FirstSimulation {
 		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 	
 		ActivityParams home = new ActivityParams("home");
-		home.setTypicalDuration(16 * 3600);
+		home.setTypicalDuration(13 * 3600);
 		ActivityParams work = new ActivityParams("work");
 		work.setTypicalDuration(8 * 3600);
+		ActivityParams other = new ActivityParams("other");
+		other.setTypicalDuration(1*3600);
 		config.planCalcScore().addActivityParams(home);
 		config.planCalcScore().addActivityParams(work);
+		config.planCalcScore().addActivityParams(other);
 		
 		StrategySettings reRoute = new StrategySettings(new IdImpl(1));
 		reRoute.setModuleName("ReRoute");
@@ -92,6 +96,7 @@ public class FirstSimulation {
 		
 		//new MatsimNetworkReader(scenario).readFile("input/oslo/trondheim.xml");
 		new MatsimNetworkReader(scenario).readFile(networkFile);
+		
 //		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 //		PopulationFactory populationFactory = population.getFactory();
@@ -105,33 +110,7 @@ public class FirstSimulation {
 		NetworkConfigGroup ncg = controler.getConfig().network();
 		ncg.setInputFile(networkFile);
 		controler.getConfig().plans().setInputFile(plansFile);
-		
-//		Person person = populationFactory.createPerson(scenario.createId("1"));
-//		population.addPerson(person);
-//		
-//		 Plan plan = populationFactory.createPlan();
-//		 person.addPlan(plan);
-//		
-//		 Coord homeCoordinates = scenario.createCoord(756503.,2063809. );
-//		 Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-//		 activity1.setEndTime(6*60*60);
-//		 plan.addActivity(activity1);
-//		 plan.addLeg(populationFactory.createLeg("car"));
-//		 
-//		 Coord workCoordinates = scenario.createCoord(7800000., 2050000.);
-//		 Activity activity2 = populationFactory.createActivityFromCoord("work", workCoordinates);
-//		 activity2.setEndTime(15*60*60);
-//		 plan.addActivity(activity2);
-//		 plan.addLeg(populationFactory.createLeg("car"));
-//		 
-//		 Activity activity3 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-//		 plan.addActivity(activity3);
-//		 
-//		// MatsimWriter populationWriter = new PopulationWriter(population, network);
-//		 //populationWriter.write("input/oslo/plans.xml");
-//		 
-//		 System.out.println("!!!" + scenario.getPopulation().getPersons().toString());
-		 
+				 
 		 
 		controler.run();
 	}

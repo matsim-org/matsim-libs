@@ -33,10 +33,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-public class ShapeConverter {
+public class ShapeConverterNetwork {
 
 	static String shapeFile = "input/oslo/Matsim_files_1/trondheim_med_omland_4.shp";
 	/**
@@ -45,7 +46,7 @@ public class ShapeConverter {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		Logger logger = Logger.getLogger(ShapeConverter.class);
+		Logger logger = Logger.getLogger(ShapeConverterNetwork.class);
 		
 		Config config = new Config();
 		config.addCoreModules();
@@ -120,6 +121,8 @@ public class ShapeConverter {
 		}
 		
 		}
+		
+		 new NetworkCleaner().run(network);
 		NetworkWriter nw = new NetworkWriter(network);
 		nw.write("input/oslo/trondheim_network.xml");
 		
