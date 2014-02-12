@@ -78,7 +78,7 @@ public class AverageCostPricing implements StartupListener, AfterMobsimListener 
 		// write out congestion statistics every iteration
 		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
 		
-		// throw all money events
+		log.info("Throwing agent money events based on calculated average marginal cost for each link and time bin.");
 		EventsManager events = event.getControler().getEvents();
 		
 		for (LinkEnterEvent enterEvent : this.tollHandler.getLinkEnterEvents()) {
