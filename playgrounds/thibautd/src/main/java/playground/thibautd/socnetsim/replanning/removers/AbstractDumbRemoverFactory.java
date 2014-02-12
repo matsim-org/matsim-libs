@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.removers;
 
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
@@ -31,9 +32,11 @@ abstract class AbstractDumbRemoverFactory implements ExtraPlanRemoverFactory {
 
 	@Override
 	public ExtraPlanRemover createRemover(final ControllerRegistry registry) {
+		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
+				registry.getScenario().getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
 		return new DumbExtraPlanRemover(
 				createSelector( registry ),
-				registry.getScenario().getConfig().strategy().getMaxAgentPlanMemorySize() );
+				conf.getMaxPlansPerAgent() );
 	}
 
 	protected abstract GroupLevelPlanSelector createSelector(final ControllerRegistry registry);

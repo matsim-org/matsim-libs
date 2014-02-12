@@ -87,6 +87,9 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	private String selectorForModification = "RandomSelection";
 	private double internalizationRatio = 0;
 
+	private int maxPlansPerComposition = 5;
+	private int maxPlansPerAgent = 50;
+
 	public GroupReplanningConfigGroup() {
 		super( GROUP_NAME );
 	}
@@ -221,6 +224,29 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 	public void setInternalizationRatio(double internalizationRatio) {
 		this.internalizationRatio = internalizationRatio;
 	}
+
+	@StringGetter( "maxPlansPerAgent" )
+	public int getMaxPlansPerAgent() {
+		return this.maxPlansPerAgent;
+	}
+
+	@StringSetter( "maxPlansPerAgent" )
+	public void setMaxPlansPerAgent(int maxPlansPerAgent) {
+		if ( maxPlansPerAgent < 1 ) throw new IllegalArgumentException( maxPlansPerAgent+" too small" );
+		this.maxPlansPerAgent = maxPlansPerAgent;
+	}
+
+	@StringGetter( "maxPlansPerComposition" )
+	public int getMaxPlansPerComposition() {
+		return this.maxPlansPerComposition;
+	}
+
+	@StringSetter( "maxPlansPerComposition" )
+	public void setMaxPlansPerComposition(int maxPlansPerComposition) {
+		if ( maxPlansPerComposition < 1 ) throw new IllegalArgumentException( maxPlansPerComposition+" too small" );
+		this.maxPlansPerComposition = maxPlansPerComposition;
+	}
+
 
 }
 

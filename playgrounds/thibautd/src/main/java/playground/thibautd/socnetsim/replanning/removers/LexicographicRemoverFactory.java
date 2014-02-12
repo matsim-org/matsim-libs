@@ -19,9 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.removers;
 
-import org.apache.log4j.Logger;
-
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
 
@@ -29,22 +28,17 @@ import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
  * @author thibautd
  */
 public class LexicographicRemoverFactory implements ExtraPlanRemoverFactory {
-	private static final Logger log =
-		Logger.getLogger(LexicographicRemoverFactory.class);
-
 
 	@Override
 	public ExtraPlanRemover createRemover(
 			final ControllerRegistry registry) {
-		log.warn( "max number of plans per agent is hard coded to 10 times the maximum number of plans per composition" );
-		log.warn( " => max "+(registry.getScenario().getConfig().strategy().getMaxAgentPlanMemorySize() * 10)+" plans per agent" );
+		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
+				registry.getScenario().getConfig().getModule(
+						GroupReplanningConfigGroup.GROUP_NAME );
 
-		// TODO: read max per agent from config.
-		// Problem: or the two parameters are separated, or the max memory size is inactive
-		// when this remover is used.
 		return new LexicographicForCompositionExtraPlanRemover(
-				registry.getScenario().getConfig().strategy().getMaxAgentPlanMemorySize(),
-				registry.getScenario().getConfig().strategy().getMaxAgentPlanMemorySize() * 10 );
+				conf.getMaxPlansPerComposition(),
+				conf.getMaxPlansPerAgent() );
 	}
 }
 
