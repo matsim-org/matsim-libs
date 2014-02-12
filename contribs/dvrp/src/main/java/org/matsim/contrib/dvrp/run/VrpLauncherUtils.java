@@ -46,22 +46,23 @@ import org.matsim.core.trafficmonitoring.*;
 
 public class VrpLauncherUtils
 {
+    public static final int MAX_TIME = 36 * 60 * 60;
+
+
     public enum TravelTimeSource
     {
-        FREE_FLOW_SPEED("FF", 24 * 60 * 60), // no eventsFileName
-        EVENTS_24_H("24H", 24 * 60 * 60), // based on eventsFileName, with 24-hour time interval
-        EVENTS_15_MIN("15M", 15 * 60); // based on eventsFileName, with 15-minute time interval
+        FREE_FLOW_SPEED("FF", TimeDiscretizer.ALL_DAY), // no eventsFileName
+        EVENTS_24_H("24H", TimeDiscretizer.ALL_DAY), // based on eventsFileName, averaged over a whole day
+        EVENTS_15_MIN("15M", TimeDiscretizer.DEFAULT); // based on eventsFileName, 15-minute time interval
 
         public final String shortcut;
-        public final int travelTimeBinSize;
-        public final int numSlots;
+        public final TimeDiscretizer timeDiscretizer;
 
 
-        private TravelTimeSource(String shortcut, int travelTimeBinSize)
+        private TravelTimeSource(String shortcut, TimeDiscretizer timeDiscretizer)
         {
             this.shortcut = shortcut;
-            this.travelTimeBinSize = travelTimeBinSize;
-            this.numSlots = 24 * 60 * 60 / travelTimeBinSize;// to cover 24 hours
+            this.timeDiscretizer = timeDiscretizer;
         }
     }
 
@@ -140,7 +141,7 @@ public class VrpLauncherUtils
                 case EVENTS_15_MIN:
                 case EVENTS_24_H:
                     scenario.getConfig().travelTimeCalculator()
-                            .setTraveltimeBinSize(ttimeSource.travelTimeBinSize);
+                            .setTraveltimeBinSize(ttimeSource.timeDiscretizer.getTimeInterval());
                     return TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
                             scenario);
 
@@ -168,15 +169,6 @@ public class VrpLauncherUtils
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-
-    public static LeastCostPathCalculatorWithCache initLeastCostPathCalculatorWithCache(
-            LeastCostPathCalculator router, TravelTimeSource ttimeSource)
-    {
-        TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
-                ttimeSource.numSlots);
-        return new LeastCostPathCalculatorWithCache(router, timeDiscretizer);
     }
 
 

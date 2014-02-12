@@ -183,9 +183,12 @@ import playground.michalm.util.RunningVehicleRegister;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource,
                 travelTime);
 
-        LeastCostPathCalculatorWithCache routerWithCache = VrpLauncherUtils
-                .initLeastCostPathCalculatorWithCache(new Dijkstra(scenario.getNetwork(),
-                        travelDisutility, travelTime), ttimeSource);
+        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
+                travelTime);
+
+        LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(
+                router, ttimeSource.timeDiscretizer);
+
         VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
                 travelDisutility);
 

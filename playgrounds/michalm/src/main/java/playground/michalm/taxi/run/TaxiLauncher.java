@@ -205,9 +205,12 @@ import playground.michalm.util.RunningVehicleRegister;
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
                 algorithmConfig.tdisSource, travelTime);
 
-        LeastCostPathCalculatorWithCache routerWithCache = VrpLauncherUtils
-                .initLeastCostPathCalculatorWithCache(new Dijkstra(scenario.getNetwork(),
-                        travelDisutility, travelTime), algorithmConfig.ttimeSource);
+        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
+                travelTime);
+
+        LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(
+                router, algorithmConfig.ttimeSource.timeDiscretizer);
+
         VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
                 travelDisutility);
 
@@ -380,7 +383,8 @@ import playground.michalm.util.RunningVehicleRegister;
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartUtils.showFrame(TaxiScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()));
+        ChartUtils.showFrame(TaxiScheduleChartUtils.chartSchedule(context.getVrpData()
+                .getVehicles()));
 
         if (outHistogram) {
             VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);

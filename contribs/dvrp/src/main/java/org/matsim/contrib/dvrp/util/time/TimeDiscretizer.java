@@ -21,24 +21,19 @@ package org.matsim.contrib.dvrp.util.time;
 
 public class TimeDiscretizer
 {
-    public static final TimeDiscretizer TD_24H_BY_15MIN = new TimeDiscretizer(15 * 60, 4 * 24);
+    public static final TimeDiscretizer DEFAULT = new TimeDiscretizer(30 * 4, 15 * 60);
+    public static final TimeDiscretizer ONE_HOUR = new TimeDiscretizer(30, 60 * 60);
+    public static final TimeDiscretizer ALL_DAY = new TimeDiscretizer(1, 30 * 60 * 60);
+    
 
-    private final int timeInterval;
     private final int intervalCount;
-    private final boolean cyclic;
+    private final int timeInterval;
 
 
-    public TimeDiscretizer(int timeInterval, int intervalCount)
-    {
-        this(timeInterval, intervalCount, true);
-    }
-
-
-    public TimeDiscretizer(int timeInterval, int intervalCount, boolean cyclic)
+    public TimeDiscretizer(int intervalCount, int timeInterval)
     {
         this.timeInterval = timeInterval;
         this.intervalCount = intervalCount;
-        this.cyclic = cyclic;
     }
 
 
@@ -50,12 +45,8 @@ public class TimeDiscretizer
 
         int idx = (int)time / timeInterval;
 
-        if (cyclic) {
-            return idx % intervalCount;
-        }
-
         if (idx >= intervalCount) {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
 
         return idx;
@@ -64,6 +55,10 @@ public class TimeDiscretizer
 
     public double getTime(int idx)
     {
+        if (idx >= intervalCount) {
+            throw new IllegalArgumentException();
+        }
+
         return idx * timeInterval;
     }
 
@@ -73,14 +68,8 @@ public class TimeDiscretizer
         int idx0 = (int)time / timeInterval;
         int idx1 = idx0 + 1;
 
-        if (cyclic) {
-            idx0 %= intervalCount;
-            idx1 %= intervalCount;
-        }
-        else {
-            if (idx1 >= intervalCount) {
-                throw new IllegalStateException();
-            }
+        if (idx1 >= intervalCount) {
+            throw new IllegalArgumentException();
         }
 
         double weight1 = time % timeInterval;
@@ -96,14 +85,8 @@ public class TimeDiscretizer
         int idx0 = (int)time / timeInterval;
         int idx1 = idx0 + 1;
 
-        if (cyclic) {
-            idx0 %= intervalCount;
-            idx1 %= intervalCount;
-        }
-        else {
-            if (idx1 >= intervalCount) {
-                throw new IllegalStateException();
-            }
+        if (idx1 >= intervalCount) {
+            throw new IllegalStateException();
         }
 
         double weight1 = time % timeInterval;
@@ -115,7 +98,7 @@ public class TimeDiscretizer
     }
 
 
-    public double getTimeInterval()
+    public int getTimeInterval()
     {
         return timeInterval;
     }
@@ -124,12 +107,6 @@ public class TimeDiscretizer
     public int getIntervalCount()
     {
         return intervalCount;
-    }
-
-
-    public boolean isCyclic()
-    {
-        return cyclic;
     }
 
 
