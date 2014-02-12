@@ -19,12 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.SocialNetworkUtils;
+import playground.thibautd.utils.CollectionUtils;
 
 /**
  * @author thibautd
@@ -56,6 +59,19 @@ public final class SocialNetworkUtils {
 		counter.printCounter();
 
 		return secondaryNetwork;
+	}
+
+	public static Map<Id, Set<Id>> getSubnetwork(
+			final SocialNetwork network,
+			final Set<Id> egos ) {
+		final Map<Id, Set<Id>> subnet = new LinkedHashMap<Id, Set<Id>>();
+
+		for ( Id ego : egos ) {
+			final Set<Id> alters = network.getAlters( ego );
+			subnet.put( ego , CollectionUtils.intersectSorted( egos , alters ) );
+		}
+
+		return subnet;
 	}
 }
 
