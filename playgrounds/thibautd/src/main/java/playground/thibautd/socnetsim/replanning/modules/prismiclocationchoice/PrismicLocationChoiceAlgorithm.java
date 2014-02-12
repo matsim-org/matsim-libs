@@ -25,13 +25,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -46,6 +44,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.grouping.GroupingUtils;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.utils.CollectionUtils;
 import playground.thibautd.utils.QuadTreeRebuilder;
@@ -163,39 +162,25 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 
 	private Collection<Collection<Subchain>> selectActivityGroups(
 			final GroupPlans plan) {
-		final Map<Id, Plan> plans = new LinkedHashMap<Id, Plan>();
-
-		for ( Plan p : plan.getAllIndividualPlans() ) {
-			plans.put( p.getPerson().getId() , p );
-		}
-
+		final Collection<Collection<Plan>> planGroups =
+			GroupingUtils.randomlyGroup( 
+					random,
+					config.getTieActivationProb(),
+					plan,
+					socialNetwork );
 		final Collection<Collection<Subchain>> groups = new ArrayList<Collection<Subchain>>();
 
-		// TODO: separate in methods to replace continues by returns
-		while ( !plans.isEmpty() ) {
-			final Plan seed = CollectionUtils.removeRandomElement( random , plans ).getValue();
-			final Subchain seedSubchain = getRandomSubchain( seed , config.getTypes() );
-			if ( seedSubchain == null ) continue;
-
+		for ( Collection<Plan> group : planGroups ) {
 			final Collection<Subchain> subchainGroup = new ArrayList<Subchain>();
-			subchainGroup.add( seedSubchain );
-			groups.add( subchainGroup );
-
-			final Collection<String> subchainType = Collections.singleton( seedSubchain.toMove.getType() );
-
-			final Set<Id> availableAlters =
-				CollectionUtils.intersectSorted( 
-						socialNetwork.getAlters( seed.getPerson().getId() ),
-						plans.keySet() );
-
-			for ( Id alter : availableAlters ) {
-				if ( random.nextDouble() > config.getTieActivationProb() ) continue;
-				final Plan alterPlan = plans.remove( alter );
-				final Subchain sc = getRandomSubchain( alterPlan , subchainType );
-				// keep in map if sc null? may have subchains of other types.
-				if ( sc == null ) continue;
-				subchainGroup.add( sc );
+			String type = null;
+			for ( Plan p : group ) {
+				final Subchain sc = type == null ?
+						getRandomSubchain( p , config.getTypes() ) :
+						getRandomSubchain( p , Collections.singleton( type ) );
+				if ( sc != null ) subchainGroup.add( sc );
+				if ( type == null && sc != null ) type = sc.toMove.getType();
 			}
+			if ( !subchainGroup.isEmpty() ) groups.add( subchainGroup );
 		}
 
 		return groups;
