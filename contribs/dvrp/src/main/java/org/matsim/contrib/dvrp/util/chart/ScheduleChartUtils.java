@@ -143,18 +143,18 @@ public class ScheduleChartUtils
     }
 
 
-    private static final Color DARK_BLUE = new Color(0, 0, 200);
-    private static final Color DARK_RED = new Color(200, 0, 0);
+    private static final Color WAIT_COLOR = new Color(0, 200, 0);
+    private static final Color DRIVE_COLOR = new Color(200, 0, 0);
 
     public static final PaintSelector<Task> BASIC_PAINT_SELECTOR = new PaintSelector<Task>() {
         public Paint select(Task task)
         {
             switch (task.getType()) {
                 case DRIVE:
-                    return DARK_RED;
+                    return DRIVE_COLOR;
 
                 case STAY:
-                    return DARK_BLUE;
+                    return WAIT_COLOR;
 
                 default:
                     throw new IllegalStateException();
