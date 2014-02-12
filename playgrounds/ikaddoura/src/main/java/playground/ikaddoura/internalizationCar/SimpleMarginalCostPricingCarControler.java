@@ -34,9 +34,9 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
  * @author ikaddoura
  *
  */
-public class SimpleInternalizationCarControler {
+public class SimpleMarginalCostPricingCarControler {
 	
-	private static final Logger log = Logger.getLogger(SimpleInternalizationCarControler.class);
+	private static final Logger log = Logger.getLogger(SimpleMarginalCostPricingCarControler.class);
 	
 	static String configFile;
 	static boolean internalization;
@@ -56,7 +56,7 @@ public class SimpleInternalizationCarControler {
 			internalization = true;
 		}
 		
-		SimpleInternalizationCarControler main = new SimpleInternalizationCarControler();
+		SimpleMarginalCostPricingCarControler main = new SimpleMarginalCostPricingCarControler();
 		main.run();
 	}
 	
