@@ -65,12 +65,12 @@ public class VehicleGenerator
     public static void main(String[] args)
         throws IOException
     {
-        int count = 1000;
-        int t1 = 10 * 60 * 60;
+        int count = 5000;
+        int t1 = 30 * 60 * 60;
 
-        String dir = "d:\\michalm\\poznan-via\\";
-        String networkFilename = dir + "network.xml";
-        String vehiclesFilename = dir + "vehicle-" + count + ".xml";
+        String dir = "d:\\michalm\\eCab\\";
+        String networkFilename = dir + "2kW.15.output_network.xml";
+        String vehiclesFilename = dir + "taxis-" + count + ".xml";
 
         generateVehicles(networkFilename, vehiclesFilename, count, t1);
     }

@@ -28,7 +28,6 @@ import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpDynLegs.LegCreator;
@@ -45,6 +44,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
+import playground.michalm.taxi.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
@@ -380,7 +380,7 @@ import playground.michalm.util.RunningVehicleRegister;
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()));
+        ChartUtils.showFrame(TaxiScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()));
 
         if (outHistogram) {
             VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);

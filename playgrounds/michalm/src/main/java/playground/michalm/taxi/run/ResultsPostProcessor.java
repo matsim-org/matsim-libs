@@ -155,11 +155,20 @@ public class ResultsPostProcessor
     {
         PrintWriter pw = new PrintWriter(filename);
 
-        pw.printf("%s\t", field);
+        pw.printf("%s", field);
 
-        for (Experiment e : experiments) {
-            double ratio = (double)e.stats.get(0).n / e.taxis;
-            pw.printf("\t%f", ratio);
+        {
+            int prevTaxis = experiments[0].taxis;
+
+            for (Experiment e : experiments) {
+                if (prevTaxis != e.taxis) {
+                    pw.print('\t');
+                }
+                prevTaxis = e.taxis;
+
+                double ratio = (double)e.stats.get(0).n / e.taxis;
+                pw.printf("\t%f", ratio);
+            }
         }
 
         pw.println();
@@ -170,6 +179,8 @@ public class ResultsPostProcessor
             String name = experiments[0].stats.get(i).name;
 
             pw.printf("%s", name);
+
+            int prevTaxis = experiments[0].taxis;
 
             for (Experiment e : experiments) {
                 double value;
@@ -200,6 +211,11 @@ public class ResultsPostProcessor
                     throw new RuntimeException();
                 }
 
+                if (prevTaxis != e.taxis) {
+                    pw.print('\t');
+                }
+                prevTaxis = e.taxis;
+
                 pw.printf("\t%f", value);
             }
 
@@ -210,59 +226,48 @@ public class ResultsPostProcessor
     }
 
 
-    public void goNOS()
-        throws FileNotFoundException
+    private static final String DIR = "d:\\michalm\\2014_02\\";
+    private static final String SUBDIR_PREFIX = "mielec-2-peaks-new-";
+    private static final String NOS_FILE = "stats_NOS.out";
+
+
+    private static String getFile(boolean destinationKnown, boolean onlineVehicleTracker,
+            boolean minimizePickupTripTime)
     {
-        String dir = "d:\\michalm\\2013_07\\";
-        String subdirPrefix = "mielec-2-peaks-new-";
-        String filename = "stats_NOS.out";
-
-        for (Experiment e : experiments) {
-            readFile(dir + subdirPrefix + e.demand + '-' + e.taxis + "\\" + filename, e);
-        }
-
-        writeValues(dir + filename + ".T_W", "T_W");
-        writeValues(dir + filename + ".T_W_MAX", "T_W_MAX");
-        writeValues(dir + filename + ".T_P", "T_P");
-        writeValues(dir + filename + ".T_W_T_P", "T_W-T_P");
-        writeValues(dir + filename + ".R_NI", "R_NI");
+        return "stats_DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
+                + minimizePickupTripTime + ".out";
     }
 
 
-    public void go(boolean destinationKnown, boolean onlineVehicleTracker,
-            boolean minimizePickupTripTime)
+    public void go(String filename)
         throws FileNotFoundException
     {
-        String dir = "d:\\michalm\\2013_07\\";
-        String subdirPrefix = "mielec-2-peaks-new-";
-        String filename = "stats_DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
-                + minimizePickupTripTime + ".out";
-
         for (Experiment e : experiments) {
-            readFile(dir + subdirPrefix + e.demand + '-' + e.taxis + "\\" + filename, e);
+            readFile(DIR + SUBDIR_PREFIX + e.demand + '-' + e.taxis + "\\" + filename, e);
         }
 
-        writeValues(dir + filename + ".T_W", "T_W");
-        writeValues(dir + filename + ".T_W_MAX", "T_W_MAX");
-        writeValues(dir + filename + ".T_P", "T_P");
-        writeValues(dir + filename + ".T_W_T_P", "T_W-T_P");
-        writeValues(dir + filename + ".R_NI", "R_NI");
+        writeValues(DIR + filename + ".T_W", "T_W");
+        writeValues(DIR + filename + ".T_W_MAX", "T_W_MAX");
+        writeValues(DIR + filename + ".T_P", "T_P");
+        writeValues(DIR + filename + ".T_W_T_P", "T_W-T_P");
+        writeValues(DIR + filename + ".R_NI", "R_NI");
     }
 
 
     public static void main(String[] args)
         throws FileNotFoundException
     {
-        new ResultsPostProcessor().goNOS();
-        
-        new ResultsPostProcessor().go(false, false, false);
-        new ResultsPostProcessor().go(false, true, false);
-        new ResultsPostProcessor().go(true, false, false);
-        new ResultsPostProcessor().go(true, true, false);
 
-        new ResultsPostProcessor().go(false, false, true);
-        new ResultsPostProcessor().go(false, true, true);
-        new ResultsPostProcessor().go(true, false, true);
-        new ResultsPostProcessor().go(true, true, true);
+        new ResultsPostProcessor().go(NOS_FILE);
+
+        new ResultsPostProcessor().go(getFile(false, false, false));
+        new ResultsPostProcessor().go(getFile(false, true, false));
+        //        new ResultsPostProcessor().go(getFile(true, false, false));
+        //        new ResultsPostProcessor().go(getFile(true, true, false));
+
+        new ResultsPostProcessor().go(getFile(false, false, true));
+        new ResultsPostProcessor().go(getFile(false, true, true));
+        //        new ResultsPostProcessor().go(getFile(true, false, true));
+        //        new ResultsPostProcessor().go(getFile(true, true, true));
     }
 }
