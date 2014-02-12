@@ -43,6 +43,8 @@ public class TransitScheduleSimplifier{
 	private TransitSchedule transitSchedule;
 	private TransitSchedule mergedSchedule;
 	
+	private final Map<Id,Double[]> departures = new HashMap<Id,Double[]>();
+	
 	private List<TransitStopFacility> checkedFacilities = new ArrayList<TransitStopFacility>();
 	
 	private int cnt = 0;
@@ -131,11 +133,28 @@ public class TransitScheduleSimplifier{
 				
 					//make the current transit route the reference for the equality test
 					refTransitRoute = transitRoutes.get(uncheckedRoutes.remove());
-				
+					
 					String id = refTransitRoute.getId().toString();
 				
 					//check all other transit routes, except for the reference route
 					for(Id transitRouteId : transitRoutes.keySet()){
+						
+						double earliest = Double.POSITIVE_INFINITY;
+						double latest = Double.NEGATIVE_INFINITY;
+						
+						for(Departure d : transitRoutes.get(transitRouteId).getDepartures().values()){
+							if(d.getDepartureTime() < earliest){
+								earliest = d.getDepartureTime();
+							}
+							if(d.getDepartureTime() > latest){
+								latest = d.getDepartureTime();
+							}
+						}
+						
+						Double[] d = new Double[2];
+						d[0] = earliest;
+						d[1] = latest;
+						this.departures.put(transitRouteId, d);
 					
 						if(!transitRouteId.equals(refTransitRoute.getId())){
 				
@@ -153,6 +172,7 @@ public class TransitScheduleSimplifier{
 								}
 						
 							}
+							
 						}
 					
 					}
@@ -663,26 +683,29 @@ public class TransitScheduleSimplifier{
 			List<TransitRouteStop> stops){
 		
 		LinkedList<TransitRouteStop> newStops = new LinkedList<TransitRouteStop>();
-		
+
 		for(int i = 0; i < refTransitRoute.getStops().size(); i++){
 			
 			double arrivalOffset = 0;
 			int arrCounter = 0;
 			double departureOffset = 0;
 			int depCounter = 0;
+//			int nDepartures = 0;
 			
 			for(int j = 0; j < listOfRoutes.length; j++){
 				
-				TransitRouteStop stop = transitRoutes.get(new IdImpl(listOfRoutes[j])).getStops().get(i);
-				arrivalOffset += stop.getArrivalOffset();
+				TransitRoute route = transitRoutes.get(new IdImpl(listOfRoutes[j]));
+				TransitRouteStop stop = route.getStops().get(i);
+				arrivalOffset += stop.getArrivalOffset()*route.getDepartures().size();
 				arrCounter++;
-				departureOffset += stop.getDepartureOffset();
+				departureOffset += stop.getDepartureOffset()*route.getDepartures().size();
 				depCounter++;
+//				nDepartures += route.getDepartures().size();
 				
 			}
 			
-			TransitRouteStop newStop = factory.createTransitRouteStop(refTransitRoute.getStops().get(i).getStopFacility(), arrivalOffset/arrCounter,
-					departureOffset/depCounter);
+			TransitRouteStop newStop = factory.createTransitRouteStop(refTransitRoute.getStops().get(i).getStopFacility(), arrivalOffset/(arrCounter),
+					departureOffset/(depCounter));
 			
 			newStop.setAwaitDepartureTime(refTransitRoute.getStops().get(i).isAwaitDepartureTime());
 			
@@ -699,8 +722,6 @@ public class TransitScheduleSimplifier{
 
 		LinkedList<TransitRouteStop> newRouteProfile = new LinkedList<TransitRouteStop>();
 		
-		int wholeRoute = routeProfile.size() == referenceRoute.getStops().size() ? 1 : 0;
-		
 		TransitStopFacility f = routeProfile.get(0);
 		
 		for(TransitStopFacility facility : routeProfile){
@@ -716,10 +737,6 @@ public class TransitScheduleSimplifier{
 				if(tr.getStops().indexOf(stop) > tr.getStops().indexOf(tr.getStop(f))){
 					arrivalOffset += stop.getArrivalOffset() - tr.getStop(f).getDepartureOffset();
 					departureOffset += stop.getDepartureOffset() - tr.getStop(f).getDepartureOffset();
-//					if(wholeRoute <= 0){
-//						arrivalOffset -= 100;
-//						departureOffset -= 100;
-//					}
 				}
 					
 			}
@@ -730,7 +747,7 @@ public class TransitScheduleSimplifier{
 				newStop = factory.createTransitRouteStop(facility, arrivalOffset/listOfRoutes.length,
 						departureOffset/listOfRoutes.length);
 			} else{
-				TransitStopFacility newFacility = factory.createTransitStopFacility(new IdImpl(facility.getId().toString()+"="+cnt), facility.getCoord(), facility.getIsBlockingLane());
+				TransitStopFacility newFacility = factory.createTransitStopFacility(new IdImpl(facility.getId().toString()+"-=virtual=-"+cnt), facility.getCoord(), facility.getIsBlockingLane());
 				newFacility.setLinkId(facility.getLinkId());
 				cnt++;
 				newStop = factory.createTransitRouteStop(newFacility, arrivalOffset/listOfRoutes.length,
