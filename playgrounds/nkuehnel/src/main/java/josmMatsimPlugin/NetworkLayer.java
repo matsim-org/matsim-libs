@@ -27,6 +27,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkImpl;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.RenameLayerAction;
 import org.openstreetmap.josm.actions.SaveAction;
@@ -63,7 +64,6 @@ public class NetworkLayer extends OsmDataLayer {
 		super(data, name, associatedFile);
 		this.matsimNetwork = network;
 		this.coordSystem = coordSystem;
-
 	}
 
 	public Network getMatsimNetwork() {

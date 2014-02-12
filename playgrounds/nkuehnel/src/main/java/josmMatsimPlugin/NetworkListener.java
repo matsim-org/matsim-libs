@@ -154,6 +154,7 @@ public class NetworkListener implements DataSetListener {
 			return Collections.emptyList();
 		if (!keys.containsKey("modes"))
 			return Collections.emptyList();
+
 		String id = Long.toString(way.getUniqueId());
 		Node fromNode = matsim4osm(way.firstNode());
 		Node toNode = matsim4osm(way.lastNode());
@@ -179,7 +180,7 @@ public class NetworkListener implements DataSetListener {
 				modes.add(tempArray[i]);
 			}
 		}
-		if (modes.size()==0) {
+		if (modes.size() == 0) {
 			return Collections.emptyList();
 		}
 		link.setAllowedModes(modes);
@@ -271,9 +272,7 @@ public class NetworkListener implements DataSetListener {
 				}
 			}
 		}
-
 		System.out.println("have links: " + network.getLinks().size());
-
 	}
 
 	@Override

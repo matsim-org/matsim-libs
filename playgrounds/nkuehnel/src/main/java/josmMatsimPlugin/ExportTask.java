@@ -35,6 +35,7 @@ import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.io.OsmTransferException;
+import org.openstreetmap.josm.tools.ImageProvider;
 import org.xml.sax.SAXException;
 
 /**
@@ -85,8 +86,12 @@ public class ExportTask extends PleaseWaitRunnable {
 							+ targetSystem + ")");
 		} else if (exportResult == VALIDATION_ERROR) {
 			JOptionPane
-					.showMessageDialog(Main.parent,
-							"Export failed due to validation errors. See validation layer for details.");
+					.showMessageDialog(
+							Main.parent,
+							"Export failed due to validation errors. See validation layer for details.",
+							"Failure", JOptionPane.ERROR_MESSAGE,
+							new ImageProvider("warning-small").setWidth(16)
+									.get());
 			OsmValidator.initializeErrorLayer();
 			Main.map.validatorDialog.unfurlDialog();
 			Main.main.getEditLayer().validationErrors.clear();
@@ -188,10 +193,6 @@ public class ExportTask extends PleaseWaitRunnable {
 				this.progressMonitor.setCustomText("cleaning network..");
 				new NetworkCleaner().run(network);
 			}
-			((NetworkImpl) network).setCapacityPeriod(Double
-					.parseDouble(ExportDialog.capacityPeriod.getText()));
-			((NetworkImpl) network).setEffectiveLaneWidth(Double
-					.parseDouble(ExportDialog.effectiveLaneWidth.getText()));
 			this.progressMonitor.setTicks(4);
 			this.progressMonitor.setCustomText("writing out xml file..");
 			new NetworkWriter(network).write(path);

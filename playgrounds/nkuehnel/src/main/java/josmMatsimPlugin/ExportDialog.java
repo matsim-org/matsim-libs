@@ -30,11 +30,6 @@ public class ExportDialog extends JPanel {
 	protected final static JComboBox exportSystem = new JComboBox(
 			Preferences.coordSystems);
 	protected final JLabel exportFilePath = new JLabel((Main.pref.get("matsim_exportFolder", System.getProperty("user.home"))+"\\josm_matsim_export.xml"));
-	protected final static JLabel capacityPeriodLabel = new JLabel("Set capacity period \n(in seconds):");
-	protected final static JLabel effectiveLaneWidthLabel = new JLabel("Set effective lane width \n(in meters):");
-	
-	protected final static JTextField capacityPeriod = new JTextField("3600.0");
-	protected final static JTextField effectiveLaneWidth = new JTextField("3.75");
 
 	public ExportDialog(String coordSystem) {
 
@@ -61,19 +56,6 @@ public class ExportDialog extends JPanel {
 		c.gridx = 1;
 		add(exportSystem, c);
 		
-		c.gridy = 2;
-		c.gridx = 0;
-		add(capacityPeriodLabel, c);
-		
-		c.gridx = 1;
-		add(capacityPeriod, c);
-		
-		c.gridy = 3;
-		c.gridx = 0;
-		add(effectiveLaneWidthLabel, c);
-		
-		c.gridx = 1;
-		add(effectiveLaneWidth, c);
 	}
 
 	public void setOptionPane(JOptionPane optionPane) {

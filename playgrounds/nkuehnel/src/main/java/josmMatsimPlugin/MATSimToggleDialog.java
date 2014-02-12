@@ -5,7 +5,6 @@ import static org.openstreetmap.josm.tools.I18n.tr;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -13,11 +12,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JCheckBox;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -26,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.SelectionChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
@@ -33,16 +38,20 @@ import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
+import org.openstreetmap.josm.gui.dialogs.DialogsPanel.Action;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.tools.ImageProvider;
 
 public class MATSimToggleDialog extends ToggleDialog implements
 		LayerChangeListener, SelectionChangedListener {
 	private JTable table;
 	private Map<Layer, MATSimTableModel> tableModels = new HashMap<Layer, MATSimTableModel>();
-
+	private JButton networkAttributes = new JButton(new ImageProvider(
+			"dialogs", "edit").setWidth(16).get());
 
 	public MATSimToggleDialog() {
-		super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true);
+		super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true,
+				Preferences.class);
 		DataSet.addSelectionListener(this);
 
 		table = new JTable();
@@ -51,9 +60,33 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		table.setAutoCreateRowSorter(true);
 
 		JScrollPane tableContainer = new JScrollPane(table);
-
-
 		createLayout(tableContainer, false, null);
+
+		networkAttributes.setToolTipText(tr("edit network attributes"));
+		networkAttributes.setBorder(BorderFactory.createEmptyBorder());
+		networkAttributes.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				NetworkAttributes dialog = new NetworkAttributes();
+				JOptionPane pane = new JOptionPane(dialog,
+						JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+				dialog.setOptionPane(pane);
+				JDialog dlg = pane.createDialog(Main.parent,
+						tr("Network Attributes"));
+				dlg.setAlwaysOnTop(true);
+				dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				dlg.setVisible(true);
+				if (pane.getValue() != null) {
+					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
+						dialog.apply();
+					}
+				}
+				dlg.dispose();
+
+			}
+		});
+		this.titleBar.add(networkAttributes);
+
 	}
 
 	private void clearTable() {
@@ -81,8 +114,10 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	public void activeLayerChange(Layer oldLayer, Layer newLayer) {
 		if (newLayer instanceof NetworkLayer) {
 			paintTable((NetworkLayer) newLayer);
+			this.networkAttributes.setEnabled(true);
 		} else {
 			clearTable();
+			this.networkAttributes.setEnabled(false);
 		}
 	}
 
@@ -114,7 +149,6 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 	}
 
-
 	private class MATSimTableRenderer extends DefaultTableCellRenderer {
 		@Override
 		public Component getTableCellRendererComponent(JTable table,
@@ -129,7 +163,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	}
 
 	private class MATSimTableModel extends AbstractTableModel {
-		
+
 		private String[] columnNames = { "id", "internal-id", "length",
 				"freespeed", "capacity", "permlanes" };
 
@@ -141,7 +175,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			this.network = network;
 			this.links = new ArrayList<Id>(network.getLinks().keySet());
 		}
-		
+
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			if (columnIndex == 0) {
@@ -198,5 +232,50 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			}
 			throw new RuntimeException();
 		}
+	}
+
+	private class NetworkAttributes extends JPanel {
+
+		private JOptionPane optionPane;
+		private JLabel laneWidth = new JLabel("effective lane width [m]:");
+		private JLabel capacityPeriod = new JLabel("capacity period [s]:");
+		private JTextField laneWidthValue = new JTextField();
+		private JTextField capacityPeriodValue = new JTextField();
+
+		public NetworkAttributes() {
+			Layer layer = Main.main.getActiveLayer();
+			if (layer instanceof NetworkLayer) {
+				laneWidthValue.setText(String.valueOf(((NetworkLayer) layer)
+						.getMatsimNetwork().getEffectiveLaneWidth()));
+				capacityPeriodValue.setText(String
+						.valueOf(((NetworkLayer) layer).getMatsimNetwork()
+								.getCapacityPeriod()));
+			}
+			add(laneWidth);
+			add(laneWidthValue);
+			add(capacityPeriod);
+			add(capacityPeriodValue);
+		}
+
+		public void setOptionPane(JOptionPane optionPane) {
+			this.optionPane = optionPane;
+		}
+
+		protected void apply() {
+			Layer layer = Main.main.getActiveLayer();
+			if (layer instanceof NetworkLayer) {
+				String lW = laneWidthValue.getText();
+				String cP = capacityPeriodValue.getText();
+				if (!lW.isEmpty()) {
+					((NetworkImpl) ((NetworkLayer) layer).getMatsimNetwork())
+					.setEffectiveLaneWidth(Double.parseDouble(lW));
+				} 
+				if (!cP.isEmpty()) {
+					((NetworkImpl) ((NetworkLayer) layer).getMatsimNetwork())
+					.setCapacityPeriod(Double.parseDouble(cP));
+				}
+			}
+		}
+
 	}
 }

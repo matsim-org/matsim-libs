@@ -114,7 +114,5 @@ public class MapRenderer extends StyledMapRenderer {
 			return ((LinkImpl) ((NetworkLayer) layer).getMatsimNetwork()
 					.getLinks().get(id)).getOrigId();
 		}
-
 	}
-
 }

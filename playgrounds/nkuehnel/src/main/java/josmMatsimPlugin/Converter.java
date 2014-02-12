@@ -185,7 +185,6 @@ public class Converter {
 					}
 				}
 			}
-
 		}
 
 		// create the required nodes

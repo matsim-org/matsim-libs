@@ -50,11 +50,11 @@ public class MATSimAction {
 	public class ExportAction extends JosmAction {
 
 		public ExportAction() {
-			super(tr("Export MATSim network"), null,
+			super(tr("Export MATSim network"), "save.png",
 					tr("Export MATSim network file"), Shortcut
 							.registerShortcut("menu:matsimexport",
 									tr("Menu: {0}", tr("MATSim Export")),
-									KeyEvent.VK_G, Shortcut.ALT_CTRL), false);
+									KeyEvent.VK_G, Shortcut.ALT_CTRL), true);
 		}
 
 		@Override
@@ -107,11 +107,11 @@ public class MATSimAction {
 	public class ImportAction extends JosmAction {
 
 		public ImportAction() {
-			super(tr("Import MATSim network"), null,
+			super(tr("Import MATSim network"), "open.png",
 					tr("Import MATSim network file"), Shortcut
 							.registerShortcut("menu:matsimImport",
 									tr("Menu: {0}", tr("MATSim Import")),
-									KeyEvent.VK_G, Shortcut.ALT_CTRL), false);
+									KeyEvent.VK_G, Shortcut.ALT_CTRL), true);
 		}
 
 		@Override
@@ -153,10 +153,10 @@ public class MATSimAction {
 	public class NewNetworkAction extends JosmAction {
 
 		public NewNetworkAction() {
-			super(tr("New MATSim network"), null, tr("Create new Network"),
+			super(tr("New MATSim network"), "new.png", tr("Create new Network"),
 					Shortcut.registerShortcut("menu:matsimNetwork",
 							tr("Menu: {0}", tr("New MATSim Network")),
-							KeyEvent.VK_G, Shortcut.ALT_CTRL), false);
+							KeyEvent.VK_G, Shortcut.ALT_CTRL), true);
 		}
 
 		@Override
