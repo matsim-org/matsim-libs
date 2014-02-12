@@ -106,9 +106,9 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 		Activity nextNonParkingAct = (Activity) selectedPlan.getPlanElements().get(currentPlanElementIndex + 3);
 
 		Collection<ActivityFacility> parkings = parkingInfrastructure.getAllFreeParkingWithinDistance(1000,
-				nextNonParkingAct.getCoord());
+				nextNonParkingAct.getCoord(), null);
 		if (parkings.size() == 0) {
-			parkings.add(parkingInfrastructure.getClosestFreeParkingFacility(nextNonParkingAct.getCoord()));
+			parkings.add(parkingInfrastructure.getClosestFreeParkingFacility(nextNonParkingAct.getCoord(), null));
 		}
 
 		// get best parking

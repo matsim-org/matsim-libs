@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WithinDayParkingRunner.java
+ * STRC2014Runner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.parking;
+package playground.christoph.strc2014;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
+import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 
-import playground.christoph.parking.core.facilities.OtherFacilityCreator;
-import playground.christoph.parking.core.facilities.ParkingFacilityCreator;
+import playground.christoph.parking.ParkingTypes;
+import playground.christoph.parking.WithinDayParkingControlerListener;
 
-public class WithinDayParkingRunner {
+public class STRC2014Runner {
 	
 	public static void main(String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -51,6 +53,9 @@ public class WithinDayParkingRunner {
 		} else {
 			Config config = ConfigUtils.loadConfig(args[0], new MultiModalConfigGroup());
 			Scenario scenario = ScenarioUtils.loadScenario(config);
+
+			fixFirstActivityStartTime(scenario);
+			fixMinLinkTravelTime(scenario);
 			
 			// if multi-modal simulation is enabled
 			MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
@@ -61,31 +66,22 @@ public class WithinDayParkingRunner {
 				 */
 				if (!NetworkUtils.isMultimodal(scenario.getNetwork())) {
 					String simulatedModes = multiModalConfigGroup.getSimulatedModes();
-					// ensure that multi-modal network includes ride and pt links
-					multiModalConfigGroup.setSimulatedModes(simulatedModes + ",ride,pt");
+//					// ensure that multi-modal network includes ride and pt links
+//					multiModalConfigGroup.setSimulatedModes(simulatedModes + ",ride,pt");
 					new MultiModalNetworkCreator(multiModalConfigGroup).run(scenario.getNetwork());
 					multiModalConfigGroup.setSimulatedModes(simulatedModes);
 				}
 				
-				// drop routes and convert ride to car legs
-				for (Person person : scenario.getPopulation().getPersons().values()) {
-					for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
-						if (planElement instanceof Leg) {
-							Leg leg = (Leg) planElement;
-							leg.setRoute(null);
-							if (leg.getMode().equals(TransportMode.ride)) leg.setMode(TransportMode.car);
-						}
-					}
-				}
-			}
-
-			OtherFacilityCreator.createParkings(scenario);
-			
-			int i = 0;
-			int mod = 3;
-			for (Link link : scenario.getNetwork().getLinks().values()) {
-				if (i++ % mod == 0) ParkingFacilityCreator.createParkings(scenario, link, ParkingTypes.PARKING);
-//				if (i++ % mod == 0) ParkingFacilityCreator.createParkings(scenario, link, ParkingTypes.PARKING, 1000.0);
+//				// drop routes and convert ride to car legs
+//				for (Person person : scenario.getPopulation().getPersons().values()) {
+//					for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
+//						if (planElement instanceof Leg) {
+//							Leg leg = (Leg) planElement;
+//							leg.setRoute(null);
+//							if (leg.getMode().equals(TransportMode.ride)) leg.setMode(TransportMode.car);
+//						}
+//					}
+//				}
 			}
 			
 			
@@ -102,7 +98,8 @@ public class WithinDayParkingRunner {
 			allParkingTypes.add(ParkingTypes.PRIVATEOUTSIDEPARKING);
 			
 			// initialize Controler listeners
-			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
+			MultiModalControlerListener multiModalControlerListener = null;
+//			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
 			WithinDayParkingControlerListener parkingControlerListener = new WithinDayParkingControlerListener(scenario,
 					multiModalControlerListener, initialParkingTypes, allParkingTypes, capacityFactor);
 
@@ -112,12 +109,49 @@ public class WithinDayParkingRunner {
 			 */
 			Controler controler = new Controler(scenario);
 			controler.addControlerListener(parkingControlerListener);
-			controler.addControlerListener(multiModalControlerListener);
+//			controler.addControlerListener(multiModalControlerListener);
+			
+			/*
+			 * Analysis stuff
+			 */
+			controler.addControlerListener(new ActivitiesAnalyzer());
+			controler.addControlerListener(new TripsAnalyzer());
 			
 			controler.setOverwriteFiles(true);
 			controler.run();
 			
 			System.exit(0);			
-		}		
+		}
+		
+	}
+	/*
+	 * Fix a problem occurring when agents end their first activity at 00:00:00. They are inserted
+	 * into the mobsim and create events even before the simulation initialized event has been
+	 * created.
+	 */
+	private static void fixFirstActivityStartTime(Scenario scenario) {
+		
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			Activity firstActivity = (Activity) plan.getPlanElements().get(0);
+			if (firstActivity.getEndTime() == 0.0) {
+				firstActivity.setEndTime(1.0);
+				firstActivity.setMaximumDuration(1.0);
+			}
+		}
+	}
+	
+	/*
+	 * Fix a problem occurring with very short links. There, agents can enter a link and start an
+	 * activity immediately, even before they had any chance to replan. This occurs if the link
+	 * travel time is < 1.0s (respectively < a time step).
+	 */
+	private static void fixMinLinkTravelTime(Scenario scenario) {
+		
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			if (((LinkImpl) link).getFreespeedTravelTime() < 1.0) {
+				link.setLength(link.getFreespeed() + 1.0);
+			}
+		}
 	}
 }

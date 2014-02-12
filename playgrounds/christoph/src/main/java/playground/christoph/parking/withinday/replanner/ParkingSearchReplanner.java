@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -90,18 +91,17 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		 * another link to the current leg.
 		 */
 		Id parkingFacilityId = this.parkingAgentsTracker.getSelectedParking(withinDayAgent.getId());
-//		Id parkingFacilityId = this.parkOnLink(withinDayAgent);
 		
 		// if no parking facility has been set, the agent has to continue its search
 		if (parkingFacilityId == null) {
 //			this.randomParkingSearch.applySearchStrategy(withinDayAgent, this.time);
-//			this.nearestAvailableParkingSearch.applySearchStrategy(withinDayAgent, time);
+			this.nearestAvailableParkingSearch.applySearchStrategy(withinDayAgent, time);
 			
-			if (withinDayAgent.getId().hashCode() % 2 == 0) {
-				this.randomParkingSearch.applySearchStrategy(withinDayAgent, this.time);
-			} else {
-				this.nearestAvailableParkingSearch.applySearchStrategy(withinDayAgent, time);
-			}
+//			if (withinDayAgent.getId().hashCode() % 2 == 0) {
+//				this.randomParkingSearch.applySearchStrategy(withinDayAgent, this.time);
+//			} else {
+//				this.nearestAvailableParkingSearch.applySearchStrategy(withinDayAgent, time);
+//			}
 		}
 
 		/*
@@ -113,7 +113,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 
 			int routeIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
-			NetworkRoute route = (NetworkRoute) leg.getRoute();
+			Route route = leg.getRoute();
 			
 			updateAgentsPlan(withinDayAgent, parkingFacilityId, route, routeIndex);
 		}
@@ -122,9 +122,10 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		return true;
 	}
 	
-	protected void updateAgentsPlan(MobsimAgent withinDayAgent, Id parkingFacilityId, NetworkRoute route, int routeIndex) {
+	protected void updateAgentsPlan(MobsimAgent withinDayAgent, Id parkingFacilityId, Route route, int routeIndex) {
 		
 		Plan plan = ((PlanAgent) withinDayAgent).getSelectedPlan();
+		Person person = plan.getPerson();
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
 		
 		ActivityImpl parkingActivity = (ActivityImpl) ((PlanAgent) withinDayAgent).getNextPlanElement();
@@ -150,19 +151,30 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 			relocateParkingActivity(parkingActivity, parkingFacility);
 			
 			// remove parts of the route that have not been passed by the agent yet
-			cutRoute(route, routeIndex);
+			cutRoute((NetworkRoute) route, routeIndex);
 			
 			// extend route if it does not end at the agent's selected parking facility
-			extendRoute(route, parkingActivity.getLinkId(),  plan.getPerson(), null);
+			if (!withinDayAgent.getCurrentLinkId().equals(parkingActivity.getLinkId())) {
+				Vehicle vehicle = null;
+				this.parkingRouter.extendCarRoute((NetworkRoute) route, parkingActivity.getLinkId(), time, person, vehicle);				
+			}
 			
 			Leg walkLegToNextActivity = (Leg) plan.getPlanElements().get(currentPlanElementIndex + 2);
+			Activity activityAfterWalkLeg = (Activity) plan.getPlanElements().get(currentPlanElementIndex + 3);
 			
-			updateStartOfWalkRoute((NetworkRoute) walkLegToNextActivity.getRoute(), parkingFacility.getLinkId(), 
-					walkLegToNextActivity.getDepartureTime(), plan.getPerson(), null);
+			Vehicle vehicle = null;
+			this.parkingRouter.adaptStartOfWalkRoute(parkingActivity, walkLegToNextActivity, activityAfterWalkLeg, 
+					walkLegToNextActivity.getDepartureTime(), person, vehicle);
 		}
 		// if only the parking facility changed but not the link where it is located
 		else if (parkingFacilityWasChanged) {
+//			relocateParkingActivity(parkingActivity, parkingFacility);
+			
+			// relocate parking activity to its new location
 			relocateParkingActivity(parkingActivity, parkingFacility);
+			
+			// remove parts of the route that have not been passed by the agent yet
+			cutRoute((NetworkRoute) route, routeIndex);
 		}
 		// parking was not change, therefore we do not have to adapt anything in the agent's plan
 		else {
@@ -192,27 +204,6 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		parkingActivity.setLinkId(facility.getLinkId());
 		parkingActivity.setFacilityId(facility.getId());
 	}
-	
-	/*
-	 * To be used when the location where a route starts has changed.
-	 * The router searches for the fastest connection from the new start point
-	 * to the n first nodes of the route.
-	 */
-	private void updateStartOfCarRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle) {
-		this.parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.car);
-	}
-	
-	private void updateStartOfWalkRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle) {
-		this.parkingRouter.adaptStartOfRoute(route, startLinkId, time, person, vehicle, TransportMode.walk);
-	}
-	
-	private void updateEndOfWalkRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle) {
-		this.parkingRouter.adaptEndOfRoute(route, endLinkId, time, person, vehicle, TransportMode.walk);
-	}
-	
-	private void createNewWalkRoute(Activity fromActivity, Leg walkLeg, Activity toActivity, Person person) {
-		this.parkingRouter.updateWalkRoute(fromActivity, walkLeg, toActivity, person);
-	}
 
 	/*
 	 * If the agent is not at the end of its route, remove not passed parts.
@@ -223,14 +214,6 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		if (length >= routeIndex) {
 			List<Id> linkIds = new ArrayList<Id>(route.getLinkIds().subList(0, routeIndex - 1));
 			route.setLinkIds(route.getStartLinkId(), linkIds, route.getLinkIds().get(routeIndex - 1));
-		}
-	}
-	
-	// extend route if the route does not end at the agent's selected parking facility
-	private void extendRoute(NetworkRoute route, Id parkingLinkId, Person person, Vehicle vehicle) {
-		
-		if (!route.getEndLinkId().equals(parkingLinkId)) {
-			this.parkingRouter.extendRoute(route, parkingLinkId, time, person, vehicle, TransportMode.car);			
 		}
 	}
 	
@@ -260,14 +243,19 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 			/*
 			 * If the parking was relocated to another link
 			 */
-			if (parkingLinkWasChanged) {	
+			if (parkingLinkWasChanged) {
 				relocateParkingActivity(nextParkingActivity, parkingFacility);
 
-				updateEndOfWalkRoute((NetworkRoute) walkLegToNextParkingActivity.getRoute(), parkingFacility.getLinkId(), 
-						walkLegToNextParkingActivity.getDepartureTime(), plan.getPerson(), null);
+				Vehicle vehicle;
 				
-				updateStartOfCarRoute((NetworkRoute) nextCarLeg.getRoute(), parkingFacility.getLinkId(), 
-						nextCarLeg.getDepartureTime(), plan.getPerson(), null);
+				vehicle = null;
+				Activity fromActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex - 3);
+				this.parkingRouter.adaptEndOfWalkRoute(fromActivity, walkLegToNextParkingActivity, nextParkingActivity,
+						walkLegToNextParkingActivity.getDepartureTime(), plan.getPerson(), vehicle);
+				
+				vehicle = null;
+				this.parkingRouter.adaptStartOfCarRoute((NetworkRoute) nextCarLeg.getRoute(), parkingFacility.getLinkId(), 
+						nextCarLeg.getDepartureTime(), plan.getPerson(), vehicle);
 			}
 			// if only the parking facility changed but not the link where it is located
 			else if (parkingFacilityWasChanged) {
@@ -276,26 +264,8 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 			// If the parking facility was not relocated, we do not have to adapt anything here.
 			else return false;
 			
-//			ActivityImpl nextNextparkingActivity = (ActivityImpl) plan.getPlanElements().get(nextCarLegIndex + 1);
-//			Leg walkLegFromNextParkingActivity = (Leg) plan.getPlanElements().get(nextCarLegIndex + 2);
-//			boolean removeNextCarLeg = (nextParkingActivity.getLinkId().equals(nextNextparkingActivity.getLinkId()));
-//			// The next car leg can be removed if it starts and ends on the same link.
-//			if (removeNextCarLeg) {				
-//				// create a new walk leg
-//				Activity previousActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex - 3);
-//				Activity nextActivity = (Activity) plan.getPlanElements().get(nextCarLegIndex + 3);
-//				createNewWalkRoute(previousActivity, walkLegFromNextParkingActivity, nextActivity, plan.getPerson());
-//
-//				plan.getPlanElements().remove(walkLegToNextParkingActivity);
-//				plan.getPlanElements().remove(nextParkingActivity);
-//				plan.getPlanElements().remove(nextCarLeg);
-//				plan.getPlanElements().remove(nextNextparkingActivity);
-//
-//				return true;
-//			}
 			return false;
 			
 		} else return false;
 	}
-	
 }

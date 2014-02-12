@@ -254,7 +254,7 @@ public class WithinDayParkingController_ZHScenario implements StartupListener, R
 		event.getControler().getEvents().addHandler(this.parkingAgentsTracker);
 		event.getControler().addControlerListener(parkingAgentsTracker);
 		
-		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, multiModalTravelTimes, 
+		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, null, null, 
 				event.getControler().getTravelDisutilityFactory(), tripRouterFactoryWrapper, nodesToCheck);
 				
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, 

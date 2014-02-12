@@ -72,7 +72,6 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	protected final ParkingInfrastructure parkingInfrastructure;
 	protected final MobsimDataProvider mobsimDataProvider;
 	private final double distance;
-	private final WithinDayAgentUtils withinDayAgentUtils;
 
 	private final Set<Id> carLegAgents;
 	private final Set<Id> searchingAgents;
@@ -110,7 +109,6 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 		this.recentlyArrivedDrivers = new HashSet<Id>();
 		this.recentlyDepartingDrivers = new HashMap<Id, Id>();
 		this.recentlyWaitingDrivers = new HashSet<Id>();
-		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 
 	public Set<Id> getSearchingAgents() {
@@ -140,7 +138,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 			Activity parkingActivity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 			parkingActivity.setEndTime(Time.UNDEFINED_TIME);
 			parkingActivity.setMaximumDuration(Time.UNDEFINED_TIME);
-			this.withinDayAgentUtils.resetCaches(agent);
+			WithinDayAgentUtils.resetCaches(agent);
 			this.internalIterface.rescheduleActivityEnd(agent);
 		}
 		this.recentlyWaitingDrivers.clear();
@@ -155,7 +153,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 			Activity parkingActivity = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
 			parkingActivity.setEndTime(e.getSimulationTime() + 180);
 			parkingActivity.setMaximumDuration(parkingActivity.getEndTime() - parkingActivity.getStartTime());
-			this.withinDayAgentUtils.resetCaches(agent);
+			WithinDayAgentUtils.resetCaches(agent);
 			this.internalIterface.rescheduleActivityEnd(agent);
 		}
 	}
@@ -290,7 +288,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 
 		MobsimAgent agent = this.mobsimDataProvider.getAgent(agentId);
 		Plan executedPlan = ((PlanAgent) agent).getSelectedPlan();
-		int planElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
+		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		
 		Activity nextNonParkingActivity = (Activity) executedPlan.getPlanElements().get(planElementIndex + 3);		
 		return nextNonParkingActivity;

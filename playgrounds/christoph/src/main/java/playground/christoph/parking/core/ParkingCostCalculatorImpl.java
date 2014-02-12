@@ -42,6 +42,10 @@ public class ParkingCostCalculatorImpl implements ParkingCostCalculator {
 			return 1.0 * parkingDuration/3600;
 		} else if(parkingTypes.get(ParkingTypes.GARAGEPARKING).contains(parkingFacilityId)) {
 			return 2.0 * parkingDuration/3600;
+		} else if (parkingTypes.get(ParkingTypes.PRIVATEINSIDEPARKING).contains(parkingFacilityId)) {
+			return 0.5;
+		} else if (parkingTypes.get(ParkingTypes.PRIVATEOUTSIDEPARKING).contains(parkingFacilityId)) {
+			return 0.0;
 		}
 		
 		return Double.MAX_VALUE;

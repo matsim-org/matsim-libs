@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -39,7 +40,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.christoph.parking.ParkingTypes;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 
 /**
@@ -50,65 +50,77 @@ import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
  * @author cdobler
  */
 public class ParkingInfrastructure {
-
+	
 	static final Logger log = Logger.getLogger(ParkingInfrastructure.class);
 
 	private final QuadTree<ActivityFacility> allParkingFacilities;
-	private final QuadTree<ActivityFacility> fullParkingFacilitiesWithFreeWaitingCapacity;
-	private final QuadTree<ActivityFacility> availableParkingFacilities;
-	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
+//	private final QuadTree<ActivityFacility> fullParkingFacilitiesWithFreeWaitingCapacity;
+//	private final QuadTree<ActivityFacility> availableParkingFacilities;
+	private final Map<String, QuadTree<ActivityFacility>> availableParkingFacilities;
+	private final Map<Id, Map<String, List<Id>>> parkingFacilitiesOnLinkMapping; // <LinkId, Map<ParkingType, List<FacilityId>>>
 	protected final Map<Id, ParkingFacility> parkingFacilities;
 	private final ParkingCostCalculator parkingCostCalculator;
 	private final Set<Id> parkingFacilitiesWithWaitingAgents;
+	private final Set<String> parkingTypes;
 	protected final Scenario scenario;
 
-	public void resetParkingFacilityForNewIteration() {
-
-		for (ParkingFacility parkingFacility : this.parkingFacilities.values())
-			parkingFacility.reset();
-
-		fillQuadTree();
-		
-		parkingFacilitiesWithWaitingAgents.clear();
-	}
-
-	public ParkingInfrastructure(Scenario scenario, ParkingCostCalculator parkingCostCalculator) {
+	public ParkingInfrastructure(Scenario scenario, ParkingCostCalculator parkingCostCalculator, Set<String> parkingTypes, double capacityFactor) {
 		this.scenario = scenario;
 		this.parkingCostCalculator = parkingCostCalculator;
 		this.parkingFacilities = new HashMap<Id, ParkingFacility>();
-
-		this.parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
+		this.parkingTypes = new TreeSet<String>(parkingTypes);
+		
 		this.parkingFacilitiesWithWaitingAgents = new HashSet<Id>();
+		this.parkingFacilitiesOnLinkMapping = new HashMap<Id, Map<String, List<Id>>>();
+				
+		// create ParkingFacility objects and add facilities to the facilitiesOnLinkMapping
+		for (String parkingType : this.parkingTypes) {
+			Map<Id, ActivityFacility> parkingFacilitiesForType = this.scenario.getActivityFacilities().getFacilitiesForActivityType(parkingType);
+			
+			for (ActivityFacility facility : parkingFacilitiesForType.values()) {
+				Id facilityId = facility.getId();
+				Id linkId = facility.getLinkId();
+				int parkingCapacity = (int) Math.round(facility.getActivityOptions().get(parkingType).getCapacity() * capacityFactor);
+				int waitingCapacity = 0;
+				ActivityOption waitingOption = facility.getActivityOptions().get(ParkingFacility.WAITINGCAPACITY);
+				if (waitingOption != null) waitingCapacity = (int) Math.round(waitingOption.getCapacity() * capacityFactor);
+				
+				ParkingFacility parkingFacility = new ParkingFacility(facilityId, linkId, parkingType, parkingCapacity, waitingCapacity);
+				this.parkingFacilities.put(facilityId, parkingFacility);
+				
+				assignFacilityToLink(linkId, facilityId, parkingFacility.getParkingType());
 
-//		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(
-//				scenario.getActivityFacilities(), (NetworkImpl) scenario.getNetwork());
-
-		// Create ParkingFacilities
-		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
-
-			ActivityOption parkingOption;
-
-			parkingOption = facility.getActivityOptions().get(ParkingTypes.PARKING);
-			if (parkingOption != null) {
-				int parkingCapacity = (int) Math.round(parkingOption.getCapacity());
-
-				if (parkingCapacity > 0) {
-					// so far: just assume that 10% of the parking capacity is available as waiting capacity
-					int waitingCapacity = (int) (((double) parkingCapacity) / 10);
-					
-					ParkingFacility parkingFacility = new ParkingFacility(facility.getId(), facility.getLinkId(), 
-							ParkingTypes.PARKING, parkingCapacity, waitingCapacity);
-					parkingFacilities.put(facility.getId(), parkingFacility);
-				}
 			}
 		}
+		
+//		/*
+//		 * Create waiting capacity for parking activities 
+//		 */
+//		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+//
+//			ActivityOption parkingOption;
+//
+//			parkingOption = facility.getActivityOptions().get(ParkingTypes.PARKING);
+//			if (parkingOption != null) {
+//				int parkingCapacity = (int) Math.round(parkingOption.getCapacity());
+//
+//				if (parkingCapacity > 0) {
+//					// so far: just assume that 10% of the parking capacity is available as waiting capacity
+//					int waitingCapacity = (int) (((double) parkingCapacity) / 10);
+//					
+//					ParkingFacility parkingFacility = new ParkingFacility(facility.getId(), facility.getLinkId(), 
+//							ParkingTypes.PARKING, parkingCapacity, waitingCapacity);
+//					parkingFacilities.put(facility.getId(), parkingFacility);
+//				}
+//			}
+//		}
 
 		// Create a quadtree containing all parking facilities
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (ParkingFacility parkingFacility : parkingFacilities.values()) {
+		for (ParkingFacility parkingFacility : this.parkingFacilities.values()) {
 			ActivityFacility facility = scenario.getActivityFacilities().getFacilities()
 					.get(parkingFacility.getFaciltyId());
 			if (facility.getCoord().getX() < minx) {
@@ -129,44 +141,63 @@ public class ParkingInfrastructure {
 		maxx += 1.0;
 		maxy += 1.0;
 
-		allParkingFacilities = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		availableParkingFacilities = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		fullParkingFacilitiesWithFreeWaitingCapacity = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		this.allParkingFacilities = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+
+//		this.availableParkingFacilities = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		this.availableParkingFacilities = new HashMap<String, QuadTree<ActivityFacility>>();
+		for (String parkingType : this.parkingTypes) this.availableParkingFacilities.put(parkingType, new QuadTree<ActivityFacility>(minx, miny, maxx, maxy));
 		
-		fillQuadTree();
+//		this.fullParkingFacilitiesWithFreeWaitingCapacity = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		
+		fillQuadTree(this.parkingTypes);
 	}
 
-	private void fillQuadTree() {
+	public void resetParkingFacilityForNewIteration() {
 
-		this.availableParkingFacilities.clear();
+		this.allParkingFacilities.clear();
+		for (ParkingFacility parkingFacility : this.parkingFacilities.values()) parkingFacility.reset();
+		
+		fillQuadTree(this.parkingTypes);
+		
+		this.parkingFacilitiesWithWaitingAgents.clear();
+	}
+
+	
+	private void fillQuadTree(Set<String> parkingTypes) {
+
+		for (String parkingType : parkingTypes) this.availableParkingFacilities.get(parkingType).clear();
 
 		for (ParkingFacility parkingFacility : parkingFacilities.values()) {
 			ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(parkingFacility.getFaciltyId());
 
 			// add the facility to the quadtrees
-			allParkingFacilities.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
+			this.allParkingFacilities.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 			
 			if (parkingFacility.getParkingCapacity() > 0) {
-				availableParkingFacilities.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);				
+				this.availableParkingFacilities.get(parkingFacility.getParkingType()).put(facility.getCoord().getX(), 
+						facility.getCoord().getY(), facility);				
 			}
 			
-			if (parkingFacility.getWaitingCapacity() > 0) {
-				fullParkingFacilitiesWithFreeWaitingCapacity.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);				
-			}
-
-			// add the facility to the facilitiesOnLinkMapping
-			Id linkId = facility.getLinkId();
-			Id facilityId = facility.getId();
-			assignFacilityToLink(linkId, facilityId);
+//			if (parkingFacility.getWaitingCapacity() > 0) {
+//				fullParkingFacilitiesWithFreeWaitingCapacity.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);				
+//			}
 		}
 	}
 
-	private void assignFacilityToLink(Id linkId, Id facilityId) {
-		List<Id> list = parkingFacilitiesOnLinkMapping.get(linkId);
+	private void assignFacilityToLink(Id linkId, Id facilityId, String parkingType) {
+		
+		Map<String, List<Id>> map = this.parkingFacilitiesOnLinkMapping.get(linkId);
+		if (map == null) {
+			map = new HashMap<String, List<Id>>();
+			this.parkingFacilitiesOnLinkMapping.put(linkId, map);
+		}
+		
+		List<Id> list = map.get(parkingType);
 		if (list == null) {
 			list = new ArrayList<Id>();
-			parkingFacilitiesOnLinkMapping.put(linkId, list);
+			map.put(parkingType, list);
 		}
+		
 		list.add(facilityId);
 	}
 
@@ -190,7 +221,7 @@ public class ParkingInfrastructure {
 		boolean reserved = parkingFacility.reserveParking(vehicleId);
 
 		if (getFreeParkingCapacity(facilityId) <= 0) {
-			markFacilityAsFull(facilityId);
+			markFacilityAsFull(facilityId, parkingFacility.getParkingType());
 		}
 
 		if (!reserved) {
@@ -250,6 +281,10 @@ public class ParkingInfrastructure {
 		ParkingFacility parkingFacility = this.parkingFacilities.get(facilityId);
 		boolean waiting = false;
 		
+		if (parkingFacility == null) {
+			System.out.println("null");
+		}
+		
 		// try to park the vehicle in the parking facility
 		boolean parked = parkingFacility.reservedToOccupied(vehicleId);
 		if (parked) {
@@ -291,7 +326,7 @@ public class ParkingInfrastructure {
 		}
 
 		if (getFreeParkingCapacity(facilityId) == 1) {
-			markFacilityAsNonFull(facilityId);
+			markFacilityAsNonFull(facilityId, parkingFacility.getParkingType());
 		}
 	}
 
@@ -321,27 +356,30 @@ public class ParkingInfrastructure {
 		return parkedAgentIds;
 	}
 	
-	private void markFacilityAsFull(Id facilityId) {
+	private void markFacilityAsFull(Id facilityId, String parkingType) {
 		ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(facilityId);
-		this.availableParkingFacilities.remove(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(),
-				activityFacility);
+		this.availableParkingFacilities.get(parkingType).remove(activityFacility.getCoord().getX(), 
+				activityFacility.getCoord().getY(), activityFacility);
 	}
 
-	private void markFacilityAsNonFull(Id facilityId) {
+	private void markFacilityAsNonFull(Id facilityId, String parkingType) {
 		ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(facilityId);
-		this.availableParkingFacilities.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(),
-				activityFacility);
+		this.availableParkingFacilities.get(parkingType).put(activityFacility.getCoord().getX(), 
+				activityFacility.getCoord().getY(), activityFacility);
 	}
 
-	public List<Id> getParkingsOnLink(Id linkId) {
-		return parkingFacilitiesOnLinkMapping.get(linkId);
+	public List<Id> getParkingsOnLink(Id linkId, String parkingType) {
+		
+		Map<String, List<Id>> map = this.parkingFacilitiesOnLinkMapping.get(linkId);
+		if (map == null) return null;
+		else return map.get(parkingType);
 	}
 
 	public List<Id> getFreeParkingFacilitiesOnLink(Id linkId, String parkingType) {
 
 		List<Id> parkings = new ArrayList<Id>();
 
-		List<Id> list = getParkingsOnLink(linkId);
+		List<Id> list = getParkingsOnLink(linkId, parkingType);
 
 		// if no parkings are available on the link, return an empty list
 		if (list == null) return parkings;
@@ -364,7 +402,7 @@ public class ParkingInfrastructure {
 
 		List<Id> parkings = new ArrayList<Id>();
 
-		List<Id> list = getParkingsOnLink(linkId);
+		List<Id> list = getParkingsOnLink(linkId, parkingType);
 
 		// if no parkings are available on the link, return an empty list
 		if (list == null) return parkings;
@@ -383,8 +421,8 @@ public class ParkingInfrastructure {
 		return parkings;
 	}
 	
-	public ActivityFacility getClosestFreeParkingFacility(Coord coord) {
-		return this.availableParkingFacilities.get(coord.getX(), coord.getY());
+	public ActivityFacility getClosestFreeParkingFacility(Coord coord, String parkingType) {
+		return this.availableParkingFacilities.get(parkingType).get(coord.getX(), coord.getY());
 	}
 
 	public ActivityFacility getClosestParkingFacility(Coord coord) {
@@ -395,9 +433,9 @@ public class ParkingInfrastructure {
 		return parkingCostCalculator;
 	}
 
-	public Collection<ActivityFacility> getAllFreeParkingWithinDistance(double distance, Coord coord) {
+	public Collection<ActivityFacility> getAllFreeParkingWithinDistance(double distance, Coord coord, String parkingType) {
 
-		Collection<ActivityFacility> parkings = this.availableParkingFacilities.get(coord.getX(), coord.getY(), distance);
+		Collection<ActivityFacility> parkings = this.availableParkingFacilities.get(parkingType).get(coord.getX(), coord.getY(), distance);
 
 		return parkings;
 	}

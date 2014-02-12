@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,7 +35,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.InitialNode;
@@ -48,7 +49,6 @@ import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicle;
 
 public class ParkingRouter {
@@ -56,31 +56,33 @@ public class ParkingRouter {
 	private static final Logger log = Logger.getLogger(ParkingRouter.class);
 	
 	private final Scenario scenario;
-//	private final Map<String, TravelTime> travelTimes;
-	private final Map<String, TravelDisutility> travelDisutilities;
+	private final TravelTime carTravelTime;
+	private final TravelTime walkTravelTime;
 	private final TripRouter tripRouter;
 	private final int nodesToCheck;
 	
-	private final Map<String, MultiNodeDijkstra> dijkstras;
-	
-	public ParkingRouter(Scenario scenario, Map<String, TravelTime> travelTimes, TravelDisutilityFactory travelDisutilityFactory, TripRouter tripRouter, int nodesToCheck) {
+	private final TravelDisutility carTravelDisutility;
+	private final TravelDisutility walkTravelDisutility;
+	private final MultiNodeDijkstra carDijkstra;
+	private final MultiNodeDijkstra walkDijkstra;
+		
+	public ParkingRouter(Scenario scenario, TravelTime carTravelTime, TravelTime walkTravelTime, TravelDisutilityFactory travelDisutilityFactory, 
+			TripRouter tripRouter, int nodesToCheck) {
 		this.scenario = scenario;
-//		this.travelTimes = travelTimes;
+		this.carTravelTime = carTravelTime;
+		this.walkTravelTime = walkTravelTime;
 		this.tripRouter = tripRouter;
 		
 		if (nodesToCheck > 0) this.nodesToCheck = nodesToCheck;
 		else this.nodesToCheck = 1;
 		
-		this.travelDisutilities = new HashMap<String, TravelDisutility>();
-		this.dijkstras = new HashMap<String, MultiNodeDijkstra>();
-		for (Entry<String, TravelTime> entry : travelTimes.entrySet()) {
-			String mode = entry.getKey();
-			TravelTime travelTime = entry.getValue();
-			TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
-			this.travelDisutilities.put(mode, travelDisutility);
-			MultiNodeDijkstra modeDijsktra = (MultiNodeDijkstra) new FastMultiNodeDijkstraFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime); 
-			this.dijkstras.put(mode, modeDijsktra);
-		}
+		this.carTravelDisutility = travelDisutilityFactory.createTravelDisutility(this.carTravelTime, scenario.getConfig().planCalcScore());
+		this.walkTravelDisutility = travelDisutilityFactory.createTravelDisutility(this.walkTravelTime, scenario.getConfig().planCalcScore());
+		
+		this.carDijkstra = (MultiNodeDijkstra) new FastMultiNodeDijkstraFactory().createPathCalculator(scenario.getNetwork(), 
+				this.carTravelDisutility, this.carTravelTime);
+		this.walkDijkstra = (MultiNodeDijkstra) new FastMultiNodeDijkstraFactory().createPathCalculator(scenario.getNetwork(), 
+				this.walkTravelDisutility, this.walkTravelTime);
 	}
 
 	/**
@@ -92,8 +94,50 @@ public class ParkingRouter {
 	 * @param vehicle
 	 * @param mode
 	 */
+	@Deprecated
 	public void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.dijkstras.get(mode), this.travelDisutilities.get(mode));
+		if (TransportMode.car.equals(mode)) {
+			adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.carDijkstra, this.carTravelDisutility);
+		} else if (TransportMode.walk.equals(mode)) {
+			adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.walkDijkstra, this.walkTravelDisutility);
+		}
+	}
+	
+	/**
+	 * Adapts the start of a car route and reuses parts of the existing route.
+	 * 
+	 * @param route
+	 * @param startLinkId
+	 * @param time
+	 * @param person
+	 * @param vehicle
+	 */
+	public void adaptStartOfCarRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle) {
+		adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.carDijkstra, this.carTravelDisutility);
+	}
+	
+	/**
+	 * Adapts the start of a walk route. If it is a NetworkRoute, parts of the existing route
+	 * are reused to speed up the routing process. If it is a GenericRoute, a new route is
+	 * created.
+	 * 
+	 * In both cases, the route inside the given walkLeg is updated.
+	 * 
+	 * @param fromActivity
+	 * @param walkLeg
+	 * @param toActivity
+	 * @param time
+	 * @param person
+	 * @param vehicle
+	 */
+	public void adaptStartOfWalkRoute(Activity fromActivity, Leg walkLeg, Activity toActivity, double time, Person person, Vehicle vehicle) {
+		Route route = walkLeg.getRoute();
+		if (route instanceof NetworkRoute) {
+			Id startLinkId = fromActivity.getLinkId();
+			adaptStartOfRoute((NetworkRoute) route, startLinkId, time, person, vehicle, this.walkDijkstra, this.walkTravelDisutility);			
+		} else if (route instanceof GenericRoute) {
+			updateWalkRoute(fromActivity, walkLeg, toActivity, person);
+		} else throw new RuntimeException("Found unexpected route type: " + route.getClass().toString() + ". Aborting!");
 	}
 	
 	private void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle, 
@@ -177,8 +221,36 @@ public class ParkingRouter {
 	 * @param vehicle
 	 * @param mode
 	 */
+	@Deprecated
 	public void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.dijkstras.get(mode), this.travelDisutilities.get(mode));
+		if (TransportMode.car.equals(mode)) {
+			adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.carDijkstra, this.carTravelDisutility);
+		} else if (TransportMode.walk.equals(mode)) {
+			adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.walkDijkstra, this.walkTravelDisutility);
+		}
+	}
+	
+	/**
+	 * Adapts the end of a walk route. If it is a NetworkRoute, parts of the existing route
+	 * are reused to speed up the routing process. If it is a GenericRoute, a new route is
+	 * created.
+	 * 
+	 * In both cases, the route inside the given walkLeg is updated.
+	 * 
+	 * @param fromActivity
+	 * @param walkLeg
+	 * @param toActivity
+	 * @param time
+	 * @param person
+	 * @param vehicle
+	 */
+	public void adaptEndOfWalkRoute(Activity fromActivity, Leg walkLeg, Activity toActivity, double time, Person person, Vehicle vehicle) {
+		Route route = walkLeg.getRoute();
+		if (route instanceof NetworkRoute) {
+			adaptEndOfRoute((NetworkRoute) route, toActivity.getLinkId(), time, person, vehicle, this.walkDijkstra, this.walkTravelDisutility);			
+		} else if (route instanceof GenericRoute) {
+			updateWalkRoute(fromActivity, walkLeg, toActivity, person);
+		} else throw new RuntimeException("Found unexpected route type: " + route.getClass().toString() + ". Aborting!");
 	}
 	
 	private void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, 
@@ -273,7 +345,11 @@ public class ParkingRouter {
 	 * @param mode
 	 */
 	public void adaptStartAndEndOfRoute(NetworkRoute route, Id startLinkId, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		adaptStartAndEndOfRoute(route, startLinkId, endLinkId, time, person, vehicle, this.dijkstras.get(mode), this.travelDisutilities.get(mode));
+		if (TransportMode.car.equals(mode)) {
+			adaptStartAndEndOfRoute(route, startLinkId, endLinkId, time, person, vehicle, this.carDijkstra, this.carTravelDisutility);
+		} else if (TransportMode.walk.equals(mode)) {
+			adaptStartAndEndOfRoute(route, startLinkId, endLinkId, time, person, vehicle, this.walkDijkstra, this.walkTravelDisutility);
+		}
 	}
 	
 	private void adaptStartAndEndOfRoute(NetworkRoute route, Id startLinkId, Id endLinkId, double time, Person person, Vehicle vehicle, 
@@ -332,8 +408,17 @@ public class ParkingRouter {
 	 * @param vehicle
 	 * @param mode
 	 */
+	@Deprecated
 	public void extendRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		extendRoute(route, endLinkId, time, person, vehicle, this.dijkstras.get(mode));
+		if (TransportMode.car.equals(mode)) {
+			extendRoute(route, endLinkId, time, person, vehicle, this.carDijkstra);
+		} else if (TransportMode.walk.equals(mode)) {
+			extendRoute(route, endLinkId, time, person, vehicle, this.walkDijkstra);
+		}
+	}
+	
+	public void extendCarRoute(NetworkRoute carRoute, Id endLinkId, double time, Person person, Vehicle vehicle) {
+		extendRoute(carRoute, endLinkId, time, person, vehicle, this.carDijkstra);
 	}
 	
 	private void extendRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, MultiNodeDijkstra dijkstra) {
@@ -361,17 +446,26 @@ public class ParkingRouter {
 		route.setLinkIds(route.getStartLinkId(), mergedLinks, endLinkId);
 	}
 	
+	/**
+	 * Creates a new route from the fromActivity to the toActivity and inserts it
+	 * into the given walkLeg.
+	 * 
+	 * @param fromActivity
+	 * @param walkLeg
+	 * @param toActivity
+	 * @param person
+	 */
 	public void updateWalkRoute(Activity fromActivity, Leg walkLeg, Activity toActivity, Person person) {
 		
 		Facility fromFacility;
 		Facility toFacility;
 		
 		if (fromActivity.getFacilityId() != null) {
-			fromFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(fromActivity.getFacilityId());
+			fromFacility = scenario.getActivityFacilities().getFacilities().get(fromActivity.getFacilityId());
 		} else fromFacility = new ActivityWrapperFacility(fromActivity);
 		
 		if (toActivity.getFacilityId() != null) {
-			toFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(toActivity.getFacilityId());
+			toFacility = scenario.getActivityFacilities().getFacilities().get(toActivity.getFacilityId());
 		} else toFacility = new ActivityWrapperFacility(toActivity);
 		
 		RoutingModule routingModule = tripRouter.getRoutingModule(TransportMode.walk);

@@ -22,7 +22,6 @@ package playground.christoph.parking.withinday.replanner.strategy;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,6 +33,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
 
+import playground.christoph.parking.ParkingTypes;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingRouter;
 
@@ -44,13 +44,11 @@ public class NearestAvailableParkingSearch implements ParkingSearchStrategy {
 	private final Network network;
 	private final ParkingRouter parkingRouter;
 	private final ParkingInfrastructure parkingInfrastructure;
-	private final WithinDayAgentUtils withinDayAgentUtils;
-	
+		
 	public NearestAvailableParkingSearch(Network network, ParkingRouter parkingRouter, ParkingInfrastructure parkingInfrastructure) {
 		this.network = network;
 		this.parkingRouter = parkingRouter;
 		this.parkingInfrastructure = parkingInfrastructure;
-		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	@Override
@@ -59,9 +57,9 @@ public class NearestAvailableParkingSearch implements ParkingSearchStrategy {
 		Id currentLinkId = agent.getCurrentLinkId();
 		Link currentLink = this.network.getLinks().get(currentLinkId);
 		
-		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
+		Leg leg = WithinDayAgentUtils.getCurrentLeg(agent);
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
-		int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+		int routeIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 		
 		// check whether the car is at the route's start link
 		if (routeIndex < route.getLinkIds().size() + 1) {
@@ -72,12 +70,13 @@ public class NearestAvailableParkingSearch implements ParkingSearchStrategy {
 			return;
 		}
 		
-		ActivityFacility parkingFacility = this.parkingInfrastructure.getClosestFreeParkingFacility(currentLink.getCoord());
+		ActivityFacility parkingFacility = this.parkingInfrastructure.getClosestFreeParkingFacility(currentLink.getCoord(), ParkingTypes.GARAGEPARKING);
 		Id endLinkId = parkingFacility.getLinkId();
-		
 		
 		Person person = ((PlanAgent) agent).getSelectedPlan().getPerson();
 		Vehicle vehicle = null;
-		parkingRouter.extendRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
+		parkingRouter.extendCarRoute((NetworkRoute) route, endLinkId, time, person, vehicle);
+		
+//		throw new RuntimeException("Fix null value when calling getClosestFreeParkingFacility(...)");
 	}
 }

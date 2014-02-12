@@ -25,8 +25,10 @@ import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +38,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -59,10 +60,17 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 	private Random random = MatsimRandom.getLocalInstance();
 	private PlanAlgorithm routingAlgorithm;
 	private String[] validNonCarModes = {TransportMode.bike, TransportMode.pt, TransportMode.walk};
+	private boolean linkBased = true;
 	
 	public LegModeChecker(Scenario scenario, PlanAlgorithm routingAlgorithm) {
 		this.scenario = scenario;
 		this.routingAlgorithm = routingAlgorithm;
+	}
+	
+	public LegModeChecker(Scenario scenario, PlanAlgorithm routingAlgorithm, boolean linkBased) {
+		this.scenario = scenario;
+		this.routingAlgorithm = routingAlgorithm;
+		this.linkBased = linkBased;
 	}
 
 	public void setValidNonCarModes(String[] validNonCarModes) {
@@ -92,6 +100,17 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 	@Override
 	public void run(Person person) {
 		for (Plan plan : person.getPlans()) this.run(plan);
+		
+//		System.out.println("-----------------");
+//		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
+//			if (planElement instanceof Leg) {
+//				Leg leg = (Leg) planElement;
+//				if (TransportMode.car.equals(leg.getMode())) {
+//					System.out.println("car trip starts at " + leg.getRoute().getStartLinkId().toString() + " and ends at " +
+//							leg.getRoute().getEndLinkId().toString());
+//				}
+//			}
+//		}
 	}
 	
 	@Override
@@ -144,13 +163,19 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				 * the coordinate of the home location of an agent.
 				 */
 				Coord carCoord = getActivityCoord(firstActivity);
+				Id carLinkId = firstActivity.getLinkId();
 				
 				/*
 				 * Where does the first car trip start?
 				 */
 				double r = random.nextDouble();
-				if (r < toCarProbability) checkLegModes(plan, carCoord, true);
-				else checkLegModes(plan, carCoord, false);
+				if (r < toCarProbability) {
+					if (this.linkBased) checkLegModes(plan, carLinkId, true);
+					else checkLegModes(plan, carCoord, true);
+				} else {
+					if (this.linkBased) checkLegModes(plan, carLinkId, false);
+					else checkLegModes(plan, carCoord, false);
+				}
 				
 				/*
 				 * Finally ensure that all routes in the plan are valid.
@@ -164,7 +189,8 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 					// if the route is null, create a new one
 					if (leg.getRoute() == null) {
 						
-						PlanImpl newPlan = new PlanImpl(plan.getPerson());
+						Plan newPlan = scenario.getPopulation().getFactory().createPlan();
+						newPlan.setPerson(plan.getPerson());
 						newPlan.addActivity(previousActivity);
 						newPlan.addLeg(leg);
 						newPlan.addActivity(nextActivity);
@@ -178,7 +204,11 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 							((ActivityImpl) nextActivity).setLinkId(nextActivityFacility.getLinkId());
 						}
 						
-						routingAlgorithm.run(newPlan);	
+						// Replaces the leg inside the plan with a new containing a new route...
+						this.routingAlgorithm.run(newPlan);
+						
+						// ...therefore get route from new leg and set it in the original plan.
+						leg.setRoute(((Leg) newPlan.getPlanElements().get(1)).getRoute());
 					}
 				}
 			}
@@ -189,6 +219,8 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 	}
 
 	private void checkLegModes(Plan plan, Coord initialCarCoord, boolean toCar) {
+		
+		boolean valid = true;
 		
 		Coord carCoord = initialCarCoord;
 		
@@ -202,12 +234,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 			if (leg.getMode().equals(TransportMode.car)) {
 				
 				Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
-				Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
-				
-//				Coord previousCoord = scenario.getActivityFacilities().getFacilities().get(previousActivity.getFacilityId()).getCoord();
-//				Coord nextCoord = scenario.getActivityFacilities().getFacilities().get(nextActivity.getFacilityId()).getCoord();
 				Coord previousCoord = getActivityCoord(previousActivity);
-				Coord nextCoord = getActivityCoord(nextActivity);
 				
 				/*
 				 * Check the distance to the car. 
@@ -229,15 +256,21 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 					}
 					previousLeg.setRoute(null);
 					
-					/*
-					 * Recursively call this method until the plan is valid.
-					 */
-					checkLegModes(plan, initialCarCoord, toCar);
-					
+					valid = false;
+					break;
 				} else {
+					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
+					Coord nextCoord = getActivityCoord(nextActivity);					
 					carCoord = nextCoord;
 				}
 			}
+		}
+		
+		/*
+		 * Recursively call this method until the plan is valid.
+		 */
+		if (!valid) {
+			checkLegModes(plan, initialCarCoord, toCar);			
 		}
 	}
 	
@@ -247,6 +280,65 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 			return scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
 		} else {
 			return scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
+		}
+	}
+	
+	private void checkLegModes(Plan plan, Id initialCarLinkId, boolean toCar) {
+		
+		boolean valid = true;
+
+		Link carLink = scenario.getNetwork().getLinks().get(initialCarLinkId);
+		
+//		System.out.println("car is at link " + carLink.getId().toString());
+		
+		for (int i = 1; i < plan.getPlanElements().size(); i = i + 2) {
+			Leg leg = (Leg) plan.getPlanElements().get(i);
+			
+			/*
+			 * If it is a car leg we have to check whether the car is available
+			 * and update the position of the car after the leg.
+			 */
+			if (leg.getMode().equals(TransportMode.car)) {
+				
+				Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
+				Link tripStartLink = this.scenario.getNetwork().getLinks().get(previousActivity.getLinkId());
+				
+				/*
+				 * Check whether the trip starts at the cars previous position.
+				 */
+				if (!carLink.equals(tripStartLink)) {
+					/* 
+					 * Idea:
+					 * Use a boolean option per plan - toCar/toNonCar.
+					 * If toCar -> Recursively set the mode of the previous leg to car
+					 * Otherwise -> set mode of the current leg to nonCarMode
+					 */
+					Leg previousLeg = (Leg) plan.getPlanElements().get(i - 2);
+					if (toCar) {
+						previousLeg.setMode(TransportMode.car);
+					} else {
+						int modeType = random.nextInt(validNonCarModes.length);
+						leg.setMode(validNonCarModes[modeType]);
+					}
+					previousLeg.setRoute(null);
+					
+					valid = false;
+					break;
+				} 
+				// It is a valid car trip. Update car's position.
+				else {
+					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
+					Link nextLink = this.scenario.getNetwork().getLinks().get(nextActivity.getLinkId());
+					carLink = nextLink;
+				}
+			}
+		}
+		
+		/*
+		 * Recursively call this method until the plan is valid.
+		 */
+		if (!valid) {
+			checkLegModes(plan, initialCarLinkId, toCar);			
 		}
 	}
 }

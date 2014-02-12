@@ -20,10 +20,7 @@
 
 package playground.christoph.parking.withinday.utils;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
@@ -34,27 +31,27 @@ import org.matsim.core.router.util.TravelTime;
 public class ParkingRouterFactory {
 
 	private final Scenario scenario;
-	private final Map<String, TravelTime> travelTimes;
+	private final TravelTime carTravelTime;
+	private final TravelTime walkTravelTime;
 	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final TripRouterFactory tripRouterFactory;
 	private final int nodesToCheck;
 
-	public ParkingRouterFactory(Scenario scenario, Map<String, TravelTime> travelTimes, 
-			TravelDisutilityFactory travelDisutilityFactory,
-			TripRouterFactory tripRouterFactory, int nodesToCheck) {
+	public ParkingRouterFactory(Scenario scenario, TravelTime carTravelTime, TravelTime walkTravelTime,
+			TravelDisutilityFactory travelDisutilityFactory, TripRouterFactory tripRouterFactory, int nodesToCheck) {
 		this.scenario = scenario;
-		this.travelTimes = travelTimes;
+		this.carTravelTime = carTravelTime;
+		this.walkTravelTime = walkTravelTime;
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.nodesToCheck = nodesToCheck;
 	}
 	
 	public ParkingRouter createParkingRouter() {
-		TravelTime travelTime = this.travelTimes.get(TransportMode.car);
-		TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, 
+		TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(carTravelTime, 
 				this.scenario.getConfig().planCalcScore());
-		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
-		return new ParkingRouter(scenario, travelTimes, travelDisutilityFactory, 
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, carTravelTime);
+		return new ParkingRouter(scenario, carTravelTime, walkTravelTime, travelDisutilityFactory, 
 				tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), nodesToCheck);
 	}
 }

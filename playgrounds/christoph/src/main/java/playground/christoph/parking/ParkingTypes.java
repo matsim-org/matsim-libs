@@ -25,4 +25,6 @@ public final class ParkingTypes {
 	public static final String PARKING = "parking";
 	public static final String GARAGEPARKING = "garageParking";
 	public static final String STREETPARKING = "streetParking";
+	public static final String PRIVATEINSIDEPARKING = "privateInsideParking";
+	public static final String PRIVATEOUTSIDEPARKING = "privateOutsideParking";
 }

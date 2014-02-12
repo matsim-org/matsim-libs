@@ -114,12 +114,12 @@ public class ParkingAgentSource implements AgentSource {
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				if (activity.getType().equals("parking")) {
+				if (InsertParkingActivities.PARKINGACTIVITY.equals(activity.getType())) {
 					Id vehicleId = this.parkingInfrastructure.getVehicleId(plan.getPerson());
 					
-					log.info("Park car for agent " + plan.getPerson().getId() +
-							" in facility " + activity.getFacilityId() +
-							" on link " + activity.getLinkId() + ".");
+//					log.info("Park car for agent " + plan.getPerson().getId() +
+//							" in facility " + activity.getFacilityId() +
+//							" on link " + activity.getLinkId() + ".");
 					
 					this.parkingInfrastructure.parkVehicle(vehicleId, activity.getFacilityId());
 					
@@ -148,8 +148,7 @@ public class ParkingAgentSource implements AgentSource {
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				if (activity.getType().equals("parking"))
-					return activity.getLinkId();
+				if (InsertParkingActivities.PARKINGACTIVITY.equals(activity.getType())) return activity.getLinkId();
 			}
 		}
 		return ((Activity) plan.getPlanElements().get(0)).getLinkId();

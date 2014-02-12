@@ -8,6 +8,9 @@ import org.matsim.api.core.v01.Id;
 
 public class ParkingFacility {
 
+	public final static String WAITING = "waiting";
+	public final static String WAITINGCAPACITY = "waitingCapacity";
+	
 	private final Id facilityId;
 	private final Id linkId;
 	private final String type;

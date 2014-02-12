@@ -40,12 +40,10 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	
 	private final Random random;
 	private final Network network;
-	private final WithinDayAgentUtils withinDayAgentUtils;
 	
 	public RandomParkingSearch(Network network) {
 		this.network = network;
 		this.random = MatsimRandom.getLocalInstance();
-		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	@Override
@@ -58,11 +56,11 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		 */
 		Id currentLinkId = agent.getCurrentLinkId();
 		
-		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
+		Leg leg = WithinDayAgentUtils.getCurrentLeg(agent);
 
 		Link currentLink = this.network.getLinks().get(currentLinkId);
 
-		int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+		int routeIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 		
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		

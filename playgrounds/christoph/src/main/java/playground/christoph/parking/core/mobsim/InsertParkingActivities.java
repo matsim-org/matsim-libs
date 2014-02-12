@@ -23,12 +23,12 @@ package playground.christoph.parking.core.mobsim;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -37,9 +37,10 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-
 public class InsertParkingActivities implements PlanAlgorithm {
 
+	public static String PARKINGACTIVITY = "parking";
+	
 	private final Scenario scenario;
 	private final ModeRouteFactory modeRouteFactory;
 	private final ParkingInfrastructure parkingInfrastructure;
@@ -55,7 +56,9 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	@Override
 	public void run(Plan plan) {
 
-		Id vehicleId = this.parkingInfrastructure.getVehicleId(plan.getPerson());
+		Person person = plan.getPerson();
+		Id personId = person.getId();
+		Id vehicleId = this.parkingInfrastructure.getVehicleId(person);
 		
 		boolean firstParking = true;
 		
@@ -83,31 +86,41 @@ public class InsertParkingActivities implements PlanAlgorithm {
 //			Leg carLeg = (Leg) planElements.get(index);
 			Activity nextActivity = (Activity) planElements.get(index + 1);
 			
-			// create walk legs and parking activities
+			/*
+			 * If the carLeg starts and ends on the same link, we replace it by a walkLeg.
+			 * Otherwise we create walk legs and parking activities
+			 */
+			if (previousActivity.getLinkId().equals(nextActivity.getLinkId())) {
+				Leg walkLeg = createWalkLeg(carLeg.getDepartureTime(), previousActivity.getLinkId(), nextActivity.getLinkId());
+				carLeg.setMode(TransportMode.walk);
+				carLeg.setRoute(walkLeg.getRoute());
+			} else {				
+				// create walk legs and parking activities
 //			Leg walkLegToParking = createWalkLeg(carLeg.getDepartureTime(), previousActivity.getLinkId(), previousActivity.getLinkId());
-			Activity firstParkingActivity = createParkingActivity(previousActivity.getFacilityId(), vehicleId, firstParking);
-			Leg walkLegToParking = createWalkLeg(carLeg.getDepartureTime(), previousActivity.getLinkId(), firstParkingActivity.getLinkId());
-			firstParking = false;
-			Activity secondParkingActivity = createParkingActivity(nextActivity.getFacilityId(), vehicleId, firstParking);
+				Activity firstParkingActivity = createParkingActivity(personId, previousActivity.getFacilityId(), vehicleId, firstParking);
+				Leg walkLegToParking = createWalkLeg(carLeg.getDepartureTime(), previousActivity.getLinkId(), firstParkingActivity.getLinkId());
+				firstParking = false;
+				Activity secondParkingActivity = createParkingActivity(personId, nextActivity.getFacilityId(), vehicleId, firstParking);
 //			Leg walkLegFromParking = createWalkLeg(carLeg.getDepartureTime() + carLeg.getTravelTime(), nextActivity.getLinkId(), nextActivity.getLinkId());
-			Leg walkLegFromParking = createWalkLeg(carLeg.getDepartureTime() + carLeg.getTravelTime(), firstParkingActivity.getLinkId(), nextActivity.getLinkId());
-			
-			// add legs and activities to plan
-			planElements.add(index + 1, walkLegFromParking);
-			planElements.add(index + 1, secondParkingActivity);
-			planElements.add(index, firstParkingActivity);
-			planElements.add(index, walkLegToParking);
+				Leg walkLegFromParking = createWalkLeg(carLeg.getDepartureTime() + carLeg.getTravelTime(), firstParkingActivity.getLinkId(), nextActivity.getLinkId());
+				
+				// add legs and activities to plan
+				planElements.add(index + 1, walkLegFromParking);
+				planElements.add(index + 1, secondParkingActivity);
+				planElements.add(index, firstParkingActivity);
+				planElements.add(index, walkLegToParking);
+			}		
 		}
 	}
 
-	private Activity createParkingActivity(Id facilityId, Id vehicleId, boolean firstParking) {
+	private Activity createParkingActivity(Id personId, Id facilityId, Id vehicleId, boolean firstParking) {
 
 		// get the facility where the activity is performed
 		ActivityFacility facility = this.scenario.getActivityFacilities().getFacilities().get(facilityId);
 		
 		/*
 		 * If it is the agents first parking, its vehicle will be placed there.
-		 * Therefore, we have to ensure reserve the parking spot.
+		 * Therefore, we have to reserve the parking spot.
 		 * 
 		 * Otherwise select the parking facility which is closest to the activity.
 		 * The simulation will relocate it, if no parking spot is available when the
@@ -115,12 +128,15 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		 */
 		ActivityFacility parkingFacility;
 		if (firstParking) {
+			
+			String parkingFacilityIdString = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(personId.toString(), 
+					InitialParkingSelector.INITIALPARKINGFACILITY);
+			Id parkingFacilityId = this.scenario.createId(parkingFacilityIdString);
+			
 			// get the closest free parking facility
-			parkingFacility = this.parkingInfrastructure.getClosestFreeParkingFacility(facility.getCoord());
+			parkingFacility = this.scenario.getActivityFacilities().getFacilities().get(parkingFacilityId);
 			
-			if (parkingFacility == null) throw new RuntimeException("No parking facility with free capacity was found!");
-			
-			this.parkingInfrastructure.reserveParking(vehicleId, parkingFacility.getId());
+			this.parkingInfrastructure.reserveParking(vehicleId, parkingFacilityId);
 		} else {
 			// get the closest parking facility (ignore capacity restrictions!!)
 //			parkingFacility = this.parkingInfrastructure.getClosestParkingFacility(facility.getCoord());
@@ -132,7 +148,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		}
 
 		Id linkId = parkingFacility.getLinkId();
-		ActivityImpl activity = (ActivityImpl) this.scenario.getPopulation().getFactory().createActivityFromLinkId("parking", linkId);
+		ActivityImpl activity = (ActivityImpl) this.scenario.getPopulation().getFactory().createActivityFromLinkId(PARKINGACTIVITY, linkId);
 		activity.setMaximumDuration(180);
 		activity.setCoord(parkingFacility.getCoord());
 		activity.setFacilityId(parkingFacility.getId());
@@ -147,12 +163,12 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		return walkLeg;
 	}
 
-	private Coord getActivityCoord(Activity activity) {
-		
-		if (activity.getFacilityId() != null) {
-			return scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
-		} else {
-			return scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
-		}
-	}
+//	private Coord getActivityCoord(Activity activity) {
+//		
+//		if (activity.getFacilityId() != null) {
+//			return scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
+//		} else {
+//			return scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
+//		}
+//	}
 }

@@ -403,11 +403,11 @@ public class ParkingRouterTest extends MatsimTestCase {
 		testTimeCost.setData(scenario.createId("l13"), 10.0, 1.0);
 		testTimeCost.setData(scenario.createId("l14"), 10.0, 1.0);
 		
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.car, testTimeCost);
+		TravelTime carTravelTime = testTimeCost;
+		TravelTime walkTravelTime = null;
 		
 		TripRouter tripRouter = null;
-		ParkingRouter parkingRouter = new ParkingRouter(scenario, travelTimes, testTimeCostFactory, tripRouter, nodesToCheck);
+		ParkingRouter parkingRouter = new ParkingRouter(scenario, carTravelTime, walkTravelTime, testTimeCostFactory, tripRouter, nodesToCheck);
 				
 		return parkingRouter;
 	}
