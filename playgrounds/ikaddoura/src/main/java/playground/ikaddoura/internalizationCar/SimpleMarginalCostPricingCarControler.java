@@ -70,7 +70,7 @@ public class SimpleMarginalCostPricingCarControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-			controler.addControlerListener(new InternalizationCarControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler ));
+			controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
 		
 		} else {
 			log.info("Internalization of congestion effects is disabled.");

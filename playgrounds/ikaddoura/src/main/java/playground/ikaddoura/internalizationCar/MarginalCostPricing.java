@@ -39,14 +39,14 @@ import org.matsim.core.scenario.ScenarioImpl;
  *
  */
 
-public class InternalizationCarControlerListener implements StartupListener, IterationEndsListener {
-	private static final Logger log = Logger.getLogger(InternalizationCarControlerListener.class);
+public class MarginalCostPricing implements StartupListener, IterationEndsListener {
+	private static final Logger log = Logger.getLogger(MarginalCostPricing.class);
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
 	private MarginalCongestionHandlerImplV3 congestionHandler;
 	
-	public InternalizationCarControlerListener(ScenarioImpl scenario, TollHandler tollHandler){
+	public MarginalCostPricing(ScenarioImpl scenario, TollHandler tollHandler){
 		this.scenario = scenario;
 		this.tollHandler = tollHandler;
 	}
