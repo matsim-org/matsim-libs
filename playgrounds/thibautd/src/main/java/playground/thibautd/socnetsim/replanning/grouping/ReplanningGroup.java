@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.replanning.grouping;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +31,7 @@ import org.matsim.api.core.v01.population.Person;
  */
 public final class ReplanningGroup {
 	private final List<Person> persons = new ArrayList<Person>();
-	private final Collection<Person> immutablePersons = Collections.unmodifiableList( persons );
+	private final List<Person> immutablePersons = Collections.unmodifiableList( persons );
 
 	public boolean addPerson(final Person person) {
 		return persons.add( person );
@@ -42,7 +41,7 @@ public final class ReplanningGroup {
 		return persons.remove( person );
 	}
 
-	public Collection<Person> getPersons() {
+	public List<Person> getPersons() {
 		return immutablePersons;
 	}
 
