@@ -300,19 +300,17 @@ public class MarginalCongestionHandlerV3QsimTest {
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				// last but one iteration
 				if(((event.getControler().getLastIteration())-(event.getIteration()))==1){
-					Link link_2 = event.getControler().getScenario().getNetwork().getLinks().get(linkId2_);
-					avgValue1 = tollHandler.getAvgToll(link_2, 28800);
-					avgValue2 = tollHandler.getAvgToll(link_2, 29700);
-					avgOldValue1 = tollHandler.getAvgTollOldValue(link_2, 28800);
-					avgOldValue2 = tollHandler.getAvgTollOldValue(link_2, 28800);
+					avgValue1 = tollHandler.getAvgToll(linkId2_, 28800);
+					avgValue2 = tollHandler.getAvgToll(linkId2_, 29700);
+					avgOldValue1 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
+					avgOldValue2 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
 				}
 				// last iteration
 				else if(((event.getControler().getLastIteration())-(event.getIteration()))==0){
-					Link link_2 = event.getControler().getScenario().getNetwork().getLinks().get(linkId2_);
-					avgValue3 = tollHandler.getAvgToll(link_2, 28800);
-					avgValue4 = tollHandler.getAvgToll(link_2, 29700);
-					avgOldValue3 = tollHandler.getAvgTollOldValue(link_2, 28800);
-					avgOldValue4 = tollHandler.getAvgTollOldValue(link_2, 28800);
+					avgValue3 = tollHandler.getAvgToll(linkId2_, 28800);
+					avgValue4 = tollHandler.getAvgToll(linkId2_, 29700);
+					avgOldValue3 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
+					avgOldValue4 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
 				}
 			}
 				

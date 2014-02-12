@@ -312,11 +312,11 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	/**
 	 * Returns the avg toll (negative monetary amount) paid on that link during that time bin.
 	 */
-	public double getAvgToll(Link link, double time) {
+	public double getAvgToll(Id linkId, double time) {
 		double avgToll = 0.;
 		
-		if (this.linkId2timeBin2avgToll.containsKey(link.getId())){
-			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgToll.get(link.getId());
+		if (this.linkId2timeBin2avgToll.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgToll.get(linkId);
 			for (Double timeBin : timeBin2avgToll.keySet()) {
 				if (time < timeBin && time >= timeBin - this.timeBinSize){
 					avgToll = timeBin2avgToll.get(timeBin);
@@ -330,11 +330,11 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 	/**
 	 * Returns the avg toll (old value) (negative monetary amount) paid on that link during that time bin.
 	 */
-	public double getAvgTollOldValue(Link link, double time) {
+	public double getAvgTollOldValue(Id linkId, double time) {
 		double avgTollOldValue = 0.;
 		
-		if (this.linkId2timeBin2avgTollOldValue.containsKey(link.getId())){
-			Map<Double, Double> timeBin2avgTollOldValue = this.linkId2timeBin2avgTollOldValue.get(link.getId());
+		if (this.linkId2timeBin2avgTollOldValue.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgTollOldValue = this.linkId2timeBin2avgTollOldValue.get(linkId);
 			for (Double timeBin : timeBin2avgTollOldValue.keySet()) {
 				if (time < timeBin && time >= timeBin - this.timeBinSize){
 					avgTollOldValue = timeBin2avgTollOldValue.get(timeBin);
@@ -376,6 +376,10 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 			e.printStackTrace();
 		}
 		
+	}
+
+	public List<LinkEnterEvent> getLinkEnterEvents() {
+		return linkEnterEvents;
 	}
 
 }

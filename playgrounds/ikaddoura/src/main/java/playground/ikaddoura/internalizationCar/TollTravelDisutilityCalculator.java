@@ -84,8 +84,8 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration i based on the tolls in iteration i-1 and i-2 */
 		
-		double linkExpectedTollNewValue = this.tollHandler.getAvgToll(link, time);
-		double linkExpectedTollOldValue = this.tollHandler.getAvgTollOldValue(link, time);
+		double linkExpectedTollNewValue = this.tollHandler.getAvgToll(link.getId(), time);
+		double linkExpectedTollOldValue = this.tollHandler.getAvgTollOldValue(link.getId(), time);
 
 		double blendedOldValue = (1 - blendFactor) * linkExpectedTollOldValue;
 		double blendedNewValue = blendFactor * linkExpectedTollNewValue;	
