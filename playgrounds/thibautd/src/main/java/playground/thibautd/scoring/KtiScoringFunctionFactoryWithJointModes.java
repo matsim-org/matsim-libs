@@ -47,31 +47,20 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 	private final CharyparNagelScoringParameters params;
 	private final Scenario scenario;
 
-	// basically to compensate for utility transfers
-	private final double additionalMarginalUtilOfBeingDriver_s;
+	private final double marginalUtilOfBeingDriver_s;
+	private final double marginalUtilOfBeingPassenger_s;
 
 	private static final double UTIL_OF_NOT_PERF = -1000;
 
 	public KtiScoringFunctionFactoryWithJointModes(
+			final double marginalUtilityOfBeingDriver_s,
+			final double marginalUtilityOfBeingPassenger_s,
 			final StageActivityTypes typesNotToScore,
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
-		this( 0,
-			typesNotToScore,
-			ktiConfig,
-			config,
-			scenario);
-	}
-
-
-	public KtiScoringFunctionFactoryWithJointModes(
-			final double additionalMarginalUtilityOfBeingDriver_s,
-			final StageActivityTypes typesNotToScore,
-			final KtiLikeScoringConfigGroup ktiConfig,
-			final PlanCalcScoreConfigGroup config,
-			final Scenario scenario) {
-		this.additionalMarginalUtilOfBeingDriver_s = additionalMarginalUtilityOfBeingDriver_s;
+		this.marginalUtilOfBeingDriver_s = marginalUtilityOfBeingDriver_s;
+		this.marginalUtilOfBeingPassenger_s = marginalUtilityOfBeingPassenger_s;
 		this.scenario = scenario;
 		this.params = new CharyparNagelScoringParameters(config);
 		this.delegate = new KtiLikeActivitiesScoringFunctionFactory(
@@ -87,12 +76,13 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			(ScoringFunctionAccumulator) delegate.createNewScoringFunction( plan );
 
 		// joint modes
+		// XXX: do better for shared cost
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
 					JointActingTypes.DRIVER,
 					new LegScoringParameters(
 						params.modeParams.get(TransportMode.car).constant,
-						params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s + additionalMarginalUtilOfBeingDriver_s,
+						marginalUtilOfBeingDriver_s,
 						params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m ),
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
@@ -100,7 +90,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 					JointActingTypes.PASSENGER,
 					new LegScoringParameters(
 						params.modeParams.get(TransportMode.car).constant,
-						params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s,
+						marginalUtilOfBeingPassenger_s,
 						// passenger doesn't pay gasoline
 						0 ),
 					scenario.getNetwork()));

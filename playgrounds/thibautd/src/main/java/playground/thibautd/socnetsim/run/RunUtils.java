@@ -472,7 +472,8 @@ public class RunUtils {
 		if ( scoringFunctionConf.isUseKtiScoring() ) {
 			builder.withScoringFunctionFactory(
 				new KtiScoringFunctionFactoryWithJointModes(
-					scoringFunctionConf.getAdditionalUtilityOfBeingDriver_s(),
+					scoringFunctionConf.getMarginalUtilityOfBeingDriver_s(),
+					scoringFunctionConf.getMarginalUtilityOfBeingPassenger_s(),
 					new StageActivityTypesImpl(
 								Arrays.asList(
 										PtConstants.TRANSIT_ACTIVITY_TYPE,

@@ -27,7 +27,8 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scoringFunction";
 	private boolean useKtiScoring = false;
 	private double marginalUtilityOfBeingTogether_h = 0;
-	private double additionalUtilityOfBeingDriver_h = 0;
+	private double marginalUtilityOfBeingDriver_h = -3;
+	private double marginalUtilityOfBeingPassenger_h = -3;
 
 	static enum TogetherScoringForm {
 		linear,
@@ -80,19 +81,34 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 		this.togetherScoringType = togetherScoringType;
 	}
 
-	@StringGetter( "additionalUtilityOfBeingDriver_h" )
-	public double getAdditionalUtilityOfBeingDriver_h() {
-		return this.additionalUtilityOfBeingDriver_h;
+	@StringGetter( "marginalUtilityOfBeingDriver_h" )
+	public double getMarginalUtilityOfBeingDriver_h() {
+		return this.marginalUtilityOfBeingDriver_h;
 	}
 
-	public double getAdditionalUtilityOfBeingDriver_s() {
-		return this.additionalUtilityOfBeingDriver_h / 3600.;
+	public double getMarginalUtilityOfBeingDriver_s() {
+		return this.marginalUtilityOfBeingDriver_h / 3600d;
 	}
 
-	@StringSetter( "additionalUtilityOfBeingDriver_h" )
-	public void setAdditionalUtilityOfBeingDriver_h(
-			double additionalUtilityOfBeingDriver_h) {
-		this.additionalUtilityOfBeingDriver_h = additionalUtilityOfBeingDriver_h;
+	@StringSetter( "marginalUtilityOfBeingDriver_h" )
+	public void setMarginalUtilityOfBeingDriver_h(
+			double marginalUtilityOfBeingDriver_h) {
+		this.marginalUtilityOfBeingDriver_h = marginalUtilityOfBeingDriver_h;
+	}
+
+	@StringGetter( "marginalUtilityOfBeingPassenger_h" )
+	public double getMarginalUtilityOfBeingPassenger_h() {
+		return this.marginalUtilityOfBeingPassenger_h;
+	}
+
+	public double getMarginalUtilityOfBeingPassenger_s() {
+		return this.marginalUtilityOfBeingPassenger_h / 3600d;
+	}
+
+	@StringSetter( "marginalUtilityOfBeingPassenger_h" )
+	public void setMarginalUtilityOfBeingPassenger_h(
+			double marginalUtilityOfBeingPassenger_h) {
+		this.marginalUtilityOfBeingPassenger_h = marginalUtilityOfBeingPassenger_h;
 	}
 
 	@StringGetter( "togetherScoringForm" )
