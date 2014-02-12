@@ -166,6 +166,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			GroupingUtils.randomlyGroup( 
 					random,
 					config.getTieActivationProb(),
+					config.getJointPlanBreakageProb(),
 					plan,
 					socialNetwork );
 		final Collection<Collection<Subchain>> groups = new ArrayList<Collection<Subchain>>();

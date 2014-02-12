@@ -33,6 +33,7 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "prismicLocationChoice";
 
 	private double tieActivationProb = 0.5;
+	private double jointPlanBreakageProb = 0.5;
 	private Collection<String> types = Collections.singleton( "leisure" );
 	private double crowflySpeed = 50 / 3.6; // default: 50 km/h
 	private double travelTimeBudget = 3600; // default: 1 hour in total
@@ -53,6 +54,19 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 			throw new IllegalArgumentException( "invalid probability "+tieActivationProb );
 		}
 		this.tieActivationProb = tieActivationProb;
+	}
+
+	@StringGetter( "jointPlanBreakageProb" )
+	public double getJointPlanBreakageProb() {
+		return this.jointPlanBreakageProb;
+	}
+
+	@StringSetter( "jointPlanBreakageProb" )
+	public void setJointPlanBreakageProb(double jointPlanBreakageProb) {
+		if ( jointPlanBreakageProb < 0 || jointPlanBreakageProb > 1 ) {
+			throw new IllegalArgumentException( "invalid probability "+jointPlanBreakageProb );
+		}
+		this.jointPlanBreakageProb = jointPlanBreakageProb;
 	}
 
 	public Collection<String> getTypes() {

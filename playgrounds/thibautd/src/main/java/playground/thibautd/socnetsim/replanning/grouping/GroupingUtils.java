@@ -33,6 +33,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 
+import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkUtils;
 import playground.thibautd.utils.CollectionUtils;
@@ -47,7 +48,7 @@ public class GroupingUtils {
 	public static Collection<Collection<Plan>> randomlyGroup(
 			final Random random,
 			final double probActivationTie,
-			//final double probBreakingJointPlan,
+			final double probBreakingJointPlan,
 			final GroupPlans groupPlans,
 			final SocialNetwork socialNetwork) {
 		final Map<Id, Plan> planPerPerson = new LinkedHashMap<Id, Plan>();
@@ -55,6 +56,7 @@ public class GroupingUtils {
 			planPerPerson.put( p.getPerson().getId() , p );
 		}
 
+		final Map<Id, Set<Id>> jpTies = getJointPlanLinks( groupPlans );
 		final Map<Id, Set<Id>> subnet =
 			SocialNetworkUtils.getSubnetwork(
 					socialNetwork,
@@ -66,7 +68,9 @@ public class GroupingUtils {
 					getRandomGroup(
 						random,
 						probActivationTie,
-						subnet );
+						subnet,
+						probBreakingJointPlan,
+						jpTies );
 
 			final Collection<Plan> plans = new ArrayList<Plan>();
 			for ( Id id : group ) plans.add( planPerPerson.remove( id ) );
@@ -76,10 +80,26 @@ public class GroupingUtils {
 		return groups;
 	}
 
+	public static Map<Id, Set<Id>> getJointPlanLinks(final GroupPlans groupPlans) {
+		final Map<Id, Set<Id>> links = new LinkedHashMap<Id, Set<Id>>();
+
+		for ( JointPlan jp : groupPlans.getJointPlans() ) {
+			for ( Id id : jp.getIndividualPlans().keySet() ) {
+				final Set<Id> alters = new LinkedHashSet<Id>( jp.getIndividualPlans().keySet() );
+				alters.remove( id );
+				links.put( id , alters );
+			}
+		}
+
+		return links;
+	}
+
 	private static Set<Id> getRandomGroup(
 			final Random random,
 			final double probActivationTie,
-			final Map<Id, Set<Id>> subnet) {
+			final Map<Id, Set<Id>> subnet,
+			final double probBreakingJointPlan,
+			final Map<Id, Set<Id>> jpTies) {
 		final Set<Id> group = new LinkedHashSet<Id>();
 
 		final Queue<Id> egoStack = Collections.asLifoQueue( new ArrayDeque<Id>( subnet.size() ) );
@@ -90,6 +110,16 @@ public class GroupingUtils {
 			final Set<Id> alters = subnet.remove( ego );
 			if ( alters == null ) continue;
 			group.add( ego );
+
+			final Set<Id> jpAlters = jpTies.remove( ego );
+			if ( jpAlters != null && random.nextDouble() >= probBreakingJointPlan ) {
+				// keep jp
+				for ( Id alter : jpAlters ) {
+					alters.remove( alter );
+					egoStack.add( alter );
+				}
+			}
+
 			for ( Id alter : alters ) {
 				if ( random.nextDouble() < probActivationTie ) {
 					egoStack.add( alter );
