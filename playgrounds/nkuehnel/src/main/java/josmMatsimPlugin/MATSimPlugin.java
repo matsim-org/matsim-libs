@@ -45,7 +45,7 @@ public class MATSimPlugin extends Plugin {
 
 		Reader reader = new InputStreamReader(this
 				.getPluginResourceClassLoader().getResourceAsStream(
-						"resources/matsimPreset.xml"));
+						"matsimPreset.xml"));
 
 		Collection<TaggingPreset> tps;
 		try {
