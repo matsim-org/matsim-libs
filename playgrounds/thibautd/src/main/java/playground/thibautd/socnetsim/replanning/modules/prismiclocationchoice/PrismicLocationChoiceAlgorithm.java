@@ -112,21 +112,34 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 		final String type = CollectionUtils.getElement( 0 , subchains ).toMove.getType();
 		final QuadTree<ActivityFacility> quadTree = facilitiesPerType.get( type );
 
-		// TODO: iterate Andi-like (extend search space if not enough potential solutions)
-		// TODO: handle case where one agent is far away (ie do choice only for other agents?)
+		// TODO: handle especially case where one agent is far away (ie do choice only for other agents?)
 		Set<ActivityFacility> potentialLocations = null;
-		for ( Subchain subchain : subchains ) {
-			final ActivityFacility start = facilities.getFacilities().get( subchain.start.getFacilityId() );
-			final ActivityFacility end = facilities.getFacilities().get( subchain.end.getFacilityId() );
+		assert !subchains.isEmpty();
+		int mult=1;
+		do {
+			final double distanceBudget = mult * config.getCrowflySpeed() * config.getTravelTimBudget_s();
+			mult *= 2;
 
-			final Collection<ActivityFacility> prism = approximatePrism( quadTree , start , end );
+			for ( Subchain subchain : subchains ) {
+				final ActivityFacility start = facilities.getFacilities().get( subchain.start.getFacilityId() );
+				final ActivityFacility end = facilities.getFacilities().get( subchain.end.getFacilityId() );
 
-			potentialLocations = potentialLocations == null ?
-				new HashSet<ActivityFacility>( prism ) :
-				CollectionUtils.intersect( potentialLocations , prism );
+				final double minDistance = CoordUtils.calcDistance( start.getCoord() , end.getCoord() );
+				final Collection<ActivityFacility> prism =
+					approximatePrism(
+							Math.max(
+								minDistance,
+								distanceBudget ),
+							quadTree,
+							start,
+							end );
 
-			if ( potentialLocations.isEmpty() ) return Collections.emptyList();
+				potentialLocations = potentialLocations == null ?
+					new HashSet<ActivityFacility>( prism ) :
+					CollectionUtils.intersect( potentialLocations , prism );
+			}
 		}
+		while ( potentialLocations.isEmpty() );
 
 		final List<ActivityFacility> list = new ArrayList<ActivityFacility>( potentialLocations );
 		// for determinsim
@@ -145,19 +158,17 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 	}
 
 	private Collection<ActivityFacility> approximatePrism(
+			final double maxTraveledDistance,
 			final QuadTree<ActivityFacility> quadTree,
 			final ActivityFacility start,
 			final ActivityFacility end) {
-		final double minDistance = CoordUtils.calcDistance( start.getCoord() , end.getCoord() );
 
 		return quadTree.getElliptical(
 				start.getCoord().getX(),
 				start.getCoord().getY(),
 				end.getCoord().getX(),
 				end.getCoord().getY(),
-				Math.max(
-					minDistance,
-					config.getCrowflySpeed() * config.getTravelTimBudget_s() ) );
+				maxTraveledDistance);
 	}
 
 	private Collection<Collection<Subchain>> selectActivityGroups(
