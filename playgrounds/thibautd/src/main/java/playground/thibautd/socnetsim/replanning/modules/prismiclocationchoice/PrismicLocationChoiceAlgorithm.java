@@ -124,7 +124,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				final ActivityFacility start = facilities.getFacilities().get( subchain.start.getFacilityId() );
 				final ActivityFacility end = facilities.getFacilities().get( subchain.end.getFacilityId() );
 
-				final double minDistance = CoordUtils.calcDistance( start.getCoord() , end.getCoord() );
+				final double minDistance = CoordUtils.calcDistance( start.getCoord() , end.getCoord() ) + 1E-9;
 				final Collection<ActivityFacility> prism =
 					approximatePrism(
 							Math.max(
