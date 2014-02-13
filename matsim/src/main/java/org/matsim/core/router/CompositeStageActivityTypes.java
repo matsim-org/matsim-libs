@@ -32,6 +32,22 @@ public class CompositeStageActivityTypes implements StageActivityTypes {
 	// set or list?
 	private final Collection<StageActivityTypes> checkers = new ArrayList<StageActivityTypes>();
 
+	// not necessary (empty varargs valid), but better for javadocs
+	/**
+	 * Creates an empty instance
+	 */
+	public CompositeStageActivityTypes() {}
+	
+	/**
+	 * Creates an instance filled with the components passed as parameter
+	 */
+	public CompositeStageActivityTypes(
+			final StageActivityTypes... components) {
+		for ( StageActivityTypes c : components ) {
+			addActivityTypes( c );
+		}
+	}
+
 	/**
 	 * Adds a {@link StageActivityTypes} to the delegates
 	 * @param checker an instance which will be used to check whether an activity
