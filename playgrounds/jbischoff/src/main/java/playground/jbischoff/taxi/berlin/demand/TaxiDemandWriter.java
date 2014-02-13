@@ -28,14 +28,19 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -58,43 +63,59 @@ import com.vividsolutions.jts.geom.Point;
 public class TaxiDemandWriter {
 	private static final Logger log = Logger.getLogger(TaxiDemandWriter.class);
 	private Map<String, Geometry> municipalityMap;
-	private Scenario scenario;
 	private Population population;
+	private NetworkImpl network;
+	private Scenario scenario;
 	private CoordinateTransformation ct = TransformationFactory
 			.getCoordinateTransformation(
-					"PROJCS[\"ETRS89_UTM_Zone_33\",GEOGCS[\"GCS_ETRS89\",DATUM[\"D_ETRS89\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",3500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",15.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]",
-					TransformationFactory.WGS84_UTM33N);
+					"EPSG:25833",
+					TransformationFactory.DHDN_GK4);
 
 	private Random rnd = new Random(17);
+	private final static String NETWORKFILE = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/network/berlin_brb.xml.gz";
+	private final static Id TXLLORID = new IdImpl("12214125");
+	private final static double SCALEFACTOR = 2.0;
+	static int fromTXL = 0;
+	static int toTXL = 0;
+	
+
 
 	public static void main(String[] args) {
-		TaxiDemandWriter tdw = new TaxiDemandWriter();
 		LorShapeReader lsr = new LorShapeReader();
-		lsr.readShapeFile("/Users/jb/tucloud/taxi/OD/LOR_SHP_EPSG_25833/Planungsraum.shp", "SCHLUESSEL");
-		lsr.readShapeFile("/Users/jb/shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp", "Nr");
-		tdw.setMunicipalityMap(lsr.getShapeMap());
+		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/Planungsraum.shp", "SCHLUESSEL");
+		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/kreise.shp", "Nr");
 		for (int i = 15; i <22 ; i++){
-			tdw.writeDemand("/Users/jb/tucloud/taxi/OD/201304"+i+"/", "OD_201304"+i);
+			TaxiDemandWriter tdw = new TaxiDemandWriter();
+			tdw.setMunicipalityMap(lsr.getShapeMap());
+			tdw.writeDemand("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/201304"+i+"/", "OD_201304"+i);
 			
 		}
+		System.out.println("trips from TXL "+TaxiDemandWriter.fromTXL);
+		System.out.println("trips to TXL "+TaxiDemandWriter.toTXL);
 	}
 	
 	
 
-	public void setMunicipalityMap(Map<String, Geometry> municipalityMap) {
+	private void setMunicipalityMap(Map<String, Geometry> municipalityMap) {
 		this.municipalityMap = municipalityMap;
 	}
+	TaxiDemandWriter(){
+	 scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());;
+	 new MatsimNetworkReader(scenario).readFile(NETWORKFILE);	
+	 this.network = (NetworkImpl) scenario.getNetwork();
+	}
 
 
 
-	public void writeDemand(String dirname, String fileNamePrefix) {
-		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private void writeDemand(String dirname, String fileNamePrefix) {
+		
+		
 		population = scenario.getPopulation();
 		generatePopulation(dirname, fileNamePrefix);
 		log.info("Population size: " +population.getPersons().size());
 		PopulationWriter populationWriter = new PopulationWriter(
 				scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write(dirname+"plans.xml");
+		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
 	}
 
 	private void generatePopulation(String dirname, String fileNamePrefix) {
@@ -122,7 +143,8 @@ public class TaxiDemandWriter {
 	private void generatePlansForZones(int hr, List<TaxiDemandElement> hourlyTaxiDemand) {
 
 		for (TaxiDemandElement tde : hourlyTaxiDemand){
-		for (int i = 0; i< tde.getAmount(); i++){
+			double amount = tde.getAmount() * SCALEFACTOR;
+		for (int i = 0; i< amount; i++){
 			Person p;
 			Id pId = scenario.createId("p"+tde.fromId+"_"+tde.toId+"_hr_"+hr+"_nr_"+i);
 			p = generatePerson(tde.fromId, tde.toId,pId, hr);
@@ -144,41 +166,60 @@ public class TaxiDemandWriter {
 
 	private Plan generatePlan(Id from, Id to, int hr) {
 		Plan plan = population.getFactory().createPlan();
-
-		Coord fromCoord = this.shoot(from);
-		Coord toCoord = this.shoot(to);
-		double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
-
-		plan.addActivity(this.addActivity("home", 0.0, activityStart - 1.0, fromCoord));
-		plan.addLeg(this.addLeg(activityStart - 1., "taxi"));
-		plan.addActivity(this.addActivity("work", toCoord));
+		Coord fromCoord;
+		Coord toCoord; 
+		if (from.equals(TXLLORID)){
+			fromCoord = new CoordImpl(4588171.603474933,5825260.734177444);
+			TaxiDemandWriter.fromTXL++;
+		} else {
+		 fromCoord = this.shoot(from);
+		}
+		if (to.equals(TXLLORID)){
+			toCoord = new CoordImpl(4588171.603474933,5825260.734177444);
+			TaxiDemandWriter.toTXL++;
+		} else {
+			toCoord = this.shoot(to);
+		}
+		
+		
+		
+		
 		if (fromCoord == null) return null;
 		if (toCoord == null) return null;
+		
+		Link fromLink = network.getNearestLinkExactly(fromCoord);
+		Link toLink = network.getNearestLinkExactly(toCoord);
+
+		
+		double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
+
+		plan.addActivity(this.addActivity("home", 0.0, activityStart, fromLink));
+		plan.addLeg(this.addLeg(activityStart , "taxi", fromLink, toLink));
+		plan.addActivity(this.addActivity("work", toLink));
 
 		return plan;
 	}
 
 	private Activity addActivity(String type, Double start, Double end,
-			Coord coord) {
+			Link link) {
 
-		Activity activity = population.getFactory().createActivityFromCoord(
-				type, coord);
+		Activity activity = population.getFactory().createActivityFromLinkId(type, link.getId());
 		activity.setStartTime(start);
 		activity.setEndTime(end);
 		return activity;
 	}
 	
-	private Activity addActivity(String type, Coord coord) {
+	private Activity addActivity(String type, Link link) {
 
-		Activity activity = population.getFactory().createActivityFromCoord(
-				type, coord);
-
+		Activity activity = population.getFactory().createActivityFromLinkId(type, link.getId());
+		
 		return activity;
 	}
 
-	private Leg addLeg(double departure, String mode) {
+	private Leg addLeg(double departure, String mode, Link fromLink, Link toLink) {
 		Leg leg = population.getFactory().createLeg(mode);
-		leg.setDepartureTime(departure + 1);
+		leg.setDepartureTime(departure );
+		leg.setRoute(new  LinkNetworkRouteImpl(fromLink.getId(),toLink.getId()));
 		return leg;
 	}
 
