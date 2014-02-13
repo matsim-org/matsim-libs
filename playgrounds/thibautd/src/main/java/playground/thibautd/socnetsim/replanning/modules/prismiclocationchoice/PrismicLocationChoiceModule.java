@@ -21,7 +21,9 @@ package playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.CompositeStageActivityTypes;
 
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -44,7 +46,9 @@ public class PrismicLocationChoiceModule  extends AbstractMultithreadedGenericSt
 				(PrismicLocationChoiceConfigGroup) scenario.getConfig().getModule( PrismicLocationChoiceConfigGroup.GROUP_NAME ),
 				scenario.getActivityFacilities(),
 				(SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ),
-				replanningContext.getTripRouter().getStageActivityTypes() );
+				new CompositeStageActivityTypes(
+						replanningContext.getTripRouter().getStageActivityTypes(),
+						JointActingTypes.JOINT_STAGE_ACTS ) );
 	}
 }
 

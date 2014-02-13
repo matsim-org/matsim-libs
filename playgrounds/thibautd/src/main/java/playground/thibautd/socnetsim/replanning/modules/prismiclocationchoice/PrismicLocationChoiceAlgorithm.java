@@ -123,7 +123,9 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			assert !subchains.isEmpty();
 			for ( Subchain subchain : subchains ) {
 				final ActivityFacility start = facilities.getFacilities().get( subchain.start.getFacilityId() );
+				if ( start == null ) throw new RuntimeException( "no facility "+subchain.start.getFacilityId()+" for activity "+subchain.start );
 				final ActivityFacility end = facilities.getFacilities().get( subchain.end.getFacilityId() );
+				if ( end == null ) throw new RuntimeException( "no facility "+subchain.end.getFacilityId()+" for activity "+subchain.end );
 
 				final double minDistance = CoordUtils.calcDistance( start.getCoord() , end.getCoord() ) + 1E-9;
 				final Collection<ActivityFacility> prism =
