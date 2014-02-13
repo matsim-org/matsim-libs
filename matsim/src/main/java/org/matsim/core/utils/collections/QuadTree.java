@@ -685,16 +685,27 @@ public class QuadTree<T> implements Serializable {
 				// to an area is always lower than the munimum of the sum of the distances,
 				// and the difference can be substantial. Just not sure how efficiently
 				// one can estimate the minimum of the sum of the distances).
-				if (this.northwest.bounds.calcDistance(x1, y1) + this.northwest.bounds.calcDistance(x2, y2) <= maxDistance) {
+
+				// this is a trick to avoid computing distance of quadrant to second focus
+				// if the quandrant is already too far from first focus.
+				// Some tests showed a huge improvement with this, when a large part
+				// of the space has to be pruned (which is typically the case in
+				// real applications). By "huge improvement", I mean several times
+				// faster (how much depends on the particular instance).
+				final double nw1 = this.northwest.bounds.calcDistance(x1, y1);
+				if ( nw1 <= maxDistance && nw1 + this.northwest.bounds.calcDistance(x2, y2) <= maxDistance) {
 					this.northwest.getElliptical(x1, y1, x2, y2, maxDistance, values);
 				}
-				if (this.northeast.bounds.calcDistance(x1, y1) + this.northeast.bounds.calcDistance(x2, y2) <= maxDistance) {
+				final double ne1 = this.northeast.bounds.calcDistance(x1, y1);
+				if (ne1 <= maxDistance && ne1 + this.northeast.bounds.calcDistance(x2, y2) <= maxDistance) {
 					this.northeast.getElliptical(x1, y1, x2, y2, maxDistance, values);
 				}
-				if (this.southeast.bounds.calcDistance(x1, y1) + this.southeast.bounds.calcDistance(x2, y2) <= maxDistance) {
+				final double se1 = this.southeast.bounds.calcDistance(x1, y1);
+				if (se1 <= maxDistance && se1 + this.southeast.bounds.calcDistance(x2, y2) <= maxDistance) {
 					this.southeast.getElliptical(x1, y1, x2, y2, maxDistance, values);
 				}
-				if (this.southwest.bounds.calcDistance(x1, y1) + this.southwest.bounds.calcDistance(x2, y2) <= maxDistance) {
+				final double sw1 = this.southwest.bounds.calcDistance(x1, y1);
+				if (sw1 <= maxDistance && sw1 + this.southwest.bounds.calcDistance(x2, y2) <= maxDistance) {
 					this.southwest.getElliptical(x1, y1, x2, y2, maxDistance, values);
 				}
 				return values;
@@ -704,11 +715,15 @@ public class QuadTree<T> implements Serializable {
 				final double distance1 = Math.sqrt(
 						(this.leaf.x - x1) * (this.leaf.x - x1)
 						+ (this.leaf.y - y1) * (this.leaf.y - y1));
-				final double distance2 = Math.sqrt(
-						(this.leaf.x - x2) * (this.leaf.x - x2)
-						+ (this.leaf.y - y2) * (this.leaf.y - y2));
-				if (distance1 + distance2 <= maxDistance) {
-					values.addAll(this.leaf.values);
+				// same trick as above, though it should not be useul in the vast
+				// majority of cases
+				if (distance1 <= maxDistance ) {
+					final double distance2 = Math.sqrt(
+							(this.leaf.x - x2) * (this.leaf.x - x2)
+							+ (this.leaf.y - y2) * (this.leaf.y - y2));
+					if ( distance1 + distance2 <= maxDistance) {
+						values.addAll(this.leaf.values);
+					}
 				}
 			}
 			return values;
