@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TelAvivControler.java
+ * DifferentIntialLocationsRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -25,8 +25,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public final class TelAvivControler {
-		
+import playground.telaviv.locationchoice.PrepareDifferentInitialLocations;
+
+public final class DifferentIntialLocationsRunner {
+	
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -38,6 +40,8 @@ public final class TelAvivControler {
 			
 			Config config = ConfigUtils.loadConfig(args[0]);
 			Scenario scenario = ScenarioUtils.loadScenario(config);
+			
+			new PrepareDifferentInitialLocations(scenario, "tta");
 			
 			new TelAvivRunner().run(scenario, basePath);
 		}

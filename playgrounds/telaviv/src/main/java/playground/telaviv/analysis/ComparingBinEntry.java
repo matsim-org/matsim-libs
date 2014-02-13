@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TelAvivControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.telaviv.controler;
+package playground.telaviv.analysis;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-
-public final class TelAvivControler {
-		
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: TelAvivControler config-file base-path");
-			System.out.println();
-		} else {
-			String basePath = null;
-			if (args.length > 1) basePath = args[1];
-			
-			Config config = ConfigUtils.loadConfig(args[0]);
-			Scenario scenario = ScenarioUtils.loadScenario(config);
-			
-			new TelAvivRunner().run(scenario, basePath);
-		}
-		System.exit(0);
+public class ComparingBinEntry {
+	
+	private double value;
+	private double weight;
+	
+	public ComparingBinEntry(double value, double weight) {
+		this.value = value;
+		this.weight = weight;
+	}
+	
+	
+	public double getValue() {
+		return value;
 	}
 
+	public void setValue(double value) {
+		this.value = value;
+	}
+
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
+	}
 }

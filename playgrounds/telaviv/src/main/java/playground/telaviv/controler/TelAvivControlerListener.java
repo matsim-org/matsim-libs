@@ -39,6 +39,7 @@ import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
 import org.matsim.contrib.analysis.christoph.DistanceDistribution;
 import org.matsim.contrib.analysis.christoph.DistanceDistribution.DistributionClass;
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
+import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -50,10 +51,13 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.telaviv.analysis.ComparingBins;
+import playground.telaviv.analysis.ComparingDistanceStats;
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.core.mobsim.qsim.agents.FilteredPopulation;
 import playground.telaviv.counts.CountsCompareToCSV;
@@ -311,19 +315,54 @@ public class TelAvivControlerListener implements StartupListener, IterationEndsL
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 20000.0, 50000.0, 0.1402);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 50000.0, 100000.0, 0.0034);
 		distanceDistribution.createAndAddDistanceBin(distributionClass, 100000.0, Double.MAX_VALUE, 0.0);
+		
+		
+		/*
+		 * further analysis stuff for location choice
+		 */
+		double analysisBinSize = Double.parseDouble(config.locationchoice().getAnalysisBinSize());
+		double analysisBoundary = Double.parseDouble(config.locationchoice().getAnalysisBoundary());
+		String idExclusion = config.locationchoice().getIdExclusion();
+		ActTypeConverter converter = new ActTypeConverter(false);
+		Set<String> flexibleTypes = CollectionUtils.stringToSet(config.locationchoice().getFlexibleTypes());
+  		for (String actType : flexibleTypes) {
+  			String filename = TelAvivConfig.basePath + "/locationchoice/" + actType + "ReferenceShares.txt";
+  			if (!new File(filename).exists()) {
+  				log.warn("Input file containing reference shares for activity type " + actType + " was not found. Skipping activity type!");
+  				continue;
+  			}
+  			
+  			double[] referenceShares = ComparingBins.readReferenceShares(filename);
+  			controler.addControlerListener(new ComparingDistanceStats(analysisBinSize, analysisBoundary, idExclusion, "best", actType, 
+  					converter, TransportMode.car, referenceShares));
+  			controler.addControlerListener(new ComparingDistanceStats(analysisBinSize, analysisBoundary, idExclusion, "selected", actType, 
+  					converter, TransportMode.car, referenceShares));
+  		}
+  		
+		analysisBinSize = 1000.0;
+		analysisBoundary = 90000.0;
+  		for (String actType : flexibleTypes) {
+  			String filename = TelAvivConfig.basePath + "/locationchoice/" + actType + "ReferenceShares1000m.txt";
+  			if (!new File(filename).exists()) {
+  				log.warn("Input file containing reference shares for activity type " + actType + " was not found. Skipping activity type!");
+  				continue;
+  			}
+  			
+  			double[] referenceShares = ComparingBins.readReferenceShares(filename);
+  			controler.addControlerListener(new ComparingDistanceStats(analysisBinSize, analysisBoundary, idExclusion, "best", actType, 
+  					converter, TransportMode.car, referenceShares));
+  			controler.addControlerListener(new ComparingDistanceStats(analysisBinSize, analysisBoundary, idExclusion, "selected", actType, 
+  					converter, TransportMode.car, referenceShares));
+  		}	
 	}
 	
-
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+	
+		String inputFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "countscompare.txt");
+		String outputFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "countscompare.csv");
 		
-		String runId = event.getControler().getConfig().controler().getRunId();
-		if (runId == null) runId = "";
-		else if (runId.length() > 0) runId = runId + ".";
-		
-		int iteration = event.getIteration();
-		
-		runCountsCompare(iteration, runId);
+		runCountsCompare(inputFile, outputFile);
 	}
 	
 	@Override
@@ -334,19 +373,18 @@ public class TelAvivControlerListener implements StartupListener, IterationEndsL
 		
 		int lastIter = event.getControler().getConfig().controler().getLastIteration();
 		
-		runCountsCompare(lastIter, runId);
+		String inputFile = event.getControler().getControlerIO().getIterationFilename(lastIter, "countscompare.txt");
+		String outputFile = event.getControler().getControlerIO().getIterationFilename(lastIter, "countscompare.csv");
+		
+		runCountsCompare(inputFile, outputFile);
 	}
 
-	private void runCountsCompare(int iteration, String runId) {
+	private void runCountsCompare(String inputFile, String outputFile) {
 		try {
-			String inputFile = TelAvivConfig.basePath + "/output/ITERS/it." + iteration + 
-					"/" + runId +  iteration + ".countscompare.txt";
-			String outputFile =  TelAvivConfig.basePath + "/output/ITERS/it." + iteration + 
-					"/" + runId +  iteration + ".countscompare.csv";
-			
 			if (new File(inputFile).exists()) new CountsCompareToCSV(inputFile, outputFile);
+			else log.warn("Counts input file countscompare.txt does not extist: " + inputFile + ". Cannot create output file countscompare.csv");
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 }
