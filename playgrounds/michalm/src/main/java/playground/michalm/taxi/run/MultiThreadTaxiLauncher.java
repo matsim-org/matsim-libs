@@ -22,18 +22,19 @@ package playground.michalm.taxi.run;
 import java.util.concurrent.*;
 
 
-public class MultiThreadTaxiLauncher
+/*package*/class MultiThreadTaxiLauncher
 {
-    //-1 20 d:\michalm\2014_02\mielec-2-peaks-new-10-25\params.in
+    //20 d:\michalm\2014_02\mielec-2-peaks-new-10-25\params.in
     private static final String PATH = "d:\\michalm\\2014_02\\mielec-2-peaks-new-";
     private static final String FILE = "\\params.in";
 
-    private static final int[] DEMANDS = { 10, 15, 20, 25, 30, 35, 40 };
-    private static final int[] SUPPLIES = { 25, 50 };
+    //reverse order of iteration (--> start with bigger tasks)
+    private static final int[] DEMANDS = { 40, 35, 30, 25, 20, 15, 10 };
+    private static final int[] SUPPLIES = { 50, 25 };
 
     private static final int RUNS = 20;
-    
-    private static final int THREADS = 12;
+
+    private static final int THREADS = 10;
 
 
     public static void main(String[] args)
@@ -47,35 +48,7 @@ public class MultiThreadTaxiLauncher
                 service.execute(new Runnable() {
                     public void run()
                     {
-                        MultipleTaxiLauncher.runNOS(-1, RUNS, paramFile);
-                    }
-                });
-
-                service.execute(new Runnable() {
-                    public void run()
-                    {
-                        MultipleTaxiLauncher.run(-1, RUNS, paramFile, false, false, false);
-                    }
-                });
-
-                service.execute(new Runnable() {
-                    public void run()
-                    {
-                        MultipleTaxiLauncher.run(-1, RUNS, paramFile, false, true, false);
-                    }
-                });
-
-                service.execute(new Runnable() {
-                    public void run()
-                    {
-                        MultipleTaxiLauncher.run(-1, RUNS, paramFile, false, false, true);
-                    }
-                });
-
-                service.execute(new Runnable() {
-                    public void run()
-                    {
-                        MultipleTaxiLauncher.run(-1, RUNS, paramFile, false, true, true);
+                        MultipleTaxiLauncher.runAll(RUNS, paramFile);
                     }
                 });
             }

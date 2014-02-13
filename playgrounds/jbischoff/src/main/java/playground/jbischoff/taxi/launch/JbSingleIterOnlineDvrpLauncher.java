@@ -139,12 +139,7 @@ import playground.michalm.util.RunningVehicleRegister;
         scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
 
         List<String> taxiCustomerIds;
-        try {
-            taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
 
         VrpLauncherUtils.convertLegModes(taxiCustomerIds, TaxiRequestCreator.MODE, scenario);
     }

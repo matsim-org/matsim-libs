@@ -111,17 +111,24 @@ public class NOSTaxiOptimizer
     @Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        if (requiresReoptimization) {
-            if (seekDemandSupplyEquilibrium) {
-                if (unplannedRequests.size() > idleVehicles.size()) {
-                    scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
-                }
-                else {
-                    scheduleUnplannedRequests();//reduce T_W (otherwise)
-                }
+        if (!requiresReoptimization) {
+            return;
+        }
+
+        if (seekDemandSupplyEquilibrium) {
+            if (unplannedRequests.size() > idleVehicles.size()) {
+                scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
             }
             else {
-                scheduleUnplannedRequests();//regular NOS
+                scheduleUnplannedRequests();//reduce T_W (otherwise)
+            }
+        }
+        else {
+            if (scheduler.getParams().minimizePickupTripTime) {
+                scheduleIdleVehicles();//reduce T_P
+            }
+            else {
+                scheduleUnplannedRequests();//reduce T_W (regular NOS)
             }
         }
     }

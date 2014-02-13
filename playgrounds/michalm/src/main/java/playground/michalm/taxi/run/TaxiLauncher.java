@@ -90,7 +90,6 @@ import playground.michalm.util.RunningVehicleRegister;
 
 
     /*package*/TaxiLauncher()
-        throws IOException
     {
         dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
         netFileName = dirName + "network.xml";
@@ -133,7 +132,6 @@ import playground.michalm.util.RunningVehicleRegister;
 
 
     /*package*/TaxiLauncher(String paramFile)
-        throws IOException
     {
         Scanner scanner;
         try {
@@ -165,7 +163,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         eventsFileName = dirName + params.get("eventsFileName");
 
-        algorithmConfig = AlgorithmConfig.ALL[Integer.valueOf(params.get("algorithmConfig"))];
+        algorithmConfig = AlgorithmConfig.valueOf(params.get("algorithmConfig"));
 
         destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
         onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
@@ -289,85 +287,6 @@ import playground.michalm.util.RunningVehicleRegister;
         if (cacheStats != null) {
             cacheStats.updateStats(routerWithCache);
         }
-
-        // TravelTime ttCalc = calc.getLinkTravelTimes();
-        //
-        // Link link = scenario.getNetwork().getLinks().get(scenario.createId("379"));
-        // System.err.println("14000 ---> " + ttCalc.getLinkTravelTime(link, 14000, null, null));
-        // System.err.println("15000 ---> " + ttCalc.getLinkTravelTime(link, 15000, null, null));
-        // System.err.println("16000 ---> " + ttCalc.getLinkTravelTime(link, 16000, null, null));
-        //
-        // TravelDisutility tcCalc = new TimeAsTravelDisutility(ttCalc);
-        //
-        // LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcCalc, ttCalc);
-        // ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
-        // ttCalc,
-        // tcCalc);
-        //
-        // SummaryStatistics aPrioriTPDiff = new SummaryStatistics();
-        // SummaryStatistics aPosterioriTPDiff = new SummaryStatistics();
-        // SummaryStatistics aPrioriTDDiff = new SummaryStatistics();
-        // SummaryStatistics aPosterioriTDDiff = new SummaryStatistics();
-        //
-        // for (Vehicle v : data.getVrpData().getVehicles()) {
-        // for (Task t : v.getSchedule().getTasks()) {
-        // if (t.getType() == TaskType.DRIVE) {
-        // DriveTask dt = (DriveTask)t;
-        // double beginTime = dt.getBeginTime();
-        // MatsimArc arc = (MatsimArc)dt.getArc();
-        //
-        // double actualDuration = dt.getEndTime() - beginTime;
-        //
-        // double aPrioriEstimation = arc.getTimeOnDeparture(beginTime);
-        //
-        // double aPosterioriEstimation = shortestPathCalculator.calculateShortestPath(arc
-        // .getFromLink(), arc.getToLink(), beginTime).travelTime;
-        //
-        // if (aPosterioriEstimation != 0) {
-        // if ( (actualDuration - aPosterioriEstimation) / aPosterioriEstimation > 1) {
-        // ShortestPath sp = shortestPathCalculator.calculateShortestPath(arc
-        // .getFromLink(), arc.getToLink(),
-        // beginTime);
-        //
-        // System.out.println(v.getId() + " : " + (beginTime / 3600) + " : "
-        // + Arrays.asList(sp.linkIds));
-        // }
-        // }
-        // else {
-        // if (actualDuration > 1) {
-        // ShortestPath sp = shortestPathCalculator.calculateShortestPath(arc
-        // .getFromLink(), arc.getToLink(),
-        // beginTime);
-        //
-        // System.out.println("0==" + v.getId() + " : " + (beginTime / 3600)
-        // + " : " + Arrays.asList(sp.linkIds));
-        // }
-        // }
-        //
-        // switch ( ((TaxiDriveTask)dt).getDriveType()) {
-        // case PICKUP:
-        // aPrioriTPDiff.addValue(actualDuration - aPrioriEstimation);
-        // aPosterioriTPDiff.addValue(actualDuration - aPosterioriEstimation);
-        // break;
-        //
-        // case DELIVERY:
-        // aPrioriTDDiff.addValue(actualDuration - aPrioriEstimation);
-        // aPosterioriTDDiff.addValue(actualDuration - aPosterioriEstimation);
-        // break;
-        //
-        // default:
-        // throw new RuntimeException();
-        // }
-        //
-        // }
-        // }
-        // }
-        //
-        // System.err.println("aPriori T_P: " + aPrioriTPDiff.getMean());
-        // System.err.println("aPosteriori T_P: " + aPosterioriTPDiff.getMean());
-        //
-        // System.err.println("aPriori T_D: " + aPrioriTDDiff.getMean());
-        // System.err.println("aPosteriori T_D: " + aPosterioriTDDiff.getMean());
     }
 
 

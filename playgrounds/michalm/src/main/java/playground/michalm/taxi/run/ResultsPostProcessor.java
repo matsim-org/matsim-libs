@@ -228,15 +228,6 @@ public class ResultsPostProcessor
 
     private static final String DIR = "d:\\michalm\\2014_02\\";
     private static final String SUBDIR_PREFIX = "mielec-2-peaks-new-";
-    private static final String NOS_FILE = "stats_NOS.out";
-
-
-    private static String getFile(boolean destinationKnown, boolean onlineVehicleTracker,
-            boolean minimizePickupTripTime)
-    {
-        return "stats_DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
-                + minimizePickupTripTime + ".out";
-    }
 
 
     public void go(String filename)
@@ -257,17 +248,6 @@ public class ResultsPostProcessor
     public static void main(String[] args)
         throws FileNotFoundException
     {
-
-        new ResultsPostProcessor().go(NOS_FILE);
-
-        new ResultsPostProcessor().go(getFile(false, false, false));
-        new ResultsPostProcessor().go(getFile(false, true, false));
-        //        new ResultsPostProcessor().go(getFile(true, false, false));
-        //        new ResultsPostProcessor().go(getFile(true, true, false));
-
-        new ResultsPostProcessor().go(getFile(false, false, true));
-        new ResultsPostProcessor().go(getFile(false, true, true));
-        //        new ResultsPostProcessor().go(getFile(true, false, true));
-        //        new ResultsPostProcessor().go(getFile(true, true, true));
+        new ResultsPostProcessor().go("stats");
     }
 }

@@ -65,12 +65,7 @@ public class MielecDemandExtender {
 	private void readCustomers() {
 
 		  List<String> taxiCustomerIds;
-	        try {
-	            taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(inputTaxiDemand);
-	        }
-	        catch (IOException e) {
-	            throw new RuntimeException(e);
-	        }
+            taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(inputTaxiDemand);
 	        for (String s : taxiCustomerIds){
 	        	customerIds.add(new IdImpl(s));
 	        }

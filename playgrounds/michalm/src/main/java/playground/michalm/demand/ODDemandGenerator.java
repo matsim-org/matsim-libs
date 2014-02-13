@@ -168,18 +168,22 @@ public class ODDemandGenerator
 
 
     public static List<String> readTaxiCustomerIds(String taxiCustomersFile)
-        throws IOException
     {
-        BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFile)));
-        List<String> taxiCustomerIds = new ArrayList<String>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFile)));
+            List<String> taxiCustomerIds = new ArrayList<String>();
 
-        String line;
-        while ( (line = br.readLine()) != null) {
-            taxiCustomerIds.add(line);
+            String line;
+            while ( (line = br.readLine()) != null) {
+                taxiCustomerIds.add(line);
+            }
+
+            br.close();
+            return taxiCustomerIds;
         }
-
-        br.close();
-        return taxiCustomerIds;
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

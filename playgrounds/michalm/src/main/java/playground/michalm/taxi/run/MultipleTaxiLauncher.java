@@ -19,7 +19,10 @@
 
 package playground.michalm.taxi.run;
 
+import static playground.michalm.taxi.run.AlgorithmConfig.*;
+
 import java.io.*;
+import java.util.EnumSet;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.data.VrpData;
@@ -40,9 +43,12 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
     private final TaxiDelaySpeedupStats delaySpeedupStats;
     private final LeastCostPathCalculatorCacheStats cacheStats;
 
+    private PrintWriter pw;
+    private PrintWriter pw2;
+    private PrintWriter pw3;
+
 
     /*package*/MultipleTaxiLauncher(String paramFile)
-        throws IOException
     {
         launcher = new TaxiLauncher(paramFile);
 
@@ -54,12 +60,40 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void run(int configIdx, int runs, boolean destinationKnown,
-            boolean onlineVehicleTracker, boolean minimizePickupTripTime, PrintWriter pw,
-            PrintWriter pw2, PrintWriter pw3)
+    /*package*/void initOutputFiles(String outputFileSuffix)
     {
+        try {
+            pw = new PrintWriter(launcher.dirName + "stats" + outputFileSuffix);
+            pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
+
+            pw2 = new PrintWriter(launcher.dirName + "timeUpdates" + outputFileSuffix);
+
+            pw3 = new PrintWriter(launcher.dirName + "cacheStats" + outputFileSuffix);
+            pw3.print("cfg\tHits\tMisses\n");
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /*package*/void closeOutputFiles()
+    {
+        pw.close();
+        pw2.close();
+        pw3.close();
+    }
+
+
+    /*package*/void run(AlgorithmConfig config, int runs, boolean destinationKnown,
+            boolean onlineVehicleTracker, boolean minimizePickupTripTime)
+    {
+        if (runs < 0 || runs > RANDOM_SEEDS.length) {
+            throw new RuntimeException();
+        }
+
         launcher.travelTimeCalculator = null;
-        launcher.algorithmConfig = AlgorithmConfig.ALL[configIdx];
+        launcher.algorithmConfig = config;
         launcher.destinationKnown = destinationKnown;
         launcher.onlineVehicleTracker = onlineVehicleTracker;
         launcher.minimizePickupTripTime = minimizePickupTripTime;
@@ -75,54 +109,8 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
         SummaryStatistics computationTime = new SummaryStatistics();
 
-        boolean warmup = launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED;
-
-        switch (configIdx) {
-            case 0://NOS_SL
-            case 1://NOS_TD
-            case 2://NOS_FF
-                   //case 3://NOS_24H
-            case 4://NOS_15M
-
-                //========================================
-
-            case 5://NOS_DSE_SL
-            case 6://NOS_DSE_TD
-            case 7://NOS_DSE_FF
-                   //case 8://NOS_DSE_24H
-            case 9://NOS_DSE_15M
-
-                //========================================
-
-            case 10://OTS_FF
-                //case 11://OTS_24H
-            case 12://OTS_15M
-
-                //========================================
-
-            case 13://RES_FF
-                //case 14://RES_24H
-            case 15://RES_15M
-
-                //========================================
-
-            case 16://APS_FF
-                //case 17://APS_24H
-            case 18://APS_15M
-
-                // run as many times as requested
-                break;
-
-            //========================================
-
-            default:
-                // do not run at all
-                return;
-        }
-
-        ///========================
-
-        if (warmup) {
+        //warmup
+        if (launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED) {
             for (int i = 0; i < runs; i += 4) {
                 MatsimRandom.reset(RANDOM_SEEDS[i]);
                 launcher.go(true);
@@ -152,9 +140,10 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         }
 
         VrpData data = launcher.context.getVrpData();
+        String cfg = launcher.algorithmConfig.name() + (minimizePickupTripTime ? "_TP" : "_TW");
 
-        pw.printf("%10s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
-                launcher.algorithmConfig.name,//
+        pw.printf("%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+                cfg,//
                 data.getRequests().size(),//
                 data.getVehicles().size(),//
                 passengerWaitTime.getMean(),//
@@ -163,171 +152,85 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
                 taxiDropoffDriveTime.getMean(),//
                 taxiPickupTime.getMean(),//
                 taxiDropoffTime.getMean(),//
-                //                taxiCruiseTime.getMean(),//
                 taxiWaitTime.getMean(),//
-                //                taxiOverTime.getMean(),//
                 computationTime.getMean());
-        //        pw.printf("Min\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
-        //                taxiPickupDriveTime.getMin(),//
-        //                taxiDropoffDriveTime.getMin(),//
-        //                taxiPickupTime.getMin(),//
-        //                taxiDropoffTime.get(),//
-        //                taxiCruiseTime.getMin(),//
-        //                taxiWaitTime.getMin(),//
-        //                taxiOverTime.getMin(),//
-        //                passengerWaitTime.getMin(),//
-        //                maxPassengerWaitTime.getMin(),//
-        //                computationTime.getMin());
-        //        pw.printf("Max\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
-        //                taxiPickupDriveTime.getMax(),//
-        //                taxiDropoffDriveTime.getMax(),//
-        //                taxiPickupTime.getMax(),//
-        //                taxiDropoffTime.get(),//
-        //                taxiCruiseTime.getMax(),//
-        //                taxiWaitTime.getMax(),//
-        //                taxiOverTime.getMax(),//
-        //                passengerWaitTime.getMax(),//
-        //                maxPassengerWaitTime.getMax(),//
-        //                computationTime.getMax());
-        //        pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
-        //                taxiPickupDriveTime.getStandardDeviation(),//
-        //                taxiDropoffDriveTime.getStandardDeviation(),//
-        //                taxiPickupTime.getStandardDeviation(),//
-        //                taxiDropoffTime.get(),//
-        //                taxiCruiseTime.getStandardDeviation(),//
-        //                taxiWaitTime.getStandardDeviation(),//
-        //                taxiOverTime.getStandardDeviation(),//
-        //                passengerWaitTime.getStandardDeviation(),//
-        //                maxPassengerWaitTime.getStandardDeviation(),//
-        //                computationTime.getStandardDeviation());
 
-        // the endTime of the simulation??? --- time of last served request
-
-        delaySpeedupStats.printStats(pw2, launcher.algorithmConfig.name);
+        delaySpeedupStats.printStats(pw2, launcher.algorithmConfig.name());
         delaySpeedupStats.clearStats();
 
-        cacheStats.printStats(pw3, launcher.algorithmConfig.name);
+        cacheStats.printStats(pw3, launcher.algorithmConfig.name());
         cacheStats.clearStats();
     }
 
 
-    private static final int FIRST_NON_NOS_IDX = 10;
-
-
-    /*package*/static void runNOS(int configIdx, int runs, String paramFile)
+    /*package*/void run(AlgorithmConfig config, int runs, boolean minimizePickupTripTime)
     {
-        try {
-            MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
+        boolean destinationKnown = false;
+        boolean onlineVehicleTracker = false;
 
-            String txt = "NOS";
+        run(config, runs, destinationKnown, onlineVehicleTracker, minimizePickupTripTime);
 
-            PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt
-                    + ".out");
-            pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
+    }
 
-            PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
-                    + ".out");
 
-            PrintWriter pw3 = new PrintWriter(multiLauncher.launcher.dirName + "cacheStats_" + txt
-                    + ".out");
-
-            if (configIdx == -1) {
-                for (int i = 0; i < FIRST_NON_NOS_IDX; i++) {
-                    multiLauncher.run(i, runs, false, false, false, pw, pw2, pw3);
-                }
-            }
-            else if (configIdx >= FIRST_NON_NOS_IDX) {
-                pw.close();
-                pw2.close();
-                pw3.close();
-                throw new IllegalArgumentException();
-            }
-            else {
-                multiLauncher.run(configIdx, runs, false, false, false, pw, pw2, pw3);
-            }
-
-            pw.close();
-            pw2.close();
-            pw3.close();
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+    /*package*/void run(EnumSet<AlgorithmConfig> configs, int runs, boolean minimizePickupTripTime)
+    {
+        for (AlgorithmConfig cfg : configs) {
+            run(cfg, runs, minimizePickupTripTime);
         }
     }
 
 
-    /*package*/static void run(int configIdx, int runs, String paramFile,
-            boolean destinationKnown, boolean onlineVehicleTracker, boolean minimizePickupTripTime)
+    /*package*/static final EnumSet<AlgorithmConfig> selectedNos = EnumSet.of(//
+            NOS_SL,
+            //NOS_TD,
+            //NOS_FF,
+            //NOS_24H,
+            NOS_15M);
+
+    /*package*/static final EnumSet<AlgorithmConfig> selectedNosDse = EnumSet.of(//
+            NOS_DSE_SL,
+            //NOS_DSE_TD,
+            //NOS_DSE_FF,
+            //NOS_DSE_24H,
+            NOS_DSE_15M);
+
+    /*package*/static final EnumSet<AlgorithmConfig> selectedNonNos = EnumSet.of(//
+            //OTS_FF,
+            //OTS_24H,
+            //OTS_15M,
+            //========================================
+            //RES_FF,
+            //RES_24H,
+            RES_15M,
+            //========================================
+            //APS_FF,
+            //APS_24H,
+            APS_15M);
+
+
+    /*package*/static void runAll(int runs, String paramFile)
     {
-        try {
-            MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
+        MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
+        multiLauncher.initOutputFiles("");
 
-            String txt = "DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
-                    + minimizePickupTripTime;
+//        multiLauncher.run(selectedNos, runs, false);
+        multiLauncher.run(selectedNos, runs, true);
 
-            PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt
-                    + ".out");
-            pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
+//        multiLauncher.run(selectedNosDse, runs, false);//true of false is the same here
 
-            PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
-                    + ".out");
+//        multiLauncher.run(selectedNonNos, runs, false);
+//        multiLauncher.run(selectedNonNos, runs, true);
 
-            PrintWriter pw3 = new PrintWriter(multiLauncher.launcher.dirName + "cacheStats_" + txt
-                    + ".out");
-            pw3.print("cfg\tHits\tMisses\n");
-
-            if (configIdx == -1) {
-                for (int i = FIRST_NON_NOS_IDX; i < AlgorithmConfig.ALL.length; i++) {
-                    multiLauncher.run(i, runs, destinationKnown, onlineVehicleTracker,
-                            minimizePickupTripTime, pw, pw2, pw3);
-                }
-            }
-            else if (configIdx < FIRST_NON_NOS_IDX) {
-                pw.close();
-                pw2.close();
-                pw3.close();
-                throw new IllegalArgumentException();
-            }
-            else {
-                multiLauncher.run(configIdx, runs, destinationKnown, onlineVehicleTracker,
-                        minimizePickupTripTime, pw, pw2, pw3);
-            }
-
-            pw.close();
-            pw2.close();
-            pw3.close();
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        multiLauncher.closeOutputFiles();
     }
 
 
     // args: configIdx runs
     public static void main(String... args)
     {
-        String paramFile = args[2];
-
-        int configIdx = Integer.valueOf(args[0]);
-        if (configIdx < -1 || configIdx >= AlgorithmConfig.ALL.length) {
-            throw new RuntimeException();
-        }
-
-        int runs = Integer.valueOf(args[1]);
-        if (runs < 1 || runs > RANDOM_SEEDS.length) {
-            throw new RuntimeException();
-        }
-
-        runNOS(configIdx, runs, paramFile);
-
-        run(configIdx, runs, paramFile, false, false, false);
-        run(configIdx, runs, paramFile, false, true, false);
-        //        run(configIdx, runs, paramFile, true, false, false);
-        //        run(configIdx, runs, paramFile, true, true, false);
-
-        run(configIdx, runs, paramFile, false, false, true);
-        run(configIdx, runs, paramFile, false, true, true);
-        //        run(configIdx, runs, paramFile, true, false, true);
-        //        run(configIdx, runs, paramFile, true, true, true);
+        int runs = Integer.valueOf(args[0]);
+        String paramFile = args[1];
+        runAll(runs, paramFile);
     }
 }

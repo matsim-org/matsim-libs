@@ -23,6 +23,8 @@ import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySourc
 import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.*;
 import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
 
+import java.util.EnumSet;
+
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
@@ -32,14 +34,115 @@ import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
 
 
-/*package*/class AlgorithmConfig
+/*package*/enum AlgorithmConfig
 {
+    NOS_SL(//
+            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
+            STRAIGHT_LINE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
+            NO_SCHEDULING), //
+
+    NOS_TD(//
+            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
+            DISTANCE, //
+            NO_SCHEDULING), //
+
+    NOS_FF(//
+            FREE_FLOW_SPEED, //
+            TIME, //
+            NO_SCHEDULING), //
+
+    NOS_24H(//
+            EVENTS_24_H, //
+            TIME, //
+            NO_SCHEDULING), //
+
+    NOS_15M(//
+            EVENTS_15_MIN, //
+            TIME, //
+            NO_SCHEDULING), //
+
+    NOS_DSE_SL(//
+            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
+            STRAIGHT_LINE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+
+    NOS_DSE_TD(//
+            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
+            DISTANCE, //
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+
+    NOS_DSE_FF(//
+            FREE_FLOW_SPEED, //
+            TIME, //
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+
+    NOS_DSE_24H(//
+            EVENTS_24_H, //
+            TIME, //
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+
+    NOS_DSE_15M(//
+            EVENTS_15_MIN, //
+            TIME, //
+            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
+
+    OTS_FF(//
+            FREE_FLOW_SPEED, //
+            TIME, //
+            ONE_TIME_SCHEDULING), //
+
+    OTS_24H(//
+            EVENTS_24_H, //
+            TIME, //
+            ONE_TIME_SCHEDULING), //
+
+    OTS_15M(//
+            EVENTS_15_MIN, //
+            TIME, //
+            ONE_TIME_SCHEDULING), //
+
+    RES_FF(//
+            FREE_FLOW_SPEED, //
+            TIME, //
+            RE_SCHEDULING), //
+
+    RES_24H(//
+            EVENTS_24_H, //
+            TIME, //
+            RE_SCHEDULING), //
+
+    RES_15M(//
+            EVENTS_15_MIN, //
+            TIME, //
+            RE_SCHEDULING), //
+
+    APS_FF(//
+            FREE_FLOW_SPEED, //
+            TIME, //
+            AP_SCHEDULING), //
+
+    APS_24H(//
+            EVENTS_24_H, //
+            TIME, //
+            AP_SCHEDULING), //
+
+    APS_15M(//
+            EVENTS_15_MIN, //
+            TIME, //
+            AP_SCHEDULING);//
+
+    /*package*/static final EnumSet<AlgorithmConfig> NOS = EnumSet.of(NOS_SL, NOS_TD, NOS_FF,
+            NOS_24H, NOS_15M, NOS_DSE_SL, NOS_DSE_TD, NOS_DSE_FF, NOS_DSE_24H, NOS_DSE_15M);
+
+    /*package*/static final EnumSet<AlgorithmConfig> NON_NOS = EnumSet.complementOf(NOS);
+
+
     /*package*/static enum AlgorithmType
     {
         NO_SCHEDULING("NOS"), //
         NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM("NOS_DS_EQ"), //
         ONE_TIME_SCHEDULING("OTS"), //
-        RE_SCHEDULING("RES"),//
+        RE_SCHEDULING("RES"), //
         AP_SCHEDULING("APS");
 
         /*package*/final String shortcut;
@@ -52,152 +155,14 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
     }
 
 
-    /*package*/static final AlgorithmConfig NOS_SL = new AlgorithmConfig(//
-            "NOS_SL",//
-            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
-            STRAIGHT_LINE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
-            NO_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig NOS_TD = new AlgorithmConfig(//
-            "NOS_TD", //
-            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
-            DISTANCE, //
-            NO_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig NOS_FF = new AlgorithmConfig(//
-            "NOS_FF", //
-            FREE_FLOW_SPEED, //
-            TIME, //
-            NO_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig NOS_24H = new AlgorithmConfig(//
-            "NOS_24H", //
-            EVENTS_24_H, //
-            TIME, //
-            NO_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig NOS_15M = new AlgorithmConfig(//
-            "NOS_15M", //
-            EVENTS_15_MIN, //
-            TIME, //
-            NO_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig NOS_DSE_SL = new AlgorithmConfig(//
-            "NOS_DSE_SL",//
-            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
-            STRAIGHT_LINE, // ????? Let's assume that taxi drivers choose the shortest-length path!!!
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
-
-    /*package*/static final AlgorithmConfig NOS_DSE_TD = new AlgorithmConfig(//
-            "NOS_DSE_TD", //
-            FREE_FLOW_SPEED, // does not matter (since ttCost: DISTANCE)
-            DISTANCE, //
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
-
-    /*package*/static final AlgorithmConfig NOS_DSE_FF = new AlgorithmConfig(//
-            "NOS_DSE_FF", //
-            FREE_FLOW_SPEED, //
-            TIME, //
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
-
-    /*package*/static final AlgorithmConfig NOS_DSE_24H = new AlgorithmConfig(//
-            "NOS_DSE_24H", //
-            EVENTS_24_H, //
-            TIME, //
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
-
-    /*package*/static final AlgorithmConfig NOS_DSE_15M = new AlgorithmConfig(//
-            "NOS_DSE_15M", //
-            EVENTS_15_MIN, //
-            TIME, //
-            NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
-
-    /*package*/static final AlgorithmConfig OTS_FF = new AlgorithmConfig(//
-            "OTS_FF", //
-            FREE_FLOW_SPEED, //
-            TIME, //
-            ONE_TIME_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig OTS_24H = new AlgorithmConfig(//
-            "OTS_24H", //
-            EVENTS_24_H, //
-            TIME, //
-            ONE_TIME_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig OTS_15M = new AlgorithmConfig(//
-            "OTS_15M", //
-            EVENTS_15_MIN, //
-            TIME, //
-            ONE_TIME_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig RES_FF = new AlgorithmConfig(//
-            "RES_FF", //
-            FREE_FLOW_SPEED, //
-            TIME, //
-            RE_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig RES_24H = new AlgorithmConfig(//
-            "RES_24H", //
-            EVENTS_24_H, //
-            TIME, //
-            RE_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig RES_15M = new AlgorithmConfig(//
-            "RES_15M", //
-            EVENTS_15_MIN, //
-            TIME, //
-            RE_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig APS_FF = new AlgorithmConfig(//
-            "APS_FF", //
-            FREE_FLOW_SPEED, //
-            TIME, //
-            AP_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig APS_24H = new AlgorithmConfig(//
-            "APS_24H", //
-            EVENTS_24_H, //
-            TIME, //
-            AP_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig APS_15M = new AlgorithmConfig(//
-            "APS_15M", //
-            EVENTS_15_MIN, //
-            TIME, //
-            AP_SCHEDULING);//
-
-    /*package*/static final AlgorithmConfig[] ALL = {//
-    NOS_SL,//
-            NOS_TD,//
-            NOS_FF,//
-            NOS_24H,//
-            NOS_15M,//
-            NOS_DSE_SL,//
-            NOS_DSE_TD,//
-            NOS_DSE_FF,//
-            NOS_DSE_24H,//
-            NOS_DSE_15M,//
-            OTS_FF,//
-            OTS_24H,//
-            OTS_15M,//
-            RES_FF,//
-            RES_24H,//
-            RES_15M, //
-            APS_FF,//
-            APS_24H,//
-            APS_15M //
-    };
-
-    /*package*/final String name;
     /*package*/final TravelTimeSource ttimeSource;
     /*package*/final TravelDisutilitySource tdisSource;
     /*package*/final AlgorithmType algorithmType;
 
 
-    /*package*/AlgorithmConfig(String name, TravelTimeSource ttimeSource,
+    /*package*/AlgorithmConfig(TravelTimeSource ttimeSource,
             TravelDisutilitySource tdisSource, AlgorithmType algorithmType)
     {
-        this.name = name;
         this.ttimeSource = ttimeSource;
         this.tdisSource = tdisSource;
         this.algorithmType = algorithmType;
