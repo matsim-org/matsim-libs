@@ -89,6 +89,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 
 		for ( Collection<Subchain> subchains : activityGroupsToHandle ) {
 			final List<ActivityFacility> potentialLocations = identifyPotentialLocations( subchains );
+			if ( potentialLocations.isEmpty() ) continue;
 			final ActivityFacility facility = potentialLocations.get( random.nextInt( potentialLocations.size() ) );
 			changeLocation( subchains , facility );
 		}
@@ -114,12 +115,12 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 
 		// TODO: handle especially case where one agent is far away (ie do choice only for other agents?)
 		Set<ActivityFacility> potentialLocations = null;
-		assert !subchains.isEmpty();
 		int mult=1;
 		do {
 			final double distanceBudget = mult * config.getCrowflySpeed() * config.getTravelTimBudget_s();
-			mult *= 2;
+			mult++;
 
+			assert !subchains.isEmpty();
 			for ( Subchain subchain : subchains ) {
 				final ActivityFacility start = facilities.getFacilities().get( subchain.start.getFacilityId() );
 				final ActivityFacility end = facilities.getFacilities().get( subchain.end.getFacilityId() );
@@ -139,7 +140,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 					CollectionUtils.intersect( potentialLocations , prism );
 			}
 		}
-		while ( potentialLocations.isEmpty() );
+		while ( potentialLocations.isEmpty() && mult <= config.getMaximumExpansionFactor() );
 
 		final List<ActivityFacility> list = new ArrayList<ActivityFacility>( potentialLocations );
 		// for determinsim

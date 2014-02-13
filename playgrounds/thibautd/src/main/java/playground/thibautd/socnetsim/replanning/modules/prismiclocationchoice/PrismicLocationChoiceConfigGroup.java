@@ -38,6 +38,7 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 	private double crowflySpeed = 50 / 3.6; // default: 50 km/h
 	private double travelTimeBudget = 3600; // default: 1 hour in total
 	private double minimalDistanceFactor = 1.2;
+	private int maximumExpansionFactor = 3;
 
 	public PrismicLocationChoiceConfigGroup() {
 		super( GROUP_NAME );
@@ -114,6 +115,17 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 	public void setMinimalDistanceFactor(double minimalDistanceFactor) {
 		if ( minimalDistanceFactor < 1 ) throw new IllegalArgumentException( "minimal distance cannot be lower than the inter-focus distance: wrong factor "+minimalDistanceFactor );
 		this.minimalDistanceFactor = minimalDistanceFactor;
+	}
+
+	@StringGetter( "maximumExpansionFactor" )
+	public int getMaximumExpansionFactor() {
+		return this.maximumExpansionFactor;
+	}
+
+	@StringSetter( "maximumExpansionFactor" )
+	public void setMaximumExpansionFactor(final int maximumExpansionFactor) {
+		if ( maximumExpansionFactor <= 1 ) throw new IllegalArgumentException( maximumExpansionFactor+"too small" );
+		this.maximumExpansionFactor = maximumExpansionFactor;
 	}
 
 	@StringGetter( "travelTimeBudget_s" )
