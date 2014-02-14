@@ -64,7 +64,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
     {
         try {
             pw = new PrintWriter(launcher.dirName + "stats" + outputFileSuffix);
-            pw.print("cfg\tn\tm\tPW\tPWmax\tPD\tDD\tPS\tDS\tW\tComp\n");
+            pw.print("cfg\tn\tm\tPW\tPWp95\tPWmax\tPD\tPDp95\tPDmax\tDD\tPS\tDS\tW\tComp\n");
 
             pw2 = new PrintWriter(launcher.dirName + "timeUpdates" + outputFileSuffix);
 
@@ -99,6 +99,8 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         launcher.minimizePickupTripTime = minimizePickupTripTime;
 
         SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
+        SummaryStatistics percentile95TaxiPickupDriveTime = new SummaryStatistics();
+        SummaryStatistics maxTaxiPickupDriveTime = new SummaryStatistics();
         SummaryStatistics taxiDropoffDriveTime = new SummaryStatistics();
         SummaryStatistics taxiPickupTime = new SummaryStatistics();
         SummaryStatistics taxiDropoffTime = new SummaryStatistics();
@@ -107,6 +109,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         SummaryStatistics taxiOverTime = new SummaryStatistics();
         SummaryStatistics passengerWaitTime = new SummaryStatistics();
         SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
+        SummaryStatistics percentile95PassengerWaitTime = new SummaryStatistics();
         SummaryStatistics computationTime = new SummaryStatistics();
 
         //warmup
@@ -128,6 +131,9 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             long t1 = System.currentTimeMillis();
 
             taxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTime());
+            percentile95TaxiPickupDriveTime.addValue(evaluation.getTaxiPickupDriveTimeStats()
+                    .getPercentile(95));
+            maxTaxiPickupDriveTime.addValue(evaluation.getMaxTaxiPickupDriveTime());
             taxiDropoffDriveTime.addValue(evaluation.getTaxiDropoffDriveTime());
             taxiPickupTime.addValue(evaluation.getTaxiPickupTime());
             taxiDropoffTime.addValue(evaluation.getTaxiDropoffTime());
@@ -135,6 +141,8 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             taxiWaitTime.addValue(evaluation.getTaxiWaitTime());
             taxiOverTime.addValue(evaluation.getTaxiOverTime());
             passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
+            percentile95PassengerWaitTime.addValue(evaluation.getPassengerWaitTimeStats()
+                    .getPercentile(95));
             maxPassengerWaitTime.addValue(evaluation.getMaxPassengerWaitTime());
             computationTime.addValue(0.001 * (t1 - t0));
         }
@@ -142,13 +150,16 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         VrpData data = launcher.context.getVrpData();
         String cfg = launcher.algorithmConfig.name() + (minimizePickupTripTime ? "_TP" : "_TW");
 
-        pw.printf("%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        pw.printf("%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 cfg,//
                 data.getRequests().size(),//
                 data.getVehicles().size(),//
                 passengerWaitTime.getMean(),//
+                percentile95PassengerWaitTime.getMean(), //
                 maxPassengerWaitTime.getMean(),//
                 taxiPickupDriveTime.getMean(),//
+                percentile95TaxiPickupDriveTime.getMean(), //
+                maxTaxiPickupDriveTime.getMean(),//
                 taxiDropoffDriveTime.getMean(),//
                 taxiPickupTime.getMean(),//
                 taxiDropoffTime.getMean(),//
@@ -214,13 +225,13 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");
 
-//        multiLauncher.run(selectedNos, runs, false);
+        //        multiLauncher.run(selectedNos, runs, false);
         multiLauncher.run(selectedNos, runs, true);
 
-//        multiLauncher.run(selectedNosDse, runs, false);//true of false is the same here
+        //        multiLauncher.run(selectedNosDse, runs, false);//true of false is the same here
 
-//        multiLauncher.run(selectedNonNos, runs, false);
-//        multiLauncher.run(selectedNonNos, runs, true);
+        //        multiLauncher.run(selectedNonNos, runs, false);
+        //        multiLauncher.run(selectedNonNos, runs, true);
 
         multiLauncher.closeOutputFiles();
     }

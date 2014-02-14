@@ -19,10 +19,9 @@
 
 package playground.michalm.taxi.optimizer;
 
-import java.io.PrintWriter;
-
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.schedule.*;
@@ -78,6 +77,9 @@ public class TaxiStatsCalculator
                     if (eval.maxPassengerWaitTime < waitTime) {
                         eval.maxPassengerWaitTime = waitTime;
                     }
+
+                    eval.passengerWaitTimeStats.addValue(waitTime);
+
                     break;
 
                 case DROPOFF_STAY:
@@ -92,15 +94,14 @@ public class TaxiStatsCalculator
         double latestValidEndTime = schedule.getVehicle().getT1();
         double actualEndTime = schedule.getEndTime();
 
-        if (actualEndTime > latestValidEndTime) {
-            eval.taxiOverTime += actualEndTime - latestValidEndTime;
-        }
+        eval.taxiOverTime += Math.max(actualEndTime - latestValidEndTime, 0);
     }
 
 
     public static class TaxiStats
     {
         public static final String HEADER = "PickupDriveT\t" //
+                + "MaxPickupDriveT" //
                 + "DeliveryDriveT\t"//
                 + "PickupT\t" //
                 + "DropoffT\t" //
@@ -118,7 +119,12 @@ public class TaxiStatsCalculator
         private double taxiWaitTime;
         private double taxiOverTime;
         private double passengerWaitTime;
+
+        private double maxTaxiPickupDriveTime;
         private double maxPassengerWaitTime;
+
+        private final DescriptiveStatistics taxiPickupDriveTimeStats = new DescriptiveStatistics();
+        private final DescriptiveStatistics passengerWaitTimeStats = new DescriptiveStatistics();
 
 
         public double getTaxiPickupDriveTime()
@@ -169,9 +175,27 @@ public class TaxiStatsCalculator
         }
 
 
+        public double getMaxTaxiPickupDriveTime()
+        {
+            return maxTaxiPickupDriveTime;
+        }
+
+
         public double getMaxPassengerWaitTime()
         {
             return maxPassengerWaitTime;
+        }
+
+
+        public DescriptiveStatistics getTaxiPickupDriveTimeStats()
+        {
+            return taxiPickupDriveTimeStats;
+        }
+
+
+        public DescriptiveStatistics getPassengerWaitTimeStats()
+        {
+            return passengerWaitTimeStats;
         }
 
 
@@ -179,6 +203,7 @@ public class TaxiStatsCalculator
         public String toString()
         {
             return new StringBuilder().append(taxiPickupDriveTime).append('\t') //
+                    .append(maxTaxiPickupDriveTime).append('\t') //
                     .append(taxiDropoffDriveTime).append('\t') //
                     .append(taxiPickupTime).append('\t') //
                     .append(taxiDropoffTime).append('\t') //
@@ -187,13 +212,6 @@ public class TaxiStatsCalculator
                     .append(taxiOverTime).append('\t') //
                     .append(passengerWaitTime).append('\t') //
                     .append(maxPassengerWaitTime).toString();
-        }
-
-
-        public void print(PrintWriter pw)
-        {
-            pw.println(HEADER);
-            pw.println(toString());
         }
     }
 }

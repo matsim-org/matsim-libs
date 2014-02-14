@@ -49,6 +49,7 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestParams;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
 import playground.michalm.util.RunningVehicleRegister;
@@ -253,7 +254,9 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/void generateOutput()
     {
         PrintWriter pw = new PrintWriter(System.out);
-        new TaxiStatsCalculator().calculateStats(context.getVrpData()).print(pw);
+        pw.println(TaxiStats.HEADER);
+        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData());
+        pw.println(stats);
         pw.flush();
 
         if (vrpOutFiles) {
