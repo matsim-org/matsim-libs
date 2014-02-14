@@ -24,7 +24,6 @@ import java.util.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.model.TaxiRequest;
@@ -107,10 +106,8 @@ public class OTSTaxiOptimizer
         TaxiTask nextTask = taxiSchedule.nextTask();
 
         if (!scheduler.getParams().destinationKnown) {
-            if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-                return;
-            }
-            else if (nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
+            if (nextTask != null // == schedule COMPLETED
+                    && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
                 requiresReoptimization = true;
             }
         }
@@ -126,6 +123,9 @@ public class OTSTaxiOptimizer
 
         double predictedEndTime = driveTask.getTaskTracker().predictEndTime(context.getTime());
         scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
+
+        //we may here possibly decide here whether or not to reoptimize
+        //if (delays/speedups encountered) {requiresReoptimization = true;}
     }
 
 
