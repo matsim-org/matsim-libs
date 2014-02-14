@@ -40,7 +40,6 @@ public class SocialNetworkReader extends MatsimXmlParser {
 	private final ObjectPool<Id> idPool = new ObjectPool<Id>();
 
 	public SocialNetworkReader(final Scenario scenario) {
-		super( false );
 		this.scenario = scenario;
 	}
 

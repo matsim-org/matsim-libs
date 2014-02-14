@@ -49,6 +49,8 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 
 	public void write( final String file ) {
 		this.openFile( file );
+		this.writeXmlHead();
+		this.writeDoctype( ROOT_TAG , "socialnetwork_v1.dtd" );
 		this.writeStartTag(
 				ROOT_TAG,
 				Collections.singletonList(
