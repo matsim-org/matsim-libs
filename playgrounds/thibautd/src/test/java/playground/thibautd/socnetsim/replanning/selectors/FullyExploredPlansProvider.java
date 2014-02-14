@@ -71,6 +71,7 @@ public class FullyExploredPlansProvider {
 			final IncompatiblePlansIdentifierFactory incompFactory,
 			final boolean isBlocking) {
 		final SelectedInformation fromFile = readGroupsAndSelected( incompFactory , isBlocking );
+
 		if ( fromFile != null ) {
 			log.info( "plans succesfully read" );
 			return fromFile;
@@ -83,62 +84,69 @@ public class FullyExploredPlansProvider {
 	private static SelectedInformation readGroupsAndSelected(
 			final IncompatiblePlansIdentifierFactory incompFactory,
 			final boolean isBlocking) {
-		log.info( "attempt to read test plans" );
-		final StoragePaths paths = getStoragePaths( incompFactory , isBlocking );
+		try {
+			log.info( "attempt to read test plans" );
+			final StoragePaths paths = getStoragePaths( incompFactory , isBlocking );
 
-		if ( !paths.allPathsExist() ) return null;
+			if ( !paths.allPathsExist() ) return null;
 
-		log.info( "read cliques from "+paths.cliquesFilePath );
-		final GroupIdentifier cliques = FixedGroupsIdentifierFileParser.readCliquesFile( paths.cliquesFilePath );
+			log.info( "read cliques from "+paths.cliquesFilePath );
+			final GroupIdentifier cliques = FixedGroupsIdentifierFileParser.readCliquesFile( paths.cliquesFilePath );
 
-		log.info( "read plans from "+paths.plansFilePath );
-		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimPopulationReader( scenario ).readFile( paths.plansFilePath );
+			log.info( "read plans from "+paths.plansFilePath );
+			final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+			new MatsimPopulationReader( scenario ).readFile( paths.plansFilePath );
 
-		log.info( "read joint plans from "+paths.jointPlansFilePath );
-		new JointPlansXmlReader( scenario ).parse( paths.jointPlansFilePath );
-		final JointPlans jointPlans = (JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
+			log.info( "read joint plans from "+paths.jointPlansFilePath );
+			new JointPlansXmlReader( scenario ).parse( paths.jointPlansFilePath );
+			final JointPlans jointPlans = (JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
 
-		final SelectedInformation information = new SelectedInformation( jointPlans );
-		for ( ReplanningGroup clique : cliques.identifyGroups( scenario.getPopulation() ) ) {
-			final List<JointPlan> selectedJointPlans = new ArrayList<JointPlan>();
-			final List<Plan> selectedPlans = new ArrayList<Plan>();
+			final SelectedInformation information = new SelectedInformation( jointPlans );
+			for ( ReplanningGroup clique : cliques.identifyGroups( scenario.getPopulation() ) ) {
+				final List<JointPlan> selectedJointPlans = new ArrayList<JointPlan>();
+				final List<Plan> selectedPlans = new ArrayList<Plan>();
 
-			for ( Person person : clique.getPersons() ) {
-				final Plan selectedPlan = person.getSelectedPlan();
-				// this is used as a "flag" for no plan selected,
-				// as PersonImpl is too sentimental to have no plan
-				// selected.
-				if ( selectedPlan.getScore() == null ) {
-					person.getPlans().remove( selectedPlan );
-					continue;
+				for ( Person person : clique.getPersons() ) {
+					final Plan selectedPlan = person.getSelectedPlan();
+					// this is used as a "flag" for no plan selected,
+					// as PersonImpl is too sentimental to have no plan
+					// selected.
+					if ( selectedPlan.getScore() == null ) {
+						person.getPlans().remove( selectedPlan );
+						continue;
+					}
+					final JointPlan jp = jointPlans.getJointPlan( selectedPlan );
+					assert jp == null || consistentSelectionStatus( jp ) : jp;
+
+					if ( jp != null && !selectedJointPlans.contains( jp ) ) {
+						selectedJointPlans.add( jp );
+					}
+
+					if ( jp == null ) {
+						selectedPlans.add( selectedPlan );
+					}
 				}
-				final JointPlan jp = jointPlans.getJointPlan( selectedPlan );
-				assert jp == null || consistentSelectionStatus( jp ) : jp;
 
-				if ( jp != null && !selectedJointPlans.contains( jp ) ) {
-					selectedJointPlans.add( jp );
-				}
+				final GroupPlans gps =
+						new GroupPlans(
+							selectedJointPlans,
+							selectedPlans );
+				final int nPlans = gps.getAllIndividualPlans().size();
 
-				if ( jp == null ) {
-					selectedPlans.add( selectedPlan );
-				}
+				assert nPlans == 0 || nPlans == clique.getPersons().size() : nPlans +" != "+ clique.getPersons().size();
+
+				information.addInformation(
+						clique,
+						nPlans == 0 ? null : gps);
 			}
 
-			final GroupPlans gps =
-					new GroupPlans(
-						selectedJointPlans,
-						selectedPlans );
-			final int nPlans = gps.getAllIndividualPlans().size();
-
-			assert nPlans == 0 || nPlans == clique.getPersons().size() : nPlans +" != "+ clique.getPersons().size();
-
-			information.addInformation(
-					clique,
-					nPlans == 0 ? null : gps);
+			return information;
 		}
-
-		return information;
+		catch (Exception e) {
+			log.warn( "got exception while reading dumped data" , e );
+			log.warn( "this can happen for instance if the file formats are changed" );
+			return null;
+		}
 	}
 
 	private static boolean consistentSelectionStatus(final Iterable<JointPlan> jps) {
