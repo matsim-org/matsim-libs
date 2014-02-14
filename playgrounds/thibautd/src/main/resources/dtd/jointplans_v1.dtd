@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT jointPlans (jointPlan*)>
+
+<!ELEMENT jointPlan (individualPlan+)>
+
+<!ELEMENT individualPlan EMPTY>
+<!ATTLIST individualPlan
+	personId	CDATA	#REQUIRED
+	planNr		CDATA	#REQUIRED>
+

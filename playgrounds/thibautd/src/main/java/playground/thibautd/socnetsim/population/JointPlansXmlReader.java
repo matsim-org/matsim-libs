@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.utils.io.MatsimXmlParser;
+
 import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.JOINT_PLAN_TAG;
 import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.PERSON_ATT;
 import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.PLAN_NR_ATT;
@@ -26,84 +29,67 @@ import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.Counter;
-
-import playground.thibautd.utils.AbstractParsePullXmlReader;
+import org.xml.sax.Attributes;
 
 /**
  * @author thibautd
  */
-public class JointPlansXmlReader extends AbstractParsePullXmlReader<JointPlans> {
-	public static JointPlans readJointPlans(
-			final Population population,
-			final String fileName) {
-		return new JointPlansXmlReader( population ).readFile( fileName );
-	}
+public class JointPlansXmlReader extends MatsimXmlParser {
+	private final Counter counter = new Counter( "read joint plan #" );
 
-	private final Population population;
+	private final Scenario scenario;
+	private final JointPlans jointPlans;
 
-	private JointPlansXmlReader(final Population population) {
-		this.population = population;
+	private Map<Id, Plan> currentJointPlan;
+
+	public JointPlansXmlReader(
+			final Scenario scenario) {
+		this.scenario = scenario;
+		this.jointPlans = new JointPlans();
+		scenario.addScenarioElement( JointPlans.ELEMENT_NAME , jointPlans );
 	}
 
 	@Override
-	protected JointPlans parse(
-			final XMLStreamReader streamReader)
-			throws XMLStreamException {
-		final Counter counter = new Counter( "parsing joint plan # " );
-		final JointPlans jointPlans = new JointPlans();
-
-		while ( streamReader.hasNext() && streamReader.next() != XMLStreamConstants.START_ELEMENT );
-		while (streamReader.hasNext()) {
-			if ( !streamReader.getLocalName().equals( JOINT_PLAN_TAG ) ) {
-				while ( streamReader.hasNext() && streamReader.next() != XMLStreamConstants.START_ELEMENT );
-				continue;
-			}
+	public void startTag(
+			final String name,
+			final Attributes atts,
+			final Stack<String> context) {
+		if ( name.equals( JOINT_PLAN_TAG ) ) {
+			currentJointPlan = new LinkedHashMap<Id, Plan>();
 			counter.incCounter();
-			jointPlans.addJointPlan( parseJointPlan( streamReader , jointPlans.getFactory() ) );
 		}
-
-		return jointPlans;
-	}
-
-	private JointPlan parseJointPlan(
-			final XMLStreamReader streamReader,
-			final JointPlanFactory factory)
-			throws XMLStreamException {
-		final Map<Id, Plan> plans = new LinkedHashMap<Id, Plan>();
-
-		while ( streamReader.next() != XMLStreamConstants.START_ELEMENT );
-		while ( streamReader.getEventType() != XMLStreamConstants.END_DOCUMENT &&
-				streamReader.getLocalName().equals( PLAN_TAG ) ) {
+		if ( name.equals( PLAN_TAG ) ) {
 			final Id id = new IdImpl(
-					streamReader.getAttributeValue(
-						null,
-						PERSON_ATT ) );
+						atts.getValue( PERSON_ATT ) );
 
 			final int planIndex = Integer.parseInt(
-					streamReader.getAttributeValue(
-						null,
-						PLAN_NR_ATT ) );
+						atts.getValue( PLAN_NR_ATT ) );
 
-			final Person person = population.getPersons().get( id );
+			final Person person = scenario.getPopulation().getPersons().get( id );
 			final Plan plan = person.getPlans().get( planIndex );
 			// use the ID from person on purpose to minimize memory consumption
-			plans.put( person.getId() , plan );
-
-			while ( streamReader.hasNext() && streamReader.next() != XMLStreamConstants.START_ELEMENT );
+			final Plan old = currentJointPlan.put( person.getId() , plan );
+			if ( old != null ) throw new RuntimeException( "joint plan contained "+old+" and "+plan+" for agent "+id );
 		}
+	}
 
-		return factory.createJointPlan( plans );
+	@Override
+	public void endTag(
+			final String name,
+			final String content,
+			final Stack<String> context) {
+		if ( name.equals( JOINT_PLAN_TAG ) ) {
+			jointPlans.addJointPlan(
+					jointPlans.getFactory().createJointPlan(
+						currentJointPlan ) );
+		}
 	}
 }
 

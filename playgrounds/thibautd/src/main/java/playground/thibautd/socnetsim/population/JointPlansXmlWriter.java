@@ -65,6 +65,8 @@ public class JointPlansXmlWriter extends MatsimXmlWriter {
 	private void write(final String file) {
 		final Counter counter = new Counter( "[JointPlansXmlWriter] dumped jointPlan # " );
 		openFile( file );
+		writeXmlHead();
+		writeDoctype( ROOT_TAG , "jointplans_v1.dtd" );
 		writeStartTag(
 				ROOT_TAG,
 				Collections.<Tuple<String, String>>emptyList() );

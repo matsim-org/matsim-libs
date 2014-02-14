@@ -96,7 +96,8 @@ public class FullyExploredPlansProvider {
 		new MatsimPopulationReader( scenario ).readFile( paths.plansFilePath );
 
 		log.info( "read joint plans from "+paths.jointPlansFilePath );
-		final JointPlans jointPlans = JointPlansXmlReader.readJointPlans( scenario.getPopulation() , paths.jointPlansFilePath );
+		new JointPlansXmlReader( scenario ).parse( paths.jointPlansFilePath );
+		final JointPlans jointPlans = (JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
 
 		final SelectedInformation information = new SelectedInformation( jointPlans );
 		for ( ReplanningGroup clique : cliques.identifyGroups( scenario.getPopulation() ) ) {

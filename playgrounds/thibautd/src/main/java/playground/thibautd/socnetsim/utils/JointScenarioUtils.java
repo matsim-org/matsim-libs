@@ -89,10 +89,7 @@ public class JointScenarioUtils {
 		final JointPlansConfigGroup jpConfig = (JointPlansConfigGroup)
 			config.getModule( JointPlansConfigGroup.GROUP_NAME );
 		if ( jpConfig.getFileName() != null) {
-			final JointPlans jps = JointPlansXmlReader.readJointPlans(
-					scenario.getPopulation(),
-					jpConfig.getFileName() );
-			scenario.addScenarioElement( JointPlans.ELEMENT_NAME , jps );
+			new JointPlansXmlReader( scenario ).parse( jpConfig.getFileName() );
 		}
 		else {
 			scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );

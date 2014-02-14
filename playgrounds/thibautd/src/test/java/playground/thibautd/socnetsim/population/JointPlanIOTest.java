@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -52,12 +53,17 @@ public class JointPlanIOTest {
 	@Test
 	public void testDumpAndRead() throws Exception {
 		final JointPlans jointPlans = new JointPlans();
-		final Population population = createScenario( jointPlans ).getPopulation();
+		final Scenario scenario = createScenario( jointPlans );
+		final Population population = scenario.getPopulation();
 
 		final String file = utils.getOutputDirectory()+"/jointPlansDump.xml";
 		JointPlansXmlWriter.write( population , jointPlans , file );
 
-		final JointPlans reReadJointPlans = JointPlansXmlReader.readJointPlans( population , file );
+		final Scenario rereadScenario = ScenarioUtils.createScenario( scenario.getConfig() );
+		((ScenarioImpl) rereadScenario).setPopulation( scenario.getPopulation() );
+		new JointPlansXmlReader( rereadScenario ).parse( file );
+		final JointPlans reReadJointPlans = (JointPlans)
+				rereadScenario.getScenarioElement( JointPlans.ELEMENT_NAME );
 
 		for ( Person person : population.getPersons().values() ) {
 			for ( Plan plan : person.getPlans() ) {
