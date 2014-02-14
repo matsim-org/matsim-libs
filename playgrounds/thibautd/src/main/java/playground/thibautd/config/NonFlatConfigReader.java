@@ -45,7 +45,6 @@ public class NonFlatConfigReader extends MatsimXmlParser {
 
 	public NonFlatConfigReader(
 			final Config config) {
-		super( false );
 		this.config = config;
 	}
 

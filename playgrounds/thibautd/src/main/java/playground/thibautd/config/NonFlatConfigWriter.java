@@ -51,6 +51,7 @@ public class NonFlatConfigWriter extends MatsimXmlWriter {
 		openFile( file );
 
 		writeXmlHead();
+		writeDoctype( CONFIG , "nonflatconfig_v1.dtd" );
 		writeStartTag(
 				CONFIG,
 				Collections.<Tuple<String,String>>emptyList() );
