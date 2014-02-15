@@ -129,6 +129,21 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
     APS_15M(//
             EVENTS_15_MIN, //
             TIME, //
+            AP_SCHEDULING), //
+
+    APS_DSE_FF(//
+            FREE_FLOW_SPEED, //
+            TIME, //
+            AP_SCHEDULING), //
+
+    APS_DSE_24H(//
+            EVENTS_24_H, //
+            TIME, //
+            AP_SCHEDULING), //
+
+    APS_DSE_15M(//
+            EVENTS_15_MIN, //
+            TIME, //
             AP_SCHEDULING);//
 
     /*package*/static final EnumSet<AlgorithmConfig> NOS = EnumSet.of(NOS_SL, NOS_TD, NOS_FF,
@@ -140,10 +155,11 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
     /*package*/static enum AlgorithmType
     {
         NO_SCHEDULING("NOS"), //
-        NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM("NOS_DS_EQ"), //
+        NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM("NOS_DSE"), //
         ONE_TIME_SCHEDULING("OTS"), //
         RE_SCHEDULING("RES"), //
-        AP_SCHEDULING("APS");
+        AP_SCHEDULING("APS"),//
+        AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM("APS_DSE");
 
         /*package*/final String shortcut;
 
@@ -160,8 +176,8 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
     /*package*/final AlgorithmType algorithmType;
 
 
-    /*package*/AlgorithmConfig(TravelTimeSource ttimeSource,
-            TravelDisutilitySource tdisSource, AlgorithmType algorithmType)
+    /*package*/AlgorithmConfig(TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource,
+            AlgorithmType algorithmType)
     {
         this.ttimeSource = ttimeSource;
         this.tdisSource = tdisSource;
@@ -190,7 +206,10 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
                 return new RESTaxiOptimizer(scheduler, context);
 
             case AP_SCHEDULING:
-                return new APSTaxiOptimizer(scheduler, context);
+                return new APSTaxiOptimizer(scheduler, context, false);
+                
+            case AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM:
+                return new APSTaxiOptimizer(scheduler, context, true);
 
             default:
                 throw new IllegalStateException();

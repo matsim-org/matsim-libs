@@ -115,21 +115,15 @@ public class NOSTaxiOptimizer
             return;
         }
 
-        if (seekDemandSupplyEquilibrium) {
-            if (unplannedRequests.size() > idleVehicles.size()) {
-                scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
-            }
-            else {
-                scheduleUnplannedRequests();//reduce T_W (otherwise)
-            }
+        boolean reduceTP = seekDemandSupplyEquilibrium ? //
+                unplannedRequests.size() > idleVehicles.size() : //
+                scheduler.getParams().minimizePickupTripTime;
+
+        if (reduceTP) {
+            scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
         }
         else {
-            if (scheduler.getParams().minimizePickupTripTime) {
-                scheduleIdleVehicles();//reduce T_P
-            }
-            else {
-                scheduleUnplannedRequests();//reduce T_W (regular NOS)
-            }
+            scheduleUnplannedRequests();//reduce T_W (regular NOS)
         }
     }
 

@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.optimizer.TaxiUtils;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
 import playground.michalm.taxi.schedule.TaxiSchedules;
 
@@ -34,9 +35,13 @@ import playground.michalm.taxi.schedule.TaxiSchedules;
 public class APSTaxiOptimizer
     extends OTSTaxiOptimizer
 {
-    public APSTaxiOptimizer(TaxiScheduler scheduler, MatsimVrpContext context)
+    private final boolean seekDemandSupplyEquilibrium;
+
+    
+    public APSTaxiOptimizer(TaxiScheduler scheduler, MatsimVrpContext context, boolean seekDemandSupplyEquilibrium)
     {
         super(scheduler, context);
+        this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
     }
 
 
@@ -46,12 +51,14 @@ public class APSTaxiOptimizer
             scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh), unplannedRequests);
         }
 
-        if (unplannedRequests.size() == 0) {
+        int rDim = unplannedRequests.size(); 
+        if (rDim == 0) {
             return;
         }
 
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
         List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
+        int idleVehCount = 0;
         for (Vehicle v : context.getVrpData().getVehicles()) {
             LinkTimePair departure = scheduler.getEarliestIdleness(v);
             //LinkTimePair departure = scheduler.getClosestDiversion(v);
@@ -59,15 +66,17 @@ public class APSTaxiOptimizer
             if (departure != null) {
                 vehicles.add(v);
                 departures.add(departure);
+                
+                if (TaxiUtils.isIdle(v)) {
+                    idleVehCount++;
+                }
             }
         }
-
+        
         int vDim = vehicles.size();
         if (vDim == 0) {
             return;
         }
-
-        int rDim = Math.min(vDim, unplannedRequests.size());
 
         TaxiRequest[] requests = new TaxiRequest[rDim];
         for (int r = 0; r < rDim; r++) {
@@ -75,7 +84,11 @@ public class APSTaxiOptimizer
         }
 
         VrpPathCalculator calculator = scheduler.getCalculator();
-        ImmediateRequestParams params = scheduler.getParams();
+
+        boolean reduceTP = seekDemandSupplyEquilibrium ? //
+                rDim > idleVehCount : //
+                scheduler.getParams().minimizePickupTripTime;
+
         double[][] costMatrix = new double[vDim][rDim];
         VrpPathWithTravelData[][] paths = new VrpPathWithTravelData[vDim][rDim];
 
@@ -87,17 +100,12 @@ public class APSTaxiOptimizer
                 VrpPathWithTravelData path = calculator.calcPath(departure.link, req.getFromLink(),
                         departure.time);
 
-                costMatrix[v][r] = params.minimizePickupTripTime ? //
+                costMatrix[v][r] = reduceTP ? //
                         path.getTravelTime() : //T_P
-                        path.getArrivalTime() - req.getSubmissionTime();//T_W
+                        path.getArrivalTime();//T_W
 
                 paths[v][r] = path;
             }
-
-            // for (int r = rDim; r < vDim; r++) {
-            //     costMatrix[v][r] = 0;//maybe cost of staying in a unattractive location
-            //     paths[v][r] = null;
-            // }
         }
 
         int[] assignment = new HungarianAlgorithm(costMatrix).execute();

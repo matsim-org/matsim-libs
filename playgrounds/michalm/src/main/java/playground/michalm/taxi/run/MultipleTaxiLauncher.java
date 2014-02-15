@@ -150,7 +150,8 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         VrpData data = launcher.context.getVrpData();
         String cfg = launcher.algorithmConfig.name() + (minimizePickupTripTime ? "_TP" : "_TW");
 
-        pw.printf("%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        pw.printf(
+                "%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 cfg,//
                 data.getRequests().size(),//
                 data.getVehicles().size(),//
@@ -193,18 +194,20 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNos = EnumSet.of(//
-            NOS_SL,
+            NOS_SL//,
             //NOS_TD,
             //NOS_FF,
             //NOS_24H,
-            NOS_15M);
+            //NOS_15M
+            );
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNosDse = EnumSet.of(//
-            NOS_DSE_SL,
+            NOS_DSE_SL//,
             //NOS_DSE_TD,
             //NOS_DSE_FF,
             //NOS_DSE_24H,
-            NOS_DSE_15M);
+            //NOS_DSE_15M
+            );
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNonNos = EnumSet.of(//
             //OTS_FF,
@@ -219,6 +222,11 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             //APS_24H,
             APS_15M);
 
+    /*package*/static final EnumSet<AlgorithmConfig> selectedNonNosDse = EnumSet.of(//
+            //APS_DSE_FF,
+            //APS_DSE_24H,
+            APS_DSE_15M);
+
 
     /*package*/static void runAll(int runs, String paramFile)
     {
@@ -226,12 +234,14 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         multiLauncher.initOutputFiles("");
 
         //        multiLauncher.run(selectedNos, runs, false);
-        multiLauncher.run(selectedNos, runs, true);
+        //multiLauncher.run(selectedNos, runs, true);
 
         //        multiLauncher.run(selectedNosDse, runs, false);//true of false is the same here
 
         //        multiLauncher.run(selectedNonNos, runs, false);
         //        multiLauncher.run(selectedNonNos, runs, true);
+
+        multiLauncher.run(selectedNonNosDse, runs, false);//true of false is the same here
 
         multiLauncher.closeOutputFiles();
     }

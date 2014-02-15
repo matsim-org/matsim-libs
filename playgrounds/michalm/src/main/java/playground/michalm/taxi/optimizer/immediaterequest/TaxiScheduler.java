@@ -162,7 +162,7 @@ public class TaxiScheduler
                 switch (lastTask.getTaxiTaskType()) {
                     case WAIT_STAY:
                         link = ((StayTask)lastTask).getLink();
-                        time = Math.max(lastTask.getBeginTime(), currentTime);
+                        time = Math.max(lastTask.getBeginTime(), currentTime);//TODO very optimistic!!!
                         return new LinkTimePair(link, time);
 
                     case PICKUP_STAY:
