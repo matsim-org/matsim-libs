@@ -109,7 +109,6 @@ public class MyCarrierSimulation {
 //		new MatsimNetworkReader(scenario).readFile(networkFile);
 //		scenario.getConfig().network().setChangeEventInputFile(changeEventsInputFile);
 
-
 		MyCarrierSimulation mcs = new MyCarrierSimulation();
 //		MyCarrierSimulation.getNetworkChangeEvents(scenario, 0, 6, 15, 22);
 

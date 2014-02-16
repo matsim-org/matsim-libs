@@ -1,8 +1,11 @@
 package playground.qvanheerden.freight;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
@@ -16,15 +19,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.TimeWindow;
@@ -44,18 +46,25 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
+import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 import playground.southafrica.utilities.Header;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class MyCarrierPlanGenerator {
 	private final static Logger log = Logger.getLogger(MyCarrierPlanGenerator.class);
 	public static Coord depotCoord;
 	public static Id depotLink;
-//	public CarrierVehicleTypes carrierVehicleTypes;
-	public static Carrier carrier;
-	public static Scenario scenario;
-	public static String initialPlanAlgorithm;
+	//	public CarrierVehicleTypes carrierVehicleTypes;
+	//	public static Carrier carrier;
+	//	public static Scenario scenario;
+	//	public static String initialPlanAlgorithm;
 	/**
-	 * Trying to create carrier plans from the freight contrib [Oct 2013]
+	 * Trying to create carrier plans from the freight contrib [Oct 2013, update Feb 2014]
 	 * 
 	 * The output from this class includes the following files:
 	 * <ul>
@@ -66,141 +75,178 @@ public class MyCarrierPlanGenerator {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(MyCarrierPlanGenerator.class.toString(), args);
-		
+
 		/* Input */
 		String networkFile = args[0];
 		Double depotLong = Double.parseDouble(args[1]);
 		Double depotLat = Double.parseDouble(args[2]);
-		String demandInputFile = args[3];
-		initialPlanAlgorithm = args[4];
-//		String changeEventsInputFile = args[5];
+		String demandInputDir = args[3];
+		String initialPlanAlgorithm = args[4];
+		String changeEventsInputFile = args[5];
 		String vehicleTypesFile = args[6];
 		String carrierInput = args[7];
-		
-		/* Output (check for consistency)*/
-		String vehicleTypeOutputFile = "./output/freight/vehicleTypes2.xml"; 
-		String carrierPlanOutputFile = "./output/freight/carrier2.xml";
-		
+		String outputDir = args[8];
+
 		/* Read network */
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory("./output/");
 		config.network().setInputFile(networkFile);
 		config.network().setTimeVariantNetwork(true);
-		scenario = ScenarioUtils.loadScenario(config);
-		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
+
 		//Add congestion
-//		MyCarrierPlanGenerator.getNetworkChangeEvents(scenario, 7, 8, 16, 17, 60);
-		
+		int speed = 80; //in kmph
+//		MyCarrierPlanGenerator.getNetworkChangeEvents(scenario, 7, 10, 16, 19, speed, true);
+
 		/* Set coordinate and linkId of depot */
 		depotCoord = new CoordImpl(depotLong, depotLat);
-//		depotLink = ((NetworkImpl) network).getNearestLink((Coord) depotCoord).getId();
+		//		depotLink = ((NetworkImpl) network).getNearestLink((Coord) depotCoord).getId();
 		depotLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink((Coord) depotCoord).getId();
-		
-		/* Build vehicle types */
-		MyCarrierPlanGenerator mcpg = new MyCarrierPlanGenerator();
-		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(carrierVehicleTypes).read(vehicleTypesFile);
-//		mcpg.buildAndWriteVehicleTypes(vehicleTypeOutputFile, true);
-		
-		/* Create carrier and assign carrier capabilities to carrier */
-//		carrier = CarrierImpl.newInstance(new IdImpl("MyCarrier"));
-		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).read(carrierInput);
-		
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(carrierVehicleTypes);
-		
-		carrier = carriers.getCarriers().get(new IdImpl("MyCarrier"));
 
-//		MyCarrierCapabilityGenerator mccg = new MyCarrierCapabilityGenerator();
-//		carrier.setCarrierCapabilities(mccg.createVehicles(carrierVehicleTypes, depotLink, scenario.getNetwork()));
-		
-		
-		/* Parse shipments/demand and add to carrier 
-		 * -for now these will be services until we figure out how to use shipments
-		 */
-		mcpg.parseDemand(demandInputFile);
-		mcpg.createInitialPlans(carrierVehicleTypes);
-		
-		carriers.getCarriers().clear();
-		carriers.getCarriers().put(new IdImpl("MyCarrier"), carrier);
-		CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
-		planWriter.write(carrierPlanOutputFile);
+		MyFileSampler mfs = new MyFileSampler(demandInputDir);
+		List<File> files = mfs.sampleFiles(Integer.MAX_VALUE, new MyFileFilter(".csv"));
+		for(File demandInputFile : files){
+			String filename = demandInputFile.getName().substring(0, demandInputFile.getName().indexOf("."));
+			/* Build vehicle types */
+			MyCarrierPlanGenerator mcpg = new MyCarrierPlanGenerator();
+			Carriers carriers = new Carriers();
+			/* Create carrier and assign carrier capabilities to carrier */
+			//		carrier = CarrierImpl.newInstance(new IdImpl("MyCarrier"));
+			new CarrierPlanXmlReaderV2(carriers).read(carrierInput);
 
-		CarrierVehicleTypes types = CarrierVehicleTypes.getVehicleTypes(carriers);
-		CarrierVehicleTypeWriter typeWriter = new CarrierVehicleTypeWriter(types);
-		typeWriter.write(vehicleTypeOutputFile);
-		
+			CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
+			new CarrierVehicleTypeReader(carrierVehicleTypes).read(vehicleTypesFile);
+
+			new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(carrierVehicleTypes);
+
+			Carrier carrier = carriers.getCarriers().get(new IdImpl("MyCarrier"));
+
+			//		mcpg.buildAndWriteVehicleTypes(vehicleTypeOutputFile, true);
+
+			//		MyCarrierCapabilityGenerator mccg = new MyCarrierCapabilityGenerator();
+			//		carrier.setCarrierCapabilities(mccg.createVehicles(carrierVehicleTypes, depotLink, scenario.getNetwork()));
+
+
+			/* Parse shipments/demand and add to carrier 
+			 * -for now these will be services until we figure out how to use shipments
+			 */
+			int day = Integer.parseInt(demandInputFile.getName().substring(demandInputFile.getName().indexOf(".")-1,demandInputFile.getName().indexOf(".")));
+
+			List<CarrierService> services = mcpg.parseDemand(demandInputFile.getAbsolutePath(), network, carrier);
+			carrier.getServices().addAll(services);
+			mcpg.createInitialPlans(carrier, network, initialPlanAlgorithm, carrierVehicleTypes);
+
+			//			carriers.getCarriers().clear();
+			carriers.getCarriers().put(new IdImpl("MyCarrier"), carrier);
+			CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
+			planWriter.write(outputDir + filename + "_" + speed +  ".xml");
+
+			//			CarrierVehicleTypes types = CarrierVehicleTypes.getVehicleTypes(carriers);
+			//			CarrierVehicleTypeWriter typeWriter = new CarrierVehicleTypeWriter(types);
+			//			typeWriter.write(outputDir);
+		}
+
 		//new Visualiser(config, scenario).visualizeLive(carriers);
-		
+
 		Header.printFooter();
 
 	}
-	
-	public void createInitialPlans(CarrierVehicleTypes carrierVehicleTypes){
-		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
+
+	public void createInitialPlans(Carrier carrier, Network network, String initialPlanAlgorithm, CarrierVehicleTypes vehicleTypes){
+		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, network);
 		vrpBuilder.setFleetSize(FleetSize.FINITE);
-//		vrpBuilder.addPenaltyVehicles(10000, 100000);
-		NetworkBasedTransportCosts.Builder costsBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), carrier.getCarrierCapabilities().getVehicleTypes());
+//				vrpBuilder.addPenaltyVehicles(10000, 100000);
+		NetworkBasedTransportCosts.Builder costsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, vehicleTypes.getVehicleTypes().values());
 		costsBuilder.setTimeSliceWidth(1800);
 		NetworkBasedTransportCosts costs = costsBuilder.build();
 		vrpBuilder.setRoutingCost(costs);
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		
+
 		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, initialPlanAlgorithm);
 		Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
-		
+
 		CarrierPlan plan = MatsimJspritFactory.createPlan(carrier, Solutions.bestOf(solutions));
 		NetworkRouter.routePlan(plan, costs);
 		carrier.setSelectedPlan(plan);
 		log.info("Initial plans created...");
 	}
-	
-	public static void getNetworkChangeEvents(Scenario scenario, double amStart, double amEnd, double pmStart, double pmEnd, int kmph) {
+
+	public static void getNetworkChangeEvents(Scenario scenario, double amStart, double amEnd, double pmStart, double pmEnd, int kmph, boolean allLinks) {
+		
+		//first create bounding box for area to limit congestion to
+		double top=-33.5379, left=25.168, bottom=-34.0788, right=25.8986;
+
+		Coordinate leftTop = new Coordinate(left, top);
+		Coordinate rightTop = new Coordinate(right, top);
+		Coordinate leftBottom = new Coordinate(left, bottom);
+		Coordinate rightBottom = new Coordinate(right, bottom);
+
+		Coordinate[] coordArray = {leftTop, rightTop, rightBottom, leftBottom, leftTop};
+
+		GeometryFactory gf = new GeometryFactory();
+		Polygon poly = gf.createPolygon(coordArray);
+		
+		//now apply congestion
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl();
 
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
-			double speed = link.getFreespeed() ;
-//			double speed = 0 ;
-			double speedKmph = kmph;
-			final double threshold = speedKmph/3.6; //convert to m/s
-			if ( speed > threshold ) {
-				{//morning peak starts
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
-					event.addLink(link);
-//					ni.addNetworkChangeEvent(event);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
-//					events.add(event);
+			boolean contains = false;
+			
+			if(!allLinks){
+				Coordinate coordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
+				Point p = gf.createPoint(coordinate);
+				contains = poly.contains(p);
+			}else{
+				contains = true;
+			}
+			
+			if(contains){
+
+				double speed = link.getFreespeed() ;
+				//			double speed = 0 ;
+				double speedKmph = kmph;
+				final double threshold = speedKmph/3.6; //convert to m/s
+				if ( speed > threshold ) {
+					{//morning peak starts
+						NetworkChangeEvent event = cef.createNetworkChangeEvent(amStart*3600.) ;
+						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+						event.addLink(link);
+						//					ni.addNetworkChangeEvent(event);
+						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						//					events.add(event);
+					}
+					{//morning peak ends
+						NetworkChangeEvent event = cef.createNetworkChangeEvent(amEnd*3600.) ;
+						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+						event.addLink(link);
+						//					ni.addNetworkChangeEvent(event);
+						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						//					events.add(event);
+					}
+					{//afternoon peak starts
+						NetworkChangeEvent event = cef.createNetworkChangeEvent(pmStart*3600.) ;
+						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
+						event.addLink(link);
+						//					ni.addNetworkChangeEvent(event);
+						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						//					events.add(event);
+					}
+					{//afternoon peak ends
+						NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
+						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+						event.addLink(link);
+						//					ni.addNetworkChangeEvent(event);
+						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+						//					events.add(event);
+					}
 				}
-				{//morning peak ends
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(amEnd*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
-					event.addLink(link);
-//					ni.addNetworkChangeEvent(event);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
-//					events.add(event);
-				}
-				{//afternoon peak starts
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmStart*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold ));
-					event.addLink(link);
-//					ni.addNetworkChangeEvent(event);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
-//					events.add(event);
-				}
-				{//afternoon peak ends
-					NetworkChangeEvent event = cef.createNetworkChangeEvent(pmEnd*3600.) ;
-					event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
-					event.addLink(link);
-//					ni.addNetworkChangeEvent(event);
-					((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
-//					events.add(event);
-				}
+
 			}
 		}
-
+		log.info("Added congestion...");
 	}
-	
+
 	/**
 	 * This method reads in a file with shipments in the format:
 	 * <br> customer, long, lat, product, mass, sale, duration, start, end
@@ -217,21 +263,19 @@ public class MyCarrierPlanGenerator {
 	 * <li> start: start of time window
 	 * <li> end: end of time window
 	 * </ul>
-	 * This format may change once we use shipments. (E.g. shipments have both 
-	 * pickup and delivery time windows).
 	 */
-	public void parseDemand(String demandFile){
-
+	public List<CarrierService> parseDemand(String demandFile, Network network, Carrier carrier){
+		List<CarrierService> services = new ArrayList<CarrierService>();
 		BufferedReader br = IOUtils.getBufferedReader(demandFile);
-		
+
 		try {
 			br.readLine();//skip header
-			
+
 			String input;
 			int i = 1;
 			while((input = br.readLine()) != null){
 				String[] array = input.split(",");
-				
+
 				String customer = array[0];
 				double longi = Double.parseDouble(array[1]);
 				double lati = Double.parseDouble(array[2]);
@@ -239,35 +283,25 @@ public class MyCarrierPlanGenerator {
 				double mass = Double.parseDouble(array[4]);
 				double sale = Double.parseDouble(array[5]);
 				double duration = Double.parseDouble(array[6]);
-				int start = Integer.parseInt(array[7]);
-				int end = Integer.parseInt(array[8]);
-				
+				double start = Double.parseDouble(array[7]);
+				double end = Double.parseDouble(array[8]);
+
 				Coord coord = new CoordImpl(longi, lati);
-				
-				Id linkId = ((NetworkImpl) scenario.getNetwork()).getNearestLink(coord).getId();
-				
-				
-				//Shipments seem to not yet be supported in the vehicle routing builder
-//				CarrierShipment ship = CarrierShipment.Builder.newInstance(new IdImpl(i), linkId, mass)
-//						.setPickupServiceTime(500)
-//						.setDeliveryServiceTime(500)
-//						.setPickupTimeWindow(TimeWindow.newInstance(start, end))
-//						.setDeliveryTimeWindow(TimeWindow.newInstance(start, end))
-//						.build();
-				
+				Id linkId = ((NetworkImpl)network).getNearestLink(coord).getId();
+
 				CarrierService serv = CarrierService.Builder.newInstance(new IdImpl(i), linkId).
 						setCapacityDemand((int) mass).
 						setServiceDuration(duration).
 						setName(customer).
 						setServiceStartTimeWindow(TimeWindow.newInstance(start, end)).
 						build();
-				
+
 				carrier.getServices().add(serv);
-				
+
 				i++;
 			}
-			
-			
+
+
 		} catch (IOException e) {
 			log.error("Could not read shipments file");
 		} finally{
@@ -277,8 +311,9 @@ public class MyCarrierPlanGenerator {
 				log.error("Could not close shipment file");
 			}
 		}
+		return services;
 	}
-	
-	
-	
+
+
+
 }
