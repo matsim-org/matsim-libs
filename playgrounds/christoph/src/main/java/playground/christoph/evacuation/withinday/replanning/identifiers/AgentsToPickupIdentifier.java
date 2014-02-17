@@ -22,7 +22,6 @@ package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -115,14 +114,18 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		 */
 		Set<Id> set = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time);
 		if (set == null) return agentsToReplan;
-		Set<Id> possibleLinkExitAgents = new HashSet<Id>(set);
+//		Set<Id> possibleLinkExitAgents = new HashSet<Id>(set);
 
-		// Apply filter to remove agents that should not be replanned.
-		this.applyFilters(possibleLinkExitAgents, time);
+//		// Apply filter to remove agents that should not be replanned.
+//		this.applyFilters(possibleLinkExitAgents, time);
 		
 		Map<Id, PlannedDeparture> plannedDepartures = new HashMap<Id, PlannedDeparture>();
 		
-		for (Id agentId : possibleLinkExitAgents) {
+//		for (Id agentId : possibleLinkExitAgents) {
+		for (Id agentId : set) {
+		
+			// if the filters do not include the agent skip it
+			if (!this.applyFilters(agentId, time)) continue;
 		
 			MobsimAgent passenger = this.mobsimDataProvider.getAgent(agentId);
 			

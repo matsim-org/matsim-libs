@@ -406,10 +406,16 @@ public class EvacuationControlerListener implements StartupListener {
 			for (Entry<String, TravelTime> entry : this.withinDayTravelTimes.entrySet()) {
 				String mode = entry.getKey();
 				TravelTime travelTime = entry.getValue();
-				FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(scenario, 
-						travelTime, this.householdsTracker, this.withinDayControlerListener.getMobsimDataProvider());
-				TravelTime fuzziedTravelTime = fuzzyTravelTimeEstimatorFactory.createTravelTime();
-				fuzziedTravelTimes.put(mode, fuzziedTravelTime);
+				
+				// so far no fuzzy travel time support for pt...
+				if (TransportMode.pt.equals(mode)) {
+					fuzziedTravelTimes.put(mode, travelTime);
+				} else {
+					FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(scenario, 
+							travelTime, this.householdsTracker, this.withinDayControlerListener.getMobsimDataProvider());
+					TravelTime fuzziedTravelTime = fuzzyTravelTimeEstimatorFactory.createTravelTime();
+					fuzziedTravelTimes.put(mode, fuzziedTravelTime);
+				}
 			}
 			this.withinDayTravelTimes = fuzziedTravelTimes;
 		}

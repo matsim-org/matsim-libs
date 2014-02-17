@@ -20,7 +20,6 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -79,18 +78,22 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		// Get all agents that have just entered a new link.
-		Map<Id, Id> linkEnteredAgents = new HashMap<Id, Id>(linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep());
+//		Map<Id, Id> linkEnteredAgents = new HashMap<Id, Id>(this.linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep());
 		
 		// Apply filter to remove agents that should not be replanned.
-		this.applyFilters(linkEnteredAgents.keySet(), time);
+//		this.applyFilters(this.linkEnteredAgents.keySet(), time);
 		
 		Set<MobsimAgent> agentsToDropOff = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		
 		Set<Id> agentsLeaveVehicle = new TreeSet<Id>();
-		for (Entry<Id, Id> entry : linkEnteredAgents.entrySet()) {
-			
+//		for (Entry<Id, Id> entry : linkEnteredAgents.entrySet()) {
+		for (Entry<Id, Id> entry : this.linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep().entrySet()) {
+						
 			Id driverId = entry.getKey();
 			Id linkId = entry.getValue();
+			
+			// if the filters do not include the agent skip it
+			if (!this.applyFilters(driverId, time)) continue;
 			
 			/*
 			 * Check whether the driver has already scheduled a JointDeparture on the current link;
