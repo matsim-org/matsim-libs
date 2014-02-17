@@ -21,6 +21,7 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -465,8 +466,37 @@ public class TaxiScheduler
     }
 
 
+    private interface RequestAdder
+    {
+        void addRequest(TaxiRequest request);
+    };
+
+
     public void removePlannedRequests(Schedule<TaxiTask> schedule,
-            Collection<TaxiRequest> unplannedRequests)
+            final Collection<TaxiRequest> collection)
+    {
+        removePlannedRequestsImpl(schedule, new RequestAdder() {
+            public void addRequest(TaxiRequest request)
+            {
+                collection.add(request);
+            }
+        });
+    }
+
+
+    public void removePlannedRequests(Schedule<TaxiTask> schedule, final Map<Id, TaxiRequest> map)
+    {
+        removePlannedRequestsImpl(schedule, new RequestAdder() {
+            public void addRequest(TaxiRequest request)
+            {
+                map.put(request.getId(), request);
+            }
+        });
+    }
+
+
+    private void removePlannedRequestsImpl(Schedule<TaxiTask> schedule,
+            RequestAdder unplannedRequestAdder)
     {
         switch (schedule.getStatus()) {
             case STARTED:
@@ -515,7 +545,7 @@ public class TaxiScheduler
                     return;
                 }
 
-                removePlannedTasks(schedule, obligatoryTasks, unplannedRequests);
+                removePlannedTasks(schedule, obligatoryTasks, unplannedRequestAdder);
 
                 double tBegin = schedule.getEndTime();
                 double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());
@@ -537,7 +567,7 @@ public class TaxiScheduler
 
 
     private void removePlannedTasks(Schedule<TaxiTask> schedule, int obligatoryTasks,
-            Collection<TaxiRequest> unplannedRequests)
+            RequestAdder unplannedRequestAdder)
     {
         List<TaxiTask> tasks = schedule.getTasks();
         int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + obligatoryTasks;
@@ -552,7 +582,7 @@ public class TaxiScheduler
                 taskWithReq.removeFromRequest();
 
                 if (task.getTaxiTaskType() == TaxiTaskType.PICKUP_DRIVE) {
-                    unplannedRequests.add(taskWithReq.getRequest());
+                    unplannedRequestAdder.addRequest(taskWithReq.getRequest());
                 }
             }
         }

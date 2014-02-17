@@ -42,8 +42,8 @@ public class OTSTaxiOptimizer
         }
     };
 
-    protected final MatsimVrpContext context;
     protected final TaxiScheduler scheduler;
+    protected final MatsimVrpContext context;
 
     protected final Queue<TaxiRequest> unplannedRequests;
 
@@ -52,8 +52,8 @@ public class OTSTaxiOptimizer
 
     public OTSTaxiOptimizer(TaxiScheduler scheduler, MatsimVrpContext context)
     {
-        this.context = context;
         this.scheduler = scheduler;
+        this.context = context;
 
         int initialCapacity = context.getVrpData().getVehicles().size();//1 awaiting req/veh
         unplannedRequests = new PriorityQueue<TaxiRequest>(initialCapacity,
@@ -106,7 +106,7 @@ public class OTSTaxiOptimizer
         TaxiTask nextTask = taxiSchedule.nextTask();
 
         if (!scheduler.getParams().destinationKnown) {
-            if (nextTask != null // == schedule COMPLETED
+            if (nextTask != null // schedule != COMPLETED
                     && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
                 requiresReoptimization = true;
             }
@@ -134,5 +134,4 @@ public class OTSTaxiOptimizer
     {
         return scheduler;
     }
-
 }
