@@ -1,4 +1,4 @@
-package analyzerExampleScenario;
+package analyzer.exampleScenario;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -9,12 +9,29 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 
 public class RunScenario {
+	
+	private static String pathToExampleScenario = "Z:/WinHome/ArbeitWorkspace/Analyzer/";
 
 	public static void main(String[] args){
 		
-		Config config = ConfigUtils.loadConfig("Z:/WinHome/ArbeitWorkspace/Analyzer/input/config_pttutorial.xml");
+		//"input/ExampleScenario/config_pttutorial_withoutPaths.xml"
+		
+		Config config = ConfigUtils.loadConfig(pathToExampleScenario 
+				+ "input/config_exampleScenario.xml");
+		config.network().setInputFile(pathToExampleScenario 
+				+ "input/network.xml");
+		config.transit().setTransitScheduleFile(pathToExampleScenario 
+				+ "input/transitSchedule.xml");
+		config.transit().setVehiclesFile(pathToExampleScenario 
+				+ "input/Vehicles.xml");
+		config.plans().setInputFile(pathToExampleScenario 
+				+ "output/ExampleScenario/1.plans.xml.gz");
+		config.controler().setOutputDirectory(pathToExampleScenario 
+				+ "output/test2ndDifferentStop2");
 		config.controler().setWriteEventsInterval(1); //soll eigentlich direkt im controler gehen, laut http://matsim.org/node/624 (8 lessons tutorial 7.1)
 		// included in config_ptturial
+		
+		config.controler().setLastIteration(10);
 		
 		/*
 		ActivityParams work = new ActivityParams("w");
@@ -31,7 +48,8 @@ public class RunScenario {
 		
 		Controler controler = new Controler(scenario);
 
-		controler.setOverwriteFiles(true);
+		controler.setOverwriteFiles(false);
+
 		controler.run();
 		
 	}

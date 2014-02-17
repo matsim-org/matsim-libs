@@ -13,17 +13,24 @@ import java.io.InputStreamReader;
  * Creates a working copy of Latex and RScript Files for the interpretation of
  * vsp analyzer results and runs R and Latex on the files in order to create an
  * automatic report on the analysis results as .pdf.
+ * <p>
+ * While copying Latex and RScript Files, existing files are kept and not 
+ * replaced, so user modifications are kept. However, this means that the Latex
+ * and RScript Files are only updated, when another working directory is chosen,
+ * where these files do not exist yet.
  * 
  * @author gleich
+ * 
+ * @param <b>workingDirectory</b>: should include the analysis results in the
+ * directory structure used in the outputDirectory of the
+ * RunAnalyzer Class
+ * @param pathToRScriptFiles
+ * @param pathToLatexFiles
+ * @param pathToRScriptExe
+ * @param pathToPdfLatexExe
  *
  */
 public class ReportGenerator {
-	
-	/*
-	 * The working directory should include the analysis results in the
-	 * directory structure used in the outputDirectory of the
-	 * RunAnalyzer Class.
-	 */
 	
 	String workingDirectory = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/workingDirectory";
 	String pathToRScriptFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Rscripts";
@@ -43,6 +50,11 @@ public class ReportGenerator {
 	
 	public ReportGenerator(){	}
 	
+	/**
+	 * The working directory should include the analysis results in the
+	 * directory structure used in the outputDirectory of the
+	 * RunAnalyzer Class.
+	 */
 	public ReportGenerator(String pathToRScriptFiles, String pathToLatexFiles, 
 			String pathToRScriptExe, String pathToPdfLatexExe, 
 			String workingDirectory){
@@ -70,45 +82,35 @@ public class ReportGenerator {
 	private void compileLatex() {
 		System.out.println("\nCompiling LATEX:");
 
+		for(int i = 0; i < 3; i++){
 		runSystemCall("\"" + pathToPdfLatexExe +
         			"\" -output-directory=" + workingDirectory 
         			+ " \"Latex/VspAnalyzerAutomaticReport.tex\"", 
         			new File(workingDirectory));
-//        			" \\include{" + pathToLatexFiles + "/LaTeX1.tex}");
-         //Process p = Runtime.getRuntime().exec("pdflatex -output-directory=Z:/WinHome/ArbeitWorkspace/Analyzer/output/RSweave Z:/WinHome/ArbeitWorkspace/Analyzer/output/RSweave/LaTeX1.tex");
-/* old:
- "\"" + pathToPdfLatexExe +
-        			"\" -output-directory=" + workingDirectory +
-        			" " + pathToLatexFiles + "/LaTeX1.tex"
- */
-	
+		}
 	}
-	
+
+	/**
+	 * R has to find all necessary packages in the libraries currently set with
+	 * .libPaths. If this is not the case install packages and / or add all 
+	 * necessary libraries by adding .libPaths("path to R library") to your 
+	 * local copy of analysis_main.R at 
+	 * <i>workingDirectory/RScripts/analysis_main.R</i> .
+	 * <p>
+	 * Necessary packages are listed in analysis_main.R .
+	 * <p>
+	 * R output and errors are shown on the console.
+	 */
 	private void runRScripts() {
 		System.out.println("\nRunning R:");
 
 		(new File(workingDirectory + "/ROutput")).mkdir(); 
 		
-		/*System.out.println("\"" + pathToRScriptExe + "\" " + "\"" 
-    			+ pathToRScriptFiles + "\"" + "/analysis_main.R " +
-    			"\"" + workingDirectory + "\" " +
-    			"\"" + pathToRScriptFiles + "\"");*/
-		// System Call to RScript.exe
-	
 		runSystemCall("\"" + pathToRScriptExe + "\" \""
 				//Execute analysis_main.R
     			+ "RScripts/analysis_main.R\"",
     			new File(workingDirectory));
 		
-		/*
-		runSystemCall("\"" + pathToRScriptExe + "\" \""
-				//Execute analysis_main.R
-    			+ workingDirectory + "/R/analysis_main.R"
-    			//1st Argument to be passed to R: Path to working directory
-    			+ "\" \"" + workingDirectory + "\" " +
-    			//2nd Argument to be passed to R: Path to other R scripts
-    			"\"" + workingDirectory + "/R\"");
-		*/
 		}
 	
 	private void runSystemCall(String command, File workSpace){

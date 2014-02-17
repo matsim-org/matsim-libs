@@ -65,19 +65,40 @@ import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
 /**
  * 
  * Runs most analyzers available in the vsp playground and invokes the
- * ReportGenerator to create a pdf-document which shows the results of some
- * analyzers.
+ * {@link ReportGenerator} to create a working copy of R and Latex scripts and
+ * finally a <i>pdf-document which shows the results of some
+ * analyzers</i>.
  * <p>
- * Some Methods still need special configuration depending on the scenario to
- * be analysed, such as the addition of network modes.
+ * Some Methods may still need special configuration depending on the scenario
+ * to be analysed: 
+ * <ul>
+ * <li> addition of distance and activity clusters at rPtAccesibility()
+ * <li> setting time intervals to be analysed at rAct2Mode(), 
+ * rAct2ModeWithPlanCoord(), rBoardingAlightingCountAnalyzer(), rPtPaxVolumes(), 
+ * rPtRoutes2PaxAnalysis(), rPtTravelStats(), rTransitVehicleVolume()
+ * </ul>
+ * 
+ * Make sure to have all necessary R packages installed and accessible (see
+ * {@link ReportGenerator#runRScripts()})
+ *
+ * @param <b>outputDirectory</b>: a path to a network drive may cause problems when
+ * ReportGenerator invokes R and Latex
+ * @param pathToScenario data: plans, network, vehicles, transitSchedule
+ * @param eventFile
+ * @param pathToRScriptFiles
+ * @param pathToLatexFiles
+ * @param pathToRScriptExe
+ * @param pathToPdfLatexExe
+ * @param useConfigXml : Shall the config be loaded from an xml file to be found at
+ * pathToScenarioData
  * 
  * @author gleich
- *
  */
 public class AnalysisRunner {
 	
-	private String pathToExampleScenario = "Z:/WinHome/ArbeitWorkspace/Analyzer/";
-	private String eventFile = pathToExampleScenario 
+	private boolean useConfigXml;
+	private String pathToScenarioData = "Z:/WinHome/ArbeitWorkspace/Analyzer/";
+	private String eventFile = pathToScenarioData 
 			+ "output/test1/ITERS/it.1/1.events.xml.gz";
 	private String outputDirectory;
 	private String pathToRScriptFiles = "Z:/WinHome/ArbeitWorkspace/Analyzer/output/Rscripts";
@@ -93,7 +114,12 @@ public class AnalysisRunner {
 	}
 	
 	public AnalysisRunner(){
-		/* Set outputDirectory to the users desktop ---- TODO: Test Linux, Mac----*/
+		/* Set outputDirectory to the users desktop ---- TODO: Test Linux, Mac----
+		 * using the desktop as output directory appears to cause runTime
+		 * exceptions of the cmd.exe on the workplace pc when ReportGenerator
+		 * tries to start R and Latex :
+		 * CMD.EXE wurde mit dem oben angegebenen Pfad als aktuellem Verzeichnis gestartet. UNC-Pfade werden nicht unterstützt.
+		 * possible solutions proposed on the internet include modifying the registry */
 		String operatingSystem = System.getProperty("os.name");
 		if(operatingSystem.equals("Windows 7") || operatingSystem.equals("Windows Vista") || operatingSystem.equals("Windows XP")){
 			outputDirectory = System.getProperty("user.home") + "/desktop/MATSimAnalyzer";
@@ -102,37 +128,44 @@ public class AnalysisRunner {
 			outputDirectory = System.getProperty("user.home") + "/Desktop/MATSimAnalyzer";
 			(new File(System.getProperty("user.home") + "/desktop/MATSimAnalyzer")).mkdir();
 		}
+		outputDirectory = "Z:/WinHome/MATSimAnalyzer";
+		(new File("Z:/WinHome/MATSimAnalyzer")).mkdir();
 		this.initialize();
 	}
 	
 	public AnalysisRunner(String pathToExampleScenario, String eventFile,
 			String outputDirectory, String pathToRScriptFiles, 
 			String pathToLatexFiles, String pathToRScriptExe, 
-			String pathToPdfLatexExe){
-		this.pathToExampleScenario = pathToExampleScenario;
+			String pathToPdfLatexExe, boolean useConfigXml){
+		this.pathToScenarioData = pathToExampleScenario;
 		this.eventFile = eventFile;
 		this.outputDirectory = outputDirectory;
 		this.pathToRScriptFiles = pathToRScriptFiles;
 		this.pathToLatexFiles = pathToLatexFiles;
 		this.pathToRScriptExe = pathToRScriptExe;
 		this.pathToPdfLatexExe = pathToPdfLatexExe;
+		this.useConfigXml = useConfigXml;
 		this.initialize();
 	}
 	
 	private void initialize(){
-		Config config = ConfigUtils.createConfig();
-//		Config config = ConfigUtils.loadConfig(pathToExampleScenario + "input/ExampleScenario/config_exampleScenario.xml");
-		config.network().setInputFile(pathToExampleScenario + "input/ExampleScenario/network.xml");
-		config.transit().setTransitScheduleFile(pathToExampleScenario + "input/ExampleScenario/transitSchedule.xml");
-		config.transit().setVehiclesFile(pathToExampleScenario + "input/ExampleScenario/Vehicles.xml");
-		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
-		
-		/* Some analyzers read the result plan files.
-		 * The Plan File should include the plans used for the iteration
-		 * whose eventfile is to be analysed. */
-		config.plans().setInputFile(pathToExampleScenario + "output/ExampleScenario/1.plans.xml.gz");
-
+		Config config;
+		if(useConfigXml){
+			config = ConfigUtils.loadConfig(pathToScenarioData);// + "input/config_exampleScenario.xml"
+		} else {
+			config = ConfigUtils.createConfig();
+//			Config config = ConfigUtils.loadConfig(pathToExampleScenario + "input/ExampleScenario/config_exampleScenario.xml");
+			config.network().setInputFile(pathToScenarioData + "input/network.xml");
+			config.transit().setTransitScheduleFile(pathToScenarioData + "input/transitSchedule.xml");
+			config.transit().setVehiclesFile(pathToScenarioData + "input/Vehicles.xml");
+			config.scenario().setUseTransit(true);
+			config.scenario().setUseVehicles(true);
+			
+			/* Some analyzers read the result plan files.
+			 * The Plan File should include the plans used for the iteration
+			 * whose eventfile is to be analysed. */
+			config.plans().setInputFile(pathToScenarioData + "output/ExampleScenario/1.plans.xml.gz");
+		}
 		scenario = ScenarioUtils.loadScenario(config);
 	}
 	
@@ -384,6 +417,7 @@ public class AnalysisRunner {
 		List<Integer> distanceCluster = new ArrayList<Integer>();
 		distanceCluster.add(200);
 		distanceCluster.add(1000);
+//		scenario.getConfig().planCalcScore().getActivityTypes()
 		SortedMap<String, List<String>> activityCluster = new TreeMap<String, List<String>>();
 		scenario.getConfig().planCalcScore().getActivityParams();
 		List<String> home = new ArrayList<String>();

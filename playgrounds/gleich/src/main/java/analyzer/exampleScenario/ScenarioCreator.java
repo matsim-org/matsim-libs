@@ -1,4 +1,4 @@
-package analyzerExampleScenario;
+package analyzer.exampleScenario;
 
 import java.util.Random;
 
@@ -20,6 +20,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ScenarioCreator {
 	
+	private static String pathToExampleScenario = "Z:/WinHome/ArbeitWorkspace/Analyzer/";
+	
 	public static void main(String[] args){
 		new ScenarioCreator().generatePopulation();
 	}
@@ -28,14 +30,16 @@ public class ScenarioCreator {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Population pop = scenario.getPopulation();
-		new MatsimNetworkReader(scenario).readFile("Z:/WinHome/ArbeitWorkspace/Analyzer/input/network_tut.xml");
+		new MatsimNetworkReader(scenario).readFile(pathToExampleScenario + "input/network.xml");
 		MatsimRandom.reset(4711);
 		Random rnd = MatsimRandom.getLocalInstance();
 		int nPersonsBase = 32;
 		int nPersonsTotal = 0;
 		
 		
-		// Creates (nPersonBase/((xFrom+yFrom)*(xTo+yTo))) persons per hour travelling from node ij to kl during peak time (6-9) and (nPersonBase/((i+j)*(k+l)*2)) 5-6 and 9-12
+		/* Creates (nPersonBase/((xFrom+yFrom)*(xTo+yTo))) persons per hour 
+		 * travelling from node ij to kl during peak time (6-9) and 
+		 * (nPersonBase/((i+j)*(k+l)*2)) 5-6 and 9-12 */
 		for(int xFrom = 1; xFrom <= 4; xFrom++){
 			for(int yFrom = 1; yFrom<= 4; yFrom++){
 				for(int xTo = 1; xTo <= 4; xTo++){
@@ -58,7 +62,7 @@ public class ScenarioCreator {
 			}
 		}
 		System.out.println("nPersonsTotal: "+nPersonsTotal);
-		new PopulationWriter(pop, scenario.getNetwork()).write("Z:/WinHome/ArbeitWorkspace/Analyzer/input/ijkl_plans.xml");		
+		new PopulationWriter(pop, scenario.getNetwork()).write(pathToExampleScenario + "input/ijkl_plans.xml");		
 	}
 	
 	
