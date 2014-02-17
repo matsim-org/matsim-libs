@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 
 import java.util.Random;
 
@@ -33,6 +35,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -44,6 +47,8 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -59,16 +64,18 @@ import playground.thibautd.utils.DesiresConverter;
  * @author thibautd
  */
 public class GenerateCircularScenarioWithCompleteSocialNetwork {
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		final ArgParser argParser = new ArgParser( args );
 		argParser.setDefaultValue( "--radius" , "10000" );
 		argParser.setDefaultValue( "--nlinks" , "100" );
 		argParser.setDefaultValue( "--nagentsperlink" , "1" );
-		argParser.setDefaultValue( "--nseparationlinks" , "5" );
+		argParser.setDefaultValue( "--nseparationlinks" , "1" );
+		argParser.setDefaultValue( "--degreesmallworld" , "20" );
 
 		final int nLinks = Integer.parseInt( argParser.getValue( "--nlinks" ) );
 		final int nAgentsPerLink = Integer.parseInt( argParser.getValue( "--nagentsperlink" ) );
 		final int nSeparationLinks = Integer.parseInt( argParser.getValue( "--nseparationlinks" ) );
+		final int smallWorldDegree = Integer.parseInt( argParser.getValue( "--degreesmallworld" ) );
 		final double radius = Integer.parseInt( argParser.getValue( "--radius" ) );
 
 		final String outputDirectory = argParser.getNonSwitchedArgs()[ 0 ];
@@ -116,8 +123,8 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 
 		final Random random = new Random( 4567 );
 		final Desires desires = new Desires( null );
-		desires.putActivityDuration( "home" , 14 );
-		desires.putActivityDuration( "leisure" , 10 );
+		desires.putActivityDuration( "home" , 14 * 3600 );
+		desires.putActivityDuration( "leisure" , 10 * 3600 );
 		for ( ActivityFacility facility : facilities.getFacilities().values() ) {
 			for ( int i = 0; i < nAgentsPerLink; i++ ) {
 				final Person person = population.getFactory().createPerson( new IdImpl( facility.getId()+"-"+i ) );
@@ -132,6 +139,7 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 							"home",
 							facility,
 							8 * 3600d ) );
+				plan.addLeg( population.getFactory().createLeg( TransportMode.car ) );
 				plan.addActivity(
 						createActivity(
 							population.getFactory(),
@@ -140,6 +148,7 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 								random,
 								facilities.getFacilities() ).getValue(),
 							18 * 3600d ) );
+				plan.addLeg( population.getFactory().createLeg( TransportMode.car ) );
 				plan.addActivity(
 						createActivity(
 							population.getFactory(),
@@ -154,12 +163,22 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 			}
 		}
 
-		final SocialNetwork socialNetwork = createSocialNetwork( population );
 
-		new SocialNetworkWriter( socialNetwork ).write( outputDirectory+"/social_network.xml.gz" );
+		new SocialNetworkWriter( createCompleteSocialNetwork( population ) ).write( outputDirectory+"/complete_social_network.xml.gz" );
+		new SocialNetworkWriter( createSmallWorldSocialNetwork( population , smallWorldDegree ) ).write( outputDirectory+"/smallworld_social_network.xml.gz" );
+
 		new NetworkWriter( net ).write( outputDirectory+"/network.xml.gz" );
 		new PopulationWriter( population , net ).write( outputDirectory+"/plans.xml.gz" );
 		new FacilitiesWriter( facilities ).write( outputDirectory+"/facilities.xml.gz" );
+
+		// now this stupid f2l file
+		final BufferedWriter f2lw = IOUtils.getBufferedWriter( outputDirectory+"/f2l.f2l" );
+		f2lw.write("fid\tlid");
+		for ( ActivityFacility f : facilities.getFacilities().values() ) {
+			f2lw.newLine();
+			f2lw.write( f.getId()+"\t"+f.getLinkId() );
+		}
+		f2lw.close();
 
 		final ObjectAttributesXmlWriter attWriter =
 			new ObjectAttributesXmlWriter( population.getPersonAttributes() );
@@ -169,7 +188,31 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 		attWriter.writeFile( outputDirectory+"/person_attributes.xml.gz" );
 	}
 
-	private static SocialNetwork createSocialNetwork(
+	private static SocialNetwork createSmallWorldSocialNetwork(
+			final Population population,
+			final int degree) {
+		final Person[] persons =
+			population.getPersons().values().toArray(
+					new Person[ population.getPersons().size() ] );
+
+		final SocialNetwork net = new SocialNetworkImpl( true );
+
+		for ( Person p : persons ) net.addEgo( p.getId() );
+
+		for ( int i=0; i < persons.length; i++ ) {
+			for ( int j=i+1; j < i + ( degree / 2) ; j++ ) {
+				net.addBidirectionalTie(
+						persons[ i ].getId(),
+						persons[ j % persons.length ].getId() );
+			}
+		}
+
+		// TODO: rewire
+
+		return net;
+	}
+
+	private static SocialNetwork createCompleteSocialNetwork(
 			final Population population) {
 		final Person[] persons =
 			population.getPersons().values().toArray(
@@ -248,6 +291,11 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 				new IdImpl( from.getId() +"^"+ to.getId() ),
 				from,
 				to );
+		l.setLength(
+				CoordUtils.calcDistance(
+					from.getCoord(),
+					to.getCoord() ) );
+		l.setFreespeed( 100000 / 3600d ); // 100 km/h
 		net.addLink( l );
 		return l;
 	}
