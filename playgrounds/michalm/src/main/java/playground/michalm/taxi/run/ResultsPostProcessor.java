@@ -54,8 +54,11 @@ public class ResultsPostProcessor
         // ============
 
         private double passengerWaitT;
+        private double percentile95PassengerWaitT;
         private double maxPassengerWaitT;
         private double pickupDriveT;
+        private double percentile95PickupDriveT;
+        private double maxPickupDriveT;
         private double dropoffDriveT;
         private double pickupT;
         private double dropoffT;
@@ -65,10 +68,13 @@ public class ResultsPostProcessor
         // ============
 
         private double T_W;
+        private double T_W_95;
         private double T_W_MAX;
         private double T_D;
         private double R_W;
         private double T_P;
+        private double T_P_95;
+        private double T_P_MAX;
         private double R_P;
         private double R_NI;
 
@@ -76,10 +82,13 @@ public class ResultsPostProcessor
         private void calcStats()
         {
             T_W = passengerWaitT / n / 60;
+            T_W_95 = percentile95PassengerWaitT / 60;
             T_W_MAX = maxPassengerWaitT / 60;
+            T_P = pickupDriveT / n / 60;
+            T_P_95 = percentile95PickupDriveT / 60;
+            T_P_MAX = maxPickupDriveT / 60;
             T_D = dropoffDriveT / n / 60;
             R_W = passengerWaitT / (passengerWaitT + pickupT + dropoffDriveT + dropoffT);
-            T_P = pickupDriveT / n / 60;
             R_P = pickupDriveT / (pickupDriveT + dropoffDriveT);
             R_NI = (pickupDriveT + pickupT + dropoffDriveT + dropoffT) / (TIME_WINDOW * m);
         }
@@ -129,15 +138,19 @@ public class ResultsPostProcessor
     {
         Stats stats = new Stats();
 
-        //        NOS_SL  406 25  55767.00    509.00  55361.00    147689.00   48720.00    24360.00    2423870.00  2.93
+        //        cfg n   m   PW  PWp95   PWmax   PD  PDp95   PDmax   DD  PS  DS  W   Comp
+        //        APS_15M_TW    1719    50  276513.60   380.00  763.45  218268.90   NaN 0.00    610428.85   206280.00   103140.00   3001882.25  11.94
 
         stats.name = sc.next();
         stats.n = sc.nextInt();
         stats.m = sc.nextInt();
 
         stats.passengerWaitT = sc.nextDouble();
+        stats.percentile95PassengerWaitT = sc.nextDouble();
         stats.maxPassengerWaitT = sc.nextDouble();
         stats.pickupDriveT = sc.nextDouble();
+        stats.percentile95PickupDriveT = sc.nextDouble();
+        stats.maxPickupDriveT = sc.nextDouble();
         stats.dropoffDriveT = sc.nextDouble();
         stats.pickupT = sc.nextDouble();
         stats.dropoffT = sc.nextDouble();
@@ -194,11 +207,20 @@ public class ResultsPostProcessor
                 if ("T_W".equals(field)) {
                     value = s.T_W;
                 }
+                else if ("T_W_95".equals(field)) {
+                    value = s.T_W_95;
+                }
                 else if ("T_W_MAX".equals(field)) {
                     value = s.T_W_MAX;
                 }
                 else if ("T_P".equals(field)) {
                     value = s.T_P;
+                }
+                else if ("T_P_95".equals(field)) {
+                    value = s.T_P_95;
+                }
+                else if ("T_P_MAX".equals(field)) {
+                    value = s.T_P_MAX;
                 }
                 else if ("T_W-T_P".equals(field)) {
                     value = s.T_W - s.T_P;
@@ -238,8 +260,11 @@ public class ResultsPostProcessor
         }
 
         writeValues(DIR + filename + ".T_W", "T_W");
+        writeValues(DIR + filename + ".T_W_95", "T_W_95");
         writeValues(DIR + filename + ".T_W_MAX", "T_W_MAX");
         writeValues(DIR + filename + ".T_P", "T_P");
+        writeValues(DIR + filename + ".T_P_95", "T_P_95");
+        writeValues(DIR + filename + ".T_P_MAX", "T_P_MAX");
         writeValues(DIR + filename + ".T_W_T_P", "T_W-T_P");
         writeValues(DIR + filename + ".R_NI", "R_NI");
     }

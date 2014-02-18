@@ -134,17 +134,17 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
     APS_DSE_FF(//
             FREE_FLOW_SPEED, //
             TIME, //
-            AP_SCHEDULING), //
+            AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
 
     APS_DSE_24H(//
             EVENTS_24_H, //
             TIME, //
-            AP_SCHEDULING), //
+            AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM), //
 
     APS_DSE_15M(//
             EVENTS_15_MIN, //
             TIME, //
-            AP_SCHEDULING);//
+            AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM);//
 
     /*package*/static final EnumSet<AlgorithmConfig> NOS = EnumSet.of(NOS_SL, NOS_TD, NOS_FF,
             NOS_24H, NOS_15M, NOS_DSE_SL, NOS_DSE_TD, NOS_DSE_FF, NOS_DSE_24H, NOS_DSE_15M);

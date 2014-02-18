@@ -76,11 +76,11 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/final Scenario scenario;
 
     /*package*/AlgorithmConfig algorithmConfig;
-    /*package*/boolean destinationKnown;
-    /*package*/boolean onlineVehicleTracker;
-    /*package*/boolean minimizePickupTripTime;
-    /*package*/double pickupDuration;
-    /*package*/double dropoffDuration;
+    /*package*/Boolean destinationKnown;
+    /*package*/Boolean onlineVehicleTracker;
+    /*package*/Boolean minimizePickupTripTime;
+    /*package*/Double pickupDuration;
+    /*package*/Double dropoffDuration;
 
     /*package*/LegHistogram legHistogram;
     /*package*/MatsimVrpContext context;
@@ -113,8 +113,8 @@ import playground.michalm.util.RunningVehicleRegister;
         destinationKnown = false;
         onlineVehicleTracker = true;
         minimizePickupTripTime = false;
-        pickupDuration = 120;
-        dropoffDuration = 60;
+        pickupDuration = 120.;
+        dropoffDuration = 60.;
 
         otfVis = !true;
 

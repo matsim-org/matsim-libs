@@ -57,9 +57,14 @@ public class TaxiScheduler
         this.calculator = calculator;
         this.params = params;
 
-        pathComparator = params.minimizePickupTripTime ? //
-                VrpPathWithTravelDataComparators.TRAVEL_TIME_COMPARATOR : //
-                VrpPathWithTravelDataComparators.ARRIVAL_TIME_COMPARATOR;
+        if (params.minimizePickupTripTime != null) {
+            pathComparator = params.minimizePickupTripTime ? //
+                    VrpPathWithTravelDataComparators.TRAVEL_TIME_COMPARATOR : //
+                    VrpPathWithTravelDataComparators.ARRIVAL_TIME_COMPARATOR;
+        }
+        else {
+            pathComparator = null;
+        }
 
         for (Vehicle veh : context.getVrpData().getVehicles()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);

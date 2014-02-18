@@ -85,8 +85,8 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void run(AlgorithmConfig config, int runs, boolean destinationKnown,
-            boolean onlineVehicleTracker, boolean minimizePickupTripTime)
+    /*package*/void run(AlgorithmConfig config, int runs, Boolean destinationKnown,
+            Boolean onlineVehicleTracker, Boolean minimizePickupTripTime)
     {
         if (runs < 0 || runs > RANDOM_SEEDS.length) {
             throw new RuntimeException();
@@ -148,7 +148,10 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         }
 
         VrpData data = launcher.context.getVrpData();
-        String cfg = launcher.algorithmConfig.name() + (minimizePickupTripTime ? "_TP" : "_TW");
+        String cfg = launcher.algorithmConfig.name();
+        if (minimizePickupTripTime != null) {
+            cfg += minimizePickupTripTime ? "_TP" : "_TW";
+        }
 
         pw.printf(
                 "%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
@@ -175,17 +178,17 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
     }
 
 
-    /*package*/void run(AlgorithmConfig config, int runs, boolean minimizePickupTripTime)
+    /*package*/void run(AlgorithmConfig config, int runs, Boolean minimizePickupTripTime)
     {
-        boolean destinationKnown = false;
-        boolean onlineVehicleTracker = false;
+        Boolean destinationKnown = false;
+        Boolean onlineVehicleTracker = false;
 
         run(config, runs, destinationKnown, onlineVehicleTracker, minimizePickupTripTime);
 
     }
 
 
-    /*package*/void run(EnumSet<AlgorithmConfig> configs, int runs, boolean minimizePickupTripTime)
+    /*package*/void run(EnumSet<AlgorithmConfig> configs, int runs, Boolean minimizePickupTripTime)
     {
         for (AlgorithmConfig cfg : configs) {
             run(cfg, runs, minimizePickupTripTime);
@@ -216,7 +219,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             //========================================
             //RES_FF,
             //RES_24H,
-            RES_15M,
+            //RES_15M,
             //========================================
             //APS_FF,
             //APS_24H,
@@ -236,12 +239,12 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         //        multiLauncher.run(selectedNos, runs, false);
         //multiLauncher.run(selectedNos, runs, true);
 
-        //        multiLauncher.run(selectedNosDse, runs, false);//true of false is the same here
+        //        multiLauncher.run(selectedNosDse, runs, null);
 
-        //        multiLauncher.run(selectedNonNos, runs, false);
-        //        multiLauncher.run(selectedNonNos, runs, true);
+//        multiLauncher.run(selectedNonNos, runs, false);
+//        multiLauncher.run(selectedNonNos, runs, true);
 
-        multiLauncher.run(selectedNonNosDse, runs, false);//true of false is the same here
+        multiLauncher.run(selectedNonNosDse, runs, null);
 
         multiLauncher.closeOutputFiles();
     }

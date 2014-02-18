@@ -21,14 +21,14 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 public class ImmediateRequestParams
 {
-    public final boolean destinationKnown;
-    public final boolean minimizePickupTripTime;
-    public final double pickupDuration;
-    public final double dropoffDuration;
+    public final Boolean destinationKnown;
+    public final Boolean minimizePickupTripTime;
+    public final Double pickupDuration;
+    public final Double dropoffDuration;
 
 
-    public ImmediateRequestParams(boolean destinationKnown, boolean minimizePickupTripTime,
-            double pickupDuration, double dropoffDuration)
+    public ImmediateRequestParams(Boolean destinationKnown, Boolean minimizePickupTripTime,
+            Double pickupDuration, Double dropoffDuration)
     {
         this.destinationKnown = destinationKnown;
         this.minimizePickupTripTime = minimizePickupTripTime;
