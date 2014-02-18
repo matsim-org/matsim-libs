@@ -226,11 +226,17 @@ public class BeingTogetherScoring {
 						Double.POSITIVE_INFINITY ) );
 		}
 
-		final ArrayList<Interval> intervals = new ArrayList<Interval>();
-
 		final ActivityFacility facility = facilities.getFacilities().get( location.facilityId );
 		final ActivityOption option = facility.getActivityOptions().get( location.activityType );
 
+		if ( option.getOpeningTimes().isEmpty() ) {
+			return Collections.singletonList(
+					new Interval(
+						Double.NEGATIVE_INFINITY,
+						Double.POSITIVE_INFINITY ) );
+		}
+
+		final ArrayList<Interval> intervals = new ArrayList<Interval>();
 		for ( OpeningTime openingTime : option.getOpeningTimes() ) {
 			intervals.add( new Interval( openingTime.getStartTime() , openingTime.getEndTime() ) );
 		}

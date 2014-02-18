@@ -585,6 +585,53 @@ public class BeingTogetherScoringTest {
 		}
 	}
 
+	@Test
+	public void testOvelapsOfActivitiesWithUndefinedOpeningTime() {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id linkId = new IdImpl( 1 );
+		final String type = "type";
+
+		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
+		final ActivityFacility facility =
+			facilities.getFactory().createActivityFacility(
+					new IdImpl( "facility" ),
+					new CoordImpl( 0 , 0 ) );
+		facilities.addActivityFacility( facility );
+		final ActivityOption option = facilities.getFactory().createActivityOption( type );
+		facility.addActivityOption( option );
+		// no opening time: should be interpreted as "always open"
+
+		for ( OverlapSpec os : new OverlapSpec[]{
+				new OverlapSpec( 0 , 10 , 20 , 30 ),
+				new OverlapSpec( 0 , 10 , 10 , 30 ),
+				new OverlapSpec( 0 , 20 , 10 , 30 ),
+				new OverlapSpec( 10 , 20 , 10 , 30 ),
+				new OverlapSpec( 20 , 30 , 10 , 30 ),
+				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
+			final BeingTogetherScoring testee =
+				new BeingTogetherScoring(
+						facilities,
+						1,
+						ego,
+						Collections.singleton( alter ) );
+			testee.handleEvent(
+					new ActivityStartEvent(os.startEgo, ego, linkId, facility.getId(), type) );
+			testee.handleEvent(
+					new ActivityStartEvent(os.startAlter, alter, linkId, facility.getId(), type) );
+			testee.handleEvent(
+					new ActivityEndEvent(os.endEgo, ego, linkId, facility.getId(), type) );
+			testee.handleEvent(
+					new ActivityEndEvent(os.endAlter, alter, linkId, facility.getId(), type) );
+
+			Assert.assertEquals(
+					"unexpected overlap for "+os,
+					Math.max( Math.min( os.endAlter , os.endEgo ) - Math.max( os.startAlter , os.startEgo ) , 0 ),
+					testee.getScore(),
+					MatsimTestUtils.EPSILON);
+		}
+	}
 
 	private static class OverlapSpec {
 		public double startEgo, startAlter, endEgo, endAlter;
