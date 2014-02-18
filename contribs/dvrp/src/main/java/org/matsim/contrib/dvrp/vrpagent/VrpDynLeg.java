@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 
@@ -126,4 +126,29 @@ public class VrpDynLeg
     @Override
     public void finalizeAction(double now)
     {}
+
+
+    @Override
+    public String getMode()
+    {
+        return TransportMode.car;
+    }
+
+
+    @Override
+    public void arrivedOnLinkByNonNetworkMode(Id linkId)
+    {
+        if (!getDestinationLinkId().equals(linkId)) {
+            throw new IllegalStateException();
+        }
+
+        currentLinkIdx = path.getLinkCount() - 1;
+    }
+
+
+    @Override
+    public Double getExpectedTravelTime()
+    {
+        return onlineTracker.getPlannedEndTime();
+    }
 }

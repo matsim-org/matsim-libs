@@ -25,7 +25,13 @@ import org.matsim.api.core.v01.Id;
 public interface DynLeg
     extends DynAction
 {
+    String getMode();
+    
+    
     void movedOverNode(Id newLinkId);
+    
+    
+    void arrivedOnLinkByNonNetworkMode(Id linkId);
 
 
     Id getCurrentLinkId();
@@ -35,4 +41,7 @@ public interface DynLeg
 
 
     Id getDestinationLinkId();
+    
+    
+    Double getExpectedTravelTime();
 }

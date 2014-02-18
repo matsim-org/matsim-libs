@@ -76,8 +76,8 @@ public class PlanToDynAgentLogicAdapter
             return new StaticDynActivity(act.getType(), act.getEndTime());
         }
         else if (planElem instanceof Leg) {
-            NetworkRoute route = (NetworkRoute) ((Leg)planElem).getRoute();
-            return new StaticDynLegImpl(route);
+            Leg leg = (Leg)planElem;
+            return new StaticDynLegImpl(leg.getMode(), (NetworkRoute)leg.getRoute());
         }
         else {
             throw new IllegalStateException();

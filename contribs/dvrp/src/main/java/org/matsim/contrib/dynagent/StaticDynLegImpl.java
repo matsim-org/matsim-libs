@@ -30,10 +30,12 @@ public class StaticDynLegImpl
 {
     private final NetworkRoute route;
     private int currentLinkIdx;
+    private final String mode;
 
 
-    public StaticDynLegImpl(NetworkRoute route)
+    public StaticDynLegImpl(String mode, NetworkRoute route)
     {
+        this.mode = mode;
         this.route = route;
         currentLinkIdx = -1;
     }
@@ -90,4 +92,30 @@ public class StaticDynLegImpl
     @Override
     public void finalizeAction(double now)
     {}
+
+
+    @Override
+    public String getMode()
+    {
+        return mode;
+    }
+
+
+    @Override
+    public void arrivedOnLinkByNonNetworkMode(Id linkId)
+    {
+        if (!getDestinationLinkId().equals(linkId)) {
+            throw new IllegalStateException();
+        }
+
+        currentLinkIdx = route.getLinkIds().size();
+    }
+
+
+    @Override
+    public Double getExpectedTravelTime()
+    {
+        //TODO add travel time of the destination link??
+        return route.getTravelTime();
+    }
 }

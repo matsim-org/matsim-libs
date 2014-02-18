@@ -21,7 +21,7 @@ package org.matsim.contrib.dynagent.examples.random;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dynagent.DynLeg;
 import org.matsim.core.gbl.MatsimRandom;
@@ -98,5 +98,25 @@ public class RandomDynLeg
             //at this point the destination can be anything, QSim does not take it into account
             destinationLinkId = null;
         }
+    }
+
+
+    @Override
+    public String getMode()
+    {
+        return TransportMode.car;
+    }
+
+
+    @Override
+    public void arrivedOnLinkByNonNetworkMode(Id linkId)
+    {
+        currentLinkId = linkId;
+    }
+
+
+    public Double getExpectedTravelTime()
+    {
+        return MatsimRandom.getRandom().nextDouble() * 3600;
     }
 }

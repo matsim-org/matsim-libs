@@ -221,15 +221,14 @@ public class DynAgent
     @Override
     public void notifyArrivalOnLinkByNonNetworkMode(Id linkId)
     {
-        throw new UnsupportedOperationException(
-                "This is used only for teleportation and this agent does not teleport");
+        dynLeg.arrivedOnLinkByNonNetworkMode(linkId);
+        currentLinkId = linkId;
     }
 
 
     @Override
     public Double getExpectedTravelTime()
     {
-        throw new UnsupportedOperationException(
-                "This is used only for teleportation and this agent does not teleport");
+        return dynLeg.getExpectedTravelTime();
     }
 }
