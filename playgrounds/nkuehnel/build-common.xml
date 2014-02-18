@@ -70,6 +70,9 @@
                 <include name="*GPL*"/>
             </fileset>
         </copy>
+    	<copy todir="${plugin.build.dir}">
+    		<fileset dir="src/main/resources"/>
+    	</copy>
     </target>
     <target name="setup-dist">
         <antcall target="setup-dist-default" />

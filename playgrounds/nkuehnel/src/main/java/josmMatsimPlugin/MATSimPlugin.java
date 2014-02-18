@@ -43,9 +43,7 @@ public class MATSimPlugin extends Plugin {
 		Main.main.menu.toolsMenu.add(MATSimAction.getImportAction());
 		Main.main.menu.toolsMenu.add(MATSimAction.getNewNetworkAction());
 
-		Reader reader = new InputStreamReader(this
-				.getPluginResourceClassLoader().getResourceAsStream(
-						"matsimPreset.xml"));
+		Reader reader = new InputStreamReader(getClass().getResourceAsStream("matsimPreset.xml"));
 
 		Collection<TaggingPreset> tps;
 		try {

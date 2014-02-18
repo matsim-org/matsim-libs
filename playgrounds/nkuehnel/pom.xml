@@ -9,13 +9,6 @@
 	<groupId>playground</groupId>
 	<artifactId>nkuehnel</artifactId>
 	<name>nkuehnel</name>
-	<build>
-		<resources>
-			<resource>
-				<directory>resources</directory>
-			</resource>
-		</resources>
-	</build>
 	<dependencies>
 		<dependency>
 			<groupId>org.openstreetmap</groupId>
