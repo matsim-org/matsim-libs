@@ -12,7 +12,6 @@
 -->
 <project name="plugin_common" basedir=".">
 
-    <property name="josm"                   location="lib/josm-custom.jar"/>
     <property name="plugin.build.dir"       value="build"/>
     <property name="plugin.src.dir"         value="src/main/java"/>
     <property name="plugin.lib.dir"         value="lib"/>

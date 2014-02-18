@@ -15,7 +15,7 @@
 			<artifactId>josm</artifactId>
 			<version>1</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/lib/josm-custom.jar</systemPath>
+			<systemPath>${basedir}/josm/josm-custom.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>

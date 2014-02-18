@@ -33,8 +33,7 @@
     <!--<property name="plugin.requires" value="..."/>-->
     <!--<property name="plugin.stage" value="..."/>-->
     
-	<property name="josm" location="lib/josm-custom.jar"/>
-	<property name="plugin.dist.dir" value="dist"/>
+	<property name="josm" location="josm/josm-custom.jar"/>
 	
     <!-- ** include targets that all plugins have in common ** -->
     <import file="build-common.xml"/>
