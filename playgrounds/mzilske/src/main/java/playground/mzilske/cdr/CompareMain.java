@@ -187,12 +187,19 @@ public class CompareMain {
 		return result;
 	}
 	
-	public void runOnceWithSimplePlans() {
+	public void runOnceWithSimplePlansUnCongested(Config config) {
 		ticker.finish();
 		callProcess.dump();
 		List<Sighting> sightings = callProcess.getSightings();
 
-		cdrVolumes = runOnceWithSimplePlans(scenario.getNetwork(), linkToZoneResolver, sightings, suffix);
+		cdrVolumes = runOnceWithSimplePlansUncongested(config, scenario.getNetwork(), linkToZoneResolver, sightings);
+	}
+	
+	public void runOnceWithSimplePlans(Config config) {
+		ticker.finish();
+		callProcess.dump();
+		List<Sighting> sightings = callProcess.getSightings();
+		cdrVolumes = runOnceWithSimplePlans(config, scenario.getNetwork(), linkToZoneResolver, sightings, suffix);
 	}
 
 	double compareEMD() {
@@ -581,25 +588,68 @@ public class CompareMain {
 		return currentPlanCadytsCorrection;
 	}
 	
-	public static VolumesAnalyzer runOnceWithSimplePlans(Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, String suffix) {
-		Config config = ConfigUtils.createConfig();
-		ActivityParams sightingParam = new ActivityParams("sighting");
-		// sighting.setOpeningTime(0.0);
-		// sighting.setClosingTime(0.0);
-		sightingParam.setTypicalDuration(30.0 * 60);
-		config.planCalcScore().addActivityParams(sightingParam);
-		config.planCalcScore().setTraveling_utils_hr(-6);
-		config.planCalcScore().setPerforming_utils_hr(0);
-		config.planCalcScore().setTravelingOther_utils_hr(-6);
-		config.planCalcScore().setConstantCar(0);
-		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
-		config.planCalcScore().setWriteExperiencedPlans(true);
-		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "-" + suffix);
-		QSimConfigGroup tmp = config.qsim();
-		tmp.setFlowCapFactor(100);
-		tmp.setStorageCapFactor(100);
-		tmp.setRemoveStuckVehicles(false);
+	public static VolumesAnalyzer runOnceWithSimplePlansUncongested(Config config, Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings) {
+
+
+		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario2.setNetwork(network);
+
+		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
+		for (Sighting sighting : sightings) {
+
+			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
+			if (sightingsOfPerson == null) {
+				sightingsOfPerson = new ArrayList<Sighting>();
+				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
+
+			}
+			System.out.println(sighting.getCellTowerId().toString());
+
+			sightingsOfPerson.add(sighting);
+		}
+
+
+		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario2, linkToZoneResolver, allSightings);
+		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
+
+		Controler controler = new Controler(scenario2);
+		controler.setOverwriteFiles(true);
+
+		controler.setCreateGraphs(false);
+		controler.run();
+		return controler.getVolumes();
+	}
+	
+	public static VolumesAnalyzer runWithSimplePlans(Config config, Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, String suffix) {
+		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario2.setNetwork(network);
+
+		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
+		for (Sighting sighting : sightings) {
+
+			List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
+			if (sightingsOfPerson == null) {
+				sightingsOfPerson = new ArrayList<Sighting>();
+				allSightings.put(sighting.getAgentId(), sightingsOfPerson);
+
+			}
+			System.out.println(sighting.getCellTowerId().toString());
+
+			sightingsOfPerson.add(sighting);
+		}
+
+		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario2, linkToZoneResolver, allSightings);
+		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
+
+		Controler controler = new Controler(scenario2);
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
+		controler.run();
+		return controler.getVolumes();
+	}
+	
+	public static VolumesAnalyzer runOnceWithSimplePlans(Config config, Network network, final LinkToZoneResolver linkToZoneResolver, List<Sighting> sightings, String suffix) {
+		
 
 		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario2.setNetwork(network);

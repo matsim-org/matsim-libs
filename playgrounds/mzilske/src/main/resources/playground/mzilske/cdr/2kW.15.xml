@@ -200,7 +200,6 @@
 		<param name="storageCapacityFactor" value="0.06" />
 		<param name="stuckTime" value="10.0" />
 		<param name="timeStepSize" value="00:00:01" />
-
 	</module>
 
 <!-- ====================================================================== -->
@@ -222,11 +221,11 @@
 	</module>
 
 <!-- ====================================================================== -->
-
+<!-- 
 	<module name="vspExperimental" >
 		<param name="vspDefaultsCheckingLevel" value="warn" />
 	</module>
-
+ -->
 <!-- ====================================================================== -->
 
 </config>

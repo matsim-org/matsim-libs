@@ -56,7 +56,7 @@ public class Potsdam {
 			
 		});
 		new MatsimEventsReader(events).readFile("output-homogeneous-37/ITERS/it.0/0.events.xml.gz");
-		compareMain.runOnceWithSimplePlans();
+		compareMain.runOnceWithSimplePlansUnCongested(ConfigUtils.createConfig());
 		pw.printf("%f\t%f\t%f\t%f\n", dailyRate, compareMain.compareAllDay(), compareMain.compareTimebins(), compareMain.compareEMDMassPerLink());
 	}
 
