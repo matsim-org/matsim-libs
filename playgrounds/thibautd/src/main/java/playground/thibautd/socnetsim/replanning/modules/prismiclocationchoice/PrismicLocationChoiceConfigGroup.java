@@ -35,7 +35,7 @@ public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
 	private double tieActivationProb = 0.5;
 	private double jointPlanBreakageProb = 0.5;
 	private Collection<String> types = Collections.singleton( "leisure" );
-	private double crowflySpeed = 50 / 3.6; // default: 50 km/h
+	private double crowflySpeed = 25 / 3.6; // default: 25 km/h
 	private double travelTimeBudget = 3600; // default: 1 hour in total
 	private double minimalDistanceFactor = 1.2;
 	private int maximumExpansionFactor = 3;
