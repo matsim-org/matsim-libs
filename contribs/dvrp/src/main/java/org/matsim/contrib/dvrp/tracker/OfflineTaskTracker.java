@@ -25,12 +25,28 @@ import org.matsim.contrib.dvrp.schedule.Task;
 public class OfflineTaskTracker
     implements TaskTracker
 {
+    private final Task task;
     private final double plannedEndTime;
 
 
     public OfflineTaskTracker(Task task)
     {
+        this.task = task;
         this.plannedEndTime = task.getEndTime();
+    }
+
+
+    @Override
+    public double getBeginTime()
+    {
+        return task.getBeginTime();
+    }
+
+
+    @Override
+    public double getPlannedEndTime()
+    {
+        return plannedEndTime;
     }
 
 
@@ -40,10 +56,4 @@ public class OfflineTaskTracker
         return Math.max(plannedEndTime, currentTime);
     }
 
-
-    @Override
-    public double getPlannedEndTime()
-    {
-        return plannedEndTime;
-    }
 }

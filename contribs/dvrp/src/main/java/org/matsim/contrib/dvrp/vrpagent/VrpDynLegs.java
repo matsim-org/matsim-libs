@@ -29,21 +29,25 @@ public class VrpDynLegs
 {
     public static VrpDynLeg createLegWithOfflineTracker(DriveTask driveTask)
     {
+        VrpDynLeg leg = new VrpDynLeg(driveTask.getPath());
+
         TaskTracker tracker = new OfflineTaskTracker(driveTask);
         driveTask.setTaskTracker(tracker);
-        return new VrpDynLeg(driveTask.getPath());
+        leg.initTracking(tracker);
+
+        return leg;
     }
 
 
     public static VrpDynLeg createLegWithOnlineTracker(DriveTask driveTask,
             VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
     {
-        OnlineDriveTaskTrackerImpl tracker = new OnlineDriveTaskTrackerImpl(driveTask, optimizer,
-                timer);
-        driveTask.setTaskTracker(tracker);
+        VrpDynLeg leg = new VrpDynLeg(driveTask.getPath());
 
-        VrpDynLeg leg = new VrpDynLeg(driveTask.getPath(), tracker);
-        tracker.setVrpDynLeg(leg);
+        OnlineDriveTaskTrackerImpl tracker = new OnlineDriveTaskTrackerImpl(driveTask, leg,
+                optimizer, timer);
+        driveTask.setTaskTracker(tracker);
+        leg.initTracking(tracker);
 
         return leg;
     }
@@ -74,8 +78,4 @@ public class VrpDynLegs
             }
         };
     }
-    
-    
-    
-    
 }

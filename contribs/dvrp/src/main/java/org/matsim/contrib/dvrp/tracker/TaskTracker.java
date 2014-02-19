@@ -21,8 +21,11 @@ package org.matsim.contrib.dvrp.tracker;
 
 public interface TaskTracker
 {
-    double predictEndTime(double currentTime);
+    double getBeginTime();
 
 
     double getPlannedEndTime();
+
+
+    double predictEndTime(double currentTime);
 }

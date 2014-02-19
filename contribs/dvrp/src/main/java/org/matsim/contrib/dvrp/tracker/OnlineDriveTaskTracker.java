@@ -43,4 +43,7 @@ public interface OnlineDriveTaskTracker
 
 
     void movedOverNode();
+
+
+    void arrivedOnLinkByNonNetworkMode();
 }

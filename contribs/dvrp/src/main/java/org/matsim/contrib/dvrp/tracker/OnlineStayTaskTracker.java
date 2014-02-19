@@ -26,13 +26,23 @@ import org.matsim.contrib.dynagent.DynActivity;
 public class OnlineStayTaskTracker
     implements TaskTracker
 {
-    private DynActivity dynActivity;
+    private final StayTask stayTask;
+    private final DynActivity dynActivity;
     private final double plannedEndTime;
 
 
-    public OnlineStayTaskTracker(StayTask stayTask)
+    public OnlineStayTaskTracker(StayTask stayTask, DynActivity dynActivity)
     {
+        this.stayTask = stayTask;
+        this.dynActivity = dynActivity;
         this.plannedEndTime = stayTask.getEndTime();
+    }
+
+
+    @Override
+    public double getBeginTime()
+    {
+        return stayTask.getBeginTime();
     }
 
 
@@ -47,11 +57,5 @@ public class OnlineStayTaskTracker
     public double getPlannedEndTime()
     {
         return plannedEndTime;
-    }
-
-
-    public void setDynActivity(DynActivity dynActivity)
-    {
-        this.dynActivity = dynActivity;
     }
 }

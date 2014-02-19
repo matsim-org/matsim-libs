@@ -145,7 +145,7 @@ public class DynAgent
     @Override
     public String getMode()
     {
-        return (state == State.LEG) ? TransportMode.car : null;
+        return (state == State.LEG) ? dynLeg.getMode() : null;
     }
 
 

@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.contrib.dvrp.tracker.*;
 
 
 /**
@@ -30,26 +30,30 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 public class VrpDynLeg
     implements DivertibleDynLeg
 {
-    private final OnlineDriveTaskTracker onlineTracker;
+    private TaskTracker tracker;
+    private Boolean onlineTracking = null;
 
     private VrpPath path;
     private int currentLinkIdx = 0;
     private boolean askedAboutNextLink = false;
 
+    private String mode = TransportMode.car;
 
-    //DriveTask with OfflineVehicleTrakcer
-    /*package*/VrpDynLeg(VrpPath path)
+
+    public VrpDynLeg(VrpPath path)
     {
         this.path = path;
-        this.onlineTracker = null;
     }
 
 
-    //DriveTask with OnlineVehicleTrakcer; the tracker notifies VrpSimEngine of new positions
-    /*package*/VrpDynLeg(VrpPath path, OnlineDriveTaskTracker onlineTracker)
+    public void initTracking(TaskTracker tracker)
     {
-        this.path = path;
-        this.onlineTracker = onlineTracker;
+        if (onlineTracking != null) {
+            throw new IllegalStateException("Tracking already initialized");
+        }
+
+        this.tracker = tracker;
+        onlineTracking = tracker instanceof OnlineDriveTaskTracker;
     }
 
 
@@ -63,8 +67,8 @@ public class VrpDynLeg
             throw new IllegalStateException();
         }
 
-        if (onlineTracker != null) {
-            onlineTracker.movedOverNode();
+        if (onlineTracking) {
+            ((OnlineDriveTaskTracker)tracker).movedOverNode();
         }
     }
 
@@ -131,7 +135,13 @@ public class VrpDynLeg
     @Override
     public String getMode()
     {
-        return TransportMode.car;
+        return mode;
+    }
+
+
+    public void setMode(String mode)
+    {
+        this.mode = mode;
     }
 
 
@@ -143,12 +153,16 @@ public class VrpDynLeg
         }
 
         currentLinkIdx = path.getLinkCount() - 1;
+
+        if (onlineTracking) {
+            ((OnlineDriveTaskTracker)tracker).arrivedOnLinkByNonNetworkMode();
+        }
     }
 
 
     @Override
     public Double getExpectedTravelTime()
     {
-        return onlineTracker.getPlannedEndTime();
+        return tracker.getPlannedEndTime() - tracker.getBeginTime();
     }
 }

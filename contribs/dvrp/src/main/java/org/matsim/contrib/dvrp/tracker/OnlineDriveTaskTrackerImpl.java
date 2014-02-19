@@ -40,7 +40,7 @@ public class OnlineDriveTaskTrackerImpl
     implements OnlineDriveTaskTracker
 {
     private final DriveTask driveTask;
-    private VrpDynLeg vrpDynLeg;
+    private final VrpDynLeg vrpDynLeg;
 
     private final VrpOptimizerWithOnlineTracking optimizer;
     private final MobsimTimer timer;
@@ -55,10 +55,11 @@ public class OnlineDriveTaskTrackerImpl
     private Link currentLink;
 
 
-    public OnlineDriveTaskTrackerImpl(DriveTask driveTask,
+    public OnlineDriveTaskTrackerImpl(DriveTask driveTask, VrpDynLeg vrpDynLeg,
             VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
     {
         this.driveTask = driveTask;
+        this.vrpDynLeg = vrpDynLeg;
         this.optimizer = optimizer;
         this.timer = timer;
 
@@ -89,6 +90,21 @@ public class OnlineDriveTaskTrackerImpl
         plannedLinkTT = path.getLinkTravelTime(currentLinkIdx);
 
         optimizer.nextLinkEntered(driveTask);
+    }
+
+
+    @Override
+    public void arrivedOnLinkByNonNetworkMode()
+    {
+        VrpPath path = vrpDynLeg.getPath();
+
+        currentLinkIdx = path.getLinkCount() - 1;
+        currentLink = path.getLink(currentLinkIdx);
+
+        linkEnterTime = timer.getTimeOfDay();
+
+        plannedTTAtPrevNode = linkEnterTime - driveTask.getBeginTime();
+        plannedLinkTT = 0;
     }
 
 
@@ -181,14 +197,15 @@ public class OnlineDriveTaskTrackerImpl
 
 
     @Override
-    public double getPlannedEndTime()
+    public double getBeginTime()
     {
-        return plannedEndTime;
+        return driveTask.getBeginTime();
     }
 
 
-    public void setVrpDynLeg(VrpDynLeg vrpDynLeg)
+    @Override
+    public double getPlannedEndTime()
     {
-        this.vrpDynLeg = vrpDynLeg;
+        return plannedEndTime;
     }
 }

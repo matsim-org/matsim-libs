@@ -245,14 +245,13 @@ public class PassengerEngine
             return false;
         }
 
-        EventsManager events = internalInterface.getMobsim().getEventsManager();
-        events.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), driver
-                .getVehicle().getId()));
-
-        PassengerAgent passengerAgent = (PassengerAgent)passenger;
         MobsimVehicle mobVehicle = driver.getVehicle();
-        mobVehicle.addPassenger(passengerAgent);
-        passengerAgent.setVehicle(mobVehicle);
+        mobVehicle.addPassenger(passenger);
+        passenger.setVehicle(mobVehicle);
+
+        EventsManager events = internalInterface.getMobsim().getEventsManager();
+        events.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
+
         return true;
     }
 
@@ -261,14 +260,12 @@ public class PassengerEngine
     {
         MobsimPassengerAgent passenger = request.getPassenger();
 
-        PassengerAgent passengerAgent = (PassengerAgent)passenger;
         MobsimVehicle mobVehicle = driver.getVehicle();
-        mobVehicle.removePassenger(passengerAgent);
-        passengerAgent.setVehicle(null);
+        mobVehicle.removePassenger(passenger);
+        passenger.setVehicle(null);
 
         EventsManager events = internalInterface.getMobsim().getEventsManager();
-        events.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), driver
-                .getVehicle().getId()));
+        events.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
 
         passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
         passenger.endLegAndComputeNextState(now);
