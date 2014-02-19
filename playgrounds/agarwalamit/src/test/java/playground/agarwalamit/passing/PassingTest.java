@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package passing;
+package playground.agarwalamit.passing;
 
 import java.util.Arrays;
 import java.util.HashMap;
