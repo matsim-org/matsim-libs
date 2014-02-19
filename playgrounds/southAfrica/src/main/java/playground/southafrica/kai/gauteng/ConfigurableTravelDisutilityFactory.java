@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
@@ -45,6 +46,8 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 	private static final Logger log = Logger.getLogger(ConfigurableTravelDisutilityFactory.class ) ;
 
 	private final Scenario scenario;
+	
+	private static int wrnCnt = 0;
 
 	private UtilityOfMoneyI uom = null ;
 	private UtilityOfDistanceI uod = null ;
@@ -189,6 +192,13 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 					Id vehicleId = null ;
 					if ( vehicle != null ) {
 						vehicleId  = vehicle.getId() ;
+					} else{
+						vehicleId = person.getId() ;
+						if ( wrnCnt<1 ) {
+							wrnCnt++ ;
+							Logger.getLogger(this.getClass()).warn( "still taking vehicle id from driver id (presumably during routing)") ;
+							Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
+						}
 					}
 					Cost cost = localScheme.getLinkCostInfo(link.getId(), time, person.getId(), vehicleId ) ;
 					if ( cost != null ) {
