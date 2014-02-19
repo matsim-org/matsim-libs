@@ -62,8 +62,8 @@ public class ElectroCabLaunchUtils
         Scenario scenario = context.getScenario();
 
         optimizer.setRankMode(false);
-        optimizer.setIdleRankMode(true);
-        boolean ALLCARSELECTRIC = true;
+        optimizer.setIdleRankMode(false);
+        boolean ALLCARSELECTRIC = false;
 
         EventsManager events = qSim.getEventsManager();
 

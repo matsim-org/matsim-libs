@@ -93,11 +93,11 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 		double tpkm = 0.;
 		System.out.println("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime");
 		for (Entry<Id,Double> e: this.taxiTravelDistance.entrySet()){
-			double relativeOccupanceDist = this.taxiTravelDistancesWithPassenger.get(e.getKey()) /e.getValue();
-			tpkm += this.taxiTravelDistancesWithPassenger.get(e.getKey());
-			double relativeOccpanceTime = this.taxiTravelDurationwithPassenger.get(e.getKey()) / this.taxiTravelDuration.get(e.getKey());
+			double relativeOccupanceDist = tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger,e.getKey()) /e.getValue();
+			tpkm += tryToGetOrReturnZero(this.taxiTravelDistancesWithPassenger,e.getKey());
+			double relativeOccpanceTime = tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey()) / (tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey()) + 0.01);
 			tkm += e.getValue();
-			System.out.println(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(this.taxiTravelDistancesWithPassenger.get(e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+this.taxiTravelDuration.get(e.getKey())+"\t"+this.taxiTravelDurationwithPassenger.get(e.getKey())+"\t"+relativeOccpanceTime);
+			System.out.println(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime);
 		}
 		tkm = tkm / 1000;
 		tpkm = tpkm /1000;
@@ -116,15 +116,15 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 			double ps = 0.;
 			bw.write("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime");
 			for (Entry<Id,Double> e: this.taxiTravelDistance.entrySet()){
-				tpkm += this.taxiTravelDistancesWithPassenger.get(e.getKey());
+				tpkm += tryToGetOrReturnZero(taxiTravelDistancesWithPassenger, e.getKey());
 				tkm += e.getValue();
-				s +=  this.taxiTravelDuration.get(e.getKey());
-				ps += this.taxiTravelDurationwithPassenger.get(e.getKey());
+				s += tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey());
+				ps += tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey());
 				
 				bw.newLine();
-				double relativeOccupanceDist = this.taxiTravelDistancesWithPassenger.get(e.getKey()) /e.getValue();
-				double relativeOccpanceTime = this.taxiTravelDurationwithPassenger.get(e.getKey()) / this.taxiTravelDuration.get(e.getKey());
-				bw.write(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(this.taxiTravelDistancesWithPassenger.get(e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+this.taxiTravelDuration.get(e.getKey())+"\t"+this.taxiTravelDurationwithPassenger.get(e.getKey())+"\t"+relativeOccpanceTime);
+				double relativeOccupanceDist = tryToGetOrReturnZero(taxiTravelDistancesWithPassenger, e.getKey()) /e.getValue();
+				double relativeOccpanceTime = tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey()) /tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey());
+				bw.write(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+tryToGetOrReturnZero( this.taxiTravelDuration, e.getKey())+"\t"+tryToGetOrReturnZero(this.taxiTravelDurationwithPassenger, e.getKey())+"\t"+relativeOccpanceTime);
 				
 			}
 			tkm = tkm / 1000;
@@ -148,6 +148,13 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 		return null;
 	}
 	
+	private Double tryToGetOrReturnZero(Map<Id,Double> map, Id id){
+		Double ret = 0.;
+		if (map.containsKey(id)) ret = map.get(id);
+		
+		return ret;
+		
+	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {

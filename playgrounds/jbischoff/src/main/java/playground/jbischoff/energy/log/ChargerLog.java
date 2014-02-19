@@ -108,7 +108,9 @@ public class ChargerLog {
 			
 			Collections.sort(log);
 			Id last = log.get(0).getChargerId();
-			String filename = (outputFileDir+"/charger_"+last.toString()+".txt");
+			int l = last.toString().length()-10;
+			String fn = last.toString().substring(l);
+			String filename = (outputFileDir+"/charger_"+fn+".txt");
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(filename)));
 			
 //			bw.write(this.getTitleRowFileOutput());
@@ -124,7 +126,10 @@ public class ChargerLog {
 					bw.flush();
 					bw.close();
 					last  = row.getChargerId();
-					filename = (outputFileDir+"/charger_"+last.toString()+".txt");
+					l = last.toString().length()-10;
+					 fn = last.toString().substring(l);
+
+					filename = (outputFileDir+"/charger_"+fn+".txt");
 					bw = new BufferedWriter(new FileWriter(new File(filename)));
 					bw.write(rowToString(row));
 				}

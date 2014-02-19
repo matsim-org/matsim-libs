@@ -184,7 +184,7 @@ public class IdleRankVehicleFinder
           for (Vehicle veh : context.getVrpData().getVehicles()) {
           	if (this.IsElectric)
           		if (!this.hasEnoughCapacityForTask(veh)) continue;
-          	
+          		if (!TaxiUtils.isIdle(veh)) continue;
               double distance = calculateDistance(req, veh);
               
               if (distance < bestDistance) {	

@@ -28,9 +28,9 @@ public class ChangeableNetworkCreator {
 	private List<NetworkChangeEvent> networkChangeEvents;
 	private final int ENDTIME = 30*3600;
 	private final int TIMESTEP = 15*60;
-	private final String NETWORKFILE = "/Users/jb/Dropbox/MasterOfDesaster/jbischoff/jbmielec/network.xml";
-	private final String EVENTSFILE =  "/Users/jb/Dropbox/MasterOfDesaster/jbischoff/jbmielec/20.events.xml.gz";
-	private final String CHANGEFILE = "/Users/jb/Dropbox/MasterOfDesaster/jbischoff/jbmielec/network_change_events.xml";
+	private final String NETWORKFILE = "/Users/jb/tucloud/berlin/2kW.15.output_network.xml.gz";
+	private final String EVENTSFILE =  "/Users/jb/tucloud/berlin/2kW.15.1000.events.xml.gz";
+	private final String CHANGEFILE = "/Users/jb/tucloud/berlin/changeevents.xml";
 
 	public ChangeableNetworkCreator(){
 		this.networkChangeEvents = new ArrayList<NetworkChangeEvent>();
@@ -55,6 +55,7 @@ public class ChangeableNetworkCreator {
 		for (Link l : network.getLinks().values()){
 			double length = l.getLength();
 			double previousTravelTime=l.getLength()/l.getFreespeed()	;	
+			double capacity = l.getCapacity();
 			
 			for (double time = 0; time<ENDTIME ; time = time+TIMESTEP){
 				
@@ -65,6 +66,8 @@ public class ChangeableNetworkCreator {
 					double newFreespeed = length / newTravelTime;
 					ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE, newFreespeed);
 					nce.setFreespeedChange(freespeedChange);
+					
+					nce.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity));
 					
 					this.networkChangeEvents.add(nce);
 					previousTravelTime= newTravelTime;

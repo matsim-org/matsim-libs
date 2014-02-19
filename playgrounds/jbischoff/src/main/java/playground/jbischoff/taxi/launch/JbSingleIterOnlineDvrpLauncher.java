@@ -97,10 +97,15 @@ import playground.michalm.util.RunningVehicleRegister;
         //        netFileName = dirName + "network.xml";
 
         // michalm - testing config (may be removed...)////////////////////////////////////
-        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
-        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
-        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
-        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+//        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
+//        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
+//        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
+//        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+    	
+    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario/";
+           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
+           netFileName = dirName + "berlin_brb.xml.gz";
+           eventsFileName = null;
         ////////////////////////////////////////////////////////         
 
         //        electricStatsDir = dirName +"electric_noranks\\";
@@ -111,7 +116,7 @@ import playground.michalm.util.RunningVehicleRegister;
         //      electricStatsDir = dirName +"gas_ranks\\";
         //        electricStatsDir = dirName +"modifiedDispatch_SL\\";
         //        electricStatsDir = dirName +"1charger\\";
-        electricStatsDir = dirName + "1slow_fifo\\";
+        electricStatsDir = dirName + "1slow_fifo/";
 
         //        plansFileName = dirName + "20.plans.xml.gz";
         //
@@ -119,8 +124,8 @@ import playground.michalm.util.RunningVehicleRegister;
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
         taxiCustomersFileName = dirName + "taxiCustomers_15_pc.txt";
 
-        taxisFileName = dirName + "electric_taxis-50.xml";
-        ranksFileName = dirName + "taxi_ranks-5.xml";
+        taxisFileName = dirName + "taxis-5000.xml";
+        ranksFileName = dirName + "berlin_ranks.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
@@ -139,10 +144,10 @@ import playground.michalm.util.RunningVehicleRegister;
 
         scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
 
-        List<String> taxiCustomerIds;
-        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
+//        List<String> taxiCustomerIds;
+//        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
 
-        VrpLauncherUtils.convertLegModes(taxiCustomerIds, TaxiRequestCreator.MODE, scenario);
+//        VrpLauncherUtils.convertLegModes(taxiCustomerIds, TaxiRequestCreator.MODE, scenario);
     }
 
 

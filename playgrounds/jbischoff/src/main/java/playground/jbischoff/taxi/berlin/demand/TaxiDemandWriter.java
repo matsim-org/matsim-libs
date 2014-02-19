@@ -19,10 +19,17 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.berlin.demand;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -46,6 +53,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -78,6 +86,9 @@ public class TaxiDemandWriter {
 	static int fromTXL = 0;
 	static int toTXL = 0;
 	
+	private Map<Id,Integer> oMap = new HashMap<Id, Integer>();
+	private Map<Id,Integer> dMap = new HashMap<Id, Integer>();
+
 
 
 	public static void main(String[] args) {
@@ -88,13 +99,46 @@ public class TaxiDemandWriter {
 			TaxiDemandWriter tdw = new TaxiDemandWriter();
 			tdw.setMunicipalityMap(lsr.getShapeMap());
 			tdw.writeDemand("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/201304"+i+"/", "OD_201304"+i);
-			
+			tdw.writeODbyZone("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/201304"+i+"/od.csv");
 		}
 		System.out.println("trips from TXL "+TaxiDemandWriter.fromTXL);
 		System.out.println("trips to TXL "+TaxiDemandWriter.toTXL);
 	}
 	
 	
+
+	private void writeODbyZone(String outputFileName) {
+		Set<Id> allZones = new TreeSet<Id>();
+		allZones.addAll(this.dMap.keySet());
+		allZones.addAll(this.oMap.keySet());
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputFileName);
+		try {
+		for (Id zoneId : allZones){
+			int o = getFromMapOrReturnZero(this.oMap,zoneId);
+			int d = getFromMapOrReturnZero(dMap, zoneId);
+			String s = zoneId.toString() + "\t" + o + "\t" +d+ "\n";
+				bw.append(s);
+		}
+
+		bw.flush();
+		bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	
+
+
+	private int getFromMapOrReturnZero(Map<Id, Integer> odMap, Id zoneId) {
+		int rv = 0;
+		if (odMap.containsKey(zoneId)) rv = odMap.get(zoneId); 
+		return rv;
+	}
+
+
 
 	private void setMunicipalityMap(Map<String, Geometry> municipalityMap) {
 		this.municipalityMap = municipalityMap;
@@ -113,9 +157,9 @@ public class TaxiDemandWriter {
 		population = scenario.getPopulation();
 		generatePopulation(dirname, fileNamePrefix);
 		log.info("Population size: " +population.getPersons().size());
-		PopulationWriter populationWriter = new PopulationWriter(
-				scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
+//		PopulationWriter populationWriter = new PopulationWriter(
+//				scenario.getPopulation(), scenario.getNetwork());
+//		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
 	}
 
 	private void generatePopulation(String dirname, String fileNamePrefix) {
@@ -130,6 +174,8 @@ public class TaxiDemandWriter {
 		}
 
 	}
+	
+	
 
 	private void read(String file, TabularFileHandler handler) {
 		TabularFileParserConfig config = new TabularFileParserConfig();
@@ -150,9 +196,21 @@ public class TaxiDemandWriter {
 			p = generatePerson(tde.fromId, tde.toId,pId, hr);
 			if (p == null ) continue;
 			population.addPerson(p);
+			incMap(oMap,tde.fromId);
+			incMap(dMap,tde.toId);
 		}
 		}
 	}
+
+	private void incMap(Map<Id, Integer> odMap, Id fromId) {
+		Integer val;
+		if (odMap.containsKey(fromId)) val = odMap.get(fromId) ;
+		else val = 0;
+		val++;
+		odMap.put(fromId, val);
+	}
+
+
 
 	private Person generatePerson(Id from, Id to, Id pId, int hr) {
 		Person p;
@@ -236,7 +294,7 @@ public class TaxiDemandWriter {
 			}
 	}
 
-	private static Point getRandomPointInFeature(Random rnd, Geometry g) {
+	public static Point getRandomPointInFeature(Random rnd, Geometry g) {
 		Point p = null;
 		double x, y;
 		do {
