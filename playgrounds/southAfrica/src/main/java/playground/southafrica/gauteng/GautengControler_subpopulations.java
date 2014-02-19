@@ -91,6 +91,7 @@ import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.gauteng.scoring.GenerationOfMoneyEvents;
 import playground.southafrica.gauteng.utilityofmoney.GautengUtilityOfMoney;
 import playground.southafrica.gauteng.utilityofmoney.UtilityOfMoneyI;
+import playground.southafrica.kai.gauteng.ConfigurableTravelDisutilityFactory;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -404,9 +405,19 @@ public class GautengControler_subpopulations {
 				));
 
 		// insert into routing:
-		controler.setTravelDisutilityFactory(new PersonSpecificTravelDisutilityInclTollFactory(
-				vehDepScheme, personSpecificUtilityOfMoney
-				));
+//		controler.setTravelDisutilityFactory(new PersonSpecificTravelDisutilityInclTollFactory(
+//				vehDepScheme, personSpecificUtilityOfMoney
+//				));
+		
+		final ConfigurableTravelDisutilityFactory travelDisutilityFactory = new ConfigurableTravelDisutilityFactory( sc );
+		// ---
+		travelDisutilityFactory.setRoadPricingScheme( vehDepScheme ); // including toll. Needed for all experiments
+//		travelDisutilityFactory.setUom(personSpecificUtilityOfMoney); 
+//		travelDisutilityFactory.setScoringFunctionFactory(scoringFunctionFactory); // including auto-sensing.  Not needed for abmtrans paper
+		travelDisutilityFactory.setRandomness(3);
+		// ---
+		controler.setTravelDisutilityFactory( travelDisutilityFactory );
+
 	}
 
 	/**
