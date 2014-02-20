@@ -124,7 +124,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 			algo.run( optimized );
 			final double optimizedOverlap = algo.calcOverlap( optimized );
 			final Counter counter = new Counter( "test plan # "+(i+1)+", test # " );
-			for ( int j = 0; j < 5000; j++ ) {
+			for ( int j = 0; j < 500; j++ ) {
 				counter.incCounter();
 				final GroupPlans randomized = createTestPlan( new Random( i ) );
 				 new AllocateVehicleToPlansInGroupPlanAlgorithm(
