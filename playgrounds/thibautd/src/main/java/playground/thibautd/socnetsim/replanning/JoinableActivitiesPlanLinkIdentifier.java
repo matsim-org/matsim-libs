@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 
 /**
@@ -97,7 +97,7 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 			final Queue<LocationEvent> events) {
 		final Id personId = plan.getPerson().getId();
 		double lastEnd = 0;
-		for ( Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ) ) {
+		for ( Activity act : TripStructureUtils.getActivities( plan , JointActingTypes.JOINT_STAGE_ACTS ) ) {
 			final Id loc = act.getFacilityId();
 
 			final LocationEvent event =
