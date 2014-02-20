@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DumpDesiresInObjectAttributesFile.java
+ * RemoveLinksAndRoutesFromPop.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,47 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
+package playground.thibautd.scripts.scenariohandling;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.Desires;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
-import playground.thibautd.utils.DesiresConverter;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 
 /**
  * @author thibautd
  */
-public class DumpDesiresInObjectAttributesFile {
+public class RemoveLinksAndRoutesFromPop {
 	public static void main(final String[] args) {
-		final String inPopulation = args[ 0 ];
-		final String inFacilities = args[ 1 ];
-		final String inNetwork = args[ 2 ];
-		final String outAttributes = args[ 3 ];
+		final String inPop = args[ 0 ];
+		final String outPop = args[ 1 ];
 
-		final Config config = ConfigUtils.createConfig();
-		config.addCoreModules();
-		config.plans().setInputFile( inPopulation );
-		config.network().setInputFile( inNetwork );
-		config.facilities().setInputFile( inFacilities );
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new MatsimPopulationReader( sc ).parse( inPop );
 
-		final ObjectAttributes attributes = new ObjectAttributes();
-
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			final Desires desires = ((PersonImpl) person).getDesires();
-			attributes.putAttribute( person.getId().toString() , "desires" , desires );
+		final PersonAlgorithm algo = new PersonRemoveLinkAndRoute();
+		for ( Person p : sc.getPopulation().getPersons().values() ) {
+			algo.run( p );
 		}
 
-		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter( attributes );
-		writer.putAttributeConverter( Desires.class , new DesiresConverter() );
-		writer.writeFile( outAttributes );
+		new PopulationWriter( sc.getPopulation() , sc.getNetwork() ).write( outPop );
 	}
 }
 

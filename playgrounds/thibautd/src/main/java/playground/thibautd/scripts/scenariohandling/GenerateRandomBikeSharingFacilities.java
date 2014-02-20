@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GenerateWeightAttributesForPersonsWithoutCarAccess.java
+ * GenerateRandomBikeSharingFacilities.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,53 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
+package playground.thibautd.scripts.scenariohandling;
+
+import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
 
 /**
  * @author thibautd
  */
-public class GenerateWeightAttributesForPersonsWithoutCarAccess {
-	public static void main(final String[] args) {
-		final String attName = args[ 0 ];
-		final double weight = Double.parseDouble( args[ 1 ] );
-		final String populationFile = args[ 2 ];
-		final String outObjectAttributesFile = args[ 3 ];
+public class GenerateRandomBikeSharingFacilities {
+	private static final double P_ACCEPT_LINK = 0.01;
+	private static final int MAX_CAPACITY = 100;
 
-		final ObjectAttributes attrs = new ObjectAttributes();
+	public static void main(final String[] args) {
+		final String networkFile = args[ 0 ];
+		final String outputFacilitiesFile = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		((PopulationImpl) sc.getPopulation()).addAlgorithm(
-			new PersonAlgorithm() {
-				@Override
-				public void run(final Person person) {
-					final String carAvail = ((PersonImpl) person).getCarAvail();
-					final String license = ((PersonImpl) person).getLicense();
-					final boolean isCarAvail =
-						!"no".equals( license ) &&
-						!"never".equals( carAvail );
-					if ( !isCarAvail ) {
-						attrs.putAttribute(
-							person.getId().toString(),
-							attName,
-							weight );
-					}
-				}
-			});
-		((PopulationImpl) sc.getPopulation()).setIsStreaming( true );
-		new MatsimPopulationReader( sc ).readFile( populationFile );
+		new MatsimNetworkReader( sc ).parse( networkFile );
 
-		new ObjectAttributesXmlWriter( attrs ).writeFile( outObjectAttributesFile );
+		final BikeSharingFacilities facilities = new BikeSharingFacilities();
+
+		final Random r = new Random( 98564 );
+		for ( Link l : sc.getNetwork().getLinks().values() ) {
+			if ( r.nextDouble() > P_ACCEPT_LINK ) continue;
+
+			final int cap = r.nextInt( MAX_CAPACITY );
+			facilities.addFacility(
+					facilities.getFactory().createBikeSharingFacility(
+						new IdImpl( "bs-"+l.getId() ),
+						l.getCoord(),
+						l.getId(),
+						cap,
+						(int) (r.nextDouble() * cap) ) );
+		}
+
+		new BikeSharingFacilitiesWriter( facilities ).write( outputFacilitiesFile );
 	}
 }
 

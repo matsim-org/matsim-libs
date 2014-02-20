@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
+package playground.thibautd.scripts.scenariohandling;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

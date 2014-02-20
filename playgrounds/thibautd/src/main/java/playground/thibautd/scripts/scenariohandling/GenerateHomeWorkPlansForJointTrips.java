@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
+package playground.thibautd.scripts.scenariohandling;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,8 +55,8 @@ public class GenerateHomeWorkPlansForJointTrips {
 		final String outputCliquesFile = args[ 0 ];
 		final String outputPopFile = args[ 1 ];
 		// only even clique sizes will be generated
-		final int maxCliqueSize = Integer.valueOf( args[ 2 ] );
-		final int popSize = Integer.valueOf( args[ 3 ] );
+		final int maxCliqueSize = Integer.parseInt( args[ 2 ] );
+		final int popSize = Integer.parseInt( args[ 3 ] );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final Population population = scenario.getPopulation();

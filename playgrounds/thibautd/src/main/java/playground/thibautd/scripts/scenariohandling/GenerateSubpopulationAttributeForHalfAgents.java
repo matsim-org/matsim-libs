@@ -1,4 +1,4 @@
-package playground.thibautd.scripts;
+package playground.thibautd.scripts.scenariohandling;
 
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;

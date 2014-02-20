@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GenerateRandomBikeSharingFacilities.java
+ * DumpDesiresInObjectAttributesFile.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
-
-import java.util.Random;
+package playground.thibautd.scripts.scenariohandling;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.population.Desires;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
+import playground.thibautd.utils.DesiresConverter;
 
 /**
  * @author thibautd
  */
-public class GenerateRandomBikeSharingFacilities {
-	private static final double P_ACCEPT_LINK = 0.01;
-	private static final int MAX_CAPACITY = 100;
-
+public class DumpDesiresInObjectAttributesFile {
 	public static void main(final String[] args) {
-		final String networkFile = args[ 0 ];
-		final String outputFacilitiesFile = args[ 1 ];
+		final String inPopulation = args[ 0 ];
+		final String inFacilities = args[ 1 ];
+		final String inNetwork = args[ 2 ];
+		final String outAttributes = args[ 3 ];
 
-		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).parse( networkFile );
+		final Config config = ConfigUtils.createConfig();
+		config.addCoreModules();
+		config.plans().setInputFile( inPopulation );
+		config.network().setInputFile( inNetwork );
+		config.facilities().setInputFile( inFacilities );
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		final BikeSharingFacilities facilities = new BikeSharingFacilities();
+		final ObjectAttributes attributes = new ObjectAttributes();
 
-		final Random r = new Random( 98564 );
-		for ( Link l : sc.getNetwork().getLinks().values() ) {
-			if ( r.nextDouble() > P_ACCEPT_LINK ) continue;
-
-			final int cap = r.nextInt( MAX_CAPACITY );
-			facilities.addFacility(
-					facilities.getFactory().createBikeSharingFacility(
-						new IdImpl( "bs-"+l.getId() ),
-						l.getCoord(),
-						l.getId(),
-						cap,
-						(int) (r.nextDouble() * cap) ) );
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			final Desires desires = ((PersonImpl) person).getDesires();
+			attributes.putAttribute( person.getId().toString() , "desires" , desires );
 		}
 
-		new BikeSharingFacilitiesWriter( facilities ).write( outputFacilitiesFile );
+		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter( attributes );
+		writer.putAttributeConverter( Desires.class , new DesiresConverter() );
+		writer.writeFile( outAttributes );
 	}
 }
 

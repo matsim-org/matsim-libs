@@ -64,7 +64,7 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehicleType;
 import playground.thibautd.mobsim.CompareEventsUtils;
 import playground.thibautd.mobsim.PseudoSimConfigGroup;
-import playground.thibautd.scripts.CreateGridNetworkWithDimensions;
+import playground.thibautd.scripts.scenariohandling.CreateGridNetworkWithDimensions;
 
 /**
  * @author thibautd

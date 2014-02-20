@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DumpTravelCardsInObjectAttributesFile.java
+ * GenerateWeightAttributesForPersonsWithoutCarAccess.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,49 +17,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scripts;
-
-import java.util.Set;
+package playground.thibautd.scripts.scenariohandling;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.Desires;
+import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
-import playground.thibautd.utils.DesiresConverter;
 
 /**
  * @author thibautd
  */
-public class DumpTravelCardsInObjectAttributesFile {
+public class GenerateWeightAttributesForPersonsWithoutCarAccess {
 	public static void main(final String[] args) {
-		final String inPopulation = args[ 0 ];
-		final String inFacilities = args[ 1 ];
-		final String inNetwork = args[ 2 ];
-		final String outAttributes = args[ 3 ];
+		final String attName = args[ 0 ];
+		final double weight = Double.parseDouble( args[ 1 ] );
+		final String populationFile = args[ 2 ];
+		final String outObjectAttributesFile = args[ 3 ];
 
-		final Config config = ConfigUtils.createConfig();
-		config.addCoreModules();
-		config.plans().setInputFile( inPopulation );
-		config.network().setInputFile( inNetwork );
-		config.facilities().setInputFile( inFacilities );
-		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		final ObjectAttributes attrs = new ObjectAttributes();
 
-		final ObjectAttributes attributes = new ObjectAttributes();
+		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		((PopulationImpl) sc.getPopulation()).addAlgorithm(
+			new PersonAlgorithm() {
+				@Override
+				public void run(final Person person) {
+					final String carAvail = ((PersonImpl) person).getCarAvail();
+					final String license = ((PersonImpl) person).getLicense();
+					final boolean isCarAvail =
+						!"no".equals( license ) &&
+						!"never".equals( carAvail );
+					if ( !isCarAvail ) {
+						attrs.putAttribute(
+							person.getId().toString(),
+							attName,
+							weight );
+					}
+				}
+			});
+		((PopulationImpl) sc.getPopulation()).setIsStreaming( true );
+		new MatsimPopulationReader( sc ).readFile( populationFile );
 
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			final Set<String> cards = ((PersonImpl) person).getTravelcards();
-			attributes.putAttribute( person.getId().toString() , "hasTravelcard" , !(cards == null || cards.isEmpty()) );
-		}
-
-		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter( attributes );
-		writer.putAttributeConverter( Desires.class , new DesiresConverter() );
-		writer.writeFile( outAttributes );
+		new ObjectAttributesXmlWriter( attrs ).writeFile( outObjectAttributesFile );
 	}
 }
 
