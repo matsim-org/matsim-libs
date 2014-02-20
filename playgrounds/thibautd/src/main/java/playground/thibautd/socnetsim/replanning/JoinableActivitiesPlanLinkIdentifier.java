@@ -27,8 +27,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
@@ -44,6 +48,11 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 	private static final Logger log =
 		Logger.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
 
+	// XXX should be passed from outside, but not available at construction
+	private final StageActivityTypes stages =
+			new CompositeStageActivityTypes(
+					JointActingTypes.JOINT_STAGE_ACTS,
+					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ) );
 	private final String type;
 
 	public JoinableActivitiesPlanLinkIdentifier(
@@ -92,12 +101,12 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 		return false;
 	}
 
-	private static void fillEvents(
+	private void fillEvents(
 			final Plan plan,
 			final Queue<LocationEvent> events) {
 		final Id personId = plan.getPerson().getId();
 		double lastEnd = 0;
-		for ( Activity act : TripStructureUtils.getActivities( plan , JointActingTypes.JOINT_STAGE_ACTS ) ) {
+		for ( Activity act : TripStructureUtils.getActivities( plan , stages ) ) {
 			final Id loc = act.getFacilityId();
 
 			final LocationEvent event =
@@ -133,7 +142,7 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 				final String type,
 				final Id locId,
 				final double startTime ) {
-			if ( locId == null ) throw new NullPointerException();
+			if ( locId == null ) throw new NullPointerException( "null location for person "+personId+" activity type "+type );
 			this.type = type;
 			this.locId = locId;
 			this.personId = personId;
