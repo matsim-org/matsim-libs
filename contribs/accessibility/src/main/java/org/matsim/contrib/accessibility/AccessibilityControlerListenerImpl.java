@@ -88,11 +88,8 @@ public abstract class AccessibilityControlerListenerImpl {
 	// destinations, opportunities like jobs etc ...
 	AggregateObject2NearestNode[] aggregatedOpportunities;
 	
-	public static enum OtherItems { weight } ;
-
 	// storing the accessibility results
 	Map<Modes4Accessibility,SpatialGrid> spatialGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
-	Map<OtherItems,SpatialGrid> otherItems = new HashMap<OtherItems,SpatialGrid>() ;
 
 	Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
 
@@ -427,9 +424,9 @@ public abstract class AccessibilityControlerListenerImpl {
 				}
 
 				// writing measured accessibilities for current measuring point 
-				writeCSVData(origin, fromNode, accessibilities ) ;
+				writeCSVData4Urbansim(origin, fromNode, accessibilities ) ;
 				// (I think the above is the urbansim output.  Better not touch it. kai, feb'14) 
-
+				
 				if(this.zoneDataExchangeListenerList != null){
 					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
 						this.zoneDataExchangeListenerList.get(i).getZoneAccessibilities(origin, accessibilities );
@@ -580,9 +577,9 @@ public abstract class AccessibilityControlerListenerImpl {
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	abstract void writeCSVData( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities ) ;
+	abstract void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities ) ;
 	// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
-
+	
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes
 	// ////////////////////////////////////////////////////////////////////

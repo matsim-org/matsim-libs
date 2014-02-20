@@ -7,23 +7,23 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
-import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.OtherItems;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
 
+// urbansim accessibility writer; better do not touch except when working on matsim-urbansim integration. kai, feb'14
+// yy move to matsim4urbansim
+public class UrbansimCellBasedAccessibilityCSVWriterV2 {
+	private static final Logger log = Logger.getLogger(UrbansimCellBasedAccessibilityCSVWriterV2.class);
 
-public class AnalysisCellBasedAccessibilityCSVWriterV2 {
-	private static final Logger log = Logger.getLogger(AnalysisCellBasedAccessibilityCSVWriterV2.class);
-
-	public static final String FILE_NAME= "accessibility_indicators.csv";
+	private static final String FILE_NAME= "accessibility_indicators.csv";
 
 	private BufferedWriter accessibilityDataWriter ;
 
 	/**
 	 * writes the header of accessibility data csv file
 	 */
-	public AnalysisCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory){
-		log.info("Initializing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
+	public UrbansimCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory){
+		log.info("Initializing  ...");
 		try {
 		accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + FILE_NAME );
 		} catch ( Exception ee ) {
@@ -59,17 +59,14 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	/**
 	 * writes the header of accessibility data csv file
 	 */
-	public AnalysisCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory, String modeName){
+	public UrbansimCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory, String modeName){
 		try{
-			log.info("Initializing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
+			log.info("Initializing ...");
 			accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + "/" + "accessibility_indicators" + "_" + modeName + ".csv" );
 			// yyyyyy in some calling sequences, this is called too early, and the directory is not yet there. kai, feb'14
 
 			// create header
 			accessibilityDataWriter.write( "x" + "\t" + "y" + "\t" + "accessibility" );
-			for ( OtherItems item : OtherItems.values() ) {
-				accessibilityDataWriter.write( "\t" + item ) ;
-			}
 			accessibilityDataWriter.newLine();
 
 			log.info("... done!");
@@ -88,12 +85,6 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	 * to coordinates, and maybe directly to zones (if averaged). --> remove eventually.  kai, jul'13
 	 * <ul>
 	 * 
-	 * @param startZone
-	 * @param node
-	 * @param freeSpeedAccessibility
-	 * @param carAccessibility
-	 * @param bikeAccessibility
-	 * @param walkAccessibility
 	 */
 	public void writeRecord(ActivityFacility startZone, Node node, Map<Modes4Accessibility,Double> accessibilities ) { 
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
@@ -117,40 +108,12 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 		}
 	}
 
-//	public void writeRecord( Coord coord, double accessibility ) {
-//		try {
-//			accessibilityDataWriter.write( coord.getX() + "\t" +  coord.getY() + "\t" +  accessibility ) ;
-//			accessibilityDataWriter.newLine() ;
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			throw new RuntimeException("io error") ;
-//		}
-//	}
-
-	public void writeField( double val ) {
-		try {
-			accessibilityDataWriter.write( val + "\t" ) ;
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("could not write");
-		}
-	}
-
-	public void writeNewLine() {
-		try {
-			accessibilityDataWriter.newLine() ;
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("i/o failure") ;
-		}
-	}
-
 	/**
 	 * finalize and close csv file
 	 */
 	public void close(){
 		try {
-			log.info("Closing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
+			log.info("Closing ...");
 			assert(accessibilityDataWriter != null);
 			accessibilityDataWriter.flush();
 			accessibilityDataWriter.close();

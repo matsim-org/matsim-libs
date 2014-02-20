@@ -1,7 +1,10 @@
 package org.matsim.contrib.accessibility;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -12,7 +15,8 @@ import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
-import org.matsim.contrib.accessibility.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
+import org.matsim.contrib.accessibility.utils.io.writer.CellBasedAccessibilityCSVWriter;
+import org.matsim.contrib.accessibility.utils.io.writer.UrbansimCellBasedAccessibilityCSVWriterV2;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
@@ -24,12 +28,10 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
@@ -128,7 +130,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 implements ShutdownListener, StartupListener { 
 
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
-	private AnalysisCellBasedAccessibilityCSVWriterV2 accessibilityWriter;
+	private UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter;
 	private Network network;
 	private Config config;
 
@@ -175,13 +177,15 @@ implements ShutdownListener, StartupListener {
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
 		String matsimOutputDirectory = config.controler().getOutputDirectory();
-		accessibilityWriter = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory);
+		urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory);
 
 	}
 
 
 	private boolean alreadyActive = false ;
-	private ActivityFacilities weights;
+	private List<ActivityFacilities> additionalFacilityData = new ArrayList<ActivityFacilities>() ; 
+	/*package*/ Map<String,SpatialGrid> additionalSpatialGrids = new TreeMap<String,SpatialGrid>() ;
+	private boolean lockedForAdditionalFacilityData = false;
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event){
@@ -202,9 +206,10 @@ implements ShutdownListener, StartupListener {
 		}
 
 		// prepare the weight:
-		if ( this.weights != null ){
-			SpatialGrid spatialGrid = this.otherItems.get( OtherItems.weight ) ; 
-			for ( ActivityFacility fac : this.weights.getFacilities().values() ) {
+		for ( ActivityFacilities facilities : this.additionalFacilityData ) {
+			SpatialGrid spatialGrid = this.additionalSpatialGrids.get( facilities.getName() ) ;
+			// yyyyyy this needs to be initialized somehwere ... and that needs to be where we have the spatial extent!!
+			for ( ActivityFacility fac : facilities.getFacilities().values() ) {
 				Coord coord = fac.getCoord() ;
 //				double value = fac.getActivityOptions().get("h").getCapacity() ; // infinity if undefined!!!
 				double value = 1 ;
@@ -261,7 +266,7 @@ implements ShutdownListener, StartupListener {
 
 		String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
 
-		accessibilityWriter.close(); 
+		urbansimAccessibilityWriter.close(); 
 		writePlottingData(matsimOutputDirectory);			
 
 		if(this.spatialGridDataExchangeListenerList != null){
@@ -285,11 +290,11 @@ implements ShutdownListener, StartupListener {
 	 * @param accCsvWriter
 	 */
 	@Override
-	void writeCSVData( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
+	void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 
 		// writing accessibility measures of current measurePoint in csv format
-		accessibilityWriter.writeRecord(measurePoint, fromNode, accessibilities ) ;
+		urbansimAccessibilityWriter.writeRecord(measurePoint, fromNode, accessibilities ) ;
 	}
 
 	/**
@@ -301,7 +306,6 @@ implements ShutdownListener, StartupListener {
 	private void writePlottingData(String matsimOutputDirectory) {
 
 		log.info("Writing plotting data for R analyis into " + matsimOutputDirectory + " ...");
-
 		for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
 			if ( this.isComputingMode.get(mode) ) {
 				final SpatialGrid spatialGrid = this.spatialGrids.get(mode);
@@ -310,29 +314,43 @@ implements ShutdownListener, StartupListener {
 				GridUtils.writeSpatialGridTable( spatialGrid, matsimOutputDirectory
 						+ "/" + mode.toString() + ACCESSIBILITY_CELLSIZE + spatialGrid.getResolution() + ".txt");
 
-				// output for gnuplot:
-				AnalysisCellBasedAccessibilityCSVWriterV2 writer = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory,"freeSpeed") ;
-				for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
-					for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
-						final double value = spatialGrid.getValue(x, y);
-						if ( !Double.isNaN(value ) ) { 
-							writer.writeField( x ) ;
-							writer.writeField( y ) ;
-							writer.writeField( value ) ;
-							for ( OtherItems item : OtherItems.values() ) {
-								writer.writeField(  this.otherItems.get(item).getValue(x, y) ) ;
-							}
-							writer.writeNewLine(); 
-						}
-					}
-					writer.writeNewLine() ;
-				}
-				writer.close() ;
-				// for gnuplot, we should rather write as much as possible into a single file since it facilitates analysis. kai, feb'14
-
 			}
 		}
 		log.info("Writing plotting data for R done!");
+
+		log.info("Writing plotting data for other analyis into " + matsimOutputDirectory + " ...");
+
+		final CellBasedAccessibilityCSVWriter writer = new CellBasedAccessibilityCSVWriter(matsimOutputDirectory) ;
+
+		final SpatialGrid spatialGrid = this.spatialGrids.get( Modes4Accessibility.freeSpeed ) ;
+		// yy for time being, have to assume that this is always there
+		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
+			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
+				writer.writeField( x ) ;
+				writer.writeField( y ) ;
+				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
+					if ( this.isComputingMode.get(mode) ) {
+						final SpatialGrid theSpatialGrid = this.spatialGrids.get(mode);
+						final double value = theSpatialGrid.getValue(x, y);
+						if ( !Double.isNaN(value ) ) { 
+							writer.writeField( value ) ;
+						} else {
+							writer.writeField( Double.NaN ) ;
+						}
+					} else {
+						writer.writeField( Double.NaN ) ;
+					}
+				}
+				for ( SpatialGrid additionalGrid : this.additionalSpatialGrids.values() ) {
+					writer.writeField( additionalGrid.getValue(x, y) ) ;
+				}
+				writer.writeNewLine(); 
+			}
+			writer.writeNewLine(); // gnuplot pm3d scanline 
+		}
+		writer.close() ;
+
+		log.info("Writing plotting data for other analysis done!");
 	}
 
 
@@ -417,8 +435,12 @@ implements ShutdownListener, StartupListener {
 				this.spatialGrids.put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
 			}
 		}
-		for ( OtherItems item : OtherItems.values() ) {
-			this.otherItems.put( item, new SpatialGrid( minX, minY, maxX, maxY, cellSize, 0. ) ) ;
+		lockedForAdditionalFacilityData  = true ;
+		for ( ActivityFacilities facilities : this.additionalFacilityData ) {
+			if ( this.additionalSpatialGrids.get( facilities.getName() ) != null ) {
+				throw new RuntimeException("this should not yet exist ...") ;
+			}
+			this.additionalSpatialGrids.put( facilities.getName(), new SpatialGrid( minX, minY, maxX, maxY, cellSize, 0. ) ) ;
 		}
 	}
 
@@ -433,8 +455,22 @@ implements ShutdownListener, StartupListener {
 	 * already does this, but maybe we should not touch that.
 	 * </ul> kai, feb'14
 	 */
-	public void addAdditionalFacilityData(ActivityFacilities weights ) {
-		this.weights = weights ;
+	public void addAdditionalFacilityData(ActivityFacilities facilities ) {
+		if ( this.lockedForAdditionalFacilityData ) {
+			throw new RuntimeException("too late for adding additional facility data; spatial grids have already been generated.  Needs"
+					+ " to be called before generating the spatial grids.  (This design should be improved ..)") ;
+		}
+		if ( facilities.getName()==null || facilities.getName().equals("") ) {
+			throw new RuntimeException("cannot add unnamed facility containers here since we need a key to find them again") ;
+		}
+		for ( ActivityFacilities existingFacilities : this.additionalFacilityData ) {
+			if ( existingFacilities.getName().equals( facilities.getName() ) ) {
+				throw new RuntimeException("additional facilities under the name of + " + facilities.getName() + 
+						" already exist; cannot add additional facilities under the same name twice.") ;
+			}
+		}
+
+		this.additionalFacilityData.add( facilities ) ;
 	}
 
 }

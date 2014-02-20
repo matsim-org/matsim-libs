@@ -190,11 +190,12 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	 * @param accCsvWriter
 	 */
 	@Override
-	protected void writeCSVData( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
+	protected void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 		
 		// writing accessibility measures of current measurePoint in csv format
 		// The UrbanSimZoneCSVWriterV2 writer produces URBANSIM INPUT
 		urbanSimZoneCSVWriterV2.write(measurePoint, accessibilities ) ;
 	}
+
 }

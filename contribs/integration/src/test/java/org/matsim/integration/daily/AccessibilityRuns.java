@@ -4,12 +4,13 @@ import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -29,6 +30,7 @@ import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AccessibilityRuns {
+	private static final Logger log = Logger.getLogger( AccessibilityRuns.class ) ; 
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -93,25 +95,32 @@ public class AccessibilityRuns {
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
 		
-
-		ActivityFacilities homes = FacilitiesUtils.createActivityFacilities() ;
+		List<String> activityTypes = new ArrayList<String>() ;
+		ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
 		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
 			for ( ActivityOption option : fac.getActivityOptions().values() ) {
+				// figure out all activity types:
+				if ( !activityTypes.contains(option.getType()) ) {
+					activityTypes.add( option.getType() ) ;
+				}
+				// figure out where the homes are:
 				if ( option.getType().equals("h") ) {
 					homes.addActivityFacility(fac);
 				}
 			}
 		}
+		
+		log.warn( "found activity types: " + activityTypes ); 
+		
+		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some other algorithms,
+		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
-		// l, s, t, e, w, minor, h
-		String[] localActivityTypes = {"l", "s", "t", "e", "w", "minor", "h"} ;
-		for ( int ii=0 ; ii<localActivityTypes.length ; ii++ ) {
-			if ( ii != 4 ) {
-				System.err.println("skipping everything besides work");
+		for ( String actType : activityTypes ) {
+			if ( !actType.equals("w") ) {
+				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 				continue ;
 			}
-			String actType = localActivityTypes[ii] ;
-
+			
 			config.controler().setOutputDirectory( utils.getOutputDirectory() + "/" + actType + "/" );
 			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
 			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
@@ -134,8 +143,8 @@ public class AccessibilityRuns {
 			GridBasedAccessibilityControlerListenerV3 listener = 
 					new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, scenario.getNetwork( ));
 			listener.setComputingAccessibilityForMode( Modes4Accessibility.freeSpeed, true );
-			listener.generateGridsAndMeasuringPointsByNetwork(scenario.getNetwork(), 1000. );
 			listener.addAdditionalFacilityData( homes ) ;
+			listener.generateGridsAndMeasuringPointsByNetwork(scenario.getNetwork(), 1000. );
 
 			controler.addControlerListener(listener);
 
@@ -147,12 +156,12 @@ public class AccessibilityRuns {
 				// kai, feb'14
 				writer.write("set pm3d map\n") ;
 				writer.write("set pm3d flush begin\n") ;
-				writer.write("set palette defined ( 0. '#ffffff', 0.5 '#ffff00', 1. '#ff0000' )\n") ;
+				writer.write("set palette defined ( 0. '#ffffff', 0.5 '#ffff00', 1. '#0000ff' )\n") ;
 				writer.write("set zrange [-0:10]\n") ;
 				writer.write("set term pdf size 25cm,15cm \n") ;
 				writer.write("set out 'accessibility.pdf'\n") ;
 				writer.write("set title 'accessibility to " + actType + "'\n") ;
-				writer.write("splot \"<awk '!/access/{print $0}' accessibility_indicators_freeSpeed.csv\" u 1:2:3\n ") ;
+				writer.write("splot \"<awk '!/access/{print $0}' accessibilities.csv\" u 1:2:3\n ") ;
 				// (the awk command filters out the first line)
 				writer.close();
 			} catch (Exception ee ) {
