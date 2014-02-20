@@ -36,7 +36,7 @@ public class PreferencesActionListener implements ActionListener,
 				Main.pref.put("matsim_renderer", true);
 				Preferences.showIds.setEnabled(true);
 				Preferences.showIds.setSelected(Main.pref
-						.getBoolean("matsim_showIds"));
+						.getBoolean("matsim_showIds", false));
 				Preferences.wayOffset.setEnabled(true);
 				Preferences.wayOffsetLabel.setEnabled(true);
 			}
@@ -92,7 +92,6 @@ public class PreferencesActionListener implements ActionListener,
 			int temp = source.getValue();
 			double offset = ((double) temp) * 0.03; 
 			Main.pref.putDouble("matsim_wayOffset", offset);
-			MapRenderer.wayOffset = (float) offset;
 		}
 
 	}

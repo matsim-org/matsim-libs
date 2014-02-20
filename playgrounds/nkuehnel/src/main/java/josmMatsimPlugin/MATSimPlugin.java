@@ -12,6 +12,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.actions.ExtensionFileFilter;
+import org.openstreetmap.josm.data.Preferences.PreferenceChangeEvent;
+import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.osm.visitor.paint.MapRendererFactory;
 import org.openstreetmap.josm.gui.MapFrame;
 import org.openstreetmap.josm.gui.MapView;
@@ -31,19 +34,24 @@ import org.xml.sax.SAXException;
  * @author nkuehnel
  * 
  */
-public class MATSimPlugin extends Plugin {
+public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 	private MATSimAction MATSimAction;
 	protected static MATSimToggleDialog toggleDialog;
+	private static boolean matsimRenderer = Main.pref.getBoolean(
+			"matsim_renderer", false);
 
 	public MATSimPlugin(PluginInformation info) throws IOException,
 			SAXException {
 		super(info);
+		
+		ExtensionFileFilter.exporters.add(0, new MATSimNetworkFileExporter());
+		
 		MATSimAction = new MATSimAction();
-		Main.main.menu.toolsMenu.add(MATSimAction.getExportAction());
 		Main.main.menu.toolsMenu.add(MATSimAction.getImportAction());
 		Main.main.menu.toolsMenu.add(MATSimAction.getNewNetworkAction());
 
-		Reader reader = new InputStreamReader(getClass().getResourceAsStream("matsimPreset.xml"));
+		Reader reader = new InputStreamReader(getClass().getResourceAsStream(
+				"matsimPreset.xml"));
 
 		Collection<TaggingPreset> tps;
 		try {
@@ -79,11 +87,17 @@ public class MATSimPlugin extends Plugin {
 			}
 		}
 
-		MapRendererFactory factory = MapRendererFactory.getInstance();
-		factory.register(MapRenderer.class, "My map renderer",
-				"This is the MATSim map renderer");
-		factory.activate(MapRenderer.class);
-		
+		if (matsimRenderer) {
+			MapRendererFactory factory = MapRendererFactory.getInstance();
+			factory.register(MapRenderer.class, "MATSim Renderer",
+					"This is the MATSim map renderer");
+			factory.activate(MapRenderer.class);
+		}
+
+		Main.pref.addPreferenceChangeListener(this);
+		Main.pref.addPreferenceChangeListener(MapRenderer.Properties
+				.getInstance());
+
 		OsmConvertDefaults.load();
 	}
 
@@ -103,7 +117,19 @@ public class MATSimPlugin extends Plugin {
 	public PreferenceSetting getPreferenceSetting() {
 		return new Preferences.Factory().createPreferenceSetting();
 	}
-	
-	
-	
+
+	@Override
+	public void preferenceChanged(PreferenceChangeEvent e) {
+		if (e.getKey().equalsIgnoreCase("matsim_renderer")) {
+			MapRendererFactory factory = MapRendererFactory.getInstance();
+			if (Main.pref.getBoolean("matsim_renderer") == true) {
+				factory.register(MapRenderer.class, "MATSim Renderer",
+						"This is the MATSim map renderer");
+				factory.activate(MapRenderer.class);
+			} else {
+				factory.activateDefault();
+				factory.unregister(MapRenderer.class);
+			}
+		}
+	}
 }

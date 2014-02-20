@@ -91,6 +91,7 @@ public class ImportTask extends PleaseWaitRunnable {
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(importSystem,
 						TransformationFactory.WGS84);
+		
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("creating scenario..");
 		Config config = ConfigUtils.createConfig();
@@ -173,7 +174,6 @@ public class ImportTask extends PleaseWaitRunnable {
 		this.progressMonitor.setCustomText("creating layer..");
 
 		layer = new NetworkLayer(dataSet, ImportDialog.path.getText(),
-				new File(path), network, importSystem);
-		dataSet.addDataSetListener(new NetworkListener(layer, way2Links));
+				new File(path), network, importSystem, way2Links);
 	}
 }

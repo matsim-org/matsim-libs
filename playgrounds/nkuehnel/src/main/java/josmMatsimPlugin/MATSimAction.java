@@ -24,7 +24,6 @@ import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.JosmAction;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Way;
-import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.tools.Shortcut;
 
 /**
@@ -35,10 +34,6 @@ import org.openstreetmap.josm.tools.Shortcut;
  */
 public class MATSimAction {
 
-	public JosmAction getExportAction() {
-		return new ExportAction();
-	}
-
 	public JosmAction getImportAction() {
 		return new ImportAction();
 	}
@@ -47,63 +42,7 @@ public class MATSimAction {
 		return new NewNetworkAction();
 	}
 
-	public class ExportAction extends JosmAction {
-
-		public ExportAction() {
-			super(tr("Export MATSim network"), "save.png",
-					tr("Export MATSim network file"), Shortcut
-							.registerShortcut("menu:matsimexport",
-									tr("Menu: {0}", tr("MATSim Export")),
-									KeyEvent.VK_G, Shortcut.ALT_CTRL), true);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-			String path = Main.pref.get("matsim_exportFolder",
-					System.getProperty("user.home"))
-					+ "/josm_matsim_export";
-
-			ExportDialog dialog;
-
-			Layer layer = Main.main.getActiveLayer();
-			if (layer instanceof NetworkLayer) {
-				dialog = new ExportDialog(
-						((NetworkLayer) layer).getCoordSystem());
-			} else {
-				dialog = new ExportDialog(null);
-			}
-			JFileChooser chooser = new JFileChooser(path);
-			chooser.setDialogTitle("MATSim-Export");
-			chooser.setApproveButtonText("Confirm");
-			FileFilter filter = new FileNameExtensionFilter("Network-XML",
-					"xml");
-			chooser.setFileFilter(filter);
-
-			int result = chooser.showSaveDialog(null);
-
-			if (result == JFileChooser.APPROVE_OPTION
-					&& chooser.getSelectedFile().getAbsolutePath() != null) {
-				path = chooser.getSelectedFile().getAbsolutePath();
-				dialog.exportFilePath.setText(path);
-				JOptionPane pane = new JOptionPane(dialog,
-						JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-				dialog.setOptionPane(pane);
-				JDialog dlg = pane.createDialog(Main.parent, tr("Export"));
-				dlg.setAlwaysOnTop(true);
-				dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-				dlg.setVisible(true);
-				if (pane.getValue() != null) {
-					if (((Integer) pane.getValue()) == JOptionPane.OK_OPTION) {
-						ExportTask task = new ExportTask(path);
-						Main.worker.execute(task);
-					}
-				}
-				dlg.dispose();
-			}
-		}
-	}
-
+	
 	public class ImportAction extends JosmAction {
 
 		public ImportAction() {
@@ -165,9 +104,7 @@ public class MATSimAction {
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			NetworkLayer layer = new NetworkLayer(dataSet, "new Layer", null,
-					scenario.getNetwork(), TransformationFactory.WGS84);
-			dataSet.addDataSetListener(new NetworkListener(layer,
-					new HashMap<Way, List<Link>>()));
+					scenario.getNetwork(), TransformationFactory.WGS84, new HashMap<Way, List<Link>>());
 			Main.main.addLayer(layer);
 		}
 	}

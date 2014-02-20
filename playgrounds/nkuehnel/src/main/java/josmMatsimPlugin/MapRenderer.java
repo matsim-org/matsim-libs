@@ -11,6 +11,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.Preferences.PreferenceChangeEvent;
+import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.visitor.paint.StyledMapRenderer;
@@ -20,11 +22,6 @@ import org.openstreetmap.josm.gui.mappaint.LabelCompositionStrategy;
 import org.openstreetmap.josm.gui.mappaint.TextElement;
 
 public class MapRenderer extends StyledMapRenderer {
-	private final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
-	private final CompositionStrategy STRATEGY = new CompositionStrategy();
-	private final Color MATSIMCOLOR = new Color(80, 145, 190);
-	protected static float wayOffset = ((float) Main.pref.getDouble(
-			"matsim_wayOffset", 1.5));
 
 	public MapRenderer(Graphics2D arg0, NavigatableComponent arg1, boolean arg2) {
 		super(arg0, arg1, arg2);
@@ -47,30 +44,33 @@ public class MapRenderer extends StyledMapRenderer {
 			boolean showOrientation, boolean showHeadArrowOnly,
 			boolean showOneway, boolean onewayReversed) {
 
-		if (Main.pref.getBoolean("matsim_renderer", true)) {
-			Layer layer = Main.main.getActiveLayer();
-			Id id = new IdImpl(way.getUniqueId());
-			if (layer instanceof NetworkLayer) {
-				Network network = ((NetworkLayer) layer).getMatsimNetwork();
-				if (network.getLinks().containsKey(id)) {
-					Link link = network.getLinks().get(id);
-					if (!way.isSelected()) {
-						if (Main.pref.getBoolean("matsim_showIds", false)) {
-							drawTextOnPath(way, new TextElement(STRATEGY, FONT,
-									0, textOffset(network, link), MATSIMCOLOR,
-									0.f, null));
-						}
-						super.drawWay(way, MATSIMCOLOR, line, dashes,
-								dashedColor, wayOffset(network, link),
-								showOrientation, showHeadArrowOnly, showOneway,
-								onewayReversed);
-						return;
-					} else {
-						if (Main.pref.getBoolean("matsim_showIds", false)) {
-							drawTextOnPath(way, new TextElement(STRATEGY, FONT,
-									0, textOffset(network, link), selectedColor,
-									0.f, null));
-						}
+		Layer layer = Main.main.getActiveLayer();
+		Id id = new IdImpl(way.getUniqueId());
+		if (layer instanceof NetworkLayer) {
+			Network network = ((NetworkLayer) layer).getMatsimNetwork();
+			if (network.getLinks().containsKey(id)) {
+				Link link = network.getLinks().get(id);
+				if (!way.isSelected()) {
+					if (Properties.showIds) {
+						drawTextOnPath(
+								way,
+								new TextElement(Properties.getInstance(),
+										Properties.FONT, 0, textOffset(network,
+												link), Properties.MATSIMCOLOR,
+										0.f, null));
+					}
+					super.drawWay(way, Properties.MATSIMCOLOR, line, dashes,
+							dashedColor, wayOffset(network, link),
+							showOrientation, showHeadArrowOnly, showOneway,
+							onewayReversed);
+					return;
+				} else {
+					if (Properties.showIds) {
+						drawTextOnPath(
+								way,
+								new TextElement(Properties.getInstance(),
+										Properties.FONT, 0, textOffset(network,
+												link), selectedColor, 0.f, null));
 					}
 				}
 			}
@@ -80,14 +80,7 @@ public class MapRenderer extends StyledMapRenderer {
 	}
 
 	private float wayOffset(Network network, Link link) {
-		for (Link link2 : network.getLinks().values()) {
-			if (link2.getFromNode().equals(link.getToNode())
-					&& link2.getToNode().equals(link.getFromNode())) {
-
-				return wayOffset;
-			}
-		}
-		return 0.f;
+		return Properties.wayOffset;
 	}
 
 	private int textOffset(Network network, Link link) {
@@ -105,7 +98,34 @@ public class MapRenderer extends StyledMapRenderer {
 		return offset;
 	}
 
-	private class CompositionStrategy extends LabelCompositionStrategy {
+	static class Properties extends LabelCompositionStrategy implements
+			PreferenceChangedListener {
+
+		private final static Properties INSTANCE = new Properties();
+		final static Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
+		final static Color MATSIMCOLOR = new Color(80, 145, 190);
+		static boolean showIds = Main.pref.getBoolean("matsim_showIds", false);
+		static float wayOffset = ((float) Main.pref.getDouble(
+				"matsim_wayOffset", 0));
+
+		public static void initialize() {
+			Main.pref.addPreferenceChangeListener(INSTANCE);
+		}
+
+		@Override
+		public void preferenceChanged(PreferenceChangeEvent e) {
+			if (e.getKey().equalsIgnoreCase("matsim_showIds")) {
+				showIds = Main.pref.getBoolean("matsim_showIds");
+			}
+			if (e.getKey().equalsIgnoreCase("matsim_wayOffset")) {
+				wayOffset = ((float) (Main.pref
+						.getDouble("matsim_wayOffset", 0)));
+			}
+		}
+
+		public static Properties getInstance() {
+			return INSTANCE;
+		}
 
 		@Override
 		public String compose(OsmPrimitive prim) {

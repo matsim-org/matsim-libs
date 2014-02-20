@@ -3,6 +3,7 @@
  */
 package josmMatsimPlugin;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,19 +49,19 @@ import org.xml.sax.SAXException;
 public class ExportTask extends PleaseWaitRunnable {
 	static Properties matsimConvertProperties = new Properties();
 	protected int exportResult;
-	private String path;
 	private String targetSystem;
 
 	protected static final int SUCCESS = 0;
 	protected static final int VALIDATION_ERROR = 1;
 	private List<TestError> validationErrors = new ArrayList<TestError>();
+	private File file;
 
-	public ExportTask(String path) {
+	public ExportTask(File file) {
 		super("MATSim Export");
 		this.exportResult = 0;
-		this.path = path.endsWith(".xml") ? path : path + ".xml";
 		this.targetSystem = (String) ExportDialog.exportSystem
 				.getSelectedItem();
+		this.file = file;
 	}
 
 	/*
@@ -82,7 +83,7 @@ public class ExportTask extends PleaseWaitRunnable {
 	protected void finish() {
 		if (exportResult == SUCCESS) {
 			JOptionPane.showMessageDialog(Main.parent,
-					"Export finished. File written to: " + path + " ("
+					"Export finished. File written to: " + file.getPath() + " ("
 							+ targetSystem + ")");
 		} else if (exportResult == VALIDATION_ERROR) {
 			JOptionPane
@@ -195,7 +196,7 @@ public class ExportTask extends PleaseWaitRunnable {
 			}
 			this.progressMonitor.setTicks(4);
 			this.progressMonitor.setCustomText("writing out xml file..");
-			new NetworkWriter(network).write(path);
+			new NetworkWriter(network).write(file.getAbsolutePath());
 		}
 	}
 }

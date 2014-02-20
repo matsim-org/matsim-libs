@@ -93,12 +93,14 @@ public final class Preferences extends DefaultTabPreferenceSetting {
 		renderMatsim.addActionListener(listener);
 		
 		wayOffset.addChangeListener(listener);
-		wayOffset.setValue((int) ((Main.pref.getDouble("matsim_wayOffset", 1.5)) / 0.03));
+		wayOffset.setValue((int) ((Main.pref.getDouble("matsim_wayOffset", 0)) / 0.03));
 
-		showIds.setSelected(Main.pref.getBoolean("matsim_showIds", false)
-				&& Main.pref.getBoolean("matsim_renderer", true));
-		renderMatsim.setSelected(Main.pref.getBoolean("matsim_renderer", true));
-		wayOffset.setEnabled(Main.pref.getBoolean("matsim_renderer", true));
+		showIds.setSelected(Main.pref.getBoolean("matsim_showIds")
+				&& Main.pref.getBoolean("matsim_renderer"));
+		renderMatsim.setSelected(Main.pref.getBoolean("matsim_renderer"));
+		wayOffset.setEnabled(Main.pref.getBoolean("matsim_renderer"));
+		showIds.setEnabled(Main.pref.getBoolean("matsim_renderer"));
+		wayOffsetLabel.setEnabled(Main.pref.getBoolean("matsim_renderer"));
 		
 
 		cOptions.anchor = GridBagConstraints.NORTHWEST;

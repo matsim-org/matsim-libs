@@ -25,6 +25,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.Preferences.PreferenceChangeEvent;
+import org.openstreetmap.josm.data.Preferences.PreferenceChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.INode;
 import org.openstreetmap.josm.data.osm.IWay;
@@ -36,7 +38,7 @@ import org.openstreetmap.josm.data.osm.Way;
  * 
  * @author nkuehnel
  */
-public class Converter {
+public class Converter implements PreferenceChangedListener {
 	private final static Logger log = Logger.getLogger(Converter.class);
 
 	private final static String TAG_LANES = "lanes";
@@ -57,7 +59,8 @@ public class Converter {
 	Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
 	private boolean scaleMaxSpeed = false;
-	private boolean keepPaths;
+	private static boolean keepPaths = Main.pref.getBoolean(
+			"matsim_convertDefaults_keepPaths", false);
 
 	final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
@@ -66,8 +69,6 @@ public class Converter {
 	public Converter(DataSet dataSet, Network network) {
 		this.dataSet = dataSet;
 		this.network = network;
-		this.keepPaths = Main.pref.getBoolean(
-				"matsim_convertDefaults_keepPaths", false);
 		this.highwayDefaults = OsmConvertDefaults.getDefaults();
 	}
 
@@ -480,6 +481,15 @@ public class Converter {
 		result.addAll(primitives);
 		Collections.sort(result, byIdComparator);
 		return result;
+	}
+
+	@Override
+	public void preferenceChanged(PreferenceChangeEvent e) {
+		if (e.getKey().equalsIgnoreCase("matsim_convertDefaults_keepPaths")) {
+			this.keepPaths = (Boolean) e.getNewValue().getValue();
+			System.out.println(keepPaths);
+		}
+		
 	}
 
 	

@@ -1,6 +1,5 @@
 package josmMatsimPlugin;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,19 +37,17 @@ import org.openstreetmap.josm.data.osm.event.WayNodesChangedEvent;
 public class NetworkListener implements DataSetListener {
 	private Network network;
 	private CoordinateTransformation ct;
-	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 	private NetworkLayer layer;
 	private static final List<String> TRANSPORT_MODES = Arrays.asList(
 			TransportMode.bike, TransportMode.car, TransportMode.other,
 			TransportMode.pt, TransportMode.ride, TransportMode.transit_walk,
 			TransportMode.walk);
 
-	public NetworkListener(NetworkLayer layer, Map<Way, List<Link>> way2Links) {
+	public NetworkListener(NetworkLayer layer) {
 		this.layer = layer;
 		this.network = layer.getMatsimNetwork();
 		this.ct = TransformationFactory.getCoordinateTransformation(
 				TransformationFactory.WGS84, layer.getCoordSystem());
-		this.way2Links = way2Links;
 	}
 
 	@Override
@@ -85,7 +82,7 @@ public class NetworkListener implements DataSetListener {
 			}
 		}
 
-		MATSimPlugin.toggleDialog.title(layer);
+		MATSimPlugin.toggleDialog.notifyDataChanged(layer);
 	}
 
 	@Override
@@ -116,17 +113,16 @@ public class NetworkListener implements DataSetListener {
 					}
 					network.addNode(nodeTemp);
 					System.out.println("node hinzugefuegt!" + nodeTemp.getId());
-					MATSimPlugin.toggleDialog.title(layer);
+					MATSimPlugin.toggleDialog.notifyDataChanged(layer);
 				}
-
 			} else if (primitive instanceof Way) {
 				Way way = (Way) primitive;
 
-				if (!way2Links.containsKey(way)) {
+				if (!layer.getWay2Links().containsKey(way)) {
 					List<Link> links = enterWay2Links(way);
 					for (Link link : links) {
 						network.addLink(link);
-						MATSimPlugin.toggleDialog.title(layer);
+						MATSimPlugin.toggleDialog.notifyDataChanged(layer);
 					}
 				}
 			}
@@ -135,14 +131,14 @@ public class NetworkListener implements DataSetListener {
 
 	private List<Link> enterWay2Links(Way way) {
 		List<Link> links = computeWay2Links(way);
-		List<Link> previous = way2Links.put(way, links);
+		List<Link> previous = layer.getWay2Links().put(way, links);
 		if (previous != null) {
 			throw new RuntimeException("Shouldn't happen.");
 		}
 		return links;
 	}
 
-	public List<Link> computeWay2Links(Way way) {
+	private List<Link> computeWay2Links(Way way) {
 		Map<String, String> keys = way.getKeys();
 		if (way.getNodesCount() != 2)
 			return Collections.emptyList();
@@ -168,9 +164,22 @@ public class NetworkListener implements DataSetListener {
 		} else {
 			((LinkImpl) link).setOrigId(id.toString());
 		}
-		link.setCapacity(Double.parseDouble(keys.get("capacity")));
-		link.setFreespeed(Double.parseDouble(keys.get("freespeed")));
-		link.setNumberOfLanes(Double.parseDouble(keys.get("permlanes")));
+		Double capacity = parseDoubleIfPossible(keys.get("capacity"));
+		if (capacity == null) {
+			return Collections.emptyList();
+		}
+		Double freespeed = parseDoubleIfPossible(keys.get("freespeed"));
+		if (freespeed == null) {
+			return Collections.emptyList();
+		}
+		Double permlanes = parseDoubleIfPossible(keys.get("permlanes"));
+		if (permlanes == null) {
+			return Collections.emptyList();
+		}
+
+		link.setCapacity(capacity);
+		link.setFreespeed(freespeed);
+		link.setNumberOfLanes(permlanes);
 
 		Set<String> modes = new HashSet<String>();
 		String tempArray[] = keys.get("modes").split(";");
@@ -194,6 +203,14 @@ public class NetworkListener implements DataSetListener {
 		return Collections.singletonList(link);
 	}
 
+	private Double parseDoubleIfPossible(String string) {
+		try {
+			return Double.parseDouble(string);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
 	private Double linkLength(Link link) {
 		Double length;
 		if (layer.getCoordSystem().equals(TransformationFactory.WGS84)) {
@@ -206,7 +223,7 @@ public class NetworkListener implements DataSetListener {
 		return length;
 	}
 
-	public Node matsim4osm(org.openstreetmap.josm.data.osm.Node firstNode) {
+	private Node matsim4osm(org.openstreetmap.josm.data.osm.Node firstNode) {
 		String id = Long.toString(firstNode.getUniqueId());
 		Node node = network.getNodes().get(new IdImpl(id));
 		return node;
@@ -222,7 +239,7 @@ public class NetworkListener implements DataSetListener {
 				System.out.println("node removed!");
 				network.removeNode(node.getId());
 			} else if (primitive instanceof Way) {
-				List<Link> links = way2Links.remove(((Way) primitive));
+				List<Link> links = layer.getWay2Links().remove(((Way) primitive));
 				for (Link link : links) {
 					network.removeLink(link.getId());
 					System.out.println("link removed!");
@@ -230,7 +247,7 @@ public class NetworkListener implements DataSetListener {
 			}
 		}
 		System.out.println("have links: " + network.getLinks().size());
-		MATSimPlugin.toggleDialog.title(layer);
+		MATSimPlugin.toggleDialog.notifyDataChanged(layer);
 	}
 
 	@Override
@@ -244,18 +261,18 @@ public class NetworkListener implements DataSetListener {
 		for (OsmPrimitive primitive : changed.getPrimitives()) {
 			if (primitive instanceof Way) {
 				Way way = (Way) primitive;
-				List<Link> oldLinks = way2Links.remove(way);
+				List<Link> oldLinks = layer.getWay2Links().remove(way);
 				List<Link> newLinks = enterWay2Links(way);
 				for (Link link : oldLinks) {
 					System.out.println("remove because tag changed.");
 					Link removedLink = network.removeLink(link.getId());
-					MATSimPlugin.toggleDialog.title(layer);
+					MATSimPlugin.toggleDialog.notifyDataChanged(layer);
 					System.out.println(removedLink);
 				}
 				for (Link link : newLinks) {
 					System.out.println("add because tag changed.");
 					network.addLink(link);
-					MATSimPlugin.toggleDialog.title(layer);
+					MATSimPlugin.toggleDialog.notifyDataChanged(layer);
 				}
 			} else if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				org.openstreetmap.josm.data.osm.Node node = (org.openstreetmap.josm.data.osm.Node) primitive;
