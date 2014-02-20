@@ -33,16 +33,25 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+
+import playground.thibautd.config.NonFlatConfigReader;
+import playground.thibautd.mobsim.PseudoSimConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTripsMutatorConfigGroup;
+import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.population.DriverRouteFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.JointPlansConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlansXmlReader;
 import playground.thibautd.socnetsim.population.PassengerRouteFactory;
+import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceConfigGroup;
+import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.RandomJointLocationChoiceConfigGroup;
+import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.utils.DesiresConverter;
 
 /**
@@ -140,23 +149,25 @@ public class JointScenarioUtils {
 	public static Config createConfig() {
 		final Config config = ConfigUtils.createConfig();
 
-		config.addModule(
-				new CliquesConfigGroup());
-		config.addModule(
-				new JointTripsMutatorConfigGroup());
-		config.addModule(
-				new JointTimeModeChooserConfigGroup());
-		config.addModule(
-				new JointTripInsertorConfigGroup());
-		config.addModule(
-				new JointPlansConfigGroup());
+		config.addModule( new CliquesConfigGroup());
+		config.addModule( new JointTripsMutatorConfigGroup());
+		config.addModule( new JointTimeModeChooserConfigGroup());
+		config.addModule( new JointTripInsertorConfigGroup());
+		config.addModule( new JointPlansConfigGroup());
+		config.addModule( new GroupReplanningConfigGroup() );
+		config.addModule( new KtiLikeScoringConfigGroup() );
+		config.addModule( new PseudoSimConfigGroup() );
+		config.addModule( new SocialNetworkConfigGroup() );
+		config.addModule( new RandomJointLocationChoiceConfigGroup() );
+		config.addModule( new PlanLinkConfigGroup() );
+		config.addModule( new PrismicLocationChoiceConfigGroup() );
 
 		return config;
 	}
 
 	public static Config loadConfig(final String configFile) {
 		final Config config = createConfig();
-		if (configFile != null) ConfigUtils.loadConfig( config , configFile );
+		new NonFlatConfigReader( config ).parse( configFile );
 		return config;
 	}
 }

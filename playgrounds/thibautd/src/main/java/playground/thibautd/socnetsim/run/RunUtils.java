@@ -628,17 +628,12 @@ public class RunUtils {
 
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig();
-		final GroupReplanningConfigGroup weights = new GroupReplanningConfigGroup();
-		config.addModule( weights );
 		config.addModule( new ScoringFunctionConfigGroup() );
-		config.addModule( new KtiLikeScoringConfigGroup() );
 		config.addModule( new KtiInputFilesConfigGroup() );
-		config.addModule( new PseudoSimConfigGroup() );
-		config.addModule( new SocialNetworkConfigGroup() );
-		config.addModule( new RandomJointLocationChoiceConfigGroup() );
-		config.addModule( new PlanLinkConfigGroup() );
-		config.addModule( new PrismicLocationChoiceConfigGroup() );
 		new NonFlatConfigReader( config ).parse( configFile );
+
+		final GroupReplanningConfigGroup weights =  (GroupReplanningConfigGroup)
+			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 	
 		if ( config.scenario().isUseHouseholds() && weights.getUseLimitedVehicles() ) {
@@ -719,7 +714,7 @@ public class RunUtils {
 								return new LinearOverlapScorer( 0 );
 							}
 							final Desires desires = person.getDesires();
-							final double typicalDuration = desires.getActivityDuration( "leisure" );
+							final double typicalDuration = desires.getActivityDuration( scoringFunctionConf.getActivityTypeForContactInDesires() );
 							final double zeroDuration = typicalDuration * Math.exp( -10.0 / typicalDuration );
 							return new LogOverlapScorer(
 									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
