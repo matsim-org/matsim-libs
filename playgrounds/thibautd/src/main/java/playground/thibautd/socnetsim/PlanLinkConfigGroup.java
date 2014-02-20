@@ -35,7 +35,7 @@ public class PlanLinkConfigGroup extends ReflectiveModule {
 
 	private boolean linkJointTrips = true;
 	private boolean linkVehicles = true;
-	private boolean linkJoinableActivities = false;
+	private boolean linkJoinableActivities = true;
 	private final Set<String> joinableTypes = new TreeSet<String>( Collections.singleton( "leisure" ) );
 
 	public PlanLinkConfigGroup() {
