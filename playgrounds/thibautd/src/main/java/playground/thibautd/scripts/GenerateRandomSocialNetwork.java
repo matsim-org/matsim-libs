@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import java.util.Date;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
@@ -49,6 +50,10 @@ public class GenerateRandomSocialNetwork {
 		if ( prob <= 0 || prob > 1 ) throw new RuntimeException( "prob="+prob );
 
 		final SocialNetwork sn = new SocialNetworkImpl( true );
+		sn.addMetadata( "generated with", "playground.thibautd.scripts.GenerateRandomSocialNetwork" );
+		sn.addMetadata( "avg egocentric network size", ""+avgEgocentricNetworkSize );
+		sn.addMetadata( "input population file", inputPopulationFile );
+		sn.addMetadata( "date", new Date().toString() );
 
 		for ( int i=0; i < ids.length; i++ ) {
 			sn.addEgo( ids[ i ] );		
