@@ -44,6 +44,9 @@ public class LockedSocialNetwork implements SocialNetwork {
 	private final Map<Id, Set<Id>> alterEgoMap;
 	private final boolean failOnUnknownEgo;
 	private boolean locked = false;
+	
+	private final Map<String, String> metadata = new LinkedHashMap<String, String>();
+
 
 	// mainly to simplify writing tests
 	public LockedSocialNetwork( final boolean failOnUnknownEgo ) {
@@ -146,6 +149,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	}
 
 	private LockedSocialNetwork secondaryNetwork = null;
+
 	public LockedSocialNetwork getNetworkOfUnknownFriendsOfFriends() {
 		if ( !locked ) {
 			log.warn( "getting the network of secondary ties has the side effect of locking the primary network" );
@@ -200,6 +204,16 @@ public class LockedSocialNetwork implements SocialNetwork {
 	@Override
 	public boolean isReflective() {
 		return true;
+	}
+
+	@Override
+	public Map<String, String> getMetadata() {
+		return metadata;
+	}
+
+	@Override
+	public void addMetadata(String att, String value) {
+		metadata.put( att , value );
 	}
 }
 
