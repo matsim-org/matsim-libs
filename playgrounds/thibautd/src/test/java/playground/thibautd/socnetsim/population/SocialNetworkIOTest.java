@@ -96,6 +96,12 @@ public class SocialNetworkIOTest {
 					expectedAlters,
 					actualAlters );
 		}
+
+		Assert.assertEquals(
+				"different metadata",
+				output.getMetadata(),
+				input.getMetadata() );
+
 		c.printCounter();
 	}
 
@@ -127,6 +133,8 @@ public class SocialNetworkIOTest {
 			}
 		}
 
+		sn.addMetadata( "some attribute" , "some value" );
+		sn.addMetadata( "some other attribute" , "some other value" );
 		return sn;
 	}
 }

@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.population;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,6 +42,8 @@ public class SocialNetworkImpl implements SocialNetwork {
 	private final Map<Id, Set<Id>> map = new HashMap<Id, Set<Id>>();
 
 	private final boolean isReflective;
+
+	private final Map<String, String> metadata = new LinkedHashMap<String, String>();
 
 	public SocialNetworkImpl() {
 		this( true );
@@ -172,5 +175,17 @@ public class SocialNetworkImpl implements SocialNetwork {
 	public boolean isReflective() {
 		return isReflective;
 	}
+
+	@Override
+	public Map<String, String> getMetadata() {
+		return metadata;
+	}
+
+	@Override
+	public void addMetadata(final String attribute, final String value) {
+		final String old = metadata.put( attribute , value );
+		if ( old != null ) log.warn( "replacing metadata \""+attribute+"\" from \""+old+"\" to \""+value+"\"" );
+	}
+
 }
 

@@ -36,20 +36,31 @@ public interface SocialNetwork {
 	 * for more safety in simulation (fail if the social network does not cover the
 	 * whole population).
 	 */
-	public abstract void addEgo(Id id);
+	public void addEgo(Id id);
 
-	public abstract void addEgos(Iterable<? extends Id> ids);
+	public void addEgos(Iterable<? extends Id> ids);
 
-	public abstract void addBidirectionalTie(Id id1, Id id2);
+	public void addBidirectionalTie(Id id1, Id id2);
 
-	public abstract void addMonodirectionalTie(Id ego, Id alter);
+	public void addMonodirectionalTie(Id ego, Id alter);
 
-	public abstract Set<Id> getAlters(Id ego);
+	public Set<Id> getAlters(Id ego);
 
-	public abstract Set<Id> getEgos();
+	public Set<Id> getEgos();
 
-	public abstract Map<Id, Set<Id>> getMapRepresentation();
+	public Map<Id, Set<Id>> getMapRepresentation();
 
-	public abstract boolean isReflective();
+	public boolean isReflective();
 
+	/**
+	 * retrieve the metadata
+	 */
+	public Map<String, String> getMetadata();
+
+	/**
+	 * add metadata. Metadata associates attribute names to values,
+	 * and can be used to store any information useful to organize data:
+	 * date of generation, source, author, etc.
+	 */
+	public void addMetadata(final String att, final String value);
 }

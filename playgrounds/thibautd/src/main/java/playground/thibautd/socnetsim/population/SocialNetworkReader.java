@@ -72,6 +72,11 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			if ( this.isReflective ) this.socialNetwork.addBidirectionalTie( ego , alter );
 			else this.socialNetwork.addMonodirectionalTie( ego , alter );
 		}
+		else if ( name.equals( SocialNetworkWriter.ATTRIBUTE_TAG ) ) {
+			this.socialNetwork.addMetadata(
+					atts.getValue( SocialNetworkWriter.NAME_ATT ),
+					atts.getValue( SocialNetworkWriter.VALUE_ATT ) );
+		}
 	}
 
 	@Override

@@ -20,9 +20,11 @@
 package playground.thibautd.socnetsim.population;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -41,6 +43,11 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 	public static final String EGO_ATT = "egoId";
 	public static final String ALTER_ATT = "alterId";
 
+	public static final String METADATA_TAG = "metadata";
+	public static final String ATTRIBUTE_TAG = "attribute";
+	public static final String NAME_ATT = "name";
+	public static final String VALUE_ATT = "value";
+
 	private final SocialNetwork network;
 
 	public SocialNetworkWriter( final SocialNetwork network ) {
@@ -57,10 +64,32 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 					createTuple(
 						REFLECTIVE_ATT,
 						network.isReflective() ) ) );
+		writeMetadata();
 		writeEgos();
 		writeNetwork( );
 		this.writeEndTag( ROOT_TAG );
 		this.close();
+	}
+
+	private void writeMetadata() {
+		if ( network.getMetadata().isEmpty() ) return;
+		writeStartTag( METADATA_TAG , Collections.<Tuple<String, String>>emptyList() );
+
+		for ( Map.Entry<String, String> e : network.getMetadata().entrySet() ) {
+			writeStartTag(
+					ATTRIBUTE_TAG,
+					Arrays.asList(
+						createTuple(
+							NAME_ATT,
+							e.getKey() ),
+						createTuple(
+							VALUE_ATT,
+							e.getValue() ) ),
+					true);
+		}
+
+		writeEndTag( METADATA_TAG );
+		writeContent( "" , true ); // to skip a line
 	}
 
 	private void writeEgos() {
