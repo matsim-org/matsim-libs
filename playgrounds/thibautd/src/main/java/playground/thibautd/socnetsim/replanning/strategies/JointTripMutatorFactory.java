@@ -72,6 +72,11 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 								MatsimRandom.getLocalInstance(),
 								true); // "iterative"
 						}
+						
+						@Override
+						protected String getName() {
+							return "JointTripMutator";
+						}
 					}));
 
 		strategy.addStrategyModule(
