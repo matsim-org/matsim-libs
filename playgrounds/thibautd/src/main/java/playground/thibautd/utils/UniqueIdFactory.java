@@ -30,10 +30,7 @@ import org.matsim.core.basic.v01.IdImpl;
 public class UniqueIdFactory {
 	private final String prefix;
 
-	// very unlikely that we need to generate more than 2**63
-	// ids, but the cost of adding this security is anyway minimal.
 	private long count = 0;
-	private long resetCount = 0;
 
 	/**
 	 * creates a new factory.
@@ -58,11 +55,10 @@ public class UniqueIdFactory {
 		count++;
 
 		if (count == Long.MAX_VALUE){
-			count = 0;
-			resetCount++;
+			throw new IllegalStateException( "no more ids!" );
 		}
 
-		return new IdImpl( prefix+"-"+resetCount+"-"+count );
+		return new IdImpl( prefix+"-"+count );
 	}
 }
 
