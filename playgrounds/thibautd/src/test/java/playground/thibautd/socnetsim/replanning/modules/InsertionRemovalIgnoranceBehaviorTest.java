@@ -68,7 +68,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 	@Before
 	public void init() {
-		config = JointScenarioUtils.loadConfig( null );
+		config = JointScenarioUtils.createConfig();
 		tripRouter = new  TripRouter();
 		random = new Random( 1234 );
 	}

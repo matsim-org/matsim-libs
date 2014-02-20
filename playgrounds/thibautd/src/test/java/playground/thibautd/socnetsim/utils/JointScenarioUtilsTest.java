@@ -55,7 +55,7 @@ public class JointScenarioUtilsTest {
 		final String popFile = utils.getOutputDirectory()+"/pop.xml";
 
 		new PopulationWriter( dumpedPopulation , null ).write( popFile );
-		final Config config = JointScenarioUtils.loadConfig( null );
+		final Config config = JointScenarioUtils.createConfig();
 		config.plans().setInputFile( popFile );
 		final Scenario loadedScenario = JointScenarioUtils.loadScenario( config );
 
