@@ -66,7 +66,7 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 		final JointPlans jointPlans = (JointPlans)
 			scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
 
-		final Queue<ReplanningGroup> jointPlansGroups =
+		final Queue<TaggedReplanningGroup> jointPlansGroups =
 			identifyGroupsBasedOnJointPlans( population , jointPlans );
 		final List<ReplanningGroup> mergedGroups =
 			randomlyMergeGroups( jointPlansGroups , socialNetwork );
@@ -75,53 +75,62 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 	}
 
 	private List<ReplanningGroup> randomlyMergeGroups(
-			final Queue<ReplanningGroup> groupsToMerge,
+			final Queue<TaggedReplanningGroup> groupsToMerge,
 			final SocialNetwork socialNetwork) {
-		final Map<Id, ReplanningGroup> groupPerPerson = new HashMap<Id, ReplanningGroup>();
+		final Map<Id, TaggedReplanningGroup> groupPerPerson = new HashMap<Id, TaggedReplanningGroup>();
 
-		for ( ReplanningGroup g : groupsToMerge ) {
-			for ( Person p : g.getPersons() ) {
-				final ReplanningGroup rem = groupPerPerson.put( p.getId() , g );
+		for ( TaggedReplanningGroup g : groupsToMerge ) {
+			for ( Person p : g.group.getPersons() ) {
+				final TaggedReplanningGroup rem = groupPerPerson.put( p.getId() , g );
 				assert rem == null;
 			}
 		}
 
 		final List<ReplanningGroup> merged = new ArrayList<ReplanningGroup>();
 		while ( true ) {
-			final ReplanningGroup g = groupsToMerge.poll();
+			final TaggedReplanningGroup g = pollNonAllocated( groupsToMerge );
 
 			if ( g == null || groupsToMerge.isEmpty() ) {
-				if ( g != null ) merged.add( g );
+				if ( g != null ) merged.add( g.group );
 				return merged;
 			}
-			for ( Person p : g.getPersons() ) groupPerPerson.remove( p.getId() );
+			for ( Person p : g.group.getPersons() ) groupPerPerson.remove( p.getId() );
 
-			final List<Id> groupAlters = getGroupAlters( g , socialNetwork , groupPerPerson.keySet() );
+			final List<Id> groupAlters = getGroupAlters( g.group , socialNetwork , groupPerPerson.keySet() );
 
 			if ( groupAlters.isEmpty() ) {
 				// no need to merge
 				if ( log.isTraceEnabled() ) {
 					log.trace( "add non-merged group "+g );
 				}
-				merged.add( g );
+				merged.add( g.group );
 				continue;
 			}
 
 			final Id selectedAlter = groupAlters.get( random.nextInt( groupAlters.size() ) );
-			final ReplanningGroup selectedGroup = groupPerPerson.remove( selectedAlter );
+			final TaggedReplanningGroup selectedGroup = groupPerPerson.remove( selectedAlter );
 			assert selectedGroup != null;
-			for ( Person p : selectedGroup.getPersons() ) groupPerPerson.remove( p.getId() );
-			groupsToMerge.remove( selectedGroup );
+			for ( Person p : selectedGroup.group.getPersons() ) groupPerPerson.remove( p.getId() );
+			selectedGroup.isAllocated = true;
 
 			final ReplanningGroup newGroup = new ReplanningGroup();
-			for ( Person p : g.getPersons() ) newGroup.addPerson( p );
-			for ( Person p : selectedGroup.getPersons() ) newGroup.addPerson( p );
+			for ( Person p : g.group.getPersons() ) newGroup.addPerson( p );
+			for ( Person p : selectedGroup.group.getPersons() ) newGroup.addPerson( p );
 
 			if ( log.isTraceEnabled() ) {
 				log.trace( "add merged groups "+g+" and "+selectedGroup );
 			}
 			merged.add( newGroup );
 		}
+	}
+
+	private static TaggedReplanningGroup pollNonAllocated(
+			final Queue<TaggedReplanningGroup> groupsToMerge) {
+		while ( !groupsToMerge.isEmpty() ) {
+			final TaggedReplanningGroup g = groupsToMerge.poll();
+			if ( !g.isAllocated ) return g;
+		}
+		return null;
 	}
 
 	private static List<Id> getGroupAlters(
@@ -148,15 +157,15 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 		return groupAlters;
 	}
 
-	private Queue<ReplanningGroup> identifyGroupsBasedOnJointPlans(
+	private Queue<TaggedReplanningGroup> identifyGroupsBasedOnJointPlans(
 			final Population population,
 			final JointPlans jointPlans) {
 		final Queue<Person> remainingPersons = new ArrayDeque<Person>( population.getPersons().values() );
-		final Queue<ReplanningGroup> groups = new ArrayDeque<ReplanningGroup>();
+		final Queue<TaggedReplanningGroup> groups = new ArrayDeque<TaggedReplanningGroup>();
 
 		while ( !remainingPersons.isEmpty() ) {
 			final ReplanningGroup group = new ReplanningGroup();
-			groups.add( group );
+			groups.add( new TaggedReplanningGroup( group ) );
 			final Person person = remainingPersons.remove();
 			group.addPerson( person );
 			addPersonsLinkedByJointPlans(
@@ -196,6 +205,18 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 						remainingPersons,
 						jointPlans );
 			}
+		}
+	}
+
+	// the groups are put in a queue, but we also need to remove
+	// specified elements. Tagging them as "allocated" is much faster than
+	// removing them.
+	private static class TaggedReplanningGroup {
+		public final ReplanningGroup group;
+		public boolean isAllocated = false;
+
+		public TaggedReplanningGroup(final ReplanningGroup r) {
+			this.group = r;
 		}
 	}
 }

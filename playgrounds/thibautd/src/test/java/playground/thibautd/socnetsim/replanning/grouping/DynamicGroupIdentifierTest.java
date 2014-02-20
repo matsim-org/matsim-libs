@@ -204,6 +204,14 @@ public class DynamicGroupIdentifierTest {
 				"unexpected number of groups",
 				fixture.expectedNGroups,
 				groups.size() );
+
+		int n = 0;
+		for ( ReplanningGroup g : groups ) n += g.getPersons().size();
+
+		Assert.assertEquals(
+				"unexpected number of persons in groups",
+				fixture.scenario.getPopulation().getPersons().size(),
+				n );
 	}
 
 	private static class Fixture {
