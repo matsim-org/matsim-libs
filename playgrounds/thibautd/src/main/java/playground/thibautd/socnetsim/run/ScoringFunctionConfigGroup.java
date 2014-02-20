@@ -19,7 +19,13 @@
 
 package playground.thibautd.socnetsim.run;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 import playground.thibautd.scoring.BeingTogetherScoring;
 
@@ -29,6 +35,7 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	private double marginalUtilityOfBeingTogether_h = 0;
 	private double marginalUtilityOfBeingDriver_h = -3;
 	private double marginalUtilityOfBeingPassenger_h = -3;
+	private String activityTypeForContactInDesires = "leisure";
 
 	static enum TogetherScoringForm {
 		linear,
@@ -38,9 +45,10 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	
 	static enum TogetherScoringType {
 		allModesAndActs,
-		leisureOnly;
+		actsRestricted;
 	}
 	private TogetherScoringType togetherScoringType = TogetherScoringType.allModesAndActs;
+	private Set<String> joinableActivityTypes = new HashSet<String>( Arrays.asList( "leisure" , "l" ) );
 
 	public ScoringFunctionConfigGroup() {
 		super( GROUP_NAME );
@@ -126,8 +134,8 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 		switch ( togetherScoringType ) {
 			case allModesAndActs:
 				return new BeingTogetherScoring.AcceptAllFilter();
-			case leisureOnly:
-				return new BeingTogetherScoring.AcceptAllInListFilter( "leisure" );
+			case actsRestricted:
+				return new BeingTogetherScoring.AcceptAllInListFilter( getJoinableActivityTypes() );
 			default:
 				throw new IllegalStateException( "gné?! "+togetherScoringType );
 		}
@@ -137,10 +145,50 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 		switch ( togetherScoringType ) {
 			case allModesAndActs:
 				return new BeingTogetherScoring.AcceptAllFilter();
-			case leisureOnly:
+			case actsRestricted:
 				return new BeingTogetherScoring.RejectAllFilter();
 			default:
 				throw new IllegalStateException( "gné?! "+togetherScoringType );
 		}
+	}
+
+	@StringGetter( "joinableActivityTypes" )
+	private String getJoinableActivityTypesString() {
+		return CollectionUtils.setToString( getJoinableActivityTypes() );
+	}
+	
+	public Set<String> getJoinableActivityTypes() {
+		return joinableActivityTypes;
+	}
+
+	@StringSetter( "joinableActivityTypes" )
+	private void setJoinableActivityTypes(final String v) {
+		setJoinableActivityTypes( CollectionUtils.stringToSet( v ) );
+	}
+	
+	public void setJoinableActivityTypes(final Set<String> joinableActivityTypes) {
+		this.joinableActivityTypes = joinableActivityTypes;
+	}
+
+	@StringGetter( "activityTypeForContactInDesires" )
+	public String getActivityTypeForContactInDesires() {
+		return activityTypeForContactInDesires;
+	}
+
+	@StringSetter( "activityTypeForContactInDesires" )
+	public void setActivityTypeForContactInDesires(
+			String activityTypeForContactInDesires) {
+		this.activityTypeForContactInDesires = activityTypeForContactInDesires;
+	}
+	
+	@Override
+	public Map<String, String> getComments() {
+		final Map<String, String> map = super.getComments();
+		
+		map.put( "activityTypeForContactInDesires" ,
+				"the type of the activity from which typical duration will be taken for the log form.\n"+
+				"This can be a real or a \"dummy\" activity type." );
+		
+		return map;
 	}
 }

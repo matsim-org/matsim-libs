@@ -548,6 +548,10 @@ public class BeingTogetherScoring {
 	public static class AcceptAllInListFilter implements Filter {
 		private final Collection<String> toAccept = new ArrayList<String>();
 
+		public AcceptAllInListFilter( final Iterable<String> types ) {
+			for ( String s : types ) toAccept.add( s );
+		}
+		
 		public AcceptAllInListFilter( final String... types ) {
 			for ( String s : types ) toAccept.add( s );
 		}
