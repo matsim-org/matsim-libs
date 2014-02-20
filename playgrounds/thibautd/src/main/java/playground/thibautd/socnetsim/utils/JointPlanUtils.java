@@ -422,7 +422,9 @@ class PlanElementIterators {
 		Iterator<PlanElement> it = iterators.get( key );
 
 		if ( it == null ) {
-			it = jointPlan.getIndividualPlan( passenger ).getPlanElements().iterator();
+			final Plan plan = jointPlan.getIndividualPlan( passenger );
+			if ( plan == null ) throw new RuntimeException( "no plan for passenger "+passenger+" in joint plan "+jointPlan );
+			it = plan.getPlanElements().iterator();
 			iterators.put( key , it );
 		}
 

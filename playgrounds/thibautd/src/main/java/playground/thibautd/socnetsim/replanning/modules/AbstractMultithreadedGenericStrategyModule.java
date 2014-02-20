@@ -116,7 +116,12 @@ public abstract class AbstractMultithreadedGenericStrategyModule<T> implements G
 		@Override
 		public void run() {
 			for (T p : groupPlans) {
-				algo.run( p );
+				try {
+					algo.run( p );
+				}
+				catch ( Exception e ) {
+					throw new RuntimeException( "exception when handling "+p , e );
+				}
 				counter.incCounter();
 			}
 		}
