@@ -399,7 +399,12 @@ public class RunUtils {
 							final Collection<Plan> plans) {
 						for ( Plan p2 : plans ) {
 							if ( p == p2 ) continue;
-							if ( links.areLinked( p , p2 ) ) return true;
+							final boolean l = links.areLinked( p , p2 );
+							if ( l != links.areLinked( p2 , p ) ) {
+								log.error( "inconsistent plan link identifier revealed by "+p+" and "+p2 );
+								gotError.set( true );
+							}
+							if ( l ) return true;
 						}
 						return false;
 					}
