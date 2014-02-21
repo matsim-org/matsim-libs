@@ -67,6 +67,10 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		Assert.assertFalse(
 				"plans with activities of different types should not be joined",
 				testee.areLinked( plan1 , plan2 ) );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
 	}
 
 	@Test
@@ -82,6 +86,10 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		Assert.assertFalse(
 				"plans with activities at different locations should not be joined",
 				testee.areLinked( plan1 , plan2 ) );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
 	}
 
 	@Test
@@ -96,6 +104,10 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		Assert.assertFalse(
 				"plans with activities of non joinable types should not be joined",
 				testee.areLinked( plan1 , plan2 ) );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
 	}
 
 	private static Plan createOpenPlan(
@@ -137,6 +149,10 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		Assert.assertTrue(
 				"plans with overlaping activities should be joint",
 				testee.areLinked( plan1 , plan2 ) );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
 	}
 
 	@Test
@@ -165,6 +181,10 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		Assert.assertFalse(
 				"plans with non overlaping activities should not be joint",
 				testee.areLinked( plan1 , plan2 ) );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
 	}
 
 	@Test
@@ -193,6 +213,10 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		Assert.assertTrue(
 				"plans with zero-length overlaping activities should be joint",
 				testee.areLinked( plan1 , plan2 ) );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
 	}
 
 	@Test
@@ -223,6 +247,10 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		Assert.assertFalse(
 				"plans with inconsistent duration not handled correctly",
 				testee.areLinked( plan1 , plan2 ) );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
 	}
 
 	private static Plan createSingleTripPlan(
