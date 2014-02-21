@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.run;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -268,6 +269,18 @@ public class RunUtils {
 	}
 
 	public static void addConsistencyCheckingListeners(final ImmutableJointController controller) {
+		final AtomicBoolean gotError = new AtomicBoolean( false );
+
+		// only fail after all listenners have been executed
+		// reminder: listenners executed in the inverse order of the insertion order
+		controller.addControlerListener( 
+				new IterationEndsListener() {
+					@Override
+					public void notifyIterationEnds(final IterationEndsEvent event) {
+						if ( gotError.get() ) throw new RuntimeException( "inconsistency detected. Look at error messages for details" );
+					}
+				});
+
 		controller.addControlerListener(
 				new IterationEndsListener() {
 					@Override
@@ -295,12 +308,22 @@ public class RunUtils {
 
 							for ( Id v : vehsOfPlan ) {
 								if ( v == null ) {
-									if ( hadNonNull ) throw new RuntimeException( "got null and non-null vehicles" );
+									if ( hadNonNull ) {
+										log.error( "got null and non-null vehicles" );
+										gotError.set( true );
+									}
+
 									hadNull = true;
 								}
 								else {
-									if ( hadNull ) throw new RuntimeException( "got null and non-null vehicles" );
-									if ( !knownVehicles.add( v ) ) throw new RuntimeException( "inconsistent allocation of vehicle "+v+" (found in several distinct joint plans)" );
+									if ( hadNull ) {
+										log.error( "got null and non-null vehicles" );
+										gotError.set( true );
+									}
+									if ( !knownVehicles.add( v ) ) {
+										log.error( "inconsistent allocation of vehicle "+v+" (found in several distinct joint plans)" );
+										gotError.set( true );
+									}
 									hadNonNull = true;
 								}
 							}
@@ -333,10 +356,11 @@ public class RunUtils {
 
 						for ( Map.Entry<JointPlan , Set<Plan>> entry : plansOfJointPlans.entrySet() ) {
 							if ( entry.getKey().getIndividualPlans().size() != entry.getValue().size() ) {
-								throw new RuntimeException( "joint plan "+entry.getKey()+
+								log.error( "joint plan "+entry.getKey()+
 										" of size "+entry.getKey().getIndividualPlans().size()+
 										" has only the "+entry.getValue().size()+" following plans selected: "+
 										entry.getValue() );
+								gotError.set( true );
 							}
 						}
 					}
@@ -362,7 +386,8 @@ public class RunUtils {
 						for ( JointPlan jp : jointPlans ) {
 							for ( Plan p : jp.getIndividualPlans().values() ) {
 								if ( !hasLinkedPlan( links , p , jp.getIndividualPlans().values() ) ) {
-									throw new RuntimeException( "plan "+p+" is in "+jp+" but is not linked with any plan" );
+									log.error( "plan "+p+" is in "+jp+" but is not linked with any plan" );
+									gotError.set( true );
 								}
 							}
 						}
