@@ -25,7 +25,7 @@ import java.util.*;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
@@ -229,6 +229,8 @@ import playground.michalm.util.RunningVehicleRegister;
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
+        
+        qSim.addQueueSimulationListeners(new BeforeSimulationTaxiCaller(passengerEngine));
 
         LegCreator legCreator = onlineVehicleTracker ? VrpDynLegs
                 .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())

@@ -61,6 +61,12 @@ public class PassengerEngine
         this.internalInterface = internalInterface;
     }
 
+    
+    public String getMode()
+    {
+        return mode;
+    }
+
 
     @Override
     public void onPrepareSim()

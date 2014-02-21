@@ -300,7 +300,7 @@ public class TaxiScheduler
 
         bestSched.addTask(new TaxiPickupDriveTask(best.path, best.request));
 
-        double t3 = best.path.getArrivalTime() + params.pickupDuration;
+        double t3 = Math.max(best.path.getArrivalTime(), best.request.getT0()) + params.pickupDuration;
         bestSched.addTask(new TaxiPickupStayTask(best.path.getArrivalTime(), t3, best.request));
 
         if (params.destinationKnown) {
