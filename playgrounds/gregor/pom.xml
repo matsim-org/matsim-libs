@@ -9,7 +9,13 @@
 	<groupId>playground</groupId>
 	<artifactId>gregor</artifactId>
 	<name>gregor</name>
-
+	<repositories>
+		<repository>
+			<id>geotools</id>
+			<name>Geotools repository</name>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.jmatio</groupId>
@@ -99,6 +105,12 @@
 			<groupId>trove</groupId>
 			<artifactId>trove</artifactId>
 			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-hsql</artifactId>
+			<version>2.7.3</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- <dependency> <groupId>org.jogamp.jocl</groupId> <artifactId>jocl-main</artifactId> 
