@@ -19,12 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
-import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createReRouteModule;
-import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule;
-import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createSynchronizerModule;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 
 /**
  * @author thibautd
@@ -40,21 +38,21 @@ public class GroupReRouteFactory extends AbstractConfigurableSelectionStrategy {
 		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 	
 		strategy.addStrategyModule(
-				createReRouteModule(
+				GroupPlanStrategyFactoryUtils.createReRouteModule(
 					registry.getScenario().getConfig(),
 					registry.getPlanRoutingAlgorithmFactory(),
 					registry.getTripRouterFactory() ) );
 
 		strategy.addStrategyModule(
-				createRecomposeJointPlansModule(
+				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+					registry.getScenario().getConfig(),
+					registry.getTripRouterFactory() ) );
+		
+		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
 					registry.getScenario().getConfig(),
 					registry.getJointPlans().getFactory(),
 					registry.getPlanLinkIdentifier()));
-
-		strategy.addStrategyModule(
-				createSynchronizerModule(
-					registry.getScenario().getConfig(),
-					registry.getTripRouterFactory() ) );
 
 		return strategy;
 	}

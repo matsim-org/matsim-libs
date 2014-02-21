@@ -60,6 +60,13 @@ public class ActivityInGroupLocationChoiceFactory extends AbstractConfigurableSe
 					registry.getScenario().getConfig(),
 					registry.getPlanRoutingAlgorithmFactory(),
 					registry.getTripRouterFactory() ) );
+		
+
+		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+					registry.getScenario().getConfig(),
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier()));
 
 		return strategy;
 	}

@@ -51,16 +51,16 @@ public class GroupPlanVehicleAllocationFactory extends AbstractConfigurableSelec
 					false));
 
 		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier()));
-
-		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
 					registry.getScenario().getConfig(),
 					registry.getPlanRoutingAlgorithmFactory(),
 					registry.getTripRouterFactory() ) );
+		
+		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
+					registry.getScenario().getConfig(),
+					registry.getJointPlans().getFactory(),
+					registry.getPlanLinkIdentifier()));
 
 		return strategy;
 

@@ -79,15 +79,15 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 					registry.getTripRouterFactory() ) );
 
 		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+					registry.getScenario().getConfig(),
+					registry.getTripRouterFactory()) );
+		
+		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
 					registry.getScenario().getConfig(),
 					registry.getJointPlans().getFactory(),
 					registry.getPlanLinkIdentifier()));
-
-		strategy.addStrategyModule(
-				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-					registry.getScenario().getConfig(),
-					registry.getTripRouterFactory()) );
 
 		return strategy;
 
