@@ -84,7 +84,7 @@ public class AccessibilityRuns {
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
-		config.vspExperimental().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration.toString() );
+		config.vspExperimental().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		{
 			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) );
 			stratSets.setModuleName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );

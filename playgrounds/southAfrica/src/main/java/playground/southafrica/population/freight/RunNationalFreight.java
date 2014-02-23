@@ -104,7 +104,7 @@ public class RunNationalFreight {
 		
 		config.global().setCoordinateSystem("WGS84_SA_Albers");
 		
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration.toString() );
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
 		
 		String[] modes ={"commercial"};
 		config.qsim().setMainModes( Arrays.asList(modes) );
