@@ -65,6 +65,8 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
 		
+		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.minOfDurationAndEndTime );
+		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(netFileName);
