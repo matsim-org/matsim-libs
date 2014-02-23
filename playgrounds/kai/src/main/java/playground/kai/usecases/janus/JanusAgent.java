@@ -25,13 +25,22 @@ import org.janusproject.kernel.status.Status;
  * @author nagel
  *
  */
-class HelloWorldAgent extends Agent {
+class JanusAgent extends Agent {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final int CNT = 10 ; 
+	private int cnt = 0 ;
 
 	@Override
 	public Status live() {
-		print("hello world!\n");
+		if ( cnt < CNT ) {
+			cnt++ ;
+			print("hello world!\n");
+		} else if ( cnt == 100 ) {
+			cnt++ ;
+			print("I have said hello world a " + CNT + " times; growing tired of it ...\n");
+		}
 		return null;
 	}
 }

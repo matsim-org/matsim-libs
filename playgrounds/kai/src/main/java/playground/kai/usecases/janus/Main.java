@@ -18,16 +18,22 @@
  * *********************************************************************** */
 package playground.kai.usecases.janus;
 
-import org.matsim.api.core.v01.Id;
+import org.apache.log4j.Logger;
+import org.janusproject.kernel.agent.Kernels;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -38,11 +44,22 @@ import org.matsim.vehicles.VehicleUtils;
 public class Main {
 
 	public static void main(String[] args) {
-		final Controler ctrl = new Controler("abd") ;
+		final Config config = ConfigUtils.createConfig() ;
+		
+		config.network().setInputFile("examples/equil/network.xml"); 
+		
+		config.qsim().setEndTime(36.*3600.);
+		
+		config.controler().setLastIteration(0);
+		
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		
+		final Controler ctrl = new Controler(scenario) ;
+		ctrl.setOverwriteFiles(true);
 
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+			public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
 				final QSim qsim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
 				
 				// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
@@ -51,19 +68,31 @@ public class Main {
 				qsim.addAgentSource(new AgentSource(){
 					@Override
 					public void insertAgentsIntoMobsim() {
-						// insert traveler agent:
-						final MobsimAgent ag = new MyMobsimAgent() ;
-						qsim.insertAgentIntoMobsim(ag) ;
+						Logger.getLogger(this.getClass()).warn("here");
 						
+						final MobsimDriverAgent ag = new MyMobsimAgent(sc.getNetwork()) ;
+
 						// insert vehicle:
-						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(ag.getId(), VehicleUtils.getDefaultVehicleType() );
-						Id linkId4VehicleInsertion = null ;
-						qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(ag.getPlannedVehicleId(), VehicleUtils.getDefaultVehicleType() );
+						qsim.createAndParkVehicleOnLink(vehicle, ag.getCurrentLinkId());
+
+						// insert traveler agent:
+						qsim.insertAgentIntoMobsim(ag) ;
 					}
 				}) ;
 				return qsim ;
 			}
 		}) ;
+		
+		ctrl.addControlerListener(new ShutdownListener(){
+			@Override
+			public void notifyShutdown(ShutdownEvent event) {
+				Kernels.killAll(); 
+			}
+		});
+		
+		ctrl.run() ;
+		
 	}
 
 	
