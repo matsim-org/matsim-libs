@@ -106,6 +106,8 @@ class VehicularDepartureHandler implements DepartureHandler {
 			if (vehicleBehavior == VehicleBehavior.TELEPORT) {
 				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
 				if ( vehicle==null ) {
+					log.warn("could not find requested vehicle in simulation.  Note that, with AgentSource and if the agent starts on a leg, the "
+							+ "vehicle needs to be inserted BEFORE the agent!") ;
 					throw new RuntimeException("could not find requested vehicle in simulation; aborting ...") ;
 				}
 				teleportVehicleTo(vehicle, linkId);
