@@ -194,7 +194,7 @@ public class GautengControler_subpopulations {
 			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
 		}
 
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
+		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;

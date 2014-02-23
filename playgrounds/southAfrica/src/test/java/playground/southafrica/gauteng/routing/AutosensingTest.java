@@ -76,7 +76,7 @@ public class AutosensingTest {
 		config.timeAllocationMutator().setMutationRange(7200.);
 		
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
-		config.vspExperimental().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
+		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.WARN );
 		

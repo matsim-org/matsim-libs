@@ -124,10 +124,10 @@ public class PlanTimesAdapter {
 					
 //					actTmp.setStartTime(arrivalTime);
 					
-					ActivityDurationInterpretation actDurInterpr = ( config.vspExperimental().getActivityDurationInterpretation() ) ;
+					ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
 					if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {
 						throw new RuntimeException("activity duration interpretation of " 
-								+ config.vspExperimental().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
+								+ config.plans().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
 										"Use " + ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
 					} else 
 //						if ( config.vspExperimental().getActivityDurationInterpretation()==ActivityDurationInterpretation.tryEndTimeThenDuration ) 

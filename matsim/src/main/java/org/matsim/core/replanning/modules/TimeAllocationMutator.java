@@ -50,7 +50,7 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange();
 		this.affectingDuration = config.timeAllocationMutator().isAffectingDuration() ;
-		this.activityDurationInterpretation = (config.vspExperimental().getActivityDurationInterpretation());
+		this.activityDurationInterpretation = (config.plans().getActivityDurationInterpretation());
 	}
 
 //	public TimeAllocationMutator(Config config, final int mutationRange, boolean affectingDuration) {
@@ -64,7 +64,7 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 		super(config.global());
 		this.affectingDuration = affectingDuration ;
 		this.mutationRange = mutationRange;
-		this.activityDurationInterpretation = (config.vspExperimental().getActivityDurationInterpretation());
+		this.activityDurationInterpretation = (config.plans().getActivityDurationInterpretation());
 	}
 
 	@Override

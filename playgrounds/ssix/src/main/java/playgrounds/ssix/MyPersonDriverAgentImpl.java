@@ -338,7 +338,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 	void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		ActivityDurationInterpretation activityDurationInterpretation = 
-				( this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation() ) ;
+				( this.simulation.getScenario().getConfig().plans().getActivityDurationInterpretation() ) ;
 		double departure = this.calculateDepartureTime(act, now, activityDurationInterpretation);
 
 		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {

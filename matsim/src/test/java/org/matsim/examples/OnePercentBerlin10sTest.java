@@ -102,7 +102,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
 		
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.minOfDurationAndEndTime);
+		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.minOfDurationAndEndTime);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

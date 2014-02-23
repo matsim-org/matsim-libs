@@ -51,7 +51,7 @@ public class SignalSystemsIntegrationTest {
 	@Test
 	public void testSignalSystems() {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
-		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.minOfDurationAndEndTime);
+		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.minOfDurationAndEndTime);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
 //		config.controler().setOutputDirectory(controlerOutputDir);
 //		config.addQSimConfigGroup(new QSimConfigGroup());

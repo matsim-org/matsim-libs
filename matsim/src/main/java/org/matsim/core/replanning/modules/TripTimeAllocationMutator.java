@@ -48,7 +48,7 @@ public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
 		this.affectingDuration = config.timeAllocationMutator().isAffectingDuration() ;
-		ActivityDurationInterpretation actDurInterpr = ( config.vspExperimental().getActivityDurationInterpretation() ) ;
+		ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
 		if ( actDurInterpr == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 			useActivityDurations = true ;
 		} else if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {

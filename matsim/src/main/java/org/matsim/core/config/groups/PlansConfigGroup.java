@@ -22,7 +22,11 @@ package org.matsim.core.config.groups;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
+import org.matsim.core.config.experimental.ReflectiveModule.StringSetter;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 
 public class PlansConfigGroup extends ReflectiveModule {
 
@@ -42,6 +46,13 @@ public class PlansConfigGroup extends ReflectiveModule {
 	private String networkRouteType = NetworkRouteType.LinkNetworkRoute;
 	private String inputPersonAttributeFile = null;
 	private String subpopulationAttributeName = "subpopulation";
+	
+	//--
+	
+	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
+	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.tryEndTimeThenDuration ;
+
+	//--
 
 	public PlansConfigGroup() {
 		super(GROUP_NAME);
@@ -62,6 +73,15 @@ public class PlansConfigGroup extends ReflectiveModule {
 				SUBPOPULATION_ATTRIBUTE,
 				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
 				" (as freight, through traffic, etc.). The attribute must be of String type." );
+
+		StringBuilder str = new StringBuilder() ;
+		for ( ActivityDurationInterpretation itp : ActivityDurationInterpretation.values() ) {
+			str.append(" ").append(itp.toString());
+		}
+		comments.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
+				+ ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
+		"(simpler) version of the TimeAllocationMutator.") ;
+
 		return comments;
 	}
 
@@ -104,4 +124,27 @@ public class PlansConfigGroup extends ReflectiveModule {
 	public void setSubpopulationAttributeName(String subpopulationAttributeName) {
 		this.subpopulationAttributeName = subpopulationAttributeName;
 	}
+	
+	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
+	public ActivityDurationInterpretation getActivityDurationInterpretation() {
+		return this.activityDurationInterpretation ;
+	}
+//	public void setActivityDurationInterpretation(final String str) {
+//		ActivityDurationInterpretation actDurInterpret = ActivityDurationInterpretation.valueOf(str) ;
+//		this.setActivityDurationInterpretation(actDurInterpret);
+//	}
+	@StringSetter(ACTIVITY_DURATION_INTERPRETATION)
+	public void setActivityDurationInterpretation( final ActivityDurationInterpretation actDurInterpret ) {
+		if ( ActivityDurationInterpretation.endTimeOnly.equals(actDurInterpret) ){
+			/*
+			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012
+			 */
+			Logger.getLogger(this.getClass()).warn("You are using " + actDurInterpret + " as activityDurationInterpretation. " +
+			"This is not working in conjunction with the pt module as pt interaction activities then will never end!");
+			Logger.getLogger(this.getClass()).warn("ActivityDurationInterpreation " + actDurInterpret + " is deprecated; use " 
+					+ ActivityDurationInterpretation.minOfDurationAndEndTime + " instead. kai, jan'13") ;
+		}
+		this.activityDurationInterpretation = actDurInterpret;
+	}
+
 }

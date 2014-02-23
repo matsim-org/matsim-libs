@@ -176,7 +176,7 @@ public class KNOldGautengController {
 			
 			// VSP DEFAULTS:
 			config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
-			config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+			config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
 			config.timeAllocationMutator().setMutationRange(7200.);
 			
 			config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;

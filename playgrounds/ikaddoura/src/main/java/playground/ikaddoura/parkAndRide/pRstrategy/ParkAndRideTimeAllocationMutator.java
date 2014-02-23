@@ -53,7 +53,7 @@ public class ParkAndRideTimeAllocationMutator extends AbstractMultithreadedModul
 	public ParkAndRideTimeAllocationMutator(Config config) {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
-		ActivityDurationInterpretation actDurInterpr = ( config.vspExperimental().getActivityDurationInterpretation() ) ;
+		ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
 		if ( actDurInterpr == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 			useActivityDurations = true ;
 		} else if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {

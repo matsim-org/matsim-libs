@@ -65,7 +65,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 		Config config = controler.getConfig();
 		this.mutationRange = config.timeAllocationMutator().getMutationRange();
 
-		ActivityDurationInterpretation actDurInterpr = ( config.vspExperimental().getActivityDurationInterpretation() ) ;
+		ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
 		if ( actDurInterpr == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 			useActivityDurations = true ;
 		} else if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {

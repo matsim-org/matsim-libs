@@ -44,13 +44,7 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 
 	// ---
 
-	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
-
 	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly } 
-
-//	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.minOfDurationAndEndTime ;
-	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.tryEndTimeThenDuration ;
-	// making this change brings tests in ReRoutingTest essentially to a halt.  Happens at the diffutil near its end.
 
 	// ---
 
@@ -217,14 +211,6 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 				"When violating VSP defaults, this results in " +
 		"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
-		StringBuilder str = new StringBuilder() ;
-		for ( ActivityDurationInterpretation itp : ActivityDurationInterpretation.values() ) {
-			str.append(" ").append(itp.toString());
-		}
-		map.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
-				+ ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
-		"(simpler) version of the TimeAllocationMutator.") ;
-
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
 		"activityStartTime. default=false") ;
 
@@ -258,27 +244,6 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 	@StringSetter(CHAIN_BASED_MODES)
 	public void setChainBasedModes(final String chainBasedModes) {
 		this.chainBasedModes = chainBasedModes;
-	}
-	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
-	public ActivityDurationInterpretation getActivityDurationInterpretation() {
-		return this.activityDurationInterpretation ;
-	}
-//	public void setActivityDurationInterpretation(final String str) {
-//		ActivityDurationInterpretation actDurInterpret = ActivityDurationInterpretation.valueOf(str) ;
-//		this.setActivityDurationInterpretation(actDurInterpret);
-//	}
-	@StringSetter(ACTIVITY_DURATION_INTERPRETATION)
-	public void setActivityDurationInterpretation( final ActivityDurationInterpretation actDurInterpret ) {
-		if ( ActivityDurationInterpretation.endTimeOnly.equals(actDurInterpret) ){
-			/*
-			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012
-			 */
-			log.warn("You are using " + actDurInterpret + " as activityDurationInterpretation. " +
-			"This is not working in conjunction with the pt module as pt interaction activities then will never end!");
-			log.warn("ActivityDurationInterpreation " + actDurInterpret + " is deprecated; use " 
-					+ ActivityDurationInterpretation.minOfDurationAndEndTime + " instead. kai, jan'13") ;
-		}
-		this.activityDurationInterpretation = actDurInterpret;
 	}
 	@StringGetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
 	public boolean isRemovingUnneccessaryPlanAttributes() {
