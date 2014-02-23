@@ -39,7 +39,7 @@ public class CRCChecksum {
 			CheckedInputStream cis = new CheckedInputStream(in, crc);
 			byte[] buffer = new byte[4096];
 			while (cis.read(buffer) != -1) {
-			  /* Read until the end of the stream is reached. */
+				/* Read until the end of the stream is reached. */
 			}
 			check = crc.getValue();
 		}
@@ -55,7 +55,12 @@ public class CRCChecksum {
 	/**
 	 * Calculates the checksum of the content of the given file. If the filename ends in ".gz",
 	 * the file is assumed to be gzipped and the checksum over the <em>uncompressed</em> content 
-	 * will be calculated. 
+	 * will be calculated. If a file is not found at its expected place, it is searched via the class loader.
+	 * <p/>
+	 * Comments:<ul>
+	 * <li> Some version of this method, possibly the variant with the class loader, does some caching: If I replace
+	 * the original file in a test case, I need to restart eclipse before it works correctly.  ???  kai, feb'14
+	 * </ul>
 	 * 
 	 * @param filename
 	 * @return CRC32-Checksum of the file's content.
@@ -67,9 +72,11 @@ public class CRCChecksum {
 				if (filename.endsWith(".gz")) {
 					in = new GZIPInputStream(new BufferedInputStream(new FileInputStream(filename)));
 				} else {
-				   in = new BufferedInputStream(new FileInputStream(filename));
+					in = new BufferedInputStream(new FileInputStream(filename));
 				}
 			} else {
+				// (the logic is: if the file cannot be found directly on the file system, this is some method to search
+				// in generic locations (which ones?).  kai, feb'14)
 				InputStream stream = CRCChecksum.class.getClassLoader().getResourceAsStream(filename);
 				if (filename.endsWith(".gz")) {
 					in = new GZIPInputStream(new BufferedInputStream(stream));

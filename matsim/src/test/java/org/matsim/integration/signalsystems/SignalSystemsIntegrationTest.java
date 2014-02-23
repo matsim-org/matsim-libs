@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
@@ -49,6 +50,63 @@ public class SignalSystemsIntegrationTest {
 	
 	@Test
 	public void testSignalSystems() {
+		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.minOfDurationAndEndTime);
+		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
+//		config.controler().setOutputDirectory(controlerOutputDir);
+//		config.addQSimConfigGroup(new QSimConfigGroup());
+		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
+		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
+		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFile());
+		
+//		config.network().setLaneDefinitionsFile(lanes20);
+		
+		Controler c = new Controler(config);
+		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
+		c.setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
+		c.run();
+		
+			//iteration 0 
+		String iterationOutput = controlerOutputDir + "ITERS/it.0/";
+		String inputDirectory = testUtils.getInputDirectory();
+		
+		Assert.assertEquals("different events files after iteration 0 ", 
+				CRCChecksum.getCRCFromFile(inputDirectory + "0.events.xml.gz"), 
+				CRCChecksum.getCRCFromFile(iterationOutput + "0.events.xml.gz"));
+
+		Assert.assertEquals("different population files after iteration 0 ", 
+				CRCChecksum.getCRCFromFile(testUtils.getInputDirectory() + "0.plans.xml.gz"), 
+				CRCChecksum.getCRCFromFile(iterationOutput + "0.plans.xml.gz"));
+
+		//iteration 10 
+		iterationOutput = controlerOutputDir + "ITERS/it.10/";
+		
+		Assert.assertTrue("different event files after iteration 10", 
+				EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") == 
+				EventsFileComparator.CODE_FILES_ARE_EQUAL);
+
+		
+		Assert.assertEquals("different population files after iteration 10 ", 
+				CRCChecksum.getCRCFromFile(testUtils.getInputDirectory() + "10.plans.xml.gz"), 
+				CRCChecksum.getCRCFromFile(iterationOutput + "10.plans.xml.gz"));
+		
+		SignalsScenarioWriter writer = new SignalsScenarioWriter(c.getControlerIO());
+		File file = new File(writer.getSignalSystemsOutputFilename());
+		Assert.assertTrue(file.exists());
+		file = new File(writer.getSignalGroupsOutputFilename());
+		Assert.assertTrue(file.exists());
+		file = new File(writer.getSignalControlOutputFilename());
+		Assert.assertTrue(file.exists());
+		file = new File(writer.getAmberTimesOutputFilename());
+		Assert.assertTrue(file.exists());
+		file = new File(writer.getIntergreenTimesOutputFilename());
+		Assert.assertTrue(file.exists());
+		
+	}
+	
+	@Test
+	public void testSignalSystemsWTryEndTimeThenDuration() {
 		String configFile = testUtils.getClassInputDirectory() + CONFIG_FILE_NAME;
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";

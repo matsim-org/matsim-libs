@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
@@ -63,7 +64,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setRemoveStuckVehicles(false);
 		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
-
+		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(netFileName);
@@ -100,6 +101,60 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
+		
+		config.vspExperimental().setActivityDurationInterpretation(ActivityDurationInterpretation.minOfDurationAndEndTime);
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimPopulationReader(scenario).readFile(popFileName);
+
+		EventsManager events = EventsUtils.createEventsManager();
+		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
+		events.addHandler(writer);
+
+		QSim qSim = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine(teleportationEngine);
+		qSim.addDepartureHandler(teleportationEngine) ;
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+        qSim.addAgentSource(agentSource);
+
+
+		log.info("START testOnePercent10s SIM");
+		qSim.run();
+		log.info("STOP testOnePercent10s SIM");
+
+		writer.closeFile();
+
+		assertTrue("different event files", EventsFileComparator.compare(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
+		
+	}
+
+	public void testOnePercent10sQSimTryEndTimeThenDuration() {
+		Config config = loadConfig(null);
+		String netFileName = "test/scenarios/berlin/network.xml";
+		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
+		String eventsFileName = getOutputDirectory() + "events.txt.gz";
+		String referenceEventsFileName = getInputDirectory() + "events.txt.gz";
+
+		MatsimRandom.reset(7411L);
+
+		config.qsim().setTimeStepSize(10.0);
+		config.qsim().setFlowCapFactor(0.01);
+		config.qsim().setStorageCapFactor(0.04);
+		config.qsim().setRemoveStuckVehicles(false);
+		config.qsim().setStuckTime(10.0);
+		config.planCalcScore().setLearningRate(1.0);
+		
+		config.controler().setOutputDirectory( this.getOutputDirectory() );
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

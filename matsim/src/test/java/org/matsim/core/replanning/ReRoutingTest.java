@@ -100,10 +100,14 @@ public class ReRoutingTest extends MatsimTestCase {
 	}
 	
 	private void evaluate() {
-		final String originalFileName = getInputDirectory() + "1.plans.xml.gz";
-		long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
 		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
+		log.warn( "output file name is: " + revisedFileName );
 		long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName);
+
+		final String originalFileName = getInputDirectory() + "1.plans.xml.gz";
+		log.warn( "input file name is: " + originalFileName );
+		long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
+
 		assertEquals("different plans files", originalCheckSum, revisedCheckSum);
 	}
 
