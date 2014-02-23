@@ -129,7 +129,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.") ;
 		}
 		
-		ActivityDurationInterpretation actDurInterpr = ActivityDurationInterpretation.valueOf( vspConfig.getActivityDurationInterpretation() ) ;
+		ActivityDurationInterpretation actDurInterpr =  vspConfig.getActivityDurationInterpretation()  ;
 		if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {
 			// added jan'13
 			log.warn(ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;

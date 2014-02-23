@@ -57,6 +57,8 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	 * If this switch is set to false, the agent modifies the person's original
 	 * plan. Do not use this unless you know what you are doing!! cdobler, sep'12
 	 */
+	@Deprecated // yyyyyy this really really really cannot be public any more.  matsim design goes down the drain if external people set this to false,
+	// and it will take ages until we will have found the problem if we ever find it. kai, feb'14
 	public static boolean copySelectedPlan = true;
 	
 	protected ExperimentalBasicWithindayAgent(Person p, Netsim simulation) {

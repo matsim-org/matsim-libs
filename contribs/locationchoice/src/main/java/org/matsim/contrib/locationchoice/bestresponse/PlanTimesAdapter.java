@@ -124,7 +124,7 @@ public class PlanTimesAdapter {
 					
 //					actTmp.setStartTime(arrivalTime);
 					
-					ActivityDurationInterpretation actDurInterpr = ActivityDurationInterpretation.valueOf( config.vspExperimental().getActivityDurationInterpretation() ) ;
+					ActivityDurationInterpretation actDurInterpr = ( config.vspExperimental().getActivityDurationInterpretation() ) ;
 					if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {
 						throw new RuntimeException("activity duration interpretation of " 
 								+ config.vspExperimental().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +

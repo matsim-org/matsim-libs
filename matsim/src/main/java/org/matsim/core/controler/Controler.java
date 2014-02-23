@@ -433,7 +433,7 @@ public class Controler extends AbstractController {
 			addControlerListener(this.signalsFactory.createSignalsControllerListener());
 		}
 
-		ActivityDurationInterpretation actDurInterpr = ActivityDurationInterpretation.valueOf( this.config.vspExperimental().getActivityDurationInterpretation() ) ;
+		ActivityDurationInterpretation actDurInterpr = this.config.vspExperimental().getActivityDurationInterpretation() ;
 		if ( actDurInterpr != ActivityDurationInterpretation.minOfDurationAndEndTime 
 				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
 			addControlerListener(new VspPlansCleaner());

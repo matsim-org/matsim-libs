@@ -160,7 +160,7 @@ public final class PopulationUtils {
 	 * </ul>
 	 */
 	public static double getActivityEndTime( Activity act, double now, Config config ) {
-		switch ( ActivityDurationInterpretation.valueOf(config.vspExperimental().getActivityDurationInterpretation()) ) {
+		switch ( config.vspExperimental().getActivityDurationInterpretation() ) {
 		case endTimeOnly:
 			return act.getEndTime() ;
 		case tryEndTimeThenDuration:

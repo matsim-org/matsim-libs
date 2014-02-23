@@ -260,12 +260,15 @@ public class VspExperimentalConfigGroup extends ReflectiveModule {
 		this.chainBasedModes = chainBasedModes;
 	}
 	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
-	public String getActivityDurationInterpretation() {
-		return this.activityDurationInterpretation.toString();
+	public ActivityDurationInterpretation getActivityDurationInterpretation() {
+		return this.activityDurationInterpretation ;
 	}
+//	public void setActivityDurationInterpretation(final String str) {
+//		ActivityDurationInterpretation actDurInterpret = ActivityDurationInterpretation.valueOf(str) ;
+//		this.setActivityDurationInterpretation(actDurInterpret);
+//	}
 	@StringSetter(ACTIVITY_DURATION_INTERPRETATION)
-	public void setActivityDurationInterpretation(final String str) {
-		ActivityDurationInterpretation actDurInterpret = ActivityDurationInterpretation.valueOf(str) ;
+	public void setActivityDurationInterpretation( final ActivityDurationInterpretation actDurInterpret ) {
 		if ( ActivityDurationInterpretation.endTimeOnly.equals(actDurInterpret) ){
 			/*
 			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012

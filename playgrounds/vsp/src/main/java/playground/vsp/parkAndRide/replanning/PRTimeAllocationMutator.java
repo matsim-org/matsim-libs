@@ -50,7 +50,7 @@ public class PRTimeAllocationMutator extends AbstractMultithreadedModule {
 	public PRTimeAllocationMutator(Config config) {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
-		ActivityDurationInterpretation actDurInterpr = ActivityDurationInterpretation.valueOf( config.vspExperimental().getActivityDurationInterpretation() ) ;
+		ActivityDurationInterpretation actDurInterpr = ( config.vspExperimental().getActivityDurationInterpretation() ) ;
 		if ( actDurInterpr == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 			useActivityDurations = true ;
 		} else if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {

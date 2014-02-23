@@ -464,7 +464,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		ActivityDurationInterpretation activityDurationInterpretation = 
-				ActivityDurationInterpretation.valueOf(this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation());
+				(this.simulation.getScenario().getConfig().vspExperimental().getActivityDurationInterpretation());
 		double departure = FreeFloatingActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 
 		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {

@@ -44,7 +44,7 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Population pop = event.getControler().getScenario().getPopulation();
 		Config config = event.getControler().getScenario().getConfig() ;
-		ActivityDurationInterpretation actDurInterp = ActivityDurationInterpretation.valueOf( config.vspExperimental().getActivityDurationInterpretation() ) ;
+		ActivityDurationInterpretation actDurInterp = ( config.vspExperimental().getActivityDurationInterpretation() ) ;
 		for ( Person person : pop.getPersons().values() ) {
 
 			Plan plan = person.getSelectedPlan() ; 
