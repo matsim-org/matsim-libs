@@ -63,7 +63,7 @@ public class FirstSimulation {
 
 		Config config = ConfigUtils.createConfig();	
 		config.addCoreModules();
-		config.controler().setLastIteration(2);
+		config.controler().setLastIteration(20);
 		config.controler().setOutputDirectory(outputDir);
 		config.controler().setWriteEventsInterval(1);
 		config.controler().setWritePlansInterval(1);
@@ -75,21 +75,58 @@ public class FirstSimulation {
 		work.setTypicalDuration(8 * 3600);
 		ActivityParams other = new ActivityParams("other");
 		other.setTypicalDuration(1*3600);
+		ActivityParams comm = new ActivityParams("commute");
+		comm.setTypicalDuration(1*3600.);
 		config.planCalcScore().addActivityParams(home);
 		config.planCalcScore().addActivityParams(work);
 		config.planCalcScore().addActivityParams(other);
+		config.planCalcScore().addActivityParams(comm);
 		
+		config.qsim().setEndTime(60*60*24.);
+		config.qsim().setRemoveStuckVehicles(true);
+		
+		// find a shortest route
 		StrategySettings reRoute = new StrategySettings(new IdImpl(1));
 		reRoute.setModuleName("ReRoute");
 		reRoute.setProbability(0.3);
 		reRoute.setDisableAfter(17);
+		config.strategy().addStrategySettings(reRoute);
 		
+		// choose one of existing plans
 		StrategySettings change = new StrategySettings(new IdImpl(2));
 		change.setModuleName("ChangeExpBeta");
-		change.setProbability(0.7);
- 
-		config.strategy().addStrategySettings(reRoute);
+		change.setProbability(0.3);
 		config.strategy().addStrategySettings(change);
+		
+		// change leg mode of a plan
+		StrategySettings modechoice = new StrategySettings(new IdImpl(3));
+		modechoice.setModuleName("ChangeLegMode");
+		modechoice.setProbability(0.3);
+		config.strategy().addStrategySettings(modechoice);
+		
+		// shift start times 
+		StrategySettings timeAll = new StrategySettings(new IdImpl(4));
+		timeAll.setModuleName("TimeAllocationMutator");
+		timeAll.setProbability(0.1);
+		config.strategy().addStrategySettings(timeAll);
+		
+		// timeallocation mutator
+		// keep last selected
+		// select exp beta (choose randomly but weighted by score)
+		/*
+		 * <module name="planscalcroute" > 
+    <param name="beelineDistanceFactor" value="1.3" /> 
+    <param name="bikeSpeed" value="4.166666666666667" /> 
+    <param name="ptSpeedFactor" value="2.0" /> 
+    <param name="undefinedModeSpeed" value="13.88888888888889" /> 
+    <param name="walkSpeed" value="0.8333333333333333" /> 
+</module>
+		 */
+ 
+		
+		//System.out.println(config.getParam("planscalcroute", "beelineDistanceFactor"));
+		
+		System.out.println(config.plansCalcRoute().getBeelineDistanceFactor());
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

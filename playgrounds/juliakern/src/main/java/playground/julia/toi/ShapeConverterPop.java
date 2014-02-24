@@ -58,6 +58,7 @@ public class ShapeConverterPop {
 	static String plansFile = "input/oslo/plans_from_start_og.xml";
 	static Collection<SimpleFeature> features;
 	static Logger logger = Logger.getLogger(ShapeConverterPop.class);
+	private static int countKnownActTypes =0;
 	/**
 	 * @param args
 	 */
@@ -72,11 +73,14 @@ public class ShapeConverterPop {
 		features = sfr.readFileAndInitialize(shapeFile);
 		
 		ActivityParams home = new ActivityParams("home");
+		config.planCalcScore().addActivityParams(home);
 		home.setTypicalDuration(16*3600);
 		ActivityParams work = new ActivityParams("work");
-		work.setTypicalDuration(8*3600);
-		config.planCalcScore().addActivityParams(home);
 		config.planCalcScore().addActivityParams(work);
+		work.setTypicalDuration(8*3600);
+		ActivityParams other = new ActivityParams("other");
+		other.setTypicalDuration(1*3600);
+		config.planCalcScore().addActivityParams(other);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(networkFile);
@@ -87,6 +91,7 @@ public class ShapeConverterPop {
 		//Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(0.0, 10000.0));
 		
 		logger.info("number of features" + features.size());
+		logger.info("features with know acttype " + countKnownActTypes);
 		
 
 		//	if(sf.getFeatureType() instanceof SimpleFeatureTypeImpl){
@@ -200,7 +205,15 @@ public class ShapeConverterPop {
 				Coord startCoordinates = scenario.createCoord(startx, starty);
 				Coord endCoordinates = scenario.createCoord(endx, endy);
 				
-				String actType = (String) sf.getAttribute("Formal_enk"); //TODO
+				String actType = (String) sf.getAttribute("Formal_enk"); // activity type
+				actType = actType.toLowerCase();
+				
+				if(!(actType.equals("home")||actType.equals("work")||actType.equals("commute")||actType.equals("other"))){
+					logger.warn("new act type " + actType);
+				}else{
+					countKnownActTypes ++;
+				}
+				
 				String legmode = (String) sf.getAttribute("trmh_enkel"); //TODO
 				legmode = legmode.toLowerCase();
 				
@@ -246,7 +259,8 @@ public class ShapeConverterPop {
 			person.addPlan(plan);
 			Trip sortedTrips[] = getSortedTrips(personid2trips.get(id));
 		
-			Activity firstAct = populationFactory.createActivityFromCoord("home", sortedTrips[0].getStartCoord());
+			String firstActType = sortedTrips[sortedTrips.length-1].getActivityType();
+			Activity firstAct = populationFactory.createActivityFromCoord(firstActType, sortedTrips[0].getStartCoord());
 			firstAct.setEndTime(sortedTrips[0].getTime());
 			plan.addActivity(firstAct);
 			

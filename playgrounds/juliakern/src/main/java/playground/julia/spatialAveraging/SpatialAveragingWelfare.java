@@ -167,13 +167,13 @@ public class SpatialAveragingWelfare {
 			Double averagePaidToll = totalPaidTolls/personId2Utility.size();
 			
 			for(Id personId: personId2Utility.keySet()){
-				personId2Utility.put(personId, personId2Utility.get(personId)+averagePaidToll);
+				personId2Utility.put(personId, personId2Utility.get(personId)-averagePaidToll);
 			}
 			
 		}else{ // personal costs
 			for(Id personId: personId2Utility.keySet())
 			if(personId2paidToll.containsKey(personId)){
-				personId2Utility.put(personId, personId2Utility.get(personId)+personId2paidToll.get(personId));
+				personId2Utility.put(personId, personId2Utility.get(personId)-personId2paidToll.get(personId));
 			}
 		}
 		

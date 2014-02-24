@@ -62,7 +62,16 @@ public class ShapeConverterNetwork {
 		
 		for(SimpleFeature sf: features){
 			if(sf.getFeatureType() instanceof SimpleFeatureTypeImpl){
-				//SimpleFeatureTypeImpl http://www.opengis.net/gml:trondheim_med_omland_4 identified extends lineFeature(the_geom:MultiLineString,FNODE_:FNODE_,TNODE_:TNODE_,LPOLY_:LPOLY_,RPOLY_:RPOLY_,LENGTH:LENGTH,VEGNETT_:VEGNETT_,VEGNETT_ID:VEGNETT_ID,OPPR:OPPR,KOORDH:KOORDH,LTEMA:LTEMA,ADRS1:ADRS1,ADRS1F:ADRS1F,ADRS1T:ADRS1T,ADRS2:ADRS2,ADRS2F:ADRS2F,ADRS2T:ADRS2T,MEDIUM:MEDIUM,KOMM:KOMM,TRANSID:TRANSID,GATE:GATE,MAALEMETOD:MAALEMETOD,NOEYAKTIGH:NOEYAKTIGH,GATENAVN:GATENAVN,VEGTYPE:VEGTYPE,VEGSTATUS:VEGSTATUS,VEGNUMMER:VEGNUMMER,HOVEDPARSE:HOVEDPARSE,METER_FRA:METER_FRA,METER_TIL:METER_TIL,VKJORFLT:VKJORFLT,VFRADATO:VFRADATO,DATO:DATO,AKSEL_SO:AKSEL_SO,AKSEL_VI:AKSEL_VI,AKSEL_TEL:AKSEL_TEL,LENGDE:LENGDE,TOTVEKT:TOTVEKT,FARTSGRENS:FARTSGRENS,HOYDE:HOYDE,ONEWAY:ONEWAY,SPERRING:SPERRING,DRIVETIME:DRIVETIME,KOMMTRANSI:KOMMTRANSI,FYLKE:FYLKE,KOMMUNE:KOMMUNE,X_fra:X_fra,Y_fra:Y_fra,X_til:X_til,Y_til:Y_til)
+				//SimpleFeatureTypeImpl http://www.opengis.net/gml:trondheim_med_omland_4 identified extends lineFeature(the_geom:MultiLineString,
+				//FNODE_:FNODE_,TNODE_:TNODE_,LPOLY_:LPOLY_,RPOLY_:RPOLY_,LENGTH:LENGTH,
+				//VEGNETT_:VEGNETT_,VEGNETT_ID:VEGNETT_ID,OPPR:OPPR,KOORDH:KOORDH,
+				//LTEMA:LTEMA,ADRS1:ADRS1,ADRS1F:ADRS1F,ADRS1T:ADRS1T,ADRS2:ADRS2,ADRS2F:ADRS2F,ADRS2T:ADRS2T,
+				//MEDIUM:MEDIUM,KOMM:KOMM,TRANSID:TRANSID,GATE:GATE,MAALEMETOD:MAALEMETOD,NOEYAKTIGH:NOEYAKTIGH,
+				//GATENAVN:GATENAVN,VEGTYPE:VEGTYPE,VEGSTATUS:VEGSTATUS,VEGNUMMER:VEGNUMMER,
+				//HOVEDPARSE:HOVEDPARSE,METER_FRA:METER_FRA,METER_TIL:METER_TIL,VKJORFLT:VKJORFLT,VFRADATO:VFRADATO,
+				//DATO:DATO,AKSEL_SO:AKSEL_SO,AKSEL_VI:AKSEL_VI,AKSEL_TEL:AKSEL_TEL,LENGDE:LENGDE,TOTVEKT:TOTVEKT,
+				//FARTSGRENS:FARTSGRENS,HOYDE:HOYDE,ONEWAY:ONEWAY,SPERRING:SPERRING,DRIVETIME:DRIVETIME,
+				//KOMMTRANSI:KOMMTRANSI,FYLKE:FYLKE,KOMMUNE:KOMMUNE,X_fra:X_fra,Y_fra:Y_fra,X_til:X_til,Y_til:Y_til)
 //				System.out.println(sf.getAttribute("FNODE_"));
 //				System.out.println(sf.getAttribute("KOORDH"));
 				
@@ -106,11 +115,12 @@ public class ShapeConverterNetwork {
 					logger.warn("nodes equal");
 				}
 				
-				Double linkLength = (Double) sf.getAttribute("LENGDE");
+				Double linkLength = (Double) sf.getAttribute("LENGTH");
 				Integer freeSpeedkmh = (Integer) sf.getAttribute("FARTSGRENS"); // tempo limit //TODO change to m/sec?
 				Double freeSpeed = freeSpeedkmh.doubleValue(); 
 				Double capacity = 3600.;
-				Double numLanes = 2.0;
+				Double numLanes = 1.0;
+				if((Double)sf.getAttribute("LENGDE")>20.0)numLanes=2.0;
 					
 				if (!network.getLinks().containsKey(linkId1)) {
 					network.createAndAddLink(linkId1, node1, node2, linkLength,freeSpeed, capacity, numLanes);
