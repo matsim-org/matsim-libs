@@ -31,9 +31,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
-import playground.julia.exposure.EmActivity;
-import playground.julia.exposure.EmPerCell;
-import playground.julia.exposure.ResponsibilityEvent;
+import playground.julia.distribution.EmActivity;
+import playground.julia.distribution.EmPerCell;
+import playground.julia.distribution.ResponsibilityEvent;
 import playground.vsp.emissions.events.EmissionEventsReader;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
