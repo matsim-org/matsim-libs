@@ -49,9 +49,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.julia.distribution.testScoringV3.EmissionControlerListener;
-import playground.julia.distribution.testScoringV3.ResponsibilityScoringFunctionFactory;
-
 /**
  * @author benjamin
  *
