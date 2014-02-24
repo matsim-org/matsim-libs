@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.distribution.testScoringV3;
+package playground.julia.distribution.withScoring;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,6 +48,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.julia.distribution.testScoringV3.EmissionControlerListener;
+import playground.julia.distribution.testScoringV3.ResponsibilityScoringFunctionFactory;
 
 /**
  * @author benjamin

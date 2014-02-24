@@ -36,7 +36,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.julia.exposure.GridTools;
+import playground.julia.distribution.GridTools;
 
 /**
  * @author benjamin

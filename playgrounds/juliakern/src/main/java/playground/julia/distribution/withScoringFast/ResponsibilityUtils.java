@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
-import playground.julia.exposure.EmActivity;
-import playground.julia.exposure.EmPerCell;
-import playground.julia.exposure.ResponsibilityEvent;
+import playground.julia.distribution.EmActivity;
+import playground.julia.distribution.EmPerCell;
+import playground.julia.distribution.ResponsibilityEvent;
 
 public class ResponsibilityUtils {
 

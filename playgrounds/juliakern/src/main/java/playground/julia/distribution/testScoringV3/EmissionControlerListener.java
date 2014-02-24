@@ -37,8 +37,8 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.julia.exposure.GridTools;
-import playground.julia.exposure.ResponsibilityEvent;
+import playground.julia.distribution.GridTools;
+import playground.julia.distribution.ResponsibilityEvent;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
 
