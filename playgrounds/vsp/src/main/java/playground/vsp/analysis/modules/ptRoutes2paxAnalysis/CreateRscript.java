@@ -65,12 +65,15 @@ public class CreateRscript {
 		readScript(outDir);
 		heatmapScript(outDir);
 		
+		/* b for the plotAll.bat, b2 added by gleich for the alternative plotAll.R */
 		StringBuffer b = new StringBuffer();
+		StringBuffer b2 = new StringBuffer();
 		
 		for(TransitLine l: lines.values()){
 			for(TransitRoute r: l.getRoutes().values()){
 				createRouteScript(l.getId(), r.getId(), outDir);
 				b.append(l.getId().toString() + "--" + r.getId().toString() + ".R\n");
+				b2.append("source(\"" +	l.getId().toString() + "--" + r.getId().toString() +".R\")\n");
 			}
 		}
 		
@@ -84,18 +87,33 @@ public class CreateRscript {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		/* w2 added by gleich for the alternative plotAll.R */
+		BufferedWriter w2 = IOUtils.getBufferedWriter(outDir + "plotAll.R");
+		try {
+			w2.write(
+					b2.toString()
+				);
+			w2.flush();
+			w2.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	// created for use with PtLines2PaxAnalysis, fuerbas
 	public static void createScriptFromTransitLines2PaxCounts (Map<Id,TransitLines2PaxCounts> tl2c, String outDir) {
 		readScript(outDir);
 		heatmapScript(outDir);
+		/* b for the plotAll.bat, b2 added by gleich for the alternative plotAll.R */
 		StringBuffer b = new StringBuffer();
+		StringBuffer b2 = new StringBuffer();
 		
 		for(TransitLines2PaxCounts l: tl2c.values()){
 			for(TransitRoute r: l.getRouteList()){
 				createRouteScript(l.getId(), r.getId(), outDir);
 				b.append(l.getId().toString() + "--" + r.getId().toString() + ".R\n");
+				b2.append("source(\"" +	l.getId().toString() + "--" + r.getId().toString() +".R\")\n");
 			}
 		}
 
@@ -106,6 +124,18 @@ public class CreateRscript {
 				);
 			w.flush();
 			w.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		/* w2 added by gleich for the alternative plotAll.R */
+		BufferedWriter w2 = IOUtils.getBufferedWriter(outDir + "plotAll.R");
+		try {
+			w2.write(
+					b2.toString()
+				);
+			w2.flush();
+			w2.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
