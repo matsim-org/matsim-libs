@@ -178,7 +178,7 @@ import playground.michalm.util.RunningVehicleRegister;
         if (ranksFileName == null)
             System.out.println("ranksFileName");
 
-        TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, null, ttimeSource,
+        TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, ttimeSource,
                 eventsFileName);
 
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource,

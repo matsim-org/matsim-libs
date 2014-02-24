@@ -92,7 +92,6 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             throw new RuntimeException();
         }
 
-        launcher.travelTimeCalculator = null;
         launcher.algorithmConfig = config;
         launcher.destinationKnown = destinationKnown;
         launcher.onlineVehicleTracker = onlineVehicleTracker;
@@ -112,15 +111,20 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         SummaryStatistics percentile95PassengerWaitTime = new SummaryStatistics();
         SummaryStatistics computationTime = new SummaryStatistics();
 
+        launcher.clearVrpPathCalculator();
+
         //warmup
         if (launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED) {
             for (int i = 0; i < runs; i += 4) {
                 MatsimRandom.reset(RANDOM_SEEDS[i]);
+                launcher.initVrpPathCalculator();
                 launcher.go(true);
             }
         }
 
         ///========================
+
+        launcher.initVrpPathCalculator();//the same for all runs
 
         for (int i = 0; i < runs; i++) {
             long t0 = System.currentTimeMillis();
@@ -201,7 +205,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             //NOS_TD,
             //NOS_FF,
             //NOS_24H,
-            NOS_15M
+            NOS_15M//
             );
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNosDse = EnumSet.of(//
@@ -209,7 +213,7 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             //NOS_DSE_TD,
             //NOS_DSE_FF,
             //NOS_DSE_24H,
-            NOS_DSE_15M
+            NOS_DSE_15M//
             );
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNonNos = EnumSet.of(//
@@ -223,13 +227,13 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             //========================================
             //APS_FF,
             //APS_24H,
-            APS_15M
+            APS_15M//
             );
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNonNosDse = EnumSet.of(//
             //APS_DSE_FF,
             //APS_DSE_24H,
-            APS_DSE_15M
+            APS_DSE_15M//
             );
 
 
@@ -238,15 +242,15 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");
 
-                multiLauncher.run(selectedNos, runs, false);
+        multiLauncher.run(selectedNos, runs, false);
         //multiLauncher.run(selectedNos, runs, true);
 
         //        multiLauncher.run(selectedNosDse, runs, null);
 
-//        multiLauncher.run(selectedNonNos, runs, false);
-//        multiLauncher.run(selectedNonNos, runs, true);
+        //        multiLauncher.run(selectedNonNos, runs, false);
+        //        multiLauncher.run(selectedNonNos, runs, true);
 
-//        multiLauncher.run(selectedNonNosDse, runs, null);
+        //        multiLauncher.run(selectedNonNosDse, runs, null);
 
         multiLauncher.closeOutputFiles();
     }

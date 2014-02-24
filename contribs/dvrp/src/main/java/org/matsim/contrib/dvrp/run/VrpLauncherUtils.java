@@ -129,28 +129,21 @@ public class VrpLauncherUtils
     }
 
 
-    public static TravelTime initTravelTime(Scenario scenario,
-            TravelTimeCalculator travelTimeCalculator, TravelTimeSource ttimeSource,
+    public static TravelTime initTravelTime(Scenario scenario, TravelTimeSource ttimeSource,
             String eventsFileName)
     {
-        if (travelTimeCalculator == null) {
-            switch (ttimeSource) {
-                case FREE_FLOW_SPEED:
-                    return new FreeSpeedTravelTime();
+        switch (ttimeSource) {
+            case FREE_FLOW_SPEED:
+                return new FreeSpeedTravelTime();
 
-                case EVENTS_15_MIN:
-                case EVENTS_24_H:
-                    scenario.getConfig().travelTimeCalculator()
-                            .setTraveltimeBinSize(ttimeSource.timeDiscretizer.getTimeInterval());
-                    return TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
-                            scenario);
+            case EVENTS_15_MIN:
+            case EVENTS_24_H:
+                scenario.getConfig().travelTimeCalculator()
+                        .setTraveltimeBinSize(ttimeSource.timeDiscretizer.getTimeInterval());
+                return TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName, scenario);
 
-                default:
-                    throw new IllegalArgumentException();
-            }
-        }
-        else {
-            return travelTimeCalculator.getLinkTravelTimes();
+            default:
+                throw new IllegalArgumentException();
         }
     }
 

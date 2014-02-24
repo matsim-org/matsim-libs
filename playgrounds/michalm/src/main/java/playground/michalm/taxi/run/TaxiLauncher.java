@@ -87,7 +87,9 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
     /*package*/LeastCostPathCalculatorCacheStats cacheStats;
 
-    /*package*/TravelTimeCalculator travelTimeCalculator;
+    private TravelTimeCalculator travelTimeCalculator;
+    private LeastCostPathCalculatorWithCache routerWithCache;
+    private VrpPathCalculator pathCalculator;
 
 
     /*package*/TaxiLauncher()
@@ -188,6 +190,34 @@ import playground.michalm.util.RunningVehicleRegister;
     }
 
 
+    /*package*/void initVrpPathCalculator()
+    {
+        TravelTime travelTime = travelTimeCalculator == null ? //
+                VrpLauncherUtils.initTravelTime(scenario, algorithmConfig.ttimeSource,
+                        eventsFileName) : //
+                travelTimeCalculator.getLinkTravelTimes();
+
+        TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
+                algorithmConfig.tdisSource, travelTime);
+
+        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
+                travelTime);
+
+        routerWithCache = new LeastCostPathCalculatorWithCache(router,
+                algorithmConfig.ttimeSource.timeDiscretizer);
+
+        pathCalculator = new VrpPathCalculatorImpl(routerWithCache, travelTime, travelDisutility);
+    }
+
+
+    /*package*/void clearVrpPathCalculator()
+    {
+        travelTimeCalculator = null;
+        routerWithCache = null;
+        pathCalculator = null;
+    }
+
+
     /**
      * Can be called several times (1 call == 1 simulation)
      */
@@ -198,21 +228,6 @@ import playground.michalm.util.RunningVehicleRegister;
 
         contextImpl.setScenario(scenario);
 
-        TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, travelTimeCalculator,
-                algorithmConfig.ttimeSource, eventsFileName);
-
-        TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
-                algorithmConfig.tdisSource, travelTime);
-
-        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
-                travelTime);
-
-        LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(
-                router, algorithmConfig.ttimeSource.timeDiscretizer);
-
-        VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
-                travelDisutility);
-
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(taxiData);
 
@@ -220,7 +235,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 minimizePickupTripTime, pickupDuration, dropoffDuration);
 
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(context,
-                calculator, params);
+                pathCalculator, params);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());
@@ -229,7 +244,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
                 TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
-        
+
         qSim.addQueueSimulationListeners(new BeforeSimulationTaxiCaller(passengerEngine));
 
         LegCreator legCreator = onlineVehicleTracker ? VrpDynLegs
