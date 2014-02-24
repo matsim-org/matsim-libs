@@ -32,6 +32,7 @@ import org.matsim.vehicles.VehicleType;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.julia.distribution.EmActivity;
+import playground.julia.distribution.EmissionModule;
 import playground.vsp.emissions.WarmEmissionAnalysisModule;
 import playground.vsp.emissions.types.WarmPollutant;
 

@@ -26,6 +26,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
+
+
 public class ResponsibilityScoringFunctionFactory implements
 		ScoringFunctionFactory {
 
@@ -41,7 +43,7 @@ public class ResponsibilityScoringFunctionFactory implements
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		// TODO Auto-generated method stub
-		return new ResponsiblityScoringFunction(plan, delegate.createNewScoringFunction(plan), ecl);
+		return new ResponsibilityScoringFunction(plan, delegate.createNewScoringFunction(plan), ecl);
 	}
 
 }

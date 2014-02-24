@@ -26,6 +26,9 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
+import playground.julia.distribution.withScoringFast.EmissionControlerListener;
+import playground.julia.distribution.withScoringFast.ResponsiblityScoringFunction;
+
 public class ResponsibilityScoringFunctionFactory implements
 		ScoringFunctionFactory {
 

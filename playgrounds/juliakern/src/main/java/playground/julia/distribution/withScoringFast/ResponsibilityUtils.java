@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
+import playground.julia.distribution.Cell;
 import playground.julia.distribution.EmActivity;
 import playground.julia.distribution.EmPerCell;
 import playground.julia.distribution.ResponsibilityEvent;

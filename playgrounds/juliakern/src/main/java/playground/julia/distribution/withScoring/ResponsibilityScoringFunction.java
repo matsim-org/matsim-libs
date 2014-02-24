@@ -28,14 +28,14 @@ import org.matsim.core.scoring.ScoringFunction;
 
 import playground.julia.distribution.ResponsibilityEvent;
 
-public class ResponsiblityScoringFunction implements ScoringFunction {
+public class ResponsibilityScoringFunction implements ScoringFunction {
 	
 	ScoringFunction delegate;
 	private Plan plan;
 	//double rScore = 0.0;
 	EmissionControlerListener ecl;
 	
-	public ResponsiblityScoringFunction(Plan plan, ScoringFunction scoringFunction, EmissionControlerListener ecl){
+	public ResponsibilityScoringFunction(Plan plan, ScoringFunction scoringFunction, EmissionControlerListener ecl){
 		this.plan=plan;
 		this.delegate = scoringFunction;
 		this.ecl=ecl;

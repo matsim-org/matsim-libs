@@ -49,6 +49,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+
 /**
  * @author benjamin
  *
@@ -172,6 +173,7 @@ public class TestEmissionPricing {
 		EmissionControlerListener ecl = new EmissionControlerListener();
 		controler.addControlerListener(ecl);
 		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
+		
 		controler.run();
 		
 		Person activeAgent = scenario.getPopulation().getPersons().get(new IdImpl("567417.1#12424"));
