@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.southafrica.utilities.DateString;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
@@ -103,7 +104,7 @@ public class ExtractOneDayTraces {
 		/* Consolidate the output. */
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputfile);
 		try{
-			bw.write("VehicleID,Time,Long,Lat,Status,Speed");
+			bw.write("VehicleID,Time,HourOfDay,Long,Lat,Status,Speed");
 			bw.newLine();
 			
 			for(Future<List<String>> job : listOfJobs){
@@ -155,7 +156,10 @@ public class ExtractOneDayTraces {
 					GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
 					cal.setTimeInMillis(Long.parseLong(sa[1])*1000);
 					if(cal.get(Calendar.DAY_OF_YEAR) == this.date.get(Calendar.DAY_OF_YEAR)){
-						list.add(line);
+						/* Convert the time into a more usable form. */
+						String time = convertDate(cal);
+						String newLine = sa[0] + "," + time + "," + sa[2] + "," + sa[3];
+						list.add(newLine);
 					} else if(cal.get(Calendar.DAY_OF_YEAR) > this.date.get(Calendar.DAY_OF_YEAR)){
 						dateExceeded = true;
 					}
@@ -165,6 +169,12 @@ public class ExtractOneDayTraces {
 			}
 			counter.incCounter();
 			return list;
+		}
+		
+		private String convertDate(GregorianCalendar calendar){
+			DateString ds = new DateString();
+			ds.setTimeInMillis(calendar.getTimeInMillis());
+			return ds.toString();
 		}
 	}
 

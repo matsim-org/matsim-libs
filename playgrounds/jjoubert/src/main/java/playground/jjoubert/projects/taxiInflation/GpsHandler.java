@@ -24,6 +24,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.management.RuntimeErrorException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -49,6 +53,7 @@ public class GpsHandler {
 	private List<Trip> trips = new ArrayList<GpsHandler.Trip>();
 	private List<String> outputRecordsDemand = new ArrayList<String>();
 	private List<String> outputRecordsSupply = new ArrayList<String>();
+	private Map<String, List<Coord>> transactions = new TreeMap<String, List<Coord>>();
 	
 
 	/**
@@ -60,14 +65,16 @@ public class GpsHandler {
 		String inputFile = args[0];
 		String outputFileDemand = args[1];
 		String outputFileSupply = args[2];
-		String fromCRS = args[3];
-		String toCRS = args[4];
+		String outputFileTransactions = args[3];
+		String fromCRS = args[4];
+		String toCRS = args[5];
 		
 		GpsHandler gh = new GpsHandler(fromCRS, toCRS);
 		gh.parseInput(inputFile);
 		gh.processTrips();
 		gh.writeDemandOutputRecordsToFile(outputFileDemand);
 		gh.writeSupplyOutputRecordsToFile(outputFileSupply);
+		gh.writeTransactions(outputFileTransactions);
 		
 		LOG.info("Found " + gh.trips.size() + " trips.");
 		Header.printFooter();
@@ -101,6 +108,30 @@ public class GpsHandler {
 			for(String s : this.outputRecordsSupply){
 				bw.write(s);
 				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + outputFile);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + outputFile);
+			}
+		}
+	}
+	
+	private void writeTransactions(String outputFile){
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
+		try{
+			bw.write("route,long,lat");
+			bw.newLine();
+			for(String s : transactions.keySet()){
+				List<Coord> stops = transactions.get(s);
+				for(Coord c : stops){
+					bw.write(String.format("%s,%.8f,%.8f\n", s, c.getX(), c.getY()));
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -151,6 +182,19 @@ public class GpsHandler {
 				} else{
 					/* Add to existing trip. */
 					currentTrip.addRecord(sa);
+					
+					/* Just capture the location of the `transaction', 
+					 * irrespective of whether commuter(s) are boarding or
+					 * alighting. */
+					double x = Double.parseDouble(sa[2]);
+					double y = Double.parseDouble(sa[1]);
+					Coord c = new CoordImpl(x, y);
+					List<Coord> list = transactions.get(tripName);
+					if(list == null){
+						list = new ArrayList<Coord>();
+					}
+					list.add(c);
+					transactions.put(tripName, list);
 				}
 			}
 		} catch (IOException e) {

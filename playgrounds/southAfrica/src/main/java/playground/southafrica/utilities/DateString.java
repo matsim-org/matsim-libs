@@ -45,7 +45,7 @@ public class DateString extends GregorianCalendar{
 		int second = this.get(SECOND);
 		int millisecond = this.get(MILLISECOND);
 			
-		result = String.format("%04d%02d%02d_%02d%02d_%02d%03d", 
+		result = String.format("%04d%02d%02d_%02d%02d_%02d.%03d", 
 				year, month, day,
 				hour, minute, second, millisecond);
 		return result;
