@@ -64,7 +64,7 @@ public class NOSRankTaxiOptimizer
     private NOSRankTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
             ImmediateRequestParams params, IdleRankVehicleFinder vehicleFinder)
     {
-        super(new RankModeTaxiScheduler(context, calculator, params), context, vehicleFinder, false);
+        super(new RankModeTaxiScheduler(context, calculator, params), vehicleFinder, false);
         this.context = context;
         this.calculator = calculator;
         this.idleVehicleFinder = vehicleFinder;

@@ -51,6 +51,10 @@ public class SinglePassengerPickupActivity
         if (passengerAboard) {
             endTime = now + pickupDuration;
         }
+        else {
+            //try to predict the end time
+            endTime = Math.max(now, request.getT0()) + pickupDuration;
+        }
     }
 
 

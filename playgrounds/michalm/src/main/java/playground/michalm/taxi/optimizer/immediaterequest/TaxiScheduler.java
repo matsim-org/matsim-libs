@@ -43,7 +43,6 @@ public class TaxiScheduler
     private final MatsimVrpContext context;
 
     private final VrpPathCalculator calculator;
-    private final Comparator<VrpPathWithTravelData> pathComparator;
 
     private final ImmediateRequestParams params;
 
@@ -56,15 +55,6 @@ public class TaxiScheduler
         this.context = context;
         this.calculator = calculator;
         this.params = params;
-
-        if (params.minimizePickupTripTime != null) {
-            pathComparator = params.minimizePickupTripTime ? //
-                    VrpPathWithTravelDataComparators.TRAVEL_TIME_COMPARATOR : //
-                    VrpPathWithTravelDataComparators.ARRIVAL_TIME_COMPARATOR;
-        }
-        else {
-            pathComparator = null;
-        }
 
         for (Vehicle veh : context.getVrpData().getVehicles()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
@@ -91,8 +81,14 @@ public class TaxiScheduler
     }
 
 
+    public MatsimVrpContext getContext()
+    {
+        return context;
+    }
+
+
     public VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req,
-            Collection<Vehicle> vehicles)
+            Collection<Vehicle> vehicles, Comparator<VrpPathWithTravelData> pathComparator)
     {
         VehicleRequestPath best = null;
 
@@ -116,7 +112,8 @@ public class TaxiScheduler
 
 
     protected VehicleRequestPath findBestVehicleRequestPath(Vehicle veh,
-            Collection<TaxiRequest> unplannedRequests)
+            Collection<TaxiRequest> unplannedRequests,
+            Comparator<VrpPathWithTravelData> pathComparator)
     {
         VehicleRequestPath best = null;
 
@@ -300,7 +297,8 @@ public class TaxiScheduler
 
         bestSched.addTask(new TaxiPickupDriveTask(best.path, best.request));
 
-        double t3 = Math.max(best.path.getArrivalTime(), best.request.getT0()) + params.pickupDuration;
+        double t3 = Math.max(best.path.getArrivalTime(), best.request.getT0())
+                + params.pickupDuration;
         bestSched.addTask(new TaxiPickupStayTask(best.path.getArrivalTime(), t3, best.request));
 
         if (params.destinationKnown) {
@@ -397,30 +395,27 @@ public class TaxiScheduler
                     if (i == tasks.size() - 1) {// last task
                         task.setBeginTime(t);
 
-                        if (task.getEndTime() < t) {// may happen if a previous task was delayed
-                            // I used to remove this WAIT_TASK, but now I keep it in the schedule:
-                            // schedule.removePlannedTask(task.getTaskIdx());
-                            task.setEndTime(t);
+                        if (task.getEndTime() < t) {// may happen if the previous task is delayed
+                            task.setEndTime(t);//do not remove this task!!! A taxi schedule should end with WAIT
                         }
                     }
                     else {
                         // if this is not the last task then some other task must have been added
-                        // at time t0 <= t
+                        // at time submissionTime <= t
                         // THEREFORE: waittask.endTime() == t0, and so it can be removed
 
                         TaxiTask nextTask = tasks.get(i + 1);
                         switch (nextTask.getTaxiTaskType()) {
                             case PICKUP_DRIVE:
+                                double endTime = task.getEndTime();
 
-                                TaxiRequest req = ((TaxiPickupDriveTask)nextTask).getRequest();
-
-                                if (req.getT0() > req.getSubmissionTime()) {//advance requests
-                                    //currently no support
-                                    throw new RuntimeException();
-                                }
-                                else {//immediate requests
+                                if (endTime <= t) {// may happen if the previous task is delayed
                                     schedule.removeTask(task);
                                     i--;
+                                }
+                                else {
+                                    task.setBeginTime(t);
+                                    t = endTime;
                                 }
 
                                 break;
@@ -550,7 +545,9 @@ public class TaxiScheduler
                     return;
                 }
 
-                removePlannedTasks(schedule, obligatoryTasks, unplannedRequestAdder);
+                int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + obligatoryTasks;
+
+                removePlannedTasks(schedule, newLastTaskIdx, unplannedRequestAdder);
 
                 double tBegin = schedule.getEndTime();
                 double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());
@@ -559,23 +556,27 @@ public class TaxiScheduler
 
                 break;
 
-            case UNPLANNED:
+            case PLANNED:
+                removePlannedTasks(schedule, -1, unplannedRequestAdder);
+                Vehicle veh = schedule.getVehicle();
+                schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+
+                break;
+
             case COMPLETED:
                 break;
 
-            case PLANNED:// at time 0, taxi agents should start WAIT (before first taxi call)
-                // therefore PLANNED->STARTED happens at the very beginning of time step 0
+            case UNPLANNED:
             default:
                 throw new IllegalStateException();
         }
     }
 
 
-    private void removePlannedTasks(Schedule<TaxiTask> schedule, int obligatoryTasks,
+    private void removePlannedTasks(Schedule<TaxiTask> schedule, int newLastTaskIdx,
             RequestAdder unplannedRequestAdder)
     {
         List<TaxiTask> tasks = schedule.getTasks();
-        int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + obligatoryTasks;
 
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
             TaxiTask task = tasks.get(i);

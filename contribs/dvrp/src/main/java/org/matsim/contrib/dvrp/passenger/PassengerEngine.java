@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 
@@ -61,7 +62,7 @@ public class PassengerEngine
         this.internalInterface = internalInterface;
     }
 
-    
+
     public String getMode()
     {
         return mode;
@@ -205,7 +206,7 @@ public class PassengerEngine
                         //TODO we have to somehow handle it (in the future)
                         //Currently this is not a problem since we do not have such cases...
                         throw new IllegalStateException(
-                                "Seems that the agent is not going to take the previously submitted taxi");
+                                "Seems that the agent is not going to take the previously submitted request");
                     }
                 }
             }
@@ -239,16 +240,20 @@ public class PassengerEngine
             MobsimDriverAgent driver, PassengerRequest request, double now)
     {
         MobsimPassengerAgent passenger = request.getPassenger();
+        Id linkId = driver.getCurrentLinkId();
 
-        Id currentLinkId = passenger.getCurrentLinkId();
-
-        if (currentLinkId != driver.getCurrentLinkId()) {
-            throw new IllegalStateException("Passenger and vehicle on different links!");
+        if (passenger.getCurrentLinkId() != linkId || passenger.getState() != State.LEG
+                || !passenger.getMode().equals(mode)) {
+            storeAwaitingPickup(request, pickupActivity);
+            return false;//wait for the passenger
         }
 
-        if (internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), currentLinkId) == null) {
+        if (internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(),
+                driver.getCurrentLinkId()) == null) {
+            //the passenger has already been picked up and is on another taxi trip
+            //seems there have been at least 2 requests made by this passenger for this location
             storeAwaitingPickup(request, pickupActivity);
-            return false;
+            return false;//wait for the passenger (optimistically, he/she should appear soon)
         }
 
         MobsimVehicle mobVehicle = driver.getVehicle();

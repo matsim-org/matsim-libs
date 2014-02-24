@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelDataComparators;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -35,6 +36,7 @@ public class NOSTaxiOptimizer
     implements ImmediateRequestTaxiOptimizer
 {
     private final TaxiScheduler scheduler;
+    private final MatsimVrpContext context;
 
     private final VehicleFinder idleVehicleFinder;
     private final boolean seekDemandSupplyEquilibrium;
@@ -45,17 +47,19 @@ public class NOSTaxiOptimizer
     private boolean requiresReoptimization = false;
 
 
-    public NOSTaxiOptimizer(TaxiScheduler scheduler, MatsimVrpContext context,
-            VehicleFinder idleVehicleFinder, boolean seekDemandSupplyEquilibrium)
+    public NOSTaxiOptimizer(TaxiScheduler scheduler, VehicleFinder idleVehicleFinder,
+            boolean seekDemandSupplyEquilibrium)
     {
         this.scheduler = scheduler;
+        this.context = scheduler.getContext();
 
         this.idleVehicleFinder = idleVehicleFinder;
         this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
 
         int vehCount = context.getVrpData().getVehicles().size();
 
-        unplannedRequests = new ArrayDeque<TaxiRequest>(vehCount);//1 req per veh
+        unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount,//1 req per 1 veh
+                Requests.T0_COMPARATOR);
         idleVehicles = new ArrayDeque<Vehicle>(vehCount);
     }
 
@@ -93,7 +97,8 @@ public class NOSTaxiOptimizer
         while (!idleVehicles.isEmpty()) {
             Vehicle veh = idleVehicles.peek();
 
-            VehicleRequestPath best = scheduler.findBestVehicleRequestPath(veh, unplannedRequests);
+            VehicleRequestPath best = scheduler.findBestVehicleRequestPath(veh, unplannedRequests,
+                    VrpPathWithTravelDataComparators.TRAVEL_TIME_COMPARATOR);
 
             if (best == null) {
                 return;//no unplanned requests
@@ -106,6 +111,26 @@ public class NOSTaxiOptimizer
     }
 
 
+    private boolean doReduceTP()
+    {
+        if (!seekDemandSupplyEquilibrium) {
+            return scheduler.getParams().minimizePickupTripTime;
+        }
+
+        //count unplannedRequests such that req.T0 < now
+        int waitingUnplannedRequestsCount = 0;
+        double now = context.getTime();
+
+        for (TaxiRequest r : unplannedRequests) {
+            if (r.getT0() < now) {
+                waitingUnplannedRequestsCount++;
+            }
+        }
+
+        return waitingUnplannedRequestsCount > idleVehicles.size();
+    }
+
+
     //==============================
 
     @Override
@@ -115,11 +140,7 @@ public class NOSTaxiOptimizer
             return;
         }
 
-        boolean reduceTP = seekDemandSupplyEquilibrium ? //
-                unplannedRequests.size() > idleVehicles.size() : //
-                scheduler.getParams().minimizePickupTripTime;
-
-        if (reduceTP) {
+        if (doReduceTP()) {
             scheduleIdleVehicles();//reduce T_P to increase throughput (demand > supply)
         }
         else {

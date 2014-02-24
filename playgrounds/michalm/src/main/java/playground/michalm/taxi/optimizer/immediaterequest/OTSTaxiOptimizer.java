@@ -22,7 +22,8 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -35,13 +36,6 @@ public class OTSTaxiOptimizer
     implements ImmediateRequestTaxiOptimizer
 
 {
-    public static final Comparator<TaxiRequest> SUBMISSION_TIME_COMPARATOR = new Comparator<TaxiRequest>() {
-        public int compare(TaxiRequest r1, TaxiRequest r2)
-        {
-            return Double.compare(r1.getSubmissionTime(), r2.getSubmissionTime());
-        }
-    };
-
     protected final TaxiScheduler scheduler;
     protected final MatsimVrpContext context;
 
@@ -49,15 +43,20 @@ public class OTSTaxiOptimizer
 
     private boolean requiresReoptimization = false;
 
+    private final Comparator<VrpPathWithTravelData> pathComparator;
 
-    public OTSTaxiOptimizer(TaxiScheduler scheduler, MatsimVrpContext context)
+
+    public OTSTaxiOptimizer(TaxiScheduler scheduler)
     {
         this.scheduler = scheduler;
-        this.context = context;
+        this.context = scheduler.getContext();
 
-        int initialCapacity = context.getVrpData().getVehicles().size();//1 awaiting req/veh
-        unplannedRequests = new PriorityQueue<TaxiRequest>(initialCapacity,
-                SUBMISSION_TIME_COMPARATOR);
+        int vehCount = context.getVrpData().getVehicles().size();//1 awaiting req/veh
+        unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount, Requests.T0_COMPARATOR);
+
+        pathComparator = scheduler.getParams().minimizePickupTripTime ? //
+                VrpPathWithTravelDataComparators.TRAVEL_TIME_COMPARATOR : //
+                VrpPathWithTravelDataComparators.ARRIVAL_TIME_COMPARATOR;
     }
 
 
@@ -67,7 +66,7 @@ public class OTSTaxiOptimizer
             TaxiRequest req = unplannedRequests.peek();
 
             VehicleRequestPath best = scheduler.findBestVehicleRequestPath(req, context
-                    .getVrpData().getVehicles());
+                    .getVrpData().getVehicles(), pathComparator);
 
             if (best == null) {
                 return;

@@ -192,18 +192,18 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
 
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(scheduler, context, new IdleVehicleFinder(context,
+                return new NOSTaxiOptimizer(scheduler, new IdleVehicleFinder(context,
                         calculator, tdisSource), false);
 
             case NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM:
-                return new NOSTaxiOptimizer(scheduler, context, new IdleVehicleFinder(context,
+                return new NOSTaxiOptimizer(scheduler, new IdleVehicleFinder(context,
                         calculator, tdisSource), true);
 
             case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizer(scheduler, context);
+                return new OTSTaxiOptimizer(scheduler);
 
             case RE_SCHEDULING:
-                return new RESTaxiOptimizer(scheduler, context);
+                return new RESTaxiOptimizer(scheduler);
 
             case AP_SCHEDULING:
                 return new APSTaxiOptimizer(scheduler, context, false);

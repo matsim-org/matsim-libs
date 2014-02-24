@@ -25,7 +25,7 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.contrib.dvrp.router.*;
 
 import playground.michalm.taxi.model.TaxiRequest;
 
@@ -66,13 +66,13 @@ public class TaxiOptimizerWithPreassignment
         TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params) {
             @Override
             public VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req,
-                    Collection<Vehicle> vehicles)
+                    Collection<Vehicle> vehicles, Comparator<VrpPathWithTravelData> pathComparator)
             {
                 Vehicle veh = reqIdToVehMap.get(req.getId());
                 return new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
             }
         };
 
-        return new OTSTaxiOptimizer(scheduler, context);
+        return new OTSTaxiOptimizer(scheduler);
     }
 }
