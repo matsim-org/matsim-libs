@@ -175,6 +175,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 		typeBuilder.setName("shape");
 		typeBuilder.add("envelope",Polygon.class);
 		typeBuilder.add("area",Double.class);
+		
 		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 		
 		ArrayList<SimpleFeature> features = new ArrayList<SimpleFeature>();
@@ -185,9 +186,9 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 		});
 		
 		features.add(feature);
-		
+
 		ShapeFileWriter.writeGeometries(features, outputFolder+"envelope"+this.SHPfile);
-		
+
 	}
 
 	/**
@@ -569,13 +570,17 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 			
 		}
 		
-		String destination = "nodeTypes";
+		String destination = "";
+		
+		if(features.size() > 0){
+		destination = "nodeTypes";
 		
 		this.filesForExportInQGisProject.put(destination,Point.class);
 		
-		ShapeFileWriter.writeGeometries(features, outputFolder+destination+this.SHPfile);
+			ShapeFileWriter.writeGeometries(features, outputFolder+destination+this.SHPfile);
+		}
 		
-		if(!(this.nodesWithHighDegrees.size()<1)){
+		if(!(this.nodesWithHighDegrees.size() < 1)){
 			features.clear();
 			
 			typeBuilder.setName("node");
