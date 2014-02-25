@@ -19,12 +19,13 @@
 
 package playground.wrashid.parkingSearch.withindayFW.util;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 
 
 /**
@@ -40,9 +41,9 @@ public class ParallelSafePlanElementAccessLib {
 
 	
 	
-	public static Leg getNextLeg(ExperimentalBasicWithindayAgent agent) {
+	public static Leg getNextLeg(PersonDriverAgentImpl agent) {
 		Plan executedPlan = agent.getCurrentPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		for (int i = planElementIndex + 1; i < executedPlan.getPlanElements().size(); i++) {
 			if (executedPlan.getPlanElements().get(i) instanceof Leg) {
 				return (Leg) executedPlan.getPlanElements().get(i);
@@ -53,9 +54,9 @@ public class ParallelSafePlanElementAccessLib {
 		return null;
 	}
 
-	public static Activity getNextAct(ExperimentalBasicWithindayAgent agent) {
+	public static Activity getNextAct(PersonDriverAgentImpl agent) {
 		Plan executedPlan = agent.getCurrentPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		for (int i = planElementIndex + 1; i < executedPlan.getPlanElements().size(); i++) {
 			if (executedPlan.getPlanElements().get(i) instanceof Activity) {
 				return (Activity) executedPlan.getPlanElements().get(i);
@@ -66,9 +67,9 @@ public class ParallelSafePlanElementAccessLib {
 		return null;
 	}
 
-	public static Activity getPreviousAct(ExperimentalBasicWithindayAgent agent) {
+	public static Activity getPreviousAct(PersonDriverAgentImpl agent) {
 		Plan executedPlan = agent.getCurrentPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		for (int i = planElementIndex - 1; i < executedPlan.getPlanElements().size(); i--) {
 			if (executedPlan.getPlanElements().get(i) instanceof Activity) {
 				return (Activity) executedPlan.getPlanElements().get(i);
@@ -80,8 +81,8 @@ public class ParallelSafePlanElementAccessLib {
 	}
 
 	
-	public static int getCurrentExpectedLegIndex(ExperimentalBasicWithindayAgent agent){
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+	public static int getCurrentExpectedLegIndex(PersonDriverAgentImpl agent){
+		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		
 		if (planElementIndex%2==0){
 			planElementIndex--;
@@ -89,8 +90,8 @@ public class ParallelSafePlanElementAccessLib {
 		return planElementIndex;
 	}
 	
-	public static int getCurrentExpectedActIndex(ExperimentalBasicWithindayAgent agent){
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+	public static int getCurrentExpectedActIndex(PersonDriverAgentImpl agent){
+		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		
 		if (planElementIndex%2==1){
 			planElementIndex--;

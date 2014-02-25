@@ -60,7 +60,7 @@ public class GuidanceAgentFactory implements AgentFactory {
 			this.ttObserver.addGuidedAgentId(p.getId());
 		}
 		else {
-			agent = new PersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation); 
+			agent = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation); 
 			this.ttObserver.addUnGuidedAgentId(p.getId());
 		}
 		return agent;

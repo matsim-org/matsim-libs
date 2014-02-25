@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,7 +39,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -113,7 +114,9 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		 * Change the persons' original plans. By doing so, the (hopefully) optimized
 		 * routes are written to the output plans file.
 		 */
-		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+//		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+		Logger.getLogger(this.getClass()).fatal("copySelectedPlan no longer possible. kai, feb'14") ;
+		System.exit(-1); 
 
 		/*
 		 * Create a WithinDayControlerListener but do NOT register it as ControlerListener.

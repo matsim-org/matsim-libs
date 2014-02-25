@@ -51,7 +51,7 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	}
 
 	private TransitAgent(final Person p, final Netsim simulation) {
-		super(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
+		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
 	}
 
 	@Override

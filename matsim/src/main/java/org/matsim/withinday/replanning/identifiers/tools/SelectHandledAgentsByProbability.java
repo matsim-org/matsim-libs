@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
@@ -101,11 +100,13 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 		this.withinDayAgents = new ArrayList<Id>();
 
 		for (MobsimAgent mobsimAgent : sim.getAgents()) {
-			if (mobsimAgent instanceof PlanBasedWithinDayAgent) {
-				withinDayAgents.add(mobsimAgent.getId());
-			} else {
-				log.warn("MobsimAgent was expected to be from type WithinDayAgent, but was from type " + mobsimAgent.getClass().toString());
-			}
+			Logger.getLogger(this.getClass()).fatal("WithinDayAgent is no longer") ;
+			System.exit(-1) ;
+//			if (mobsimAgent instanceof PlanBasedWithinDayAgent) {
+//				withinDayAgents.add(mobsimAgent.getId());
+//			} else {
+//				log.warn("MobsimAgent was expected to be from type WithinDayAgent, but was from type " + mobsimAgent.getClass().toString());
+//			}
 		}
 		log.info("Collected " + withinDayAgents.size() + " registered WithinDayAgents.");
 	}

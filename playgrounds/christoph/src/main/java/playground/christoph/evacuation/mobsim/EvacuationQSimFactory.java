@@ -41,8 +41,8 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelPassengerQNetsimEngine;
@@ -89,7 +89,10 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
     	 * As long as we need ExperimentalBasicWithindayAgents because other agents cannot
     	 * change their persons' plans. 
     	 */
-    	ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+//    	ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+		Logger.getLogger(this.getClass()).fatal("copySelectedPlan no longer possible. kai, feb'14") ;
+		System.exit(-1); 
+
     	
     	// so far "ride_passenger" - might be switched to "ride"
     	PassengerDepartureHandler.passengerMode = PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE;
@@ -143,7 +146,7 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
 //		this.householdsInformerRNG++;
 //		EvacuationConfig.householdsInformerRandomSeed++;
 		
-        AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+        AgentFactory agentFactory = new DefaultAgentFactory(qSim);
         AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim, this.householdObjectAttributes, 
         		this.agentsVehiclesFile, this.parkedVehiclesFile);
         qSim.addAgentSource(agentSource);

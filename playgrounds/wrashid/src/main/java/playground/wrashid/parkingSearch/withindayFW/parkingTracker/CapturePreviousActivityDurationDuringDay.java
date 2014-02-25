@@ -22,37 +22,31 @@ package playground.wrashid.parkingSearch.withindayFW.parkingTracker;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 
 import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 
 //If several activities between two parking activities, count sum of all activities
 
 public class CapturePreviousActivityDurationDuringDay implements ActivityStartEventHandler, ActivityEndEventHandler {
-	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
+	private final Map<Id, PersonDriverAgentImpl> agents;
 	private final Map<Id, Integer> firstParkingActivityPlanElemIndex;
 	private Map<Id, Integer> lastParkingActivityPlanElemIndex;
 	private Map<Id, Double> activityDurationTmpValue;
 
-	public CapturePreviousActivityDurationDuringDay(Map<Id, ExperimentalBasicWithindayAgent> agents,
+	public CapturePreviousActivityDurationDuringDay(Map<Id, PersonDriverAgentImpl> agents,
 			Map<Id, Integer> firstParkingActivityPlanElemIndex, Map<Id, Integer> lastParkingActivityPlanElemIndex) {
 		this.agents = agents;
 		this.firstParkingActivityPlanElemIndex = firstParkingActivityPlanElemIndex;
@@ -74,9 +68,9 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		Id personId = event.getPersonId();
-		ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
+		PersonDriverAgentImpl agent = this.agents.get(event.getPersonId());
 		Plan executedPlan = agent.getCurrentPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
 		DebugLib.traceAgent(personId, 11);
 		
@@ -110,9 +104,9 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 		Id personId = event.getPersonId();
 
 		
-		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
+		PersonDriverAgentImpl agent = this.agents.get(personId);
 		Plan executedPlan = agent.getCurrentPlan();
-		int planElementIndex = agent.getCurrentPlanElementIndex();
+		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		
 		DebugLib.traceAgent(personId, 11);
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
@@ -125,7 +119,7 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 			PlanElement planElement = executedPlan.getPlanElements().get(planElementIndex - 2);
 			
 			if (!(planElement instanceof Activity)){
-				ExperimentalBasicWithindayAgent experimentalBasicWithindayAgent = this.agents.get(personId);
+				PersonDriverAgentImpl experimentalBasicWithindayAgent = this.agents.get(personId);
 				
 				System.out.println();
 			}

@@ -46,7 +46,8 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 // events werden während sim step geschmissen, aftermobsimstep kommt nachher.
@@ -61,7 +62,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	private final Set<Id> linkEnteredAgents;
 	private final Set<Id> lastTimeStepsLinkEnteredAgents;
 	private final Map<Id, ActivityFacility> nextActivityFacilityMap;
-	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
+	private final Map<Id, PersonDriverAgentImpl> agents;
 	private final Map<Id, Id> selectedParkingsMap;
 
 	/**
@@ -85,7 +86,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 																	// deterministic!
 		this.searchingAgents = new HashSet<Id>();
 		this.nextActivityFacilityMap = new HashMap<Id, ActivityFacility>();
-		this.agents = new HashMap<Id, ExperimentalBasicWithindayAgent>();
+		this.agents = new HashMap<Id, PersonDriverAgentImpl>();
 	}
 
 	public Set<Id> getSearchingAgents() {
@@ -95,7 +96,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
-			this.agents.put(agent.getId(), (ExperimentalBasicWithindayAgent) agent);
+			this.agents.put(agent.getId(), (PersonDriverAgentImpl) agent);
 		}
 	}
 
@@ -123,9 +124,9 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 		if (event.getLegMode().equals(TransportMode.car)) {
 			this.carLegAgents.add(event.getPersonId());
 
-			ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
+			PersonDriverAgentImpl agent = this.agents.get(event.getPersonId());
 			Plan executedPlan = agent.getCurrentPlan();
-			int planElementIndex = agent.getCurrentPlanElementIndex();
+			int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
 			/*
 			 * Get the coordinate of the next non-parking activity's facility.

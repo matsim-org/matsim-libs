@@ -60,7 +60,7 @@ class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverP
 
 
 	private TransitSubModeAgent(Person p, Netsim sim, boolean fixedMode) {
-		super(p, p.getSelectedPlan(), sim);
+		super(p.getSelectedPlan(), sim);
 		this.fixedSubMode = fixedMode;
 		this.transitSchedule = sim.getScenario().getTransitSchedule();
 	}

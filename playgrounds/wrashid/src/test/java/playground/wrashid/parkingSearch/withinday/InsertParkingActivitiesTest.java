@@ -47,8 +47,10 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
@@ -174,15 +176,16 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
-        AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+//        AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim) ;
         AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
         		insertParkingActivities, parkingInfrastructure, 1);
         qSim.addAgentSource(agentSource);
 		
         agentSource.insertAgentsIntoMobsim(); 
-        ExperimentalBasicWithindayAgent agent = null;
+        PersonDriverAgentImpl agent = null;
         for (MobsimAgent a : qSim.getAgents()) {
-        	agent = (ExperimentalBasicWithindayAgent) a;
+        	agent = (PersonDriverAgentImpl) a;
         	break;
         }
         
@@ -205,7 +208,8 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		plan.addLeg(factory.createLeg(TransportMode.car));
 		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
 		
-		agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
+//		agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
+		agent = new PersonDriverAgentImpl(person.getSelectedPlan(),qSim) ;
 		try {
 			insertParkingActivities.run(agent.getCurrentPlan());
 			Assert.fail("Expected RuntimeException, but there was none.");

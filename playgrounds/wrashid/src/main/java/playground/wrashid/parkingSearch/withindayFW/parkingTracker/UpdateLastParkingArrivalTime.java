@@ -24,25 +24,22 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 
 import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 
 public class UpdateLastParkingArrivalTime implements PersonArrivalEventHandler {
 
-	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
+	private final Map<Id, PersonDriverAgentImpl> agents;
 	private final Map<Id, Double> lastParkingArrivalTime;
 	private Map<Id, Double> currentPlanElementIndexCarDeparture;
 
-	public UpdateLastParkingArrivalTime(Map<Id, ExperimentalBasicWithindayAgent> agents) {
+	public UpdateLastParkingArrivalTime(Map<Id, PersonDriverAgentImpl> agents) {
 		this.agents = agents;
 		this.lastParkingArrivalTime = new HashMap<Id, Double>();
 		this.currentPlanElementIndexCarDeparture=new HashMap<Id, Double>();
@@ -60,7 +57,7 @@ public class UpdateLastParkingArrivalTime implements PersonArrivalEventHandler {
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
-		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
+		PersonDriverAgentImpl agent = this.agents.get(personId);
 		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 

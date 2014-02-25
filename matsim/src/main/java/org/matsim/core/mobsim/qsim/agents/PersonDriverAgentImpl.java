@@ -94,8 +94,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	// ============================================================================================================================
 	// c'tor
 
-	public PersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation) {
-		this.person = person;
+	public PersonDriverAgentImpl(final Plan plan, final Netsim simulation) {
+		this.person = plan.getPerson();
 		this.simulation = simulation;
 		this.plan = plan;
 		List<? extends PlanElement> planElements = this.plan.getPlanElements();

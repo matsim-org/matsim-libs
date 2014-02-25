@@ -44,7 +44,7 @@ public class MyAgent implements MobsimDriverAgent {
 	
 	public MyAgent(Person p, Plan unmodifiablePlan, QSim qSim) {
 		// create a normal agent
-		delegate = new PersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
+		delegate = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
 		this.simulation = qSim;
 		
 		if (unmodifiablePlan.getPlanElements().size() > 0) {

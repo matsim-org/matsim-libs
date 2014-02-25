@@ -37,7 +37,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -95,7 +94,10 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this);
 
 		// let Agents adapt their original plans
-		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+//		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+		Logger.getLogger(this.getClass()).fatal("copySelectedPlan no longer possible. kai, feb'14") ;
+		System.exit(-1); 
+
 		
 		// Use a Scoring Function, that only scores the travel times!
 		controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());

@@ -140,7 +140,7 @@ public class RunDemo {
 		
 		Map<Id, CAAgent> agents = new LinkedHashMap<Id, CAAgent>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			MobsimAgent mobsimAgent = new PersonDriverAgentImpl(person, person.getSelectedPlan(), netsim);
+			MobsimAgent mobsimAgent = new PersonDriverAgentImpl(person.getSelectedPlan(), netsim);
 			CAAgent caAgent = new CAAgent(mobsimAgent, network);
 			agents.put(mobsimAgent.getId(), caAgent);
 		}

@@ -62,7 +62,7 @@ public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriver
 
 
 	private PTransitAgent(final Person p, final Netsim simulation, boolean boardAllLines) {
-		super(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
+		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
 		this.boardAllLines = boardAllLines;
 		this.transitSchedule = simulation.getScenario().getTransitSchedule();
 	}

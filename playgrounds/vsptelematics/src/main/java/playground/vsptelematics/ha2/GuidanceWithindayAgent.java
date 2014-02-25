@@ -22,7 +22,7 @@ package playground.vsptelematics.ha2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 
@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
  * @author dgrether
  *
  */
-public class GuidanceWithindayAgent extends ExperimentalBasicWithindayAgent {
+public class GuidanceWithindayAgent extends PersonDriverAgentImpl {
 
 	private Id id1 = new IdImpl("1");
 	private Id id2 = new IdImpl("2");
@@ -42,7 +42,9 @@ public class GuidanceWithindayAgent extends ExperimentalBasicWithindayAgent {
 	private Netsim simulation;
 	
 	protected GuidanceWithindayAgent(Person p, Netsim simulation, Guidance guidance) {
-		super(p, simulation);
+		super(p.getSelectedPlan(), simulation);
+		// (not sure if this will work; this class used to extend from ExperimentalWithindayAgent. kai, feb'14)
+
 		this.simulation = simulation;
 		this.guidance = guidance;
 	}

@@ -46,7 +46,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.MissedJointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
@@ -250,7 +250,10 @@ public class EvacuationControler extends WithinDayController implements
 		 * Change the persons' plans. Doing so might simplify bug-tracking.
 		 */
 		if (adaptOriginalPlans) {
-			ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+//			ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+			Logger.getLogger(this.getClass()).fatal("copySelectedPlan no longer possible. kai, feb'14") ;
+			System.exit(-1); 
+
 		}
 		
 		/*

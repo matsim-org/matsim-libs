@@ -44,9 +44,10 @@ public class DgWithindayAgentFactory implements AgentFactory {
 
 	@Override
 	public PersonDriverAgentImpl createMobsimAgentFromPerson(final Person p) {
-		PersonDriverAgentImpl agent = DgWithindayQPersonAgent.createDgWithindayQPersonAgent(p,
-				this.simulation, this.random);
-		return agent;
+//		PersonDriverAgentImpl agent = DgWithindayQPersonAgent.createDgWithindayQPersonAgent(p,
+//				this.simulation, this.random);
+//		return agent;
+		throw new RuntimeException("ExperimentalWithindayAgent, on which DgWithindayAgent depended, is no longer ...") ;
 	}
 	
 }

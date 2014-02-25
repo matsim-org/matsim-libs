@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 
 
 public class FreightQSimFactory implements MobsimFactory {
@@ -59,7 +59,7 @@ public class FreightQSimFactory implements MobsimFactory {
 		}
 		final QSim sim = (QSim) new QSimFactory().createMobsim(sc, eventsManager);
 		Collection<MobSimVehicleRoute> vRoutes = carrierAgentTracker.createPlans();
-		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new ExperimentalBasicWithindayAgentFactory(sim), sim);
+		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new DefaultAgentFactory(sim), sim);
 		sim.addAgentSource(agentSource);
 		if (physicallyEnforceTimeWindowBeginnings) {
 			WithinDayActivityReScheduling withinDayActivityRescheduling = new WithinDayActivityReScheduling(agentSource, carrierAgentTracker);

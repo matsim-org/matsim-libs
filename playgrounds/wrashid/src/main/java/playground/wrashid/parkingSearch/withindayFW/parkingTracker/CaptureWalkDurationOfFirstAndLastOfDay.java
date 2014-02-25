@@ -23,15 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 
 import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 
@@ -40,11 +38,11 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements PersonDepartureEv
 
 	private final Map<Id, Double> firstParkWalkOfDayTmp;
 	private final Map<Id, Double> lastParkWalkOfDayTmp;
-	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
+	private final Map<Id, PersonDriverAgentImpl> agents;
 	private final Map<Id, Integer> firstParkingActivityPlanElemIndex;
 	private final Map<Id, Integer> lastParkingActivityPlanElemIndex;
 
-	public CaptureWalkDurationOfFirstAndLastOfDay(Map<Id, ExperimentalBasicWithindayAgent> agents,
+	public CaptureWalkDurationOfFirstAndLastOfDay(Map<Id, PersonDriverAgentImpl> agents,
 			Map<Id, Integer> firstParkingActivityPlanElemIndex, Map<Id, Integer> lastParkingActivityPlanElemIndex) {
 		this.agents = agents;
 		this.firstParkingActivityPlanElemIndex = firstParkingActivityPlanElemIndex;
@@ -66,7 +64,7 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements PersonDepartureEv
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
-		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
+		PersonDriverAgentImpl agent = this.agents.get(personId);
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
@@ -103,7 +101,7 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements PersonDepartureEv
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
-		ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
+		PersonDriverAgentImpl agent = this.agents.get(event.getPersonId());
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 		double startTimeWalkLeg = event.getTime();
 

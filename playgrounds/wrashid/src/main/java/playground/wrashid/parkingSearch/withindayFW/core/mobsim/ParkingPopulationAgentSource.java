@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -136,8 +136,8 @@ public class ParkingPopulationAgentSource implements AgentSource {
 			 * been altered.
 			 */
 			Plan plan;
-			if (agent instanceof ExperimentalBasicWithindayAgent) {
-				plan = ((ExperimentalBasicWithindayAgent) agent).getCurrentPlan();
+			if (agent instanceof PersonDriverAgentImpl) {
+				plan = ((PersonDriverAgentImpl) agent).getCurrentPlan();
 			} else
 				plan = person.getSelectedPlan();
 

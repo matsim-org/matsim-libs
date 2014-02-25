@@ -31,7 +31,7 @@ public class WithinDayAgentWithRouter {
 		private PersonDriverAgentImpl delegate;
 
 		public MyAgent(Person p, Plan unmodifiablePlan, QSim qSim) {
-			delegate = new PersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
+			delegate = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
 		}
 
 		public final void endActivityAndComputeNextState(double now) {
@@ -125,7 +125,7 @@ public class WithinDayAgentWithRouter {
 			if (p.getId().toString().equals("50")) {
 				agent = new MyAgent(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.qSim);
 			} else {
-			    agent = new PersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.qSim); 
+			    agent = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.qSim); 
 			}
 			return agent;
 		}
