@@ -20,6 +20,7 @@
 package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -182,6 +183,10 @@ public class NOSRankTaxiOptimizer
 
             case STARTED:
                 oldEndTime = lastTask.getEndTime();
+                
+                if (oldEndTime<veh.getT1())
+                	System.out.println("endddd time is weird.");
+                
                 lastTask.setEndTime(currentTime);// shortening the WAIT task
 
                 break;
@@ -193,18 +198,38 @@ public class NOSRankTaxiOptimizer
         }
 
         Link lastLink = lastTask.getLink();
-
-        if (veh.getStartLink() != lastLink) {// not a loop
-            VrpPathWithTravelData path = calculator.calcPath(lastLink, veh.getStartLink(),
+        Link rankLink = findNearestRank(lastLink);
+        if (rankLink != lastLink) {// not a loop
+        	
+            VrpPathWithTravelData path = calculator.calcPath(lastLink, rankLink,
                     currentTime);
+            
             sched.addTask(new TaxiCruiseDriveTask(path));
 
             double arrivalTime = path.getArrivalTime();
-            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldEndTime, veh.getStartLink()));
+            sched.addTask(new TaxiWaitStayTask(arrivalTime, oldEndTime, rankLink));
             // System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:"
             // +oldendtime);
         }
+        else {
+        	lastTask.setEndTime(oldEndTime);
+        }
+        
 
+    }
+    
+    private Link findNearestRank(Link positionLink){
+    	Link nearestRankLink = null;
+    	double bestTravelCost = Double.MAX_VALUE;
+    	for (Entry<Id, Integer> e :    	this.rankArrivalDepartureCharger.getRankLocations().entrySet()){
+    		Link currentLink = this.context.getScenario().getNetwork().getLinks().get(e.getKey());
+    	double currentCost = calculator.calcPath(positionLink,currentLink,context.getTime()).getTravelCost();
+    	if (currentCost <bestTravelCost) {
+    		bestTravelCost = currentCost;
+    		nearestRankLink = currentLink;
+    	}
+    	}
+    	return nearestRankLink;
     }
 
 

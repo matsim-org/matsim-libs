@@ -165,7 +165,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		int occ = this.currentChargerOccupation.get(linkId);
 		occ++;
 		this.currentChargerOccupation.put(linkId, occ);
-		log.info("Added vehicle "+vehicleId+ "to Charger "+linkId+" load: "+occ);
+//		log.info("Added vehicle "+vehicleId+ "to Charger "+linkId+" load: "+occ);
 		
 	}
 
@@ -177,7 +177,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		occ--;
 		this.currentChargerOccupation.put(linkId, occ);
 		chargingVehicles.remove(vehicleId);
-		log.info("Removed vehicle "+vehicleId+ "to Charger "+linkId+" load: "+occ);
+//		log.info("Removed vehicle "+vehicleId+ "to Charger "+linkId+" load: "+occ);
 
 		}
 		
@@ -208,7 +208,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 			double rsoc = soc
 					/ ((BatteryElectricVehicle) e.getValue())
 							.getUsableBatteryCapacityInJoules();
-			this.soCLog.add(new SocLogRow(e.getKey(), time, soc, rsoc));
+//			this.soCLog.add(new SocLogRow(e.getKey(), time, soc, rsoc));
 			currentSoc.add(soc);
 		}
 		if (currentSoc.size() > 0) {
@@ -290,6 +290,10 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		if ((this.vehicles.containsKey(carId))&&(isBatteryElectricVehicle(carId)))
 				return ((BatteryElectricVehicle) this.vehicles.get(carId)).getSocInJoules();
 		else return 0;
+	}
+	
+	public Map<Id, Integer> getRankLocations() {
+		return rankLocations;
 	}
 
 }

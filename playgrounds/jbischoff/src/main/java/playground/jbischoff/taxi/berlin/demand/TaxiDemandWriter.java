@@ -82,7 +82,7 @@ public class TaxiDemandWriter {
 	private Random rnd = new Random(17);
 	private final static String NETWORKFILE = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/network/berlin_brb.xml.gz";
 	private final static Id TXLLORID = new IdImpl("12214125");
-	private final static double SCALEFACTOR = 2.0;
+	private final static double SCALEFACTOR = 1.0;
 	static int fromTXL = 0;
 	static int toTXL = 0;
 	
@@ -94,7 +94,7 @@ public class TaxiDemandWriter {
 	public static void main(String[] args) {
 		LorShapeReader lsr = new LorShapeReader();
 		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/Planungsraum.shp", "SCHLUESSEL");
-		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/kreise.shp", "Nr");
+		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/gemeinden.shp", "NR");
 		for (int i = 15; i <22 ; i++){
 			TaxiDemandWriter tdw = new TaxiDemandWriter();
 			tdw.setMunicipalityMap(lsr.getShapeMap());
@@ -157,9 +157,9 @@ public class TaxiDemandWriter {
 		population = scenario.getPopulation();
 		generatePopulation(dirname, fileNamePrefix);
 		log.info("Population size: " +population.getPersons().size());
-//		PopulationWriter populationWriter = new PopulationWriter(
-//				scenario.getPopulation(), scenario.getNetwork());
-//		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
+		PopulationWriter populationWriter = new PopulationWriter(
+				scenario.getPopulation(), scenario.getNetwork());
+		populationWriter.write(dirname+fileNamePrefix+"_SCALE_"+SCALEFACTOR+"_"+"plans.xml.gz");
 	}
 
 	private void generatePopulation(String dirname, String fileNamePrefix) {

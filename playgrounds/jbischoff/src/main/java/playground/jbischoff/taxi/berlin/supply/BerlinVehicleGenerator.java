@@ -42,6 +42,7 @@ public class BerlinVehicleGenerator {
 	private final static int  PAXPERCAR = 4;
 	private final static int T0 = 0;
 	private final static int T1 = 30*60*60;
+	private final static int AMOUNTOFTAXIS = 3000;
 	private NetworkImpl network;
 	private CoordinateTransformation ct = TransformationFactory
 			.getCoordinateTransformation(
@@ -56,7 +57,7 @@ public class BerlinVehicleGenerator {
 		BerlinVehicleGenerator bvr = new BerlinVehicleGenerator();
 		
 		bvr.readInputData("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/201304"+i+"/od.csv");
-		List<Vehicle> vehicleList = bvr.createVehicles(3000);
+		List<Vehicle> vehicleList = bvr.createVehicles(AMOUNTOFTAXIS);
 		new VehicleWriter(vehicleList).write("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/201304"+i+"/vehicles.xml");
 		}
 	}
@@ -111,7 +112,7 @@ public class BerlinVehicleGenerator {
 	private void readInputData(String tabularDemandPerLor) {
 		LorShapeReader lsr = new LorShapeReader();
 		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/Planungsraum.shp", "SCHLUESSEL");
-		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/kreise.shp", "Nr");
+		lsr.readShapeFile("/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/OD/shp_merged/gemeinden.shp", "NR");
 		this.shapedata = lsr.getShapeMap();
 		DemandPerLorParser dpl = new DemandPerLorParser();
 		this.read(tabularDemandPerLor,dpl);

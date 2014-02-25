@@ -102,7 +102,7 @@ import playground.michalm.util.RunningVehicleRegister;
 //        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
 //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
     	
-    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario/";
+    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
            plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
            netFileName = dirName + "berlin_brb.xml.gz";
            eventsFileName = null;
@@ -116,7 +116,7 @@ import playground.michalm.util.RunningVehicleRegister;
         //      electricStatsDir = dirName +"gas_ranks\\";
         //        electricStatsDir = dirName +"modifiedDispatch_SL\\";
         //        electricStatsDir = dirName +"1charger\\";
-        electricStatsDir = dirName + "1slow_fifo/";
+        electricStatsDir = dirName + "1slow_nolog/";
 
         //        plansFileName = dirName + "20.plans.xml.gz";
         //
@@ -124,7 +124,7 @@ import playground.michalm.util.RunningVehicleRegister;
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
         taxiCustomersFileName = dirName + "taxiCustomers_15_pc.txt";
 
-        taxisFileName = dirName + "taxis-5000.xml";
+        taxisFileName = dirName + "taxis-3000.xml";
         ranksFileName = dirName + "berlin_ranks.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
@@ -250,7 +250,7 @@ import playground.michalm.util.RunningVehicleRegister;
         for (Request r : context.getVrpData().getRequests()) {
             TaxiRequest tr = (TaxiRequest)r;
             if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
-                throw new IllegalStateException();
+//                throw new IllegalStateException();
             }
         }
     }
