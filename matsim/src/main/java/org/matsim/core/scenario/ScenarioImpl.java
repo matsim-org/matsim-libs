@@ -104,9 +104,11 @@ public class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseTransit()) {
 			this.createTransitSchedule();
 		}
-		if (this.config.scenario().isUseSignalSystems()){
-			this.createSignals();
-		}
+		// this did not do anything (there is no "typed getter" for signals,
+		// they are added as a custom scenario element) td, feb'14
+		//if (this.config.scenario().isUseSignalSystems()){
+		//	this.createSignals();
+		//}
 	}
 
 	/**
@@ -181,12 +183,6 @@ public class ScenarioImpl implements Scenario {
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 	}
 	
-	 void createSignals(){
-//		this.addScenarioElement(
-//				SignalsData.ELEMENT_NAME,
-//				new SignalsDataImpl(this.config.signalSystems()));
-	}
-
 	@Override
 	public ActivityFacilities getActivityFacilities() {
 		return this.facilities;
