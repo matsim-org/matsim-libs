@@ -26,8 +26,11 @@ import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 
+import playground.thibautd.socnetsim.analysis.LocatedTripsWriter;
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
@@ -123,6 +126,19 @@ public final class ImmutableJointController extends AbstractController {
 						registry.getScenario().getConfig().controler().getWriteEventsInterval(),
 						registry.getScenario().getConfig().controler().getEventsFileFormats(),
 						getControlerIO() ));
+
+		// dump data file immediately, rather than regenerate it by re-reading pop file,
+		// which is rather slow.
+		this.addCoreControlerListener(
+				new ShutdownListener() {
+					@Override
+					public void notifyShutdown(final ShutdownEvent event) {
+						LocatedTripsWriter.write(
+							registry.getScenario().getPopulation(),
+							getControlerIO().getOutputFilename( "located_trips.csv.gz" ) );
+					}
+				});
+
 	}
 
 	@Override
