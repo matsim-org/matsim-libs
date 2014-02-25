@@ -25,10 +25,13 @@ import java.io.*;
 import java.util.EnumSet;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
+import pl.poznan.put.util.jfreechart.ChartUtils;
+import playground.michalm.taxi.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
@@ -179,6 +182,11 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 
         cacheStats.printStats(pw3, launcher.algorithmConfig.name());
         cacheStats.clearStats();
+
+        JFreeChart chart = TaxiScheduleChartUtils.chartSchedule(launcher.context.getVrpData()
+                .getVehicles());
+        chart.setTitle(cfg);
+        ChartUtils.showFrame(chart);
     }
 
 
@@ -203,17 +211,17 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
     /*package*/static final EnumSet<AlgorithmConfig> selectedNos = EnumSet.of(//
             //NOS_SL,
             //NOS_TD,
-            //NOS_FF,
+            NOS_FF
             //NOS_24H,
-            NOS_15M//
+            //NOS_15M
             );
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNosDse = EnumSet.of(//
             //NOS_DSE_SL,
             //NOS_DSE_TD,
-            //NOS_DSE_FF,
+            NOS_DSE_FF
             //NOS_DSE_24H,
-            NOS_DSE_15M//
+            //NOS_DSE_15M
             );
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNonNos = EnumSet.of(//
@@ -225,15 +233,15 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
             //RES_24H,
             //RES_15M,
             //========================================
-            //APS_FF,
+            APS_FF
             //APS_24H,
-            APS_15M//
+            //APS_15M
             );
 
     /*package*/static final EnumSet<AlgorithmConfig> selectedNonNosDse = EnumSet.of(//
-            //APS_DSE_FF,
+            APS_DSE_FF
             //APS_DSE_24H,
-            APS_DSE_15M//
+            //APS_DSE_15M
             );
 
 
@@ -242,15 +250,15 @@ import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
         MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");
 
-        multiLauncher.run(selectedNos, runs, false);
-        //multiLauncher.run(selectedNos, runs, true);
+        //multiLauncher.run(NOS_SL, runs, false);
 
-        //        multiLauncher.run(selectedNosDse, runs, null);
+        //                multiLauncher.run(selectedNos, runs, false);
+        //                multiLauncher.run(selectedNos, runs, true);
+        //                multiLauncher.run(selectedNosDse, runs, null);
 
-        //        multiLauncher.run(selectedNonNos, runs, false);
-        //        multiLauncher.run(selectedNonNos, runs, true);
-
-        //        multiLauncher.run(selectedNonNosDse, runs, null);
+        multiLauncher.run(selectedNonNos, runs, false);
+        multiLauncher.run(selectedNonNos, runs, true);
+        multiLauncher.run(selectedNonNosDse, runs, null);
 
         multiLauncher.closeOutputFiles();
     }

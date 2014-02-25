@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 
 import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 
 /*package*/enum AlgorithmConfig
@@ -154,20 +155,12 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
 
     /*package*/static enum AlgorithmType
     {
-        NO_SCHEDULING("NOS"), //
-        NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM("NOS_DSE"), //
-        ONE_TIME_SCHEDULING("OTS"), //
-        RE_SCHEDULING("RES"), //
-        AP_SCHEDULING("APS"),//
-        AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM("APS_DSE");
-
-        /*package*/final String shortcut;
-
-
-        private AlgorithmType(String shortcut)
-        {
-            this.shortcut = shortcut;
-        }
+        NO_SCHEDULING, //
+        NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM, //
+        ONE_TIME_SCHEDULING, //
+        RE_SCHEDULING, //
+        AP_SCHEDULING, //
+        AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM;
     }
 
 
@@ -189,27 +182,31 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
             VrpPathCalculator calculator, ImmediateRequestParams params)
     {
         TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
+        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator, scheduler);
+
+        OptimizerConfiguration optimConfig = new OptimizerConfiguration(context, params,
+                calculator, scheduler, vrpFinder);
 
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(scheduler, new IdleVehicleFinder(context,
-                        calculator, tdisSource), false);
+                return new NOSTaxiOptimizer(optimConfig,
+                        new StraightLineNearestVehicleRequestFinder(optimConfig.scheduler), false);
 
             case NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM:
-                return new NOSTaxiOptimizer(scheduler, new IdleVehicleFinder(context,
-                        calculator, tdisSource), true);
+                return new NOSTaxiOptimizer(optimConfig,
+                        new StraightLineNearestVehicleRequestFinder(optimConfig.scheduler), true);
 
             case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizer(scheduler);
+                return new OTSTaxiOptimizer(optimConfig);
 
             case RE_SCHEDULING:
-                return new RESTaxiOptimizer(scheduler);
+                return new RESTaxiOptimizer(optimConfig);
 
             case AP_SCHEDULING:
-                return new APSTaxiOptimizer(scheduler, context, false);
-                
+                return new APSTaxiOptimizer(optimConfig, false);
+
             case AP_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM:
-                return new APSTaxiOptimizer(scheduler, context, true);
+                return new APSTaxiOptimizer(optimConfig, true);
 
             default:
                 throw new IllegalStateException();

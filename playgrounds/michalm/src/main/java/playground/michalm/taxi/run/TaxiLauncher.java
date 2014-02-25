@@ -273,7 +273,7 @@ import playground.michalm.util.RunningVehicleRegister;
             events.addHandler(travelTimeCalculator);
         }
         else {
-            optimizer.getScheduler().setDelaySpeedupStats(delaySpeedupStats);
+            optimizer.getOptimizerConfiguration().scheduler.setDelaySpeedupStats(delaySpeedupStats);
         }
 
         RunningVehicleRegister rvr = new RunningVehicleRegister();

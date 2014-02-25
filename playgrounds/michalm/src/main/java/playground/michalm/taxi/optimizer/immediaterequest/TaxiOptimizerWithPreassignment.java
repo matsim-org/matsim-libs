@@ -25,9 +25,10 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.vehreqpath.*;
 
 
 /**
@@ -41,7 +42,42 @@ public class TaxiOptimizerWithPreassignment
             VrpPathCalculator calculator, double pickupDuration, double dropoffDuration,
             String reqIdToVehIdFile)
     {
+        final Map<Id, Vehicle> reqIdToVehMap = readReqIdToVehMap(context, reqIdToVehIdFile);
+
+        ImmediateRequestParams params = new ImmediateRequestParams(true, false, pickupDuration,
+                dropoffDuration);
+
+        TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
+
+        VehicleRequestPathFinder vrpFinder = createVrpFinder(calculator, scheduler, reqIdToVehMap);
+
+        OptimizerConfiguration optimConfig = new OptimizerConfiguration(context, params,
+                calculator, scheduler, vrpFinder);
+
+        return new OTSTaxiOptimizer(optimConfig);
+    }
+
+
+    private static VehicleRequestPathFinder createVrpFinder(VrpPathCalculator calculator,
+            TaxiScheduler scheduler, final Map<Id, Vehicle> reqIdToVehMap)
+    {
+        return new VehicleRequestPathFinder(calculator, scheduler) {
+            @Override
+            public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
+                    Iterable<Vehicle> vehicles, Comparator<VehicleRequestPath> vrpComparator)
+            {
+                Vehicle veh = reqIdToVehMap.get(req.getId());
+                return new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
+            }
+        };
+    }
+
+
+    private static Map<Id, Vehicle> readReqIdToVehMap(MatsimVrpContext context,
+            String reqIdToVehIdFile)
+    {
         Scanner scanner = null;
+
         try {
             scanner = new Scanner(new File(reqIdToVehIdFile));
         }
@@ -50,29 +86,16 @@ public class TaxiOptimizerWithPreassignment
         }
 
         List<Vehicle> vehicles = context.getVrpData().getVehicles();
-        final Map<Id, Vehicle> reqIdToVehMap = new HashMap<Id, Vehicle>();
-
-        int count = scanner.nextInt();
         Scenario scenario = context.getScenario();
+        Map<Id, Vehicle> reqIdToVehMap = new HashMap<Id, Vehicle>();
 
-        for (int i = 0; i < count; i++) {
-            reqIdToVehMap.put(scenario.createId(i + ""), vehicles.get(scanner.nextInt()));
+        while (scanner.hasNext()) {
+            Id reqId = scenario.createId(scanner.next());
+            Vehicle veh = vehicles.get(scanner.nextInt());
+            reqIdToVehMap.put(reqId, veh);
         }
+
         scanner.close();
-
-        ImmediateRequestParams params = new ImmediateRequestParams(true, false, pickupDuration,
-                dropoffDuration);
-
-        TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params) {
-            @Override
-            public VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req,
-                    Collection<Vehicle> vehicles, Comparator<VrpPathWithTravelData> pathComparator)
-            {
-                Vehicle veh = reqIdToVehMap.get(req.getId());
-                return new VehicleRequestPath(veh, req, calculateVrpPath(veh, req));
-            }
-        };
-
-        return new OTSTaxiOptimizer(scheduler);
+        return reqIdToVehMap;
     }
 }

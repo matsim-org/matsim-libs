@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
 import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 
 /**
@@ -42,9 +43,8 @@ import playground.michalm.taxi.schedule.*;
 public class NOSRankTaxiOptimizer
     extends NOSTaxiOptimizer
 {
-    private MatsimVrpContext context;
-    private VrpPathCalculator calculator;
-    private IdleRankVehicleFinder idleVehicleFinder;
+    private final OptimizerConfiguration optimConfig;
+    private final IdleRankVehicleFinder idleVehicleFinder;
 
     private boolean idleRankMode;
 
@@ -57,17 +57,23 @@ public class NOSRankTaxiOptimizer
             VrpPathCalculator calculator, ImmediateRequestParams params,
             TravelDisutilitySource tdisSource)
     {
-        return new NOSRankTaxiOptimizer(context, calculator, params, new IdleRankVehicleFinder(
-                context, calculator, tdisSource));
+        TaxiScheduler scheduler = new RankModeTaxiScheduler(context, calculator, params);
+
+        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator,
+                scheduler);
+
+        OptimizerConfiguration optimConfig = new OptimizerConfiguration(context, params,
+                calculator, scheduler, vrpFinder);
+
+        return new NOSRankTaxiOptimizer(optimConfig, new IdleRankVehicleFinder(context, scheduler));
     }
 
 
-    private NOSRankTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator,
-            ImmediateRequestParams params, IdleRankVehicleFinder vehicleFinder)
+    private NOSRankTaxiOptimizer(OptimizerConfiguration optimConfig,
+            IdleRankVehicleFinder vehicleFinder)
     {
-        super(new RankModeTaxiScheduler(context, calculator, params), vehicleFinder, false);
-        this.context = context;
-        this.calculator = calculator;
+        super(optimConfig, vehicleFinder, false);
+        this.optimConfig = optimConfig;
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();
     }
@@ -75,14 +81,14 @@ public class NOSRankTaxiOptimizer
 
     public void setRankMode(boolean rankMode)
     {
-        ((RankModeTaxiScheduler)getScheduler()).rankmode = rankMode;
+        ((RankModeTaxiScheduler)optimConfig.scheduler).rankmode = rankMode;
     }
 
 
     public void setRankArrivalCharger(RankArrivalDepartureCharger rankArrivalDepartureCharger)
     {
         this.rankArrivalDepartureCharger = rankArrivalDepartureCharger;
-        this.idleVehicleFinder.addRankArrivalCharger(this.rankArrivalDepartureCharger);
+        idleVehicleFinder.addRankArrivalCharger(this.rankArrivalDepartureCharger);
     }
 
 
@@ -154,7 +160,7 @@ public class NOSRankTaxiOptimizer
 
     private void checkWaitingVehiclesBatteryState()
     {
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
             Task last = Schedules.getLastTask(veh.getSchedule());
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
@@ -173,7 +179,7 @@ public class NOSRankTaxiOptimizer
 
         @SuppressWarnings("unchecked")
         Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
-        double currentTime = context.getTime();
+        double currentTime = optimConfig.context.getTime();
         double oldEndTime;
         TaxiWaitStayTask lastTask = (TaxiWaitStayTask)Schedules.getLastTask(sched);// only WAIT
 
@@ -201,7 +207,7 @@ public class NOSRankTaxiOptimizer
         Link rankLink = findNearestRank(lastLink);
         if (rankLink != lastLink) {// not a loop
         	
-            VrpPathWithTravelData path = calculator.calcPath(lastLink, rankLink,
+            VrpPathWithTravelData path = optimConfig.calculator.calcPath(lastLink, rankLink,
                     currentTime);
             
             sched.addTask(new TaxiCruiseDriveTask(path));
@@ -222,8 +228,8 @@ public class NOSRankTaxiOptimizer
     	Link nearestRankLink = null;
     	double bestTravelCost = Double.MAX_VALUE;
     	for (Entry<Id, Integer> e :    	this.rankArrivalDepartureCharger.getRankLocations().entrySet()){
-    		Link currentLink = this.context.getScenario().getNetwork().getLinks().get(e.getKey());
-    	double currentCost = calculator.calcPath(positionLink,currentLink,context.getTime()).getTravelCost();
+    		Link currentLink = optimConfig.context.getScenario().getNetwork().getLinks().get(e.getKey());
+    	double currentCost = optimConfig.calculator.calcPath(positionLink,currentLink,optimConfig.context.getTime()).getTravelCost();
     	if (currentCost <bestTravelCost) {
     		bestTravelCost = currentCost;
     		nearestRankLink = currentLink;
@@ -236,7 +242,7 @@ public class NOSRankTaxiOptimizer
     public void updateIdlers()
     {
         this.shortTimeIdlers.clear();
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
             Task last = Schedules.getLastTask(veh.getSchedule());
             if (last instanceof TaxiWaitStayTask) {
                 TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
@@ -250,7 +256,7 @@ public class NOSRankTaxiOptimizer
 
     public void sendIdlingTaxisToRank()
     {
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
+        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
             if (shortTimeIdlers.contains(veh.getId())) {
                 Task last = Schedules.getLastTask(veh.getSchedule());
                 if (last instanceof TaxiWaitStayTask) {

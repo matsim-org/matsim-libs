@@ -29,5 +29,5 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 public interface ImmediateRequestTaxiOptimizer
     extends VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
 {
-    TaxiScheduler getScheduler();
+    OptimizerConfiguration getOptimizerConfiguration();
 }

@@ -36,14 +36,13 @@ import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.TaxiDelaySpeedupStats;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 public class TaxiScheduler
 {
     private final MatsimVrpContext context;
-
     private final VrpPathCalculator calculator;
-
     private final ImmediateRequestParams params;
 
     private TaxiDelaySpeedupStats delaySpeedupStats;
@@ -66,81 +65,6 @@ public class TaxiScheduler
     public void setDelaySpeedupStats(TaxiDelaySpeedupStats delaySpeedupStats)
     {
         this.delaySpeedupStats = delaySpeedupStats;
-    }
-
-
-    public ImmediateRequestParams getParams()
-    {
-        return params;
-    }
-
-
-    public VrpPathCalculator getCalculator()
-    {
-        return calculator;
-    }
-
-
-    public MatsimVrpContext getContext()
-    {
-        return context;
-    }
-
-
-    public VehicleRequestPath findBestVehicleRequestPath(TaxiRequest req,
-            Collection<Vehicle> vehicles, Comparator<VrpPathWithTravelData> pathComparator)
-    {
-        VehicleRequestPath best = null;
-
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
-            VrpPathWithTravelData current = calculateVrpPath(veh, req);
-
-            if (current == null) {
-                continue;
-            }
-            else if (best == null) {
-                best = new VehicleRequestPath(veh, req, current);
-            }
-            else if (pathComparator.compare(current, best.path) < 0) {
-                // TODO: in the future: add a check if the taxi time windows are satisfied
-                best = new VehicleRequestPath(veh, req, current);
-            }
-        }
-
-        return best;
-    }
-
-
-    protected VehicleRequestPath findBestVehicleRequestPath(Vehicle veh,
-            Collection<TaxiRequest> unplannedRequests,
-            Comparator<VrpPathWithTravelData> pathComparator)
-    {
-        VehicleRequestPath best = null;
-
-        for (TaxiRequest req : unplannedRequests) {
-            VrpPathWithTravelData current = calculateVrpPath(veh, req);
-
-            if (current == null) {
-                continue;
-            }
-            else if (best == null) {
-                best = new VehicleRequestPath(veh, req, current);
-            }
-            else if (pathComparator.compare(current, best.path) < 0) {
-                // TODO: in the future: add a check if the taxi time windows are satisfied
-                best = new VehicleRequestPath(veh, req, current);
-            }
-        }
-
-        return best;
-    }
-
-
-    public VrpPathWithTravelData calculateVrpPath(Vehicle veh, TaxiRequest req)
-    {
-        LinkTimePair departure = getEarliestIdleness(veh);
-        return departure == null ? null : calculator.calcPath(departure.link, req.getFromLink(),
-                departure.time);
     }
 
 
@@ -473,23 +397,24 @@ public class TaxiScheduler
 
 
     public void removePlannedRequests(Schedule<TaxiTask> schedule,
-            final Collection<TaxiRequest> collection)
+            final Collection<TaxiRequest> unplannedRequests)
     {
         removePlannedRequestsImpl(schedule, new RequestAdder() {
             public void addRequest(TaxiRequest request)
             {
-                collection.add(request);
+                unplannedRequests.add(request);
             }
         });
     }
 
 
-    public void removePlannedRequests(Schedule<TaxiTask> schedule, final Map<Id, TaxiRequest> map)
+    public void removePlannedRequests(Schedule<TaxiTask> schedule,
+            final Map<Id, TaxiRequest> unplannedReqsById)
     {
         removePlannedRequestsImpl(schedule, new RequestAdder() {
             public void addRequest(TaxiRequest request)
             {
-                map.put(request.getId(), request);
+                unplannedReqsById.put(request.getId(), request);
             }
         });
     }

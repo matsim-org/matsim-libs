@@ -21,42 +21,45 @@ package playground.michalm.taxi.optimizer.immediaterequest;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+import playground.michalm.taxi.vehreqpath.*;
 
 
 public class OTSTaxiOptimizer
     implements ImmediateRequestTaxiOptimizer
-
 {
-    protected final TaxiScheduler scheduler;
-    protected final MatsimVrpContext context;
+    /*package*/final OptimizerConfiguration optimConfig;
 
-    protected final Queue<TaxiRequest> unplannedRequests;
+    /*package*/final Queue<TaxiRequest> unplannedRequests;
 
     private boolean requiresReoptimization = false;
 
-    private final Comparator<VrpPathWithTravelData> pathComparator;
+    private final Comparator<VehicleRequestPath> vrpComparator;
 
 
-    public OTSTaxiOptimizer(TaxiScheduler scheduler)
+    public OTSTaxiOptimizer(OptimizerConfiguration optimConfig)
     {
-        this.scheduler = scheduler;
-        this.context = scheduler.getContext();
+        this.optimConfig = optimConfig;
 
-        int vehCount = context.getVrpData().getVehicles().size();//1 awaiting req/veh
+        int vehCount = optimConfig.context.getVrpData().getVehicles().size();//1 awaiting req/veh
         unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount, Requests.T0_COMPARATOR);
 
-        pathComparator = scheduler.getParams().minimizePickupTripTime ? //
-                VrpPathWithTravelDataComparators.TRAVEL_TIME_COMPARATOR : //
-                VrpPathWithTravelDataComparators.ARRIVAL_TIME_COMPARATOR;
+        vrpComparator = optimConfig.params.minimizePickupTripTime ? //
+                VehicleRequestPaths.TP_COMPARATOR : //
+                VehicleRequestPaths.TW_COMPARATOR;
+    }
+
+
+    @Override
+    public OptimizerConfiguration getOptimizerConfiguration()
+    {
+        return optimConfig;
     }
 
 
@@ -65,14 +68,14 @@ public class OTSTaxiOptimizer
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
 
-            VehicleRequestPath best = scheduler.findBestVehicleRequestPath(req, context
-                    .getVrpData().getVehicles(), pathComparator);
+            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
+                    optimConfig.context.getVrpData().getVehicles(), vrpComparator);
 
             if (best == null) {
                 return;
             }
 
-            scheduler.scheduleRequest(best);
+            optimConfig.scheduler.scheduleRequest(best);
             unplannedRequests.poll();
         }
     }
@@ -101,10 +104,10 @@ public class OTSTaxiOptimizer
         @SuppressWarnings("unchecked")
         Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
 
-        scheduler.updateBeforeNextTask(taxiSchedule);
+        optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
         TaxiTask nextTask = taxiSchedule.nextTask();
 
-        if (!scheduler.getParams().destinationKnown) {
+        if (!optimConfig.params.destinationKnown) {
             if (nextTask != null // schedule != COMPLETED
                     && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
                 requiresReoptimization = true;
@@ -120,17 +123,11 @@ public class OTSTaxiOptimizer
         @SuppressWarnings("unchecked")
         Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
 
-        double predictedEndTime = driveTask.getTaskTracker().predictEndTime(context.getTime());
-        scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
+        double predictedEndTime = driveTask.getTaskTracker().predictEndTime(
+                optimConfig.context.getTime());
+        optimConfig.scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
 
         //we may here possibly decide here whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
-    }
-
-
-    @Override
-    public TaxiScheduler getScheduler()
-    {
-        return scheduler;
     }
 }

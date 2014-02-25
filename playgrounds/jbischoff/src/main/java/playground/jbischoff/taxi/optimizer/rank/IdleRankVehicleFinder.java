@@ -21,10 +21,10 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
+import org.matsim.contrib.dvrp.util.*;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
@@ -42,23 +42,21 @@ public class IdleRankVehicleFinder
     implements VehicleFinder
 {
     private final MatsimVrpContext context;
-    private final VrpPathCalculator calculator;
-    private final TravelDisutilitySource tdisSource;
+    private final TaxiScheduler scheduler;
 	private RankArrivalDepartureCharger rankArrivaldeparturecharger;
 	private boolean IsElectric;
 	private boolean useChargeOverTime;
 	Random rnd;
 
 
-    public IdleRankVehicleFinder(MatsimVrpContext context, VrpPathCalculator calculator, TravelDisutilitySource tdisSource)
+    public IdleRankVehicleFinder(MatsimVrpContext context, TaxiScheduler scheduler)
     {
         this.context = context;
-        this.calculator = calculator;
-        this.tdisSource = tdisSource;
+        this.scheduler = scheduler;
         this.IsElectric = false;
         this.useChargeOverTime = false;
         this.rnd = new Random(7);
-        System.out.println("Using distance measure: " + this.tdisSource.name());
+        System.out.println("Using distance measure: Straight line");
     }
     public void addRankArrivalCharger(RankArrivalDepartureCharger rankArrivalDepartureCharger){
     	this.rankArrivaldeparturecharger = rankArrivalDepartureCharger;
@@ -80,7 +78,7 @@ public class IdleRankVehicleFinder
     
     
 	@Override
-    public Vehicle findVehicle(Collection<Vehicle> vehicles, TaxiRequest req)
+    public Vehicle findBestVehicleForRequest(Iterable<Vehicle> vehicles, TaxiRequest req)
     {
     	
     	if(this.useChargeOverTime) {
@@ -131,8 +129,7 @@ public class IdleRankVehicleFinder
      	  double bestSoc=0;
           Collections.shuffle(context.getVrpData().getVehicles(),rnd);
           
-          for (Vehicle veh : context.getVrpData().getVehicles()) {
-        	  if (!TaxiUtils.isIdle(veh)) continue;
+          for (Vehicle veh : TaxiUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
         	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
         	  double soc = this.getVehicleSoc(veh);
         	  if (soc>bestSoc){
@@ -151,8 +148,7 @@ public class IdleRankVehicleFinder
    	  double bestSoc=0;
         Collections.shuffle(context.getVrpData().getVehicles(),rnd);
         
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
-      	  if (!TaxiUtils.isIdle(veh)) continue;
+        for (Vehicle veh : TaxiUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
       	  if (this.IsElectric)   if (!this.hasEnoughCapacityForTask(veh)) continue;
       	  double soc = this.getVehicleSoc(veh);
       	  if (soc>bestSoc){
@@ -181,10 +177,9 @@ public class IdleRankVehicleFinder
     	  Vehicle bestVeh = null;
 //          double bestDistance = Double.MAX_VALUE;
           double bestDistance = Double.MAX_VALUE/2;
-          for (Vehicle veh : context.getVrpData().getVehicles()) {
+          for (Vehicle veh : TaxiUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
           	if (this.IsElectric)
           		if (!this.hasEnoughCapacityForTask(veh)) continue;
-          		if (!TaxiUtils.isIdle(veh)) continue;
               double distance = calculateDistance(req, veh);
               
               if (distance < bestDistance) {	
@@ -208,8 +203,12 @@ public class IdleRankVehicleFinder
     }
     
     
-    private double calculateDistance(TaxiRequest req, Vehicle veh){
-        return IdleVehicleFinder.calculateCost(req, veh, context.getTime(), calculator,
-                tdisSource);
+    private double calculateDistance(TaxiRequest req, Vehicle veh)
+    {
+        LinkTimePair departure = scheduler.getEarliestIdleness(veh);
+        Link fromLink = departure.link;
+        Link toLink = req.getFromLink();
+
+        return DistanceUtils.calculateSquareDistance(fromLink, toLink);
     }
 }

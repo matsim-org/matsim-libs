@@ -26,9 +26,26 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+
 
 public class TaxiUtils
 {
+    public static final Predicate<Vehicle> IS_IDLE_PREDICATE = new Predicate<Vehicle>() {
+        public boolean apply(Vehicle vehicle)
+        {
+            return isIdle(vehicle);
+        }
+    };
+
+
+    public static Iterable<Vehicle> filterIdleVehicles(Iterable<Vehicle> vehicles)
+    {
+        return Iterables.filter(vehicles, IS_IDLE_PREDICATE);
+    }
+
+
     public static boolean isIdle(Vehicle vehicle)
     {
         Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);

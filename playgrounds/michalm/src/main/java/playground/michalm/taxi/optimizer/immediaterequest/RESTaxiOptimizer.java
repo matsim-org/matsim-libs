@@ -27,20 +27,20 @@ import playground.michalm.taxi.schedule.TaxiSchedules;
 public class RESTaxiOptimizer
     extends OTSTaxiOptimizer
 {
-    public RESTaxiOptimizer(TaxiScheduler scheduler)
+    public RESTaxiOptimizer(OptimizerConfiguration optimConfig)
     {
-        super(scheduler);
+        super(optimConfig);
     }
 
 
     @Override
     protected void scheduleUnplannedRequests()
     {
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
-            scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh), unplannedRequests);
+        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
+            optimConfig.scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh),
+                    unplannedRequests);
         }
 
         super.scheduleUnplannedRequests();
     }
-
 }
