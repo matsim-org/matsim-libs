@@ -109,19 +109,55 @@ public class ScenarioImpl implements Scenario {
 		}
 	}
 
-	 void createVehicleContainer(){
+	/**
+	 * Creates a vehicle container and stores it.
+	 * This is necessary only in very special use cases, when one needs
+	 * to create such a container <b>without</b> setting the useVehicles
+	 * config switch to true (see MATSIM-202 for an example).
+	 */
+	 public void createVehicleContainer(){
+		if ( !this.config.scenario().isUseVehicles() ) {
+			log.info( "creating vehicles container while switch in config set to false. File will not be loaded automatically." );
+		}
 		this.vehicles = VehicleUtils.createVehiclesContainer();
 	}
 
-	 void createHouseholdsContainer(){
+	/**
+	 * Creates a household container and stores it.
+	 * This is necessary only in very special use cases, when one needs
+	 * to create such a container <b>without</b> setting the useHouseholds
+	 * config switch to true.
+	 */
+	public void createHouseholdsContainer(){
+		if ( !this.config.scenario().isUseHouseholds() ) {
+			log.info( "creating households container while switch in config set to false. File will not be loaded automatically." );
+		}
 		this.households = new HouseholdsImpl();
 	}
 
-	 void createKnowledges() {
+	/**
+	 * Creates a knowledge container and stores it.
+	 * This is necessary only in very special use cases, when one needs
+	 * to create such a container <b>without</b> setting the useKnowledge
+	 * config switch to true.
+	 */
+	public void createKnowledges() {
+		if ( !this.config.scenario().isUseKnowledges() ) {
+			log.info( "creating knowledges container while switch in config set to false. File will not be loaded automatically." );
+		}
 		this.knowledges = new KnowledgesImpl();
 	}
 
-	 void createLaneDefinitionsContainer() {
+	/**
+	 * Creates a LaneDefinition container and stores it.
+	 * This is necessary only in very special use cases, when one needs
+	 * to create such a container <b>without</b> setting the useLanes
+	 * config switch to true.
+	 */
+	public void createLaneDefinitionsContainer() {
+		if ( !this.config.scenario().isUseLanes() ) {
+			log.info( "creating lanes definitions container while switch in config set to false. File will not be loaded automatically." );
+		}
 		this.laneDefinitions = new LaneDefinitionsImpl();
 		// thought: this is not the responsibility of the scenario to add 
 		// custom elements (the idea being that those elements are not known.
@@ -131,7 +167,17 @@ public class ScenarioImpl implements Scenario {
 //				new LaneDefinitions20Impl());
 	}
 
-	 void createTransit() {
+	/**
+	 * Creates a transit schedule and stores it.
+	 * This is necessary only in very special use cases, when one needs
+	 * to create such a container <b>without</b> setting the useTransit
+	 * config switch to true (see MATSIM-220 for an example).
+	 *  (
+	 */
+	 public void createTransit() {
+		if ( !this.config.scenario().isUseTransit() ) {
+			log.info( "creating transit schedule while switch in config set to false. File will not be loaded automatically." );
+		}
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 	}
 	
