@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
@@ -180,8 +181,13 @@ public class PlanTimesAdapter {
 			pathCosts = getTravelTimeApproximation(plan, (ActivityImpl)pe);
 		}
 		else {
-			//use travel times from last iteration for efficiency reasons
-			pathCosts.setRoute((plan).getPreviousLeg((Activity)pe).getRoute());
+			//use travel times from last iteration for efficiency reasons if route is available
+			Route routeOfPlan = (plan).getPreviousLeg((Activity)pe).getRoute();
+			if (routeOfPlan != null) {
+				pathCosts.setRoute(routeOfPlan);
+			} else {
+				pathCosts = getTravelTimeApproximation(plan, (ActivityImpl)pe);
+			}
 		}
 		return pathCosts;
 	}
