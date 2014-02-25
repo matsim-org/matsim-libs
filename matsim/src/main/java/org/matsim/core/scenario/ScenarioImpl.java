@@ -102,7 +102,7 @@ public class ScenarioImpl implements Scenario {
 			this.createKnowledges();
 		}
 		if (this.config.scenario().isUseTransit()) {
-			this.createTransit();
+			this.createTransitSchedule();
 		}
 		if (this.config.scenario().isUseSignalSystems()){
 			this.createSignals();
@@ -174,7 +174,7 @@ public class ScenarioImpl implements Scenario {
 	 * config switch to true (see MATSIM-220 for an example).
 	 *  (
 	 */
-	 public void createTransit() {
+	 public void createTransitSchedule() {
 		if ( !this.config.scenario().isUseTransit() ) {
 			log.info( "creating transit schedule while switch in config set to false. File will not be loaded automatically." );
 		}
@@ -276,7 +276,7 @@ public class ScenarioImpl implements Scenario {
 	@Override
 	public TransitSchedule getTransitSchedule() {
 		if ((this.transitSchedule == null) && this.config.scenario().isUseTransit()){
-			this.createTransit();
+			this.createTransitSchedule();
 		}
 		else if (!this.config.scenario().isUseTransit()) {
 			log.warn("transit schedule: " + NON_ENABLED_ATTRIBUTE_WARNING);
