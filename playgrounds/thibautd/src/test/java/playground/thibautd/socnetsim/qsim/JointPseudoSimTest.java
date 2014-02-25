@@ -112,6 +112,9 @@ public class JointPseudoSimTest {
 		final Scenario sc = JointScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		CreateGridNetworkWithDimensions.createNetwork(
 				sc.getNetwork(),
+				75 / 3.6,
+				1000,
+				100,
 				2,
 				10 );
 

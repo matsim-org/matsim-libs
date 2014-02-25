@@ -34,42 +34,75 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.thibautd.utils.ArgParser;
 import playground.thibautd.utils.UniqueIdFactory;
 
 /**
  * @author thibautd
  */
 public class CreateGridNetworkWithDimensions {
-	private static final double FREESPEED = 75 * 1000 / 3600;
-	private static final double LINK_LENGTH = 1000;
-	private static final double LINK_CAPACITY = 100;
 
 	public static void main(final String[] args) {
-		final int width = Integer.valueOf( args[ 0 ] ).intValue();
-		final int height = Integer.valueOf( args[ 1 ] ).intValue();
-		final String outFile = args[ 2 ];
+		final ArgParser argParser = new ArgParser( args );
+		argParser.setDefaultValue( "--freespeed" , ""+(75d * 1000 / 3600) );
+		argParser.setDefaultValue( "--link-length" , "1000" );
+		argParser.setDefaultValue( "--link-capacity" , "100" );
+		argParser.setDefaultValue( "--width" , "100" );
+		argParser.setDefaultValue( "--height" , "100" );
 
-		final Network network = createNetwork( width , height );
-		new NetworkWriter( network ).write( outFile );
-	}
+		final double freespeed = Double.parseDouble( argParser.getValue( "--freespeed" ) );
+		final double linkLength = Double.parseDouble( argParser.getValue( "--link-length" ) );
+		final double linkCapacity = Double.parseDouble( argParser.getValue( "--link-capacity" ) );
+		final int width = Integer.parseInt( argParser.getValue( "--width" ) );
+		final int height = Integer.parseInt( argParser.getValue( "--height" ) );
 
-	public static Network createNetwork(final int width, final int height) {
+		final String outFile = argParser.getNonSwitchedArgs()[ 0 ];
+
 		final Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork();
-		createNetwork( network , width , height );
-		return network;
+		createNetwork(
+				network,
+				freespeed,
+				linkLength,
+				linkCapacity,
+				width,
+				height );
+
+		new NetworkWriter( network ).write( outFile );
 	}
 
 	public static void createNetwork(
 			final Network network,
+			final double freespeed,
+			final double length,
+			final double capacity,
 			final int width,
 			final int height) {
 		List<Node> lastHorizontalLine = Collections.emptyList();
 
 		final UniqueIdFactory nodeIdFactory = new UniqueIdFactory( "" );
 		for ( int i = 0; i < height; i++ ) {
-			final List<Node> newHorizontalLine = createNodes( nodeIdFactory , i * LINK_LENGTH , width , network.getFactory());
-			final List<Link> horizontalLinks = createLinks( newHorizontalLine , network.getFactory() );
-			final List<Link> verticalLinks = linkLines( lastHorizontalLine , newHorizontalLine , network.getFactory() );
+			final List<Node> newHorizontalLine =
+				createNodes(
+						nodeIdFactory,
+						i * length,
+						width,
+						length,
+						network.getFactory());
+			final List<Link> horizontalLinks =
+				createLinks(
+						newHorizontalLine,
+						length,
+						freespeed,
+						capacity,
+						network.getFactory() );
+			final List<Link> verticalLinks =
+				linkLines(
+						lastHorizontalLine,
+						newHorizontalLine,
+						length,
+						freespeed,
+						capacity,
+						network.getFactory() );
 
 			for ( Node n : newHorizontalLine ) network.addNode( n );
 			for ( Link l : horizontalLinks ) network.addLink( l ) ;
@@ -82,6 +115,9 @@ public class CreateGridNetworkWithDimensions {
 	private static List<Link> linkLines(
 			final List<Node> lastHorizontalLine,
 			final List<Node> newHorizontalLine,
+			final double length,
+			final double freespeed,
+			final double capacity,
 			final NetworkFactory fact) {
 		if ( lastHorizontalLine.isEmpty() ) return Collections.emptyList();
 		if ( lastHorizontalLine.size() != newHorizontalLine.size() ) throw new IllegalArgumentException();
@@ -90,8 +126,8 @@ public class CreateGridNetworkWithDimensions {
 		for ( int i=0; i < lastHorizontalLine.size(); i++ ) {
 			final Node n1 = lastHorizontalLine.get( i );
 			final Node n2 = newHorizontalLine.get( i );
-			links.add( createLink( fact , n1 , n2 ) );
-			links.add( createLink( fact , n2 , n1 ) );
+			links.add( createLink( fact , length , freespeed , capacity , n1 , n2 ) );
+			links.add( createLink( fact , length , freespeed , capacity , n2 , n1 ) );
 		}
 
 		return links;
@@ -99,6 +135,9 @@ public class CreateGridNetworkWithDimensions {
 
 	private static List<Link> createLinks(
 			final List<Node> newHorizontalLine,
+			final double length,
+			final double freespeed,
+			final double capacity,
 			final NetworkFactory fact) {
 		final List<Link> links = new ArrayList<Link>();
 
@@ -108,8 +147,8 @@ public class CreateGridNetworkWithDimensions {
 		while ( nodeIterator.hasNext() ) {
 			final Node newNode = nodeIterator.next();
 
-			links.add( createLink( fact , lastNode , newNode ) );
-			links.add( createLink( fact , newNode , lastNode ) );
+			links.add( createLink( fact , length , freespeed , capacity , lastNode , newNode ) );
+			links.add( createLink( fact , length , freespeed , capacity , newNode , lastNode ) );
 
 			lastNode = newNode;
 		}
@@ -119,15 +158,18 @@ public class CreateGridNetworkWithDimensions {
 
 	private static Link createLink(
 			final NetworkFactory fact,
+			final double length,
+			final double freespeed,
+			final double capacity,
 			final Node o,
 			final Node d) {
 		final Link link = fact.createLink(
 				new IdImpl( o.getId() +"--"+ d.getId() ),
 				o,
 				d );
-		link.setLength( LINK_LENGTH );
-		link.setFreespeed( FREESPEED );
-		link.setCapacity( LINK_CAPACITY );
+		link.setLength( length );
+		link.setFreespeed( freespeed );
+		link.setCapacity( capacity );
 
 		return link;
 	}
@@ -136,13 +178,14 @@ public class CreateGridNetworkWithDimensions {
 			final UniqueIdFactory nodeIdFactory,
 			final double y,
 			final int width,
+			final double length,
 			final NetworkFactory factory) {
 		final List<Node> nodes = new ArrayList<Node>();
 		for ( int i=0; i < width; i++ ) {
 			nodes.add(
 					factory.createNode(
 						nodeIdFactory.createNextId(),
-						new CoordImpl( i * LINK_LENGTH , y ) ) );
+						new CoordImpl( i * length , y ) ) );
 		}
 		return nodes;
 	}

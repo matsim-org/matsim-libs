@@ -142,6 +142,9 @@ public class PSeudoQSimCompareEventsTest {
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		CreateGridNetworkWithDimensions.createNetwork(
 				sc.getNetwork(),
+				75 / 3.6,
+				1000,
+				100,
 				20,
 				20 );
 		if ( useTransit ) createSchedule( sc );

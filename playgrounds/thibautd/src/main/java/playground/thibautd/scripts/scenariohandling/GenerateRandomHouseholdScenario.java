@@ -47,6 +47,7 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 
+import playground.thibautd.utils.ArgParser;
 import playground.thibautd.utils.UniqueIdFactory;
 
 /**
@@ -54,11 +55,24 @@ import playground.thibautd.utils.UniqueIdFactory;
  */
 public class GenerateRandomHouseholdScenario {
 	public static void main(final String[] args) {
-		final String inputNetworkFile = args[ 0 ];
-		final String outputPopulationFile = args[ 1 ];
-		final String outputHouseholdsFile = args[ 2 ];
-		final int popSize = Integer.valueOf( args[ 3 ] ).intValue();
-		final int maxHouseholdSize = Integer.valueOf( args[ 4 ] ).intValue();
+		final ArgParser parser = new ArgParser( args );
+
+		parser.setDefaultValue( "--inputnetfile" , null );
+		parser.setDefaultValue( "--outputplans" , null );
+		parser.setDefaultValue( "--outputhhs" , null );
+
+		parser.setDefaultValue( "--popsize" , "1000" );
+		parser.setDefaultValue( "--maxhhsize" , "10" );
+		parser.setDefaultValue( "--doubleplans" , "false" );
+		parser.setDefaultValue( "--fixedactsequence" , "true" );
+
+		final String inputNetworkFile = parser.getValue( "--inputnetfile" );
+		final String outputPopulationFile = parser.getValue( "--outputplans" );
+		final String outputHouseholdsFile = parser.getValue( "--outputhhs" );
+		final int popSize = Integer.parseInt( parser.getValue( "--popsize" ) );
+		final int maxHouseholdSize = Integer.parseInt( parser.getValue( "--maxhhsize" ) );
+		final boolean doublePlans = Boolean.parseBoolean( parser.getValue( "--doubleplans" ) );
+		final boolean fixedActivitySequence = Boolean.parseBoolean( parser.getValue( "--fixedactsequence" ) );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader( scenario ).readFile( inputNetworkFile );
@@ -86,22 +100,25 @@ public class GenerateRandomHouseholdScenario {
 
 			final Link homeLink = randomLinks.nextLink();
 
-			for (int i=0; i < hhSize; i+=2 ) {
+			for (int i=0; i < hhSize; i+=(doublePlans ? 2 : 1) ) {
+				final boolean workThenLeisure = fixedActivitySequence ? true : random.nextBoolean();
 				final Link workLink = randomLinks.nextLink();
 				final Link leisureLink = randomLinks.nextLink();
 
-				// generate twice the "same" plan, once with car, once without
 				final Person driver = popFactory.createPerson( personIdFactory.createNextId() );
 				((PersonImpl) driver).setCarAvail( "always" );
-				createPlan( random , popFactory , driver , homeLink , workLink , leisureLink );
+				createPlan( random , popFactory , driver , homeLink , workLink , leisureLink , workThenLeisure );
 				members.add( driver.getId() );
 				population.addPerson( driver );
 
-				final Person passenger = popFactory.createPerson( personIdFactory.createNextId() );
-				((PersonImpl) passenger).setCarAvail( "never" );
-				createPlan( random , popFactory , passenger , homeLink , workLink , leisureLink );
-				members.add( passenger.getId() );
-				population.addPerson( passenger );
+				if ( doublePlans ) {
+					// generate twice the "same" plan, once with car, once without
+					final Person passenger = popFactory.createPerson( personIdFactory.createNextId() );
+					((PersonImpl) passenger).setCarAvail( "never" );
+					createPlan( random , popFactory , passenger , homeLink , workLink , leisureLink , workThenLeisure );
+					members.add( passenger.getId() );
+					population.addPerson( passenger );
+				}
 			}
 		}
 
@@ -115,7 +132,8 @@ public class GenerateRandomHouseholdScenario {
 			final Person person,
 			final Link homeLink,
 			final Link workLink,
-			final Link leisureLink) {
+			final Link leisureLink,
+			final boolean workThenLeisure) {
 		final Plan plan = popFactory.createPlan();
 		person.addPlan( plan );
 		plan.setPerson( person );
@@ -132,8 +150,8 @@ public class GenerateRandomHouseholdScenario {
 		plan.addActivity(
 				createActivity(
 					popFactory,
-					"w",
-					workLink,
+					workThenLeisure ? "w" : "l",
+					workThenLeisure ? workLink : leisureLink,
 					random.nextDouble() * 24 * 3600 ) );
 
 		plan.addLeg( popFactory.createLeg( TransportMode.pt ) );
@@ -141,8 +159,8 @@ public class GenerateRandomHouseholdScenario {
 		plan.addActivity(
 				createActivity(
 					popFactory,
-					"l",
-					leisureLink,
+					workThenLeisure ? "l" : "w",
+					workThenLeisure ? leisureLink : workLink,
 					random.nextDouble() * 24 * 3600 ) );
 
 		plan.addLeg( popFactory.createLeg( TransportMode.pt ) );
