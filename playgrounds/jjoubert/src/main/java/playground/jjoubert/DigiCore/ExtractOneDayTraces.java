@@ -104,7 +104,7 @@ public class ExtractOneDayTraces {
 		/* Consolidate the output. */
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputfile);
 		try{
-			bw.write("VehicleID,Time,HourOfDay,Long,Lat,Status,Speed");
+			bw.write("VehicleID,Time,HourOfDay,Long,Lat");
 			bw.newLine();
 			
 			for(Future<List<String>> job : listOfJobs){
@@ -158,7 +158,7 @@ public class ExtractOneDayTraces {
 					if(cal.get(Calendar.DAY_OF_YEAR) == this.date.get(Calendar.DAY_OF_YEAR)){
 						/* Convert the time into a more usable form. */
 						String time = convertDate(cal);
-						String newLine = sa[0] + "," + time + "," + sa[2] + "," + sa[3];
+						String newLine = sa[0] + "," + time + "," + Integer.parseInt(time.substring(9, 11)) + ","  + sa[2] + "," + sa[3];
 						list.add(newLine);
 					} else if(cal.get(Calendar.DAY_OF_YEAR) > this.date.get(Calendar.DAY_OF_YEAR)){
 						dateExceeded = true;
