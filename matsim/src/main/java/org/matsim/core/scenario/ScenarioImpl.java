@@ -270,6 +270,7 @@ public class ScenarioImpl implements Scenario {
 
 		return this.households;
 	}
+	
 	@Override
 	public Vehicles getVehicles(){
 		if ((this.vehicles == null) && this.config.scenario().isUseVehicles()){
@@ -278,6 +279,10 @@ public class ScenarioImpl implements Scenario {
 
 		return this.vehicles;
 	}
+	
+	/**
+	 * @deprecated use {@link Population#getPersonAttributes()} instead.
+	 */
 	@Deprecated // use population.getPopulationAttributes instead
 	public Knowledges getKnowledges(){
 		if ((this.knowledges == null) && this.config.scenario().isUseKnowledges()){
