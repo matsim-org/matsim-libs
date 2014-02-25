@@ -31,6 +31,7 @@ import java.util.Set;
  */
 public class ArgParser {
 	private final Map<String, String> defaultValues = new LinkedHashMap<String, String>();
+	private final Map<String, List<String>> defaultMultipleValues = new LinkedHashMap<String, List<String>>();
 	private final Set<String> switches = new HashSet<String>();
 
 	private final String[] args;
@@ -43,6 +44,10 @@ public class ArgParser {
 		defaultValues.put( name , v );
 	}
 
+	public void setDefaultMultipleValue( final String name, final List<String> v ) {
+		defaultMultipleValues.put( name , v );
+	}
+
 	public void addSwitch( final String name ) {
 		switches.add( name );
 	}
@@ -53,6 +58,20 @@ public class ArgParser {
 			if ( args[ i ].equals( name ) ) return args[ i + 1 ];
 		}
 		return defaultValues.get( name );
+	}
+
+	public List<String> getValues(final String name) {
+		if ( !defaultMultipleValues.containsKey( name ) ) throw new IllegalArgumentException( name+" not in "+defaultMultipleValues.keySet() );
+
+		final List<String> values = new ArrayList<String>();
+
+		for ( int i=0; i < args.length; i++ ) {
+			if ( args[ i ].equals( name ) ) {
+				values.add( args[ ++i ] );
+			}
+		}
+
+		return values.isEmpty() ? defaultMultipleValues.get( name ) : values;
 	}
 
 	public boolean isSwitched(final String name) {
