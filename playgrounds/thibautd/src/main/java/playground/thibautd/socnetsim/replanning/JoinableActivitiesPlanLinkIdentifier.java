@@ -106,19 +106,21 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 			final Queue<LocationEvent> events) {
 		final Id personId = plan.getPerson().getId();
 		double lastEnd = 0;
+		int ind = 0;
 		for ( Activity act : TripStructureUtils.getActivities( plan , stages ) ) {
 			final Id loc = act.getFacilityId();
 
 			final LocationEvent event =
 				new LocationEvent(
+						ind++,
 						personId,
 						act.getType(),
 						loc,
 						lastEnd );
 
-			// keep events in the right order
+			// correct times if inconsistent
 			lastEnd = Math.max(
-				lastEnd + .1d,
+				lastEnd,
 				act.getEndTime() != Time.UNDEFINED_TIME ?
 					act.getEndTime() :
 					lastEnd + act.getMaximumDuration() );
@@ -136,13 +138,16 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 		private final Id locId;
 		private final Id personId;
 		private final double startTime;
+		private int index;
 
 		public LocationEvent(
+				final int index,
 				final Id personId,
 				final String type,
 				final Id locId,
 				final double startTime ) {
 			if ( locId == null ) throw new NullPointerException( "null location for person "+personId+" activity type "+type );
+			this.index = index;
 			this.type = type;
 			this.locId = locId;
 			this.personId = personId;
@@ -155,7 +160,14 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 
 		@Override
 		public int compareTo(final LocationEvent o) {
-			return Double.compare( startTime , o.startTime );
+			final int comp = Double.compare( startTime , o.startTime );
+			if ( comp != 0 ) return comp;
+
+			// order as in plan.
+			if ( personId.equals( o.personId ) ) return index - o.index;
+
+			// ugly, but could not find a better way to enforce consistency
+			return personId.compareTo( o.personId );
 		}
 
 		@Override

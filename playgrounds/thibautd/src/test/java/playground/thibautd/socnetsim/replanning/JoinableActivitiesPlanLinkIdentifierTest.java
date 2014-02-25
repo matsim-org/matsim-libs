@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
@@ -64,13 +65,13 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		final Plan plan2 = createOpenPlan( new IdImpl( 2 ) , "other type" , facility );
 
 		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
-		Assert.assertFalse(
-				"plans with activities of different types should not be joined",
-				testee.areLinked( plan1 , plan2 ) );
 		Assert.assertEquals(
 				"inconsistency!",
 				testee.areLinked( plan1 , plan2 ),
 				testee.areLinked( plan2 , plan1 ) );
+		Assert.assertFalse(
+				"plans with activities of different types should not be joined",
+				testee.areLinked( plan1 , plan2 ) );
 	}
 
 	@Test
@@ -83,13 +84,13 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		final Plan plan2 = createOpenPlan( new IdImpl( 2 ) , type , facility2 );
 
 		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
-		Assert.assertFalse(
-				"plans with activities at different locations should not be joined",
-				testee.areLinked( plan1 , plan2 ) );
 		Assert.assertEquals(
 				"inconsistency!",
 				testee.areLinked( plan1 , plan2 ),
 				testee.areLinked( plan2 , plan1 ) );
+		Assert.assertFalse(
+				"plans with activities at different locations should not be joined",
+				testee.areLinked( plan1 , plan2 ) );
 	}
 
 	@Test
@@ -101,13 +102,13 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 		final Plan plan2 = createOpenPlan( new IdImpl( 2 ) , type , facility );
 
 		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( "other type" );
-		Assert.assertFalse(
-				"plans with activities of non joinable types should not be joined",
-				testee.areLinked( plan1 , plan2 ) );
 		Assert.assertEquals(
 				"inconsistency!",
 				testee.areLinked( plan1 , plan2 ),
 				testee.areLinked( plan2 , plan1 ) );
+		Assert.assertFalse(
+				"plans with activities of non joinable types should not be joined",
+				testee.areLinked( plan1 , plan2 ) );
 	}
 
 	private static Plan createOpenPlan(
@@ -146,13 +147,13 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 
 		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
-		Assert.assertTrue(
-				"plans with overlaping activities should be joint",
-				testee.areLinked( plan1 , plan2 ) );
 		Assert.assertEquals(
 				"inconsistency!",
 				testee.areLinked( plan1 , plan2 ),
 				testee.areLinked( plan2 , plan1 ) );
+		Assert.assertTrue(
+				"plans with overlaping activities should be joint",
+				testee.areLinked( plan1 , plan2 ) );
 	}
 
 	@Test
@@ -178,13 +179,13 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 
 		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
-		Assert.assertFalse(
-				"plans with non overlaping activities should not be joint",
-				testee.areLinked( plan1 , plan2 ) );
 		Assert.assertEquals(
 				"inconsistency!",
 				testee.areLinked( plan1 , plan2 ),
 				testee.areLinked( plan2 , plan1 ) );
+		Assert.assertFalse(
+				"plans with non overlaping activities should not be joint",
+				testee.areLinked( plan1 , plan2 ) );
 	}
 
 	@Test
@@ -210,13 +211,114 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 
 		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
-		Assert.assertTrue(
-				"plans with zero-length overlaping activities should be joint",
-				testee.areLinked( plan1 , plan2 ) );
 		Assert.assertEquals(
 				"inconsistency!",
 				testee.areLinked( plan1 , plan2 ),
 				testee.areLinked( plan2 , plan1 ) );
+		Assert.assertTrue(
+				"plans with zero-length overlaping activities should be joint",
+				testee.areLinked( plan1 , plan2 ) );
+	}
+
+	@Test
+	public void testSingleTourPlansZeroDurationBegin() {
+		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		final String type = "type";
+		final Id facility = new IdImpl( "fac" );
+
+		final Plan plan1 =
+			createSingleTripPlan(
+					new IdImpl( 1 ),
+					type,
+					facility,
+					22,
+					22);
+		final Plan plan2 =
+			createSingleTripPlan(
+					new IdImpl( 2 ),
+					type,
+					facility,
+					22,
+					40);
+
+		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
+		// actual result irrelevant for this border case, as long as consistent
+		//Assert.assertTrue(
+		//		"plans with zero-length overlaping activities should be joint",
+		//		testee.areLinked( plan1 , plan2 ) );
+	}
+
+	@Test
+	public void testSingleTourPlansZeroDurationEnd() {
+		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		final String type = "type";
+		final Id facility = new IdImpl( "fac" );
+
+		final Plan plan1 =
+			createSingleTripPlan(
+					new IdImpl( 1 ),
+					type,
+					facility,
+					40,
+					40);
+		final Plan plan2 =
+			createSingleTripPlan(
+					new IdImpl( 2 ),
+					type,
+					facility,
+					22,
+					40);
+
+		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
+		// actual result irrelevant for this border case, as long as consistent
+		//Assert.assertTrue(
+		//		"plans with zero-length overlaping activities should be joint",
+		//		testee.areLinked( plan1 , plan2 ) );
+	}
+
+	@Test
+	public void testDoubleTourPlansZeroDurationEnd() {
+		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
+		final String type = "type";
+		final Id facility = new IdImpl( "fac" );
+		final Id wrongFacility = new IdImpl( "fac2" );
+
+		final Plan plan1 =
+			createDoubleTripPlan(
+					new IdImpl( 1 ),
+					type,
+					30,
+					wrongFacility,
+					40,
+					facility,
+					40);
+		final Plan plan2 =
+			createSingleTripPlan(
+					new IdImpl( 2 ),
+					type,
+					facility,
+					22,
+					40);
+
+
+		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
+		Assert.assertEquals(
+				"inconsistency!",
+				testee.areLinked( plan1 , plan2 ),
+				testee.areLinked( plan2 , plan1 ) );
+		// whether plans are linked or not on this border case is irrelevant,
+		// but the result should be consistent.
+		//Assert.assertTrue(
+		//		"plans with zero-length overlaping activities should be joint",
+		//		testee.areLinked( plan1 , plan2 ) );
 	}
 
 	@Test
@@ -244,13 +346,62 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 
 		final PlanLinkIdentifier testee = new JoinableActivitiesPlanLinkIdentifier( type );
-		Assert.assertFalse(
-				"plans with inconsistent duration not handled correctly",
-				testee.areLinked( plan1 , plan2 ) );
 		Assert.assertEquals(
 				"inconsistency!",
 				testee.areLinked( plan1 , plan2 ),
 				testee.areLinked( plan2 , plan1 ) );
+		Assert.assertFalse(
+				"plans with inconsistent duration not handled correctly",
+				testee.areLinked( plan1 , plan2 ) );
+	}
+
+	private static Plan createDoubleTripPlan(
+			final Id personId,
+			final String type,
+			final double start1,
+			final Id facility1,
+			final double end1,
+			final Id facility2,
+			final double end2) {
+		final Person pers = factory.createPerson( personId );
+		final Plan plan = factory.createPlan();
+		pers.addPlan( plan );
+
+		{
+			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , new IdImpl( "link" ) );
+			act.setFacilityId( new IdImpl( "home" ) );
+			act.setEndTime( start1 );
+			plan.addActivity( act );
+		}
+
+		plan.addLeg( new LegImpl( "car" ) );
+
+		{
+			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , new IdImpl( "link" ) );
+			act.setFacilityId( facility1 );
+			act.setEndTime( end1 );
+			plan.addActivity( act );
+		}
+
+		plan.addLeg( new LegImpl( "car" ) );
+
+		{
+			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , new IdImpl( "link" ) );
+			act.setFacilityId( facility2 );
+			act.setEndTime( end2 );
+			plan.addActivity( act );
+		}
+
+
+		plan.addLeg( new LegImpl( "car" ) );
+
+		{
+			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , new IdImpl( "link" ) );
+			act.setFacilityId( new IdImpl( "home" ) );
+			plan.addActivity( act );
+		}
+
+		return plan;
 	}
 
 	private static Plan createSingleTripPlan(
@@ -270,12 +421,16 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 			plan.addActivity( act );
 		}
 
+		plan.addLeg( new LegImpl( "car" ) );
+
 		{
 			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( type , new IdImpl( "link" ) );
 			act.setFacilityId( facility );
 			act.setEndTime( end );
 			plan.addActivity( act );
 		}
+
+		plan.addLeg( new LegImpl( "car" ) );
 
 		{
 			final ActivityImpl act = (ActivityImpl) factory.createActivityFromLinkId( "home" , new IdImpl( "link" ) );
