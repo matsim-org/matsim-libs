@@ -144,13 +144,14 @@ public class PlansCalcRouteConfigGroup extends Module {
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
 		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) { 
-			map.put(TELEPORTED_MODE_SPEEDS + entry.getKey(), "Speed for a teleported mode based on beeline-distance: " +
-					"(<beeline distance> * beelineDistanceFactor) / speed. Insert a line like this for every such mode.");
+			map.put(TELEPORTED_MODE_SPEEDS + entry.getKey(), "Speed for a teleported mode. " +
+					"Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode.");
 		}
 		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) { 
-			map.put(TELEPORTED_MODE_FREESPEED_FACTORS + entry.getKey(), "Free-speed factor for a teleported mode based on " +
-					"freespeed: freespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
-					"freespeedFactor wins over teleportedModeSpeed, if both are set (says michaz).");
+			map.put(TELEPORTED_MODE_FREESPEED_FACTORS + entry.getKey(), "Free-speed factor for a teleported mode. " +
+					"Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
+					"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
+					"teleportedModeFreespeedFactor wins over teleportedModeSpeed.");
 		}
 		return map;
 	}
