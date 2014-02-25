@@ -57,8 +57,6 @@ public class ScenarioImpl implements Scenario {
 
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
 
-	private static final String NON_ENABLED_ATTRIBUTE_WARNING = "Trying to retrieve not enabled scenario feature, have you enabled the feature in ScenarioConfigGroup?";
-
 	private final Map<String, Object> elements = new HashMap<String, Object>();
 
 	//mandatory attributes
@@ -218,17 +216,6 @@ public class ScenarioImpl implements Scenario {
 		return this.config;
 	}
 
-
-	public LaneDefinitions getLaneDefinitions11() {
-		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
-			this.createLaneDefinitionsContainer();
-		}
-		else if (!this.config.scenario().isUseLanes()){
-			log.warn("lanes: " + NON_ENABLED_ATTRIBUTE_WARNING);
-		}
-		return laneDefinitions;
-	}
-
 	@Deprecated
 	public void setNetwork(Network network) {
 		this.network = network;
@@ -238,14 +225,21 @@ public class ScenarioImpl implements Scenario {
 	public void setPopulation(Population population) {
 		this.population = population;
 	}
+
+	public LaneDefinitions getLaneDefinitions11() {
+		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
+			this.createLaneDefinitionsContainer();
+		}
+
+		return laneDefinitions;
+	}
+
 	@Override
 	public Households getHouseholds() {
 		if ((this.households == null) && this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
 		}
-		else if (!this.config.scenario().isUseHouseholds()){
-			log.warn("households: " + NON_ENABLED_ATTRIBUTE_WARNING);
-		}
+
 		return this.households;
 	}
 	@Override
@@ -253,9 +247,7 @@ public class ScenarioImpl implements Scenario {
 		if ((this.vehicles == null) && this.config.scenario().isUseVehicles()){
 			this.createVehicleContainer();
 		}
-		else if (!this.config.scenario().isUseVehicles()){
-			log.warn("vehicles: " + NON_ENABLED_ATTRIBUTE_WARNING);
-		}
+
 		return this.vehicles;
 	}
 	@Deprecated // use population.getPopulationAttributes instead
@@ -263,9 +255,7 @@ public class ScenarioImpl implements Scenario {
 		if ((this.knowledges == null) && this.config.scenario().isUseKnowledges()){
 			this.createKnowledges();
 		}
-		else if (!this.config.scenario().isUseKnowledges()){
-			log.warn("knowledges: " + NON_ENABLED_ATTRIBUTE_WARNING);
-		}
+
 		return this.knowledges;
 	}
 
@@ -274,9 +264,7 @@ public class ScenarioImpl implements Scenario {
 		if ((this.transitSchedule == null) && this.config.scenario().isUseTransit()){
 			this.createTransitSchedule();
 		}
-		else if (!this.config.scenario().isUseTransit()) {
-			log.warn("transit schedule: " + NON_ENABLED_ATTRIBUTE_WARNING);
-		}
+
 		return this.transitSchedule;
 	}
 
