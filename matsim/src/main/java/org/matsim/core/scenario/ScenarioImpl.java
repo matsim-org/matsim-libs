@@ -255,8 +255,19 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	public LaneDefinitions getLaneDefinitions11() {
-		if ((this.laneDefinitions == null) && this.config.scenario().isUseLanes()){
-			this.createLaneDefinitionsContainer();
+		if ( this.laneDefinitions == null ) {
+			if ( this.config.scenario().isUseLanes() ) {
+				this.createLaneDefinitionsContainer();
+			}
+			else {
+				// throwing an exception should be the right approach,
+				// but it requires some testing (there may be places in the code
+				// which are happy with getting a null pointer, and would then
+				// not work anymore)
+				// throw new IllegalStateException(
+				log.warn(
+						"no lane definitions, and lanes not activated from config. You must first call the create method of ScenarioImpl." );
+			}
 		}
 
 		return laneDefinitions;
@@ -264,17 +275,39 @@ public class ScenarioImpl implements Scenario {
 
 	@Override
 	public Households getHouseholds() {
-		if ((this.households == null) && this.config.scenario().isUseHouseholds()){
-			this.createHouseholdsContainer();
+		if ( this.households == null ) {
+			if ( this.config.scenario().isUseHouseholds() ) {
+				this.createHouseholdsContainer();
+			}
+			else {
+				// throwing an exception should be the right approach,
+				// but it requires some testing (there may be places in the code
+				// which are happy with getting a null pointer, and would then
+				// not work anymore)
+				// throw new IllegalStateException(
+				log.warn(
+						"no households, and households not activated from config. You must first call the create method of ScenarioImpl." );
+			}
 		}
 
 		return this.households;
 	}
-	
+
 	@Override
-	public Vehicles getVehicles(){
-		if ((this.vehicles == null) && this.config.scenario().isUseVehicles()){
-			this.createVehicleContainer();
+	public Vehicles getVehicles() {
+		if ( this.vehicles == null ) {
+			if ( this.config.scenario().isUseVehicles() ) {
+				this.createVehicleContainer();
+			}
+			else {
+				// throwing an exception should be the right approach,
+				// but it requires some testing (there may be places in the code
+				// which are happy with getting a null pointer, and would then
+				// not work anymore)
+				// throw new IllegalStateException(
+				log.warn(
+						"no vehicles container, and vehicles not activated from config. You must first call the create method of ScenarioImpl." );
+			}
 		}
 
 		return this.vehicles;
@@ -284,9 +317,20 @@ public class ScenarioImpl implements Scenario {
 	 * @deprecated use {@link Population#getPersonAttributes()} instead.
 	 */
 	@Deprecated // use population.getPopulationAttributes instead
-	public Knowledges getKnowledges(){
-		if ((this.knowledges == null) && this.config.scenario().isUseKnowledges()){
-			this.createKnowledges();
+	public Knowledges getKnowledges() {
+		if ( this.knowledges == null ) {
+			if ( this.config.scenario().isUseKnowledges() ) {
+				this.createKnowledges();
+			}
+			else {
+				// throwing an exception should be the right approach,
+				// but it requires some testing (there may be places in the code
+				// which are happy with getting a null pointer, and would then
+				// not work anymore)
+				// throw new IllegalStateException(
+				log.warn(
+						"no knowledge container, and kowledge not activated from config. You must first call the create method of ScenarioImpl." );
+			}
 		}
 
 		return this.knowledges;
@@ -294,8 +338,19 @@ public class ScenarioImpl implements Scenario {
 
 	@Override
 	public TransitSchedule getTransitSchedule() {
-		if ((this.transitSchedule == null) && this.config.scenario().isUseTransit()){
-			this.createTransitSchedule();
+		if ( this.transitSchedule == null ) {
+			if ( this.config.scenario().isUseTransit() ) {
+				this.createTransitSchedule();
+			}
+			else {
+				// throwing an exception should be the right approach,
+				// but it requires some testing (there may be places in the code
+				// which are happy with getting a null pointer, and would then
+				// not work anymore)
+				// throw new IllegalStateException(
+				log.warn(
+						"no transit schedule, and transit not activated from config. You must first call the create method of ScenarioImpl." );
+			}
 		}
 
 		return this.transitSchedule;
