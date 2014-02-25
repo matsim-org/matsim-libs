@@ -402,6 +402,8 @@ public class RunUtils {
 							final boolean l = links.areLinked( p , p2 );
 							if ( l != links.areLinked( p2 , p ) ) {
 								log.error( "inconsistent plan link identifier revealed by "+p+" and "+p2 );
+								log.error( p.getPerson().getId()+" is "+(l ? "" : "NOT")+" linked with "+p2.getPerson().getId() );
+								log.error( p2.getPerson().getId()+" is "+(l ? "NOT" : "")+" linked with "+p.getPerson().getId() );
 								gotError.set( true );
 							}
 							if ( l ) return true;
