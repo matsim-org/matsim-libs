@@ -160,6 +160,7 @@ public class GautengControler_subpopulations {
 		String[] modes ={"car","commercial"};
 		config.qsim().setMainModes( Arrays.asList(modes) );
 		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
+
 		// yy note: I doubt that the jdqsim honors "main modes".  Either check, or do not use. kai, jan'14
 		if ( !config.controler().getMobsim().equals( ControlerConfigGroup.MobsimType.qsim.toString() ) ) {
 			throw new RuntimeException("error") ;
@@ -176,10 +177,15 @@ public class GautengControler_subpopulations {
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.controler().setRoutingAlgorithmType( RoutingAlgorithmType.FastAStarLandmarks );
 		config.controler().setLastIteration(1000);
+		if ( user==User.kai ) {
+			config.controler().setLastIteration(100);
+		}
+		
+		final double sampleFactor = 0.01 ;
 
-		config.counts().setCountsScaleFactor(100.);
-		config.qsim().setFlowCapFactor(0.01);
-		config.qsim().setStorageCapFactor(0.03);
+		config.counts().setCountsScaleFactor(1./sampleFactor);
+		config.qsim().setFlowCapFactor(sampleFactor);
+		config.qsim().setStorageCapFactor(Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
 		config.counts().setOutputFormat("all");
 		config.qsim().setEndTime(36.*3600.);
 		
@@ -191,10 +197,11 @@ public class GautengControler_subpopulations {
 		if ( user==User.kai ) {
 			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
 		} else if(user == User.johan){
-			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
+			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
 
-		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
+//		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
+		// is now default.
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
@@ -207,9 +214,11 @@ public class GautengControler_subpopulations {
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		config.scenario().setUseVehicles(true); // _after_ scenario loading. :-(
-
+		// (there will eventually be something like sc.createVehiclesContainer or ((ScenarioImpl)sc).createVehiclesContainer which will
+		// address this problem. kai, feb'14)
+		
 		if ( user==User.kai ) {
-			simplifyScenario(sc);
+			simplifyPopulation(sc) ;
 		}
 
 		/* CREATE VEHICLES. */
@@ -256,6 +265,7 @@ public class GautengControler_subpopulations {
 		Header.printFooter();
 	}
 
+	@SuppressWarnings("unused")
 	private static void installJdqsim(Config config) {
 		throw new RuntimeException("cannot use jdqsim with vehicle-based toll") ;
 		
@@ -267,13 +277,21 @@ public class GautengControler_subpopulations {
 //		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
 	}
 
-	private static void simplifyScenario(final Scenario sc) {
+	/**
+	 * I think this method served the following functions:<ul>
+	 * <li> change commercial vehicles from mode "commercial" to mode "car" so that the jdqsim would simulate them
+	 * <li> remove some of the commercial population since it seemed too many
+	 * <li> remove the routes in case the network is simplified 
+	 * </ul>
+	 * I think that only the last item is still meaningful.  kai, feb'14
+	 */
+//	@SuppressWarnings("unused")
+	private static void simplifyPopulation(final Scenario sc) {
 		
 //		simplifyNetwork(sc.getNetwork());
 
 		// modify population:
 		PopulationFactory pf = sc.getPopulation().getFactory() ;
-		Random rnd = MatsimRandom.getLocalInstance() ;
 //		List<Id> commercialIds = new ArrayList<Id>() ;
 		for ( Person pp : sc.getPopulation().getPersons().values() ) {
 			Plan plan = pp.getSelectedPlan() ;
@@ -311,6 +329,7 @@ public class GautengControler_subpopulations {
 			
 		} // end person
 		
+//		Random rnd = MatsimRandom.getLocalInstance() ;
 //		for ( Id id : commercialIds ) {
 //			if ( rnd.nextDouble() < 0.9 ) {
 //				sc.getPopulation().getPersons().remove(id) ;
@@ -319,6 +338,10 @@ public class GautengControler_subpopulations {
 
 	}
 
+	/**
+	 * this throws out all the local roads.  A problem is that then the initial routes to not work any more, so this is not that great.  kai, feb'14
+	 */
+	@SuppressWarnings("unused")
 	private static void simplifyNetwork(final Network network) {
 		// ...
 		List<Id> toBeRemoved = new ArrayList<Id>();

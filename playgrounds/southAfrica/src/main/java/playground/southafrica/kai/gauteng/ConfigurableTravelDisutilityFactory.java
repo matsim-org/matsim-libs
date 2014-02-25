@@ -98,24 +98,24 @@ public class ConfigurableTravelDisutilityFactory implements TravelDisutilityFact
 		if ( (this.externalUom==null || this.externalUod==null || this.externalUott==null ) && this.scoringFunctionFactory != null ) { 
 			 muc = RouterUtils.createAutoSensingMarginalUtilitiesContainer(scenario, scoringFunctionFactory);
 		}
-		if ( this.externalUom==null ) {
+		if ( this.externalUom==null && this.uom!=null ) {
 			this.uom = muc ; // works because muc fulfills _all_ the interfaces.  Maybe not so nice.
 			log.warn( "using autosensing marginal utility of money") ;
-		} else {
+		} else if ( this.externalUom!=null ){
 			this.uom = this.externalUom ;
 			log.warn( " using external marginal utility of money" ) ;
 		}
-		if ( this.externalUom==null ) {
+		if ( this.externalUom==null && this.uom!=null ) {
 			this.uod=muc ;
 			log.warn( "using autosensing marginal utility of distance") ;
-		} else {
+		} else if ( this.externalUod!=null ){
 			this.uod = this.externalUod ;
 			log.warn( " using external marginal utility of distance" ) ;
 		}
-		if ( this.externalUom==null ) {
+		if ( this.externalUom==null && this.uom!=null ) {
 			this.uott=muc ;
 			log.warn( "using autosensing marginal utility of ttime") ;
-		} else {
+		} else if ( this.externalUott!=null ){
 			this.uott = this.externalUott ;
 			log.warn( " using external marginal utility of ttime" ) ;
 		}

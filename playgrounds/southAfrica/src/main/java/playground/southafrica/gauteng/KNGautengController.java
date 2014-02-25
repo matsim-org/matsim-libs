@@ -10,17 +10,23 @@ public class KNGautengController {
 		
 		String[] args2 = {
 				GAUTENG_PATH + "config/basicConfig.xml" // config
-				, GAUTENG_PATH + "population/20140124/gauteng.xml.gz" // pop
+				
+//				, GAUTENG_PATH + "population/20140124/gauteng.xml.gz" // pop
 //				, "/Users/nagel/gauteng-kairuns/much_simplified_plans.xml.gz"
-				, GAUTENG_PATH + "population/20140124/gautengAttr.xml.gz" // pop attribs 
+				, "/Users/nagel/southafrica/gautengRuns/output_base/ITERS/it.300/300.plans.xml.gz"
+				
+				, GAUTENG_PATH + "population/20140208/gautengAttr.xml.gz" // pop attribs 
 //				, GAUTENG_PATH + "network/gauteng_20131210_coarseNationalNetwork_clean.xml.gz" // net 
 				, "/Users/nagel/gauteng-kairuns/much_simplified_network.xml.gz"
-				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Existing_20131211.xml" // toll
+
+//				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Existing_20131211.xml" // toll
+				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Combined_20131211.xml" // toll
+
 				, "110" // base VoT
-				, "1" // VoT multiplier
+				, "4" // VoT multiplier
 				, "1" // number of threads
 				, User.kai.toString()
-				, "/Users/nagel/gauteng-kairuns/output"
+				, "./output"
 				, GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz"
 				} ;
 		GautengControler_subpopulations.main(args2);
