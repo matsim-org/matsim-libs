@@ -101,7 +101,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		MyBoundingBox nbb = new MyBoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
-		PtMatrix ptm = new PtMatrix(config.plansCalcRoute(), nbb, module);
+		PtMatrix ptm = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, module);
 
 		// test the matrix
 		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();
@@ -211,7 +211,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		MyBoundingBox nbb = new MyBoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
-		PtMatrix ptm = new PtMatrix(config.plansCalcRoute(), nbb, module);
+		PtMatrix ptm = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, module);
 
 		// test the matrix
 		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();

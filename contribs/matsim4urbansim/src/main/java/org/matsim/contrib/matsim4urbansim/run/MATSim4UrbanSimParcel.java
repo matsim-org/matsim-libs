@@ -313,8 +313,7 @@ public class MATSim4UrbanSimParcel{
 			// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
 			MyBoundingBox nbb = new MyBoundingBox();
 			nbb.setDefaultBoundaryBox(controler.getScenario().getNetwork());
-			ptMatrix = new PtMatrix(controler.getScenario().getConfig().plansCalcRoute(),
-									nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
+			ptMatrix = PtMatrix.createPtMatrix(controler.getScenario().getConfig().plansCalcRoute(), nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
 			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(scenario, ptMatrix) ); // the car and pt router
 			
 			log.error("reconstructing pt route distances; not tested ...") ;

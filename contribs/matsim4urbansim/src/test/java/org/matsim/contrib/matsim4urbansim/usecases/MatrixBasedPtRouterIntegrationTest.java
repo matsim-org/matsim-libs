@@ -118,8 +118,7 @@ public class MatrixBasedPtRouterIntegrationTest {
 		nbb.setDefaultBoundaryBox(network);
 		
 		//create new pt matrix
-		PtMatrix ptMatrix = new PtMatrix(plansCalcRoute,
-								nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));
 		controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler.getScenario(), ptMatrix) ); // the car and pt router
 
 		//execute MATSim run

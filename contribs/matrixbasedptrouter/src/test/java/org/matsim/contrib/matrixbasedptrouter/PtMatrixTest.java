@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.matrixbasedptrouter;
 
+import java.io.IOException;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -83,9 +84,10 @@ public class PtMatrixTest extends MatsimTestCase{
 	
 	/**
 	 * tests the pt matrix for the first case, when only the coordinates of the pt stops are known
+	 * @throws IOException 
 	 */
 	@Test
-	public void testPtMatrixStops(){
+	public void testPtMatrixStops() throws IOException{
 		log.info("Start testing the pt matrix with information about the pt stops.");
 		long start = System.currentTimeMillis();
 		
@@ -112,7 +114,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		MyBoundingBox nbb = new MyBoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
-		PtMatrix ptm = new PtMatrix(config.plansCalcRoute(), nbb, module);
+		PtMatrix ptm = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, module);
 
 		// test the matrix
 		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();
@@ -189,9 +191,10 @@ public class PtMatrixTest extends MatsimTestCase{
 	 * 
 	 * the values for the pt distances and times are given from a csv-file created with CreateTestNetwork.java
 	 * For reasons of simplification we use the same csv-file for both informations (times and distances). Between all pt stops we set the pt distance to 100 m and the pt travel time to 100 min, except pairs of same pt stops, where we set both informations to zero.  
+	 * @throws IOException 
 	 */
 	@Test
-	public void testPtMatrixTimesAndDistances(){
+	public void testPtMatrixTimesAndDistances() throws IOException{
 		log.info("Start testing the pt matrix with information about the pt stops, pt travel times and distances.");
 		long start = System.currentTimeMillis();
 		
@@ -222,7 +225,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		MyBoundingBox nbb = new MyBoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
-		PtMatrix ptm = new PtMatrix(config.plansCalcRoute(), nbb, module);
+		PtMatrix ptm = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, module);
 
 		// test the matrix
 		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();

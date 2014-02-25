@@ -33,7 +33,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  */
 public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 	static final Logger log = Logger.getLogger(MatrixBasedPtRouterConfigGroup.class) ;
-	
+
 	public static final String GROUP_NAME="matrixBasedPtRouter" ;
 
 	public static final String PT_STOPS = "ptStopsFile"; // tnicolai: originally, this was named "ptStops" in the matsim config. old config files need to be adjusted
@@ -46,55 +46,55 @@ public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 	private String ptTravelDistancesInputFile;
 	private boolean usingTravelTimesAndDistances = false ;
 	private boolean usingPtStops = false ;
-	
+
 	public MatrixBasedPtRouterConfigGroup() {
 		super(GROUP_NAME);
 	}
 
 	@StringSetter(PT_STOPS)
-    public void setPtStopsInputFile(String ptStops){
-    	this.ptStopsInputFile = ptStops;
-    }
+	public void setPtStopsInputFile(String ptStops){
+		this.ptStopsInputFile = ptStops;
+	}
 	@StringGetter(PT_STOPS)
-    public String getPtStopsInputFile(){
-    	return this.ptStopsInputFile;
-    }
-    @StringSetter(PT_TRAVEL_TIMES)
-    public void setPtTravelTimesInputFile(String ptTravelTimes){
-    	this.ptTravelTimesInputFile = ptTravelTimes;
-    }
-    @StringGetter(PT_TRAVEL_TIMES)
-    public String getPtTravelTimesInputFile(){
-    	return this.ptTravelTimesInputFile;
-    }
-    @StringSetter(PT_TRAVEL_DISTANCES )
-    public void setPtTravelDistancesInputFile(String ptTravelDistances){
-    	this.ptTravelDistancesInputFile = ptTravelDistances;
-    }
-    @StringGetter(PT_TRAVEL_DISTANCES )
-    public String getPtTravelDistancesInputFile(){
-    	return this.ptTravelDistancesInputFile;
-    }
-    @StringSetter(PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH)
-    public void setUsingTravelTimesAndDistances( boolean val ) {
-    	this.usingTravelTimesAndDistances = val ;
-    }
-    @StringGetter(PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH)
-    public boolean isUsingTravelTimesAndDistances() {
-    	return this.usingTravelTimesAndDistances ;
-    }
-    @StringGetter(USING_PT_STOPS)
+	public String getPtStopsInputFile(){
+		return this.ptStopsInputFile;
+	}
+	@StringSetter(PT_TRAVEL_TIMES)
+	public void setPtTravelTimesInputFile(String ptTravelTimes){
+		this.ptTravelTimesInputFile = ptTravelTimes;
+	}
+	@StringGetter(PT_TRAVEL_TIMES)
+	public String getPtTravelTimesInputFile(){
+		return this.ptTravelTimesInputFile;
+	}
+	@StringSetter(PT_TRAVEL_DISTANCES )
+	public void setPtTravelDistancesInputFile(String ptTravelDistances){
+		this.ptTravelDistancesInputFile = ptTravelDistances;
+	}
+	@StringGetter(PT_TRAVEL_DISTANCES )
+	public String getPtTravelDistancesInputFile(){
+		return this.ptTravelDistancesInputFile;
+	}
+	@StringSetter(PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH)
+	public void setUsingTravelTimesAndDistances( boolean val ) {
+		this.usingTravelTimesAndDistances = val ;
+	}
+	@StringGetter(PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH)
+	public boolean isUsingTravelTimesAndDistances() {
+		return this.usingTravelTimesAndDistances ;
+	}
+	@StringGetter(USING_PT_STOPS)
 	public boolean isUsingPtStops() {
 		return usingPtStops;
 	}
-    @StringSetter(USING_PT_STOPS)
+	@StringSetter(USING_PT_STOPS)
 	public void setUsingPtStops(boolean usingPtStops) {
 		this.usingPtStops = usingPtStops;
 	}
-    
-    	@Override
+
+	@Override
 	protected void checkConsistency() {
-    		boolean problem = false ;
+		boolean problem = false ;
 		if( isUsingPtStops() ) {
 			log.info(MatrixBasedPtRouterConfigGroup.USING_PT_STOPS + " switch is set to true. Trying to find pt stops file ...");
 			// checking for pt stops
@@ -107,11 +107,11 @@ public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 					log.error("Pt stops file " + getPtStopsInputFile() + " not found although switch is set to true! Will abort ...");
 
 				}
-				
+
 				// checking for other input files
 				if( isUsingTravelTimesAndDistances() ) {
 					log.info(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to true. Trying to find travel times and distances files ...");
-					
+
 					if(new File( getPtTravelTimesInputFile() ).exists() && new File( getPtTravelDistancesInputFile() ).exists()){
 						log.info("Found travel times and travel distances input files:");
 						log.info("Travel times input file: " + getPtTravelTimesInputFile());
@@ -125,7 +125,7 @@ public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 				} else {
 					log.info(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to false. Additional travel times and distances files will not be read!");
 				}
-				
+
 			} else {
 				problem = true ;
 				log.warn("No pt stops file given although switch is set to true!  Will abort ...");
@@ -137,6 +137,6 @@ public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 			throw new RuntimeException("found fatal problem in matrix based pt router initialization; aborting ...") ;
 		}
 
-    	}
+	}
 
 }
