@@ -21,6 +21,7 @@ package playground.thibautd.scripts.scenariohandling;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -66,6 +68,16 @@ public class CreateGridNetworkWithDimensions {
 				linkCapacity,
 				width,
 				height );
+
+		// metadata
+		final StringBuilder meta = new StringBuilder();
+		meta.append( "generated with " );
+		meta.append( CreateGridNetworkWithDimensions.class.getName() );
+		for ( String arg : args ) meta.append( " "+arg );
+		meta.append( " on the " );
+		meta.append( new Date().toString() );
+
+		((NetworkImpl) network).setName( meta.toString() );
 
 		new NetworkWriter( network ).write( outFile );
 	}
