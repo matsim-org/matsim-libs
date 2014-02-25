@@ -49,7 +49,6 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			return ;
 		}
 		log.info("running checkConsistency ...");
-		VspExperimentalConfigGroup vspConfig = config.vspExperimental() ; // convenience variable
 		
 		boolean problem = false ; // ini
 
