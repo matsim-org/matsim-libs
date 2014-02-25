@@ -263,7 +263,7 @@ public class BikeSharingEngineTest {
 		}
 
 		@Override
-		public Plan getSelectedPlan() {
+		public Plan getCurrentPlan() {
 			throw new UnsupportedOperationException();
 		}
 

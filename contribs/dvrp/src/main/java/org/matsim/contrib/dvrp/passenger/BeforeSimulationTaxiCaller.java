@@ -48,7 +48,7 @@ public class BeforeSimulationTaxiCaller
 
         for (MobsimAgent mobsimAgent : agents) {
             if (mobsimAgent instanceof PlanAgent) {
-                Plan plan = ((PlanAgent)mobsimAgent).getSelectedPlan();
+                Plan plan = ((PlanAgent)mobsimAgent).getCurrentPlan();
 
                 for (PlanElement elem : plan.getPlanElements()) {
                     if (elem instanceof Leg) {

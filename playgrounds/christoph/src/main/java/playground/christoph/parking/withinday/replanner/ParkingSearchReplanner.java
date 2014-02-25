@@ -124,7 +124,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 	
 	protected void updateAgentsPlan(MobsimAgent withinDayAgent, Id parkingFacilityId, Route route, int routeIndex) {
 		
-		Plan plan = ((PlanAgent) withinDayAgent).getSelectedPlan();
+		Plan plan = ((PlanAgent) withinDayAgent).getCurrentPlan();
 		Person person = plan.getPerson();
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
 		

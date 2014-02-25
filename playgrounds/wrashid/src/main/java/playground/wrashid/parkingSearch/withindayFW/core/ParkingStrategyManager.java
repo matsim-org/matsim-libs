@@ -66,7 +66,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 			// assign strategies per leg at random
 			
 			for (ExperimentalBasicWithindayAgent agent : agents.values()) {
-				Plan selectedPlan = agent.getSelectedPlan();
+				Plan selectedPlan = agent.getCurrentPlan();
 				
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 					PlanElement planElement = selectedPlan.getPlanElements().get(i);
@@ -89,7 +89,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 				DebugLib.traceAgent(agent.getId());
 				
-				Plan selectedPlan = agent.getSelectedPlan();
+				Plan selectedPlan = agent.getCurrentPlan();
 
 				for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 					PlanElement planElement = selectedPlan.getPlanElements().get(i);
@@ -229,7 +229,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 	// general evolutionary algorithm
 	private void updatedPlanElementHashCodes(ExperimentalBasicWithindayAgent agent) {
 
-		Plan selectedPlan = agent.getSelectedPlan();
+		Plan selectedPlan = agent.getCurrentPlan();
 
 		for (int i = 0; i < selectedPlan.getPlanElements().size(); i++) {
 

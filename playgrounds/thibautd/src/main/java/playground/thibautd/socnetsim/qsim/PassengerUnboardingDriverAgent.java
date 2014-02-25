@@ -244,8 +244,8 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	}
 
 	@Override
-	public Plan getSelectedPlan() {
-		return planDelegate.getSelectedPlan();
+	public Plan getCurrentPlan() {
+		return planDelegate.getCurrentPlan();
 	}
 
 	@Override
@@ -253,8 +253,8 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 		return "["+getClass().getSimpleName()+
 			": id="+getId()+
 			"; currentElement="+getCurrentPlanElement()+
-			"; positionInPlan="+getSelectedPlan().getPlanElements().indexOf( getCurrentPlanElement() )+
-			" / "+getSelectedPlan().getPlanElements().size()+
+			"; positionInPlan="+getCurrentPlan().getPlanElements().indexOf( getCurrentPlanElement() )+
+			" / "+getCurrentPlan().getPlanElements().size()+
 			"; currentLinkId="+getCurrentLinkId()+
 			"; state="+getState()+
 			"]";

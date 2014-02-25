@@ -62,7 +62,7 @@ public class MarathonEndActivityAndEvacuateReplanner extends WithinDayDuringActi
 		
 		if (!replanned) return replanned;
 
-		Plan plan = ((PlanAgent) withinDayAgent).getSelectedPlan(); 
+		Plan plan = ((PlanAgent) withinDayAgent).getCurrentPlan(); 
 		
 		for (int i = 0; i < plan.getPlanElements().size(); i++) {
 			PlanElement planElement = plan.getPlanElements().get(i);

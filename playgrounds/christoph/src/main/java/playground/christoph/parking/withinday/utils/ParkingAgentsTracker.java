@@ -287,7 +287,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 	private Activity getNextNonParkingActivity(Id agentId) {
 
 		MobsimAgent agent = this.mobsimDataProvider.getAgent(agentId);
-		Plan executedPlan = ((PlanAgent) agent).getSelectedPlan();
+		Plan executedPlan = ((PlanAgent) agent).getCurrentPlan();
 		int planElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		
 		Activity nextNonParkingActivity = (Activity) executedPlan.getPlanElements().get(planElementIndex + 3);		

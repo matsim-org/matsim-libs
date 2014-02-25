@@ -20,6 +20,7 @@
 
 package org.matsim.core.population;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -36,9 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
@@ -61,8 +61,125 @@ public final class PopulationUtils {
 		// yy here, the "network" lookup could be pushed into the create method: createRoute(...,network) ;
 		return new PopulationImpl( config, network ) ;
 	}
+	
+	public static Leg unmodifiableLeg( Leg leg ) {
+		return new UnmodifiableLeg( leg ) ;
+	}
+	public static class UnmodifiableLeg implements Leg {
+		private final Leg delegate ;
+		public UnmodifiableLeg( Leg leg ) {
+			this.delegate = leg ;
+		}
+		@Override
+		public String getMode() {
+			return this.delegate.getMode() ;
+		}
 
-	/**The idea of this method is to mirror the concept of Collections.unmodifiableXxx( xxx ) .
+		@Override
+		public void setMode(String mode) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public Route getRoute() {
+			// route should be unmodifiable. kai
+			return this.delegate.getRoute() ;
+		}
+
+		@Override
+		public void setRoute(Route route) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public double getDepartureTime() {
+			return this.delegate.getDepartureTime() ;
+		}
+
+		@Override
+		public void setDepartureTime(double seconds) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public double getTravelTime() {
+			return this.delegate.getTravelTime() ;
+		}
+
+		@Override
+		public void setTravelTime(double seconds) {
+			throw new UnsupportedOperationException() ;
+		}
+		
+	}
+	
+	public static Activity unmodifiableActivity( Activity act ) {
+		return new UnmodifiableActivity( act ) ;
+	}
+	public static class UnmodifiableActivity implements Activity {
+		private final Activity delegate ;
+		public UnmodifiableActivity( Activity act ) {
+			this.delegate = act ;
+		}
+
+		@Override
+		public double getEndTime() {
+			return this.delegate.getEndTime() ;
+		}
+
+		@Override
+		public void setEndTime(double seconds) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public String getType() {
+			return this.delegate.getType() ;
+		}
+
+		@Override
+		public void setType(String type) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public Coord getCoord() {
+			return this.delegate.getCoord() ;
+		}
+
+		@Override
+		public double getStartTime() {
+			return this.delegate.getStartTime() ;
+		}
+
+		@Override
+		public void setStartTime(double seconds) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public double getMaximumDuration() {
+			return this.delegate.getMaximumDuration() ;
+		}
+
+		@Override
+		public void setMaximumDuration(double seconds) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public Id getLinkId() {
+			return this.delegate.getLinkId() ;
+		}
+
+		@Override
+		public Id getFacilityId() {
+			return this.delegate.getFacilityId() ;
+		}
+	}
+
+	/**
+	 * The idea of this method is to mirror the concept of Collections.unmodifiableXxx( xxx ) .
 	 * At this point, the protection does not go to the end, i.e. PlanElements themselves can
 	 * still be modified.  kai, nov'10
 	 * <p/>
@@ -78,6 +195,13 @@ public final class PopulationUtils {
 		
 		public UnmodifiablePlan( Plan plan ) {
 			this.delegate = plan;
+			List<PlanElement> tmp = new ArrayList<PlanElement>() ;
+			for ( PlanElement pe : plan.getPlanElements() ) {
+				if ( pe instanceof Leg ) {
+					tmp.add( unmodifiableLeg( (Leg) pe ) ) ;
+				}
+			}
+			
 			this.unmodifiablePlanElements = Collections.unmodifiableList(delegate.getPlanElements());
 		}
 

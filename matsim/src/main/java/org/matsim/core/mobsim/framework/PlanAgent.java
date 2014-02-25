@@ -33,6 +33,6 @@ public interface PlanAgent {
 
 	public PlanElement getNextPlanElement() ;
 	
-	public Plan getSelectedPlan() ;
+	public Plan getCurrentPlan() ;
 	
 }

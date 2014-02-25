@@ -230,7 +230,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	private void initializeFirstAndLastParkingActPlanElemIndex() {
 		for (ExperimentalBasicWithindayAgent agent : this.agents.values()) {
-			Plan executedPlan = agent.getSelectedPlan();
+			Plan executedPlan = agent.getCurrentPlan();
 
 			for (int i = 0; i < executedPlan.getPlanElements().size(); i++) {
 				Id personId = agent.getPerson().getId();
@@ -294,7 +294,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			this.carLegAgents.add(personId);
 
 			ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-			Plan executedPlan = agent.getSelectedPlan();
+			Plan executedPlan = agent.getCurrentPlan();
 			int planElementIndex = agent.getCurrentPlanElementIndex();
 
 			
@@ -444,7 +444,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	private Link getNextActivityLink(Id personId) {
 		Integer currentPlanElementIndex = agents.get(personId).getCurrentPlanElementIndex();
 
-		ActivityImpl act=(ActivityImpl) agents.get(personId).getSelectedPlan().getPlanElements().get(currentPlanElementIndex+1);
+		ActivityImpl act=(ActivityImpl) agents.get(personId).getCurrentPlan().getPlanElements().get(currentPlanElementIndex+1);
 		
 		Id actLinkId=act.getLinkId();
 		Link actLink = scenario.getNetwork().getLinks().get(actLinkId);
@@ -513,7 +513,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		endTimeOfPreviousActivity.put(personId, event.getTime());
 
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedActIndex(agent);
 
 		if (event.getActType().equalsIgnoreCase("parking")) {
@@ -592,7 +592,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		// parking search time
 
 		if (this.getSearchStartTime().get(personId) == null) {
-			List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
+			List<PlanElement> planElements = agents.get(personId).getCurrentPlan().getPlanElements();
 			System.out.println(agents.get(personId).getCurrentPlanElementIndex());
 
 			System.out
@@ -675,7 +675,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	private Integer getIndexOfPreviousCarLeg(Id personId) {
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
 		for (int i = planElementIndex; i > 0; i--) {
@@ -695,7 +695,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	private void updateNextParkingActivityIfNeeded(Id personId) {
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
 		Activity currentParking = (Activity) executedPlan.getPlanElements().get(planElementIndex);
@@ -853,7 +853,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	private Integer getLastCarLegIndexOfDay(Id personId) {
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
 		List<PlanElement> planElements = executedPlan.getPlanElements();
@@ -876,7 +876,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	private Id getLastParkingFacilityIdOfDay(Id personId) {
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 
 		Activity lastParkingActivity = (Activity) executedPlan.getPlanElements().get(
 				lastParkingActivityPlanElemIndex.get(personId));
@@ -910,7 +910,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 		if (event.getActType().equalsIgnoreCase("parking")) {
 			ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
-			Plan executedPlan = agent.getSelectedPlan();
+			Plan executedPlan = agent.getCurrentPlan();
 			int planElementIndex = agent.getCurrentPlanElementIndex();
 
 			Leg nextLeg = (Leg) executedPlan.getPlanElements().get(planElementIndex + 1);

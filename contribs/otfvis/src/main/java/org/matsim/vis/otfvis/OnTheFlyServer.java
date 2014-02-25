@@ -83,7 +83,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 				for (MobsimAgent agent : agents) {
 					if (agent instanceof PlanAgent) {
 						PlanAgent pa = (PlanAgent) agent;
-						plans.put(pa.getSelectedPlan().getPerson().getId(), pa.getSelectedPlan());
+						plans.put(pa.getCurrentPlan().getPerson().getId(), pa.getCurrentPlan());
 					}
 				}
 			} else {

@@ -54,7 +54,7 @@ public class ParkingStrategyManager {
 	// assumption on invocation: agent is driving!
 	public FullParkingSearchStrategy getParkingStrategyForCurrentLeg(MobsimAgent agent){
 		Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
-		Id nextActLinkId=((ActivityImpl) ((PlanAgent) agent).getSelectedPlan().getPlanElements().get(currentPlanElementIndex+3)).getLinkId();
+		Id nextActLinkId=((ActivityImpl) ((PlanAgent) agent).getCurrentPlan().getPlanElements().get(currentPlanElementIndex+3)).getLinkId();
 		return strategyEvaluations.get(agent.getId()).get(currentPlanElementIndex).get(nextActLinkId).getCurrentSelectedStrategy().strategy;
 	}
 	
@@ -62,15 +62,15 @@ public class ParkingStrategyManager {
 	public void prepareStrategiesForNewIteration(MobsimAgent ag, int currentIterationNumber){
 		Random random = MatsimRandom.getLocalInstance();
 		PlanAgent agent = (PlanAgent) ag;
-		Id agentId = agent.getSelectedPlan().getPerson().getId();
-		for (int i=0;i<agent.getSelectedPlan().getPlanElements().size();i++){
-			PlanElement pe=agent.getSelectedPlan().getPlanElements().get(i);
+		Id agentId = agent.getCurrentPlan().getPerson().getId();
+		for (int i=0;i<agent.getCurrentPlan().getPlanElements().size();i++){
+			PlanElement pe=agent.getCurrentPlan().getPlanElements().get(i);
 						
 			if (pe instanceof LegImpl){
 				LegImpl leg=(LegImpl) pe;
 				
 				if (leg.getMode().equals(TransportMode.car)){
-					Id nextActLinkId=((ActivityImpl) agent.getSelectedPlan().getPlanElements().get(i+3)).getLinkId();
+					Id nextActLinkId=((ActivityImpl) agent.getCurrentPlan().getPlanElements().get(i+3)).getLinkId();
 				
 					HashMap<Integer, HashMap<Id, EvaluationContainer>> agentHashMap = strategyEvaluations.get(agentId);
 					

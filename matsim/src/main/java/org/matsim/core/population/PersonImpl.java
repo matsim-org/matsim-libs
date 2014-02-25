@@ -169,6 +169,7 @@ public class PersonImpl implements Person {
 		setSelectedPlan(newPlan);
 	}
 
+	@Override
 	public Plan createCopyOfSelectedPlanAndMakeSelected() {
 		Plan oldPlan = this.getSelectedPlan();
 		if (oldPlan == null) {

@@ -73,7 +73,7 @@ public class NearestAvailableParkingSearch implements ParkingSearchStrategy {
 		ActivityFacility parkingFacility = this.parkingInfrastructure.getClosestFreeParkingFacility(currentLink.getCoord(), ParkingTypes.GARAGEPARKING);
 		Id endLinkId = parkingFacility.getLinkId();
 		
-		Person person = ((PlanAgent) agent).getSelectedPlan().getPerson();
+		Person person = ((PlanAgent) agent).getCurrentPlan().getPerson();
 		Vehicle vehicle = null;
 		parkingRouter.extendCarRoute((NetworkRoute) route, endLinkId, time, person, vehicle);
 		

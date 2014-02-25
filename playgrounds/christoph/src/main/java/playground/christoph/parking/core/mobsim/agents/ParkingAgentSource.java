@@ -81,13 +81,13 @@ public class ParkingAgentSource implements AgentSource {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
 			
 			// ... and then insert parking activities into its plan.
-			insertParkingActivities.run(((PlanAgent) agent).getSelectedPlan());
+			insertParkingActivities.run(((PlanAgent) agent).getCurrentPlan());
 			
 			// Insert the agent into the mobsim...
 			qsim.insertAgentIntoMobsim(agent);
 			
 			// ... and park its vehicle at the link where the first parking activity is performed.
-			Plan plan = ((PlanAgent) agent).getSelectedPlan();
+			Plan plan = ((PlanAgent) agent).getCurrentPlan();
 			this.parkVehicleAtFirstParking(plan);
 
 			/*

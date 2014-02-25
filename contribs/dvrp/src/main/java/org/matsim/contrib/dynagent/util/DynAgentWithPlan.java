@@ -173,7 +173,7 @@ public class DynAgentWithPlan
 
 
     @Override
-    public Plan getSelectedPlan()
+    public Plan getCurrentPlan()
     {
         return planFactory.create(dynAgent);
     }

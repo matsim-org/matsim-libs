@@ -64,7 +64,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 		Id agentId = agent.getId();
 		PlanAgent planAgent = (PlanAgent) agent;
 		Leg leg = (Leg) planAgent.getCurrentPlanElement();
-		List<PlanElement> planElements = planAgent.getSelectedPlan().getPlanElements();
+		List<PlanElement> planElements = planAgent.getCurrentPlan().getPlanElements();
 		int idx = planElements.indexOf(leg);
 		PlanElement fromAct = planElements.get(idx-1);
 		PlanElement toAct = planElements.get(idx+1);

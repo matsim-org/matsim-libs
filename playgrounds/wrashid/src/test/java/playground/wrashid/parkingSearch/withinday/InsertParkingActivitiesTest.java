@@ -189,9 +189,9 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 //		ExperimentalBasicWithindayAgent agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
 //		insertParkingActivities.run(agent.getSelectedPlan());
 		
-		assertEquals(17, agent.getSelectedPlan().getPlanElements().size());
+		assertEquals(17, agent.getCurrentPlan().getPlanElements().size());
 		
-		for (PlanElement planElement : agent.getSelectedPlan().getPlanElements()) {
+		for (PlanElement planElement : agent.getCurrentPlan().getPlanElements()) {
 			log.info(planElement.toString());
 		}
 				
@@ -207,7 +207,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		
 		agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
 		try {
-			insertParkingActivities.run(agent.getSelectedPlan());
+			insertParkingActivities.run(agent.getCurrentPlan());
 			Assert.fail("Expected RuntimeException, but there was none.");
 		} catch (RuntimeException e) { }
 	}

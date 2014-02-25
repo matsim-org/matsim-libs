@@ -137,7 +137,7 @@ public class ParkingPopulationAgentSource implements AgentSource {
 			 */
 			Plan plan;
 			if (agent instanceof ExperimentalBasicWithindayAgent) {
-				plan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
+				plan = ((ExperimentalBasicWithindayAgent) agent).getCurrentPlan();
 			} else
 				plan = person.getSelectedPlan();
 

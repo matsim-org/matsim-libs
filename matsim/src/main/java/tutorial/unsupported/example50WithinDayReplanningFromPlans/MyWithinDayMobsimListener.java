@@ -108,7 +108,7 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		}
 		PersonDriverAgentImpl withindayAgent = (PersonDriverAgentImpl) mobsimAgent ;
 		
-		Plan plan = withindayAgent.getSelectedPlan() ;
+		Plan plan = withindayAgent.getCurrentPlan() ;
 
 		if (plan == null) {
 			log.info( " we don't have a selected plan; returning ... ") ;

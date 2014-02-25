@@ -61,7 +61,7 @@ public class UpdateLastParkingArrivalTime implements PersonArrivalEventHandler {
 	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 
 		

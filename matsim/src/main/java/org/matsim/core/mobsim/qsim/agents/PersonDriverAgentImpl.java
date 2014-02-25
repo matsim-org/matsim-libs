@@ -44,6 +44,8 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 
@@ -359,7 +361,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
 	private final List<PlanElement> getPlanElements() {
-		return this.getSelectedPlan().getPlanElements();
+		return this.getCurrentPlan().getPlanElements();
 	}
 
 	public final Netsim getMobsim(){
@@ -452,10 +454,29 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		return this.person.getId();
 	}
 
+	private boolean firstTimeToGetCurrentPlan = true ;
+	private Plan modifiablePlansCopy = null ;
 	@Override
-	public final Plan getSelectedPlan() {
-		return this.plan;
+	public final Plan getCurrentPlan() {
+		if ( firstTimeToGetCurrentPlan ) {
+			firstTimeToGetCurrentPlan = false ;
+			PlanImpl newPlan = new PlanImpl(this.plan.getPerson()) ;
+			newPlan.copyFrom( this.plan );
+			this.modifiablePlansCopy = newPlan ;
+		}
+		return this.modifiablePlansCopy ;
 	}
+	
+	private boolean firstTimeToGetOriginalPlan = true ;
+	private Plan unmodifiablePlan = null ;
+	public final Plan getUnmodifiableOriginalPlan() {
+		if ( firstTimeToGetOriginalPlan ) {
+			firstTimeToGetOriginalPlan = false ;
+			this.unmodifiablePlan = PopulationUtils.unmodifiablePlan( this.plan ) ;
+		}
+		return this.unmodifiablePlan ;
+	}
+	
 
 	@Override
 	public MobsimAgent.State getState() {

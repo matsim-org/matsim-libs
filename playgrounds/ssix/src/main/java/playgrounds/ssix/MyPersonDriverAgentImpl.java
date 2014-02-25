@@ -363,7 +363,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
 	private final List<PlanElement> getPlanElements() {
-		return this.getSelectedPlan().getPlanElements();
+		return this.getCurrentPlan().getPlanElements();
 	}
 
 	public final Netsim getMobsim(){
@@ -457,7 +457,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 	}
 
 	@Override
-	public final Plan getSelectedPlan() {
+	public final Plan getCurrentPlan() {
 		return this.plan;
 	}
 

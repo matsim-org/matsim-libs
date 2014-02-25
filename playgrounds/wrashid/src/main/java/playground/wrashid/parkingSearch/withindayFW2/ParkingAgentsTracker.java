@@ -124,7 +124,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 			this.carLegAgents.add(event.getPersonId());
 
 			ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
-			Plan executedPlan = agent.getSelectedPlan();
+			Plan executedPlan = agent.getCurrentPlan();
 			int planElementIndex = agent.getCurrentPlanElementIndex();
 
 			/*

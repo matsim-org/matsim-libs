@@ -55,7 +55,7 @@ public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 
-		Plan executedPlan = ((PlanAgent) withinDayAgent).getSelectedPlan();
+		Plan executedPlan = ((PlanAgent) withinDayAgent).getCurrentPlan();
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;

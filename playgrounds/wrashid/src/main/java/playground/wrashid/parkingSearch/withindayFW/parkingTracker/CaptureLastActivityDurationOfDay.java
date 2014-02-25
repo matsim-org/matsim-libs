@@ -73,7 +73,7 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 		
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedActIndex(agent);
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
@@ -101,7 +101,7 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 		Id personId = event.getPersonId();
 
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedActIndex(agent);
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)){
@@ -114,7 +114,7 @@ public class CaptureLastActivityDurationOfDay implements ActivityStartEventHandl
 			if (previousAct.getType().equals("parking")) {
 				
 				if (activityDurationTmpValue.get(personId)==null){
-					List<PlanElement> planElements = agents.get(personId).getSelectedPlan().getPlanElements();
+					List<PlanElement> planElements = agents.get(personId).getCurrentPlan().getPlanElements();
 					
 					DebugLib.emptyFunctionForSettingBreakPoint();
 				}

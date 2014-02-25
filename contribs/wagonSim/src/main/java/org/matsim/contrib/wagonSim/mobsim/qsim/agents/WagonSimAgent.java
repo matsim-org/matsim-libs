@@ -225,8 +225,8 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 	}
 
 	@Override
-	public Plan getSelectedPlan() {
-		return this.delegate.getSelectedPlan();
+	public Plan getCurrentPlan() {
+		return this.delegate.getCurrentPlan();
 	}
 
 	@Override

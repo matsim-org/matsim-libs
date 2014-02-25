@@ -75,7 +75,7 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 	public void handleEvent(ActivityEndEvent event) {
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 
 		DebugLib.traceAgent(personId, 11);
@@ -111,7 +111,7 @@ public class CapturePreviousActivityDurationDuringDay implements ActivityStartEv
 
 		
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		
 		DebugLib.traceAgent(personId, 11);

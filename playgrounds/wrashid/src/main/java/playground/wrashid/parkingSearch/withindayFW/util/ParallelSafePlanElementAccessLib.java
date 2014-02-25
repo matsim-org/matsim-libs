@@ -41,7 +41,7 @@ public class ParallelSafePlanElementAccessLib {
 	
 	
 	public static Leg getNextLeg(ExperimentalBasicWithindayAgent agent) {
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		for (int i = planElementIndex + 1; i < executedPlan.getPlanElements().size(); i++) {
 			if (executedPlan.getPlanElements().get(i) instanceof Leg) {
@@ -54,7 +54,7 @@ public class ParallelSafePlanElementAccessLib {
 	}
 
 	public static Activity getNextAct(ExperimentalBasicWithindayAgent agent) {
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		for (int i = planElementIndex + 1; i < executedPlan.getPlanElements().size(); i++) {
 			if (executedPlan.getPlanElements().get(i) instanceof Activity) {
@@ -67,7 +67,7 @@ public class ParallelSafePlanElementAccessLib {
 	}
 
 	public static Activity getPreviousAct(ExperimentalBasicWithindayAgent agent) {
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = agent.getCurrentPlanElementIndex();
 		for (int i = planElementIndex - 1; i < executedPlan.getPlanElements().size(); i--) {
 			if (executedPlan.getPlanElements().get(i) instanceof Activity) {

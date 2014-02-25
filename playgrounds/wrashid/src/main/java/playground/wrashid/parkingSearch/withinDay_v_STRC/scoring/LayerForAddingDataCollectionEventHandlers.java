@@ -188,12 +188,12 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 	}
 
 	private boolean previousActivityIsParking(Id personId) {
-		ActivityImpl activityImpl = (ActivityImpl) ((PlanAgent) this.mobsimDataProvider.getAgent(personId)).getSelectedPlan().getPlanElements().get(currentPlanElementIndex-1);
+		ActivityImpl activityImpl = (ActivityImpl) ((PlanAgent) this.mobsimDataProvider.getAgent(personId)).getCurrentPlan().getPlanElements().get(currentPlanElementIndex-1);
 		return activityImpl.getType().equalsIgnoreCase("parking");
 	}
 
 	private boolean nextActivityIsParking(Id personId) {
-		Plan plan =  ((PlanAgent) this.mobsimDataProvider.getAgent(personId)).getSelectedPlan();
+		Plan plan =  ((PlanAgent) this.mobsimDataProvider.getAgent(personId)).getCurrentPlan();
 		if (plan.getPlanElements().size() > currentPlanElementIndex + 2) {
 			ActivityImpl activityImpl = (ActivityImpl) plan.getPlanElements().get(currentPlanElementIndex+1);
 			return activityImpl.getType().equalsIgnoreCase("parking");			
@@ -226,7 +226,7 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		}
 		
 		if (firstParkingActivityPlanElemIndex.get(personId)<currentPlanElementIndex){
-			if (((ActivityImpl) ((PlanAgent) this.mobsimDataProvider.getAgent(personId)).getSelectedPlan().getPlanElements().get(currentPlanElementIndex-2)).getType().equalsIgnoreCase("parking")){
+			if (((ActivityImpl) ((PlanAgent) this.mobsimDataProvider.getAgent(personId)).getCurrentPlan().getPlanElements().get(currentPlanElementIndex-2)).getType().equalsIgnoreCase("parking")){
 				startTimeOfFirstActivityAfterParkingCar.put(personId, time);
 			}
 		}
@@ -254,7 +254,7 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 		}
 		
 		if (lastParkingActivityPlanElemIndex.get(personId)>currentPlanElementIndex){
-			List<PlanElement> planElements = ((PlanAgent) mobsimAgent).getSelectedPlan().getPlanElements();
+			List<PlanElement> planElements = ((PlanAgent) mobsimAgent).getCurrentPlan().getPlanElements();
 			
 			
 			
@@ -274,7 +274,7 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 
 	private void initializeFirstAndLastParkingActPlanElemIndex() {
 		for (MobsimAgent agent : this.mobsimDataProvider.getAgents().values()) {
-			Plan executedPlan = ((PlanAgent) agent).getSelectedPlan();
+			Plan executedPlan = ((PlanAgent) agent).getCurrentPlan();
 
 			for (int i = 0; i < executedPlan.getPlanElements().size(); i++) {
 				Id personId = agent.getId();

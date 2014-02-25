@@ -66,9 +66,9 @@ public class CaptureParkingWalkTimesDuringDay implements PersonDepartureEventHan
 		this.agents = agents;
 
 		for (ExperimentalBasicWithindayAgent agent : agents.values()) {
-			Id personId = agent.getSelectedPlan().getPerson().getId();
+			Id personId = agent.getCurrentPlan().getPerson().getId();
 
-			for (PlanElement pe : agent.getSelectedPlan().getPlanElements()) {
+			for (PlanElement pe : agent.getCurrentPlan().getPlanElements()) {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 
@@ -98,7 +98,7 @@ public class CaptureParkingWalkTimesDuringDay implements PersonDepartureEventHan
 		Id personId = event.getPersonId();
 		
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 
 		if (agentDoesNotDriveCarDuringWholeDay(personId)) {
@@ -147,7 +147,7 @@ public class CaptureParkingWalkTimesDuringDay implements PersonDepartureEventHan
 		Id personId = event.getPersonId();
 	
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
-		Plan executedPlan = agent.getSelectedPlan();
+		Plan executedPlan = agent.getCurrentPlan();
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
 		double startTimeWalkLeg = event.getTime();
 
