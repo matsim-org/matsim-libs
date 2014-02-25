@@ -19,21 +19,35 @@
  * *********************************************************************** */
 package eu.eunoiaproject.examples.schedulebasedteleportation;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 /**
  * @author thibautd
  */
 public class Run {
+	private static final Logger log =
+		Logger.getLogger(Run.class);
+
 
 	public static void main(final String[] args) {
 		final String configFile = args[ 0 ];
+
+		// This allows to get all log messages in the log file.
+		// Otherwise, one only gets the messages happening after Controler
+		// initialization
+		OutputDirectoryLogging.catchLogEntries();
 
 		final Config config = loadConfig( configFile );
 		final Scenario scenario = loadScenario( config );
@@ -49,21 +63,30 @@ public class Run {
 	}
 
 	private static Scenario loadScenario( final Config config ) {
-		// here comes some uglyness. the config should never be modified from the
-		// code, but this is currently the only wy to get the transit containers
-		// loaded while not simulating transit. This will be fixed soon.
-
-		final boolean vehs = config.scenario().isUseVehicles();
-		config.scenario().setUseVehicles( true );
-
-		final boolean transit = config.scenario().isUseTransit();
-		config.scenario().setUseTransit( true );
-
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		// set back parameters to the values in the config
-		config.scenario().setUseVehicles( vehs );
-		config.scenario().setUseTransit( transit );
+		// if actual simulation of transit is disabled, the transit schedule
+		// is not loaded automatically: we need to do it by hand
+		if ( !config.scenario().isUseTransit() ) {
+			((ScenarioImpl) scenario).createTransitSchedule();
+			log.info( "read schedule from "+config.transit().getTransitScheduleFile() );
+			new TransitScheduleReader( scenario ).readFile( config.transit().getTransitScheduleFile() );
+
+			// this is not necessary in the vast majority of applications.
+			if ( config.transit().getTransitLinesAttributesFile() != null ) {
+				log.info("loading transit lines attributes from " + config.transit().getTransitLinesAttributesFile());
+				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitLinesAttributes() ).parse(
+						config.transit().getTransitLinesAttributesFile() );
+			}
+			if ( config.transit().getTransitStopsAttributesFile() != null ) {
+				log.info("loading transit stop facilities attributes from " + config.transit().getTransitStopsAttributesFile() );
+				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitStopsAttributes() ).parse(
+						config.transit().getTransitStopsAttributesFile() );
+			}
+		}
+		else {
+			log.warn( "Transit will be simulated! This is not the purpose of this script" );
+		}
 
 		return scenario;
 	}
