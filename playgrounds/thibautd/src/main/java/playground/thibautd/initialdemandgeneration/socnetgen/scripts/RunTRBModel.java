@@ -136,7 +136,12 @@ public class RunTRBModel {
 					final Attributes atts,
 					final Stack<String> context) {
 				if ( name.equals( "person" ) ) {
-					if ( Integer.parseInt( atts.getValue( "id" ) ) > 1000000000 ) return;
+					try {
+						if ( Integer.parseInt( atts.getValue( "id" ) ) > 1000000000 ) return;
+					}
+					catch ( NumberFormatException e ) {
+						// not the herbie population: do no bother.
+					}
 					counter.incCounter();
 
 					try {
