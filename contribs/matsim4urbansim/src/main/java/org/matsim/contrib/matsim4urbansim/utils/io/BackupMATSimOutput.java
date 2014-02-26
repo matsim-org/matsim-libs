@@ -3,10 +3,9 @@ package org.matsim.contrib.matsim4urbansim.utils.io;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl;
-import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
-import org.matsim.contrib.accessibility.utils.io.writer.UrbanSimZoneCSVWriterV2;
+import org.matsim.contrib.accessibility.UrbanSimZoneCSVWriterV2;
 import org.matsim.contrib.matsim4urbansim.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
@@ -15,6 +14,7 @@ import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriter;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimPersonCSVWriter;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -51,7 +51,7 @@ public class BackupMATSimOutput {
 
 		M4UControlerConfigModuleV3 m4ucModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(scenario.getConfig()) ;
 		UrbanSimParameterConfigModuleV3 uspModule = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(scenario.getConfig()) ;
-		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
+		AccessibilityConfigGroup acm = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class) ;
 		int currentYear = uspModule.getYear();
 		
 		String saveDirectory = "run" + currentYear;

@@ -1,12 +1,9 @@
 package org.matsim.contrib.matsim4urbansim.accessibility;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -20,12 +17,11 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
-import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
@@ -45,10 +41,10 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	private double resolution = 100.;
 	private int nPersons = 3;
 	private double[][] accessibilities;
-	
+
 	private Map<Modes4Accessibility,Double> accessibilitiesHomeZone;
 	private Map<Modes4Accessibility,Double> accessibilitiesWorkZone;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		OutputDirectoryLogging.catchLogEntries();		
@@ -65,9 +61,8 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 * The test result should be that the accessibility of the measuring point at (200,100) is higher than the accessibility at
 	 * any other measuring point.
 	 */
-	
-		@Test
-//	@Ignore // found this with "ignore" on 19/jan/2014. ??? kai
+
+	@Test
 	public void testGridBasedAccessibilityMeasure(){
 
 		//create local temp directory
@@ -76,7 +71,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		//create test network with 9 nodes and 8 links and write it into the temp directory
 		Network net = CreateTestNetwork.createTestNetwork();
 		new NetworkWriter(net).write(path+"network.xml");
-		
+
 		//create matsim config file and write it into the temp director<
 		String configLocation = new CreateTestM4UConfig(path, path+"network.xml").generateConfigV3();
 
@@ -97,11 +92,10 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
 		ctrl.setOverwriteFiles(true);
-		
+
 		//pt not used in this test
 		PtMatrix ptMatrix = null;
-		
-		Benchmark benchmark = new Benchmark() ;
+
 
 		{
 			//create a bounding box with 9 measuring points (one for each node)
@@ -134,7 +128,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 			ctrl.addControlerListener(listener);
 		}
 		ctrl.run();
-	
+
 		//test case: verify that accessibility of measuring point 7 (200,100) is higher than all other's
 		for(int i=0;i<4;i++){
 			for(int j=0;j<accessibilities.length;j++){
@@ -142,7 +136,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 			}
 		}
 	}
-	
+
 	/**
 	 * This method tests the zone based accessibility computation.
 	 * The test scenario contains a small network with 9 nodes at (0,0),(100,0),(200,0),(0,100),(100,100),(200,100),(0,200),(100,200),(200,200)
@@ -152,16 +146,15 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 * The test result should be that the accessibility of the work zone is higher than the accessibility of the home zone.
 	 */
 	@Test
-//	@Ignore // found this with "ignore" on 19/jan/2014. ??? kai
 	public void testZoneBasedAccessibilityMeasure(){
-		
+
 		//create local temp directory
 		String path = utils.getOutputDirectory();
 
 		//create test network with 9 nodes and 8 links and write it into the temp directory
 		Network net = CreateTestNetwork.createTestNetwork();
 		new NetworkWriter(net).write(path+"network.xml");
-		
+
 		//create matsim config file and write it into the temp director<
 		CreateTestM4UConfig ctmc = new CreateTestM4UConfig(path, path+"network.xml");
 		String configLocation = ctmc.generateConfigV3();
@@ -183,65 +176,59 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
 		ctrl.setOverwriteFiles(true);
-			
+
 		//create a bounding box with 9 measuring points (one for each node)
 		BoundingBox bbox = new BoundingBox();
 		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
-				
+
 		double minX = boundary[0]-resolution/2;
 		double minY = boundary[1]-resolution/2;
 		double maxX = boundary[2]+resolution/2;
 		double maxY = boundary[3]+resolution/2;
-				
+
 		bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
-				
+
 		//initialize opportunities for accessibility computation
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
 		opportunities.createAndAddFacility(new IdImpl("opp"), new CoordImpl(200, 100));
-		
+
 		ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
-			
-		//pt not used in this test
-		PtMatrix ptMatrix = null;
 
 		//initialize new zone based accessibility controler listener and grids for the modes we want to analyze here
 		ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, opportunities,
-				ptMatrix, path, scenario);
+				path, scenario);
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			listener.setComputingAccessibilityForMode(mode, true);
 		}
 		listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
 		// don't know why this is not activated as a test. kai, feb'14
-		
+
 		listener.addZoneDataExchangeListener(this);
-		
+
 		//add grid based accessibility controler listener to the controler and run the simulation
 		ctrl.addControlerListener(listener);
 		ctrl.run();
-		
+
 		//test case: verify that accessibility of work zone (200,100) is higher than the home zone's (0,100)
-		if(this.endReached()){
-			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-				final Double accHZ = accessibilitiesHomeZone.get(mode);
-				final Double accWZ = accessibilitiesWorkZone.get(mode);
-				if ( accHZ != null && accWZ!=null ) {
-					Assert.assertTrue (accHZ < accWZ ) ;
-				}
+
+		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+			final Double accHZ = accessibilitiesHomeZone.get(mode);
+			final Double accWZ = accessibilitiesWorkZone.get(mode);
+			if ( accHZ != null && accWZ!=null ) {
+				Assert.assertTrue (accHZ < accWZ ) ;
 			}
-//			for(int i=0;i<accessibilitiesHomeZone.size();i++){
-//				Assert.assertTrue(accessibilitiesHomeZone.get(i)<accessibilitiesWorkZone.get(i));
-//			}
 		}
-				
+
+
 	}
 
 	@Override
 	public void getAndProcessSpatialGrids( Map<Modes4Accessibility,SpatialGrid> spatialGrids ) {
-		
+
 		if(accessibilities==null)
 			//initialize accessibilities-array with place for 9 measuring points and 4 modes
 			accessibilities = new double[9][4];
-		
+
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( mode != Modes4Accessibility.pt ) {
 				final SpatialGrid spatialGrid = spatialGrids.get(mode);
@@ -250,23 +237,13 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 				}
 			}
 		}
-		
-//		//get accessibilities from the grids
-//		if(freeSpeedGrid != null)
-//			getAccessibilities(freeSpeedGrid,0);
-//		if(carGrid != null)
-//			getAccessibilities(carGrid,1);
-//		if(bikeGrid != null)
-//			getAccessibilities(bikeGrid,2);
-//		if(walkGrid != null)
-//			getAccessibilities(walkGrid,3);
-		
+
 	}
 
 	private void getAccessibilities(SpatialGrid grid,int index) {
-		
+
 		int i=0;
-		
+
 		//store the accessibility of measuring point n in the array at position (n,mode)
 		for(double x=grid.getXmin()+resolution/2;x<=grid.getXmax()-resolution/2;x+=grid.getResolution()){
 			for(double y=grid.getYmin()+resolution/2;y<=grid.getYmax()-resolution/2;y+=grid.getResolution()){
@@ -274,11 +251,10 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 				i++;
 			}
 		}
-		
+
 	}
 
 	@Override
-	@Ignore
 	public void getZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities1 ) {
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
@@ -288,14 +264,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		if(measurePoint.getCoord().equals(new CoordImpl(200,100))){
 			accessibilitiesWorkZone = accessibilities1 ;
 		}
-		
-	}
-	
-	@Override
-	public boolean endReached(){
-		if(this.accessibilitiesHomeZone!=null&&this.accessibilitiesWorkZone!=null)
-			return true;
-		return false;
+
 	}
 
 }
