@@ -210,9 +210,11 @@ public class PtMatrixTest extends MatsimTestCase{
 		String distancesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel distances fitting into the dummy network
 		
 		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
-		module.setPtStopsInputFile(stopsLocation);								// this is to be compatible with real code
-		module.setPtTravelTimesInputFile(timesLocation);						// this is to be compatible with real code
-		module.setPtTravelDistancesInputFile(distancesLocation);				// this is to be compatible with real code
+		module.setUsingPtStops(true);
+		module.setUsingTravelTimesAndDistances(true);
+		module.setPtStopsInputFile(stopsLocation);								
+		module.setPtTravelTimesInputFile(timesLocation);						
+		module.setPtTravelDistancesInputFile(distancesLocation);				
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
 		BoundingBox nbb = new BoundingBox();

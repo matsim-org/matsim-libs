@@ -66,10 +66,8 @@ public class MatrixBasedPtRouterIntegrationTest {
 		
 		String path = utils.getOutputDirectory();
 		
-		//create a new config file and add a config group for pseudo pt
-		Config config = ConfigUtils.createConfig() ;
-		config.addModule( new MatrixBasedPtRouterConfigGroup() ) ;
-
+	
+		
 		//a dummy network is created and written into the output directory
 		Network network = CreateTestNetwork.createTestNetwork();
 		new NetworkWriter(network).write(path+"network.xml");
@@ -84,12 +82,19 @@ public class MatrixBasedPtRouterIntegrationTest {
 		String distancesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();
 
 		//add stops, travel times and travel distances file to the pseudo pt config group
-		final MatrixBasedPtRouterConfigGroup matrixBasedPtRouterConfigGroup 
-			= (MatrixBasedPtRouterConfigGroup)config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		final MatrixBasedPtRouterConfigGroup matrixBasedPtRouterConfigGroup = new MatrixBasedPtRouterConfigGroup();
+		matrixBasedPtRouterConfigGroup.setUsingPtStops(true);
+		matrixBasedPtRouterConfigGroup.setUsingTravelTimesAndDistances(true);
 		matrixBasedPtRouterConfigGroup.setPtStopsInputFile(stopsLocation);
 		matrixBasedPtRouterConfigGroup.setPtTravelTimesInputFile(timesLocation);
 		matrixBasedPtRouterConfigGroup.setPtTravelDistancesInputFile(distancesLocation);
 
+		//create a new config file and add a config group for pseudo pt
+		Config config = ConfigUtils.createConfig() ;
+		config.addModule(matrixBasedPtRouterConfigGroup) ;
+
+
+		
 		//modification of the config according to what's needed
 		config.controler().setMobsim("qsim");
 		config.controler().setFirstIteration(0);
