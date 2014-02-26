@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.listeners.*;
 
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.TaxiUtils;
+import playground.michalm.taxi.util.TaxiUtils;
 
 
 public class IdleVehicleUnplannedRequestStats

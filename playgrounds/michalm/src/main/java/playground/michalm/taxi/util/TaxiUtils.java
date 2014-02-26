@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.util;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -76,5 +76,11 @@ public class TaxiUtils
         else {
             throw new IllegalStateException();
         }
+    }
+
+
+    public static int countIdleVehicles(Iterable<Vehicle> vehicles)
+    {
+        return Iterables.size(Iterables.filter(vehicles, IS_IDLE_PREDICATE));
     }
 }

@@ -17,20 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.fifo;
+package playground.michalm.taxi.optimizer;
 
-public class TaxiSchedulerParams
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+
+import playground.michalm.taxi.data.*;
+import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.util.*;
+
+
+public class TaxiOptimizationValidation
 {
-    public final boolean destinationKnown;
-    public final double pickupDuration;
-    public final double dropoffDuration;
-
-
-    public TaxiSchedulerParams(boolean destinationKnown, double pickupDuration,
-            double dropoffDuration)
+    public static void assertNoUnplannedRequestsWhenIdleVehicles(MatsimVrpContext context)
     {
-        this.destinationKnown = destinationKnown;
-        this.pickupDuration = pickupDuration;
-        this.dropoffDuration = dropoffDuration;
+        TaxiData taxiData = (TaxiData)context.getVrpData();
+
+        if (TaxiUtils.countIdleVehicles(taxiData.getVehicles()) == 0) {
+            return;//OK
+        }
+
+        if (RequestUtils.countRequestsWithStatus(taxiData.getTaxiRequests(),
+                TaxiRequestStatus.UNPLANNED) == 0) {
+            return; //OK
+        }
+
+        //idle vehicles and unplanned requests
+        throw new IllegalStateException();
     }
 }

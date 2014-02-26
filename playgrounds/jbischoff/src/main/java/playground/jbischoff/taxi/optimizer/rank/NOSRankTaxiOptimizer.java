@@ -33,7 +33,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
+import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 

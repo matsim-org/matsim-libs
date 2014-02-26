@@ -17,35 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
-
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Vehicle;
+package playground.michalm.taxi.util;
 
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 
-public class TaxiScheduleValidator
+public class RequestUtils
 {
-    public static void assertNotIdleVehiclesAndUnplannedRequests(MatsimVrpContext context)
+    public static int countRequestsWithStatus(Iterable<TaxiRequest> requests,
+            TaxiRequestStatus status)
     {
-        int unplannedRequests = 0;
-        for (TaxiRequest req : ((TaxiData)context.getVrpData()).getTaxiRequests()) {
-            if (req.getStatus() == TaxiRequestStatus.UNPLANNED) {
-                unplannedRequests++;
+        int count = 0;
+        for (TaxiRequest req : requests) {
+            if (req.getStatus() == status) {
+                count++;
             }
         }
-
-        int idleTaxis = 0;
-        for (Vehicle veh : context.getVrpData().getVehicles()) {
-            if (TaxiUtils.isIdle(veh)) {
-                idleTaxis++;
-            }
-        }
-
-        if (idleTaxis > 0 && unplannedRequests > 0) {
-            throw new IllegalStateException();
-        }
+        return count;
     }
 }

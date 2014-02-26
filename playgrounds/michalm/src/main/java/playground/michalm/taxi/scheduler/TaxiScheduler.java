@@ -33,7 +33,6 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.fifo.TaxiSchedulerParams;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;

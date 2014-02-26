@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
+import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.*;
 
 

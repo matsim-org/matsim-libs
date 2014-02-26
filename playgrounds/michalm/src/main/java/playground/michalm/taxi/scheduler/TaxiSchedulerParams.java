@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,50 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data;
+package playground.michalm.taxi.scheduler;
 
-import java.util.*;
-
-import org.matsim.contrib.dvrp.data.VrpDataImpl;
-import org.matsim.contrib.dvrp.extensions.electric.*;
-
-
-public class TaxiData
-    extends VrpDataImpl
-    implements ElectricVrpData
+public class TaxiSchedulerParams
 {
-    private final List<TaxiRank> taxiRanks = new ArrayList<TaxiRank>();
-    private final List<Charger> chargers = new ArrayList<Charger>();
+    public final boolean destinationKnown;
+    public final double pickupDuration;
+    public final double dropoffDuration;
 
 
-    public List<TaxiRank> getTaxiRanks()
+    public TaxiSchedulerParams(boolean destinationKnown, double pickupDuration,
+            double dropoffDuration)
     {
-        return taxiRanks;
-    }
-
-
-    public List<Charger> getChargers()
-    {
-        return chargers;
-    }
-
-
-    public List<ElectricVehicle> getElectricVehicles()
-    {
-        return convertList(getVehicles());
-    }
-
-
-    public List<TaxiRequest> getTaxiRequests()
-    {
-        return convertList(getRequests());
-    }
-
-
-    //casts List of supertype S to List of type T
-    @SuppressWarnings("unchecked")
-    private static <S, T> List<T> convertList(List<S> list)
-    {
-        return (List<T>)list;
+        this.destinationKnown = destinationKnown;
+        this.pickupDuration = pickupDuration;
+        this.dropoffDuration = dropoffDuration;
     }
 }

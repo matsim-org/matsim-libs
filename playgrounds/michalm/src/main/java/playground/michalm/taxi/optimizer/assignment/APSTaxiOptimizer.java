@@ -33,6 +33,7 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+import playground.michalm.taxi.util.TaxiUtils;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
