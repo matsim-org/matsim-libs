@@ -19,13 +19,8 @@
 
 package playground.vsp.analysis.modules;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -38,8 +33,6 @@ import org.matsim.core.events.handler.EventHandler;
 public abstract class AbstractAnalyisModule {
 	
 	private final String name;
-	protected LinkedList<String> ptModes = null;
-	protected HashMap<Id,String> lineIds2ptModeMap;
 	
 	/**
 	 * 
@@ -55,26 +48,6 @@ public abstract class AbstractAnalyisModule {
 	 */
 	public String getName() {
 		return this.name;
-	}
-	
-	/**
-	 * 
-	 * @param lineIds2ptModeMap Is called at the beginning of each iteration. Contains on public transport mode for each line in the schedule. 
-	 */
-	public void setLineId2ptModeMap(HashMap<Id, String> lineIds2ptModeMap) {
-		this.lineIds2ptModeMap = lineIds2ptModeMap;
-		
-		if (this.ptModes == null) {
-			Set<String> ptModesSet = new TreeSet<String>();
-			for (String ptMode : this.lineIds2ptModeMap.values()) {
-				ptModesSet.add(ptMode);
-			}
-			this.ptModes = new LinkedList<String>();
-			
-			for (String ptMode : ptModesSet) {
-				this.ptModes.add(ptMode);
-			}
-		}
 	}
 	
 	/**
