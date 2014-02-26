@@ -65,10 +65,10 @@ public class SiouxFallsControler {
 		Controler controler = new Controler(config);
 
 		//===emission files
-		config.vspExperimental().setAverageColdEmissionFactorsFile("./input/emissionFiles/averageColdEmissionFactorsFile.txt");
-		config.vspExperimental().setAverageWarmEmissionFactorsFile("./input/emissionFiles/averageWarmEmissionFactorsFile.txt");
-		config.vspExperimental().setEmissionRoadTypeMappingFile("./input/emissionFiles/roadTypeMapping.txt");
-		config.vspExperimental().setEmissionVehicleFile("./input/emissionFiles/emissionVehicles.xml");
+		config.vspExperimental().setAverageColdEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
+		config.vspExperimental().setAverageWarmEmissionFactorsFile("../../matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
+		config.vspExperimental().setEmissionRoadTypeMappingFile("../../siouxFalls/input/SiouxFalls_roadTypeMapping.txt");
+		config.vspExperimental().setEmissionVehicleFile("../../siouxFalls/input/SiouxFalls_emissionVehicles.xml");
 		config.vspExperimental().setUsingDetailedEmissionCalculation(false);
 		//===only emission events genertaion; used with all runs for comparisons
 		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
