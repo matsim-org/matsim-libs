@@ -119,10 +119,10 @@ public class GautengControler_subpopulations {
 		/* Config must be passed as an argument, everything else is optional. */
 		final String configFilename = args[0];
 		Config config = ConfigUtils.createConfig();
-		if ( configFilename != null ) {
-			ConfigUtils.loadConfig(config, configFilename);
-		}
 
+		// ### I moved loadConfig down quite a lot so that we can overwrite config options on the server without having to build a new jar every time. kai
+		
+		
 		/* Required argument:
 		 * [0] - Config file;
 		 * 
@@ -206,6 +206,11 @@ public class GautengControler_subpopulations {
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
 		config.vspExperimental().setWritingOutputEvents(true);
+
+		// ### moved this down quite a lot so that we can overwrite config options on the server without having to build a new jar every time. kai
+		if ( configFilename != null ) {
+			ConfigUtils.loadConfig(config, configFilename);
+		}
 
 		config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() );
 		config.checkConsistency();

@@ -61,7 +61,7 @@ public class ConfigReaderMatsimV1 extends MatsimXmlParser implements MatsimSomeR
 		} else if (MODULE.equals(name)) {
 			startModule(atts);
 		} else if (INCLUDE.equals(name)) {
-			log.warn("<incude> is currently not supported.");
+			log.warn("<include> is currently not supported.");
 		}
 	}
 

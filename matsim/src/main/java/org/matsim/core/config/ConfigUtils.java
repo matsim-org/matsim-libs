@@ -51,6 +51,16 @@ public abstract class ConfigUtils {
 		return config;
 	}
 
+	/**
+	 * This does (hopefully) overwrite config settings if they are defined in the file.  So you can do
+	 * <pre>
+	 * Config config = ConfigUtils.createConfig() ;
+	 * config.xxx().setYyy() ; // set some defaults for your application.
+	 * ConfigUtils.loadConfig( config, filename ) ; // read user-defined options
+	 * config.aaa().bbb() ; // set config options which you don't want the user to potentially overwrite.
+	 * ...
+	 * </pre>  
+	 */
 	public static void loadConfig(final Config config, final String filename) throws UncheckedIOException {
 		if (config.global() == null) {
 			config.addCoreModules();

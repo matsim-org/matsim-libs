@@ -134,7 +134,7 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	/**
 	 * Parses the specified file. The file can be gzip-compressed and is decompressed on-the-fly while parsing. A gzip-compressed
 	 * file must have the ending ".gz" to be correctly recognized. The passed filename may or may not contain the ending ".gz". If
-	 * no uncompressed file is found with the specified name, the ending ".gz" will be added  ot the filename and a compressed file
+	 * no uncompressed file is found with the specified name, the ending ".gz" will be added to the filename and a compressed file
 	 * will be searched for and read if found.
 	 *
 	 * @param filename The filename of the file to read, optionally ending with ".gz" to force reading a gzip-compressed file.
