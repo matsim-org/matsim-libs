@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.contoler;
+package playground.agarwalamit.siouxFalls.controler;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -25,6 +25,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
+import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
@@ -40,9 +42,9 @@ public class SiouxFallsControler {
 
 	public static void main(String[] args) {
 
-		boolean internalizeEmission = false; //run0 false, false false; run1 true, false false; run2 false,true, false; run 3 false, false true
-		boolean internalizeCongestion = false;
-		boolean both = false;
+		boolean internalizeEmission = Boolean.valueOf(args [0]); //run0 false, false false; run1 true, false false; run2 false,true, false; run 3 false, false true
+		boolean internalizeCongestion = Boolean.valueOf(args [1]);
+		boolean both = Boolean.valueOf(args [2]);
 
 		String configFile = "../../input/SiouxFalls_config.xml";
 
@@ -51,7 +53,7 @@ public class SiouxFallsControler {
 		String emissionCostFactor = "1.0";
 
 		Config config = ConfigUtils.loadConfig(configFile);
-		config.controler().setOutputDirectory("../../output/run0/");
+		config.controler().setOutputDirectory(args[3]);
 
 		//===vsp defaults
 //		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
@@ -92,13 +94,13 @@ public class SiouxFallsControler {
 			controler.addControlerListener(new MarginalCostPricing((ScenarioImpl) controler.getScenario(), tollHandler ));
 		}
 		
-//		if(both) {
-//			TollHandler tollHandler = new TollHandler(controler.getScenario());
-//			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-//			EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, tollHandler);
-//			controler.setTravelDisutilityFactory(emissionCongestionTravelDisutilityCalculatorFactory);
-//			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionModule, emissionCostModule, (ScenarioImpl) controler.getScenario(), tollHandler));
-//		}
+		if(both) {
+			TollHandler tollHandler = new TollHandler(controler.getScenario());
+			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
+			EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, tollHandler);
+			controler.setTravelDisutilityFactory(emissionCongestionTravelDisutilityCalculatorFactory);
+			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionModule, emissionCostModule, (ScenarioImpl) controler.getScenario(), tollHandler));
+		}
 
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
