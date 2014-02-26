@@ -46,14 +46,14 @@ public class SiouxFallsControler {
 		boolean internalizeCongestion = Boolean.valueOf(args [1]);
 		boolean both = Boolean.valueOf(args [2]);
 
-		String configFile = "../../input/SiouxFalls_config.xml";
+		String configFile = args[3];
 
 		String emissionEfficiencyFactor ="1.0";
 		String considerCO2Costs = "true";
 		String emissionCostFactor = "1.0";
 
 		Config config = ConfigUtils.loadConfig(configFile);
-		config.controler().setOutputDirectory(args[3]);
+		config.controler().setOutputDirectory(args[4]);
 
 		//===vsp defaults
 //		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
