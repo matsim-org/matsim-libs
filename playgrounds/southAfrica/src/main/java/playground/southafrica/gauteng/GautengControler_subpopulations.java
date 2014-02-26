@@ -195,7 +195,7 @@ public class GautengControler_subpopulations {
 		config.controler().setWriteSnapshotsInterval(0);
 		
 		if ( user==User.kai ) {
-			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
+//			config.parallelEventHandling().setNumberOfThreads(1); // even "1" is slowing down my laptop quite a lot
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
@@ -217,9 +217,9 @@ public class GautengControler_subpopulations {
 		// (there will eventually be something like sc.createVehiclesContainer or ((ScenarioImpl)sc).createVehiclesContainer which will
 		// address this problem. kai, feb'14)
 		
-		if ( user==User.kai ) {
-			simplifyPopulation(sc) ;
-		}
+//		if ( user==User.kai ) {
+//			simplifyPopulation(sc) ;
+//		}
 
 		/* CREATE VEHICLES. */
 		createVehiclePerPerson(sc);
@@ -366,6 +366,7 @@ public class GautengControler_subpopulations {
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 		nsimply.setMergeLinkStats(false); //default = false
 		nsimply.run(network);
+		// yy this might combine freeway links, meaning they would not charge toll any more afterwards
 
 		final long numberOfLinksAfter = network.getLinks().size() ;
 
