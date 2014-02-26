@@ -234,7 +234,7 @@ import playground.michalm.util.RunningVehicleRegister;
         ImmediateRequestParams params = new ImmediateRequestParams(destinationKnown,
                 minimizePickupTripTime, pickupDuration, dropoffDuration);
 
-        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(context,
+        TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(context,
                 pathCalculator, params);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);

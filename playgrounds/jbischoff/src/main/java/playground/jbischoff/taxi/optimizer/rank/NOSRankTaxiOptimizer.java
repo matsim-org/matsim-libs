@@ -72,7 +72,7 @@ public class NOSRankTaxiOptimizer
     private NOSRankTaxiOptimizer(OptimizerConfiguration optimConfig,
             IdleRankVehicleFinder vehicleFinder)
     {
-        super(optimConfig, vehicleFinder, false);
+        super(optimConfig, vehicleFinder, null, false);
         this.optimConfig = optimConfig;
         this.idleVehicleFinder = vehicleFinder;
         this.shortTimeIdlers = new ArrayList<Id>();

@@ -17,14 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.query;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.michalm.taxi.model.TaxiRequest;
 
 
-public interface VehicleFinder
+public interface RequestFinder
 {
-    public Vehicle findBestVehicleForRequest(Iterable<Vehicle> vehicles, TaxiRequest req);
+    public TaxiRequest findRequestForVehicle(Iterable<TaxiRequest> requests, Vehicle vehicle);
 }

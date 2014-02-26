@@ -17,70 +17,56 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.query;
+
+import java.util.Collections;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
-import org.matsim.contrib.dvrp.util.*;
+import org.matsim.contrib.dvrp.util.DistanceUtils;
 
 import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.optimizer.immediaterequest.TaxiScheduler;
 
 
-public class StraightLineNearestVehicleRequestFinder
-    implements VehicleFinder
+public class StraightLineNearestVehicleFinder
+    implements VehicleFinder, VehicleFilter
 {
     private final TaxiScheduler scheduler;
 
 
-    public StraightLineNearestVehicleRequestFinder(TaxiScheduler scheduler)
+    public StraightLineNearestVehicleFinder(TaxiScheduler scheduler)
     {
         this.scheduler = scheduler;
     }
 
 
     @Override
-    public Vehicle findBestVehicleForRequest(Iterable<Vehicle> vehicles, TaxiRequest req)
+    public Vehicle findVehicleForRequest(Iterable<Vehicle> vehicles, TaxiRequest req)
     {
+        Link toLink = req.getFromLink();
         Vehicle bestVeh = null;
-        double bestCost = Double.MAX_VALUE;
+        double bestSquaredDistance = Double.MAX_VALUE;
 
         for (Vehicle veh : vehicles) {
-            LinkTimePair departure = scheduler.getEarliestIdleness(veh);
-            Link fromLink = departure.link;
-            Link toLink = req.getFromLink();
+            Link fromLink = scheduler.getEarliestIdleness(veh).link;
 
-            double cost = DistanceUtils.calculateSquareDistance(fromLink, toLink);
+            double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
 
-            if (cost < bestCost) {
+            if (squaredDistance < bestSquaredDistance) {
                 bestVeh = veh;
-                bestCost = cost;
+                bestSquaredDistance = squaredDistance;
             }
         }
 
         return bestVeh;
     }
-    
-    
-    public Vehicle findBestRequestForVehicle(Iterable<Vehicle> vehicles, TaxiRequest req)
+
+
+    @Override
+    public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
+            TaxiRequest request)
     {
-        Vehicle bestVeh = null;
-        double bestCost = Double.MAX_VALUE;
-
-        for (Vehicle veh : vehicles) {
-            LinkTimePair departure = scheduler.getEarliestIdleness(veh);
-            Link fromLink = departure.link;
-            Link toLink = req.getFromLink();
-
-            double cost = DistanceUtils.calculateSquareDistance(fromLink, toLink);
-
-            if (cost < bestCost) {
-                bestVeh = veh;
-                bestCost = cost;
-            }
-        }
-
-        return bestVeh;
+        return Collections.singletonList(findVehicleForRequest(vehicles, request));
     }
 }

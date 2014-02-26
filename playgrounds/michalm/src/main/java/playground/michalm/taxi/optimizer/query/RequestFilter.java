@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.query;
 
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.contrib.dvrp.data.Vehicle;
+
+import playground.michalm.taxi.model.TaxiRequest;
 
 
-/**
- * @author michalm
- */
-public interface ImmediateRequestTaxiOptimizer
-    extends VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
+public interface RequestFilter
 {
-    OptimizerConfiguration getOptimizerConfiguration();
+    RequestFilter NO_FILTER = new RequestFilter() {
+        public Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
+                Vehicle vehicle)
+        {
+            return requests;
+        }
+    };
+
+
+    Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests, Vehicle vehicle);
 }

@@ -29,7 +29,8 @@ import org.matsim.contrib.dvrp.util.*;
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
-import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.optimizer.immediaterequest.TaxiScheduler;
+import playground.michalm.taxi.optimizer.query.*;
 /**
  * 
  * 
@@ -39,7 +40,7 @@ import playground.michalm.taxi.optimizer.immediaterequest.*;
  */
 
 public class IdleRankVehicleFinder
-    implements VehicleFinder
+    implements VehicleFinder, VehicleFilter
 {
     private final MatsimVrpContext context;
     private final TaxiScheduler scheduler;
@@ -78,19 +79,24 @@ public class IdleRankVehicleFinder
     
     
 	@Override
-    public Vehicle findBestVehicleForRequest(Iterable<Vehicle> vehicles, TaxiRequest req)
+    public Vehicle findVehicleForRequest(Iterable<Vehicle> vehicles, TaxiRequest request)
     {
-    	
     	if(this.useChargeOverTime) {
     		
-//    		return findHighestChargedIdleVehicleDistanceSort(req);
-    		return findBestChargedVehicle(req);
-//    		return findHighestChargedIdleVehicle(req);
+//    		return findHighestChargedIdleVehicleDistanceSort(request);
+    		return findBestChargedVehicle(request);
+//    		return findHighestChargedIdleVehicle(request);
     	
     	}
-    	else return findClosestFIFOVehicle(req);
-    	
+    	else return findClosestFIFOVehicle(request);
     }
+	
+	@Override
+	public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
+	        TaxiRequest request)
+	{
+	    return Collections.singleton(findVehicleForRequest(vehicles, request));
+	}
       
     
     private Vehicle findBestChargedVehicle(TaxiRequest req){
@@ -102,7 +108,7 @@ public class IdleRankVehicleFinder
              	if (this.IsElectric)
              		if (!this.hasEnoughCapacityForTask(veh)) continue;
              	
-                 double distance = calculateDistance(req, veh);
+                 double distance = calculateSquaredDistance(req, veh);
                  
                  if (distance < bestDistance) {	
                      bestDistance = distance;
@@ -161,7 +167,7 @@ public class IdleRankVehicleFinder
      		bestVeh= veh;
      		continue;           		
      		}
-      		if (this.calculateDistance(req, veh)<this.calculateDistance(req, bestVeh)){
+      		if (this.calculateSquaredDistance(req, veh)<this.calculateSquaredDistance(req, bestVeh)){
       			bestVeh = veh;
       		}
       	  }
@@ -180,7 +186,7 @@ public class IdleRankVehicleFinder
           for (Vehicle veh : TaxiUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
           	if (this.IsElectric)
           		if (!this.hasEnoughCapacityForTask(veh)) continue;
-              double distance = calculateDistance(req, veh);
+              double distance = calculateSquaredDistance(req, veh);
               
               if (distance < bestDistance) {	
                   bestDistance = distance;
@@ -203,12 +209,12 @@ public class IdleRankVehicleFinder
     }
     
     
-    private double calculateDistance(TaxiRequest req, Vehicle veh)
+    private double calculateSquaredDistance(TaxiRequest req, Vehicle veh)
     {
         LinkTimePair departure = scheduler.getEarliestIdleness(veh);
         Link fromLink = departure.link;
         Link toLink = req.getFromLink();
 
-        return DistanceUtils.calculateSquareDistance(fromLink, toLink);
+        return DistanceUtils.calculateSquaredDistance(fromLink, toLink);
     }
 }

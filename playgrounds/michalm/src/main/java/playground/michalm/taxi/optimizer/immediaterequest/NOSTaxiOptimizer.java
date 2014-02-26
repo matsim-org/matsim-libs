@@ -27,16 +27,20 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.optimizer.TaxiOptimizer;
+import playground.michalm.taxi.optimizer.query.*;
 import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.vehreqpath.*;
 
 
 public class NOSTaxiOptimizer
-    implements ImmediateRequestTaxiOptimizer
+    implements TaxiOptimizer
 {
     private final OptimizerConfiguration optimConfig;
 
-    private final VehicleFinder idleVehicleFinder;
+    private final VehicleFilter vehicleFilter;
+    private final RequestFilter requestFilter;
+
     private final boolean seekDemandSupplyEquilibrium;
 
     private final Queue<TaxiRequest> unplannedRequests;
@@ -45,12 +49,14 @@ public class NOSTaxiOptimizer
     private boolean requiresReoptimization = false;
 
 
-    public NOSTaxiOptimizer(OptimizerConfiguration optimConfig, VehicleFinder idleVehicleFinder,
-            boolean seekDemandSupplyEquilibrium)
+    public NOSTaxiOptimizer(OptimizerConfiguration optimConfig, VehicleFilter vehicleFilter,
+            RequestFilter requestFilter, boolean seekDemandSupplyEquilibrium)
     {
         this.optimConfig = optimConfig;
 
-        this.idleVehicleFinder = idleVehicleFinder;
+        this.vehicleFilter = vehicleFilter != null ? vehicleFilter : VehicleFilter.NO_FILTER;
+        this.requestFilter = requestFilter != null ? requestFilter : RequestFilter.NO_FILTER;
+
         this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
 
         int vehCount = optimConfig.context.getVrpData().getVehicles().size();
@@ -70,48 +76,46 @@ public class NOSTaxiOptimizer
 
     //==============================
 
-    /**
-     * Try to schedule all unplanned tasks (if any)
-     */
     protected void scheduleUnplannedRequests()
     {
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
+            Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,
+                    req);
 
-            Vehicle veh = idleVehicleFinder.findBestVehicleForRequest(idleVehicles, req);
+            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
+                    filteredVehs, VehicleRequestPaths.TW_COMPARATOR);
 
-            if (veh == null) {
-                return;
+            if (best == null) {
+                return;//no idle vehicles
             }
-
-            VehicleRequestPath best = new VehicleRequestPath(veh, req,
-                    optimConfig.vrpFinder.calculateVrpPath(veh, req));
 
             optimConfig.scheduler.scheduleRequest(best);
             unplannedRequests.poll();
-            idleVehicles.remove(veh);
+            idleVehicles.remove(best.vehicle);
         }
     }
 
 
     //==============================
 
-    //TODO straight-line distance not supported
     private void scheduleIdleVehicles()
     {
         while (!idleVehicles.isEmpty()) {
             Vehicle veh = idleVehicles.peek();
+            Iterable<TaxiRequest> filteredReqs = requestFilter.filterRequestsForVehicle(
+                    unplannedRequests, veh);
 
             VehicleRequestPath best = optimConfig.vrpFinder.findBestRequestForVehicle(veh,
-                    unplannedRequests, VehicleRequestPaths.TP_COMPARATOR);
+                    filteredReqs, VehicleRequestPaths.TP_COMPARATOR);
 
             if (best == null) {
                 return;//no unplanned requests
             }
 
             optimConfig.scheduler.scheduleRequest(best);
+            idleVehicles.poll();
             unplannedRequests.remove(best.request);
-            idleVehicles.remove(veh);
         }
     }
 

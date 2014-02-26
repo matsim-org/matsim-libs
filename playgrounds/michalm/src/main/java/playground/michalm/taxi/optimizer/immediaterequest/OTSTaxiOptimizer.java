@@ -26,13 +26,14 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.optimizer.TaxiOptimizer;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.vehreqpath.*;
 
 
 public class OTSTaxiOptimizer
-    implements ImmediateRequestTaxiOptimizer
+    implements TaxiOptimizer
 {
     /*package*/final OptimizerConfiguration optimConfig;
 

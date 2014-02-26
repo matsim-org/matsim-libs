@@ -6,13 +6,25 @@ import org.matsim.api.core.v01.network.Link;
 
 public class DistanceUtils
 {
-    public static double calculateSquareDistance(Link fromLink, Link toLink)
+    public static double calculateDistance(Link fromLink, Link toLink)
     {
-        return calculateSquareDistance(fromLink.getCoord(), toLink.getCoord());
+        return calculateDistance(fromLink.getCoord(), toLink.getCoord());
     }
 
 
-    public static double calculateSquareDistance(Coord fromCoord, Coord toCoord)
+    public static double calculateSquaredDistance(Link fromLink, Link toLink)
+    {
+        return calculateSquaredDistance(fromLink.getCoord(), toLink.getCoord());
+    }
+
+
+    public static double calculateDistance(Coord fromCoord, Coord toCoord)
+    {
+        return Math.sqrt(calculateSquaredDistance(fromCoord, toCoord));
+    }
+
+
+    public static double calculateSquaredDistance(Coord fromCoord, Coord toCoord)
     {
         double deltaX = toCoord.getX() - fromCoord.getX();
         double deltaY = toCoord.getY() - fromCoord.getY();
