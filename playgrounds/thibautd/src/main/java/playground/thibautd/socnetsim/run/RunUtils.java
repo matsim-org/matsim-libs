@@ -572,47 +572,14 @@ public class RunUtils {
 
 		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
 					config.getModule( PseudoSimConfigGroup.GROUP_NAME );
-		final GroupReplanningConfigGroup groupReplanningConf = (GroupReplanningConfigGroup)
-					config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
-		if ( !pSimConf.isIsUsePSimAtAll() ) {
-			final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
-			final AnnealingCoalitionExpBetaFactory annealingSelectorFactory =
-				new AnnealingCoalitionExpBetaFactory(
-					Double.MIN_VALUE, // TODO pass by config
-					//0.01,
-					config.planCalcScore().getBrainExpBeta(),
-					config.controler().getFirstIteration(),
-					groupReplanningConf.getDisableInnovationAfterIter() );
+		return  pSimConf.isIsUsePSimAtAll() ?
+			initializePSimController( controllerRegistry ) :
+			initializeNonPSimController( controllerRegistry );
+	}
 
-			{
-				final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
-				factories.addSelectorFactory( "AnnealingCoalitionExpBeta" , annealingSelectorFactory );
-				RunUtils.loadStrategyRegistryFromGroupStrategyConfigGroup(
-						factories,
-						strategyRegistry,
-						controllerRegistry );
-			}
-
-			// create strategy manager
-			final GroupStrategyManager strategyManager =
-				new GroupStrategyManager( 
-						strategyRegistry );
-
-			// create controler
-			final ImmutableJointController controller =
-				new ImmutableJointController(
-						controllerRegistry,
-						new GroupReplanningListenner(
-							controllerRegistry,
-							strategyManager));
-			controller.addControlerListener( annealingSelectorFactory );
-
-			strategyManager.setStopWatch( controller.stopwatch );
-
-			return controller;
-		}
-
+	public static ImmutableJointController initializePSimController(
+			final ControllerRegistry controllerRegistry) {
 		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
 
 		final GroupStrategyRegistry mainStrategyRegistry = new GroupStrategyRegistry();
@@ -650,6 +617,50 @@ public class RunUtils {
 
 		listenner.setStopWatch( controller.stopwatch );
 		listenner.setOutputDirectoryHierarchy( controller.getControlerIO() );
+
+		return controller;
+	}
+
+	public static ImmutableJointController initializeNonPSimController(
+			final ControllerRegistry controllerRegistry) {
+		final Config config = controllerRegistry.getScenario().getConfig();
+
+		final GroupReplanningConfigGroup groupReplanningConf = (GroupReplanningConfigGroup)
+					config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+
+		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
+		final AnnealingCoalitionExpBetaFactory annealingSelectorFactory =
+			new AnnealingCoalitionExpBetaFactory(
+				Double.MIN_VALUE, // TODO pass by config
+				//0.01,
+				config.planCalcScore().getBrainExpBeta(),
+				config.controler().getFirstIteration(),
+				groupReplanningConf.getDisableInnovationAfterIter() );
+
+		{
+			final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
+			factories.addSelectorFactory( "AnnealingCoalitionExpBeta" , annealingSelectorFactory );
+			RunUtils.loadStrategyRegistryFromGroupStrategyConfigGroup(
+					factories,
+					strategyRegistry,
+					controllerRegistry );
+		}
+
+		// create strategy manager
+		final GroupStrategyManager strategyManager =
+			new GroupStrategyManager( 
+					strategyRegistry );
+
+		// create controler
+		final ImmutableJointController controller =
+			new ImmutableJointController(
+					controllerRegistry,
+					new GroupReplanningListenner(
+						controllerRegistry,
+						strategyManager));
+		controller.addControlerListener( annealingSelectorFactory );
+
+		strategyManager.setStopWatch( controller.stopwatch );
 
 		return controller;
 	}
