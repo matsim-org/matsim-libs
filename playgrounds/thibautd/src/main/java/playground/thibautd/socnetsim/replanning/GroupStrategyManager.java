@@ -36,6 +36,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.utils.MapUtils;
 
 /**
  * Implements the group-level replanning logic.
@@ -58,11 +59,16 @@ public class GroupStrategyManager {
 	private final GroupStrategyRegistry registry;
 
 	private final Random random;
+	private final List<Listener> listeners = new ArrayList<Listener>( 1 );
 
 	public GroupStrategyManager(
 			final GroupStrategyRegistry registry ) {
 		this.registry = registry;
 		this.random = MatsimRandom.getLocalInstance();
+	}
+
+	public void addListener(final Listener l) {
+		listeners.add( l );
 	}
 
 	public final void run(
@@ -81,14 +87,9 @@ public class GroupStrategyManager {
 					g );
 
 			final GroupPlanStrategy strategy = registry.chooseStrategy( iteration , random.nextDouble() );
-			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
+			final List<ReplanningGroup> alloc = MapUtils.getList( strategy , strategyAllocations );
 
-			if (alloc == null) {
-				alloc = new ArrayList<ReplanningGroup>();
-				strategyAllocations.put( strategy , alloc );
-			}
-
-			logAlloc( g , strategy );
+			notifyAlloc( g , strategy );
 			alloc.add( g );
 		}
 		if ( stopWatch != null ) stopWatch.endOperation( "remove plans alloc strategy" );
@@ -107,15 +108,16 @@ public class GroupStrategyManager {
 		}
 	}
 
-	private static void logAlloc(
+	private void notifyAlloc(
 			final ReplanningGroup g,
 			final GroupPlanStrategy strategy) {
-		if ( !log.isTraceEnabled() ) return;
-	
-		final List<Id> ids = new ArrayList<Id>();
-		for (Person p : g.getPersons()) ids.add( p.getId() );
+		for ( Listener l : listeners ) l.notifyAlloc( g , strategy );
+	}
 
-		log.trace( "group "+ids+" gets strategy "+strategy );
+	public static interface Listener {
+		public void notifyAlloc(
+				final ReplanningGroup g,
+				final GroupPlanStrategy strategy );
 	}
 }
 
