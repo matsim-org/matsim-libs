@@ -63,7 +63,7 @@ public class ConvertSocialNetworkToLocatedMatsimNetwork {
 		new NetworkWriter( network ).write( outNetwork );
 	}
 
-	private static Map<Id, Coord> parsePopulation(final String populationFile) {
+	public static Map<Id, Coord> parsePopulation(final String populationFile) {
 		final Counter counter = new Counter( "read person # " );
 		final ObjectPool<Coord> coordPool = new ObjectPool<Coord>();
 
