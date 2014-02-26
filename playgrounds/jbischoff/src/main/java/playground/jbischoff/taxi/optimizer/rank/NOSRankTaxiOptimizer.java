@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
-import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
@@ -43,7 +43,7 @@ import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 public class NOSRankTaxiOptimizer
     extends NOSTaxiOptimizer
 {
-    private final OptimizerConfiguration optimConfig;
+    private final TaxiOptimizerConfiguration optimConfig;
     private final IdleRankVehicleFinder idleVehicleFinder;
 
     private boolean idleRankMode;
@@ -62,14 +62,14 @@ public class NOSRankTaxiOptimizer
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator,
                 scheduler);
 
-        OptimizerConfiguration optimConfig = new OptimizerConfiguration(context, params,
+        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context, params,
                 calculator, scheduler, vrpFinder);
 
         return new NOSRankTaxiOptimizer(optimConfig, new IdleRankVehicleFinder(context, scheduler));
     }
 
 
-    private NOSRankTaxiOptimizer(OptimizerConfiguration optimConfig,
+    private NOSRankTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
             IdleRankVehicleFinder vehicleFinder)
     {
         super(optimConfig, vehicleFinder, null, false);

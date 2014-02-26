@@ -17,11 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.fifo;
+
+import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource.STRAIGHT_LINE;
 
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -36,7 +39,7 @@ import playground.michalm.taxi.vehreqpath.*;
 public class NOSTaxiOptimizer
     implements TaxiOptimizer
 {
-    private final OptimizerConfiguration optimConfig;
+    private final TaxiOptimizerConfiguration optimConfig;
 
     private final VehicleFilter vehicleFilter;
     private final RequestFilter requestFilter;
@@ -49,18 +52,45 @@ public class NOSTaxiOptimizer
     private boolean requiresReoptimization = false;
 
 
-    public NOSTaxiOptimizer(OptimizerConfiguration optimConfig, VehicleFilter vehicleFilter,
+    public static NOSTaxiOptimizer createNOS(TaxiOptimizerConfiguration optimConfig,
+            boolean seekDemandSupplyEquilibrium, TravelDisutilitySource tdisSource)
+    {
+        return tdisSource == STRAIGHT_LINE ? //
+                NOSTaxiOptimizer.createNOSWithStraightLineDistance(optimConfig, false) : //
+                NOSTaxiOptimizer.createNOSWithoutStraightLineDistance(optimConfig, false);
+
+    }
+
+
+    public static NOSTaxiOptimizer createNOSWithStraightLineDistance(
+            TaxiOptimizerConfiguration optimConfig, boolean seekDemandSupplyEquilibrium)
+    {
+        VehicleFilter vehFilter = new StraightLineNearestVehicleFinder(optimConfig.scheduler);
+        RequestFilter reqFilter = new StraightLineNearestRequestFinder(optimConfig.scheduler);
+
+        return new NOSTaxiOptimizer(optimConfig, vehFilter, reqFilter, seekDemandSupplyEquilibrium);
+    }
+
+
+    public static NOSTaxiOptimizer createNOSWithoutStraightLineDistance(
+            TaxiOptimizerConfiguration optimConfig, boolean seekDemandSupplyEquilibrium)
+    {
+        VehicleFilter vehFilter = VehicleFilter.NO_FILTER;
+        RequestFilter reqFilter = RequestFilter.NO_FILTER;
+
+        return new NOSTaxiOptimizer(optimConfig, vehFilter, reqFilter, seekDemandSupplyEquilibrium);
+    }
+
+
+    protected NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig, VehicleFilter vehicleFilter,
             RequestFilter requestFilter, boolean seekDemandSupplyEquilibrium)
     {
         this.optimConfig = optimConfig;
-
-        this.vehicleFilter = vehicleFilter != null ? vehicleFilter : VehicleFilter.NO_FILTER;
-        this.requestFilter = requestFilter != null ? requestFilter : RequestFilter.NO_FILTER;
-
+        this.vehicleFilter = vehicleFilter;
+        this.requestFilter = requestFilter;
         this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
 
         int vehCount = optimConfig.context.getVrpData().getVehicles().size();
-
         unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount,//1 req per 1 veh
                 Requests.T0_COMPARATOR);
         idleVehicles = new ArrayDeque<Vehicle>(vehCount);
@@ -68,7 +98,7 @@ public class NOSTaxiOptimizer
 
 
     @Override
-    public OptimizerConfiguration getOptimizerConfiguration()
+    public TaxiOptimizerConfiguration getConfiguration()
     {
         return optimConfig;
     }

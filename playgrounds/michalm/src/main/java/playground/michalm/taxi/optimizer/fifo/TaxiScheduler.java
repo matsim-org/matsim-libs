@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.fifo;
 
 import java.util.*;
 

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.fifo;
 
 import java.util.*;
 
@@ -35,7 +35,7 @@ import playground.michalm.taxi.vehreqpath.*;
 public class OTSTaxiOptimizer
     implements TaxiOptimizer
 {
-    /*package*/final OptimizerConfiguration optimConfig;
+    /*package*/final TaxiOptimizerConfiguration optimConfig;
 
     /*package*/final Queue<TaxiRequest> unplannedRequests;
 
@@ -44,7 +44,7 @@ public class OTSTaxiOptimizer
     private final Comparator<VehicleRequestPath> vrpComparator;
 
 
-    public OTSTaxiOptimizer(OptimizerConfiguration optimConfig)
+    public OTSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
 
@@ -58,7 +58,7 @@ public class OTSTaxiOptimizer
 
 
     @Override
-    public OptimizerConfiguration getOptimizerConfiguration()
+    public TaxiOptimizerConfiguration getConfiguration()
     {
         return optimConfig;
     }

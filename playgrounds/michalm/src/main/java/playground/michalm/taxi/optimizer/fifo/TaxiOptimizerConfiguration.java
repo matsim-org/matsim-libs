@@ -1,4 +1,4 @@
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.fifo;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
@@ -6,7 +6,7 @@ import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 
-public class OptimizerConfiguration
+public class TaxiOptimizerConfiguration
 {
     public final MatsimVrpContext context;
     public final ImmediateRequestParams params;
@@ -16,7 +16,7 @@ public class OptimizerConfiguration
     public final VehicleRequestPathFinder vrpFinder;
 
 
-    public OptimizerConfiguration(MatsimVrpContext context, ImmediateRequestParams params,
+    public TaxiOptimizerConfiguration(MatsimVrpContext context, ImmediateRequestParams params,
             VrpPathCalculator calculator, TaxiScheduler scheduler,
             VehicleRequestPathFinder vrpFinder)
     {

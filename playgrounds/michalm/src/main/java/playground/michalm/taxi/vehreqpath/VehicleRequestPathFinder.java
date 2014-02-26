@@ -7,7 +7,7 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.model.TaxiRequest;
-import playground.michalm.taxi.optimizer.immediaterequest.TaxiScheduler;
+import playground.michalm.taxi.optimizer.fifo.TaxiScheduler;
 
 import com.google.common.base.Function;
 import com.google.common.collect.*;

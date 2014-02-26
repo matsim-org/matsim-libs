@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.fifo;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
@@ -27,7 +27,7 @@ import playground.michalm.taxi.schedule.TaxiSchedules;
 public class RESTaxiOptimizer
     extends OTSTaxiOptimizer
 {
-    public RESTaxiOptimizer(OptimizerConfiguration optimConfig)
+    public RESTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         super(optimConfig);
     }

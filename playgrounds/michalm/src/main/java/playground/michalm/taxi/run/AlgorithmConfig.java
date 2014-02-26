@@ -32,8 +32,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 
 import playground.michalm.taxi.optimizer.TaxiOptimizer;
 import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
-import playground.michalm.taxi.optimizer.immediaterequest.*;
-import playground.michalm.taxi.optimizer.query.*;
+import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 
@@ -186,21 +185,15 @@ import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
         TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator, scheduler);
 
-        OptimizerConfiguration optimConfig = new OptimizerConfiguration(context, params,
+        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context, params,
                 calculator, scheduler, vrpFinder);
 
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(optimConfig,
-                        new StraightLineNearestVehicleFinder(optimConfig.scheduler),
-                        new StraightLineNearestRequestFinder(optimConfig.scheduler),
-                        false);
+                return NOSTaxiOptimizer.createNOS(optimConfig, false, tdisSource);
 
             case NO_SCHEDULING_DEMAND_SUPPLY_EQUILIBRIUM:
-                return new NOSTaxiOptimizer(optimConfig,
-                        new StraightLineNearestVehicleFinder(optimConfig.scheduler),
-                        new StraightLineNearestRequestFinder(optimConfig.scheduler),
-                        true);
+                return NOSTaxiOptimizer.createNOS(optimConfig, true, tdisSource);
 
             case ONE_TIME_SCHEDULING:
                 return new OTSTaxiOptimizer(optimConfig);

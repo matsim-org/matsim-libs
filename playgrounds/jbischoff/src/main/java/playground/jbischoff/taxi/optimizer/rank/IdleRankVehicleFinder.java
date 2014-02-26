@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.util.*;
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiUtils;
-import playground.michalm.taxi.optimizer.immediaterequest.TaxiScheduler;
+import playground.michalm.taxi.optimizer.fifo.TaxiScheduler;
 import playground.michalm.taxi.optimizer.query.*;
 /**
  * 

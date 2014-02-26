@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi.optimizer.fifo;
 
 import java.io.*;
 import java.util.*;
@@ -51,7 +51,7 @@ public class TaxiOptimizerWithPreassignment
 
         VehicleRequestPathFinder vrpFinder = createVrpFinder(calculator, scheduler, reqIdToVehMap);
 
-        OptimizerConfiguration optimConfig = new OptimizerConfiguration(context, params,
+        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context, params,
                 calculator, scheduler, vrpFinder);
 
         return new OTSTaxiOptimizer(optimConfig);

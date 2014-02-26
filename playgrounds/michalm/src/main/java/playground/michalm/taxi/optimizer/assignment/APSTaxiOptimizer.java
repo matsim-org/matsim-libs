@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.model.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
@@ -39,7 +39,7 @@ import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 public class APSTaxiOptimizer
     implements TaxiOptimizer
 {
-    private final OptimizerConfiguration optimConfig;
+    private final TaxiOptimizerConfiguration optimConfig;
 
     private final boolean seekDemandSupplyEquilibrium;
 
@@ -48,7 +48,7 @@ public class APSTaxiOptimizer
     private boolean requiresReoptimization = false;
 
 
-    public APSTaxiOptimizer(OptimizerConfiguration optimConfig, boolean seekDemandSupplyEquilibrium)
+    public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig, boolean seekDemandSupplyEquilibrium)
     {
         this.optimConfig = optimConfig;
         this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
@@ -60,7 +60,7 @@ public class APSTaxiOptimizer
 
 
     @Override
-    public OptimizerConfiguration getOptimizerConfiguration()
+    public TaxiOptimizerConfiguration getConfiguration()
     {
         // TODO Auto-generated method stub
         return null;

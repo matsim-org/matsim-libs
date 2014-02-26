@@ -49,7 +49,7 @@ import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
-import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.util.RunningVehicleRegister;
 
 
@@ -273,7 +273,7 @@ import playground.michalm.util.RunningVehicleRegister;
             events.addHandler(travelTimeCalculator);
         }
         else {
-            optimizer.getOptimizerConfiguration().scheduler.setDelaySpeedupStats(delaySpeedupStats);
+            optimizer.getConfiguration().scheduler.setDelaySpeedupStats(delaySpeedupStats);
         }
 
         RunningVehicleRegister rvr = new RunningVehicleRegister();

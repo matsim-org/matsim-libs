@@ -50,7 +50,7 @@ import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
-import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestParams;
+import playground.michalm.taxi.optimizer.fifo.ImmediateRequestParams;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
 import playground.michalm.util.RunningVehicleRegister;
 
