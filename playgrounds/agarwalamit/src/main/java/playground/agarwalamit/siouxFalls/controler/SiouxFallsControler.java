@@ -105,7 +105,7 @@ public class SiouxFallsControler {
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
 		controler.setDumpDataAtEnd(true);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();	
 
 	}
