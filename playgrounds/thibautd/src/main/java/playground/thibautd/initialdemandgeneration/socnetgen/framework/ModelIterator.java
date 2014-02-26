@@ -167,7 +167,9 @@ public class ModelIterator {
 		final LockedSocialNetwork primaryNetwork = runner.runPrimary( population );
 		while ( adaptiveThreshold.continueSearch() &&
 				continueBasedOnStat( target , bestClustering , PRECISION_SECONDARY ) ) {
-			final double newThreshold = adaptiveThreshold.newThreshold();
+			// the iteration process does not consider the fact that the reduction
+			// must be negative.
+			final double newThreshold = Math.min( 0 , adaptiveThreshold.newThreshold() );
 			runner.getThresholds().setSecondaryReduction( -newThreshold );
 
 			final LockedSocialNetwork newNet = runner.runSecondary( primaryNetwork , population );
@@ -403,7 +405,7 @@ public class ModelIterator {
 			// stop if lower bound greater than upper bound
 			final boolean basedOnBounds = Double.isNaN( lowerBoundThreshold ) ||
 				Double.isNaN( upperBoundThreshold ) ||
-				lowerBoundThreshold <= upperBoundThreshold;
+				lowerBoundThreshold < upperBoundThreshold;
 
 			log.info( "interval ["+lowerBoundThreshold+" ; "+upperBoundThreshold+"]: "+
 					(basedOnBounds ? "CONTINUE" : "STOP" ) );
