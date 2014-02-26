@@ -25,8 +25,10 @@ function( datasets,
 	}
 
 	merged <- ds.with.name( 1 )
-	for ( i in seq( 2 , length( datasets ) ) ) {
-		merged <- rbind.withcolcompl( merged ,  ds.with.name( i ) )
+	if ( length( datasets ) > 1 ) {
+		for ( i in seq( 2 , length( datasets ) ) ) {
+			merged <- rbind.withcolcompl( merged ,  ds.with.name( i ) )
+		}
 	}
 	merged
 }
