@@ -50,16 +50,18 @@ public class BerlinActivityDurationsCongested {
 				for (int dailyRate : BerlinPhone.CALLRATES) {
 					distances(pw, dailyRate, baseVolumes, baseScenario);
 				}
+				sumDistancesAndPutInBasePopulation(baseScenario, "infinite");
 				pw.close();
 			}
 
 
 
-			PrintWriter pw = new PrintWriter(new File("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/person-kilometers.txt"));
+			PrintWriter pw = new PrintWriter(new File("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/person-kilometers2.txt"));
 			pw.printf("person\tkilometers-base\t");
 			for (int dailyRate : BerlinPhone.CALLRATES) {
 				pw.printf("kilometers-%d\t", dailyRate);
 			}
+			pw.printf("kilometers-%s\t", "infinite");
 			pw.printf("\n");
 			for (Person person : baseScenario.getPopulation().getPersons().values()) {
 				pw.printf("%s\t", person.getId().toString());
@@ -72,6 +74,12 @@ public class BerlinActivityDurationsCongested {
 					}
 					pw.printf("%f\t", km);
 				}
+				Double km = (Double) person.getCustomAttributes().get("kilometers-"+"infinite");
+				if (km == null) {
+					// person not seen even once
+					km = 0.0;
+				}
+				pw.printf("%f\t", km);
 
 				pw.printf("\n");
 			}
@@ -81,18 +89,15 @@ public class BerlinActivityDurationsCongested {
 
 
 	private static void distances(PrintWriter pw, int callrate, VolumesAnalyzer baseVolumes, Scenario baseScenario) {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		new MatsimPopulationReader(scenario).readFile("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-"+callrate+"/ITERS/it.20/20.experienced_plans.xml.gz");
-
 		String suffix = Integer.toString(callrate);
-		double km = PowerPlans.sumDistancesAndPutInBasePopulation(scenario, baseScenario, suffix);
+		
+		double km = sumDistancesAndPutInBasePopulation(baseScenario, suffix);
 
 
 		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer volumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, baseScenario.getNetwork());
 		events.addHandler(volumes);
-		new MatsimEventsReader(events).readFile("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-"+callrate+"/ITERS/it.20/20.events.xml.gz");
+		new MatsimEventsReader(events).readFile("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-"+suffix+"/ITERS/it.20/20.events.xml.gz");
 
 
 		double baseSum = PowerPlans.drivenKilometersWholeDay(baseScenario, baseVolumes);
@@ -102,6 +107,17 @@ public class BerlinActivityDurationsCongested {
 
 		pw.printf("%d\t%f\t%f\t%f\n", callrate, km, sum, baseSum - sum);
 		pw.flush();
+	}
+
+
+	private static double sumDistancesAndPutInBasePopulation(
+			Scenario baseScenario, String suffix) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		new MatsimPopulationReader(scenario).readFile("/Users/michaelzilske/runs-svn/synthetic-cdr/ant2014/car-congested/output-"+suffix+"/ITERS/it.20/20.experienced_plans.xml.gz");
+
+		double km = PowerPlans.sumDistancesAndPutInBasePopulation(scenario, baseScenario, suffix);
+		return km;
 	}
 
 }
