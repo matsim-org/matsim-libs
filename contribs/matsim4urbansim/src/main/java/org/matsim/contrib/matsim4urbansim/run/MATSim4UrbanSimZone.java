@@ -29,16 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.matsim4urbansim.analysis.DanielAnalysisListenerEvents;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.algorithms.NetworkScenarioCut;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 
 
@@ -99,49 +94,6 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		this(args);
 		this.cleFile = cleFile;
 	}
-	
-//	@Override
-//	void modifyNetwork( Network net ) {
-//	
-//	
-//		generated network may be found in the relevant folder in shared-svn (opus_home\data\brussels_zone\base_year_data\2001\matsim\network) \DR
-//
-//		if ( BRUSSELS_SCENARIO_MODIFY_NETWORK ) {
-//			
-//			log.error("cutting the Brussels network.  It is really really dangerous to leave this in the code as such.  kai, apr'13") ;
-//			Coord min = new CoordImpl(94902.,112575.) ;
-//			Coord max = new CoordImpl(220907.,220000.) ;
-//			NetworkScenarioCut nsc = new NetworkScenarioCut(min, max) ;
-//			nsc.run(net) ;
-//
-//			log.error("modifying the Brussels network.  It is really really dangerous to leave this in the code as such.  kai, apr'13") ;
-//			long cnt = 0 ;
-//			for ( Link link : net.getLinks().values() ) {
-//				double spd = link.getFreespeed() ;
-//				double cap = link.getCapacity() ;
-//				// the free speeds do not seem very reliable (frontage roads sometimes have faster speeds than main roads) 
-//				if ( cap <= 1000. ) {
-//					// something like a one-lane local street
-//					link.setFreespeed(15./3.6) ;
-//					cnt++ ;
-//				} else if ( cap <= 2000. && spd < 61./3.6 ) {
-//					// something like a two-lane slow arterial
-//					link.setFreespeed( 20./3.6 ) ;
-//					cnt++ ;
-//				} else if ( cap <= 3000. && spd < 61/3.6 ) {
-//					// something like a three-lane boulevard
-//					link.setFreespeed( 25./3.6 ) ;
-//					cnt++ ;
-//				} else if ( cap <= 3500. && spd < 81/3.6 ) {
-//					// something like a narrow two-lane tunnel
-//					link.setFreespeed( 60./3.6 ) ;
-//					cnt++ ;
-//				}
-//			}
-//			log.warn("modified the free speed on " + cnt + " of " + net.getLinks().size() + " links.") ;
-//		}
-//
-//	}
 	
 	@Override
 	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler) {

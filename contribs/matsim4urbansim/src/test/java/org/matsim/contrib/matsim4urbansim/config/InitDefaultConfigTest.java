@@ -81,7 +81,7 @@ public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertFalse(true);
 		}
-		tempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleanUpCustomTempDirectories();
 	}
 
 }

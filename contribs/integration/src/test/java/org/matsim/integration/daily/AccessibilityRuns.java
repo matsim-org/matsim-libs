@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -139,9 +138,8 @@ public class AccessibilityRuns {
 			
 			controler.setOverwriteFiles(true);
 
-			PtMatrix ptMatrix = null  ;
 			GridBasedAccessibilityControlerListenerV3 listener = 
-					new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, scenario.getNetwork( ));
+					new GridBasedAccessibilityControlerListenerV3(opportunities, config, scenario.getNetwork( ));
 			listener.setComputingAccessibilityForMode( Modes4Accessibility.freeSpeed, true );
 			listener.addAdditionalFacilityData( homes ) ;
 			listener.generateGridsAndMeasuringPointsByNetwork(scenario.getNetwork(), 1000. );

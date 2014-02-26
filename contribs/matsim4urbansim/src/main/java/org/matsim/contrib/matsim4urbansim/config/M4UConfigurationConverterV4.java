@@ -26,13 +26,10 @@ package org.matsim.contrib.matsim4urbansim.config;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
-import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 
 /**

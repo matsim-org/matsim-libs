@@ -22,7 +22,7 @@ import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
-import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
@@ -105,7 +105,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 		{
 			//create a bounding box with 9 measuring points (one for each node)
-			MyBoundingBox bbox = new MyBoundingBox();
+			BoundingBox bbox = new BoundingBox();
 			double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
 
 			double minX = boundary[0]-resolution/2;
@@ -185,7 +185,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		ctrl.setOverwriteFiles(true);
 			
 		//create a bounding box with 9 measuring points (one for each node)
-		MyBoundingBox bbox = new MyBoundingBox();
+		BoundingBox bbox = new BoundingBox();
 		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
 				
 		double minX = boundary[0]-resolution/2;

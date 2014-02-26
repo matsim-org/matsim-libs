@@ -22,9 +22,7 @@
  */
 package org.matsim.contrib.matsim4urbansim.utils.io.misc;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,22 +32,13 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.matrixbasedptrouter.utils.NetworkUtil;
-import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
-import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -145,7 +134,7 @@ public class RandomLocationDistributor {
 			y = (zoneCoordinate.getY() - radius) + (random.nextDouble() * 2 * radius);
 			p = new CoordImpl(x, y);
 			
-			distance = NetworkUtil.getEuclidianDistance(zoneCoordinate, p);
+			distance = CoordUtils.calcDistance(zoneCoordinate, p);
 			
 		} while ( distance > radius );
 		return p;
@@ -204,7 +193,7 @@ public class RandomLocationDistributor {
 	 * @return true if coordinate lies within the radius
 	 */
 	public boolean coordinatesInRadius(Coord coordinateA, Coord coordinateB){
-		double distance = NetworkUtil.getEuclidianDistance(coordinateA, coordinateB);
+		double distance = CoordUtils.calcDistance(coordinateA, coordinateB);
 		boolean withinRadius = (distance <= radius);
 		return withinRadius;
 	}

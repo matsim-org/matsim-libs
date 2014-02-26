@@ -24,7 +24,7 @@ package org.matsim.contrib.matsim4urbansim.utils.io.interpolate;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
-import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matsim4urbansim.interpolation.Interpolation;
 
 /**
@@ -64,7 +64,7 @@ public class Interpolate {
 		Interpolation interpol = new Interpolation(inputSG, Interpolation.BILINEAR);
 		
 		log.info("Creating spatial grid for interpolated values.");
-		MyBoundingBox boundary = new MyBoundingBox();
+		BoundingBox boundary = new BoundingBox();
 		boundary.setCustomBoundaryBox(inputSG.getXmin(), inputSG.getYmin(), inputSG.getXmax(), inputSG.getYmax());
 		SpatialGrid outputSG= new SpatialGrid(cellSizeInMeter, boundary.getBoundingBox());
 		

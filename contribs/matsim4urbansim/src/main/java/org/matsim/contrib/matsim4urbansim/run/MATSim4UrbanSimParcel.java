@@ -34,17 +34,16 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
-import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
@@ -57,6 +56,7 @@ import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriterListener;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -122,7 +122,7 @@ public class MATSim4UrbanSimParcel{
 	boolean computeAgentPerformance					 = false;	// determines whether agent performances should be calculated
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
-	MyBoundingBox nwBoundaryBox				 = null;
+	BoundingBox nwBoundaryBox				 = null;
 	
 	/**
 	 * constructor
@@ -286,34 +286,16 @@ public class MATSim4UrbanSimParcel{
 			// remove those "configuration" flags completely from the config.  However, then some other mechanism needs to be found 
 			// to be able to configure externally written "scripts" (such as this one) in a simple way.  kai & michael z, feb'13
 		}
-		controler.setOverwriteFiles(true);	// sets whether output files are overwritten
-		controler.setCreateGraphs(true);	// sets whether output graphs are created
+		controler.setOverwriteFiles(true);	
+		controler.setCreateGraphs(true);	
 		
 		PtMatrix ptMatrix = null ;
-		MatrixBasedPtRouterConfigGroup ippcm = MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
+		MatrixBasedPtRouterConfigGroup ippcm = ConfigUtils.addOrGetModule(scenario.getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class) ;
 		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
-			// will lead to a null pointer anyway, but since the 
-			// routerFactory has changed an initialization of plansCalcRoute
-			// as it was done before is no longer possible. Thus, I think a 
-			// more meaningful message seems to be helpful. Daniel, May '13
-			
-			// I don't think that the following are very helpful.  If needed, it should be in the consistency checker ...
-//			if(ippcm.getPtTravelDistancesInputFile() == null || ippcm.getPtTravelTimesInputFile() == null){
-//				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) == null){
-//					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
-//							"but without a teleportedModeSpeed for pt as well. Default is teleportedModeFreespeedFactor...");
-//				}
-//				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) == null){
-//					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
-//							"but without a teleportedModeSpeed for walk as well. Default is teleportedModeFreespeed...");
-//				}
-//			}
-			
-			// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-			MyBoundingBox nbb = new MyBoundingBox();
+			BoundingBox nbb = new BoundingBox();
 			nbb.setDefaultBoundaryBox(controler.getScenario().getNetwork());
-			ptMatrix = PtMatrix.createPtMatrix(controler.getScenario().getConfig().plansCalcRoute(), nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
+			ptMatrix = PtMatrix.createPtMatrix(controler.getScenario().getConfig().plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));	
 			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(scenario, ptMatrix) ); // the car and pt router
 			
 			log.error("reconstructing pt route distances; not tested ...") ;
@@ -472,7 +454,7 @@ public class MATSim4UrbanSimParcel{
 		
 		// the boundary box defines the study area for accessibility calculations if no shape file is provided or a zone based UrbanSim application is used
 		// the boundary is either defined by a user defined boundary box or if not applicable by the extend of the road network
-		this.nwBoundaryBox 				= new MyBoundingBox();
+		this.nwBoundaryBox 				= new BoundingBox();
 		if(this.computeGridBasedAccessibilityUsingBoundingBox){	// check if a boundary box is defined
 			// log.info("Using custom bounding box for accessibility computation.");
 			nwBoundaryBox.setCustomBoundaryBox(moduleAccessibility.getBoundingBoxLeft(), 

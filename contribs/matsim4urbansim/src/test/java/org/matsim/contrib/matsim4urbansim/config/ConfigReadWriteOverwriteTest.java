@@ -36,14 +36,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
-import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -136,7 +136,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
 		//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 
-		tempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleanUpCustomTempDirectories();
 
 
 		log.info("done") ;
@@ -181,7 +181,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertTrue(false);
 		}
-		tempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleanUpCustomTempDirectories();
 		log.info("done") ;
 	}
 
@@ -256,7 +256,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// following test is too tough for regular tests (because of default changes) but can be made operational before refactorings.
 		//			Assert.assertEquals( "config files are different", originalCheckSum, revisedCheckSum	 ) ;
 
-		tempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleanUpCustomTempDirectories();
 	}
 
 	// Helper method for get the file content
@@ -331,7 +331,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		///////////////////////////////////////////////////
 		//		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
 		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		MatrixBasedPtRouterConfigGroup ippcm = MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		MatrixBasedPtRouterConfigGroup ippcm = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class) ;
 
 		// time of day
 		Assert.assertTrue( acm.getTimeOfDay() == externalTestConfig.timeOfDay );

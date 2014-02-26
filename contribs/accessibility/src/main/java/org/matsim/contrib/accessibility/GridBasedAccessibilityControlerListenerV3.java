@@ -18,7 +18,7 @@ import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.io.writer.CellBasedAccessibilityCSVWriter;
 import org.matsim.contrib.accessibility.utils.io.writer.UrbansimCellBasedAccessibilityCSVWriterV2;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -138,6 +138,10 @@ implements ShutdownListener, StartupListener {
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 
+	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, Config config, Network network){
+		this(opportunities, null, config, network); // PtMatrix is optional and in a different contrib
+	}
+	
 	/**
 	 * constructor
 	 * 
@@ -411,7 +415,7 @@ implements ShutdownListener, StartupListener {
 	public void generateGridsAndMeasuringPointsByNetwork(Network network, double cellSize){
 		log.info("Using the boundary of the network file to determine the area for accessibility computation.");
 		log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
-		MyBoundingBox bb = new MyBoundingBox();
+		BoundingBox bb = new BoundingBox();
 		bb.setDefaultBoundaryBox(network);
 		generateGridsAndMeasuringPoints(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
 	}

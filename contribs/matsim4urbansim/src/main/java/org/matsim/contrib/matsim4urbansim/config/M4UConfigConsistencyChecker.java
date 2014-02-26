@@ -25,12 +25,12 @@ package org.matsim.contrib.matsim4urbansim.config;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
-import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
 /**
@@ -50,7 +50,7 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 		UrbanSimParameterConfigModuleV3 urbansimParameterModule = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME ) ;
 		@SuppressWarnings("unused")
 		AccessibilityConfigGroup accessibilityConfigModule = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		MatrixBasedPtRouterConfigGroup ippcm = MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		MatrixBasedPtRouterConfigGroup ippcm = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class) ;
 		
 		if ( ippcm.isUsingTravelTimesAndDistances() ) {
 			if ( !ippcm.isUsingPtStops() ) {

@@ -12,10 +12,10 @@ import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.contrib.accessibility.gis.ZoneLayer;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
 import org.matsim.contrib.accessibility.utils.io.writer.SpatialGridTableWriter;
-import org.matsim.contrib.matrixbasedptrouter.utils.NetworkUtil;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Point;
@@ -58,7 +58,7 @@ public class AccessibilityCalcV2 {
 			
 			Link nearestLink = network.getNearestLinkExactly(coord);
 			
-			double distance_meter = NetworkUtil.getEuclidianDistance(coord, nearestLink.getCoord());
+			double distance_meter = CoordUtils.calcDistance(coord, nearestLink.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 			
 			this.freeSpeedGrid.setValue(walkTravelTime_h, p);

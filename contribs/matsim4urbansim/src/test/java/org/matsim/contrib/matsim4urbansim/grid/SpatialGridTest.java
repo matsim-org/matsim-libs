@@ -2,10 +2,10 @@ package org.matsim.contrib.matsim4urbansim.grid;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
-import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.testcases.MatsimTestCase;
 
 public class SpatialGridTest extends MatsimTestCase{
@@ -16,10 +16,10 @@ public class SpatialGridTest extends MatsimTestCase{
 	public void testSpatialGrid() {
 		
 		// get network
-		NetworkImpl network = CreateTestNetwork.createTestNetwork();
+		Network network = CreateTestNetwork.createTestNetwork();
 		
 		// get boundaries of network, i.e. x and y coordinates
-		MyBoundingBox nbb = new MyBoundingBox();
+		BoundingBox nbb = new BoundingBox();
 		nbb.setDefaultBoundaryBox(network);		
 		
 		// create spatial grid		

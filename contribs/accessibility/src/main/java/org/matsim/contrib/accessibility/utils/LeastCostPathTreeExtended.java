@@ -213,7 +213,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		log.info("Distance = " + distance );
 		log.info("Toll = " + toll);
 		
-		tempDirectoryUtil.cleaningUpCustomTempDirectories();
+		tempDirectoryUtil.cleanUpCustomTempDirectories();
 	}
 	
 	/**

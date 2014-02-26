@@ -27,7 +27,7 @@ import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.contrib.accessibility.gis.ZoneLayer;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.contrib.accessibility.utils.io.writer.SpatialGridTableWriter;
-import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -254,7 +254,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 		checkLinkAttributes();
 		
 		//create a bounding box for accessibility computation
-		MyBoundingBox bbox = new MyBoundingBox();
+		BoundingBox bbox = new BoundingBox();
 		bbox.setDefaultBoundaryBox(this.scenario.getNetwork());
 		
 		double resolution = 100;

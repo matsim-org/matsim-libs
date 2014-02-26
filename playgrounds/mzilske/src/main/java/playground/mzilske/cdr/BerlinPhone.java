@@ -22,8 +22,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class BerlinPhone {
-	
-	public static final int[] CALLRATES = new int[]{150};
+
+	public static final int[] CALLRATES = new int[]{0, 2, 5, 10, 20, 30, 40, 50, 100, 150};
 
 	public static void main(String[] args) throws FileNotFoundException {
 		new BerlinPhone().run();

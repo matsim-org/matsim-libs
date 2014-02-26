@@ -263,7 +263,7 @@ public class Convert4Gnuplot {
 						// for JFreeChart
 						yAxis[i-1] = Double.parseDouble(parts[ho1.getIndexOf(i)]);
 						// for gnuplot
-						content.append( ((int)xAxis[i-1]) + InternalConstants.TAB + yAxis[i-1] + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE);
+						content.append( ((int)xAxis[i-1]) + InternalConstants.TAB + yAxis[i-1] + org.matsim.contrib.matsim4urbansim.utils.InternalConstants.NEW_LINE);
 					}
 					break;
 				}
@@ -371,7 +371,7 @@ public class Convert4Gnuplot {
 						// for JFreeChart
 						yAxis1[j-1] = Double.parseDouble(parts1[ho1.getIndexOf(j)]);
 						// for gnuplot
-						content1.append( ((int)xAxis1[j-1]) + InternalConstants.TAB + yAxis1[j-1] + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE);
+						content1.append( ((int)xAxis1[j-1]) + InternalConstants.TAB + yAxis1[j-1] + org.matsim.contrib.matsim4urbansim.utils.InternalConstants.NEW_LINE);
 					}
 					foundZoneID1 = true;
 				}
@@ -383,7 +383,7 @@ public class Convert4Gnuplot {
 						// for JFreeChart
 						yAxis2[j-1] = Double.parseDouble(parts2[ho2.getIndexOf(j)]);
 						// for gnuplot
-						content2.append( ((int)xAxis2[j-1]) + InternalConstants.TAB + yAxis2[j-1] + org.matsim.contrib.matrixbasedptrouter.constants.InternalConstants.NEW_LINE);
+						content2.append( ((int)xAxis2[j-1]) + InternalConstants.TAB + yAxis2[j-1] + org.matsim.contrib.matsim4urbansim.utils.InternalConstants.NEW_LINE);
 					}
 					foundZoneID2 = true;
 				}

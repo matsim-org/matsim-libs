@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.contrib.accessibility.gis.ZoneLayer;
-import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -313,7 +313,7 @@ public class NetworkInspector {//TODO pfade ändern
 		if(!(this.nodeTypes.size()<1))
 			exportNodesToShape();
 		
-		MyBoundingBox bbox = new MyBoundingBox();
+		BoundingBox bbox = new BoundingBox();
 		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
 		
 		ZoneLayer<Id> measuringPoints = NetworkInspector.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
