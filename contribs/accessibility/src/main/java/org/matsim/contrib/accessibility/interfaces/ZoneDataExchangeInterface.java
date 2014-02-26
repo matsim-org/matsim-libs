@@ -9,6 +9,4 @@ public interface ZoneDataExchangeInterface {
 	
 	public void getZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities ) ;
 	
-	public boolean endReached();
-	
 }

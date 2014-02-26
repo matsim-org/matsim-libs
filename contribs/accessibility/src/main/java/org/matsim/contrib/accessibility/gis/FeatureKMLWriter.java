@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.accessibility.gis.io;
+package org.matsim.contrib.accessibility.gis;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -38,8 +38,6 @@ import net.opengis.kml._2.StyleType;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.matsim.contrib.accessibility.gis.CRSUtils;
-import org.matsim.contrib.accessibility.gis.graph.spatial.io.Colorizable;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

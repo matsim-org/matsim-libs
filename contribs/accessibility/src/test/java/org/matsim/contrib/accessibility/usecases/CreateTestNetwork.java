@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.accessibility.utils;
+package org.matsim.contrib.accessibility.usecases;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thomas
  * @author tthunig
  */
-public class CreateTestNetwork {
+class CreateTestNetwork {
 	
 	@Rule public static MatsimTestUtils utils = new MatsimTestUtils();
 	

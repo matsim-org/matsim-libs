@@ -35,13 +35,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.accessibility.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -248,11 +247,10 @@ public class AccessibilityIntegrationTest {
 		
 //		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
 		// (purely grid based controler listener does not yet exist)
-		PtMatrix ptMatrix = null ;
 		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
 		double cellSize = 100. ;
 
-		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, sc.getNetwork());
+		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, config, sc.getNetwork());
 		// activating transport modes of interest
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			gacl.setComputingAccessibilityForMode(mode, true);

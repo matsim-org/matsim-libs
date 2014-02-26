@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.accessibility.gis.io;
+package org.matsim.contrib.accessibility.gis;
 
 import java.io.File;
 import java.io.IOException;

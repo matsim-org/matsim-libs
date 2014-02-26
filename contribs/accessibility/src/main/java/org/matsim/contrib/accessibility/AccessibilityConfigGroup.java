@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.accessibility.config;
+package org.matsim.contrib.accessibility;
 
 import java.util.Map;
 import java.util.TreeMap;

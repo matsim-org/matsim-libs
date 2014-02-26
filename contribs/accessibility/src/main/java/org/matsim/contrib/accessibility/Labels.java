@@ -1,6 +1,6 @@
-package org.matsim.contrib.accessibility.utils.io.writer;
+package org.matsim.contrib.accessibility;
 
-public class Labels {
+class Labels {
 	
 	public static final String ACCESSIBILITY_BY_FREESPEED = "freespeed_accessibility";
 	public static final String ACCESSIBILITY_BY_CAR = "car_accessibility";

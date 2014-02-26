@@ -17,13 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.accessibility.utils.io.writer;
+package org.matsim.contrib.accessibility.gis;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
 
 
 /**

@@ -5,10 +5,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.costcalculator.TravelDistanceCalculator;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
-import org.matsim.contrib.accessibility.utils.io.writer.UrbanSimZoneCSVWriterV2;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -69,10 +67,17 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// ////////////////////////////////////////////////////////////////////
 	
 	public ZoneBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl measuringPoints,
+			   ActivityFacilitiesImpl opportunities,
+			   String matsim4opusTempDirectory,
+			   Scenario scenario) {
+		this(measuringPoints, opportunities, null, matsim4opusTempDirectory, scenario);
+	}
+	
+	public ZoneBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl measuringPoints,
 												   ActivityFacilitiesImpl opportunities,
 												   PtMatrix ptMatrix,
 												   String matsim4opusTempDirectory,
-												   Scenario scenario){
+												   Scenario scenario) {
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
@@ -138,7 +143,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 
 		// get travel distance (in meter)
-		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new TravelDistanceCalculator());
+		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new LinkLengthTravelDisutility());
 		
 		this.scheme = (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 

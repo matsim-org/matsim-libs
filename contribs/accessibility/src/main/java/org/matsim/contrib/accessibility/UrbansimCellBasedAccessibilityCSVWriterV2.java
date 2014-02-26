@@ -1,4 +1,4 @@
-package org.matsim.contrib.accessibility.utils.io.writer;
+package org.matsim.contrib.accessibility;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 // urbansim accessibility writer; better do not touch except when working on matsim-urbansim integration. kai, feb'14
 // yy move to matsim4urbansim
-public class UrbansimCellBasedAccessibilityCSVWriterV2 {
+class UrbansimCellBasedAccessibilityCSVWriterV2 {
 	private static final Logger log = Logger.getLogger(UrbansimCellBasedAccessibilityCSVWriterV2.class);
 
 	private static final String FILE_NAME= "accessibility_indicators.csv";

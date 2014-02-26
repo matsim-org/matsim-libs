@@ -1,4 +1,4 @@
-package org.matsim.contrib.accessibility.utils.io.writer;
+package org.matsim.contrib.accessibility;
 
 import java.io.BufferedWriter;
 import java.io.File;
