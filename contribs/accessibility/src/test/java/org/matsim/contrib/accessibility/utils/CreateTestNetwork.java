@@ -148,7 +148,7 @@ public class CreateTestNetwork {
 	 * This methods creates a csv file with informations about pt travel times and pt distances for the test network from createTestNetwork().
 	 * We set the pt travel time between all pairs of pt stops to 100 seconds, except pairs of same pt stops where the travel time is 0 seconds.
 	 * We set the pt distance between all pairs of pt stops to 100 meter, except pairs of same pt stops where the distance is 0 meter.
-	 * Because the data in the csv file does not need an entity, you can use the same csv file for both informations.
+	 * Because the data in the csv file does not need any measurement unit, one can use the same csv file for both informations.
 	 * 
 	 * @return the location of the written file
 	 */
