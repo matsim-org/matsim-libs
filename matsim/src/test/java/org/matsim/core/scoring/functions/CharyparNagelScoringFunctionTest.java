@@ -72,7 +72,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * @author mrieser
  */
 public class CharyparNagelScoringFunctionTest {
-	
+
 	private static final double EPSILON =1e-9;
 
 	private ScoringFunction getScoringFunctionInstance(final Fixture f, final PlanImpl somePlan) {
@@ -163,14 +163,34 @@ public class CharyparNagelScoringFunctionTest {
 		double zeroUtilDurH = getZeroUtilDuration_hrs(16.0, 1.0);
 		double zeroUtilDurW2 = getZeroUtilDuration_hrs(8.0, 2.0);
 
-		ActivityUtilityParameters params = new ActivityUtilityParameters("w", 1.0, 8.0 * 3600);
-		assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
+		{
+			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory();
+			factory.setType("w");
+			factory.setPriority(1.0);
+			factory.setTypicalDuration_s(8.0 * 3600);
+			ActivityUtilityParameters params = factory.create();
+			assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
 
-		params = new ActivityUtilityParameters("h", 1.0, 16.0 * 3600);
-		assertEquals(zeroUtilDurH, params.getZeroUtilityDuration_h(), EPSILON);
+		}
 
-		params = new ActivityUtilityParameters("w2", 2.0, 8.0 * 3600); // test that the priority is respected as well
-		assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration_h(), EPSILON);
+		{
+			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory();
+			factory.setType("h");
+			factory.setPriority(1.0);
+			factory.setTypicalDuration_s(16.0 * 3600);
+			ActivityUtilityParameters params = factory.create();
+			assertEquals(zeroUtilDurH, params.getZeroUtilityDuration_h(), EPSILON);
+		}
+
+		{
+			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory();
+			factory.setType("w2");
+			// test that the priority is respected as well
+			factory.setPriority(2.0);
+			factory.setTypicalDuration_s(8.0 * 3600);
+			ActivityUtilityParameters params = factory.create();
+			assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration_h(), EPSILON);
+		}
 	}
 
 	/**
@@ -224,7 +244,7 @@ public class CharyparNagelScoringFunctionTest {
 	@Test
 	public void testPerforming() {
 		Fixture f = new Fixture();
-		
+
 		double perf = +6.0;
 		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_hrs(15.0, 1.0);
@@ -235,12 +255,12 @@ public class CharyparNagelScoringFunctionTest {
 				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
 				+ perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
 
-//		perf = +3.0;
-//		f.config.planCalcScore().setPerforming_utils_hr(perf);
-//		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
-//				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
-//				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
-//				+ perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
+		//		perf = +3.0;
+		//		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		//		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
+		//				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
+		//				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
+		//				+ perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
 	}
 
 	/**
@@ -307,8 +327,8 @@ public class CharyparNagelScoringFunctionTest {
 		wParams.setOpeningTime(20*3600.0);
 		wParams.setClosingTime(21*3600.0);
 
-//		// only the home-activity should add to the score
-//		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
+		//		// only the home-activity should add to the score
+		//		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
 		// not longer true, since not doing a scheduled activity now carries a penalty.  kai, nov'13
 		double score_home = perf_hrs * 15.0 * Math.log(14.75 / getZeroUtilDuration_hrs(15.0, 1.0)) ;
 
@@ -332,7 +352,7 @@ public class CharyparNagelScoringFunctionTest {
 		wParams.setOpeningTime(8.*3600.0 + 15.*60. );
 		wParams.setClosingTime (8.*3600.0 + 15.*60. );
 		// (note that even _some_ opening time causes zero score, since the minDuration needs to be overcome!)
-		
+
 		assertEquals(score_home+3.*score_work , calcScore(f), EPSILON);
 	}
 
@@ -487,7 +507,7 @@ public class CharyparNagelScoringFunctionTest {
 		params.setTypicalDuration(8*3600);
 		f.config.planCalcScore().addActivityParams(params);
 		f.config.planCalcScore().getActivityParams("h").setTypicalDuration(6.0 * 3600);
-		
+
 		double perf = +6.0;
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
 		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
@@ -508,11 +528,11 @@ public class CharyparNagelScoringFunctionTest {
 	 */
 	@Test
 	public void testNoNightActivity() {
-		
+
 		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_hrs(7.0, 1.0);
 		double perf = +3.0;
-		
+
 		Fixture f = new Fixture();
 		// Need to change the typical duration of the home activity
 		// for this test, since with the setting of 15 hours for "home",
@@ -521,19 +541,19 @@ public class CharyparNagelScoringFunctionTest {
 		// are truncated, so we wouldn't test anything. :-/
 		f.config.planCalcScore().getActivityParams("h").setTypicalDuration(7.0 * 3600);
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
-		
+
 		ScoringFunction testee = getScoringFunctionInstance(f, f.plan);
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
 		testee.handleLeg((Leg) f.plan.getPlanElements().get(1));
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(2));
 		testee.finish();
-		
+
 		assertEquals(
 				perf * 3.0 * Math.log(2.5 / zeroUtilDurW) +
 				perf * 7.0 * Math.log(7.0 / zeroUtilDurH), 
 				testee.getScore(), EPSILON);
 	}
-	
+
 	/**
 	 * Tests if the scoring function correctly handles {@link PersonMoneyEvent}.
 	 * It generates one person with one plan having two activities (home, work)
@@ -589,8 +609,8 @@ public class CharyparNagelScoringFunctionTest {
 		f.config.planCalcScore().addParam("traveling_sackhuepfen", "-30.0");
 		assertEquals(-15.0, calcScore(f), EPSILON);
 	}
-	
-	
+
+
 	private static class Fixture {
 		protected Config config = null;
 		private PersonImpl person = null;
@@ -620,7 +640,7 @@ public class CharyparNagelScoringFunctionTest {
 			// work 10:15 to 13:00
 			// work 13:30 to 16:00
 			// home 15:15 to ...
-			
+
 			this.config = ConfigUtils.createConfig();
 			PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
 			scoring.setBrainExpBeta(2.0);
@@ -648,7 +668,7 @@ public class CharyparNagelScoringFunctionTest {
 			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h");
 			params.setTypicalDuration(15*3600);
 			scoring.addActivityParams(params);
-			
+
 
 			params = new PlanCalcScoreConfigGroup.ActivityParams("w");
 			params.setTypicalDuration(3*3600);

@@ -54,13 +54,13 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		private double minimalDuration;
 		private double openingTime;
 		private boolean scoreAtAll;
-		
+
 		/**
 		 * empty constructor; deliberately permitted
 		 */
 		public Factory() {
 		}
-		
+
 		/**
 		 * Convenience constructor for main use case
 		 */
@@ -113,45 +113,53 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		}
 
 		public ActivityUtilityParameters create() {
-			ActivityUtilityParameters params = new ActivityUtilityParameters( this.type, this.priority, this.typicalDuration_s ) ;
+			ActivityUtilityParameters params = new ActivityUtilityParameters(this.type) ;
+			params.setScoreAtAll(this.scoreAtAll) ;
+			params.setPriorityAndTypicalDuration(this.priority, this.typicalDuration_s) ;
 			params.setClosingTime(this.closingTime) ;
 			params.setEarliestEndTime(this.earliestEndTime) ;
 			params.setLatestStartTime(this.latestStartTime) ;
 			params.setMinimalDuration(this.minimalDuration) ;
 			params.setOpeningTime(this.openingTime) ;
-			params.setScoreAtAll(this.scoreAtAll) ;
 			return params ;
 		}
 	}
 
 	private final String type;
-	private final double typicalDuration_s;
+	private double typicalDuration_s;
 
 	/**
 	 * 	"duration at which the [performance] utility starts to be positive"
 	 * (from Dave's paper, ga-acts-iatbr03.tex, though he called it t_0)
 	 * (In decimal number of hours.)
 	 */
-	private final double zeroUtilityDuration_h; // in hours!
+	private double zeroUtilityDuration_h; // in hours!
 	private double minimalDuration = -1;
 	private double openingTime = -1;
 	private double closingTime = -1;
 	private double latestStartTime = -1;
 	private double earliestEndTime = -1;
 	private boolean scoreAtAll=true;
-	
-	@Deprecated // use factory.  nov'12
-	/*package!*/ ActivityUtilityParameters(final String type, final double priority, final double typicalDuration_s) {
+
+	// use factory.  nov'12
+	/*package!*/ ActivityUtilityParameters(final String type) {
+		this.type = type;	
+	}
+
+	/*package!*/ final void setScoreAtAll(boolean scoreAtAll) {
+		this.scoreAtAll = scoreAtAll;
+	}
+
+	/*package!*/ final void setPriorityAndTypicalDuration(final double priority, final double typicalDuration_s) {
 		//if typical duration is <=48 seconds (and priority=1) then zeroUtilityDuration becomes 0.0 because of the double precision. This means it is not possible
 		// to have activities with a typical duration <=48 seconds (GL/June2011)
-		super();
-		this.type = type;
+
 		this.typicalDuration_s = typicalDuration_s;
-		
-//		this.zeroUtilityDuration_h = (typicalDuration_s / 3600.0)
-//		* Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
+
+		//		this.zeroUtilityDuration_h = (typicalDuration_s / 3600.0)
+		//		* Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
 		// replacing the above two lines with the two lines below causes the test failure of ReRoutingTest.  kai, nov'12
-		
+
 		this.zeroUtilityDuration_h = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority,
 				typicalDuration_s) / 3600. ;
 
@@ -159,11 +167,11 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		// 120/3600 * exp( -10 / (120 / 3600) ) =  1.7 x 10^(-132)  (!!!!!!!!!!)
 		// In consequence, even a pt interaction of one seconds causes a fairly large utility.
 
-		if (this.zeroUtilityDuration_h <= 0.0) {
+		if (this.scoreAtAll && this.zeroUtilityDuration_h <= 0.0) {
 			throw new RuntimeException("zeroUtilityDuration of type " + type + " must be greater than 0.0. Did you forget to specify the typicalDuration?");
 		}
 	}
-
+	
 	/*package!*/ final void setMinimalDuration(final double dur) {
 		this.minimalDuration = dur;
 	}
@@ -187,11 +195,6 @@ public class ActivityUtilityParameters implements MatsimParameters {
 	public final String getType() {
 		return this.type;
 	}
-
-//	public final double getPriority() {
-//		return this.priority;
-//	}
-	// nobody seems to be using this, and it should not be used anyways ...  kai, nov'12
 
 	public final double getTypicalDuration() {
 		return this.typicalDuration_s;
@@ -223,10 +226,6 @@ public class ActivityUtilityParameters implements MatsimParameters {
 
 	public final boolean isScoreAtAll() {
 		return scoreAtAll;
-	}
-
-	/*package!*/ void setScoreAtAll(boolean scoreAtAll) {
-		this.scoreAtAll = scoreAtAll;
 	}
 
 }
