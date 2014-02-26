@@ -50,6 +50,8 @@ import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.taxi.optimizer.fifo.*;
+import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 import playground.michalm.util.RunningVehicleRegister;
 
 
@@ -112,11 +114,14 @@ import playground.michalm.util.RunningVehicleRegister;
 
         algorithmConfig = AlgorithmConfig.NOS_FF;
 
+        //scheduler:
         destinationKnown = false;
-        onlineVehicleTracker = true;
-        minimizePickupTripTime = false;
         pickupDuration = 120.;
         dropoffDuration = 60.;
+
+        //optimizer:
+        onlineVehicleTracker = true;
+        minimizePickupTripTime = false;
 
         otfVis = !true;
 
@@ -231,11 +236,7 @@ import playground.michalm.util.RunningVehicleRegister;
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
         contextImpl.setVrpData(taxiData);
 
-        ImmediateRequestParams params = new ImmediateRequestParams(destinationKnown,
-                minimizePickupTripTime, pickupDuration, dropoffDuration);
-
-        TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(context,
-                pathCalculator, params);
+        TaxiOptimizer optimizer = createOptimizer();
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         contextImpl.setMobsimTimer(qSim.getSimTimer());
@@ -305,6 +306,21 @@ import playground.michalm.util.RunningVehicleRegister;
         if (cacheStats != null) {
             cacheStats.updateStats(routerWithCache);
         }
+    }
+
+
+    private TaxiOptimizer createOptimizer()
+    {
+        TaxiSchedulerParams params = new TaxiSchedulerParams(destinationKnown, pickupDuration,
+                dropoffDuration);
+        TaxiScheduler scheduler = new TaxiScheduler(context, pathCalculator, params);
+
+        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator, scheduler);
+
+        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
+                pathCalculator, scheduler, vrpFinder, minimizePickupTripTime);
+
+        return algorithmConfig.createTaxiOptimizer(optimConfig);
     }
 
 

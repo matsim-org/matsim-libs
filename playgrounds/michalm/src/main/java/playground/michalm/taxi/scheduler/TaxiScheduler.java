@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.fifo;
+package playground.michalm.taxi.scheduler;
 
 import java.util.*;
 
@@ -33,7 +33,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.TaxiDelaySpeedupStats;
+import playground.michalm.taxi.optimizer.fifo.TaxiSchedulerParams;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
@@ -43,13 +43,13 @@ public class TaxiScheduler
 {
     private final MatsimVrpContext context;
     private final VrpPathCalculator calculator;
-    private final ImmediateRequestParams params;
+    private final TaxiSchedulerParams params;
 
     private TaxiDelaySpeedupStats delaySpeedupStats;
 
 
     public TaxiScheduler(MatsimVrpContext context, VrpPathCalculator calculator,
-            ImmediateRequestParams params)
+            TaxiSchedulerParams params)
     {
         this.context = context;
         this.calculator = calculator;
@@ -59,6 +59,12 @@ public class TaxiScheduler
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
             schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
+    }
+
+
+    public TaxiSchedulerParams getParams()
+    {
+        return params;
     }
 
 

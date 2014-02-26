@@ -48,7 +48,8 @@ public class APSTaxiOptimizer
     private boolean requiresReoptimization = false;
 
 
-    public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig, boolean seekDemandSupplyEquilibrium)
+    public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
+            boolean seekDemandSupplyEquilibrium)
     {
         this.optimConfig = optimConfig;
         this.seekDemandSupplyEquilibrium = seekDemandSupplyEquilibrium;
@@ -70,7 +71,8 @@ public class APSTaxiOptimizer
     protected void scheduleUnplannedRequests()
     {
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
-            optimConfig.scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh), unplannedRequests);
+            optimConfig.scheduler.removePlannedRequests(TaxiSchedules.getSchedule(veh),
+                    unplannedRequests);
         }
 
         int rDim = unplannedRequests.size();
@@ -116,16 +118,16 @@ public class APSTaxiOptimizer
 
         boolean reduceTP = seekDemandSupplyEquilibrium ? //
                 awaitingReqCount > idleVehCount : //
-                    optimConfig.params.minimizePickupTripTime;
+                optimConfig.minimizePickupTripTime;
 
         double[][] costMatrix = new double[vDim][rDim];
         VrpPathWithTravelData[][] paths = new VrpPathWithTravelData[vDim][rDim];
 
         for (int r = 0; r < rDim; r++) {
             TaxiRequest req = requests[r];
-            
+
             //if ()
-            
+
             for (int v = 0; v < vDim; v++) {
                 LinkTimePair departure = departures.get(v);
 
@@ -188,7 +190,7 @@ public class APSTaxiOptimizer
         optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
         TaxiTask nextTask = taxiSchedule.nextTask();
 
-        if (!optimConfig.params.destinationKnown) {
+        if (!optimConfig.scheduler.getParams().destinationKnown) {
             if (nextTask != null // schedule != COMPLETED
                     && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
                 requiresReoptimization = true;
@@ -204,7 +206,8 @@ public class APSTaxiOptimizer
         @SuppressWarnings("unchecked")
         Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
 
-        double predictedEndTime = driveTask.getTaskTracker().predictEndTime(optimConfig.context.getTime());
+        double predictedEndTime = driveTask.getTaskTracker().predictEndTime(
+                optimConfig.context.getTime());
         optimConfig.scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
 
         //we may here possibly decide here whether or not to reoptimize

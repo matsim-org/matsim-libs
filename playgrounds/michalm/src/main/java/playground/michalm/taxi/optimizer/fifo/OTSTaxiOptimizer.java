@@ -51,7 +51,7 @@ public class OTSTaxiOptimizer
         int vehCount = optimConfig.context.getVrpData().getVehicles().size();//1 awaiting req/veh
         unplannedRequests = new PriorityQueue<TaxiRequest>(vehCount, Requests.T0_COMPARATOR);
 
-        vrpComparator = optimConfig.params.minimizePickupTripTime ? //
+        vrpComparator = optimConfig.minimizePickupTripTime ? //
                 VehicleRequestPaths.TP_COMPARATOR : //
                 VehicleRequestPaths.TW_COMPARATOR;
     }
@@ -108,7 +108,7 @@ public class OTSTaxiOptimizer
         optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
         TaxiTask nextTask = taxiSchedule.nextTask();
 
-        if (!optimConfig.params.destinationKnown) {
+        if (!optimConfig.scheduler.getParams().destinationKnown) {
             if (nextTask != null // schedule != COMPLETED
                     && nextTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
                 requiresReoptimization = true;

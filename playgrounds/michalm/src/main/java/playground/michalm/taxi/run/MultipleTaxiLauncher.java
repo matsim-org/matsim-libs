@@ -34,6 +34,7 @@ import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.michalm.taxi.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
 
 
 /*package*/class MultipleTaxiLauncher

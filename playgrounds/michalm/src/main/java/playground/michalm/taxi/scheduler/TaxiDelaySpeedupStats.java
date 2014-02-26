@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.scheduler;
 
 import java.io.PrintWriter;
 

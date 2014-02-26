@@ -57,7 +57,7 @@ public class TaxiStatsCalculator
             switch (t.getTaxiTaskType()) {
                 case PICKUP_DRIVE:
                     eval.taxiPickupDriveTime += time;
-                    
+
                     if (eval.maxTaxiPickupDriveTime < time) {
                         eval.maxTaxiPickupDriveTime = time;
                     }

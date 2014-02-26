@@ -153,7 +153,7 @@ public class NOSTaxiOptimizer
     private boolean doReduceTP()
     {
         if (!seekDemandSupplyEquilibrium) {
-            return optimConfig.params.minimizePickupTripTime;
+            return optimConfig.minimizePickupTripTime;
         }
         else {
             int awaitingReqCount = DemandSupplyEquilibriumUtils.countAwaitingUnplannedRequests(

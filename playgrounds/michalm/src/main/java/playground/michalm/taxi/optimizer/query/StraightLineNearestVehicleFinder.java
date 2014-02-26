@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.DistanceUtils;
 
 import playground.michalm.taxi.model.TaxiRequest;
-import playground.michalm.taxi.optimizer.fifo.TaxiScheduler;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
 public class StraightLineNearestVehicleFinder

@@ -19,19 +19,17 @@
 
 package playground.michalm.taxi.optimizer.fifo;
 
-public class ImmediateRequestParams
+public class TaxiSchedulerParams
 {
-    public final Boolean destinationKnown;
-    public final Boolean minimizePickupTripTime;
-    public final Double pickupDuration;
-    public final Double dropoffDuration;
+    public final boolean destinationKnown;
+    public final double pickupDuration;
+    public final double dropoffDuration;
 
 
-    public ImmediateRequestParams(Boolean destinationKnown, Boolean minimizePickupTripTime,
-            Double pickupDuration, Double dropoffDuration)
+    public TaxiSchedulerParams(boolean destinationKnown, double pickupDuration,
+            double dropoffDuration)
     {
         this.destinationKnown = destinationKnown;
-        this.minimizePickupTripTime = minimizePickupTripTime;
         this.pickupDuration = pickupDuration;
         this.dropoffDuration = dropoffDuration;
     }

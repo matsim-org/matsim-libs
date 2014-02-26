@@ -25,15 +25,12 @@ import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
 
 import java.util.EnumSet;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 
 import playground.michalm.taxi.optimizer.TaxiOptimizer;
 import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.fifo.*;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 
 /*package*/enum AlgorithmConfig
@@ -179,15 +176,8 @@ import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
     }
 
 
-    /*package*/TaxiOptimizer createTaxiOptimizer(MatsimVrpContext context,
-            VrpPathCalculator calculator, ImmediateRequestParams params)
+    /*package*/TaxiOptimizer createTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
-        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator, scheduler);
-
-        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context, params,
-                calculator, scheduler, vrpFinder);
-
         switch (algorithmType) {
             case NO_SCHEDULING:
                 return NOSTaxiOptimizer.createNOS(optimConfig, false, tdisSource);

@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 
@@ -54,16 +55,15 @@ public class NOSRankTaxiOptimizer
 
 
     public static NOSRankTaxiOptimizer createNOSRankTaxiOptimizer(MatsimVrpContext context,
-            VrpPathCalculator calculator, ImmediateRequestParams params,
+            VrpPathCalculator calculator, TaxiSchedulerParams params,
             TravelDisutilitySource tdisSource)
     {
         TaxiScheduler scheduler = new RankModeTaxiScheduler(context, calculator, params);
 
-        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator,
-                scheduler);
+        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator, scheduler);
 
-        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context, params,
-                calculator, scheduler, vrpFinder);
+        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
+                calculator, scheduler, vrpFinder, false);
 
         return new NOSRankTaxiOptimizer(optimConfig, new IdleRankVehicleFinder(context, scheduler));
     }
@@ -100,7 +100,7 @@ public class NOSRankTaxiOptimizer
 
 
         public RankModeTaxiScheduler(MatsimVrpContext context, VrpPathCalculator calculator,
-                ImmediateRequestParams params)
+                TaxiSchedulerParams params)
         {
             super(context, calculator, params);
             this.calculator = calculator;
@@ -189,10 +189,10 @@ public class NOSRankTaxiOptimizer
 
             case STARTED:
                 oldEndTime = lastTask.getEndTime();
-                
-                if (oldEndTime<veh.getT1())
-                	System.out.println("endddd time is weird.");
-                
+
+                if (oldEndTime < veh.getT1())
+                    System.out.println("endddd time is weird.");
+
                 lastTask.setEndTime(currentTime);// shortening the WAIT task
 
                 break;
@@ -206,10 +206,10 @@ public class NOSRankTaxiOptimizer
         Link lastLink = lastTask.getLink();
         Link rankLink = findNearestRank(lastLink);
         if (rankLink != lastLink) {// not a loop
-        	
+
             VrpPathWithTravelData path = optimConfig.calculator.calcPath(lastLink, rankLink,
                     currentTime);
-            
+
             sched.addTask(new TaxiCruiseDriveTask(path));
 
             double arrivalTime = path.getArrivalTime();
@@ -218,24 +218,27 @@ public class NOSRankTaxiOptimizer
             // +oldendtime);
         }
         else {
-        	lastTask.setEndTime(oldEndTime);
+            lastTask.setEndTime(oldEndTime);
         }
-        
 
     }
-    
-    private Link findNearestRank(Link positionLink){
-    	Link nearestRankLink = null;
-    	double bestTravelCost = Double.MAX_VALUE;
-    	for (Entry<Id, Integer> e :    	this.rankArrivalDepartureCharger.getRankLocations().entrySet()){
-    		Link currentLink = optimConfig.context.getScenario().getNetwork().getLinks().get(e.getKey());
-    	double currentCost = optimConfig.calculator.calcPath(positionLink,currentLink,optimConfig.context.getTime()).getTravelCost();
-    	if (currentCost <bestTravelCost) {
-    		bestTravelCost = currentCost;
-    		nearestRankLink = currentLink;
-    	}
-    	}
-    	return nearestRankLink;
+
+
+    private Link findNearestRank(Link positionLink)
+    {
+        Link nearestRankLink = null;
+        double bestTravelCost = Double.MAX_VALUE;
+        for (Entry<Id, Integer> e : this.rankArrivalDepartureCharger.getRankLocations().entrySet()) {
+            Link currentLink = optimConfig.context.getScenario().getNetwork().getLinks()
+                    .get(e.getKey());
+            double currentCost = optimConfig.calculator.calcPath(positionLink, currentLink,
+                    optimConfig.context.getTime()).getTravelCost();
+            if (currentCost < bestTravelCost) {
+                bestTravelCost = currentCost;
+                nearestRankLink = currentLink;
+            }
+        }
+        return nearestRankLink;
     }
 
 

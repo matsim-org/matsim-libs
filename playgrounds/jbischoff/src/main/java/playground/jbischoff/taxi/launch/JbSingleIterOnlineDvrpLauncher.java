@@ -44,14 +44,14 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
-import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.model.*;
 import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
-import playground.michalm.taxi.optimizer.fifo.ImmediateRequestParams;
+import playground.michalm.taxi.optimizer.fifo.TaxiSchedulerParams;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
+import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
 import playground.michalm.util.RunningVehicleRegister;
 
 
@@ -97,15 +97,15 @@ import playground.michalm.util.RunningVehicleRegister;
         //        netFileName = dirName + "network.xml";
 
         // michalm - testing config (may be removed...)////////////////////////////////////
-//        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
-//        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
-//        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
-//        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
-    	
-    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
-           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
-           netFileName = dirName + "berlin_brb.xml.gz";
-           eventsFileName = null;
+        //        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
+        //        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
+        //        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
+        //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+
+        dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
+        plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
+        netFileName = dirName + "berlin_brb.xml.gz";
+        eventsFileName = null;
         ////////////////////////////////////////////////////////         
 
         //        electricStatsDir = dirName +"electric_noranks\\";
@@ -144,10 +144,10 @@ import playground.michalm.util.RunningVehicleRegister;
 
         scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
 
-//        List<String> taxiCustomerIds;
-//        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
+        //        List<String> taxiCustomerIds;
+        //        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
 
-//        VrpLauncherUtils.convertLegModes(taxiCustomerIds, TaxiRequestCreator.MODE, scenario);
+        //        VrpLauncherUtils.convertLegModes(taxiCustomerIds, TaxiRequestCreator.MODE, scenario);
     }
 
 
@@ -198,8 +198,7 @@ import playground.michalm.util.RunningVehicleRegister;
 
         double pickupDuration = 120;
         double dropoffDuration = 60;
-        ImmediateRequestParams params = new ImmediateRequestParams(true, false, pickupDuration,
-                dropoffDuration);
+        TaxiSchedulerParams params = new TaxiSchedulerParams(false, pickupDuration, dropoffDuration);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
                 calculator, params, tdisSource);
@@ -250,7 +249,7 @@ import playground.michalm.util.RunningVehicleRegister;
         for (Request r : context.getVrpData().getRequests()) {
             TaxiRequest tr = (TaxiRequest)r;
             if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
-//                throw new IllegalStateException();
+                //                throw new IllegalStateException();
             }
         }
     }
