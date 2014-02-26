@@ -27,7 +27,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.michalm.taxi.model.TaxiRank;
+import playground.michalm.taxi.data.TaxiRank;
 
 public class BerlinTaxiRankCreator {
 	private static final Logger log = Logger.getLogger(BerlinTaxiRankCreator.class);

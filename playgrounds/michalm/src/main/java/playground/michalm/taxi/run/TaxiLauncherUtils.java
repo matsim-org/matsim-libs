@@ -21,8 +21,8 @@ package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
 
-import playground.michalm.taxi.TaxiData;
-import playground.michalm.taxi.file.*;
+import playground.michalm.taxi.data.TaxiData;
+import playground.michalm.taxi.data.file.*;
 
 
 public class TaxiLauncherUtils

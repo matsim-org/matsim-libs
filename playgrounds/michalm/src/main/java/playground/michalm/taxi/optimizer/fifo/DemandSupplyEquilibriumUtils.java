@@ -2,7 +2,7 @@ package playground.michalm.taxi.optimizer.fifo;
 
 import java.util.Collection;
 
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.data.TaxiRequest;
 
 
 public class DemandSupplyEquilibriumUtils

@@ -21,7 +21,7 @@ package playground.michalm.taxi.optimizer.query;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.data.TaxiRequest;
 
 
 public interface VehicleFilter

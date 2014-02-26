@@ -31,8 +31,8 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.taxi.model.*;
-import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.data.*;
+import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.fifo.TaxiSchedulerParams;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;

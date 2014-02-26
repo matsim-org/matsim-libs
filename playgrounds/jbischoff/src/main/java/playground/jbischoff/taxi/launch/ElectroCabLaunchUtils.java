@@ -35,8 +35,7 @@ import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
-import playground.michalm.taxi.TaxiData;
-import playground.michalm.taxi.model.TaxiRank;
+import playground.michalm.taxi.data.*;
 
 
 /**

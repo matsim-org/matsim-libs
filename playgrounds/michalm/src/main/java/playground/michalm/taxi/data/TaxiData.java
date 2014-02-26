@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.data;
 
-import java.io.PrintWriter;
+import java.util.*;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.matsim.contrib.dvrp.router.LeastCostPathCalculatorWithCache;
+import org.matsim.contrib.dvrp.data.VrpDataImpl;
+import org.matsim.contrib.dvrp.extensions.electric.*;
+
+import playground.michalm.taxi.data.*;
 
 
-public class LeastCostPathCalculatorCacheStats
+public class TaxiData
+    extends VrpDataImpl
+    implements ElectricVrpData
 {
-    private final SummaryStatistics hitStats = new SummaryStatistics();
-    private final SummaryStatistics missStats = new SummaryStatistics();
+    private final List<TaxiRank> taxiRanks = new ArrayList<TaxiRank>();
+    private final List<Charger> chargers = new ArrayList<Charger>();
 
 
-    public void updateStats(LeastCostPathCalculatorWithCache calculatorWithCache)
+    public List<TaxiRank> getTaxiRanks()
     {
-        hitStats.addValue(calculatorWithCache.getCacheHits());
-        missStats.addValue(calculatorWithCache.getCacheMisses());
+        return taxiRanks;
     }
 
 
-    public void printStats(PrintWriter pw, String id)
+    public List<Charger> getChargers()
     {
-        pw.printf("%10s\t%f\t%f\n", id, hitStats.getMean(), missStats.getMean());
+        return chargers;
     }
 
 
-    public void clearStats()
+    public List<ElectricVehicle> getElectricVehicles()
     {
-        hitStats.clear();
-        missStats.clear();
+        return convertList(getVehicles());
+    }
+
+
+    public List<TaxiRequest> getTaxiRequests()
+    {
+        return convertList(getRequests());
+    }
+
+
+    //casts List of supertype S to List of type T
+    @SuppressWarnings("unchecked")
+    private static <S, T> List<T> convertList(List<S> list)
+    {
+        return (List<T>)list;
     }
 }

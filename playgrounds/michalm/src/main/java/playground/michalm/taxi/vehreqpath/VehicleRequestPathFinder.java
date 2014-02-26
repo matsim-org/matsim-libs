@@ -6,7 +6,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 import com.google.common.base.Function;

@@ -45,13 +45,14 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.taxi.*;
-import playground.michalm.taxi.model.*;
-import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.data.*;
+import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.taxi.optimizer.fifo.TaxiSchedulerParams;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
 import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.util.RunningVehicleRegister;
 
 

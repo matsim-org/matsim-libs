@@ -1,4 +1,4 @@
-package playground.michalm.taxi.chart;
+package playground.michalm.taxi.util.chart;
 
 import java.awt.*;
 import java.util.List;

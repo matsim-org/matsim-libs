@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.util.stats;
 
 import java.io.*;
 
@@ -27,8 +27,9 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 
-import playground.michalm.taxi.model.*;
-import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.data.*;
+import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.optimizer.TaxiUtils;
 
 
 public class IdleVehicleUnplannedRequestStats

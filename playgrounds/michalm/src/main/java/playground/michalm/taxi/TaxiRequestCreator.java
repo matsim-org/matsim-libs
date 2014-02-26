@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.data.TaxiRequest;
 
 
 public class TaxiRequestCreator

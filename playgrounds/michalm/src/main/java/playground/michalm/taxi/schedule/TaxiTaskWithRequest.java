@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.schedule;
 
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.data.TaxiRequest;
 
 
 public interface TaxiTaskWithRequest

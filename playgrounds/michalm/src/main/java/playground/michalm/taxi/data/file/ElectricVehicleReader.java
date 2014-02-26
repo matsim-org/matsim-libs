@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.file;
+package playground.michalm.taxi.data.file;
 
 import java.util.*;
 

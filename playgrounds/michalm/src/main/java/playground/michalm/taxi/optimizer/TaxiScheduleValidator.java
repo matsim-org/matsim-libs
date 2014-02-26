@@ -22,9 +22,8 @@ package playground.michalm.taxi.optimizer;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
-import playground.michalm.taxi.TaxiData;
-import playground.michalm.taxi.model.*;
-import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.data.*;
+import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 
 public class TaxiScheduleValidator

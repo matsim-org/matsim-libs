@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.file;
+package playground.michalm.taxi.data.file;
 
 import java.util.*;
 
@@ -28,8 +28,7 @@ import org.matsim.contrib.dvrp.extensions.electric.ChargerImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.michalm.taxi.TaxiData;
-import playground.michalm.taxi.model.TaxiRank;
+import playground.michalm.taxi.data.*;
 
 
 public class TaxiRankReader

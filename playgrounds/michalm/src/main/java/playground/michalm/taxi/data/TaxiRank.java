@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.model;
+package playground.michalm.taxi.data;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;

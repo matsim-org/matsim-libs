@@ -44,13 +44,14 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.taxi.*;
-import playground.michalm.taxi.chart.TaxiScheduleChartUtils;
-import playground.michalm.taxi.model.*;
-import playground.michalm.taxi.model.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.data.*;
+import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.taxi.optimizer.fifo.*;
 import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
+import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 import playground.michalm.util.RunningVehicleRegister;
 

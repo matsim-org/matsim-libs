@@ -21,7 +21,7 @@ package playground.michalm.taxi.schedule;
 
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
-import playground.michalm.taxi.model.TaxiRequest;
+import playground.michalm.taxi.data.TaxiRequest;
 
 
 public class TaxiDropoffStayTask
