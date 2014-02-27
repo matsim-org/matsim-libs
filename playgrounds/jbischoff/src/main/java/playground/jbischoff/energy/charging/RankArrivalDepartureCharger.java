@@ -40,7 +40,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 	private final double MINIMUMCHARGETIME = 120.;
 //	private final double POWERINKW = 50.0; // max charge for Nissan Leaf
 	private final double POWERINKW = 22.0; // max charge at standard Berlin Charger
-	private final int RANKCHARGERAMOUNT = 1; //amount of chargers at each rank location
+	private final int RANKCHARGERAMOUNT = 50; //amount of chargers at each rank location
 	
 	private final double MINIMUMSOCFORDEPARTURE = 5.;
 	private static final Logger log = Logger
@@ -71,6 +71,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 			refreshLog(time);
 
 		}
+	
 
 	}
 
@@ -208,7 +209,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 			double rsoc = soc
 					/ ((BatteryElectricVehicle) e.getValue())
 							.getUsableBatteryCapacityInJoules();
-//			this.soCLog.add(new SocLogRow(e.getKey(), time, soc, rsoc));
+			this.soCLog.add(new SocLogRow(e.getKey(), time, soc, rsoc));
 			currentSoc.add(soc);
 		}
 		if (currentSoc.size() > 0) {

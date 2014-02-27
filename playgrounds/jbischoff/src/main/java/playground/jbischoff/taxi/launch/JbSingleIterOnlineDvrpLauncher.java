@@ -23,6 +23,7 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.data.Request;
@@ -97,15 +98,18 @@ import playground.michalm.util.RunningVehicleRegister;
         //        netFileName = dirName + "network.xml";
 
         // michalm - testing config (may be removed...)////////////////////////////////////
-        //        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
-        //        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
-        //        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
-        //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
 
-        dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
-        plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
-        netFileName = dirName + "berlin_brb.xml.gz";
-        eventsFileName = null;
+//        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
+//        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
+//        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
+//        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+    	
+//    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
+    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\";
+           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
+           netFileName = dirName + "berlin_brb.xml.gz";
+           eventsFileName = null;
+
         ////////////////////////////////////////////////////////         
 
         //        electricStatsDir = dirName +"electric_noranks\\";
@@ -237,7 +241,11 @@ import playground.michalm.util.RunningVehicleRegister;
         }
         //        qSim.getScenario().getConfig().simulation().setEndTime(86399);
         qSim.run();
-
+        System.out.println("taxiless agents: ");
+        for (Id id : rvr.getRunningAgentIds()){
+        	System.out.println(id.toString());
+        	
+        }
         events.finishProcessing();
 
         if (writeSimEvents) {
