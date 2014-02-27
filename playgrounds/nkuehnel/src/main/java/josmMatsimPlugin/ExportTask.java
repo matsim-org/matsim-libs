@@ -30,6 +30,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.validation.OsmValidator;
+import org.openstreetmap.josm.data.validation.Severity;
 import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.gui.layer.Layer;
@@ -51,17 +52,16 @@ public class ExportTask extends PleaseWaitRunnable {
 	protected int exportResult;
 	private String targetSystem;
 
-	protected static final int SUCCESS = 0;
-	protected static final int VALIDATION_ERROR = 1;
-	private List<TestError> validationErrors = new ArrayList<TestError>();
 	private File file;
 
 	public ExportTask(File file) {
 		super("MATSim Export");
-		this.exportResult = 0;
 		this.targetSystem = (String) ExportDialog.exportSystem
 				.getSelectedItem();
 		this.file = file;
+		if (!this.file.getAbsolutePath().endsWith(".xml")) {
+			this.file = new File(this.file.getAbsolutePath() + ".xml");
+		}
 	}
 
 	/*
@@ -71,7 +71,6 @@ public class ExportTask extends PleaseWaitRunnable {
 	 */
 	@Override
 	protected void cancel() {
-		// TODO Auto-generated method stub
 	}
 
 	/*
@@ -81,25 +80,8 @@ public class ExportTask extends PleaseWaitRunnable {
 	 */
 	@Override
 	protected void finish() {
-		if (exportResult == SUCCESS) {
-			JOptionPane.showMessageDialog(Main.parent,
-					"Export finished. File written to: " + file.getPath() + " ("
-							+ targetSystem + ")");
-		} else if (exportResult == VALIDATION_ERROR) {
-			JOptionPane
-					.showMessageDialog(
-							Main.parent,
-							"Export failed due to validation errors. See validation layer for details.",
-							"Failure", JOptionPane.ERROR_MESSAGE,
-							new ImageProvider("warning-small").setWidth(16)
-									.get());
-			OsmValidator.initializeErrorLayer();
-			Main.map.validatorDialog.unfurlDialog();
-			Main.main.getEditLayer().validationErrors.clear();
-			Main.main.getEditLayer().validationErrors
-					.addAll(this.validationErrors);
-			Main.map.validatorDialog.tree.setErrors(this.validationErrors);
-		}
+		JOptionPane.showMessageDialog(Main.parent,
+				"Export finished. File written to: " + file.getPath());
 	}
 
 	/*
@@ -111,7 +93,7 @@ public class ExportTask extends PleaseWaitRunnable {
 	protected void realRun() throws SAXException, IOException,
 			OsmTransferException, UncheckedIOException {
 
-		this.progressMonitor.setTicksCount(4);
+		this.progressMonitor.setTicksCount(3);
 		this.progressMonitor.setTicks(0);
 
 		Config config = ConfigUtils.createConfig();
@@ -122,56 +104,41 @@ public class ExportTask extends PleaseWaitRunnable {
 						targetSystem);
 
 		Layer layer = Main.main.getActiveLayer();
+		
 		if (layer instanceof OsmDataLayer) {
 			if (layer instanceof NetworkLayer) {
 				this.progressMonitor.setTicks(1);
-				this.progressMonitor.setCustomText("validating data..");
+				this.progressMonitor.setCustomText("rearranging data..");
 
-				DuplicateId test = new DuplicateId();
-				test.startTest(NullProgressMonitor.INSTANCE);
-				test.visit(((OsmDataLayer) layer).data.allPrimitives());
-				test.endTest();
-
-				if (test.getErrors().size() > 0) {
-					this.exportResult = VALIDATION_ERROR;
-					this.validationErrors.addAll(test.getErrors());
-					return;
-
-				} else {
-					this.progressMonitor.setTicks(2);
-					this.progressMonitor.setCustomText("rearranging data..");
-
-					for (Node node : ((NetworkLayer) layer).getMatsimNetwork()
-							.getNodes().values()) {
-						Node newNode = network.getFactory().createNode(
-								new IdImpl(((NodeImpl) node).getOrigId()),
-								node.getCoord());
-						CoordinateTransformation customCt = TransformationFactory
-								.getCoordinateTransformation(
-										((NetworkLayer) layer).getCoordSystem(),
-										targetSystem);
-						Coord temp = customCt.transform(node.getCoord());
-						node.getCoord().setXY(temp.getX(), temp.getY());
-						network.addNode(newNode);
-					}
-					for (Link link : ((NetworkLayer) layer).getMatsimNetwork()
-							.getLinks().values()) {
-						Link newLink = network.getFactory().createLink(
-								new IdImpl(((LinkImpl) link).getOrigId()),
-								network.getNodes().get(
-										new IdImpl(((NodeImpl) link
-												.getFromNode()).getOrigId())),
-								network.getNodes().get(
-										new IdImpl(
-												((NodeImpl) link.getToNode())
-														.getOrigId())));
-						newLink.setFreespeed(link.getFreespeed());
-						newLink.setCapacity(link.getCapacity());
-						newLink.setLength(link.getLength());
-						newLink.setNumberOfLanes(link.getNumberOfLanes());
-						newLink.setAllowedModes(link.getAllowedModes());
-						network.addLink(newLink);
-					}
+				for (Node node : ((NetworkLayer) layer).getMatsimNetwork()
+						.getNodes().values()) {
+					Node newNode = network.getFactory().createNode(
+							new IdImpl(((NodeImpl) node).getOrigId()),
+							node.getCoord());
+					CoordinateTransformation customCt = TransformationFactory
+							.getCoordinateTransformation(
+									((NetworkLayer) layer).getCoordSystem(),
+									targetSystem);
+					Coord temp = customCt.transform(node.getCoord());
+					node.getCoord().setXY(temp.getX(), temp.getY());
+					network.addNode(newNode);
+				}
+				for (Link link : ((NetworkLayer) layer).getMatsimNetwork()
+						.getLinks().values()) {
+					Link newLink = network.getFactory().createLink(
+							new IdImpl(((LinkImpl) link).getOrigId()),
+							network.getNodes().get(
+									new IdImpl(((NodeImpl) link.getFromNode())
+											.getOrigId())),
+							network.getNodes().get(
+									new IdImpl(((NodeImpl) link.getToNode())
+											.getOrigId())));
+					newLink.setFreespeed(link.getFreespeed());
+					newLink.setCapacity(link.getCapacity());
+					newLink.setLength(link.getLength());
+					newLink.setNumberOfLanes(link.getNumberOfLanes());
+					newLink.setAllowedModes(link.getAllowedModes());
+					network.addLink(newLink);
 				}
 			} else {
 				this.progressMonitor.setTicks(1);
@@ -190,11 +157,11 @@ public class ExportTask extends PleaseWaitRunnable {
 			}
 
 			if (Main.pref.getBoolean("matsim_cleanNetwork")) {
-				this.progressMonitor.setTicks(3);
+				this.progressMonitor.setTicks(2);
 				this.progressMonitor.setCustomText("cleaning network..");
 				new NetworkCleaner().run(network);
 			}
-			this.progressMonitor.setTicks(4);
+			this.progressMonitor.setTicks(3);
 			this.progressMonitor.setCustomText("writing out xml file..");
 			new NetworkWriter(network).write(file.getAbsolutePath());
 		}

@@ -3,6 +3,8 @@ package josmMatsimPlugin;
 import static org.openstreetmap.josm.tools.I18n.tr;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,7 +25,7 @@ import org.openstreetmap.josm.data.validation.TestError;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 
-public class DuplicateId extends Test {
+public class MATSimTest extends Test {
 
 	Map<String, ArrayList<Way>> linkIds;
 	Map<String, ArrayList<Node>> nodeIds;
@@ -31,8 +33,9 @@ public class DuplicateId extends Test {
 
 	protected final static int DUPLICATE_LINK_ID = 3001;
 	protected final static int DUPLICATE_NODE_ID = 3002;
+	protected final static int DOUBTFUL_LINK_ATTRIBUTE = 3003;
 
-	public DuplicateId() {
+	public MATSimTest() {
 		super(tr("MATSimValidation"),
 				tr("Validates MATSim-related network data"));
 	}
@@ -50,29 +53,48 @@ public class DuplicateId extends Test {
 
 	@Override
 	public void visit(Way w) {
-		for (Link link : network.getLinks().values()) {
-			if (String.valueOf(w.getUniqueId()).equalsIgnoreCase(
-					link.getId().toString())) {
-				String origId = ((LinkImpl) link).getOrigId();
-				if (!linkIds.containsKey(origId)) {
-					linkIds.put(origId, new ArrayList<Way>());
+		if (this.network != null) {
+			for (Link link : network.getLinks().values()) {
+				if (String.valueOf(w.getUniqueId()).equalsIgnoreCase(
+						link.getId().toString())) {
+					String origId = ((LinkImpl) link).getOrigId();
+					if (!linkIds.containsKey(origId)) {
+						linkIds.put(origId, new ArrayList<Way>());
+					}
+					linkIds.get(origId).add(w);
+
+					if (doubtfulAttributes(link)) {
+						String msg = ("Link contains doubtful attributes");
+						Collection<Way> way = Collections.singleton(w);
+						errors.add(new TestError(this, Severity.WARNING, msg,
+								DOUBTFUL_LINK_ATTRIBUTE, way, way));
+					}
 				}
-				linkIds.get(origId).add(w);
 			}
 		}
 	}
 
+	private boolean doubtfulAttributes(Link link) {
+		if (link.getFreespeed() == 0 || link.getCapacity() == 0
+				|| link.getLength() == 0 || link.getNumberOfLanes() == 0) {
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public void visit(Node n) {
-		for (org.matsim.api.core.v01.network.Node node : network.getNodes()
-				.values()) {
-			if (String.valueOf(n.getUniqueId()).equalsIgnoreCase(
-					node.getId().toString())) {
-				String origId = ((NodeImpl) node).getOrigId();
-				if (!nodeIds.containsKey(origId)) {
-					nodeIds.put(origId, new ArrayList<Node>());
+		if (this.network != null) {
+			for (org.matsim.api.core.v01.network.Node node : network.getNodes()
+					.values()) {
+				if (String.valueOf(n.getUniqueId()).equalsIgnoreCase(
+						node.getId().toString())) {
+					String origId = ((NodeImpl) node).getOrigId();
+					if (!nodeIds.containsKey(origId)) {
+						nodeIds.put(origId, new ArrayList<Node>());
+					}
+					nodeIds.get(origId).add(n);
 				}
-				nodeIds.get(origId).add(n);
 			}
 		}
 	}

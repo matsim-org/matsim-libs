@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.actions.ExtensionFileFilter;
 import org.openstreetmap.josm.data.SelectionChangedListener;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -41,6 +42,7 @@ import org.openstreetmap.josm.gui.MapView.LayerChangeListener;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
 import org.openstreetmap.josm.gui.dialogs.DialogsPanel.Action;
 import org.openstreetmap.josm.gui.layer.Layer;
+import org.openstreetmap.josm.io.FileExporter;
 import org.openstreetmap.josm.tools.ImageProvider;
 
 public class MATSimToggleDialog extends ToggleDialog implements
@@ -50,11 +52,14 @@ public class MATSimToggleDialog extends ToggleDialog implements
 	private MATSimTableModel tableModel;
 	private JButton networkAttributes = new JButton(new ImageProvider(
 			"dialogs", "edit").setWidth(16).get());
+	private List<FileExporter> exporterCopy = new ArrayList<FileExporter>();
 
 	public MATSimToggleDialog() {
 		super("Links/Nodes", "logo.png", "Links/Nodes", null, 150, true,
 				Preferences.class);
 		DataSet.addSelectionListener(this);
+
+		exporterCopy.addAll(ExtensionFileFilter.exporters);
 
 		table = new JTable();
 		table.setDefaultRenderer(Object.class, new MATSimTableRenderer());
@@ -105,7 +110,15 @@ public class MATSimToggleDialog extends ToggleDialog implements
 			table.setModel(tableModel);
 			notifyDataChanged(layer);
 			this.networkAttributes.setEnabled(true);
+			if(!(oldLayer instanceof NetworkLayer)) {
+				ExtensionFileFilter.exporters.clear();
+				ExtensionFileFilter.exporters.add(0, new MATSimNetworkFileExporter());
+			}
+
 		} else {
+			if (oldLayer instanceof NetworkLayer) {
+				ExtensionFileFilter.exporters.addAll(this.exporterCopy);
+			}
 			table.setModel(new DefaultTableModel());
 			setTitle(tr("Links/Nodes"));
 			layer = null;
@@ -121,11 +134,14 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		table.clearSelection();
 		for (OsmPrimitive prim : primitives) {
 			if (prim instanceof Way) {
-				List<Link> links = layer.getWay2Links().get((Way) prim);
-				for (Link link : links) {
-					int rowIndex = ((MATSimTableModel) table.getModel()).getRowIndexFor(link);
-					table.addRowSelectionInterval(rowIndex, rowIndex);
-				}	
+				if (layer.getWay2Links().get((Way) prim) != null) {
+					List<Link> links = layer.getWay2Links().get((Way) prim);
+					for (Link link : links) {
+						int rowIndex = ((MATSimTableModel) table.getModel())
+								.getRowIndexFor(link);
+						table.addRowSelectionInterval(rowIndex, rowIndex);
+					}
+				}
 			}
 		}
 	}
@@ -151,7 +167,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		private Network network;
 
 		private Map<Id, Integer> link2rowIndex;
-		
+
 		private ArrayList<Id> links;
 
 		MATSimTableModel(Network network) {
@@ -208,7 +224,7 @@ public class MATSimToggleDialog extends ToggleDialog implements
 		public int getRowIndexFor(Link link) {
 			return link2rowIndex.get(link.getId());
 		}
-		
+
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			Link link = network.getLinks().get(links.get(rowIndex));
@@ -263,11 +279,11 @@ public class MATSimToggleDialog extends ToggleDialog implements
 				String cP = capacityPeriodValue.getText();
 				if (!lW.isEmpty()) {
 					((NetworkImpl) ((NetworkLayer) layer).getMatsimNetwork())
-					.setEffectiveLaneWidth(Double.parseDouble(lW));
-				} 
+							.setEffectiveLaneWidth(Double.parseDouble(lW));
+				}
 				if (!cP.isEmpty()) {
 					((NetworkImpl) ((NetworkLayer) layer).getMatsimNetwork())
-					.setCapacityPeriod(Double.parseDouble(cP));
+							.setCapacityPeriod(Double.parseDouble(cP));
 				}
 			}
 		}
@@ -276,12 +292,12 @@ public class MATSimToggleDialog extends ToggleDialog implements
 
 	@Override
 	public void layerAdded(Layer newLayer) {
-		
+
 	}
 
 	@Override
 	public void layerRemoved(Layer oldLayer) {
-		
+
 	}
-	
+
 }
