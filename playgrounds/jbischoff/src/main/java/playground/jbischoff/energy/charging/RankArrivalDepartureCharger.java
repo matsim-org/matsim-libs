@@ -244,7 +244,7 @@ public class RankArrivalDepartureCharger implements PersonArrivalEventHandler,
 		return (this.vehicles.containsKey(agentId));
 	}
 
-	private boolean isAtRankLocation(Id linkId) {
+	public boolean isAtRankLocation(Id linkId) {
 		return (this.rankLocations.containsKey(linkId));
 	}
 

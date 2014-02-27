@@ -150,12 +150,13 @@ public class NOSRankTaxiOptimizer
         if (time % 60. == 0.) {
             checkWaitingVehiclesBatteryState();
             if (this.idleRankMode)
-                updateIdlers();
+//                updateIdlers();
+            	sendIdlingTaxisBackToRank(time);
         }
-        if (this.idleRankMode)
-            if (time % 60. == 5.) {
-                sendIdlingTaxisToRank();
-            }
+//        if (this.idleRankMode)
+//            if (time % 60. == 5.) {
+//                sendIdlingTaxisToRank();
+//            }
     }
 
 
@@ -243,30 +244,48 @@ public class NOSRankTaxiOptimizer
     }
 
 
-    public void updateIdlers()
-    {
-        this.shortTimeIdlers.clear();
-        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
-            Task last = Schedules.getLastTask(veh.getSchedule());
-            if (last instanceof TaxiWaitStayTask) {
-                TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
-                if (!lastw.getLink().equals(veh.getStartLink())) {
-                    this.shortTimeIdlers.add(veh.getId());
-                }
-            }
-        }
-    }
+//    public void updateIdlers()
+//    {
+//        this.shortTimeIdlers.clear();
+//        for (Vehicle veh : context.getVrpData().getVehicles()) {
+//            Task last = Schedules.getLastTask(veh.getSchedule());
+//            if (last instanceof TaxiWaitStayTask) {
+//                TaxiWaitStayTask lastw = (TaxiWaitStayTask)last;
+//                if (!lastw.getLink().equals(veh.getStartLink())) {
+//                    this.shortTimeIdlers.add(veh.getId());
+//                }
+//            }
+//        }
+//    }
+//
+//
+//    public void sendIdlingTaxisToRank()
+//    {
+//        for (Vehicle veh : context.getVrpData().getVehicles()) {
+//            if (shortTimeIdlers.contains(veh.getId())) {
+//                Task last = Schedules.getLastTask(veh.getSchedule());
+//                if (last instanceof TaxiWaitStayTask) {
+//                    scheduleRankReturn(veh);
+//                }
+//            }
+//        }
+//    }
 
+public void sendIdlingTaxisBackToRank(double time){
+    for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
+    	if (veh.getSchedule().getCurrentTask() instanceof TaxiWaitStayTask){
+    		TaxiWaitStayTask twst = (TaxiWaitStayTask) veh.getSchedule().getCurrentTask();
+    		if (!this.rankArrivalDepartureCharger.isAtRankLocation(twst.getLink().getId())){
+        		if (time-twst.getBeginTime()>60.){
+        		scheduleRankReturn(veh);
+        		}
+    			
+    		}
+   
+    		
+    	
+    	}
 
-    public void sendIdlingTaxisToRank()
-    {
-        for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
-            if (shortTimeIdlers.contains(veh.getId())) {
-                Task last = Schedules.getLastTask(veh.getSchedule());
-                if (last instanceof TaxiWaitStayTask) {
-                    scheduleRankReturn(veh);
-                }
-            }
-        }
-    }
+}
+}
 }
