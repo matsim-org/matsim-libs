@@ -17,31 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.optimizer.assignment;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
+import java.util.*;
 
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.util.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 
+import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.util.TaxicabUtils;
 
-public class TaxiOptimizationValidation
+class VehicleData
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(MatsimVrpContext context)
+    final List<Vehicle> vehicles = new ArrayList<Vehicle>();
+    final List<LinkTimePair> departures = new ArrayList<LinkTimePair>();
+    final int idleVehCount;
+    final int dimension;
+
+
+    VehicleData(TaxiOptimizerConfiguration optimConfig)
     {
-        TaxiData taxiData = (TaxiData)context.getVrpData();
+        int idleVehs = 0;
+        double maxDepartureTime = -Double.MAX_VALUE;
+        for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
+            LinkTimePair departure = optimConfig.scheduler.getEarliestIdleness(v);
+            //LinkTimePair departure = scheduler.getClosestDiversion(v);
 
-        if (TaxicabUtils.countIdleVehicles(taxiData.getVehicles()) == 0) {
-            return;//OK
+            if (departure != null) {
+                vehicles.add(v);
+                departures.add(departure);
+
+                if (departure.time > maxDepartureTime) {
+                    maxDepartureTime = departure.time;
+                }
+
+                if (TaxicabUtils.isIdle(v)) {
+                    idleVehs++;
+                }
+            }
         }
 
-        if (TaxiRequestUtils.countRequestsWithStatus(taxiData.getTaxiRequests(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
+        idleVehCount = idleVehs;
+        dimension = vehicles.size();
     }
 }

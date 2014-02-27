@@ -17,31 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.optimizer.assignment;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
+import java.util.Set;
 
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.util.*;
+import org.matsim.contrib.dvrp.data.Requests;
+
+import playground.michalm.taxi.data.TaxiRequest;
+import playground.michalm.taxi.optimizer.fifo.TaxiOptimizerConfiguration;
 
 
-public class TaxiOptimizationValidation
+class RequestData
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(MatsimVrpContext context)
+    final TaxiRequest[] requests;
+    final int urgentReqCount;
+    final int dimension;
+
+
+    public RequestData(TaxiOptimizerConfiguration optimConfig, Set<TaxiRequest> unplannedRequests)
     {
-        TaxiData taxiData = (TaxiData)context.getVrpData();
+        dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        if (TaxicabUtils.countIdleVehicles(taxiData.getVehicles()) == 0) {
-            return;//OK
-        }
+        urgentReqCount = Requests.countUrgentRequests(unplannedRequests,
+                optimConfig.context.getTime());
 
-        if (TaxiRequestUtils.countRequestsWithStatus(taxiData.getTaxiRequests(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
+        requests = unplannedRequests.toArray(new TaxiRequest[dimension]);
     }
 }

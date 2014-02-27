@@ -156,8 +156,8 @@ public class NOSTaxiOptimizer
                 return false;
 
             case DEMAND_SUPPLY_EQUIL:
-                int awaitingReqCount = DemandSupplyBalanceUtils.countUrgentUnplannedRequests(
-                        unplannedRequests, optimConfig.context.getTime());
+                int awaitingReqCount = Requests.countUrgentRequests(unplannedRequests,
+                        optimConfig.context.getTime());
                 return awaitingReqCount > idleVehicles.size();
 
             default:

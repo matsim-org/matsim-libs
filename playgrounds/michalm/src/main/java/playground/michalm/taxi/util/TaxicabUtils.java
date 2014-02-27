@@ -30,7 +30,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 
-public class TaxiUtils
+public class TaxicabUtils
 {
     public static final Predicate<Vehicle> IS_IDLE_PREDICATE = new Predicate<Vehicle>() {
         public boolean apply(Vehicle vehicle)
@@ -40,7 +40,7 @@ public class TaxiUtils
     };
 
 
-    public static Iterable<Vehicle> filterIdleVehicles(Iterable<Vehicle> vehicles)
+    public static <V extends Vehicle> Iterable<V> filterIdleVehicles(Iterable<V> vehicles)
     {
         return Iterables.filter(vehicles, IS_IDLE_PREDICATE);
     }
@@ -79,7 +79,7 @@ public class TaxiUtils
     }
 
 
-    public static int countIdleVehicles(Iterable<Vehicle> vehicles)
+    public static int countIdleVehicles(Iterable<? extends Vehicle> vehicles)
     {
         return Iterables.size(Iterables.filter(vehicles, IS_IDLE_PREDICATE));
     }

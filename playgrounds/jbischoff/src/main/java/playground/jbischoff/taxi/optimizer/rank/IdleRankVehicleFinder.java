@@ -30,7 +30,7 @@ import playground.jbischoff.energy.charging.RankArrivalDepartureCharger;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.query.*;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.util.TaxiUtils;
+import playground.michalm.taxi.util.TaxicabUtils;
 
 
 /**
@@ -147,7 +147,7 @@ public class IdleRankVehicleFinder
         double bestSoc = 0;
         Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
-        for (Vehicle veh : TaxiUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
+        for (Vehicle veh : TaxicabUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -169,7 +169,7 @@ public class IdleRankVehicleFinder
         double bestSoc = 0;
         Collections.shuffle(context.getVrpData().getVehicles(), rnd);
 
-        for (Vehicle veh : TaxiUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
+        for (Vehicle veh : TaxicabUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -201,7 +201,7 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         //          double bestDistance = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE / 2;
-        for (Vehicle veh : TaxiUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
+        for (Vehicle veh : TaxicabUtils.filterIdleVehicles(context.getVrpData().getVehicles())) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;

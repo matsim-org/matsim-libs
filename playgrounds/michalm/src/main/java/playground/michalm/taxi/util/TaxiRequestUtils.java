@@ -23,7 +23,7 @@ import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 
-public class RequestUtils
+public class TaxiRequestUtils
 {
     public static int countRequestsWithStatus(Iterable<TaxiRequest> requests,
             TaxiRequestStatus status)
